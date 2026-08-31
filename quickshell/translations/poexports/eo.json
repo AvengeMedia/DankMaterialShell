@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Komandoj"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Komunumaj etosoj"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": ""
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Nur nombri"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": ""
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Daŭre tajpu"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Ŝprucfenestroj kaj modaloj sekvas globalan animacian rapidon (malŝaltu por agordi memstare)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Nur ŝprucfenestro"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Daŭrigi"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Malkaŝu la arkojn kie surfacoj renkontas la kadron"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "Montri dokon"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Spektaklo Sentas Kiel Temperaturo"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "Transformi"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "Transira efekto"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "Hieraŭ"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Vi havas nekonservitajn ŝanĝojn. Ĉu konservi antaŭ ol daŭrigi?"

@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "命令"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "社区主题"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "无法加载热点密码"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "仅数量"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "重新打开剪贴板历史记录时保持上次的筛选类别"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "继续输入"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "弹窗与模态框遵循全局动画速度（禁用则单独自定义）"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "仅弹窗"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "恢复"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "平面与框架交汇处显示倒角"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "显示 Dock"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "显示体感温度"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "变换"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "过渡效果"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "昨天"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "检测到未保存的更改，是否在执行此操作前保存？"

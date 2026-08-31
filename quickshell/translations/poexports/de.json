@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Befehle"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Community-Themes"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Hotspot-Passwort konnte nicht geladen werden"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Nur Anzahl"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Zwischenablage-Typfilter beim erneuten Öffnen des Verlaufs beibehalten"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Tippen Sie weiter"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Popouts und Modale folgen der globalen Animationsgeschwindigkeit (deaktivieren, um sie einzeln anzupassen)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Nur Popup"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Fortsetzen"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Bögen dort anzeigen, wo Oberflächen auf den Rahmen treffen"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "Dock anzeigen"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Gefühlte Temperatur anzeigen"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "Transformiere"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "Übergangseffekt"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "Gestern"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ungespeicherte Änderungen vorhanden. Jetzt speichern?"

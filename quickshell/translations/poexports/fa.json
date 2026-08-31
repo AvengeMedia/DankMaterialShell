@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "دستورات"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "تم‌های کامیونیتی"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": ""
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "فقط تعداد"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": ""
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "به تایپ کردن ادامه دهید"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "پاپ‌آپ‌ها و مودال‌ها از سرعت انیمیشن سراسری پیروی کنند (برای سفارشی‌سازی جداگانه غیرفعال کنید)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "فقط پاپ‌آپ"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "ازسرگیری"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "قوس‌ها در محل برخورد سطوح با قاب آشکار کن"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "نمایش داک"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "نمایش دمای حسی"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "تبدیل"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "افکت گذار"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "دیروز"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شوند؟"

@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Opdrachten"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Community-thema's"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Kon hotspot-wachtwoord niet laden"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Alleen aantal"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Behoud het klembordtypefilter bij het heropenen van de geschiedenis"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Blijf typen"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Pop-outs en modalen volgen de globale animatiesnelheid (uitschakelen om onafhankelijk aan te passen)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Alleen pop-up"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Hervatten"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Onthul de bogen waar oppervlakken het frame raken"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "Dock tonen"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Toon gevoelstemperatuur"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "Transformatie"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "Overgangseffect"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "Gisteren"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "U hebt niet-opgeslagen wijzigingen. Opslaan voordat u doorgaat?"

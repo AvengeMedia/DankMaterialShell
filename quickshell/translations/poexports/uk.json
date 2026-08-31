@@ -78,7 +78,7 @@
     "%1 online": "%1 онлайн"
   },
   "%1 position": {
-    "%1 position": ""
+    "%1 position": "Позиція %1"
   },
   "%1 tasks": {
     "%1 tasks": "%1 завдань"
@@ -315,7 +315,7 @@
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Окремий мінімальний запуск, який працює в автономному режимі, режимах окремого та підключеного фреймів"
   },
   "A slight natural settle, DMS default": {
-    "A slight natural settle, DMS default": ""
+    "A slight natural settle, DMS default": "Легка природна стабілізація, типово у DMS"
   },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Користувач з таким ім'ям вже існує"
@@ -495,7 +495,7 @@
     "Add to Autostart": "Додати в автозапуск"
   },
   "Additional settings are managed by the Island": {
-    "Additional settings are managed by the Island": ""
+    "Additional settings are managed by the Island": "Додаткові налаштування керуються Островом"
   },
   "Adjust pointer sensitivity speed": {
     "Adjust pointer sensitivity speed": "Налаштувати швидкість чутливості вказівника"
@@ -552,7 +552,7 @@
     "Allow": "Дозволити"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": ""
+    "Allow %1 in Do Not Disturb": "Дозволити %1 у режимі «Не турбувати»"
   },
   "Allow LAN access": {
     "Allow LAN access": "Дозволити доступ до локальної мережі"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "Дозволити вхід через екран входу"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": ""
+    "Allow in Do Not Disturb": "Дозволити в режимі «Не турбувати»"
   },
   "Already on that session": {
     "Already on that session": "Вже в цій сесії"
@@ -720,7 +720,7 @@
     "Apply inverse concave corner cutouts to the bar": "Застосувати інверсні увігнуті вирізи кутів до панелі"
   },
   "Apply island geometry changes immediately without spring overshoot": {
-    "Apply island geometry changes immediately without spring overshoot": ""
+    "Apply island geometry changes immediately without spring overshoot": "Застосовувати зміни геометрії острова негайно, без пружинного ефекту"
   },
   "Apply to Hardware": {
     "Apply to Hardware": "Застосувати до обладнання"
@@ -747,7 +747,7 @@
     "Apps Icon": "Іконки програм"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "Програми, яким дозволено показувати спливаючі вікна, коли увімкнено режим «Не турбувати». Натисніть правою кнопкою миші на сповіщення та виберіть «Дозволити в режимі «Не турбувати»», щоб додати програму сюди"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Програми впорядковано за частотою використання, потім за останнім використанням, потім за алфавітом"
@@ -861,10 +861,10 @@
     "Auto (Bar-aware)": "Авто (враховуючи панелі)"
   },
   "Auto (Dark Mode)": {
-    "Auto (Dark Mode)": ""
+    "Auto (Dark Mode)": "Авто (темний режим)"
   },
   "Auto (Light Mode)": {
-    "Auto (Light Mode)": ""
+    "Auto (Light Mode)": "Авто (світлий режим)"
   },
   "Auto (Wide)": {
     "Auto (Wide)": "Авто (широкий)"
@@ -873,7 +873,7 @@
     "Auto Compositor Gaps": "Автоматичні проміжки композитора"
   },
   "Auto From Wallpaper": {
-    "Auto From Wallpaper": ""
+    "Auto From Wallpaper": "Автоматично за шпалерами"
   },
   "Auto Location": {
     "Auto Location": "Автовизначення місця"
@@ -984,7 +984,7 @@
     "Automatically lock the screen when the system prepares to suspend": "Автоматично блокувати екран перед переходом у режим сну"
   },
   "Automatically picks the scheme variant based on the wallpaper.": {
-    "Automatically picks the scheme variant based on the wallpaper.": ""
+    "Automatically picks the scheme variant based on the wallpaper.": "Автоматично вибирає варіант схеми на основі шпалер"
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Автоматично зберігати зміни у відкритих файлах під час введення тексту"
@@ -1092,10 +1092,10 @@
     "Bar Spacing": "Проміжки панелі"
   },
   "Bar border and shadow": {
-    "Bar border and shadow": ""
+    "Bar border and shadow": "Межа та тінь панелі"
   },
   "Bar corners": {
-    "Bar corners": ""
+    "Bar corners": "Кути панелі"
   },
   "Bar corners and background": {
     "Bar corners and background": "Кути та фон панелі"
@@ -1104,7 +1104,7 @@
     "Bar shadow, border, and corners": "Тінь, межа та кути панелі"
   },
   "Bar visibility": {
-    "Bar visibility": ""
+    "Bar visibility": "Видимість панелі"
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Базовий колір тіней (прозорість застосовується автоматично)"
@@ -1119,7 +1119,7 @@
     "Battery %1": "Батарея %1"
   },
   "Battery / Control Center": {
-    "Battery / Control Center": ""
+    "Battery / Control Center": "Батарея / Центр керування"
   },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Ліміт заряду батареї"
@@ -1134,7 +1134,7 @@
     "Battery and power management": "Керування батареєю та живленням"
   },
   "Battery gauge opens Control Center": {
-    "Battery gauge opens Control Center": ""
+    "Battery gauge opens Control Center": "Індикатор заряду батареї відкриває Центр керування"
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "Батарея заряджена до встановленого ліміту в %1%"
@@ -1170,7 +1170,7 @@
     "Blend between Surface High and the selected custom color": "Змішування між Surface High та обраним власним кольором"
   },
   "Block %1 in Do Not Disturb": {
-    "Block %1 in Do Not Disturb": ""
+    "Block %1 in Do Not Disturb": "Блокувати %1 у режимі «Не турбувати»"
   },
   "Block Out": {
     "Block Out": "Заблокувати"
@@ -1218,7 +1218,7 @@
     "Body": "Тло"
   },
   "Body Click Runs Default Action": {
-    "Body Click Runs Default Action": ""
+    "Body Click Runs Default Action": "Натискання на тіло виконує дію за замовчуванням"
   },
   "Body Font Size": {
     "Body Font Size": "Розмір основного шрифта"
@@ -1278,7 +1278,7 @@
     "Bottom dock for pinned and running applications": "Нижня панель для закріплених і запущених програм"
   },
   "Bright": {
-    "Bright": ""
+    "Bright": "Яскравий"
   },
   "Brightness": {
     "Brightness": "Яскравість"
@@ -1404,19 +1404,19 @@
     "Category": "Категорія"
   },
   "Cellular": {
-    "Cellular": ""
+    "Cellular": "Стільниковий зв'язок"
   },
   "Cellular disabled": {
-    "Cellular disabled": ""
+    "Cellular disabled": "Стільниковий зв'язок вимкнено"
   },
   "Cellular enabled": {
-    "Cellular enabled": ""
+    "Cellular enabled": "Стільниковий зв'язок увімкнено"
   },
   "Center Section": {
     "Center Section": "Центральна секція"
   },
   "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
+    "Center Section - Reserved by Dank Island": "Центральна секція — зарезервована для Острова"
   },
   "Center Single Column": {
     "Center Single Column": "Центрувати одну колонку"
@@ -1557,7 +1557,7 @@
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Оберіть монітори для інтерфейсу екрана блокування. Інші монітори показуватимуть суцільний колір для захисту OLED від вигоряння."
   },
   "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
+    "Choose which shortcuts sit left or right of the clock": "Виберіть, які ярлики розміщувати ліворуч або праворуч від годинника"
   },
   "Chroma Style": {
     "Chroma Style": "Стиль Chroma"
@@ -1584,7 +1584,7 @@
     "Clear All Jobs": "Очистити всі завдання"
   },
   "Clear Badge on Open": {
-    "Clear Badge on Open": ""
+    "Clear Badge on Open": "Очищати індикатор під час відкриття"
   },
   "Clear History?": {
     "Clear History?": "Очистити історію?"
@@ -1599,10 +1599,10 @@
     "Clear at Startup": "Очищати при запуску"
   },
   "Clears the badge on open but keeps notifications active": {
-    "Clears the badge on open but keeps notifications active": ""
+    "Clears the badge on open but keeps notifications active": "Очищає індикатор під час відкриття, але залишає сповіщення активними"
   },
   "Click": {
-    "Click": ""
+    "Click": "Натискання"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Натисніть «Налаштувати», щоб створити %1 та додати include у конфігурацію вашого композитора"
@@ -1623,10 +1623,10 @@
     "Click any shortcut to edit. Changes save to %1": "Натисніть на будь-який ярлик для редагування. Зміни зберігаються у %1"
   },
   "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
-    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": "Розгортання відбувається лише при навмисному натисканні. Гібридний режим показує поточний компактний вигляд при наведенні"
   },
   "Click the icon to mute": {
-    "Click the icon to mute": ""
+    "Click the icon to mute": "Натисніть на іконку, щоб вимкнути звук"
   },
   "Click to Paste": {
     "Click to Paste": "Клік для вставки"
@@ -1638,7 +1638,7 @@
     "Click to select a custom theme JSON file": "Натисніть, щоб вибрати власний JSON-файл теми"
   },
   "Clicking a popup runs its first action instead of expanding the body": {
-    "Clicking a popup runs its first action instead of expanding the body": ""
+    "Clicking a popup runs its first action instead of expanding the body": "Натискання на спливаюче вікно виконує його першу дію замість розгортання тіла"
   },
   "Clip": {
     "Clip": "Обрізка"
@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Команди"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Спільнотні теми"
   },
@@ -1788,16 +1791,16 @@
     "Compact": "Компактний"
   },
   "Compact Clock Pill": {
-    "Compact Clock Pill": ""
+    "Compact Clock Pill": "Компактний годинник у вигляді капсули"
   },
   "Compact Island Height": {
-    "Compact Island Height": ""
+    "Compact Island Height": "Компактна висота Острова"
   },
   "Compact Mode": {
     "Compact Mode": "Компактний режим"
   },
   "Compact home clock pill in both width and height": {
-    "Compact home clock pill in both width and height": ""
+    "Compact home clock pill in both width and height": "Компактний за шириною та висотою домашній годинник у вигляді капсули"
   },
   "Completed": {
     "Completed": "Завершено"
@@ -1854,7 +1857,7 @@
     "Configure which displays show \"%1\"": "Налаштуйте, які дисплеї показуватимуть «%1»"
   },
   "Configure which displays show Dank Island as \"%1": {
-    "Configure which displays show Dank Island as \"%1\"": ""
+    "Configure which displays show Dank Island as \"%1\"": "Налаштуйте, на яких дисплеях Острів відображається як «%1»"
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Налаштуйте, на яких дисплеях відображатимуться компоненти оболонки"
@@ -2037,13 +2040,16 @@
     "Corner Style": "Стиль кутів"
   },
   "Corner style applies to the bar surface": {
-    "Corner style applies to the bar surface": ""
+    "Corner style applies to the bar surface": "Стиль кутів застосовується до поверхні панелі"
   },
   "Corners & Background": {
     "Corners & Background": "Кути та тло"
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Не вдалося завантажити пароль точки доступу"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Тільки підрахунок"
@@ -2169,7 +2175,7 @@
     "Curve": "Крива"
   },
   "Curve rasterizer.": {
-    "Curve rasterizer.": ""
+    "Curve rasterizer.": "Растеризатор кривих"
   },
   "Curve: curve rasterizer.": {
     "Curve: curve rasterizer.": "Крива: растризація кривих"
@@ -2301,7 +2307,7 @@
     "Daily at:": "Щоденно о:"
   },
   "Damped springs settle straight to their target with no overshoot": {
-    "Damped springs settle straight to their target with no overshoot": ""
+    "Damped springs settle straight to their target with no overshoot": "Заспокоєні пружини стабілізуються безпосередньо в межах цілі"
   },
   "Dank": {
     "Dank": "Dank"
@@ -2316,10 +2322,10 @@
     "Dank Dash": "Dank Dash"
   },
   "Dank Island - Beta": {
-    "Dank Island - Beta": ""
+    "Dank Island - Beta": "Острів — Бета"
   },
   "Dank Island instance": {
-    "Dank Island instance": ""
+    "Dank Island instance": "Екземпляр Острова"
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2352,13 +2358,13 @@
     "Dark mode harmony": "Гармонія темного режиму"
   },
   "Dark or light mode follows the wallpaper brightness": {
-    "Dark or light mode follows the wallpaper brightness": ""
+    "Dark or light mode follows the wallpaper brightness": "Темний або світлий режим залежить від яскравості шпалер"
   },
   "Darken Modal Background": {
     "Darken Modal Background": "Затемнювати тло модальних вікон"
   },
   "Dashboard": {
-    "Dashboard": ""
+    "Dashboard": "Панель керування"
   },
   "Date First": {
     "Date First": "Спочатку дата"
@@ -2418,13 +2424,13 @@
     "Default Opens": "Відкривається за замовчуванням"
   },
   "Default Task List": {
-    "Default Task List": ""
+    "Default Task List": "Список завдань за замовчуванням"
   },
   "Default Width (%)": {
     "Default Width (%)": "Типова ширина (%)"
   },
   "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
-    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": "Ярлики запускача за замовчуванням відкривають рідну активність запускача всередині Острова. Spotlight використовується, якщо на активному екрані немає Острова"
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Типові ярлики запуску відкривають повний запускач з вкладками режимів, сіткою та панеллю дій"
@@ -2550,7 +2556,7 @@
     "Digital": "Цифровий"
   },
   "Dim": {
-    "Dim": ""
+    "Dim": "Приглушений"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Прямий шлях до файлу карти клавіш .xkb. Перевизначає розкладки/варіанти, вказані вище"
@@ -2598,7 +2604,7 @@
     "Disabling auto-login on startup...": "Вимкнення автологіну при запуску..."
   },
   "Disabling cellular...": {
-    "Disabling cellular...": ""
+    "Disabling cellular...": "Вимкнення стільникового зв'язку..."
   },
   "Disc": {
     "Disc": "Диск"
@@ -2709,10 +2715,10 @@
     "Displays the active keyboard layout and allows switching": "Відображає активну розкладку клавіатури та дозволяє її перемикати"
   },
   "Distance between display edge and island": {
-    "Distance between display edge and island": ""
+    "Distance between display edge and island": "Відстань між краєм дисплея та островом"
   },
   "Distance-field renderer.": {
-    "Distance-field renderer.": ""
+    "Distance-field renderer.": "Рендерер відстаней полів"
   },
   "Distribution": {
     "Distribution": "Дистрибутив"
@@ -2775,10 +2781,10 @@
     "Draw a connected picture-frame border around the entire display": "Намалювати суцільну рамку навколо всього дисплея"
   },
   "Draw an island-styled background behind satellite widgets": {
-    "Draw an island-styled background behind satellite widgets": ""
+    "Draw an island-styled background behind satellite widgets": "Малювати фон у стилі острова за супутниковими віджетами"
   },
   "Draw an outline and use the highest-contrast surface tone": {
-    "Draw an outline and use the highest-contrast surface tone": ""
+    "Draw an outline and use the highest-contrast surface tone": "Малювати контур і використовувати найбільш контрастний тон поверхні"
   },
   "Driver": {
     "Driver": "Драйвер"
@@ -2898,7 +2904,7 @@
     "Enable Bar": "Увімкнути панель"
   },
   "Enable Cellular": {
-    "Enable Cellular": ""
+    "Enable Cellular": "Увімкнути стільниковий зв'язок"
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Увімкнути режим «Не турбувати»"
@@ -2910,7 +2916,7 @@
     "Enable History": "Увімкнути історію"
   },
   "Enable Island": {
-    "Enable Island": ""
+    "Enable Island": "Увімкнути Острів"
   },
   "Enable Num Lock": {
     "Enable Num Lock": "Увімкнути Num Lock"
@@ -2961,7 +2967,7 @@
     "Enable security key authentication": "Дозволити автентифікацію за ключем безпеки"
   },
   "Enable weather in Time & Weather to show this shortcut": {
-    "Enable weather in Time & Weather to show this shortcut": ""
+    "Enable weather in Time & Weather to show this shortcut": "Увімкніть погоду в розділі «Час і погода», щоб відобразити цей ярлик"
   },
   "Enabled": {
     "Enabled": "Увімкнено"
@@ -2970,7 +2976,7 @@
     "Enabling WiFi...": "Увімкнення WiFi..."
   },
   "Enabling cellular...": {
-    "Enabling cellular...": ""
+    "Enabling cellular...": "Увімкнення стільникового зв'язку..."
   },
   "End": {
     "End": "Кінець"
@@ -3096,13 +3102,13 @@
     "Exit node": "Вихідний вузол"
   },
   "Expand Notifications": {
-    "Expand Notifications": ""
+    "Expand Notifications": "Розгорнути сповіщення"
   },
   "Expand notifications by default instead of click or hover": {
-    "Expand notifications by default instead of click or hover": ""
+    "Expand notifications by default instead of click or hover": "Розгортати сповіщення за замовчуванням замість натискання або наведення"
   },
   "Expansion Mode": {
-    "Expansion Mode": ""
+    "Expansion Mode": "Режим розгортання"
   },
   "Experimental Feature": {
     "Experimental Feature": "Експериментальна функція"
@@ -3333,10 +3339,10 @@
     "Failed to save clipboard setting": "Не вдалося зберегти налаштування буфера обміну"
   },
   "Failed to save dropped file": {
-    "Failed to save dropped file": ""
+    "Failed to save dropped file": "Не вдалося зберегти перетягнутий файл"
   },
   "Failed to save dropped text": {
-    "Failed to save dropped text": ""
+    "Failed to save dropped text": "Не вдалося зберегти перетягнутий текст"
   },
   "Failed to save keybind": {
     "Failed to save keybind": "Не вдалося зберегти комбінацію клавіш"
@@ -3393,10 +3399,10 @@
     "Failed to switch codec": "Не вдалося змінити кодек"
   },
   "Failed to switch port": {
-    "Failed to switch port": ""
+    "Failed to switch port": "Не вдалося переключити порт"
   },
   "Failed to toggle cellular": {
-    "Failed to toggle cellular": ""
+    "Failed to toggle cellular": "Не вдалося перемкнути стільниковий зв'язок"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Не вдалося відкріпити запис"
@@ -3576,7 +3582,7 @@
     "Floating windows follow Surface Styling settings": "Плаваючі вікна використовують налаштування стилізації поверхонь"
   },
   "Floats above windows and other content": {
-    "Floats above windows and other content": ""
+    "Floats above windows and other content": "Плаває над вікнами та іншим вмістом"
   },
   "Fluent": {
     "Fluent": "Плавний"
@@ -3867,7 +3873,7 @@
     "Globally scale all animation durations": "Глобально масштабувати тривалість усіх анімацій"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
-    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Глобально масштабувати тривалість анімацій із геометричним рухом і пружинною фізикою за допомогою кривих Безьє"
   },
   "Golden Hour": {
     "Golden Hour": "Золота година"
@@ -4092,19 +4098,19 @@
     "High": "Високий"
   },
   "High Contrast": {
-    "High Contrast": ""
+    "High Contrast": "Високий контраст"
   },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Високоточна палітра, що зберігає вихідні відтінки"
   },
   "Higher percentages give island more inertia": {
-    "Higher percentages give island more inertia": ""
+    "Higher percentages give island more inertia": "Вищі відсотки надають острову більше інерції"
   },
   "Higher values pull island toward its target more strongly": {
-    "Higher values pull island toward its target more strongly": ""
+    "Higher values pull island toward its target more strongly": "Вищі значення сильніше притягують острів до цілі"
   },
   "Higher values settle island with less bounce": {
-    "Higher values settle island with less bounce": ""
+    "Higher values settle island with less bounce": "Вищі значення стабілізують острів із меншим відскоком"
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Підсвітити програму активного робочого простору"
@@ -4131,13 +4137,13 @@
     "Hold to Confirm Power Actions": "Утримуйте для підтвердження дій живлення"
   },
   "Home Compact": {
-    "Home Compact": ""
+    "Home Compact": "Компактний домашній"
   },
   "Horizontal": {
-    "Horizontal": ""
+    "Horizontal": "Горизонтальний"
   },
   "Horizontal Offset": {
-    "Horizontal Offset": ""
+    "Horizontal Offset": "Горизонтальний зсув"
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Товщина горизонтальної та вертикальної панелей"
@@ -4203,10 +4209,10 @@
     "Humidity": "Вологість"
   },
   "Hybrid": {
-    "Hybrid": ""
+    "Hybrid": "Гібридний"
   },
   "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
-    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": "Гібридний режим показує поточний компактний вигляд при наведенні. Натискання закріплює ціль, щоб вона залишалася відкритою"
   },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Discord-сервер Hyprland"
@@ -4257,7 +4263,7 @@
     "Icon Size %": "Розмір іконок %"
   },
   "Icon Spacing": {
-    "Icon Spacing": ""
+    "Icon Spacing": "Відстань між іконками"
   },
   "Icon Theme": {
     "Icon Theme": "Тема іконок"
@@ -4350,7 +4356,7 @@
     "Include Transitions": "Включити переходи"
   },
   "Include application streams and virtual sinks in the device lists": {
-    "Include application streams and virtual sinks in the device lists": ""
+    "Include application streams and virtual sinks in the device lists": "Включати потоки програм і віртуальні виходи в списки пристроїв"
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Включати дії робочого столу (ярлики) в результатах пошуку"
@@ -4371,7 +4377,7 @@
     "Indicator Style": "Стиль індикатора"
   },
   "Individual Batteries": {
-    "Individual Batteries": "Окремі акумулятори"
+    "Individual Batteries": "Окремі батареї"
   },
   "Individual bar configuration": {
     "Individual bar configuration": "Індивідуальна конфігурація панелі"
@@ -4398,7 +4404,7 @@
     "Inner Gaps": "Внутрішні проміжки"
   },
   "Inner authentication": {
-    "Inner authentication": ""
+    "Inner authentication": "Внутрішня автентифікація"
   },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Внутрішній відступ, що застосовується до кожного віджета"
@@ -4515,16 +4521,16 @@
     "Iris Bloom": "Розквіт іриса"
   },
   "Island": {
-    "Island": ""
+    "Island": "Острів"
   },
   "Island Gap": {
-    "Island Gap": ""
+    "Island Gap": "Відступ острова"
   },
   "Island Instance": {
-    "Island Instance": ""
+    "Island Instance": "Екземпляр острова"
   },
   "Island placement": {
-    "Island placement": ""
+    "Island placement": "Розміщення острова"
   },
   "Isolate Displays": {
     "Isolate Displays": "Ізолювати дисплеї"
@@ -4548,7 +4554,7 @@
     "Keep Changes": "Зберегти зміни"
   },
   "Keep Clock with Media": {
-    "Keep Clock with Media": ""
+    "Keep Clock with Media": "Залишати годинник із медіа"
   },
   "Keep My Edits": {
     "Keep My Edits": "Зберегти мої правки"
@@ -4565,11 +4571,14 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Зберігати фільтр типу буфера обміну при повторному відкритті історії"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Продовжуйте друкувати"
   },
   "Keep widgets beside the island or align them like a standalone bar": {
-    "Keep widgets beside the island or align them like a standalone bar": ""
+    "Keep widgets beside the island or align them like a standalone bar": "Тримати віджети поруч із островом або вирівнювати їх як окрему панель"
   },
   "Keeping Awake": {
     "Keeping Awake": "Заборона засинання"
@@ -4785,7 +4794,7 @@
     "Loading keybinds...": "Завантаження комбінацій клавіш..."
   },
   "Loading ports...": {
-    "Loading ports...": ""
+    "Loading ports...": "Завантаження портів..."
   },
   "Loading trending...": {
     "Loading trending...": "Завантаження популярного..."
@@ -4971,10 +4980,10 @@
     "Material": "Material"
   },
   "Material 3 Expressive bezier curves, default.": {
-    "Material 3 Expressive bezier curves, default.": ""
+    "Material 3 Expressive bezier curves, default.": "Експресивні криві Безьє Material 3 (типово)"
   },
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
-    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": "Експресивні панелі Material 3 піднімаються знизу з легким масштабуванням (типово)"
   },
   "Material Battery Style": {
     "Material Battery Style": "Стиль батареї Material"
@@ -5079,7 +5088,7 @@
     "Maximum pinned entries reached": "Досягнуто максимуму закріплених записів"
   },
   "Media / Launcher": {
-    "Media / Launcher": ""
+    "Media / Launcher": "Медіа / Запускач"
   },
   "Media Controls": {
     "Media Controls": "Керування відтворенням"
@@ -5226,10 +5235,10 @@
     "Morning": "Ранок"
   },
   "Motion": {
-    "Motion": ""
+    "Motion": "Рух"
   },
   "Motion & Accessibility": {
-    "Motion & Accessibility": ""
+    "Motion & Accessibility": "Рух і доступність"
   },
   "Motion Effects": {
     "Motion Effects": "Ефекти руху"
@@ -5256,7 +5265,7 @@
     "Move Widget": "Перемістити віджет"
   },
   "Move island and satellites left or right from display center": {
-    "Move island and satellites left or right from display center": ""
+    "Move island and satellites left or right from display center": "Переміщайте острів і супутники ліворуч або праворуч від центру дисплея"
   },
   "Moving to Paused": {
     "Moving to Paused": "Перехід до призупинення"
@@ -5319,7 +5328,7 @@
     "Navigate": "Навігувати"
   },
   "Near Island": {
-    "Near Island": ""
+    "Near Island": "Біля острова"
   },
   "Network": {
     "Network": "Мережа"
@@ -5640,7 +5649,7 @@
     "No plugins found": "Не знайдено плагінів"
   },
   "No ports found": {
-    "No ports found": ""
+    "No ports found": "Портів не знайдено"
   },
   "No printer found": {
     "No printer found": "Принтерів не знайдено"
@@ -5934,7 +5943,7 @@
     "Open From": "Відкрити з"
   },
   "Open Island": {
-    "Open Island": ""
+    "Open Island": "Відкрити Острів"
   },
   "Open Notepad File": {
     "Open Notepad File": "Відкрити файл Блокнота"
@@ -6108,7 +6117,7 @@
     "PDF Reader": "PDF-рідер"
   },
   "PID": {
-    "PID": ""
+    "PID": "PID"
   },
   "PIN": {
     "PIN": "PIN-код"
@@ -6150,13 +6159,13 @@
     "Pairing...": "Сполучення..."
   },
   "Palette": {
-    "Palette": ""
+    "Palette": "Палітра"
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
-    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "Панелі плавно ковзають із більшої відстані в повному розмірі, без зміни масштабу, чистий рух"
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
-    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "Панелі збільшуються від маленького розміру під час ковзання, створюючи ефект глибини з висуванням вперед"
   },
   "Partial": {
     "Partial": "Частково"
@@ -6285,7 +6294,7 @@
     "Place clipboard history on the Wayland overlay layer": "Розмістити історію буфера обміну на шарі накладання Wayland"
   },
   "Place independent widgets to left and right of island": {
-    "Place independent widgets to left and right of island": ""
+    "Place independent widgets to left and right of island": "Розмістити незалежні віджети ліворуч і праворуч від острова"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Розташуйте каталоги плагінів тут. Кожен плагін повинен мати файл маніфесту plugin.json"
@@ -6300,7 +6309,7 @@
     "Place the dock on the Wayland overlay layer": "Розмістити док на шарі overlay Wayland"
   },
   "Platform renderer (FreeType).": {
-    "Platform renderer (FreeType).": ""
+    "Platform renderer (FreeType).": "Платформений рендерер (FreeType)"
   },
   "Play": {
     "Play": "Відтворити"
@@ -6327,7 +6336,7 @@
     "Playback error: ": "Помилка відтворення: "
   },
   "Playful": {
-    "Playful": ""
+    "Playful": "Грайливий"
   },
   "Plays audio files": {
     "Plays audio files": "Відтворює аудіофайли"
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Спливаючі та модальні вікна слідують за глобальною швидкістю анімації (вимкніть, щоб налаштувати окремо)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Тільки спливаюче"
   },
@@ -6417,10 +6429,10 @@
     "Port": "Порт"
   },
   "Port Selection": {
-    "Port Selection": ""
+    "Port Selection": "Вибір порту"
   },
   "Port switched": {
-    "Port switched": ""
+    "Port switched": "Порт переключено"
   },
   "Portal": {
     "Portal": "Портал"
@@ -6537,7 +6549,7 @@
     "Primary": "Основний"
   },
   "Primary Bar": {
-    "Primary Bar": ""
+    "Primary Bar": "Основна панель"
   },
   "Primary Container": {
     "Primary Container": "Основний контейнер"
@@ -6624,7 +6636,7 @@
     "Profile saved: %1": "Профіль збережено: %1"
   },
   "Profile when Plugged In (AC)": {
-    "Profile when Plugged In (AC)": "Профіль при підключенні до мережі (AC)"
+    "Profile when Plugged In (AC)": "Профіль при підключенні до мережі"
   },
   "Profile when on Battery": {
     "Profile when on Battery": "Профіль при роботі від батареї"
@@ -6732,7 +6744,7 @@
     "Recommended available": "Доступні рекомендовані"
   },
   "Reduce Motion": {
-    "Reduce Motion": ""
+    "Reduce Motion": "Зменшити рух"
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": "Зменшувати видиму довжину панелі з обох кінців"
@@ -6858,7 +6870,7 @@
     "Rename Workspace": "Перейменувати робочий простір"
   },
   "Render Type": {
-    "Render Type": ""
+    "Render Type": "Тип рендерингу"
   },
   "Reorder & Group": {
     "Reorder & Group": "Змінити порядок і групувати"
@@ -6918,7 +6930,7 @@
     "Requires the DMS Theme extension from the editor marketplace": "Потребує розширення DMS Theme з маркетплейсу редактора"
   },
   "Reserved Height": {
-    "Reserved Height": ""
+    "Reserved Height": "Зарезервована висота"
   },
   "Reset": {
     "Reset": "Скинути"
@@ -6942,7 +6954,7 @@
     "Resize on Border": "Змінювати розмір за межу"
   },
   "Resize the resting island to align with nearby widgets": {
-    "Resize the resting island to align with nearby widgets": ""
+    "Resize the resting island to align with nearby widgets": "Зміна розміру острова в стані спокою, щоб він узгоджувався з сусідніми віджетами"
   },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "Змінюйте розмір вікон, перетягуючи їхні краї мишею"
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Відновити"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Показати дуги в місцях стику поверхонь і рамки"
@@ -7104,10 +7119,10 @@
     "SSID": "SSID"
   },
   "Satellite Widgets": {
-    "Satellite Widgets": ""
+    "Satellite Widgets": "Супутникові віджети"
   },
   "Satellites widget to place left or right of the island": {
-    "Satellites widget to place left or right of the island": ""
+    "Satellites widget to place left or right of the island": "Супутникові віджети для розміщення ліворуч або праворуч від острова"
   },
   "Saturation": {
     "Saturation": "Насиченість"
@@ -7194,7 +7209,7 @@
     "Score": "Оцінка"
   },
   "Screen Edges": {
-    "Screen Edges": ""
+    "Screen Edges": "Межі екрана"
   },
   "Screen sharing": {
     "Screen sharing": "Демонстрація екрана"
@@ -7269,7 +7284,7 @@
     "Search themes...": "Пошук тем..."
   },
   "Search when idle, visualizer when media is playing": {
-    "Search when idle, visualizer when media is playing": ""
+    "Search when idle, visualizer when media is playing": "Пошук у режимі очікування, візуалізатор під час відтворення медіа"
   },
   "Search widgets...": {
     "Search widgets...": "Пошук віджетів..."
@@ -7613,6 +7628,9 @@
   "Show Dock": {
     "Show Dock": "Відобразити док-панель"
   },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
+  },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Показувати температуру «відчувається як»"
   },
@@ -7725,7 +7743,7 @@
     "Show Restart DMS": "Показувати перезапуск DMS"
   },
   "Show Satellite Widgets": {
-    "Show Satellite Widgets": ""
+    "Show Satellite Widgets": "Показувати супутникові віджети"
   },
   "Show Saved Items": {
     "Show Saved Items": "Показувати збережені елементи"
@@ -7764,7 +7782,7 @@
     "Show Trash in Dock": "Показувати кошик у док-панелі"
   },
   "Show Virtual Devices": {
-    "Show Virtual Devices": ""
+    "Show Virtual Devices": "Показувати віртуальні пристрої"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "Показувати стан погоди"
@@ -7785,7 +7803,7 @@
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Показувати смужку, яка зменшується під час роботи таймера автозакриття спливаючого вікна"
   },
   "Show a clickable clock beside compact media details": {
-    "Show a clickable clock beside compact media details": ""
+    "Show a clickable clock beside compact media details": "Показувати годинник, на який можна натиснути, поруч із компактними деталями медіа"
   },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Показувати сповіщення, коли батарея досягає ліміту заряду"
@@ -7809,7 +7827,7 @@
     "Show cava audio visualizer in media widget": "Показувати аудіовізуалізатор Cava у віджеті медіа"
   },
   "Show critical priority popups while Do Not Disturb is on": {
-    "Show critical priority popups while Do Not Disturb is on": ""
+    "Show critical priority popups while Do Not Disturb is on": "Показувати спливаючі вікна з критичним пріоритетом, коли увімкнено режим «Не турбувати»"
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Показувати затемнений шар позаду модальних діалогових вікон"
@@ -7947,22 +7965,22 @@
     "Small": "Малий"
   },
   "Smart": {
-    "Smart": ""
+    "Smart": "Розумний"
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Автентифікація за допомогою смарт-картки"
   },
   "Smooth": {
-    "Smooth": ""
+    "Smooth": "Плавний"
   },
   "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
-    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": "Плавне кубічне сповільнення при вході, швидкий вихід, чисті, елегантні криві"
   },
   "Snap": {
     "Snap": "Snap"
   },
   "Snap spring-driven motion straight to its target without physics travel": {
-    "Snap spring-driven motion straight to its target without physics travel": ""
+    "Snap spring-driven motion straight to its target without physics travel": "Миттєвий рух пружини прямо до цілі без фізичного переміщення"
   },
   "Snow": {
     "Snow": "Сніг"
@@ -7971,16 +7989,16 @@
     "Soft Reboot": "М'яке перезавантаження"
   },
   "Solid": {
-    "Solid": ""
+    "Solid": "Суцільний"
   },
   "Solid material type or Outline": {
-    "Solid material type or Outline": ""
+    "Solid material type or Outline": "Суцільний матеріал або контури"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Деяким плагінам потрібна новіша версія DMS:"
   },
   "Some settings are managed by the island": {
-    "Some settings are managed by the island": ""
+    "Some settings are managed by the island": "Деякі налаштування керуються островом"
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Сортувати за алфавітом"
@@ -8013,7 +8031,7 @@
     "Space between windows and screen edges": "Відступ між вікнами та краями екрана"
   },
   "Space kept clear for compact island and satellites": {
-    "Space kept clear for compact island and satellites": ""
+    "Space kept clear for compact island and satellites": "Простір, що залишається вільним для компактного острова та супутників"
   },
   "Spacer": {
     "Spacer": "Розпірка"
@@ -8043,22 +8061,22 @@
     "Spotlight Search": "Пошук Spotlight"
   },
   "Spring Damping": {
-    "Spring Damping": ""
+    "Spring Damping": "Заспокоєння пружини"
   },
   "Spring Mass": {
-    "Spring Mass": ""
+    "Spring Mass": "Маса пружини"
   },
   "Spring Motion": {
-    "Spring Motion": ""
+    "Spring Motion": "Пружинний рух"
   },
   "Spring Stiffness": {
-    "Spring Stiffness": ""
+    "Spring Stiffness": "Жорсткість пружини"
   },
   "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
-    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": "Пружинна крива Безьє з вильотом: при вході значення короткочасно вилітає за межі цілі, а потім стабілізується"
   },
   "Springs carry extra energy and visibly bounce before settling": {
-    "Springs carry extra energy and visibly bounce before settling": ""
+    "Springs carry extra energy and visibly bounce before settling": "Пружини мають додаткову енергію і помітно відскакують перед стабілізацією"
   },
   "Square": {
     "Square": "Прямі"
@@ -8070,7 +8088,7 @@
     "Stacked": "Один над одним"
   },
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
-    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "Налаштувати шар накладання Wayland, щоб він залишався видимим поверх програм у повноекранному режимі"
   },
   "Standard": {
     "Standard": "Стандарт"
@@ -8214,7 +8232,7 @@
     "Sway Website": "Сайт Sway"
   },
   "Sweep the background into the screen edges": {
-    "Sweep the background into the screen edges": ""
+    "Sweep the background into the screen edges": "Розтягнути фон до меж екрана"
   },
   "Switch Layout Shortcut": {
     "Switch Layout Shortcut": "Гаряча клавіша перемикання розкладки"
@@ -8355,7 +8373,7 @@
     "Tap to Click": "Натискання для кліку"
   },
   "Task list used when adding tasks from the dash calendar": {
-    "Task list used when adding tasks from the dash calendar": ""
+    "Task list used when adding tasks from the dash calendar": "Список завдань, що використовується при додаванні завдань із календаря панелі"
   },
   "Terminal": {
     "Terminal": "Термінал"
@@ -8418,10 +8436,10 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Змінна середовища DMS_SOCKET не встановлена або сокет недоступний. Для автоматичного керування плагінами потрібен DMS_SOCKET"
   },
   "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
+    "The Island anchors to the top or bottom edge": "Острів закріплюється за верхнім або нижнім краєм"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
-    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "Острів утримує край на дисплеї, який покриває ця панель, тому панель там залишається прихованою"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "WiFi-адаптер не зміг запустити режим точки доступу"
@@ -8436,10 +8454,10 @@
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Спеціальна команда, що використовується при підключенні до сесій (отримує назву сесії як перший аргумент)"
   },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "Вікно входу, що постачається з DMS, є активним (налаштування archinstall). Воно продовжує працювати, але для синхронізації теми та налаштувань потрібне спеціальне. Встановіть 'greetd-dms-greeter-bin' з AUR, а потім запустіть Sync, щоб мігрувати екран входу"
   },
   "The island draws its own surface": {
-    "The island draws its own surface": ""
+    "The island draws its own surface": "Острів малює власну поверхню"
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Черга завдань цього принтера порожня"
@@ -8478,7 +8496,7 @@
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Це додає записи до каталогу автозапуску XDG (~/.config/autostart/*.desktop)"
   },
   "These style the bar surface, which the Island replaces": {
-    "These style the bar surface, which the Island replaces": ""
+    "These style the bar surface, which the Island replaces": "Це стилізує поверхню панелі, яку замінює Острів"
   },
   "Thickness": {
     "Thickness": "Товщина"
@@ -8631,7 +8649,7 @@
     "Toggle fonts": "Перемкнути шрифти"
   },
   "Toggle the Island on this instance's displays": {
-    "Toggle the Island on this instance's displays": ""
+    "Toggle the Island on this instance's displays": "Перемкнути Острів на дисплеях цього екземпляра"
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Перемикнути видимість цієї конфігурації панелі"
@@ -8658,7 +8676,7 @@
     "Tools": "Інструменти"
   },
   "Tools icon opens Control Center": {
-    "Tools icon opens Control Center": ""
+    "Tools icon opens Control Center": "Іконка інструментів відкриває Центр керування"
   },
   "Top": {
     "Top": "Вгорі"
@@ -8701,6 +8719,9 @@
   },
   "Transform": {
     "Transform": "Трансформація"
+  },
+  "Transition Duration": {
+    "Transition Duration": ""
   },
   "Transition Effect": {
     "Transition Effect": "Ефект переходу"
@@ -8880,7 +8901,7 @@
     "Unpin from Dock": "Відкріпити від док-панелі"
   },
   "Unread notification count beside the clock": {
-    "Unread notification count beside the clock": ""
+    "Unread notification count beside the clock": "Кількість непрочитаних сповіщень поруч із годинником"
   },
   "Unsaved changes": {
     "Unsaved changes": "Незбережені зміни"
@@ -9162,7 +9183,7 @@
     "Version": "Версія"
   },
   "Vertical": {
-    "Vertical": ""
+    "Vertical": "Вертикальний"
   },
   "Vertical Deck": {
     "Vertical Deck": "Вертикальна колода"
@@ -9279,7 +9300,7 @@
     "Weather Widget": "Віджет погоди"
   },
   "Weather icon and temperature open the weather activity": {
-    "Weather icon and temperature open the weather activity": ""
+    "Weather icon and temperature open the weather activity": "Іконка погоди та температура відкривають активність погоди"
   },
   "Web Browser": {
     "Web Browser": "Переглядач Інтернет"
@@ -9491,6 +9512,9 @@
   "Yesterday": {
     "Yesterday": "Вчора"
   },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
+  },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ви маєте незбережені зміни. Зберегти їх, щоб продовжити?"
   },
@@ -9576,7 +9600,7 @@
     "Normal": "Нормальний"
   },
   "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "Пакет 'dms-greeter' не встановлено. Встановіть його, щоб керувати вікном входу"
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"
@@ -9696,7 +9720,7 @@
     "on Sway": "на Sway"
   },
   "power-profiles-daemon not available": {
-    "power-profiles-daemon not available": "power-profiles-daemon недоступний"
+    "power-profiles-daemon not available": "Недоступний 'power-profiles-daemon'"
   },
   "primary network connection label": {
     "Primary": "Основний"

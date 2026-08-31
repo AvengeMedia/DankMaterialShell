@@ -1404,13 +1404,13 @@
     "Category": "الفئة"
   },
   "Cellular": {
-    "Cellular": ""
+    "Cellular": "خلوي"
   },
   "Cellular disabled": {
-    "Cellular disabled": ""
+    "Cellular disabled": "تم تعطيل الشبكة الخلوية"
   },
   "Cellular enabled": {
-    "Cellular enabled": ""
+    "Cellular enabled": "تم تمكين الشبكة الخلوية"
   },
   "Center Section": {
     "Center Section": "القسم الأوسط"
@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "الأوامر"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "سمات المجتمع"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "تعذر تحميل كلمة مرور نقطة الاتصال"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "العد فقط"
@@ -2418,7 +2424,7 @@
     "Default Opens": "يفتح افتراضيًا"
   },
   "Default Task List": {
-    "Default Task List": ""
+    "Default Task List": "قائمة المهام الافتراضية"
   },
   "Default Width (%)": {
     "Default Width (%)": "العرض الافتراضي (%)"
@@ -2598,7 +2604,7 @@
     "Disabling auto-login on startup...": "جاري إلغاء تفعيل تسجيل الدخول التلقائي عند بدء التشغيل..."
   },
   "Disabling cellular...": {
-    "Disabling cellular...": ""
+    "Disabling cellular...": "جاري تعطيل الشبكة الخلوية..."
   },
   "Disc": {
     "Disc": "قرص"
@@ -2898,7 +2904,7 @@
     "Enable Bar": "تفعيل الشريط"
   },
   "Enable Cellular": {
-    "Enable Cellular": ""
+    "Enable Cellular": "تمكين الشبكة الخلوية"
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "تمكين 'عدم الإزعاج'"
@@ -2970,7 +2976,7 @@
     "Enabling WiFi...": "جاري تمكين الWiFi..."
   },
   "Enabling cellular...": {
-    "Enabling cellular...": ""
+    "Enabling cellular...": "جاري تمكين الشبكة الخلوية..."
   },
   "End": {
     "End": "النهاية"
@@ -3333,10 +3339,10 @@
     "Failed to save clipboard setting": "فشل في حفظ إعداد الحافظة"
   },
   "Failed to save dropped file": {
-    "Failed to save dropped file": ""
+    "Failed to save dropped file": "فشل حفظ الملف الملقى"
   },
   "Failed to save dropped text": {
-    "Failed to save dropped text": ""
+    "Failed to save dropped text": "فشل حفظ النص الملقى"
   },
   "Failed to save keybind": {
     "Failed to save keybind": "فشل في حفظ اختصار لوحة المفاتيح"
@@ -3396,7 +3402,7 @@
     "Failed to switch port": "فشل تبديل المنفذ"
   },
   "Failed to toggle cellular": {
-    "Failed to toggle cellular": ""
+    "Failed to toggle cellular": "فشل تبديل حالة الشبكة الخلوية"
   },
   "Failed to unpin entry": {
     "Failed to unpin entry": "فشل في إلغاء تثبيت الإدخال"
@@ -4134,7 +4140,7 @@
     "Home Compact": "الشاشة الرئيسية المدمجة"
   },
   "Horizontal": {
-    "Horizontal": ""
+    "Horizontal": "أفقي"
   },
   "Horizontal Offset": {
     "Horizontal Offset": "إزاحة أفقية"
@@ -4350,7 +4356,7 @@
     "Include Transitions": "تضمين التأثيرات الانتقالية"
   },
   "Include application streams and virtual sinks in the device lists": {
-    "Include application streams and virtual sinks in the device lists": ""
+    "Include application streams and virtual sinks in the device lists": "تضمين تدفقات التطبيقات والمصادر الافتراضية في قوائم الأجهزة"
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "تضمين إجراءات سطح المكتب (الاختصارات) في نتائج البحث."
@@ -4564,6 +4570,9 @@
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "احتفظ بفلتر نوع الحافظة عند إعادة فتح السجل"
+  },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
   },
   "Keep typing": {
     "Keep typing": "استمر في الكتابة"
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "تتبع النوافذ المنبثقة والنوافذ المشروطة سرعة الرسوم المتحركة العالمية (عطل الخيار للتخصيص بشكل مستقل)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "نافذة منبثقة فقط"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "استئناف"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "كشف الأقواس حيث تلتقي الأسطح بالإطار"
@@ -7613,6 +7628,9 @@
   "Show Dock": {
     "Show Dock": "إظهار شريط التطبيقات"
   },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
+  },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "عرض درجة الحرارة المحسوسة"
   },
@@ -7764,7 +7782,7 @@
     "Show Trash in Dock": "إظهار المهملات في شريط التطبيقات"
   },
   "Show Virtual Devices": {
-    "Show Virtual Devices": ""
+    "Show Virtual Devices": "إظهار الأجهزة الافتراضية"
   },
   "Show Weather Condition": {
     "Show Weather Condition": "عرض حالة الطقس"
@@ -8355,7 +8373,7 @@
     "Tap to Click": "النقر للنقر"
   },
   "Task list used when adding tasks from the dash calendar": {
-    "Task list used when adding tasks from the dash calendar": ""
+    "Task list used when adding tasks from the dash calendar": "قائمة المهام المستخدمة عند إضافة مهام من تقويم لوحة التحكم"
   },
   "Terminal": {
     "Terminal": "محطة طرفية"
@@ -8436,7 +8454,7 @@
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "الأمر المخصص المستخدم عند الاتصال بالجلسات (يستقبل اسم الجلسة كأول وسيط)"
   },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "برنامج الترحيب (greeter) المرفق مع DMS نشط (إعداد archinstall). يستمر في العمل كما هو، ولكن مزامنة السمة والإعدادات تتطلب برنامج الترحيب المستقل. قم بتثبيت greetd-dms-greeter-bin من AUR، ثم قم بتشغيل المزامنة لنقل شاشة تسجيل الدخول."
   },
   "The island draws its own surface": {
     "The island draws its own surface": "ترسم الجزيرة سطحها الخاص"
@@ -8701,6 +8719,9 @@
   },
   "Transform": {
     "Transform": "تحويل"
+  },
+  "Transition Duration": {
+    "Transition Duration": ""
   },
   "Transition Effect": {
     "Transition Effect": "تأثير الانتقال"
@@ -9162,7 +9183,7 @@
     "Version": "الإصدار"
   },
   "Vertical": {
-    "Vertical": ""
+    "Vertical": "عمودي"
   },
   "Vertical Deck": {
     "Vertical Deck": "عمودي متطابق"
@@ -9491,6 +9512,9 @@
   "Yesterday": {
     "Yesterday": "أمس"
   },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
+  },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المتابعة؟"
   },
@@ -9576,7 +9600,7 @@
     "Normal": "عادي"
   },
   "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
-    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": "برنامج dms-greeter غير مثبت. قم بتثبيت حزمة dms-greeter لإدارة شاشة الترحيب."
   },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "مثال: /usr/bin/my-script --flag"

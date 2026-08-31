@@ -4130,6 +4130,13 @@
     "comment": ""
   },
   {
+    "term": "Community favorites to get you started",
+    "translation": "",
+    "context": "Community favorites to get you started",
+    "reference": "",
+    "comment": "greeter plugins page subtitle"
+  },
+  {
     "term": "Community themes",
     "translation": "",
     "context": "Community themes",
@@ -4751,6 +4758,13 @@
     "context": "Couldn't load hotspot password",
     "reference": "",
     "comment": "hotspot password error title"
+  },
+  {
+    "term": "Couldn't load plugins",
+    "translation": "",
+    "context": "Couldn't load plugins",
+    "reference": "",
+    "comment": "plugin registry fetch error"
   },
   {
     "term": "Count Only",
@@ -10535,6 +10549,13 @@
     "comment": "Clipboard behavior setting description"
   },
   {
+    "term": "Keep the dock visible above fullscreen applications",
+    "translation": "",
+    "context": "Keep the dock visible above fullscreen applications",
+    "reference": "",
+    "comment": "dock visibility toggle description"
+  },
+  {
     "term": "Keep typing",
     "translation": "",
     "context": "Keep typing",
@@ -14805,6 +14826,13 @@
     "comment": ""
   },
   {
+    "term": "Popular Plugins",
+    "translation": "",
+    "context": "Popular Plugins",
+    "reference": "",
+    "comment": "greeter plugins page title"
+  },
+  {
     "term": "Popup Only",
     "translation": "",
     "context": "Popup Only",
@@ -16161,6 +16189,13 @@
     "context": "Resume",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Retry",
+    "translation": "",
+    "context": "Retry",
+    "reference": "",
+    "comment": "retry failed action button"
   },
   {
     "term": "Reveal the arcs where surfaces meet the frame",
@@ -17659,6 +17694,13 @@
     "context": "Show Dock",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Show Dock Over Fullscreen",
+    "translation": "",
+    "context": "Show Dock Over Fullscreen",
+    "reference": "",
+    "comment": "dock visibility toggle"
   },
   {
     "term": "Show Feels Like Temperature",
@@ -20195,6 +20237,13 @@
     "comment": ""
   },
   {
+    "term": "Transition Duration",
+    "translation": "",
+    "context": "Transition Duration",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Transition Effect",
     "translation": "",
     "context": "Transition Effect",
@@ -22020,6 +22069,13 @@
     "context": "Yesterday",
     "reference": "",
     "comment": "notification history filter"
+  },
+  {
+    "term": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
+    "translation": "",
+    "context": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
+    "reference": "",
+    "comment": "greeter plugins page intro"
   },
   {
     "term": "You have unsaved changes. Save before continuing?",

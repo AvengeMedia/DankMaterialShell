@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Parancsok"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Közösségi témák"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Nem sikerült betölteni a hotspot jelszavát"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Csak darabszám"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Vágólap típusának szűrőjének megjegyzése az előzmények újbóli megnyitásakor"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Gépelj tovább"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "A felugró ablakok és kizárólagos párbeszédablakok a globális animációs sebességet követik (letiltás az egyéni testreszabáshoz)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Csak felugró"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Folytatás"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Az ívek felfedése ott, ahol a felületek találkoznak a kerettel"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "Dokk megjelenítése"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Hőérzet megjelenítése"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "Átalakítás"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "Átmeneti hatás"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "Tegnap"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Nem mentett változtatásaid vannak. Szeretnél menteni a folytatás előtt?"

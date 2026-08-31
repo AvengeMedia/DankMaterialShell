@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "פקודות"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "ערכות נושא קהילתיות"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "לא ניתן היה לטעון את סיסמת הנקודה החמה"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "ספירה בלבד"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "שמור/שמרי את מסנן הסוגים של לוח ההעתקה בפתיחה מחדש של ההיסטוריה"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "המשך/המשיכי להקליד"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "חלונות קופצים ומודליים עוקבים אחר מהירות האנימציה הגלובלית (השבת/י כדי להתאים אישית באופן עצמאי)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "חלון קופץ בלבד"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "המשך"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "חשוף/חשפי את הקשתות שבהן המשטחים פוגשים את המסגרת"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "הצגה של הDock"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "הצגת הטמפרטורה המורגשת (\"מרגיש כמו\")"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "שינוי"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "אפקט מעבר"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "אתמול"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "יש לך שינויים שלא נשמרו. האם ברצונך לשמור אותם לפני שממשיכים?"

@@ -1781,6 +1781,9 @@
   "Commands": {
     "Commands": "Các lệnh"
   },
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
+  },
   "Community themes": {
     "Community themes": "Các chủ đề cộng đồng"
   },
@@ -2044,6 +2047,9 @@
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Không thể tải mật khẩu điểm nóng"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Chỉ đếm"
@@ -4565,6 +4571,9 @@
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Giữ bộ lọc loại clipboard khi mở lại lịch sử"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Tiếp tục gõ"
   },
@@ -6398,6 +6407,9 @@
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Cửa sổ nổi và Bảng thông báo theo Tốc độ ảnh động toàn cầu (tắt để tùy chỉnh độc lập)"
   },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
   "Popup Only": {
     "Popup Only": "Chỉ cửa sổ nổi"
   },
@@ -6976,6 +6988,9 @@
   },
   "Resume": {
     "Resume": "Tiếp tục"
+  },
+  "Retry": {
+    "Retry": ""
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Hiển thị các cung tròn nơi các bề mặt tiếp xúc với khung"
@@ -7612,6 +7627,9 @@
   },
   "Show Dock": {
     "Show Dock": "Hiển thị Dock"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Hiển thị nhiệt độ cảm nhận"
@@ -8702,6 +8720,9 @@
   "Transform": {
     "Transform": "Biến đổi"
   },
+  "Transition Duration": {
+    "Transition Duration": ""
+  },
   "Transition Effect": {
     "Transition Effect": "Hiệu ứng chuyển tiếp"
   },
@@ -9490,6 +9511,9 @@
   },
   "Yesterday": {
     "Yesterday": "Hôm qua"
+  },
+  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
+    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Bạn có những thay đổi chưa lưu. Lưu trước khi tiếp tục?"

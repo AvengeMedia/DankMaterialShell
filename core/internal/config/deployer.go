@@ -38,25 +38,6 @@ func (cd *ConfigDeployer) log(message string) {
 	}
 }
 
-// DeployConfigurations deploys all necessary configurations based on the chosen window manager
-func (cd *ConfigDeployer) DeployConfigurations(ctx context.Context, wm deps.WindowManager) ([]DeploymentResult, error) {
-	return cd.DeployConfigurationsWithTerminal(ctx, wm, deps.TerminalGhostty)
-}
-
-// DeployConfigurationsWithTerminal deploys all necessary configurations based on chosen window manager and terminal
-func (cd *ConfigDeployer) DeployConfigurationsWithTerminal(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal) ([]DeploymentResult, error) {
-	return cd.DeployConfigurationsSelective(ctx, wm, terminal, nil, nil)
-}
-
-// DeployConfigurationsWithSystemd deploys configurations with systemd option
-func (cd *ConfigDeployer) DeployConfigurationsWithSystemd(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, useSystemd bool) ([]DeploymentResult, error) {
-	return cd.deployConfigurationsInternal(ctx, wm, terminal, nil, nil, nil, useSystemd)
-}
-
-func (cd *ConfigDeployer) DeployConfigurationsSelective(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool) ([]DeploymentResult, error) {
-	return cd.DeployConfigurationsSelectiveWithReinstalls(ctx, wm, terminal, installedDeps, replaceConfigs, nil)
-}
-
 func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstalls(ctx context.Context, wm deps.WindowManager, terminal deps.Terminal, installedDeps []deps.Dependency, replaceConfigs map[string]bool, reinstallItems map[string]bool) ([]DeploymentResult, error) {
 	return cd.deployConfigurationsInternal(ctx, wm, terminal, installedDeps, replaceConfigs, reinstallItems, true)
 }
@@ -172,6 +153,32 @@ func (cd *ConfigDeployer) deployConfigurationsInternal(_ context.Context, wm dep
 	}
 
 	return results, nil
+}
+
+func (cd *ConfigDeployer) DeployCompositor(wm deps.WindowManager, terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
+	switch wm {
+	case deps.WindowManagerNiri:
+		return cd.deployNiriConfig(terminal, useSystemd)
+	case deps.WindowManagerHyprland:
+		return cd.deployHyprlandConfig(terminal, useSystemd)
+	case deps.WindowManagerMango:
+		return cd.deployMangoConfig(terminal, useSystemd)
+	default:
+		return DeploymentResult{}, fmt.Errorf("unsupported window manager")
+	}
+}
+
+func (cd *ConfigDeployer) DeployTerminal(terminal deps.Terminal) ([]DeploymentResult, error) {
+	switch terminal {
+	case deps.TerminalGhostty:
+		return cd.deployGhosttyConfig()
+	case deps.TerminalKitty:
+		return cd.deployKittyConfig()
+	case deps.TerminalAlacritty:
+		return cd.deployAlacrittyConfig()
+	default:
+		return nil, fmt.Errorf("unsupported terminal")
+	}
 }
 
 func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal, useSystemd bool) (DeploymentResult, error) {
@@ -572,7 +579,13 @@ func (cd *ConfigDeployer) deployAlacrittyConfig() ([]DeploymentResult, error) {
 
 func (cd *ConfigDeployer) mergeNiriOutputSections(newConfig, existingConfig, dmsDir string) (string, error) {
 	outputRegex := regexp.MustCompile(`(?m)^(/-)?\s*output\s+"[^"]+"\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}`)
-	existingOutputs := outputRegex.FindAllString(existingConfig, -1)
+	var existingOutputs []string
+	for _, output := range outputRegex.FindAllString(existingConfig, -1) {
+		if strings.Contains(NiriConfig, output) {
+			continue
+		}
+		existingOutputs = append(existingOutputs, output)
+	}
 
 	if len(existingOutputs) == 0 {
 		return newConfig, nil
