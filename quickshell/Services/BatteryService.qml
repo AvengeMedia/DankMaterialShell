@@ -339,6 +339,29 @@ Singleton {
         return val;
     }
 
+    // Aggregated charge/discharge rate, signed: positive while charging,
+    // negative while draining the battery, zero when idle/fully charged.
+    readonly property real signedChangeRate: {
+        if (!batteryAvailable)
+            return 0;
+        const rate = Math.abs(changeRate);
+        if (!isFinite(rate) || rate < 0.05)
+            return 0;
+        return isCharging ? rate : -rate;
+    }
+
+    // Compact signed wattage for bar widgets, e.g. "+45W" / "-8.4W".
+    // Returns an empty string when there is nothing meaningful to show.
+    // compact drops the decimal entirely (used by vertical bars).
+    function formatPowerRate(compact) {
+        const rate = signedChangeRate;
+        if (rate === 0)
+            return "";
+        const magnitude = Math.abs(rate);
+        const value = (compact || magnitude >= 10) ? Math.round(magnitude).toString() : magnitude.toFixed(1);
+        return `${rate > 0 ? "+" : "-"}${value}W`;
+    }
+
     // A time-weighted exponential moving average based on the aggregated charge/discharge rate
     property real _smoothedChangeRate: 0
     property real _lastRateSampleTime: 0

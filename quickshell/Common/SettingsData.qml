@@ -813,6 +813,8 @@ Singleton {
     property bool showBatteryPercentOnlyOnBattery: false
     property bool showBatteryTime: false
     property bool showBatteryTimeOnlyOnBattery: false
+    property bool showBatteryPowerCharging: false
+    property bool showBatteryPowerDischarging: false
     property bool batteryPillStyle: false
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
