@@ -515,6 +515,7 @@ BasePill {
         popupWidth: trayMenuState.computedWidth
         popupHeight: trayMenuState.computedHeight
         content: trayMenuContentComponent
+        contentHandlesKeys: true
         property alias openedByHover: trayMenuState.openedByHover
     }
 
@@ -1680,10 +1681,10 @@ BasePill {
 
         const barPosition = (axisObj?.edge === "left") ? 2 : ((axisObj?.edge === "right") ? 3 : ((axisObj?.edge === "top") ? 0 : 1));
 
-        let localPos = Qt.point(0, 0);
-        if (anchor) {
+        let localPos = anchor ? anchor.mapToItem(null, 0, 0) : Qt.point(0, 0);
+        if (anchor && anchor.window && root.window && anchor.window !== root.window) {
             const globalPos = anchor.mapToGlobal(0, 0);
-            localPos = root.mapFromGlobal(globalPos.x, globalPos.y);
+            localPos = root.window.mapFromGlobal(globalPos.x, globalPos.y);
         }
         const triggerWidth = anchor ? anchor.width : root.width;
         const pos = SettingsData.getPopupTriggerPosition(localPos, screen, root.barThickness, triggerWidth, root.barSpacing, barPosition, root.barConfig);
