@@ -1329,12 +1329,17 @@ BasePill {
                                         root.menuOpen = false;
                                         return;
                                     }
+                                    const localPos = itemArea.mapToGlobal(mouse.x, mouse.y);
+                                    const isStandalone = !SettingsData.connectedFrameModeActive;
+                                    const popX = (isStandalone && overflowPopout && overflowPopout.alignedX !== undefined) ? overflowPopout.alignedX : 0;
+                                    const popY = (isStandalone && overflowPopout && overflowPopout.alignedY !== undefined) ? overflowPopout.alignedY : 0;
+                                    const gx = localPos.x + popX;
+                                    const gy = localPos.y + popY;
                                     if (!trayItem.hasMenu) {
-                                        const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
-                                        root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
+                                        root.callContextMenuFallback(trayItem.id, Math.round(gx), Math.round(gy));
                                         return;
                                     }
-                                    root.showForTrayItem(trayItem, overflowContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
+                                    root.showForTrayItemAtGlobalPoint(trayItem, gx, gy, itemArea.width, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                                 }
                             }
                         }
@@ -1685,21 +1690,16 @@ BasePill {
         }
     }
 
-    function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj, byHover) {
+    function showForTrayItemAtGlobalPoint(item, gx, gy, triggerWidth, screen, atBottom, vertical, axisObj, byHover) {
         if (!screen)
             return;
 
         trayMenuState.close();
 
         const barPosition = (axisObj?.edge === "left") ? 2 : ((axisObj?.edge === "right") ? 3 : ((axisObj?.edge === "top") ? 0 : 1));
-
-        let localPos = Qt.point(0, 0);
-        if (anchor) {
-            const globalPos = anchor.mapToGlobal(0, 0);
-            localPos = Qt.point(globalPos.x - (screen.x || 0), globalPos.y - (screen.y || 0));
-        }
-        const triggerWidth = anchor ? anchor.width : root.width;
-        const pos = SettingsData.getPopupTriggerPosition(localPos, screen, root.barThickness, triggerWidth, root.barSpacing, barPosition, root.barConfig);
+        const localPos = Qt.point(gx - (screen.x || 0), gy - (screen.y || 0));
+        const tw = triggerWidth || root.width;
+        const pos = SettingsData.getPopupTriggerPosition(localPos, screen, root.barThickness, tw, root.barSpacing, barPosition, root.barConfig);
 
         trayMenuPopout.setTriggerPosition(pos.x, pos.y, pos.width, root.section, screen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
 
@@ -1717,6 +1717,15 @@ BasePill {
 
         trayMenuState.showMenu = true;
         PopoutManager.requestPopout(trayMenuPopout, undefined, "tray-menu-" + (item?.id ?? ""));
+    }
+
+    function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj, byHover) {
+        if (!screen)
+            return;
+
+        const globalPos = anchor ? anchor.mapToGlobal(0, 0) : Qt.point(0, 0);
+        const triggerWidth = anchor ? anchor.width : root.width;
+        showForTrayItemAtGlobalPoint(item, globalPos.x, globalPos.y, triggerWidth, screen, atBottom, vertical, axisObj, byHover);
     }
 
     function _trayLayoutRoot() {
