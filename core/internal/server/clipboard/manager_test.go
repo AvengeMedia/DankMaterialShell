@@ -923,34 +923,67 @@ func TestManager_ConcurrentPostWithMock(t *testing.T) {
 	assert.Equal(t, int32(100), postCount.Load())
 }
 
-func corruptInlineBucketRoot(t *testing.T, path string) {
+// zero padding in a fresh db, never a valid page
+const corruptRootPgid = 7
+
+func corruptInlineBucketRoot(t *testing.T, path string, rootPgid byte) {
 	t.Helper()
 
 	f, err := os.OpenFile(path, os.O_RDWR, 0o644)
 	require.NoError(t, err)
 	defer f.Close()
 
-	// flips the inline bucket root pgid to an out-of-range page, per issue #3232
-	_, err = f.WriteAt([]byte{16}, int64(4*os.Getpagesize()+32+9))
+	// flips the inline bucket root pgid to an unwritten page, per issue #3232
+	_, err = f.WriteAt([]byte{rootPgid}, int64(4*os.Getpagesize()+32+9))
 	require.NoError(t, err)
 }
 
-func TestOpenDB_HealsCorruptedBucketPage(t *testing.T) {
+// bbolt maps to the next power of two, so the root stays mapped but past EOF: fault, not panic
+func dropPage(t *testing.T, path string, pgid byte) {
+	t.Helper()
+
+	require.NoError(t, os.Truncate(path, int64(pgid)*int64(os.Getpagesize())))
+}
+
+func newCorruptDB(t *testing.T, pastEOF bool) string {
+	t.Helper()
+
 	path := filepath.Join(t.TempDir(), "db")
 
 	db, err := openDB(path)
 	require.NoError(t, err)
 	require.NoError(t, db.Close())
 
-	corruptInlineBucketRoot(t, path)
+	corruptInlineBucketRoot(t, path, corruptRootPgid)
+	if pastEOF {
+		dropPage(t, path, corruptRootPgid)
+	}
 
-	db, err = openDB(path)
-	require.NoError(t, err)
-	defer db.Close()
+	return path
+}
 
-	m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
-	require.NoError(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
-	assert.Len(t, m.GetHistory(), 1)
+var corruptDBCases = []struct {
+	name    string
+	pastEOF bool
+}{
+	{"root page unwritten", false},
+	{"root page past end of file", true},
+}
+
+func TestOpenDB_HealsCorruptedBucketPage(t *testing.T) {
+	for _, tt := range corruptDBCases {
+		t.Run(tt.name, func(t *testing.T) {
+			path := newCorruptDB(t, tt.pastEOF)
+
+			db, err := openDB(path)
+			require.NoError(t, err)
+			defer db.Close()
+
+			m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+			require.NoError(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+			assert.Len(t, m.GetHistory(), 1)
+		})
+	}
 }
 
 func TestOpenDB_HealsGarbageFile(t *testing.T) {
@@ -966,19 +999,17 @@ func TestOpenDB_HealsGarbageFile(t *testing.T) {
 }
 
 func TestStoreEntry_CorruptDBReturnsErrorNotPanic(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "db")
+	for _, tt := range corruptDBCases {
+		t.Run(tt.name, func(t *testing.T) {
+			path := newCorruptDB(t, tt.pastEOF)
 
-	db, err := openDB(path)
-	require.NoError(t, err)
-	require.NoError(t, db.Close())
+			db, err := bolt.Open(path, 0o644, &bolt.Options{Timeout: time.Second})
+			require.NoError(t, err)
+			defer db.Close()
 
-	corruptInlineBucketRoot(t, path)
-
-	db, err = bolt.Open(path, 0o644, &bolt.Options{Timeout: time.Second})
-	require.NoError(t, err)
-	defer db.Close()
-
-	m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
-	_ = m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"})
-	_ = m.GetHistory()
+			m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+			assert.Error(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+			assert.Empty(t, m.GetHistory())
+		})
+	}
 }

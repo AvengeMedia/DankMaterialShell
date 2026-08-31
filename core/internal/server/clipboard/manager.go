@@ -155,6 +155,12 @@ func recoverDBPanic(err *error) {
 	*err = fmt.Errorf("clipboard db panic: %v", r)
 }
 
+// a pgid past the mmap end faults instead of panicking; only recoverable while armed
+func armDBFaultPanics() func() {
+	prev := debug.SetPanicOnFault(true)
+	return func() { debug.SetPanicOnFault(prev) }
+}
+
 func tryOpenDB(path string) (db *bolt.DB, err error) {
 	defer func() {
 		r := recover()
@@ -166,6 +172,7 @@ func tryOpenDB(path string) (db *bolt.DB, err error) {
 		}
 		db, err = nil, fmt.Errorf("clipboard db panic: %v", r)
 	}()
+	defer armDBFaultPanics()()
 
 	db, err = bolt.Open(path, 0o644, &bolt.Options{
 		Timeout: 1 * time.Second,
@@ -200,11 +207,13 @@ func tryOpenDB(path string) (db *bolt.DB, err error) {
 
 func (m *Manager) dbUpdate(fn func(tx *bolt.Tx) error) (err error) {
 	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
 	return m.db.Update(fn)
 }
 
 func (m *Manager) dbView(fn func(tx *bolt.Tx) error) (err error) {
 	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
 	return m.db.View(fn)
 }
 
@@ -1277,6 +1286,7 @@ func (m *Manager) compactDB() error {
 
 func compactInto(srcPath, dstPath string, txMaxSize int64) (err error) {
 	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
 
 	srcDB, err := bolt.Open(srcPath, 0o644, &bolt.Options{ReadOnly: true, Timeout: time.Second})
 	if err != nil {
