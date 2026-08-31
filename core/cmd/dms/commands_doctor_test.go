@@ -119,6 +119,26 @@ func writePlugin(t *testing.T, pluginsDir, file string) {
 	}
 }
 
+// qtenginePluginFile("", major) is a path with a directory component, and
+// qtPluginPath joins platformthemes/ again — a regression here silently warns
+// at every correctly installed system, so pin the full path down.
+func TestQtenginePluginPath(t *testing.T) {
+	root := t.TempDir()
+	if got := qtenginePluginPath([]string{root}, "6"); got != "" {
+		t.Fatalf("missing plugin should yield an empty path, got %q", got)
+	}
+	want := filepath.Join(root, "platformthemes", "libqt6engine-plugin.so")
+	if err := os.MkdirAll(filepath.Join(root, "platformthemes"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(want, nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := qtenginePluginPath([]string{root}, "6"); got != want {
+		t.Fatalf("qtenginePluginPath = %q, want %q", got, want)
+	}
+}
+
 func TestCheckQtPlatformThemePlugin(t *testing.T) {
 	t.Run("qt6ct-kde is flagged as a package name, not a theme", func(t *testing.T) {
 		t.Setenv("QT_QPA_PLATFORMTHEME", "qt6ct-kde")

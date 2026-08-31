@@ -551,7 +551,7 @@ func qtPluginPath(roots []string, files ...string) string {
 // qtenginePluginPath returns the first of roots that holds the qtengine platform
 // theme plugin for the given Qt major, or "" if none does.
 func qtenginePluginPath(roots []string, major string) string {
-	return qtPluginPath(roots, qtenginePluginFile("", major))
+	return qtPluginPath(roots, fmt.Sprintf("libqt%sengine-plugin.so", major))
 }
 
 func qtenginePluginFile(root, major string) string {
