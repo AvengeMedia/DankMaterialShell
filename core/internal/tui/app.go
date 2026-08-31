@@ -36,6 +36,7 @@ type Model struct {
 	selectedTerminal   int
 	selectedDep        int
 	selectedConfig     int
+	selectedAuthMethod int
 	reinstallItems     map[string]bool
 	disabledItems      map[string]bool
 	replaceConfigs     map[string]bool
@@ -43,17 +44,18 @@ type Model struct {
 	sudoPassword       string
 	existingConfigs    []ExistingConfigInfo
 	fingerprintFailed  bool
+	authValidating     bool
+	authFailed         bool
 
 	availablePrivesc []privesc.Tool
 	selectedPrivesc  int
 }
 
 func NewModel(version string, logFilePath string) Model {
+	styles := NewStyles(TerminalTheme())
+
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-
-	theme := TerminalTheme()
-	styles := NewStyles(theme)
 	s.Style = styles.SpinnerStyle
 
 	pi := textinput.New()
@@ -62,35 +64,22 @@ func NewModel(version string, logFilePath string) Model {
 	pi.EchoCharacter = '•'
 	pi.Focus()
 
-	logChan := make(chan string, 1000)
-	packageProgressChan := make(chan packageInstallProgressMsg, 100)
-
 	return Model{
-		version:       version,
-		state:         StateWelcome,
-		spinner:       s,
-		passwordInput: pi,
-		isLoading:     true,
-		styles:        styles,
-
-		logMessages:         []string{},
-		logChan:             logChan,
+		version:             version,
+		state:               StateWelcome,
+		spinner:             s,
+		passwordInput:       pi,
+		isLoading:           true,
+		styles:              styles,
+		logChan:             make(chan string, 1000),
 		logFilePath:         logFilePath,
-		packageProgressChan: packageProgressChan,
+		packageProgressChan: make(chan packageInstallProgressMsg, 100),
 		packageProgress: packageInstallProgressMsg{
-			progress:   0.0,
-			step:       "Initializing package installation",
-			isComplete: false,
+			step: "Initializing package installation",
 		},
-		showDebugLogs:    false,
-		selectedWM:       0,
-		selectedTerminal: 0, // Default to Ghostty
-		selectedDep:      0,
-		selectedConfig:   0,
-		reinstallItems:   make(map[string]bool),
-		disabledItems:    make(map[string]bool),
-		replaceConfigs:   make(map[string]bool),
-		installationLogs: []string{},
+		reinstallItems: make(map[string]bool),
+		disabledItems:  make(map[string]bool),
+		replaceConfigs: make(map[string]bool),
 	}
 }
 
@@ -107,32 +96,29 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "ctrl+d":
-			// Toggle debug logs view (except during password input states)
 			if m.state != StatePasswordPrompt && m.state != StateFingerprintAuth {
 				m.showDebugLogs = !m.showDebugLogs
 				return m, nil
 			}
 		}
-	}
 
-	if tickMsg, ok := msg.(spinner.TickMsg); ok {
+	case spinner.TickMsg:
 		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(tickMsg)
+		m.spinner, cmd = m.spinner.Update(msg)
 		return m, tea.Batch(cmd, m.listenForLogs())
-	}
 
-	if sizeMsg, ok := msg.(tea.WindowSizeMsg); ok {
-		m.width = sizeMsg.Width
-		m.height = sizeMsg.Height
-	}
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
 
-	if logMsg, ok := msg.(logMsg); ok {
-		m.logMessages = append(m.logMessages, logMsg.message)
+	case logMsg:
+		m.logMessages = append(m.logMessages, msg.message)
 		return m, m.listenForLogs()
 	}
 
@@ -175,7 +161,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	// If debug logs are shown, show that view regardless of state
 	if m.showDebugLogs {
 		return m.viewDebugLogs()
 	}
@@ -218,6 +203,26 @@ func (m Model) View() string {
 	}
 }
 
+func (m Model) startInstallation(password string) (tea.Model, tea.Cmd) {
+	m.sudoPassword = password
+	m.passwordInput.SetValue("")
+	m.authValidating = false
+	m.authFailed = false
+	m.packageProgress = packageInstallProgressMsg{}
+	m.state = StateInstallingPackages
+	m.isLoading = true
+	return m, tea.Batch(m.spinner.Tick, m.installPackages())
+}
+
+func (m Model) promptForPassword() (tea.Model, tea.Cmd) {
+	m.authValidating = false
+	m.authFailed = false
+	m.passwordInput.SetValue("")
+	m.passwordInput.Focus()
+	m.state = StatePasswordPrompt
+	return m, nil
+}
+
 func (m Model) listenForLogs() tea.Cmd {
 	return func() tea.Msg {
 		select {
@@ -235,14 +240,17 @@ func (m Model) listenForLogs() tea.Cmd {
 func (m Model) detectOS() tea.Cmd {
 	return func() tea.Msg {
 		info, err := distros.GetOSInfo()
-		osInfoMsg := &distros.OSInfo{}
-		if info != nil {
-			osInfoMsg.Distribution = info.Distribution
-			osInfoMsg.Version = info.Version
-			osInfoMsg.VersionID = info.VersionID
-			osInfoMsg.PrettyName = info.PrettyName
-			osInfoMsg.Architecture = info.Architecture
+		if info == nil {
+			info = &distros.OSInfo{}
 		}
-		return osInfoCompleteMsg{info: osInfoMsg, err: err}
+		return osInfoCompleteMsg{info: info, err: err}
 	}
+}
+
+func moveIndex(current, delta, max int) int {
+	next := current + delta
+	if next < 0 || next > max {
+		return current
+	}
+	return next
 }

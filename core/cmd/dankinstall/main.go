@@ -14,7 +14,6 @@ import (
 
 var Version = "dev"
 
-// Flag variables bound via pflag
 var (
 	compositor        string
 	term              string
@@ -81,7 +80,6 @@ func runDankinstall(cmd *cobra.Command, args []string) error {
 	headlessMode := compositor != "" || term != ""
 
 	if !headlessMode {
-		// Reject headless-only flags when running in TUI mode.
 		headlessOnly := []string{
 			"privesc",
 			"git",
@@ -114,7 +112,6 @@ func runDankinstall(cmd *cobra.Command, args []string) error {
 }
 
 func runHeadless() error {
-	// Validate required flags
 	if compositor == "" {
 		return fmt.Errorf("--compositor is required for headless mode (niri, hyprland, or mango)")
 	}
@@ -141,7 +138,6 @@ func runHeadless() error {
 
 	runner := headless.NewRunner(cfg)
 
-	// Set up file logging
 	fileLogger, err := log.NewFileLogger()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: Failed to create log file: %v\n", err)
@@ -156,10 +152,6 @@ func runHeadless() error {
 			}
 		}()
 	} else {
-		// Drain the log channel to prevent blocking sends from deadlocking
-		// downstream components (distros, config deployer) that write to it.
-		// Use an explicit stop signal because this code does not own the
-		// runner log channel and cannot assume it will be closed.
 		defer drainLogChan(runner.GetLogChan())()
 	}
 
@@ -199,10 +191,6 @@ func runTUI() error {
 	if fileLogger != nil {
 		fileLogger.StartListening(model.GetLogChan())
 	} else {
-		// Drain the log channel to prevent blocking sends from deadlocking
-		// downstream components (distros, config deployer) that write to it.
-		// Use an explicit stop signal because this code does not own the
-		// model log channel and cannot assume it will be closed.
 		defer drainLogChan(model.GetLogChan())()
 	}
 
@@ -220,10 +208,9 @@ func runTUI() error {
 	return nil
 }
 
-// drainLogChan starts a goroutine that discards all messages from logCh,
-// preventing blocking sends from deadlocking downstream components. It returns
-// a cleanup function that signals the goroutine to stop and waits for it to
-// exit. Callers should defer the returned function.
+// drainLogChan discards messages from logCh so blocking sends in downstream
+// components cannot deadlock when no file logger is attached; the returned
+// cleanup stops the drain without assuming the channel will ever close.
 func drainLogChan(logCh <-chan string) func() {
 	drainStop := make(chan struct{})
 	drainDone := make(chan struct{})

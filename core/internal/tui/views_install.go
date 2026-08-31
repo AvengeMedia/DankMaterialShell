@@ -7,117 +7,102 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
-// wrapText wraps text to the specified width
 func wrapText(text string, width int) string {
 	if len(text) <= width {
 		return text
 	}
 
 	var result strings.Builder
-	words := strings.Fields(text)
 	currentLine := ""
-
-	for _, word := range words {
-		if len(currentLine) == 0 {
+	for word := range strings.FieldsSeq(text) {
+		switch {
+		case currentLine == "":
 			currentLine = word
-		} else if len(currentLine)+1+len(word) <= width {
+		case len(currentLine)+1+len(word) <= width:
 			currentLine += " " + word
-		} else {
+		default:
 			result.WriteString(currentLine)
-			result.WriteString("\n")
+			result.WriteByte('\n')
 			currentLine = word
 		}
 	}
+	result.WriteString(currentLine)
+	return result.String()
+}
 
-	if len(currentLine) > 0 {
-		result.WriteString(currentLine)
+func tailLines(lines []string, n int) []string {
+	if len(lines) <= n {
+		return lines
+	}
+	return lines[len(lines)-n:]
+}
+
+func (m Model) writeRecentLogs(b *strings.Builder, renderedHeader string, maxLines int) {
+	if len(m.installationLogs) == 0 {
+		return
 	}
 
-	return result.String()
+	b.WriteString(renderedHeader)
+	b.WriteByte('\n')
+	for _, line := range tailLines(m.installationLogs, maxLines) {
+		if line == "" {
+			continue
+		}
+		b.WriteString(m.styles.Subtle.Render("  " + line))
+		b.WriteByte('\n')
+	}
 }
 
 func (m Model) viewInstallingPackages() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("Installing Packages")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("Installing Packages"))
 	b.WriteString("\n\n")
 
-	if !m.packageProgress.isComplete {
-		spinner := m.spinner.View()
-		status := m.styles.Normal.Render(m.packageProgress.step)
-		fmt.Fprintf(&b, "%s %s", spinner, status)
-		b.WriteString("\n\n")
-
-		// Show progress bar
-		progressBar := fmt.Sprintf("[%s%s] %.0f%%",
-			strings.Repeat("█", int(m.packageProgress.progress*30)),
-			strings.Repeat("░", 30-int(m.packageProgress.progress*30)),
-			m.packageProgress.progress*100)
-		b.WriteString(m.styles.Normal.Render(progressBar))
-		b.WriteString("\n")
-
-		// Show command info if available
-		if m.packageProgress.commandInfo != "" {
-			cmdInfo := m.styles.Subtle.Render("$ " + m.packageProgress.commandInfo)
-			b.WriteString(cmdInfo)
-			b.WriteString("\n")
-		}
-
-		// Show live log output
-		if len(m.installationLogs) > 0 {
-			b.WriteString("\n")
-			logHeader := m.styles.Subtle.Render("Live Output:")
-			b.WriteString(logHeader)
-			b.WriteString("\n")
-
-			// Show last few lines of accumulated logs
-			maxLines := 8
-			startIdx := 0
-			if len(m.installationLogs) > maxLines {
-				startIdx = len(m.installationLogs) - maxLines
-			}
-
-			for i := startIdx; i < len(m.installationLogs); i++ {
-				if m.installationLogs[i] != "" {
-					logLine := m.styles.Subtle.Render("  " + m.installationLogs[i])
-					b.WriteString(logLine)
-					b.WriteString("\n")
-				}
-			}
-		}
-
-		// Show error if any
+	if m.packageProgress.isComplete {
 		if m.packageProgress.error != nil {
-			b.WriteString("\n")
-			wrappedErrorMsg := wrapText("Error: "+m.packageProgress.error.Error(), 80)
-			errorMsg := m.styles.Error.Render(wrappedErrorMsg)
-			b.WriteString(errorMsg)
+			b.WriteString(m.styles.Error.Render(wrapText("✗ Installation failed: "+m.packageProgress.error.Error(), 80)))
+			return b.String()
 		}
+		b.WriteString(m.styles.Success.Render("✓ Installation complete!"))
+		return b.String()
+	}
 
-		// Show sudo prompt if needed
-		if m.packageProgress.needsSudo {
-			sudoWarning := m.styles.Warning.Render("⚠ Using provided sudo password")
-			b.WriteString(sudoWarning)
-		}
-	} else {
-		if m.packageProgress.error != nil {
-			wrappedFailedMsg := wrapText("✗ Installation failed: "+m.packageProgress.error.Error(), 80)
-			errorMsg := m.styles.Error.Render(wrappedFailedMsg)
-			b.WriteString(errorMsg)
-		} else {
-			success := m.styles.Success.Render("✓ Installation complete!")
-			b.WriteString(success)
-		}
+	fmt.Fprintf(&b, "%s %s\n\n", m.spinner.View(), m.styles.Normal.Render(m.packageProgress.step))
+	b.WriteString(m.styles.Normal.Render(m.renderInstallProgressBar()))
+	b.WriteByte('\n')
+
+	if m.packageProgress.commandInfo != "" {
+		b.WriteString(m.styles.Subtle.Render("$ " + m.packageProgress.commandInfo))
+		b.WriteByte('\n')
+	}
+
+	if len(m.installationLogs) > 0 {
+		b.WriteByte('\n')
+		m.writeRecentLogs(&b, m.styles.Subtle.Render("Live Output:"), 8)
+	}
+
+	if m.packageProgress.error != nil {
+		b.WriteByte('\n')
+		b.WriteString(m.styles.Error.Render(wrapText("Error: "+m.packageProgress.error.Error(), 80)))
+	}
+
+	if m.packageProgress.needsSudo {
+		b.WriteString(m.styles.Warning.Render("⚠ Using provided sudo password"))
 	}
 
 	return b.String()
+}
+
+func (m Model) renderInstallProgressBar() string {
+	const barWidth = 30
+	filled := min(max(int(m.packageProgress.progress*barWidth), 0), barWidth)
+	return fmt.Sprintf("[%s%s] %.0f%%",
+		strings.Repeat("█", filled), strings.Repeat("░", barWidth-filled), m.packageProgress.progress*100)
 }
 
 func dmsPackageName(distroID string, dependencies []deps.Dependency) string {
@@ -128,7 +113,7 @@ func dmsPackageName(distroID string, dependencies []deps.Dependency) string {
 
 	var isGit bool
 	for _, dep := range dependencies {
-		if dep.Name == "dms (DankMaterialShell)" {
+		if dep.Name == dmsDepName {
 			isGit = dep.Variant == deps.VariantGit
 			break
 		}
@@ -158,6 +143,7 @@ func uninstallCommand(distroID string, dependencies []deps.Dependency) string {
 	if config.Family == distros.FamilyGentoo {
 		return "sudo emerge --deselect gui-apps/dankmaterialshell && sudo emerge --depclean gui-apps/dankmaterialshell"
 	}
+
 	pkg := dmsPackageName(distroID, dependencies)
 	switch config.Family {
 	case distros.FamilyArch:
@@ -175,18 +161,60 @@ func uninstallCommand(distroID string, dependencies []deps.Dependency) string {
 	}
 }
 
+func (m Model) loginHint() string {
+	wm := m.chosenWindowManager()
+
+	if !m.useSystemdConfig() {
+		switch wm {
+		case deps.WindowManagerNiri:
+			return "If you do not have a greeter, from a TTY run: dbus-run-session niri"
+		case deps.WindowManagerHyprland:
+			return "If you do not have a greeter, from a TTY run: dbus-run-session Hyprland"
+		default:
+			return "If you do not have a greeter, from a TTY run: dbus-run-session mango"
+		}
+	}
+
+	switch wm {
+	case deps.WindowManagerNiri:
+		return `If you do not have a greeter, login with "niri-session"`
+	case deps.WindowManagerHyprland:
+		return `If you do not have a greeter, login with "Hyprland"`
+	default:
+		return `If you do not have a greeter, login with "mango"`
+	}
+}
+
+func (m Model) troubleshootingHints() (autostart, logs string) {
+	wm := m.chosenWindowManager()
+
+	if !m.useSystemdConfig() {
+		logs = "quickshell --path ~/.config/quickshell/dms log"
+		switch wm {
+		case deps.WindowManagerNiri:
+			autostart = `remove spawn-at-startup "dms" "run" from ~/.config/niri/config.kdl`
+		case deps.WindowManagerHyprland:
+			autostart = `remove hl.exec_cmd("dms run") from ~/.config/hypr/hyprland.lua`
+		default:
+			autostart = "remove 'exec-once=dms run' from ~/.config/mango/config.conf"
+		}
+		return autostart, logs
+	}
+
+	if wm == deps.WindowManagerMango {
+		return "remove 'exec-once=dms run' from ~/.config/mango/config.conf", "qs -p ~/.config/quickshell/dms log"
+	}
+	return "systemctl --user disable dms", "journalctl --user -u dms"
+}
+
 func (m Model) viewInstallComplete() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Success.Render("Setup Complete!")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Success.Render("Setup Complete!"))
 	b.WriteString("\n\n")
-
-	success := m.styles.Success.Render("✓ All packages installed and configurations deployed.")
-	b.WriteString(success)
+	b.WriteString(m.styles.Success.Render("✓ All packages installed and configurations deployed."))
 	b.WriteString("\n\n")
 
 	accomplishments := []string{
@@ -195,77 +223,35 @@ func (m Model) viewInstallComplete() string {
 		"• Configuration files deployed with backups",
 		"• System optimized for DankMaterialShell",
 	}
-
 	for _, item := range accomplishments {
 		b.WriteString(m.styles.Subtle.Render(item))
-		b.WriteString("\n")
+		b.WriteByte('\n')
 	}
 
-	wm := m.selectedWindowManager()
-
-	loginHint := "If you do not have a greeter, login with \"niri-session\" or \"Hyprland\""
-	if !m.useSystemdConfig() {
-		switch wm {
-		case deps.WindowManagerNiri:
-			loginHint = "If you do not have a greeter, from a TTY run: dbus-run-session niri"
-		case deps.WindowManagerHyprland:
-			loginHint = "If you do not have a greeter, from a TTY run: dbus-run-session Hyprland"
-		case deps.WindowManagerMango:
-			loginHint = "If you do not have a greeter, from a TTY run: dbus-run-session mango"
-		}
-	} else {
-		// mango launches DMS via `exec-once=dms run` (not a systemd session target)
-		switch wm {
-		case deps.WindowManagerNiri:
-			loginHint = "If you do not have a greeter, login with \"niri-session\""
-		case deps.WindowManagerHyprland:
-			loginHint = "If you do not have a greeter, login with \"Hyprland\""
-		case deps.WindowManagerMango:
-			loginHint = "If you do not have a greeter, login with \"mango\""
-		}
-	}
-
-	b.WriteString("\n")
-	info := m.styles.Normal.Render("Your system is ready! Log out and log back in to start using\nyour new desktop environment.\n" + loginHint)
-	b.WriteString(info)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Normal.Render("Your system is ready! Log out and log back in to start using\nyour new desktop environment.\n" + m.loginHint()))
 	b.WriteString("\n\n")
 
-	theme := TerminalTheme()
-	cmdStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Accent))
-	labelStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Subtle))
+	label := m.styles.Subtle
+	cmd := m.styles.Accent
+	autostart, logs := m.troubleshootingHints()
 
-	b.WriteString(labelStyle.Render("Troubleshooting:") + "\n")
-	if !m.useSystemdConfig() {
-		switch wm {
-		case deps.WindowManagerNiri:
-			b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render(`remove spawn-at-startup "dms" "run" from ~/.config/niri/config.kdl`) + "\n")
-		case deps.WindowManagerHyprland:
-			b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render(`remove hl.exec_cmd("dms run") from ~/.config/hypr/hyprland.lua`) + "\n")
-		case deps.WindowManagerMango:
-			b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("remove 'exec-once=dms run' from ~/.config/mango/config.conf") + "\n")
-		}
-		b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("quickshell --path ~/.config/quickshell/dms log") + "\n")
-	} else if wm == deps.WindowManagerMango {
-		b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("remove 'exec-once=dms run' from ~/.config/mango/config.conf") + "\n")
-		b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("qs -p ~/.config/quickshell/dms log") + "\n")
-	} else {
-		b.WriteString(labelStyle.Render("  Disable autostart: ") + cmdStyle.Render("systemctl --user disable dms") + "\n")
-		b.WriteString(labelStyle.Render("  View logs:         ") + cmdStyle.Render("journalctl --user -u dms") + "\n")
-	}
+	b.WriteString(label.Render("Troubleshooting:") + "\n")
+	b.WriteString(label.Render("  Disable autostart: ") + cmd.Render(autostart) + "\n")
+	b.WriteString(label.Render("  View logs:         ") + cmd.Render(logs) + "\n")
 
 	if m.osInfo != nil {
-		if cmd := uninstallCommand(m.osInfo.Distribution.ID, m.dependencies); cmd != "" {
-			b.WriteString(labelStyle.Render("  Uninstall:         ") + cmdStyle.Render(cmd) + "\n")
+		if uninstall := uninstallCommand(m.osInfo.Distribution.ID, m.dependencies); uninstall != "" {
+			b.WriteString(label.Render("  Uninstall:         ") + cmd.Render(uninstall) + "\n")
 		}
 	}
 
-	b.WriteString("\n")
+	b.WriteByte('\n')
 	b.WriteString(m.styles.Normal.Render("Press Enter to exit."))
 
 	if m.logFilePath != "" {
 		b.WriteString("\n\n")
-		logInfo := m.styles.Subtle.Render(fmt.Sprintf("Full logs: %s", m.logFilePath))
-		b.WriteString(logInfo)
+		b.WriteString(m.styles.Subtle.Render(fmt.Sprintf("Full logs: %s", m.logFilePath)))
 	}
 
 	return b.String()
@@ -275,111 +261,77 @@ func (m Model) viewError() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Error.Render("Installation Failed")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Error.Render("Installation Failed"))
 	b.WriteString("\n\n")
 
 	if m.err != nil {
-		wrappedError := wrapText("✗ "+m.err.Error(), 80)
-		error := m.styles.Error.Render(wrappedError)
-		b.WriteString(error)
+		b.WriteString(m.styles.Error.Render(wrapText("✗ "+m.err.Error(), 80)))
 		b.WriteString("\n\n")
 	}
 
-	// Show package progress error if available
 	if m.packageProgress.error != nil {
-		wrappedPackageError := wrapText("Package Installation Error: "+m.packageProgress.error.Error(), 80)
-		packageError := m.styles.Error.Render(wrappedPackageError)
-		b.WriteString(packageError)
+		b.WriteString(m.styles.Error.Render(wrapText("Package Installation Error: "+m.packageProgress.error.Error(), 80)))
 		b.WriteString("\n\n")
 	}
 
-	// Show persistent installation logs
 	if len(m.installationLogs) > 0 {
-		logHeader := m.styles.Warning.Render("Installation Logs (last 15 lines):")
-		b.WriteString(logHeader)
-		b.WriteString("\n")
-
-		maxLines := 15
-		startIdx := 0
-		if len(m.installationLogs) > maxLines {
-			startIdx = len(m.installationLogs) - maxLines
-		}
-
-		for i := startIdx; i < len(m.installationLogs); i++ {
-			if m.installationLogs[i] != "" {
-				logLine := m.styles.Subtle.Render("  " + m.installationLogs[i])
-				b.WriteString(logLine)
-				b.WriteString("\n")
-			}
-		}
-		b.WriteString("\n")
+		m.writeRecentLogs(&b, m.styles.Warning.Render("Installation Logs (last 15 lines):"), 15)
+		b.WriteByte('\n')
 	}
 
-	hint := m.styles.Subtle.Render("Press Ctrl+D for full debug logs")
-	b.WriteString(hint)
-	b.WriteString("\n")
+	b.WriteString(m.styles.Subtle.Render("Press Ctrl+D for full debug logs"))
+	b.WriteByte('\n')
 
 	if m.logFilePath != "" {
-		b.WriteString("\n")
-		logInfo := m.styles.Warning.Render(fmt.Sprintf("Full logs: %s", m.logFilePath))
-		b.WriteString(logInfo)
-		b.WriteString("\n")
+		b.WriteByte('\n')
+		b.WriteString(m.styles.Warning.Render(fmt.Sprintf("Full logs: %s", m.logFilePath)))
+		b.WriteByte('\n')
 	}
 
-	help := m.styles.Subtle.Render("Press Enter to exit")
-	b.WriteString(help)
-
+	b.WriteString(m.styles.Subtle.Render("Press Enter to exit"))
 	return b.String()
 }
 
 func (m Model) updateInstallingPackagesState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if progressMsg, ok := msg.(packageInstallProgressMsg); ok {
-		m.packageProgress = progressMsg
+	progressMsg, ok := msg.(packageInstallProgressMsg)
+	if !ok {
+		return m, m.listenForLogs()
+	}
 
-		// Accumulate log output
-		if progressMsg.logOutput != "" {
-			m.installationLogs = append(m.installationLogs, progressMsg.logOutput)
-			// Keep only last 50 lines to preserve more context for debugging
-			if len(m.installationLogs) > 50 {
-				m.installationLogs = m.installationLogs[len(m.installationLogs)-50:]
-			}
-		}
+	m.packageProgress = progressMsg
 
-		if progressMsg.isComplete {
-			if progressMsg.error != nil {
-				m.state = StateError
-				m.isLoading = false
-			} else {
-				m.installationLogs = []string{}
-				m.state = StateConfigConfirmation
-				m.isLoading = true
-				return m, tea.Batch(m.spinner.Tick, m.checkExistingConfigurations())
-			}
-		}
+	if progressMsg.logOutput != "" {
+		m.installationLogs = append(m.installationLogs, progressMsg.logOutput)
+		m.installationLogs = tailLines(m.installationLogs, 50)
+	}
+
+	if !progressMsg.isComplete {
 		return m, m.listenForPackageProgress()
 	}
-	return m, m.listenForLogs()
+
+	if progressMsg.error != nil {
+		m.state = StateError
+		m.isLoading = false
+		return m, m.listenForPackageProgress()
+	}
+
+	m.installationLogs = nil
+	m.state = StateConfigConfirmation
+	m.isLoading = true
+	return m, tea.Batch(m.spinner.Tick, m.checkExistingConfigurations())
 }
 
 func (m Model) updateInstallCompleteState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
-		case "enter":
-			return m, tea.Quit
-		}
+	if keyMsg, ok := msg.(tea.KeyMsg); ok && keyMsg.String() == "enter" {
+		return m, tea.Quit
 	}
 	return m, m.listenForLogs()
 }
 
 func (m Model) updateErrorState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
-		case "enter":
-			return m, tea.Quit
-		}
+	if keyMsg, ok := msg.(tea.KeyMsg); ok && keyMsg.String() == "enter" {
+		return m, tea.Quit
 	}
 	return m, m.listenForLogs()
 }
@@ -390,7 +342,6 @@ func (m Model) listenForPackageProgress() tea.Cmd {
 		if !ok {
 			return packageProgressCompletedMsg{}
 		}
-		// Always return the message, completion will be handled in updateInstallingPackagesState
 		return msg
 	}
 }
@@ -398,30 +349,15 @@ func (m Model) listenForPackageProgress() tea.Cmd {
 func (m Model) viewDebugLogs() string {
 	var b strings.Builder
 
-	theme := TerminalTheme()
-
-	titleStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Primary)).
-		Bold(true)
-
-	b.WriteString(titleStyle.Render("Debug Logs"))
+	b.WriteString(m.styles.Highlight.Render("Debug Logs"))
 	b.WriteString("\n\n")
 
-	// Combine both logMessages and installationLogs
-	allLogs := append([]string{}, m.logMessages...)
-	allLogs = append(allLogs, m.installationLogs...)
-
+	allLogs := append(append([]string{}, m.logMessages...), m.installationLogs...)
 	if len(allLogs) == 0 {
 		b.WriteString("No logs available\n")
 	} else {
-		// Calculate available height (reserve space for header and footer)
 		maxHeight := max(m.height-6, 10)
-
-		// Show the most recent logs
-		startIdx := 0
-		if len(allLogs) > maxHeight {
-			startIdx = len(allLogs) - maxHeight
-		}
+		startIdx := max(len(allLogs)-maxHeight, 0)
 
 		for i := startIdx; i < len(allLogs); i++ {
 			if allLogs[i] != "" {
@@ -430,14 +366,11 @@ func (m Model) viewDebugLogs() string {
 		}
 
 		if startIdx > 0 {
-			subtleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Subtle))
-			b.WriteString(subtleStyle.Render(fmt.Sprintf("... (%d older log entries hidden)\n", startIdx)))
+			b.WriteString(m.styles.Subtle.Render(fmt.Sprintf("... (%d older log entries hidden)\n", startIdx)))
 		}
 	}
 
-	b.WriteString("\n")
-	statusStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(theme.Accent))
-	b.WriteString(statusStyle.Render("Press Ctrl+D to return, Ctrl+C to quit"))
-
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Accent.Render("Press Ctrl+D to return, Ctrl+C to quit"))
 	return b.String()
 }

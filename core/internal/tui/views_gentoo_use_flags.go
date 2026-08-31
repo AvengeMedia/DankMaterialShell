@@ -13,41 +13,29 @@ func (m Model) viewGentooUseFlags() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("Gentoo Global USE Flags")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("Gentoo Global USE Flags"))
 	b.WriteString("\n\n")
-
-	info := m.styles.Normal.Render("The following global USE flags will be enabled in /etc/portage/make.conf:")
-	b.WriteString(info)
+	b.WriteString(m.styles.Normal.Render("The following global USE flags will be enabled in /etc/portage/make.conf:"))
 	b.WriteString("\n\n")
 
 	for _, flag := range distros.GentooGlobalUseFlags {
-		flagLine := m.styles.Success.Render(fmt.Sprintf("  • %s", flag))
-		b.WriteString(flagLine)
-		b.WriteString("\n")
+		b.WriteString(m.styles.Success.Render(fmt.Sprintf("  • %s", flag)))
+		b.WriteByte('\n')
 	}
 
-	b.WriteString("\n")
-	note := m.styles.Subtle.Render("These flags ensure proper Qt6, Wayland, and compositor support.")
-	b.WriteString(note)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Subtle.Render("These flags ensure proper Qt6, Wayland, and compositor support."))
 	b.WriteString("\n\n")
 
-	var toggleLine string
+	toggle := m.styles.Subtle.Render("  [ ] Skip adding global USE flags (will use existing configuration)")
 	if m.skipGentooUseFlags {
-		toggleLine = "▶ [✗] Skip adding global USE flags (will use existing configuration)"
-		toggleLine = m.styles.Warning.Render(toggleLine)
-	} else {
-		toggleLine = "  [ ] Skip adding global USE flags (will use existing configuration)"
-		toggleLine = m.styles.Subtle.Render(toggleLine)
+		toggle = m.styles.Warning.Render("▶ [✗] Skip adding global USE flags (will use existing configuration)")
 	}
-	b.WriteString(toggleLine)
+	b.WriteString(toggle)
 	b.WriteString("\n\n")
 
-	help := m.styles.Subtle.Render("Space: Toggle skip, Enter: Continue, Esc: Go back")
-	b.WriteString(help)
-
+	b.WriteString(m.styles.Subtle.Render("Space: Toggle skip, Enter: Continue, Esc: Go back"))
 	return b.String()
 }
 
@@ -66,7 +54,7 @@ func (m Model) updateGentooUseFlagsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.skipGentooUseFlags = !m.skipGentooUseFlags
 			return m, nil
 		case "enter":
-			if m.selectedWindowManager() == deps.WindowManagerHyprland {
+			if m.chosenWindowManager() == deps.WindowManagerHyprland {
 				return m, m.checkGCCVersion()
 			}
 			return m.enterAuthPhase()
