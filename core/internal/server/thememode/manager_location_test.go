@@ -61,6 +61,21 @@ func TestComputeLocationScheduleAcrossUTCOffsets(t *testing.T) {
 			wantLight: false,
 		},
 		{
+			// Apia: west longitude on a UTC+13 offset. With the reference day
+			// taken from the civil date the schedule reported dark around the
+			// clock, because every event landed on the following local day.
+			name: "antimeridian_local_midday_is_light",
+			lat:  -13.83, lon: -171.76,
+			now:       time.Date(2026, 8, 26, 12, 0, 0, 0, time.FixedZone("UTC+13", 13*60*60)),
+			wantLight: true,
+		},
+		{
+			name: "antimeridian_local_night_is_dark",
+			lat:  -13.83, lon: -171.76,
+			now:       time.Date(2026, 8, 26, 2, 0, 0, 0, time.FixedZone("UTC+13", 13*60*60)),
+			wantLight: false,
+		},
+		{
 			name: "utc_midday",
 			lat:  51.5074, lon: -0.1278,
 			now:       time.Date(2026, 8, 26, 12, 0, 0, 0, time.UTC),

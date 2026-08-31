@@ -30,6 +30,29 @@ func TestSunTimesUseLocalCalendarDay(t *testing.T) {
 			lon:  -118.24,
 			date: time.Date(2026, 8, 26, 18, 0, 0, 0, time.FixedZone("UTC-7", -7*60*60)),
 		},
+		{
+			// Apia: west longitude, but UTC+13. The zone sits a whole day away
+			// from its own mean solar time, so the local calendar day and the
+			// local solar day are different days.
+			name: "antimeridian_west_longitude_east_offset",
+			lat:  -13.83,
+			lon:  -171.76,
+			date: time.Date(2026, 8, 26, 12, 0, 0, 0, time.FixedZone("UTC+13", 13*60*60)),
+		},
+		{
+			// Kiritimati, the largest offset in use.
+			name: "antimeridian_utc_plus_14",
+			lat:  1.87,
+			lon:  -157.43,
+			date: time.Date(2026, 8, 26, 12, 0, 0, 0, time.FixedZone("UTC+14", 14*60*60)),
+		},
+		{
+			// Chatham Islands, a three-quarter-hour offset on the same side.
+			name: "antimeridian_quarter_hour_offset",
+			lat:  -43.95,
+			lon:  -176.55,
+			date: time.Date(2026, 8, 26, 12, 0, 0, 0, time.FixedZone("UTC+12:45", 12*60*60+45*60)),
+		},
 	}
 
 	for _, tt := range tests {
