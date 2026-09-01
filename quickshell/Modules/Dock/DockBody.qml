@@ -354,30 +354,34 @@ Item {
         onTriggered: dock.startupRevealDone = true
     }
 
+    readonly property bool overviewReveal: CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview
+    readonly property bool hoverOrActive: dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky
+
+    onOverviewRevealChanged: {
+        if (overviewReveal && usesConnectedFrameChrome) {
+            slideXSpring.snapTo(dockSlide.targetX);
+            slideYSpring.snapTo(dockSlide.targetY);
+            dock._syncDockChromeState();
+        }
+    }
+
     property bool reveal: {
-        const overviewReveal = CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview;
         if ((!startupRevealDone && !overviewReveal) || !dock.geometryReady || !(hostWindow?.visible ?? true))
             return false;
 
         if (_modalRetractActive)
             return false;
 
-        if (overviewReveal) {
+        if (overviewReveal)
             return true;
-        }
 
-        if (hiddenForFullscreen)
+        if (hiddenForFullscreen || !SettingsData.showDock)
             return false;
 
-        // Smart auto-hide: show dock when no windows overlap, hide when they do
-        if (SettingsData.dockSmartAutoHide) {
-            if (shouldHideForWindows)
-                return dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky;
-            return true;  // No overlapping windows - show dock
-        }
+        if (SettingsData.dockSmartAutoHide)
+            return !shouldHideForWindows || hoverOrActive;
 
-        // Regular auto-hide: always hide unless hovering
-        return !autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky;
+        return !autoHide || hoverOrActive;
     }
 
     onContextMenuOpenChanged: {
