@@ -9527,9 +9527,6 @@
   "Yesterday": {
     "Yesterday": "Tegnap"
   },
-  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": "A DMS-t további appletekkel, indító funkciókkal és widgetekkel bővítheted a bővítményrendszeren keresztül. Több száz érhető el a hivatalos DMS-regiszterben, amelyeket a közösség és a DMS csapata készített. Telepíts néhányat most, vagy később a DMS CLI-n vagy a Beállítások ablakon keresztül."
-  },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Nem mentett változtatásaid vannak. Szeretnél menteni a folytatás előtt?"
   },

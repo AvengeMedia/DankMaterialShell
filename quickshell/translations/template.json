@@ -1568,13 +1568,6 @@
     "comment": "lock screen notification mode option | notification rule match field option"
   },
   {
-    "term": "App Theming",
-    "translation": "",
-    "context": "App Theming",
-    "reference": "",
-    "comment": "greeter feature card title"
-  },
-  {
     "term": "App name or identity (e.g., firefox)",
     "translation": "",
     "context": "App name or identity (e.g., firefox)",
@@ -4144,13 +4137,6 @@
     "comment": "greeter plugins page subtitle"
   },
   {
-    "term": "Community themes",
-    "translation": "",
-    "context": "Community themes",
-    "reference": "",
-    "comment": "greeter feature card description"
-  },
-  {
     "term": "Compact",
     "translation": "",
     "context": "Compact",
@@ -5430,13 +5416,6 @@
     "context": "DankCalendar isn't running",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "DankMaterialShell is ready to use",
-    "translation": "",
-    "context": "DankMaterialShell is ready to use",
-    "reference": "",
-    "comment": "greeter completion page subtitle"
   },
   {
     "term": "DankShell & System Icons (requires restart)",
@@ -8785,13 +8764,6 @@
     "comment": "battery status"
   },
   {
-    "term": "G: grid • Z/X: size",
-    "translation": "",
-    "context": "G: grid • Z/X: size",
-    "reference": "",
-    "comment": "Widget grid keyboard hints"
-  },
-  {
     "term": "GPU",
     "translation": "",
     "context": "GPU",
@@ -8825,13 +8797,6 @@
     "context": "GTK colors applied successfully",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "GTK, Qt, IDEs, more",
-    "translation": "",
-    "context": "GTK, Qt, IDEs, more",
-    "reference": "",
-    "comment": "greeter feature card description"
   },
   {
     "term": "Games",
@@ -11134,7 +11099,7 @@
     "translation": "",
     "context": "Lock Screen",
     "reference": "",
-    "comment": "greeter feature card title | lock screen notifications settings card"
+    "comment": "lock screen notifications settings card"
   },
   {
     "term": "Lock Screen Format",
@@ -14767,7 +14732,7 @@
     "translation": "",
     "context": "Plugins",
     "reference": "",
-    "comment": "greeter feature card title | greeter plugins link"
+    "comment": "greeter feature card title"
   },
   {
     "term": "Pointer",
@@ -16938,13 +16903,6 @@
     "context": "Security",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Security & privacy",
-    "translation": "",
-    "context": "Security & privacy",
-    "reference": "",
-    "comment": "greeter feature card description"
   },
   {
     "term": "Security Key PAM Source",
@@ -19677,13 +19635,6 @@
     "comment": ""
   },
   {
-    "term": "Theme Registry",
-    "translation": "",
-    "context": "Theme Registry",
-    "reference": "",
-    "comment": "greeter feature card title"
-  },
-  {
     "term": "Theme color used for the border",
     "translation": "",
     "context": "Theme color used for the border",
@@ -22083,13 +22034,6 @@
     "context": "Yesterday",
     "reference": "",
     "comment": "notification history filter"
-  },
-  {
-    "term": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
-    "translation": "",
-    "context": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
-    "reference": "",
-    "comment": "greeter plugins page intro"
   },
   {
     "term": "You have unsaved changes. Save before continuing?",

@@ -690,7 +690,7 @@
     "Application": "Програма"
   },
   "Application Dock": {
-    "Application Dock": "Док-панель"
+    "Application Dock": "Док програм"
   },
   "Applications": {
     "Applications": "Програми"
@@ -918,7 +918,7 @@
     "Auto-hide": "Автоприховування"
   },
   "Auto-hide Dock": {
-    "Auto-hide Dock": "Автоприховування док-панелі"
+    "Auto-hide Dock": "Автоприховування доку"
   },
   "Auto-login change needs a sync": {
     "Auto-login change needs a sync": "Зміна автологіну потребує синхронізації"
@@ -1275,7 +1275,7 @@
     "Bottom Section": "Нижня секція"
   },
   "Bottom dock for pinned and running applications": {
-    "Bottom dock for pinned and running applications": "Нижня панель для закріплених і запущених програм"
+    "Bottom dock for pinned and running applications": "Нижній док для закріплених і запущених програм"
   },
   "Bright": {
     "Bright": "Яскравий"
@@ -1587,7 +1587,7 @@
     "Clear Badge on Open": "Очищати індикатор під час відкриття"
   },
   "Clear Filtered": {
-    "Clear Filtered": ""
+    "Clear Filtered": "Очистити відфільтроване"
   },
   "Clear History?": {
     "Clear History?": "Очистити історію?"
@@ -1785,7 +1785,7 @@
     "Commands": "Команди"
   },
   "Community favorites to get you started": {
-    "Community favorites to get you started": ""
+    "Community favorites to get you started": "Вподобання загалу для швидкого початку"
   },
   "Community themes": {
     "Community themes": "Спільнотні теми"
@@ -2052,7 +2052,7 @@
     "Couldn't load hotspot password": "Не вдалося завантажити пароль точки доступу"
   },
   "Couldn't load plugins": {
-    "Couldn't load plugins": ""
+    "Couldn't load plugins": "Не вдалося завантажити плагіни"
   },
   "Count Only": {
     "Count Only": "Тільки підрахунок"
@@ -2667,7 +2667,7 @@
     "Display Settings": "Налаштування дисплея"
   },
   "Display a dock with pinned and running applications": {
-    "Display a dock with pinned and running applications": "Відображати док-панель із закріпленими та запущеними програмами"
+    "Display a dock with pinned and running applications": "Відображати док із закріпленими та запущеними програмами"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Відображати всі пріоритети поверх повноекранних програм"
@@ -2733,7 +2733,7 @@
     "Do Not Disturb": "Не турбувати"
   },
   "Dock": {
-    "Dock": "Док-панель"
+    "Dock": "Док"
   },
   "Dock & Launcher": {
     "Dock & Launcher": "Док та запуск"
@@ -4482,7 +4482,7 @@
     "Integrations": "Інтеграції"
   },
   "Intelligent Auto-hide": {
-    "Intelligent Auto-hide": "Інтелектуальний автохост"
+    "Intelligent Auto-hide": "Інтелектуальне автоприховування"
   },
   "Intensity": {
     "Intensity": "Інтенсивність"
@@ -4575,7 +4575,7 @@
     "Keep the clipboard type filter when reopening history": "Зберігати фільтр типу буфера обміну при повторному відкритті історії"
   },
   "Keep the dock visible above fullscreen applications": {
-    "Keep the dock visible above fullscreen applications": ""
+    "Keep the dock visible above fullscreen applications": "Залишати док видимим поверх програм у повноекранному режимі"
   },
   "Keep typing": {
     "Keep typing": "Продовжуйте друкувати"
@@ -6411,7 +6411,7 @@
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Спливаючі та модальні вікна слідують за глобальною швидкістю анімації (вимкніть, щоб налаштувати окремо)"
   },
   "Popular Plugins": {
-    "Popular Plugins": ""
+    "Popular Plugins": "Популярні плагіни"
   },
   "Popup Only": {
     "Popup Only": "Тільки спливаюче"
@@ -6993,7 +6993,7 @@
     "Resume": "Відновити"
   },
   "Retry": {
-    "Retry": ""
+    "Retry": "Повторити"
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Показати дуги в місцях стику поверхонь і рамки"
@@ -7347,7 +7347,7 @@
     "Select Custom Theme": "Вибрати власну тему"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": "Оберіть логотип запускача в доці"
+    "Select Dock Launcher Logo": "Оберіть логотип запускача доку"
   },
   "Select File to Send": {
     "Select File to Send": "Оберіть файл для надсилання"
@@ -7623,22 +7623,22 @@
     "Show CPU Temp": "Показувати температуру ЦП"
   },
   "Show Charge Rate": {
-    "Show Charge Rate": ""
+    "Show Charge Rate": "Показувати швидкість заряджання"
   },
   "Show Date": {
     "Show Date": "Показувати дату"
   },
   "Show Discharge Rate": {
-    "Show Discharge Rate": ""
+    "Show Discharge Rate": "Показувати швидкість розряджання"
   },
   "Show Disk": {
     "Show Disk": "Показувати диск"
   },
   "Show Dock": {
-    "Show Dock": "Відобразити док-панель"
+    "Show Dock": "Відобразити док"
   },
   "Show Dock Over Fullscreen": {
-    "Show Dock Over Fullscreen": ""
+    "Show Dock Over Fullscreen": "Показувати док поверх повноекранного режиму"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Показувати температуру «відчувається як»"
@@ -7788,7 +7788,7 @@
     "Show Top Processes": "Показувати топ-процеси"
   },
   "Show Trash in Dock": {
-    "Show Trash in Dock": "Показувати кошик у док-панелі"
+    "Show Trash in Dock": "Показувати кошик у доці"
   },
   "Show Virtual Devices": {
     "Show Virtual Devices": "Показувати віртуальні пристрої"
@@ -7845,7 +7845,7 @@
     "Show device": "Показувати пристрій"
   },
   "Show dock when floating windows don't overlap its area": {
-    "Show dock when floating windows don't overlap its area": "Показувати док-панель, коли плаваючі вікна не перекривають її область"
+    "Show dock when floating windows don't overlap its area": "Показувати док, коли плаваючі вікна не перекривають її область"
   },
   "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": {
     "Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.": "Показувати тінь для спливаючих сповіщень. Потребує увімкнення M3 Elevation у розділі «Тема та кольори»"
@@ -7902,7 +7902,7 @@
     "Show weather information in top bar and control center": "Показувати інформацію про погоду у верхній панелі та центрі керування"
   },
   "Show weather on the login screen": {
-    "Show weather on the login screen": ""
+    "Show weather on the login screen": "Показувати погоду на екрані входу"
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Показувати номери робочих областей у перемикачі на верхній панелі"
@@ -8547,7 +8547,7 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Це видалить усі незакріплені записи. Буде збережено %1 закріплених записів"
   },
   "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
-    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": "Це видалить %1 записів, що відповідають поточному фільтру. Закріплені записи будуть збережені"
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Це розірве з'єднання WiFi з «%1» — радіомодуль не може одночасно працювати як точка доступу та бути підключеним до мережі. Для спільного використання інтернету знадобиться інше підключення, наприклад Ethernet"
@@ -8736,7 +8736,7 @@
     "Transform": "Трансформація"
   },
   "Transition Duration": {
-    "Transition Duration": ""
+    "Transition Duration": "Тривалість переходу"
   },
   "Transition Effect": {
     "Transition Effect": "Ефект переходу"
@@ -8913,7 +8913,7 @@
     "Unpin": "Відкріпити"
   },
   "Unpin from Dock": {
-    "Unpin from Dock": "Відкріпити від док-панелі"
+    "Unpin from Dock": "Відкріпити від доку"
   },
   "Unread notification count beside the clock": {
     "Unread notification count beside the clock": "Кількість непрочитаних сповіщень поруч із годинником"
@@ -9526,9 +9526,6 @@
   },
   "Yesterday": {
     "Yesterday": "Вчора"
-  },
-  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ви маєте незбережені зміни. Зберегти їх, щоб продовжити?"

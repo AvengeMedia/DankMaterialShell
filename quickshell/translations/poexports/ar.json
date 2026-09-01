@@ -9527,9 +9527,6 @@
   "Yesterday": {
     "Yesterday": "أمس"
   },
-  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": "يمكنك توسيع DMS بمزيد من التطبيقات الصغيرة وميزات المشغل والأدوات عبر نظام الملحقات. تتوفر المئات منها في سجل DMS الرسمي، وهي من بناء المجتمع وفريق DMS. قم بتثبيت بعضها الآن، أو لاحقًا عبر واجهة سطر أوامر DMS أو نافذة الإعدادات."
-  },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المتابعة؟"
   },

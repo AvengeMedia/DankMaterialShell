@@ -591,7 +591,7 @@
     "Always Show Percentage": "Mostra sempre la percentuale"
   },
   "Always blur against the wallpaper, even with Xray off": {
-    "Always blur against the wallpaper, even with Xray off": "Sfoca sempre sullo sfondo, anche con Xray disattivato"
+    "Always blur against the wallpaper, even with Xray off": "Sfoca sempre rispetto allo sfondo, anche con Xray disattivato"
   },
   "Always hide the dock and reveal it when hovering near the dock area": {
     "Always hide the dock and reveal it when hovering near the dock area": "Nascondi sempre il dock e mostralo passando il puntatore vicino all'area del dock"
@@ -888,7 +888,7 @@
     "Auto Power Saver": "Risparmio energetico automatico"
   },
   "Auto matches bar spacing; Off leaves gaps to your %1 config": {
-    "Auto matches bar spacing; Off leaves gaps to your %1 config": "Auto adatta la spaziatura della barra; Off lascia gli spazi impostati nella tua configurazione %1"
+    "Auto matches bar spacing; Off leaves gaps to your %1 config": "Auto adatta la spaziatura della barra; Disattivato lascia gli spazi alla configurazione di %1."
   },
   "Auto mode is on. Manual profile selection is disabled.": {
     "Auto mode is on. Manual profile selection is disabled.": "La modalità automatica è attiva. La selezione manuale dei profili è disabilitata."
@@ -1020,7 +1020,7 @@
     "Available Screens (%1)": "Schermi disponibili (%1)"
   },
   "Available Updates (%1)": {
-    "Available Updates (%1)": "Aggiornamenti Disponibili (%1)"
+    "Available Updates (%1)": "Aggiornamenti disponibili (%1)"
   },
   "Available in Detailed and Forecast view modes": {
     "Available in Detailed and Forecast view modes": "Disponibile nelle modalità di visualizzazione Dettagliata e Previsioni"
@@ -1191,7 +1191,7 @@
     "Bluetooth": "Bluetooth"
   },
   "Bluetooth Settings": {
-    "Bluetooth Settings": "Impostazioni del Bluetooth"
+    "Bluetooth Settings": "Impostazioni del bluetooth"
   },
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth non disponibile"
@@ -1404,7 +1404,7 @@
     "Category": "Categoria"
   },
   "Cellular": {
-    "Cellular": "Rete Cellulare"
+    "Cellular": "Rete cellulare"
   },
   "Cellular disabled": {
     "Cellular disabled": "Rete cellulare disabilitata"
@@ -1698,7 +1698,7 @@
     "Codec switching is unavailable because WirePlumber was not found": "Il cambio codec non è disponibile perché WirePlumber non è stato trovato"
   },
   "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "Il passaggio del codec non è disponibile perché pactl non è stato trovato"
+    "Codec switching is unavailable because pactl was not found": "Il cambio di codec non è disponibile perché pactl non è stato trovato"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "Il cambio codec non è disponibile. WirePlumber wpexec non è stato trovato."
@@ -2256,7 +2256,7 @@
     "Customizable empty space": "Spazio vuoto personalizzabile"
   },
   "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": {
-    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Personalizza il font e lo sfondo della schermata di blocco, o lascia vuoto per usare il font del tuo tema e lo sfondo del desktop. Le modifiche vengono applicate immediatamente."
+    "Customize the font and background of the lock screen, or leave empty to use your theme font and desktop wallpaper. Changes apply instantly.": "Personalizza il font e lo sfondo della schermata di blocco, oppure lascia vuoto per usare il font del tuo tema e lo sfondo del desktop. Le modifiche vengono applicate immediatamente."
   },
   "Customize which actions appear in the power menu": {
     "Customize which actions appear in the power menu": "Personalizza le azioni da visualizzare nel menu di alimentazione"
@@ -3171,7 +3171,7 @@
     "Failed to add printer to class": "Impossibile aggiungere la stampante alla classe"
   },
   "Failed to apply %1 colors": {
-    "Failed to apply %1 colors": "Impossibile applicare i colori %1"
+    "Failed to apply %1 colors": "Impossibile applicare i colori di %1"
   },
   "Failed to apply charge limit to system": {
     "Failed to apply charge limit to system": "Impossibile applicare il limite di carica al sistema"
@@ -3663,7 +3663,7 @@
     "Font Weight": "Spessore del Font"
   },
   "Font used for the clock and date on the lock screen": {
-    "Font used for the clock and date on the lock screen": "Font utilizzato per orologio e data sulla schermata di blocco"
+    "Font used for the clock and date on the lock screen": "Font utilizzato per l'orologio e la data sulla schermata di blocco"
   },
   "Font used on the login screen": {
     "Font used on the login screen": "Font utilizzato nella schermata di accesso"
@@ -3693,7 +3693,7 @@
     "Force Kill (SIGKILL)": "Terminazione forzata (SIGKILL)"
   },
   "Force Padding": {
-    "Force Padding": "Forza spaziatura"
+    "Force Padding": "Spaziatura forzata"
   },
   "Force RGBX": {
     "Force RGBX": "Forza RGBX"
@@ -3789,7 +3789,7 @@
     "Full Day & Month": "Giorno e mese completi"
   },
   "Full Size": {
-    "Full Size": "Grandezza massima"
+    "Full Size": "Dimensione intera"
   },
   "Full command to execute": {
     "Full command to execute": "Comando completo da eseguire"
@@ -3876,7 +3876,7 @@
     "Globally scale all animation durations": "Ridimensiona globalmente la durata di tutte le animazioni"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
-    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Scala globalmente la durata delle animazioni con moto geometrico, fisica a molla e curve di Bézier"
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Scala globalmente la durata delle animazioni con moto geometrico, fisica a molla e curve di bezier"
   },
   "Golden Hour": {
     "Golden Hour": "Ora dorata"
@@ -3933,7 +3933,7 @@
     "Greeter group:": "Gruppo greeter:"
   },
   "Greeter sync complete": {
-    "Greeter sync complete": "Sincronizzazione greeter completata"
+    "Greeter sync complete": "Sincronizzazione del greeter completata"
   },
   "Grid": {
     "Grid": "Griglia"
@@ -3972,7 +3972,7 @@
     "Groups": "Gruppi"
   },
   "H": {
-    "H": "H"
+    "H": "A"
   },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
@@ -3993,7 +3993,7 @@
     "HTML copied to clipboard": "HTML copiato negli appunti"
   },
   "Handles geo: location links": {
-    "Handles geo: location links": "Gestisce i link geo: di localizzazione"
+    "Handles geo: location links": "Gestisce i collegamenti geo: di posizione"
   },
   "Handles links and opens HTML files": {
     "Handles links and opens HTML files": "Gestisce i collegamenti e apre i file HTML"
@@ -4206,7 +4206,7 @@
     "How the background image is scaled": "Come viene ridimensionata l'immagine di sfondo"
   },
   "How the wallpaper is scaled to fit the screen": {
-    "How the wallpaper is scaled to fit the screen": "Come viene scalato lo sfondo per adattarlo allo schermo"
+    "How the wallpaper is scaled to fit the screen": "Come viene ridimensionato lo sfondo per adattarlo allo schermo"
   },
   "Humidity": {
     "Humidity": "Umidità"
@@ -4320,10 +4320,10 @@
     "Ignored Packages": "Pacchetti ignorati"
   },
   "Ignored packages are hidden from the updater and skipped by 'Update All'.": {
-    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "I pacchetti ignorati sono nascosti dall'updater e saltati quando si esegue \"Aggiorna Tutto\"."
+    "Ignored packages are hidden from the updater and skipped by 'Update All'.": "I pacchetti ignorati vengono nascosti dallo strumento di aggiornamento e saltati da \"Aggiorna Tutto\"."
   },
   "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": {
-    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "I pacchetti ignorati si applicano solo all'updater integrato. Il tuo comando personalizzato gestisce le proprie esclusioni."
+    "Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.": "I pacchetti ignorati si applicano solo allo strumento di aggiornamento integrato. Il tuo comando personalizzato gestisce le proprie esclusioni."
   },
   "Image": {
     "Image": "Immagine"
@@ -4374,7 +4374,7 @@
     "Incorrect password - try again": "Password errata - riprova"
   },
   "Index Centering": {
-    "Index Centering": "Centratura indice"
+    "Index Centering": "Centratura dell'indice"
   },
   "Indicator Style": {
     "Indicator Style": "Stile indicatore"
@@ -4812,7 +4812,7 @@
     "Local Weather": "Meteo locale"
   },
   "Locale": {
-    "Locale": "Regione e Lingua"
+    "Locale": "Lingua e Regione"
   },
   "Location": {
     "Location": "Posizione"
@@ -4983,7 +4983,7 @@
     "Material": "Material"
   },
   "Material 3 Expressive bezier curves, default.": {
-    "Material 3 Expressive bezier curves, default.": "Curve di Bézier espressive di Material 3, predefinito."
+    "Material 3 Expressive bezier curves, default.": "Curve di bezier espressive di Material 3, predefinito."
   },
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": "I pannelli espressivi di Material 3 emergono dal basso con una scala sottile, predefinito."
@@ -5253,7 +5253,7 @@
     "Mouse & Touchpad": "Mouse e Touchpad"
   },
   "Mouse Settings": {
-    "Mouse Settings": "Impostazioni del Mouse"
+    "Mouse Settings": "Impostazioni del mouse"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "I clic del mouse attraversano la barra e raggiungono le finestre dietro di essa"
@@ -5640,7 +5640,7 @@
     "No output devices found": "Nessun dispositivo di uscita trovato"
   },
   "No packages ignored. Add one here or hover an update in the popout and click the hide button.": {
-    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "Nessun pacchetto ignorato. Aggiungine uno qui o passa il cursore su un aggiornamento nel pannello a comparsa e fai clic sul pulsante nascondi."
+    "No packages ignored. Add one here or hover an update in the popout and click the hide button.": "Nessun pacchetto ignorato. Aggiungine uno qui oppure passa il cursore su un aggiornamento nel pannello a comparsa e fai clic sul pulsante Nascondi."
   },
   "No peers found": {
     "No peers found": "Nessun peer trovato"
@@ -6126,7 +6126,7 @@
     "PIN": "PIN"
   },
   "Package name (e.g., docker)": {
-    "Package name (e.g., docker)": "Nome del pacchetto (es., docker)"
+    "Package name (e.g., docker)": "Nome del pacchetto (es. docker)"
   },
   "Pad": {
     "Pad": "Centra"
@@ -6474,7 +6474,7 @@
     "Power Profile Degradation": "Degrado del profilo energetico"
   },
   "Power Profiles & Saving": {
-    "Power Profiles & Saving": "Profili Energetici e Risparmio"
+    "Power Profiles & Saving": "Profili di alimentazione e risparmio energetico"
   },
   "Power Saver": {
     "Power Saver": "Risparmio energetico"
@@ -8196,7 +8196,7 @@
     "Surface Border Color": "Colore del bordo della superficie"
   },
   "Surface Border Opacity": {
-    "Surface Border Opacity": "Opacità bordo superficie"
+    "Surface Border Opacity": "Opacità del bordo della superficie"
   },
   "Surface Border Outline": {
     "Surface Border Outline": "Contorno del bordo della superficie"
@@ -8727,7 +8727,7 @@
     "Touch your security key...": "Tocca la chiave di sicurezza..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": "Impostazioni del Touchpad"
+    "Touchpad Settings": "Impostazioni del touchpad"
   },
   "Touchpad Speed": {
     "Touchpad Speed": "Velocità del touchpad"
@@ -8829,7 +8829,7 @@
     "Unfocused Color": "Colore inattivo"
   },
   "Unfocused Display(s)": {
-    "Unfocused Display(s)": "Schermo(i) inattivo(i)"
+    "Unfocused Display(s)": "Schermo/i non attivo/i"
   },
   "Ungrouped": {
     "Ungrouped": "Non raggruppato"
@@ -9015,7 +9015,7 @@
     "Use System Theme": "Usa tema di sistema"
   },
   "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": {
-    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Utilizza un'immagine personalizzata per la schermata di blocco, oppure lascia vuoto per usare lo sfondo del desktop."
+    "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Usa un'immagine personalizzata per la schermata di blocco, oppure lascia vuoto per usare lo sfondo del desktop."
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
     "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Usa un'immagine personalizzata per la schermata di accesso, oppure lascia vuoto per utilizzare lo sfondo del desktop"
@@ -9030,7 +9030,7 @@
     "Use a security key for lock screen authentication": "Usa una chiave di sicurezza per l'autenticazione della schermata di blocco"
   },
   "Use album art accent": {
-    "Use album art accent": "Usa l'accento della copertina dell'album"
+    "Use album art accent": "Usa il colore d'accento della copertina dell'album"
   },
   "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "Usa un gestore di sfondi esterno come swww, hyprpaper o swaybg."
@@ -9252,7 +9252,7 @@
     "Volume": "Volume"
   },
   "Volume Changed": {
-    "Volume Changed": "Cambio di Volume"
+    "Volume Changed": "Cambio di volume"
   },
   "Volume Slider": {
     "Volume Slider": "Cursore del volume"
@@ -9264,7 +9264,7 @@
     "Votes": "Voti"
   },
   "W": {
-    "W": "W"
+    "W": "L"
   },
   "WCAG %1 body": {
     "WCAG %1 body": "WCAG %1 corpo"
@@ -9507,7 +9507,7 @@
     "XWayland": "XWayland"
   },
   "Xray Blur Effect": {
-    "Xray Blur Effect": "Effetto sfocatura Xray"
+    "Xray Blur Effect": "Effetto di sfocatura Xray"
   },
   "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": {
     "Xray blurs only the wallpaper (efficient) and is the default when Blur is on. Set Xray to Off for regular full blur of everything beneath the window (more expensive).": "La modalità Raggi X sfoca solo lo sfondo (efficiente) ed è l'impostazione predefinita quando la sfocatura è attiva. Imposta Raggi X su Disattivato per una normale sfocatura completa di tutto ciò che si trova sotto la finestra (più dispendioso)."
@@ -9526,9 +9526,6 @@
   },
   "Yesterday": {
     "Yesterday": "Ieri"
-  },
-  "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": {
-    "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.": ""
   },
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ci sono modifiche non salvate. Vuoi salvarle prima di continuare?"
@@ -9675,7 +9672,7 @@
     "mangowc GitHub": "GitHub di mangowc"
   },
   "matugen not available or disabled - cannot apply %1 colors": {
-    "matugen not available or disabled - cannot apply %1 colors": "matugen non è disponibile o disabilitato - impossibile applicare i colori %1"
+    "matugen not available or disabled - cannot apply %1 colors": "matugen non è disponibile o disabilitato - Impossibile applicare i colori di %1"
   },
   "matugen not found - install matugen package for dynamic theming": {
     "matugen not found - install matugen package for dynamic theming": "matugen non trovato - installa il pacchetto matugen per i temi dinamici"
@@ -9765,7 +9762,7 @@
     "source": "sorgente"
   },
   "the Qt 6 Multimedia QML module": {
-    "the Qt 6 Multimedia QML module": "il modulo QML Qt 6 Multimedia"
+    "the Qt 6 Multimedia QML module": "il modulo QML Multimedia di Qt 6"
   },
   "this app": {
     "this app": "questa app"

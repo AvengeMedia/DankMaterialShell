@@ -2032,15 +2032,6 @@
     ]
   },
   {
-    "term": "App Theming",
-    "context": "App Theming",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:97",
-    "comment": "greeter feature card title",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
     "term": "App name or identity (e.g., firefox)",
     "context": "App name or identity (e.g., firefox)",
     "reference": "Modules/Settings/MediaPlayerTab.qml:194",
@@ -3169,7 +3160,7 @@
   {
     "term": "Background image",
     "context": "Background image",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:382",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:540",
     "comment": "greeter wallpaper description",
     "tags": [
       "shell"
@@ -3915,7 +3906,7 @@
   {
     "term": "Browse Plugins",
     "context": "Browse Plugins",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:213, Modules/Settings/PluginBrowser.qml:503, Modules/Settings/PluginBrowser.qml:661, Modules/Settings/DesktopWidgetsTab.qml:199",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:204, Modules/Settings/PluginBrowser.qml:503, Modules/Settings/PluginBrowser.qml:661, Modules/Settings/DesktopWidgetsTab.qml:199",
     "comment": "plugin browser header | plugin browser window title",
     "tags": [
       "settings",
@@ -3943,7 +3934,7 @@
   {
     "term": "Browse or search plugins",
     "context": "Browse or search plugins",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:214, Modals/DankLauncherV2/ResultsList.qml:566",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:205, Modals/DankLauncherV2/ResultsList.qml:566",
     "comment": "",
     "tags": [
       "shell"
@@ -5102,7 +5093,7 @@
   {
     "term": "Codec switched successfully",
     "context": "Codec switched successfully",
-    "reference": "Services/BluetoothService.qml:789",
+    "reference": "Services/BluetoothService.qml:804",
     "comment": "",
     "tags": [
       "shell"
@@ -5120,7 +5111,7 @@
   {
     "term": "Codec switching is unavailable. WirePlumber wpexec was not found.",
     "context": "Codec switching is unavailable. WirePlumber wpexec was not found.",
-    "reference": "Services/BluetoothService.qml:657",
+    "reference": "Services/BluetoothService.qml:672",
     "comment": "",
     "tags": [
       "shell"
@@ -5380,15 +5371,6 @@
     ]
   },
   {
-    "term": "Community themes",
-    "context": "Community themes",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:106",
-    "comment": "greeter feature card description",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
     "term": "Compact",
     "context": "Compact",
     "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:15, Modules/Settings/WidgetsTabSection.qml:926, Modules/Settings/WidgetsTabSection.qml:1928, Modules/Settings/NotificationsTab.qml:294",
@@ -5536,7 +5518,7 @@
   {
     "term": "Configure",
     "context": "Configure",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:356",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:514",
     "comment": "greeter settings section header",
     "tags": [
       "shell"
@@ -5545,7 +5527,7 @@
   {
     "term": "Configure Keybinds",
     "context": "Configure Keybinds",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:297",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:455",
     "comment": "greeter configure keybinds link",
     "tags": [
       "shell"
@@ -5846,7 +5828,7 @@
   {
     "term": "Control Center",
     "context": "Control Center",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:148, Modules/DankIsland/DankIslandSurface.qml:458, Modules/Settings/WidgetsTab.qml:186",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:132, Modules/DankIsland/DankIslandSurface.qml:458, Modules/Settings/WidgetsTab.qml:186",
     "comment": "greeter feature card title | island compact face: control center label",
     "tags": [
       "settings",
@@ -6191,7 +6173,7 @@
   {
     "term": "Couldn't load plugins",
     "context": "Couldn't load plugins",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:162, Modules/Settings/PluginBrowser.qml:1030",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:153, Modules/Settings/PluginBrowser.qml:1030",
     "comment": "plugin registry fetch error",
     "tags": [
       "settings",
@@ -6870,7 +6852,7 @@
   {
     "term": "DMS Shortcuts",
     "context": "DMS Shortcuts",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:136",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:309",
     "comment": "greeter keybinds section header",
     "tags": [
       "shell"
@@ -7023,7 +7005,7 @@
   {
     "term": "DankBar",
     "context": "DankBar",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:113, Modals/Greeter/GreeterCompletePage.qml:405",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:97, Modals/Greeter/GreeterCompletePage.qml:563",
     "comment": "greeter feature card title | greeter settings link",
     "tags": [
       "shell"
@@ -7052,15 +7034,6 @@
     "context": "DankCalendar isn't running",
     "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:253",
     "comment": "",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
-    "term": "DankMaterialShell is ready to use",
-    "context": "DankMaterialShell is ready to use",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:112",
-    "comment": "greeter completion page subtitle",
     "tags": [
       "shell"
     ]
@@ -8001,7 +7974,7 @@
   {
     "term": "Display Control",
     "context": "Display Control",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:140",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:124",
     "comment": "greeter feature card title",
     "tags": [
       "shell"
@@ -8173,7 +8146,7 @@
   {
     "term": "Displays",
     "context": "Displays",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:373, Modals/Settings/SettingsSidebar.qml:235, Modules/Settings/Widgets/SettingsDisplayPicker.qml:36",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:531, Modals/Settings/SettingsSidebar.qml:235, Modules/Settings/Widgets/SettingsDisplayPicker.qml:36",
     "comment": "greeter settings link",
     "tags": [
       "settings",
@@ -8238,7 +8211,7 @@
   {
     "term": "Dock",
     "context": "Dock",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:422, Modals/Settings/SettingsSidebar.qml:214",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:580, Modals/Settings/SettingsSidebar.qml:214",
     "comment": "greeter settings link",
     "tags": [
       "settings",
@@ -8284,7 +8257,7 @@
   {
     "term": "Docs",
     "context": "Docs",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:468, Modules/Settings/AboutTab.qml:270, Modules/Settings/AboutTab.qml:278",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:626, Modules/Settings/AboutTab.qml:270, Modules/Settings/AboutTab.qml:278",
     "comment": "greeter documentation link",
     "tags": [
       "settings",
@@ -8564,7 +8537,7 @@
   {
     "term": "Dynamic colors, presets",
     "context": "Dynamic colors, presets",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:390",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:548",
     "comment": "greeter theme description",
     "tags": [
       "shell"
@@ -9400,7 +9373,7 @@
   {
     "term": "Explore",
     "context": "Explore",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:453",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:611",
     "comment": "greeter explore section header",
     "tags": [
       "shell"
@@ -9445,7 +9418,7 @@
   {
     "term": "Extensible architecture",
     "context": "Extensible architecture",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:122",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:106",
     "comment": "greeter feature card description",
     "tags": [
       "shell"
@@ -9877,7 +9850,7 @@
   {
     "term": "Failed to parse %1",
     "context": "Failed to parse %1",
-    "reference": "Common/SettingsData.qml:1751, Common/SettingsData.qml:1871, Common/SettingsData.qml:3414, Services/ToastService.qml:188",
+    "reference": "Common/SettingsData.qml:1751, Common/SettingsData.qml:1871, Common/SettingsData.qml:3413, Services/ToastService.qml:188",
     "comment": "",
     "tags": [
       "shell"
@@ -10210,7 +10183,7 @@
   {
     "term": "Failed to switch codec",
     "context": "Failed to switch codec",
-    "reference": "Services/BluetoothService.qml:789",
+    "reference": "Services/BluetoothService.qml:804",
     "comment": "",
     "tags": [
       "shell"
@@ -11236,10 +11209,11 @@
   {
     "term": "Frame",
     "context": "Frame",
-    "reference": "Modals/Settings/SettingsSidebar.qml:156",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:74, Modals/Settings/SettingsSidebar.qml:156",
     "comment": "",
     "tags": [
-      "settings"
+      "settings",
+      "shell"
     ]
   },
   {
@@ -11406,15 +11380,6 @@
     ]
   },
   {
-    "term": "G: grid • Z/X: size",
-    "context": "G: grid • Z/X: size",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:803",
-    "comment": "Widget grid keyboard hints",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
     "term": "GPU",
     "context": "GPU",
     "reference": "Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:138",
@@ -11455,15 +11420,6 @@
     "context": "GTK colors applied successfully",
     "reference": "Common/Theme.qml:1910",
     "comment": "",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
-    "term": "GTK, Qt, IDEs, more",
-    "context": "GTK, Qt, IDEs, more",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:98",
-    "comment": "greeter feature card description",
     "tags": [
       "shell"
     ]
@@ -11787,7 +11743,7 @@
   {
     "term": "Grid: OFF",
     "context": "Grid: OFF",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:773",
+    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:777",
     "comment": "Widget grid snap status",
     "tags": [
       "shell"
@@ -11796,7 +11752,7 @@
   {
     "term": "Grid: ON",
     "context": "Grid: ON",
-    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:773",
+    "reference": "Modules/Plugins/DesktopPluginWrapper.qml:777",
     "comment": "Widget grid snap status",
     "tags": [
       "shell"
@@ -12040,7 +11996,7 @@
   {
     "term": "Hibernate",
     "context": "Hibernate",
-    "reference": "Services/SessionService.qml:597, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:606, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -12050,7 +12006,7 @@
   {
     "term": "Hibernate failed",
     "context": "Hibernate failed",
-    "reference": "Services/SessionService.qml:144",
+    "reference": "Services/SessionService.qml:146",
     "comment": "",
     "tags": [
       "shell"
@@ -13541,10 +13497,11 @@
   {
     "term": "Island",
     "context": "Island",
-    "reference": "Modals/Settings/SettingsSidebar.qml:162, Modules/Settings/LauncherTab.qml:93, Modules/Settings/DankBarTab.qml:482",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:78, Modals/Settings/SettingsSidebar.qml:162, Modules/Settings/LauncherTab.qml:93, Modules/Settings/DankBarTab.qml:482",
     "comment": "",
     "tags": [
-      "settings"
+      "settings",
+      "shell"
     ]
   },
   {
@@ -13767,7 +13724,7 @@
   {
     "term": "Keybinds",
     "context": "Keybinds",
-    "reference": "Modals/KeybindsModalWindow.qml:28, Modals/KeybindsModalWindow.qml:76, Modals/KeybindsContent.qml:72, Modals/Greeter/GreeterCompletePage.qml:413",
+    "reference": "Modals/KeybindsModalWindow.qml:28, Modals/KeybindsModalWindow.qml:76, Modals/KeybindsContent.qml:72, Modals/Greeter/GreeterCompletePage.qml:571",
     "comment": "greeter settings link",
     "tags": [
       "shell"
@@ -14129,7 +14086,7 @@
   {
     "term": "Layout",
     "context": "Layout",
-    "reference": "Modules/Settings/LockScreenTab.qml:270, Modules/Settings/WidgetsTab.qml:61, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2204, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:350, Modules/DankBar/Popouts/DWLLayoutPopout.qml:169",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:168, Modules/Settings/LockScreenTab.qml:270, Modules/Settings/WidgetsTab.qml:61, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2204, Modules/Settings/DesktopWidgetSettings/SystemMonitorSettings.qml:350, Modules/DankBar/Popouts/DWLLayoutPopout.qml:169",
     "comment": "",
     "tags": [
       "settings",
@@ -14439,7 +14396,7 @@
   {
     "term": "Lock",
     "context": "Lock",
-    "reference": "Services/SessionService.qml:585, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:594, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -14449,11 +14406,10 @@
   {
     "term": "Lock Screen",
     "context": "Lock Screen",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:156, Modals/Settings/SettingsSidebar.qml:413, Modules/Settings/NotificationsTab.qml:844",
-    "comment": "greeter feature card title | lock screen notifications settings card",
+    "reference": "Modals/Settings/SettingsSidebar.qml:413, Modules/Settings/NotificationsTab.qml:844",
+    "comment": "lock screen notifications settings card",
     "tags": [
-      "settings",
-      "shell"
+      "settings"
     ]
   },
   {
@@ -14513,7 +14469,7 @@
   {
     "term": "Log Out",
     "context": "Log Out",
-    "reference": "Modals/SwitchUserModal.qml:253, Services/SessionService.qml:573, Modules/Settings/PowerSleepTab.qml:406, Modules/Settings/PowerSleepTab.qml:412",
+    "reference": "Modals/SwitchUserModal.qml:253, Services/SessionService.qml:582, Modules/Settings/PowerSleepTab.qml:406, Modules/Settings/PowerSleepTab.qml:412",
     "comment": "",
     "tags": [
       "settings",
@@ -15613,7 +15569,7 @@
   {
     "term": "Modular widget bar",
     "context": "Modular widget bar",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:114",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:98",
     "comment": "greeter feature card description",
     "tags": [
       "shell"
@@ -15822,7 +15778,7 @@
   {
     "term": "Multi-Monitor",
     "context": "Multi-Monitor",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:129",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:113",
     "comment": "greeter feature card title",
     "tags": [
       "shell"
@@ -16241,7 +16197,7 @@
   {
     "term": "Night mode & gamma",
     "context": "Night mode & gamma",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:141",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:125",
     "comment": "greeter feature card description",
     "tags": [
       "shell"
@@ -16334,7 +16290,7 @@
   {
     "term": "No DMS shortcuts configured",
     "context": "No DMS shortcuts configured",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:265",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:423",
     "comment": "greeter no keybinds message",
     "tags": [
       "shell"
@@ -17506,7 +17462,7 @@
   {
     "term": "Notifications",
     "context": "Notifications",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1602, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:761, Modals/Greeter/GreeterCompletePage.qml:397, Modals/Settings/SettingsSidebar.qml:188, Modules/DankIsland/DankIslandSurface.qml:553, Modules/Settings/DankIslandTab.qml:318, Modules/Settings/CompositorLayoutTab.qml:402, Modules/Notifications/Center/NotificationHeader.qml:74",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1602, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:761, Modals/Greeter/GreeterCompletePage.qml:555, Modals/Settings/SettingsSidebar.qml:188, Modules/DankIsland/DankIslandSurface.qml:553, Modules/Settings/DankIslandTab.qml:318, Modules/Settings/CompositorLayoutTab.qml:402, Modules/Notifications/Center/NotificationHeader.qml:74",
     "comment": "KDE Connect notifications label | greeter settings link | island compact face: notification center label | island settings: notifications card title",
     "tags": [
       "plugin-dankkdeconnect",
@@ -18730,7 +18686,7 @@
   {
     "term": "Per-screen config",
     "context": "Per-screen config",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:130",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:114",
     "comment": "greeter feature card description",
     "tags": [
       "shell"
@@ -19185,8 +19141,8 @@
   {
     "term": "Plugins",
     "context": "Plugins",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:121, Modals/Greeter/GreeterCompletePage.qml:476, Modals/DankLauncherV2/SpotlightLauncherContent.qml:508, Modals/DankLauncherV2/LauncherContent.qml:342, Modals/Settings/SettingsSidebar.qml:434, Modules/Settings/AboutTab.qml:286, Modules/Settings/AboutTab.qml:294",
-    "comment": "greeter feature card title | greeter plugins link",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:105, Modals/DankLauncherV2/SpotlightLauncherContent.qml:508, Modals/DankLauncherV2/LauncherContent.qml:342, Modals/Settings/SettingsSidebar.qml:434, Modules/Settings/AboutTab.qml:286, Modules/Settings/AboutTab.qml:294",
+    "comment": "greeter feature card title",
     "tags": [
       "settings",
       "shell"
@@ -19294,7 +19250,7 @@
   {
     "term": "Popup behavior, position",
     "context": "Popup behavior, position",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:398",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:556",
     "comment": "greeter notifications description",
     "tags": [
       "shell"
@@ -19357,7 +19313,7 @@
   {
     "term": "Position, pinned apps",
     "context": "Position, pinned apps",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:423",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:581",
     "comment": "greeter dock description",
     "tags": [
       "shell"
@@ -19430,7 +19386,7 @@
   {
     "term": "Power Off",
     "context": "Power Off",
-    "reference": "Services/SessionService.qml:579, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:588, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -20094,7 +20050,7 @@
   {
     "term": "Quick system toggles",
     "context": "Quick system toggles",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:149",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:133",
     "comment": "greeter feature card description",
     "tags": [
       "shell"
@@ -20238,7 +20194,7 @@
   {
     "term": "Reboot",
     "context": "Reboot",
-    "reference": "Services/SessionService.qml:561, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:570, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -20945,7 +20901,7 @@
   {
     "term": "Resolution, position, scale",
     "context": "Resolution, position, scale",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:374",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:532",
     "comment": "greeter displays description",
     "tags": [
       "shell"
@@ -20954,7 +20910,7 @@
   {
     "term": "Restart DMS",
     "context": "Restart DMS",
-    "reference": "Services/SessionService.qml:603, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:612, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -21028,7 +20984,7 @@
   {
     "term": "Retry",
     "context": "Retry",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:176, Modules/Settings/PluginBrowser.qml:1044",
+    "reference": "Modals/Greeter/GreeterPluginsPage.qml:167, Modules/Settings/PluginBrowser.qml:1044",
     "comment": "retry failed action button",
     "tags": [
       "settings",
@@ -22008,15 +21964,6 @@
     "comment": "",
     "tags": [
       "settings"
-    ]
-  },
-  {
-    "term": "Security & privacy",
-    "context": "Security & privacy",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:157",
-    "comment": "greeter feature card description",
-    "tags": [
-      "shell"
     ]
   },
   {
@@ -24090,7 +24037,7 @@
   {
     "term": "Soft Reboot",
     "context": "Soft Reboot",
-    "reference": "Services/SessionService.qml:567, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:576, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -24406,11 +24353,12 @@
   {
     "term": "Standard",
     "context": "Standard",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modules/Settings/TypographyMotionTab.qml:305",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modals/Greeter/GreeterCompletePage.qml:70, Modules/Settings/TypographyMotionTab.qml:305",
     "comment": "",
     "tags": [
       "plugin-dankdesktopweather",
-      "settings"
+      "settings",
+      "shell"
     ]
   },
   {
@@ -24783,7 +24731,7 @@
   {
     "term": "Suspend",
     "context": "Suspend",
-    "reference": "Services/SessionService.qml:591, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:600, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
     "comment": "",
     "tags": [
       "settings",
@@ -24856,7 +24804,7 @@
   {
     "term": "Switch User",
     "context": "Switch User",
-    "reference": "Modals/SwitchUserModal.qml:97, Services/SessionService.qml:609",
+    "reference": "Modals/SwitchUserModal.qml:97, Services/SessionService.qml:618",
     "comment": "",
     "tags": [
       "shell"
@@ -25537,7 +25485,7 @@
   {
     "term": "Theme & Colors",
     "context": "Theme & Colors",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:389, Modals/Settings/SettingsSidebar.qml:93",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:547, Modals/Settings/SettingsSidebar.qml:93",
     "comment": "greeter settings link",
     "tags": [
       "settings",
@@ -25551,15 +25499,6 @@
     "comment": "",
     "tags": [
       "settings"
-    ]
-  },
-  {
-    "term": "Theme Registry",
-    "context": "Theme Registry",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:105",
-    "comment": "greeter feature card title",
-    "tags": [
-      "shell"
     ]
   },
   {
@@ -25601,7 +25540,7 @@
   {
     "term": "Themes",
     "context": "Themes",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:484",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:634",
     "comment": "greeter themes link",
     "tags": [
       "shell"
@@ -27913,7 +27852,7 @@
   {
     "term": "Wallpaper",
     "context": "Wallpaper",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:381, Modals/Settings/SettingsSidebar.qml:87, Modules/DankIsland/DankIslandSurface.qml:482, Modules/Settings/DisplayWidgetsTab.qml:47, Modules/Settings/WallpaperTab.qml:63, Modules/Settings/KeybindItem.qml:1143, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1159",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:539, Modals/Settings/SettingsSidebar.qml:87, Modules/DankIsland/DankIslandSurface.qml:482, Modules/Settings/DisplayWidgetsTab.qml:47, Modules/Settings/WallpaperTab.qml:63, Modules/Settings/KeybindItem.qml:1143, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1159",
     "comment": "greeter settings link | island compact face: wallpaper picker label",
     "tags": [
       "settings",
@@ -28323,7 +28262,7 @@
   {
     "term": "Widgets, layout, style",
     "context": "Widgets, layout, style",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:406",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:564",
     "comment": "greeter dankbar description",
     "tags": [
       "shell"
@@ -28688,15 +28627,6 @@
     ]
   },
   {
-    "term": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
-    "context": "You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.",
-    "reference": "Modals/Greeter/GreeterPluginsPage.qml:130",
-    "comment": "greeter plugins page intro",
-    "tags": [
-      "shell"
-    ]
-  },
-  {
     "term": "You have unsaved changes. Save before continuing?",
     "context": "You have unsaved changes. Save before continuing?",
     "reference": "Modules/Notepad/Notepad.qml:702",
@@ -28735,7 +28665,7 @@
   {
     "term": "You're All Set!",
     "context": "You're All Set!",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:105",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:145",
     "comment": "greeter completion page title",
     "tags": [
       "shell"
@@ -29168,7 +29098,7 @@
   {
     "term": "niri shortcuts config",
     "context": "niri shortcuts config",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:414",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:572",
     "comment": "greeter keybinds niri description",
     "tags": [
       "shell"
