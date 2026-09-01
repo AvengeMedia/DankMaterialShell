@@ -517,7 +517,10 @@ BasePill {
         content: trayMenuContentComponent
         contentHandlesKeys: true
         property alias openedByHover: trayMenuState.openedByHover
-        onOpened: contentLoader.item?.forceActiveFocus()
+        onOpened: {
+            contentLoader.item?.entryStack?.clear();
+            contentLoader.item?.forceActiveFocus();
+        }
     }
 
     Connections {
@@ -1390,6 +1393,7 @@ BasePill {
         Item {
             id: trayMenuContentRoot
             focus: true
+            property alias entryStack: entryStack
 
             readonly property real _rawW: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
             readonly property real _rawH: Math.min(
