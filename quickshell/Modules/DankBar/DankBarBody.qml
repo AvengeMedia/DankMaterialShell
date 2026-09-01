@@ -265,6 +265,28 @@ Item {
         }
     }
 
+    Component {
+        id: blurCornerRegionComp
+
+        // BarCanvas paints square corners at the attached edge and the wing roots (#2975); re-add what the body radius rounds off
+        Region {
+            id: cornerRegion
+
+            property bool atRight: false
+            property bool atBottom: false
+
+            readonly property real r: barBackground.rt
+            readonly property bool attachedEdgeCorner: (barBackground.isTop && !atBottom) || (barBackground.isBottom && atBottom) || (barBackground.isLeft && !atRight) || (barBackground.isRight && atRight)
+            readonly property bool wingEdgeCorner: (barBackground.isTop && atBottom) || (barBackground.isBottom && !atBottom) || (barBackground.isLeft && atRight) || (barBackground.isRight && !atRight)
+            readonly property bool squared: (barBackground.edgeAttached && attachedEdgeCorner) || (barBackground.gothEnabled && wingEdgeCorner)
+
+            x: topBarMouseArea.x + barUnitInset.x + topBarSlide.x + (atRight ? barUnitInset.width - r : 0)
+            y: topBarMouseArea.y + barUnitInset.y + topBarSlide.y + (atBottom ? barUnitInset.height - r : 0)
+            width: squared ? r : 0
+            height: squared ? r : 0
+        }
+    }
+
     Item {
         id: barBlur
         visible: false
@@ -316,6 +338,19 @@ Item {
                     });
                     if (wing)
                         subRegions.push(wing);
+                }
+            }
+
+            if (hasBar) {
+                for (const atRight of [false, true]) {
+                    for (const atBottom of [false, true]) {
+                        const corner = blurCornerRegionComp.createObject(region, {
+                            atRight: atRight,
+                            atBottom: atBottom
+                        });
+                        if (corner)
+                            subRegions.push(corner);
+                    }
                 }
             }
 

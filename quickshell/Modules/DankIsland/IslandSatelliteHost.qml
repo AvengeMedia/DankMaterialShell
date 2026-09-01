@@ -204,8 +204,8 @@ Item {
                 subRegions.push(islandSub);
         }
         for (const chrome of chromes) {
-            const body = blurItemRegionComp.createObject(region, {
-                w: chrome
+            const body = blurChromeRegionComp.createObject(region, {
+                chrome: chrome
             });
             if (body)
                 subRegions.push(body);
@@ -310,6 +310,49 @@ Item {
 
             item: w
             radius: Theme.cornerRadius
+        }
+    }
+
+    Component {
+        id: blurChromeRegionComp
+
+        // The chrome paints square corners at the attached edge (and above the sweep in edge mode); square those blur corners too
+        Region {
+            id: body
+
+            property Item chrome
+
+            readonly property real cr: body.chrome.cornerR
+            readonly property real edgeY: body.chrome.bottomEdge ? body.y + body.height - body.cr : body.y
+            readonly property real sweepY: body.chrome.bottomEdge ? body.y : body.y + body.height - body.cr
+            readonly property bool sweepSquare: !body.chrome.floating && body.chrome.sweepR > 0
+
+            x: body.chrome.x
+            y: body.chrome.y
+            width: body.chrome.width
+            height: body.chrome.height
+            radius: body.cr
+
+            Region {
+                x: body.x
+                y: body.edgeY
+                width: body.cr
+                height: body.cr
+            }
+
+            Region {
+                x: body.x + body.width - body.cr
+                y: body.edgeY
+                width: body.cr
+                height: body.cr
+            }
+
+            Region {
+                x: body.chrome.rightSide ? body.x + body.width - body.cr : body.x
+                y: body.sweepY
+                width: body.sweepSquare ? body.cr : 0
+                height: body.sweepSquare ? body.cr : 0
+            }
         }
     }
 
