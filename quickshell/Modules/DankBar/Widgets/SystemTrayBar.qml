@@ -1330,9 +1330,9 @@ BasePill {
                                         return;
                                     }
                                     const localPos = itemArea.mapToGlobal(mouse.x, mouse.y);
-                                    const isStandalone = !SettingsData.connectedFrameModeActive;
-                                    const popX = (isStandalone && overflowPopout && overflowPopout.alignedX !== undefined) ? overflowPopout.alignedX : 0;
-                                    const popY = (isStandalone && overflowPopout && overflowPopout.alignedY !== undefined) ? overflowPopout.alignedY : 0;
+                                    const isStandalone = !overflowPopout.useConnectedBackend;
+                                    const popX = isStandalone ? overflowPopout.alignedX : 0;
+                                    const popY = isStandalone ? overflowPopout.alignedY : 0;
                                     const gx = localPos.x + popX;
                                     const gy = localPos.y + popY;
                                     if (!trayItem.hasMenu) {
@@ -1723,7 +1723,8 @@ BasePill {
         if (!screen)
             return;
 
-        const globalPos = anchor ? anchor.mapToGlobal(0, 0) : Qt.point(0, 0);
+        const anchorY = (vertical && anchor) ? (anchor.height / 2 + root.minTooltipY) : 0;
+        const globalPos = anchor ? anchor.mapToGlobal(0, anchorY) : Qt.point(0, 0);
         const triggerWidth = anchor ? anchor.width : root.width;
         showForTrayItemAtGlobalPoint(item, globalPos.x, globalPos.y, triggerWidth, screen, atBottom, vertical, axisObj, byHover);
     }
