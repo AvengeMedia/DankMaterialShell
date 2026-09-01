@@ -22,6 +22,12 @@ FocusScope {
         root.forceActiveFocus();
     }
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton
+        onClicked: root.controller.requestCollapse()
+    }
+
     Loader {
         id: tabLoader
 
