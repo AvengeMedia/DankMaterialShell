@@ -27,8 +27,6 @@ QtObject {
     }
     property string launcherPendingQuery: ""
     property string launcherPendingMode: ""
-    property bool _launcherPendingExpand: true
-    property bool _launcherPendingKeyboardFocus: true
     property string controlCenterPendingSection: ""
     property bool notificationExpandAllowed: false
     property bool keyboardYielded: false
@@ -125,6 +123,7 @@ QtObject {
                 "requested": false,
                 "ready": false,
                 "pending": false,
+                "pendingKeyboardFocus": false,
                 "contentWidth": destinationDefaults[id].contentWidth,
                 "contentHeight": destinationDefaults[id].contentHeight
             };
@@ -193,11 +192,7 @@ QtObject {
         destinationRevision++;
         if (!pending)
             return;
-        if (activityId === "launcher") {
-            requestActivity("launcher", _launcherPendingExpand, _launcherPendingKeyboardFocus);
-            return;
-        }
-        requestActivity(activityId, true, true);
+        requestActivity(activityId, true, entry.pendingKeyboardFocus);
     }
 
     function clearPendingRequests(exceptId) {
@@ -529,12 +524,9 @@ QtObject {
         if (destination && shouldExpand === true && !visualsReady(activityId)) {
             const entry = destinationState[activityId];
             entry.pending = true;
+            entry.pendingKeyboardFocus = requestKeyboardFocus === true;
             entry.requested = true;
             destinationRevision++;
-            if (activityId === "launcher") {
-                _launcherPendingExpand = true;
-                _launcherPendingKeyboardFocus = requestKeyboardFocus === true;
-            }
             return true;
         }
 
