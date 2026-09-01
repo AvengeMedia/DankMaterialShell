@@ -18,6 +18,7 @@ Singleton {
     property bool isElogind: false
     property bool loginctlCommandAvailable: false
     property bool systemctlCommandAvailable: false
+    property bool userManagerAvailable: false
     property bool hibernateSupported: false
     readonly property bool softRebootSupported: systemctlCommandAvailable
     property bool inhibitorAvailable: true
@@ -108,10 +109,11 @@ Singleton {
     Process {
         id: detectSystemctlProcess
         running: false
-        command: ["sh", "-c", "command -v systemctl"]
+        command: ["sh", "-c", "command -v systemctl > /dev/null || exit 1; systemctl --user show-environment > /dev/null 2>&1 || exit 2"]
 
         onExited: function (exitCode) {
-            systemctlCommandAvailable = (exitCode === 0);
+            systemctlCommandAvailable = (exitCode === 0 || exitCode === 2);
+            userManagerAvailable = (exitCode === 0);
         }
     }
 
@@ -422,8 +424,15 @@ Singleton {
 
             HyprlandService.exit();
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLogout]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionLogout));
         }
+    }
+
+    // systemd-run escapes the shell's cgroup so session teardown can't kill the command mid-run (#3250)
+    function customActionCommand(cmd) {
+        if (!userManagerAvailable)
+            return ["sh", "-c", cmd];
+        return ["systemd-run", "--user", "--scope", "--collect", "--quiet", "sh", "-c", cmd];
     }
 
     function powerManagerCommand(action) {
@@ -483,7 +492,7 @@ Singleton {
         if (SettingsData.customPowerActionReboot.length === 0) {
             Quickshell.execDetached(powerManagerCommand("reboot"));
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionReboot]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionReboot));
         }
     }
 
@@ -495,7 +504,7 @@ Singleton {
         if (SettingsData.customPowerActionPowerOff.length === 0) {
             Quickshell.execDetached(powerManagerCommand("poweroff"));
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionPowerOff]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionPowerOff));
         }
     }
 
@@ -515,7 +524,7 @@ Singleton {
             const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
             if (!button?.command)
                 return false;
-            Quickshell.execDetached(["sh", "-c", button.command]);
+            Quickshell.execDetached(customActionCommand(button.command));
             return true;
         }
         switch (action) {
