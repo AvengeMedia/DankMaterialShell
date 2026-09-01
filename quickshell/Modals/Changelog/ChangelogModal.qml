@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -129,7 +128,7 @@ DankFloatingWindow {
                     iconName: "open_in_new"
                     backgroundColor: Theme.surfaceContainerHighest
                     textColor: Theme.surfaceText
-                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-5-release")
+                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-6-release")
                 }
 
                 DankButton {
