@@ -52,6 +52,8 @@ Item {
     property real outgoingMorph: 0
     property bool homeExpandedTouched: false
 
+    Keys.onEscapePressed: root.controller.requestCollapse()
+
     function fadeCompact(morph) {
         return 1 - Math.max(0, Math.min(1, morph / 0.34));
     }

@@ -58,16 +58,7 @@ FocusScope {
         visible: !tabLoader.visible
     }
 
-    Keys.onPressed: event => {
-        if (root.overviewTab?.handleKeyEvent(event) === true) {
-            event.accepted = true;
-            return;
-        }
-        if (event.key === Qt.Key_Escape) {
-            root.controller.requestCollapse();
-            event.accepted = true;
-        }
-    }
+    Keys.onPressed: event => event.accepted = root.overviewTab?.handleKeyEvent(event) === true
 
     Component.onCompleted: root.contentStaged = true
 }

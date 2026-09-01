@@ -22,12 +22,6 @@ FocusScope {
         root.forceActiveFocus();
     }
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
-        onClicked: root.controller.requestCollapse()
-    }
-
     Loader {
         id: tabLoader
 
@@ -54,13 +48,6 @@ FocusScope {
         anchors.centerIn: parent
         size: 40
         visible: !tabLoader.visible
-    }
-
-    Keys.onPressed: event => {
-        if (event.key === Qt.Key_Escape) {
-            root.controller.requestCollapse();
-            event.accepted = true;
-        }
     }
 
     Component.onCompleted: {

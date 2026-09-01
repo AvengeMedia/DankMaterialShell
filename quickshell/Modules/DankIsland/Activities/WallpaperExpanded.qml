@@ -67,16 +67,7 @@ FocusScope {
         visible: !tabLoader.visible
     }
 
-    Keys.onPressed: event => {
-        if (root.wallpaperTab?.handleKeyEvent(event) === true) {
-            event.accepted = true;
-            return;
-        }
-        if (event.key === Qt.Key_Escape) {
-            root.controller.requestCollapse();
-            event.accepted = true;
-        }
-    }
+    Keys.onPressed: event => event.accepted = root.wallpaperTab?.handleKeyEvent(event) === true
 
     Connections {
         target: root.controller

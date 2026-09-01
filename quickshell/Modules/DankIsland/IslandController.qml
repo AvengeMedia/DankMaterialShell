@@ -92,6 +92,7 @@ QtObject {
     }
 
     readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
+    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter"]
     readonly property var destinationDefaults: ({
             "launcher": {
                 "contentWidth": 160,
@@ -323,7 +324,7 @@ QtObject {
     readonly property bool notificationHeldForSystem: root.systemActivityActive && root.transientReturnActivity === "notification"
     readonly property bool transientActive: systemActivityActive || notificationActive
     readonly property bool timeoutSuspended: pointerInside || (expanded && !notificationActive)
-    readonly property bool activityOwnsBlankClicks: isDestination(activeActivity)
+    readonly property bool activityOwnsBlankClicks: blankClickOwners.indexOf(activeActivity) !== -1
     readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
     function compactTargetFor(activityId) {
         switch (activityId) {
@@ -411,7 +412,7 @@ QtObject {
         keyboardYielded = false;
         launcherSessionActive = false;
         clearPendingRequests("");
-        if (activityOwnsBlankClicks)
+        if (isDestination(activeActivity))
             activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
     }
 
@@ -452,7 +453,7 @@ QtObject {
             syncTransientTimeout(true);
             return false;
         }
-        if (activityOwnsBlankClicks)
+        if (isDestination(activeActivity))
             return requestActivity(activeActivity, true, requestKeyboardFocus);
         if (notificationActive && !notificationExpandAllowed)
             return requestNotificationCenter(false);
@@ -484,7 +485,7 @@ QtObject {
             finishTransient();
             return true;
         }
-        if (activityOwnsBlankClicks)
+        if (isDestination(activeActivity))
             activeActivity = mediaAvailable && mediaPreferred ? "media" : "home";
         return true;
     }
