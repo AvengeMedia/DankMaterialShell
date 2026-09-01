@@ -87,7 +87,7 @@ PanelWindow {
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
     readonly property bool _dockHostedHere: {
-        const dockVisible = SettingsData.showDock || (CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview);
+        const dockVisible = SettingsData.showDock || (CompositorService.isNiri && SettingsData.dockOpenOnOverview);
         if (!win._connectedActive || !dockVisible || SettingsData.dockUseOverlayLayer)
             return false;
         const screens = SettingsData.getFilteredScreens("dock");
