@@ -2879,14 +2879,13 @@ Singleton {
     function getCursorEnvironment() {
         const isSystemDefault = cursorSettings.theme === "System Default";
         const isDefaultSize = !cursorSettings.size || cursorSettings.size === 24;
-        if (isSystemDefault && isDefaultSize)
-            return {};
-
         const themeName = isSystemDefault ? "" : cursorSettings.theme;
         const size = String(cursorSettings.size || 24);
         const env = {};
 
-        if (!isDefaultSize) {
+        // Started from systemd the shell inherits no XCURSOR_SIZE from the compositor
+        // XWayland children would size their cursor from the display instead
+        if (!isDefaultSize || !Quickshell.env("XCURSOR_SIZE")) {
             env["XCURSOR_SIZE"] = size;
             env["HYPRCURSOR_SIZE"] = size;
         }
