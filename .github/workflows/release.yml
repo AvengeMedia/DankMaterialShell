@@ -23,7 +23,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  verify-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Verify quickshell/VERSION matches the tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          version=$(cat quickshell/VERSION)
+          if [ "${version#v}" != "${TAG#v}" ]; then
+            echo "::error::quickshell/VERSION is '${version}' but the tag is '${TAG}'"; exit 1
+          fi
+
   build-core:
+    needs: [verify-version]
     runs-on: ubuntu-latest
     strategy:
       matrix:
