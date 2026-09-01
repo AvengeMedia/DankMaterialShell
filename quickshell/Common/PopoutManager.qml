@@ -16,6 +16,7 @@ Singleton {
 
     signal popoutOpening
     signal popoutChanged
+    signal popoutToggledClosed(string screenName)
 
     property real hoverCursorGlobalX: 0
     property real hoverCursorGlobalY: 0
@@ -310,6 +311,7 @@ Singleton {
 
             if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
                 _closePopout(popout);
+                popoutToggledClosed(screenName);
                 return;
             }
 

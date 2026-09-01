@@ -440,8 +440,8 @@ Item {
         hoverController.resetForBarGeometryChange();
     }
 
-    function _dashTriggerSource(section, tabIndex) {
-        return hoverController.dashTriggerSource(section, tabIndex);
+    function _dashTriggerSource(section, tabId) {
+        return hoverController.dashTriggerSource(section, tabId);
     }
 
     function getBarPosition() {
