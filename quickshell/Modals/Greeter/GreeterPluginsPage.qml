@@ -125,15 +125,6 @@ Item {
                 }
             }
 
-            StyledText {
-                width: parent.width
-                text: I18n.tr("You can extend DMS with more applets, launcher features, and widgets through the plugin system. Hundreds are available on the official DMS registry, built by the community and the DMS team. Install some now, or later through the DMS CLI or the Settings window.", "greeter plugins page intro")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceVariantText
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-            }
-
             Item {
                 width: parent.width
                 height: Math.round(Theme.fontSizeMedium * 8)

@@ -762,34 +762,29 @@ Item {
                     spacing: Theme.spacingM
                     height: parent.height
 
-                    DankIcon {
-                        name: "grid_on"
-                        size: 16
-                        color: root.gridEnabled ? Theme.primary : Theme.surfaceText
+                    Row {
+                        spacing: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
-                    }
 
-                    StyledText {
-                        text: root.gridEnabled ? I18n.tr("Grid: ON", "Widget grid snap status") : I18n.tr("Grid: OFF", "Widget grid snap status")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: Theme.fontFamily
-                        color: root.gridEnabled ? Theme.primary : Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                        DankIcon {
+                            name: "grid_on"
+                            size: 16
+                            color: root.gridEnabled ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
 
-                    Rectangle {
-                        width: 1
-                        height: 16
-                        color: Theme.outline
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                        StyledText {
+                            text: root.gridEnabled ? I18n.tr("Grid: ON", "Widget grid snap status") : I18n.tr("Grid: OFF", "Widget grid snap status")
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.family: Theme.fontFamily
+                            color: root.gridEnabled ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
 
-                    StyledText {
-                        text: root.gridSize + "px"
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: Theme.fontFamily
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
+                        DankKeycap {
+                            text: "G"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
                     }
 
                     Rectangle {
@@ -799,14 +794,29 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    StyledText {
-                        text: I18n.tr("G: grid • Z/X: size", "Widget grid keyboard hints")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: Theme.fontFamily
-                        font.italic: true
-                        color: Theme.surfaceText
-                        opacity: 0.7
+                    Row {
+                        spacing: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
+
+                        DankKeycap {
+                            text: "Z"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        NumericText {
+                            text: root.gridSize + "px"
+                            reserveText: "200px"
+                            width: Math.ceil(reservedWidth)
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        DankKeycap {
+                            text: "X"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
                     }
                 }
             }
