@@ -369,14 +369,14 @@ Item {
         if ((!startupRevealDone && !overviewReveal) || !dock.geometryReady || !(hostWindow?.visible ?? true))
             return false;
 
-        if (_modalRetractActive || hiddenForFullscreen)
+        if (_modalRetractActive)
             return false;
 
         if (overviewReveal)
             return true;
 
-        if (!SettingsData.showDock)
-            return autoHide && hoverOrActive;
+        if (hiddenForFullscreen || !SettingsData.showDock)
+            return false;
 
         if (SettingsData.dockSmartAutoHide)
             return !shouldHideForWindows || hoverOrActive;
