@@ -205,6 +205,8 @@ func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
 		return
 	}
 
+	textOnly := params.BoolOpt(req.Params, "textOnly", false) && entry.AltMimeType != ""
+
 	if entry.AltMimeType == "" {
 		filePath := m.EntryToFile(entry)
 		if filePath != "" {
@@ -220,8 +222,15 @@ func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
 		}
 	}
 
-	if err := m.SetClipboardEntry(entry); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+	var setErr error
+	switch {
+	case textOnly:
+		setErr = m.SetClipboard(entry.AltData, entry.AltMimeType)
+	default:
+		setErr = m.SetClipboardEntry(entry)
+	}
+	if setErr != nil {
+		models.RespondError(conn, req.ID, setErr.Error())
 		return
 	}
 

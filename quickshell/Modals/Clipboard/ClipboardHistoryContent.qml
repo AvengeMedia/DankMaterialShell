@@ -108,6 +108,10 @@ FocusScope {
         ClipboardService.copyEntry(entry, () => root.requestClose(false));
     }
 
+    function copyEntryAsText(entry) {
+        ClipboardService.copyEntry(entry, () => root.requestClose(false), true);
+    }
+
     function selectedEntry() {
         const entries = activeTab === "saved" ? pinnedEntries : unpinnedEntries;
         if (!entries || entries.length === 0 || selectedIndex < 0 || selectedIndex >= entries.length)

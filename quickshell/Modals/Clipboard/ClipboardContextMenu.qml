@@ -29,6 +29,7 @@ Item {
 
     readonly property bool hasPinnedDuplicate: !!entry && !entry.pinned && ClipboardService.getPinnedEntryByHash(entry.hash) !== null
     readonly property bool canEditEntry: !!entry && !(entry.isImage ?? false)
+    readonly property bool hasTextAlternative: !!entry && (entry.altMimeType ?? "") !== ""
     readonly property string pinText: entry?.pinned || hasPinnedDuplicate ? I18n.tr("Unpin") : I18n.tr("Pin")
     readonly property string pinIcon: entry?.pinned || hasPinnedDuplicate ? "keep_off" : "push_pin"
 
@@ -47,6 +48,15 @@ Item {
                 action: togglePin
             }
         ];
+
+        if (hasTextAlternative) {
+            items.splice(1, 0, {
+                type: "item",
+                icon: "text_fields",
+                text: I18n.tr("Copy Text"),
+                action: copyEntryAsText
+            });
+        }
 
         if (canEditEntry) {
             items.push({
@@ -177,6 +187,13 @@ Item {
         if (!entry)
             return;
         modal?.copyEntry(entry);
+        hide();
+    }
+
+    function copyEntryAsText() {
+        if (!entry || !hasTextAlternative)
+            return;
+        modal?.copyEntryAsText(entry);
         hide();
     }
 

@@ -202,15 +202,17 @@ Singleton {
         unpinnedEntries = [];
     }
 
-    function copyEntry(entry, closeCallback) {
+    function copyEntry(entry, closeCallback, textOnly) {
+        const asText = textOnly === true;
         DMSService.sendRequest("clipboard.copyEntry", {
-            "id": entry.id
+            "id": entry.id,
+            "textOnly": asText
         }, function (response) {
             if (response.error) {
                 ToastService.showError(I18n.tr("Failed to copy entry"));
                 return;
             }
-            ToastService.showInfo(entry.isImage ? I18n.tr("Image copied to clipboard") : I18n.tr("Copied to clipboard"));
+            ToastService.showInfo(entry.isImage && !asText ? I18n.tr("Image copied to clipboard") : I18n.tr("Copied to clipboard"));
             historyCopied();
             if (closeCallback) {
                 closeCallback();
