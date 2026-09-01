@@ -904,6 +904,10 @@ Singleton {
     property bool dockShowTrash: false
     property string dockTrashFileManager: "default"
     property string dockTrashCustomCommand: ""
+    property bool dockMagnificationEnabled: false
+    property real dockMagnificationAmount: 1.6
+    property real dockMagnificationSpread: 3.8
+    property real dockAppSpacing: 4
 
     property bool notificationOverlayEnabled: false
     property bool notificationPopupShadowEnabled: true

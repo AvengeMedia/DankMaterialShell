@@ -544,7 +544,7 @@ Item {
 
     function showTooltipForHoveredButton() {
         dockTooltip.hide();
-        if (!dock.hoveredButton || !dock.reveal || slideXAnimation.running || slideYAnimation.running)
+        if (!dock.hoveredButton || !dock.reveal || slideXSpring.running || slideYSpring.running)
             return;
 
         const buttonLocalPos = dock.hoveredButton.mapToItem(null, 0, 0);
@@ -564,7 +564,16 @@ Item {
             const tooltipX = buttonLocalPos.x + btnW / 2 + adjacentLeftBarWidth;
             const tooltipHeight = 32;
             const totalFromEdge = bgMargin + dockBackground.height + dock.borderThickness + gap;
-            const screenRelativeY = isBottom ? (screenHeight - totalFromEdge - tooltipHeight) : totalFromEdge;
+            const magTargetScale = SettingsData.dockMagnificationEnabled ? SettingsData.dockMagnificationAmount : 1.0;
+            const magExtra = btnH * (magTargetScale - 1);
+            let screenRelativeY;
+            if (isBottom) {
+                screenRelativeY = screenHeight - totalFromEdge - tooltipHeight - magExtra;
+                if (screenRelativeY < gap)
+                    screenRelativeY = gap;
+            } else {
+                screenRelativeY = totalFromEdge;
+            }
             dockTooltip.show(tooltipText, tooltipX, screenRelativeY, dock.screen, false, false);
             return;
         }

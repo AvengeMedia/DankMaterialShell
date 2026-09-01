@@ -24,6 +24,11 @@ Item {
     property bool overflowExpanded: false
     property int overflowItemCount: 0
 
+    property real stableMouseDelta: -9999
+    property real globalMagFactor: 0
+    readonly property real maxMagnification: SettingsData.dockMagnificationEnabled ? SettingsData.dockMagnificationAmount : 1.0
+    readonly property real magSpread: SettingsData.dockMagnificationEnabled ? root.iconSize * SettingsData.dockMagnificationSpread : 1
+
     readonly property real baseImplicitWidth: isVertical ? baseAppHeight : baseAppWidth
     readonly property real baseImplicitHeight: isVertical ? baseAppWidth : baseAppHeight
     readonly property real baseAppWidth: {
@@ -71,12 +76,63 @@ Item {
         SessionData.setPinnedApps(currentPinned);
     }
 
+    function updateMouseDelta(pos) {
+        if (baseAppWidth <= 0)
+            return;
+        let accumCurrent = 0;
+        let accumBase = 0;
+
+        for (let i = 0; i < repeater.count; i++) {
+            let item = repeater.itemAt(i);
+            if (!item || item.isInOverflow)
+                continue;
+
+            let curSize = isVertical ? item.height : item.width;
+            let baseSize = (repeater.dockItems[i]?.type === "separator") ? 8 : iconSize * 1.2;
+            let spacing = layoutFlow.spacing;
+
+            if (pos <= accumCurrent + curSize + spacing / 2) {
+                let frac = curSize > 0 ? Math.min(1.0, Math.max(0.0, (pos - accumCurrent) / curSize)) : 0.5;
+                let unmagPos = accumBase + frac * baseSize;
+                stableMouseDelta = unmagPos - (baseAppWidth / 2);
+                return;
+            }
+            accumCurrent += curSize + spacing;
+            accumBase += baseSize + spacing;
+        }
+
+        if (pos > accumCurrent) {
+            stableMouseDelta = baseAppWidth / 2;
+        } else {
+            stableMouseDelta = -baseAppWidth / 2;
+        }
+    }
+
+    Behavior on globalMagFactor {
+        NumberAnimation {
+            duration: 150
+            easing.type: Easing.OutCubic
+        }
+    }
+
     Item {
         id: appLayout
         width: layoutFlow.width
         height: layoutFlow.height
 
+        HoverHandler {
+            id: dockHover
+            onPointChanged: {
+                let pos = root.isVertical ? dockHover.point.position.y : dockHover.point.position.x;
+                root.updateMouseDelta(pos);
+            }
+            onHoveredChanged: {
+                root.globalMagFactor = SettingsData.dockMagnificationEnabled && hovered ? 1.0 : 0.0;
+            }
+        }
+
         Behavior on width {
+            enabled: root.globalMagFactor === 0
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Easing.OutCubic
@@ -84,6 +140,7 @@ Item {
         }
 
         Behavior on height {
+            enabled: root.globalMagFactor === 0
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Easing.OutCubic
@@ -98,7 +155,7 @@ Item {
         Flow {
             id: layoutFlow
             flow: root.isVertical ? Flow.TopToBottom : Flow.LeftToRight
-            spacing: Math.min(8, Math.max(4, root.iconSize * 0.08))
+            spacing: SettingsData.dockAppSpacing
 
             Repeater {
                 id: repeater
@@ -545,22 +602,48 @@ Item {
                     }
 
                     clip: false
-                    z: isDragging ? 100 : 0
+                    z: isDragging ? 100 : Math.round(magFactor * 50)
                     visible: !isInOverflow || root.overflowExpanded
                     opacity: (isInOverflow && !root.overflowExpanded) ? 0 : 1
-                    scale: (isInOverflow && !root.overflowExpanded) ? 0.8 : 1
 
-                    width: (isInOverflow && !root.overflowExpanded) ? 0 : (itemData.type === "separator" ? (root.isVertical ? root.iconSize : 8) : (root.isVertical ? root.iconSize : root.iconSize * 1.2))
-                    height: (isInOverflow && !root.overflowExpanded) ? 0 : (itemData.type === "separator" ? (root.isVertical ? 8 : root.iconSize) : (root.isVertical ? root.iconSize * 1.2 : root.iconSize))
+                    readonly property bool isSeparator: itemData.type === "separator"
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Easing.OutCubic
+                    readonly property real baseCenterPos: {
+                        let pos = 0;
+                        const items = repeater.dockItems;
+                        for (let i = 0; i < delegateItem.index; i++) {
+                            const item = items[i];
+                            if (item.isInOverflow && !root.overflowExpanded)
+                                continue;
+                            let w = (item.type === "separator") ? 8 : root.iconSize * 1.2;
+                            pos += w + layoutFlow.spacing;
                         }
+                        let myW = (itemData.type === "separator") ? 8 : root.iconSize * 1.2;
+                        return pos + myW / 2;
                     }
 
-                    Behavior on scale {
+                    readonly property real stableItemDelta: baseCenterPos - (root.baseAppWidth / 2)
+                    readonly property real distToMouse: root.globalMagFactor === 0 ? 9999 : Math.abs(stableItemDelta - root.stableMouseDelta)
+
+                    readonly property real magFactor: {
+                        if (!SettingsData.dockMagnificationEnabled || isSeparator || root.globalMagFactor === 0)
+                            return 0;
+                        if (distToMouse >= root.magSpread)
+                            return 0;
+                        return Math.pow(Math.cos((distToMouse / root.magSpread) * (Math.PI / 2)), 2);
+                    }
+
+                    readonly property real targetScale: (isInOverflow && !root.overflowExpanded)
+                        ? 0.8
+                        : (1.0 + (root.maxMagnification - 1.0) * magFactor * root.globalMagFactor)
+
+                    readonly property real baseW: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? root.iconSize : 8) : (root.isVertical ? root.iconSize : root.iconSize * 1.2))
+                    readonly property real baseH: (isInOverflow && !root.overflowExpanded) ? 0 : (isSeparator ? (root.isVertical ? 8 : root.iconSize) : (root.isVertical ? root.iconSize * 1.2 : root.iconSize))
+
+                    width: root.isVertical ? baseW : (baseW * targetScale)
+                    height: root.isVertical ? (baseH * targetScale) : baseH
+
+                    Behavior on opacity {
                         NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
@@ -623,67 +706,87 @@ Item {
                         y: root.isVertical ? shiftYSpring.value : 0
                     }
 
-                    Rectangle {
-                        visible: itemData.type === "separator"
-                        width: root.isVertical ? root.iconSize * 0.5 : 2
-                        height: root.isVertical ? 2 : root.iconSize * 0.5
-                        color: Theme.outlineHeavy
-                        radius: 1
-                        anchors.centerIn: parent
-                    }
+                    Item {
+                        id: visualWrapper
+                        width: delegateItem.baseW
+                        height: delegateItem.baseH
 
-                    DockOverflowButton {
-                        id: overflowButton
-                        visible: isOverflowToggle
-                        anchors.centerIn: parent
-                        width: delegateItem.width
-                        height: delegateItem.height
-                        actualIconSize: root.iconSize
-                        overflowCount: itemData.overflowCount || 0
-                        overflowExpanded: root.overflowExpanded
-                        isVertical: root.isVertical
-                        onClicked: root.overflowExpanded = !root.overflowExpanded
-                    }
+                        anchors.bottom: root.isVertical ? undefined : parent.bottom
+                        anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
 
-                    DockLauncherButton {
-                        id: launcherButton
-                        visible: itemData.type === "launcher"
-                        anchors.centerIn: parent
-                        width: delegateItem.width
-                        height: delegateItem.height
-                        actualIconSize: root.iconSize
-                        dockApps: root
-                        index: delegateItem.index
-                    }
+                        anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
+                        anchors.left: (root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left) ? parent.left : undefined
+                        anchors.right: (root.isVertical && SettingsData.dockPosition === SettingsData.Position.Right) ? parent.right : undefined
 
-                    DockTrashButton {
-                        id: trashButton
-                        visible: itemData.type === "trash"
-                        anchors.centerIn: parent
-                        width: delegateItem.width
-                        height: delegateItem.height
-                        actualIconSize: root.iconSize
-                        dockApps: root
-                        contextMenu: root.trashContextMenu
-                        parentDockScreen: root.dockScreen
-                    }
+                        scale: delegateItem.targetScale
+                        transformOrigin: {
+                            if (!root.isVertical)
+                                return Item.Bottom;
+                            return SettingsData.dockPosition === SettingsData.Position.Left ? Item.Left : Item.Right;
+                        }
 
-                    DockAppButton {
-                        id: button
-                        visible: !isOverflowToggle && itemData.type !== "separator" && itemData.type !== "launcher" && itemData.type !== "trash"
-                        anchors.centerIn: parent
-                        width: delegateItem.width
-                        height: delegateItem.height
-                        actualIconSize: root.iconSize
-                        appData: itemData
-                        contextMenu: root.contextMenu
-                        dockApps: root
-                        index: delegateItem.index
-                        parentDockScreen: root.dockScreen
-                        showWindowTitle: itemData?.type === "window" || itemData?.type === "grouped"
-                        windowTitle: {
-                            const title = itemData?.toplevel?.title || "(Unnamed)";
-                            return title.length > 50 ? title.substring(0, 47) + "..." : title;
+                        Rectangle {
+                            visible: itemData.type === "separator"
+                            width: root.isVertical ? root.iconSize * 0.5 : 2
+                            height: root.isVertical ? 2 : root.iconSize * 0.5
+                            color: Theme.outlineHeavy
+                            radius: 1
+                            anchors.centerIn: parent
+                        }
+
+                        DockOverflowButton {
+                            id: overflowButton
+                            visible: isOverflowToggle
+                            anchors.centerIn: parent
+                            width: parent.width
+                            height: parent.height
+                            actualIconSize: root.iconSize
+                            overflowCount: itemData.overflowCount || 0
+                            overflowExpanded: root.overflowExpanded
+                            isVertical: root.isVertical
+                            onClicked: root.overflowExpanded = !root.overflowExpanded
+                        }
+
+                        DockLauncherButton {
+                            id: launcherButton
+                            visible: itemData.type === "launcher"
+                            anchors.centerIn: parent
+                            width: parent.width
+                            height: parent.height
+                            actualIconSize: root.iconSize
+                            dockApps: root
+                            index: delegateItem.index
+                        }
+
+                        DockTrashButton {
+                            id: trashButton
+                            visible: itemData.type === "trash"
+                            anchors.centerIn: parent
+                            width: parent.width
+                            height: parent.height
+                            actualIconSize: root.iconSize
+                            dockApps: root
+                            contextMenu: root.trashContextMenu
+                            parentDockScreen: root.dockScreen
+                        }
+
+                        DockAppButton {
+                            id: button
+                            visible: !isOverflowToggle && itemData.type !== "separator" && itemData.type !== "launcher" && itemData.type !== "trash"
+                            anchors.centerIn: parent
+                            width: parent.width
+                            height: parent.height
+                            actualIconSize: root.iconSize
+                            appData: itemData
+                            contextMenu: root.contextMenu
+                            dockApps: root
+                            index: delegateItem.index
+                            parentDockScreen: root.dockScreen
+                            showWindowTitle: itemData?.type === "window" || itemData?.type === "grouped"
+                            windowTitle: {
+                                const title = itemData?.toplevel?.title || "(Unnamed)";
+                                return title.length > 50 ? title.substring(0, 47) + "..." : title;
+                            }
                         }
                     }
                 }
