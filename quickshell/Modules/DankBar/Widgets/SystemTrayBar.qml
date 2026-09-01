@@ -456,7 +456,7 @@ BasePill {
         if (!triggerItem || !root.parentScreen)
             return;
         const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
-        const triggerPos = triggerItem.mapToItem(null, 0, 0);
+        const triggerPos = triggerItem.mapToItem(null, 0, root.isVerticalOrientation ? (triggerItem.height / 2 + root.minTooltipY) : 0);
         const pos = SettingsData.getPopupTriggerPosition(triggerPos, root.parentScreen, root.barThickness, triggerItem.width, root.barSpacing, barPosition, root.barConfig);
         overflowPopout.setTriggerPosition(pos.x, pos.y, pos.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
         root.menuOpen = true;
