@@ -115,6 +115,7 @@ func parseDnfList(text, backendID string, installed map[string]string) []Package
 		return nil
 	}
 	var pkgs []Package
+	seen := make(map[string]struct{})
 	for line := range strings.SplitSeq(text, "\n") {
 		fields := strings.Fields(line)
 		if len(fields) < 2 {
@@ -129,6 +130,12 @@ func parseDnfList(text, backendID string, installed map[string]string) []Package
 		if !looksLikeRpmVersion(version) {
 			continue
 		}
+		// dnf prints one row per (package, repo), so one version in two repos appears twice
+		key := nameArch + "\t" + version
+		if _, dup := seen[key]; dup {
+			continue
+		}
+		seen[key] = struct{}{}
 		name := nameArch[:dot]
 		pkgs = append(pkgs, Package{
 			Name:        nameArch,

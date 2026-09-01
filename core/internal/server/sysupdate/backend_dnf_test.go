@@ -56,6 +56,32 @@ bash.x86_64       5.2.40-1.fc41       updates`,
 			want:      nil,
 		},
 		{
+			name: "one package offered by two repos is reported once",
+			input: `dms-greeter.x86_64   1.5.1-1.fc44   copr:copr.fedorainfracloud.org:avengemedia:danklinux
+dms-greeter.x86_64   1.5.1-1.fc44   coprdep:copr.fedorainfracloud.org:avengemedia:danklinux`,
+			backendID: "dnf5",
+			installed: map[string]string{"dms-greeter": "1.5.0-1.fc44"},
+			want: []Package{
+				{Name: "dms-greeter.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "1.5.0-1.fc44", ToVersion: "1.5.1-1.fc44"},
+			},
+		},
+		{
+			name: "duplicate rows do not suppress other packages or differing versions",
+			input: `bash.x86_64      5.2.40-1.fc41   updates
+bash.x86_64      5.2.40-1.fc41   fedora
+bash.i686        5.2.40-1.fc41   updates
+kernel.x86_64    6.14.2-1.fc41   updates
+kernel.x86_64    6.14.3-1.fc41   updates`,
+			backendID: "dnf5",
+			installed: map[string]string{"bash": "5.2.39-1.fc41", "kernel": "6.14.1-1.fc41"},
+			want: []Package{
+				{Name: "bash.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "5.2.39-1.fc41", ToVersion: "5.2.40-1.fc41"},
+				{Name: "bash.i686", Repo: RepoSystem, Backend: "dnf5", FromVersion: "5.2.39-1.fc41", ToVersion: "5.2.40-1.fc41"},
+				{Name: "kernel.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "6.14.1-1.fc41", ToVersion: "6.14.2-1.fc41"},
+				{Name: "kernel.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "6.14.1-1.fc41", ToVersion: "6.14.3-1.fc41"},
+			},
+		},
+		{
 			name: "skips dnf5 banner / column header lines",
 			input: `Updates available
 Last metadata expiration check: 0:01:23 ago on Tue Apr 29 14:00:00 2026.
