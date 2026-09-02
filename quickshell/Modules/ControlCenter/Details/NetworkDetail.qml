@@ -165,6 +165,16 @@ Rectangle {
                 }
             }
 
+            DankActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "refresh"
+                buttonSize: 28
+                iconSize: 16
+                iconColor: Theme.surfaceVariantText
+                visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !NetworkService.isScanning
+                onClicked: NetworkService.scanWifi()
+            }
+
             DankButtonGroup {
                 id: preferenceControls
                 anchors.verticalCenter: parent.verticalCenter
