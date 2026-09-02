@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "로그인할 때 자동으로 시작할 애플리케이션 및 명령"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "배경 포함 테두리"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "하단"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "밝기 슬라이더"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "밝기 값"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "현재 작업 공간"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "현재 시간 및 날짜 표시"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "게임"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "감마 제어"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "볼륨 슬라이더"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "볼륨, 밝기 및 기타 시스템 OSD"

@@ -1617,6 +1617,13 @@
     "comment": ""
   },
   {
+    "term": "Applied independently of night mode",
+    "translation": "",
+    "context": "Applied independently of night mode",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Applies on the next greeter sync",
     "translation": "",
     "context": "Applies on the next greeter sync",
@@ -2919,6 +2926,13 @@
     "comment": ""
   },
   {
+    "term": "Both",
+    "translation": "",
+    "context": "Both",
+    "reference": "",
+    "comment": "island settings: level shown as icon and percentage"
+  },
+  {
     "term": "Bottom",
     "translation": "",
     "context": "Bottom",
@@ -2972,7 +2986,7 @@
     "translation": "",
     "context": "Brightness",
     "reference": "",
-    "comment": "island system face: brightness title"
+    "comment": "island settings: brightness slot row | island system face: brightness title"
   },
   {
     "term": "Brightness Slider",
@@ -2980,6 +2994,13 @@
     "context": "Brightness Slider",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Brightness Style",
+    "translation": "",
+    "context": "Brightness Style",
+    "reference": "",
+    "comment": "island settings: brightness display mode row"
   },
   {
     "term": "Brightness Value",
@@ -4996,6 +5017,20 @@
     "context": "Current Workspace",
     "reference": "",
     "comment": "Running apps filter: only show apps from the active workspace"
+  },
+  {
+    "term": "Current display brightness on the home face",
+    "translation": "",
+    "context": "Current display brightness on the home face",
+    "reference": "",
+    "comment": "island settings: brightness slot description"
+  },
+  {
+    "term": "Current output volume on the home face",
+    "translation": "",
+    "context": "Current output volume on the home face",
+    "reference": "",
+    "comment": "island settings: volume slot description"
   },
   {
     "term": "Current time and date display",
@@ -8806,6 +8841,13 @@
     "comment": ""
   },
   {
+    "term": "Gamma",
+    "translation": "",
+    "context": "Gamma",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Gamma Control",
     "translation": "",
     "context": "Gamma Control",
@@ -9258,7 +9300,7 @@
     "translation": "",
     "context": "Hidden",
     "reference": "",
-    "comment": "island settings: battery or control center slot hidden | island settings: media or launcher slot hidden | island settings: weather slot hidden"
+    "comment": "island settings: battery or control center slot hidden | island settings: brightness slot hidden | island settings: media or launcher slot hidden | island settings: volume slot hidden | island settings: weather slot hidden"
   },
   {
     "term": "Hidden (%1)",
@@ -9797,7 +9839,7 @@
     "translation": "",
     "context": "Icon",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: level shown as icon only"
   },
   {
     "term": "Icon Scale",
@@ -10868,7 +10910,7 @@
     "translation": "",
     "context": "Left",
     "reference": "",
-    "comment": "island settings: battery or control center slot left of the clock | island settings: media or launcher slot left of the clock | island settings: weather slot left of the clock | screen edge position"
+    "comment": "island settings: battery or control center slot left of the clock | island settings: brightness slot left of the clock | island settings: media or launcher slot left of the clock | island settings: volume slot left of the clock | island settings: weather slot left of the clock | screen edge position"
   },
   {
     "term": "Left Center",
@@ -12506,7 +12548,7 @@
     "translation": "",
     "context": "No Active Players",
     "reference": "",
-    "comment": "island media player: empty state"
+    "comment": ""
   },
   {
     "term": "No Anim",
@@ -14389,7 +14431,7 @@
     "translation": "",
     "context": "Percentage",
     "reference": "",
-    "comment": ""
+    "comment": "island settings: level shown as percentage only"
   },
   {
     "term": "Performance",
@@ -16209,7 +16251,7 @@
     "translation": "",
     "context": "Right",
     "reference": "",
-    "comment": "island settings: battery or control center slot right of the clock | island settings: media or launcher slot right of the clock | island settings: weather slot right of the clock | screen edge position"
+    "comment": "island settings: battery or control center slot right of the clock | island settings: brightness slot right of the clock | island settings: media or launcher slot right of the clock | island settings: volume slot right of the clock | island settings: weather slot right of the clock | screen edge position"
   },
   {
     "term": "Right Center",
@@ -20493,7 +20535,7 @@
     "translation": "",
     "context": "Unknown Artist",
     "reference": "",
-    "comment": "island media face: fallback artist | island media player: fallback artist"
+    "comment": "island media face: fallback artist"
   },
   {
     "term": "Unknown Config",
@@ -20549,7 +20591,7 @@
     "translation": "",
     "context": "Unknown Track",
     "reference": "",
-    "comment": "island media face: fallback title | island media player: fallback title"
+    "comment": "island media face: fallback title"
   },
   {
     "term": "Unload on Close",
@@ -21389,7 +21431,7 @@
     "translation": "",
     "context": "Volume",
     "reference": "",
-    "comment": "island system face: volume title"
+    "comment": "island settings: volume slot row | island system face: volume title"
   },
   {
     "term": "Volume Changed",
@@ -21404,6 +21446,13 @@
     "context": "Volume Slider",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Volume Style",
+    "translation": "",
+    "context": "Volume Style",
+    "reference": "",
+    "comment": "island settings: volume display mode row"
   },
   {
     "term": "Volume, brightness, and other system OSDs",

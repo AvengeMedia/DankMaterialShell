@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "التطبيقات والأوامر التي تبدأ تلقائياً عند تسجيل الدخول"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "يُطبق عند مزامنة الgreeter التالية"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "حدود مع خلفية"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "أسفل"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "شريط تمرير السطوع"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "قيمة السطوع"
@@ -1587,7 +1596,7 @@
     "Clear Badge on Open": "مسح الشارة عند الفتح"
   },
   "Clear Filtered": {
-    "Clear Filtered": ""
+    "Clear Filtered": "مسح التصفية"
   },
   "Clear History?": {
     "Clear History?": "مسح السجل؟"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "سطح المكتب الحالي"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "عرض الوقت والتاريخ الحاليين"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "الالعاب"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "التحكم في دفء الألوان"
@@ -7623,13 +7641,13 @@
     "Show CPU Temp": "إظهار درجة حرارة المعالج"
   },
   "Show Charge Rate": {
-    "Show Charge Rate": ""
+    "Show Charge Rate": "إظهار معدل الشحن"
   },
   "Show Date": {
     "Show Date": "إظهار التاريخ"
   },
   "Show Discharge Rate": {
-    "Show Discharge Rate": ""
+    "Show Discharge Rate": "إظهار معدل التفريغ"
   },
   "Show Disk": {
     "Show Disk": "إظهار القرص"
@@ -7902,7 +7920,7 @@
     "Show weather information in top bar and control center": "إظهار معلومات الطقس في الشريط العلوي ومركز التحكم"
   },
   "Show weather on the login screen": {
-    "Show weather on the login screen": ""
+    "Show weather on the login screen": "إظهار الطقس على شاشة تسجيل الدخول"
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "إظهار أرقام أسطح المكتب في مبدل أسطح المكتب بالشريط العلوي"
@@ -8547,7 +8565,7 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "سيؤدي هذا إلى حذف جميع الإدخالات غير المثبتة. سيتم الاحتفاظ بـ %1 من الإدخالات المثبتة."
   },
   "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
-    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": "سيؤدي هذا إلى حذف %1 من الإدخالات التي تطابق عامل التصفية الحالي. يتم الاحتفاظ بالإدخالات المثبتة."
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "سيؤدي هذا إلى قطع اتصال WiFi من \"%1\" — لا يمكن للراديو استضافة نقطة اتصال والبقاء متصلاً في الوقت نفسه. ستحتاج مشاركة الإنترنت إلى اتصال آخر، مثل إيثرنت."
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "شريط تمرير مستوى الصوت"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "مؤشرات العرض على الشاشة OSD لمستوى الصوت والسطوع وأنظمة أخرى"

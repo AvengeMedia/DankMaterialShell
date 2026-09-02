@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Bejelentkezéskor automatikusan elinduló alkalmazások és parancsok"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "A következő greeter szinkronizáláskor lép életbe"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Keret háttérrel"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Alul"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Fényerőszabályozó"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Fényerő értéke"
@@ -1587,7 +1596,7 @@
     "Clear Badge on Open": "Jelvény törlése megnyitáskor"
   },
   "Clear Filtered": {
-    "Clear Filtered": ""
+    "Clear Filtered": "Szűrt elemek törlése"
   },
   "Clear History?": {
     "Clear History?": "Törlöd az előzményeket?"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Jelenlegi munkaterület"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Jelenlegi idő- és dátumkijelzés"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Játékok"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Gammavezérlés"
@@ -7623,13 +7641,13 @@
     "Show CPU Temp": "CPU-hőmérséklet megjelenítése"
   },
   "Show Charge Rate": {
-    "Show Charge Rate": ""
+    "Show Charge Rate": "Töltési sebesség megjelenítése"
   },
   "Show Date": {
     "Show Date": "Dátum megjelenítése"
   },
   "Show Discharge Rate": {
-    "Show Discharge Rate": ""
+    "Show Discharge Rate": "Merülési sebesség megjelenítése"
   },
   "Show Disk": {
     "Show Disk": "Lemez megjelenítése"
@@ -7902,7 +7920,7 @@
     "Show weather information in top bar and control center": "Időjárási információk megjelenítése a felső sávon és a vezérlőközponton"
   },
   "Show weather on the login screen": {
-    "Show weather on the login screen": ""
+    "Show weather on the login screen": "Időjárás megjelenítése a bejelentkezési képernyőn"
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Munkaterület-indexszámok megjelenítése a felső sáv munkaterület-váltójában"
@@ -8547,7 +8565,7 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Ez törli az összes nem rögzített bejegyzést. %1 rögzített bejegyzés marad meg."
   },
   "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
-    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": "Ez törli a jelenlegi szűrőnek megfelelő %1 bejegyzést. A rögzített bejegyzések megmaradnak."
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Ez le fogja választani a Wi-Fi-t a(z) „%1” hálózatról – az interfész nem tud egyszerre hotspotot biztosítani és kapcsolódva is maradni. Az internetmegosztáshoz egy másik kapcsolatra, például Ethernetre lesz szükség."
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "Hangerőszabályozó"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Hangerő, fényerő és egyéb rendszer képernyőkijelzők"

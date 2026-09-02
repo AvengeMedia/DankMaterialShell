@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Aplikoj kaj komandoj por komenci aŭtomate kiam vi ensalutas"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Limo kun Fono"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Malsupre"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Brileca rulilo"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Brileca valoro"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Aktuala laborspaco"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Aktuala tempo- kaj datvidigo"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Ludoj"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Gama-regado"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "Rulstango de laŭteco"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Laŭteco, brileco, kaj aliaj sistemaj OSD-oj"

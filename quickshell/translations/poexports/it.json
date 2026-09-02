@@ -432,7 +432,7 @@
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Aggiungere \"%1\" al gruppo %2? L'utente deve disconnettersi e accedere di nuovo, quindi eseguire dms greeter sync --profile per pubblicare il tema della schermata di accesso."
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Aggiungi \"%1\" al gruppo %2? L'utente deve disconnettersi e accedere di nuovo, dopo deve eseguire dms-greeter sync --profile per pubblicare il tema della schermata di accesso."
+    "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Aggiungere \"%1\" al gruppo %2? L'utente dovrà disconnettersi e accedere di nuovo, quindi eseguire dms-greeter sync --profile per pubblicare il tema della schermata di accesso."
   },
   "Add Bar": {
     "Add Bar": "Aggiungi barra"
@@ -498,7 +498,7 @@
     "Additional settings are managed by the Island": "Le impostazioni aggiuntive sono gestite dall'Isola"
   },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": "Regola la velocità di sensibilità del puntatore"
+    "Adjust pointer sensitivity speed": "Regola la velocità di risposta del puntatore"
   },
   "Adjust scrolling sensitivity multiplier": {
     "Adjust scrolling sensitivity multiplier": "Regola il moltiplicatore di sensibilità dello scorrimento"
@@ -528,7 +528,7 @@
     "Advanced": "Avanzate"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": "Opzioni avanzate libxkbcommon separate da virgola."
+    "Advanced comma-separated libxkbcommon options.": "Opzioni avanzate libxkbcommon separate da virgole."
   },
   "Afternoon": {
     "Afternoon": "Pomeriggio"
@@ -552,7 +552,7 @@
     "Allow": "Consenti"
   },
   "Allow %1 in Do Not Disturb": {
-    "Allow %1 in Do Not Disturb": "Consenti %1 in Non Disturbare"
+    "Allow %1 in Do Not Disturb": "Consenti %1 in non disturbare"
   },
   "Allow LAN access": {
     "Allow LAN access": "Consenti l'accesso LAN"
@@ -570,7 +570,7 @@
     "Allow greeter login access": "Consenti l'accesso al greeter di login"
   },
   "Allow in Do Not Disturb": {
-    "Allow in Do Not Disturb": "Consenti in Non Disturbare"
+    "Allow in Do Not Disturb": "Consenti in non disturbare"
   },
   "Already on that session": {
     "Already on that session": "Già in quella sessione"
@@ -684,7 +684,7 @@
     "Appearance": "Aspetto"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": "Copertine animate Apple Music"
+    "Apple Music animated covers": "Copertine animate di Apple Music"
   },
   "Application": {
     "Application": "Applicazione"
@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Applicazioni e comandi da avviare automaticamente all'accesso"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Verrà applicato alla prossima sincronizzazione del greeter"
   },
@@ -708,10 +711,10 @@
     "Apply Flatpak updates alongside system updates when running 'Update All'.": "Applica gli aggiornamenti Flatpak insieme agli aggiornamenti di sistema quando esegui \"Aggiorna tutto\"."
   },
   "Apply GTK Colors": {
-    "Apply GTK Colors": "Applica colori GTK"
+    "Apply GTK Colors": "Applica i colori GTK"
   },
   "Apply Qt Colors": {
-    "Apply Qt Colors": "Applica colori Qt"
+    "Apply Qt Colors": "Applica i colori Qt"
   },
   "Apply compositor blur behind the frame border": {
     "Apply compositor blur behind the frame border": "Applica la sfocatura del compositor dietro il bordo della cornice"
@@ -747,7 +750,7 @@
     "Apps Icon": "Icona App"
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
-    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "App autorizzate a mostrare popup durante la modalità Non Disturbare. Fai clic destro su una notifica e scegli \"Consenti in Non Disturbare\" per aggiungerne una qui."
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": "App autorizzate a mostrare popup durante la modalità Non Disturbare. Fai clic destro su una notifica e scegli \"Consenti in non disturbare\" per aggiungerne una qui."
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Le applicazioni sono ordinate per frequenza di utilizzo, poi per ultimo utilizzo, infine in ordine alfabetico."
@@ -837,7 +840,7 @@
     "Authentication Source": "Fonte di autenticazione"
   },
   "Authentication changes applied": {
-    "Authentication changes applied": "Modifiche di autenticazione applicate"
+    "Authentication changes applied": "Modifiche all'autenticazione applicate"
   },
   "Authentication changes apply automatically": {
     "Authentication changes apply automatically": "Le modifiche all'autenticazione vengono applicate automaticamente"
@@ -1080,7 +1083,7 @@
     "Bar Inset Padding": "Spaziatura interna della barra"
   },
   "Bar Length Padding": {
-    "Bar Length Padding": "Rientro longitudinale della barra"
+    "Bar Length Padding": "Spaziatura longitudinale della barra"
   },
   "Bar Opacity": {
     "Bar Opacity": "Opacità barra"
@@ -1170,7 +1173,7 @@
     "Blend between Surface High and the selected custom color": "Mischia tra superficie elevata e il colore personalizzato selezionato"
   },
   "Block %1 in Do Not Disturb": {
-    "Block %1 in Do Not Disturb": "Blocca %1 in Non Disturbare"
+    "Block %1 in Do Not Disturb": "Blocca %1 in non disturbare"
   },
   "Block Out": {
     "Block Out": "Escludi"
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Bordo con sfondo"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "In basso"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Cursore della luminosità"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Valore della luminosità"
@@ -1443,7 +1452,7 @@
     "Channel": "Canale"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": "Caratteri al secondo durante la pressione del tasto"
+    "Characters per second while holding down key": "Caratteri al secondo quando si tiene premuto il tasto"
   },
   "Charge Level": {
     "Charge Level": "Livello di carica"
@@ -1584,10 +1593,10 @@
     "Clear All Jobs": "Elimina tutte le stampe"
   },
   "Clear Badge on Open": {
-    "Clear Badge on Open": "Azzera Badge all'Apertura"
+    "Clear Badge on Open": "Azzera i badge all'apertura"
   },
   "Clear Filtered": {
-    "Clear Filtered": ""
+    "Clear Filtered": "Cancella filtrati"
   },
   "Clear History?": {
     "Clear History?": "Cancellare la cronologia?"
@@ -1695,13 +1704,13 @@
     "Codec switched successfully": "Codec cambiato correttamente"
   },
   "Codec switching is unavailable because WirePlumber was not found": {
-    "Codec switching is unavailable because WirePlumber was not found": "Il cambio codec non è disponibile perché WirePlumber non è stato trovato"
+    "Codec switching is unavailable because WirePlumber was not found": "Il cambio di codec non è disponibile perché WirePlumber non è stato trovato"
   },
   "Codec switching is unavailable because pactl was not found": {
     "Codec switching is unavailable because pactl was not found": "Il cambio di codec non è disponibile perché pactl non è stato trovato"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
-    "Codec switching is unavailable. WirePlumber wpexec was not found.": "Il cambio codec non è disponibile. WirePlumber wpexec non è stato trovato."
+    "Codec switching is unavailable. WirePlumber wpexec was not found.": "Il cambio di codec non è disponibile. WirePlumber wpexec non è stato trovato."
   },
   "Color": {
     "Color": "Colore"
@@ -1770,7 +1779,7 @@
     "Column Width": "Larghezza colonna"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Elenco di nomi di layout separati da virgola. Lascia vuoto per usare le impostazioni della tastiera di sistema."
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Elenco di nomi di layout separati da virgole. Lascia vuoto per usare le impostazioni della tastiera di sistema."
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Elenco separato da virgole dei nomi delle sessioni da nascondere. Racchiudi tra slash per usare una regex (es. /^ .*/)."
@@ -1785,7 +1794,7 @@
     "Commands": "Comandi"
   },
   "Community favorites to get you started": {
-    "Community favorites to get you started": ""
+    "Community favorites to get you started": "Preferiti della community per iniziare"
   },
   "Community themes": {
     "Community themes": "Temi della community"
@@ -1794,16 +1803,16 @@
     "Compact": "Compatto"
   },
   "Compact Clock Pill": {
-    "Compact Clock Pill": "Pillola orologio compatta"
+    "Compact Clock Pill": "Pillola dell'orologio compatta"
   },
   "Compact Island Height": {
-    "Compact Island Height": "Altezza isola compatta"
+    "Compact Island Height": "Altezza dell'isola compatta"
   },
   "Compact Mode": {
     "Compact Mode": "Modalità compatta"
   },
   "Compact home clock pill in both width and height": {
-    "Compact home clock pill in both width and height": "Riduci la pillola dell'orologio principale sia in larghezza che in altezza"
+    "Compact home clock pill in both width and height": "Riduci la pillola dell'orologio della schermata Home sia in larghezza sia in altezza"
   },
   "Completed": {
     "Completed": "Completato"
@@ -1860,7 +1869,7 @@
     "Configure which displays show \"%1\"": "Configura quali schermi mostrano \"%1\""
   },
   "Configure which displays show Dank Island as \"%1": {
-    "Configure which displays show Dank Island as \"%1\"": "Configura quali schermi mostrano Dank Island come \"%1\""
+    "Configure which displays show Dank Island as \"%1\"": "Configura su quali schermi mostrare Dank Island come \"%1\""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Configura quali schermi mostrano i componenti della shell"
@@ -2031,7 +2040,7 @@
     "Copy Text": "Copia testo"
   },
   "Copy target (%1)": {
-    "Copy target (%1)": "Copia Destinazione (%1)"
+    "Copy target (%1)": "Copia destinazione (%1)"
   },
   "Corner Radius": {
     "Corner Radius": "Raggio degli angoli"
@@ -2052,7 +2061,7 @@
     "Couldn't load hotspot password": "Impossibile caricare la password dell'hotspot"
   },
   "Couldn't load plugins": {
-    "Couldn't load plugins": ""
+    "Couldn't load plugins": "Impossibile caricare i plugin"
   },
   "Count Only": {
     "Count Only": "Solo conteggio"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Spazio di lavoro attuale"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Mostra data e ora correnti"
@@ -2289,7 +2304,7 @@
     "DMS out of date": "Versione di DMS obsoleta"
   },
   "DMS removes its managed block from /etc/pam.d/greetd and stops write services": {
-    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS rimuove il suo blocco gestito da /etc/pam.d/greetd e interrompe i servizi di scrittura"
+    "DMS removes its managed block from /etc/pam.d/greetd and stops write services": "DMS rimuove il blocco gestito da /etc/pam.d/greetd e interrompe i servizi di scrittura"
   },
   "DMS server is outdated (API v%1, expected v%2)": {
     "DMS server is outdated (API v%1, expected v%2)": "Il server DMS è obsoleto (API v%1, previsto v%2)"
@@ -2310,7 +2325,7 @@
     "Daily at:": "Ogni giorno alle:"
   },
   "Damped springs settle straight to their target with no overshoot": {
-    "Damped springs settle straight to their target with no overshoot": "Le molle smorzate si stabilizzano direttamente sul bersaglio senza oscillazioni"
+    "Damped springs settle straight to their target with no overshoot": "Le molle smorzate si stabilizzano direttamente sull'obiettivo senza oscillazioni"
   },
   "Dank": {
     "Dank": "Dank"
@@ -2607,7 +2622,7 @@
     "Disabling auto-login on startup...": "Disabilitazione accesso automatico all'avvio..."
   },
   "Disabling cellular...": {
-    "Disabling cellular...": "Disabilitazione rete cellulare..."
+    "Disabling cellular...": "Disabilitazione della rete cellulare..."
   },
   "Disc": {
     "Disc": "Disco"
@@ -2958,7 +2973,7 @@
     "Enable fingerprint authentication": "Abilita l'autenticazione tramite impronta digitale"
   },
   "Enable fingerprint or security key for DMS Greeter": {
-    "Enable fingerprint or security key for DMS Greeter": "Abilita l'impronta digitale o la chiave di sicurezza per il Greeter DMS"
+    "Enable fingerprint or security key for DMS Greeter": "Abilita l'impronta digitale o la chiave di sicurezza per DMS greeter"
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "Abilita l'integrazione di blocco tramite loginctl"
@@ -2979,7 +2994,7 @@
     "Enabling WiFi...": "Attivazione Wi-Fi..."
   },
   "Enabling cellular...": {
-    "Enabling cellular...": "Abilitazione rete cellulare..."
+    "Enabling cellular...": "Abilitazione della rete cellulare..."
   },
   "End": {
     "End": "Fine"
@@ -3402,7 +3417,7 @@
     "Failed to switch codec": "Impossibile cambiare codec"
   },
   "Failed to switch port": {
-    "Failed to switch port": "Impossibile cambiare porta"
+    "Failed to switch port": "Impossibile cambiare la porta"
   },
   "Failed to toggle cellular": {
     "Failed to toggle cellular": "Impossibile attivare/disattivare la rete cellulare"
@@ -3510,7 +3525,7 @@
     "Fine-tune the space reserved for the bar from the screen edge": "Regola con precisione lo spazio riservato alla barra rispetto al bordo dello schermo"
   },
   "Fingerprint availability could not be confirmed": {
-    "Fingerprint availability could not be confirmed": "Impossibile confermare la disponibilità dell'impronta digitale"
+    "Fingerprint availability could not be confirmed": "Impossibile confermare la disponibilità del lettore di impronte"
   },
   "Fingerprint error": {
     "Fingerprint error": "Errore impronta digitale"
@@ -3543,7 +3558,7 @@
     "Flat": "Costante"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": "Costante usa una velocità fissa; Adattivo si adatta alla velocità del movimento"
+    "Flat uses constant speed; Adaptive scales with movement speed": "La modalità Costante usa una velocità fissa; Adattivo si adatta alla velocità di movimento"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
@@ -3585,7 +3600,7 @@
     "Floating windows follow Surface Styling settings": "Le finestre fluttuanti seguono le impostazioni di Stile delle superfici"
   },
   "Floats above windows and other content": {
-    "Floats above windows and other content": "Fluttua sopra le finestre e gli altri contenuti"
+    "Floats above windows and other content": "Rimane sopra le finestre e gli altri contenuti"
   },
   "Fluent": {
     "Fluent": "Fluente"
@@ -3720,7 +3735,7 @@
     "Foreground Layers": "Livelli in primo piano"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": "Opacità primo piano"
+    "Foreground Opacity": "Opacità del primo piano"
   },
   "Forever": {
     "Forever": "Per sempre"
@@ -3744,7 +3759,7 @@
     "Format Legend": "Legenda del formato"
   },
   "Format the date on the login screen": {
-    "Format the date on the login screen": "Formatta la data sulla schermata di accesso"
+    "Format the date on the login screen": "Formatta la data nella schermata di accesso"
   },
   "Forward 10s": {
     "Forward 10s": "Avanti di 10s"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Giochi"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Controllo Gamma"
@@ -4110,7 +4128,7 @@
     "Higher percentages give island more inertia": "Percentuali più elevate conferiscono maggiore inerzia all'isola"
   },
   "Higher values pull island toward its target more strongly": {
-    "Higher values pull island toward its target more strongly": "Valori più alti attirano l'isola verso il bersaglio con maggiore forza"
+    "Higher values pull island toward its target more strongly": "Valori più alti attirano l'isola verso l'obiettivo con maggiore forza"
   },
   "Higher values settle island with less bounce": {
     "Higher values settle island with less bounce": "Valori più alti stabilizzano l'isola con minori rimbalzi"
@@ -4248,7 +4266,7 @@
     "IP address or hostname": "Indirizzo IP o nome host"
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
-    "IP sharing setup failed. Check that dnsmasq is installed.": "Configurazione della condivisione IP non riuscita. Controlla che dnsmasq sia installato."
+    "IP sharing setup failed. Check that dnsmasq is installed.": "Configurazione della condivisione IP non riuscita. Verifica che dnsmasq sia installato."
   },
   "ISO Date": {
     "ISO Date": "Data ISO"
@@ -4359,7 +4377,7 @@
     "Include Transitions": "Includi transizioni"
   },
   "Include application streams and virtual sinks in the device lists": {
-    "Include application streams and virtual sinks in the device lists": "Includi flussi applicativi e sink (uscite) virtuali nell'elenco dei dispositivi"
+    "Include application streams and virtual sinks in the device lists": "Includi i flussi delle applicazioni e i sink virtuali negli elenchi dei dispositivi"
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Includi azioni desktop (scorciatoie) nei risultati di ricerca."
@@ -4557,7 +4575,7 @@
     "Keep Changes": "Mantieni modifiche"
   },
   "Keep Clock with Media": {
-    "Keep Clock with Media": "Mantieni Orologio con i Media"
+    "Keep Clock with Media": "Mantieni l'orologio con i media"
   },
   "Keep My Edits": {
     "Keep My Edits": "Mantieni le mie modifiche"
@@ -4575,7 +4593,7 @@
     "Keep the clipboard type filter when reopening history": "Mantieni il filtro per tipo degli appunti alla riapertura della cronologia"
   },
   "Keep the dock visible above fullscreen applications": {
-    "Keep the dock visible above fullscreen applications": ""
+    "Keep the dock visible above fullscreen applications": "Mantieni il dock visibile sopra le applicazioni a schermo intero"
   },
   "Keep typing": {
     "Keep typing": "Continua a digitare"
@@ -4593,7 +4611,7 @@
     "Key": "Tasto"
   },
   "Key combination": {
-    "Key combination": "Combinazione di Tasti"
+    "Key combination": "Combinazione di tasti"
   },
   "Keybind Sources": {
     "Keybind Sources": "Sorgenti scorciatoie"
@@ -4875,7 +4893,7 @@
     "Low Priority": "Priorità bassa"
   },
   "Lower display refresh rate on battery": {
-    "Lower display refresh rate on battery": "Riduci la frequenza di aggiornamento dello schermo quando a batteria"
+    "Lower display refresh rate on battery": "Riduci la frequenza di aggiornamento dello schermo con alimentazione a batteria"
   },
   "MAC": {
     "MAC": "MAC"
@@ -5112,7 +5130,7 @@
     "Media Playback": "Riproduzione multimediale"
   },
   "Media Player": {
-    "Media Player": "Lettore Multimediale"
+    "Media Player": "Lettore multimediale"
   },
   "Media Players (": {
     "Media Players (": "Lettori Multimediali ("
@@ -5475,7 +5493,7 @@
     "No Rounding": "Squadrato"
   },
   "No Scroll": {
-    "No Scroll": "Nessuno scorrimento"
+    "No Scroll": "Nessun scorrimento"
   },
   "No Shadow": {
     "No Shadow": "Nessuna ombra"
@@ -5577,7 +5595,7 @@
     "No files found": "Nessun file trovato"
   },
   "No fingerprint reader detected": {
-    "No fingerprint reader detected": "Nessun lettore di impronte trovato"
+    "No fingerprint reader detected": "Nessun lettore di impronte rilevato"
   },
   "No folders found": {
     "No folders found": "Nessuna cartella trovata"
@@ -5898,7 +5916,7 @@
     "Only adjust gamma based on time or location rules.": "Regola la gamma solo in base a regole di orario o di posizione."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": "Continua solo se riconosci questa impronta del certificato del server."
+    "Only continue if you recognize this server certificate fingerprint.": "Continua solo se riconosci l'impronta di questo certificato del server."
   },
   "Only on Battery": {
     "Only on Battery": "Solo a batteria"
@@ -5916,7 +5934,7 @@
     "Opacity of cards and nested surfaces inside floating windows": "Opacità delle schede e delle superfici annidate nelle finestre fluttuanti"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Opacità delle finestre fluttuanti DMS come Impostazioni, Blocco Note e Richieste di Autenticazione"
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Opacità delle finestre fluttuanti DMS come Impostazioni, blocco note e richieste di autenticazione"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
     "Opacity of foreground cards and nested surfaces on shell panels": "Opacità delle schede in primo piano e delle superfici annidate sui pannelli della shell"
@@ -5931,7 +5949,7 @@
     "Open App": "Apri l'app"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": "Apri le Finestre DMS fluttuanti invece che affiancate"
+    "Open DMS windows floating instead of tiled": "Apri le finestre DMS come fluttuanti invece che affiancate"
   },
   "Open Delay": {
     "Open Delay": "Ritardo apertura"
@@ -5958,7 +5976,7 @@
     "Open Trash With": "Apri cestino con"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": "Apri finestre come fluttuanti"
+    "Open Windows Floating": "Apri le finestre come fluttuanti"
   },
   "Open a new note": {
     "Open a new note": "Apri una nuova nota"
@@ -6081,7 +6099,7 @@
     "Override Corner Radius": "Sovrascrivi il raggio degli angoli"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": "Sovrascrivi la trasparenza delle finestre fluttuanti per il Blocco Note"
+    "Override floating window transparency for Notepad": "Sovrascrivi la trasparenza delle finestre fluttuanti per blocco note"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Sovrascrivi le impostazioni di layout globali per questo output"
@@ -6165,10 +6183,10 @@
     "Palette": "Palette"
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
-    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "I pannelli scivolano da maggiore distanza a dimensione reale, senza cambio di scala, movimento pulito."
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "I pannelli scivolano da una distanza maggiore a dimensione reale, senza variazioni di dimensione, movimento puro e pulito."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
-    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "I pannelli si ingrandiscono mentre scorrono in entrata, per un marcato effetto di profondità in primo piano."
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "I pannelli si ingrandiscono da una dimensione ridotta mentre scorrono in entrata, per un marcato effetto di profondità in primo piano."
   },
   "Partial": {
     "Partial": "Parziale"
@@ -6312,7 +6330,7 @@
     "Place the dock on the Wayland overlay layer": "Posiziona il dock sul livello di sovrapposizione di Wayland"
   },
   "Platform renderer (FreeType).": {
-    "Platform renderer (FreeType).": "Renderer di piattaforma (FreeType)"
+    "Platform renderer (FreeType).": "Renderer di piattaforma (FreeType)."
   },
   "Play": {
     "Play": "Riproduci"
@@ -6411,7 +6429,7 @@
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Pannelli a comparsa e finestre modali seguono la velocità di animazione globale (disattiva per personalizzarne la velocità indipendentemente)"
   },
   "Popular Plugins": {
-    "Popular Plugins": ""
+    "Popular Plugins": "Plugin popolari"
   },
   "Popup Only": {
     "Popup Only": "Solo i popup"
@@ -6432,7 +6450,7 @@
     "Port": "Porta"
   },
   "Port Selection": {
-    "Port Selection": "Selezione porta"
+    "Port Selection": "Selezione della porta"
   },
   "Port switched": {
     "Port switched": "Porta cambiata"
@@ -6747,7 +6765,7 @@
     "Recommended available": "Driver consigliato disponibile"
   },
   "Reduce Motion": {
-    "Reduce Motion": "Riduci movimento"
+    "Reduce Motion": "Riduci il movimento"
   },
   "Reduce the visible bar length from both ends": {
     "Reduce the visible bar length from both ends": "Riduci la lunghezza visibile della barra da entrambe le estremità"
@@ -6921,7 +6939,7 @@
     "Requires a newer version of Quickshell": "Richiede una versione più recente di Quickshell"
   },
   "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": {
-    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Richiede greetd, dms-greeter e l'inclusione del tuo utente nel gruppo greeter (inoltre fprintd/pam_fprintd per l'impronta digitale, pam_u2f per le chiavi di sicurezza)."
+    "Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).": "Richiede greetd, dms-greeter e che il tuo utente appartenga al gruppo greeter (oltre a fprintd/pam_fprintd per l'impronta digitale e pam_u2f per le chiavi di sicurezza)."
   },
   "Requires night mode support": {
     "Requires night mode support": "Richiede il supporto alla modalità notturna"
@@ -6993,7 +7011,7 @@
     "Resume": "Riprendi"
   },
   "Retry": {
-    "Retry": ""
+    "Retry": "Riprova"
   },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Mostra gli archi dove le superfici incontrano la cornice"
@@ -7131,7 +7149,7 @@
     "Saturation": "Saturazione"
   },
   "Save & Start": {
-    "Save & Start": "Salva e Avvia"
+    "Save & Start": "Salva e avvia"
   },
   "Save Extracted Theme": {
     "Save Extracted Theme": "Salva tema estratto"
@@ -7461,7 +7479,7 @@
     "Separate Light & Dark Themes": "Separa i temi chiaro e scuro"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": "Separa app fissate e in esecuzione"
+    "Separate Pinned and Running Apps": "Separa le app fissate e quelle in esecuzione"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "L’aspetto separato per gli schermi non attivi non è supportato su questo compositor."
@@ -7611,7 +7629,7 @@
     "Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.": "Mostra i chip Tutti, App, File e Plugin accanto al campo di inserimento della barra Spotlight."
   },
   "Show Badge": {
-    "Show Badge": "Mostra badge"
+    "Show Badge": "Mostra i badge"
   },
   "Show CPU": {
     "Show CPU": "Mostra CPU"
@@ -7623,13 +7641,13 @@
     "Show CPU Temp": "Mostra temperatura CPU"
   },
   "Show Charge Rate": {
-    "Show Charge Rate": ""
+    "Show Charge Rate": "Mostra la velocità di carica"
   },
   "Show Date": {
     "Show Date": "Mostra data"
   },
   "Show Discharge Rate": {
-    "Show Discharge Rate": ""
+    "Show Discharge Rate": "Mostra la velocità di scarica"
   },
   "Show Disk": {
     "Show Disk": "Mostra disco"
@@ -7638,7 +7656,7 @@
     "Show Dock": "Mostra il dock"
   },
   "Show Dock Over Fullscreen": {
-    "Show Dock Over Fullscreen": ""
+    "Show Dock Over Fullscreen": "Mostra il dock sopra le app a schermo intero"
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Mostra temperatura percepita"
@@ -7692,7 +7710,7 @@
     "Show Material Design ripple animations on interactive elements": "Mostra le animazioni di increspatura del Material Design sugli elementi interattivi"
   },
   "Show Media Player": {
-    "Show Media Player": "Mostra lettore multimediale"
+    "Show Media Player": "Mostra il lettore multimediale"
   },
   "Show Memory": {
     "Show Memory": "Mostra memoria"
@@ -7752,7 +7770,7 @@
     "Show Restart DMS": "Mostra Riavvia DMS"
   },
   "Show Satellite Widgets": {
-    "Show Satellite Widgets": "Mostra Widget satellite"
+    "Show Satellite Widgets": "Mostra widget satellite"
   },
   "Show Saved Items": {
     "Show Saved Items": "Mostra elementi salvati"
@@ -7761,7 +7779,7 @@
     "Show Seconds": "Mostra i secondi"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": "Mostra Riavvio Soft"
+    "Show Soft Reboot": "Mostra Riavvio soft"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Mostra alba/tramonto"
@@ -7857,7 +7875,7 @@
     "Show foreground surfaces on cards inside floating windows": "Mostra le superfici in primo piano sulle schede nelle finestre fluttuanti"
   },
   "Show foreground surfaces on notification cards": {
-    "Show foreground surfaces on notification cards": "Mostra superfici in primo piano sulle schede di notifica"
+    "Show foreground surfaces on notification cards": "Mostra le superfici in primo piano sulle schede di notifica"
   },
   "Show foreground surfaces on panels for stronger contrast": {
     "Show foreground surfaces on panels for stronger contrast": "Mostra le superfici in primo piano sui pannelli per un contrasto più forte"
@@ -7869,7 +7887,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Mostra la sovrapposizione del launcher durante la digitazione nella panoramica di Niri. Disabilita per usare un altro launcher."
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Mostra le copertine video in loop da Apple Music quando disponibili. Invia il nome dell'artista e dell'album in riproduzione ad Apple."
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Mostra le copertine video in loop da Apple Music quando disponibili. Invia ad Apple l'artista e il nome dell'album in riproduzione."
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Mostra le schede delle modalità e i suggerimenti della tastiera in basso."
@@ -7902,7 +7920,7 @@
     "Show weather information in top bar and control center": "Mostra le informazioni meteo nella barra superiore e nel centro di controllo"
   },
   "Show weather on the login screen": {
-    "Show weather on the login screen": ""
+    "Show weather on the login screen": "Mostra il meteo nella schermata di accesso"
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Mostra i numeri indice degli spazi di lavoro nel selettore della barra superiore"
@@ -7998,13 +8016,13 @@
     "Snow": "Neve"
   },
   "Soft Reboot": {
-    "Soft Reboot": "Riavvio Soft"
+    "Soft Reboot": "Riavvio soft"
   },
   "Solid": {
     "Solid": "Pieno"
   },
   "Solid material type or Outline": {
-    "Solid material type or Outline": "Tipo di materiale pieno o Contorno"
+    "Solid material type or Outline": "Tipo di materiale pieno o contorno"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Alcuni plugin richiedono una versione più recente di DMS:"
@@ -8079,7 +8097,7 @@
     "Spring Mass": "Massa della molla"
   },
   "Spring Motion": {
-    "Spring Motion": "Movimento elastico"
+    "Spring Motion": "Movimento a molla"
   },
   "Spring Stiffness": {
     "Spring Stiffness": "Rigidità della molla"
@@ -8088,7 +8106,7 @@
     "Spring bezier with overshoot, entry briefly exceeds its target then settles.": "Curva di bezier a molla con rimbalzo: l'entrata supera brevemente il punto finale per poi assestarsi."
   },
   "Springs carry extra energy and visibly bounce before settling": {
-    "Springs carry extra energy and visibly bounce before settling": "Le molle accumulano energia extra e rimbalzano visibilmente prima di stabilizzarsi"
+    "Springs carry extra energy and visibly bounce before settling": "Le molle accumulano energia aggiuntiva e rimbalzano visibilmente prima di stabilizzarsi"
   },
   "Square": {
     "Square": "Squadrato"
@@ -8100,7 +8118,7 @@
     "Stacked": "Impilato"
   },
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
-    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "Predisponi il livello overlay di Wayland per rimanere visibile sopra le app a schermo intero"
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": "Imposta il livello overlay di Wayland per restare visibile sopra le app a schermo intero"
   },
   "Standard": {
     "Standard": "Standard"
@@ -8115,7 +8133,7 @@
     "Start DankConnect, KDE Connect, or Valent to use this plugin": "Avvia DankConnect, KDE Connect o Valent per usare questo plugin"
   },
   "Start Hotspot?": {
-    "Start Hotspot?": "Avvia l'hotspot?"
+    "Start Hotspot?": "Avviare l'hotspot?"
   },
   "Start KDE Connect or Valent to use this plugin": {
     "Start KDE Connect or Valent to use this plugin": "Avvia KDE Connect o Valent per usare questo plugin"
@@ -8127,7 +8145,7 @@
     "Starting hotspot...": "Avvio dell'hotspot..."
   },
   "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
-    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": "L'avvio dell'hotspot disconnetterà il Wi-Fi da \"%1\" — la radio non può fare entrambe le cose contemporaneamente. Per condividere Internet sarà necessaria un'altra connessione, ad esempio Ethernet."
+    "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": "L'avvio dell'hotspot disconnetterà il Wi-Fi da \"%1\" - la radio non può svolgere entrambe le funzioni contemporaneamente. Per condividere Internet sarà necessaria un'altra connessione, ad esempio Ethernet."
   },
   "Starting...": {
     "Starting...": "Avviando..."
@@ -8247,13 +8265,13 @@
     "Sweep the background into the screen edges": "Estendi lo sfondo fino ai bordi dello schermo"
   },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": "Scorciatoia cambio Layout"
+    "Switch Layout Shortcut": "Scorciatoia per cambiare il layout"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Passa da una configurazione del display all'altra"
   },
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
-    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Passa gli schermi con una modalità a 60 Hz disponibile a 60 Hz quando a batteria e ripristina la modalità precedente se collegato alla rete elettrica. Salta gli schermi con VRR abilitato."
+    "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Con alimentazione a batteria, imposta a 60 Hz gli schermi per cui è disponibile una modalità a 60 Hz e ripristina la modalità precedente quando si passa all'alimentazione di rete. Ignora gli schermi con VRR abilitato."
   },
   "Switch to power profile": {
     "Switch to power profile": "Passa al profilo energetico"
@@ -8274,10 +8292,10 @@
     "Sync Position Across Screens": "Sincronizza la posizione tra gli schermi"
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "La sincronizzazione applica il tuo tema e le tue impostazioni alla schermata di accesso. Gli utenti condivisi dovrebbero eseguire dms greeter sync --profile invece della sincronizzazione dell'utente principale."
+    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "La sincronizzazione applica tema e impostazioni personali alla schermata di accesso. Gli utenti condivisi dovrebbero eseguire dms-greeter sync --profile invece di una sincronizzazione dell'utente principale."
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "La sincronizzazione applica il tuo tema e le tue impostazioni alla schermata di accesso. Gli utenti condivisi dovrebbero eseguire dms-greeter sync --profile invece di una sincronizzazione dell'utente principale."
+    "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "La sincronizzazione applica tema e impostazioni personali alla schermata di accesso. Gli utenti condivisi dovrebbero eseguire dms-greeter sync --profile invece di una sincronizzazione dell'utente principale."
   },
   "Sync completed successfully.": {
     "Sync completed successfully.": "Sincronizzazione completata correttamente."
@@ -8295,7 +8313,7 @@
     "Sync to apply": "Sincronizza per applicare"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": "Sincronizza con impostazioni globali"
+    "Sync with Global Settings": "Sincronizza con le impostazioni globali"
   },
   "Syncing...": {
     "Syncing...": "Sincronizzazione..."
@@ -8394,13 +8412,13 @@
     "Terminal additional parameters": "Parametri aggiuntivi del terminale"
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
-    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Terminale di ripiego non riuscito. Installa un emulatore di terminale supportato o esegui \"dms auth sync\" manualmente."
+    "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Avvio del terminale di ripiego non riuscito. Installa un emulatore di terminale supportato o esegui \"dms auth sync\" manualmente."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Impossibile utilizzare il terminale di ripiego. Installa uno degli emulatori di terminale supportati oppure esegui manualmente 'dms greeter sync'."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Terminale di ripiego non riuscito. Installa uno degli emulatori di terminale supportati o esegui manualmente 'dms-greeter sync'."
+    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Avvio del terminale di ripiego non riuscito. Installa uno degli emulatori di terminale supportati o esegui manualmente \"dms-greeter sync\"."
   },
   "Terminal fallback opened. Complete authentication there; it will close automatically when done.": {
     "Terminal fallback opened. Complete authentication there; it will close automatically when done.": "Terminale di ripiego aperto. Completa lì l'autenticazione; si chiuderà automaticamente al termine."
@@ -8448,10 +8466,10 @@
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La variabile d'ambiente DMS_SOCKET non è impostata oppure il socket non è disponibile. La gestione automatica dei plugin richiede DMS_SOCKET."
   },
   "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": "L'isola si ancora al bordo superiore o inferiore"
+    "The Island anchors to the top or bottom edge": "L'isola si fissa al bordo superiore o inferiore"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
-    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "L'isola occupa questo bordo su uno schermo coperto da questa barra, quindi la barra rimane nascosta"
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "L'isola occupa questo bordo su uno schermo coperto da questa barra, quindi la barra resta nascosta in quel punto"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "L'adattatore Wi-Fi non è riuscito ad avviare la modalità access point."
@@ -8466,7 +8484,7 @@
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Il comando personalizzato usato per agganciarsi alle sessioni (riceve il nome della sessione come primo argomento)"
   },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "Il greeter incluso con la DMS è attivo (configurazione archinstall). Continua a funzionare così com'è, ma sincronizzare tema e impostazioni richiede il greeter standalone. Installa greetd-dms-greeter-bin dall'AUR, poi esegui Sincronizza per migrare la schermata di accesso."
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "Il greeter incluso in DMS è attivo (configurazione archinstall). Continua a funzionare così com'è, ma per sincronizzare tema e impostazioni è necessario il greeter standalone. Installa greetd-dms-greeter-bin dall'AUR, poi esegui Sincronizza per migrare la schermata di accesso."
   },
   "The island draws its own surface": {
     "The island draws its own surface": "L'isola disegna la propria superficie"
@@ -8529,7 +8547,7 @@
     "This device": "Questo dispositivo"
   },
   "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": {
-    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Questa installazione sta ancora usando hyprland.conf. Esegui dms setup per migrare prima di modificare queste impostazioni."
+    "This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.": "Questa installazione usa ancora hyprland.conf. Esegui dms setup per effettuare la migrazione prima di modificare queste impostazioni."
   },
   "This may take a few seconds": {
     "This may take a few seconds": "L'operazione potrebbe richiedere alcuni secondi"
@@ -8547,10 +8565,10 @@
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Verranno eliminate tutte le voci non fissate. Saranno mantenute %1 voci fissate."
   },
   "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
-    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": "uesta operazione eliminerà le %1 voci corrispondenti al filtro attuale. Le voci fissate verranno mantenute."
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
-    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Questa operazione disconnetterà il Wi-Fi da \"%1\" — la radio non può ospitare un hotspot e rimanere connessa contemporaneamente. La condivisione di Internet richiederà un'altra connessione, ad esempio Ethernet."
+    "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Questa operazione disconnetterà il Wi-Fi da \"%1\" - la radio non può ospitare un hotspot e restare connessa contemporaneamente. La condivisione di Internet richiederà un'altra connessione, ad esempio Ethernet."
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "Questa azione eliminerà definitivamente tutta la cronologia degli appunti."
@@ -8736,7 +8754,7 @@
     "Transform": "Trasforma"
   },
   "Transition Duration": {
-    "Transition Duration": ""
+    "Transition Duration": "Durata della transizione"
   },
   "Transition Effect": {
     "Transition Effect": "Effetto di transizione"
@@ -9018,7 +9036,7 @@
     "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.": "Usa un'immagine personalizzata per la schermata di blocco, oppure lascia vuoto per usare lo sfondo del desktop."
   },
   "Use a custom image for the login screen, or leave empty to use desktop wallpaper": {
-    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Usa un'immagine personalizzata per la schermata di accesso, oppure lascia vuoto per utilizzare lo sfondo del desktop"
+    "Use a custom image for the login screen, or leave empty to use desktop wallpaper": "Usa un'immagine personalizzata per la schermata di accesso oppure lascia il campo vuoto per usare lo sfondo del desktop"
   },
   "Use a custom radius for goth corner cutouts": {
     "Use a custom radius for goth corner cutouts": "Utilizza un raggio personalizzato per gli intagli angolari concavi"
@@ -9257,6 +9275,9 @@
   "Volume Slider": {
     "Volume Slider": "Cursore del volume"
   },
+  "Volume Style": {
+    "Volume Style": ""
+  },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Volume, luminosità e altri indicatori a schermo di sistema"
   },
@@ -9267,7 +9288,7 @@
     "W": "L"
   },
   "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1 corpo"
+    "WCAG %1 body": "WCAG %1 corpo del testo"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -9369,7 +9390,7 @@
     "WiFi is disabled": "Wi-Fi disattivato"
   },
   "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": {
-    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": "Wi-Fi disattivato. Puoi comunque modificare e salvare le impostazioni dell'hotspot, ma l'avvio dell'hotspot richiede che il Wi-Fi sia abilitato."
+    "WiFi is disabled. You can still edit and save hotspot settings, but starting the hotspot requires WiFi to be enabled.": "Il Wi-Fi è disattivato. Puoi comunque modificare e salvare le impostazioni dell'hotspot, ma per avviarlo è necessario che il Wi-Fi sia abilitato."
   },
   "WiFi is off": {
     "WiFi is off": "Wi-Fi disattivato"
@@ -9441,7 +9462,7 @@
     "Wind Speed in m/s": "Velocità del vento in m/s"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": "Raggio degli angoli finestra"
+    "Window Corner Radius": "Raggio degli angoli della finestra"
   },
   "Window Gaps": {
     "Window Gaps": "Spaziatura tra le finestre"
@@ -9453,7 +9474,7 @@
     "Window Height": "Altezza finestra"
   },
   "Window Opacity": {
-    "Window Opacity": "Opacità finestra"
+    "Window Opacity": "Opacità della finestra"
   },
   "Window Opening": {
     "Window Opening": "Apertura finestra"
@@ -9483,7 +9504,7 @@
     "Workspace name": "Nome dello spazio di lavoro"
   },
   "Workspaces": {
-    "Workspaces": "Spazi di Lavoro"
+    "Workspaces": "Spazi di lavoro"
   },
   "Wrap the app command. %command% is replaced with the actual executable": {
     "Wrap the app command. %command% is replaced with the actual executable": "Avvolgi il comando dell'app. %command% viene sostituito con l'eseguibile effettivo"

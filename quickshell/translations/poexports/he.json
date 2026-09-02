@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "אפליקציות ופקודות שיופעלו אוטומטית בעת ההתחברות"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "יוחל בסנכרון הבא של מסך ההתחברות"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "מסגרת עם רקע"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "למטה"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "מחוון בהירות"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "ערך הבהירות"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "סביבת העבודה הנוכחית"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "הצגה של התאריך והשעה הנוכחיים"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "משחקים"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "בקרת גאמה"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "מחוון עוצמה"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "עוצמת שמע, בהירות ותצוגות מערכת (OSD) אחרות על המסך"

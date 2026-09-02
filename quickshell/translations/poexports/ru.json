@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Приложения и команды для автоматического запуска при входе в систему"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Применится при следующей синхронизации экрана входа"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Рамка с фоном"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Снизу"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Яркости Ползунок"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Яркости Значение"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Текущее рабочее пространство"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Отображение текущих даты и времени"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Игры"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Настройка гаммы"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "Громкость Ползунок"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Громкость, яркость и другие системные OSD"

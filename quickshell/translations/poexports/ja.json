@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "ログイン時に自動起動するアプリケーションとコマンド"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "背景付き境界線"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "ボトム"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "明るさスライダー"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "明るさの値"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "現在のワークスペース"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "現在の日時を表示"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "ゲーム"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "ガンマ設定"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "音量スライダー"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、明るさ、その他のシステム OSD"
