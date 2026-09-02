@@ -37,12 +37,6 @@ DankPopout {
             onLockRequested: root.lockRequested()
             onSwitchUserRequested: root.switchUserRequested()
             onCloseRequested: root.close()
-
-            Keys.onEscapePressed: event => {
-                cancelHold();
-                root.close();
-                event.accepted = true;
-            }
         }
     }
 }
