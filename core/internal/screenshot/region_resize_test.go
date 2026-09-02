@@ -263,3 +263,51 @@ func TestHUDDimensionsContainText(t *testing.T) {
 		}
 	}
 }
+
+func TestOverlayDeltaHandlesClampedMonitorEdge(t *testing.T) {
+	prev := &overlay{
+		interior:    dirtyRect{100, 100, 1920, 1080},
+		top:         true,
+		bottom:      true,
+		left:        true,
+		right:       true,
+		showHandles: true,
+		scaleX:      1.0,
+	}
+	cur := &overlay{
+		interior:    dirtyRect{100, 100, 1920, 1080},
+		top:         true,
+		bottom:      true,
+		left:        true,
+		right:       false,
+		showHandles: true,
+		scaleX:      1.0,
+	}
+
+	dim, _ := overlayDelta(prev, cur)
+	rightTopHandle := prev.handleRects()[1] // TopRight
+	for _, piece := range rightTopHandle.minus(cur.interior) {
+		found := false
+		for _, d := range dim {
+			if d == piece {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expected piece %v of right-top handle in dim rects, got %v", piece, dim)
+		}
+	}
+
+	damage := overlayDamage(prev, cur)
+	foundDamage := false
+	for _, d := range damage {
+		if d == rightTopHandle {
+			foundDamage = true
+			break
+		}
+	}
+	if !foundDamage {
+		t.Errorf("expected right-top handle %v in damage rects when crossing monitor edge, got %v", rightTopHandle, damage)
+	}
+}

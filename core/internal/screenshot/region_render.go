@@ -3,6 +3,7 @@ package screenshot
 import (
 	"fmt"
 	"math"
+	"slices"
 )
 
 var fontGlyphs = map[rune][12]uint8{
@@ -181,12 +182,14 @@ func (o *overlay) handleRects() []dirtyRect {
 // overlayDelta returns the areas to re-dim and to re-brighten when prev is replaced by cur; nil means no overlay.
 func overlayDelta(prev, cur *overlay) (dim, bright []dirtyRect) {
 	var curInterior, prevInner dirtyRect
+	var curHandles []dirtyRect
 	if cur != nil {
 		curInterior = cur.interior
+		curHandles = cur.handleRects()
 	}
 	if prev != nil {
 		dim = append(prev.full().minus(curInterior), prev.label.minus(curInterior)...)
-		if prev.showHandles && (cur == nil || !cur.showHandles || cur.interior != prev.interior) {
+		if prev.showHandles && !slices.Equal(prev.handleRects(), curHandles) {
 			for _, h := range prev.handleRects() {
 				dim = append(dim, h.minus(curInterior)...)
 			}
@@ -430,17 +433,21 @@ func (r *RegionSelector) drawCornerHandle(data []byte, stride, bufW, bufH, cx, c
 func overlayDamage(prev, cur *overlay) []dirtyRect {
 	dim, bright := overlayDelta(prev, cur)
 	damage := append(dim, bright...)
-	if prev != nil && prev.showHandles && (cur == nil || !cur.showHandles || cur.interior != prev.interior) {
-		damage = append(damage, prev.handleRects()...)
+	var prevHandles, curHandles []dirtyRect
+	if prev != nil {
+		prevHandles = prev.handleRects()
+	}
+	if cur != nil {
+		curHandles = cur.handleRects()
+	}
+	if !slices.Equal(prevHandles, curHandles) {
+		damage = append(damage, prevHandles...)
+		damage = append(damage, curHandles...)
 	}
 	if cur == nil {
 		return damage
 	}
-	damage = append(append(damage, cur.ring()...), cur.label)
-	if cur.showHandles && (prev == nil || !prev.showHandles || cur.interior != prev.interior) {
-		damage = append(damage, cur.handleRects()...)
-	}
-	return damage
+	return append(append(damage, cur.ring()...), cur.label)
 }
 
 func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuffer) {
