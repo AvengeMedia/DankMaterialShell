@@ -226,39 +226,33 @@ func TestOverlayDeltaIdenticalOverlayNoHandleDimming(t *testing.T) {
 }
 
 func TestHUDDimensionsContainText(t *testing.T) {
-	for _, captureKey := range []string{"Space/Enter", "Drag+Release"} {
-		for _, cursorLabel := range []string{"show", "hide"} {
-			items := []struct{ key, desc string }{
-				{captureKey, "capture"},
-				{"Ctrl", "resize/move"},
-				{"P", cursorLabel + " cursor"},
-				{"Esc", "cancel"},
+	const bufW, bufH = 1920, 1080
+	stride := bufW * 4
+
+	for _, noConfirm := range []bool{false, true} {
+		for _, showCursor := range []bool{false, true} {
+			r := &RegionSelector{
+				showCapturedCursor: showCursor,
+				screenshoter: &Screenshoter{
+					config: Config{NoConfirm: noConfirm},
+				},
 			}
 
-			const charW, padding, itemSpacing = 8, 12, 24
+			hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH)
+			data := make([]byte, bufH*stride)
+			r.drawHUD(data, stride, bufW, bufH, uint32(FormatARGB8888))
 
-			totalW := 0
-			for i, item := range items {
-				totalW += len(item.key)*(charW+1) + (1+len(item.desc))*(charW+1)
-				if i < len(items)-1 {
-					totalW += itemSpacing
+			// Assert no lit pixel falls outside the pill boundaries
+			for y := range bufH {
+				for x := range bufW {
+					off := y*stride + x*4
+					if data[off] != 0 || data[off+1] != 0 || data[off+2] != 0 || data[off+3] != 0 {
+						if x < hudX || x >= hudX+hudW || y < hudY || y >= hudY+hudH {
+							t.Fatalf("noConfirm=%v showCursor=%v: pixel (%d, %d) is non-zero outside HUD pill [%d..%d, %d..%d]",
+								noConfirm, showCursor, x, y, hudX, hudX+hudW, hudY, hudY+hudH)
+						}
+					}
 				}
-			}
-
-			hudW := totalW + padding*2
-
-			tx := padding
-			for i, item := range items {
-				tx += len(item.key) * (charW + 1)
-				tx += (1 + len(item.desc)) * (charW + 1)
-				if i < len(items)-1 {
-					tx += itemSpacing
-				}
-			}
-
-			if hudW-tx != padding {
-				t.Errorf("for key %q label %q: HUD pill width %d does not match text end %d + padding %d (diff=%d)",
-					captureKey, cursorLabel, hudW, tx, padding, hudW-tx-padding)
 			}
 		}
 	}

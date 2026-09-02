@@ -525,12 +525,7 @@ func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, form
 		style.TextR, style.TextG, style.TextB, format)
 }
 
-func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {
-	if r.selection.dragging {
-		return
-	}
-
-	style := LoadOverlayStyle()
+func (r *RegionSelector) hudDimensions(bufW, bufH int) (hudX, hudY, hudW, hudH int) {
 	const charW, charH, padding, itemSpacing = 8, 12, 12, 24
 
 	cursorLabel := "hide"
@@ -557,13 +552,39 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 		}
 	}
 
-	hudW := totalW + padding*2
-	hudH := charH + padding*2
-	hudX := (bufW - hudW) / 2
-	hudY := bufH - hudH - 20
+	hudW = totalW + padding*2
+	hudH = charH + padding*2
+	hudX = (bufW - hudW) / 2
+	hudY = bufH - hudH - 20
+	return hudX, hudY, hudW, hudH
+}
 
+func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {
+	if r.selection.dragging {
+		return
+	}
+
+	hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH)
+	style := LoadOverlayStyle()
 	r.fillRect(data, stride, bufW, bufH, hudX, hudY, hudW, hudH,
 		style.BackgroundR, style.BackgroundG, style.BackgroundB, style.BackgroundA, format)
+
+	const charW, padding, itemSpacing = 8, 12, 24
+	cursorLabel := "hide"
+	if !r.showCapturedCursor {
+		cursorLabel = "show"
+	}
+	captureKey := "Space/Enter"
+	if r.screenshoter != nil && r.screenshoter.config.NoConfirm {
+		captureKey = "Drag+Release"
+	}
+
+	items := []struct{ key, desc string }{
+		{captureKey, "capture"},
+		{"Ctrl", "resize/move"},
+		{"P", cursorLabel + " cursor"},
+		{"Esc", "cancel"},
+	}
 
 	tx, ty := hudX+padding, hudY+padding
 	for i, item := range items {
