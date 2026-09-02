@@ -156,32 +156,19 @@ Singleton {
                 return;
             }
 
-            if (colorsFileLoadFailed && currentTheme === dynamic && rawWallpaperPath) {
-                log.info("Matugen now available, regenerating colors for dynamic theme");
-                const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-                const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
-                const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                if (rawWallpaperPath.startsWith("#")) {
-                    setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                } else {
-                    setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                }
-                return;
-            }
-
             const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
             const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
 
             if (currentTheme === dynamic) {
                 if (rawWallpaperPath) {
+                    if (colorsFileLoadFailed) log.info("Matugen now available, regenerating colors for dynamic theme");
+
                     const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                    if (rawWallpaperPath.startsWith("#")) {
-                        setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    } else {
-                        setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    }
+
+                    if (rawWallpaperPath.startsWith("#")) setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
+                    else setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
                 }
-            } else if (currentTheme !== "custom") {
+            } else if (currentTheme !== custom) {
                 const darkTheme = StockThemes.getThemeByName(currentTheme, false);
                 const lightTheme = StockThemes.getThemeByName(currentTheme, true);
                 if (darkTheme && darkTheme.primary) {
