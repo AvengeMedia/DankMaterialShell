@@ -90,8 +90,12 @@ BasePill {
     function getNiriFocusedWindow() {
         if (!CompositorService.isNiri)
             return null;
-        return NiriService.windows.find(w => w.is_focused)
-            || (NiriService.lastFocusedWindowId !== null ? NiriService.windows.find(w => w.id === NiriService.lastFocusedWindowId) : null);
+        const focused = NiriService.windows.find(w => w.is_focused);
+        if (focused)
+            return focused;
+        if (!focusedWindowPopoutLoader.item?.shouldBeVisible || NiriService.lastFocusedWindowId === null)
+            return null;
+        return NiriService.windows.find(w => w.id === NiriService.lastFocusedWindowId) || null;
     }
 
     function updateActiveWindow() {
