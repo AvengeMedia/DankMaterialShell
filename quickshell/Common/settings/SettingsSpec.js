@@ -557,8 +557,6 @@ var SPEC = {
     dankIslandHomeVolumeDisplay: { def: "both" },
     dankIslandHomeBrightnessSlot: { def: "hidden" },
     dankIslandHomeBrightnessDisplay: { def: "both" },
-    dankIslandHomeLeftOrder: { def: ["media", "weather", "status", "volume", "brightness", "notifications"] },
-    dankIslandHomeRightOrder: { def: ["weather", "status", "notifications", "media", "volume", "brightness"] },
     dankIslandBatteryStyle: { def: "solid" },
     dankIslandSatellitesEnabled: { def: true },
     dankIslandSatellitePosition: { def: "edges" },

@@ -27,43 +27,74 @@ Item {
     readonly property real brightnessMaximum: DisplayService.brightnessMaximum(root.brightnessDevice)
     readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(DisplayService.brightnessLevel / root.brightnessMaximum * 100) : 0
     readonly property int volumePercent: Math.min(AudioService.sinkMaxVolume, Math.round((AudioService.sink?.audio?.volume ?? 0) * 100))
+    readonly property var leftGroupOrder: ["media", "weather", "status", "volume", "brightness"]
+    readonly property var rightGroupOrder: ["weather", "status", "volume", "brightness", "notifications", "media"]
     readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
+    readonly property real touchpadThreshold: 100
+    property real wheelAccumulator: 0
     property bool weatherRefHeld: false
 
     function groupsForSide(side) {
-        const ids = [];
-        const order = side === "left" ? root.controller.homeLeftOrder : root.controller.homeRightOrder;
-        for (const id of order) {
-            if (id === "media" && root.controller.homeMediaSlot === side)
-                ids.push(id);
-            else if (id === "weather" && root.controller.homeWeatherSlot === side && WeatherService.weather.available)
-                ids.push(id);
-            else if (id === "status" && root.controller.homeStatusSlot === side)
-                ids.push(id);
-            else if (id === "notifications" && side === "right" && root.controller.homeNotificationBadge)
-                ids.push(id);
-            else if (id === "volume" && root.controller.homeVolumeSlot === side && AudioService.sink?.audio)
-                ids.push(id);
-            else if (id === "brightness" && root.controller.homeBrightnessSlot === side && DisplayService.brightnessAvailable && root.brightnessDevice)
-                ids.push(id);
+        const order = side === "left" ? root.leftGroupOrder : root.rightGroupOrder;
+        return order.filter(id => root.groupShown(id, side));
+    }
+
+    function groupShown(id, side) {
+        switch (id) {
+        case "media":
+            return root.controller.homeMediaSlot === side;
+        case "weather":
+            return root.controller.homeWeatherSlot === side && WeatherService.weather.available;
+        case "status":
+            return root.controller.homeStatusSlot === side;
+        case "notifications":
+            return side === "right" && root.controller.homeNotificationBadge;
+        case "volume":
+            return root.controller.homeVolumeSlot === side && !!AudioService.sink?.audio;
+        case "brightness":
+            return root.controller.homeBrightnessSlot === side && DisplayService.brightnessAvailable && !!root.brightnessDevice;
         }
-        return ids;
+        return false;
+    }
+
+    function wheelDirection(delta) {
+        const isMouseWheel = Math.abs(delta) >= 120 && Math.abs(delta) % 120 === 0;
+        if (isMouseWheel)
+            return delta > 0 ? 1 : -1;
+        root.wheelAccumulator += delta;
+        if (Math.abs(root.wheelAccumulator) < root.touchpadThreshold)
+            return 0;
+        const direction = root.wheelAccumulator > 0 ? 1 : -1;
+        root.wheelAccumulator = 0;
+        return direction;
     }
 
     function adjustSystemLevel(activityId, delta) {
-        if (delta === 0)
+        const direction = root.wheelDirection(delta);
+        if (direction === 0)
             return;
-        const direction = delta > 0 ? 1 : -1;
-        if (activityId === "volume") {
-            if (!AudioService.sink?.audio)
-                return;
-            SessionData.suppressOSDTemporarily();
-            AudioService.adjustDefaultSinkVolume(5, direction);
-            AudioService.playVolumeChangeSoundIfEnabled();
+        switch (activityId) {
+        case "volume":
+            root.adjustVolume(direction);
+            return;
+        case "brightness":
+            root.adjustBrightness(direction);
             return;
         }
-        if (activityId !== "brightness" || !root.brightnessDevice)
+    }
+
+    function adjustVolume(direction) {
+        if (!AudioService.sink?.audio)
             return;
+        SessionData.suppressOSDTemporarily();
+        AudioService.adjustDefaultSinkVolume(AudioService.wheelVolumeStep, direction);
+        AudioService.playVolumeChangeSoundIfEnabled();
+    }
+
+    function adjustBrightness(direction) {
+        if (!root.brightnessDevice)
+            return;
+        SessionData.suppressOSDTemporarily();
         const next = Math.max(DisplayService.brightnessMinimum(root.brightnessDevice), Math.min(root.brightnessMaximum, DisplayService.brightnessLevel + direction * 5));
         DisplayService.setBrightness(next, root.brightnessDevice.id, true);
     }
@@ -255,14 +286,14 @@ Item {
                 visible: systemLevelRow.displayMode !== "percentage"
                 name: item.isVolume ? AudioService.sinkVolumeIconName : DisplayService.brightnessIconName(root.brightnessDevice, DisplayService.brightnessLevel)
                 size: root.statusIconSize
-                color: item.isBrightness ? Theme.primary : Theme.surfaceTextSecondary
+                color: Theme.surfaceTextSecondary
             }
 
             NumericText {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: systemLevelRow.displayMode !== "icon"
                 text: (item.isVolume ? root.volumePercent : root.brightnessPercent) + "%"
-                reserveText: item.isVolume ? Math.round(AudioService.sinkMaxVolume) + "%" : "100%"
+                reserveText: item.isVolume ? AudioService.sinkMaxVolume + "%" : "100%"
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: root.textSize
             }
@@ -314,7 +345,7 @@ Item {
                     return;
                 }
                 if (item.isVolume || item.isBrightness) {
-                    root.systemModel.show(item.groupId);
+                    root.systemModel.open(item.groupId);
                     return;
                 }
                 root.controller.requestControlCenter("", false);

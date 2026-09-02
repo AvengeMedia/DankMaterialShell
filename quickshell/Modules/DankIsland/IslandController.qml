@@ -279,21 +279,6 @@ QtObject {
         return "both";
     }
 
-    function resolvedHomeOrder(value, fallback) {
-        const known = ["media", "weather", "status", "notifications", "volume", "brightness"];
-        const order = [];
-        const configured = Array.isArray(value) ? value : [];
-        for (const id of configured) {
-            if (known.indexOf(id) !== -1 && order.indexOf(id) === -1)
-                order.push(id);
-        }
-        for (const id of fallback) {
-            if (order.indexOf(id) === -1)
-                order.push(id);
-        }
-        return order;
-    }
-
     readonly property string homeMediaSlot: resolvedHomeSlot(SettingsData.dankIslandHomeMediaSlot, "left")
     readonly property string homeStatusSlot: resolvedHomeSlot(SettingsData.dankIslandHomeStatusSlot, "hidden")
     readonly property string homeWeatherSlot: SettingsData.weatherEnabled ? resolvedHomeSlot(SettingsData.dankIslandHomeWeatherSlot, "hidden") : "hidden"
@@ -301,8 +286,6 @@ QtObject {
     readonly property string homeVolumeDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeVolumeDisplay)
     readonly property string homeBrightnessSlot: resolvedHomeSlot(SettingsData.dankIslandHomeBrightnessSlot, "hidden")
     readonly property string homeBrightnessDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeBrightnessDisplay)
-    readonly property var homeLeftOrder: resolvedHomeOrder(SettingsData.dankIslandHomeLeftOrder, ["media", "weather", "status", "volume", "brightness", "notifications"])
-    readonly property var homeRightOrder: resolvedHomeOrder(SettingsData.dankIslandHomeRightOrder, ["weather", "status", "notifications", "media", "volume", "brightness"])
 
     readonly property real homeCompactWidth: Math.ceil(homeSlotMargin * 2 + Math.max(homeContentWidth, 1))
     readonly property real mediaCompactWidth: Math.ceil(Math.max(1, mediaContentWidth))

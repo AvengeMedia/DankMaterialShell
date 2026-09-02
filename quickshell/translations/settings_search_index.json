@@ -12382,6 +12382,52 @@
     "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
   },
   {
+    "section": "dankIslandHomeBrightnessSlot",
+    "label": "Brightness",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "backlight",
+      "bright",
+      "brightness",
+      "compact",
+      "current",
+      "dank",
+      "dim",
+      "display",
+      "dynamic island",
+      "face",
+      "home",
+      "island",
+      "monitor",
+      "output",
+      "screen"
+    ],
+    "description": "Current display brightness on the home face"
+  },
+  {
+    "section": "dankIslandHomeBrightnessDisplay",
+    "label": "Brightness Style",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "backlight",
+      "bright",
+      "brightness",
+      "compact",
+      "dank",
+      "dim",
+      "dynamic island",
+      "home",
+      "icon",
+      "island",
+      "percentage",
+      "style"
+    ]
+  },
+  {
     "section": "dankIslandNotificationBadgeClearOnOpen",
     "label": "Clear Badge on Open",
     "tabIndex": 46,
@@ -13207,6 +13253,51 @@
       "wayland"
     ],
     "description": "Stage the Wayland overlay layer to remain visible over fullscreen apps"
+  },
+  {
+    "section": "dankIslandHomeVolumeSlot",
+    "label": "Volume",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "audio",
+      "compact",
+      "current",
+      "dank",
+      "dynamic island",
+      "face",
+      "home",
+      "island",
+      "loudness",
+      "output",
+      "sound",
+      "speaker",
+      "volume"
+    ],
+    "description": "Current output volume on the home face"
+  },
+  {
+    "section": "dankIslandHomeVolumeDisplay",
+    "label": "Volume Style",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "audio",
+      "compact",
+      "dank",
+      "dynamic island",
+      "home",
+      "icon",
+      "island",
+      "loudness",
+      "percentage",
+      "sound",
+      "speaker",
+      "style",
+      "volume"
+    ]
   },
   {
     "section": "dankIslandHomeWeatherSlot",
