@@ -586,8 +586,8 @@ Item {
         Loader {
             readonly property real indicatorOffset: SettingsData.dockSpacing / 2 + 1.4
 
-            width: item ? item.width : 0
-            height: item ? item.height : 0
+            width: item ? item.implicitWidth : 0
+            height: item ? item.implicitHeight : 0
 
             x: !root.isVertical ? Math.round((parent.width - width) / 2) : (SettingsData.dockPosition === SettingsData.Position.Right ? parent.width - width + indicatorOffset : -indicatorOffset)
             y: root.isVertical ? Math.round((parent.height - height) / 2) : (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height + indicatorOffset : -indicatorOffset)
@@ -602,6 +602,8 @@ Item {
 
         Row {
             spacing: Theme.spacingXXS
+            width: implicitWidth
+            height: implicitHeight
 
             Repeater {
                 model: {
@@ -660,6 +662,8 @@ Item {
 
         Column {
             spacing: Theme.spacingXXS
+            width: implicitWidth
+            height: implicitHeight
 
             Repeater {
                 model: {
