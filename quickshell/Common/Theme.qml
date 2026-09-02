@@ -1520,6 +1520,11 @@ Singleton {
         return 2 * Math.round((barThickness / 48) * (size + defaultOffset) * s / 2);
     }
 
+    // A widget that carries no icon, the clock above all, is centred as a whole
+    // line box, so the same parity rule as snapEven applies to it. At
+    // fontSizeSmall that box is 15 px tall and has no exact centre in an even
+    // pill, one step up it is 16 px and the widget lands on the grid. The 0.9
+    // branch already comes out at 14 px and stays where it is.
     function barTextSize(barThickness, fontScale, maximizeText) {
         const scale = barThickness / 48;
         const dankBarScale = fontScale !== undefined ? fontScale : 1.0;
@@ -1528,7 +1533,7 @@ Singleton {
             return Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale);
         if (scale >= 1.25)
             return Math.round(fontSizeMedium * dankBarScale * maxScale);
-        return Math.round(fontSizeSmall * dankBarScale * maxScale);
+        return Math.round((fontSizeSmall + 1) * dankBarScale * maxScale);
     }
 
     function getBatteryIcon(level, isCharging, batteryAvailable) {
