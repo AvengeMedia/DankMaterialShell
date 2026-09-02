@@ -5,6 +5,7 @@ import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
+import "../../Common/QmlUtils.js" as QmlUtils
 
 Item {
     id: root
@@ -30,6 +31,7 @@ Item {
     }
     readonly property int instanceIndex: Math.max(0, root.instanceChoices.findIndex(row => row.id === SettingsData.dankIslandBarId))
     readonly property var homeSlotValues: ["left", "right", "hidden"]
+    readonly property var systemLevelDisplayValues: ["icon", "percentage", "both"]
     readonly property var paletteValues: ["default", "bright", "dim"]
     readonly property var batteryStyleValues: ["solid", "outline"]
     readonly property var satellitePositionValues: ["island", "edges"]
@@ -38,6 +40,113 @@ Item {
     function valueIndex(values, value, fallback) {
         const index = values.indexOf(value);
         return index >= 0 ? index : Math.max(0, values.indexOf(fallback));
+    }
+
+    function setHomeActivitySlot(activityId, settingKey, index, selected) {
+        if (!selected)
+            return;
+        const slot = root.homeSlotValues[index] ?? "hidden";
+        const leftOrder = Array.isArray(SettingsData.dankIslandHomeLeftOrder) ? SettingsData.dankIslandHomeLeftOrder.filter(id => id !== activityId) : [];
+        const rightOrder = Array.isArray(SettingsData.dankIslandHomeRightOrder) ? SettingsData.dankIslandHomeRightOrder.filter(id => id !== activityId) : [];
+        if (slot === "left")
+            leftOrder.unshift(activityId);
+        else if (slot === "right")
+            rightOrder.push(activityId);
+        SettingsData.set("dankIslandHomeLeftOrder", leftOrder);
+        SettingsData.set("dankIslandHomeRightOrder", rightOrder);
+        SettingsData.set(settingKey, slot);
+    }
+
+    component SystemLevelActivityRow: Item {
+        id: activityRow
+
+        required property string activityId
+        required property string settingKey
+        required property string text
+        required property string description
+        required property string slot
+        required property string displayMode
+        property var tags: []
+
+        readonly property bool compact: width - controls.implicitWidth - Theme.spacingM * 3 < 200
+        readonly property bool isHighlighted: SettingsSearchService.highlightSection === settingKey
+
+        width: parent?.width ?? 0
+        height: compact ? textColumn.implicitHeight + Theme.spacingS + controls.implicitHeight + Theme.spacingM * 2 : Math.max(60, Math.max(textColumn.implicitHeight, controls.implicitHeight) + Theme.spacingM * 2)
+
+        Component.onCompleted: {
+            const flickable = QmlUtils.findParentFlickable(activityRow.parent);
+            if (flickable)
+                SettingsSearchService.registerCard(settingKey, activityRow, flickable);
+        }
+        Component.onDestruction: SettingsSearchService.unregisterCard(settingKey)
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.primary, activityRow.isHighlighted ? 0.2 : 0)
+            visible: activityRow.isHighlighted
+        }
+
+        Column {
+            id: textColumn
+
+            x: Theme.spacingM
+            y: activityRow.compact ? Theme.spacingM : (activityRow.height - height) / 2
+            width: activityRow.compact ? activityRow.width - Theme.spacingM * 2 : activityRow.width - controls.implicitWidth - Theme.spacingM * 3
+            spacing: Theme.spacingXXS
+
+            StyledText {
+                width: parent.width
+                text: activityRow.text
+                color: Theme.surfaceText
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+            }
+
+            StyledText {
+                width: parent.width
+                text: activityRow.description
+                color: Theme.surfaceVariantText
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+            }
+        }
+
+        Column {
+            id: controls
+
+            x: activityRow.compact ? (activityRow.width - width) / 2 : activityRow.width - width - Theme.spacingM
+            y: activityRow.compact ? textColumn.y + textColumn.implicitHeight + Theme.spacingS : (activityRow.height - height) / 2
+            spacing: Theme.spacingXS
+
+            DankButtonGroup {
+                model: [I18n.tr("Left", "island settings: activity left of clock"), I18n.tr("Right", "island settings: activity right of clock"), I18n.tr("Hidden", "island settings: activity hidden")]
+                currentIndex: root.valueIndex(root.homeSlotValues, activityRow.slot, "hidden")
+                selectionMode: "single"
+                onSelectionChanged: (index, selected) => root.setHomeActivitySlot(activityRow.activityId, activityRow.settingKey, index, selected)
+            }
+
+            DankButtonGroup {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: activityRow.slot !== "hidden"
+                model: [I18n.tr("Icon", "island settings: system level icon only"), "%", I18n.tr("Both", "island settings: system level icon and percentage")]
+                currentIndex: root.valueIndex(root.systemLevelDisplayValues, activityRow.displayMode, "both")
+                buttonHeight: 32
+                minButtonWidth: 52
+                buttonPadding: Theme.spacingS
+                textSize: Theme.fontSizeSmall
+                checkEnabled: false
+                selectionMode: "single"
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    const value = root.systemLevelDisplayValues[index] ?? "both";
+                    SettingsData.set(activityRow.activityId === "volume" ? "dankIslandHomeVolumeDisplay" : "dankIslandHomeBrightnessDisplay", value);
+                }
+            }
+        }
     }
 
     DankFlickable {
@@ -178,10 +287,7 @@ Item {
                     description: I18n.tr("Search when idle, visualizer when media is playing", "island settings: media slot description")
                     model: [I18n.tr("Left", "island settings: media or launcher slot left of the clock"), I18n.tr("Right", "island settings: media or launcher slot right of the clock"), I18n.tr("Hidden", "island settings: media or launcher slot hidden")]
                     currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeMediaSlot, "left")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeMediaSlot", root.homeSlotValues[index] ?? "left");
-                    }
+                    onSelectionChanged: (index, selected) => root.setHomeActivitySlot("media", "dankIslandHomeMediaSlot", index, selected)
                 }
 
                 SettingsButtonGroupRow {
@@ -191,10 +297,7 @@ Item {
                     description: BatteryService.batteryAvailable ? I18n.tr("Battery gauge opens Control Center", "island settings: status slot description with battery") : I18n.tr("Tools icon opens Control Center", "island settings: status slot description without battery")
                     model: [I18n.tr("Left", "island settings: battery or control center slot left of the clock"), I18n.tr("Right", "island settings: battery or control center slot right of the clock"), I18n.tr("Hidden", "island settings: battery or control center slot hidden")]
                     currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeStatusSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeStatusSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
+                    onSelectionChanged: (index, selected) => root.setHomeActivitySlot("status", "dankIslandHomeStatusSlot", index, selected)
                 }
 
                 SettingsButtonGroupRow {
@@ -204,10 +307,27 @@ Item {
                     description: SettingsData.weatherEnabled ? I18n.tr("Weather icon and temperature open the weather activity", "island settings: weather slot description") : I18n.tr("Enable weather in Time & Weather to show this shortcut", "island settings: weather slot disabled hint")
                     model: [I18n.tr("Left", "island settings: weather slot left of the clock"), I18n.tr("Right", "island settings: weather slot right of the clock"), I18n.tr("Hidden", "island settings: weather slot hidden")]
                     currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeWeatherSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeWeatherSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
+                    onSelectionChanged: (index, selected) => root.setHomeActivitySlot("weather", "dankIslandHomeWeatherSlot", index, selected)
+                }
+
+                SystemLevelActivityRow {
+                    activityId: "volume"
+                    settingKey: "dankIslandHomeVolumeSlot"
+                    tags: ["island", "home", "compact", "volume", "audio", "percentage"]
+                    text: I18n.tr("Volume", "island settings: volume slot row")
+                    description: I18n.tr("Current output volume on the home face", "island settings: volume slot description")
+                    slot: SettingsData.dankIslandHomeVolumeSlot
+                    displayMode: SettingsData.dankIslandHomeVolumeDisplay
+                }
+
+                SystemLevelActivityRow {
+                    activityId: "brightness"
+                    settingKey: "dankIslandHomeBrightnessSlot"
+                    tags: ["island", "home", "compact", "brightness", "display", "percentage"]
+                    text: I18n.tr("Brightness", "island settings: brightness slot row")
+                    description: I18n.tr("Current display brightness on the home face", "island settings: brightness slot description")
+                    slot: SettingsData.dankIslandHomeBrightnessSlot
+                    displayMode: SettingsData.dankIslandHomeBrightnessDisplay
                 }
 
                 SettingsToggleRow {

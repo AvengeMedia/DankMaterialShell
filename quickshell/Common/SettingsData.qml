@@ -1017,6 +1017,12 @@ Singleton {
     property string dankIslandHomeStatusSlot: "hidden"
     property string dankIslandHomeWeatherSlot: "hidden"
     property bool dankIslandHomeCompactTight: false
+    property string dankIslandHomeVolumeSlot: "hidden"
+    property string dankIslandHomeVolumeDisplay: "both"
+    property string dankIslandHomeBrightnessSlot: "hidden"
+    property string dankIslandHomeBrightnessDisplay: "both"
+    property var dankIslandHomeLeftOrder: ["media", "weather", "status", "volume", "brightness", "notifications"]
+    property var dankIslandHomeRightOrder: ["weather", "status", "notifications", "media", "volume", "brightness"]
     property string dankIslandBatteryStyle: "solid"
     property bool dankIslandSatellitesEnabled: true
     property string dankIslandSatellitePosition: "edges"

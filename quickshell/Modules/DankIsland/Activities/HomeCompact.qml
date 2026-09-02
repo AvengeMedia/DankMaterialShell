@@ -11,6 +11,7 @@ Item {
     id: root
 
     required property var controller
+    required property var systemModel
 
     readonly property string timeText: systemClock.date.toLocaleTimeString(I18n.locale(), SettingsData.getEffectiveTimeFormat())
     readonly property string dateText: systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.getEffectiveDateFormat("ddd MMM d"))
@@ -22,23 +23,49 @@ Item {
     readonly property real groupSpacing: root.controller.homeSlotMargin
     readonly property real edgePad: Math.max(root.groupSpacing, (root.width - compactRow.width) / 2)
     readonly property bool weatherSlotEnabled: root.controller.homeWeatherSlot !== "hidden"
+    readonly property var brightnessDevice: DisplayService.getCurrentDeviceInfo()
+    readonly property real brightnessMaximum: DisplayService.brightnessMaximum(root.brightnessDevice)
+    readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(DisplayService.brightnessLevel / root.brightnessMaximum * 100) : 0
+    readonly property int volumePercent: Math.min(AudioService.sinkMaxVolume, Math.round((AudioService.sink?.audio?.volume ?? 0) * 100))
     readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
     property bool weatherRefHeld: false
 
     function groupsForSide(side) {
         const ids = [];
-        const media = root.controller.homeMediaSlot === side;
-        if (media && side === "left")
-            ids.push("media");
-        if (root.controller.homeWeatherSlot === side && WeatherService.weather.available)
-            ids.push("weather");
-        if (root.controller.homeStatusSlot === side)
-            ids.push("status");
-        if (side === "right" && root.controller.homeNotificationBadge)
-            ids.push("notifications");
-        if (media && side === "right")
-            ids.push("media");
+        const order = side === "left" ? root.controller.homeLeftOrder : root.controller.homeRightOrder;
+        for (const id of order) {
+            if (id === "media" && root.controller.homeMediaSlot === side)
+                ids.push(id);
+            else if (id === "weather" && root.controller.homeWeatherSlot === side && WeatherService.weather.available)
+                ids.push(id);
+            else if (id === "status" && root.controller.homeStatusSlot === side)
+                ids.push(id);
+            else if (id === "notifications" && side === "right" && root.controller.homeNotificationBadge)
+                ids.push(id);
+            else if (id === "volume" && root.controller.homeVolumeSlot === side && AudioService.sink?.audio)
+                ids.push(id);
+            else if (id === "brightness" && root.controller.homeBrightnessSlot === side && DisplayService.brightnessAvailable && root.brightnessDevice)
+                ids.push(id);
+        }
         return ids;
+    }
+
+    function adjustSystemLevel(activityId, delta) {
+        if (delta === 0)
+            return;
+        const direction = delta > 0 ? 1 : -1;
+        if (activityId === "volume") {
+            if (!AudioService.sink?.audio)
+                return;
+            SessionData.suppressOSDTemporarily();
+            AudioService.adjustDefaultSinkVolume(5, direction);
+            AudioService.playVolumeChangeSoundIfEnabled();
+            return;
+        }
+        if (activityId !== "brightness" || !root.brightnessDevice)
+            return;
+        const next = Math.max(DisplayService.brightnessMinimum(root.brightnessDevice), Math.min(root.brightnessMaximum, DisplayService.brightnessLevel + direction * 5));
+        DisplayService.setBrightness(next, root.brightnessDevice.id, true);
     }
 
     function syncWeatherRef(wanted) {
@@ -96,6 +123,8 @@ Item {
         readonly property bool isWeather: item.groupId === "weather"
         readonly property bool isStatus: item.groupId === "status"
         readonly property bool isNotifications: item.groupId === "notifications"
+        readonly property bool isVolume: item.groupId === "volume"
+        readonly property bool isBrightness: item.groupId === "brightness"
         readonly property bool usesBattery: item.isStatus && BatteryService.batteryAvailable
 
         width: {
@@ -105,6 +134,8 @@ Item {
                 return weatherRow.implicitWidth;
             if (item.isNotifications)
                 return notificationRow.implicitWidth;
+            if (item.isVolume || item.isBrightness)
+                return systemLevelRow.implicitWidth;
             if (item.isStatus)
                 return item.usesBattery ? batteryMeter.width : root.iconSize;
             return clockRow.implicitWidth;
@@ -112,7 +143,7 @@ Item {
         height: root.slotSize
 
         HoverBackdrop {
-            visible: item.isMedia || item.isWeather || item.isNotifications || (item.isStatus && !item.usesBattery)
+            visible: item.isMedia || item.isWeather || item.isNotifications || item.isVolume || item.isBrightness || (item.isStatus && !item.usesBattery)
             hovered: groupArea.containsMouse
         }
 
@@ -210,6 +241,33 @@ Item {
             }
         }
 
+        Row {
+            id: systemLevelRow
+
+            readonly property string displayMode: item.isVolume ? root.controller.homeVolumeDisplay : root.controller.homeBrightnessDisplay
+
+            anchors.verticalCenter: parent.verticalCenter
+            visible: item.isVolume || item.isBrightness
+            spacing: Theme.spacingXXS
+
+            DankIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: systemLevelRow.displayMode !== "percentage"
+                name: item.isVolume ? AudioService.sinkVolumeIconName : DisplayService.brightnessIconName(root.brightnessDevice, DisplayService.brightnessLevel)
+                size: root.statusIconSize
+                color: item.isBrightness ? Theme.primary : Theme.surfaceTextSecondary
+            }
+
+            NumericText {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: systemLevelRow.displayMode !== "icon"
+                text: (item.isVolume ? root.volumePercent : root.brightnessPercent) + "%"
+                reserveText: item.isVolume ? Math.round(AudioService.sinkMaxVolume) + "%" : "100%"
+                color: Theme.surfaceTextSecondary
+                font.pixelSize: root.textSize
+            }
+        }
+
         BatteryMeter {
             id: batteryMeter
 
@@ -255,7 +313,17 @@ Item {
                     root.controller.requestNotificationCenter(false);
                     return;
                 }
+                if (item.isVolume || item.isBrightness) {
+                    root.systemModel.show(item.groupId);
+                    return;
+                }
                 root.controller.requestControlCenter("", false);
+            }
+            onWheel: wheel => {
+                if (!item.isVolume && !item.isBrightness)
+                    return;
+                root.adjustSystemLevel(item.groupId, wheel.angleDelta.y || wheel.angleDelta.x);
+                wheel.accepted = true;
             }
         }
     }
