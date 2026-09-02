@@ -72,6 +72,7 @@ Item {
                 SettingsControlledBy {
                     visible: SettingsData.connectedFrameModeActive
                     parentModal: root.parentModal
+                    section: "frameConnectedOptions"
                     settingLabel: I18n.tr("Default Launcher")
                     reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
                 }
@@ -756,6 +757,7 @@ Item {
                 SettingsControlledBy {
                     visible: SettingsData.frameEnabled
                     parentModal: root.parentModal
+                    section: "frameBorder"
                     settingLabel: I18n.tr("Darken Modal Background")
                     reason: I18n.tr("Disabled by Frame Mode")
                 }

@@ -292,6 +292,15 @@ Item {
             spacing: Theme.spacingXL
 
             SettingsCard {
+                iconName: "toolbar"
+                title: I18n.tr("Layout")
+                settingKey: "barLayout"
+                tags: ["layout", "standard", "frame", "island", "mode", "bar"]
+
+                SettingsLayoutPicker {}
+            }
+
+            SettingsCard {
                 tab: "appearance"
                 iconName: "toolbar"
                 title: I18n.tr("Dank Bar")
@@ -554,6 +563,7 @@ Item {
                     target: "island"
                     visible: dankBarTab.selectedBarIsIsland
                     parentModal: dankBarTab.parentModal
+                    section: "dankIslandPlacement"
                     settingLabel: I18n.tr("Island placement")
                     reason: I18n.tr("The Island anchors to the top or bottom edge")
                 }
@@ -562,6 +572,7 @@ Item {
                     target: "island"
                     visible: dankBarTab.islandShadowsSelectedBar
                     parentModal: dankBarTab.parentModal
+                    section: "dankIslandPlacement"
                     settingLabel: I18n.tr("%1 position").arg(dankBarTab.positionLabel(selectedBarConfig?.position ?? SettingsData.Position.Top))
                     reason: I18n.tr("The Island holds this edge on a display this bar covers, so the bar stays hidden there")
                 }
@@ -710,6 +721,7 @@ Item {
                     target: "island"
                     visible: dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: "dankIslandPlacement"
                     settingLabel: I18n.tr("Bar visibility")
                     reason: I18n.tr("Additional settings are managed by the Island")
                 }
@@ -943,18 +955,11 @@ Item {
                 }
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: SettingsData.frameEnabled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: SettingsData.frameEnabled ? "frameOpacity" : "dankIslandAppearance"
                     settingLabel: I18n.tr("Bar Opacity")
-                    reason: I18n.tr("Managed by Frame")
-                }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar Opacity")
-                    reason: I18n.tr("The island draws its own surface")
+                    reason: SettingsData.frameEnabled ? I18n.tr("Managed by Frame") : I18n.tr("The island draws its own surface")
                 }
             }
 
@@ -966,10 +971,11 @@ Item {
                 visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false)
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: SettingsData.frameEnabled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: SettingsData.frameEnabled ? "frameBorder" : "dankIslandPlacement"
                     settingLabel: I18n.tr("Bar Spacing")
-                    reason: I18n.tr("Edge spacing, exclusive zone, and popup gaps are managed by Frame")
+                    reason: SettingsData.frameEnabled ? I18n.tr("Edge spacing, exclusive zone, and popup gaps are managed by Frame") : I18n.tr("Some settings are managed by the island")
                 }
 
                 SettingsSliderRow {
@@ -1199,14 +1205,6 @@ Item {
                         }
                     }
                 }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar Spacing")
-                    reason: I18n.tr("Some settings are managed by the island")
-                }
             }
 
             SettingsSliderCard {
@@ -1273,18 +1271,11 @@ Item {
                 visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: SettingsData.frameEnabled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: SettingsData.frameEnabled ? "frameBorder" : "dankIslandAppearance"
                     settingLabel: I18n.tr("Bar corners and background")
-                    reason: I18n.tr("Managed by Frame")
-                }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar corners")
-                    reason: I18n.tr("Corner style applies to the bar surface")
+                    reason: SettingsData.frameEnabled ? I18n.tr("Managed by Frame") : I18n.tr("Corner style applies to the bar surface")
                 }
 
                 SettingsToggleRow {
@@ -1763,18 +1754,11 @@ Item {
             }
 
             SettingsControlledBy {
-                visible: dankBarTab.appearanceOnly && dankBarTab.connectedFrameModeActive
+                visible: dankBarTab.appearanceOnly && (dankBarTab.connectedFrameModeActive || dankBarTab.islandOwnsSelectedBarTop)
                 parentModal: dankBarTab.parentModal
+                section: dankBarTab.connectedFrameModeActive ? "frameBorder" : "dankIslandAppearance"
                 settingLabel: I18n.tr("Bar shadow, border, and corners")
-                reason: I18n.tr("Managed by Frame in Connected Mode")
-            }
-
-            SettingsControlledBy {
-                target: "island"
-                visible: dankBarTab.appearanceOnly && !dankBarTab.connectedFrameModeActive && dankBarTab.islandOwnsSelectedBarTop
-                parentModal: dankBarTab.parentModal
-                settingLabel: I18n.tr("Bar border and shadow")
-                reason: I18n.tr("These style the bar surface, which the Island replaces")
+                reason: dankBarTab.connectedFrameModeActive ? I18n.tr("Managed by Frame in Connected Mode") : I18n.tr("These style the bar surface, which the Island replaces")
             }
 
             SettingsCard {

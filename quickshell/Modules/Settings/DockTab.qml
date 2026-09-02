@@ -663,6 +663,7 @@ Item {
             SettingsControlledBy {
                 visible: root.connectedFrameModeActive
                 parentModal: root.parentModal
+                section: "frameBorder"
                 settingLabel: I18n.tr("Dock margin, opacity, and border")
                 reason: I18n.tr("Managed by Frame in Connected Mode")
             }

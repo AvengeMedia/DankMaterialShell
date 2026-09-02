@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -61,7 +62,7 @@ CATEGORY_KEYWORDS = {
     "Personalization": ["customize", "custom", "personal", "appearance"],
     "Time & Weather": ["clock", "forecast", "date"],
     "Keyboard Shortcuts": ["keys", "bindings", "hotkey"],
-    "Dank Bar": ["panel", "topbar", "statusbar"],
+    "Bar": ["panel", "topbar", "statusbar"],
     "Applications": ["apps", "programs", "window", "rules", "matching", "floating"],
     "Dock": ["taskbar", "launcher bar"],
     "Network": ["connectivity", "online"],
@@ -97,6 +98,7 @@ TAB_INDEX_MAP = {
     "TimeWeatherTab.qml": 1,
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
+    "DankDashTab.qml": 43,
     "DankIslandTab.qml": 46,
     "WorkspacesTab.qml": 4,
     "CompositorLayoutTab.qml": 37,
@@ -146,16 +148,19 @@ FILE_CONDITION_MAP = {
     "GreeterTab.qml": "greeterAvailable",
     "MouseTouchpadTab.qml": "isNiri",
     "KeyboardTab.qml": "isNiri",
+    "FrameTab.qml": "frameEnabled",
+    "DankIslandTab.qml": "islandEnabled",
+    "NetworkCellularTab.qml": "cellularAvailable",
 }
 
 TAB_CATEGORY_MAP = {
     0: "Personalization",
     1: "Time & Weather",
     2: "Keyboard Shortcuts",
-    3: "Dank Bar",
-    4: "Dank Bar",
+    3: "Bar",
+    4: "Bar",
     5: "Dock",
-    6: "Dank Bar",
+    6: "Bar",
     7: "Network",
     8: "System",
     9: "Launcher",
@@ -171,7 +176,7 @@ TAB_CATEGORY_MAP = {
     19: "Running Apps",
     20: "System Updater",
     21: "Power & Sleep",
-    22: "Dank Bar",
+    22: "Bar",
     23: "System",
     24: "Displays",
     25: "Displays",
@@ -184,17 +189,17 @@ TAB_CATEGORY_MAP = {
     33: "Frame",
     34: "Default Apps",
     35: "Users",
-    36: "Autostart",
+    36: "Autostart Apps",
     37: "Personalization",
     38: "Applications",
     39: "Network",
     40: "Network",
     41: "Network",
     42: "Power & Security",
-    43: "Dank Dash",
+    43: "Dashboard",
     44: "System",
     45: "System",
-    46: "Dank Island",
+    46: "Island",
     47: "Network",
 }
 
@@ -466,8 +471,8 @@ def parse_tabs_from_sidebar(sidebar_file):
         parent = parent_match.group(1) if parent_match else None
 
         cond = None
-        after_pos = match.end()
-        snippet = content[match.start() : min(after_pos + 200, len(content))]
+        snippet_end = content.find("}", match.end())
+        snippet = content[match.start() : snippet_end if snippet_end != -1 else len(content)]
         for qml_cond, key in [
             ("shortcutsOnly", "keybindsAvailable"),
             ("soundsOnly", "soundsAvailable"),
@@ -479,6 +484,9 @@ def parse_tabs_from_sidebar(sidebar_file):
             ("niriOnly", "isNiri"),
             ("windowRulesCapable", "windowRulesCapable"),
             ("layoutCapable", "layoutCapable"),
+            ("frameOnly", "frameEnabled"),
+            ("islandOnly", "islandEnabled"),
+            ("cellularOnly", "cellularAvailable"),
         ]:
             if f'"{qml_cond}": true' in snippet:
                 cond = key
@@ -594,25 +602,59 @@ def extract_settings_index(root_dir):
                 "section": "dankIslandHomeLayout",
                 "label": "Home Layout",
                 "tabIndex": 46,
-                "category": "Dank Island",
+                "category": "Island",
                 "keywords": enrich_keywords(
                     "Home Layout",
                     "Order and hide the groups around the island clock",
-                    "Dank Island",
+                    "Island",
                     ["media", "launcher", "weather", "battery", "volume", "brightness", "notifications", "badge", "left", "right", "hidden", "reorder"],
                 ),
                 "icon": "home",
                 "description": "Order and hide the groups around the island clock",
+                "conditionKey": "islandEnabled",
             }
         )
 
     return all_entries
 
 
+def validate(all_entries, sidebar_file, root_dir):
+    errors = []
+    settings_dir = root_dir / "Modules" / "Settings"
+    for tab_file in sorted(settings_dir.glob("*Tab.qml")):
+        if tab_file.name not in TAB_INDEX_MAP:
+            errors.append(f"{tab_file.name} missing from TAB_INDEX_MAP")
+
+    with open(sidebar_file, "r", encoding="utf-8") as f:
+        sidebar_content = f.read()
+    sidebar_tabs = {int(n) for n in re.findall(r'"tabIndex"\s*:\s*(\d+)', sidebar_content)}
+    with open(Path(__file__).parent / "en.json", "r", encoding="utf-8") as f:
+        catalog_terms = {entry["term"] for entry in json.load(f)}
+    known_labels = catalog_terms | set(re.findall(r'I18n\.tr\("([^"]+)"', sidebar_content))
+    service_file = root_dir / "Services" / "SettingsSearchService.qml"
+    with open(service_file, "r", encoding="utf-8") as f:
+        condition_keys = set(re.findall(r'"(\w+)":\s*\(\)\s*=>', f.read()))
+
+    for entry in all_entries:
+        if entry["tabIndex"] not in sidebar_tabs:
+            errors.append(f"{entry['section']}: tabIndex {entry['tabIndex']} not in sidebar")
+        if entry["category"] not in known_labels:
+            errors.append(f"{entry['section']}: category '{entry['category']}' is not a catalog term")
+        cond = entry.get("conditionKey")
+        if cond and cond not in condition_keys:
+            errors.append(f"{entry['section']}: unknown conditionKey '{cond}'")
+
+    if not errors:
+        return
+    for error in sorted(set(errors)):
+        print(f"error: {error}", file=sys.stderr)
+    sys.exit(1)
+
+
 def main():
     script_dir = Path(__file__).parent
     root_dir = script_dir.parent
-    sidebar_file = root_dir / "Modals" / "Settings" / "SettingsSidebar.qml"
+    sidebar_file = root_dir / "Common" / "SettingsTabs.qml"
 
     print("Extracting settings search index...")
     settings_entries = extract_settings_index(root_dir)
@@ -621,6 +663,7 @@ def main():
     all_entries = tab_entries + settings_entries
 
     all_entries.sort(key=lambda x: (x["tabIndex"], x["label"], x["section"]))
+    validate(all_entries, sidebar_file, root_dir)
 
     output_path = script_dir / "settings_search_index.json"
     with open(output_path, "w", encoding="utf-8") as f:

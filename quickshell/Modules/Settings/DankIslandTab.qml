@@ -16,10 +16,7 @@ Item {
     readonly property var instanceChoices: {
         SettingsData.barConfigs;
         SettingsData.dankIslandBarId;
-        const rows = [({
-                    "id": "",
-                    "name": I18n.tr("Off", "island instance choice: island disabled")
-                })];
+        const rows = [];
         const configs = SettingsData.barConfigs || [];
         for (let i = 0; i < configs.length; i++)
             rows.push({
@@ -59,10 +56,14 @@ Item {
                 iconName: "view_in_ar"
                 title: I18n.tr("Dank Island - Beta", "island settings: page title")
                 settingKey: "dankIslandInstance"
+                tags: ["island", "layout", "standard", "frame", "mode", "bar"]
+
+                SettingsLayoutPicker {}
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandBarId"
                     tags: ["island", "activities", "media", "notifications", "osd", "bar"]
+                    visible: !!SettingsData.dankIslandBarId && SettingsData.barConfigs.length > 1
                     text: I18n.tr("Island Instance", "island settings: which bar config the island replaces")
                     model: root.instanceChoices.map(row => row.name)
                     currentIndex: root.instanceIndex
@@ -71,6 +72,18 @@ Item {
                             SettingsData.set("dankIslandBarId", root.instanceChoices[index]?.id ?? "");
                     }
                 }
+
+                SettingsToggleRow {
+                    settingKey: "dankIslandEnable"
+                    tags: ["island", "enable", "show", "hide"]
+                    visible: !!SettingsData.dankIslandBarId
+                    text: I18n.tr("Enable Island")
+                    description: I18n.tr("Toggle the Island on this instance's displays")
+                    checked: SettingsData.dankIslandEnabled
+                    onToggled: checked => SettingsData.updateBarConfig(SettingsData.dankIslandBarId, {
+                            enabled: checked
+                        })
+                }
             }
 
             SettingsCard {
@@ -78,7 +91,7 @@ Item {
                 iconName: "open_with"
                 title: I18n.tr("Position", "island settings: position card title")
                 settingKey: "dankIslandPlacement"
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsToggleRow {
                     settingKey: "dankIslandFloating"
@@ -161,7 +174,7 @@ Item {
                 iconName: "home"
                 title: I18n.tr("Home Compact", "island settings: home face card title")
                 settingKey: "dankIslandActivities"
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 StyledText {
                     width: parent.width
@@ -243,7 +256,7 @@ Item {
                 iconName: "palette"
                 title: I18n.tr("Appearance", "island settings: appearance card title")
                 settingKey: "dankIslandAppearance"
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandPalette"
@@ -308,7 +321,7 @@ Item {
                 iconName: "notifications"
                 title: I18n.tr("Notifications", "island settings: notifications card title")
                 settingKey: "dankIslandNotifications"
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsToggleRow {
                     settingKey: "dankIslandNotificationExpand"
@@ -337,7 +350,7 @@ Item {
                 settingKey: "dankIslandSatellites"
                 collapsible: true
                 expanded: true
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsToggleRow {
                     settingKey: "dankIslandSatellitesEnabled"
@@ -439,7 +452,7 @@ Item {
                 iconName: "touch_app"
                 title: I18n.tr("Behavior", "island settings: behavior card title")
                 settingKey: "dankIslandInteraction"
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandInteractionMode"
@@ -498,7 +511,7 @@ Item {
                 title: I18n.tr("Motion & Accessibility", "island settings: motion card title")
                 settingKey: "dankIslandMotion"
                 collapsible: true
-                enabled: SettingsData.dankIslandEnabled
+                visible: SettingsData.dankIslandEnabled
 
                 SettingsToggleRow {
                     settingKey: "dankIslandReducedMotion"

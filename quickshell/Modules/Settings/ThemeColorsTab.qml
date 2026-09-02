@@ -1956,6 +1956,7 @@ Item {
                 SettingsControlledBy {
                     visible: themeColorsTab.connectedFrameModeActive
                     parentModal: themeColorsTab.parentModal
+                    section: "frameOpacity"
                     settingLabel: I18n.tr("Surface Opacity")
                     reason: I18n.tr("Managed by Frame in Connected Mode")
                 }

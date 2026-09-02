@@ -14,10 +14,6 @@ Column {
     property string title: ""
     property string titleIcon: "widgets"
     property string sectionId: ""
-    property bool readOnly: false
-
-    enabled: !readOnly
-    opacity: readOnly ? 0.55 : 1.0
 
     DankTooltipV2 {
         id: sharedTooltip

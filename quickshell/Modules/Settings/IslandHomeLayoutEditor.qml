@@ -9,7 +9,7 @@ import "../../Common/QmlUtils.js" as QmlUtils
 Item {
     id: root
 
-    readonly property string settingKey: "dankIslandHomeLayout"
+    property string settingKey: "dankIslandHomeLayout"
     readonly property var groupIds: SettingsData._islandHomeGroupIds
     readonly property var layout: SettingsData.getIslandHomeLayout()
     readonly property bool isHighlighted: SettingsSearchService.highlightSection === settingKey
@@ -141,14 +141,17 @@ Item {
     Component.onCompleted: {
         rebuild();
         Qt.callLater(() => {
-            if (!root.parent)
+            if (!root.parent || !root.settingKey)
                 return;
             const flickable = QmlUtils.findParentFlickable(root.parent);
             if (flickable)
                 SettingsSearchService.registerCard(root.settingKey, root, flickable);
         });
     }
-    Component.onDestruction: SettingsSearchService.unregisterCard(settingKey)
+    Component.onDestruction: {
+        if (settingKey)
+            SettingsSearchService.unregisterCard(settingKey);
+    }
 
     function stepHighlight(dir, move) {
         const order = enabledOrder.concat(disabledOrder);
