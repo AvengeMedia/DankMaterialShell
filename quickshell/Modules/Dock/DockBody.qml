@@ -403,7 +403,17 @@ Item {
     onHeightChanged: dock._syncDockChromeState()
     onVisibleChanged: dock._syncDockChromeState()
     onHasAppsChanged: dock._syncDockChromeState()
-    onConnectedBarSideChanged: dock._syncDockChromeState()
+    property bool _switchingPosition: false
+
+    onConnectedBarSideChanged: {
+        dock._switchingPosition = true;
+        slideXSpring.snapTo(dock.isVertical ? dockSlide.targetX : 0);
+        slideYSpring.snapTo(!dock.isVertical ? dockSlide.targetY : 0);
+        dockChromeSync.schedule();
+        Qt.callLater(() => {
+            dock._switchingPosition = false;
+        });
+    }
     onUsesConnectedFrameChromeChanged: dock._syncDockChromeState()
 
     Connections {
@@ -623,8 +633,8 @@ Item {
 
             height: {
                 if (dock.isVertical) {
-                    // Keep the taller hit area regardless of the reveal state to prevent shrinking loop
-                    return Math.min(Math.max(dockBackground.height + 64, 200), maxDockHeight);
+                    const h = dockApps.implicitWidth + SettingsData.dockSpacing * 2;
+                    return Math.min(Math.max(h + 64, 200), maxDockHeight);
                 }
                 return dock.reveal ? Theme.px(dockGeometry.motionThickness, _dpr) : 1;
             }
@@ -632,21 +642,16 @@ Item {
                 if (dock.isVertical) {
                     return dock.reveal ? Theme.px(dockGeometry.motionThickness, _dpr) : 1;
                 }
-                // Keep the wider hit area regardless of the reveal state to prevent shrinking loop
-                return Math.min(dockBackground.width + 8 + dock.borderThickness, maxDockWidth);
+                const w = dockApps.implicitWidth + SettingsData.dockSpacing * 2;
+                return Math.min(w + 8 + dock.borderThickness, maxDockWidth);
             }
-            anchors {
-                top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top) : undefined
-                bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined) : undefined
-                horizontalCenter: !dock.isVertical ? parent.horizontalCenter : undefined
-                left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? undefined : parent.left) : undefined
-                right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
-                verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
-            }
+            x: !dock.isVertical ? Math.round((parent.width - width) / 2) : (SettingsData.dockPosition === SettingsData.Position.Right ? parent.width - width : 0)
+            y: dock.isVertical ? Math.round((parent.height - height) / 2) : (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height : 0)
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
 
             Behavior on height {
+                enabled: !dock._switchingPosition
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
@@ -654,11 +659,15 @@ Item {
             }
 
             Behavior on width {
+                enabled: !dock._switchingPosition
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
                 }
             }
+
+            onXChanged: dockChromeSync.schedule()
+            onYChanged: dockChromeSync.schedule()
 
             Item {
                 id: dockContainer
@@ -702,8 +711,8 @@ Item {
                         }
                     }
 
-                    x: slideXSpring.value
-                    y: slideYSpring.value
+                    x: dock.isVertical ? slideXSpring.value : 0
+                    y: !dock.isVertical ? slideYSpring.value : 0
 
                     onTargetXChanged: slideXSpring.retarget(targetX)
                     onTargetYChanged: slideYSpring.retarget(targetY)
@@ -716,18 +725,8 @@ Item {
                     id: dockBackground
                     objectName: "dockBackground"
                     visible: dock.hasApps
-                    anchors {
-                        top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top ? parent.top : undefined) : undefined
-                        bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined) : undefined
-                        horizontalCenter: !dock.isVertical ? parent.horizontalCenter : undefined
-                        left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined) : undefined
-                        right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
-                        verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
-                    }
-                    anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? dockGeometry.bodyEdgeMargin : 0
-                    anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? dockGeometry.bodyEdgeMargin : 0
-                    anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? dockGeometry.bodyEdgeMargin : 0
-                    anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? dockGeometry.bodyEdgeMargin : 0
+                    x: !dock.isVertical ? Math.round((parent.width - width) / 2) : (SettingsData.dockPosition === SettingsData.Position.Right ? parent.width - width - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
+                    y: dock.isVertical ? Math.round((parent.height - height) / 2) : (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
 
                     implicitWidth: dock.isVertical ? (dockApps.implicitHeight + SettingsData.dockSpacing * 2) : (dockApps.implicitWidth + SettingsData.dockSpacing * 2)
                     implicitHeight: dock.isVertical ? (dockApps.implicitWidth + SettingsData.dockSpacing * 2) : (dockApps.implicitHeight + SettingsData.dockSpacing * 2)
@@ -762,10 +761,10 @@ Item {
                     }
 
                     // Sync dockBackground geometry to ConnectedModeState
-                    onXChanged: dock._syncDockChromeState()
-                    onYChanged: dock._syncDockChromeState()
-                    onWidthChanged: dock._syncDockChromeState()
-                    onHeightChanged: dock._syncDockChromeState()
+                    onXChanged: dockChromeSync.schedule()
+                    onYChanged: dockChromeSync.schedule()
+                    onWidthChanged: dockChromeSync.schedule()
+                    onHeightChanged: dockChromeSync.schedule()
                 }
 
                 Item {
@@ -865,16 +864,9 @@ Item {
                 DockApps {
                     id: dockApps
 
-                    anchors.top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top ? dockBackground.top : undefined) : undefined
-                    anchors.bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? dockBackground.bottom : undefined) : undefined
-                    anchors.horizontalCenter: !dock.isVertical ? dockBackground.horizontalCenter : undefined
-                    anchors.left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Left ? dockBackground.left : undefined) : undefined
-                    anchors.right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? dockBackground.right : undefined) : undefined
-                    anchors.verticalCenter: dock.isVertical ? dockBackground.verticalCenter : undefined
-                    anchors.topMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
-                    anchors.bottomMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
-                    anchors.leftMargin: dock.isVertical ? SettingsData.dockSpacing : 0
-                    anchors.rightMargin: dock.isVertical ? SettingsData.dockSpacing : 0
+                    width: dock.isVertical ? implicitHeight : implicitWidth
+                    height: dock.isVertical ? implicitWidth : implicitHeight
+                    anchors.centerIn: dockBackground
 
                     contextMenu: dock.contextMenu
                     trashContextMenu: dock.trashContextMenu
