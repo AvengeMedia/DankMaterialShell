@@ -8947,6 +8947,22 @@
     "icon": "monitor"
   },
   {
+    "section": "displayContrast",
+    "label": "Contrast",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "contrast",
+      "display",
+      "displays",
+      "monitor",
+      "panel",
+      "resolution",
+      "screen",
+      "washed out"
+    ]
+  },
+  {
     "section": "nightModeHighTemperature",
     "label": "Day Temperature",
     "tabIndex": 25,
@@ -8965,6 +8981,32 @@
       "temp",
       "temperature"
     ]
+  },
+  {
+    "section": "displayGamma",
+    "label": "Gamma",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "applied",
+      "blue light",
+      "brightness",
+      "color temperature",
+      "display",
+      "displays",
+      "gamma",
+      "independently",
+      "mode",
+      "monitor",
+      "night",
+      "night light",
+      "panel",
+      "redshift",
+      "resolution",
+      "screen",
+      "washed out"
+    ],
+    "description": "Applied independently of night mode"
   },
   {
     "section": "_tab_25",

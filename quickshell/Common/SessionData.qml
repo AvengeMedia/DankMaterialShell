@@ -168,6 +168,8 @@ Singleton {
     property int nightModeEndHour: 6
     property int nightModeEndMinute: 0
     property int nightModeTransitionMinutes: 60
+    property real displayGamma: 1.0
+    property real displayContrast: 1.0
     property real latitude: 0.0
     property real longitude: 0.0
     property bool nightModeUseIPLocation: false
@@ -1089,6 +1091,16 @@ Singleton {
 
     function setNightModeTransitionMinutes(minutes) {
         nightModeTransitionMinutes = minutes;
+        saveSettings();
+    }
+
+    function setDisplayGamma(gamma) {
+        displayGamma = gamma;
+        saveSettings();
+    }
+
+    function setDisplayContrast(contrast) {
+        displayContrast = contrast;
         saveSettings();
     }
 

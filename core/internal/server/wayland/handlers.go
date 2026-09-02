@@ -144,7 +144,12 @@ func handleSetGamma(conn *models.Conn, req models.Request, manager *Manager) {
 		return
 	}
 
-	if err := manager.SetGamma(gamma); err != nil {
+	_, contrast := manager.Adjustments()
+	if v, ok := models.Get[float64](req, "contrast"); ok {
+		contrast = v
+	}
+
+	if err := manager.SetAdjustments(gamma, contrast); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

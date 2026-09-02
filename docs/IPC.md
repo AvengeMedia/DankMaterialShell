@@ -125,6 +125,18 @@ Night mode (gamma/color temperature) control.
 - Get current night mode status
 - Returns: Night mode enabled/disabled state
 
+**`gamma [value]`**
+- Get or set the display gamma correction, applied whether or not night mode is enabled
+- Parameters:
+  - `value` - Optional gamma multiplier (0.5-2.0, 1.0 is neutral)
+- Returns: Current or newly set gamma
+
+**`contrast [value]`**
+- Get or set the display contrast, pivoting around mid-gray, applied whether or not night mode is enabled
+- Parameters:
+  - `value` - Optional contrast multiplier (0.5-2.0, 1.0 is neutral)
+- Returns: Current or newly set contrast
+
 **`temperature [value]`**
 - Get or set night mode color temperature
 - Parameters:
@@ -154,6 +166,8 @@ Night mode (gamma/color temperature) control.
 ### Examples
 ```bash
 dms ipc call night toggle
+dms ipc call night gamma 1.2
+dms ipc call night contrast 1.1
 dms ipc call night temperature 4000
 dms ipc call night automation time
 dms ipc call night schedule 20:00 06:00

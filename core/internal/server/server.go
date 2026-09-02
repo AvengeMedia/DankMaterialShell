@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 33
+const APIVersion = 34
 
 var CLIVersion = "dev"
 
@@ -1432,7 +1432,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" wayland.gamma.setTemperature          - Set temperature range (params: low, high)")
 		log.Info(" wayland.gamma.setLocation             - Set location (params: latitude, longitude)")
 		log.Info(" wayland.gamma.setManualTimes          - Set manual times (params: sunrise, sunset, durationMinutes)")
-		log.Info(" wayland.gamma.setGamma                - Set gamma value (params: gamma)")
+		log.Info(" wayland.gamma.setGamma                - Set gamma and contrast (params: gamma, contrast)")
 		log.Info(" wayland.gamma.setEnabled              - Enable/disable gamma control (params: enabled)")
 		log.Info(" wayland.gamma.subscribe               - Subscribe to gamma state changes (streaming)")
 		log.Info("Theme automation:")
