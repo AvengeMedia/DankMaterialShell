@@ -1517,7 +1517,7 @@ Singleton {
         const size = (maximizeIcon ?? false) ? iconSizeLarge : iconSize;
         const s = iconScale !== undefined ? iconScale : 1.0;
 
-        return Math.round((barThickness / 48) * (size + defaultOffset) * s);
+        return 2 * Math.round((barThickness / 48) * (size + defaultOffset) * s / 2);
     }
 
     function barTextSize(barThickness, fontScale, maximizeText) {
@@ -2078,6 +2078,13 @@ Singleton {
     function snap(value, dpr) {
         const s = dpr || 1;
         return Math.round(value * s) / s;
+    }
+
+    // Whole pairs of pixels. Qt rounds the offset of a centred anchor to whole
+    // pixels, so anything that content gets centred in has to keep its parity
+    // aligned with that content or the content lands on a half pixel.
+    function snapEven(value) {
+        return 2 * Math.round(value / 2);
     }
 
     function px(value, dpr) {
