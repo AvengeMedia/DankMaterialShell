@@ -14,6 +14,21 @@ import (
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
+type resizeHandle int
+
+const (
+	handleNone resizeHandle = iota
+	handleTopLeft
+	handleTopRight
+	handleBottomLeft
+	handleBottomRight
+)
+
+const (
+	resizeHandleRadius = 12
+	resizeHitRadius    = resizeHandleRadius + 4
+)
+
 type SelectionState struct {
 	hasSelection bool           // There's a selection to display (pre-loaded or user-drawn)
 	dragging     bool           // User is actively drawing a new selection
@@ -36,15 +51,19 @@ type RenderSlot struct {
 	backgroundDragging    bool
 	backgroundCursor      bool
 	backgroundPhase       selectorPhase
+	backgroundHandles     bool
+	backgroundShift       bool
 	overlay               *overlay
 }
 
-func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase) bool {
+func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase, handles, shift bool) bool {
 	return s.backgroundInitialized &&
 		s.backgroundSource == src &&
 		s.backgroundDragging == dragging &&
 		s.backgroundCursor == cursor &&
-		s.backgroundPhase == phase
+		s.backgroundPhase == phase &&
+		s.backgroundHandles == handles &&
+		s.backgroundShift == shift
 }
 
 type OutputSurface struct {
@@ -124,6 +143,7 @@ type RegionSelector struct {
 	movingSelection    bool
 	moveOffsetX        float64
 	moveOffsetY        float64
+	resizingHandle     resizeHandle
 
 	phase  selectorPhase
 	scroll *scrollSession
@@ -624,13 +644,34 @@ func (r *RegionSelector) refreshCursor() {
 	r.setNativeCursor(r.cursorSerial)
 }
 
+func cursorShapeForHandle(handle resizeHandle) uint32 {
+	switch handle {
+	case handleTopLeft, handleBottomRight:
+		return uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeNwseResize)
+	case handleTopRight, handleBottomLeft:
+		return uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeNeswResize)
+	default:
+		return uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
+	}
+}
+
 func (r *RegionSelector) setNativeCursor(serial uint32) {
 	if r.cursorShape == nil || r.pointer == nil || serial == 0 {
 		return
 	}
 	shape := uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeCrosshair)
-	if r.movingSelection && r.selection.dragging {
+	if r.resizingHandle != handleNone {
+		shape = cursorShapeForHandle(r.resizingHandle)
+	} else if r.movingSelection && r.selection.dragging {
 		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrabbing)
+	} else if r.ctrlHeld && r.selection.hasSelection {
+		if r.activeSurface != nil && r.activeSurface.output != nil {
+			pointerGlobalX := r.pointerX + float64(r.activeSurface.output.x)
+			pointerGlobalY := r.pointerY + float64(r.activeSurface.output.y)
+			shape = cursorShapeForHandle(r.resizeHandleAt(pointerGlobalX, pointerGlobalY))
+		} else {
+			shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
+		}
 	} else if r.ctrlHeld {
 		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrab)
 	}
@@ -864,8 +905,10 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		slot.overlay, os.shown = nil, nil
 	default:
 		cur := r.overlayFor(os, slot.shm)
+		handles := (r.resizingHandle != handleNone || r.ctrlHeld) && r.selection.hasSelection && r.phase != phaseScroll
+		shift := r.shiftHeld && r.selection.hasSelection
 		switch {
-		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase):
+		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase, handles, shift):
 			slot.shm.CopyFrom(srcBuf)
 			r.dimBackground(slot.shm)
 			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat)
@@ -874,6 +917,8 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 			slot.backgroundDragging = r.selection.dragging
 			slot.backgroundCursor = r.showCapturedCursor
 			slot.backgroundPhase = r.phase
+			slot.backgroundHandles = handles
+			slot.backgroundShift = shift
 			slot.overlay = nil
 		case r.compositorVersion >= 4:
 			fullDamage = false
