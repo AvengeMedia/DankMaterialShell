@@ -165,13 +165,13 @@ Rectangle {
                 }
             }
 
-            DankActionButton {
+            DankRefreshButton {
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: "refresh"
                 buttonSize: 28
                 iconSize: 16
                 iconColor: Theme.surfaceVariantText
-                visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !NetworkService.isScanning
+                visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling
+                busy: NetworkService.isScanning
                 onClicked: NetworkService.scanWifi()
             }
 
@@ -182,10 +182,10 @@ Rectangle {
                 textSize: Theme.fontSizeSmall
 
                 readonly property var labelsByType: ({
-                    "ethernet": I18n.tr("Ethernet"),
-                    "wifi": I18n.tr("WiFi"),
-                    "cellular": I18n.tr("Cellular")
-                })
+                        "ethernet": I18n.tr("Ethernet"),
+                        "wifi": I18n.tr("WiFi"),
+                        "cellular": I18n.tr("Cellular")
+                    })
 
                 visible: connectionTypes.length > 1 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
                 model: connectionTypes.map(t => labelsByType[t] || t)

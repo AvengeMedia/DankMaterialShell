@@ -464,21 +464,12 @@ Item {
                                     }
                                 }
 
-                                DankActionButton {
+                                DankRefreshButton {
                                     id: scanDevicesBtn
-                                    iconName: "refresh"
                                     buttonSize: 32
                                     anchors.verticalCenter: parent.verticalCenter
-                                    enabled: !CupsService.loadingDevices
+                                    busy: CupsService.loadingDevices
                                     onClicked: CupsService.getDevices()
-
-                                    RotationAnimator on rotation {
-                                        running: CupsService.loadingDevices
-                                        loops: Animation.Infinite
-                                        from: 0
-                                        to: 360
-                                        duration: 1000
-                                    }
                                 }
                             }
 
@@ -745,21 +736,12 @@ Item {
                                     }
                                 }
 
-                                DankActionButton {
+                                DankRefreshButton {
                                     id: refreshPpdsBtn
-                                    iconName: "refresh"
                                     buttonSize: 32
                                     anchors.verticalCenter: parent.verticalCenter
-                                    enabled: !CupsService.loadingPPDs
+                                    busy: CupsService.loadingPPDs
                                     onClicked: CupsService.getPPDs()
-
-                                    RotationAnimator on rotation {
-                                        running: CupsService.loadingPPDs
-                                        loops: Animation.Infinite
-                                        from: 0
-                                        to: 360
-                                        duration: 1000
-                                    }
                                 }
                             }
 

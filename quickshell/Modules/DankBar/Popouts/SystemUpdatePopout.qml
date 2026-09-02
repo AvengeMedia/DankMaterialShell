@@ -176,28 +176,15 @@ DankPopout {
                         color: SystemUpdateService.hasError ? Theme.error : Theme.surfaceVariantText
                     }
 
-                    DankActionButton {
+                    DankRefreshButton {
                         id: refreshButton
                         buttonSize: 28
-                        iconName: "refresh"
                         iconSize: 18
                         iconColor: Theme.surfaceText
-                        enabled: !SystemUpdateService.isChecking && !SystemUpdateService.isUpgrading
-                        opacity: enabled ? 1.0 : 0.5
+                        busy: SystemUpdateService.isChecking
+                        enabled: !busy && !SystemUpdateService.isUpgrading
+                        opacity: SystemUpdateService.isUpgrading ? 0.5 : 1.0
                         onClicked: SystemUpdateService.checkForUpdates()
-
-                        RotationAnimator on rotation {
-                            from: 0
-                            to: 360
-                            duration: 1000
-                            loops: Animation.Infinite
-                            running: SystemUpdateService.isChecking
-
-                            onRunningChanged: {
-                                if (!running)
-                                    refreshButton.rotation = 0;
-                            }
-                        }
                     }
                 }
             }

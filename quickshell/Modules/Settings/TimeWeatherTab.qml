@@ -749,42 +749,21 @@ Item {
                         width: parent.width
                         height: 70
 
-                        DankIcon {
+                        DankRefreshButton {
                             id: refreshButton
-                            name: "refresh"
-                            size: Theme.iconSize - 4
-                            color: Theme.onSurface_38
                             anchors.right: parent.right
                             anchors.top: parent.top
-                            smoothTransform: isRefreshing
-
-                            property bool isRefreshing: false
-                            enabled: !isRefreshing
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: parent.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
-                                onClicked: {
-                                    refreshButton.isRefreshing = true;
-                                    WeatherService.forceRefresh();
-                                    refreshTimer.restart();
-                                }
-                                enabled: parent.enabled
+                            iconSize: Theme.iconSize - 4
+                            iconColor: Theme.onSurface_38
+                            busy: refreshTimer.running
+                            onClicked: {
+                                WeatherService.forceRefresh();
+                                refreshTimer.restart();
                             }
 
                             Timer {
                                 id: refreshTimer
                                 interval: 2000
-                                onTriggered: refreshButton.isRefreshing = false
-                            }
-
-                            RotationAnimator on rotation {
-                                running: refreshButton.isRefreshing
-                                from: 0
-                                to: 360
-                                duration: 1000
-                                loops: Animation.Infinite
                             }
                         }
 

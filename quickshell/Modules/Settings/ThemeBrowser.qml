@@ -352,12 +352,11 @@ DankFloatingWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXS
 
-                    DankActionButton {
+                    DankRefreshButton {
                         id: refreshButton
-                        iconName: "refresh"
                         iconSize: 18
                         iconColor: Theme.primary
-                        visible: !root.isLoading
+                        busy: root.isLoading
                         onClicked: root.refreshThemes()
                     }
 
