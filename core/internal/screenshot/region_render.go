@@ -544,7 +544,7 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 
 	totalW := 0
 	for i, item := range items {
-		totalW += len(item.key)*(charW+1) + 4 + len(item.desc)*(charW+1)
+		totalW += len(item.key)*(charW+1) + (1+len(item.desc))*(charW+1)
 		if i < len(items)-1 {
 			totalW += itemSpacing
 		}

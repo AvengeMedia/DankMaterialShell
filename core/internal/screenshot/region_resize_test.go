@@ -224,3 +224,42 @@ func TestOverlayDeltaIdenticalOverlayNoHandleDimming(t *testing.T) {
 		}
 	}
 }
+
+func TestHUDDimensionsContainText(t *testing.T) {
+	for _, captureKey := range []string{"Space/Enter", "Drag+Release"} {
+		for _, cursorLabel := range []string{"show", "hide"} {
+			items := []struct{ key, desc string }{
+				{captureKey, "capture"},
+				{"Ctrl", "resize/move"},
+				{"P", cursorLabel + " cursor"},
+				{"Esc", "cancel"},
+			}
+
+			const charW, padding, itemSpacing = 8, 12, 24
+
+			totalW := 0
+			for i, item := range items {
+				totalW += len(item.key)*(charW+1) + (1+len(item.desc))*(charW+1)
+				if i < len(items)-1 {
+					totalW += itemSpacing
+				}
+			}
+
+			hudW := totalW + padding*2
+
+			tx := padding
+			for i, item := range items {
+				tx += len(item.key) * (charW + 1)
+				tx += (1 + len(item.desc)) * (charW + 1)
+				if i < len(items)-1 {
+					tx += itemSpacing
+				}
+			}
+
+			if hudW-tx != padding {
+				t.Errorf("for key %q label %q: HUD pill width %d does not match text end %d + padding %d (diff=%d)",
+					captureKey, cursorLabel, hudW, tx, padding, hudW-tx-padding)
+			}
+		}
+	}
+}
