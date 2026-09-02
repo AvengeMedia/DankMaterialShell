@@ -69,7 +69,7 @@ Item {
         }
         width: root.artworkSize
         height: width
-        mediaModel: root.mediaModel
+        artUrl: root.mediaModel.artUrl
     }
 
     Row {

@@ -25,10 +25,15 @@ Item {
     property real contentOffsetY: 0
     property string section: ""
     property int barPosition: SettingsData.Position.Top
-    property string chrome: "dash"
     property bool live: Window.window?.visible ?? false
     property bool menusEnabled: true
-    readonly property bool islandChrome: chrome === "island"
+    property bool compact: false
+
+    readonly property real contentTopMargin: compact ? Theme.spacingM : 20
+    readonly property real contentHeight: compact ? 320 : 370
+    readonly property real artAreaHeight: compact ? 150 : 200
+    readonly property real sideButtonTop: contentTopMargin + artAreaHeight / 2 + 10
+    readonly property real sideButtonStep: 55
 
     readonly property color accent: MediaAccentService.accent
     readonly property color onAccent: MediaAccentService.onAccent
@@ -121,7 +126,7 @@ Item {
     }
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-    implicitHeight: chromeLoader.item ? chromeLoader.item.implicitHeight : 410
+    implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
 
     Connections {
         target: activePlayer
@@ -197,18 +202,8 @@ Item {
     }
 
     function dropdownAnchor(button) {
-        if (!button)
-            return null;
-        if (root.islandChrome) {
-            const rightEdge = root.mapToItem(null, root.width, 0).x;
-            const point = button.mapToItem(null, 0, button.height / 2);
-            return {
-                "pos": Qt.point(rightEdge + Theme.spacingS, point.y),
-                "rightEdge": true
-            };
-        }
         const buttonsOnRight = !root.isRightEdge;
-        const btnY = button.mapToItem(root, 0, button.height / 2).y;
+        const btnY = button.y + button.height / 2;
         return {
             "pos": Qt.point(buttonsOnRight ? (root.popoutX + root.popoutWidth) : root.popoutX, root.popoutY + root.contentOffsetY + btnY),
             "rightEdge": buttonsOnRight
@@ -216,42 +211,27 @@ Item {
     }
 
     function triggerVolumeDropdown() {
-        if (!root.menusEnabled || !volumeAvailable)
+        if (!root.menusEnabled || !volumeAvailable || volumeExpanded)
             return;
-        if (volumeExpanded)
-            return;
-        const button = chromeLoader.item?.volumeButton;
-        const anchor = dropdownAnchor(button);
-        if (!anchor)
-            return;
+        const anchor = dropdownAnchor(volumeButton);
         hideDropdowns();
         volumeExpanded = true;
         showVolumeDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
     }
 
     function triggerPlayersDropdown() {
-        if (!root.menusEnabled)
+        if (!root.menusEnabled || playersExpanded)
             return;
-        const button = chromeLoader.item?.playerSelectorButton;
-        const anchor = dropdownAnchor(button);
-        if (!anchor)
-            return;
-        if (playersExpanded)
-            return;
+        const anchor = dropdownAnchor(playerSelectorButton);
         hideDropdowns();
         playersExpanded = true;
         showPlayersDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
     }
 
     function triggerDevicesDropdown() {
-        if (!root.menusEnabled)
+        if (!root.menusEnabled || devicesExpanded)
             return;
-        const button = chromeLoader.item?.audioDevicesButton;
-        const anchor = dropdownAnchor(button);
-        if (!anchor)
-            return;
-        if (devicesExpanded)
-            return;
+        const anchor = dropdownAnchor(audioDevicesButton);
         hideDropdowns();
         devicesExpanded = true;
         showAudioDevicesDropdown(anchor.pos, targetScreen, anchor.rightEdge);
@@ -392,33 +372,8 @@ Item {
         onTriggered: activePlayer?.positionChanged()
     }
 
-    Loader {
-        id: chromeLoader
-
-        anchors.fill: parent
-        sourceComponent: root.islandChrome ? islandChromeComponent : dashChromeComponent
-    }
-
-    Component {
-        id: islandChromeComponent
-
-        MediaPlayerIslandChrome {
-            player: root
-        }
-    }
-
-    Component {
-        id: dashChromeComponent
-
-        Item {
-            anchors.fill: parent
-            implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
-            property alias volumeButton: volumeButton
-            property alias playerSelectorButton: playerSelectorButton
-            property alias audioDevicesButton: audioDevicesButton
-
-            Item {
-                id: bgContainer
+    Item {
+        id: bgContainer
         anchors.fill: parent
 
         // Fall back to the live mpris url so the background is never blank.
@@ -564,15 +519,15 @@ Item {
         ColumnLayout {
             id: playerContent
             width: 484
-            height: 370
+            height: root.contentHeight
             spacing: Theme.spacingXS
             anchors.top: parent.top
-            anchors.topMargin: 20
+            anchors.topMargin: root.contentTopMargin
             anchors.horizontalCenter: parent.horizontalCenter
 
             Item {
                 width: parent.width
-                height: 200
+                height: root.artAreaHeight
                 clip: false
 
                 DankAlbumArt {
@@ -876,21 +831,7 @@ Item {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (activePlayer && activePlayer.canControl && activePlayer.loopSupported) {
-                                            switch (activePlayer.loopState) {
-                                            case MprisLoopState.None:
-                                                activePlayer.loopState = MprisLoopState.Playlist;
-                                                break;
-                                            case MprisLoopState.Playlist:
-                                                activePlayer.loopState = MprisLoopState.Track;
-                                                break;
-                                            case MprisLoopState.Track:
-                                                activePlayer.loopState = MprisLoopState.None;
-                                                break;
-                                            }
-                                        }
-                                    }
+                                    onClicked: root.cycleLoopState()
                                 }
                             }
                         }
@@ -906,7 +847,7 @@ Item {
         height: 40
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: 185
+        y: root.sideButtonTop + root.sideButtonStep
         color: playerSelectorArea.containsMouse || playersExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
         border.color: Theme.outlineStrong
         border.width: 1
@@ -927,39 +868,14 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (playersExpanded) {
-                    const players = (root.allPlayers || []).filter(p => p && !MprisController.isIdle(p));
-                    if (players.length > 1) {
-                        let currentIndex = -1;
-                        for (let i = 0; i < players.length; i++) {
-                            if (players[i] === root.activePlayer) {
-                                currentIndex = i;
-                                break;
-                            }
-                        }
-                        const nextIndex = (currentIndex + 1) % players.length;
-                        MprisController.setActivePlayer(players[nextIndex]);
-                    }
+                    root.cycleNextPlayer();
                     return;
                 }
-                hideDropdowns();
-                playersExpanded = true;
-                const buttonsOnRight = !isRightEdge;
-                const btnY = playerSelectorButton.y + playerSelectorButton.height / 2;
-                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-                const screenY = popoutY + contentOffsetY + btnY;
-                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+                root.triggerPlayersDropdown();
             }
             onEntered: {
                 dropdownButtonEntered();
-                if (playersExpanded)
-                    return;
-                hideDropdowns();
-                playersExpanded = true;
-                const buttonsOnRight = !isRightEdge;
-                const btnY = playerSelectorButton.y + playerSelectorButton.height / 2;
-                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-                const screenY = popoutY + contentOffsetY + btnY;
-                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+                root.triggerPlayersDropdown();
             }
             onExited: {
                 if (playersExpanded)
@@ -974,7 +890,7 @@ Item {
         height: 40
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: 130
+        y: root.sideButtonTop
         color: volumeButtonArea.containsMouse && volumeAvailable || volumeExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
         border.color: volumeAvailable ? Theme.outlineStrong : Theme.outlineMedium
         border.width: 1
@@ -995,23 +911,13 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onEntered: {
                 dropdownButtonEntered();
-                if (volumeExpanded)
-                    return;
-                hideDropdowns();
-                volumeExpanded = true;
-                const buttonsOnRight = !isRightEdge;
-                const btnY = volumeButton.y + volumeButton.height / 2;
-                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-                const screenY = popoutY + contentOffsetY + btnY;
-                showVolumeDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+                root.triggerVolumeDropdown();
             }
             onExited: {
                 if (volumeExpanded)
                     dropdownButtonExited();
             }
-            onClicked: {
-                toggleMute();
-            }
+            onClicked: root.toggleMute()
             property real wheelAccum: 0
             onWheel: wheelEvent => {
                 wheelEvent.accepted = true;
@@ -1031,7 +937,7 @@ Item {
         height: 40
         radius: 20
         x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: 240
+        y: root.sideButtonTop + root.sideButtonStep * 2
         color: audioDevicesArea.containsMouse || devicesExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
         border.color: Theme.outlineStrong
         border.width: 1
@@ -1050,66 +956,34 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onPressed: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    mouse.accepted = true;
-                }
-            }
             onWheel: wheelEvent => {
                 const delta = wheelEvent.angleDelta.y;
-                if (delta !== 0) {
-                    AudioService.cycleAudioOutputDirection(delta < 0);
-                    wheelEvent.accepted = true;
-                }
+                if (delta === 0)
+                    return;
+                AudioService.cycleAudioOutputDirection(delta < 0);
+                wheelEvent.accepted = true;
             }
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {
-                    if (AudioService.sink?.audio) {
-                        SessionData.suppressOSDTemporarily();
-                        AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
-                    }
+                    if (!AudioService.sink?.audio)
+                        return;
+                    SessionData.suppressOSDTemporarily();
+                    AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
                     return;
                 }
                 if (devicesExpanded) {
-                    const sinks = AudioService.getAvailableSinks();
-                    if (sinks && sinks.length > 1) {
-                        let currentIndex = -1;
-                        for (let i = 0; i < sinks.length; i++) {
-                            if (sinks[i]?.name === AudioService.sink?.name) {
-                                currentIndex = i;
-                                break;
-                            }
-                        }
-                        const nextIndex = (currentIndex + 1) % sinks.length;
-                        AudioService.setSink(sinks[nextIndex]);
-                    }
+                    root.cycleNextSink();
                     return;
                 }
-                hideDropdowns();
-                devicesExpanded = true;
-                const buttonsOnRight = !isRightEdge;
-                const btnY = audioDevicesButton.y + audioDevicesButton.height / 2;
-                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-                const screenY = popoutY + contentOffsetY + btnY;
-                showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
+                root.triggerDevicesDropdown();
             }
             onEntered: {
                 dropdownButtonEntered();
-                if (devicesExpanded)
-                    return;
-                hideDropdowns();
-                devicesExpanded = true;
-                const buttonsOnRight = !isRightEdge;
-                const btnY = audioDevicesButton.y + audioDevicesButton.height / 2;
-                const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
-                const screenY = popoutY + contentOffsetY + btnY;
-                showAudioDevicesDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight);
+                root.triggerDevicesDropdown();
             }
             onExited: {
                 if (devicesExpanded)
                     dropdownButtonExited();
-            }
-        }
             }
         }
     }

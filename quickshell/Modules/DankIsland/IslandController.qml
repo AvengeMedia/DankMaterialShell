@@ -301,13 +301,11 @@ QtObject {
     }
 
     readonly property var homeCompactTarget: pillTarget(homeCompactWidth, homeCompactFaceHeight)
-    readonly property var homeExpandedTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
     readonly property var mediaCompactTarget: pillTarget(mediaCompactWidth, compactFaceHeight)
-    readonly property var mediaExpandedTarget: sheetTarget(600, 352)
+    readonly property var dashSheetTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
+    readonly property var mediaExpandedTarget: sheetTarget(600, 384)
     readonly property var launcherExpandedTarget: sheetTarget(680, 560)
     readonly property var controlCenterExpandedTarget: sheetTarget(580, controlCenterHeight)
-    readonly property var wallpaperExpandedTarget: sheetTarget(700, 452)
-    readonly property var weatherExpandedTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
     readonly property var systemCompactTarget: pillTarget(SettingsData.osdAlwaysShowValue ? 330 : 282, compactFaceHeight)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
     readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinWidth, Math.min(notificationCompactMaxWidth, notificationContentWidth))), compactFaceHeight)
@@ -348,16 +346,12 @@ QtObject {
             return launcherExpandedTarget;
         case "controlcenter":
             return controlCenterExpandedTarget;
-        case "wallpaper":
-            return wallpaperExpandedTarget;
-        case "weather":
-            return weatherExpandedTarget;
         case "notificationcenter":
             return notificationCenterExpandedTarget;
         case "media":
             return mediaExpandedTarget;
         }
-        return homeExpandedTarget;
+        return dashSheetTarget;
     }
 
     readonly property var expandedTarget: expandedTargetFor(activeActivity)

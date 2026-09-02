@@ -353,17 +353,6 @@ Item {
         onCloseRequested: root.hideMediaDropdowns()
         onPanelEntered: root.stopMediaDropdownCloseTimer()
         onPanelExited: root.startMediaDropdownCloseTimer()
-        onVolumeChanged: volume => {
-            const player = MprisController.activePlayer;
-            const identity = (player?.identity ?? "").toLowerCase();
-            const chrome = identity.includes("chrome") || identity.includes("chromium");
-            if (player && player.volumeSupported && !chrome)
-                player.volume = volume;
-            else if (AudioService.sink?.audio)
-                AudioService.sink.audio.volume = volume;
-        }
-        onDeviceSelected: device => AudioService.setSink(device)
-        onPlayerSelected: player => MprisController.setActivePlayer(player)
     }
 
     Component {
@@ -401,11 +390,9 @@ Item {
             alignedX: root.targetVisualX
             alignedY: root.targetVisualY
             alignedWidth: root.targetVisualWidth
-            alignedHeight: root.targetVisualHeight
-            onShowVolumeDropdown: pos => root.openMediaDropdown(1, pos)
-            onShowAudioDevicesDropdown: pos => root.openMediaDropdown(2, pos)
-            onShowPlayersDropdown: pos => root.openMediaDropdown(3, pos)
-            onHideDropdowns: root.hideMediaDropdowns()
+            onDropdownRequested: (dropdownType, pos) => root.openMediaDropdown(dropdownType, pos)
+            onDropdownsHidden: root.hideMediaDropdowns()
+            onDropdownHoverStarted: root.stopMediaDropdownCloseTimer()
             onDropdownHoverEnded: root.startMediaDropdownCloseTimer()
         }
     }
