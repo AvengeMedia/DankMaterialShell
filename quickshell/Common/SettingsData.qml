@@ -166,6 +166,7 @@ Singleton {
     property string currentThemeCategory: "generic"
     property string customThemeFile: ""
     property var registryThemeVariants: ({})
+    property bool generateThemeAtStartup: true
     property string matugenScheme: "scheme-tonal-spot"
     property bool matugenSmartMode: false
     property real matugenContrast: 0

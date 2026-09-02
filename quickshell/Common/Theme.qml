@@ -152,7 +152,7 @@ Singleton {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
 
-            if (!matugenAvailable || isGreeterMode) {
+            if (!matugenAvailable || isGreeterMode || (typeof SettingsData !== "undefined" && !SettingsData.generateThemeAtStartup)) {
                 return;
             }
 

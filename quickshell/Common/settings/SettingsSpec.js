@@ -12,6 +12,7 @@ var SPEC = {
     currentThemeCategory: { def: "generic" },
     customThemeFile: { def: "" },
     registryThemeVariants: { def: {} },
+    generateThemeAtStartup: { def: true },
     matugenScheme: { def: "scheme-tonal-spot", onChange: "regenSystemThemes" },
     matugenSmartMode: { def: false, onChange: "regenSystemThemes" },
     matugenContrast: { def: 0, onChange: "regenSystemThemes" },
