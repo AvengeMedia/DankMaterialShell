@@ -554,7 +554,7 @@ Item {
 
     function showTooltipForHoveredButton() {
         dockTooltip.hide();
-        if (!dock.hoveredButton || !dock.reveal || slideXAnimation.running || slideYAnimation.running)
+        if (!dock.hoveredButton || !dock.reveal || slideXSpring.running || slideYSpring.running)
             return;
 
         const buttonLocalPos = dock.hoveredButton.mapToItem(null, 0, 0);
