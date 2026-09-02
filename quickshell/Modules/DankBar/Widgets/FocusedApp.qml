@@ -111,7 +111,7 @@ BasePill {
         if (!active) {
             if (activeWindow) {
                 if (CompositorService.isNiri) {
-                    const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_focused);
+                    const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
                     const wsWindows = currentWs ? NiriService.windows.filter(w => w.workspace_id === currentWs.id) : [];
                     if (!isWindowAlive(activeWindow) || wsWindows.length === 0)
                         activeWindow = null;
@@ -218,7 +218,7 @@ BasePill {
                 return true;
             const focusedWin = getNiriFocusedWindow();
             if (!focusedWin) {
-                const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_focused);
+                const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
                 return !!currentWs && NiriService.windows.some(w => w.workspace_id === currentWs.id);
             }
             const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
