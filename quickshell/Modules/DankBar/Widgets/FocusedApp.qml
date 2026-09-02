@@ -80,18 +80,43 @@ BasePill {
         return 0;
     }
 
+    function isWindowAlive(win) {
+        if (!win)
+            return false;
+        const alive = ToplevelManager.toplevels?.values;
+        return !!alive && Array.from(alive).some(t => t === win);
+    }
+
+    function getNiriFocusedWindow() {
+        if (!CompositorService.isNiri)
+            return null;
+        return NiriService.windows.find(w => w.is_focused)
+            || (NiriService.lastFocusedWindowId !== null ? NiriService.windows.find(w => w.id === NiriService.lastFocusedWindowId) : null);
+    }
+
     function updateActiveWindow() {
-        const active = ToplevelManager.activeToplevel;
+        let active = ToplevelManager.activeToplevel;
+
+        if (!active && CompositorService.isNiri) {
+            const focusedWin = getNiriFocusedWindow();
+            if (focusedWin) {
+                const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
+                if (screenWsIds.has(focusedWin.workspace_id)) {
+                    const sortedMatch = (CompositorService.sortedToplevels || []).find(st => st.niriWindowId === focusedWin.id);
+                    active = sortedMatch?.sourceToplevel || (Array.from(ToplevelManager.toplevels?.values || []).find(t => t.appId === focusedWin.app_id && (!focusedWin.title || t.title === focusedWin.title)) || null);
+                }
+            }
+        }
 
         if (!active) {
             if (activeWindow) {
                 if (CompositorService.isNiri) {
-                    if (NiriService.currentOutput === (parentScreen?.name ?? ""))
+                    const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_focused);
+                    const wsWindows = currentWs ? NiriService.windows.filter(w => w.workspace_id === currentWs.id) : [];
+                    if (!isWindowAlive(activeWindow) || wsWindows.length === 0)
                         activeWindow = null;
-                } else {
-                    const alive = ToplevelManager.toplevels?.values;
-                    if (alive && !Array.from(alive).some(t => t === activeWindow))
-                        activeWindow = null;
+                } else if (!isWindowAlive(activeWindow)) {
+                    activeWindow = null;
                 }
             }
             return;
@@ -99,10 +124,8 @@ BasePill {
 
         if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
             activeWindow = active;
-        } else if (activeWindow) {
-            const alive = ToplevelManager.toplevels?.values;
-            if (alive && !Array.from(alive).some(t => t === activeWindow))
-                activeWindow = null;
+        } else if (!isWindowAlive(activeWindow)) {
+            activeWindow = null;
         }
     }
 
@@ -114,8 +137,7 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            if (!CompositorService.isNiri)
-                root.updateActiveWindow();
+            root.updateActiveWindow();
         }
     }
 
@@ -134,6 +156,9 @@ BasePill {
         function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
+        function onAllWorkspacesChanged() {
+            root.updateActiveWindow();
+        }
     }
 
     Connections {
@@ -143,10 +168,30 @@ BasePill {
         }
     }
 
+    function syncPopoutState() {
+        const popout = focusedWindowPopoutLoader.item;
+        if (!popout || !activeWindow || !root.parentScreen)
+            return;
+        popout.currentWindow = activeWindow;
+        popout.processId = root.resolveActiveWindowPid();
+        const globalPos = root.visualContent.mapToItem(null, 0, 0);
+        const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+        const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
+        popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+    }
+
     Connections {
         target: root
         function onActiveWindowChanged() {
             root.updateDesktopEntry();
+            if (focusedWindowPopoutLoader.item?.shouldBeVisible) {
+                if (root.activeWindow) {
+                    root.syncPopoutState();
+                    Qt.callLater(() => root.syncPopoutState());
+                } else {
+                    focusedWindowPopoutLoader.item.close();
+                }
+            }
         }
     }
 
@@ -171,10 +216,12 @@ BasePill {
                 return false;
             if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
                 return true;
-            const focusedWin = NiriService.windows.find(w => w.is_focused);
-            if (!focusedWin)
-                return false;
-            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
+            const focusedWin = getNiriFocusedWindow();
+            if (!focusedWin) {
+                const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_focused);
+                return !!currentWs && NiriService.windows.some(w => w.workspace_id === currentWs.id);
+            }
+            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
             return screenWsIds.has(focusedWin.workspace_id);
         }
 
@@ -442,14 +489,8 @@ BasePill {
             if (!focusedWindowPopoutLoader.item)
                 return;
 
-            const globalPos = root.visualContent.mapToItem(null, 0, 0);
-            const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
-            const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
-            const popout = focusedWindowPopoutLoader.item;
-            popout.currentWindow = activeWindow;
-            popout.processId = root.resolveActiveWindowPid();
-            popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
-            popout.toggle();
+            root.syncPopoutState();
+            focusedWindowPopoutLoader.item.toggle();
         }
     }
 
@@ -463,5 +504,16 @@ BasePill {
         id: focusedWindowPopoutLoader
         active: false
         sourceComponent: FocusedWindowContextMenu {}
+    }
+
+    Connections {
+        target: focusedWindowPopoutLoader.item
+        function onShouldBeVisibleChanged() {
+            if (!focusedWindowPopoutLoader.item?.shouldBeVisible)
+                root.updateActiveWindow();
+        }
+        function onPopoutClosed() {
+            root.updateActiveWindow();
+        }
     }
 }
