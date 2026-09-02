@@ -330,7 +330,7 @@ QtObject {
     readonly property var homeCompactTarget: pillTarget(homeCompactWidth, homeCompactFaceHeight)
     readonly property var mediaCompactTarget: pillTarget(mediaCompactWidth, compactFaceHeight)
     readonly property var dashSheetTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
-    readonly property var mediaExpandedTarget: sheetTarget(600, 384)
+    readonly property var mediaExpandedTarget: sheetTarget(600, 352)
     readonly property var launcherExpandedTarget: sheetTarget(680, 560)
     readonly property var controlCenterExpandedTarget: sheetTarget(580, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(SettingsData.osdAlwaysShowValue ? 330 : 282, compactFaceHeight)

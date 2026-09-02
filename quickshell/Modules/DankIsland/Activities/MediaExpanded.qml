@@ -19,9 +19,10 @@ DashTabFace {
     signal dropdownHoverEnded
 
     activityId: "media"
+    inset: 1
     tabComponent: Component {
         MediaPlayerTab {
-            compact: true
+            chrome: "island"
             live: root.live
             menusEnabled: root.menusEnabled
             targetScreen: root.effectiveScreen

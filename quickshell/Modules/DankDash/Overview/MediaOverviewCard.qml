@@ -61,7 +61,6 @@ Card {
                 activePlayer: root.activePlayer
                 artUrl: TrackArtService.resolvedArtUrl
                 accentColor: MediaAccentService.accent
-                cavaService: CavaService
                 showAnimation: root.live && SettingsData.audioVisualizerEnabled
                 albumSize: 76
                 animationScale: 1.05

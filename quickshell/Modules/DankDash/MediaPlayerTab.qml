@@ -1,12 +1,7 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Layouts
 import Quickshell.Services.Mpris
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
-import qs.Widgets
-import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -27,13 +22,8 @@ Item {
     property int barPosition: SettingsData.Position.Top
     property bool live: Window.window?.visible ?? false
     property bool menusEnabled: true
-    property bool compact: false
-
-    readonly property real contentTopMargin: compact ? Theme.spacingM : 20
-    readonly property real contentHeight: compact ? 320 : 370
-    readonly property real artAreaHeight: compact ? 150 : 200
-    readonly property real sideButtonTop: contentTopMargin + artAreaHeight / 2 + 10
-    readonly property real sideButtonStep: 55
+    property string chrome: "dash"
+    readonly property bool islandChrome: chrome === "island"
 
     readonly property color accent: MediaAccentService.accent
     readonly property color onAccent: MediaAccentService.onAccent
@@ -126,7 +116,7 @@ Item {
     }
 
     implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-    implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
+    implicitHeight: chromeLoader.item?.implicitHeight ?? 410
 
     Connections {
         target: activePlayer
@@ -203,7 +193,7 @@ Item {
 
     function dropdownAnchor(button) {
         const buttonsOnRight = !root.isRightEdge;
-        const btnY = button.y + button.height / 2;
+        const btnY = button.mapToItem(root, 0, button.height / 2).y;
         return {
             "pos": Qt.point(buttonsOnRight ? (root.popoutX + root.popoutWidth) : root.popoutX, root.popoutY + root.contentOffsetY + btnY),
             "rightEdge": buttonsOnRight
@@ -213,7 +203,7 @@ Item {
     function triggerVolumeDropdown() {
         if (!root.menusEnabled || !volumeAvailable || volumeExpanded)
             return;
-        const anchor = dropdownAnchor(volumeButton);
+        const anchor = dropdownAnchor(chromeLoader.item.volumeButton);
         hideDropdowns();
         volumeExpanded = true;
         showVolumeDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
@@ -222,7 +212,7 @@ Item {
     function triggerPlayersDropdown() {
         if (!root.menusEnabled || playersExpanded)
             return;
-        const anchor = dropdownAnchor(playerSelectorButton);
+        const anchor = dropdownAnchor(chromeLoader.item.playerSelectorButton);
         hideDropdowns();
         playersExpanded = true;
         showPlayersDropdown(anchor.pos, targetScreen, anchor.rightEdge, activePlayer, allPlayers);
@@ -231,7 +221,7 @@ Item {
     function triggerDevicesDropdown() {
         if (!root.menusEnabled || devicesExpanded)
             return;
-        const anchor = dropdownAnchor(audioDevicesButton);
+        const anchor = dropdownAnchor(chromeLoader.item.audioDevicesButton);
         hideDropdowns();
         devicesExpanded = true;
         showAudioDevicesDropdown(anchor.pos, targetScreen, anchor.rightEdge);
@@ -372,619 +362,26 @@ Item {
         onTriggered: activePlayer?.positionChanged()
     }
 
-    Item {
-        id: bgContainer
-        anchors.fill: parent
-
-        // Fall back to the live mpris url so the background is never blank.
-        readonly property string curArt: {
-            const resolved = TrackArtService.resolvedArtUrl;
-            if (resolved !== "")
-                return resolved;
-            const p = root.activePlayer;
-            if (!p)
-                return "";
-            if (p.trackArtUrl)
-                return p.trackArtUrl;
-            const m = p.metadata;
-            return m && m["mpris:artUrl"] ? m["mpris:artUrl"].toString() : "";
-        }
-        // Two layers crossfade: new art loads into the hidden one and fades in once decoded.
-        property bool _showA: true
-        visible: layerA.ready || layerB.ready
-
-        onCurArtChanged: syncArt()
-        Component.onCompleted: syncArt()
-
-        function syncArt() {
-            if (curArt === "")
-                return;
-            const front = _showA ? layerA : layerB;
-            const back = _showA ? layerB : layerA;
-            if (front.art == curArt)
-                return;
-            if (back.art == curArt) {
-                // Already decoded in the hidden layer; flip once ready (else promote() does).
-                if (back.ready)
-                    _showA = !_showA;
-                return;
-            }
-            back.art = curArt;
-        }
-
-        // Flip to the hidden layer only when it holds the current art, ignoring stale
-        // Ready re-emits (e.g. popout re-expose) that would otherwise ping-pong _showA.
-        function promote(layer) {
-            const back = _showA ? layerB : layerA;
-            if (layer !== back)
-                return;
-            if (layer.art != curArt)
-                return;
-            _showA = (layer === layerA);
-            root.maybeFinishSwitch();
-        }
-
-        BgBlurLayer {
-            id: layerA
-            front: bgContainer._showA
-            onLoaded: bgContainer.promote(layerA)
-        }
-
-        BgBlurLayer {
-            id: layerB
-            front: !bgContainer._showA
-            onLoaded: bgContainer.promote(layerB)
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: Theme.cornerRadius
-            color: Theme.surface
-            opacity: 0.3
-        }
-    }
-
-    component BgBlurLayer: ClippingRectangle {
-        id: layer
-        property alias art: layerImg.source
-        readonly property bool ready: layerImg.status === Image.Ready && layerImg.source != ""
-        property bool front: false
-        signal loaded
+    Loader {
+        id: chromeLoader
 
         anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: "transparent"
-        antialiasing: true
-        opacity: front ? 0.7 : 0
+        sourceComponent: root.islandChrome ? islandChromeComponent : dashChromeComponent
+    }
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 350
-                easing.type: Easing.InOutQuad
-            }
-        }
+    Component {
+        id: dashChromeComponent
 
-        Image {
-            id: layerImg
-            anchors.centerIn: parent
-            width: Math.max(parent.width, parent.height) * 1.1
-            height: width
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            cache: true
-            visible: false
-            onStatusChanged: {
-                if (status === Image.Ready && source != "")
-                    layer.loaded();
-            }
-        }
-
-        MultiEffect {
-            anchors.centerIn: parent
-            width: layerImg.width
-            height: layerImg.height
-            source: layerImg
-            blurEnabled: true
-            blurMax: 64
-            blur: 0.8
-            saturation: -0.2
-            brightness: -0.25
+        MediaPlayerDashChrome {
+            player: root
         }
     }
 
-    Column {
-        anchors.centerIn: parent
-        spacing: Theme.spacingM
-        visible: showNoPlayerNow
+    Component {
+        id: islandChromeComponent
 
-        DankIcon {
-            name: "music_note"
-            size: Theme.iconSize * 3
-            color: Theme.surfaceTextSecondary
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        StyledText {
-            text: I18n.tr("No Active Players")
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.surfaceTextMedium
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
-
-    Item {
-        anchors.fill: parent
-        clip: false
-        visible: !noneAvailable && (!showNoPlayerNow)
-        ColumnLayout {
-            id: playerContent
-            width: 484
-            height: root.contentHeight
-            spacing: Theme.spacingXS
-            anchors.top: parent.top
-            anchors.topMargin: root.contentTopMargin
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            Item {
-                width: parent.width
-                height: root.artAreaHeight
-                clip: false
-
-                DankAlbumArt {
-                    width: Math.min(parent.width * 0.8, parent.height * 0.9)
-                    height: width
-                    anchors.centerIn: parent
-                    activePlayer: root.activePlayer
-                    artUrl: TrackArtService.resolvedArtUrl
-                    accentColor: MediaAccentService.accent
-                    cavaService: CavaService
-                    showAnimation: SettingsData.audioVisualizerEnabled
-                }
-            }
-
-            // Song Info and Controls Section
-            Item {
-                width: parent.width
-                Layout.fillHeight: true
-
-                Column {
-                    id: songInfo
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    StyledText {
-                        text: MprisController.stableTitle || I18n.tr("Unknown Track")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Bold
-                        color: Theme.surfaceText
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 2
-                    }
-
-                    StyledText {
-                        text: MprisController.stableArtist || I18n.tr("Unknown Artist")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceTextMedium
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 1
-                    }
-
-                    StyledText {
-                        text: MprisController.stableAlbum
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextSecondary
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 1
-                        // Reserve the line so late album metadata doesn't shift the seekbar.
-                        height: Math.max(implicitHeight, Theme.fontSizeSmall * 1.4)
-                    }
-                }
-
-                Item {
-                    id: seekbarContainer
-                    width: parent.width
-                    anchors.top: songInfo.bottom
-                    anchors.bottom: playbackControls.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingXXS
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: parent.height * 0.2
-
-                        DankSeekbar {
-                            width: parent.width * 0.8
-                            height: 20
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            activePlayer: root.activePlayer
-                            stableLength: MprisController.activePlayerStableLength
-                            accentColor: MediaAccentService.accent
-                            accentTrackColor: MediaAccentService.accentTrack
-                            accentSubtleColor: MediaAccentService.accentSubtle
-                            isSeeking: root.isSeeking
-                            onIsSeekingChanged: root.isSeeking = isSeeking
-                        }
-
-                        Item {
-                            width: parent.width * 0.8
-                            height: 16
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            StyledText {
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: {
-                                    if (!activePlayer)
-                                        return "0:00";
-                                    const rawPos = Math.max(0, activePlayer.position || 0);
-                                    return Format.formatDuration(stableLength ? rawPos % Math.max(1, stableLength) : rawPos);
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
-
-                            StyledText {
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: {
-                                    if (!activePlayer || stableLength <= 0)
-                                        return "--:--";
-                                    return Format.formatDuration(stableLength);
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    id: playbackControls
-                    width: parent.width
-                    height: 50
-                    anchors.bottom: parent.bottom
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingM
-                        height: parent.height
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: activePlayer && activePlayer.shuffleSupported
-
-                            Rectangle {
-                                width: 40
-                                height: 40
-                                radius: 20
-                                anchors.centerIn: parent
-                                color: shuffleArea.containsMouse ? root.accentHover : Theme.withAlpha(root.accent, 0)
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: "shuffle"
-                                    size: 20
-                                    color: activePlayer && activePlayer.shuffle ? root.accent : Theme.surfaceText
-                                }
-
-                                MouseArea {
-                                    id: shuffleArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (activePlayer && activePlayer.canControl && activePlayer.shuffleSupported) {
-                                            activePlayer.shuffle = !activePlayer.shuffle;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Rectangle {
-                                width: 40
-                                height: 40
-                                radius: 20
-                                anchors.centerIn: parent
-                                color: prevBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: "skip_previous"
-                                    size: 24
-                                    color: Theme.surfaceText
-                                }
-
-                                MouseArea {
-                                    id: prevBtnArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: MprisController.previousOrRewind()
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Rectangle {
-                                width: 50
-                                height: 50
-                                radius: 25
-                                anchors.centerIn: parent
-                                color: root.accent
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
-                                    size: 28
-                                    color: root.onAccent
-                                    weight: 500
-                                }
-
-                                StateLayer {
-                                    id: playPauseArea
-                                    disabled: !root.activePlayer || !root.activePlayer.canTogglePlaying
-                                    stateColor: root.onAccent
-                                    cornerRadius: parent.radius
-                                    onClicked: root.activePlayer.togglePlaying()
-                                }
-
-                                ElevationShadow {
-                                    anchors.fill: parent
-                                    z: -1
-                                    level: Theme.elevationLevel1
-                                    fallbackOffset: 1
-                                    targetRadius: parent.radius
-                                    targetColor: parent.color
-                                    shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
-                                    shadowEnabled: Theme.elevationEnabled
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Rectangle {
-                                width: 40
-                                height: 40
-                                radius: 20
-                                anchors.centerIn: parent
-                                color: nextBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: "skip_next"
-                                    size: 24
-                                    color: Theme.surfaceText
-                                }
-
-                                MouseArea {
-                                    id: nextBtnArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: MprisController.next()
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: activePlayer && activePlayer.loopSupported
-
-                            Rectangle {
-                                width: 40
-                                height: 40
-                                radius: 20
-                                anchors.centerIn: parent
-                                color: repeatArea.containsMouse ? root.accentHover : Theme.withAlpha(root.accent, 0)
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: {
-                                        if (!activePlayer)
-                                            return "repeat";
-                                        switch (activePlayer.loopState) {
-                                        case MprisLoopState.Track:
-                                            return "repeat_one";
-                                        case MprisLoopState.Playlist:
-                                            return "repeat";
-                                        default:
-                                            return "repeat";
-                                        }
-                                    }
-                                    size: 20
-                                    color: activePlayer && activePlayer.loopState !== MprisLoopState.None ? root.accent : Theme.surfaceText
-                                }
-
-                                MouseArea {
-                                    id: repeatArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.cycleLoopState()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Rectangle {
-        id: playerSelectorButton
-        width: 40
-        height: 40
-        radius: 20
-        x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: root.sideButtonTop + root.sideButtonStep
-        color: playerSelectorArea.containsMouse || playersExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
-        border.color: Theme.outlineStrong
-        border.width: 1
-        z: 100
-        visible: (allPlayers?.length || 0) >= 1
-
-        DankIcon {
-            anchors.centerIn: parent
-            name: "assistant_device"
-            size: 18
-            color: Theme.surfaceText
-        }
-
-        MouseArea {
-            id: playerSelectorArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (playersExpanded) {
-                    root.cycleNextPlayer();
-                    return;
-                }
-                root.triggerPlayersDropdown();
-            }
-            onEntered: {
-                dropdownButtonEntered();
-                root.triggerPlayersDropdown();
-            }
-            onExited: {
-                if (playersExpanded)
-                    dropdownButtonExited();
-            }
-        }
-    }
-
-    Rectangle {
-        id: volumeButton
-        width: 40
-        height: 40
-        radius: 20
-        x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: root.sideButtonTop
-        color: volumeButtonArea.containsMouse && volumeAvailable || volumeExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
-        border.color: volumeAvailable ? Theme.outlineStrong : Theme.outlineMedium
-        border.width: 1
-        z: 101
-        enabled: volumeAvailable
-
-        DankIcon {
-            anchors.centerIn: parent
-            name: getVolumeIcon()
-            size: 18
-            color: volumeAvailable && currentVolume > 0 ? root.accent : Theme.withAlpha(Theme.surfaceText, volumeAvailable ? 1.0 : 0.5)
-        }
-
-        MouseArea {
-            id: volumeButtonArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onEntered: {
-                dropdownButtonEntered();
-                root.triggerVolumeDropdown();
-            }
-            onExited: {
-                if (volumeExpanded)
-                    dropdownButtonExited();
-            }
-            onClicked: root.toggleMute()
-            property real wheelAccum: 0
-            onWheel: wheelEvent => {
-                wheelEvent.accepted = true;
-                wheelAccum += wheelEvent.angleDelta.y;
-                const notches = wheelAccum > 0 ? Math.floor(wheelAccum / 120) : Math.ceil(wheelAccum / 120);
-                if (notches === 0)
-                    return;
-                wheelAccum -= notches * 120;
-                root.adjustVolume(notches * AudioService.wheelVolumeStep);
-            }
-        }
-    }
-
-    Rectangle {
-        id: audioDevicesButton
-        width: 40
-        height: 40
-        radius: 20
-        x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
-        y: root.sideButtonTop + root.sideButtonStep * 2
-        color: audioDevicesArea.containsMouse || devicesExpanded ? root.accentPressed : Theme.withAlpha(root.accentPressed, 0)
-        border.color: Theme.outlineStrong
-        border.width: 1
-        z: 100
-
-        DankIcon {
-            anchors.centerIn: parent
-            name: "speaker"
-            size: 18
-            color: Theme.surfaceText
-        }
-
-        MouseArea {
-            id: audioDevicesArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onWheel: wheelEvent => {
-                const delta = wheelEvent.angleDelta.y;
-                if (delta === 0)
-                    return;
-                AudioService.cycleAudioOutputDirection(delta < 0);
-                wheelEvent.accepted = true;
-            }
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    if (!AudioService.sink?.audio)
-                        return;
-                    SessionData.suppressOSDTemporarily();
-                    AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
-                    return;
-                }
-                if (devicesExpanded) {
-                    root.cycleNextSink();
-                    return;
-                }
-                root.triggerDevicesDropdown();
-            }
-            onEntered: {
-                dropdownButtonEntered();
-                root.triggerDevicesDropdown();
-            }
-            onExited: {
-                if (devicesExpanded)
-                    dropdownButtonExited();
-            }
+        MediaPlayerIslandChrome {
+            player: root
         }
     }
 }
