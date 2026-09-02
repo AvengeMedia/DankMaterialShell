@@ -29,7 +29,6 @@ Item {
         return rows;
     }
     readonly property int instanceIndex: Math.max(0, root.instanceChoices.findIndex(row => row.id === SettingsData.dankIslandBarId))
-    readonly property var homeSlotValues: ["left", "right", "hidden"]
     readonly property var systemLevelDisplayValues: ["icon", "percentage", "both"]
     readonly property var paletteValues: ["default", "bright", "dim"]
     readonly property var batteryStyleValues: ["solid", "outline"]
@@ -166,69 +165,21 @@ Item {
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("Choose which shortcuts sit left or right of the clock", "island settings: home face slot hint")
+                    text: I18n.tr("Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.", "island settings: home layout editor hint")
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.WordWrap
                 }
 
-                SettingsButtonGroupRow {
-                    settingKey: "dankIslandHomeMediaSlot"
-                    tags: ["island", "home", "compact", "media", "launcher", "search", "cava"]
-                    text: I18n.tr("Media / Launcher", "island settings: media or launcher slot row")
-                    description: I18n.tr("Search when idle, visualizer when media is playing", "island settings: media slot description")
-                    model: [I18n.tr("Left", "island settings: media or launcher slot left of the clock"), I18n.tr("Right", "island settings: media or launcher slot right of the clock"), I18n.tr("Hidden", "island settings: media or launcher slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeMediaSlot, "left")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeMediaSlot", root.homeSlotValues[index] ?? "left");
-                    }
-                }
-
-                SettingsButtonGroupRow {
-                    settingKey: "dankIslandHomeStatusSlot"
-                    tags: ["island", "home", "compact", "battery", "control center", "tools"]
-                    text: I18n.tr("Battery / Control Center", "island settings: battery or control center slot row")
-                    description: BatteryService.batteryAvailable ? I18n.tr("Battery gauge opens Control Center", "island settings: status slot description with battery") : I18n.tr("Tools icon opens Control Center", "island settings: status slot description without battery")
-                    model: [I18n.tr("Left", "island settings: battery or control center slot left of the clock"), I18n.tr("Right", "island settings: battery or control center slot right of the clock"), I18n.tr("Hidden", "island settings: battery or control center slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeStatusSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeStatusSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
-                }
-
-                SettingsButtonGroupRow {
-                    settingKey: "dankIslandHomeWeatherSlot"
-                    tags: ["island", "home", "compact", "weather", "forecast"]
-                    text: I18n.tr("Weather", "island settings: weather slot row")
-                    description: SettingsData.weatherEnabled ? I18n.tr("Weather icon and temperature open the weather activity", "island settings: weather slot description") : I18n.tr("Enable weather in Time & Weather to show this shortcut", "island settings: weather slot disabled hint")
-                    model: [I18n.tr("Left", "island settings: weather slot left of the clock"), I18n.tr("Right", "island settings: weather slot right of the clock"), I18n.tr("Hidden", "island settings: weather slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeWeatherSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeWeatherSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
-                }
-
-                SettingsButtonGroupRow {
-                    settingKey: "dankIslandHomeVolumeSlot"
-                    tags: ["island", "home", "compact", "volume", "audio"]
-                    text: I18n.tr("Volume", "island settings: volume slot row")
-                    description: I18n.tr("Current output volume on the home face", "island settings: volume slot description")
-                    model: [I18n.tr("Left", "island settings: volume slot left of the clock"), I18n.tr("Right", "island settings: volume slot right of the clock"), I18n.tr("Hidden", "island settings: volume slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeVolumeSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeVolumeSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
+                IslandHomeLayoutEditor {
+                    width: parent.width
                 }
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandHomeVolumeDisplay"
                     tags: ["island", "home", "compact", "volume", "icon", "percentage"]
                     text: I18n.tr("Volume Style", "island settings: volume display mode row")
-                    visible: SettingsData.dankIslandHomeVolumeSlot !== "hidden"
+                    visible: SettingsData.islandHomeGroupEnabled("volume")
                     model: [I18n.tr("Icon", "island settings: level shown as icon only"), I18n.tr("Percentage", "island settings: level shown as percentage only"), I18n.tr("Both", "island settings: level shown as icon and percentage")]
                     currentIndex: root.valueIndex(root.systemLevelDisplayValues, SettingsData.dankIslandHomeVolumeDisplay, "both")
                     onSelectionChanged: (index, selected) => {
@@ -238,23 +189,10 @@ Item {
                 }
 
                 SettingsButtonGroupRow {
-                    settingKey: "dankIslandHomeBrightnessSlot"
-                    tags: ["island", "home", "compact", "brightness", "display"]
-                    text: I18n.tr("Brightness", "island settings: brightness slot row")
-                    description: I18n.tr("Current display brightness on the home face", "island settings: brightness slot description")
-                    model: [I18n.tr("Left", "island settings: brightness slot left of the clock"), I18n.tr("Right", "island settings: brightness slot right of the clock"), I18n.tr("Hidden", "island settings: brightness slot hidden")]
-                    currentIndex: root.valueIndex(root.homeSlotValues, SettingsData.dankIslandHomeBrightnessSlot, "hidden")
-                    onSelectionChanged: (index, selected) => {
-                        if (selected)
-                            SettingsData.set("dankIslandHomeBrightnessSlot", root.homeSlotValues[index] ?? "hidden");
-                    }
-                }
-
-                SettingsButtonGroupRow {
                     settingKey: "dankIslandHomeBrightnessDisplay"
                     tags: ["island", "home", "compact", "brightness", "icon", "percentage"]
                     text: I18n.tr("Brightness Style", "island settings: brightness display mode row")
-                    visible: SettingsData.dankIslandHomeBrightnessSlot !== "hidden"
+                    visible: SettingsData.islandHomeGroupEnabled("brightness")
                     model: [I18n.tr("Icon", "island settings: level shown as icon only"), I18n.tr("Percentage", "island settings: level shown as percentage only"), I18n.tr("Both", "island settings: level shown as icon and percentage")]
                     currentIndex: root.valueIndex(root.systemLevelDisplayValues, SettingsData.dankIslandHomeBrightnessDisplay, "both")
                     onSelectionChanged: (index, selected) => {
@@ -382,21 +320,12 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    settingKey: "dankIslandHomeNotificationBadge"
-                    tags: ["island", "home", "notifications", "badge", "unread", "count"]
-                    text: I18n.tr("Show Badge", "island settings: unread notification count on the home face")
-                    description: I18n.tr("Unread notification count beside the clock", "island settings: notification badge description")
-                    checked: SettingsData.dankIslandHomeNotificationBadge
-                    onToggled: checked => SettingsData.set("dankIslandHomeNotificationBadge", checked)
-                }
-
-                SettingsToggleRow {
                     settingKey: "dankIslandNotificationBadgeClearOnOpen"
                     tags: ["island", "home", "notifications", "badge", "unread", "clear", "dismiss", "open"]
                     text: I18n.tr("Clear Badge on Open", "island settings: clear the notification badge when the center opens")
                     description: I18n.tr("Clears the badge on open but keeps notifications active", "island settings: clear badge on open description")
                     checked: SettingsData.dankIslandNotificationBadgeClearOnOpen
-                    enabled: SettingsData.dankIslandHomeNotificationBadge
+                    enabled: SettingsData.islandHomeGroupEnabled("notifications")
                     onToggled: checked => SettingsData.set("dankIslandNotificationBadgeClearOnOpen", checked)
                 }
             }

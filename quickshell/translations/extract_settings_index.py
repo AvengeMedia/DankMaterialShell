@@ -588,6 +588,24 @@ def extract_settings_index(root_dir):
             }
         )
 
+    if "dankIslandHomeLayout" not in seen_keys:
+        all_entries.append(
+            {
+                "section": "dankIslandHomeLayout",
+                "label": "Home Layout",
+                "tabIndex": 46,
+                "category": "Dank Island",
+                "keywords": enrich_keywords(
+                    "Home Layout",
+                    "Order and hide the groups around the island clock",
+                    "Dank Island",
+                    ["media", "launcher", "weather", "battery", "volume", "brightness", "notifications", "badge", "left", "right", "hidden", "reorder"],
+                ),
+                "icon": "home",
+                "description": "Order and hide the groups around the island clock",
+            }
+        )
+
     return all_entries
 
 

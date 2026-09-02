@@ -12330,31 +12330,6 @@
     "description": "Draw an island-styled background behind satellite widgets"
   },
   {
-    "section": "dankIslandHomeStatusSlot",
-    "label": "Battery / Control Center",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "battery",
-      "center",
-      "charge",
-      "charging",
-      "compact",
-      "control",
-      "control center",
-      "dank",
-      "dynamic island",
-      "gauge",
-      "home",
-      "island",
-      "opens",
-      "power",
-      "tools"
-    ],
-    "description": "Battery gauge opens Control Center"
-  },
-  {
     "section": "dankIslandInteraction",
     "label": "Behavior",
     "tabIndex": 46,
@@ -12380,31 +12355,6 @@
     ],
     "icon": "touch_app",
     "description": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover"
-  },
-  {
-    "section": "dankIslandHomeBrightnessSlot",
-    "label": "Brightness",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "backlight",
-      "bright",
-      "brightness",
-      "compact",
-      "current",
-      "dank",
-      "dim",
-      "display",
-      "dynamic island",
-      "face",
-      "home",
-      "island",
-      "monitor",
-      "output",
-      "screen"
-    ],
-    "description": "Current display brightness on the home face"
   },
   {
     "section": "dankIslandHomeBrightnessDisplay",
@@ -12684,25 +12634,59 @@
     "category": "Dank Island",
     "keywords": [
       "activities",
-      "afk",
-      "cava",
+      "both",
+      "clock",
       "compact",
       "dank",
       "dynamic island",
+      "height",
       "home",
-      "idle",
-      "inactive",
+      "icon",
       "island",
-      "launcher",
-      "media",
-      "playing",
-      "screensaver",
-      "search",
-      "timeout",
-      "visualizer"
+      "percentage",
+      "pill",
+      "time",
+      "volume",
+      "watch",
+      "width"
     ],
     "icon": "home",
-    "description": "Search when idle, visualizer when media is playing"
+    "description": "Compact home clock pill in both width and height"
+  },
+  {
+    "section": "dankIslandHomeLayout",
+    "label": "Home Layout",
+    "tabIndex": 46,
+    "category": "Dank Island",
+    "keywords": [
+      "activities",
+      "around",
+      "badge",
+      "battery",
+      "brightness",
+      "clock",
+      "dank",
+      "dynamic island",
+      "groups",
+      "hidden",
+      "hide",
+      "home",
+      "island",
+      "launcher",
+      "layout",
+      "left",
+      "media",
+      "notifications",
+      "order",
+      "reorder",
+      "right",
+      "time",
+      "volume",
+      "watch",
+      "weather"
+    ],
+    "icon": "home",
+    "description": "Order and hide the groups around the island clock"
   },
   {
     "section": "dankIslandHorizontalOffset",
@@ -12821,36 +12805,6 @@
       "type"
     ],
     "description": "Solid material type or Outline"
-  },
-  {
-    "section": "dankIslandHomeMediaSlot",
-    "label": "Media / Launcher",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "afk",
-      "app drawer",
-      "app menu",
-      "applications",
-      "cava",
-      "compact",
-      "dank",
-      "dynamic island",
-      "home",
-      "idle",
-      "inactive",
-      "island",
-      "launcher",
-      "media",
-      "playing",
-      "screensaver",
-      "search",
-      "start menu",
-      "timeout",
-      "visualizer"
-    ],
-    "description": "Search when idle, visualizer when media is playing"
   },
   {
     "section": "dankIslandMotion",
@@ -13117,32 +13071,6 @@
     "description": "Place independent widgets to left and right of island"
   },
   {
-    "section": "dankIslandHomeNotificationBadge",
-    "label": "Show Badge",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "alert",
-      "badge",
-      "beside",
-      "clock",
-      "count",
-      "dank",
-      "dynamic island",
-      "home",
-      "island",
-      "notif",
-      "notification",
-      "notifications",
-      "show",
-      "time",
-      "unread",
-      "watch"
-    ],
-    "description": "Unread notification count beside the clock"
-  },
-  {
     "section": "dankIslandSatellitesEnabled",
     "label": "Show Satellite Widgets",
     "tabIndex": 46,
@@ -13255,29 +13183,6 @@
     "description": "Stage the Wayland overlay layer to remain visible over fullscreen apps"
   },
   {
-    "section": "dankIslandHomeVolumeSlot",
-    "label": "Volume",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "audio",
-      "compact",
-      "current",
-      "dank",
-      "dynamic island",
-      "face",
-      "home",
-      "island",
-      "loudness",
-      "output",
-      "sound",
-      "speaker",
-      "volume"
-    ],
-    "description": "Current output volume on the home face"
-  },
-  {
     "section": "dankIslandHomeVolumeDisplay",
     "label": "Volume Style",
     "tabIndex": 46,
@@ -13298,31 +13203,6 @@
       "style",
       "volume"
     ]
-  },
-  {
-    "section": "dankIslandHomeWeatherSlot",
-    "label": "Weather",
-    "tabIndex": 46,
-    "category": "Dank Island",
-    "keywords": [
-      "activities",
-      "activity",
-      "celsius",
-      "climate",
-      "compact",
-      "dank",
-      "dynamic island",
-      "fahrenheit",
-      "forecast",
-      "home",
-      "icon",
-      "island",
-      "open",
-      "temp",
-      "temperature",
-      "weather"
-    ],
-    "description": "Weather icon and temperature open the weather activity"
   },
   {
     "section": "networkCellular",

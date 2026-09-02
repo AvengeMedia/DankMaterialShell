@@ -56,7 +56,8 @@ QtObject {
     readonly property real homeCompactFaceHeight: homeCompactTight ? Math.max(16, Math.min(32, compactHeight - 8)) : compactFaceHeight
 
     property int unreadNotificationCount: 0
-    readonly property bool homeNotificationBadge: SettingsData.dankIslandHomeNotificationBadge && unreadNotificationCount > 0
+    readonly property bool homeNotificationBadge: SettingsData.islandHomeGroupEnabled("notifications") && unreadNotificationCount > 0
+    readonly property bool homeWeatherEnabled: SettingsData.weatherEnabled && SettingsData.islandHomeGroupEnabled("weather")
     readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingS : Theme.spacingM
     property real homeContentWidth: 200
     property real mediaContentWidth: 360
@@ -267,10 +268,11 @@ QtObject {
         return Math.ceil(Math.max(root.compactFaceHeight, destinationContentWidth(activityId) + root.destinationCompactEndPad * 2));
     }
 
-    function resolvedHomeSlot(value, fallback) {
-        if (value === "left" || value === "right" || value === "hidden")
-            return value;
-        return fallback;
+    function homeGroups(side) {
+        const layout = SettingsData.getIslandHomeLayout();
+        const clock = layout.findIndex(g => g.id === "clock");
+        const groups = side === "left" ? layout.slice(0, clock) : layout.slice(clock + 1);
+        return groups.filter(g => g.enabled).map(g => g.id);
     }
 
     function resolvedSystemLevelDisplay(value) {
@@ -279,12 +281,9 @@ QtObject {
         return "both";
     }
 
-    readonly property string homeMediaSlot: resolvedHomeSlot(SettingsData.dankIslandHomeMediaSlot, "left")
-    readonly property string homeStatusSlot: resolvedHomeSlot(SettingsData.dankIslandHomeStatusSlot, "hidden")
-    readonly property string homeWeatherSlot: SettingsData.weatherEnabled ? resolvedHomeSlot(SettingsData.dankIslandHomeWeatherSlot, "hidden") : "hidden"
-    readonly property string homeVolumeSlot: resolvedHomeSlot(SettingsData.dankIslandHomeVolumeSlot, "hidden")
+    readonly property var homeLeftGroups: homeGroups("left")
+    readonly property var homeRightGroups: homeGroups("right")
     readonly property string homeVolumeDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeVolumeDisplay)
-    readonly property string homeBrightnessSlot: resolvedHomeSlot(SettingsData.dankIslandHomeBrightnessSlot, "hidden")
     readonly property string homeBrightnessDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeBrightnessDisplay)
 
     readonly property real homeCompactWidth: Math.ceil(homeSlotMargin * 2 + Math.max(homeContentWidth, 1))

@@ -1010,17 +1010,91 @@ Singleton {
     property real dankIslandTransparency: 1
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
-    property bool dankIslandHomeNotificationBadge: true
     property bool dankIslandNotificationBadgeClearOnOpen: false
     property bool dankIslandNotificationExpand: false
-    property string dankIslandHomeMediaSlot: "left"
-    property string dankIslandHomeStatusSlot: "hidden"
-    property string dankIslandHomeWeatherSlot: "hidden"
     property bool dankIslandHomeCompactTight: false
-    property string dankIslandHomeVolumeSlot: "hidden"
     property string dankIslandHomeVolumeDisplay: "both"
-    property string dankIslandHomeBrightnessSlot: "hidden"
     property string dankIslandHomeBrightnessDisplay: "both"
+    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
+    readonly property var _islandHomeLayoutDefault: [
+        {
+            "id": "media",
+            "enabled": true
+        },
+        {
+            "id": "clock",
+            "enabled": true
+        },
+        {
+            "id": "weather",
+            "enabled": false
+        },
+        {
+            "id": "status",
+            "enabled": false
+        },
+        {
+            "id": "volume",
+            "enabled": false
+        },
+        {
+            "id": "brightness",
+            "enabled": false
+        },
+        {
+            "id": "notifications",
+            "enabled": true
+        }
+    ]
+    property var dankIslandHomeLayout: _islandHomeLayoutDefault
+
+    function getIslandHomeLayout() {
+        const stored = Array.isArray(dankIslandHomeLayout) ? dankIslandHomeLayout : [];
+        const result = [];
+        const seen = {};
+        for (const entry of stored) {
+            const id = entry && entry.id;
+            if (_islandHomeGroupIds.indexOf(id) < 0 || seen[id])
+                continue;
+            seen[id] = true;
+            result.push({
+                "id": id,
+                "enabled": id === "clock" || entry.enabled !== false
+            });
+        }
+        for (const fallback of _islandHomeLayoutDefault) {
+            if (!seen[fallback.id])
+                result.push({
+                    "id": fallback.id,
+                    "enabled": fallback.enabled
+                });
+        }
+        return result;
+    }
+
+    function islandHomeGroupEnabled(id) {
+        const entry = getIslandHomeLayout().find(g => g.id === id);
+        return entry ? entry.enabled : false;
+    }
+
+    function setIslandHomeLayoutOrder(ids) {
+        const current = getIslandHomeLayout();
+        const ordered = ids.map(id => current.find(g => g.id === id)).filter(g => g);
+        for (const entry of current) {
+            if (ids.indexOf(entry.id) < 0)
+                ordered.push(entry);
+        }
+        set("dankIslandHomeLayout", ordered);
+    }
+
+    function setIslandHomeGroupEnabled(id, on) {
+        if (id === "clock")
+            return;
+        set("dankIslandHomeLayout", getIslandHomeLayout().map(g => g.id === id ? {
+                "id": g.id,
+                "enabled": on
+            } : g));
+    }
     property string dankIslandBatteryStyle: "solid"
     property bool dankIslandSatellitesEnabled: true
     property string dankIslandSatellitePosition: "edges"

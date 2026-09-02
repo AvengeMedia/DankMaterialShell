@@ -22,39 +22,33 @@ Item {
     readonly property real statusIconSize: root.textSize + Theme.spacingXXS
     readonly property real groupSpacing: root.controller.homeSlotMargin
     readonly property real edgePad: Math.max(root.groupSpacing, (root.width - compactRow.width) / 2)
-    readonly property bool weatherSlotEnabled: root.controller.homeWeatherSlot !== "hidden"
+    readonly property bool weatherSlotEnabled: root.controller.homeWeatherEnabled
     readonly property var brightnessDevice: DisplayService.getCurrentDeviceInfo()
     readonly property real brightnessMaximum: DisplayService.brightnessMaximum(root.brightnessDevice)
     readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(DisplayService.brightnessLevel / root.brightnessMaximum * 100) : 0
     readonly property int volumePercent: Math.min(AudioService.sinkMaxVolume, Math.round((AudioService.sink?.audio?.volume ?? 0) * 100))
-    readonly property var leftGroupOrder: ["media", "weather", "status", "volume", "brightness"]
-    readonly property var rightGroupOrder: ["weather", "status", "volume", "brightness", "notifications", "media"]
     readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
     readonly property real touchpadThreshold: 100
     property real wheelAccumulator: 0
     property bool weatherRefHeld: false
 
     function groupsForSide(side) {
-        const order = side === "left" ? root.leftGroupOrder : root.rightGroupOrder;
-        return order.filter(id => root.groupShown(id, side));
+        const groups = side === "left" ? root.controller.homeLeftGroups : root.controller.homeRightGroups;
+        return groups.filter(id => root.groupShown(id));
     }
 
-    function groupShown(id, side) {
+    function groupShown(id) {
         switch (id) {
-        case "media":
-            return root.controller.homeMediaSlot === side;
         case "weather":
-            return root.controller.homeWeatherSlot === side && WeatherService.weather.available;
-        case "status":
-            return root.controller.homeStatusSlot === side;
+            return root.controller.homeWeatherEnabled && WeatherService.weather.available;
         case "notifications":
-            return side === "right" && root.controller.homeNotificationBadge;
+            return root.controller.homeNotificationBadge;
         case "volume":
-            return root.controller.homeVolumeSlot === side && !!AudioService.sink?.audio;
+            return !!AudioService.sink?.audio;
         case "brightness":
-            return root.controller.homeBrightnessSlot === side && DisplayService.brightnessAvailable && !!root.brightnessDevice;
+            return DisplayService.brightnessAvailable && !!root.brightnessDevice;
         }
-        return false;
+        return true;
     }
 
     function wheelDirection(delta) {
