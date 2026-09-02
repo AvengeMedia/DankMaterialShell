@@ -222,11 +222,17 @@ FocusScope {
             event.accepted = true;
             return;
         }
+        if (event.key === Qt.Key_Escape) {
+            cancelHold();
+            closeRequested();
+            event.accepted = true;
+            return;
+        }
         holdFromKeyboard = true;
         if (SettingsData.powerMenuGridLayout) {
-            handleGridNavigation(event, true);
+            handleGridNavigation(event);
         } else {
-            handleListNavigation(event, true);
+            handleListNavigation(event);
         }
     }
 
@@ -240,21 +246,98 @@ FocusScope {
             executeCommittedAction();
             return;
         }
-        if (SettingsData.powerMenuGridLayout) {
-            handleGridNavigation(event, false);
-        } else {
-            handleListNavigation(event, false);
+        if (event.key === Qt.Key_Escape) {
+            event.accepted = true;
+            return;
+        }
+        handleKeyRelease(event);
+    }
+
+    Keys.onEscapePressed: event => {
+        cancelHold();
+        closeRequested();
+        event.accepted = true;
+    }
+
+    function handleKeyRelease(event) {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
+            cancelHold();
+            event.accepted = true;
         }
     }
 
-    function handleListNavigation(event, isPressed) {
-        if (!isPressed) {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                cancelHold();
-                event.accepted = true;
+    function handleActionShortcut(event) {
+        switch (event.key) {
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            startHold(getActionAtIndex(selectedIndex), selectedIndex);
+            event.accepted = true;
+            return true;
+        case Qt.Key_P:
+            if (!(event.modifiers & Qt.ControlModifier)) {
+                if (visibleActions.includes("poweroff")) {
+                    startHold("poweroff", visibleActions.indexOf("poweroff"));
+                    event.accepted = true;
+                    return true;
+                }
             }
-            return;
+            break;
+        case Qt.Key_R:
+            if (visibleActions.includes("reboot")) {
+                startHold("reboot", visibleActions.indexOf("reboot"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_B:
+            if (visibleActions.includes("softreboot")) {
+                startHold("softreboot", visibleActions.indexOf("softreboot"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_X:
+            if (visibleActions.includes("logout")) {
+                startHold("logout", visibleActions.indexOf("logout"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_L:
+            if (visibleActions.includes("lock")) {
+                startHold("lock", visibleActions.indexOf("lock"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_S:
+            if (visibleActions.includes("suspend")) {
+                startHold("suspend", visibleActions.indexOf("suspend"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_H:
+            if (visibleActions.includes("hibernate")) {
+                startHold("hibernate", visibleActions.indexOf("hibernate"));
+                event.accepted = true;
+                return true;
+            }
+            break;
+        case Qt.Key_D:
+            if (visibleActions.includes("restart")) {
+                startHold("restart", visibleActions.indexOf("restart"));
+                event.accepted = true;
+                return true;
+            }
+            break;
         }
+        return false;
+    }
+
+    function handleListNavigation(event) {
+        if (handleActionShortcut(event))
+            return;
 
         switch (event.key) {
         case Qt.Key_Up:
@@ -267,94 +350,26 @@ FocusScope {
             selectedIndex = (selectedIndex + 1) % visibleActions.length;
             event.accepted = true;
             break;
-        case Qt.Key_Return:
-        case Qt.Key_Enter:
-            startHold(getActionAtIndex(selectedIndex), selectedIndex);
-            event.accepted = true;
-            break;
         case Qt.Key_N:
-            if (event.modifiers & Qt.ControlModifier) {
-                selectedIndex = (selectedIndex + 1) % visibleActions.length;
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_P:
-            if (!(event.modifiers & Qt.ControlModifier)) {
-                if (visibleActions.includes("poweroff")) {
-                    const idx = visibleActions.indexOf("poweroff");
-                    startHold("poweroff", idx);
-                    event.accepted = true;
-                }
-            } else {
-                selectedIndex = (selectedIndex - 1 + visibleActions.length) % visibleActions.length;
-                event.accepted = true;
-            }
-            break;
         case Qt.Key_J:
             if (event.modifiers & Qt.ControlModifier) {
                 selectedIndex = (selectedIndex + 1) % visibleActions.length;
                 event.accepted = true;
             }
             break;
+        case Qt.Key_P:
         case Qt.Key_K:
             if (event.modifiers & Qt.ControlModifier) {
                 selectedIndex = (selectedIndex - 1 + visibleActions.length) % visibleActions.length;
                 event.accepted = true;
             }
             break;
-        case Qt.Key_R:
-            if (visibleActions.includes("reboot")) {
-                startHold("reboot", visibleActions.indexOf("reboot"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_B:
-            if (visibleActions.includes("softreboot")) {
-                startHold("softreboot", visibleActions.indexOf("softreboot"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_X:
-            if (visibleActions.includes("logout")) {
-                startHold("logout", visibleActions.indexOf("logout"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_L:
-            if (visibleActions.includes("lock")) {
-                startHold("lock", visibleActions.indexOf("lock"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_S:
-            if (visibleActions.includes("suspend")) {
-                startHold("suspend", visibleActions.indexOf("suspend"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_H:
-            if (visibleActions.includes("hibernate")) {
-                startHold("hibernate", visibleActions.indexOf("hibernate"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_D:
-            if (visibleActions.includes("restart")) {
-                startHold("restart", visibleActions.indexOf("restart"));
-                event.accepted = true;
-            }
-            break;
         }
     }
 
-    function handleGridNavigation(event, isPressed) {
-        if (!isPressed) {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
-                cancelHold();
-                event.accepted = true;
-            }
+    function handleGridNavigation(event) {
+        if (handleActionShortcut(event))
             return;
-        }
 
         switch (event.key) {
         case Qt.Key_Left:
@@ -379,11 +394,6 @@ FocusScope {
             selectedIndex = selectedRow * gridColumns + selectedCol;
             event.accepted = true;
             break;
-        case Qt.Key_Return:
-        case Qt.Key_Enter:
-            startHold(getActionAtIndex(selectedIndex), selectedIndex);
-            event.accepted = true;
-            break;
         case Qt.Key_N:
             if (event.modifiers & Qt.ControlModifier) {
                 selectedCol = (selectedCol + 1) % gridColumns;
@@ -392,13 +402,7 @@ FocusScope {
             }
             break;
         case Qt.Key_P:
-            if (!(event.modifiers & Qt.ControlModifier)) {
-                if (visibleActions.includes("poweroff")) {
-                    const idx = visibleActions.indexOf("poweroff");
-                    startHold("poweroff", idx);
-                    event.accepted = true;
-                }
-            } else {
+            if (event.modifiers & Qt.ControlModifier) {
                 selectedCol = (selectedCol - 1 + gridColumns) % gridColumns;
                 selectedIndex = selectedRow * gridColumns + selectedCol;
                 event.accepted = true;
@@ -415,48 +419,6 @@ FocusScope {
             if (event.modifiers & Qt.ControlModifier) {
                 selectedRow = (selectedRow - 1 + gridRows) % gridRows;
                 selectedIndex = selectedRow * gridColumns + selectedCol;
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_R:
-            if (visibleActions.includes("reboot")) {
-                startHold("reboot", visibleActions.indexOf("reboot"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_B:
-            if (visibleActions.includes("softreboot")) {
-                startHold("softreboot", visibleActions.indexOf("softreboot"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_X:
-            if (visibleActions.includes("logout")) {
-                startHold("logout", visibleActions.indexOf("logout"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_L:
-            if (visibleActions.includes("lock")) {
-                startHold("lock", visibleActions.indexOf("lock"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_S:
-            if (visibleActions.includes("suspend")) {
-                startHold("suspend", visibleActions.indexOf("suspend"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_H:
-            if (visibleActions.includes("hibernate")) {
-                startHold("hibernate", visibleActions.indexOf("hibernate"));
-                event.accepted = true;
-            }
-            break;
-        case Qt.Key_D:
-            if (visibleActions.includes("restart")) {
-                startHold("restart", visibleActions.indexOf("restart"));
                 event.accepted = true;
             }
             break;
