@@ -1261,6 +1261,11 @@ Item {
             Component.onCompleted: show()
         }
 
+        Component.onCompleted: {
+            if (FirstLaunchService.shouldShowGreeter)
+                active = true;
+        }
+
         Connections {
             target: FirstLaunchService
             function onGreeterRequested() {
@@ -1280,6 +1285,11 @@ Item {
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
+        }
+
+        Component.onCompleted: {
+            if (ChangelogService.shouldShowChangelog)
+                active = true;
         }
 
         Connections {

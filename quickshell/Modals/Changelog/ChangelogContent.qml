@@ -199,7 +199,7 @@ Column {
                 width: (parent.width - Theme.spacingS) / 2
                 iconName: "language"
                 title: "Translations"
-                description: "21 languages, and plugins too"
+                description: "22 languages, plugin translations"
                 onClicked: {
                     SettingsSearchService.navigateToSection("locale");
                     PopoutService.openSettingsWithTab("locale");
