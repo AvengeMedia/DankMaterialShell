@@ -194,4 +194,3 @@ func TestHUDGlyphsCoverage(t *testing.T) {
 		}
 	}
 }
-

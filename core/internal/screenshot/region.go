@@ -51,15 +51,19 @@ type RenderSlot struct {
 	backgroundDragging    bool
 	backgroundCursor      bool
 	backgroundPhase       selectorPhase
+	backgroundHandles     bool
+	backgroundShift       bool
 	overlay               *overlay
 }
 
-func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase) bool {
+func (s *RenderSlot) cacheValid(src *ShmBuffer, dragging, cursor bool, phase selectorPhase, handles, shift bool) bool {
 	return s.backgroundInitialized &&
 		s.backgroundSource == src &&
 		s.backgroundDragging == dragging &&
 		s.backgroundCursor == cursor &&
-		s.backgroundPhase == phase
+		s.backgroundPhase == phase &&
+		s.backgroundHandles == handles &&
+		s.backgroundShift == shift
 }
 
 type OutputSurface struct {
@@ -901,8 +905,10 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		slot.overlay, os.shown = nil, nil
 	default:
 		cur := r.overlayFor(os, slot.shm)
+		handles := (r.resizingHandle != handleNone || r.ctrlHeld) && r.selection.hasSelection && r.phase != phaseScroll
+		shift := r.shiftHeld && r.selection.hasSelection
 		switch {
-		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase):
+		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase, handles, shift):
 			slot.shm.CopyFrom(srcBuf)
 			r.dimBackground(slot.shm)
 			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat)
@@ -911,6 +917,8 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 			slot.backgroundDragging = r.selection.dragging
 			slot.backgroundCursor = r.showCapturedCursor
 			slot.backgroundPhase = r.phase
+			slot.backgroundHandles = handles
+			slot.backgroundShift = shift
 			slot.overlay = nil
 		case r.compositorVersion >= 4:
 			fullDamage = false
