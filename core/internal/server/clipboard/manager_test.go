@@ -692,7 +692,6 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 func TestManager_ConcurrentOfferAccess(t *testing.T) {
 	m := &Manager{
 		offerMimeTypes: make(map[any][]string),
-		offerRegistry:  make(map[uint32]any),
 	}
 
 	var wg sync.WaitGroup
@@ -707,17 +706,14 @@ func TestManager_ConcurrentOfferAccess(t *testing.T) {
 
 			for range iterations {
 				m.offerMutex.Lock()
-				m.offerRegistry[key] = struct{}{}
 				m.offerMimeTypes[key] = []string{"text/plain"}
 				m.offerMutex.Unlock()
 
 				m.offerMutex.RLock()
-				_ = m.offerRegistry[key]
 				_ = m.offerMimeTypes[key]
 				m.offerMutex.RUnlock()
 
 				m.offerMutex.Lock()
-				delete(m.offerRegistry, key)
 				delete(m.offerMimeTypes, key)
 				m.offerMutex.Unlock()
 			}

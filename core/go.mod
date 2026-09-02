@@ -79,7 +79,7 @@ require (
 )
 
 require (
-	github.com/AvengeMedia/dankgo v0.0.0-20260902000600-4c1f8e7ec93b
+	github.com/AvengeMedia/dankgo v0.0.0-20260902003743-aeb6467c214e
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect

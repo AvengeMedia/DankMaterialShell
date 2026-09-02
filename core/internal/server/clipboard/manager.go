@@ -63,7 +63,6 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 		subscribers:    make(map[string]chan State),
 		dirty:          make(chan struct{}, 1),
 		offerMimeTypes: make(map[any][]string),
-		offerRegistry:  make(map[uint32]any),
 		dbPath:         dbPath,
 	}
 
@@ -279,7 +278,11 @@ func (m *Manager) setupDataDeviceSync() {
 	ctx := m.display.Context()
 	dataMgr := m.dataControlMgr.(*ext_data_control.ExtDataControlManagerV1)
 
-	dataDevice := ext_data_control.NewExtDataControlDeviceV1(ctx)
+	dataDevice, err := dataMgr.GetDataDevice(m.seat)
+	if err != nil {
+		log.Errorf("Failed to send get_data_device request: %v", err)
+		return
+	}
 
 	dataDevice.SetDataOfferHandler(func(e ext_data_control.ExtDataControlDeviceV1DataOfferEvent) {
 		if e.Id == nil {
@@ -287,7 +290,6 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		m.offerMutex.Lock()
-		m.offerRegistry[e.Id.ID()] = e.Id
 		m.offerMimeTypes[e.Id] = make([]string, 0)
 		m.offerMutex.Unlock()
 
@@ -305,13 +307,8 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		var offer any
-		switch {
-		case e.Id != nil:
+		if e.Id != nil {
 			offer = e.Id
-		case e.OfferId != 0:
-			m.offerMutex.RLock()
-			offer = m.offerRegistry[e.OfferId]
-			m.offerMutex.RUnlock()
 		}
 
 		m.ownerLock.Lock()
@@ -391,11 +388,6 @@ func (m *Manager) setupDataDeviceSync() {
 		go m.readAndStore(r, preferredMime, altR, altMime)
 	})
 
-	if err := dataMgr.GetDataDeviceWithProxy(dataDevice, m.seat); err != nil {
-		log.Errorf("Failed to send get_data_device request: %v", err)
-		return
-	}
-
 	m.dataDevice = dataDevice
 
 	if err := ctx.Dispatch(); err != nil {
@@ -416,7 +408,6 @@ func (m *Manager) releaseOffer(offer any) {
 	}
 	m.offerMutex.Lock()
 	delete(m.offerMimeTypes, offer)
-	delete(m.offerRegistry, typedOffer.ID())
 	m.offerMutex.Unlock()
 	typedOffer.Destroy()
 }
