@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/gpu"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/shellembed"
@@ -83,5 +84,6 @@ func dmsExtraEnv(string) []string {
 	if _, set := os.LookupEnv("MALLOC_CONF"); !set {
 		env = append(env, "MALLOC_CONF=thp:never,narenas:4,dirty_decay_ms:3000")
 	}
+	env = append(env, gpu.EGLVendorEnv()...)
 	return env
 }
