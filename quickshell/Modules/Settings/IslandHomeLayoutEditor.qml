@@ -61,6 +61,7 @@ Item {
     property string draggingId: ""
     property var dragStartOrder: []
     property string highlightedId: ""
+    property bool showHidden: false
 
     readonly property bool hasHidden: disabledOrder.length > 0
     readonly property real dividerY: enabledOrder.length * (rowHeight + rowSpacing)
@@ -68,6 +69,8 @@ Item {
         const base = enabledOrder.length * (rowHeight + rowSpacing);
         if (!hasHidden)
             return Math.max(0, base - rowSpacing);
+        if (!showHidden)
+            return base + dividerGap;
         return base + dividerGap + disabledOrder.length * (rowHeight + rowSpacing) - rowSpacing;
     }
 
@@ -222,10 +225,9 @@ Item {
         }
 
         Row {
-            anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.right: parent.right
-            spacing: Theme.spacingM
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.spacingS
 
             DankIcon {
                 name: "visibility_off"
@@ -235,20 +237,26 @@ Item {
             }
 
             StyledText {
-                text: I18n.tr("Hidden", "island settings: hidden groups divider")
+                text: I18n.tr("Hidden (%1)", "island settings: hidden groups divider, %1 is count").arg(root.disabledOrder.length)
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.outline
                 anchors.verticalCenter: parent.verticalCenter
             }
+        }
 
-            Rectangle {
-                width: parent.width - x
-                height: 1
-                color: Theme.outline
-                opacity: 0.2
-                anchors.verticalCenter: parent.verticalCenter
-            }
+        DankIcon {
+            name: root.showHidden ? "expand_less" : "expand_more"
+            size: 14
+            color: Theme.outline
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.showHidden = !root.showHidden
         }
     }
 
@@ -270,6 +278,7 @@ Item {
             width: root.width
             height: root.rowHeight
             z: dragging ? 100 : (highlighted ? 3 : 1)
+            visible: isEnabled || root.showHidden
 
             Binding {
                 target: rowItem
