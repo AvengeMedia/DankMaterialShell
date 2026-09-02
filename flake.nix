@@ -111,7 +111,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-Oa0vgzOrLTfRFpS/w7U22XlK1tKmwE/spf4xVmZ8iXU=";
+              vendorHash = "sha256-hGp4ZYmtQSruHubslhUIFauG0sduGAVfyORpin95+rM=";
 
               subPackages = [ "cmd/dms" ];
 
