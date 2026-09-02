@@ -186,7 +186,7 @@ func overlayDelta(prev, cur *overlay) (dim, bright []dirtyRect) {
 	}
 	if prev != nil {
 		dim = append(prev.full().minus(curInterior), prev.label.minus(curInterior)...)
-		if prev.showHandles {
+		if prev.showHandles && (cur == nil || !cur.showHandles || cur.interior != prev.interior) {
 			for _, h := range prev.handleRects() {
 				dim = append(dim, h.minus(curInterior)...)
 			}
@@ -430,14 +430,14 @@ func (r *RegionSelector) drawCornerHandle(data []byte, stride, bufW, bufH, cx, c
 func overlayDamage(prev, cur *overlay) []dirtyRect {
 	dim, bright := overlayDelta(prev, cur)
 	damage := append(dim, bright...)
-	if prev != nil && prev.showHandles {
+	if prev != nil && prev.showHandles && (cur == nil || !cur.showHandles || cur.interior != prev.interior) {
 		damage = append(damage, prev.handleRects()...)
 	}
 	if cur == nil {
 		return damage
 	}
 	damage = append(append(damage, cur.ring()...), cur.label)
-	if cur.showHandles {
+	if cur.showHandles && (prev == nil || !prev.showHandles || cur.interior != prev.interior) {
 		damage = append(damage, cur.handleRects()...)
 	}
 	return damage

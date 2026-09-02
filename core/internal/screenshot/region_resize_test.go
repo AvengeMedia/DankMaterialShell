@@ -194,3 +194,33 @@ func TestHUDGlyphsCoverage(t *testing.T) {
 		}
 	}
 }
+
+func TestOverlayDeltaIdenticalOverlayNoHandleDimming(t *testing.T) {
+	o1 := &overlay{
+		interior:    dirtyRect{10, 10, 100, 100},
+		top:         true,
+		bottom:      true,
+		left:        true,
+		right:       true,
+		showHandles: true,
+		scaleX:      1.0,
+	}
+	o2 := &overlay{
+		interior:    dirtyRect{10, 10, 100, 100},
+		top:         true,
+		bottom:      true,
+		left:        true,
+		right:       true,
+		showHandles: true,
+		scaleX:      1.0,
+	}
+
+	dim, _ := overlayDelta(o1, o2)
+	for _, d := range dim {
+		for _, h := range o1.handleRects() {
+			if d == h {
+				t.Errorf("handle rect %v should not be re-dimmed when overlay is identical", h)
+			}
+		}
+	}
+}

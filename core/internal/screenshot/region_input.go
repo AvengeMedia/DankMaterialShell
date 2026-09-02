@@ -412,11 +412,15 @@ func surfaceEpsilon(surface *OutputSurface) (float64, float64) {
 
 func (r *RegionSelector) setupKeyboardHandlers() {
 	r.keyboard.SetModifiersHandler(func(e client.KeyboardModifiersEvent) {
-		r.shiftHeld = e.ModsDepressed&1 != 0
-		r.ctrlHeld = e.ModsDepressed&4 != 0
-		r.altHeld = e.ModsDepressed&8 != 0
+		shift := e.ModsDepressed&1 != 0
+		ctrl := e.ModsDepressed&4 != 0
+		alt := e.ModsDepressed&8 != 0
+		changed := shift != r.shiftHeld || ctrl != r.ctrlHeld
+		r.shiftHeld = shift
+		r.ctrlHeld = ctrl
+		r.altHeld = alt
 		r.refreshCursor()
-		if r.selection.hasSelection {
+		if changed && r.selection.hasSelection {
 			for _, os := range r.surfaces {
 				r.redrawSurface(os)
 			}
@@ -426,11 +430,14 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 	r.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
 		switch e.Key {
 		case 29, 97: // Ctrl left/right
-			r.ctrlHeld = e.State != 0
-			r.refreshCursor()
-			if r.selection.hasSelection {
-				for _, os := range r.surfaces {
-					r.redrawSurface(os)
+			ctrl := e.State != 0
+			if ctrl != r.ctrlHeld {
+				r.ctrlHeld = ctrl
+				r.refreshCursor()
+				if r.selection.hasSelection {
+					for _, os := range r.surfaces {
+						r.redrawSurface(os)
+					}
 				}
 			}
 		case 56, 100: // Alt left/right
