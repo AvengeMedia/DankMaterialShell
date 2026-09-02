@@ -341,35 +341,19 @@ Item {
                     spacing: Theme.spacingS
                     visible: SessionService.hibernateSupported
 
-                    SettingsButtonGroupRow {
+                    SettingsDropdownRow {
                         id: suspendBehaviorSelector
+
+                        readonly property bool onAc: powerCategory.currentIndex === 0
+
                         text: I18n.tr("Suspend behavior")
-                        model: [I18n.tr("Suspend"), I18n.tr("Hibernate"), I18n.tr("Suspend then Hibernate")]
-                        selectionMode: "single"
-                        checkEnabled: false
-
-                        Connections {
-                            target: powerCategory
-                            function onCurrentIndexChanged() {
-                                const behavior = powerCategory.currentIndex === 0 ? SettingsData.acSuspendBehavior : SettingsData.batterySuspendBehavior;
-                                suspendBehaviorSelector.currentIndex = behavior;
-                            }
-                        }
-
-                        Component.onCompleted: {
-                            const behavior = powerCategory.currentIndex === 0 ? SettingsData.acSuspendBehavior : SettingsData.batterySuspendBehavior;
-                            currentIndex = behavior;
-                        }
-
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
+                        options: [I18n.tr("Suspend"), I18n.tr("Hibernate"), I18n.tr("Suspend then Hibernate")]
+                        currentValue: options[onAc ? SettingsData.acSuspendBehavior : SettingsData.batterySuspendBehavior] ?? options[0]
+                        onValueChanged: value => {
+                            const index = suspendBehaviorSelector.options.indexOf(value);
+                            if (index < 0)
                                 return;
-                            currentIndex = index;
-                            if (powerCategory.currentIndex === 0) {
-                                SettingsData.set("acSuspendBehavior", index);
-                            } else {
-                                SettingsData.set("batterySuspendBehavior", index);
-                            }
+                            SettingsData.set(suspendBehaviorSelector.onAc ? "acSuspendBehavior" : "batterySuspendBehavior", index);
                         }
                     }
                 }
