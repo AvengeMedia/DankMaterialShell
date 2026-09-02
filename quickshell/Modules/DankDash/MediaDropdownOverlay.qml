@@ -73,10 +73,7 @@ Item {
     }
 
     function selectPlayer(player) {
-        const current = MprisController.activePlayer;
-        if (current && current !== player && current.canPause)
-            current.pause();
-        MprisController.setActivePlayer(player);
+        MprisController.switchActivePlayer(player);
         root.closeRequested();
     }
 

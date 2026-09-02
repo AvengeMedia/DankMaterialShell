@@ -13,7 +13,6 @@ QtObject {
     property bool pointerInside: false
     property int slotHoverCount: 0
     readonly property bool slotHovered: slotHoverCount > 0
-    property bool mediaDropdownOpen: false
     property bool keyboardDismissRequested: false
     property string activeActivity: "home"
     property bool mediaAvailable: false
@@ -61,6 +60,7 @@ QtObject {
     readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingS : Theme.spacingM
     property real homeContentWidth: 200
     property real mediaContentWidth: 360
+    property real mediaExpandedHeight: 324
     readonly property real mediaCompactMaxWidth: 360
     property real notificationContentWidth: 0
     readonly property real notificationCompactMinWidth: compactDense ? 200 : 240
@@ -80,6 +80,13 @@ QtObject {
         if (!isFinite(next) || next <= 0 || Math.abs(next - notificationContentWidth) < 2)
             return;
         notificationContentWidth = next;
+    }
+
+    function setMediaExpandedHeight(height) {
+        const next = Math.ceil(height);
+        if (!isFinite(next) || next <= 0 || Math.abs(next - mediaExpandedHeight) < 1)
+            return;
+        mediaExpandedHeight = next;
     }
 
     function setMediaContentWidth(width) {
@@ -330,7 +337,7 @@ QtObject {
     readonly property var homeCompactTarget: pillTarget(homeCompactWidth, homeCompactFaceHeight)
     readonly property var mediaCompactTarget: pillTarget(mediaCompactWidth, compactFaceHeight)
     readonly property var dashSheetTarget: sheetTarget(SettingsData.showWeekNumber ? 736 : 700, 452)
-    readonly property var mediaExpandedTarget: sheetTarget(600, 352)
+    readonly property var mediaExpandedTarget: sheetTarget(600, mediaExpandedHeight)
     readonly property var launcherExpandedTarget: sheetTarget(680, 560)
     readonly property var controlCenterExpandedTarget: sheetTarget(580, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(SettingsData.osdAlwaysShowValue ? 330 : 282, compactFaceHeight)
@@ -761,16 +768,6 @@ QtObject {
             hoverOpenTimer.restart();
     }
 
-    onMediaDropdownOpenChanged: {
-        if (mediaDropdownOpen) {
-            hoverOpenTimer.stop();
-            hoverCloseTimer.stop();
-            return;
-        }
-        if (!pointerInside && hoverExpanded && expanded)
-            hoverCloseTimer.restart();
-    }
-
     function updatePointerInside(inside) {
         pointerInside = inside === true;
         syncNotificationTimeout(!pointerInside);
@@ -778,7 +775,7 @@ QtObject {
         if (!pointerInside) {
             slotHoverCount = 0;
             hoverOpenTimer.stop();
-            if (hoverExpanded && expanded && !mediaDropdownOpen)
+            if (hoverExpanded && expanded)
                 hoverCloseTimer.restart();
             return;
         }
@@ -799,7 +796,7 @@ QtObject {
     property Timer hoverCloseTimer: Timer {
         interval: root.hoverCloseDelay
         onTriggered: {
-            if (!root.pointerInside && !root.mediaDropdownOpen && root.hoverExpanded)
+            if (!root.pointerInside && root.hoverExpanded)
                 root.requestHoverCollapse();
         }
     }

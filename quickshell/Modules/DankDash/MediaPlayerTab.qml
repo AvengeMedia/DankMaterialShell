@@ -176,19 +176,23 @@ Item {
         return "volume_up";
     }
 
-    function adjustVolume(step) {
+    readonly property real maxVolumePercent: usePlayerVolume ? 100 : AudioService.sinkMaxVolume
+
+    function setVolume(ratio) {
         if (!volumeAvailable)
             return;
-        const maxVol = usePlayerVolume ? 100 : AudioService.sinkMaxVolume;
-        const current = Math.round(currentVolume * 100);
-        const newVolume = Math.min(maxVol, Math.max(0, current + step));
-
+        const clamped = Math.min(maxVolumePercent / 100, Math.max(0, ratio));
         SessionData.suppressOSDTemporarily();
         if (usePlayerVolume) {
-            activePlayer.volume = newVolume / 100;
-        } else if (AudioService.sink?.audio) {
-            AudioService.sink.audio.volume = newVolume / 100;
+            activePlayer.volume = clamped;
+            return;
         }
+        if (AudioService.sink?.audio)
+            AudioService.sink.audio.volume = clamped;
+    }
+
+    function adjustVolume(step) {
+        setVolume((Math.round(currentVolume * 100) + step) / 100);
     }
 
     function dropdownAnchor(button) {
@@ -274,22 +278,12 @@ Item {
     function toggleMute() {
         if (!volumeAvailable)
             return;
-        SessionData.suppressOSDTemporarily();
         if (currentVolume > 0) {
             root.previousVolume = currentVolume;
-            if (usePlayerVolume) {
-                activePlayer.volume = 0;
-            } else if (AudioService.sink?.audio) {
-                AudioService.sink.audio.volume = 0;
-            }
-        } else {
-            const restoreVolume = root.previousVolume > 0 ? root.previousVolume : 0.5;
-            if (usePlayerVolume) {
-                activePlayer.volume = restoreVolume;
-            } else if (AudioService.sink?.audio) {
-                AudioService.sink.audio.volume = restoreVolume;
-            }
+            setVolume(0);
+            return;
         }
+        setVolume(root.previousVolume > 0 ? root.previousVolume : 0.5);
     }
 
     function handleKeyEvent(event) {

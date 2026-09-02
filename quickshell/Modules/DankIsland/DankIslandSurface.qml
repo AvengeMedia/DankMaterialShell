@@ -65,12 +65,9 @@ Item {
     readonly property bool motionRunning: motion.running
     readonly property real springTimeConstantMs: motion.timeConstantMs
     property real trackedHeight: 0
-    readonly property Item mediaDropdownMaskItem: mediaDropdowns.activePanel
     property real fadeCompactHeight: 48
     property real fadeExpandedHeight: 352
     property rect motionStartBounds: Qt.rect(0, 0, 0, 0)
-    property int mediaDropdownType: 0
-    property point mediaDropdownAnchor: Qt.point(0, 0)
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
     readonly property real currentVisualWidth: motion.currentWidth
     readonly property real currentVisualHeight: motion.currentHeight
@@ -109,27 +106,6 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
-    function openMediaDropdown(type, pos) {
-        stopMediaDropdownCloseTimer();
-        mediaDropdownAnchor = pos;
-        mediaDropdownType = type;
-        controller.mediaDropdownOpen = true;
-    }
-
-    function hideMediaDropdowns() {
-        stopMediaDropdownCloseTimer();
-        mediaDropdownType = 0;
-        controller.mediaDropdownOpen = false;
-    }
-
-    function startMediaDropdownCloseTimer() {
-        mediaDropdownCloseTimer.restart();
-    }
-
-    function stopMediaDropdownCloseTimer() {
-        mediaDropdownCloseTimer.stop();
-    }
-
     function requestActivityFocus() {
         return contentHost.requestActivityFocus();
     }
@@ -156,16 +132,6 @@ Item {
         function onTargetDescriptorChanged() {
             root.applyTarget();
         }
-
-        function onExpandedChanged() {
-            if (!controller.expanded || controller.activeActivity !== "media")
-                root.hideMediaDropdowns();
-        }
-
-        function onActiveActivityChanged() {
-            if (controller.activeActivity !== "media")
-                root.hideMediaDropdowns();
-        }
     }
 
     Connections {
@@ -174,8 +140,6 @@ Item {
         function onRunningChanged() {
             if (motion.running) {
                 root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, root.currentVisualWidth, root.currentVisualHeight);
-                if (root.controller.activeActivity === "media")
-                    root.hideMediaDropdowns();
                 return;
             }
             root.controller.releaseIdleVisuals();
@@ -189,13 +153,6 @@ Item {
         stiffness: root.springStiffness
         damping: root.springDamping
         mass: root.springMass
-    }
-
-    Timer {
-        id: mediaDropdownCloseTimer
-
-        interval: 400
-        onTriggered: root.hideMediaDropdowns()
     }
 
     // Frozen start/target union so the Wayland mask is not rewritten every spring frame.
@@ -340,21 +297,6 @@ Item {
         }
     }
 
-    MediaDropdownOverlay {
-        id: mediaDropdowns
-
-        dropdownType: root.mediaDropdownType
-        anchorPos: root.mediaDropdownAnchor
-        isRightEdge: true
-        availableBounds: Qt.rect(0, 0, root.width, root.height)
-        activePlayer: MprisController.activePlayer
-        allPlayers: MprisController.availablePlayers
-        targetWindow: root.Window.window
-        onCloseRequested: root.hideMediaDropdowns()
-        onPanelEntered: root.stopMediaDropdownCloseTimer()
-        onPanelExited: root.startMediaDropdownCloseTimer()
-    }
-
     Component {
         id: compactHomeComponent
 
@@ -386,15 +328,6 @@ Item {
 
         MediaExpanded {
             controller: root.controller
-            geometrySettled: !motion.running
-            effectiveScreen: root.effectiveScreen
-            alignedX: root.targetVisualX
-            alignedY: root.targetVisualY
-            alignedWidth: root.targetVisualWidth
-            onDropdownRequested: (dropdownType, pos) => root.openMediaDropdown(dropdownType, pos)
-            onDropdownsHidden: root.hideMediaDropdowns()
-            onDropdownHoverStarted: root.stopMediaDropdownCloseTimer()
-            onDropdownHoverEnded: root.startMediaDropdownCloseTimer()
         }
     }
 

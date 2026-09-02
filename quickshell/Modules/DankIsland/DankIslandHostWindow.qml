@@ -26,7 +26,7 @@ PanelWindow {
 
     function containsGlobalPoint(gx, gy, padding) {
         const pad = padding !== undefined ? padding : 16;
-        const items = [surface.inputMaskItem, surface.fittsStripItem, surface.mediaDropdownMaskItem, satelliteHost.leftInputItem, satelliteHost.rightInputItem];
+        const items = [surface.inputMaskItem, surface.fittsStripItem, satelliteHost.leftInputItem, satelliteHost.rightInputItem];
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (!item || item.width <= 0 || item.height <= 0)
@@ -136,10 +136,6 @@ PanelWindow {
 
         Region {
             item: controller.inputSuspended ? null : satelliteHost.rightInputItem
-        }
-
-        Region {
-            item: controller.inputSuspended ? null : surface.mediaDropdownMaskItem
         }
 
         Region {
@@ -337,11 +333,6 @@ PanelWindow {
                 item: rightSatelliteHole
                 intersection: Intersection.Subtract
             }
-
-            Region {
-                item: mediaDropdownHole
-                intersection: Intersection.Subtract
-            }
         }
 
         Rectangle {
@@ -386,15 +377,6 @@ PanelWindow {
             y: satelliteHost.rightInputItem.y + root.hostOriginY
             width: satelliteHost.rightInputItem.width
             height: satelliteHost.rightInputItem.height
-        }
-
-        Item {
-            id: mediaDropdownHole
-
-            x: surface.mediaDropdownMaskItem ? surface.mediaDropdownMaskItem.x : 0
-            y: surface.mediaDropdownMaskItem ? surface.mediaDropdownMaskItem.y + root.hostOriginY : 0
-            width: surface.mediaDropdownMaskItem ? surface.mediaDropdownMaskItem.width : 0
-            height: surface.mediaDropdownMaskItem ? surface.mediaDropdownMaskItem.height : 0
         }
 
         MouseArea {
