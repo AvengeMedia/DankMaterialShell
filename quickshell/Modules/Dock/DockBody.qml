@@ -403,10 +403,16 @@ Item {
     onHeightChanged: dock._syncDockChromeState()
     onVisibleChanged: dock._syncDockChromeState()
     onHasAppsChanged: dock._syncDockChromeState()
+    property bool _switchingPosition: false
+
     onConnectedBarSideChanged: {
+        dock._switchingPosition = true;
         slideXSpring.snapTo(dock.isVertical ? dockSlide.targetX : 0);
         slideYSpring.snapTo(!dock.isVertical ? dockSlide.targetY : 0);
         dockChromeSync.schedule();
+        Qt.callLater(() => {
+            dock._switchingPosition = false;
+        });
     }
     onUsesConnectedFrameChromeChanged: dock._syncDockChromeState()
 
@@ -627,7 +633,7 @@ Item {
 
             height: {
                 if (dock.isVertical) {
-                    const h = dockApps.implicitHeight + SettingsData.dockSpacing * 2;
+                    const h = dockApps.implicitWidth + SettingsData.dockSpacing * 2;
                     return Math.min(Math.max(h + 64, 200), maxDockHeight);
                 }
                 return dock.reveal ? Theme.px(dockGeometry.motionThickness, _dpr) : 1;
@@ -645,6 +651,7 @@ Item {
             acceptedButtons: Qt.NoButton
 
             Behavior on height {
+                enabled: !dock._switchingPosition
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
@@ -652,6 +659,7 @@ Item {
             }
 
             Behavior on width {
+                enabled: !dock._switchingPosition
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Easing.OutCubic
@@ -753,10 +761,10 @@ Item {
                     }
 
                     // Sync dockBackground geometry to ConnectedModeState
-                    onXChanged: dock._syncDockChromeState()
-                    onYChanged: dock._syncDockChromeState()
-                    onWidthChanged: dock._syncDockChromeState()
-                    onHeightChanged: dock._syncDockChromeState()
+                    onXChanged: dockChromeSync.schedule()
+                    onYChanged: dockChromeSync.schedule()
+                    onWidthChanged: dockChromeSync.schedule()
+                    onHeightChanged: dockChromeSync.schedule()
                 }
 
                 Item {
