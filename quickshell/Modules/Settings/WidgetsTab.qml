@@ -10,7 +10,21 @@ Item {
     id: widgetsTab
 
     property var parentModal: null
-    property string selectedBarId: "default"
+    property string selectedBarId: SettingsUiState.selectedBarId
+
+    onSelectedBarIdChanged: {
+        if (SettingsUiState.selectedBarId !== selectedBarId)
+            SettingsUiState.selectedBarId = selectedBarId;
+    }
+
+    Connections {
+        target: SettingsUiState
+
+        function onSelectedBarIdChanged() {
+            if (widgetsTab.selectedBarId !== SettingsUiState.selectedBarId)
+                widgetsTab.selectedBarId = SettingsUiState.selectedBarId;
+        }
+    }
 
     property var selectedBarConfig: {
         selectedBarId;

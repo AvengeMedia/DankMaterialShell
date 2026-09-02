@@ -80,7 +80,6 @@ Item {
     readonly property real adjacentTopBarHeight: {
         if (!isVertical || autoHide)
             return 0;
-        const screenName = dock.modelData?.name ?? "";
         const topBar = SettingsData.barConfigs.find(bc => {
             if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
                 return false;
@@ -88,8 +87,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Top && bc.position !== 0)
                 return false;
-            const onThisScreen = bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all") || bc.screenPreferences.includes(screenName);
-            return onThisScreen;
+            return SettingsData.barConfigCoversScreen(bc, dock.modelData);
         });
         return getBarHeight(topBar);
     }
@@ -97,7 +95,6 @@ Item {
     readonly property real adjacentLeftBarWidth: {
         if (isVertical || autoHide)
             return 0;
-        const screenName = dock.modelData?.name ?? "";
         const leftBar = SettingsData.barConfigs.find(bc => {
             if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
                 return false;
@@ -105,8 +102,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Left && bc.position !== 2)
                 return false;
-            const onThisScreen = bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all") || bc.screenPreferences.includes(screenName);
-            return onThisScreen;
+            return SettingsData.barConfigCoversScreen(bc, dock.modelData);
         });
         return getBarHeight(leftBar);
     }

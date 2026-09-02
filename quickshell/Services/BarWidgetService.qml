@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.I3
+import qs.Common
 
 Singleton {
     id: root
@@ -13,27 +14,45 @@ Singleton {
     property var dankBarRepeater: null
 
     // Bars rendered inside the frame surface (connected mode) have no DankBarWindow in the
-    // repeater, so they self-register here (screenName -> DankBarBody) for trigger routing.
+    // repeater, so they self-register here (screenName -> barId -> DankBarBody) for trigger routing.
     property var frameHostedBars: ({})
 
     // Shared dock context-menu windows (created in DMSShell) so a frame-hosted dock can reach them.
     property var dockContextMenu: null
     property var dockTrashContextMenu: null
 
-    function registerFrameBar(screenName, body) {
-        if (!screenName || !body)
+    function registerFrameBar(screenName, barId, body) {
+        if (!screenName || !barId || !body)
             return;
         const next = Object.assign({}, frameHostedBars);
-        next[screenName] = body;
+        const bars = Object.assign({}, next[screenName] ?? {});
+        bars[barId] = body;
+        next[screenName] = bars;
         frameHostedBars = next;
     }
 
-    function unregisterFrameBar(screenName, body) {
-        if (!screenName || frameHostedBars[screenName] !== body)
+    function unregisterFrameBar(screenName, barId, body) {
+        if (!screenName || !barId || frameHostedBars[screenName]?.[barId] !== body)
             return;
         const next = Object.assign({}, frameHostedBars);
-        delete next[screenName];
+        const bars = Object.assign({}, next[screenName]);
+        delete bars[barId];
+        if (Object.keys(bars).length === 0)
+            delete next[screenName];
+        else
+            next[screenName] = bars;
         frameHostedBars = next;
+    }
+
+    // Horizontal bars first, then config order, matching the standalone repeater order.
+    function frameBarsForScreen(screenName) {
+        const bars = frameHostedBars[screenName] ?? {};
+        const order = SettingsData.barConfigs.map(cfg => cfg.id);
+        const vertical = barId => {
+            const position = SettingsData.getBarConfig(barId)?.position ?? SettingsData.Position.Top;
+            return (position === SettingsData.Position.Left || position === SettingsData.Position.Right) ? 1 : 0;
+        };
+        return Object.keys(bars).sort((a, b) => (vertical(a) - vertical(b)) || (order.indexOf(a) - order.indexOf(b))).map(barId => bars[barId]);
     }
 
     // DankBar items self-register here (barConfig id -> DankBar) so frame-hosted bars can
@@ -185,8 +204,9 @@ Singleton {
     }
 
     function getBarWindowForScreen(screenName) {
-        if (frameHostedBars[screenName])
-            return frameHostedBars[screenName];
+        const hosted = frameBarsForScreen(screenName);
+        if (hosted.length > 0)
+            return hosted[0];
 
         if (!dankBarRepeater)
             return null;
@@ -226,8 +246,9 @@ Singleton {
         }
 
         for (const screenName in frameHostedBars) {
-            if (frameHostedBars[screenName])
-                return frameHostedBars[screenName];
+            const hosted = frameBarsForScreen(screenName);
+            if (hosted.length > 0)
+                return hosted[0];
         }
         return null;
     }

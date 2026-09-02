@@ -2297,11 +2297,7 @@ Singleton {
                 continue;
             if (other.autoHide)
                 continue;
-            const otherScreens = other.screenPreferences || ["all"];
-            const barScreens = barConfig.screenPreferences || ["all"];
-            const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") || otherScreens.some(s => isScreenInPreferences(screen, [s]));
-
-            if (!onSameScreen)
+            if (!barConfigCoversScreen(other, screen))
                 continue;
             const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
             const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
@@ -2377,11 +2373,7 @@ Singleton {
                 const other = enabledBars[i];
                 if (other.id === barConfig.id)
                     continue;
-                const otherScreens = other.screenPreferences || ["all"];
-                const barScreens = barConfig.screenPreferences || ["all"];
-                const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") || otherScreens.some(s => isScreenInPreferences(screen, [s]));
-
-                if (!onSameScreen)
+                if (!barConfigCoversScreen(other, screen))
                     continue;
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
@@ -2472,6 +2464,23 @@ Singleton {
 
     function getBarConfig(barId) {
         return barConfigs.find(cfg => cfg.id === barId) || null;
+    }
+
+    function setIslandBarId(barId) {
+        const config = getBarConfig(barId);
+        if (!config)
+            return;
+        set("dankIslandBarId", barId);
+        const updates = {};
+        if (!config.enabled)
+            updates.enabled = true;
+        if ((config.screenPreferences ?? []).length === 0)
+            updates.screenPreferences = ["all"];
+        const position = config.position ?? SettingsData.Position.Top;
+        if (position !== SettingsData.Position.Top && position !== SettingsData.Position.Bottom)
+            updates.position = SettingsData.Position.Top;
+        if (Object.keys(updates).length > 0)
+            updateBarConfig(barId, updates);
     }
 
     function isBarIpcRevealed(barId) {
@@ -2744,76 +2753,38 @@ Singleton {
     }
 
     function getActiveBarEdgesForScreen(screen) {
-        if (!screen)
-            return [];
-        var edges = [];
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled)
-                continue;
-            if (!barConfigCoversScreen(bc, screen))
-                continue;
-            if (isIslandBarConfig(bc))
-                continue;
-            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
-                continue;
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:
-                edges.push("top");
-                break;
-            case SettingsData.Position.Bottom:
-                edges.push("bottom");
-                break;
-            case SettingsData.Position.Left:
-                edges.push("left");
-                break;
-            case SettingsData.Position.Right:
-                edges.push("right");
-                break;
-            }
-        }
-        return edges;
+        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).length > 0);
     }
 
     function getOverlayBarEdgesForScreen(screen) {
-        if (!screen)
-            return [];
-        var edges = [];
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled || !(bc.useOverlayLayer ?? false))
-                continue;
-            if (!barConfigCoversScreen(bc, screen))
-                continue;
-            if (isIslandBarConfig(bc))
-                continue;
-            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
-                continue;
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:
-                edges.push("top");
-                break;
-            case SettingsData.Position.Bottom:
-                edges.push("bottom");
-                break;
-            case SettingsData.Position.Left:
-                edges.push("left");
-                break;
-            case SettingsData.Position.Right:
-                edges.push("right");
-                break;
-            }
-        }
-        return edges;
+        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).some(bc => bc.useOverlayLayer ?? false));
     }
 
     readonly property real frameBarContentGap: frameBarInsetPadding < 0 ? frameThickness : frameBarInsetPadding
     readonly property real frameBarContentGapExtra: Math.max(0, frameBarContentGap - frameThickness)
 
+    function getActiveBarConfigsForEdge(screen, edge) {
+        if (!screen)
+            return [];
+        const sidePos = _sideToPosition(edge);
+        if (sidePos < 0 || dankIslandOwnsEdge(screen, edge))
+            return [];
+        return barConfigs.filter(bc => bc.enabled && (bc.position ?? SettingsData.Position.Top) === sidePos && !isIslandBarConfig(bc) && barConfigCoversScreen(bc, screen));
+    }
+
+    function getFrameHostedBarConfigsForEdge(screen, edge) {
+        return getActiveBarConfigsForEdge(screen, edge).filter(bc => !(bc.useOverlayLayer ?? false));
+    }
+
+    // Connected mode hosts one row per non-overlay bar; an edge holding only overlay bars keeps one band.
     function frameEdgeReservation(screen, edge) {
         if (!screen)
             return 0;
-        return getActiveBarEdgesForScreen(screen).includes(edge) ? frameBarSize : frameThickness;
+        const active = getActiveBarConfigsForEdge(screen, edge);
+        if (active.length === 0)
+            return frameThickness;
+        const rows = FrameTransitionState.effectiveConnectedFrameModeActive ? active.filter(bc => !(bc.useOverlayLayer ?? false)) : active;
+        return frameBarSize * Math.max(1, rows.length);
     }
 
     function frameEdgeInsetForSide(screen, side) {

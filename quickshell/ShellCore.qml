@@ -43,6 +43,7 @@ Item {
 
     function recreateBarSurfaces() {
         log.info("Recreating bar surfaces, screens:", Quickshell.screens.length, Quickshell.screens.map(s => s.name).join(","));
+        dankBarRepeater.horizontalReady = 0;
         if (barSurfacesLoaded)
             barSurfacesLoaded = false;
         barSurfaceReloadAction.schedule();
@@ -120,6 +121,7 @@ Item {
         // Horizontal bars must claim their exclusive zones first, so vertical bars wait for every enabled horizontal bar to load
         readonly property int horizontalWanted: SettingsData.getBarKindConfigs().filter(c => (c.enabled ?? false) && c.position !== SettingsData.Position.Left && c.position !== SettingsData.Position.Right).length
         property int horizontalReady: 0
+        onHorizontalWantedChanged: recountHorizontalReady()
 
         function recountHorizontalReady() {
             let ready = 0;

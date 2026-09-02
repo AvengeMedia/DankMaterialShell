@@ -44,15 +44,9 @@ Row {
         case "island":
             {
                 const configs = SettingsData.barConfigs || [];
-                const target = SettingsData.islandBarConfig ?? configs.find(cfg => cfg.enabled) ?? configs[0];
-                if (!target)
-                    return;
-                if (!SettingsData.dankIslandBarId)
-                    SettingsData.set("dankIslandBarId", target.id);
-                if (!target.enabled)
-                    SettingsData.updateBarConfig(target.id, {
-                        enabled: true
-                    });
+                const target = SettingsData.islandBarConfig ?? SettingsData.getBarConfig(SettingsUiState.selectedBarId) ?? configs.find(cfg => cfg.enabled) ?? configs[0];
+                if (target)
+                    SettingsData.setIslandBarId(target.id);
                 return;
             }
         default:

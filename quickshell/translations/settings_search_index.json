@@ -12418,6 +12418,22 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "dankIslandDisplays",
+    "label": "Display Assignment",
+    "tabIndex": 46,
+    "category": "Island",
+    "keywords": [
+      "assignment",
+      "display",
+      "island",
+      "monitor",
+      "output",
+      "screen"
+    ],
+    "icon": "monitor",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "dankIslandEnable",
     "label": "Enable Island",
     "tabIndex": 46,

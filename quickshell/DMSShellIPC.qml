@@ -32,9 +32,8 @@ Item {
             for (let i = 0; i < root.dankBarRepeater.count; i++)
                 bars.push(...(root.dankBarRepeater.itemAt(i)?.item?.barVariants?.instances || []));
         }
-        const frameBars = BarWidgetService.frameHostedBars;
-        for (const screenName in frameBars)
-            bars.push(frameBars[screenName]);
+        for (const screenName in BarWidgetService.frameHostedBars)
+            bars.push(...BarWidgetService.frameBarsForScreen(screenName));
 
         let currentBar = null;
         for (const bar of bars) {

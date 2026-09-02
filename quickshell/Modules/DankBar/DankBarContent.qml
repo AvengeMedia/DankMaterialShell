@@ -67,14 +67,14 @@ Item {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentTopBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetResolved;
+            return hasAdjacentTopBarLive ? (_edgeBaseMargin + SettingsData.frameEdgeReservation(barWindow.screen, "top") + _frameInsetExtra) : _frameInsetResolved;
         return Math.max(0, _barInsetPadding);
     }
     readonly property real _bottomMargin: {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentBottomBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetResolved;
+            return hasAdjacentBottomBarLive ? (_edgeBaseMargin + SettingsData.frameEdgeReservation(barWindow.screen, "bottom") + _frameInsetExtra) : _frameInsetResolved;
         return Math.max(0, _barInsetPadding);
     }
 

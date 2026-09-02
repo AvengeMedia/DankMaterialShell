@@ -69,7 +69,7 @@ Item {
                     currentIndex: root.instanceIndex
                     onSelectionChanged: (index, selected) => {
                         if (selected)
-                            SettingsData.set("dankIslandBarId", root.instanceChoices[index]?.id ?? "");
+                            SettingsData.setIslandBarId(root.instanceChoices[index]?.id ?? "");
                     }
                 }
 
@@ -82,6 +82,24 @@ Item {
                     checked: SettingsData.dankIslandEnabled
                     onToggled: checked => SettingsData.updateBarConfig(SettingsData.dankIslandBarId, {
                             enabled: checked
+                        })
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "monitor"
+                title: I18n.tr("Display Assignment")
+                settingKey: "dankIslandDisplays"
+                collapsible: true
+                expanded: false
+                visible: SettingsData.dankIslandEnabled
+
+                SettingsDisplayPicker {
+                    emptyMeansAll: false
+                    displayPreferences: SettingsData.islandBarConfig?.screenPreferences ?? ["all"]
+                    onPreferencesChanged: prefs => SettingsData.updateBarConfig(SettingsData.dankIslandBarId, {
+                            screenPreferences: prefs
                         })
                 }
             }
