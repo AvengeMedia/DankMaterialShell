@@ -253,12 +253,6 @@ FocusScope {
         handleKeyRelease(event);
     }
 
-    Keys.onEscapePressed: event => {
-        cancelHold();
-        closeRequested();
-        event.accepted = true;
-    }
-
     function handleKeyRelease(event) {
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_R || event.key === Qt.Key_B || event.key === Qt.Key_X || event.key === Qt.Key_L || event.key === Qt.Key_S || event.key === Qt.Key_H || event.key === Qt.Key_D || (event.key === Qt.Key_P && !(event.modifiers & Qt.ControlModifier))) {
             cancelHold();
