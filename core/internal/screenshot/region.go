@@ -2,6 +2,7 @@ package screenshot
 
 import (
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -229,7 +230,19 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		return nil, false, r.scroll.abortErr
 	}
 
-	if r.cancelled || r.capturedBuffer == nil {
+	if r.cancelled {
+		return nil, true, nil
+	}
+
+	if r.screenshoter != nil && r.screenshoter.config.Geometry {
+		reg, ok := r.selectedLogicalGeometry()
+		if !ok {
+			return nil, true, nil
+		}
+		return geometryResult(reg), false, nil
+	}
+
+	if r.capturedBuffer == nil {
 		return nil, r.cancelled, nil
 	}
 
@@ -255,6 +268,42 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		Format:    format,
 		Scale:     scale,
 	}, false, nil
+}
+
+func (r *RegionSelector) selectedLogicalGeometry() (Region, bool) {
+	ext, ok := r.selectionExtent()
+	if !ok || ext.width() <= 0 || ext.height() <= 0 {
+		return Region{}, false
+	}
+
+	x1, y1, x2, y2 := ext.logical()
+	lx := int(math.Round(x1))
+	ly := int(math.Round(y1))
+	lw := int(math.Round(x2 - x1))
+	lh := int(math.Round(y2 - y1))
+
+	if r.shiftHeld && ext.within(ext.surface) {
+		size := min(lw, lh)
+		lw = size
+		lh = size
+	}
+
+	if lw <= 0 || lh <= 0 {
+		return Region{}, false
+	}
+
+	outputName := ""
+	if ext.within(ext.surface) && ext.surface.output != nil {
+		outputName = ext.surface.output.name
+	}
+
+	return Region{
+		X:      int32(lx),
+		Y:      int32(ly),
+		Width:  int32(lw),
+		Height: int32(lh),
+		Output: outputName,
+	}, true
 }
 
 func (r *RegionSelector) connect() error {

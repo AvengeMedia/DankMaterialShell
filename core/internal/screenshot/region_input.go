@@ -495,6 +495,11 @@ func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, i
 }
 
 func (r *RegionSelector) finishSelection() {
+	if r.screenshoter != nil && r.screenshoter.config.Geometry {
+		r.running = false
+		return
+	}
+
 	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll
 	switch {
 	case scrollMode:

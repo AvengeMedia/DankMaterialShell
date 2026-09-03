@@ -156,7 +156,11 @@ func (s *Screenshoter) captureNiriWindow() (*CaptureResult, error) {
 	}
 
 	return &CaptureResult{
-		Buffer:    buf,
+		Buffer: buf,
+		Region: Region{
+			Width:  int32(img.Bounds().Dx()),
+			Height: int32(img.Bounds().Dy()),
+		},
 		YInverted: false,
 		Format:    uint32(FormatARGB8888),
 		Scale:     scale,
