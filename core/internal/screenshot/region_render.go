@@ -496,6 +496,88 @@ func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuff
 
 	r.drawBorder(data, stride, w, h, holeX-1, holeY-1, holeW+2, holeH+2, os.screenFormat)
 	r.drawScrollBar(data, stride, w, h, os.screenFormat)
+	r.drawScrollPreview(data, stride, w, h, os)
+}
+
+func (r *RegionSelector) drawScrollPreview(data []byte, stride, bufW, bufH int, os *OutputSurface) {
+	s := r.scroll
+	if s == nil || s.st == nil || s.st.rows() == 0 || !s.hasPreview {
+		return
+	}
+
+	canvas := s.st.canvas
+	sourceW := s.frameW
+	sourceRows := s.st.rows()
+	if sourceW <= 0 || sourceRows <= 0 || len(canvas) < sourceW*sourceRows*4 {
+		return
+	}
+
+	scale := 1.0
+	if os.logicalW > 0 {
+		scale = float64(bufW) / float64(os.logicalW)
+	}
+	if scale <= 0 {
+		scale = 1.0
+	}
+	padding := int(float64(scrollPreviewPaddingLogical) * scale)
+
+	format := os.screenFormat
+	// 1. Draw translucent dark panel background
+	r.fillRect(data, stride, bufW, bufH, s.previewX, s.previewY, s.previewW, s.previewH, 16, 16, 16, 230, format)
+
+	// 2. Draw downscaled stitched canvas
+	imageX := s.previewX + padding
+	imageY := s.previewY + padding
+	imageW := s.previewW - padding*2
+	imageH := s.previewH - padding*2
+	if imageW <= 0 || imageH <= 0 {
+		return
+	}
+
+	needSwap := formatIsBGR(uint32(s.format)) != formatIsBGR(format)
+
+	for y := range imageH {
+		srcY := y * sourceRows / imageH
+		dstY := imageY + y
+		if dstY < 0 || dstY >= bufH {
+			continue
+		}
+		dstRowOff := dstY * stride
+		srcRowOff := srcY * sourceW * 4
+
+		for x := range imageW {
+			srcX := x * sourceW / imageW
+			dstX := imageX + x
+			if dstX < 0 || dstX >= bufW {
+				continue
+			}
+			srcIdx := srcRowOff + srcX*4
+			dstIdx := dstRowOff + dstX*4
+			if srcIdx+3 >= len(canvas) || dstIdx+3 >= len(data) {
+				continue
+			}
+
+			if needSwap {
+				data[dstIdx+0] = canvas[srcIdx+2]
+				data[dstIdx+1] = canvas[srcIdx+1]
+				data[dstIdx+2] = canvas[srcIdx+0]
+			} else {
+				data[dstIdx+0] = canvas[srcIdx+0]
+				data[dstIdx+1] = canvas[srcIdx+1]
+				data[dstIdx+2] = canvas[srcIdx+2]
+			}
+			data[dstIdx+3] = 255
+		}
+	}
+
+	// 3. Draw border around preview panel
+	borderW := max(int(scale+0.5), 1)
+	for i := range borderW {
+		r.drawHLine(data, stride, bufW, bufH, s.previewX-i, s.previewY-i, s.previewW+2*i, format)
+		r.drawHLine(data, stride, bufW, bufH, s.previewX-i, s.previewY+s.previewH+i-1, s.previewW+2*i, format)
+		r.drawVLine(data, stride, bufW, bufH, s.previewX-i, s.previewY-i, s.previewH+2*i, format)
+		r.drawVLine(data, stride, bufW, bufH, s.previewX+s.previewW+i-1, s.previewY-i, s.previewH+2*i, format)
+	}
 }
 
 func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, format uint32) {

@@ -660,7 +660,14 @@ func (r *RegionSelector) setNativeCursor(serial uint32) {
 		return
 	}
 	shape := uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeCrosshair)
-	if r.resizingHandle != handleNone {
+	if r.phase == phaseScroll {
+		switch r.scrollBarHit(r.pointerX, r.pointerY) {
+		case "done", "cancel", "preview":
+			shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapePointer)
+		default:
+			shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeDefault)
+		}
+	} else if r.resizingHandle != handleNone {
 		shape = cursorShapeForHandle(r.resizingHandle)
 	} else if r.movingSelection && r.selection.dragging {
 		shape = uint32(wp_cursor_shape.WpCursorShapeDeviceV1ShapeGrabbing)

@@ -58,6 +58,11 @@ func (r *RegionSelector) setupPointerHandlers() {
 		r.pointerX = e.SurfaceX
 		r.pointerY = e.SurfaceY
 
+		if r.phase == phaseScroll {
+			r.refreshCursor()
+			return
+		}
+
 		if !r.selection.dragging {
 			if r.ctrlHeld && r.selection.hasSelection {
 				r.refreshCursor()
@@ -78,7 +83,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 				return
 			}
 			switch r.scrollBarHit(r.pointerX, r.pointerY) {
-			case "done":
+			case "done", "preview":
 				r.finishScroll()
 			case "cancel":
 				r.cancelled = true
