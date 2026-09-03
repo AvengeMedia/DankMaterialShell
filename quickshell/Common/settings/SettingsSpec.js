@@ -228,6 +228,7 @@ var SPEC = {
     mediaAdaptiveWidthEnabled: { def: true },
     audioVisualizerEnabled: { def: true },
     mediaUseAlbumArtAccent: { def: false },
+    mediaWallpaperEnabled: { def: true },
     appleMusicAnimatedArtEnabled: { def: false },
     audioScrollMode: { def: "volume" },
     audioWheelScrollAmount: { def: 5 },

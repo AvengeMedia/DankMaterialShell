@@ -188,6 +188,7 @@ Item {
         id: mediaExpandedLoader
 
         activity: "media"
+        height: Math.max(target.height, root.height)
         active: root.mediaSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.mediaExpandedComponent

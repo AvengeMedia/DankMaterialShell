@@ -23,6 +23,7 @@ Item {
     property bool live: Window.window?.visible ?? false
     property bool menusEnabled: true
     property string chrome: "dash"
+    property bool wallpaperEnabled: SettingsData.mediaWallpaperEnabled
     readonly property bool islandChrome: chrome === "island"
 
     readonly property color accent: MediaAccentService.accent

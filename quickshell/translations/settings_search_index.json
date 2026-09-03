@@ -6989,6 +6989,33 @@
     "description": "Use colors extracted from album art instead of system theme colors"
   },
   {
+    "section": "mediaWallpaper",
+    "label": "Wallpaper",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "album",
+      "art",
+      "audio",
+      "backdrop",
+      "background",
+      "behind",
+      "bg",
+      "blur",
+      "desktop",
+      "image",
+      "media",
+      "mpris",
+      "music",
+      "picture",
+      "playback",
+      "player",
+      "spotify",
+      "wallpaper"
+    ],
+    "description": "Blur the album art behind the media player"
+  },
+  {
     "section": "mediaWaveProgress",
     "label": "Wave Progress Bars",
     "tabIndex": 16,

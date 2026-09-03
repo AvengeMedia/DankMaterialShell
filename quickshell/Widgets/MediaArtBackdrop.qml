@@ -12,6 +12,10 @@ Item {
     property real radius: Theme.cornerRadius
     property real artOpacity: 0.7
     property real surfaceTint: 0.3
+    property real stableHeight: 0
+
+    readonly property bool pinned: root.stableHeight > 0
+    readonly property real anchorHeight: root.pinned ? root.stableHeight : root.height
 
     signal artReady
 
@@ -101,8 +105,7 @@ Item {
 
         Image {
             id: layerImg
-            anchors.centerIn: parent
-            width: Math.max(parent.width, parent.height) * 1.1
+            width: Math.max(parent.width, root.anchorHeight) * 1.1
             height: width
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -115,7 +118,8 @@ Item {
         }
 
         MultiEffect {
-            anchors.centerIn: parent
+            x: (parent.width - width) / 2
+            y: root.pinned ? 0 : (parent.height - height) / 2
             width: layerImg.width
             height: layerImg.height
             source: layerImg

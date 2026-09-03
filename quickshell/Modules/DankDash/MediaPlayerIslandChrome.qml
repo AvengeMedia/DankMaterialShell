@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
+import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -35,6 +36,11 @@ Item {
     readonly property real cardMargin: 18
     readonly property real artSize: 150
     readonly property real seekBlockHeight: 42
+    readonly property real seekbarHeight: 22
+    readonly property real seekWidthRatio: 0.9
+    readonly property real seekGapTop: 32
+    readonly property real seekGapBottom: 16
+    readonly property real seekTopMargin: root.seekGapTop - root.seekbarHeight / 2
     readonly property real transportHeight: 56
     readonly property real groupButtonSize: 44
     readonly property real groupOuterRadius: root.groupButtonSize / 2
@@ -53,7 +59,7 @@ Item {
         }
         return 0;
     }
-    readonly property real baseHeight: root.cardMargin * 2 + root.artSize + root.seekBlockHeight + root.transportHeight + Theme.spacingM * 2
+    readonly property real baseHeight: root.cardMargin * 2 + root.artSize + root.seekTopMargin + root.seekBlockHeight + root.seekGapBottom + root.transportHeight
 
     implicitHeight: root.baseHeight + (root.panel !== "" ? Theme.spacingM + root.panelHeight : 0)
 
@@ -71,6 +77,18 @@ Item {
     onLiveChanged: {
         if (root.live)
             root.panel = "";
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.player.wallpaperEnabled
+
+        sourceComponent: MediaArtBackdrop {
+            radius: 30
+            stableHeight: root.baseHeight
+            activePlayer: root.activePlayer
+            onArtReady: root.player.maybeFinishSwitch()
+        }
     }
 
     MediaPlayerEmptyState {
@@ -111,58 +129,63 @@ Item {
                 artUrl: root.artUrl
             }
 
-            Row {
+            ClippingRectangle {
                 id: buttonGroup
 
                 anchors {
                     right: parent.right
                     top: parent.top
                 }
-                spacing: Theme.spacingXXS
+                width: buttonRow.width
+                height: root.groupButtonSize
+                color: "transparent"
+                radius: root.groupOuterRadius
 
-                GroupButton {
-                    id: volumeButton
+                Row {
+                    id: buttonRow
 
-                    panelId: "volume"
-                    topLeftRadius: root.groupOuterRadius
-                    bottomLeftRadius: root.groupOuterRadius
-                    iconName: root.player.getVolumeIcon()
-                    enabled: root.player.volumeAvailable
+                    spacing: Theme.spacingXXS
 
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.NoButton
-                        onWheel: wheelEvent => {
-                            wheelEvent.accepted = true;
-                            root.player.adjustVolume((wheelEvent.angleDelta.y > 0 ? 1 : -1) * AudioService.wheelVolumeStep);
+                    GroupButton {
+                        id: volumeButton
+
+                        panelId: "volume"
+                        iconName: root.player.getVolumeIcon()
+                        enabled: root.player.volumeAvailable
+
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            onWheel: wheelEvent => {
+                                wheelEvent.accepted = true;
+                                root.player.adjustVolume((wheelEvent.angleDelta.y > 0 ? 1 : -1) * AudioService.wheelVolumeStep);
+                            }
                         }
                     }
-                }
 
-                GroupButton {
-                    id: outputButton
+                    GroupButton {
+                        id: outputButton
 
-                    panelId: "devices"
-                    iconName: root.player.getAudioDeviceIcon(AudioService.sink)
+                        panelId: "devices"
+                        iconName: root.player.getAudioDeviceIcon(AudioService.sink)
 
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.NoButton
-                        onWheel: wheelEvent => {
-                            wheelEvent.accepted = true;
-                            AudioService.cycleAudioOutputDirection(wheelEvent.angleDelta.y < 0);
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            onWheel: wheelEvent => {
+                                wheelEvent.accepted = true;
+                                AudioService.cycleAudioOutputDirection(wheelEvent.angleDelta.y < 0);
+                            }
                         }
                     }
-                }
 
-                GroupButton {
-                    id: sourceButton
+                    GroupButton {
+                        id: sourceButton
 
-                    panelId: "players"
-                    topRightRadius: root.groupOuterRadius
-                    bottomRightRadius: root.groupOuterRadius
-                    visible: (root.player.allPlayers?.length || 0) > 0
-                    iconName: "assistant_device"
+                        panelId: "players"
+                        visible: (root.player.allPlayers?.length || 0) > 0
+                        iconName: "assistant_device"
+                    }
                 }
             }
 
@@ -215,17 +238,17 @@ Item {
             id: seekBlock
 
             anchors {
-                left: parent.left
-                right: parent.right
+                horizontalCenter: parent.horizontalCenter
                 top: header.bottom
-                topMargin: Theme.spacingM
+                topMargin: root.seekTopMargin
             }
+            width: Math.round(parent.width * root.seekWidthRatio)
             height: root.seekBlockHeight
 
             DankSeekbar {
                 anchors.top: parent.top
                 width: parent.width
-                height: 22
+                height: root.seekbarHeight
                 activePlayer: root.activePlayer
                 stableLength: root.player.stableLength
                 accentColor: root.accent
@@ -268,7 +291,7 @@ Item {
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 top: seekBlock.bottom
-                topMargin: Theme.spacingM
+                topMargin: root.seekGapBottom
             }
             height: root.transportHeight
             spacing: Theme.spacingS

@@ -17,10 +17,14 @@ Item {
 
     implicitHeight: playerContent.height + playerContent.anchors.topMargin * 2
 
-    MediaArtBackdrop {
+    Loader {
         anchors.fill: parent
-        activePlayer: root.player.activePlayer
-        onArtReady: root.player.maybeFinishSwitch()
+        active: root.player.wallpaperEnabled
+
+        sourceComponent: MediaArtBackdrop {
+            activePlayer: root.player.activePlayer
+            onArtReady: root.player.maybeFinishSwitch()
+        }
     }
 
     MediaPlayerEmptyState {
