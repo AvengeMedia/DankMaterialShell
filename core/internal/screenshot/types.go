@@ -1,5 +1,7 @@
 package screenshot
 
+import "fmt"
+
 type Mode int
 
 const (
@@ -37,6 +39,10 @@ type Region struct {
 
 func (r Region) IsEmpty() bool {
 	return r.Width <= 0 || r.Height <= 0
+}
+
+func (r Region) GeometryString() string {
+	return fmt.Sprintf("%d,%d %dx%d", r.X, r.Y, r.Width, r.Height)
 }
 
 type Output struct {

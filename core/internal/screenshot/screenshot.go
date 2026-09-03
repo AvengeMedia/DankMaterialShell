@@ -47,6 +47,26 @@ func (o *WaylandOutput) effectiveScale() float64 {
 	return scale
 }
 
+func (o *WaylandOutput) bounds() Region {
+	x, y, w, h := o.x, o.y, o.width, o.height
+	if DetectCompositor() == CompositorHyprland {
+		if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
+			x, y, w, h = hx, hy, hw, hh
+		}
+	}
+	return Region{
+		X:      x,
+		Y:      y,
+		Width:  w,
+		Height: h,
+		Output: o.name,
+	}
+}
+
+func geometryResult(region Region) *CaptureResult {
+	return &CaptureResult{Region: region}
+}
+
 type Screenshoter struct {
 	config Config
 
@@ -117,9 +137,7 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 	}
 
 	if s.config.Geometry {
-		return &CaptureResult{
-			Region: lastRegion,
-		}, nil
+		return geometryResult(lastRegion), nil
 	}
 
 	output := s.findOutputForRegion(lastRegion)
@@ -182,9 +200,7 @@ func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 	}
 
 	if s.config.Geometry {
-		return &CaptureResult{
-			Region: region,
-		}, nil
+		return geometryResult(region), nil
 	}
 
 	var output *WaylandOutput
@@ -321,15 +337,7 @@ func (s *Screenshoter) captureFullScreen() (*CaptureResult, error) {
 	}
 
 	if s.config.Geometry {
-		return &CaptureResult{
-			Region: Region{
-				X:      output.x,
-				Y:      output.y,
-				Width:  output.width,
-				Height: output.height,
-				Output: output.name,
-			},
-		}, nil
+		return geometryResult(output.bounds()), nil
 	}
 
 	return s.captureWholeOutput(output)
@@ -351,15 +359,7 @@ func (s *Screenshoter) captureOutput(name string) (*CaptureResult, error) {
 	}
 
 	if s.config.Geometry {
-		return &CaptureResult{
-			Region: Region{
-				X:      output.x,
-				Y:      output.y,
-				Width:  output.width,
-				Height: output.height,
-				Output: output.name,
-			},
-		}, nil
+		return geometryResult(output.bounds()), nil
 	}
 
 	return s.captureWholeOutput(output)
@@ -381,27 +381,26 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 		minX, minY := math.MaxInt32, math.MaxInt32
 		maxX, maxY := math.MinInt32, math.MinInt32
 		for _, o := range outputs {
-			if int(o.x) < minX {
-				minX = int(o.x)
+			b := o.bounds()
+			if int(b.X) < minX {
+				minX = int(b.X)
 			}
-			if int(o.y) < minY {
-				minY = int(o.y)
+			if int(b.Y) < minY {
+				minY = int(b.Y)
 			}
-			if int(o.x+o.width) > maxX {
-				maxX = int(o.x + o.width)
+			if int(b.X+b.Width) > maxX {
+				maxX = int(b.X + b.Width)
 			}
-			if int(o.y+o.height) > maxY {
-				maxY = int(o.y + o.height)
+			if int(b.Y+b.Height) > maxY {
+				maxY = int(b.Y + b.Height)
 			}
 		}
-		return &CaptureResult{
-			Region: Region{
-				X:      int32(minX),
-				Y:      int32(minY),
-				Width:  int32(maxX - minX),
-				Height: int32(maxY - minY),
-			},
-		}, nil
+		return geometryResult(Region{
+			X:      int32(minX),
+			Y:      int32(minY),
+			Width:  int32(maxX - minX),
+			Height: int32(maxY - minY),
+		}), nil
 	}
 
 	if len(outputs) == 1 {
@@ -969,26 +968,16 @@ func (s *Screenshoter) findOutputForRegion(region Region) *WaylandOutput {
 	cy := region.Y + region.Height/2
 
 	for _, o := range s.outputs {
-		x, y, w, h := o.x, o.y, o.width, o.height
-		if DetectCompositor() == CompositorHyprland {
-			if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
-				x, y, w, h = hx, hy, hw, hh
-			}
-		}
-		if cx >= x && cx < x+w && cy >= y && cy < y+h {
+		b := o.bounds()
+		if cx >= b.X && cx < b.X+b.Width && cy >= b.Y && cy < b.Y+b.Height {
 			return o
 		}
 	}
 
 	for _, o := range s.outputs {
-		x, y, w, h := o.x, o.y, o.width, o.height
-		if DetectCompositor() == CompositorHyprland {
-			if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
-				x, y, w, h = hx, hy, hw, hh
-			}
-		}
-		if region.X >= x && region.X < x+w &&
-			region.Y >= y && region.Y < y+h {
+		b := o.bounds()
+		if region.X >= b.X && region.X < b.X+b.Width &&
+			region.Y >= b.Y && region.Y < b.Y+b.Height {
 			return o
 		}
 	}

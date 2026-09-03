@@ -1,7 +1,6 @@
 package screenshot
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -93,7 +92,7 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 				},
 			}
 
-			x, y, w, h, ok := r.selectedLogicalGeometry()
+			reg, ok := r.selectedLogicalGeometry()
 			if ok != tc.wantOK {
 				t.Fatalf("selectedLogicalGeometry() ok = %v, want %v", ok, tc.wantOK)
 			}
@@ -101,15 +100,22 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 				return
 			}
 
-			if x != tc.wantX || y != tc.wantY || w != tc.wantW || h != tc.wantH {
+			if int(reg.X) != tc.wantX || int(reg.Y) != tc.wantY || int(reg.Width) != tc.wantW || int(reg.Height) != tc.wantH {
 				t.Errorf("got (%d, %d, %d, %d), want (%d, %d, %d, %d)",
-					x, y, w, h, tc.wantX, tc.wantY, tc.wantW, tc.wantH)
+					reg.X, reg.Y, reg.Width, reg.Height, tc.wantX, tc.wantY, tc.wantW, tc.wantH)
 			}
 
-			formatted := fmt.Sprintf("%d,%d %dx%d", x, y, w, h)
+			formatted := reg.GeometryString()
 			if formatted != tc.wantFormatted {
 				t.Errorf("formatted = %q, want %q", formatted, tc.wantFormatted)
 			}
 		})
+	}
+}
+
+func TestRegionGeometryString(t *testing.T) {
+	r := Region{X: 1920, Y: 1080, Width: 800, Height: 600}
+	if got := r.GeometryString(); got != "1920,1080 800x600" {
+		t.Fatalf("GeometryString() = %q, want %q", got, "1920,1080 800x600")
 	}
 }

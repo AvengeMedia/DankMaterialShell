@@ -291,13 +291,15 @@ func runScreenshot(config screenshot.Config) {
 		fmt.Fprintln(os.Stderr, "Error: --json cannot be combined with --stdout")
 		os.Exit(1)
 	}
-	if ssGeometry && config.Stdout {
-		fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with --stdout")
-		os.Exit(1)
-	}
-	if ssGeometry && config.Mode == screenshot.ModeScroll {
-		fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with scroll mode")
-		os.Exit(1)
+	if config.Geometry {
+		if config.Stdout {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with --stdout")
+			os.Exit(1)
+		}
+		if config.Mode == screenshot.ModeScroll {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with scroll mode")
+			os.Exit(1)
+		}
 	}
 
 	// Short-lived process over a few tens of MB: let the heap grow instead of paying GC cycles mid-capture.
@@ -331,7 +333,7 @@ func runScreenshot(config screenshot.Config) {
 				Height: int(result.Region.Height),
 			})
 		} else {
-			fmt.Printf("%d,%d %dx%d\n", result.Region.X, result.Region.Y, result.Region.Width, result.Region.Height)
+			fmt.Println(result.Region.GeometryString())
 		}
 		os.Exit(0)
 	}

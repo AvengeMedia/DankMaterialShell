@@ -235,23 +235,11 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 	}
 
 	if r.screenshoter != nil && r.screenshoter.config.Geometry {
-		gx, gy, gw, gh, ok := r.selectedLogicalGeometry()
+		reg, ok := r.selectedLogicalGeometry()
 		if !ok {
 			return nil, true, nil
 		}
-		var outputName string
-		if r.selection.surface != nil && r.selection.surface.output != nil {
-			outputName = r.selection.surface.output.name
-		}
-		return &CaptureResult{
-			Region: Region{
-				X:      int32(gx),
-				Y:      int32(gy),
-				Width:  int32(gw),
-				Height: int32(gh),
-				Output: outputName,
-			},
-		}, false, nil
+		return geometryResult(reg), false, nil
 	}
 
 	if r.capturedBuffer == nil {
@@ -282,9 +270,9 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 	}, false, nil
 }
 
-func (r *RegionSelector) selectedLogicalGeometry() (x, y, w, h int, ok bool) {
+func (r *RegionSelector) selectedLogicalGeometry() (Region, bool) {
 	if !r.selection.hasSelection {
-		return 0, 0, 0, 0, false
+		return Region{}, false
 	}
 	minX := math.Min(r.selection.anchorX, r.selection.currentX)
 	minY := math.Min(r.selection.anchorY, r.selection.currentY)
@@ -302,9 +290,19 @@ func (r *RegionSelector) selectedLogicalGeometry() (x, y, w, h int, ok bool) {
 		lw, lh = size, size
 	}
 	if lw <= 0 || lh <= 0 {
-		return 0, 0, 0, 0, false
+		return Region{}, false
 	}
-	return x1, y1, lw, lh, true
+	var outputName string
+	if r.selection.surface != nil && r.selection.surface.output != nil {
+		outputName = r.selection.surface.output.name
+	}
+	return Region{
+		X:      int32(x1),
+		Y:      int32(y1),
+		Width:  int32(lw),
+		Height: int32(lh),
+		Output: outputName,
+	}, true
 }
 
 func (r *RegionSelector) connect() error {
