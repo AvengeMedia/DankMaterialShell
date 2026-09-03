@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modals.Common
+import qs.Services
 import qs.Modules.PowerMenu
 
 DankModal {
@@ -38,8 +39,7 @@ DankModal {
     customPosition: {
         if (parentBounds.width > 0) {
             const bar = SettingsData.getPrimaryBarConfig();
-            const barPadding = bar?.innerPadding ?? 4;
-            const effectiveBarThickness = Math.max(26 + barPadding * 0.6 + barPadding + 4, Theme.barHeight - 4 - (8 - barPadding));
+            const effectiveBarThickness = Theme.barThickness(bar?.innerPadding ?? 4, CompositorService.getScreenScale(parentScreen));
             const barExclusionZone = effectiveBarThickness + (bar?.spacing ?? 4) + (bar?.bottomGap ?? 0);
             const barPosition = bar?.position ?? SettingsData.Position.Top;
             const screenW = parentScreen?.width ?? 1920;

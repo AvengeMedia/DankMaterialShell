@@ -104,8 +104,7 @@ Item {
     }
 
     readonly property real effectiveBarThickness: {
-        const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
-        return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing;
+        return Theme.barThickness(storedBarConfig?.innerPadding ?? 4, dpr) + storedBarSpacing;
     }
 
     readonly property var barBounds: {

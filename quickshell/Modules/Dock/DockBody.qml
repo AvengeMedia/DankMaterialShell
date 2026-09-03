@@ -44,9 +44,7 @@ Item {
     function getBarHeight(barConfig) {
         if (!barConfig)
             return 0;
-        const innerPadding = barConfig.innerPadding ?? 4;
-        const widgetThickness = Math.max(20, 26 + innerPadding * 0.6);
-        const barThickness = Math.max(widgetThickness + innerPadding + 4, Theme.barHeight - 4 - (8 - innerPadding));
+        const barThickness = Theme.barThickness(barConfig.innerPadding ?? 4, CompositorService.getScreenScale(dock.screen));
         const spacing = barConfig.spacing ?? 4;
         const bottomGap = barConfig.bottomGap ?? 0;
         return barThickness + spacing + bottomGap;
