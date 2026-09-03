@@ -16,7 +16,6 @@ FloatingWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.cornerRadius
         color: root.surfaceColor
     }
 
@@ -26,7 +25,6 @@ FloatingWindow {
         blurY: 0
         blurWidth: root.visible ? root.width : 0
         blurHeight: root.visible ? root.height : 0
-        blurRadius: Theme.cornerRadius
     }
 
     Item {
@@ -39,7 +37,6 @@ FloatingWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.cornerRadius
         color: "transparent"
         border.color: BlurService.borderColor
         border.width: BlurService.borderWidth
