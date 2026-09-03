@@ -35,8 +35,8 @@ Item {
     readonly property string scrollYBehavior: satelliteConfig?.scrollYBehavior ?? "workspace"
     readonly property real screenScale: CompositorService.getScreenScale(root.targetScreen)
     readonly property real innerPadding: root.satelliteConfig?.innerPadding ?? 4
-    readonly property real widgetThickness: Theme.snapEven(Math.max(20, 26 + root.innerPadding * 0.6), root.screenScale)
-    readonly property real barThickness: Theme.snapEven(Math.max(root.widgetThickness + root.innerPadding + 4, Theme.barHeight - 4 - (8 - root.innerPadding)), root.screenScale)
+    readonly property real widgetThickness: Theme.barWidgetThickness(root.innerPadding, root.screenScale)
+    readonly property real barThickness: Theme.barThickness(root.innerPadding, root.screenScale)
     readonly property real satelliteSpacing: root.satelliteConfig?.spacing ?? 4
     readonly property bool edgeAligned: SettingsData.dankIslandSatellitePosition === "edges"
     readonly property real edgeBaseMargin: Math.max(Theme.spacingXS, root.innerPadding * 0.8)

@@ -2111,6 +2111,14 @@ Singleton {
         return Math.round(value * s) / s;
     }
 
+    function barWidgetThickness(innerPadding, dpr) {
+        return snapEven(Math.max(20, 26 + innerPadding * 0.6), dpr);
+    }
+
+    function barThickness(innerPadding, dpr) {
+        return snapEven(Math.max(barWidgetThickness(innerPadding, dpr) + innerPadding + 4, barHeight - 4 - (8 - innerPadding)), dpr);
+    }
+
     function hairline(dpr) {
         return 1 / (dpr || 1);
     }

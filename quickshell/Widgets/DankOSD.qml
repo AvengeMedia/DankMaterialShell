@@ -140,8 +140,7 @@ PanelWindow {
             if (!SettingsData.barConfigCoversScreen(bc, screen))
                 continue;
             const innerPadding = bc.innerPadding ?? (defaultBar?.innerPadding ?? 4);
-            const widgetThickness = Math.max(20, 26 + innerPadding * 0.6);
-            const thickness = Math.max(widgetThickness + innerPadding + 4, Theme.barHeight - 4 - (8 - innerPadding));
+            const thickness = Theme.barThickness(innerPadding, dpr);
             const spacing = bc.spacing ?? (defaultBar?.spacing ?? 4);
             const bottomGap = bc.bottomGap ?? (defaultBar?.bottomGap ?? 0);
             const offset = thickness + spacing + bottomGap;

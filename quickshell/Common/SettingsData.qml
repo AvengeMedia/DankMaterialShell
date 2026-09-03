@@ -2304,7 +2304,7 @@ Singleton {
                 continue;
             const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
             const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-            const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing;
+            const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing;
 
             const useAutoGaps = other.popupGapsAuto !== undefined ? other.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
             const manualGap = other.popupGapsManual !== undefined ? other.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
@@ -2380,7 +2380,7 @@ Singleton {
                     continue;
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-                const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize;
+                const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing + wingSize;
                 const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
 
                 switch (other.position) {
