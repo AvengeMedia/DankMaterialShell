@@ -1520,20 +1520,35 @@ Singleton {
         return 2 * Math.round((barThickness / 48) * (size + defaultOffset) * s / 2);
     }
 
-    // A widget that carries no icon, the clock above all, is centred as a whole
-    // line box, so the same parity rule as snapEven applies to it. At
-    // fontSizeSmall that box is 15 px tall and has no exact centre in an even
-    // pill, one step up it is 16 px and the widget lands on the grid. The 0.9
-    // branch already comes out at 14 px and stays where it is.
     function barTextSize(barThickness, fontScale, maximizeText) {
         const scale = barThickness / 48;
         const dankBarScale = fontScale !== undefined ? fontScale : 1.0;
         const maxScale = (maximizeText ?? false) ? 1.5 : 1.0;
         if (scale <= 0.75)
-            return Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale);
+            return evenLineBoxSize(Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale));
         if (scale >= 1.25)
-            return Math.round(fontSizeMedium * dankBarScale * maxScale);
-        return Math.round((fontSizeSmall + 1) * dankBarScale * maxScale);
+            return evenLineBoxSize(Math.round(fontSizeMedium * dankBarScale * maxScale));
+        return evenLineBoxSize(Math.round(fontSizeSmall * dankBarScale * maxScale));
+    }
+
+    FontMetrics {
+        id: lineBoxProbe
+    }
+
+    // Text.implicitHeight is ceil(FontMetrics.height); probe.font is written whole and read via boundingRect() so bindings capture no dependency on the probe
+    function lineBoxHeight(pixelSize) {
+        lineBoxProbe.font = Qt.font({
+            family: fontFamily,
+            weight: fontWeight,
+            pixelSize: pixelSize
+        });
+        return Math.ceil(lineBoxProbe.boundingRect("0").height);
+    }
+
+    function evenLineBoxSize(pixelSize) {
+        if (lineBoxHeight(pixelSize) % 2 === 0)
+            return pixelSize;
+        return lineBoxHeight(pixelSize + 1) % 2 === 0 ? pixelSize + 1 : pixelSize;
     }
 
     function getBatteryIcon(level, isCharging, batteryAvailable) {
@@ -2085,11 +2100,10 @@ Singleton {
         return Math.round(value * s) / s;
     }
 
-    // Whole pairs of pixels. Qt rounds the offset of a centred anchor to whole
-    // pixels, so anything that content gets centred in has to keep its parity
-    // aligned with that content or the content lands on a half pixel.
-    function snapEven(value) {
-        return 2 * Math.round(value / 2);
+    // Qt rounds a centred anchor offset to whole pixels, so a box must share its content's parity
+    function snapEven(value, dpr) {
+        const s = dpr || 1;
+        return 2 * Math.round(value * s / 2) / s;
     }
 
     function px(value, dpr) {

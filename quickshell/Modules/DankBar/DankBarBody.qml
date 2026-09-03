@@ -611,7 +611,7 @@ Item {
         return length > 0 ? Math.min(pad, Math.max(0, length / 2 - effectiveSpacing)) : pad;
     }
     readonly property bool effectiveOpenOnOverview: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
-    readonly property real widgetThickness: Theme.snapEven(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6))
+    readonly property real widgetThickness: Theme.snapEven(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
 
     readonly property bool hasAdjacentTopBar: {
         if (barConfig?.autoHide ?? false)
