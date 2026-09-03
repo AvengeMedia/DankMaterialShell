@@ -1010,6 +1010,7 @@ Singleton {
     property int dankIslandHoverCloseDelay: 150
     property string dankIslandPalette: "default"
     property real dankIslandTransparency: 1
+    property int dankIslandCornerRadius: 34
     property bool dankIslandHighContrast: false
     property bool dankIslandMediaClockVisible: true
     property bool dankIslandNotificationBadgeClearOnOpen: false

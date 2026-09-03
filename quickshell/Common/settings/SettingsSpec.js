@@ -546,6 +546,7 @@ var SPEC = {
     dankIslandHoverCloseDelay: { def: 150 },
     dankIslandPalette: { def: "default" },
     dankIslandTransparency: { def: 1 },
+    dankIslandCornerRadius: { def: 34 },
     dankIslandHighContrast: { def: false },
     dankIslandMediaClockVisible: { def: true },
     dankIslandNotificationBadgeClearOnOpen: { def: false },

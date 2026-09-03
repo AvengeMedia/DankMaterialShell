@@ -12501,21 +12501,21 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteSwoopRadius",
+    "section": "dankIslandCornerRadius",
     "label": "Corner Radius",
     "tabIndex": 46,
     "category": "Island",
     "keywords": [
+      "appearance",
       "corner",
       "corners",
-      "goth",
+      "expanded",
       "island",
+      "pill",
       "radius",
       "round",
       "rounded",
-      "satellite",
-      "size",
-      "sweep"
+      "rounding"
     ],
     "conditionKey": "islandEnabled"
   },
@@ -12636,6 +12636,25 @@
       "windows"
     ],
     "description": "Floats above windows and other content",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "dankIslandSatelliteSwoopRadius",
+    "label": "Goth Corner Radius",
+    "tabIndex": 46,
+    "category": "Island",
+    "keywords": [
+      "corner",
+      "corners",
+      "goth",
+      "island",
+      "radius",
+      "round",
+      "rounded",
+      "satellite",
+      "size",
+      "sweep"
+    ],
     "conditionKey": "islandEnabled"
   },
   {

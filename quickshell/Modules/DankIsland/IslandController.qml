@@ -32,8 +32,10 @@ QtObject {
     property real horizontalOffset: 0
     property real outerGap: 8
     readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real anchoredRadius: bottomEdge ? 34 : 26
-    readonly property real freeRadius: bottomEdge ? 26 : 34
+    readonly property real cornerRadius: Math.max(0, Math.min(64, SettingsData.dankIslandCornerRadius))
+    readonly property real edgeCornerRadius: Math.round(cornerRadius * 0.75)
+    readonly property real topCornerRadius: bottomEdge ? cornerRadius : edgeCornerRadius
+    readonly property real bottomCornerRadius: bottomEdge ? edgeCornerRadius : cornerRadius
     property real compactHeight: 38
     property int transientTimeout: 2200
     property int notificationTimeout: 5000
@@ -290,7 +292,7 @@ QtObject {
     readonly property real mediaCompactWidth: Math.ceil(Math.max(1, mediaContentWidth))
 
     function pillTarget(width, height) {
-        const radius = height / 2;
+        const radius = Math.min(height / 2, root.cornerRadius);
         return {
             "width": width,
             "height": height,
@@ -309,10 +311,10 @@ QtObject {
             "height": height,
             "offsetX": root.horizontalOffset,
             "offsetY": root.outerGap,
-            "topLeftRadius": root.anchoredRadius,
-            "topRightRadius": root.anchoredRadius,
-            "bottomLeftRadius": root.freeRadius,
-            "bottomRightRadius": root.freeRadius
+            "topLeftRadius": root.topCornerRadius,
+            "topRightRadius": root.topCornerRadius,
+            "bottomLeftRadius": root.bottomCornerRadius,
+            "bottomRightRadius": root.bottomCornerRadius
         };
     }
 

@@ -38,14 +38,8 @@ Item {
         return Theme.surfaceContainerHigh;
     }
     readonly property bool popupStyled: root.controller.expanded
-    readonly property real compactOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandTransparency))
-    readonly property color effectiveSurfaceColor: {
-        if (root.highContrast)
-            return Theme.surfaceContainerHighest;
-        if (root.popupStyled)
-            return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
-        return Theme.withAlpha(root.surfaceColor, root.compactOpacity);
-    }
+    readonly property real islandOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandTransparency))
+    readonly property color effectiveSurfaceColor: root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {

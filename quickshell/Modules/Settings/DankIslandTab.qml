@@ -301,6 +301,19 @@ Item {
                     onSliderValueChanged: value => SettingsData.set("dankIslandTransparency", value / 100)
                 }
 
+                SettingsSliderRow {
+                    settingKey: "dankIslandCornerRadius"
+                    tags: ["island", "appearance", "corner", "radius", "rounding", "pill", "expanded"]
+                    text: I18n.tr("Corner Radius", "island settings: island corner radius slider")
+                    unit: "px"
+                    minimum: 0
+                    maximum: 64
+                    step: 1
+                    defaultValue: 34
+                    value: SettingsData.dankIslandCornerRadius
+                    onSliderValueChanged: value => SettingsData.set("dankIslandCornerRadius", value)
+                }
+
                 SettingsToggleRow {
                     settingKey: "dankIslandHighContrast"
                     tags: ["island", "appearance", "contrast", "accessibility", "outline"]
@@ -402,7 +415,7 @@ Item {
                 SettingsSliderRow {
                     settingKey: "dankIslandSatelliteSwoopRadius"
                     tags: ["island", "satellite", "goth", "corners", "radius", "sweep", "size"]
-                    text: I18n.tr("Corner Radius", "island settings: satellite goth corner radius slider")
+                    text: I18n.tr("Goth Corner Radius", "island settings: satellite goth corner radius slider")
                     unit: "px"
                     minimum: 4
                     maximum: 64

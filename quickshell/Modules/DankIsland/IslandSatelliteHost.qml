@@ -72,6 +72,7 @@ Item {
     }
     readonly property color chromeColor: Theme.withAlpha(root.chromeBase, root.chromeOpacity)
     readonly property bool chromeTranslucent: root.backgroundEnabled && root.chromeOpacity > 0 && root.chromeOpacity < 1
+    readonly property bool chromeCoversWidgets: root.backgroundEnabled && root.chromeOpacity > 0
     readonly property real islandOpacity: root.islandSurface?.surfaceOpacity ?? 1
     readonly property bool islandTranslucent: root.islandOpacity > 0 && root.islandOpacity < 1
     readonly property bool tracksIsland: !root.edgeAligned && root.visible
@@ -190,7 +191,7 @@ Item {
         }
         if (!BlurService.enabled)
             return;
-        const widgets = root._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
+        const widgets = root.chromeCoversWidgets ? [] : root._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
         const chromes = [leftChrome, rightChrome].filter(c => root.chromeTranslucent && c.visible);
         if (chromes.length === 0 && widgets.length === 0 && !root.islandTranslucent)
             return;
@@ -233,6 +234,7 @@ Item {
     }
 
     onChromeTranslucentChanged: blurRebuildTimer.restart()
+    onChromeCoversWidgetsChanged: blurRebuildTimer.restart()
     onEdgeAlignedChanged: {
         blurRebuildTimer.restart();
         blurTrailTimer.restart();
