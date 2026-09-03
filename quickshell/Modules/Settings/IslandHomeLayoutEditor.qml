@@ -12,7 +12,7 @@ Item {
     property string settingKey: "dankIslandHomeLayout"
     readonly property var groupIds: SettingsData._islandHomeGroupIds
     readonly property var layout: SettingsData.getIslandHomeLayout()
-    readonly property bool isHighlighted: SettingsSearchService.highlightSection === settingKey
+    readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
 
     readonly property var presentation: ({
             "media": {
@@ -52,7 +52,7 @@ Item {
             }
         })
 
-    readonly property real rowHeight: 64
+    readonly property real rowHeight: 72
     readonly property real rowSpacing: Theme.spacingS
     readonly property real dividerGap: 40
 
@@ -157,7 +157,7 @@ Item {
         const order = enabledOrder.concat(disabledOrder);
         if (order.length === 0)
             return;
-        if (move && highlightedId !== "" && highlightedId !== "clock" && isEnabled(highlightedId)) {
+        if (move && highlightedId !== "" && isEnabled(highlightedId)) {
             moveEnabled(highlightedId, dir);
             return;
         }
@@ -210,7 +210,7 @@ Item {
 
         width: parent.width
         height: root.dividerGap
-        y: root.dividerY + root.rowSpacing / 2
+        y: root.dividerY
         opacity: root.hasHidden ? 1 : 0
         visible: opacity > 0.01
 
@@ -276,7 +276,8 @@ Item {
             readonly property bool isEnabled: root.isEnabled(modelData)
             readonly property bool dragging: root.draggingId === modelData
             readonly property bool highlighted: root.highlightedId === modelData
-            readonly property bool draggable: isEnabled && !isClock
+            readonly property bool draggable: isEnabled
+            readonly property real surfaceAlphaScale: isClock ? 0.5 : (isEnabled ? 0.7 : 0.4)
 
             width: root.width
             height: root.rowHeight
@@ -320,9 +321,7 @@ Item {
                     to: {
                         if (rowItem.dragging)
                             return Theme.secondaryContainer;
-                        if (rowItem.isClock)
-                            return Theme.withAlpha(Theme.primaryContainer, 0.35);
-                        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * (rowItem.isEnabled ? 0.7 : 0.4) : 0);
+                        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * rowItem.surfaceAlphaScale : 0);
                     }
                     duration: Theme.shortDuration
                 }
@@ -407,6 +406,16 @@ Item {
                     }
                 }
 
+                DankIcon {
+                    name: "lock"
+                    size: 16
+                    color: Theme.outline
+                    opacity: 0.6
+                    anchors.horizontalCenter: visibilityButton.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: rowItem.isClock
+                }
+
                 DankActionButton {
                     id: visibilityButton
 
@@ -431,7 +440,7 @@ Item {
                 id: dragArea
 
                 anchors.fill: parent
-                anchors.rightMargin: rowItem.isClock ? 0 : 48
+                anchors.rightMargin: 48
                 hoverEnabled: true
                 enabled: rowItem.draggable
                 cursorShape: rowItem.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
