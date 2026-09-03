@@ -67,8 +67,9 @@ type scrollSession struct {
 	cancelW                int
 	btnH                   int
 
-	// preview panel geometry in overlay buffer pixels
+	// preview panel geometry and window in overlay buffer pixels
 	previewX, previewY, previewW, previewH int
+	previewStartRow, previewRows           int
 	hasPreview                             bool
 
 	sigCh     chan os.Signal
@@ -220,10 +221,10 @@ func (r *RegionSelector) layoutScrollBar(os *OutputSurface) {
 	s.cancelY = s.doneY
 }
 
-func (r *RegionSelector) scrollPreviewPanel(os *OutputSurface) (x, y, w, h int, ok bool) {
+func (r *RegionSelector) scrollPreviewPanel(os *OutputSurface) (x, y, w, h int, startRow, previewRows int, ok bool) {
 	s := r.scroll
 	if s == nil || s.st == nil || s.frameW <= 0 || s.st.rows() <= 0 || os == nil || os.screenBuf == nil {
-		return 0, 0, 0, 0, false
+		return 0, 0, 0, 0, 0, 0, false
 	}
 
 	bufW, bufH := os.screenBuf.Width, os.screenBuf.Height
@@ -264,15 +265,24 @@ func (r *RegionSelector) scrollPreviewPanel(os *OutputSurface) (x, y, w, h int, 
 	maxHeight := min(maxImageH, bufH-margin*2)
 	availableWidth := sideGap - (margin*2 + padding*2)
 	if maxHeight <= 0 || availableWidth < minImageW {
-		return 0, 0, 0, 0, false
+		return 0, 0, 0, 0, 0, 0, false
 	}
 
-	aspect := float64(s.frameW) / float64(s.st.rows())
+	totalRows := s.st.rows()
+	maxPreviewRows := int(float64(s.frameW) * float64(maxHeight) / float64(minImageW))
+	startRow = 0
+	previewRows = totalRows
+	if maxPreviewRows > 0 && totalRows > maxPreviewRows {
+		startRow = totalRows - maxPreviewRows
+		previewRows = maxPreviewRows
+	}
+
+	aspect := float64(s.frameW) / float64(previewRows)
 	imageWidth := int(float64(maxHeight)*aspect + 0.5)
 	imageWidth = min(imageWidth, maxImageW)
 	imageWidth = min(imageWidth, availableWidth)
 	if imageWidth < minImageW {
-		return 0, 0, 0, 0, false
+		return 0, 0, 0, 0, 0, 0, false
 	}
 
 	imageHeight := max(int(float64(imageWidth)/aspect+0.5), 1)
@@ -289,7 +299,7 @@ func (r *RegionSelector) scrollPreviewPanel(os *OutputSurface) (x, y, w, h int, 
 	panelY := selY + (selH-panelHeight)/2
 	panelY = clamp(panelY, margin, bufH-margin-panelHeight)
 
-	return panelX, panelY, panelWidth, panelHeight, true
+	return panelX, panelY, panelWidth, panelHeight, startRow, previewRows, true
 }
 
 func (r *RegionSelector) updateScrollPreviewLayout(os *OutputSurface) {
@@ -297,9 +307,10 @@ func (r *RegionSelector) updateScrollPreviewLayout(os *OutputSurface) {
 	if s == nil || os == nil {
 		return
 	}
-	px, py, pw, ph, ok := r.scrollPreviewPanel(os)
+	px, py, pw, ph, startRow, previewRows, ok := r.scrollPreviewPanel(os)
 	changed := s.hasPreview != ok || s.previewX != px || s.previewY != py || s.previewW != pw || s.previewH != ph
 	s.previewX, s.previewY, s.previewW, s.previewH = px, py, pw, ph
+	s.previewStartRow, s.previewRows = startRow, previewRows
 	s.hasPreview = ok
 
 	if changed {

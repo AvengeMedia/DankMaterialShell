@@ -37,9 +37,12 @@ func TestScrollPreviewPanelLayoutRight(t *testing.T) {
 		},
 	}
 
-	x, y, w, h, ok := r.scrollPreviewPanel(os)
+	x, y, w, h, startRow, previewRows, ok := r.scrollPreviewPanel(os)
 	if !ok {
 		t.Fatalf("expected scrollPreviewPanel to succeed, got ok=false")
+	}
+	if startRow != 0 || previewRows != 1200 {
+		t.Errorf("expected full canvas window (0, 1200), got (%d, %d)", startRow, previewRows)
 	}
 
 	// Selection is at x=100..700. Right gap is 1920 - 700 = 1220; left gap is 100.
@@ -53,7 +56,7 @@ func TestScrollPreviewPanelLayoutRight(t *testing.T) {
 	if y < 0 || y+h > 1080 {
 		t.Errorf("panel y=%d h=%d out of screen bounds [0, 1080]", y, h)
 	}
-	if w <= 0 || h <= 0 {
+	if y < 0 || y+h > 1080 || w <= 0 || h <= 0 {
 		t.Errorf("invalid dimensions w=%d h=%d", w, h)
 	}
 }
@@ -75,7 +78,7 @@ func TestScrollPreviewPanelLayoutLeft(t *testing.T) {
 		},
 	}
 
-	x, y, w, h, ok := r.scrollPreviewPanel(os)
+	x, y, w, h, _, _, ok := r.scrollPreviewPanel(os)
 	if !ok {
 		t.Fatalf("expected scrollPreviewPanel to succeed, got ok=false")
 	}
@@ -110,9 +113,46 @@ func TestScrollPreviewPanelInsufficientSpace(t *testing.T) {
 		},
 	}
 
-	_, _, _, _, ok := r.scrollPreviewPanel(os)
+	_, _, _, _, _, _, ok := r.scrollPreviewPanel(os)
 	if ok {
 		t.Fatalf("expected scrollPreviewPanel to return false when side gaps are too small")
+	}
+}
+
+func TestScrollPreviewPanelBoundedTailLongCapture(t *testing.T) {
+	os := createMockScrollSurface(1920, 1080, 1920, 1080)
+	st := newStitcher(600 * 4)
+	totalRows := 10000
+	st.canvas = make([]byte, 600*4*totalRows)
+	st.cols = make([]rowCols, totalRows)
+
+	r := &RegionSelector{
+		scroll: &scrollSession{
+			holeX:  100,
+			holeY:  100,
+			holeW:  600,
+			holeH:  800,
+			frameW: 600,
+			st:     st,
+		},
+	}
+
+	x, y, w, h, startRow, previewRows, ok := r.scrollPreviewPanel(os)
+	if !ok {
+		t.Fatalf("expected scrollPreviewPanel to succeed on long capture, got ok=false")
+	}
+
+	if startRow <= 0 {
+		t.Errorf("expected startRow > 0 for 10000-row capture, got %d", startRow)
+	}
+	if startRow+previewRows != totalRows {
+		t.Errorf("expected startRow (%d) + previewRows (%d) == %d", startRow, previewRows, totalRows)
+	}
+	if y < 0 || y+h > 1080 || w <= 0 || h <= 0 {
+		t.Errorf("invalid dimensions w=%d, h=%d", w, h)
+	}
+	if x <= r.scroll.holeX+r.scroll.holeW {
+		t.Errorf("panel x=%d should be to the right of hole end", x)
 	}
 }
 

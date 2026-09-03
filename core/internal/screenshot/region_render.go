@@ -536,8 +536,18 @@ func (r *RegionSelector) drawScrollPreview(data []byte, stride, bufW, bufH int, 
 
 	needSwap := formatIsBGR(uint32(s.format)) != formatIsBGR(format)
 
+	startRow := s.previewStartRow
+	previewRows := s.previewRows
+	if previewRows <= 0 || startRow < 0 || startRow+previewRows > sourceRows {
+		startRow = 0
+		previewRows = sourceRows
+	}
+
 	for y := range imageH {
-		srcY := y * sourceRows / imageH
+		srcY := startRow + y*previewRows/imageH
+		if srcY >= sourceRows {
+			srcY = sourceRows - 1
+		}
 		dstY := imageY + y
 		if dstY < 0 || dstY >= bufH {
 			continue
