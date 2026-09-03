@@ -2,6 +2,7 @@ package screenshot
 
 import (
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -229,7 +230,31 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		return nil, false, r.scroll.abortErr
 	}
 
-	if r.cancelled || r.capturedBuffer == nil {
+	if r.cancelled {
+		return nil, true, nil
+	}
+
+	if r.screenshoter != nil && r.screenshoter.config.Geometry {
+		gx, gy, gw, gh, ok := r.selectedLogicalGeometry()
+		if !ok {
+			return nil, true, nil
+		}
+		var outputName string
+		if r.selection.surface != nil && r.selection.surface.output != nil {
+			outputName = r.selection.surface.output.name
+		}
+		return &CaptureResult{
+			Region: Region{
+				X:      int32(gx),
+				Y:      int32(gy),
+				Width:  int32(gw),
+				Height: int32(gh),
+				Output: outputName,
+			},
+		}, false, nil
+	}
+
+	if r.capturedBuffer == nil {
 		return nil, r.cancelled, nil
 	}
 
@@ -255,6 +280,31 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		Format:    format,
 		Scale:     scale,
 	}, false, nil
+}
+
+func (r *RegionSelector) selectedLogicalGeometry() (x, y, w, h int, ok bool) {
+	if !r.selection.hasSelection {
+		return 0, 0, 0, 0, false
+	}
+	minX := math.Min(r.selection.anchorX, r.selection.currentX)
+	minY := math.Min(r.selection.anchorY, r.selection.currentY)
+	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
+	maxY := math.Max(r.selection.anchorY, r.selection.currentY)
+
+	x1 := int(math.Round(minX))
+	y1 := int(math.Round(minY))
+	x2 := int(math.Round(maxX))
+	y2 := int(math.Round(maxY))
+	lw := x2 - x1
+	lh := y2 - y1
+	if r.shiftHeld {
+		size := min(lw, lh)
+		lw, lh = size, size
+	}
+	if lw <= 0 || lh <= 0 {
+		return 0, 0, 0, 0, false
+	}
+	return x1, y1, lw, lh, true
 }
 
 func (r *RegionSelector) connect() error {

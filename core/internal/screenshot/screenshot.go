@@ -116,6 +116,12 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 		return s.captureRegion()
 	}
 
+	if s.config.Geometry {
+		return &CaptureResult{
+			Region: lastRegion,
+		}, nil
+	}
+
 	output := s.findOutputForRegion(lastRegion)
 	if output == nil {
 		return s.captureRegion()
@@ -173,6 +179,12 @@ func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 		Y:      geom.Y,
 		Width:  geom.Width,
 		Height: geom.Height,
+	}
+
+	if s.config.Geometry {
+		return &CaptureResult{
+			Region: region,
+		}, nil
 	}
 
 	var output *WaylandOutput
@@ -308,6 +320,18 @@ func (s *Screenshoter) captureFullScreen() (*CaptureResult, error) {
 		return nil, fmt.Errorf("no output available")
 	}
 
+	if s.config.Geometry {
+		return &CaptureResult{
+			Region: Region{
+				X:      output.x,
+				Y:      output.y,
+				Width:  output.width,
+				Height: output.height,
+				Output: output.name,
+			},
+		}, nil
+	}
+
 	return s.captureWholeOutput(output)
 }
 
@@ -326,6 +350,18 @@ func (s *Screenshoter) captureOutput(name string) (*CaptureResult, error) {
 		return nil, fmt.Errorf("output %q not found", name)
 	}
 
+	if s.config.Geometry {
+		return &CaptureResult{
+			Region: Region{
+				X:      output.x,
+				Y:      output.y,
+				Width:  output.width,
+				Height: output.height,
+				Output: output.name,
+			},
+		}, nil
+	}
+
 	return s.captureWholeOutput(output)
 }
 
@@ -340,6 +376,34 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 	if len(outputs) == 0 {
 		return nil, fmt.Errorf("no outputs available")
 	}
+
+	if s.config.Geometry {
+		minX, minY := math.MaxInt32, math.MaxInt32
+		maxX, maxY := math.MinInt32, math.MinInt32
+		for _, o := range outputs {
+			if int(o.x) < minX {
+				minX = int(o.x)
+			}
+			if int(o.y) < minY {
+				minY = int(o.y)
+			}
+			if int(o.x+o.width) > maxX {
+				maxX = int(o.x + o.width)
+			}
+			if int(o.y+o.height) > maxY {
+				maxY = int(o.y + o.height)
+			}
+		}
+		return &CaptureResult{
+			Region: Region{
+				X:      int32(minX),
+				Y:      int32(minY),
+				Width:  int32(maxX - minX),
+				Height: int32(maxY - minY),
+			},
+		}, nil
+	}
+
 	if len(outputs) == 1 {
 		return s.captureWholeOutput(outputs[0])
 	}

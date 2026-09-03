@@ -63,6 +63,7 @@ type Config struct {
 	SaveFile   bool
 	Notify     bool
 	Stdout     bool
+	Geometry   bool
 	IntervalMs int
 	// SelectorHook runs as the interactive selector starts (true) and ends (false).
 	SelectorHook func(begin bool)
