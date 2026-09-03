@@ -559,13 +559,6 @@ Singleton {
     }
 
     function getLocationFromCoords(lat, lon) {
-        const configuredName = SettingsData.weatherLocation;
-        if (configuredName) {
-            setLocation(lat, lon, configuredName, "");
-            fetchWeather(lat, lon);
-            return;
-        }
-
         // Use coordinates immediately for weather; resolve city name in parallel with fallbacks
         setLocation(lat, lon, I18n.tr("Local Weather"), "");
         fetchWeather(lat, lon);
@@ -855,7 +848,7 @@ Singleton {
                         throw new Error("Missing or invalid location data");
                     }
 
-                    setLocation(lat, lon, city, data.countryName || "");
+                    setLocation(lat, lon, city, data.country || "");
                     fetchWeather(lat, lon);
                 } catch (e) {
                     root.handleWeatherFailure();
