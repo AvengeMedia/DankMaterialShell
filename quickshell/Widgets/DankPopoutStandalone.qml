@@ -395,6 +395,19 @@ Item {
         closeTimer.restart();
     }
 
+    function instantClose() {
+        closeTimer.stop();
+        animationsEnabled = false;
+        isClosing = false;
+        shouldBeVisible = false;
+        _primeContent = false;
+        contentWindow.visible = false;
+        backgroundWindow.visible = false;
+        PopoutManager.hidePopout(popoutHandle);
+        popoutClosed();
+        Qt.callLater(() => animationsEnabled = true);
+    }
+
     function toggle() {
         shouldBeVisible ? close() : open();
     }

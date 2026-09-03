@@ -520,6 +520,21 @@ Item {
         closeTimer.restart();
     }
 
+    function instantClose() {
+        closeTimer.stop();
+        _endMorphTravel();
+        _resetPublishedBody();
+        animationsEnabled = false;
+        isClosing = false;
+        shouldBeVisible = false;
+        _keyboardReady = false;
+        _primeContent = false;
+        contentWindow.visible = false;
+        PopoutManager.hidePopout(popoutHandle);
+        popoutClosed();
+        Qt.callLater(() => animationsEnabled = true);
+    }
+
     function toggle() {
         shouldBeVisible ? close() : open();
     }
