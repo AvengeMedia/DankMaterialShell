@@ -44,7 +44,7 @@ Item {
     function getBarHeight(barConfig) {
         if (!barConfig)
             return 0;
-        const barThickness = Theme.barThickness(barConfig.innerPadding ?? 4, dock._dpr);
+        const barThickness = Theme.barThickness(barConfig.innerPadding ?? 4, CompositorService.getScreenScale(dock.screen));
         const spacing = barConfig.spacing ?? 4;
         const bottomGap = barConfig.bottomGap ?? 0;
         return barThickness + spacing + bottomGap;
