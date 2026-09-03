@@ -197,7 +197,7 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		return nil, nil
 	}
 
-	if result.Region.Output != "" {
+	if !s.config.Geometry && result.Region.Output != "" {
 		if err := SaveLastRegion(result.Region); err != nil {
 			log.Debug("failed to save last region", "err", err)
 		}
@@ -212,6 +212,9 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 
 func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 	if DetectCompositor() == CompositorNiri {
+		if s.config.Geometry {
+			return nil, fmt.Errorf("window geometry mode is not supported on niri")
+		}
 		return s.captureNiriWindow()
 	}
 
