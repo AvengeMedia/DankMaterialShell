@@ -91,11 +91,12 @@ func (c *ColorMode) GTKTheme() string {
 }
 
 var (
-	matugenVersionMu   sync.Mutex
-	matugenVersionOK   bool
-	matugenSupportsCOE bool
-	matugenIsV4        bool
-	matugenIsV42       bool
+	matugenVersionMu      sync.Mutex
+	matugenVersionOK      bool
+	matugenSupportsCOE    bool
+	matugenIsV4           bool
+	matugenIsV42          bool
+	matugenSupportsPrefer bool
 )
 
 type Options struct {
@@ -108,6 +109,7 @@ type Options struct {
 	IconTheme           string
 	MatugenType         string
 	Contrast            float64
+	SourceMode          string
 	RunUserTemplates    bool
 	ColorsOnly          bool
 	StockColors         string
@@ -344,6 +346,28 @@ func buildOnce(opts *Options) (bool, error) {
 	var primaryDark, primaryLight, surface string
 	var dank16JSON string
 	var importArgs []string
+	var sourceImage string
+
+	// Colorful mode resolves the seed here, before matugen is invoked at all,
+	// by rewriting the source to the extracted hex. Both the dry-run and the
+	// real run below read opts.Kind/opts.Value, so one rewrite covers both and
+	// they cannot disagree about the seed. Extraction failure (a format
+	// image.Decode cannot read, an unreadable file) falls through to matugen's
+	// own extraction: this must never fail a theme build.
+	if opts.StockColors == "" && opts.Kind == "image" && opts.SourceMode == SourceModeColorful {
+		if seed, err := ExtractSourceColor(opts.Value); err != nil {
+			log.Warnf("Colorful source extraction failed for %s, using matugen's own: %v", opts.Value, err)
+		} else {
+			log.Infof("Colorful source color: %s -> %s", opts.Value, seed)
+			// matugen resolves {{image}} to an absolute path, so match it.
+			sourceImage = opts.Value
+			if abs, err := filepath.Abs(sourceImage); err == nil {
+				sourceImage = abs
+			}
+			opts.Kind = "hex"
+			opts.Value = seed
+		}
+	}
 
 	if opts.StockColors != "" {
 		log.Info("Using stock/custom theme colors with matugen base")
@@ -366,7 +390,7 @@ func buildOnce(opts *Options) (bool, error) {
 		args := []string{"color", "hex", primaryDark, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name()}
 		args = appendContrastArg(args, opts.Contrast)
 		args = append(args, importArgs...)
-		if err := runMatugen(args); err != nil {
+		if err := runMatugen(args, opts.SourceMode); err != nil {
 			return false, err
 		}
 	} else {
@@ -389,8 +413,7 @@ func buildOnce(opts *Options) (bool, error) {
 		}
 
 		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surface, opts.Mode)
-		importData := fmt.Sprintf(`{"dank16": %s}`, dank16JSON)
-		importArgs = []string{"--import-json-string", importData}
+		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)
 		var args []string
@@ -403,7 +426,7 @@ func buildOnce(opts *Options) (bool, error) {
 		args = append(args, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name())
 		args = appendContrastArg(args, opts.Contrast)
 		args = append(args, importArgs...)
-		if err := runMatugen(args); err != nil {
+		if err := runMatugen(args, opts.SourceMode); err != nil {
 			return false, err
 		}
 	}
@@ -464,6 +487,17 @@ func appendContrastArg(args []string, contrast float64) []string {
 		return args
 	}
 	return append(args, "--contrast", strconv.FormatFloat(contrast, 'f', -1, 64))
+}
+
+// buildImportData is the JSON passed to matugen's --import-json-string. image is
+// set only when the source was rewritten from a wallpaper to a hex color, where
+// matugen leaves {{image}} unset and templates using it would render "Null".
+func buildImportData(dank16JSON, image string) string {
+	if image == "" {
+		return fmt.Sprintf(`{"dank16": %s}`, dank16JSON)
+	}
+	path, _ := json.Marshal(image)
+	return fmt.Sprintf(`{"dank16": %s, "image": %s}`, dank16JSON, path)
 }
 
 func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
@@ -798,9 +832,10 @@ func extractTOMLSection(content, startMarker, endMarker string) string {
 }
 
 type matugenFlags struct {
-	supportsCOE bool
-	isV4        bool
-	isV42       bool
+	supportsCOE    bool
+	isV4           bool
+	isV42          bool
+	supportsPrefer bool
 }
 
 func detectMatugenVersion() (matugenFlags, error) {
@@ -808,7 +843,7 @@ func detectMatugenVersion() (matugenFlags, error) {
 	defer matugenVersionMu.Unlock()
 
 	if matugenVersionOK {
-		return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42}, nil
+		return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer}, nil
 	}
 
 	return detectMatugenVersionLocked()
@@ -828,7 +863,8 @@ func redetectMatugenVersion(old matugenFlags) (matugenFlags, bool) {
 	if err != nil {
 		return old, false
 	}
-	changed := flags.supportsCOE != old.supportsCOE || flags.isV4 != old.isV4 || flags.isV42 != old.isV42
+	changed := flags.supportsCOE != old.supportsCOE || flags.isV4 != old.isV4 || flags.isV42 != old.isV42 ||
+		flags.supportsPrefer != old.supportsPrefer
 	return flags, changed
 }
 
@@ -861,6 +897,9 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	matugenSupportsCOE = major > 3 || (major == 3 && minor >= 1)
 	matugenIsV4 = major >= 4
 	matugenIsV42 = major > 4 || (major == 4 && minor >= 2)
+	// --prefer landed in 4.1; 4.0.x has --source-color-index but not --prefer,
+	// and clap aborts on an unknown argument rather than ignoring it.
+	matugenSupportsPrefer = major > 4 || (major == 4 && minor >= 1)
 	matugenVersionOK = true
 
 	if matugenSupportsCOE {
@@ -869,28 +908,34 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	if matugenIsV4 {
 		log.Debugf("Matugen %s detected: using v4 compatibility flags", versionStr)
 	}
-	return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42}, nil
+	if matugenIsV4 && !matugenSupportsPrefer {
+		log.Debugf("Matugen %s detected: --prefer unavailable, source modes fall back to the dominant color", versionStr)
+	}
+	return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer}, nil
 }
 
-func buildMatugenArgs(baseArgs []string, flags matugenFlags) []string {
+func buildMatugenArgs(baseArgs []string, flags matugenFlags, sourceMode string) []string {
 	args := make([]string, 0, len(baseArgs)+4)
 	if flags.supportsCOE {
 		args = append(args, "--continue-on-error")
 	}
 	args = append(args, baseArgs...)
+	// matugen 3 has neither flag. matugen 4's --source-color-index help notes
+	// "In earlier versions the default was 0", so omitting both on v3 gives the
+	// same seed the flag would have asked for.
 	if flags.isV4 {
-		args = append(args, "--source-color-index", "0")
+		args = append(args, sourceSelectionArgs(sourceMode, flags.supportsPrefer)...)
 	}
 	return args
 }
 
-func runMatugen(baseArgs []string) error {
+func runMatugen(baseArgs []string, sourceMode string) error {
 	flags, err := detectMatugenVersion()
 	if err != nil {
 		return err
 	}
 
-	args := buildMatugenArgs(baseArgs, flags)
+	args := buildMatugenArgs(baseArgs, flags, sourceMode)
 	cmd := exec.Command("matugen", args...)
 	cmd.Env = utils.EnvWithUserBinPath(nil)
 	cmd.Stdout = os.Stdout
@@ -908,7 +953,7 @@ func runMatugen(baseArgs []string) error {
 	}
 
 	log.Warnf("Matugen version changed (v4: %v -> %v), retrying", flags.isV4, newFlags.isV4)
-	args = buildMatugenArgs(baseArgs, newFlags)
+	args = buildMatugenArgs(baseArgs, newFlags, sourceMode)
 	retryCmd := exec.Command("matugen", args...)
 	retryCmd.Env = utils.EnvWithUserBinPath(nil)
 	retryCmd.Stdout = os.Stdout
@@ -949,7 +994,8 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 	baseArgs = append(baseArgs, "-m", string(opts.Mode), "-t", opts.MatugenType, "--json", "hex", "--dry-run")
 	baseArgs = appendContrastArg(baseArgs, opts.Contrast)
 	if flags.isV4 {
-		baseArgs = append(baseArgs, "--source-color-index", "0", "--old-json-output")
+		baseArgs = append(baseArgs, sourceSelectionArgs(opts.SourceMode, flags.supportsPrefer)...)
+		baseArgs = append(baseArgs, "--old-json-output")
 	}
 
 	cmd := exec.Command("matugen", baseArgs...)

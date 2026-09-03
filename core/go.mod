@@ -4,6 +4,7 @@ go 1.26.5
 
 require (
 	github.com/AvengeMedia/dgop v0.2.4-0.20260819141338-085d828cf577
+	github.com/Nadim147c/material/v3 v3.1.1
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/charmbracelet/bubbles v1.0.0
