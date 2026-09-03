@@ -12,6 +12,19 @@ var SESSION_BACKED_PLUGIN_IDS = ["dankNotepadModule"];
 // Superseded by desktopWidgetInstances at v4; nothing has written them since
 var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClockTransparency", "desktopClockColorMode", "desktopClockCustomColor", "desktopClockShowDate", "desktopClockShowAnalogNumbers", "desktopClockShowAnalogSeconds", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorEnabled", "systemMonitorShowHeader", "systemMonitorTransparency", "systemMonitorColorMode", "systemMonitorCustomColor", "systemMonitorShowCpu", "systemMonitorShowCpuGraph", "systemMonitorShowCpuTemp", "systemMonitorShowGpuTemp", "systemMonitorGpuPciId", "systemMonitorShowMemory", "systemMonitorShowMemoryGraph", "systemMonitorShowNetwork", "systemMonitorShowNetworkGraph", "systemMonitorShowDisk", "systemMonitorShowTopProcesses", "systemMonitorTopProcessCount", "systemMonitorTopProcessSortBy", "systemMonitorGraphInterval", "systemMonitorLayoutMode", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants", "desktopWidgetPositions"];
 
+var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
+
+function migrateBatteryPillStyle(target) {
+    if (!target || typeof target !== "object" || target.batteryPillStyle === undefined)
+        return;
+    var pill = target.batteryPillStyle === true;
+    delete target.batteryPillStyle;
+    if (target.batteryStyle !== undefined && target.batteryStyle !== "icon")
+        return;
+    if (pill)
+        target.batteryStyle = "solid";
+}
+
 function withoutInstancePositions(instances) {
     if (!Array.isArray(instances)) return instances;
     return instances.map(function (inst) {
@@ -399,6 +412,25 @@ function migrateToVersion(obj, targetVersion) {
         delete settings.spotlightCloseNiriOverview;
 
         settings.configVersion = 16;
+    }
+
+    if (currentVersion < 17) {
+        console.info("Migrating settings from version", currentVersion, "to version 17");
+        console.info("Converting batteryPillStyle to batteryStyle");
+
+        migrateBatteryPillStyle(settings);
+        var bars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
+        for (var b = 0; b < bars.length; b++) {
+            for (var k = 0; k < BAR_WIDGET_LIST_KEYS.length; k++) {
+                var widgets = bars[b] && bars[b][BAR_WIDGET_LIST_KEYS[k]];
+                if (!Array.isArray(widgets))
+                    continue;
+                for (var w = 0; w < widgets.length; w++)
+                    migrateBatteryPillStyle(widgets[w]);
+            }
+        }
+
+        settings.configVersion = 17;
     }
 
     return settings;
