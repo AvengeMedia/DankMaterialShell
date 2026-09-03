@@ -53,6 +53,14 @@ func (o *WaylandOutput) bounds() Region {
 		if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
 			x, y, w, h = hx, hy, hw, hh
 		}
+	} else {
+		if o.transform == 1 || o.transform == 3 || o.transform == 5 || o.transform == 7 {
+			w, h = h, w
+		}
+		if scale := o.effectiveScale(); scale > 0 {
+			w = int32(math.Round(float64(w) / scale))
+			h = int32(math.Round(float64(h) / scale))
+		}
 	}
 	return Region{
 		X:      x,
@@ -136,13 +144,33 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 		return s.captureRegion()
 	}
 
-	if s.config.Geometry {
-		return geometryResult(lastRegion), nil
+	var output *WaylandOutput
+	if lastRegion.Output != "" {
+		output = s.findOutputByName(lastRegion.Output)
 	}
-
-	output := s.findOutputForRegion(lastRegion)
+	if output == nil {
+		output = s.findOutputForRegion(lastRegion)
+	}
 	if output == nil {
 		return s.captureRegion()
+	}
+
+	if s.config.Geometry {
+		scale := output.effectiveScale()
+		if scale <= 0 {
+			scale = 1.0
+		}
+		localX := float64(lastRegion.X-output.x) / scale
+		localY := float64(lastRegion.Y-output.y) / scale
+		logicalW := float64(lastRegion.Width) / scale
+		logicalH := float64(lastRegion.Height) / scale
+		return geometryResult(Region{
+			X:      int32(math.Round(float64(output.x) + localX)),
+			Y:      int32(math.Round(float64(output.y) + localY)),
+			Width:  int32(math.Round(logicalW)),
+			Height: int32(math.Round(logicalH)),
+			Output: output.name,
+		}), nil
 	}
 
 	return s.captureRegionOnOutput(output, lastRegion)

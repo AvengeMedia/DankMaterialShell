@@ -5,6 +5,22 @@ import (
 )
 
 func TestSelectedLogicalGeometry(t *testing.T) {
+	mockSurface := &OutputSurface{
+		logicalW: 3840,
+		logicalH: 2160,
+		output: &WaylandOutput{
+			name:            "DP-1",
+			x:               0,
+			y:               0,
+			fractionalScale: 1.0,
+		},
+		screenBuf: &ShmBuffer{
+			Width:  3840,
+			Height: 2160,
+			Stride: 3840 * 4,
+		},
+	}
+
 	tests := []struct {
 		name          string
 		anchorX       float64
@@ -21,18 +37,18 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 		wantFormatted string
 	}{
 		{
-			name:          "standard drag top-left to bottom-right",
+			name:          "standard drag inclusive edges",
 			anchorX:       2263,
 			anchorY:       118,
-			currentX:      2263 + 513,
-			currentY:      118 + 313,
+			currentX:      2776,
+			currentY:      431,
 			hasSelection:  true,
 			wantX:         2263,
 			wantY:         118,
-			wantW:         513,
-			wantH:         313,
+			wantW:         514,
+			wantH:         314,
 			wantOK:        true,
-			wantFormatted: "2263,118 513x313",
+			wantFormatted: "2263,118 514x314",
 		},
 		{
 			name:          "inverted drag bottom-right to top-left",
@@ -43,10 +59,10 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 			hasSelection:  true,
 			wantX:         400,
 			wantY:         300,
-			wantW:         600,
-			wantH:         500,
+			wantW:         601,
+			wantH:         501,
 			wantOK:        true,
-			wantFormatted: "400,300 600x500",
+			wantFormatted: "400,300 601x501",
 		},
 		{
 			name:          "shift held square constraint",
@@ -58,23 +74,14 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 			hasSelection:  true,
 			wantX:         100,
 			wantY:         100,
-			wantW:         200,
-			wantH:         200,
+			wantW:         201,
+			wantH:         201,
 			wantOK:        true,
-			wantFormatted: "100,100 200x200",
+			wantFormatted: "100,100 201x201",
 		},
 		{
 			name:         "no selection",
 			hasSelection: false,
-			wantOK:       false,
-		},
-		{
-			name:         "zero width",
-			anchorX:      100,
-			anchorY:      100,
-			currentX:     100,
-			currentY:     200,
-			hasSelection: true,
 			wantOK:       false,
 		},
 	}
@@ -85,6 +92,7 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 				shiftHeld: tc.shiftHeld,
 				selection: SelectionState{
 					hasSelection: tc.hasSelection,
+					surface:      mockSurface,
 					anchorX:      tc.anchorX,
 					anchorY:      tc.anchorY,
 					currentX:     tc.currentX,
@@ -110,6 +118,66 @@ func TestSelectedLogicalGeometry(t *testing.T) {
 				t.Errorf("formatted = %q, want %q", formatted, tc.wantFormatted)
 			}
 		})
+	}
+}
+
+func TestSelectedLogicalGeometryPreSelection(t *testing.T) {
+	mockSurface := &OutputSurface{
+		logicalW: 1920,
+		logicalH: 1080,
+		output: &WaylandOutput{
+			name:            "eDP-1",
+			x:               0,
+			y:               0,
+			fractionalScale: 1.0,
+		},
+		screenBuf: &ShmBuffer{
+			Width:  1920,
+			Height: 1080,
+			Stride: 1920 * 4,
+		},
+	}
+
+	r := &RegionSelector{
+		preSelect: Region{
+			X:      2263,
+			Y:      118,
+			Width:  513,
+			Height: 313,
+			Output: "eDP-1",
+		},
+	}
+
+	r.applyPreSelection(mockSurface)
+	reg, ok := r.selectedLogicalGeometry()
+	if !ok {
+		t.Fatal("expected preselection to produce valid geometry")
+	}
+
+	if reg.X != 2263 || reg.Y != 118 || reg.Width != 513 || reg.Height != 313 {
+		t.Errorf("got (%d, %d, %d, %d), want (2263, 118, 513, 313)",
+			reg.X, reg.Y, reg.Width, reg.Height)
+	}
+	if got := reg.GeometryString(); got != "2263,118 513x313" {
+		t.Errorf("GeometryString() = %q, want %q", got, "2263,118 513x313")
+	}
+}
+
+func TestWaylandOutputBoundsScaled(t *testing.T) {
+	out := &WaylandOutput{
+		name:            "DP-2",
+		x:               1920,
+		y:               0,
+		width:           3840,
+		height:          2160,
+		scale:           2,
+		fractionalScale: 2.0,
+	}
+
+	b := out.bounds()
+	if b.X != 1920 || b.Y != 0 || b.Width != 1920 || b.Height != 1080 {
+		t.Errorf("bounds() = (%d, %d, %d, %d), want (1920, 0, 1920, 1080)",
+			b.X, b.Y, b.Width, b.Height)
 	}
 }
 

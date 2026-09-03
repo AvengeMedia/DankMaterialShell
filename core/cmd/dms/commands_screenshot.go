@@ -38,8 +38,8 @@ var (
 type screenshotMetadata struct {
 	Status string  `json:"status"`
 	Path   string  `json:"path,omitempty"`
-	X      int     `json:"x,omitempty"`
-	Y      int     `json:"y,omitempty"`
+	X      *int    `json:"x,omitempty"`
+	Y      *int    `json:"y,omitempty"`
 	Width  int     `json:"width,omitempty"`
 	Height int     `json:"height,omitempty"`
 	Scale  float64 `json:"scale,omitempty"`
@@ -325,10 +325,12 @@ func runScreenshot(config screenshot.Config) {
 
 	if config.Geometry {
 		if ssJSON {
+			x := int(result.Region.X)
+			y := int(result.Region.Y)
 			writeScreenshotJSON(screenshotMetadata{
 				Status: "success",
-				X:      int(result.Region.X),
-				Y:      int(result.Region.Y),
+				X:      &x,
+				Y:      &y,
 				Width:  int(result.Region.Width),
 				Height: int(result.Region.Height),
 			})

@@ -271,34 +271,35 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 }
 
 func (r *RegionSelector) selectedLogicalGeometry() (Region, bool) {
-	if !r.selection.hasSelection {
+	ext, ok := r.selectionExtent()
+	if !ok || ext.width() <= 0 || ext.height() <= 0 {
 		return Region{}, false
 	}
-	minX := math.Min(r.selection.anchorX, r.selection.currentX)
-	minY := math.Min(r.selection.anchorY, r.selection.currentY)
-	maxX := math.Max(r.selection.anchorX, r.selection.currentX)
-	maxY := math.Max(r.selection.anchorY, r.selection.currentY)
 
-	x1 := int(math.Round(minX))
-	y1 := int(math.Round(minY))
-	x2 := int(math.Round(maxX))
-	y2 := int(math.Round(maxY))
-	lw := x2 - x1
-	lh := y2 - y1
-	if r.shiftHeld {
+	x1, y1, x2, y2 := ext.logical()
+	lx := int(math.Round(x1))
+	ly := int(math.Round(y1))
+	lw := int(math.Round(x2 - x1))
+	lh := int(math.Round(y2 - y1))
+
+	if r.shiftHeld && ext.within(ext.surface) {
 		size := min(lw, lh)
-		lw, lh = size, size
+		lw = size
+		lh = size
 	}
+
 	if lw <= 0 || lh <= 0 {
 		return Region{}, false
 	}
-	var outputName string
-	if r.selection.surface != nil && r.selection.surface.output != nil {
-		outputName = r.selection.surface.output.name
+
+	outputName := ""
+	if ext.within(ext.surface) && ext.surface.output != nil {
+		outputName = ext.surface.output.name
 	}
+
 	return Region{
-		X:      int32(x1),
-		Y:      int32(y1),
+		X:      int32(lx),
+		Y:      int32(ly),
 		Width:  int32(lw),
 		Height: int32(lh),
 		Output: outputName,
