@@ -2461,6 +2461,44 @@
     "icon": "toolbar"
   },
   {
+    "section": "batteryColorMode",
+    "label": "Battery Colors",
+    "tabIndex": 6,
+    "category": "Bar",
+    "keywords": [
+      "accent",
+      "appearance",
+      "bar",
+      "battery",
+      "charge",
+      "charging",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "drains",
+      "follow",
+      "green",
+      "hue",
+      "icon",
+      "indicator",
+      "level",
+      "look",
+      "meter",
+      "palette",
+      "panel",
+      "power",
+      "statusbar",
+      "step",
+      "style",
+      "theme",
+      "tint",
+      "topbar"
+    ],
+    "icon": "battery_horiz_075",
+    "description": "Follow the theme accent, or step from green to red as the battery drains."
+  },
+  {
     "section": "barBorder",
     "label": "Border",
     "tabIndex": 6,
@@ -12265,6 +12303,32 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "dankIslandBatteryStyle",
+    "label": "Battery Style",
+    "tabIndex": 46,
+    "category": "Island",
+    "keywords": [
+      "appearance",
+      "battery",
+      "charge",
+      "charging",
+      "circle",
+      "circular",
+      "gauge",
+      "island",
+      "material",
+      "meter",
+      "outline",
+      "outlined",
+      "power",
+      "ring",
+      "solid",
+      "style"
+    ],
+    "description": "Solid or outlined material meter, or a circular gauge",
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "dankIslandInteraction",
     "label": "Behavior",
     "tabIndex": 46,
@@ -12398,12 +12462,11 @@
   },
   {
     "section": "dankIslandInstance",
-    "label": "Dank Island - Beta",
+    "label": "Dank Island",
     "tabIndex": 46,
     "category": "Island",
     "keywords": [
       "bar",
-      "beta",
       "dank",
       "frame",
       "instance",
@@ -12713,28 +12776,6 @@
       "watch"
     ],
     "description": "Show a clickable clock beside compact media details",
-    "conditionKey": "islandEnabled"
-  },
-  {
-    "section": "dankIslandBatteryStyle",
-    "label": "Material Battery Style",
-    "tabIndex": 46,
-    "category": "Island",
-    "keywords": [
-      "appearance",
-      "battery",
-      "charge",
-      "charging",
-      "gauge",
-      "island",
-      "material",
-      "outline",
-      "power",
-      "solid",
-      "style",
-      "type"
-    ],
-    "description": "Solid material type or Outline",
     "conditionKey": "islandEnabled"
   },
   {

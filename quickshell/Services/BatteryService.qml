@@ -181,6 +181,19 @@ Singleton {
     readonly property bool hasBatteryReading: batteryAvailable && batteryLevel > 0
     readonly property bool isLowBattery: hasBatteryReading && batteryLevel <= SettingsData.batteryLowThreshold
     readonly property bool isCriticalBattery: hasBatteryReading && batteryLevel <= SettingsData.batteryCriticalThreshold
+    readonly property color levelCautionColor: "#FFC107"
+    readonly property color levelCriticalColor: "#F44336"
+    readonly property color levelColor: {
+        if (isCharging)
+            return Theme.success;
+        if (isCriticalBattery)
+            return levelCriticalColor;
+        if (isLowBattery)
+            return Theme.warning;
+        if (batteryLevel <= SettingsData.batteryLowThreshold * 2)
+            return levelCautionColor;
+        return Theme.success;
+    }
 
     property bool _hasNotifiedLowBattery: false
     property bool _hasNotifiedCriticalBattery: false

@@ -145,7 +145,7 @@ var SPEC = {
     showBatteryTimeOnlyOnBattery: { def: false },
     showBatteryPowerCharging: { def: false },
     showBatteryPowerDischarging: { def: false },
-    batteryPillStyle: { def: false },
+    batteryStyle: { def: "icon" },
     showControlCenterButton: { def: true },
     showCapsLockIndicator: { def: true },
 
@@ -634,6 +634,7 @@ var SPEC = {
             maximizeWidgetText: false,
             removeWidgetPadding: false,
             widgetPadding: 8,
+            batteryColorMode: "theme",
             gothCornersEnabled: false,
             gothCornerRadiusOverride: false,
             gothCornerRadiusValue: 12,

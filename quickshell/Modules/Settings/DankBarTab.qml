@@ -1485,6 +1485,29 @@ Item {
 
             SettingsCard {
                 tab: "appearance"
+                iconName: "battery_horiz_075"
+                title: I18n.tr("Battery Colors", "bar appearance: battery indicator color card")
+                settingKey: "batteryColorMode"
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled && BatteryService.batteryAvailable
+
+                SettingsButtonGroupRow {
+                    tags: ["battery", "color", "level", "theme", "icon", "meter", "indicator"]
+                    text: I18n.tr("Indicator Colors", "battery settings: battery indicator color mode")
+                    description: I18n.tr("Follow the theme accent, or step from green to red as the battery drains.", "battery settings: indicator color mode description")
+                    model: [I18n.tr("Theme", "battery settings: theme accent indicator colors"), I18n.tr("Level", "battery settings: charge level indicator colors")]
+                    currentIndex: (dankBarTab.selectedBarConfig?.batteryColorMode ?? "theme") === "level" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.updateBarConfig(dankBarTab.selectedBarId, {
+                                batteryColorMode: index === 1 ? "level" : "theme"
+                            });
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "appearance"
                 iconName: "filter_b_and_w"
                 title: I18n.tr("System Tray Icon Tint")
                 settingKey: "trayIconTint"

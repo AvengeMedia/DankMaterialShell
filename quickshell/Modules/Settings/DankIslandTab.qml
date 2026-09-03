@@ -28,7 +28,7 @@ Item {
     readonly property int instanceIndex: Math.max(0, root.instanceChoices.findIndex(row => row.id === SettingsData.dankIslandBarId))
     readonly property var systemLevelDisplayValues: ["icon", "percentage", "both"]
     readonly property var paletteValues: ["default", "bright", "dim"]
-    readonly property var batteryStyleValues: ["solid", "outline"]
+    readonly property var batteryStyleValues: ["solid", "outline", "ring"]
     readonly property var satellitePositionValues: ["island", "edges"]
     readonly property var interactionModeValues: ["click", "hybrid"]
 
@@ -54,7 +54,7 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "view_in_ar"
-                title: I18n.tr("Dank Island - Beta", "island settings: page title")
+                title: I18n.tr("Dank Island", "island settings: page title")
                 settingKey: "dankIslandInstance"
                 tags: ["island", "layout", "standard", "frame", "mode", "bar"]
 
@@ -321,11 +321,11 @@ Item {
 
                 SettingsButtonGroupRow {
                     settingKey: "dankIslandBatteryStyle"
-                    tags: ["island", "battery", "gauge", "solid", "outline", "appearance"]
-                    text: I18n.tr("Material Battery Style", "island settings: battery meter style row")
-                    description: I18n.tr("Solid material type or Outline", "island settings: battery style description")
+                    tags: ["island", "battery", "gauge", "solid", "outline", "ring", "circle", "appearance"]
+                    text: I18n.tr("Battery Style", "island settings: battery meter style row")
+                    description: I18n.tr("Solid or outlined material meter, or a circular gauge", "island settings: battery style description")
                     visible: BatteryService.batteryAvailable
-                    model: [I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style")]
+                    model: [I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style")]
                     currentIndex: root.valueIndex(root.batteryStyleValues, SettingsData.dankIslandBatteryStyle, "solid")
                     onSelectionChanged: (index, selected) => {
                         if (selected)

@@ -18,7 +18,9 @@ BasePill {
     }
     readonly property bool showTime: widgetData?.showBatteryTime !== undefined ? widgetData.showBatteryTime : SettingsData.showBatteryTime
     readonly property bool showTimeOnlyOnBattery: widgetData?.showBatteryTimeOnlyOnBattery !== undefined ? widgetData.showBatteryTimeOnlyOnBattery : SettingsData.showBatteryTimeOnlyOnBattery
-    readonly property bool pillStyle: widgetData?.batteryPillStyle !== undefined ? widgetData.batteryPillStyle : SettingsData.batteryPillStyle
+    readonly property string batteryStyle: widgetData?.batteryStyle !== undefined ? widgetData.batteryStyle : SettingsData.batteryStyle
+    readonly property bool pillStyle: battery.batteryStyle !== "icon"
+    readonly property bool levelColors: (barConfig?.batteryColorMode ?? "theme") === "level"
     readonly property bool showPowerCharging: widgetData?.showBatteryPowerCharging !== undefined ? widgetData.showBatteryPowerCharging : SettingsData.showBatteryPowerCharging
     readonly property bool showPowerDischarging: widgetData?.showBatteryPowerDischarging !== undefined ? widgetData.showBatteryPowerDischarging : SettingsData.showBatteryPowerDischarging
     readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
@@ -144,6 +146,10 @@ BasePill {
                             return Theme.widgetIconColor;
                         }
 
+                        if (battery.levelColors) {
+                            return BatteryService.levelColor;
+                        }
+
                         if (BatteryService.isLowBattery && !BatteryService.isCharging) {
                             return Theme.error;
                         }
@@ -161,6 +167,9 @@ BasePill {
                     visible: battery.pillStyle
                     vertical: true
                     showNumber: false
+                    meterStyle: battery.batteryStyle
+                    levelColors: battery.levelColors
+                    maxDiameter: battery.widgetThickness - Theme.spacingXS
                     thickness: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -190,6 +199,10 @@ BasePill {
                             return Theme.widgetIconColor;
                         }
 
+                        if (battery.levelColors) {
+                            return BatteryService.levelColor;
+                        }
+
                         if (BatteryService.isLowBattery && !BatteryService.isCharging) {
                             return Theme.error;
                         }
@@ -206,6 +219,9 @@ BasePill {
                 BatteryMeter {
                     visible: battery.pillStyle
                     showNumber: battery.showPercent
+                    meterStyle: battery.batteryStyle
+                    levelColors: battery.levelColors
+                    maxDiameter: battery.widgetThickness - Theme.spacingXS
                     thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter

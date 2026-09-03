@@ -510,7 +510,7 @@ Item {
             widgetObj.showBatteryTimeOnlyOnBattery = SettingsData.showBatteryTimeOnlyOnBattery;
             widgetObj.showBatteryPowerCharging = SettingsData.showBatteryPowerCharging;
             widgetObj.showBatteryPowerDischarging = SettingsData.showBatteryPowerDischarging;
-            widgetObj.batteryPillStyle = SettingsData.batteryPillStyle;
+            widgetObj.batteryStyle = SettingsData.batteryStyle;
         }
         if (widgetId === "runningApps") {
             widgetObj.runningAppsCompactMode = SettingsData.runningAppsCompactMode;
@@ -1053,8 +1053,8 @@ Item {
                     item.showBatteryPowerCharging = widget.showBatteryPowerCharging;
                 if (widget.showBatteryPowerDischarging !== undefined)
                     item.showBatteryPowerDischarging = widget.showBatteryPowerDischarging;
-                if (widget.batteryPillStyle !== undefined)
-                    item.batteryPillStyle = widget.batteryPillStyle;
+                if (widget.batteryStyle !== undefined)
+                    item.batteryStyle = widget.batteryStyle;
                 if (widget.showPrinterIcon !== undefined)
                     item.showPrinterIcon = widget.showPrinterIcon;
                 if (widget.showScreenSharingIcon !== undefined)

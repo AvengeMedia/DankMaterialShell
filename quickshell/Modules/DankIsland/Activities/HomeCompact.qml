@@ -301,7 +301,8 @@ Item {
             thickness: root.statusIconSize
             fontSize: root.textSize
             hovered: groupArea.containsMouse
-            outlined: SettingsData.dankIslandBatteryStyle === "outline"
+            meterStyle: SettingsData.dankIslandBatteryStyle
+            levelColors: (SettingsData.islandBarConfig?.batteryColorMode ?? "theme") === "level"
         }
 
         DankIcon {

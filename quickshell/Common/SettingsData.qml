@@ -815,7 +815,7 @@ Singleton {
     property bool showBatteryTimeOnlyOnBattery: false
     property bool showBatteryPowerCharging: false
     property bool showBatteryPowerDischarging: false
-    property bool batteryPillStyle: false
+    property string batteryStyle: "icon"
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: true
@@ -1179,6 +1179,7 @@ Singleton {
             "maximizeWidgetText": false,
             "removeWidgetPadding": false,
             "widgetPadding": 8,
+            "batteryColorMode": "theme",
             "gothCornersEnabled": false,
             "gothCornerRadiusOverride": false,
             "gothCornerRadiusValue": 12,
