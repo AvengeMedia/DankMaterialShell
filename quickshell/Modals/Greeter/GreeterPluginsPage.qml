@@ -193,7 +193,7 @@ Item {
                             if (modelData.repo)
                                 Qt.openUrlExternally(modelData.repo);
                         }
-                        onInstallRequested: PluginService.installFromRegistry(modelData.name, modelData.type === "desktop")
+                        onInstallRequested: PluginService.installFromRegistry(modelData.id, modelData.name, modelData.type === "desktop")
                     }
                 }
             }
