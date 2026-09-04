@@ -366,7 +366,7 @@ Rectangle {
 
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 150
+                        duration: Theme.shortDuration
                     }
                 }
 
