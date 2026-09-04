@@ -1327,3 +1327,76 @@ func TestResolveSmartMode(t *testing.T) {
 		})
 	}
 }
+
+func writeUserMatugenConfig(t *testing.T, configDir, content string) {
+	t.Helper()
+	dir := filepath.Join(configDir, "matugen")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatalf("failed to create matugen config dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "config.toml"), []byte(content), 0o644); err != nil {
+		t.Fatalf("failed to write user config: %v", err)
+	}
+}
+
+func TestWriteDryRunConfigAlwaysDeclaresConfigAndTemplates(t *testing.T) {
+	tests := []struct {
+		name             string
+		userConfig       string
+		runUserTemplates bool
+		wantContains     []string
+		wantNotContains  []string
+	}{
+		{
+			name:             "comment only user config",
+			userConfig:       "# nothing here\n",
+			runUserTemplates: true,
+			wantNotContains:  []string{"# nothing here"},
+		},
+		{
+			name:             "user config section is carried over",
+			userConfig:       "[config]\nfallback_color = \"#ff0000\"\n\n[templates.mine]\ninput_path = 'in'\noutput_path = 'out'\n",
+			runUserTemplates: true,
+			wantContains:     []string{"fallback_color = \"#ff0000\""},
+			wantNotContains:  []string{"[templates.mine]"},
+		},
+		{
+			name:            "user templates disabled",
+			userConfig:      "[config]\nfallback_color = \"#ff0000\"\n",
+			wantNotContains: []string{"fallback_color"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			configDir := filepath.Join(t.TempDir(), "config")
+			writeUserMatugenConfig(t, configDir, tc.userConfig)
+
+			opts := &Options{ConfigDir: configDir, RunUserTemplates: tc.runUserTemplates}
+			cfgPath, err := writeDryRunConfig(opts)
+			if err != nil {
+				t.Fatalf("writeDryRunConfig failed: %v", err)
+			}
+			defer os.Remove(cfgPath)
+
+			data, err := os.ReadFile(cfgPath)
+			if err != nil {
+				t.Fatalf("failed to read dry-run config: %v", err)
+			}
+
+			content := string(data)
+			assert.Contains(t, content, "[config]")
+			assert.Contains(t, content, "[templates]")
+			for _, want := range tc.wantContains {
+				assert.Contains(t, content, want)
+			}
+			for _, unwanted := range tc.wantNotContains {
+				assert.NotContains(t, content, unwanted)
+			}
+		})
+	}
+}
+
+func TestUserConfigSectionWithoutConfigDir(t *testing.T) {
+	assert.Equal(t, "[config]\n\n", userConfigSection(&Options{RunUserTemplates: true}))
+}
