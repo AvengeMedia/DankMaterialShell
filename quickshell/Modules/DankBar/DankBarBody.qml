@@ -454,7 +454,7 @@ Item {
     readonly property real _wingR: Math.max(0, wingtipsRadius)
 
     // Shadow buffer: extra window space for shadow to render beyond bar bounds
-    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (renderBarConfig?.shadowIntensity ?? 0) > 0
+    readonly property bool _shadowActive: Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)
     readonly property real _shadowBuffer: {
         if (!_shadowActive)
             return 0;
