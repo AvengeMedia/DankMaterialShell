@@ -8,6 +8,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Common.settings
 import qs.Services
+import "GSettings.js" as GSettings
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
 
@@ -1524,11 +1525,7 @@ Singleton {
             return;
         if (!SessionData.lastAppliedIconTheme)
             return;
-        const script = `if command -v gsettings >/dev/null 2>&1; then
-        gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
-        elif command -v dconf >/dev/null 2>&1; then
-        dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
-        fi`;
+        const script = GSettings.getCmd("org.gnome.desktop.interface", "icon-theme");
 
         Proc.runCommand("iconThemeDriftCheck", ["sh", "-c", script], (output, exitCode) => {
             const platform = (output || "").trim();
@@ -1566,11 +1563,7 @@ Singleton {
         const resolved = resolveIconTheme();
         let cosmicThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
-            const detectScript = `if command -v gsettings >/dev/null 2>&1; then
-            gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
-            elif command -v dconf >/dev/null 2>&1; then
-            dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
-            fi`;
+            const detectScript = GSettings.getCmd("org.gnome.desktop.interface", "icon-theme");
 
             Proc.runCommand("detectCosmicIconTheme", ["sh", "-c", detectScript], (output, exitCode) => {
                 if (exitCode !== 0)
@@ -1632,11 +1625,7 @@ Singleton {
         fi
         done
 
-        if command -v gsettings >/dev/null 2>&1; then
-        gsettings set org.gnome.desktop.interface icon-theme '${gtkThemeName}' 2>/dev/null || true
-        elif command -v dconf >/dev/null 2>&1; then
-        dconf write /org/gnome/desktop/interface/icon-theme "'${gtkThemeName}'" 2>/dev/null || true
-        fi
+        ${GSettings.setCmd("org.gnome.desktop.interface", "icon-theme", gtkThemeName)} || true
 
         pkill -HUP -f 'gtk' 2>/dev/null || true`;
 
@@ -2132,7 +2121,7 @@ Singleton {
         const pathsArg = iconPaths.join(" ");
 
         const script = `
-            echo "SYSDEFAULT:$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g" || echo '')"
+            echo "SYSDEFAULT:$(${GSettings.getCmd("org.gnome.desktop.interface", "icon-theme")})"
             for dir in ${pathsArg}; do
                 [ -d "$dir" ] || continue
                 for theme in "$dir"/*/; do
@@ -2171,7 +2160,7 @@ Singleton {
         const pathsArg = cursorPaths.join(" ");
 
         const script = `
-            echo "SYSDEFAULT:$(gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | sed "s/'//g" || echo '')"
+            echo "SYSDEFAULT:$(${GSettings.getCmd("org.gnome.desktop.interface", "cursor-theme")})"
             for dir in ${pathsArg}; do
                 [ -d "$dir" ] || continue
                 for theme in "$dir"/*/; do

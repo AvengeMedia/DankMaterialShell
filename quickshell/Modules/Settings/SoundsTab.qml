@@ -91,7 +91,7 @@ Item {
                         tab: "sounds"
                         tags: ["sound", "theme", "system"]
                         settingKey: "useSystemSoundTheme"
-                        visible: AudioService.gsettingsAvailable
+                        visible: AudioService.soundThemeSupported
                         text: I18n.tr("Use System Theme")
                         description: I18n.tr("Use sound theme from system settings")
                         checked: SettingsData.useSystemSoundTheme
@@ -123,7 +123,7 @@ Item {
                         height: 1
                         color: Theme.outline
                         opacity: 0.2
-                        visible: AudioService.gsettingsAvailable
+                        visible: AudioService.soundThemeSupported
                     }
 
                     SettingsToggleRow {

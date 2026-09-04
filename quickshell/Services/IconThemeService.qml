@@ -84,7 +84,7 @@ Singleton {
         if (Quickshell.env("QS_ICON_THEME"))
             return;
         const script = `v=$(sed -n 's/^gtk-icon-theme-name *= *//p' "\${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0/settings.ini" 2>/dev/null | head -1)
-[ -z "$v" ] && command -v gsettings >/dev/null 2>&1 && v=$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)
+[ -z "$v" ] && v=$(${GSettings.getCmd("org.gnome.desktop.interface", "icon-theme")})
 printf '%s' "$v" | tr -d "'\\""`;
 
         Proc.runCommand("iconThemeProbe", ["sh", "-c", script], (out, code) => {
