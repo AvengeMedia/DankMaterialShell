@@ -20,6 +20,8 @@ Singleton {
     readonly property bool soundsAvailable: MultimediaService.available
     property bool playersRequested: false
     property bool soundThemeSupported: false
+    property bool soundThemeResolved: false
+    property bool loginSoundPending: false
     property var availableSoundThemes: []
     property string currentSoundTheme: ""
     property var soundFilePaths: ({})
@@ -549,10 +551,12 @@ EOFCONFIG
     function checkSoundThemeSupport() {
         Proc.runCommand("checkSoundThemeSupport", ["sh", "-c", GSettings.getCmd("org.gnome.desktop.sound", "theme-name")], (output, exitCode) => {
             soundThemeSupported = (output || "").trim().length > 0;
-            if (soundThemeSupported) {
-                scanSoundThemes();
-                getCurrentSoundTheme();
+            if (!soundThemeSupported) {
+                markSoundThemeResolved();
+                return;
             }
+            scanSoundThemes();
+            getCurrentSoundTheme();
         }, 0);
     }
 
@@ -583,16 +587,13 @@ EOFCONFIG
 
     function getCurrentSoundTheme() {
         Proc.runCommand("getCurrentSoundTheme", ["sh", "-c", GSettings.getCmd("org.gnome.desktop.sound", "theme-name")], (output, exitCode) => {
-            if (output.trim()) {
-                currentSoundTheme = output.trim();
-                log.debug("Current system sound theme:", currentSoundTheme);
-                if (SettingsData.useSystemSoundTheme) {
-                    discoverSoundFiles(currentSoundTheme);
-                }
-            } else {
-                currentSoundTheme = "";
-                log.debug("No system sound theme found");
+            currentSoundTheme = output.trim();
+            log.debug("Current system sound theme:", currentSoundTheme || "none");
+            if (currentSoundTheme && SettingsData.useSystemSoundTheme) {
+                discoverSoundFiles(currentSoundTheme);
+                return;
             }
+            markSoundThemeResolved();
         }, 0);
     }
 
@@ -614,6 +615,7 @@ EOFCONFIG
     function discoverSoundFiles(themeName) {
         if (!themeName) {
             soundFilePaths = {};
+            markSoundThemeResolved();
             return;
         }
 
@@ -670,7 +672,16 @@ EOFCONFIG
                 }
             }
             soundFilePaths = paths;
+            markSoundThemeResolved();
         }, 0);
+    }
+
+    function markSoundThemeResolved() {
+        soundThemeResolved = true;
+        if (!loginSoundPending)
+            return;
+        loginSoundPending = false;
+        playLoginSound();
     }
 
     function getSoundPath(soundEvent) {
@@ -708,9 +719,10 @@ EOFCONFIG
         log.debug("Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme);
         if (SettingsData.useSystemSoundTheme && currentSoundTheme) {
             discoverSoundFiles(currentSoundTheme);
-        } else {
-            soundFilePaths = {};
+            return;
         }
+        soundFilePaths = {};
+        markSoundThemeResolved();
     }
 
     function isMediaPlaying() {
@@ -765,6 +777,11 @@ EOFCONFIG
 
     function playLoginSound() {
         ensurePlayers();
+        // playing before the theme paths land swaps the player source mid-playback, which stops it
+        if (SettingsData.useSystemSoundTheme && !soundThemeResolved) {
+            loginSoundPending = true;
+            return;
+        }
         if (!soundsAvailable || !loginSound || notificationsAudioMuted || shouldMuteForMedia()) {
             return;
         }
@@ -1178,5 +1195,7 @@ EOFCONFIG
     Component.onCompleted: {
         rebuildTypedNodeLists();
         loadDeviceAliases();
+        if (SettingsData.soundsEnabled && SettingsData.useSystemSoundTheme)
+            getCurrentSoundTheme();
     }
 }
