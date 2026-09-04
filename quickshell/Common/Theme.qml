@@ -145,10 +145,6 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
-        // shellDir may be an embedded-UI extraction, which is read-only and
-        // unexecutable (dankgo shellapp/shellfs makeReadOnly chmods 0444)
-        if (typeof SessionData === "undefined" || !SessionData.isGreeterMode)
-            Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "assets", "", shellDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
@@ -1931,7 +1927,7 @@ Singleton {
 
     function patchGtk3colors() {
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight], (output, exitCode) => {
             switch (exitCode) {
             case 0:
                 refreshGtkTheme();
@@ -1953,7 +1949,7 @@ Singleton {
         }
 
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "true" : "false";
-        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, "apply", isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, "apply", isLight], (output, exitCode) => {
             if (exitCode === 0) {
                 if (typeof ToastService !== "undefined" && !root.matugenToastSuppressed) {
                     ToastService.showInfo(I18n.tr("GTK colors applied successfully"));
