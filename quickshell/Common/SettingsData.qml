@@ -1016,6 +1016,7 @@ Singleton {
     property bool dankIslandNotificationBadgeClearOnOpen: false
     property bool dankIslandNotificationExpand: false
     property bool dankIslandHomeCompactTight: false
+    property string dankIslandHomeClockDisplay: "both"
     property string dankIslandHomeVolumeDisplay: "both"
     property string dankIslandHomeBrightnessDisplay: "both"
     readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]

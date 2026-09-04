@@ -26,6 +26,7 @@ Item {
         return rows;
     }
     readonly property int instanceIndex: Math.max(0, root.instanceChoices.findIndex(row => row.id === SettingsData.dankIslandBarId))
+    readonly property var clockDisplayValues: ["time", "date", "both"]
     readonly property var systemLevelDisplayValues: ["icon", "percentage", "both"]
     readonly property var paletteValues: ["default", "bright", "dim"]
     readonly property var batteryStyleValues: ["solid", "outline", "ring"]
@@ -207,6 +208,19 @@ Item {
                 }
 
                 SettingsButtonGroupRow {
+                    settingKey: "dankIslandHomeClockDisplay"
+                    tags: ["island", "home", "compact", "clock", "time", "date"]
+                    text: I18n.tr("Clock Style", "island settings: clock display mode row")
+                    description: I18n.tr("Current time and date pill", "island settings: clock display mode description")
+                    model: [I18n.tr("Time", "island settings: clock shows time only"), I18n.tr("Date", "island settings: clock shows date only"), I18n.tr("Both", "island settings: clock shows time and date")]
+                    currentIndex: root.valueIndex(root.clockDisplayValues, SettingsData.dankIslandHomeClockDisplay, "both")
+                    onSelectionChanged: (index, selected) => {
+                        if (selected)
+                            SettingsData.set("dankIslandHomeClockDisplay", root.clockDisplayValues[index] ?? "both");
+                    }
+                }
+
+                SettingsButtonGroupRow {
                     settingKey: "dankIslandHomeVolumeDisplay"
                     tags: ["island", "home", "compact", "volume", "icon", "percentage"]
                     text: I18n.tr("Volume Style", "island settings: volume display mode row")
@@ -235,7 +249,7 @@ Item {
                 SettingsToggleRow {
                     settingKey: "dankIslandHomeCompactTight"
                     tags: ["island", "home", "compact", "narrow", "width", "height", "clock"]
-                    text: I18n.tr("Compact Clock Pill", "island settings: tighter home pill toggle")
+                    text: I18n.tr("Compact Pill", "island settings: tighter home pill toggle")
                     description: I18n.tr("Compact home clock pill in both width and height", "island settings: tight pill description")
                     checked: SettingsData.dankIslandHomeCompactTight
                     onToggled: checked => SettingsData.set("dankIslandHomeCompactTight", checked)

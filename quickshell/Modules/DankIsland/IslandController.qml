@@ -283,8 +283,15 @@ QtObject {
         return "both";
     }
 
+    function resolvedClockDisplay(value) {
+        if (value === "time" || value === "date" || value === "both")
+            return value;
+        return "both";
+    }
+
     readonly property var homeLeftGroups: homeGroups("left")
     readonly property var homeRightGroups: homeGroups("right")
+    readonly property string homeClockDisplay: resolvedClockDisplay(SettingsData.dankIslandHomeClockDisplay)
     readonly property string homeVolumeDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeVolumeDisplay)
     readonly property string homeBrightnessDisplay: resolvedSystemLevelDisplay(SettingsData.dankIslandHomeBrightnessDisplay)
 

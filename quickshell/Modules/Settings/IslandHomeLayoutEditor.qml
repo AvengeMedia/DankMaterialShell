@@ -23,7 +23,7 @@ Item {
             "clock": {
                 "icon": "schedule",
                 "text": I18n.tr("Clock", "island settings: pinned clock row in the home layout"),
-                "description": ""
+                "description": I18n.tr("Current time and date display")
             },
             "weather": {
                 "icon": "wb_sunny",

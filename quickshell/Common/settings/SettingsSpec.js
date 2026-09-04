@@ -552,6 +552,7 @@ var SPEC = {
     dankIslandNotificationBadgeClearOnOpen: { def: false },
     dankIslandNotificationExpand: { def: false },
     dankIslandHomeCompactTight: { def: false },
+    dankIslandHomeClockDisplay: { def: "both" },
     dankIslandHomeVolumeDisplay: { def: "both" },
     dankIslandHomeBrightnessDisplay: { def: "both" },
     dankIslandHomeLayout: { def: [{ id: "media", enabled: true }, { id: "clock", enabled: true }, { id: "weather", enabled: false }, { id: "status", enabled: false }, { id: "volume", enabled: false }, { id: "brightness", enabled: false }, { id: "notifications", enabled: true }] },
