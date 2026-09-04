@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/GSettings.js" as GSettings
 
 Singleton {
     id: root
@@ -19,7 +20,6 @@ Singleton {
     property bool colorSchemeInitialized: false
 
     property bool freedeskAvailable: false
-    property string colorSchemeCommand: ""
     property string pendingProfileImage: ""
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
@@ -146,14 +146,7 @@ Singleton {
         const preferLight = isLightMode && systemColorScheme === 2;
         const targetScheme = isLightMode ? (preferLight ? "prefer-light" : "default") : "prefer-dark";
 
-        switch (colorSchemeCommand) {
-        case "gsettings":
-            Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", targetScheme]);
-            break;
-        case "dconf":
-            Quickshell.execDetached(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", `'${targetScheme}'`]);
-            break;
-        }
+        Quickshell.execDetached(["sh", "-c", GSettings.setCmd("org.gnome.desktop.interface", "color-scheme", targetScheme)]);
     }
 
     function setSystemIconTheme(themeName) {
@@ -207,7 +200,6 @@ Singleton {
         } else {
             log.info("DMS_SOCKET not set");
         }
-        colorSchemeDetector.running = true;
     }
 
     Connections {
@@ -344,23 +336,6 @@ Singleton {
             if (exitCode !== 0 && root.pendingGreeterProfileUser !== "") {
                 root.profileImage = "";
                 root.pendingGreeterProfileUser = "";
-            }
-        }
-    }
-
-    Process {
-        id: colorSchemeDetector
-        command: ["bash", "-c", "command -v gsettings || command -v dconf"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const cmd = text.trim();
-                if (cmd.includes("gsettings")) {
-                    root.colorSchemeCommand = "gsettings";
-                } else if (cmd.includes("dconf")) {
-                    root.colorSchemeCommand = "dconf";
-                }
             }
         }
     }

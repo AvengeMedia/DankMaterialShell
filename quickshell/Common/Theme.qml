@@ -10,6 +10,7 @@ import qs.DankCommon.Common as DankCommon
 import qs.Services
 import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
+import "GSettings.js" as GSettings
 
 Singleton {
     id: root
@@ -1918,23 +1919,12 @@ Singleton {
         const theme = isLight ? "adw-gtk3" : "adw-gtk3-dark";
         const schema = "org.gnome.desktop.interface";
         const key = "gtk-theme";
+        const reset = GSettings.setCmd(schema, key, "");
+        const apply = GSettings.setCmd(schema, key, theme);
 
-        const makeCmd = (tool, schema, val) => {
-            if (tool === "gsettings") {
-                return `gsettings set ${schema} ${key} '' && gsettings set ${schema} ${key} ${val}`;
-            } else {
-                const dconfPath = `/${schema.replace(/\./g, "/")}`;
-                return `dconf write ${dconfPath}/${key} "''" && dconf write ${dconfPath}/${key} "'${val}'"`;
-            }
-        };
-
-        Proc.runCommand("gtkRefresher", ["sh", "-c", makeCmd("gsettings", schema, theme)], (output, exitCode) => {
+        Proc.runCommand("gtkRefresher", ["sh", "-c", `${reset}; ${apply}`], (output, exitCode) => {
             if (exitCode !== 0) {
-                Proc.runCommand("gtkRefreshFallback", ["sh", "-c", makeCmd("dconf", schema, theme)], (output, exitCode) => {
-                    if (exitCode !== 0) {
-                        log.warn("Failed to refresh gtk-theme");
-                    }
-                });
+                log.warn("Failed to refresh gtk-theme");
             }
         });
     }
