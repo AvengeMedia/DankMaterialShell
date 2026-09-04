@@ -500,23 +500,25 @@ func buildImportData(dank16JSON, image string) string {
 	return fmt.Sprintf(`{"dank16": %s, "image": %s}`, dank16JSON, path)
 }
 
+func userConfigSection(opts *Options) string {
+	if !opts.RunUserTemplates || opts.ConfigDir == "" {
+		return "[config]\n\n"
+	}
+	data, err := os.ReadFile(filepath.Join(opts.ConfigDir, "matugen", "config.toml"))
+	if err != nil {
+		return "[config]\n\n"
+	}
+	section := extractTOMLSection(string(data), "[config]", "[templates]")
+	if section == "" {
+		return "[config]\n\n"
+	}
+	return section + "\n"
+}
+
 func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {
 	userConfigPath := filepath.Join(opts.ConfigDir, "matugen", "config.toml")
 
-	wroteConfig := false
-	if opts.RunUserTemplates {
-		if data, err := os.ReadFile(userConfigPath); err == nil {
-			configSection := extractTOMLSection(string(data), "[config]", "[templates]")
-			if configSection != "" {
-				cfgFile.WriteString(configSection)
-				cfgFile.WriteString("\n")
-				wroteConfig = true
-			}
-		}
-	}
-	if !wroteConfig {
-		cfgFile.WriteString("[config]\n\n")
-	}
+	cfgFile.WriteString(userConfigSection(opts))
 
 	baseConfigPath := filepath.Join(opts.ShellDir, "matugen", "configs", "base.toml")
 	if data, err := os.ReadFile(baseConfigPath); err == nil {
@@ -983,7 +985,32 @@ func runMatugenDryRun(opts *Options) (string, error) {
 	return execDryRun(opts, newFlags)
 }
 
+// matugen aborts on a config file it cannot deserialize, and without -c it
+// reads the user's own ~/.config/matugen/config.toml, so a dry run gets a
+// config of its own instead of inheriting whatever is there.
+func writeDryRunConfig(opts *Options) (string, error) {
+	cfgFile, err := os.CreateTemp("", "matugen-dryrun-*.toml")
+	if err != nil {
+		return "", fmt.Errorf("failed to create dry-run config: %w", err)
+	}
+	defer cfgFile.Close()
+
+	section := userConfigSection(opts)
+	if idx := strings.Index(section, "\n[templates"); idx != -1 {
+		section = section[:idx+1]
+	}
+	cfgFile.WriteString(section)
+	cfgFile.WriteString("[templates]\n")
+	return cfgFile.Name(), nil
+}
+
 func execDryRun(opts *Options, flags matugenFlags) (string, error) {
+	cfgPath, err := writeDryRunConfig(opts)
+	if err != nil {
+		return "", err
+	}
+	defer os.Remove(cfgPath)
+
 	var baseArgs []string
 	switch opts.Kind {
 	case "hex":
@@ -991,7 +1018,7 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 	default:
 		baseArgs = []string{opts.Kind, opts.Value}
 	}
-	baseArgs = append(baseArgs, "-m", string(opts.Mode), "-t", opts.MatugenType, "--json", "hex", "--dry-run")
+	baseArgs = append(baseArgs, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgPath, "--json", "hex", "--dry-run")
 	baseArgs = appendContrastArg(baseArgs, opts.Contrast)
 	if flags.isV4 {
 		baseArgs = append(baseArgs, sourceSelectionArgs(opts.SourceMode, flags.supportsPrefer)...)
