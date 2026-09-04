@@ -1281,16 +1281,17 @@ Singleton {
         return badges;
     }
 
-    function installFromRegistry(pluginName, enableAfterInstall, onDone) {
-        ToastService.showInfo(I18n.tr("Installing: %1", "installation progress").arg(pluginName));
-        DMSService.install(pluginName, response => {
+    function installFromRegistry(pluginId, pluginName, enableAfterInstall, onDone) {
+        const displayName = pluginName || pluginId;
+        ToastService.showInfo(I18n.tr("Installing: %1", "installation progress").arg(displayName));
+        DMSService.install(pluginId, response => {
             if (response.error) {
                 ToastService.showError(I18n.tr("Install failed: %1", "installation error").arg(response.error));
                 if (onDone)
                     onDone(false);
                 return;
             }
-            ToastService.showInfo(I18n.tr("Installed: %1", "installation success").arg(pluginName));
+            ToastService.showInfo(I18n.tr("Installed: %1", "installation success").arg(displayName));
             scanPlugins();
             if (!enableAfterInstall) {
                 if (onDone)
@@ -1298,11 +1299,11 @@ Singleton {
                 return;
             }
             Qt.callLater(() => {
-                enablePlugin(pluginName);
-                const plugin = availablePlugins[pluginName];
+                enablePlugin(pluginId);
+                const plugin = availablePlugins[pluginId];
                 if (plugin?.type === "desktop") {
-                    const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(pluginName);
-                    SettingsData.createDesktopWidgetInstance(pluginName, plugin.name || pluginName, defaultConfig);
+                    const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(pluginId);
+                    SettingsData.createDesktopWidgetInstance(pluginId, plugin.name || displayName, defaultConfig);
                 }
                 if (onDone)
                     onDone(true);
