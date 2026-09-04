@@ -204,7 +204,7 @@ BasePill {
                 spacing: Theme.spacingS
 
                 property real fontSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                property real digitWidth: fontSize * 0.6
+                property real digitWidth: Math.round(fontSize * 0.6)
 
                 property string hoursStr: {
                     const hours = systemClock?.date?.getHours() ?? 0;
@@ -234,6 +234,8 @@ BasePill {
                     text: "•"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.outlineButton
+                    width: Math.ceil(implicitWidth)
+                    horizontalAlignment: Text.AlignHCenter
                     anchors.verticalCenter: parent.verticalCenter
                     visible: !compact
                 }
@@ -272,6 +274,8 @@ BasePill {
                             text: ":"
                             font.pixelSize: clockRow.fontSize
                             color: Theme.widgetTextColor
+                            width: Math.ceil(implicitWidth)
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         StyledText {
@@ -295,6 +299,8 @@ BasePill {
                             text: ":"
                             font.pixelSize: clockRow.fontSize
                             color: Theme.widgetTextColor
+                            width: Math.ceil(implicitWidth)
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         StyledText {
@@ -320,6 +326,8 @@ BasePill {
                             text: clockRow.ampmStr
                             font.pixelSize: clockRow.fontSize
                             color: Theme.widgetTextColor
+                            width: Math.ceil(implicitWidth)
+                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
                 }
@@ -337,6 +345,8 @@ BasePill {
                         }
                         font.pixelSize: clockRow.fontSize
                         color: Theme.widgetTextColor
+                        width: Math.ceil(implicitWidth)
+                        horizontalAlignment: Text.AlignHCenter
                         anchors.verticalCenter: parent.verticalCenter
                         visible: !compact
                     }
