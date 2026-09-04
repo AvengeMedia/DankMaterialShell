@@ -1813,12 +1813,13 @@ Item {
                 visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !dankBarTab.selectedBarFrameSanitized && !dankBarTab.islandOwnsSelectedBarTop
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
+                readonly property bool barShadowsEnabled: (SettingsData.m3ElevationEnabled ?? true) && (SettingsData.barElevationEnabled ?? true)
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
                 readonly property string directionSource: selectedBarConfig?.shadowDirectionMode ?? "inherit"
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.")
+                    text: shadowCard.barShadowsEnabled ? I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.") : I18n.tr("Requires Bar Shadows to be enabled in Theme & Colors.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
