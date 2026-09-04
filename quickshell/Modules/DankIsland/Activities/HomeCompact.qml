@@ -192,12 +192,15 @@ Item {
         Row {
             id: clockRow
 
+            readonly property string displayMode: root.controller.homeClockDisplay
+
             anchors.verticalCenter: parent.verticalCenter
             visible: item.isClock
             spacing: Theme.spacingS
 
             NumericText {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: clockRow.displayMode !== "date"
                 isMonospace: false
                 text: root.timeText
                 reserveText: root.timeText.replace(/\d/g, "0")
@@ -208,6 +211,7 @@ Item {
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: clockRow.displayMode === "both"
                 width: Theme.spacingXS
                 height: Theme.spacingXS
                 radius: height / 2
@@ -216,6 +220,7 @@ Item {
 
             StyledText {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: clockRow.displayMode !== "time"
                 text: root.dateText
                 color: Theme.surfaceTextMedium
                 font.pixelSize: root.textSize

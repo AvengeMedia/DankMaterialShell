@@ -12457,24 +12457,23 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeCompactTight",
-    "label": "Compact Clock Pill",
+    "section": "dankIslandHomeClockDisplay",
+    "label": "Clock Style",
     "tabIndex": 46,
     "category": "Island",
     "keywords": [
-      "both",
       "clock",
       "compact",
-      "height",
+      "current",
+      "date",
       "home",
       "island",
-      "narrow",
       "pill",
+      "style",
       "time",
-      "watch",
-      "width"
+      "watch"
     ],
-    "description": "Compact home clock pill in both width and height",
+    "description": "Current time and date pill",
     "conditionKey": "islandEnabled"
   },
   {
@@ -12498,6 +12497,27 @@
       "widgets"
     ],
     "description": "Resize the resting island to align with nearby widgets",
+    "conditionKey": "islandEnabled"
+  },
+  {
+    "section": "dankIslandHomeCompactTight",
+    "label": "Compact Pill",
+    "tabIndex": 46,
+    "category": "Island",
+    "keywords": [
+      "both",
+      "clock",
+      "compact",
+      "height",
+      "home",
+      "island",
+      "narrow",
+      "pill",
+      "time",
+      "watch",
+      "width"
+    ],
+    "description": "Compact home clock pill in both width and height",
     "conditionKey": "islandEnabled"
   },
   {
@@ -12720,22 +12740,17 @@
     "tabIndex": 46,
     "category": "Island",
     "keywords": [
-      "both",
       "clock",
       "compact",
-      "height",
+      "current",
+      "date",
       "home",
-      "icon",
       "island",
-      "percentage",
       "pill",
-      "time",
-      "volume",
-      "watch",
-      "width"
+      "time"
     ],
     "icon": "home",
-    "description": "Compact home clock pill in both width and height",
+    "description": "Current time and date pill",
     "conditionKey": "islandEnabled"
   },
   {
