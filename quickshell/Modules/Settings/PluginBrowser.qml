@@ -434,8 +434,8 @@ DankFloatingWindow {
         ensureSelectedVisible();
     }
 
-    function installPlugin(pluginName, enableAfterInstall) {
-        PluginService.installFromRegistry(pluginName, enableAfterInstall, success => {
+    function installPlugin(pluginId, pluginName, enableAfterInstall) {
+        PluginService.installFromRegistry(pluginId, pluginName, enableAfterInstall, success => {
             if (!success)
                 return;
             refreshPlugins();
@@ -471,7 +471,7 @@ DankFloatingWindow {
             "message": I18n.tr("Install plugin '%1' from the DMS registry?", "plugin installation confirmation").arg(pluginId),
             "confirmText": I18n.tr("Install", "install action button"),
             "cancelText": I18n.tr("Cancel"),
-            "onConfirm": () => installPlugin(pluginId, true),
+            "onConfirm": () => installPlugin(pluginId, pluginId, true),
             "onCancel": () => hide()
         });
     }
@@ -952,7 +952,7 @@ DankFloatingWindow {
                             installed: cardCell.modelData.installed || false
                             selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
                             onClicked: root.openPluginDetail(cardCell.modelData)
-                            onInstallRequested: root.installPlugin(cardCell.modelData.name, cardCell.modelData.type === "desktop")
+                            onInstallRequested: root.installPlugin(cardCell.modelData.id, cardCell.modelData.name, cardCell.modelData.type === "desktop")
                         }
                     }
                 }
@@ -1236,7 +1236,7 @@ DankFloatingWindow {
                             hoverEnabled: true
                             cursorShape: detailInstallButton.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
                             enabled: detailInstallButton.buttonState === "available"
-                            onClicked: root.installPlugin(detailPane.plugin.name, detailPane.plugin.type === "desktop")
+                            onClicked: root.installPlugin(detailPane.plugin.id, detailPane.plugin.name, detailPane.plugin.type === "desktop")
                         }
                     }
                 }
