@@ -490,6 +490,16 @@ Singleton {
         }
     }
 
+    Connections {
+        target: SettingsData
+        function onBuiltInPluginSettingsChanged() {
+            root.invalidateLauncherCache();
+        }
+        function onLauncherPluginVisibilityChanged() {
+            root.invalidateLauncherCache();
+        }
+    }
+
     Component.onCompleted: {
         _rebuildHiddenSet();
         refreshApplications();
