@@ -349,11 +349,37 @@ Rectangle {
             }
 
             DankActionButton {
+                id: todayButton
+
+                readonly property bool isCurrentMonth: {
+                    const now = systemClock.date;
+                    const disp = calendarGrid.displayDate;
+                    return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth();
+                }
+
                 buttonSize: 28
                 iconSize: 14
                 iconName: "today"
-                iconColor: Theme.primary
-                onClicked: root.goToToday()
+                iconColor: enabled ? Theme.primary : Theme.surfaceTextMedium
+                enabled: !isCurrentMonth
+                opacity: enabled ? 1 : 0.38
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 150
+                    }
+                }
+
+                onClicked: {
+                    todayTooltip.hide();
+                    root.goToToday();
+                }
+                onEntered: if (enabled) todayTooltip.show(I18n.tr("Today"), todayButton, 0, 0, "bottom")
+                onExited: todayTooltip.hide()
+
+                DankTooltipV2 {
+                    id: todayTooltip
+                }
             }
 
             DankActionButton {
