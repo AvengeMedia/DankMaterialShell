@@ -349,8 +349,6 @@ Rectangle {
             }
 
             DankActionButton {
-                id: todayButton
-
                 readonly property bool isCurrentMonth: {
                     const now = systemClock.date;
                     const disp = calendarGrid.displayDate;
