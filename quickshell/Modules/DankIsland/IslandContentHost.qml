@@ -14,7 +14,9 @@ Item {
 
     required property var controller
     required property real islandX
+    required property real islandY
     required property real hostWidth
+    required property real hostHeight
     required property real springTimeConstantMs
     required property real morphProgress
     required property bool expanded
@@ -137,12 +139,16 @@ Item {
         }
     }
 
+    // Pinned to the compact target's own screen slot so the face holds still while the island morphs.
     component CompactFace: Loader {
         required property string activity
         readonly property var target: root.controller.compactTargetFor(activity)
+        readonly property bool isVertical: root.controller.isVertical
+        readonly property real alongPos: isVertical ? Math.round((root.hostHeight - target.height) / 2 + target.offsetAlong) - Math.round(root.islandY) : Math.round((root.hostWidth - target.width) / 2 + target.offsetAlong) - Math.round(root.islandX)
+        readonly property real crossPos: isVertical ? Math.round((parent.width - width) / 2) : Math.round((parent.height - height) / 2)
 
-        x: Math.round((root.hostWidth - target.width) / 2 + target.offsetX) - Math.round(root.islandX)
-        y: Math.round((parent.height - height) / 2)
+        x: isVertical ? crossPos : alongPos
+        y: isVertical ? alongPos : crossPos
         width: target.width
         height: target.height
         asynchronous: false

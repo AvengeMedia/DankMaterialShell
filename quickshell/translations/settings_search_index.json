@@ -12320,7 +12320,7 @@
     "conditionKey": "isNiri"
   },
   {
-    "section": "dankIslandAppearance",
+    "section": "islandAppearance",
     "label": "Appearance",
     "tabIndex": 46,
     "category": "Island",
@@ -12342,7 +12342,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteBackground",
+    "section": "islandSatelliteBackground",
     "label": "Background",
     "tabIndex": 46,
     "category": "Island",
@@ -12362,7 +12362,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandBatteryStyle",
+    "section": "islandBatteryStyle",
     "label": "Battery Style",
     "tabIndex": 46,
     "category": "Island",
@@ -12388,7 +12388,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandInteraction",
+    "section": "islandInteraction",
     "label": "Behavior",
     "tabIndex": 46,
     "category": "Island",
@@ -12413,7 +12413,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeBrightnessDisplay",
+    "section": "islandHomeBrightnessDisplay",
     "label": "Brightness Style",
     "tabIndex": 46,
     "category": "Island",
@@ -12432,7 +12432,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandNotificationBadgeClearOnOpen",
+    "section": "islandNotificationBadgeClearOnOpen",
     "label": "Clear Badge on Open",
     "tabIndex": 46,
     "category": "Island",
@@ -12457,7 +12457,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeClockDisplay",
+    "section": "islandHomeClockDisplay",
     "label": "Clock Style",
     "tabIndex": 46,
     "category": "Island",
@@ -12477,7 +12477,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandCompactHeight",
+    "section": "islandCompactThickness",
     "label": "Compact Island Height",
     "tabIndex": 46,
     "category": "Island",
@@ -12494,13 +12494,15 @@
       "resting",
       "satellite",
       "size",
-      "widgets"
+      "thickness",
+      "widgets",
+      "width"
     ],
     "description": "Resize the resting island to align with nearby widgets",
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeCompactTight",
+    "section": "islandHomeCompactTight",
     "label": "Compact Pill",
     "tabIndex": 46,
     "category": "Island",
@@ -12521,7 +12523,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandCornerRadius",
+    "section": "islandCornerRadius",
     "label": "Corner Radius",
     "tabIndex": 46,
     "category": "Island",
@@ -12540,7 +12542,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandInstance",
+    "section": "islandInstance",
     "label": "Dank Island",
     "tabIndex": 46,
     "category": "Island",
@@ -12560,7 +12562,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandDisplays",
+    "section": "islandDisplays",
     "label": "Display Assignment",
     "tabIndex": 46,
     "category": "Island",
@@ -12576,7 +12578,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandEnable",
+    "section": "islandEnable",
     "label": "Enable Island",
     "tabIndex": 46,
     "category": "Island",
@@ -12592,7 +12594,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandNotificationExpand",
+    "section": "islandNotificationExpand",
     "label": "Expand Notifications",
     "tabIndex": 46,
     "category": "Island",
@@ -12614,7 +12616,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandInteractionMode",
+    "section": "islandInteractionMode",
     "label": "Expansion Mode",
     "tabIndex": 46,
     "category": "Island",
@@ -12639,7 +12641,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandFloating",
+    "section": "islandFloating",
     "label": "Float",
     "tabIndex": 46,
     "category": "Island",
@@ -12659,7 +12661,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteSwoopRadius",
+    "section": "islandSatelliteSwoopRadius",
     "label": "Goth Corner Radius",
     "tabIndex": 46,
     "category": "Island",
@@ -12678,7 +12680,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteGothCorners",
+    "section": "islandSatelliteGothCorners",
     "label": "Goth Corners",
     "tabIndex": 46,
     "category": "Island",
@@ -12700,7 +12702,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHoverCloseDelay",
+    "section": "islandHoverCloseDelay",
     "label": "Hide Delay",
     "tabIndex": 46,
     "category": "Island",
@@ -12715,7 +12717,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHighContrast",
+    "section": "islandHighContrast",
     "label": "High Contrast",
     "tabIndex": 46,
     "category": "Island",
@@ -12735,7 +12737,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandActivities",
+    "section": "islandActivities",
     "label": "Home Compact",
     "tabIndex": 46,
     "category": "Island",
@@ -12754,7 +12756,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeLayout",
+    "section": "islandHomeLayout",
     "label": "Home Layout",
     "tabIndex": 46,
     "category": "Island",
@@ -12787,7 +12789,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHorizontalOffset",
+    "section": "islandAlongOffset",
     "label": "Horizontal Offset",
     "tabIndex": 46,
     "category": "Island",
@@ -12804,7 +12806,8 @@
       "placement",
       "right",
       "satellites",
-      "screen"
+      "screen",
+      "vertical"
     ],
     "description": "Move island and satellites left or right from display center",
     "conditionKey": "islandEnabled"
@@ -12821,7 +12824,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteGap",
+    "section": "islandSatelliteGap",
     "label": "Island Gap",
     "tabIndex": 46,
     "category": "Island",
@@ -12835,7 +12838,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandBarId",
+    "section": "islandInstanceSelect",
     "label": "Island Instance",
     "tabIndex": 46,
     "category": "Island",
@@ -12851,7 +12854,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandMediaClockVisible",
+    "section": "islandMediaClockVisible",
     "label": "Keep Clock with Media",
     "tabIndex": 46,
     "category": "Island",
@@ -12872,7 +12875,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandMotion",
+    "section": "islandMotion",
     "label": "Motion & Accessibility",
     "tabIndex": 46,
     "category": "Island",
@@ -12895,7 +12898,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandNotifications",
+    "section": "islandNotifications",
     "label": "Notifications",
     "tabIndex": 46,
     "category": "Island",
@@ -12918,7 +12921,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatelliteTransparency",
+    "section": "islandSatelliteTransparency",
     "label": "Opacity",
     "tabIndex": 46,
     "category": "Island",
@@ -12933,7 +12936,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandTransparency",
+    "section": "islandTransparency",
     "label": "Opacity",
     "tabIndex": 46,
     "category": "Island",
@@ -12948,7 +12951,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHoverOpenDelay",
+    "section": "islandHoverOpenDelay",
     "label": "Open Delay",
     "tabIndex": 46,
     "category": "Island",
@@ -12962,7 +12965,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandOuterGap",
+    "section": "islandOuterGap",
     "label": "Outer Gaps",
     "tabIndex": 46,
     "category": "Island",
@@ -12986,7 +12989,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandPalette",
+    "section": "islandPalette",
     "label": "Palette",
     "tabIndex": 46,
     "category": "Island",
@@ -13001,7 +13004,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandPlacement",
+    "section": "islandPlacement",
     "label": "Position",
     "tabIndex": 46,
     "category": "Island",
@@ -13023,7 +13026,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatellitePosition",
+    "section": "islandSatellitePosition",
     "label": "Position",
     "tabIndex": 46,
     "category": "Island",
@@ -13049,7 +13052,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandReducedMotion",
+    "section": "islandReducedMotion",
     "label": "Reduce Motion",
     "tabIndex": 46,
     "category": "Island",
@@ -13071,7 +13074,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandReserveHeight",
+    "section": "islandReserveThickness",
     "label": "Reserved Height",
     "tabIndex": 46,
     "category": "Island",
@@ -13086,13 +13089,15 @@
       "reservation",
       "reserved",
       "satellites",
-      "space"
+      "space",
+      "thickness",
+      "width"
     ],
     "description": "Space kept clear for compact island and satellites",
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatellites",
+    "section": "islandSatellites",
     "label": "Satellite Widgets",
     "tabIndex": 46,
     "category": "Island",
@@ -13112,7 +13117,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSatellitesEnabled",
+    "section": "islandSatellitesEnabled",
     "label": "Show Satellite Widgets",
     "tabIndex": 46,
     "category": "Island",
@@ -13132,7 +13137,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSpringDamping",
+    "section": "islandSpringDamping",
     "label": "Spring Damping",
     "tabIndex": 46,
     "category": "Island",
@@ -13152,7 +13157,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSpringMass",
+    "section": "islandSpringMass",
     "label": "Spring Mass",
     "tabIndex": 46,
     "category": "Island",
@@ -13172,7 +13177,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandSpringStiffness",
+    "section": "islandSpringStiffness",
     "label": "Spring Stiffness",
     "tabIndex": 46,
     "category": "Island",
@@ -13194,7 +13199,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandUseOverlayLayer",
+    "section": "islandUseOverlayLayer",
     "label": "Use Overlay Layer",
     "tabIndex": 46,
     "category": "Island",
@@ -13214,7 +13219,7 @@
     "conditionKey": "islandEnabled"
   },
   {
-    "section": "dankIslandHomeVolumeDisplay",
+    "section": "islandHomeVolumeDisplay",
     "label": "Volume Style",
     "tabIndex": 46,
     "category": "Island",

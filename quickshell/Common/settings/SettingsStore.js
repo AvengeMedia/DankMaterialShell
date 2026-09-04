@@ -14,6 +14,43 @@ var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClo
 
 var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
 
+// v18: the shell-wide island settings became per-bar-config island* keys
+var ISLAND_KEY_MOVES = {
+    dankIslandFloating: "islandFloating",
+    dankIslandUseOverlayLayer: "islandUseOverlayLayer",
+    dankIslandReserveHeight: "islandReserveThickness",
+    dankIslandCompactHeight: "islandCompactThickness",
+    dankIslandOuterGap: "islandOuterGap",
+    dankIslandHorizontalOffset: "islandAlongOffset",
+    dankIslandInteractionMode: "islandInteractionMode",
+    dankIslandHoverOpenDelay: "islandHoverOpenDelay",
+    dankIslandHoverCloseDelay: "islandHoverCloseDelay",
+    dankIslandPalette: "islandPalette",
+    dankIslandTransparency: "islandTransparency",
+    dankIslandCornerRadius: "islandCornerRadius",
+    dankIslandHighContrast: "islandHighContrast",
+    dankIslandMediaClockVisible: "islandMediaClockVisible",
+    dankIslandNotificationBadgeClearOnOpen: "islandNotificationBadgeClearOnOpen",
+    dankIslandNotificationExpand: "islandNotificationExpand",
+    dankIslandHomeCompactTight: "islandHomeCompactTight",
+    dankIslandHomeClockDisplay: "islandHomeClockDisplay",
+    dankIslandHomeVolumeDisplay: "islandHomeVolumeDisplay",
+    dankIslandHomeBrightnessDisplay: "islandHomeBrightnessDisplay",
+    dankIslandHomeLayout: "islandHomeLayout",
+    dankIslandBatteryStyle: "islandBatteryStyle",
+    dankIslandSatellitesEnabled: "islandSatellitesEnabled",
+    dankIslandSatellitePosition: "islandSatellitePosition",
+    dankIslandSatelliteGap: "islandSatelliteGap",
+    dankIslandSatelliteBackground: "islandSatelliteBackground",
+    dankIslandSatelliteGothCorners: "islandSatelliteGothCorners",
+    dankIslandSatelliteTransparency: "islandSatelliteTransparency",
+    dankIslandSatelliteSwoopRadius: "islandSatelliteSwoopRadius",
+    dankIslandReducedMotion: "islandReducedMotion",
+    dankIslandSpringStiffness: "islandSpringStiffness",
+    dankIslandSpringDamping: "islandSpringDamping",
+    dankIslandSpringMass: "islandSpringMass"
+};
+
 function migrateBatteryPillStyle(target) {
     if (!target || typeof target !== "object" || target.batteryPillStyle === undefined)
         return;
@@ -431,6 +468,29 @@ function migrateToVersion(obj, targetVersion) {
         }
 
         settings.configVersion = 17;
+    }
+
+    if (currentVersion < 18) {
+        console.info("Migrating settings from version", currentVersion, "to version 18");
+        console.info("Moving the shell-wide Dank Island onto its bar config as a per-instance mode");
+
+        var islandId = settings.dankIslandBarId;
+        var islandBars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
+        for (var ib = 0; ib < islandBars.length; ib++) {
+            if (!islandBars[ib] || islandBars[ib].id !== islandId)
+                continue;
+            islandBars[ib].island = true;
+            for (var oldKey in ISLAND_KEY_MOVES) {
+                if (!(oldKey in settings))
+                    continue;
+                islandBars[ib][ISLAND_KEY_MOVES[oldKey]] = settings[oldKey];
+            }
+        }
+        for (var dropKey in ISLAND_KEY_MOVES)
+            delete settings[dropKey];
+        delete settings.dankIslandBarId;
+
+        settings.configVersion = 18;
     }
 
     return settings;

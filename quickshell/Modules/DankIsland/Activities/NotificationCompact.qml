@@ -12,18 +12,33 @@ Item {
     property bool dense: false
     property real iconSize: 36
 
+    readonly property bool isVertical: root.controller.isVertical
     readonly property string headerText: root.notificationModel.appName + (root.notificationModel.timeText ? " · " + root.notificationModel.timeText : "")
     readonly property string summaryText: root.dense && root.notificationModel.appName ? root.notificationModel.appName + " · " + root.notificationModel.summary : root.notificationModel.summary
     readonly property real measuredWidth: Theme.spacingS * 3 + root.iconSize + Theme.spacingXS + Math.max(root.dense ? 0 : headerLabel.implicitWidth, summaryLabel.implicitWidth)
 
-    function pushMeasuredWidth() {
-        root.controller.setNotificationContentWidth(root.measuredWidth);
+    function pushMeasuredLength() {
+        root.controller.setNotificationContentLength(root.isVertical ? root.iconSize + Theme.spacingS * 2 : root.measuredWidth);
     }
 
-    onMeasuredWidthChanged: root.pushMeasuredWidth()
-    Component.onCompleted: root.pushMeasuredWidth()
+    onMeasuredWidthChanged: root.pushMeasuredLength()
+    onIsVerticalChanged: root.pushMeasuredLength()
+    Component.onCompleted: root.pushMeasuredLength()
+
+    // A side strip only fits the sender's icon; the text lives in the expanded face.
+    DankCircularImage {
+        anchors.centerIn: parent
+        visible: root.isVertical
+        width: root.iconSize
+        height: width
+        imageSource: root.notificationModel.imageSource
+        fallbackIcon: root.notificationModel.fallbackIcon
+        fallbackText: root.notificationModel.fallbackText
+        cacheImages: false
+    }
 
     Row {
+        visible: !root.isVertical
         anchors {
             fill: parent
             leftMargin: Theme.spacingS

@@ -26,7 +26,7 @@ PanelWindow {
 
     function containsGlobalPoint(gx, gy, padding) {
         const pad = padding !== undefined ? padding : 16;
-        const items = [surface.inputMaskItem, surface.fittsStripItem, satelliteHost.leftInputItem, satelliteHost.rightInputItem];
+        const items = [surface.inputMaskItem, surface.fittsStripItem, satelliteHost.leadingInputItem, satelliteHost.trailingInputItem];
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (!item || item.width <= 0 || item.height <= 0)
@@ -35,40 +35,55 @@ PanelWindow {
             if (!topLeft)
                 continue;
             // mapToItem(null) is window-local; callers pass screen-space cursor coords.
+            const left = topLeft.x + root.hostOriginX;
             const top = topLeft.y + root.hostOriginY;
-            if (gx >= topLeft.x - pad && gx < topLeft.x + item.width + pad && gy >= top - pad && gy < top + item.height + pad)
+            if (gx >= left - pad && gx < left + item.width + pad && gy >= top - pad && gy < top + item.height + pad)
                 return true;
         }
         return false;
     }
 
-    readonly property int reserveHeight: Math.max(24, Math.min(128, SettingsData.dankIslandReserveHeight))
-    readonly property int compactHeight: Math.max(24, Math.min(72, SettingsData.dankIslandCompactHeight))
-    readonly property bool floating: SettingsData.dankIslandFloating
-    readonly property bool usesOverlayLayer: LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", SettingsData.dankIslandUseOverlayLayer)
+    required property string barId
+    readonly property var barConfig: {
+        SettingsData.barConfigs;
+        return SettingsData.getBarConfig(root.barId);
+    }
+
+    function setting(key) {
+        return SettingsData.islandSetting(root.barConfig, key);
+    }
+
+    readonly property int reserveThickness: Math.max(24, Math.min(128, root.setting("islandReserveThickness")))
+    readonly property int compactThickness: Math.max(24, Math.min(72, root.setting("islandCompactThickness")))
+    readonly property bool floating: root.setting("islandFloating")
+    readonly property bool usesOverlayLayer: LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", root.setting("islandUseOverlayLayer"))
     readonly property var islandLayer: LayerShell.fromEnv("DMS_DANKISLAND_LAYER", usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
-    readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property int reservedStripHeight: Math.max(reserveHeight, outerGap + compactHeight)
-    readonly property int stripY: root.bottomEdge ? root.height - root.reservedStripHeight : 0
-    readonly property int hostOriginY: root.bottomEdge ? Math.max(0, (root.screen?.height ?? 0) - root.height) : 0
-    readonly property int outerGap: Math.max(0, Math.min(48, SettingsData.dankIslandOuterGap))
+    readonly property string edge: SettingsData.islandEdge(root.barConfig)
+    readonly property bool isVertical: SettingsData.islandVertical(root.barConfig)
+    readonly property bool farEdge: root.edge === "bottom" || root.edge === "right"
+    readonly property int reservedStripThickness: Math.max(reserveThickness, outerGap + compactThickness)
+    readonly property int stripPos: root.farEdge ? (root.isVertical ? root.width : root.height) - root.reservedStripThickness : 0
+    readonly property int hostOriginX: root.isVertical && root.farEdge ? Math.max(0, (root.screen?.width ?? 0) - root.width) : 0
+    readonly property int hostOriginY: !root.isVertical && root.farEdge ? Math.max(0, (root.screen?.height ?? 0) - root.height) : 0
+    readonly property int outerGap: Math.max(0, Math.min(48, root.setting("islandOuterGap")))
     readonly property int maxActivityHeight: Math.max(560, Math.min(680, (screen?.height ?? 1080) - 200))
-    readonly property int hostHeight: outerGap + maxActivityHeight + 8
-    readonly property int maxActivityWidth: 736
-    readonly property real maximumHorizontalOffset: Math.max(0, (width - maxActivityWidth) / 2 - 8)
+    readonly property int maxActivityWidth: Math.min(736, Math.max(320, (screen?.width ?? 1920) - 200))
+    readonly property int hostThickness: outerGap + (root.isVertical ? maxActivityWidth : maxActivityHeight) + 8
+    readonly property real maximumAlongOffset: root.isVertical ? Math.max(0, (height - maxActivityHeight) / 2 - 8) : Math.max(0, (width - maxActivityWidth) / 2 - 8)
     property bool keyboardFocusArmed: true
 
     color: "transparent"
-    implicitHeight: hostHeight
-    exclusiveZone: floating ? 0 : reservedStripHeight
+    implicitHeight: hostThickness
+    implicitWidth: hostThickness
+    exclusiveZone: floating ? 0 : reservedStripThickness
     readonly property alias islandController: controller
     readonly property int launcherResultCount: launcherController.flatModel?.length ?? 0
 
     anchors {
-        top: !root.bottomEdge
-        bottom: root.bottomEdge
-        left: true
-        right: true
+        top: root.isVertical || root.edge === "top"
+        bottom: root.isVertical || root.edge === "bottom"
+        left: !root.isVertical || root.edge === "left"
+        right: !root.isVertical || root.edge === "right"
     }
 
     WlrLayershell.namespace: "dms:dankisland"
@@ -131,11 +146,11 @@ PanelWindow {
         }
 
         Region {
-            item: controller.inputSuspended ? null : satelliteHost.leftInputItem
+            item: controller.inputSuspended ? null : satelliteHost.leadingInputItem
         }
 
         Region {
-            item: controller.inputSuspended ? null : satelliteHost.rightInputItem
+            item: controller.inputSuspended ? null : satelliteHost.trailingInputItem
         }
 
         Region {
@@ -150,18 +165,27 @@ PanelWindow {
     IslandController {
         id: controller
 
-        interactionMode: SettingsData.dankIslandInteractionMode === "click" ? "click" : "hybrid"
+        barConfig: root.barConfig
+        edge: root.edge
+        interactionMode: root.setting("islandInteractionMode") === "click" ? "click" : "hybrid"
         inputSuspended: PopoutManager.screenshotActive
-        horizontalOffset: Math.max(-root.maximumHorizontalOffset, Math.min(root.maximumHorizontalOffset, SettingsData.dankIslandHorizontalOffset))
+        alongOffset: Math.max(-root.maximumAlongOffset, Math.min(root.maximumAlongOffset, root.setting("islandAlongOffset")))
         outerGap: root.outerGap
-        compactHeight: root.compactHeight
+        compactThickness: root.compactThickness
+        cornerRadius: Math.max(0, Math.min(64, root.setting("islandCornerRadius")))
+        homeCompactTight: root.setting("islandHomeCompactTight")
+        homeClockDisplay: SettingsData.islandClockDisplay(root.barConfig)
+        homeVolumeDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeVolumeDisplay")
+        homeBrightnessDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeBrightnessDisplay")
+        batteryStyle: root.setting("islandBatteryStyle")
+        mediaClockVisible: root.setting("islandMediaClockVisible")
         launcherCycleEnabled: SettingsData.launcherStyle === "island"
         controlCenterMaxHeight: root.maxActivityHeight
         notificationCenterMaxHeight: root.maxActivityHeight
-        notificationExpandAllowed: SettingsData.dankIslandNotificationExpand
-        unreadNotificationCount: SettingsData.dankIslandNotificationBadgeClearOnOpen ? NotificationService.unreadCount : NotificationService.notifications.length
-        hoverOpenDelay: Math.max(0, Math.min(1000, SettingsData.dankIslandHoverOpenDelay))
-        hoverCloseDelay: Math.max(0, Math.min(1000, SettingsData.dankIslandHoverCloseDelay))
+        notificationExpandAllowed: root.setting("islandNotificationExpand")
+        unreadNotificationCount: root.setting("islandNotificationBadgeClearOnOpen") ? NotificationService.unreadCount : NotificationService.notifications.length
+        hoverOpenDelay: Math.max(0, Math.min(1000, root.setting("islandHoverOpenDelay")))
+        hoverCloseDelay: Math.max(0, Math.min(1000, root.setting("islandHoverCloseDelay")))
     }
 
     DankLauncher.Controller {
@@ -221,11 +245,11 @@ PanelWindow {
     MouseArea {
         id: satelliteDismissStrip
 
-        x: 0
-        y: root.stripY
+        x: root.isVertical ? root.stripPos : 0
+        y: root.isVertical ? 0 : root.stripPos
         z: -2
-        width: parent.width
-        height: root.reservedStripHeight
+        width: root.isVertical ? root.reservedStripThickness : parent.width
+        height: root.isVertical ? parent.height : root.reservedStripThickness
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         hoverEnabled: false
         enabled: root.satelliteSurfacesOpen && !controller.inputSuspended
@@ -235,11 +259,11 @@ PanelWindow {
     BarScrollArea {
         id: scrollStrip
 
-        x: 0
-        y: root.stripY
+        x: root.isVertical ? root.stripPos : 0
+        y: root.isVertical ? 0 : root.stripPos
         z: -1
-        width: parent.width
-        height: root.reservedStripHeight
+        width: root.isVertical ? root.reservedStripThickness : parent.width
+        height: root.isVertical ? parent.height : root.reservedStripThickness
         hoverEnabled: false
         enabled: satelliteHost.scrollEnabled && !controller.inputSuspended
         scrollEnabled: satelliteHost.scrollEnabled
@@ -261,13 +285,15 @@ PanelWindow {
         launcherTransientSurfaceTracker: launcherTransientSurfaces
         notificationTransientSurfaceTracker: notificationTransientSurfaces
         effectiveScreen: root.screen
+        hostOriginX: root.hostOriginX
         hostOriginY: root.hostOriginY
-        reducedMotion: SettingsData.dankIslandReducedMotion || SettingsData.reduceMotion || SettingsData.animationSpeed === SettingsData.AnimationSpeed.None
-        springStiffness: Math.max(100, Math.min(1200, SettingsData.dankIslandSpringStiffness))
-        springDamping: Math.max(10, Math.min(100, SettingsData.dankIslandSpringDamping))
-        springMass: Math.max(0.25, Math.min(3, SettingsData.dankIslandSpringMass))
-        palette: SettingsData.dankIslandPalette
-        highContrast: SettingsData.dankIslandHighContrast
+        reducedMotion: root.setting("islandReducedMotion") || SettingsData.reduceMotion || SettingsData.animationSpeed === SettingsData.AnimationSpeed.None
+        springStiffness: Math.max(100, Math.min(1200, root.setting("islandSpringStiffness")))
+        springDamping: Math.max(10, Math.min(100, root.setting("islandSpringDamping")))
+        springMass: Math.max(0.25, Math.min(3, root.setting("islandSpringMass")))
+        palette: root.setting("islandPalette")
+        highContrast: root.setting("islandHighContrast")
+        transparency: root.setting("islandTransparency")
         onScrollWheel: wheel => scrollStrip.processWheel(wheel)
     }
 
@@ -277,6 +303,7 @@ PanelWindow {
         anchors.fill: parent
         hostWindow: root
         targetScreen: root.screen
+        barConfig: root.barConfig
         controller: controller
         islandSurface: surface
         outerGap: root.outerGap
@@ -325,12 +352,12 @@ PanelWindow {
             }
 
             Region {
-                item: leftSatelliteHole
+                item: leadingSatelliteHole
                 intersection: Intersection.Subtract
             }
 
             Region {
-                item: rightSatelliteHole
+                item: trailingSatelliteHole
                 intersection: Intersection.Subtract
             }
         }
@@ -346,7 +373,7 @@ PanelWindow {
         Item {
             id: islandHole
 
-            x: surface.inputMaskItem.x
+            x: surface.inputMaskItem.x + root.hostOriginX
             y: surface.inputMaskItem.y + root.hostOriginY
             width: surface.inputMaskItem.width
             height: surface.inputMaskItem.height
@@ -355,28 +382,28 @@ PanelWindow {
         Item {
             id: fittsStripHole
 
-            x: surface.fittsStripItem.x
+            x: surface.fittsStripItem.x + root.hostOriginX
             y: surface.fittsStripItem.y + root.hostOriginY
             width: surface.fittsStripItem.visible ? surface.fittsStripItem.width : 0
             height: surface.fittsStripItem.visible ? surface.fittsStripItem.height : 0
         }
 
         Item {
-            id: leftSatelliteHole
+            id: leadingSatelliteHole
 
-            x: satelliteHost.leftInputItem.x
-            y: satelliteHost.leftInputItem.y + root.hostOriginY
-            width: satelliteHost.leftInputItem.width
-            height: satelliteHost.leftInputItem.height
+            x: satelliteHost.leadingInputItem.x + root.hostOriginX
+            y: satelliteHost.leadingInputItem.y + root.hostOriginY
+            width: satelliteHost.leadingInputItem.width
+            height: satelliteHost.leadingInputItem.height
         }
 
         Item {
-            id: rightSatelliteHole
+            id: trailingSatelliteHole
 
-            x: satelliteHost.rightInputItem.x
-            y: satelliteHost.rightInputItem.y + root.hostOriginY
-            width: satelliteHost.rightInputItem.width
-            height: satelliteHost.rightInputItem.height
+            x: satelliteHost.trailingInputItem.x + root.hostOriginX
+            y: satelliteHost.trailingInputItem.y + root.hostOriginY
+            width: satelliteHost.trailingInputItem.width
+            height: satelliteHost.trailingInputItem.height
         }
 
         MouseArea {

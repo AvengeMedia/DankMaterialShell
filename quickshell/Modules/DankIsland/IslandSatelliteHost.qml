@@ -12,16 +12,18 @@ Item {
 
     required property var hostWindow
     required property var targetScreen
+    required property var barConfig
     required property IslandController controller
     required property var islandSurface
     property real outerGap: 8
 
-    readonly property alias leftInputItem: leftInputEnvelope
-    readonly property alias rightInputItem: rightInputEnvelope
-    readonly property var referenceBarConfig: {
-        SettingsData.barConfigs;
-        return SettingsData.islandBarConfig ?? ({});
+    function setting(key) {
+        return SettingsData.islandSetting(root.barConfig, key);
     }
+
+    readonly property alias leadingInputItem: leadingInputEnvelope
+    readonly property alias trailingInputItem: trailingInputEnvelope
+    readonly property var referenceBarConfig: root.barConfig ?? ({})
     readonly property var satelliteConfig: {
         const base = SettingsData.effectiveBarConfigForRender(root.referenceBarConfig, false) ?? root.referenceBarConfig ?? ({});
         if (!root.hostWindow?.usesOverlayLayer)
@@ -38,31 +40,30 @@ Item {
     readonly property real widgetThickness: Theme.barWidgetThickness(root.innerPadding, root.screenScale)
     readonly property real barThickness: Theme.barThickness(root.innerPadding, root.screenScale)
     readonly property real satelliteSpacing: root.satelliteConfig?.spacing ?? 4
-    readonly property bool edgeAligned: SettingsData.dankIslandSatellitePosition === "edges"
+    readonly property bool edgeAligned: root.setting("islandSatellitePosition") === "edges"
     readonly property real edgeBaseMargin: Math.max(Theme.spacingXS, root.innerPadding * 0.8)
     readonly property real edgeInsetRaw: SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (root.satelliteConfig?.barInsetPadding ?? -1)
     readonly property real edgeInset: Theme.snap(Math.max(0, root.edgeInsetRaw < 0 ? root.edgeBaseMargin : root.edgeInsetRaw), root.screenScale)
 
-    readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
-    readonly property real stripHeight: root.hostWindow?.reservedStripHeight ?? (root.outerGap + root.barThickness)
-    readonly property real rowY: {
-        const centered = Theme.snap((root.stripHeight - root.barThickness) / 2, root.screenScale);
-        return root.bottomEdge ? root.height - root.stripHeight + centered : centered;
-    }
-    readonly property bool backgroundEnabled: SettingsData.dankIslandSatelliteBackground
+    readonly property bool isVertical: root.controller.isVertical
+    readonly property bool crossFar: root.controller.edge === "bottom" || root.controller.edge === "right"
+    readonly property real alongExtent: root.isVertical ? root.height : root.width
+    readonly property real crossExtent: root.isVertical ? root.width : root.height
+    readonly property real stripThickness: root.hostWindow?.reservedStripThickness ?? (root.outerGap + root.barThickness)
+    readonly property real stripStart: root.crossFar ? root.crossExtent - root.stripThickness : 0
+    readonly property real rowCross: root.stripStart + Theme.snap((root.stripThickness - root.barThickness) / 2, root.screenScale)
+    readonly property bool backgroundEnabled: root.setting("islandSatelliteBackground")
     readonly property bool spanEdges: root.edgeAligned
     readonly property real chromePad: Theme.snap(root.innerPadding + Theme.spacingXS, root.screenScale)
     readonly property real chromeInset: root.backgroundEnabled ? root.chromePad : 0
-    readonly property real chromeY: root.bottomEdge ? root.height - root.stripHeight : 0
-    readonly property real chromeHeight: root.stripHeight
-    readonly property real crossEdgeExtension: root.spanEdges ? (root.bottomEdge ? root.height - root.rowY - root.barThickness : root.rowY) : 0
-    readonly property bool gothCorners: SettingsData.dankIslandSatelliteGothCorners
-    readonly property real chromeOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandSatelliteTransparency))
-    readonly property real sweepRadius: Math.max(4, Math.min(64, SettingsData.dankIslandSatelliteSwoopRadius))
+    readonly property real crossEdgeExtension: root.spanEdges ? (root.crossFar ? root.crossExtent - root.rowCross - root.barThickness : root.rowCross) : 0
+    readonly property bool gothCorners: root.setting("islandSatelliteGothCorners")
+    readonly property real chromeOpacity: Math.max(0, Math.min(1, root.setting("islandSatelliteTransparency")))
+    readonly property real sweepRadius: Math.max(4, Math.min(64, root.setting("islandSatelliteSwoopRadius")))
     readonly property color chromeBase: {
-        if (SettingsData.dankIslandHighContrast)
+        if (root.setting("islandHighContrast"))
             return Theme.surfaceContainerHighest;
-        switch (SettingsData.dankIslandPalette) {
+        switch (root.setting("islandPalette")) {
         case "bright":
             return Theme.surfaceBright;
         case "dim":
@@ -77,13 +78,17 @@ Item {
     readonly property bool islandTranslucent: root.islandOpacity > 0 && root.islandOpacity < 1
     readonly property bool tracksIsland: !root.edgeAligned && root.visible
     readonly property bool motionRunning: root.tracksIsland && (root.islandSurface?.motionRunning ?? false)
-    readonly property real islandStartX: root.islandSurface?.motionStartBounds.x ?? 0
-    readonly property real islandStartRight: root.islandStartX + (root.islandSurface?.motionStartBounds.width ?? 0)
-    readonly property real islandTargetX: root.islandSurface?.targetVisualX ?? 0
-    readonly property real islandTargetRight: root.islandTargetX + (root.islandSurface?.targetVisualWidth ?? 0)
+    readonly property rect islandStartBounds: root.islandSurface?.motionStartBounds ?? Qt.rect(0, 0, 0, 0)
+    readonly property real islandStartAlong: root.isVertical ? root.islandStartBounds.y : root.islandStartBounds.x
+    readonly property real islandStartAlongEnd: root.islandStartAlong + (root.isVertical ? root.islandStartBounds.height : root.islandStartBounds.width)
+    readonly property real islandTargetAlong: root.islandSurface?.targetAlongPos ?? 0
+    readonly property real islandTargetAlongEnd: root.islandTargetAlong + (root.islandSurface?.targetVisualAlong ?? 0)
+    readonly property real islandCurrentAlong: root.islandSurface?.currentAlongPos ?? 0
+    readonly property real islandCurrentAlongEnd: root.islandCurrentAlong + (root.islandSurface?.currentVisualAlong ?? 0)
+    readonly property real satelliteGap: root.setting("islandSatelliteGap")
 
-    readonly property real leftEdgeSpread: root.motionRunning ? Math.abs(root.islandStartX - root.islandTargetX) : 0
-    readonly property real rightEdgeSpread: root.motionRunning ? Math.abs(root.islandStartRight - root.islandTargetRight) : 0
+    readonly property real leadingEdgeSpread: root.motionRunning ? Math.abs(root.islandStartAlong - root.islandTargetAlong) : 0
+    readonly property real trailingEdgeSpread: root.motionRunning ? Math.abs(root.islandStartAlongEnd - root.islandTargetAlongEnd) : 0
 
     function normalizedWidgets(widgets) {
         return (widgets || []).map((widget, index) => {
@@ -102,7 +107,7 @@ Item {
         });
     }
 
-    visible: SettingsData.dankIslandSatellitesEnabled
+    visible: root.setting("islandSatellitesEnabled")
 
     function switchWorkspace(direction) {
         componentProvider.switchWorkspace(direction);
@@ -111,7 +116,7 @@ Item {
     AxisContext {
         id: satelliteAxis
 
-        edge: SettingsData.dankIslandEdge
+        edge: root.controller.edge
     }
 
     ScriptModel {
@@ -140,7 +145,7 @@ Item {
         property string screenName: root.targetScreen?.name ?? ""
         property real widgetThickness: root.widgetThickness
         property real effectiveBarThickness: root.barThickness
-        property bool isVertical: false
+        property bool isVertical: root.isVertical
         property bool usesFrameBarChrome: false
         property bool hasAdjacentTopBar: false
         property bool hasAdjacentBottomBar: false
@@ -192,7 +197,7 @@ Item {
         if (!BlurService.enabled)
             return;
         const widgets = root.chromeCoversWidgets ? [] : root._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
-        const chromes = [leftChrome, rightChrome].filter(c => root.chromeTranslucent && c.visible);
+        const chromes = [leadingChrome, trailingChrome].filter(c => root.chromeTranslucent && c.visible);
         if (chromes.length === 0 && widgets.length === 0 && !root.islandTranslucent)
             return;
         const region = blurRegionComp.createObject(root.hostWindow);
@@ -324,36 +329,31 @@ Item {
 
             property Item chrome
 
-            readonly property real cr: body.chrome.cornerR
-            readonly property real edgeY: body.chrome.bottomEdge ? body.y + body.height - body.cr : body.y
-            readonly property real sweepY: body.chrome.bottomEdge ? body.y : body.y + body.height - body.cr
-            readonly property bool sweepSquare: !body.chrome.floating && body.chrome.sweepR > 0
-
             x: body.chrome.x
             y: body.chrome.y
             width: body.chrome.width
             height: body.chrome.height
-            radius: body.cr
+            radius: body.chrome.cornerR
 
             Region {
-                x: body.x
-                y: body.edgeY
-                width: body.cr
-                height: body.cr
+                x: body.x + body.chrome.leadCornerSquare.x
+                y: body.y + body.chrome.leadCornerSquare.y
+                width: body.chrome.leadCornerSquare.width
+                height: body.chrome.leadCornerSquare.height
             }
 
             Region {
-                x: body.x + body.width - body.cr
-                y: body.edgeY
-                width: body.cr
-                height: body.cr
+                x: body.x + body.chrome.trailCornerSquare.x
+                y: body.y + body.chrome.trailCornerSquare.y
+                width: body.chrome.trailCornerSquare.width
+                height: body.chrome.trailCornerSquare.height
             }
 
             Region {
-                x: body.chrome.rightSide ? body.x + body.width - body.cr : body.x
-                y: body.sweepY
-                width: body.sweepSquare ? body.cr : 0
-                height: body.sweepSquare ? body.cr : 0
+                x: body.x + body.chrome.sweepCornerSquare.x
+                y: body.y + body.chrome.sweepCornerSquare.y
+                width: body.chrome.sweepCornerSquare.width
+                height: body.chrome.sweepCornerSquare.height
             }
         }
     }
@@ -380,32 +380,21 @@ Item {
             property Item chrome
             property bool isWing
 
-            readonly property real s: piece.chrome.sweepR
+            readonly property rect body: piece.isWing ? piece.chrome.sweepWingRect : piece.chrome.sweepBodyRect
+            readonly property rect disc: piece.isWing ? piece.chrome.sweepWingDisc : piece.chrome.sweepBodyDisc
 
-            readonly property bool leadsIn: piece.chrome.floating ? piece.isWing : piece.chrome.rightSide
-
-            x: {
-                if (piece.chrome.floating)
-                    return piece.isWing ? piece.chrome.x - piece.s : piece.chrome.x + piece.chrome.width;
-                if (piece.isWing)
-                    return piece.chrome.rightSide ? piece.chrome.x + piece.chrome.width - piece.s : piece.chrome.x;
-                return piece.chrome.rightSide ? piece.chrome.x - piece.s : piece.chrome.x + piece.chrome.width;
-            }
-            y: {
-                if (piece.isWing && !piece.chrome.floating)
-                    return piece.chrome.bottomEdge ? piece.chrome.y - piece.s : piece.chrome.y + piece.chrome.height;
-                return piece.chrome.bottomEdge ? piece.chrome.y + piece.chrome.height - piece.s : piece.chrome.y;
-            }
-            width: piece.s
-            height: piece.s
+            x: piece.chrome.x + piece.body.x
+            y: piece.chrome.y + piece.body.y
+            width: piece.body.width
+            height: piece.body.height
 
             Region {
                 intersection: Intersection.Subtract
-                radius: piece.s
-                width: piece.s * 2
-                height: piece.s * 2
-                x: piece.x - (piece.leadsIn ? piece.s : 0)
-                y: piece.y - (piece.chrome.bottomEdge ? piece.s : 0)
+                radius: piece.chrome.sweepR
+                x: piece.chrome.x + piece.disc.x
+                y: piece.chrome.y + piece.disc.y
+                width: piece.disc.width
+                height: piece.disc.height
             }
         }
     }
@@ -425,72 +414,93 @@ Item {
     }
 
     Item {
-        id: leftInputEnvelope
+        id: leadingInputEnvelope
 
-        x: (root.spanEdges ? 0 : (root.motionRunning ? Math.min(root.islandStartX, root.islandTargetX) - SettingsData.dankIslandSatelliteGap - leftInput.width : leftInput.x)) - (root.spanEdges ? 0 : root.chromeInset)
-        y: root.spanEdges ? root.chromeY : leftInput.y
-        width: root.spanEdges ? (leftInput.width > 0 ? Math.max(0, leftInput.x + leftInput.width + root.chromeInset) : 0) : leftInput.width + root.leftEdgeSpread + root.chromeInset * 2
-        height: root.spanEdges ? (leftInput.width > 0 ? root.chromeHeight : 0) : leftInput.height
+        readonly property real alongPos: (root.spanEdges ? 0 : (root.motionRunning ? Math.min(root.islandStartAlong, root.islandTargetAlong) - root.satelliteGap - leadingInput.alongSize : leadingInput.alongPos)) - (root.spanEdges ? 0 : root.chromeInset)
+        readonly property real alongSize: root.spanEdges ? (leadingInput.alongSize > 0 ? Math.max(0, leadingInput.alongPos + leadingInput.alongSize + root.chromeInset) : 0) : leadingInput.alongSize + root.leadingEdgeSpread + root.chromeInset * 2
+        readonly property real crossPos: root.spanEdges ? root.stripStart : root.rowCross
+        readonly property real crossSize: root.spanEdges ? (leadingInput.alongSize > 0 ? root.stripThickness : 0) : leadingInput.crossSize
+
+        x: root.isVertical ? crossPos : alongPos
+        y: root.isVertical ? alongPos : crossPos
+        width: root.isVertical ? crossSize : alongSize
+        height: root.isVertical ? alongSize : crossSize
     }
 
     Item {
-        id: rightInputEnvelope
+        id: trailingInputEnvelope
 
-        readonly property real edgeX: rightInput.width > 0 ? rightInput.x - root.chromeInset : root.width
+        readonly property real edgeAlong: trailingInput.alongSize > 0 ? trailingInput.alongPos - root.chromeInset : root.alongExtent
+        readonly property real alongPos: (root.spanEdges ? edgeAlong : (root.motionRunning ? Math.min(root.islandStartAlongEnd, root.islandTargetAlongEnd) + root.satelliteGap : trailingInput.alongPos)) - (root.spanEdges ? 0 : root.chromeInset)
+        readonly property real alongSize: root.spanEdges ? Math.max(0, root.alongExtent - edgeAlong) : trailingInput.alongSize + root.trailingEdgeSpread + root.chromeInset * 2
+        readonly property real crossPos: root.spanEdges ? root.stripStart : root.rowCross
+        readonly property real crossSize: root.spanEdges ? (trailingInput.alongSize > 0 ? root.stripThickness : 0) : trailingInput.crossSize
 
-        x: (root.spanEdges ? edgeX : (root.motionRunning ? Math.min(root.islandStartRight, root.islandTargetRight) + SettingsData.dankIslandSatelliteGap : rightInput.x)) - (root.spanEdges ? 0 : root.chromeInset)
-        y: root.spanEdges ? root.chromeY : rightInput.y
-        width: root.spanEdges ? Math.max(0, root.width - edgeX) : rightInput.width + root.rightEdgeSpread + root.chromeInset * 2
-        height: root.spanEdges ? (rightInput.width > 0 ? root.chromeHeight : 0) : rightInput.height
+        x: root.isVertical ? crossPos : alongPos
+        y: root.isVertical ? alongPos : crossPos
+        width: root.isVertical ? crossSize : alongSize
+        height: root.isVertical ? alongSize : crossSize
     }
 
     IslandSatelliteChrome {
-        id: leftChrome
+        id: leadingChrome
+
+        readonly property real alongPos: root.edgeAligned ? 0 : leadingInput.alongPos - root.chromePad
+        readonly property real alongSize: leadingInput.alongSize > 0 ? (root.edgeAligned ? leadingInput.alongPos + leadingInput.alongSize + root.chromePad : leadingInput.alongSize + root.chromePad * 2) : 0
 
         floating: !root.edgeAligned
-        x: root.edgeAligned ? 0 : leftInput.x - root.chromePad
-        y: root.chromeY
-        width: leftInput.width > 0 ? (root.edgeAligned ? leftInput.x + leftInput.width + root.chromePad : leftInput.width + root.chromePad * 2) : 0
-        height: root.chromeHeight
-        visible: root.backgroundEnabled && leftInput.width > 0
+        x: root.isVertical ? root.stripStart : alongPos
+        y: root.isVertical ? alongPos : root.stripStart
+        width: root.isVertical ? root.stripThickness : alongSize
+        height: root.isVertical ? alongSize : root.stripThickness
+        visible: root.backgroundEnabled && leadingInput.alongSize > 0
         fillColor: root.chromeColor
         gothEnabled: root.gothCorners
         sweep: root.sweepRadius
-        bottomEdge: root.bottomEdge
+        isVertical: root.isVertical
+        crossFar: root.crossFar
         parentScreen: root.targetScreen
         onVisibleChanged: blurRebuildTimer.restart()
     }
 
     IslandSatelliteChrome {
-        id: rightChrome
+        id: trailingChrome
+
+        readonly property real alongPos: trailingInput.alongPos - root.chromePad
+        readonly property real alongSize: trailingInput.alongSize > 0 ? (root.edgeAligned ? Math.max(0, root.alongExtent - alongPos) : trailingInput.alongSize + root.chromePad * 2) : 0
 
         rightSide: true
         floating: !root.edgeAligned
-        x: rightInput.x - root.chromePad
-        y: root.chromeY
-        width: rightInput.width > 0 ? (root.edgeAligned ? Math.max(0, root.width - x) : rightInput.width + root.chromePad * 2) : 0
-        height: root.chromeHeight
-        visible: root.backgroundEnabled && rightInput.width > 0
+        x: root.isVertical ? root.stripStart : alongPos
+        y: root.isVertical ? alongPos : root.stripStart
+        width: root.isVertical ? root.stripThickness : alongSize
+        height: root.isVertical ? alongSize : root.stripThickness
+        visible: root.backgroundEnabled && trailingInput.alongSize > 0
         fillColor: root.chromeColor
         gothEnabled: root.gothCorners
         sweep: root.sweepRadius
-        bottomEdge: root.bottomEdge
+        isVertical: root.isVertical
+        crossFar: root.crossFar
         parentScreen: root.targetScreen
         onVisibleChanged: blurRebuildTimer.restart()
     }
 
     Item {
-        id: leftInput
+        id: leadingInput
 
-        x: root.edgeAligned ? root.edgeInset : Math.round(root.islandSurface.currentVisualX - SettingsData.dankIslandSatelliteGap - width)
-        y: root.rowY
-        width: root.visible ? leftWidgetSection.implicitWidth : 0
-        height: root.visible ? root.barThickness : 0
-        onXChanged: root.kickBlur()
-        onWidthChanged: root.kickBlur()
+        readonly property real alongPos: root.edgeAligned ? root.edgeInset : Math.round(root.islandCurrentAlong - root.satelliteGap - alongSize)
+        readonly property real alongSize: root.visible ? (root.isVertical ? leadingWidgetSection.implicitHeight : leadingWidgetSection.implicitWidth) : 0
+        readonly property real crossSize: root.visible ? root.barThickness : 0
+
+        x: root.isVertical ? root.rowCross : alongPos
+        y: root.isVertical ? alongPos : root.rowCross
+        width: root.isVertical ? crossSize : alongSize
+        height: root.isVertical ? alongSize : crossSize
+        onAlongPosChanged: root.kickBlur()
+        onAlongSizeChanged: root.kickBlur()
 
         LeftSection {
-            id: leftWidgetSection
+            id: leadingWidgetSection
 
             anchors.fill: parent
             objectName: "leftSection"
@@ -510,17 +520,21 @@ Item {
     }
 
     Item {
-        id: rightInput
+        id: trailingInput
 
-        x: root.edgeAligned ? root.width - root.edgeInset - width : Math.round(root.islandSurface.currentVisualX + root.islandSurface.currentVisualWidth + SettingsData.dankIslandSatelliteGap)
-        y: root.rowY
-        width: root.visible ? rightWidgetSection.implicitWidth : 0
-        height: root.visible ? root.barThickness : 0
-        onXChanged: root.kickBlur()
-        onWidthChanged: root.kickBlur()
+        readonly property real alongPos: root.edgeAligned ? root.alongExtent - root.edgeInset - alongSize : Math.round(root.islandCurrentAlongEnd + root.satelliteGap)
+        readonly property real alongSize: root.visible ? (root.isVertical ? trailingWidgetSection.implicitHeight : trailingWidgetSection.implicitWidth) : 0
+        readonly property real crossSize: root.visible ? root.barThickness : 0
+
+        x: root.isVertical ? root.rowCross : alongPos
+        y: root.isVertical ? alongPos : root.rowCross
+        width: root.isVertical ? crossSize : alongSize
+        height: root.isVertical ? alongSize : crossSize
+        onAlongPosChanged: root.kickBlur()
+        onAlongSizeChanged: root.kickBlur()
 
         RightSection {
-            id: rightWidgetSection
+            id: trailingWidgetSection
 
             anchors.fill: parent
             objectName: "rightSection"

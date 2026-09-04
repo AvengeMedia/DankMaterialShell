@@ -21,38 +21,35 @@ Row {
             "label": I18n.tr("Island")
         }
     ]
-    readonly property string activeBarMode: SettingsData.frameEnabled ? "frame" : SettingsData.dankIslandBarId ? "island" : "standard"
-
-    function leaveIsland() {
-        const config = SettingsData.islandBarConfig;
-        if (SettingsData.dankIslandBarId)
-            SettingsData.set("dankIslandBarId", "");
-        if (config && !config.enabled)
-            SettingsData.updateBarConfig(config.id, {
-                enabled: true
-            });
+    // Frame is a shell-wide surface; standard vs island is per bar instance.
+    readonly property var targetConfig: {
+        SettingsData.barConfigs;
+        SettingsUiState.selectedBarId;
+        const configs = SettingsData.barConfigs || [];
+        return SettingsData.getBarConfig(SettingsUiState.selectedBarId) ?? configs.find(cfg => cfg.enabled) ?? configs[0] ?? null;
     }
+    readonly property string activeBarMode: SettingsData.frameEnabled ? "frame" : (SettingsData.isIslandBarConfig(root.targetConfig) ? "island" : "standard")
 
     function applyBarMode(mode) {
+        const target = root.targetConfig;
         switch (mode) {
         case "frame":
             if (SettingsData.frameEnabled)
                 return;
-            leaveIsland();
             SettingsData.set("frameEnabled", true);
             return;
         case "island":
-            {
-                const configs = SettingsData.barConfigs || [];
-                const target = SettingsData.islandBarConfig ?? SettingsData.getBarConfig(SettingsUiState.selectedBarId) ?? configs.find(cfg => cfg.enabled) ?? configs[0];
-                if (target)
-                    SettingsData.setIslandBarId(target.id);
+            if (!target)
                 return;
-            }
+            if (SettingsData.frameEnabled)
+                SettingsData.set("frameEnabled", false);
+            SettingsData.setBarIsland(target.id, true);
+            return;
         default:
             if (SettingsData.frameEnabled)
                 SettingsData.set("frameEnabled", false);
-            leaveIsland();
+            if (target)
+                SettingsData.setBarIsland(target.id, false);
             return;
         }
     }

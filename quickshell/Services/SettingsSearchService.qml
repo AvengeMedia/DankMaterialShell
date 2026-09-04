@@ -55,7 +55,7 @@ Singleton {
             "matugenAvailable": () => Theme.matugenAvailable,
             "greeterAvailable": () => GreeterService.available,
             "frameEnabled": () => SettingsData.frameEnabled,
-            "islandEnabled": () => !!SettingsData.dankIslandBarId,
+            "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
             "cellularAvailable": () => (NetworkService.cellularDevices?.length ?? 0) > 0
         })
 

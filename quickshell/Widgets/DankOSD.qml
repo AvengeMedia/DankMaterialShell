@@ -162,6 +162,8 @@ PanelWindow {
         // Legacy OSDs still instantiate on island screens, so the strip has to be reserved for them.
         offsets.top = Math.max(offsets.top, SettingsData.dankIslandEdgeOffset(screen, "top"));
         offsets.bottom = Math.max(offsets.bottom, SettingsData.dankIslandEdgeOffset(screen, "bottom"));
+        offsets.left = Math.max(offsets.left, SettingsData.dankIslandEdgeOffset(screen, "left"));
+        offsets.right = Math.max(offsets.right, SettingsData.dankIslandEdgeOffset(screen, "right"));
         return offsets;
     }
 

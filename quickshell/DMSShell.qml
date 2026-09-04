@@ -37,7 +37,7 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
-    readonly property var dankIslandScreens: SettingsData.getIslandScreens()
+    readonly property var dankIslandScreens: Quickshell.screens.filter(screen => SettingsData.dankIslandCoversScreen(screen))
     readonly property var notificationPopupScreens: {
         const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
         return root.withoutDankIslandScreens(screens);
