@@ -349,17 +349,18 @@ Rectangle {
             }
 
             DankActionButton {
-                readonly property bool isCurrentMonth: {
+                readonly property bool isToday: {
                     const now = systemClock.date;
                     const disp = calendarGrid.displayDate;
-                    return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth();
+                    const sel = calendarGrid.selectedDate;
+                    return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth() && sel.getFullYear() === now.getFullYear() && sel.getMonth() === now.getMonth() && sel.getDate() === now.getDate();
                 }
 
                 buttonSize: 28
                 iconSize: 14
                 iconName: "today"
                 iconColor: enabled ? Theme.primary : Theme.surfaceTextMedium
-                enabled: !isCurrentMonth
+                enabled: !isToday
                 opacity: enabled ? 1 : 0.38
                 tooltipText: I18n.tr("Today")
 
