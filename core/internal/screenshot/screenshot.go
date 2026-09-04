@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
@@ -177,6 +178,14 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 }
 
 func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
+	if !s.config.AllowMultiple {
+		lock, err := utils.LockSelectionOverlay()
+		if err != nil {
+			return nil, err
+		}
+		defer lock.Release()
+	}
+
 	if s.config.Reset {
 		if err := SaveLastRegion(Region{}); err != nil {
 			log.Debug("failed to reset last region", "err", err)

@@ -33,8 +33,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/ipc"
-	"github.com/AvengeMedia/dankgo/paths"
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
@@ -86,7 +86,7 @@ var cupsMu sync.Mutex
 var cupsSubscriberCount int
 var cupsEverAvailable bool
 
-var appPaths = paths.New("danklinux")
+var appPaths = utils.App()
 
 func GetSocketPath() string {
 	return appPaths.SocketPath()
