@@ -1522,30 +1522,10 @@ Singleton {
         const dankBarScale = fontScale !== undefined ? fontScale : 1.0;
         const maxScale = (maximizeText ?? false) ? 1.5 : 1.0;
         if (scale <= 0.75)
-            return evenLineBoxSize(Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale));
+            return Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale);
         if (scale >= 1.25)
-            return evenLineBoxSize(Math.round(fontSizeMedium * dankBarScale * maxScale));
-        return evenLineBoxSize(Math.round(fontSizeSmall * dankBarScale * maxScale));
-    }
-
-    FontMetrics {
-        id: lineBoxProbe
-    }
-
-    // Text.implicitHeight is ceil(FontMetrics.height); probe.font is written whole and read via boundingRect() so bindings capture no dependency on the probe
-    function lineBoxHeight(pixelSize) {
-        lineBoxProbe.font = Qt.font({
-            family: fontFamily,
-            weight: fontWeight,
-            pixelSize: pixelSize
-        });
-        return Math.ceil(lineBoxProbe.boundingRect("0").height);
-    }
-
-    function evenLineBoxSize(pixelSize) {
-        if (lineBoxHeight(pixelSize) % 2 === 0)
-            return pixelSize;
-        return lineBoxHeight(pixelSize + 1) % 2 === 0 ? pixelSize + 1 : pixelSize;
+            return Math.round(fontSizeMedium * dankBarScale * maxScale);
+        return Math.round(fontSizeSmall * dankBarScale * maxScale);
     }
 
     function getBatteryIcon(level, isCharging, batteryAvailable) {
