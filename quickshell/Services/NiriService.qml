@@ -38,6 +38,12 @@ Singleton {
     property var keyboardLayoutNames: []
 
     property string configValidationOutput: ""
+    readonly property string niriConfigDir: {
+        const override = Quickshell.env("DMS_NIRI_CONFIG_DIR");
+        if (override && override.trim() !== "")
+            return Paths.strip(override);
+        return Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/niri/dms";
+    }
     property bool hasInitialConnection: false
     property bool suppressConfigToast: true
     property bool suppressNextConfigToast: false
@@ -1167,8 +1173,7 @@ Singleton {
         if (_layoutXrayLoading)
             return;
         _layoutXrayLoading = true;
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        Proc.runCommand("niri-read-layout-xray", ["cat", configDir + "/niri/dms/layout.kdl"], (output, exitCode) => {
+        Proc.runCommand("niri-read-layout-xray", ["cat", root.niriConfigDir + "/layout.kdl"], (output, exitCode) => {
             _layoutXrayLoading = false;
             if (!_layoutXrayLoaded) {
                 const content = exitCode === 0 ? output : "";
@@ -1272,8 +1277,7 @@ window-rule {
     }
 }`;
 
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        const niriDmsDir = configDir + "/niri/dms";
+        const niriDmsDir = root.niriConfigDir;
         const configPath = niriDmsDir + "/layout.kdl";
         const alttabPath = niriDmsDir + "/alttab.kdl";
 
@@ -1304,8 +1308,7 @@ window-rule {
     function generateNiriBlurrule() {
         log.debug("Generating wpblur config...");
 
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        const niriDmsDir = configDir + "/niri/dms";
+        const niriDmsDir = root.niriConfigDir;
         const blurrulePath = niriDmsDir + "/wpblur.kdl";
         const sourceBlurrulePath = Paths.strip(Qt.resolvedUrl("niri-wpblur.kdl"));
 
@@ -1320,8 +1323,7 @@ window-rule {
 
         log.debug("Generating cursor config...");
 
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        const niriDmsDir = configDir + "/niri/dms";
+        const niriDmsDir = root.niriConfigDir;
         const cursorPath = niriDmsDir + "/cursor.kdl";
 
         const settings = typeof SettingsData !== "undefined" ? SettingsData.cursorSettings : null;
@@ -1554,8 +1556,7 @@ window-rule {
             return;
         }
 
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        const niriDmsDir = configDir + "/niri/dms";
+        const niriDmsDir = root.niriConfigDir;
         const outputsPath = niriDmsDir + "/outputs.kdl";
 
         Proc.runCommand("niri-write-outputs", ["sh", "-c", `mkdir -p "${niriDmsDir}" && cat > "${outputsPath}" << 'EOF'\n${kdlContent}EOF`], (output, exitCode) => {
@@ -1817,8 +1818,7 @@ window-rule {
 
         inputContent += "}\n";
 
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation));
-        const niriDmsDir = configDir + "/niri/dms";
+        const niriDmsDir = root.niriConfigDir;
         const inputPath = niriDmsDir + "/input.kdl";
 
         writeInputProcess.inputContent = inputContent;
