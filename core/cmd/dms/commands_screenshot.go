@@ -33,6 +33,7 @@ var (
 	ssStdout      bool
 	ssJSON        bool
 	ssGeometry    bool
+	ssAllowMulti  bool
 )
 
 type screenshotMetadata struct {
@@ -80,6 +81,7 @@ Examples:
   dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85
   dms screenshot --json              # Print capture metadata as JSON
+  dms screenshot --allow-multiple    # Skip the one-selector-at-a-time guard
   dms screenshot -g                  # Print selected region geometry (X,Y WxH) to stdout
   dms screenshot scroll              # Scroll capture, Enter finishes / Esc cancels
   dms screenshot scroll --interval 250`,
@@ -176,6 +178,7 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
 	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
 	screenshotCmd.PersistentFlags().BoolVarP(&ssGeometry, "geometry", "g", false, "Print selected region geometry (X,Y WxH) to stdout without capturing an image")
+	screenshotCmd.PersistentFlags().BoolVar(&ssAllowMulti, "allow-multiple", false, "Open a selector even when another one is already open")
 
 	ssScrollCmd.Flags().IntVar(&ssScrollInterval, "interval", 45, "Capture interval in milliseconds (30-1000)")
 
@@ -205,6 +208,7 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config.Reset = ssReset
 	config.Stdout = ssStdout
 	config.Geometry = ssGeometry
+	config.AllowMultiple = ssAllowMulti
 
 	if ssGeometry {
 		config.Clipboard = false

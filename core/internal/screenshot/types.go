@@ -56,21 +56,22 @@ type Output struct {
 }
 
 type Config struct {
-	Mode       Mode
-	OutputName string
-	Cursor     CursorMode
-	NoConfirm  bool
-	Reset      bool
-	Format     Format
-	Quality    int
-	OutputDir  string
-	Filename   string
-	Clipboard  bool
-	SaveFile   bool
-	Notify     bool
-	Stdout     bool
-	Geometry   bool
-	IntervalMs int
+	Mode          Mode
+	OutputName    string
+	Cursor        CursorMode
+	NoConfirm     bool
+	Reset         bool
+	Format        Format
+	Quality       int
+	OutputDir     string
+	Filename      string
+	Clipboard     bool
+	SaveFile      bool
+	Notify        bool
+	Stdout        bool
+	Geometry      bool
+	AllowMultiple bool
+	IntervalMs    int
 	// SelectorHook runs as the interactive selector starts (true) and ends (false).
 	SelectorHook func(begin bool)
 }
