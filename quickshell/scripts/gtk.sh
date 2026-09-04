@@ -4,13 +4,11 @@ CONFIG_DIR="$1"
 # apply: setup overrides and config dirs
 # patch: refresh overrides in adw-gtk3
 # remove: remove all overrides
-# assets: relink adw-gtk3 assets if DMS already manages gtk.css
 MODE="${2:-apply}"
 IS_LIGHT="${3:-light}"
-SHELL_DIR="$4"
 
 if [ -z "$CONFIG_DIR" ]; then
-	echo "Usage: $0 <config_dir> [apply|patch|remove|assets] [is_light] [shell_dir]" >&2
+	echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light]" >&2
 	exit 1
 fi
 
@@ -119,44 +117,6 @@ ensure_user_adw_gtk3() {
 		} >"$marker"
 		echo "Copied adw-gtk3${name} to '$dest' for dynamic theming"
 	done
-}
-
-# The light template references adw-gtk3 image assets relative to gtk.css
-# (check/radio glyphs, slider knobs); without them checked boxes render as
-# solid blocks.
-link_gtk3_assets() {
-	local gtk3_dir="$1"
-	local assets_link="$gtk3_dir/assets"
-
-	if [ -e "$assets_link" ] && [ ! -L "$assets_link" ]; then
-		echo "Leaving user-managed $assets_link in place"
-		return
-	fi
-
-	local candidates=(
-		"$USER_DATA_THEMES/adw-gtk3/gtk-3.0/assets"
-		"$HOME/.themes/adw-gtk3/gtk-3.0/assets"
-	)
-	local root
-	while IFS= read -r root; do
-		candidates+=("$root/adw-gtk3/gtk-3.0/assets")
-	done < <(system_theme_roots)
-	local target=""
-	for c in "${candidates[@]}"; do
-		if [ -d "$c" ]; then
-			target="$c"
-			break
-		fi
-	done
-	if [ -z "$target" ] && [ -n "$SHELL_DIR" ] && [ -d "$SHELL_DIR/matugen/gtk3-assets" ]; then
-		target="$SHELL_DIR/matugen/gtk3-assets"
-	fi
-	if [ -z "$target" ]; then
-		return
-	fi
-
-	ln -sfn "$target" "$assets_link"
-	echo "Linked GTK3 assets: $assets_link -> $target"
 }
 
 DANK_IMPORT='@import url("dank-colors.css");'
@@ -333,7 +293,6 @@ apply_gtk3_colors() {
 		fi
 
 		inject_dank_import "$gtk3_override" || exit 1
-		link_gtk3_assets "$gtk3_dir"
 
 		return
 	fi
@@ -408,14 +367,8 @@ case "$MODE" in
 
 		echo "GTK colors applied successfully"
 		;;
-	assets)
-		# Repair pass at startup; only acts when DMS already manages gtk.css
-		if dms_managed_css "$CONFIG_DIR/gtk-3.0/gtk.css"; then
-			link_gtk3_assets "$CONFIG_DIR/gtk-3.0"
-		fi
-		;;
 	*)
-		echo "Usage: $0 <config_dir> [apply|patch|remove|assets] [is_light] [shell_dir]" >&2
+		echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light]" >&2
 		exit 1
 		;;
 esac
