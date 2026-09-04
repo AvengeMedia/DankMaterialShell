@@ -763,6 +763,11 @@ Item {
 
     Connections {
         target: NiriService
+        function onWindowsChanged() {
+            barWindow._updateHasMaximizedToplevel();
+            barWindow._updateShouldHideForWindows();
+        }
+
         function onAllWorkspacesChanged() {
             barWindow._updateHasMaximizedToplevel();
             barWindow._updateShouldHideForWindows();
