@@ -9,9 +9,13 @@ import "../../Common/QmlUtils.js" as QmlUtils
 Item {
     id: root
 
-    property string settingKey: "dankIslandHomeLayout"
+    property string settingKey: "islandHomeLayout"
+    required property string barId
     readonly property var groupIds: SettingsData._islandHomeGroupIds
-    readonly property var layout: SettingsData.getIslandHomeLayout()
+    readonly property var layout: {
+        SettingsData.barConfigs;
+        return SettingsData.getIslandHomeLayout(SettingsData.getBarConfig(root.barId));
+    }
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
 
     readonly property var presentation: ({
@@ -113,7 +117,7 @@ Item {
     }
 
     function commit() {
-        SettingsData.setIslandHomeLayoutOrder(enabledOrder.concat(disabledOrder));
+        SettingsData.setIslandHomeLayoutOrder(root.barId, enabledOrder.concat(disabledOrder));
     }
 
     function endDrag() {
@@ -184,7 +188,7 @@ Item {
         case Qt.Key_Return:
             if (highlightedId === "")
                 return;
-            SettingsData.setIslandHomeGroupEnabled(highlightedId, !isEnabled(highlightedId));
+            SettingsData.setIslandHomeGroupEnabled(root.barId, highlightedId, !isEnabled(highlightedId));
             event.accepted = true;
             return;
         }
@@ -431,7 +435,7 @@ Item {
                     onClicked: {
                         root.forceActiveFocus();
                         root.highlightedId = rowItem.modelData;
-                        SettingsData.setIslandHomeGroupEnabled(rowItem.modelData, !rowItem.isEnabled);
+                        SettingsData.setIslandHomeGroupEnabled(root.barId, rowItem.modelData, !rowItem.isEnabled);
                     }
                 }
             }

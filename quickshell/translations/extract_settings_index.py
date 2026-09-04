@@ -596,10 +596,10 @@ def extract_settings_index(root_dir):
             }
         )
 
-    if "dankIslandHomeLayout" not in seen_keys:
+    if "islandHomeLayout" not in seen_keys:
         all_entries.append(
             {
-                "section": "dankIslandHomeLayout",
+                "section": "islandHomeLayout",
                 "label": "Home Layout",
                 "tabIndex": 46,
                 "category": "Island",

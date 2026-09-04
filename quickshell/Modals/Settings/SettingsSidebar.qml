@@ -92,8 +92,8 @@ Rectangle {
                 root.leaveHiddenTab(33);
         }
 
-        function onDankIslandBarIdChanged() {
-            if (!SettingsData.dankIslandBarId)
+        function onIslandBarConfigsChanged() {
+            if (SettingsData.islandBarConfigs.length === 0)
                 root.leaveHiddenTab(46);
         }
     }
@@ -125,7 +125,7 @@ Rectangle {
             return false;
         if (item.frameOnly && !SettingsData.frameEnabled)
             return false;
-        if (item.islandOnly && !SettingsData.dankIslandBarId)
+        if (item.islandOnly && SettingsData.islandBarConfigs.length === 0)
             return false;
         if (item.cellularOnly && (NetworkService.cellularDevices?.length ?? 0) === 0)
             return false;

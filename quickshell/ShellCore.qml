@@ -152,9 +152,7 @@ Item {
     Loader {
         active: SettingsData.dankIslandEnabled
         asynchronous: false
-        sourceComponent: DankIsland {
-            screenModel: SettingsData.getIslandScreens()
-        }
+        sourceComponent: DankIsland {}
     }
 
     property bool hadRealScreen: true

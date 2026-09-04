@@ -40,9 +40,9 @@ Item {
     }
 
     readonly property bool dankIslandOwnsSelectedBarCenter: {
-        SettingsData.dankIslandBarId;
+        SettingsData.barConfigs;
         selectedBarId;
-        return !!selectedBarId && selectedBarId === SettingsData.dankIslandBarId;
+        return SettingsData.isIslandBarConfig(SettingsData.getBarConfig(selectedBarId));
     }
 
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1

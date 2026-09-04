@@ -964,9 +964,6 @@ Item {
             const posValue = positionMap[position.toLowerCase()];
             if (posValue === undefined)
                 return "BAR_INVALID_POSITION";
-            // The island silhouette only anchors top or bottom.
-            if (SettingsData.isIslandBarConfig(barConfig) && posValue !== SettingsData.Position.Top && posValue !== SettingsData.Position.Bottom)
-                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 position: posValue
             });
