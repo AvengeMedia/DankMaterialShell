@@ -1479,6 +1479,8 @@ Item {
                             return;
 
                         if (mouse.button === Qt.LeftButton) {
+                            if (delegateRoot.focusWindowAt(mouse.x, mouse.y))
+                                return;
                             if (root.useExtWorkspace) {
                                 if (typeof modelData?.activate === "function")
                                     modelData.activate();
@@ -1552,6 +1554,29 @@ Item {
 
                 function updateAllData() {
                     dataUpdateTimer.restart();
+                }
+
+                function windowIdAt(x, y) {
+                    const layout = appIconsLoader.item?.iconsLayout;
+                    if (!layout)
+                        return null;
+                    const point = layout.mapFromItem(mouseArea, x, y);
+                    return layout.childAt(point.x, point.y)?.windowId ?? null;
+                }
+
+                function focusWindowAt(x, y) {
+                    const winId = delegateRoot.windowIdAt(x, y);
+                    if (!winId)
+                        return false;
+                    if (CompositorService.isHyprland) {
+                        HyprlandService.focusWindow(winId);
+                        return true;
+                    }
+                    if (CompositorService.isNiri) {
+                        NiriService.focusWindow(winId);
+                        return true;
+                    }
+                    return false;
                 }
 
                 width: root.isVertical ? root.widgetHeight : visualWidth
@@ -1678,6 +1703,7 @@ Item {
                             id: contentRoot
                             readonly property real contentWidth: contentRow.item?.implicitWidth ?? 0
                             readonly property real contentHeight: contentRow.item?.implicitHeight ?? 0
+                            property alias iconsLayout: contentRow.item
 
                             Loader {
                                 id: contentRow
@@ -1743,16 +1769,17 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
+                                            readonly property var windowId: modelData.windowId
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: rowAppIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
                                             }
 
@@ -1794,7 +1821,7 @@ Item {
                                             IconImage {
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isQuickshell
                                                 layer.enabled: true
                                                 layer.effect: MultiEffect {
@@ -1808,7 +1835,7 @@ Item {
                                                 id: rowSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && modelData.icon
                                             }
 
@@ -1817,7 +1844,7 @@ Item {
                                                 size: root.appIconSize
                                                 name: "sports_esports"
                                                 color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
@@ -1831,21 +1858,8 @@ Item {
                                                 z: 1
                                             }
 
-                                            MouseArea {
-                                                id: rowAppMouseArea
-                                                anchors.fill: parent
-                                                enabled: isActive
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    const winId = modelData.windowId;
-                                                    if (!winId)
-                                                        return;
-                                                    if (CompositorService.isHyprland) {
-                                                        HyprlandService.focusWindow(winId);
-                                                    } else if (CompositorService.isNiri) {
-                                                        NiriService.focusWindow(winId);
-                                                    }
-                                                }
+                                            HoverHandler {
+                                                id: rowAppHover
                                             }
 
                                             Rectangle {
@@ -1912,16 +1926,17 @@ Item {
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
+                                            readonly property var windowId: modelData.windowId
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                            readonly property real appOpacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
 
                                             IconImage {
                                                 id: colAppIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
                                             }
 
@@ -1963,7 +1978,7 @@ Item {
                                             IconImage {
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isQuickshell
                                                 layer.enabled: true
                                                 layer.effect: MultiEffect {
@@ -1977,7 +1992,7 @@ Item {
                                                 id: colSteamIcon
                                                 anchors.fill: parent
                                                 source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && modelData.icon
                                             }
 
@@ -1986,7 +2001,7 @@ Item {
                                                 size: root.appIconSize
                                                 name: "sports_esports"
                                                 color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
                                                 visible: modelData.isSteamApp && !modelData.icon
                                             }
 
@@ -2000,21 +2015,8 @@ Item {
                                                 z: 1
                                             }
 
-                                            MouseArea {
-                                                id: colAppMouseArea
-                                                anchors.fill: parent
-                                                enabled: isActive
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    const winId = modelData.windowId;
-                                                    if (!winId)
-                                                        return;
-                                                    if (CompositorService.isHyprland) {
-                                                        HyprlandService.focusWindow(winId);
-                                                    } else if (CompositorService.isNiri) {
-                                                        NiriService.focusWindow(winId);
-                                                    }
-                                                }
+                                            HoverHandler {
+                                                id: colAppHover
                                             }
 
                                             Rectangle {

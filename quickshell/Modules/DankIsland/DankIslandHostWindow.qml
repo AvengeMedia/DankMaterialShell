@@ -12,6 +12,8 @@ import qs.Widgets
 PanelWindow {
     id: root
 
+    property var hyprlandOverviewLoader: null
+
     function requestKeyboardFocus() {
         if (!controller.keyboardDismissRequested) {
             keyboardActivationTimer.stop();
@@ -307,6 +309,7 @@ PanelWindow {
         controller: controller
         islandSurface: surface
         outerGap: root.outerGap
+        hyprlandOverviewLoader: root.hyprlandOverviewLoader
     }
 
     FocusScope {

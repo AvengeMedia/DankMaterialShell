@@ -16,6 +16,7 @@ Item {
     required property IslandController controller
     required property var islandSurface
     property real outerGap: 8
+    property var hyprlandOverviewLoader: null
 
     function setting(key) {
         return SettingsData.islandSetting(root.barConfig, key);
@@ -151,7 +152,7 @@ Item {
         property bool hasAdjacentBottomBar: false
         property bool hasAdjacentLeftBar: false
         property bool hasAdjacentRightBar: false
-        property var hyprlandOverviewLoader: null
+        property var hyprlandOverviewLoader: root.hyprlandOverviewLoader
         property var controlCenterButtonRef: null
         property var clockButtonRef: null
         property var systemUpdateButtonRef: null

@@ -152,7 +152,9 @@ Item {
     Loader {
         active: SettingsData.dankIslandEnabled
         asynchronous: false
-        sourceComponent: DankIsland {}
+        sourceComponent: DankIsland {
+            hyprlandOverviewLoader: root.hyprlandOverviewLoader
+        }
     }
 
     property bool hadRealScreen: true
