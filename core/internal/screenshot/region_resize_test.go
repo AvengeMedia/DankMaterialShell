@@ -238,18 +238,20 @@ func TestHUDDimensionsContainText(t *testing.T) {
 				},
 			}
 
-			hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH)
-			data := make([]byte, bufH*stride)
-			r.drawHUD(data, stride, bufW, bufH, uint32(FormatARGB8888))
+			for _, scale := range []int{1, 2} {
+				hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH, scale)
+				data := make([]byte, bufH*stride)
+				r.drawHUD(data, stride, bufW, bufH, uint32(FormatARGB8888), scale)
 
-			// Assert no lit pixel falls outside the pill boundaries
-			for y := range bufH {
-				for x := range bufW {
-					off := y*stride + x*4
-					if data[off] != 0 || data[off+1] != 0 || data[off+2] != 0 || data[off+3] != 0 {
-						if x < hudX || x >= hudX+hudW || y < hudY || y >= hudY+hudH {
-							t.Fatalf("noConfirm=%v showCursor=%v: pixel (%d, %d) is non-zero outside HUD pill [%d..%d, %d..%d]",
-								noConfirm, showCursor, x, y, hudX, hudX+hudW, hudY, hudY+hudH)
+				// Assert no lit pixel falls outside the pill boundaries
+				for y := range bufH {
+					for x := range bufW {
+						off := y*stride + x*4
+						if data[off] != 0 || data[off+1] != 0 || data[off+2] != 0 || data[off+3] != 0 {
+							if x < hudX || x >= hudX+hudW || y < hudY || y >= hudY+hudH {
+								t.Fatalf("scale=%d noConfirm=%v showCursor=%v: pixel (%d, %d) is non-zero outside HUD pill [%d..%d, %d..%d]",
+									scale, noConfirm, showCursor, x, y, hudX, hudX+hudW, hudY, hudY+hudH)
+							}
 						}
 					}
 				}
