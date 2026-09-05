@@ -53,7 +53,10 @@ Singleton {
             "networkAvailable": () => NetworkService.networkAvailable,
             "dmsConnected": () => DMSService.isConnected && DMSService.apiVersion >= 23,
             "matugenAvailable": () => Theme.matugenAvailable,
-            "greeterAvailable": () => GreeterService.available
+            "greeterAvailable": () => GreeterService.available,
+            "frameEnabled": () => SettingsData.frameEnabled,
+            "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
+            "cellularAvailable": () => (NetworkService.cellularDevices?.length ?? 0) > 0
         })
 
     Component.onCompleted: indexFile.reload()

@@ -10,6 +10,7 @@ import qs.DankCommon.Common as DankCommon
 import qs.Services
 import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
+import "GSettings.js" as GSettings
 
 Singleton {
     id: root
@@ -144,10 +145,6 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
-        // shellDir may be an embedded-UI extraction, which is read-only and
-        // unexecutable (dankgo shellapp/shellfs makeReadOnly chmods 0444)
-        if (typeof SessionData === "undefined" || !SessionData.isGreeterMode)
-            Quickshell.execDetached(["bash", shellDir + "/scripts/gtk.sh", configDir, "assets", "", shellDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
@@ -379,6 +376,38 @@ Singleton {
                 return schemes[i];
         }
         return schemes[0];
+    }
+
+    readonly property var availableSourceModes: [({
+                "value": "dominant",
+                "label": I18n.tr("Dominant", "matugen source color option")
+            }), ({
+                "value": "colorful",
+                "label": I18n.tr("Colorful", "matugen source color option")
+            }), ({
+                "value": "darkness",
+                "label": I18n.tr("Darkest", "matugen source color option")
+            }), ({
+                "value": "lightness",
+                "label": I18n.tr("Lightest", "matugen source color option")
+            }), ({
+                "value": "saturation",
+                "label": I18n.tr("Most Saturated", "matugen source color option")
+            }), ({
+                "value": "less-saturation",
+                "label": I18n.tr("Least Saturated", "matugen source color option")
+            }), ({
+                "value": "value",
+                "label": I18n.tr("Most Vivid", "matugen source color option")
+            })]
+
+    function getSourceMode(value) {
+        const modes = availableSourceModes;
+        for (var i = 0; i < modes.length; i++) {
+            if (modes[i].value === value)
+                return modes[i];
+        }
+        return modes[0];
     }
 
     property color primary: currentThemeData.primary
@@ -1472,7 +1501,7 @@ Singleton {
         const size = (maximizeIcon ?? false) ? iconSizeLarge : iconSize;
         const s = iconScale !== undefined ? iconScale : 1.0;
 
-        return Math.round((barThickness / 48) * (size + defaultOffset) * s);
+        return 2 * Math.round((barThickness / 48) * (size + defaultOffset) * s / 2);
     }
 
     function barTextSize(barThickness, fontScale, maximizeText) {
@@ -1606,6 +1635,13 @@ Singleton {
         }
         if (typeof SettingsData !== "undefined" && SettingsData.matugenContrast !== 0) {
             args.push("--contrast", SettingsData.matugenContrast.toString());
+        }
+        // Only sent when it would change something. A shell newer than the dms
+        // binary is a supported setup (DMS_SHELL_DIR / -c), and an older binary
+        // exits with "unknown flag: --source-mode" rather than ignoring it, so
+        // the default must not put the flag on the command line at all.
+        if (typeof SettingsData !== "undefined" && SettingsData.matugenSourceMode && SettingsData.matugenSourceMode !== "dominant") {
+            args.push("--source-mode", SettingsData.matugenSourceMode);
         }
 
         if (typeof SettingsData !== "undefined") {
@@ -1846,30 +1882,19 @@ Singleton {
         const theme = isLight ? "adw-gtk3" : "adw-gtk3-dark";
         const schema = "org.gnome.desktop.interface";
         const key = "gtk-theme";
+        const reset = GSettings.setCmd(schema, key, "");
+        const apply = GSettings.setCmd(schema, key, theme);
 
-        const makeCmd = (tool, schema, val) => {
-            if (tool === "gsettings") {
-                return `gsettings set ${schema} ${key} '' && gsettings set ${schema} ${key} ${val}`;
-            } else {
-                const dconfPath = `/${schema.replace(/\./g, "/")}`;
-                return `dconf write ${dconfPath}/${key} "''" && dconf write ${dconfPath}/${key} "'${val}'"`;
-            }
-        };
-
-        Proc.runCommand("gtkRefresher", ["sh", "-c", makeCmd("gsettings", schema, theme)], (output, exitCode) => {
+        Proc.runCommand("gtkRefresher", ["sh", "-c", `${reset}; ${apply}`], (output, exitCode) => {
             if (exitCode !== 0) {
-                Proc.runCommand("gtkRefreshFallback", ["sh", "-c", makeCmd("dconf", schema, theme)], (output, exitCode) => {
-                    if (exitCode !== 0) {
-                        log.warn("Failed to refresh gtk-theme");
-                    }
-                });
+                log.warn("Failed to refresh gtk-theme");
             }
         });
     }
 
     function patchGtk3colors() {
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtk3Patcher", ["bash", shellDir + "/scripts/gtk.sh", configDir, "patch", isLight], (output, exitCode) => {
             switch (exitCode) {
             case 0:
                 refreshGtkTheme();
@@ -1891,7 +1916,7 @@ Singleton {
         }
 
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "true" : "false";
-        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, "apply", isLight, shellDir], (output, exitCode) => {
+        Proc.runCommand("gtkApplier", ["bash", shellDir + "/scripts/gtk.sh", configDir, "apply", isLight], (output, exitCode) => {
             if (exitCode === 0) {
                 if (typeof ToastService !== "undefined" && !root.matugenToastSuppressed) {
                     ToastService.showInfo(I18n.tr("GTK colors applied successfully"));
@@ -2028,9 +2053,23 @@ Singleton {
         return Math.round(value * s) / s;
     }
 
+    // Qt rounds a centred anchor offset to whole pixels, so a box must share its content's parity
+    function snapEven(value, dpr) {
+        const s = dpr || 1;
+        return 2 * Math.round(value * s / 2) / s;
+    }
+
     function px(value, dpr) {
         const s = dpr || 1;
         return Math.round(value * s) / s;
+    }
+
+    function barWidgetThickness(innerPadding, dpr) {
+        return snapEven(Math.max(20, 26 + innerPadding * 0.6), dpr);
+    }
+
+    function barThickness(innerPadding, dpr) {
+        return snapEven(Math.max(barWidgetThickness(innerPadding, dpr) + innerPadding + 4, barHeight - 4 - (8 - innerPadding)), dpr);
     }
 
     function hairline(dpr) {

@@ -37,7 +37,7 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
-    readonly property var dankIslandScreens: SettingsData.getIslandScreens()
+    readonly property var dankIslandScreens: Quickshell.screens.filter(screen => SettingsData.dankIslandCoversScreen(screen))
     readonly property var notificationPopupScreens: {
         const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
         return root.withoutDankIslandScreens(screens);
@@ -1261,6 +1261,11 @@ Item {
             Component.onCompleted: show()
         }
 
+        Component.onCompleted: {
+            if (FirstLaunchService.shouldShowGreeter)
+                active = true;
+        }
+
         Connections {
             target: FirstLaunchService
             function onGreeterRequested() {
@@ -1280,6 +1285,11 @@ Item {
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
+        }
+
+        Component.onCompleted: {
+            if (ChangelogService.shouldShowChangelog)
+                active = true;
         }
 
         Connections {

@@ -22,9 +22,11 @@ Item {
     property real springStiffness: 560
     property real springDamping: 37
     property real springMass: 1
+    property real hostOriginX: 0
     property real hostOriginY: 0
     property string palette: "default"
     property bool highContrast: false
+    property real transparency: 1
 
     readonly property color surfaceColor: {
         if (root.highContrast)
@@ -38,14 +40,8 @@ Item {
         return Theme.surfaceContainerHigh;
     }
     readonly property bool popupStyled: root.controller.expanded
-    readonly property real compactOpacity: Math.max(0, Math.min(1, SettingsData.dankIslandTransparency))
-    readonly property color effectiveSurfaceColor: {
-        if (root.highContrast)
-            return Theme.surfaceContainerHighest;
-        if (root.popupStyled)
-            return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
-        return Theme.withAlpha(root.surfaceColor, root.compactOpacity);
-    }
+    readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
+    readonly property color effectiveSurfaceColor: root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {
@@ -64,35 +60,51 @@ Item {
     readonly property alias fittsStripItem: fittsStrip
     readonly property bool motionRunning: motion.running
     readonly property real springTimeConstantMs: motion.timeConstantMs
-    property real trackedHeight: 0
-    readonly property Item mediaDropdownMaskItem: mediaDropdowns.activePanel
-    property real fadeCompactHeight: 48
-    property real fadeExpandedHeight: 352
+    property real trackedCrossExtent: 0
+    property real fadeCompactCross: 48
+    property real fadeExpandedCross: 352
     property rect motionStartBounds: Qt.rect(0, 0, 0, 0)
-    property int mediaDropdownType: 0
-    property point mediaDropdownAnchor: Qt.point(0, 0)
-    readonly property bool bottomEdge: SettingsData.dankIslandEdge === "bottom"
+    readonly property bool isVertical: root.controller.isVertical
+    readonly property bool farEdge: root.controller.edge === "bottom" || root.controller.edge === "right"
+    readonly property real alongExtent: root.isVertical ? root.height : root.width
+    readonly property real crossExtent: root.isVertical ? root.width : root.height
     readonly property real currentVisualWidth: motion.currentWidth
     readonly property real currentVisualHeight: motion.currentHeight
-    readonly property real currentVisualX: (width - currentVisualWidth) / 2 + motion.currentOffsetX
-    readonly property real currentVisualY: bottomEdge ? height - motion.currentOffsetY - currentVisualHeight : motion.currentOffsetY
-    readonly property real targetVisualX: Math.round((width - motion.targetWidth) / 2 + motion.targetOffsetX)
-    readonly property real targetVisualY: bottomEdge ? height - Math.round(motion.targetOffsetY) - motion.targetHeight : Math.round(motion.targetOffsetY)
+    readonly property real currentVisualCross: isVertical ? motion.currentWidth : motion.currentHeight
+    readonly property real currentAlongPos: (alongExtent - (isVertical ? currentVisualHeight : currentVisualWidth)) / 2 + motion.currentOffsetAlong
+    readonly property real currentCrossPos: farEdge ? crossExtent - motion.currentOffsetCross - currentVisualCross : motion.currentOffsetCross
+    readonly property real currentVisualX: isVertical ? currentCrossPos : currentAlongPos
+    readonly property real currentVisualY: isVertical ? currentAlongPos : currentCrossPos
+    readonly property real targetAlongPos: Math.round((alongExtent - (isVertical ? motion.targetHeight : motion.targetWidth)) / 2 + motion.targetOffsetAlong)
+    readonly property real targetCrossPos: farEdge ? crossExtent - Math.round(motion.targetOffsetCross) - (isVertical ? motion.targetWidth : motion.targetHeight) : Math.round(motion.targetOffsetCross)
+    readonly property real targetVisualX: isVertical ? targetCrossPos : targetAlongPos
+    readonly property real targetVisualY: isVertical ? targetAlongPos : targetCrossPos
+    readonly property real targetScreenX: targetVisualX + root.hostOriginX
     readonly property real targetScreenY: targetVisualY + root.hostOriginY
     readonly property real targetVisualWidth: motion.targetWidth
     readonly property real targetVisualHeight: motion.targetHeight
+    readonly property real currentVisualAlong: isVertical ? motion.currentHeight : motion.currentWidth
+    readonly property real targetVisualAlong: isVertical ? motion.targetHeight : motion.targetWidth
     readonly property real morphProgress: {
-        const span = fadeExpandedHeight - fadeCompactHeight;
+        const span = fadeExpandedCross - fadeCompactCross;
         if (Math.abs(span) < 1)
             return controller.expanded ? 1 : 0;
-        return Math.max(0, Math.min(1, (motion.currentHeight - fadeCompactHeight) / span));
+        return Math.max(0, Math.min(1, (currentVisualCross - fadeCompactCross) / span));
+    }
+
+    function descriptorCross(target) {
+        return root.isVertical ? target.width : target.height;
+    }
+
+    function descriptorAlong(target) {
+        return root.isVertical ? target.height : target.width;
     }
 
     function applyTarget() {
         if (controller.expanded)
-            fadeExpandedHeight = controller.expandedTarget.height;
+            fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
         else
-            fadeCompactHeight = controller.compactTarget.height;
+            fadeCompactCross = root.descriptorCross(controller.compactTarget);
         if (motion.running)
             root.unionMotionStartBounds();
         motion.setTarget(controller.targetDescriptor);
@@ -109,45 +121,26 @@ Item {
         root.motionStartBounds = Qt.rect(left, top, right - left, bottom - top);
     }
 
-    function openMediaDropdown(type, pos) {
-        stopMediaDropdownCloseTimer();
-        mediaDropdownAnchor = pos;
-        mediaDropdownType = type;
-        controller.mediaDropdownOpen = true;
-    }
-
-    function hideMediaDropdowns() {
-        stopMediaDropdownCloseTimer();
-        mediaDropdownType = 0;
-        controller.mediaDropdownOpen = false;
-    }
-
-    function startMediaDropdownCloseTimer() {
-        mediaDropdownCloseTimer.restart();
-    }
-
-    function stopMediaDropdownCloseTimer() {
-        mediaDropdownCloseTimer.stop();
-    }
-
     function requestActivityFocus() {
         return contentHost.requestActivityFocus();
     }
 
     Component.onCompleted: {
-        trackedHeight = height;
-        fadeCompactHeight = controller.compactTarget.height;
-        fadeExpandedHeight = controller.expandedTarget.height;
+        trackedCrossExtent = crossExtent;
+        fadeCompactCross = root.descriptorCross(controller.compactTarget);
+        fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
         motion.snapTo(controller.targetDescriptor);
     }
 
-    onHeightChanged: {
-        const delta = height - trackedHeight;
-        trackedHeight = height;
-        if (!bottomEdge || !motion.running || delta === 0)
+    // On a far edge the cross coordinate is measured from the far side, so a host resize
+    // shifts everything already in flight by the same delta.
+    onCrossExtentChanged: {
+        const delta = crossExtent - trackedCrossExtent;
+        trackedCrossExtent = crossExtent;
+        if (!farEdge || !motion.running || delta === 0)
             return;
         const b = motionStartBounds;
-        motionStartBounds = Qt.rect(b.x, b.y + delta, b.width, b.height);
+        motionStartBounds = isVertical ? Qt.rect(b.x + delta, b.y, b.width, b.height) : Qt.rect(b.x, b.y + delta, b.width, b.height);
     }
 
     Connections {
@@ -155,16 +148,6 @@ Item {
 
         function onTargetDescriptorChanged() {
             root.applyTarget();
-        }
-
-        function onExpandedChanged() {
-            if (!controller.expanded || controller.activeActivity !== "media")
-                root.hideMediaDropdowns();
-        }
-
-        function onActiveActivityChanged() {
-            if (controller.activeActivity !== "media")
-                root.hideMediaDropdowns();
         }
     }
 
@@ -174,8 +157,6 @@ Item {
         function onRunningChanged() {
             if (motion.running) {
                 root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, root.currentVisualWidth, root.currentVisualHeight);
-                if (root.controller.activeActivity === "media")
-                    root.hideMediaDropdowns();
                 return;
             }
             root.controller.releaseIdleVisuals();
@@ -189,13 +170,6 @@ Item {
         stiffness: root.springStiffness
         damping: root.springDamping
         mass: root.springMass
-    }
-
-    Timer {
-        id: mediaDropdownCloseTimer
-
-        interval: 400
-        onTriggered: root.hideMediaDropdowns()
     }
 
     // Frozen start/target union so the Wayland mask is not rewritten every spring frame.
@@ -271,7 +245,9 @@ Item {
 
             controller: root.controller
             islandX: root.currentVisualX
+            islandY: root.currentVisualY
             hostWidth: root.width
+            hostHeight: root.height
             springTimeConstantMs: root.springTimeConstantMs
             morphProgress: root.morphProgress
             expanded: root.controller.expanded
@@ -314,14 +290,17 @@ Item {
     Item {
         id: fittsStrip
 
-        readonly property real spanWidth: Math.max(root.controller.compactTarget.width, motion.targetWidth)
-        readonly property real edgeGap: root.bottomEdge ? Math.max(0, root.height - (root.targetVisualY + motion.targetHeight)) : Math.max(0, root.targetVisualY)
+        readonly property real targetCross: root.isVertical ? motion.targetWidth : motion.targetHeight
+        readonly property real span: Math.max(root.descriptorAlong(root.controller.compactTarget), root.isVertical ? motion.targetHeight : motion.targetWidth)
+        readonly property real edgeGap: root.farEdge ? Math.max(0, root.crossExtent - (root.targetCrossPos + targetCross)) : Math.max(0, root.targetCrossPos)
+        readonly property real alongPos: Math.round((root.alongExtent - span) / 2 + motion.targetOffsetAlong)
+        readonly property real crossPos: root.farEdge ? root.targetCrossPos + targetCross : 0
 
-        x: Math.round((root.width - spanWidth) / 2 + motion.targetOffsetX)
-        y: root.bottomEdge ? root.targetVisualY + motion.targetHeight : 0
-        width: spanWidth
-        height: edgeGap
-        visible: edgeGap > 0 && spanWidth > 0
+        x: root.isVertical ? crossPos : alongPos
+        y: root.isVertical ? alongPos : crossPos
+        width: root.isVertical ? edgeGap : span
+        height: root.isVertical ? span : edgeGap
+        visible: edgeGap > 0 && span > 0
 
         HoverHandler {
             id: stripHover
@@ -340,37 +319,12 @@ Item {
         }
     }
 
-    MediaDropdownOverlay {
-        id: mediaDropdowns
-
-        dropdownType: root.mediaDropdownType
-        anchorPos: root.mediaDropdownAnchor
-        isRightEdge: true
-        availableBounds: Qt.rect(0, 0, root.width, root.height)
-        activePlayer: MprisController.activePlayer
-        allPlayers: MprisController.availablePlayers
-        targetWindow: root.Window.window
-        onCloseRequested: root.hideMediaDropdowns()
-        onPanelEntered: root.stopMediaDropdownCloseTimer()
-        onPanelExited: root.startMediaDropdownCloseTimer()
-        onVolumeChanged: volume => {
-            const player = MprisController.activePlayer;
-            const identity = (player?.identity ?? "").toLowerCase();
-            const chrome = identity.includes("chrome") || identity.includes("chromium");
-            if (player && player.volumeSupported && !chrome)
-                player.volume = volume;
-            else if (AudioService.sink?.audio)
-                AudioService.sink.audio.volume = volume;
-        }
-        onDeviceSelected: device => AudioService.setSink(device)
-        onPlayerSelected: player => MprisController.setActivePlayer(player)
-    }
-
     Component {
         id: compactHomeComponent
 
         HomeCompact {
             controller: root.controller
+            systemModel: root.systemModel
         }
     }
 
@@ -396,17 +350,6 @@ Item {
 
         MediaExpanded {
             controller: root.controller
-            geometrySettled: !motion.running
-            effectiveScreen: root.effectiveScreen
-            alignedX: root.targetVisualX
-            alignedY: root.targetVisualY
-            alignedWidth: root.targetVisualWidth
-            alignedHeight: root.targetVisualHeight
-            onShowVolumeDropdown: pos => root.openMediaDropdown(1, pos)
-            onShowAudioDevicesDropdown: pos => root.openMediaDropdown(2, pos)
-            onShowPlayersDropdown: pos => root.openMediaDropdown(3, pos)
-            onHideDropdowns: root.hideMediaDropdowns()
-            onDropdownHoverEnded: root.startMediaDropdownCloseTimer()
         }
     }
 
@@ -443,7 +386,7 @@ Item {
             launcherController: root.launcherController
             transientSurfaceTracker: root.launcherTransientSurfaceTracker
             effectiveScreen: root.effectiveScreen
-            alignedX: root.targetVisualX
+            alignedX: root.targetScreenX
             alignedY: root.targetScreenY
         }
     }
@@ -465,7 +408,7 @@ Item {
         ControlCenterExpanded {
             controller: root.controller
             effectiveScreen: root.effectiveScreen
-            alignedX: root.targetVisualX
+            alignedX: root.targetScreenX
             alignedY: root.targetScreenY
             alignedWidth: root.targetVisualWidth
             alignedHeight: root.targetVisualHeight
@@ -516,6 +459,7 @@ Item {
 
         SystemLevelCompact {
             systemModel: root.systemModel
+            isVertical: root.isVertical
             iconSize: root.controller.compactIconSize
         }
     }

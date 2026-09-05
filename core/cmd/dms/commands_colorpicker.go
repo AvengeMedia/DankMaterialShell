@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	colorOutputFmt string
-	colorAutocopy  bool
-	colorNotify    bool
-	colorLowercase bool
+	colorOutputFmt  string
+	colorAutocopy   bool
+	colorNotify     bool
+	colorLowercase  bool
+	colorAllowMulti bool
 )
 
 var colorCmd = &cobra.Command{
@@ -54,7 +55,8 @@ Examples:
   dms color pick --rgb          # Output as RGB
   dms color pick --json         # Output all formats as JSON
   dms color pick --hex -l       # Output hex in lowercase
-  dms color pick -a             # Auto-copy result to clipboard`,
+  dms color pick -a             # Auto-copy result to clipboard
+  dms color pick --allow-multiple  # Skip the one-picker-at-a-time guard`,
 	Run: runColorPick,
 }
 
@@ -69,6 +71,7 @@ func init() {
 	colorPickCmd.Flags().StringVarP(&colorOutputFmt, "output-format", "o", "", "Custom output format template")
 	colorPickCmd.Flags().BoolVarP(&colorAutocopy, "autocopy", "a", false, "Copy result to clipboard")
 	colorPickCmd.Flags().BoolVarP(&colorLowercase, "lowercase", "l", false, "Output hex in lowercase")
+	colorPickCmd.Flags().BoolVar(&colorAllowMulti, "allow-multiple", false, "Open a picker even when another selection overlay is already open")
 
 	colorPickCmd.MarkFlagsMutuallyExclusive("hex", "rgb", "hsl", "hsv", "cmyk", "json")
 
@@ -90,11 +93,12 @@ func runColorPick(cmd *cobra.Command, args []string) {
 	}
 
 	config := colorpicker.Config{
-		Format:       format,
-		CustomFormat: colorOutputFmt,
-		Lowercase:    colorLowercase,
-		Autocopy:     colorAutocopy,
-		Notify:       colorNotify,
+		Format:        format,
+		CustomFormat:  colorOutputFmt,
+		Lowercase:     colorLowercase,
+		Autocopy:      colorAutocopy,
+		Notify:        colorNotify,
+		AllowMultiple: colorAllowMulti,
 	}
 
 	// One-shot process holding a few screen-sized buffers: skip GC cycles while it runs.

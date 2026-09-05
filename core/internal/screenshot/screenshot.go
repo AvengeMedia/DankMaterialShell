@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
@@ -45,6 +46,34 @@ func (o *WaylandOutput) effectiveScale() float64 {
 		return 1.0
 	}
 	return scale
+}
+
+func (o *WaylandOutput) bounds() Region {
+	x, y, w, h := o.x, o.y, o.width, o.height
+	if DetectCompositor() == CompositorHyprland {
+		if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
+			x, y, w, h = hx, hy, hw, hh
+		}
+	} else {
+		if o.transform == 1 || o.transform == 3 || o.transform == 5 || o.transform == 7 {
+			w, h = h, w
+		}
+		if scale := o.effectiveScale(); scale > 0 {
+			w = int32(math.Round(float64(w) / scale))
+			h = int32(math.Round(float64(h) / scale))
+		}
+	}
+	return Region{
+		X:      x,
+		Y:      y,
+		Width:  w,
+		Height: h,
+		Output: o.name,
+	}
+}
+
+func geometryResult(region Region) *CaptureResult {
+	return &CaptureResult{Region: region}
 }
 
 type Screenshoter struct {
@@ -116,15 +145,47 @@ func (s *Screenshoter) captureLastRegion() (*CaptureResult, error) {
 		return s.captureRegion()
 	}
 
-	output := s.findOutputForRegion(lastRegion)
+	var output *WaylandOutput
+	if lastRegion.Output != "" {
+		output = s.findOutputByName(lastRegion.Output)
+	}
+	if output == nil {
+		output = s.findOutputForRegion(lastRegion)
+	}
 	if output == nil {
 		return s.captureRegion()
+	}
+
+	if s.config.Geometry {
+		scale := output.effectiveScale()
+		if scale <= 0 {
+			scale = 1.0
+		}
+		localX := float64(lastRegion.X-output.x) / scale
+		localY := float64(lastRegion.Y-output.y) / scale
+		logicalW := float64(lastRegion.Width) / scale
+		logicalH := float64(lastRegion.Height) / scale
+		return geometryResult(Region{
+			X:      int32(math.Round(float64(output.x) + localX)),
+			Y:      int32(math.Round(float64(output.y) + localY)),
+			Width:  int32(math.Round(logicalW)),
+			Height: int32(math.Round(logicalH)),
+			Output: output.name,
+		}), nil
 	}
 
 	return s.captureRegionOnOutput(output, lastRegion)
 }
 
 func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
+	if !s.config.AllowMultiple {
+		lock, err := utils.LockSelectionOverlay()
+		if err != nil {
+			return nil, err
+		}
+		defer lock.Release()
+	}
+
 	if s.config.Reset {
 		if err := SaveLastRegion(Region{}); err != nil {
 			log.Debug("failed to reset last region", "err", err)
@@ -145,7 +206,7 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		return nil, nil
 	}
 
-	if result.Region.Output != "" {
+	if !s.config.Geometry && result.Region.Output != "" {
 		if err := SaveLastRegion(result.Region); err != nil {
 			log.Debug("failed to save last region", "err", err)
 		}
@@ -160,6 +221,9 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 
 func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 	if DetectCompositor() == CompositorNiri {
+		if s.config.Geometry {
+			return nil, fmt.Errorf("window geometry mode is not supported on niri")
+		}
 		return s.captureNiriWindow()
 	}
 
@@ -173,6 +237,10 @@ func (s *Screenshoter) captureWindow() (*CaptureResult, error) {
 		Y:      geom.Y,
 		Width:  geom.Width,
 		Height: geom.Height,
+	}
+
+	if s.config.Geometry {
+		return geometryResult(region), nil
 	}
 
 	var output *WaylandOutput
@@ -308,6 +376,10 @@ func (s *Screenshoter) captureFullScreen() (*CaptureResult, error) {
 		return nil, fmt.Errorf("no output available")
 	}
 
+	if s.config.Geometry {
+		return geometryResult(output.bounds()), nil
+	}
+
 	return s.captureWholeOutput(output)
 }
 
@@ -326,6 +398,10 @@ func (s *Screenshoter) captureOutput(name string) (*CaptureResult, error) {
 		return nil, fmt.Errorf("output %q not found", name)
 	}
 
+	if s.config.Geometry {
+		return geometryResult(output.bounds()), nil
+	}
+
 	return s.captureWholeOutput(output)
 }
 
@@ -340,6 +416,33 @@ func (s *Screenshoter) captureAllScreens() (*CaptureResult, error) {
 	if len(outputs) == 0 {
 		return nil, fmt.Errorf("no outputs available")
 	}
+
+	if s.config.Geometry {
+		minX, minY := math.MaxInt32, math.MaxInt32
+		maxX, maxY := math.MinInt32, math.MinInt32
+		for _, o := range outputs {
+			b := o.bounds()
+			if int(b.X) < minX {
+				minX = int(b.X)
+			}
+			if int(b.Y) < minY {
+				minY = int(b.Y)
+			}
+			if int(b.X+b.Width) > maxX {
+				maxX = int(b.X + b.Width)
+			}
+			if int(b.Y+b.Height) > maxY {
+				maxY = int(b.Y + b.Height)
+			}
+		}
+		return geometryResult(Region{
+			X:      int32(minX),
+			Y:      int32(minY),
+			Width:  int32(maxX - minX),
+			Height: int32(maxY - minY),
+		}), nil
+	}
+
 	if len(outputs) == 1 {
 		return s.captureWholeOutput(outputs[0])
 	}
@@ -905,26 +1008,16 @@ func (s *Screenshoter) findOutputForRegion(region Region) *WaylandOutput {
 	cy := region.Y + region.Height/2
 
 	for _, o := range s.outputs {
-		x, y, w, h := o.x, o.y, o.width, o.height
-		if DetectCompositor() == CompositorHyprland {
-			if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
-				x, y, w, h = hx, hy, hw, hh
-			}
-		}
-		if cx >= x && cx < x+w && cy >= y && cy < y+h {
+		b := o.bounds()
+		if cx >= b.X && cx < b.X+b.Width && cy >= b.Y && cy < b.Y+b.Height {
 			return o
 		}
 	}
 
 	for _, o := range s.outputs {
-		x, y, w, h := o.x, o.y, o.width, o.height
-		if DetectCompositor() == CompositorHyprland {
-			if hx, hy, hw, hh, ok := GetHyprlandMonitorGeometry(o.name); ok {
-				x, y, w, h = hx, hy, hw, hh
-			}
-		}
-		if region.X >= x && region.X < x+w &&
-			region.Y >= y && region.Y < y+h {
+		b := o.bounds()
+		if region.X >= b.X && region.X < b.X+b.Width &&
+			region.Y >= b.Y && region.Y < b.Y+b.Height {
 			return o
 		}
 	}

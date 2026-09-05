@@ -37,6 +37,8 @@ var SPEC = {
     nightModeEndHour: { def: 6 },
     nightModeEndMinute: { def: 0 },
     nightModeTransitionMinutes: { def: 60 },
+    displayGamma: { def: 1.0 },
+    displayContrast: { def: 1.0 },
     latitude: { def: 0.0 },
     longitude: { def: 0.0 },
     nightModeUseIPLocation: { def: false },

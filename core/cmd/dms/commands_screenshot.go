@@ -32,11 +32,15 @@ var (
 	ssReset       bool
 	ssStdout      bool
 	ssJSON        bool
+	ssGeometry    bool
+	ssAllowMulti  bool
 )
 
 type screenshotMetadata struct {
 	Status string  `json:"status"`
 	Path   string  `json:"path,omitempty"`
+	X      *int    `json:"x,omitempty"`
+	Y      *int    `json:"y,omitempty"`
 	Width  int     `json:"width,omitempty"`
 	Height int     `json:"height,omitempty"`
 	Scale  float64 `json:"scale,omitempty"`
@@ -77,6 +81,8 @@ Examples:
   dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85
   dms screenshot --json              # Print capture metadata as JSON
+  dms screenshot --allow-multiple    # Skip the one-selector-at-a-time guard
+  dms screenshot -g                  # Print selected region geometry (X,Y WxH) to stdout
   dms screenshot scroll              # Scroll capture, Enter finishes / Esc cancels
   dms screenshot scroll --interval 250`,
 }
@@ -171,6 +177,8 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssReset, "reset", false, "Reset saved last-region preselection before capturing")
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
 	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
+	screenshotCmd.PersistentFlags().BoolVarP(&ssGeometry, "geometry", "g", false, "Print selected region geometry (X,Y WxH) to stdout without capturing an image")
+	screenshotCmd.PersistentFlags().BoolVar(&ssAllowMulti, "allow-multiple", false, "Open a selector even when another one is already open")
 
 	ssScrollCmd.Flags().IntVar(&ssScrollInterval, "interval", 45, "Capture interval in milliseconds (30-1000)")
 
@@ -199,6 +207,14 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config.NoConfirm = ssNoConfirm
 	config.Reset = ssReset
 	config.Stdout = ssStdout
+	config.Geometry = ssGeometry
+	config.AllowMultiple = ssAllowMulti
+
+	if ssGeometry {
+		config.Clipboard = false
+		config.SaveFile = false
+		config.Notify = false
+	}
 
 	if ssOutputDir != "" {
 		config.OutputDir = ssOutputDir
@@ -279,6 +295,16 @@ func runScreenshot(config screenshot.Config) {
 		fmt.Fprintln(os.Stderr, "Error: --json cannot be combined with --stdout")
 		os.Exit(1)
 	}
+	if config.Geometry {
+		if config.Stdout {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with --stdout")
+			os.Exit(1)
+		}
+		if config.Mode == screenshot.ModeScroll {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with scroll mode")
+			os.Exit(1)
+		}
+	}
 
 	// Short-lived process over a few tens of MB: let the heap grow instead of paying GC cycles mid-capture.
 	debug.SetGCPercent(-1)
@@ -295,13 +321,35 @@ func runScreenshot(config screenshot.Config) {
 		if ssJSON {
 			writeScreenshotJSON(screenshotMetadata{Status: "aborted", Error: "User cancelled selection"})
 		}
+		if config.Geometry {
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 
-	defer result.Buffer.Close()
+	if config.Geometry {
+		if ssJSON {
+			x := int(result.Region.X)
+			y := int(result.Region.Y)
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "success",
+				X:      &x,
+				Y:      &y,
+				Width:  int(result.Region.Width),
+				Height: int(result.Region.Height),
+			})
+		} else {
+			fmt.Println(result.Region.GeometryString())
+		}
+		os.Exit(0)
+	}
 
-	if result.YInverted {
-		result.Buffer.FlipVertical()
+	if result.Buffer != nil {
+		defer result.Buffer.Close()
+
+		if result.YInverted {
+			result.Buffer.FlipVertical()
+		}
 	}
 
 	if config.Stdout {

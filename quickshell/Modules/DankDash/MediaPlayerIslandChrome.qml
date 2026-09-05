@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell.Services.Mpris
+import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
@@ -17,133 +18,82 @@ Item {
     property alias playerSelectorButton: sourceButton
     property alias audioDevicesButton: outputButton
 
-    implicitHeight: 352
+    property string panel: ""
 
     readonly property var activePlayer: root.player.activePlayer
+    readonly property bool playing: root.activePlayer?.playbackState === MprisPlaybackState.Playing
     readonly property color accent: root.player.accent
     readonly property color onAccent: root.player.onAccent
-    readonly property string artUrl: TrackArtService.resolvedArtUrl
-    readonly property string title: MprisController.stableTitle || I18n.tr("Unknown Track", "island media player: fallback title")
-    readonly property string artist: MprisController.stableArtist || I18n.tr("Unknown Artist", "island media player: fallback artist")
+    readonly property string title: MprisController.stableTitle || I18n.tr("Unknown Track")
+    readonly property string artist: MprisController.stableArtist || I18n.tr("Unknown Artist")
     readonly property string album: MprisController.stableAlbum || ""
+    readonly property string artUrl: TrackArtService.resolvedArtUrl || root.activePlayer?.trackArtUrl || ""
+    readonly property var sinks: {
+        Pipewire.nodes.values;
+        return root.panel === "devices" ? AudioService.getAvailableSinks() : [];
+    }
+    readonly property var players: root.panel === "players" ? (root.player.allPlayers || []).filter(p => p && !MprisController.isIdle(p)) : []
+    readonly property real cardMargin: 18
+    readonly property real artSize: 150
+    readonly property real seekBlockHeight: 42
+    readonly property real seekbarHeight: 22
+    readonly property real seekWidthRatio: 0.9
+    readonly property real seekGapTop: 32
+    readonly property real seekGapBottom: 16
+    readonly property real seekTopMargin: root.seekGapTop - root.seekbarHeight / 2
+    readonly property real transportHeight: 56
+    readonly property real groupButtonSize: 44
+    readonly property real groupOuterRadius: root.groupButtonSize / 2
+    readonly property real groupInnerRadius: 8
+    readonly property real panelPadding: Theme.spacingS
+    readonly property real rowHeight: 44
+    readonly property int maxRows: 4
+    readonly property real panelHeight: {
+        switch (root.panel) {
+        case "volume":
+            return 64;
+        case "devices":
+            return root.listHeight(root.sinks.length);
+        case "players":
+            return root.listHeight(root.players.length);
+        }
+        return 0;
+    }
+    readonly property real baseHeight: root.cardMargin * 2 + root.artSize + root.seekTopMargin + root.seekBlockHeight + root.seekGapBottom + root.transportHeight
 
-    Component {
-        id: artBlobComponent
+    implicitHeight: root.baseHeight + (root.panel !== "" ? Theme.spacingM + root.panelHeight : 0)
 
-        MediaBlobHalo {
-            accentColor: root.accent
-            playing: root.activePlayer?.playbackState === MprisPlaybackState.Playing
+    function listHeight(count) {
+        const rows = Math.max(1, Math.min(root.maxRows, count));
+        return root.panelPadding * 2 + rows * root.rowHeight + (rows - 1) * Theme.spacingXXS;
+    }
+
+    function togglePanel(panelId) {
+        root.panel = root.panel === panelId ? "" : panelId;
+    }
+
+    readonly property bool live: root.player.live
+
+    onLiveChanged: {
+        if (root.live)
+            root.panel = "";
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.player.wallpaperEnabled
+
+        sourceComponent: MediaArtBackdrop {
+            radius: 30
+            stableHeight: root.baseHeight
+            activePlayer: root.activePlayer
+            onArtReady: root.player.maybeFinishSwitch()
         }
     }
 
-    function volumeIcon() {
-        return root.player.getVolumeIcon();
-    }
-
-    function outputIcon() {
-        return root.player.getAudioDeviceIcon(AudioService.sink);
-    }
-
-    ClippingRectangle {
-        anchors {
-            fill: parent
-            margins: 1
-        }
-        radius: 30
-        color: Theme.surfaceContainerHigh
-        antialiasing: true
-
-        Image {
-            id: backdropImage
-
-            anchors.fill: parent
-            source: root.visible ? root.artUrl : ""
-            asynchronous: true
-            cache: true
-            fillMode: Image.PreserveAspectCrop
-            sourceSize: Qt.size(320, 320)
-            visible: backdropImage.status === Image.Ready
-            opacity: 0.62
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            visible: backdropImage.status === Image.Ready
-
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.9)
-                }
-
-                GradientStop {
-                    position: 0.4
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.46)
-                }
-
-                GradientStop {
-                    position: 1
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.95)
-                }
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.surfaceContainerHigh
-            visible: backdropImage.status !== Image.Ready
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            visible: backdropImage.status !== Image.Ready
-
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: Theme.withAlpha(root.accent, 0.16)
-                }
-
-                GradientStop {
-                    position: 0.55
-                    color: Theme.withAlpha(root.accent, 0.04)
-                }
-
-                GradientStop {
-                    position: 1
-                    color: "transparent"
-                }
-            }
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            name: "music_note"
-            size: 120
-            color: Theme.withAlpha(root.accent, 0.10)
-            visible: backdropImage.status !== Image.Ready
-        }
-    }
-
-    Column {
+    MediaPlayerEmptyState {
         anchors.centerIn: parent
-        spacing: Theme.spacingM
         visible: root.player.showNoPlayerNow
-        z: 2
-
-        DankIcon {
-            name: "music_note"
-            size: Theme.iconSize * 3
-            color: Theme.surfaceTextSecondary
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        StyledText {
-            text: I18n.tr("No Active Players", "island media player: empty state")
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.surfaceTextMedium
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
     }
 
     Item {
@@ -151,71 +101,102 @@ Item {
 
         anchors {
             fill: parent
-            margins: 18
+            margins: root.cardMargin
         }
         visible: !root.player.noneAvailable && !root.player.showNoPlayerNow
 
         Item {
-            id: headerRow
+            id: header
 
             anchors {
                 left: parent.left
                 right: parent.right
                 top: parent.top
             }
-            height: 132
-            clip: false
+            height: root.artSize
 
-            Item {
-                id: artCluster
+            MediaArtwork {
+                id: art
 
                 anchors {
                     left: parent.left
                     top: parent.top
                 }
-                width: 120
-                height: 120
-                clip: false
-                z: 1
+                width: root.artSize
+                height: root.artSize
+                cornerRadius: 28
+                placeholderIconSize: 56
+                artUrl: root.artUrl
+            }
 
-                Loader {
-                    anchors.centerIn: parent
-                    width: 136
-                    height: 136
-                    z: 0
-                    active: root.visible && root.player.live && SettingsData.audioVisualizerEnabled
-                    sourceComponent: artBlobComponent
+            ClippingRectangle {
+                id: buttonGroup
+
+                anchors {
+                    right: parent.right
+                    top: parent.top
                 }
+                width: buttonRow.width
+                height: root.groupButtonSize
+                color: "transparent"
+                radius: root.groupOuterRadius
 
-                Rectangle {
-                    id: artFrame
+                Row {
+                    id: buttonRow
 
-                    anchors.fill: parent
-                    z: 1
-                    radius: 30
-                    color: "transparent"
-                    border.width: 1
-                    border.color: Theme.withAlpha(root.accent, 0.3)
+                    spacing: Theme.spacingXXS
 
-                    MediaArtwork {
-                        anchors {
-                            fill: parent
-                            margins: 2
+                    GroupButton {
+                        id: volumeButton
+
+                        panelId: "volume"
+                        iconName: root.player.getVolumeIcon()
+                        enabled: root.player.volumeAvailable
+
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            onWheel: wheelEvent => {
+                                wheelEvent.accepted = true;
+                                root.player.adjustVolume((wheelEvent.angleDelta.y > 0 ? 1 : -1) * AudioService.wheelVolumeStep);
+                            }
                         }
-                        cornerRadius: 28
-                        placeholderIconSize: 46
-                        artUrl: root.artUrl
+                    }
+
+                    GroupButton {
+                        id: outputButton
+
+                        panelId: "devices"
+                        iconName: root.player.getAudioDeviceIcon(AudioService.sink)
+
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            onWheel: wheelEvent => {
+                                wheelEvent.accepted = true;
+                                AudioService.cycleAudioOutputDirection(wheelEvent.angleDelta.y < 0);
+                            }
+                        }
+                    }
+
+                    GroupButton {
+                        id: sourceButton
+
+                        panelId: "players"
+                        visible: (root.player.allPlayers?.length || 0) > 0
+                        iconName: "assistant_device"
                     }
                 }
             }
 
             Column {
                 anchors {
-                    left: artCluster.right
+                    left: art.right
                     leftMargin: Theme.spacingL
-                    right: parent.right
+                    right: buttonGroup.left
+                    rightMargin: Theme.spacingM
                     top: parent.top
-                    topMargin: 2
+                    topMargin: Theme.spacingXS
                 }
                 spacing: Theme.spacingXS
 
@@ -254,287 +235,345 @@ Item {
         }
 
         Item {
-            id: iconRail
+            id: seekBlock
 
             anchors {
-                right: parent.right
-                top: headerRow.bottom
-                topMargin: Theme.spacingL
-                bottom: parent.bottom
+                horizontalCenter: parent.horizontalCenter
+                top: header.bottom
+                topMargin: root.seekTopMargin
             }
-            width: 44
-            z: 4
+            width: Math.round(parent.width * root.seekWidthRatio)
+            height: root.seekBlockHeight
 
-            Column {
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
+            DankSeekbar {
+                anchors.top: parent.top
+                width: parent.width
+                height: root.seekbarHeight
+                activePlayer: root.activePlayer
+                stableLength: root.player.stableLength
+                accentColor: root.accent
+                accentTrackColor: MediaAccentService.accentTrack
+                accentSubtleColor: MediaAccentService.accentSubtle
+                isSeeking: root.player.isSeeking
+                onIsSeekingChanged: root.player.isSeeking = isSeeking
+            }
 
-                TonalIconButton {
-                    id: volumeButton
-
-                    width: 44
-                    height: 44
-                    radius: 22
-                    iconName: root.volumeIcon()
-                    iconSize: 20
-                    iconColor: root.player.volumeAvailable && root.player.currentVolume > 0 ? root.accent : Theme.surfaceTextMedium
-                    containerColor: Theme.withAlpha(Theme.surfaceText, 0.08)
-                    interactive: root.player.volumeAvailable
-                    onTriggered: root.player.toggleMute()
-                    onScrolled: notches => root.player.adjustVolume(notches * AudioService.wheelVolumeStep)
-
-                    HoverHandler {
-                        enabled: root.player.menusEnabled && root.player.volumeAvailable
-                        onHoveredChanged: {
-                            if (hovered)
-                                root.player.triggerVolumeDropdown();
-                            else
-                                root.player.dropdownButtonExited();
-                        }
-                    }
+            StyledText {
+                anchors {
+                    left: parent.left
+                    bottom: parent.bottom
                 }
-
-                TonalIconButton {
-                    id: outputButton
-
-                    width: 44
-                    height: 44
-                    radius: 22
-                    iconName: root.outputIcon()
-                    iconSize: 20
-                    iconColor: Theme.surfaceText
-                    containerColor: Theme.withAlpha(Theme.surfaceText, 0.08)
-                    onTriggered: root.player.cycleNextSink()
-                    onScrolled: notches => AudioService.cycleAudioOutputDirection(notches < 0)
-
-                    HoverHandler {
-                        enabled: root.player.menusEnabled
-                        onHoveredChanged: {
-                            if (hovered)
-                                root.player.triggerDevicesDropdown();
-                            else
-                                root.player.dropdownButtonExited();
-                        }
-                    }
+                text: {
+                    const rawPos = Math.max(0, root.activePlayer?.position || 0);
+                    const length = root.player.stableLength;
+                    return Format.formatDuration(length ? rawPos % Math.max(1, length) : rawPos);
                 }
+                color: root.accent
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.DemiBold
+            }
 
-                TonalIconButton {
-                    id: sourceButton
-
-                    width: 44
-                    height: 44
-                    radius: 22
-                    visible: (root.player.allPlayers?.length || 0) > 0
-                    iconName: "assistant_device"
-                    iconSize: 20
-                    iconColor: root.player.playersExpanded ? root.accent : Theme.surfaceText
-                    containerColor: Theme.withAlpha(root.accent, root.player.playersExpanded ? 0.16 : 0.08)
-                    onTriggered: {
-                        if (root.player.playersExpanded) {
-                            root.player.cycleNextPlayer();
-                            return;
-                        }
-                        root.player.triggerPlayersDropdown();
-                    }
-
-                    HoverHandler {
-                        enabled: root.player.menusEnabled && sourceButton.visible
-                        onHoveredChanged: {
-                            if (hovered)
-                                root.player.triggerPlayersDropdown();
-                            else
-                                root.player.dropdownButtonExited();
-                        }
-                    }
+            StyledText {
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
                 }
+                text: root.player.stableLength > 0 ? Format.formatDuration(root.player.stableLength) : "--:--"
+                color: Theme.surfaceTextSecondary
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
             }
         }
 
-        Item {
-            id: playColumn
+        Row {
+            id: transport
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: seekBlock.bottom
+                topMargin: root.seekGapBottom
+            }
+            height: root.transportHeight
+            spacing: Theme.spacingS
+
+            DankActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: !!root.activePlayer?.shuffleSupported
+                buttonSize: 48
+                radius: 24
+                iconName: "shuffle"
+                iconSize: 20
+                iconColor: root.activePlayer?.shuffle ? root.accent : Theme.surfaceText
+                backgroundColor: Theme.withAlpha(root.accent, root.activePlayer?.shuffle ? 0.2 : 0)
+                onClicked: {
+                    if (root.activePlayer?.canControl && root.activePlayer?.shuffleSupported)
+                        root.activePlayer.shuffle = !root.activePlayer.shuffle;
+                }
+            }
+
+            TransportButton {
+                iconName: "skip_previous"
+                enabled: !!root.activePlayer?.canGoPrevious || !!root.activePlayer?.canSeek
+                onClicked: MprisController.previousOrRewind()
+            }
+
+            DankActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 96
+                height: root.transportHeight
+                radius: root.playing ? 16 : root.transportHeight / 2
+                iconName: root.playing ? "pause" : "play_arrow"
+                iconSize: 32
+                iconColor: root.onAccent
+                backgroundColor: root.accent
+                enabled: !!root.activePlayer?.canTogglePlaying
+                opacity: enabled ? 1 : 0.38
+                onClicked: root.activePlayer.togglePlaying()
+            }
+
+            TransportButton {
+                iconName: "skip_next"
+                enabled: !!root.activePlayer?.canGoNext
+                onClicked: MprisController.next()
+            }
+
+            DankActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: !!root.activePlayer?.loopSupported
+                buttonSize: 48
+                radius: 24
+                iconName: root.activePlayer?.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
+                iconSize: 20
+                iconColor: root.activePlayer && root.activePlayer.loopState !== MprisLoopState.None ? root.accent : Theme.surfaceText
+                backgroundColor: Theme.withAlpha(root.accent, root.activePlayer && root.activePlayer.loopState !== MprisLoopState.None ? 0.2 : 0)
+                onClicked: root.player.cycleLoopState()
+            }
+        }
+
+        Rectangle {
+            id: panelBox
 
             anchors {
                 left: parent.left
-                right: iconRail.left
-                rightMargin: Theme.spacingM
-                top: headerRow.bottom
-                topMargin: Theme.spacingL
-                bottom: parent.bottom
+                right: parent.right
+                top: transport.bottom
+                topMargin: Theme.spacingM
             }
+            height: root.panelHeight
+            radius: 20
+            color: Theme.withAlpha(Theme.surfaceText, 0.08)
+            visible: root.panel !== ""
 
-            Item {
-                id: seekBlock
-
+            Loader {
                 anchors {
-                    left: parent.left
-                    leftMargin: iconRail.width + Theme.spacingM
-                    right: parent.right
-                    bottom: parent.bottom
-                    bottomMargin: 76
+                    fill: parent
+                    margins: root.panelPadding
                 }
-                height: 40
-
-                DankSeekbar {
-                    anchors.top: parent.top
-                    width: parent.width
-                    height: 22
-                    activePlayer: root.activePlayer
-                    stableLength: root.player.stableLength
-                    accentColor: root.accent
-                    accentTrackColor: MediaAccentService.accentTrack
-                    accentSubtleColor: MediaAccentService.accentSubtle
-                    isSeeking: root.player.isSeeking
-                    onIsSeekingChanged: root.player.isSeeking = isSeeking
-                }
-
-                StyledText {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
+                sourceComponent: {
+                    switch (root.panel) {
+                    case "volume":
+                        return volumePanel;
+                    case "devices":
+                        return devicesPanel;
+                    case "players":
+                        return playersPanel;
                     }
-                    text: Format.formatDuration(root.activePlayer?.position || 0)
-                    color: root.accent
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.DemiBold
-                }
-
-                StyledText {
-                    anchors {
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-                    text: root.player.stableLength > 0 ? Format.formatDuration(root.player.stableLength) : "--:--"
-                    color: Theme.surfaceTextSecondary
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                }
-            }
-
-            Row {
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    horizontalCenterOffset: (iconRail.width + Theme.spacingM) / 2
-                    bottom: parent.bottom
-                    bottomMargin: 2
-                }
-                spacing: Theme.spacingS
-
-                TonalIconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 40
-                    height: 40
-                    radius: 20
-                    visible: !!root.activePlayer?.shuffleSupported
-                    iconName: "shuffle"
-                    iconSize: 18
-                    iconColor: root.activePlayer?.shuffle ? root.accent : Theme.surfaceText
-                    containerColor: Theme.withAlpha(root.accent, root.activePlayer?.shuffle ? 0.16 : 0)
-                    onTriggered: {
-                        if (root.activePlayer?.canControl && root.activePlayer?.shuffleSupported)
-                            root.activePlayer.shuffle = !root.activePlayer.shuffle;
-                    }
-                }
-
-                TonalIconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 52
-                    height: 52
-                    radius: 18
-                    iconName: "skip_previous"
-                    iconSize: 26
-                    containerColor: Theme.withAlpha(root.accent, 0.14)
-                    interactive: !!root.activePlayer?.canGoPrevious || !!root.activePlayer?.canSeek
-                    onTriggered: MprisController.previousOrRewind()
-                }
-
-                Rectangle {
-                    id: playHero
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 68
-                    height: 68
-                    radius: root.activePlayer?.playbackState === MprisPlaybackState.Playing ? 22 : 34
-                    color: root.accent
-                    opacity: root.activePlayer?.canTogglePlaying ? 1 : 0.38
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: root.activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
-                        size: 34
-                        color: root.onAccent
-                        weight: 500
-                    }
-
-                    StateLayer {
-                        stateColor: root.onAccent
-                        disabled: !root.activePlayer || !root.activePlayer.canTogglePlaying
-                        onClicked: root.activePlayer.togglePlaying()
-                    }
-                }
-
-                TonalIconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 52
-                    height: 52
-                    radius: 18
-                    iconName: "skip_next"
-                    iconSize: 26
-                    containerColor: Theme.withAlpha(root.accent, 0.14)
-                    interactive: !!root.activePlayer?.canGoNext
-                    onTriggered: MprisController.next()
-                }
-
-                TonalIconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 40
-                    height: 40
-                    radius: 20
-                    visible: !!root.activePlayer?.loopSupported
-                    iconName: {
-                        if (!root.activePlayer)
-                            return "repeat";
-                        return root.activePlayer.loopState === MprisLoopState.Track ? "repeat_one" : "repeat";
-                    }
-                    iconSize: 18
-                    iconColor: root.activePlayer && root.activePlayer.loopState !== MprisLoopState.None ? root.accent : Theme.surfaceText
-                    containerColor: Theme.withAlpha(root.accent, root.activePlayer && root.activePlayer.loopState !== MprisLoopState.None ? 0.16 : 0)
-                    onTriggered: root.player.cycleLoopState()
+                    return null;
                 }
             }
         }
     }
 
-    component TonalIconButton: Rectangle {
-        id: tonal
+    Component {
+        id: volumePanel
 
-        property string iconName: ""
-        property real iconSize: 22
-        property color iconColor: Theme.surfaceText
-        property color containerColor: Theme.withAlpha(Theme.surfaceText, 0.08)
-        property bool interactive: true
+        Row {
+            spacing: Theme.spacingS
 
-        signal triggered
-        signal scrolled(int notches)
+            DankActionButton {
+                anchors.verticalCenter: parent.verticalCenter
+                buttonSize: 40
+                radius: 20
+                iconName: root.player.getVolumeIcon()
+                iconSize: 20
+                iconColor: root.player.currentVolume > 0 ? root.accent : Theme.surfaceTextMedium
+                backgroundColor: Theme.withAlpha(root.accent, 0.14)
+                onClicked: root.player.toggleMute()
+            }
 
-        color: tonal.containerColor
-        opacity: tonal.interactive ? 1 : 0.38
+            DankSlider {
+                id: volumeSlider
+
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 40 - parent.spacing
+                height: 40
+                minimum: 0
+                maximum: Math.max(1, Math.round(root.player.maxVolumePercent))
+                enabled: root.player.volumeAvailable
+                unit: "%"
+                thumbOutlineColor: Theme.surfaceContainerHigh
+                valueOverride: Math.round(root.player.currentVolume * 100)
+                onSliderValueChanged: newValue => root.player.setVolume(newValue / 100)
+
+                Binding on value {
+                    value: Math.round(root.player.currentVolume * 100)
+                    when: !volumeSlider.isDragging
+                }
+            }
+        }
+    }
+
+    Component {
+        id: devicesPanel
+
+        DankListView {
+            clip: true
+            spacing: Theme.spacingXXS
+            model: root.sinks
+
+            delegate: PanelRow {
+                required property var modelData
+
+                readonly property bool isCurrent: modelData === AudioService.sink
+
+                width: ListView.view.width
+                iconName: root.player.getAudioDeviceIcon(modelData)
+                title: AudioService.displayName(modelData)
+                subtitle: {
+                    if (!modelData?.audio)
+                        return isCurrent ? I18n.tr("Active") : I18n.tr("Available");
+                    if (modelData.audio.muted)
+                        return I18n.tr("Muted");
+                    return Math.round(modelData.audio.volume * 100) + "%";
+                }
+                selected: isCurrent
+                onActivated: AudioService.setSink(modelData)
+            }
+        }
+    }
+
+    Component {
+        id: playersPanel
+
+        DankListView {
+            clip: true
+            spacing: Theme.spacingXXS
+            model: root.players
+
+            delegate: PanelRow {
+                required property var modelData
+
+                width: ListView.view.width
+                iconName: "music_note"
+                title: {
+                    const identity = modelData?.identity || "";
+                    const trackTitle = modelData?.trackTitle || "";
+                    return trackTitle.length > 0 ? identity + " - " + trackTitle : identity;
+                }
+                subtitle: modelData?.trackArtist || ""
+                selected: modelData === root.activePlayer
+                onActivated: MprisController.switchActivePlayer(modelData)
+            }
+        }
+    }
+
+    component GroupButton: DankActionButton {
+        required property string panelId
+
+        readonly property bool active: root.panel === panelId
+
+        buttonSize: root.groupButtonSize
+        radius: root.groupInnerRadius
+        iconSize: 20
+        iconColor: active ? root.accent : Theme.surfaceText
+        backgroundColor: active ? Theme.withAlpha(root.accent, 0.2) : Theme.withAlpha(Theme.surfaceText, 0.1)
+        opacity: enabled ? 1 : 0.38
+        onClicked: root.togglePanel(panelId)
+    }
+
+    component TransportButton: DankActionButton {
+        anchors.verticalCenter: parent.verticalCenter
+        width: 64
+        height: root.transportHeight
+        radius: 16
+        iconSize: 26
+        backgroundColor: Theme.withAlpha(root.accent, 0.14)
+        opacity: enabled ? 1 : 0.38
+    }
+
+    component PanelRow: Rectangle {
+        id: row
+
+        property string iconName: "speaker"
+        property string title: ""
+        property string subtitle: ""
+        property bool selected: false
+
+        signal activated
+
+        height: root.rowHeight
+        radius: 14
+        color: row.selected ? Theme.withAlpha(root.accent, 0.2) : "transparent"
+
+        Row {
+            anchors {
+                left: parent.left
+                right: checkIcon.left
+                leftMargin: Theme.spacingM
+                rightMargin: Theme.spacingS
+                verticalCenter: parent.verticalCenter
+            }
+            spacing: Theme.spacingS
+
+            DankIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: row.iconName
+                size: 20
+                color: row.selected ? root.accent : Theme.surfaceText
+            }
+
+            Column {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 20 - parent.spacing
+
+                StyledText {
+                    width: parent.width
+                    text: row.title
+                    color: Theme.surfaceText
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: row.selected ? Font.DemiBold : Font.Medium
+                    elide: Text.ElideRight
+                }
+
+                StyledText {
+                    width: parent.width
+                    text: row.subtitle
+                    color: Theme.surfaceTextSecondary
+                    font.pixelSize: Theme.fontSizeSmall
+                    elide: Text.ElideRight
+                    visible: text.length > 0
+                }
+            }
+        }
 
         DankIcon {
-            anchors.centerIn: parent
-            name: tonal.iconName
-            size: tonal.iconSize
-            color: tonal.iconColor
+            id: checkIcon
+
+            anchors {
+                right: parent.right
+                rightMargin: Theme.spacingM
+                verticalCenter: parent.verticalCenter
+            }
+            name: "check"
+            size: 20
+            color: root.accent
+            visible: row.selected
+            width: row.selected ? 20 : 0
         }
 
         StateLayer {
-            stateColor: tonal.iconColor
-            disabled: !tonal.interactive
-            enabled: tonal.interactive
-            onClicked: tonal.triggered()
-            onWheel: wheelEvent => {
-                wheelEvent.accepted = true;
-                tonal.scrolled(wheelEvent.angleDelta.y > 0 ? 1 : -1);
-            }
+            stateColor: row.selected ? root.accent : Theme.surfaceText
+            onClicked: row.activated()
         }
     }
 }

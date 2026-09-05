@@ -14,10 +14,6 @@ Column {
     property string title: ""
     property string titleIcon: "widgets"
     property string sectionId: ""
-    property bool readOnly: false
-
-    enabled: !readOnly
-    opacity: readOnly ? 0.55 : 1.0
 
     DankTooltipV2 {
         id: sharedTooltip
@@ -3459,18 +3455,18 @@ Column {
                     }
                 }
 
-                Rectangle {
+                Column {
+                    id: batteryStyleBlock
+
                     width: parent.width
-                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
-                    radius: Theme.cornerRadius
-                    color: batteryPillArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
+                    leftPadding: Theme.spacingS
+                    rightPadding: Theme.spacingS
+                    topPadding: Theme.spacingXS
+                    bottomPadding: Theme.spacingXS
+                    spacing: Theme.spacingXS
 
                     Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.right: batteryPillToggle.left
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
+                        width: batteryStyleBlock.width - Theme.spacingS * 2
                         spacing: Theme.spacingS
                         clip: true
 
@@ -3482,7 +3478,7 @@ Column {
                         }
 
                         StyledText {
-                            text: I18n.tr("Material Battery Style")
+                            text: I18n.tr("Battery Style")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal
@@ -3493,27 +3489,24 @@ Column {
                         }
                     }
 
-                    DankToggle {
-                        id: batteryPillToggle
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 40
-                        height: 20
-                        checked: batteryContextMenu.currentWidgetData?.batteryPillStyle ?? SettingsData.batteryPillStyle
-                        onToggled: {
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillStyle", toggled);
-                        }
-                    }
+                    DankButtonGroup {
+                        id: batteryStyleGroup
 
-                    MouseArea {
-                        id: batteryPillArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: {
-                            batteryPillToggle.checked = !batteryPillToggle.checked;
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillStyle", batteryPillToggle.checked);
+                        readonly property var values: ["icon", "solid", "outline", "ring"]
+
+                        model: [I18n.tr("Icon", "battery widget: system battery glyph"), I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style")]
+                        buttonHeight: 24
+                        minButtonWidth: 44
+                        maximumWidth: batteryStyleBlock.width - Theme.spacingS * 2
+                        buttonPadding: 6
+                        checkIconSize: 10
+                        textSize: 10
+                        spacing: 2
+                        currentIndex: Math.max(0, batteryStyleGroup.values.indexOf(batteryContextMenu.currentWidgetData?.batteryStyle ?? SettingsData.batteryStyle))
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryStyle", batteryStyleGroup.values[index] ?? "icon");
                         }
                     }
                 }

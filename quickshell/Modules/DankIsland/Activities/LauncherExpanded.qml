@@ -19,8 +19,9 @@ FocusScope {
 
     clip: true
 
-    function focusSearch() {
+    function focusFace() {
         launcherContent.searchField.forceActiveFocus();
+        return true;
     }
 
     function initializeSession() {
@@ -42,7 +43,7 @@ FocusScope {
             launcherController.performSearch();
 
         launcherContent.resetScroll();
-        root.focusSearch();
+        root.focusFace();
         if (!root.controller.launcherPendingQuery) {
             launcherContent.searchField.selectAll();
             return;

@@ -4,12 +4,27 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Item {
     id: widgetsTab
 
     property var parentModal: null
-    property string selectedBarId: "default"
+    property string selectedBarId: SettingsUiState.selectedBarId
+
+    onSelectedBarIdChanged: {
+        if (SettingsUiState.selectedBarId !== selectedBarId)
+            SettingsUiState.selectedBarId = selectedBarId;
+    }
+
+    Connections {
+        target: SettingsUiState
+
+        function onSelectedBarIdChanged() {
+            if (widgetsTab.selectedBarId !== SettingsUiState.selectedBarId)
+                widgetsTab.selectedBarId = SettingsUiState.selectedBarId;
+        }
+    }
 
     property var selectedBarConfig: {
         selectedBarId;
@@ -25,9 +40,9 @@ Item {
     }
 
     readonly property bool dankIslandOwnsSelectedBarCenter: {
-        SettingsData.dankIslandBarId;
+        SettingsData.barConfigs;
         selectedBarId;
-        return !!selectedBarId && selectedBarId === SettingsData.dankIslandBarId;
+        return SettingsData.isIslandBarConfig(SettingsData.getBarConfig(selectedBarId));
     }
 
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
@@ -495,7 +510,7 @@ Item {
             widgetObj.showBatteryTimeOnlyOnBattery = SettingsData.showBatteryTimeOnlyOnBattery;
             widgetObj.showBatteryPowerCharging = SettingsData.showBatteryPowerCharging;
             widgetObj.showBatteryPowerDischarging = SettingsData.showBatteryPowerDischarging;
-            widgetObj.batteryPillStyle = SettingsData.batteryPillStyle;
+            widgetObj.batteryStyle = SettingsData.batteryStyle;
         }
         if (widgetId === "runningApps") {
             widgetObj.runningAppsCompactMode = SettingsData.runningAppsCompactMode;
@@ -1038,8 +1053,8 @@ Item {
                     item.showBatteryPowerCharging = widget.showBatteryPowerCharging;
                 if (widget.showBatteryPowerDischarging !== undefined)
                     item.showBatteryPowerDischarging = widget.showBatteryPowerDischarging;
-                if (widget.batteryPillStyle !== undefined)
-                    item.batteryPillStyle = widget.batteryPillStyle;
+                if (widget.batteryStyle !== undefined)
+                    item.batteryStyle = widget.batteryStyle;
                 if (widget.showPrinterIcon !== undefined)
                     item.showPrinterIcon = widget.showPrinterIcon;
                 if (widget.showScreenSharingIcon !== undefined)
@@ -1413,6 +1428,29 @@ Item {
                     }
                 }
 
+                SettingsCard {
+                    iconName: "view_in_ar"
+                    title: I18n.tr("Home Compact", "island settings: home face card title")
+                    visible: widgetsTab.dankIslandOwnsSelectedBarCenter
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.", "island settings: home layout editor hint")
+                        color: Theme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeSmall
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Loader {
+                        width: parent.width
+                        height: item?.height ?? 0
+                        active: widgetsTab.dankIslandOwnsSelectedBarCenter
+                        sourceComponent: IslandHomeLayoutEditor {
+                            settingKey: ""
+                        }
+                    }
+                }
+
                 StyledRect {
                     width: parent.width
                     height: centerSection.implicitHeight + Theme.spacingL * 2
@@ -1420,15 +1458,15 @@ Item {
                     color: Theme.floatingWindowNestedSurface
                     border.color: Theme.outlineMedium
                     border.width: Theme.layerOutlineWidth
+                    visible: !widgetsTab.dankIslandOwnsSelectedBarCenter
 
                     WidgetsTabSection {
                         id: centerSection
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
-                        title: widgetsTab.dankIslandOwnsSelectedBarCenter ? I18n.tr("Center Section - Reserved by Dank Island") : (selectedBarIsVertical ? I18n.tr("Middle Section") : I18n.tr("Center Section"))
-                        titleIcon: widgetsTab.dankIslandOwnsSelectedBarCenter ? "lock" : "format_align_center"
+                        title: selectedBarIsVertical ? I18n.tr("Middle Section") : I18n.tr("Center Section")
+                        titleIcon: "format_align_center"
                         sectionId: "center"
-                        readOnly: widgetsTab.dankIslandOwnsSelectedBarCenter
                         allWidgets: widgetsTab.baseWidgetDefinitions
                         items: widgetsTab.getItemsForSection("center")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {

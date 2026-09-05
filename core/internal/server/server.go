@@ -33,12 +33,12 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/ipc"
-	"github.com/AvengeMedia/dankgo/paths"
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 33
+const APIVersion = 34
 
 var CLIVersion = "dev"
 
@@ -86,7 +86,7 @@ var cupsMu sync.Mutex
 var cupsSubscriberCount int
 var cupsEverAvailable bool
 
-var appPaths = paths.New("danklinux")
+var appPaths = utils.App()
 
 func GetSocketPath() string {
 	return appPaths.SocketPath()
@@ -1432,7 +1432,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" wayland.gamma.setTemperature          - Set temperature range (params: low, high)")
 		log.Info(" wayland.gamma.setLocation             - Set location (params: latitude, longitude)")
 		log.Info(" wayland.gamma.setManualTimes          - Set manual times (params: sunrise, sunset, durationMinutes)")
-		log.Info(" wayland.gamma.setGamma                - Set gamma value (params: gamma)")
+		log.Info(" wayland.gamma.setGamma                - Set gamma and contrast (params: gamma, contrast)")
 		log.Info(" wayland.gamma.setEnabled              - Enable/disable gamma control (params: enabled)")
 		log.Info(" wayland.gamma.subscribe               - Subscribe to gamma state changes (streaming)")
 		log.Info("Theme automation:")

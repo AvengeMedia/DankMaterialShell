@@ -584,19 +584,15 @@ Item {
         }
 
         Loader {
-            anchors.horizontalCenter: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right ? undefined : parent.horizontalCenter
-            anchors.verticalCenter: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right ? parent.verticalCenter : undefined
-            anchors.bottom: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined
-            anchors.top: SettingsData.dockPosition === SettingsData.Position.Top ? parent.top : undefined
-            anchors.left: SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined
-            anchors.right: SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined
-            anchors.bottomMargin: SettingsData.dockPosition === SettingsData.Position.Bottom ? -(SettingsData.dockSpacing / 2 + 1.4) : 0
-            anchors.topMargin: SettingsData.dockPosition === SettingsData.Position.Top ? -(SettingsData.dockSpacing / 2 + 1.4) : 0
-            anchors.leftMargin: SettingsData.dockPosition === SettingsData.Position.Left ? -(SettingsData.dockSpacing / 2 + 1.4) : 0
-            anchors.rightMargin: SettingsData.dockPosition === SettingsData.Position.Right ? -(SettingsData.dockSpacing / 2 + 1.4) : 0
+            readonly property real indicatorOffset: SettingsData.dockSpacing / 2 + 1.4
 
-            sourceComponent: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right ? columnIndicator : rowIndicator
+            width: item ? item.implicitWidth : 0
+            height: item ? item.implicitHeight : 0
 
+            x: !root.isVertical ? Math.round((parent.width - width) / 2) : (SettingsData.dockPosition === SettingsData.Position.Right ? parent.width - width + indicatorOffset : -indicatorOffset)
+            y: root.isVertical ? Math.round((parent.height - height) / 2) : (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height + indicatorOffset : -indicatorOffset)
+
+            sourceComponent: root.isVertical ? columnIndicator : rowIndicator
             visible: root.shouldShowIndicator
         }
     }
@@ -606,6 +602,8 @@ Item {
 
         Row {
             spacing: Theme.spacingXXS
+            width: implicitWidth
+            height: implicitHeight
 
             Repeater {
                 model: {
@@ -664,6 +662,8 @@ Item {
 
         Column {
             spacing: Theme.spacingXXS
+            width: implicitWidth
+            height: implicitHeight
 
             Repeater {
                 model: {

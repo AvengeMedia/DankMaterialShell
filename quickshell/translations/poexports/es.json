@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Aplicaciones y comandos para ejecutar automáticamente al iniciar sesión"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Se aplica en la próxima sincronización de greeter"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Borde con fondo"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Abajo"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Deslizador de brillo"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Valor del brillo"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Espacio de trabajo actual"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Mostrar hora y fecha actual"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Juegos"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Control de gamma"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "Deslizador de volumen"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Volumen, brillo y otros indicadores en pantalla"

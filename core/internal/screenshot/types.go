@@ -1,5 +1,7 @@
 package screenshot
 
+import "fmt"
+
 type Mode int
 
 const (
@@ -39,6 +41,10 @@ func (r Region) IsEmpty() bool {
 	return r.Width <= 0 || r.Height <= 0
 }
 
+func (r Region) GeometryString() string {
+	return fmt.Sprintf("%d,%d %dx%d", r.X, r.Y, r.Width, r.Height)
+}
+
 type Output struct {
 	Name            string
 	X, Y            int32
@@ -50,20 +56,22 @@ type Output struct {
 }
 
 type Config struct {
-	Mode       Mode
-	OutputName string
-	Cursor     CursorMode
-	NoConfirm  bool
-	Reset      bool
-	Format     Format
-	Quality    int
-	OutputDir  string
-	Filename   string
-	Clipboard  bool
-	SaveFile   bool
-	Notify     bool
-	Stdout     bool
-	IntervalMs int
+	Mode          Mode
+	OutputName    string
+	Cursor        CursorMode
+	NoConfirm     bool
+	Reset         bool
+	Format        Format
+	Quality       int
+	OutputDir     string
+	Filename      string
+	Clipboard     bool
+	SaveFile      bool
+	Notify        bool
+	Stdout        bool
+	Geometry      bool
+	AllowMultiple bool
+	IntervalMs    int
 	// SelectorHook runs as the interactive selector starts (true) and ends (false).
 	SelectorHook func(begin bool)
 }

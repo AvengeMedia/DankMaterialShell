@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": ""
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": ""
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "پایین"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "اسلایدر روشنایی"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "مقدار روشنایی"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "محیط‌کار کنونی"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "نمایش زمان و تاریخ کنونی"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "بازی‌ها"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "کنترل گاما"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "اسلایدر حجم صدا"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "OSD‌های حجم صدا، روشنایی و سیستمی"

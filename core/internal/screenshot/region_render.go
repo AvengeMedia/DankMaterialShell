@@ -3,6 +3,7 @@ package screenshot
 import (
 	"fmt"
 	"math"
+	"slices"
 )
 
 var fontGlyphs = map[rune][12]uint8{
@@ -17,15 +18,20 @@ var fontGlyphs = map[rune][12]uint8{
 	'8': {0x3C, 0x66, 0x66, 0x66, 0x3C, 0x66, 0x66, 0x66, 0x66, 0x3C, 0x00, 0x00},
 	'9': {0x3C, 0x66, 0x66, 0x66, 0x3E, 0x06, 0x06, 0x06, 0x0C, 0x38, 0x00, 0x00},
 	'x': {0x00, 0x00, 0x00, 0x66, 0x66, 0x3C, 0x18, 0x3C, 0x66, 0x66, 0x00, 0x00},
+	'C': {0x3C, 0x66, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x66, 0x3C, 0x00, 0x00},
+	'D': {0x7C, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x7C, 0x00, 0x00},
 	'E': {0x7E, 0x60, 0x60, 0x60, 0x7C, 0x60, 0x60, 0x60, 0x60, 0x7E, 0x00, 0x00},
 	'P': {0x7C, 0x66, 0x66, 0x66, 0x7C, 0x60, 0x60, 0x60, 0x60, 0x60, 0x00, 0x00},
+	'R': {0x7C, 0x66, 0x66, 0x66, 0x7C, 0x6C, 0x66, 0x66, 0x66, 0x66, 0x00, 0x00},
 	'S': {0x3C, 0x66, 0x60, 0x60, 0x3C, 0x06, 0x06, 0x06, 0x66, 0x3C, 0x00, 0x00},
 	'a': {0x00, 0x00, 0x00, 0x3C, 0x06, 0x3E, 0x66, 0x66, 0x66, 0x3E, 0x00, 0x00},
 	'c': {0x00, 0x00, 0x00, 0x3C, 0x66, 0x60, 0x60, 0x60, 0x66, 0x3C, 0x00, 0x00},
 	'd': {0x00, 0x00, 0x06, 0x06, 0x06, 0x3E, 0x66, 0x66, 0x66, 0x3E, 0x00, 0x00},
 	'e': {0x00, 0x00, 0x00, 0x3C, 0x66, 0x66, 0x7E, 0x60, 0x60, 0x3C, 0x00, 0x00},
+	'g': {0x00, 0x00, 0x00, 0x3E, 0x66, 0x66, 0x66, 0x3E, 0x06, 0x7C, 0x00, 0x00},
 	'h': {0x00, 0x60, 0x60, 0x60, 0x7C, 0x66, 0x66, 0x66, 0x66, 0x66, 0x00, 0x00},
 	'i': {0x00, 0x18, 0x00, 0x38, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C, 0x00, 0x00},
+	'm': {0x00, 0x00, 0x00, 0x76, 0x6B, 0x6B, 0x6B, 0x6B, 0x6B, 0x6B, 0x00, 0x00},
 	'n': {0x00, 0x00, 0x00, 0x7C, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x00, 0x00},
 	'o': {0x00, 0x00, 0x00, 0x3C, 0x66, 0x66, 0x66, 0x66, 0x66, 0x3C, 0x00, 0x00},
 	'p': {0x00, 0x00, 0x00, 0x7C, 0x66, 0x66, 0x66, 0x7C, 0x60, 0x60, 0x00, 0x00},
@@ -33,8 +39,11 @@ var fontGlyphs = map[rune][12]uint8{
 	's': {0x00, 0x00, 0x00, 0x3E, 0x60, 0x60, 0x3C, 0x06, 0x06, 0x7C, 0x00, 0x00},
 	't': {0x00, 0x18, 0x18, 0x7E, 0x18, 0x18, 0x18, 0x18, 0x18, 0x0E, 0x00, 0x00},
 	'u': {0x00, 0x00, 0x00, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x3E, 0x00, 0x00},
+	'v': {0x00, 0x00, 0x00, 0x66, 0x66, 0x66, 0x3C, 0x3C, 0x18, 0x18, 0x00, 0x00},
 	'w': {0x00, 0x00, 0x00, 0x63, 0x63, 0x63, 0x6B, 0x7F, 0x77, 0x63, 0x00, 0x00},
+	'z': {0x00, 0x00, 0x00, 0x7E, 0x0C, 0x18, 0x30, 0x60, 0x60, 0x7E, 0x00, 0x00},
 	'l': {0x38, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3C, 0x00, 0x00},
+	'+': {0x00, 0x00, 0x00, 0x18, 0x18, 0x7E, 0x18, 0x18, 0x00, 0x00, 0x00, 0x00},
 	' ': {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	':': {0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00},
 	'/': {0x00, 0x02, 0x06, 0x0C, 0x18, 0x18, 0x30, 0x60, 0x40, 0x00, 0x00, 0x00},
@@ -59,6 +68,7 @@ type selectionRenderBounds struct {
 	labelText   string
 	top, bottom bool
 	left, right bool
+	scaleX      float64
 }
 
 // dirtyRect is half-open in buffer pixels.
@@ -116,13 +126,15 @@ func (d dirtyRect) minus(o dirtyRect) []dirtyRect {
 // overlay is what a frame draws on top of the dimmed background: the bright
 // selection interior with its border ring, and the dimensions label.
 type overlay struct {
-	interior dirtyRect
-	label    dirtyRect
-	text     string
-	top      bool
-	bottom   bool
-	left     bool
-	right    bool
+	interior    dirtyRect
+	label       dirtyRect
+	text        string
+	top         bool
+	bottom      bool
+	left        bool
+	right       bool
+	showHandles bool
+	scaleX      float64
 }
 
 func (o *overlay) full() dirtyRect {
@@ -137,14 +149,51 @@ func (o *overlay) ring() []dirtyRect {
 	return o.full().minus(o.inner())
 }
 
+func handleRadius(scale float64) int {
+	radius := int(math.Round(float64(resizeHandleRadius) * scale))
+	if radius < 6 {
+		return 6
+	}
+	return radius
+}
+
+func (o *overlay) handleRects() []dirtyRect {
+	if !o.showHandles {
+		return nil
+	}
+	radius := handleRadius(o.scaleX)
+	var rects []dirtyRect
+	in := o.interior
+	if o.top && o.left {
+		rects = append(rects, dirtyRect{in.x1 - radius, in.y1 - radius, in.x1 + radius + 1, in.y1 + radius + 1})
+	}
+	if o.top && o.right {
+		rects = append(rects, dirtyRect{in.x2 - 1 - radius, in.y1 - radius, in.x2 + radius, in.y1 + radius + 1})
+	}
+	if o.bottom && o.left {
+		rects = append(rects, dirtyRect{in.x1 - radius, in.y2 - 1 - radius, in.x1 + radius + 1, in.y2 + radius})
+	}
+	if o.bottom && o.right {
+		rects = append(rects, dirtyRect{in.x2 - 1 - radius, in.y2 - 1 - radius, in.x2 + radius, in.y2 + radius})
+	}
+	return rects
+}
+
 // overlayDelta returns the areas to re-dim and to re-brighten when prev is replaced by cur; nil means no overlay.
 func overlayDelta(prev, cur *overlay) (dim, bright []dirtyRect) {
 	var curInterior, prevInner dirtyRect
+	var curHandles []dirtyRect
 	if cur != nil {
 		curInterior = cur.interior
+		curHandles = cur.handleRects()
 	}
 	if prev != nil {
 		dim = append(prev.full().minus(curInterior), prev.label.minus(curInterior)...)
+		if prev.showHandles && !slices.Equal(prev.handleRects(), curHandles) {
+			for _, h := range prev.handleRects() {
+				dim = append(dim, h.minus(curInterior)...)
+			}
+		}
 		prevInner = prev.inner()
 	}
 	if cur != nil {
@@ -252,6 +301,7 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 		bottom: selectionMaxY > outputMinY && selectionMaxY <= outputMaxY,
 		left:   selectionMinX >= outputMinX && selectionMinX < outputMaxX,
 		right:  selectionMaxX > outputMinX && selectionMaxX <= outputMaxX,
+		scaleX: scaleX,
 	}, true
 }
 
@@ -265,13 +315,15 @@ func (r *RegionSelector) overlayFor(os *OutputSurface, buf *ShmBuffer) *overlay 
 		label, _ = labelRect(bounds, buf.Width, buf.Height)
 	}
 	return &overlay{
-		interior: dirtyRect{bounds.x, bounds.y, bounds.x + bounds.w, bounds.y + bounds.h},
-		label:    label,
-		text:     bounds.labelText,
-		top:      bounds.top,
-		bottom:   bounds.bottom,
-		left:     bounds.left,
-		right:    bounds.right,
+		interior:    dirtyRect{bounds.x, bounds.y, bounds.x + bounds.w, bounds.y + bounds.h},
+		label:       label,
+		text:        bounds.labelText,
+		top:         bounds.top,
+		bottom:      bounds.bottom,
+		left:        bounds.left,
+		right:       bounds.right,
+		showHandles: (r.resizingHandle != handleNone || r.ctrlHeld) && r.selection.hasSelection && r.phase != phaseScroll,
+		scaleX:      bounds.scaleX,
 	}
 }
 
@@ -291,6 +343,9 @@ func (r *RegionSelector) drawOverlay(os *OutputSurface, renderBuf *ShmBuffer, pr
 	data, stride, w, h := renderBuf.Data(), renderBuf.Stride, renderBuf.Width, renderBuf.Height
 	in := cur.interior
 	r.drawSelectionBorder(data, stride, w, h, in, cur, os.screenFormat)
+	if cur.showHandles {
+		r.drawCornerHandles(data, stride, w, h, in, cur, os.screenFormat)
+	}
 	if cur.text != "" {
 		r.drawLabel(data, stride, w, h, cur, os.screenFormat)
 	}
@@ -313,10 +368,82 @@ func (r *RegionSelector) drawSelectionBorder(data []byte, stride, bufW, bufH int
 	}
 }
 
+func (r *RegionSelector) drawCornerHandles(data []byte, stride, bufW, bufH int, in dirtyRect, o *overlay, format uint32) {
+	radius := handleRadius(o.scaleX)
+	if o.top && o.left {
+		r.drawCornerHandle(data, stride, bufW, bufH, in.x1, in.y1, radius, handleTopLeft)
+	}
+	if o.top && o.right {
+		r.drawCornerHandle(data, stride, bufW, bufH, in.x2-1, in.y1, radius, handleTopRight)
+	}
+	if o.bottom && o.left {
+		r.drawCornerHandle(data, stride, bufW, bufH, in.x1, in.y2-1, radius, handleBottomLeft)
+	}
+	if o.bottom && o.right {
+		r.drawCornerHandle(data, stride, bufW, bufH, in.x2-1, in.y2-1, radius, handleBottomRight)
+	}
+}
+
+func (r *RegionSelector) drawCornerHandle(data []byte, stride, bufW, bufH, cx, cy, radius int, handle resizeHandle) {
+	radSq := radius * radius
+	for dy := -radius; dy <= radius; dy++ {
+		py := cy + dy
+		if py < 0 || py >= bufH {
+			continue
+		}
+		rowOff := py * stride
+		for dx := -radius; dx <= radius; dx++ {
+			px := cx + dx
+			if px < 0 || px >= bufW {
+				continue
+			}
+			if dx*dx+dy*dy > radSq {
+				continue
+			}
+			switch handle {
+			case handleTopLeft:
+				if dx >= 0 && dy >= 0 {
+					continue
+				}
+			case handleTopRight:
+				if dx <= 0 && dy >= 0 {
+					continue
+				}
+			case handleBottomLeft:
+				if dx >= 0 && dy <= 0 {
+					continue
+				}
+			case handleBottomRight:
+				if dx <= 0 && dy <= 0 {
+					continue
+				}
+			}
+			off := rowOff + px*4
+			if off+3 < len(data) {
+				data[off] = 255
+				data[off+1] = 255
+				data[off+2] = 255
+				data[off+3] = 255
+			}
+		}
+	}
+}
+
 // overlayDamage lists the buffer areas that differ between a frame showing prev and one showing cur.
 func overlayDamage(prev, cur *overlay) []dirtyRect {
 	dim, bright := overlayDelta(prev, cur)
 	damage := append(dim, bright...)
+	var prevHandles, curHandles []dirtyRect
+	if prev != nil {
+		prevHandles = prev.handleRects()
+	}
+	if cur != nil {
+		curHandles = cur.handleRects()
+	}
+	if !slices.Equal(prevHandles, curHandles) {
+		damage = append(damage, prevHandles...)
+		damage = append(damage, curHandles...)
+	}
 	if cur == nil {
 		return damage
 	}
@@ -369,6 +496,98 @@ func (r *RegionSelector) drawScrollOverlay(os *OutputSurface, renderBuf *ShmBuff
 
 	r.drawBorder(data, stride, w, h, holeX-1, holeY-1, holeW+2, holeH+2, os.screenFormat)
 	r.drawScrollBar(data, stride, w, h, os.screenFormat)
+	r.drawScrollPreview(data, stride, w, h, os)
+}
+
+func (r *RegionSelector) drawScrollPreview(data []byte, stride, bufW, bufH int, os *OutputSurface) {
+	s := r.scroll
+	if s == nil || s.st == nil || s.st.rows() == 0 || !s.hasPreview {
+		return
+	}
+
+	canvas := s.st.canvas
+	sourceW := s.frameW
+	sourceRows := s.st.rows()
+	if sourceW <= 0 || sourceRows <= 0 || len(canvas) < sourceW*sourceRows*4 {
+		return
+	}
+
+	scale := 1.0
+	if os.logicalW > 0 {
+		scale = float64(bufW) / float64(os.logicalW)
+	}
+	if scale <= 0 {
+		scale = 1.0
+	}
+	padding := int(float64(scrollPreviewPaddingLogical) * scale)
+
+	format := os.screenFormat
+	// 1. Draw translucent dark panel background
+	r.fillRect(data, stride, bufW, bufH, s.previewX, s.previewY, s.previewW, s.previewH, 16, 16, 16, 230, format)
+
+	// 2. Draw downscaled stitched canvas
+	imageX := s.previewX + padding
+	imageY := s.previewY + padding
+	imageW := s.previewW - padding*2
+	imageH := s.previewH - padding*2
+	if imageW <= 0 || imageH <= 0 {
+		return
+	}
+
+	needSwap := formatIsBGR(uint32(s.format)) != formatIsBGR(format)
+
+	startRow := s.previewStartRow
+	previewRows := s.previewRows
+	if previewRows <= 0 || startRow < 0 || startRow+previewRows > sourceRows {
+		startRow = 0
+		previewRows = sourceRows
+	}
+
+	for y := range imageH {
+		srcY := startRow + y*previewRows/imageH
+		if srcY >= sourceRows {
+			srcY = sourceRows - 1
+		}
+		dstY := imageY + y
+		if dstY < 0 || dstY >= bufH {
+			continue
+		}
+		dstRowOff := dstY * stride
+		srcRowOff := srcY * sourceW * 4
+
+		for x := range imageW {
+			srcX := x * sourceW / imageW
+			dstX := imageX + x
+			if dstX < 0 || dstX >= bufW {
+				continue
+			}
+			srcIdx := srcRowOff + srcX*4
+			dstIdx := dstRowOff + dstX*4
+			if srcIdx+3 >= len(canvas) || dstIdx+3 >= len(data) {
+				continue
+			}
+
+			if needSwap {
+				data[dstIdx+0] = canvas[srcIdx+2]
+				data[dstIdx+1] = canvas[srcIdx+1]
+				data[dstIdx+2] = canvas[srcIdx+0]
+			} else {
+				data[dstIdx+0] = canvas[srcIdx+0]
+				data[dstIdx+1] = canvas[srcIdx+1]
+				data[dstIdx+2] = canvas[srcIdx+2]
+			}
+			data[dstIdx+3] = 255
+		}
+	}
+
+	// 3. Draw border around preview panel
+	borderW := max(int(scale+0.5), 1)
+	for i := range borderW {
+		r.drawHLine(data, stride, bufW, bufH, s.previewX-i, s.previewY-i, s.previewW+2*i, format)
+		r.drawHLine(data, stride, bufW, bufH, s.previewX-i, s.previewY+s.previewH+i-1, s.previewW+2*i, format)
+		r.drawVLine(data, stride, bufW, bufH, s.previewX-i, s.previewY-i, s.previewH+2*i, format)
+		r.drawVLine(data, stride, bufW, bufH, s.previewX+s.previewW+i-1, s.previewY-i, s.previewH+2*i, format)
+	}
 }
 
 func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, format uint32) {
@@ -398,12 +617,7 @@ func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, form
 		style.TextR, style.TextG, style.TextB, format)
 }
 
-func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {
-	if r.selection.dragging {
-		return
-	}
-
-	style := LoadOverlayStyle()
+func (r *RegionSelector) hudDimensions(bufW, bufH int) (hudX, hudY, hudW, hudH int) {
 	const charW, charH, padding, itemSpacing = 8, 12, 12, 24
 
 	cursorLabel := "hide"
@@ -417,25 +631,52 @@ func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uin
 
 	items := []struct{ key, desc string }{
 		{captureKey, "capture"},
+		{"Ctrl", "resize/move"},
 		{"P", cursorLabel + " cursor"},
 		{"Esc", "cancel"},
 	}
 
 	totalW := 0
 	for i, item := range items {
-		totalW += len(item.key)*(charW+1) + 4 + len(item.desc)*(charW+1)
+		totalW += len(item.key)*(charW+1) + (1+len(item.desc))*(charW+1)
 		if i < len(items)-1 {
 			totalW += itemSpacing
 		}
 	}
 
-	hudW := totalW + padding*2
-	hudH := charH + padding*2
-	hudX := (bufW - hudW) / 2
-	hudY := bufH - hudH - 20
+	hudW = totalW + padding*2
+	hudH = charH + padding*2
+	hudX = (bufW - hudW) / 2
+	hudY = bufH - hudH - 20
+	return hudX, hudY, hudW, hudH
+}
 
+func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {
+	if r.selection.dragging {
+		return
+	}
+
+	hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH)
+	style := LoadOverlayStyle()
 	r.fillRect(data, stride, bufW, bufH, hudX, hudY, hudW, hudH,
 		style.BackgroundR, style.BackgroundG, style.BackgroundB, style.BackgroundA, format)
+
+	const charW, padding, itemSpacing = 8, 12, 24
+	cursorLabel := "hide"
+	if !r.showCapturedCursor {
+		cursorLabel = "show"
+	}
+	captureKey := "Space/Enter"
+	if r.screenshoter != nil && r.screenshoter.config.NoConfirm {
+		captureKey = "Drag+Release"
+	}
+
+	items := []struct{ key, desc string }{
+		{captureKey, "capture"},
+		{"Ctrl", "resize/move"},
+		{"P", cursorLabel + " cursor"},
+		{"Esc", "cancel"},
+	}
 
 	tx, ty := hudX+padding, hudY+padding
 	for i, item := range items {

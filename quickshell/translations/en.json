@@ -11,7 +11,7 @@
   {
     "term": "%1 Animation Speed",
     "context": "%1 Animation Speed",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:434, Modules/Settings/TypographyMotionTab.qml:503",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:436, Modules/Settings/TypographyMotionTab.qml:505",
     "comment": "",
     "tags": [
       "settings"
@@ -218,7 +218,7 @@
   {
     "term": "%1 notifications",
     "context": "%1 notifications",
-    "reference": "Modules/Lock/LockScreenContent.qml:604, Modules/DankIsland/DankIslandSurface.qml:553",
+    "reference": "Modules/Lock/LockScreenContent.qml:604, Modules/DankIsland/DankIslandSurface.qml:474",
     "comment": "island compact face: unread notification count",
     "tags": [
       "shell"
@@ -462,7 +462,7 @@
   {
     "term": "1 second",
     "context": "1 second",
-    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:527, Modules/Settings/NotificationsTab.qml:35",
+    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:511, Modules/Settings/NotificationsTab.qml:35",
     "comment": "",
     "tags": [
       "settings"
@@ -498,7 +498,7 @@
   {
     "term": "10 seconds",
     "context": "10 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1032, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:527, Modules/Settings/NotificationsTab.qml:51",
+    "reference": "Modules/Settings/WallpaperTab.qml:1032, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:511, Modules/Settings/NotificationsTab.qml:51",
     "comment": "wallpaper interval",
     "tags": [
       "settings"
@@ -597,7 +597,7 @@
   {
     "term": "2 seconds",
     "context": "2 seconds",
-    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:527",
+    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:511",
     "comment": "",
     "tags": [
       "settings"
@@ -651,7 +651,7 @@
   {
     "term": "250 ms",
     "context": "250 ms",
-    "reference": "Modules/Settings/PowerSleepTab.qml:527",
+    "reference": "Modules/Settings/PowerSleepTab.qml:511",
     "comment": "",
     "tags": [
       "settings"
@@ -697,7 +697,7 @@
   {
     "term": "3 seconds",
     "context": "3 seconds",
-    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:527, Modules/Settings/NotificationsTab.qml:39",
+    "reference": "Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:511, Modules/Settings/NotificationsTab.qml:39",
     "comment": "",
     "tags": [
       "settings"
@@ -833,7 +833,7 @@
   {
     "term": "5 seconds",
     "context": "5 seconds",
-    "reference": "Modules/Settings/WallpaperTab.qml:1032, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:527, Modules/Settings/NotificationsTab.qml:43, Modules/Settings/NotificationsTab.qml:158",
+    "reference": "Modules/Settings/WallpaperTab.qml:1032, Modules/Settings/PowerSleepTab.qml:103, Modules/Settings/PowerSleepTab.qml:114, Modules/Settings/PowerSleepTab.qml:129, Modules/Settings/PowerSleepTab.qml:140, Modules/Settings/PowerSleepTab.qml:511, Modules/Settings/NotificationsTab.qml:43, Modules/Settings/NotificationsTab.qml:158",
     "comment": "wallpaper interval",
     "tags": [
       "settings"
@@ -851,7 +851,7 @@
   {
     "term": "500 ms",
     "context": "500 ms",
-    "reference": "Modules/Settings/PowerSleepTab.qml:527, Modules/Settings/PowerSleepTab.qml:537",
+    "reference": "Modules/Settings/PowerSleepTab.qml:511, Modules/Settings/PowerSleepTab.qml:521",
     "comment": "",
     "tags": [
       "settings"
@@ -888,7 +888,7 @@
   {
     "term": "750 ms",
     "context": "750 ms",
-    "reference": "Modules/Settings/PowerSleepTab.qml:527",
+    "reference": "Modules/Settings/PowerSleepTab.qml:511",
     "comment": "",
     "tags": [
       "settings"
@@ -952,7 +952,7 @@
   {
     "term": "A slight natural settle, DMS default",
     "context": "A slight natural settle, DMS default",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:326",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:328",
     "comment": "",
     "tags": [
       "settings"
@@ -997,7 +997,7 @@
   {
     "term": "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.",
     "context": "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:617",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:604",
     "comment": "",
     "tags": [
       "shell"
@@ -1024,7 +1024,7 @@
   {
     "term": "Acceleration Profile",
     "context": "Acceleration Profile",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:63, Modules/Settings/MouseTouchpadTab.qml:184",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:63, Modules/Settings/MouseTouchpadTab.qml:182",
     "comment": "",
     "tags": [
       "settings"
@@ -1051,7 +1051,7 @@
   {
     "term": "Accept Jobs",
     "context": "Accept Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1325",
+    "reference": "Modules/Settings/PrinterTab.qml:1307",
     "comment": "",
     "tags": [
       "settings"
@@ -1060,7 +1060,7 @@
   {
     "term": "Accepting",
     "context": "Accepting",
-    "reference": "Modules/Settings/PrinterTab.qml:1187",
+    "reference": "Modules/Settings/PrinterTab.qml:1169",
     "comment": "",
     "tags": [
       "settings"
@@ -1142,7 +1142,7 @@
   {
     "term": "Activate",
     "context": "Activate",
-    "reference": "Modules/Settings/GreeterTab.qml:89, Modules/Settings/GreeterTab.qml:120, Modules/ControlCenter/Details/NetworkDetail.qml:955",
+    "reference": "Modules/Settings/GreeterTab.qml:89, Modules/Settings/GreeterTab.qml:120, Modules/ControlCenter/Details/NetworkDetail.qml:965",
     "comment": "",
     "tags": [
       "settings",
@@ -1170,7 +1170,7 @@
   {
     "term": "Activates immediately",
     "context": "Activates immediately",
-    "reference": "Modules/PowerMenu/PowerMenuContent.qml:763",
+    "reference": "Modules/PowerMenu/PowerMenuContent.qml:719",
     "comment": "",
     "tags": [
       "shell"
@@ -1188,7 +1188,7 @@
   {
     "term": "Active",
     "context": "Active",
-    "reference": "Modals/WindowRuleModal.qml:897, Modules/DankDash/MediaDropdownOverlay.qml:415, Modules/Settings/ThemeColorsTab.qml:1625, Modules/Settings/NetworkEthernetTab.qml:435, Modules/Settings/WindowRulesTab.qml:48, Modules/ControlCenter/Details/AudioInputDetail.qml:249, Modules/ControlCenter/Details/AudioOutputDetail.qml:251, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:196",
+    "reference": "Modals/WindowRuleModal.qml:897, Modules/DankDash/MediaPlayerIslandChrome.qml:421, Modules/DankDash/MediaDropdownOverlay.qml:426, Modules/Settings/ThemeColorsTab.qml:1625, Modules/Settings/NetworkEthernetTab.qml:435, Modules/Settings/WindowRulesTab.qml:48, Modules/ControlCenter/Details/AudioInputDetail.qml:249, Modules/ControlCenter/Details/AudioOutputDetail.qml:251, Modules/ControlCenter/BuiltinPlugins/DisplayProfilesWidget.qml:196",
     "comment": "active state label",
     "tags": [
       "settings",
@@ -1271,7 +1271,7 @@
   {
     "term": "Adaptive",
     "context": "Adaptive",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:186",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:184",
     "comment": "",
     "tags": [
       "settings"
@@ -1508,7 +1508,7 @@
   {
     "term": "Adjust scrolling sensitivity multiplier",
     "context": "Adjust scrolling sensitivity multiplier",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:94, Modules/Settings/MouseTouchpadTab.qml:215",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:94, Modules/Settings/MouseTouchpadTab.qml:213",
     "comment": "",
     "tags": [
       "settings"
@@ -1535,7 +1535,7 @@
   {
     "term": "Adjust touchpad pointer speed",
     "context": "Adjust touchpad pointer speed",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:172",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:170",
     "comment": "",
     "tags": [
       "settings"
@@ -1907,7 +1907,7 @@
   {
     "term": "Animation Duration",
     "context": "Animation Duration",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:382",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:384",
     "comment": "",
     "tags": [
       "settings"
@@ -1916,7 +1916,7 @@
   {
     "term": "Animation Speed",
     "context": "Animation Speed",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:352, Modules/Settings/NotificationsTab.qml:377",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:354, Modules/Settings/NotificationsTab.qml:377",
     "comment": "",
     "tags": [
       "settings"
@@ -1925,7 +1925,7 @@
   {
     "term": "Animation Style",
     "context": "Animation Style",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:270",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:272",
     "comment": "",
     "tags": [
       "settings"
@@ -2043,7 +2043,7 @@
   {
     "term": "Appearance",
     "context": "Appearance",
-    "reference": "Modals/Settings/SettingsSidebar.qml:132, Modules/Settings/GreeterTab.qml:512, Modules/Settings/LauncherTab.qml:609, Modules/Settings/LockScreenTab.qml:371, Modules/Settings/DankIslandTab.qml:253, Modules/Settings/WorkspaceAppearanceCard.qml:11",
+    "reference": "Modals/Settings/SettingsSidebar.qml:132, Modules/Settings/GreeterTab.qml:512, Modules/Settings/LauncherTab.qml:609, Modules/Settings/LockScreenTab.qml:371, Modules/Settings/DankIslandTab.qml:306, Modules/Settings/WorkspaceAppearanceCard.qml:11",
     "comment": "island settings: appearance card title | launcher appearance settings",
     "tags": [
       "settings"
@@ -2090,6 +2090,15 @@
     "term": "Applications and commands to start automatically when you log in",
     "context": "Applications and commands to start automatically when you log in",
     "reference": "Modules/Settings/AutoStartTab.qml:637",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Applied independently of night mode",
+    "context": "Applied independently of night mode",
+    "reference": "Modules/Settings/GammaControlTab.qml:72",
     "comment": "",
     "tags": [
       "settings"
@@ -2161,7 +2170,7 @@
   {
     "term": "Apply island geometry changes immediately without spring overshoot",
     "context": "Apply island geometry changes immediately without spring overshoot",
-    "reference": "Modules/Settings/DankIslandTab.qml:525",
+    "reference": "Modules/Settings/DankIslandTab.qml:578",
     "comment": "island settings: reduce motion description",
     "tags": [
       "settings"
@@ -2179,7 +2188,7 @@
   {
     "term": "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.",
     "context": "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.",
-    "reference": "Modules/Settings/GammaControlTab.qml:65",
+    "reference": "Modules/Settings/GammaControlTab.qml:101",
     "comment": "",
     "tags": [
       "settings"
@@ -2406,7 +2415,7 @@
   {
     "term": "Audio Output Devices (",
     "context": "Audio Output Devices (",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:338",
+    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:349",
     "comment": "",
     "tags": [
       "shell"
@@ -2853,7 +2862,7 @@
   {
     "term": "Automatic Control",
     "context": "Automatic Control",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1343, Modules/Settings/GammaControlTab.qml:126",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1343, Modules/Settings/GammaControlTab.qml:162",
     "comment": "",
     "tags": [
       "settings"
@@ -3015,7 +3024,7 @@
   {
     "term": "Available",
     "context": "Available",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:415, Modules/Settings/PrinterTab.qml:214, Modules/Settings/NetworkCellularTab.qml:279, Modules/ControlCenter/Details/AudioPortSelector.qml:294, Modules/ControlCenter/Details/AudioInputDetail.qml:249, Modules/ControlCenter/Details/AudioOutputDetail.qml:251, Modules/ControlCenter/Details/NetworkDetail.qml:675, Modules/ControlCenter/Details/NetworkDetail.qml:755",
+    "reference": "Modules/DankDash/MediaPlayerIslandChrome.qml:421, Modules/DankDash/MediaDropdownOverlay.qml:426, Modules/Settings/PrinterTab.qml:214, Modules/Settings/NetworkCellularTab.qml:279, Modules/ControlCenter/Details/AudioPortSelector.qml:294, Modules/ControlCenter/Details/AudioInputDetail.qml:249, Modules/ControlCenter/Details/AudioOutputDetail.qml:251, Modules/ControlCenter/Details/NetworkDetail.qml:685, Modules/ControlCenter/Details/NetworkDetail.qml:765",
     "comment": "audio port availability status",
     "tags": [
       "settings",
@@ -3106,7 +3115,7 @@
   {
     "term": "Background",
     "context": "Background",
-    "reference": "Modules/Settings/GreeterTab.qml:575, Modules/Settings/LockScreenTab.qml:392, Modules/Settings/DankIslandTab.qml:372",
+    "reference": "Modules/Settings/GreeterTab.qml:575, Modules/Settings/LockScreenTab.qml:392, Modules/Settings/DankIslandTab.qml:425",
     "comment": "island settings: satellite background toggle",
     "tags": [
       "settings"
@@ -3187,7 +3196,7 @@
   {
     "term": "Balanced",
     "context": "Balanced",
-    "reference": "Common/Theme.qml:1557, Modules/Settings/TypographyMotionTab.qml:329",
+    "reference": "Common/Theme.qml:1557, Modules/Settings/TypographyMotionTab.qml:331",
     "comment": "power profile option",
     "tags": [
       "settings",
@@ -3361,7 +3370,7 @@
   {
     "term": "Battery / Control Center",
     "context": "Battery / Control Center",
-    "reference": "Modules/Settings/DankIslandTab.qml:190",
+    "reference": "Modules/Settings/DankIslandTab.qml:191",
     "comment": "island settings: battery or control center slot row",
     "tags": [
       "settings"
@@ -3407,7 +3416,7 @@
   {
     "term": "Battery gauge opens Control Center",
     "context": "Battery gauge opens Control Center",
-    "reference": "Modules/Settings/DankIslandTab.qml:191",
+    "reference": "Modules/Settings/DankIslandTab.qml:192",
     "comment": "island settings: status slot description with battery",
     "tags": [
       "settings"
@@ -3452,7 +3461,7 @@
   {
     "term": "Behavior",
     "context": "Behavior",
-    "reference": "Modules/Settings/DockTab.qml:166, Modules/Settings/GreeterTab.qml:609, Modules/Settings/LockScreenTab.qml:722, Modules/Settings/DankIslandTab.qml:458, Modules/Settings/ClipboardTab.qml:442",
+    "reference": "Modules/Settings/DockTab.qml:166, Modules/Settings/GreeterTab.qml:609, Modules/Settings/LockScreenTab.qml:722, Modules/Settings/DankIslandTab.qml:511, Modules/Settings/ClipboardTab.qml:442",
     "comment": "island settings: behavior card title",
     "tags": [
       "settings"
@@ -3785,6 +3794,15 @@
     ]
   },
   {
+    "term": "Both",
+    "context": "Both",
+    "reference": "Modules/Settings/DankIslandTab.qml:232, Modules/Settings/DankIslandTab.qml:258",
+    "comment": "island settings: level shown as icon and percentage",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
     "term": "Bottom",
     "context": "Bottom",
     "reference": "Modules/Settings/ThemeColorsTab.qml:2221, Modules/Settings/ThemeColorsTab.qml:2231, Modules/Settings/ThemeColorsTab.qml:2244, Modules/Settings/DockTab.qml:126, Modules/Settings/DankBarTab.qml:93, Modules/Settings/DankBarTab.qml:393, Modules/Settings/DankBarTab.qml:1888, Modules/Settings/DankBarTab.qml:1896, Modules/Settings/DankBarTab.qml:1910, Modules/Settings/FrameTab.qml:343",
@@ -3841,7 +3859,7 @@
   {
     "term": "Bright",
     "context": "Bright",
-    "reference": "Modules/Settings/DankIslandTab.qml:261",
+    "reference": "Modules/Settings/DankIslandTab.qml:314",
     "comment": "island settings: bright surface tone",
     "tags": [
       "settings"
@@ -3850,8 +3868,8 @@
   {
     "term": "Brightness",
     "context": "Brightness",
-    "reference": "Modules/DankIsland/IslandSystemSource.qml:22, Modules/Settings/WidgetsTabSection.qml:2323, Modules/Settings/WidgetsTabSection.qml:2511, Modules/Settings/DockTab.qml:516, Modules/Settings/LauncherTab.qml:522, Modules/Settings/OSDTab.qml:114",
-    "comment": "island system face: brightness title",
+    "reference": "Modules/DankIsland/IslandSystemSource.qml:22, Modules/Settings/WidgetsTabSection.qml:2323, Modules/Settings/WidgetsTabSection.qml:2511, Modules/Settings/DockTab.qml:516, Modules/Settings/LauncherTab.qml:522, Modules/Settings/DankIslandTab.qml:243, Modules/Settings/OSDTab.qml:114",
+    "comment": "island settings: brightness slot row | island system face: brightness title",
     "tags": [
       "settings",
       "shell"
@@ -3864,6 +3882,15 @@
     "comment": "",
     "tags": [
       "shell"
+    ]
+  },
+  {
+    "term": "Brightness Style",
+    "context": "Brightness Style",
+    "reference": "Modules/Settings/DankIslandTab.qml:256",
+    "comment": "island settings: brightness display mode row",
+    "tags": [
+      "settings"
     ]
   },
   {
@@ -4089,7 +4116,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:33, Modals/Common/ConfirmDialogOverlay.qml:10, Modals/Common/ConfirmDialogOverlay.qml:31, Modals/Common/ConfirmDialogContent.qml:11, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1649, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:190, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1562, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
+    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:33, Modals/Common/ConfirmDialogOverlay.qml:10, Modals/Common/ConfirmDialogOverlay.qml:31, Modals/Common/ConfirmDialogContent.qml:11, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1649, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:190, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1562, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:240",
     "comment": "cancel hotspot editing action",
     "tags": [
       "settings",
@@ -4099,7 +4126,7 @@
   {
     "term": "Cancel all jobs for \"%1\"?",
     "context": "Cancel all jobs for \"%1\"?",
-    "reference": "Modules/Settings/PrinterTab.qml:1404",
+    "reference": "Modules/Settings/PrinterTab.qml:1386",
     "comment": "",
     "tags": [
       "settings"
@@ -4237,7 +4264,7 @@
   {
     "term": "Cellular",
     "context": "Cellular",
-    "reference": "Modals/Settings/SettingsSidebar.qml:285, Modules/Settings/NetworkStatusTab.qml:120, Modules/Settings/NetworkStatusTab.qml:178, Modules/Settings/NetworkCellularTab.qml:35, Modules/ControlCenter/Details/NetworkDetail.qml:177, Modules/ControlCenter/Components/DragDropGrid.qml:481, Modules/ControlCenter/Components/DragDropGrid.qml:486",
+    "reference": "Modals/Settings/SettingsSidebar.qml:285, Modules/Settings/NetworkStatusTab.qml:120, Modules/Settings/NetworkStatusTab.qml:178, Modules/Settings/NetworkCellularTab.qml:35, Modules/ControlCenter/Details/NetworkDetail.qml:187, Modules/ControlCenter/Components/DragDropGrid.qml:481, Modules/ControlCenter/Components/DragDropGrid.qml:486",
     "comment": "network status",
     "tags": [
       "settings",
@@ -4427,7 +4454,7 @@
   {
     "term": "Checking for updates...",
     "context": "Checking for updates...",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:355",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:342",
     "comment": "",
     "tags": [
       "shell"
@@ -4628,7 +4655,7 @@
   {
     "term": "Choose when to generate scrolling events",
     "context": "Choose when to generate scrolling events",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:107, Modules/Settings/MouseTouchpadTab.qml:228",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:111, Modules/Settings/MouseTouchpadTab.qml:230",
     "comment": "",
     "tags": [
       "settings"
@@ -4691,7 +4718,7 @@
   {
     "term": "Choose which shortcuts sit left or right of the clock",
     "context": "Choose which shortcuts sit left or right of the clock",
-    "reference": "Modules/Settings/DankIslandTab.qml:168",
+    "reference": "Modules/Settings/DankIslandTab.qml:169",
     "comment": "island settings: home face slot hint",
     "tags": [
       "settings"
@@ -4746,7 +4773,7 @@
   {
     "term": "Clear",
     "context": "Clear",
-    "reference": "Modules/DankDash/WallpaperTab.qml:953, Modules/Settings/PrinterTab.qml:1405, Modules/Notifications/Center/NotificationHeader.qml:160",
+    "reference": "Modules/DankDash/WallpaperTab.qml:953, Modules/Settings/PrinterTab.qml:1387, Modules/Notifications/Center/NotificationHeader.qml:160",
     "comment": "",
     "tags": [
       "settings",
@@ -4756,7 +4783,7 @@
   {
     "term": "Clear All",
     "context": "Clear All",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:71, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:98, Modules/Settings/PrinterTab.qml:1389, Modules/DankBar/Widgets/ClipboardButton.qml:326",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:71, Modals/Clipboard/ClipboardHistoryPopout.qml:105, Modals/Clipboard/ClipboardHistoryModal.qml:98, Modules/Settings/PrinterTab.qml:1371, Modules/DankBar/Widgets/ClipboardButton.qml:326",
     "comment": "",
     "tags": [
       "settings",
@@ -4766,7 +4793,7 @@
   {
     "term": "Clear All Jobs",
     "context": "Clear All Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1403",
+    "reference": "Modules/Settings/PrinterTab.qml:1385",
     "comment": "",
     "tags": [
       "settings"
@@ -4775,7 +4802,7 @@
   {
     "term": "Clear Badge on Open",
     "context": "Clear Badge on Open",
-    "reference": "Modules/Settings/DankIslandTab.qml:343",
+    "reference": "Modules/Settings/DankIslandTab.qml:396",
     "comment": "island settings: clear the notification badge when the center opens",
     "tags": [
       "settings"
@@ -4793,7 +4820,7 @@
   {
     "term": "Clear History?",
     "context": "Clear History?",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:150, Modals/Clipboard/ClipboardHistoryContent.qml:157, Modules/DankBar/DankBarContent.qml:922",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:154, Modals/Clipboard/ClipboardHistoryContent.qml:161, Modules/DankBar/DankBarContent.qml:922",
     "comment": "",
     "tags": [
       "shell"
@@ -4829,7 +4856,7 @@
   {
     "term": "Clears the badge on open but keeps notifications active",
     "context": "Clears the badge on open but keeps notifications active",
-    "reference": "Modules/Settings/DankIslandTab.qml:344",
+    "reference": "Modules/Settings/DankIslandTab.qml:397",
     "comment": "island settings: clear badge on open description",
     "tags": [
       "settings"
@@ -4838,7 +4865,7 @@
   {
     "term": "Click",
     "context": "Click",
-    "reference": "Modules/Settings/DankIslandTab.qml:467",
+    "reference": "Modules/Settings/DankIslandTab.qml:520",
     "comment": "island settings: click expansion mode",
     "tags": [
       "settings"
@@ -4902,7 +4929,7 @@
   {
     "term": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover",
     "context": "Click expands only on an intentional press. Hybrid peeks the current compact face on hover",
-    "reference": "Modules/Settings/DankIslandTab.qml:466",
+    "reference": "Modules/Settings/DankIslandTab.qml:519",
     "comment": "island settings: expansion mode description",
     "tags": [
       "settings"
@@ -5056,7 +5083,7 @@
   {
     "term": "Close",
     "context": "Close",
-    "reference": "Modals/NetworkWiredInfoModal.qml:129, Modals/MuxModal.qml:587, Modals/SwitchUserModal.qml:245, Modals/NetworkInfoModal.qml:129, Modules/DankDash/WallpaperTab.qml:977, Modules/DankBar/Popouts/SystemUpdatePopout.qml:301, Modules/DankBar/Widgets/RunningApps.qml:944",
+    "reference": "Modals/NetworkWiredInfoModal.qml:129, Modals/MuxModal.qml:587, Modals/SwitchUserModal.qml:245, Modals/NetworkInfoModal.qml:129, Modules/DankDash/WallpaperTab.qml:977, Modules/DankBar/Popouts/SystemUpdatePopout.qml:288, Modules/DankBar/Widgets/RunningApps.qml:944",
     "comment": "",
     "tags": [
       "shell"
@@ -5184,7 +5211,7 @@
   {
     "term": "Color Temperature",
     "context": "Color Temperature",
-    "reference": "Modules/Settings/GammaControlTab.qml:93",
+    "reference": "Modules/Settings/GammaControlTab.qml:129",
     "comment": "",
     "tags": [
       "settings"
@@ -5220,7 +5247,7 @@
   {
     "term": "Color temperature for night mode",
     "context": "Color temperature for night mode",
-    "reference": "Modules/Settings/GammaControlTab.qml:94",
+    "reference": "Modules/Settings/GammaControlTab.qml:130",
     "comment": "",
     "tags": [
       "settings"
@@ -5383,7 +5410,7 @@
   {
     "term": "Compact Clock Pill",
     "context": "Compact Clock Pill",
-    "reference": "Modules/Settings/DankIslandTab.qml:216",
+    "reference": "Modules/Settings/DankIslandTab.qml:269",
     "comment": "island settings: tighter home pill toggle",
     "tags": [
       "settings"
@@ -5392,7 +5419,7 @@
   {
     "term": "Compact Island Height",
     "context": "Compact Island Height",
-    "reference": "Modules/Settings/DankIslandTab.qml:119",
+    "reference": "Modules/Settings/DankIslandTab.qml:120",
     "comment": "island settings: compact pill height slider",
     "tags": [
       "settings"
@@ -5410,7 +5437,7 @@
   {
     "term": "Compact home clock pill in both width and height",
     "context": "Compact home clock pill in both width and height",
-    "reference": "Modules/Settings/DankIslandTab.qml:217",
+    "reference": "Modules/Settings/DankIslandTab.qml:270",
     "comment": "island settings: tight pill description",
     "tags": [
       "settings"
@@ -5653,7 +5680,7 @@
   {
     "term": "Connect",
     "context": "Connect",
-    "reference": "Modals/WifiPasswordModal.qml:851, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/BluetoothDetail.qml:673, Modules/ControlCenter/Details/NetworkDetail.qml:1353, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
+    "reference": "Modals/WifiPasswordModal.qml:851, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/BluetoothDetail.qml:673, Modules/ControlCenter/Details/NetworkDetail.qml:1363, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
     "comment": "Tailscale connect button",
     "tags": [
       "settings",
@@ -5690,7 +5717,7 @@
   {
     "term": "Connected",
     "context": "Connected",
-    "reference": "Modules/Settings/AboutTab.qml:712, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkCellularTab.qml:279, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:962, Modules/ControlCenter/Details/BluetoothDetail.qml:352, Modules/ControlCenter/Details/BluetoothDetail.qml:353, Modules/ControlCenter/Details/NetworkDetail.qml:675, Modules/ControlCenter/Details/NetworkDetail.qml:755, Modules/ControlCenter/Details/NetworkDetail.qml:1177, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:26, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:113, Modules/ControlCenter/Components/DragDropGrid.qml:525, Modules/ControlCenter/Components/DragDropGrid.qml:527, Modules/ControlCenter/Components/DragDropGrid.qml:530, Modules/ControlCenter/Components/DragDropGrid.qml:532, Modules/ControlCenter/Components/DragDropGrid.qml:534, Modules/ControlCenter/Components/DragDropGrid.qml:537",
+    "reference": "Modules/Settings/AboutTab.qml:712, Modules/Settings/NetworkVpnTab.qml:101, Modules/Settings/NetworkCellularTab.qml:279, Modules/Settings/NetworkEthernetTab.qml:163, Modules/Settings/DisplayConfigTab.qml:393, Modules/Settings/FrameTab.qml:59, Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:962, Modules/ControlCenter/Details/BluetoothDetail.qml:352, Modules/ControlCenter/Details/BluetoothDetail.qml:353, Modules/ControlCenter/Details/NetworkDetail.qml:685, Modules/ControlCenter/Details/NetworkDetail.qml:765, Modules/ControlCenter/Details/NetworkDetail.qml:1187, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:26, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:113, Modules/ControlCenter/Components/DragDropGrid.qml:525, Modules/ControlCenter/Components/DragDropGrid.qml:527, Modules/ControlCenter/Components/DragDropGrid.qml:530, Modules/ControlCenter/Components/DragDropGrid.qml:532, Modules/ControlCenter/Components/DragDropGrid.qml:534, Modules/ControlCenter/Components/DragDropGrid.qml:537",
     "comment": "Tailscale connection status: connected | network status",
     "tags": [
       "settings",
@@ -5763,7 +5790,7 @@
   {
     "term": "Connecting...",
     "context": "Connecting...",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:961, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/BluetoothDetail.qml:348, Modules/ControlCenter/Details/VpnProfileDelegate.qml:145, Modules/ControlCenter/Details/NetworkDetail.qml:1177, Modules/ControlCenter/Details/NetworkDetail.qml:1353, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/Components/DragDropGrid.qml:475, Modules/ControlCenter/Components/DragDropGrid.qml:521, Modules/ControlCenter/Components/DragDropGrid.qml:549",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:961, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/BluetoothDetail.qml:348, Modules/ControlCenter/Details/VpnProfileDelegate.qml:145, Modules/ControlCenter/Details/NetworkDetail.qml:1187, Modules/ControlCenter/Details/NetworkDetail.qml:1363, Modules/ControlCenter/BuiltinPlugins/VpnWidget.qml:21, Modules/ControlCenter/Components/DragDropGrid.qml:475, Modules/ControlCenter/Components/DragDropGrid.qml:521, Modules/ControlCenter/Components/DragDropGrid.qml:549",
     "comment": "bluetooth status | network status",
     "tags": [
       "settings",
@@ -5773,7 +5800,7 @@
   {
     "term": "Connection failed",
     "context": "Connection failed",
-    "reference": "Modules/Settings/PrinterTab.qml:656",
+    "reference": "Modules/Settings/PrinterTab.qml:647",
     "comment": "Status message when test connection to printer fails",
     "tags": [
       "settings"
@@ -5810,7 +5837,7 @@
   {
     "term": "Contrast",
     "context": "Contrast",
-    "reference": "Modules/Settings/DockTab.qml:528, Modules/Settings/LauncherTab.qml:534",
+    "reference": "Modules/Settings/GammaControlTab.qml:86, Modules/Settings/DockTab.qml:528, Modules/Settings/LauncherTab.qml:534",
     "comment": "",
     "tags": [
       "settings"
@@ -5828,7 +5855,7 @@
   {
     "term": "Control Center",
     "context": "Control Center",
-    "reference": "Modals/Greeter/GreeterWelcomePage.qml:132, Modules/DankIsland/DankIslandSurface.qml:458, Modules/Settings/WidgetsTab.qml:186",
+    "reference": "Modals/Greeter/GreeterWelcomePage.qml:132, Modules/DankIsland/DankIslandSurface.qml:379, Modules/Settings/WidgetsTab.qml:186",
     "comment": "greeter feature card title | island compact face: control center label",
     "tags": [
       "settings",
@@ -6012,7 +6039,7 @@
   {
     "term": "Copied to clipboard",
     "context": "Copied to clipboard",
-    "reference": "Modals/AppPickerModal.qml:201, Services/ClipboardService.qml:213, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:334, Modals/Settings/SettingsModal.qml:351, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:30",
+    "reference": "Modals/AppPickerModal.qml:201, Services/ClipboardService.qml:215, dms-plugins/DankStickerSearch/DankStickerSearch.qml:230, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:154, dms-plugins/DankGifSearch/DankGifSearch.qml:175, Modals/Settings/SettingsModal.qml:334, Modals/Settings/SettingsModal.qml:351, Modules/Notepad/NotepadTextEditor.qml:328, Modules/Settings/DesktopWidgetInstanceCard.qml:426, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:30",
     "comment": "",
     "tags": [
       "plugin-dankgifsearch",
@@ -6034,7 +6061,7 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "Modals/QRGeneratorModal.qml:266, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1282, Modals/Clipboard/ClipboardContextMenu.qml:40, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:403",
+    "reference": "Modals/QRGeneratorModal.qml:266, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:1282, Modals/Clipboard/ClipboardContextMenu.qml:41, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:403",
     "comment": "Copy to clipboard",
     "tags": [
       "plugin-danklauncherkeys",
@@ -6091,7 +6118,7 @@
   {
     "term": "Copy Text",
     "context": "Copy Text",
-    "reference": "Modules/Notepad/NotepadTextEditor.qml:753",
+    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:56, Modules/Notepad/NotepadTextEditor.qml:753",
     "comment": "",
     "tags": [
       "shell"
@@ -6118,7 +6145,7 @@
   {
     "term": "Corner Radius",
     "context": "Corner Radius",
-    "reference": "Modals/WindowRuleModal.qml:1243, Modules/Settings/ThemeColorsTab.qml:1946, Modules/Settings/DankIslandTab.qml:392",
+    "reference": "Modals/WindowRuleModal.qml:1243, Modules/Settings/ThemeColorsTab.qml:1946, Modules/Settings/DankIslandTab.qml:445",
     "comment": "island settings: satellite goth corner radius slider",
     "tags": [
       "settings",
@@ -6220,7 +6247,7 @@
   {
     "term": "Create Printer",
     "context": "Create Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:837",
+    "reference": "Modules/Settings/PrinterTab.qml:819",
     "comment": "",
     "tags": [
       "settings"
@@ -6283,7 +6310,7 @@
   {
     "term": "Creating...",
     "context": "Creating...",
-    "reference": "Modules/Settings/PrinterTab.qml:837",
+    "reference": "Modules/Settings/PrinterTab.qml:819",
     "comment": "",
     "tags": [
       "settings"
@@ -6445,7 +6472,7 @@
   {
     "term": "Current Period",
     "context": "Current Period",
-    "reference": "Modules/Settings/GammaControlTab.qml:447",
+    "reference": "Modules/Settings/GammaControlTab.qml:483",
     "comment": "",
     "tags": [
       "settings"
@@ -6454,7 +6481,7 @@
   {
     "term": "Current Status",
     "context": "Current Status",
-    "reference": "Modules/Settings/GammaControlTab.qml:369",
+    "reference": "Modules/Settings/GammaControlTab.qml:405",
     "comment": "",
     "tags": [
       "settings"
@@ -6463,7 +6490,7 @@
   {
     "term": "Current Temp",
     "context": "Current Temp",
-    "reference": "Modules/Settings/GammaControlTab.qml:410",
+    "reference": "Modules/Settings/GammaControlTab.qml:446",
     "comment": "",
     "tags": [
       "settings"
@@ -6492,6 +6519,24 @@
     "context": "Current Workspace",
     "reference": "Modules/Settings/WidgetsTabSection.qml:3806",
     "comment": "Running apps filter: only show apps from the active workspace",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Current display brightness on the home face",
+    "context": "Current display brightness on the home face",
+    "reference": "Modules/Settings/DankIslandTab.qml:244",
+    "comment": "island settings: brightness slot description",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
+    "term": "Current output volume on the home face",
+    "context": "Current output volume on the home face",
+    "reference": "Modules/Settings/DankIslandTab.qml:218",
+    "comment": "island settings: volume slot description",
     "tags": [
       "settings"
     ]
@@ -6562,7 +6607,7 @@
   {
     "term": "Custom",
     "context": "Custom",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:69, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/ThemeColorsTab.qml:1906, Modules/Settings/ThemeColorsTab.qml:1918, Modules/Settings/ThemeColorsTab.qml:2176, Modules/Settings/ThemeColorsTab.qml:2182, Modules/Settings/ThemeColorsTab.qml:2193, Modules/Settings/ThemeColorsTab.qml:2204, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/DockTab.qml:314, Modules/Settings/DockTab.qml:421, Modules/Settings/GreeterTab.qml:565, Modules/Settings/WallpaperTab.qml:379, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:427, Modules/Settings/TimeWeatherTab.qml:241, Modules/Settings/TimeWeatherTab.qml:328, Modules/Settings/DankBarTab.qml:1946, Modules/Settings/WorkspaceAppearanceCard.qml:52, Modules/Settings/WorkspaceAppearanceCard.qml:90, Modules/Settings/WorkspaceAppearanceCard.qml:122, Modules/Settings/WorkspaceAppearanceCard.qml:157, Modules/Settings/WorkspaceAppearanceCard.qml:183, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/KeybindItem.qml:1584, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:448, Modules/Settings/CompositorLayoutTab.qml:599, Modules/Settings/SystemUpdaterTab.qml:33, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:47, Modules/Settings/ThemeColorsTab.qml:69, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:540, Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1895, Modules/Settings/ThemeColorsTab.qml:1906, Modules/Settings/ThemeColorsTab.qml:1918, Modules/Settings/ThemeColorsTab.qml:2176, Modules/Settings/ThemeColorsTab.qml:2182, Modules/Settings/ThemeColorsTab.qml:2193, Modules/Settings/ThemeColorsTab.qml:2204, Modules/Settings/TypographyMotionTab.qml:363, Modules/Settings/TypographyMotionTab.qml:446, Modules/Settings/TypographyMotionTab.qml:515, Modules/Settings/DockTab.qml:314, Modules/Settings/DockTab.qml:421, Modules/Settings/GreeterTab.qml:565, Modules/Settings/WallpaperTab.qml:379, Modules/Settings/LauncherTab.qml:318, Modules/Settings/LauncherTab.qml:427, Modules/Settings/TimeWeatherTab.qml:241, Modules/Settings/TimeWeatherTab.qml:328, Modules/Settings/DankBarTab.qml:1946, Modules/Settings/WorkspaceAppearanceCard.qml:52, Modules/Settings/WorkspaceAppearanceCard.qml:90, Modules/Settings/WorkspaceAppearanceCard.qml:122, Modules/Settings/WorkspaceAppearanceCard.qml:157, Modules/Settings/WorkspaceAppearanceCard.qml:183, Modules/Settings/FrameTab.qml:231, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/KeybindItem.qml:1584, Modules/Settings/CompositorLayoutTab.qml:283, Modules/Settings/CompositorLayoutTab.qml:448, Modules/Settings/CompositorLayoutTab.qml:599, Modules/Settings/SystemUpdaterTab.qml:33, Modules/Settings/Widgets/SettingsColorPicker.qml:52, Modules/Settings/Widgets/DeviceAliasRow.qml:92",
     "comment": "shadow color option | surface border color | theme category option | widget background color option | workspace color option",
     "tags": [
       "plugin-dankdesktopweather",
@@ -6600,7 +6645,7 @@
   {
     "term": "Custom Duration",
     "context": "Custom Duration",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:467, Modules/Settings/TypographyMotionTab.qml:536",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:469, Modules/Settings/TypographyMotionTab.qml:538",
     "comment": "",
     "tags": [
       "settings"
@@ -6609,7 +6654,7 @@
   {
     "term": "Custom Hibernate Command",
     "context": "Custom Hibernate Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:575",
+    "reference": "Modules/Settings/PowerSleepTab.qml:559",
     "comment": "",
     "tags": [
       "settings"
@@ -6627,7 +6672,7 @@
   {
     "term": "Custom Lock Command",
     "context": "Custom Lock Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:560",
+    "reference": "Modules/Settings/PowerSleepTab.qml:544",
     "comment": "",
     "tags": [
       "settings"
@@ -6636,7 +6681,7 @@
   {
     "term": "Custom Logout Command",
     "context": "Custom Logout Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:565",
+    "reference": "Modules/Settings/PowerSleepTab.qml:549",
     "comment": "",
     "tags": [
       "settings"
@@ -6654,7 +6699,7 @@
   {
     "term": "Custom Power Actions",
     "context": "Custom Power Actions",
-    "reference": "Modules/Settings/PowerSleepTab.qml:552",
+    "reference": "Modules/Settings/PowerSleepTab.qml:536",
     "comment": "",
     "tags": [
       "settings"
@@ -6663,7 +6708,7 @@
   {
     "term": "Custom Power Off Command",
     "context": "Custom Power Off Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:585",
+    "reference": "Modules/Settings/PowerSleepTab.qml:569",
     "comment": "",
     "tags": [
       "settings"
@@ -6672,7 +6717,7 @@
   {
     "term": "Custom Reboot Command",
     "context": "Custom Reboot Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:580",
+    "reference": "Modules/Settings/PowerSleepTab.qml:564",
     "comment": "",
     "tags": [
       "settings"
@@ -6699,7 +6744,7 @@
   {
     "term": "Custom Suspend Command",
     "context": "Custom Suspend Command",
-    "reference": "Modules/Settings/PowerSleepTab.qml:570",
+    "reference": "Modules/Settings/PowerSleepTab.qml:554",
     "comment": "",
     "tags": [
       "settings"
@@ -6789,7 +6834,7 @@
   {
     "term": "Customize which actions appear in the power menu",
     "context": "Customize which actions appear in the power menu",
-    "reference": "Modules/Settings/PowerSleepTab.qml:385",
+    "reference": "Modules/Settings/PowerSleepTab.qml:369",
     "comment": "",
     "tags": [
       "settings"
@@ -6924,7 +6969,7 @@
   {
     "term": "Daily",
     "context": "Daily",
-    "reference": "Modules/DankDash/WeatherTab.qml:840",
+    "reference": "Modules/DankDash/WeatherTab.qml:828",
     "comment": "",
     "tags": [
       "shell"
@@ -6942,7 +6987,7 @@
   {
     "term": "Damped springs settle straight to their target with no overshoot",
     "context": "Damped springs settle straight to their target with no overshoot",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:322",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:324",
     "comment": "",
     "tags": [
       "settings"
@@ -6987,7 +7032,7 @@
   {
     "term": "Dank Island - Beta",
     "context": "Dank Island - Beta",
-    "reference": "Modules/Settings/DankIslandTab.qml:60",
+    "reference": "Modules/Settings/DankIslandTab.qml:61",
     "comment": "island settings: page title",
     "tags": [
       "settings"
@@ -7186,7 +7231,7 @@
   {
     "term": "Day Temperature",
     "context": "Day Temperature",
-    "reference": "Modules/Settings/GammaControlTab.qml:112",
+    "reference": "Modules/Settings/GammaControlTab.qml:148",
     "comment": "",
     "tags": [
       "settings"
@@ -7195,7 +7240,7 @@
   {
     "term": "Daytime",
     "context": "Daytime",
-    "reference": "Modules/Settings/GammaControlTab.qml:439",
+    "reference": "Modules/Settings/GammaControlTab.qml:475",
     "comment": "",
     "tags": [
       "settings"
@@ -7213,7 +7258,7 @@
   {
     "term": "Default",
     "context": "Default",
-    "reference": "Modals/WindowRuleModal.qml:579, Modules/Settings/ThemeColorsTab.qml:1688, Modules/Settings/TypographyMotionTab.qml:249, Modules/Settings/DockTab.qml:421, Modules/Settings/WallpaperTab.qml:868, Modules/Settings/WallpaperTab.qml:883, Modules/Settings/WallpaperTab.qml:890, Modules/Settings/LauncherTab.qml:427, Modules/Settings/DankIslandTab.qml:261, Modules/Settings/WorkspaceAppearanceCard.qml:95, Modules/Settings/FrameTab.qml:231, Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:108, Modules/Settings/MouseTouchpadTab.qml:186, Modules/Settings/MouseTouchpadTab.qml:229, Modules/Settings/NotificationsTab.qml:117, Modules/Settings/NotificationsTab.qml:140",
+    "reference": "Modals/WindowRuleModal.qml:579, Modules/Settings/ThemeColorsTab.qml:1688, Modules/Settings/TypographyMotionTab.qml:250, Modules/Settings/DockTab.qml:421, Modules/Settings/WallpaperTab.qml:868, Modules/Settings/WallpaperTab.qml:883, Modules/Settings/WallpaperTab.qml:890, Modules/Settings/LauncherTab.qml:427, Modules/Settings/DankIslandTab.qml:314, Modules/Settings/WorkspaceAppearanceCard.qml:95, Modules/Settings/FrameTab.qml:231, Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:112, Modules/Settings/MouseTouchpadTab.qml:184, Modules/Settings/MouseTouchpadTab.qml:231, Modules/Settings/NotificationsTab.qml:117, Modules/Settings/NotificationsTab.qml:140",
     "comment": "island settings: default surface tone | notification rule action option | notification rule urgency option | widget style option | workspace color option",
     "tags": [
       "settings",
@@ -7331,7 +7376,7 @@
   {
     "term": "Default selected action",
     "context": "Default selected action",
-    "reference": "Modules/Settings/PowerSleepTab.qml:405",
+    "reference": "Modules/Settings/PowerSleepTab.qml:389",
     "comment": "",
     "tags": [
       "settings"
@@ -7376,7 +7421,7 @@
   {
     "term": "Delete",
     "context": "Delete",
-    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:63, Modules/Settings/NetworkVpnTab.qml:374, Modules/Settings/DesktopWidgetInstanceCard.qml:152, Modules/Settings/PrinterTab.qml:1113, Modules/Settings/PrinterTab.qml:1701, Modules/Settings/UsersTab.qml:324, Modules/Settings/DisplayConfigTab.qml:322, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/VpnDetailContent.qml:223, Modules/DankDash/Overview/CalendarEventDetail.qml:368",
+    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:73, Modules/Settings/NetworkVpnTab.qml:374, Modules/Settings/DesktopWidgetInstanceCard.qml:152, Modules/Settings/PrinterTab.qml:1095, Modules/Settings/PrinterTab.qml:1683, Modules/Settings/UsersTab.qml:324, Modules/Settings/DisplayConfigTab.qml:322, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/VpnDetailContent.qml:223, Modules/DankDash/Overview/CalendarEventDetail.qml:368",
     "comment": "",
     "tags": [
       "settings",
@@ -7395,7 +7440,7 @@
   {
     "term": "Delete \"%1\"?",
     "context": "Delete \"%1\"?",
-    "reference": "Modules/Settings/NetworkVpnTab.qml:373, Modules/Settings/PrinterTab.qml:1112, Modules/ControlCenter/Details/VpnDetailContent.qml:222",
+    "reference": "Modules/Settings/NetworkVpnTab.qml:373, Modules/Settings/PrinterTab.qml:1094, Modules/ControlCenter/Details/VpnDetailContent.qml:222",
     "comment": "",
     "tags": [
       "settings",
@@ -7405,7 +7450,7 @@
   {
     "term": "Delete Class",
     "context": "Delete Class",
-    "reference": "Modules/Settings/PrinterTab.qml:1699",
+    "reference": "Modules/Settings/PrinterTab.qml:1681",
     "comment": "",
     "tags": [
       "settings"
@@ -7414,7 +7459,7 @@
   {
     "term": "Delete Printer",
     "context": "Delete Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:1111",
+    "reference": "Modules/Settings/PrinterTab.qml:1093",
     "comment": "",
     "tags": [
       "settings"
@@ -7432,7 +7477,7 @@
   {
     "term": "Delete Saved Item?",
     "context": "Delete Saved Item?",
-    "reference": "Services/ClipboardService.qml:281",
+    "reference": "Services/ClipboardService.qml:283",
     "comment": "",
     "tags": [
       "shell"
@@ -7451,7 +7496,7 @@
   {
     "term": "Delete class \"%1\"?",
     "context": "Delete class \"%1\"?",
-    "reference": "Modules/Settings/PrinterTab.qml:1700",
+    "reference": "Modules/Settings/PrinterTab.qml:1682",
     "comment": "",
     "tags": [
       "settings"
@@ -7496,7 +7541,7 @@
   {
     "term": "Depth",
     "context": "Depth",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:305",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:307",
     "comment": "",
     "tags": [
       "settings"
@@ -7514,7 +7559,7 @@
   {
     "term": "Description",
     "context": "Description",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:182, Modules/Settings/PrinterTab.qml:813",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:182, Modules/Settings/PrinterTab.qml:795",
     "comment": "",
     "tags": [
       "settings",
@@ -7687,7 +7732,7 @@
   {
     "term": "Dim",
     "context": "Dim",
-    "reference": "Modules/Settings/DankIslandTab.qml:261",
+    "reference": "Modules/Settings/DankIslandTab.qml:314",
     "comment": "island settings: dim surface tone",
     "tags": [
       "settings"
@@ -7714,7 +7759,7 @@
   {
     "term": "Directional",
     "context": "Directional",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:305",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:307",
     "comment": "",
     "tags": [
       "settings"
@@ -7723,7 +7768,7 @@
   {
     "term": "Disable Autoconnect",
     "context": "Disable Autoconnect",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:1211, Modules/ControlCenter/Details/NetworkDetail.qml:1402",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:1211, Modules/ControlCenter/Details/NetworkDetail.qml:1412",
     "comment": "",
     "tags": [
       "settings",
@@ -7760,7 +7805,7 @@
   {
     "term": "Disable While Typing",
     "context": "Disable While Typing",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:252",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:244",
     "comment": "",
     "tags": [
       "settings"
@@ -7769,7 +7814,7 @@
   {
     "term": "Disable on External Mouse",
     "context": "Disable on External Mouse",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:261",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:253",
     "comment": "",
     "tags": [
       "settings"
@@ -7778,7 +7823,7 @@
   {
     "term": "Disable touchpad when an external mouse is connected",
     "context": "Disable touchpad when an external mouse is connected",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:262",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:254",
     "comment": "",
     "tags": [
       "settings"
@@ -7787,7 +7832,7 @@
   {
     "term": "Disabled",
     "context": "Disabled",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/AutoStartTab.qml:723, Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NetworkCellularTab.qml:56, Modules/Settings/DankBarTab.qml:462, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NetworkWifiTab.qml:172, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2190, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2198, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2224, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/ControlCenter/Components/DragDropGrid.qml:503",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1590, Modules/Settings/AutoStartTab.qml:723, Modules/Settings/LockScreenTab.qml:357, Modules/Settings/NetworkCellularTab.qml:56, Modules/Settings/DankBarTab.qml:462, Modules/Settings/NotificationsTab.qml:852, Modules/Settings/NetworkWifiTab.qml:172, Modules/Settings/DisplayConfig/OutputCard.qml:128, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2190, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2198, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2224, Modules/ControlCenter/Details/NetworkDetail.qml:585, Modules/ControlCenter/Components/DragDropGrid.qml:503",
     "comment": "bluetooth status | lock screen notification mode option",
     "tags": [
       "settings",
@@ -7806,7 +7851,7 @@
   {
     "term": "Disabling WiFi...",
     "context": "Disabling WiFi...",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:423, Modules/ControlCenter/Components/DragDropGrid.qml:473",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:433, Modules/ControlCenter/Components/DragDropGrid.qml:473",
     "comment": "network status",
     "tags": [
       "shell"
@@ -7824,7 +7869,7 @@
   {
     "term": "Disabling cellular...",
     "context": "Disabling cellular...",
-    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:542",
+    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:552",
     "comment": "",
     "tags": [
       "settings",
@@ -7861,7 +7906,7 @@
   {
     "term": "Disconnect",
     "context": "Disconnect",
-    "reference": "Modules/Settings/NetworkVpnTab.qml:172, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/VpnDetailContent.qml:126, Modules/ControlCenter/Details/BluetoothDetail.qml:673, Modules/ControlCenter/Details/NetworkDetail.qml:979, Modules/ControlCenter/Details/NetworkDetail.qml:1353, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
+    "reference": "Modules/Settings/NetworkVpnTab.qml:172, Modules/Settings/NetworkWifiTab.qml:1184, Modules/ControlCenter/Details/VpnDetailContent.qml:126, Modules/ControlCenter/Details/BluetoothDetail.qml:673, Modules/ControlCenter/Details/NetworkDetail.qml:989, Modules/ControlCenter/Details/NetworkDetail.qml:1363, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:156",
     "comment": "Tailscale disconnect button",
     "tags": [
       "settings",
@@ -8110,7 +8155,7 @@
   {
     "term": "Display power menu actions in a grid instead of a list",
     "context": "Display power menu actions in a grid instead of a list",
-    "reference": "Modules/Settings/PowerSleepTab.qml:396",
+    "reference": "Modules/Settings/PowerSleepTab.qml:380",
     "comment": "",
     "tags": [
       "settings"
@@ -8165,7 +8210,7 @@
   {
     "term": "Distance between display edge and island",
     "context": "Distance between display edge and island",
-    "reference": "Modules/Settings/DankIslandTab.qml:134",
+    "reference": "Modules/Settings/DankIslandTab.qml:135",
     "comment": "island settings: outer gap description",
     "tags": [
       "settings"
@@ -8312,7 +8357,7 @@
   {
     "term": "Drag Lock",
     "context": "Drag Lock",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:162",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:160",
     "comment": "",
     "tags": [
       "settings"
@@ -8375,7 +8420,7 @@
   {
     "term": "Draw an island-styled background behind satellite widgets",
     "context": "Draw an island-styled background behind satellite widgets",
-    "reference": "Modules/Settings/DankIslandTab.qml:373",
+    "reference": "Modules/Settings/DankIslandTab.qml:426",
     "comment": "island settings: satellite background description",
     "tags": [
       "settings"
@@ -8384,7 +8429,7 @@
   {
     "term": "Draw an outline and use the highest-contrast surface tone",
     "context": "Draw an outline and use the highest-contrast surface tone",
-    "reference": "Modules/Settings/DankIslandTab.qml:286",
+    "reference": "Modules/Settings/DankIslandTab.qml:339",
     "comment": "island settings: high contrast description",
     "tags": [
       "settings"
@@ -8393,7 +8438,7 @@
   {
     "term": "Driver",
     "context": "Driver",
-    "reference": "Modules/Settings/PrinterTab.qml:708, Modules/Settings/NetworkEthernetTab.qml:312",
+    "reference": "Modules/Settings/PrinterTab.qml:699, Modules/Settings/NetworkEthernetTab.qml:312",
     "comment": "",
     "tags": [
       "settings"
@@ -8483,7 +8528,7 @@
   {
     "term": "Dynamic",
     "context": "Dynamic",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:481, Modules/Settings/TypographyMotionTab.qml:281",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:481, Modules/Settings/TypographyMotionTab.qml:283",
     "comment": "dynamic theme name",
     "tags": [
       "settings"
@@ -8546,7 +8591,7 @@
   {
     "term": "Edge",
     "context": "Edge",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:229",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:231",
     "comment": "",
     "tags": [
       "settings"
@@ -8591,7 +8636,7 @@
   {
     "term": "Edit",
     "context": "Edit",
-    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:55, Modules/Settings/ClipboardTab.qml:156, Modules/Settings/NetworkWifiTab.qml:1572, Modules/DankDash/Overview/CalendarEventDetail.qml:361",
+    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:65, Modules/Settings/ClipboardTab.qml:156, Modules/Settings/NetworkWifiTab.qml:1572, Modules/DankDash/Overview/CalendarEventDetail.qml:361",
     "comment": "edit hotspot action",
     "tags": [
       "settings",
@@ -8700,7 +8745,7 @@
   {
     "term": "Emulate middle click by pressing left and right buttons",
     "context": "Emulate middle click by pressing left and right buttons",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:128, Modules/Settings/MouseTouchpadTab.qml:271",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:126, Modules/Settings/MouseTouchpadTab.qml:263",
     "comment": "",
     "tags": [
       "settings"
@@ -8718,7 +8763,7 @@
   {
     "term": "Enable Autoconnect",
     "context": "Enable Autoconnect",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:1211, Modules/ControlCenter/Details/NetworkDetail.qml:1402",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:1211, Modules/ControlCenter/Details/NetworkDetail.qml:1412",
     "comment": "",
     "tags": [
       "settings",
@@ -8737,7 +8782,7 @@
   {
     "term": "Enable Cellular",
     "context": "Enable Cellular",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:594",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:604",
     "comment": "",
     "tags": [
       "shell"
@@ -8800,7 +8845,7 @@
   {
     "term": "Enable Ripple Effects",
     "context": "Enable Ripple Effects",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:580",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:582",
     "comment": "",
     "tags": [
       "settings"
@@ -8836,7 +8881,7 @@
   {
     "term": "Enable WiFi",
     "context": "Enable WiFi",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:475",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:485",
     "comment": "",
     "tags": [
       "shell"
@@ -8927,7 +8972,7 @@
   {
     "term": "Enable weather in Time & Weather to show this shortcut",
     "context": "Enable weather in Time & Weather to show this shortcut",
-    "reference": "Modules/Settings/DankIslandTab.qml:204",
+    "reference": "Modules/Settings/DankIslandTab.qml:205",
     "comment": "island settings: weather slot disabled hint",
     "tags": [
       "settings"
@@ -8946,7 +8991,7 @@
   {
     "term": "Enabling WiFi...",
     "context": "Enabling WiFi...",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:423, Modules/ControlCenter/Components/DragDropGrid.qml:473",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:433, Modules/ControlCenter/Components/DragDropGrid.qml:473",
     "comment": "network status",
     "tags": [
       "shell"
@@ -8955,7 +9000,7 @@
   {
     "term": "Enabling cellular...",
     "context": "Enabling cellular...",
-    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:542",
+    "reference": "Modules/Settings/NetworkCellularTab.qml:54, Modules/ControlCenter/Details/NetworkDetail.qml:552",
     "comment": "",
     "tags": [
       "settings",
@@ -8965,7 +9010,7 @@
   {
     "term": "End",
     "context": "End",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1494, Modules/Settings/GammaControlTab.qml:282, Modules/DankDash/Overview/CalendarEventEditor.qml:264",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1494, Modules/Settings/GammaControlTab.qml:318, Modules/DankDash/Overview/CalendarEventEditor.qml:264",
     "comment": "",
     "tags": [
       "settings",
@@ -9182,7 +9227,7 @@
   {
     "term": "Entry pinned",
     "context": "Entry pinned",
-    "reference": "Services/ClipboardService.qml:316",
+    "reference": "Services/ClipboardService.qml:318",
     "comment": "",
     "tags": [
       "shell"
@@ -9191,7 +9236,7 @@
   {
     "term": "Entry unpinned",
     "context": "Entry unpinned",
-    "reference": "Services/ClipboardService.qml:330",
+    "reference": "Services/ClipboardService.qml:332",
     "comment": "",
     "tags": [
       "shell"
@@ -9237,7 +9282,7 @@
   {
     "term": "Ethernet",
     "context": "Ethernet",
-    "reference": "Modals/Settings/SettingsSidebar.qml:273, Modules/Settings/NetworkStatusTab.qml:116, Modules/Settings/NetworkStatusTab.qml:176, Modules/Settings/NetworkEthernetTab.qml:42, Modules/ControlCenter/Details/NetworkDetail.qml:175, Modules/ControlCenter/Components/DragDropGrid.qml:479, Modules/ControlCenter/Components/DragDropGrid.qml:484",
+    "reference": "Modals/Settings/SettingsSidebar.qml:273, Modules/Settings/NetworkStatusTab.qml:116, Modules/Settings/NetworkStatusTab.qml:176, Modules/Settings/NetworkEthernetTab.qml:42, Modules/ControlCenter/Details/NetworkDetail.qml:185, Modules/ControlCenter/Components/DragDropGrid.qml:479, Modules/ControlCenter/Components/DragDropGrid.qml:484",
     "comment": "network status",
     "tags": [
       "settings",
@@ -9337,7 +9382,7 @@
   {
     "term": "Expand Notifications",
     "context": "Expand Notifications",
-    "reference": "Modules/Settings/DankIslandTab.qml:325",
+    "reference": "Modules/Settings/DankIslandTab.qml:378",
     "comment": "island settings: expanded notification toggle",
     "tags": [
       "settings"
@@ -9346,7 +9391,7 @@
   {
     "term": "Expand notifications by default instead of click or hover",
     "context": "Expand notifications by default instead of click or hover",
-    "reference": "Modules/Settings/DankIslandTab.qml:326",
+    "reference": "Modules/Settings/DankIslandTab.qml:379",
     "comment": "island settings: expanded notification description",
     "tags": [
       "settings"
@@ -9355,7 +9400,7 @@
   {
     "term": "Expansion Mode",
     "context": "Expansion Mode",
-    "reference": "Modules/Settings/DankIslandTab.qml:465",
+    "reference": "Modules/Settings/DankIslandTab.qml:518",
     "comment": "island settings: click or hover expansion row",
     "tags": [
       "settings"
@@ -9580,7 +9625,7 @@
   {
     "term": "Failed to check pin limit",
     "context": "Failed to check pin limit",
-    "reference": "Services/ClipboardService.qml:299",
+    "reference": "Services/ClipboardService.qml:301",
     "comment": "",
     "tags": [
       "shell"
@@ -9616,7 +9661,7 @@
   {
     "term": "Failed to copy entry",
     "context": "Failed to copy entry",
-    "reference": "Services/ClipboardService.qml:210, Services/ClipboardService.qml:239",
+    "reference": "Services/ClipboardService.qml:212, Services/ClipboardService.qml:241",
     "comment": "",
     "tags": [
       "shell"
@@ -9670,7 +9715,7 @@
   {
     "term": "Failed to disable night mode",
     "context": "Failed to disable night mode",
-    "reference": "Services/DisplayService.qml:1101",
+    "reference": "Services/DisplayService.qml:1102",
     "comment": "",
     "tags": [
       "shell"
@@ -9724,7 +9769,7 @@
   {
     "term": "Failed to enable IP location",
     "context": "Failed to enable IP location",
-    "reference": "Services/DisplayService.qml:1242",
+    "reference": "Services/DisplayService.qml:1267",
     "comment": "",
     "tags": [
       "shell"
@@ -9751,7 +9796,7 @@
   {
     "term": "Failed to enable night mode",
     "context": "Failed to enable night mode",
-    "reference": "Services/DisplayService.qml:1073",
+    "reference": "Services/DisplayService.qml:1074",
     "comment": "",
     "tags": [
       "shell"
@@ -9850,7 +9895,7 @@
   {
     "term": "Failed to parse %1",
     "context": "Failed to parse %1",
-    "reference": "Common/SettingsData.qml:1751, Common/SettingsData.qml:1871, Common/SettingsData.qml:3413, Services/ToastService.qml:188",
+    "reference": "Common/SettingsData.qml:1755, Common/SettingsData.qml:1875, Common/SettingsData.qml:3417, Services/ToastService.qml:188",
     "comment": "",
     "tags": [
       "shell"
@@ -9868,7 +9913,7 @@
   {
     "term": "Failed to pin entry",
     "context": "Failed to pin entry",
-    "reference": "Services/ClipboardService.qml:313",
+    "reference": "Services/ClipboardService.qml:315",
     "comment": "",
     "tags": [
       "shell"
@@ -10084,7 +10129,7 @@
   {
     "term": "Failed to set brightness",
     "context": "Failed to set brightness",
-    "reference": "Services/DisplayService.qml:892",
+    "reference": "Services/DisplayService.qml:893",
     "comment": "",
     "tags": [
       "shell"
@@ -10093,7 +10138,7 @@
   {
     "term": "Failed to set night mode location",
     "context": "Failed to set night mode location",
-    "reference": "Services/DisplayService.qml:1262",
+    "reference": "Services/DisplayService.qml:1287",
     "comment": "",
     "tags": [
       "shell"
@@ -10102,7 +10147,7 @@
   {
     "term": "Failed to set night mode schedule",
     "context": "Failed to set night mode schedule",
-    "reference": "Services/DisplayService.qml:1204",
+    "reference": "Services/DisplayService.qml:1229",
     "comment": "",
     "tags": [
       "shell"
@@ -10111,7 +10156,7 @@
   {
     "term": "Failed to set night mode temperature",
     "context": "Failed to set night mode temperature",
-    "reference": "Services/DisplayService.qml:1142, Services/DisplayService.qml:1193, Services/DisplayService.qml:1232",
+    "reference": "Services/DisplayService.qml:1167, Services/DisplayService.qml:1218, Services/DisplayService.qml:1257",
     "comment": "",
     "tags": [
       "shell"
@@ -10210,7 +10255,7 @@
   {
     "term": "Failed to unpin entry",
     "context": "Failed to unpin entry",
-    "reference": "Services/ClipboardService.qml:327",
+    "reference": "Services/ClipboardService.qml:329",
     "comment": "",
     "tags": [
       "shell"
@@ -10282,7 +10327,7 @@
   {
     "term": "Failed: %1",
     "context": "Failed: %1",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:350",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:337",
     "comment": "",
     "tags": [
       "shell"
@@ -10309,7 +10354,7 @@
   {
     "term": "Feels Like",
     "context": "Feels Like",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:977",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:926",
     "comment": "",
     "tags": [
       "settings"
@@ -10318,7 +10363,7 @@
   {
     "term": "Feels Like %1°",
     "context": "Feels Like %1°",
-    "reference": "Modules/DankDash/WeatherTab.qml:293, Modules/Settings/TimeWeatherTab.qml:862",
+    "reference": "Modules/DankDash/WeatherTab.qml:281, Modules/Settings/TimeWeatherTab.qml:841",
     "comment": "weather feels like temperature",
     "tags": [
       "settings",
@@ -10582,7 +10627,7 @@
   {
     "term": "Flat",
     "context": "Flat",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:186",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:65, Modules/Settings/MouseTouchpadTab.qml:184",
     "comment": "",
     "tags": [
       "settings"
@@ -10591,7 +10636,7 @@
   {
     "term": "Flat uses constant speed; Adaptive scales with movement speed",
     "context": "Flat uses constant speed; Adaptive scales with movement speed",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:64, Modules/Settings/MouseTouchpadTab.qml:185",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:64, Modules/Settings/MouseTouchpadTab.qml:183",
     "comment": "",
     "tags": [
       "settings"
@@ -10600,7 +10645,7 @@
   {
     "term": "Flatpak",
     "context": "Flatpak",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:217",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:204",
     "comment": "",
     "tags": [
       "shell"
@@ -10645,7 +10690,7 @@
   {
     "term": "Float",
     "context": "Float",
-    "reference": "Modals/WindowRuleModal.qml:958, Modals/WindowRuleModal.qml:968, Modules/Settings/DankIslandTab.qml:86, Modules/Settings/WindowRulesTab.qml:95",
+    "reference": "Modals/WindowRuleModal.qml:958, Modals/WindowRuleModal.qml:968, Modules/Settings/DankIslandTab.qml:87, Modules/Settings/WindowRulesTab.qml:95",
     "comment": "island settings: float toggle",
     "tags": [
       "settings",
@@ -10719,7 +10764,7 @@
   {
     "term": "Floats above windows and other content",
     "context": "Floats above windows and other content",
-    "reference": "Modules/Settings/DankIslandTab.qml:87",
+    "reference": "Modules/Settings/DankIslandTab.qml:88",
     "comment": "island settings: float toggle description",
     "tags": [
       "settings"
@@ -10728,7 +10773,7 @@
   {
     "term": "Fluent",
     "context": "Fluent",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:281",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:283",
     "comment": "",
     "tags": [
       "settings"
@@ -11163,7 +11208,7 @@
   {
     "term": "Forget Network",
     "context": "Forget Network",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:149, Modules/Settings/NetworkWifiTab.qml:1234, Modules/ControlCenter/Details/NetworkDetail.qml:1425",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:149, Modules/Settings/NetworkWifiTab.qml:1234, Modules/ControlCenter/Details/NetworkDetail.qml:1435",
     "comment": "",
     "tags": [
       "settings",
@@ -11434,6 +11479,15 @@
     ]
   },
   {
+    "term": "Gamma",
+    "context": "Gamma",
+    "reference": "Modules/Settings/GammaControlTab.qml:71",
+    "comment": "",
+    "tags": [
+      "settings"
+    ]
+  },
+  {
     "term": "Gamma Control",
     "context": "Gamma Control",
     "reference": "Modals/Settings/SettingsSidebar.qml:247, Modules/Settings/GammaControlTab.qml:52",
@@ -11445,7 +11499,7 @@
   {
     "term": "Gamma control not available. Requires DMS API v6+.",
     "context": "Gamma control not available. Requires DMS API v6+.",
-    "reference": "Modules/Settings/GammaControlTab.qml:65",
+    "reference": "Modules/Settings/GammaControlTab.qml:101",
     "comment": "",
     "tags": [
       "settings"
@@ -11553,7 +11607,7 @@
   {
     "term": "Globally scale animation durations with geometric motion & spring based physics with bezier curves",
     "context": "Globally scale animation durations with geometric motion & spring based physics with bezier curves",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:383",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:385",
     "comment": "",
     "tags": [
       "settings"
@@ -11571,7 +11625,7 @@
   {
     "term": "Good",
     "context": "Good",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:1232",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:973",
     "comment": "",
     "tags": [
       "settings"
@@ -11589,7 +11643,7 @@
   {
     "term": "Goth Corners",
     "context": "Goth Corners",
-    "reference": "Modules/Settings/DankIslandTab.qml:382, Modules/Settings/DankBarTab.qml:1369",
+    "reference": "Modules/Settings/DankIslandTab.qml:435, Modules/Settings/DankBarTab.qml:1369",
     "comment": "island settings: satellite goth corners toggle",
     "tags": [
       "settings"
@@ -11996,7 +12050,7 @@
   {
     "term": "Hibernate",
     "context": "Hibernate",
-    "reference": "Services/SessionService.qml:606, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:606, Modules/Settings/PowerSleepTab.qml:350, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -12015,8 +12069,8 @@
   {
     "term": "Hidden",
     "context": "Hidden",
-    "reference": "Modules/Settings/DankIslandTab.qml:179, Modules/Settings/DankIslandTab.qml:192, Modules/Settings/DankIslandTab.qml:205, Modules/Settings/NetworkWifiTab.qml:586, Modules/Settings/NetworkWifiTab.qml:965, Modules/Settings/DankDashTab.qml:349",
-    "comment": "island settings: battery or control center slot hidden | island settings: media or launcher slot hidden | island settings: weather slot hidden",
+    "reference": "Modules/Settings/DankIslandTab.qml:180, Modules/Settings/DankIslandTab.qml:193, Modules/Settings/DankIslandTab.qml:206, Modules/Settings/DankIslandTab.qml:219, Modules/Settings/DankIslandTab.qml:245, Modules/Settings/NetworkWifiTab.qml:586, Modules/Settings/NetworkWifiTab.qml:965, Modules/Settings/DankDashTab.qml:349",
+    "comment": "island settings: battery or control center slot hidden | island settings: brightness slot hidden | island settings: media or launcher slot hidden | island settings: volume slot hidden | island settings: weather slot hidden",
     "tags": [
       "settings"
     ]
@@ -12087,7 +12141,7 @@
   {
     "term": "Hide Delay",
     "context": "Hide Delay",
-    "reference": "Modules/Settings/DankIslandTab.qml:501, Modules/Settings/DankBarTab.qml:748",
+    "reference": "Modules/Settings/DankIslandTab.qml:554, Modules/Settings/DankBarTab.qml:748",
     "comment": "island settings: hover hide delay slider",
     "tags": [
       "settings"
@@ -12213,7 +12267,7 @@
   {
     "term": "High",
     "context": "High",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:249",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:250",
     "comment": "quality level option",
     "tags": [
       "settings"
@@ -12222,7 +12276,7 @@
   {
     "term": "High Contrast",
     "context": "High Contrast",
-    "reference": "Modules/Settings/DankIslandTab.qml:285",
+    "reference": "Modules/Settings/DankIslandTab.qml:338",
     "comment": "island settings: high contrast toggle",
     "tags": [
       "settings"
@@ -12240,7 +12294,7 @@
   {
     "term": "Higher percentages give island more inertia",
     "context": "Higher percentages give island more inertia",
-    "reference": "Modules/Settings/DankIslandTab.qml:562",
+    "reference": "Modules/Settings/DankIslandTab.qml:615",
     "comment": "island settings: mass description",
     "tags": [
       "settings"
@@ -12249,7 +12303,7 @@
   {
     "term": "Higher values pull island toward its target more strongly",
     "context": "Higher values pull island toward its target more strongly",
-    "reference": "Modules/Settings/DankIslandTab.qml:534",
+    "reference": "Modules/Settings/DankIslandTab.qml:587",
     "comment": "island settings: stiffness description",
     "tags": [
       "settings"
@@ -12258,7 +12312,7 @@
   {
     "term": "Higher values settle island with less bounce",
     "context": "Higher values settle island with less bounce",
-    "reference": "Modules/Settings/DankIslandTab.qml:548",
+    "reference": "Modules/Settings/DankIslandTab.qml:601",
     "comment": "island settings: damping description",
     "tags": [
       "settings"
@@ -12312,7 +12366,7 @@
   {
     "term": "History cleared. %1 pinned entries kept.",
     "context": "History cleared. %1 pinned entries kept.",
-    "reference": "Services/ClipboardService.qml:346",
+    "reference": "Services/ClipboardService.qml:348",
     "comment": "",
     "tags": [
       "shell"
@@ -12321,7 +12375,7 @@
   {
     "term": "Hold Duration",
     "context": "Hold Duration",
-    "reference": "Modules/Settings/PowerSleepTab.qml:530",
+    "reference": "Modules/Settings/PowerSleepTab.qml:514",
     "comment": "",
     "tags": [
       "settings"
@@ -12330,7 +12384,7 @@
   {
     "term": "Hold longer to confirm",
     "context": "Hold longer to confirm",
-    "reference": "Modules/PowerMenu/PowerMenuContent.qml:761",
+    "reference": "Modules/PowerMenu/PowerMenuContent.qml:717",
     "comment": "",
     "tags": [
       "shell"
@@ -12339,7 +12393,7 @@
   {
     "term": "Hold to Confirm Power Actions",
     "context": "Hold to Confirm Power Actions",
-    "reference": "Modules/Settings/PowerSleepTab.qml:517",
+    "reference": "Modules/Settings/PowerSleepTab.qml:501",
     "comment": "",
     "tags": [
       "settings"
@@ -12348,7 +12402,7 @@
   {
     "term": "Hold to confirm (%1 ms)",
     "context": "Hold to confirm (%1 ms)",
-    "reference": "Modules/PowerMenu/PowerMenuContent.qml:766, Modules/PowerMenu/PowerMenuContent.qml:770",
+    "reference": "Modules/PowerMenu/PowerMenuContent.qml:722, Modules/PowerMenu/PowerMenuContent.qml:726",
     "comment": "",
     "tags": [
       "shell"
@@ -12357,7 +12411,7 @@
   {
     "term": "Hold to confirm (%1s)",
     "context": "Hold to confirm (%1s)",
-    "reference": "Modules/PowerMenu/PowerMenuContent.qml:767, Modules/PowerMenu/PowerMenuContent.qml:771",
+    "reference": "Modules/PowerMenu/PowerMenuContent.qml:723, Modules/PowerMenu/PowerMenuContent.qml:727",
     "comment": "",
     "tags": [
       "shell"
@@ -12366,7 +12420,7 @@
   {
     "term": "Home Compact",
     "context": "Home Compact",
-    "reference": "Modules/Settings/DankIslandTab.qml:162",
+    "reference": "Modules/Settings/DankIslandTab.qml:163",
     "comment": "island settings: home face card title",
     "tags": [
       "settings"
@@ -12384,7 +12438,7 @@
   {
     "term": "Horizontal Offset",
     "context": "Horizontal Offset",
-    "reference": "Modules/Settings/DankIslandTab.qml:147",
+    "reference": "Modules/Settings/DankIslandTab.qml:148",
     "comment": "island settings: horizontal offset slider",
     "tags": [
       "settings"
@@ -12402,7 +12456,7 @@
   {
     "term": "Host",
     "context": "Host",
-    "reference": "Modules/Settings/PrinterTab.qml:515",
+    "reference": "Modules/Settings/PrinterTab.qml:506",
     "comment": "Label for printer IP address or hostname input field",
     "tags": [
       "settings"
@@ -12438,7 +12492,7 @@
   {
     "term": "Hotspot",
     "context": "Hotspot",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:1264, Modules/ControlCenter/Details/NetworkDetail.qml:261",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:1264, Modules/ControlCenter/Details/NetworkDetail.qml:271",
     "comment": "hotspot control label | hotspot settings card title",
     "tags": [
       "settings",
@@ -12493,7 +12547,7 @@
   {
     "term": "Hour",
     "context": "Hour",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1432, Modules/Settings/GammaControlTab.qml:219",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1432, Modules/Settings/GammaControlTab.qml:255",
     "comment": "",
     "tags": [
       "settings"
@@ -12502,7 +12556,7 @@
   {
     "term": "Hourly",
     "context": "Hourly",
-    "reference": "Modules/DankDash/WeatherTab.qml:840",
+    "reference": "Modules/DankDash/WeatherTab.qml:828",
     "comment": "",
     "tags": [
       "shell"
@@ -12574,7 +12628,7 @@
   {
     "term": "Humidity",
     "context": "Humidity",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:101, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:1023",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:413, Modules/DankDash/WeatherTab.qml:101, Modules/DankDash/WeatherForecastCard.qml:80, Modules/Settings/TimeWeatherTab.qml:931",
     "comment": "",
     "tags": [
       "plugin-dankdesktopweather",
@@ -12585,7 +12639,7 @@
   {
     "term": "Hybrid",
     "context": "Hybrid",
-    "reference": "Modules/Settings/DankIslandTab.qml:467",
+    "reference": "Modules/Settings/DankIslandTab.qml:520",
     "comment": "island settings: hover plus click expansion mode",
     "tags": [
       "settings"
@@ -12594,7 +12648,7 @@
   {
     "term": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
     "context": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
-    "reference": "Modules/Settings/DankIslandTab.qml:477",
+    "reference": "Modules/Settings/DankIslandTab.qml:530",
     "comment": "island settings: hybrid mode hint",
     "tags": [
       "settings"
@@ -12685,7 +12739,7 @@
   {
     "term": "IP address or hostname",
     "context": "IP address or hostname",
-    "reference": "Modules/Settings/PrinterTab.qml:525",
+    "reference": "Modules/Settings/PrinterTab.qml:516",
     "comment": "Placeholder text for manual printer address input",
     "tags": [
       "settings"
@@ -12712,8 +12766,8 @@
   {
     "term": "Icon",
     "context": "Icon",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:162, Modules/Settings/DockTab.qml:279",
-    "comment": "",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:162, Modules/Settings/DockTab.qml:279, Modules/Settings/DankIslandTab.qml:232, Modules/Settings/DankIslandTab.qml:258",
+    "comment": "island settings: level shown as icon only",
     "tags": [
       "settings",
       "shell"
@@ -12767,7 +12821,7 @@
   {
     "term": "Icon theme changed outside DMS; switched to System Default",
     "context": "Icon theme changed outside DMS; switched to System Default",
-    "reference": "Common/SettingsData.qml:1457",
+    "reference": "Common/SettingsData.qml:1461",
     "comment": "shown when an external tool overrides the icon theme DMS applied",
     "tags": [
       "shell"
@@ -12884,7 +12938,7 @@
   {
     "term": "Ignore this package",
     "context": "Ignore this package",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:477",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:464",
     "comment": "",
     "tags": [
       "shell"
@@ -12893,7 +12947,7 @@
   {
     "term": "Ignored (%1)",
     "context": "Ignored (%1)",
-    "reference": "Modules/Settings/SystemUpdaterTab.qml:270, Modules/DankBar/Popouts/SystemUpdatePopout.qml:519",
+    "reference": "Modules/Settings/SystemUpdaterTab.qml:270, Modules/DankBar/Popouts/SystemUpdatePopout.qml:506",
     "comment": "",
     "tags": [
       "settings",
@@ -12948,7 +13002,7 @@
   {
     "term": "Image copied to clipboard",
     "context": "Image copied to clipboard",
-    "reference": "Services/ClipboardService.qml:213",
+    "reference": "Services/ClipboardService.qml:215",
     "comment": "",
     "tags": [
       "shell"
@@ -13259,7 +13313,7 @@
   {
     "term": "Install color themes from the DMS theme registry",
     "context": "Install color themes from the DMS theme registry",
-    "reference": "Modules/Settings/ThemeBrowser.qml:388",
+    "reference": "Modules/Settings/ThemeBrowser.qml:387",
     "comment": "theme browser description",
     "tags": [
       "settings"
@@ -13507,7 +13561,7 @@
   {
     "term": "Island Gap",
     "context": "Island Gap",
-    "reference": "Modules/Settings/DankIslandTab.qml:434",
+    "reference": "Modules/Settings/DankIslandTab.qml:487",
     "comment": "island settings: satellite to island gap slider",
     "tags": [
       "settings"
@@ -13516,7 +13570,7 @@
   {
     "term": "Island Instance",
     "context": "Island Instance",
-    "reference": "Modules/Settings/DankIslandTab.qml:66",
+    "reference": "Modules/Settings/DankIslandTab.qml:67",
     "comment": "island settings: which bar config the island replaces",
     "tags": [
       "settings"
@@ -13543,7 +13597,7 @@
   {
     "term": "Jobs",
     "context": "Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1358, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:19, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:183",
+    "reference": "Modules/Settings/PrinterTab.qml:1340, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:19, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:183",
     "comment": "",
     "tags": [
       "settings",
@@ -13598,7 +13652,7 @@
   {
     "term": "Keep Clock with Media",
     "context": "Keep Clock with Media",
-    "reference": "Modules/Settings/DankIslandTab.qml:294",
+    "reference": "Modules/Settings/DankIslandTab.qml:347",
     "comment": "island settings: clock in media face toggle",
     "tags": [
       "settings"
@@ -13616,7 +13670,7 @@
   {
     "term": "Keep dragging when finger is briefly lifted",
     "context": "Keep dragging when finger is briefly lifted",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:163",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:161",
     "comment": "",
     "tags": [
       "settings"
@@ -13670,7 +13724,7 @@
   {
     "term": "Keep widgets beside the island or align them like a standalone bar",
     "context": "Keep widgets beside the island or align them like a standalone bar",
-    "reference": "Modules/Settings/DankIslandTab.qml:421",
+    "reference": "Modules/Settings/DankIslandTab.qml:474",
     "comment": "island settings: satellite position description",
     "tags": [
       "settings"
@@ -14040,7 +14094,7 @@
   {
     "term": "Launcher",
     "context": "Launcher",
-    "reference": "Modals/Settings/SettingsSidebar.qml:220, Modules/DankIsland/DankIslandSurface.qml:424, Modules/Settings/DankIslandTab.qml:227",
+    "reference": "Modals/Settings/SettingsSidebar.qml:220, Modules/DankIsland/DankIslandSurface.qml:345, Modules/Settings/DankIslandTab.qml:280",
     "comment": "island compact face: launcher label | island settings: button to launcher tab",
     "tags": [
       "settings",
@@ -14105,8 +14159,8 @@
   {
     "term": "Left",
     "context": "Left",
-    "reference": "Modules/Notepad/NotepadSettings.qml:434, Modules/Settings/DockTab.qml:126, Modules/Settings/DankIslandTab.qml:179, Modules/Settings/DankIslandTab.qml:192, Modules/Settings/DankIslandTab.qml:205, Modules/Settings/DankBarTab.qml:95, Modules/Settings/DankBarTab.qml:395, Modules/DankBar/Popouts/BatteryPopout.qml:521",
-    "comment": "island settings: battery or control center slot left of the clock | island settings: media or launcher slot left of the clock | island settings: weather slot left of the clock | screen edge position",
+    "reference": "Modules/Notepad/NotepadSettings.qml:434, Modules/Settings/DockTab.qml:126, Modules/Settings/DankIslandTab.qml:180, Modules/Settings/DankIslandTab.qml:193, Modules/Settings/DankIslandTab.qml:206, Modules/Settings/DankIslandTab.qml:219, Modules/Settings/DankIslandTab.qml:245, Modules/Settings/DankBarTab.qml:95, Modules/Settings/DankBarTab.qml:395, Modules/DankBar/Popouts/BatteryPopout.qml:521",
+    "comment": "island settings: battery or control center slot left of the clock | island settings: brightness slot left of the clock | island settings: media or launcher slot left of the clock | island settings: volume slot left of the clock | island settings: weather slot left of the clock | screen edge position",
     "tags": [
       "settings",
       "shell"
@@ -14341,7 +14395,7 @@
   {
     "term": "Loading...",
     "context": "Loading...",
-    "reference": "Modules/Settings/PrinterTab.qml:724, Modules/Settings/NetworkWifiTab.qml:1584",
+    "reference": "Modules/Settings/PrinterTab.qml:715, Modules/Settings/NetworkWifiTab.qml:1584",
     "comment": "hotspot password loading status",
     "tags": [
       "settings"
@@ -14377,7 +14431,7 @@
   {
     "term": "Location",
     "context": "Location",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1388, Modules/Settings/GammaControlTab.qml:175, Modules/Settings/PrinterTab.qml:792, Modules/Settings/PrinterTab.qml:1183, Modules/DankDash/Overview/CalendarEventEditor.qml:300",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1388, Modules/Settings/GammaControlTab.qml:211, Modules/Settings/PrinterTab.qml:774, Modules/Settings/PrinterTab.qml:1165, Modules/DankDash/Overview/CalendarEventEditor.qml:300",
     "comment": "theme auto mode tab",
     "tags": [
       "settings",
@@ -14396,7 +14450,7 @@
   {
     "term": "Lock",
     "context": "Lock",
-    "reference": "Services/SessionService.qml:594, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:594, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -14469,7 +14523,7 @@
   {
     "term": "Log Out",
     "context": "Log Out",
-    "reference": "Modals/SwitchUserModal.qml:253, Services/SessionService.qml:582, Modules/Settings/PowerSleepTab.qml:406, Modules/Settings/PowerSleepTab.qml:412",
+    "reference": "Modals/SwitchUserModal.qml:253, Services/SessionService.qml:582, Modules/Settings/PowerSleepTab.qml:390, Modules/Settings/PowerSleepTab.qml:396",
     "comment": "",
     "tags": [
       "settings",
@@ -14488,7 +14542,7 @@
   {
     "term": "Long",
     "context": "Long",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/NotificationsTab.qml:379",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:363, Modules/Settings/TypographyMotionTab.qml:446, Modules/Settings/TypographyMotionTab.qml:515, Modules/Settings/NotificationsTab.qml:379",
     "comment": "",
     "tags": [
       "settings"
@@ -14524,7 +14578,7 @@
   {
     "term": "Low",
     "context": "Low",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:249",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:250",
     "comment": "quality level option",
     "tags": [
       "settings"
@@ -14876,7 +14930,7 @@
   {
     "term": "Material",
     "context": "Material",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:281",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:283",
     "comment": "",
     "tags": [
       "settings"
@@ -14885,7 +14939,7 @@
   {
     "term": "Material 3 Expressive bezier curves, default.",
     "context": "Material 3 Expressive bezier curves, default.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:278",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:280",
     "comment": "",
     "tags": [
       "settings"
@@ -14894,7 +14948,7 @@
   {
     "term": "Material 3 Expressive panels rise from below with a subtle scale, default.",
     "context": "Material 3 Expressive panels rise from below with a subtle scale, default.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:302",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:304",
     "comment": "",
     "tags": [
       "settings"
@@ -14903,7 +14957,7 @@
   {
     "term": "Material Battery Style",
     "context": "Material Battery Style",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:3485, Modules/Settings/DankIslandTab.qml:303",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:3485, Modules/Settings/DankIslandTab.qml:356",
     "comment": "island settings: battery meter style row",
     "tags": [
       "settings"
@@ -15194,7 +15248,7 @@
   {
     "term": "Maximum pinned entries reached",
     "context": "Maximum pinned entries reached",
-    "reference": "Services/ClipboardService.qml:305",
+    "reference": "Services/ClipboardService.qml:307",
     "comment": "",
     "tags": [
       "shell"
@@ -15213,7 +15267,7 @@
   {
     "term": "Media / Launcher",
     "context": "Media / Launcher",
-    "reference": "Modules/Settings/DankIslandTab.qml:177",
+    "reference": "Modules/Settings/DankIslandTab.qml:178",
     "comment": "island settings: media or launcher slot row",
     "tags": [
       "settings"
@@ -15286,7 +15340,7 @@
   {
     "term": "Media Players (",
     "context": "Media Players (",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:543",
+    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:552",
     "comment": "",
     "tags": [
       "shell"
@@ -15304,7 +15358,7 @@
   {
     "term": "Medium",
     "context": "Medium",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:116, Modules/Settings/TypographyMotionTab.qml:128, Modules/Settings/TypographyMotionTab.qml:156, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/WidgetsTabSection.qml:2032, Modules/Settings/WidgetsTabSection.qml:3549, Modules/Settings/NotificationsTab.qml:379",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:116, Modules/Settings/TypographyMotionTab.qml:128, Modules/Settings/TypographyMotionTab.qml:156, Modules/Settings/TypographyMotionTab.qml:363, Modules/Settings/TypographyMotionTab.qml:446, Modules/Settings/TypographyMotionTab.qml:515, Modules/Settings/WidgetsTabSection.qml:2032, Modules/Settings/WidgetsTabSection.qml:3549, Modules/Settings/NotificationsTab.qml:379",
     "comment": "font weight",
     "tags": [
       "settings"
@@ -15431,7 +15485,7 @@
   {
     "term": "Middle Click Emulation",
     "context": "Middle Click Emulation",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:127, Modules/Settings/MouseTouchpadTab.qml:270",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:125, Modules/Settings/MouseTouchpadTab.qml:262",
     "comment": "",
     "tags": [
       "settings"
@@ -15487,7 +15541,7 @@
   {
     "term": "Minute",
     "context": "Minute",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1440, Modules/Settings/GammaControlTab.qml:227",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1440, Modules/Settings/GammaControlTab.qml:263",
     "comment": "",
     "tags": [
       "settings"
@@ -15532,7 +15586,7 @@
   {
     "term": "Modals",
     "context": "Modals",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:503",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:505",
     "comment": "",
     "tags": [
       "settings"
@@ -15550,7 +15604,7 @@
   {
     "term": "Model",
     "context": "Model",
-    "reference": "Modules/Settings/DisplayWidgetsTab.qml:229, Modules/Settings/PrinterTab.qml:1178, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2175",
+    "reference": "Modules/Settings/DisplayWidgetsTab.qml:229, Modules/Settings/PrinterTab.qml:1160, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2175",
     "comment": "",
     "tags": [
       "settings"
@@ -15670,7 +15724,7 @@
   {
     "term": "Motion",
     "context": "Motion",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:262",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:264",
     "comment": "",
     "tags": [
       "settings"
@@ -15679,7 +15733,7 @@
   {
     "term": "Motion & Accessibility",
     "context": "Motion & Accessibility",
-    "reference": "Modules/Settings/DankIslandTab.qml:516",
+    "reference": "Modules/Settings/DankIslandTab.qml:569",
     "comment": "island settings: motion card title",
     "tags": [
       "settings"
@@ -15688,7 +15742,7 @@
   {
     "term": "Motion Effects",
     "context": "Motion Effects",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:294",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:296",
     "comment": "",
     "tags": [
       "settings"
@@ -15760,7 +15814,7 @@
   {
     "term": "Move island and satellites left or right from display center",
     "context": "Move island and satellites left or right from display center",
-    "reference": "Modules/Settings/DankIslandTab.qml:148",
+    "reference": "Modules/Settings/DankIslandTab.qml:149",
     "comment": "island settings: horizontal offset description",
     "tags": [
       "settings"
@@ -15850,7 +15904,7 @@
   {
     "term": "Muted",
     "context": "Muted",
-    "reference": "Modules/DankDash/MediaDropdownOverlay.qml:417, Modules/DankIsland/IslandSystemSource.qml:24, Modules/OSD/VolumeOSD.qml:74, Modules/OSD/MicVolumeOSD.qml:80, Modules/ControlCenter/Components/DragDropGrid.qml:579, Modules/ControlCenter/Components/DragDropGrid.qml:590",
+    "reference": "Modules/DankDash/MediaPlayerIslandChrome.qml:423, Modules/DankDash/MediaDropdownOverlay.qml:428, Modules/DankIsland/IslandSystemSource.qml:24, Modules/OSD/VolumeOSD.qml:74, Modules/OSD/MicVolumeOSD.qml:80, Modules/ControlCenter/Components/DragDropGrid.qml:579, Modules/ControlCenter/Components/DragDropGrid.qml:590",
     "comment": "audio status | island system face: muted value label",
     "tags": [
       "shell"
@@ -15895,7 +15949,7 @@
   {
     "term": "Name",
     "context": "Name",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:142, Modals/DankLauncherV2/LauncherContent.qml:686, Modals/DankLauncherV2/LauncherContent.qml:695, Modals/DankLauncherV2/LauncherContent.qml:700, Modules/ProcessList/ProcessesView.qml:293, Modules/Settings/PluginBrowser.qml:55, Modules/Settings/DisplayWidgetsTab.qml:229, Modules/Settings/AutoStartTab.qml:542, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PluginsTab.qml:455, Modules/Settings/PrinterTab.qml:771, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2175, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:142, Modals/DankLauncherV2/LauncherContent.qml:686, Modals/DankLauncherV2/LauncherContent.qml:695, Modals/DankLauncherV2/LauncherContent.qml:700, Modules/ProcessList/ProcessesView.qml:293, Modules/Settings/PluginBrowser.qml:55, Modules/Settings/DisplayWidgetsTab.qml:229, Modules/Settings/AutoStartTab.qml:542, Modules/Settings/DesktopWidgetInstanceCard.qml:203, Modules/Settings/PluginsTab.qml:455, Modules/Settings/PrinterTab.qml:753, Modules/Settings/DisplayConfigTab.qml:517, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2175, Modules/Settings/Widgets/SystemMonitorVariantCard.qml:144",
     "comment": "plugin browser sort option",
     "tags": [
       "settings",
@@ -15923,7 +15977,7 @@
   {
     "term": "Natural Scrolling",
     "context": "Natural Scrolling",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:84, Modules/Settings/MouseTouchpadTab.qml:205",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:84, Modules/Settings/MouseTouchpadTab.qml:203",
     "comment": "",
     "tags": [
       "settings"
@@ -15950,7 +16004,7 @@
   {
     "term": "Near Island",
     "context": "Near Island",
-    "reference": "Modules/Settings/DankIslandTab.qml:422",
+    "reference": "Modules/Settings/DankIslandTab.qml:475",
     "comment": "island settings: satellites hug the island",
     "tags": [
       "settings"
@@ -15978,7 +16032,7 @@
   {
     "term": "Network Info",
     "context": "Network Info",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:1002, Modules/ControlCenter/Details/NetworkDetail.qml:1378",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:1012, Modules/ControlCenter/Details/NetworkDetail.qml:1388",
     "comment": "",
     "tags": [
       "shell"
@@ -16150,7 +16204,7 @@
   {
     "term": "Next Transition",
     "context": "Next Transition",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1652, Modules/Settings/GammaControlTab.qml:564",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1652, Modules/Settings/GammaControlTab.qml:600",
     "comment": "",
     "tags": [
       "settings"
@@ -16168,7 +16222,7 @@
   {
     "term": "Night",
     "context": "Night",
-    "reference": "Services/WeatherService.qml:317, Modules/Settings/GammaControlTab.qml:439",
+    "reference": "Services/WeatherService.qml:317, Modules/Settings/GammaControlTab.qml:475",
     "comment": "",
     "tags": [
       "settings",
@@ -16178,7 +16232,7 @@
   {
     "term": "Night Mode",
     "context": "Night Mode",
-    "reference": "Modules/Settings/GammaControlTab.qml:64, Modules/ControlCenter/Models/WidgetModel.qml:128, Modules/ControlCenter/Components/DragDropGrid.qml:757",
+    "reference": "Modules/Settings/GammaControlTab.qml:100, Modules/ControlCenter/Models/WidgetModel.qml:128, Modules/ControlCenter/Components/DragDropGrid.qml:757",
     "comment": "",
     "tags": [
       "settings",
@@ -16188,7 +16242,7 @@
   {
     "term": "Night Temperature",
     "context": "Night Temperature",
-    "reference": "Modules/Settings/GammaControlTab.qml:93",
+    "reference": "Modules/Settings/GammaControlTab.qml:129",
     "comment": "",
     "tags": [
       "settings"
@@ -16206,7 +16260,7 @@
   {
     "term": "Night mode failed: DMS gamma control not available",
     "context": "Night mode failed: DMS gamma control not available",
-    "reference": "Services/DisplayService.qml:1061",
+    "reference": "Services/DisplayService.qml:1062",
     "comment": "",
     "tags": [
       "shell"
@@ -16224,7 +16278,7 @@
   {
     "term": "No",
     "context": "No",
-    "reference": "Modules/Settings/PrinterTab.qml:1188, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2200, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2220, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2222",
+    "reference": "Modules/Settings/PrinterTab.qml:1170, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2200, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2220, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2222",
     "comment": "",
     "tags": [
       "settings"
@@ -16233,8 +16287,8 @@
   {
     "term": "No Active Players",
     "context": "No Active Players",
-    "reference": "Modules/DankDash/MediaPlayerIslandChrome.qml:142, Modules/DankDash/MediaPlayerTab.qml:553",
-    "comment": "island media player: empty state",
+    "reference": "Modules/DankDash/MediaPlayerEmptyState.qml:16",
+    "comment": "",
     "tags": [
       "shell"
     ]
@@ -16373,7 +16427,7 @@
   {
     "term": "No Scroll",
     "context": "No Scroll",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:108, Modules/Settings/MouseTouchpadTab.qml:229",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:112, Modules/Settings/MouseTouchpadTab.qml:231",
     "comment": "",
     "tags": [
       "settings"
@@ -16603,7 +16657,7 @@
   {
     "term": "No devices found",
     "context": "No devices found",
-    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:450, Modules/Settings/NetworkCellularTab.qml:60, Modules/ControlCenter/Details/NetworkDetail.qml:805",
+    "reference": "dms-plugins/DankKDEConnect/components/EmptyState.qml:11, Modules/Settings/PrinterTab.qml:450, Modules/Settings/NetworkCellularTab.qml:60, Modules/ControlCenter/Details/NetworkDetail.qml:815",
     "comment": "KDE Connect no devices message",
     "tags": [
       "plugin-dankkdeconnect",
@@ -16641,7 +16695,7 @@
   {
     "term": "No drivers found",
     "context": "No drivers found",
-    "reference": "Modules/Settings/PrinterTab.qml:721",
+    "reference": "Modules/Settings/PrinterTab.qml:712",
     "comment": "",
     "tags": [
       "settings"
@@ -16930,7 +16984,7 @@
   {
     "term": "No printers configured",
     "context": "No printers configured",
-    "reference": "Modules/Settings/PrinterTab.qml:900",
+    "reference": "Modules/Settings/PrinterTab.qml:882",
     "comment": "",
     "tags": [
       "settings"
@@ -16939,7 +16993,7 @@
   {
     "term": "No printers found",
     "context": "No printers found",
-    "reference": "Modules/Settings/PrinterTab.qml:942",
+    "reference": "Modules/Settings/PrinterTab.qml:924",
     "comment": "",
     "tags": [
       "settings"
@@ -17041,7 +17095,7 @@
   {
     "term": "No supported package manager found.",
     "context": "No supported package manager found.",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:353",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:340",
     "comment": "",
     "tags": [
       "shell"
@@ -17050,7 +17104,7 @@
   {
     "term": "No themes found",
     "context": "No themes found",
-    "reference": "Modules/Settings/ThemeBrowser.qml:485",
+    "reference": "Modules/Settings/ThemeBrowser.qml:484",
     "comment": "empty theme list",
     "tags": [
       "settings"
@@ -17196,7 +17250,7 @@
   {
     "term": "None",
     "context": "None",
-    "reference": "Modals/WindowRuleModal.qml:1186, Services/CupsService.qml:668, Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/WallpaperTab.qml:1197, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1495, Modules/Settings/DankBarTab.qml:2030, Modules/Settings/DankBarTab.qml:2030, Modules/Settings/DankBarTab.qml:2071, Modules/Settings/WorkspaceAppearanceCard.qml:49, Modules/Settings/WorkspaceAppearanceCard.qml:57, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/WindowRulesTab.qml:1073, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:187",
+    "reference": "Modals/WindowRuleModal.qml:1186, Services/CupsService.qml:668, Modules/Settings/TypographyMotionTab.qml:363, Modules/Settings/TypographyMotionTab.qml:446, Modules/Settings/TypographyMotionTab.qml:515, Modules/Settings/WallpaperTab.qml:1197, Modules/Settings/DesktopWidgetInstanceCard.qml:258, Modules/Settings/DesktopWidgetInstanceCard.qml:274, Modules/Settings/DankBarTab.qml:1495, Modules/Settings/DankBarTab.qml:2030, Modules/Settings/DankBarTab.qml:2030, Modules/Settings/DankBarTab.qml:2071, Modules/Settings/WorkspaceAppearanceCard.qml:49, Modules/Settings/WorkspaceAppearanceCard.qml:57, Modules/Settings/NotificationsTab.qml:379, Modules/Settings/WindowRulesTab.qml:1073, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:94, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:107, Modules/Settings/DisplayConfig/HyprlandOutputSettings.qml:111, Modules/ControlCenter/BuiltinPlugins/TailscaleWidget.qml:187",
     "comment": "Tailscale exit node: none selected | wallpaper transition option | workspace color option",
     "tags": [
       "settings",
@@ -17215,7 +17269,7 @@
   {
     "term": "Normal",
     "context": "Normal",
-    "reference": "Modals/WindowRuleModal.qml:1208, Modules/Settings/TypographyMotionTab.qml:249",
+    "reference": "Modals/WindowRuleModal.qml:1208, Modules/Settings/TypographyMotionTab.qml:250",
     "comment": "quality level option",
     "tags": [
       "settings",
@@ -17462,7 +17516,7 @@
   {
     "term": "Notifications",
     "context": "Notifications",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1602, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:761, Modals/Greeter/GreeterCompletePage.qml:555, Modals/Settings/SettingsSidebar.qml:188, Modules/DankIsland/DankIslandSurface.qml:553, Modules/Settings/DankIslandTab.qml:318, Modules/Settings/CompositorLayoutTab.qml:402, Modules/Notifications/Center/NotificationHeader.qml:74",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1602, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:761, Modals/Greeter/GreeterCompletePage.qml:555, Modals/Settings/SettingsSidebar.qml:188, Modules/DankIsland/DankIslandSurface.qml:474, Modules/Settings/DankIslandTab.qml:371, Modules/Settings/CompositorLayoutTab.qml:402, Modules/Notifications/Center/NotificationHeader.qml:74",
     "comment": "KDE Connect notifications label | greeter settings link | island compact face: notification center label | island settings: notifications card title",
     "tags": [
       "plugin-dankkdeconnect",
@@ -17601,7 +17655,7 @@
   {
     "term": "On Button Down",
     "context": "On Button Down",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:108, Modules/Settings/MouseTouchpadTab.qml:229",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:112, Modules/Settings/MouseTouchpadTab.qml:231",
     "comment": "",
     "tags": [
       "settings"
@@ -17655,7 +17709,7 @@
   {
     "term": "Only adjust gamma based on time or location rules.",
     "context": "Only adjust gamma based on time or location rules.",
-    "reference": "Modules/Settings/GammaControlTab.qml:127",
+    "reference": "Modules/Settings/GammaControlTab.qml:163",
     "comment": "",
     "tags": [
       "settings"
@@ -17691,7 +17745,7 @@
   {
     "term": "Only visible if hibernate is supported by your system",
     "context": "Only visible if hibernate is supported by your system",
-    "reference": "Modules/Settings/PowerSleepTab.qml:469",
+    "reference": "Modules/Settings/PowerSleepTab.qml:453",
     "comment": "",
     "tags": [
       "settings"
@@ -17700,7 +17754,7 @@
   {
     "term": "Opacity",
     "context": "Opacity",
-    "reference": "Modals/WindowRuleModal.qml:1124, Modules/ColorPicker/ColorPickerContent.qml:425, Modules/Settings/DockTab.qml:673, Modules/Settings/DankIslandTab.qml:272, Modules/Settings/DankIslandTab.qml:406, Modules/Settings/DankBarTab.qml:896, Modules/Settings/DankBarTab.qml:1627, Modules/Settings/DankBarTab.qml:1721, Modules/Settings/DankBarTab.qml:1837, Modules/Settings/WindowRulesTab.qml:94",
+    "reference": "Modals/WindowRuleModal.qml:1124, Modules/ColorPicker/ColorPickerContent.qml:425, Modules/Settings/DockTab.qml:673, Modules/Settings/DankIslandTab.qml:325, Modules/Settings/DankIslandTab.qml:459, Modules/Settings/DankBarTab.qml:896, Modules/Settings/DankBarTab.qml:1627, Modules/Settings/DankBarTab.qml:1721, Modules/Settings/DankBarTab.qml:1837, Modules/Settings/WindowRulesTab.qml:94",
     "comment": "island settings: island surface opacity slider | island settings: satellite background opacity slider",
     "tags": [
       "settings",
@@ -17756,7 +17810,7 @@
   {
     "term": "Open",
     "context": "network security type",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:766, Modules/Settings/NetworkWifiTab.qml:962, Modules/Settings/NetworkWifiTab.qml:1127, Modules/ControlCenter/Details/NetworkDetail.qml:1177",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:766, Modules/Settings/NetworkWifiTab.qml:962, Modules/Settings/NetworkWifiTab.qml:1127, Modules/ControlCenter/Details/NetworkDetail.qml:1187",
     "comment": "",
     "tags": [
       "settings",
@@ -17784,7 +17838,7 @@
   {
     "term": "Open Delay",
     "context": "Open Delay",
-    "reference": "Modules/Settings/DankIslandTab.qml:487, Modules/Settings/DankBarTab.qml:1441",
+    "reference": "Modules/Settings/DankIslandTab.qml:540, Modules/Settings/DankBarTab.qml:1441",
     "comment": "island settings: hover open delay slider",
     "tags": [
       "settings"
@@ -17992,7 +18046,7 @@
   {
     "term": "Opens a picker of other active sessions on this seat",
     "context": "Opens a picker of other active sessions on this seat",
-    "reference": "Modules/Settings/PowerSleepTab.qml:464",
+    "reference": "Modules/Settings/PowerSleepTab.qml:448",
     "comment": "",
     "tags": [
       "settings"
@@ -18019,7 +18073,7 @@
   {
     "term": "Optional description",
     "context": "Optional description",
-    "reference": "Modules/Settings/PrinterTab.qml:823",
+    "reference": "Modules/Settings/PrinterTab.qml:805",
     "comment": "",
     "tags": [
       "settings"
@@ -18028,7 +18082,7 @@
   {
     "term": "Optional location",
     "context": "Optional location",
-    "reference": "Modules/Settings/PrinterTab.qml:802",
+    "reference": "Modules/Settings/PrinterTab.qml:784",
     "comment": "",
     "tags": [
       "settings"
@@ -18091,7 +18145,7 @@
   {
     "term": "Outer Gaps",
     "context": "Outer Gaps",
-    "reference": "Modules/Settings/DankIslandTab.qml:133, Modules/Settings/CompositorLayoutTab.qml:487, Modules/Settings/CompositorLayoutTab.qml:638",
+    "reference": "Modules/Settings/DankIslandTab.qml:134, Modules/Settings/CompositorLayoutTab.qml:487, Modules/Settings/CompositorLayoutTab.qml:638",
     "comment": "island settings: gap between screen edge and island",
     "tags": [
       "settings"
@@ -18100,7 +18154,7 @@
   {
     "term": "Outline",
     "context": "Outline",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1891, Modules/Settings/ThemeColorsTab.qml:1908, Modules/Settings/LauncherTab.qml:736, Modules/Settings/DankIslandTab.qml:306",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1889, Modules/Settings/ThemeColorsTab.qml:1891, Modules/Settings/ThemeColorsTab.qml:1908, Modules/Settings/LauncherTab.qml:736, Modules/Settings/DankIslandTab.qml:359",
     "comment": "island settings: outlined battery meter style | outline color | surface border color",
     "tags": [
       "settings"
@@ -18464,7 +18518,7 @@
   {
     "term": "Palette",
     "context": "Palette",
-    "reference": "Modules/Settings/DankIslandTab.qml:260",
+    "reference": "Modules/Settings/DankIslandTab.qml:313",
     "comment": "island settings: surface tone choice",
     "tags": [
       "settings"
@@ -18473,7 +18527,7 @@
   {
     "term": "Panels glide in from a larger distance at full size, no scale change, pure clean motion.",
     "context": "Panels glide in from a larger distance at full size, no scale change, pure clean motion.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:298",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:300",
     "comment": "",
     "tags": [
       "settings"
@@ -18482,7 +18536,7 @@
   {
     "term": "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.",
     "context": "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:300",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:302",
     "comment": "",
     "tags": [
       "settings"
@@ -18564,7 +18618,7 @@
   {
     "term": "Paste",
     "context": "Paste",
-    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1283, Modals/Clipboard/ClipboardContextMenu.qml:70, Modules/Settings/ClipboardTab.qml:156",
+    "reference": "dms-plugins/DankStickerSearch/DankStickerSearch.qml:248, dms-plugins/DankGifSearch/DankGifSearch.qml:195, Modals/DankLauncherV2/Controller.qml:1283, Modals/Clipboard/ClipboardContextMenu.qml:80, Modules/Settings/ClipboardTab.qml:156",
     "comment": "",
     "tags": [
       "plugin-dankgifsearch",
@@ -18612,7 +18666,7 @@
   {
     "term": "Pause",
     "context": "Pause",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1858, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, Modules/Settings/PrinterTab.qml:1251, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1858, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1410, Modules/Settings/PrinterTab.qml:1233, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
     "comment": "Media pause tooltip",
     "tags": [
       "plugin-dankkdeconnect",
@@ -18695,8 +18749,8 @@
   {
     "term": "Percentage",
     "context": "Percentage",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:2153, Modules/Settings/WidgetsTab.qml:149",
-    "comment": "",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:2153, Modules/Settings/DankIslandTab.qml:232, Modules/Settings/DankIslandTab.qml:258, Modules/Settings/WidgetsTab.qml:149",
+    "comment": "island settings: level shown as percentage only",
     "tags": [
       "settings"
     ]
@@ -18785,7 +18839,7 @@
   {
     "term": "Pin",
     "context": "Pin",
-    "reference": "Modals/WindowRuleModal.qml:1599, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:32, Modules/Settings/WindowRulesTab.qml:123, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/BluetoothDetail.qml:411, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:290, Modules/ControlCenter/Details/AudioOutputDetail.qml:307, Modules/ControlCenter/Details/NetworkDetail.qml:1246",
+    "reference": "Modals/WindowRuleModal.qml:1599, dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:33, Modules/Settings/WindowRulesTab.qml:123, Modules/Settings/ClipboardTab.qml:156, Modules/ControlCenter/Details/BluetoothDetail.qml:411, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:290, Modules/ControlCenter/Details/AudioOutputDetail.qml:307, Modules/ControlCenter/Details/NetworkDetail.qml:1256",
     "comment": "pin item action",
     "tags": [
       "plugin-danklauncherkeys",
@@ -18823,7 +18877,7 @@
   {
     "term": "Pinned",
     "context": "Pinned",
-    "reference": "Modals/WindowRuleModal.qml:937, Modals/DankLauncherV2/Controller.qml:194, Modals/DankLauncherV2/Controller.qml:1286, Modules/Settings/WindowRulesTab.qml:56, Modules/ControlCenter/Details/BluetoothDetail.qml:411, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:290, Modules/ControlCenter/Details/AudioOutputDetail.qml:307, Modules/ControlCenter/Details/NetworkDetail.qml:1246",
+    "reference": "Modals/WindowRuleModal.qml:937, Modals/DankLauncherV2/Controller.qml:194, Modals/DankLauncherV2/Controller.qml:1286, Modules/Settings/WindowRulesTab.qml:56, Modules/ControlCenter/Details/BluetoothDetail.qml:411, Modules/ControlCenter/Details/BrightnessDetail.qml:239, Modules/ControlCenter/Details/AudioInputDetail.qml:290, Modules/ControlCenter/Details/AudioOutputDetail.qml:307, Modules/ControlCenter/Details/NetworkDetail.qml:1256",
     "comment": "",
     "tags": [
       "settings",
@@ -18869,7 +18923,7 @@
   {
     "term": "Place independent widgets to left and right of island",
     "context": "Place independent widgets to left and right of island",
-    "reference": "Modules/Settings/DankIslandTab.qml:364",
+    "reference": "Modules/Settings/DankIslandTab.qml:417",
     "comment": "island settings: satellite widgets description",
     "tags": [
       "settings"
@@ -18995,7 +19049,7 @@
   {
     "term": "Playful",
     "context": "Playful",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:329",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:331",
     "comment": "",
     "tags": [
       "settings"
@@ -19196,7 +19250,7 @@
   {
     "term": "Popouts",
     "context": "Popouts",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:434",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:436",
     "comment": "",
     "tags": [
       "settings"
@@ -19205,7 +19259,7 @@
   {
     "term": "Popouts and Modals follow global Animation Speed (disable to customize independently)",
     "context": "Popouts and Modals follow global Animation Speed (disable to customize independently)",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:425",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:427",
     "comment": "",
     "tags": [
       "settings"
@@ -19268,7 +19322,7 @@
   {
     "term": "Port",
     "context": "Port",
-    "reference": "Modules/Settings/PrinterTab.qml:540",
+    "reference": "Modules/Settings/PrinterTab.qml:531",
     "comment": "Label for printer port number input field",
     "tags": [
       "settings"
@@ -19304,7 +19358,7 @@
   {
     "term": "Position",
     "context": "Position",
-    "reference": "Modules/Settings/DockTab.qml:116, Modules/Settings/DankIslandTab.qml:79, Modules/Settings/DankIslandTab.qml:420, Modules/Settings/DankBarTab.qml:549, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2182",
+    "reference": "Modules/Settings/DockTab.qml:116, Modules/Settings/DankIslandTab.qml:80, Modules/Settings/DankIslandTab.qml:473, Modules/Settings/DankBarTab.qml:549, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2182",
     "comment": "island settings: position card title",
     "tags": [
       "settings"
@@ -19359,7 +19413,7 @@
   {
     "term": "Power Action Confirmation",
     "context": "Power Action Confirmation",
-    "reference": "Modules/Settings/PowerSleepTab.qml:511",
+    "reference": "Modules/Settings/PowerSleepTab.qml:495",
     "comment": "",
     "tags": [
       "settings"
@@ -19368,7 +19422,7 @@
   {
     "term": "Power Menu Customization",
     "context": "Power Menu Customization",
-    "reference": "Modules/Settings/PowerSleepTab.qml:381",
+    "reference": "Modules/Settings/PowerSleepTab.qml:365",
     "comment": "",
     "tags": [
       "settings"
@@ -19386,7 +19440,7 @@
   {
     "term": "Power Off",
     "context": "Power Off",
-    "reference": "Services/SessionService.qml:588, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:588, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -19567,7 +19621,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:111, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:1128",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:111, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:941",
     "comment": "",
     "tags": [
       "plugin-dankdesktopweather",
@@ -19578,7 +19632,7 @@
   {
     "term": "Prevent accidental cursor jumps while typing",
     "context": "Prevent accidental cursor jumps while typing",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:253",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:245",
     "comment": "",
     "tags": [
       "settings"
@@ -19706,7 +19760,7 @@
   {
     "term": "Printer Classes",
     "context": "Printer Classes",
-    "reference": "Modules/Settings/PrinterTab.qml:1591",
+    "reference": "Modules/Settings/PrinterTab.qml:1573",
     "comment": "",
     "tags": [
       "settings"
@@ -19733,7 +19787,7 @@
   {
     "term": "Printer name (no spaces)",
     "context": "Printer name (no spaces)",
-    "reference": "Modules/Settings/PrinterTab.qml:781",
+    "reference": "Modules/Settings/PrinterTab.qml:763",
     "comment": "",
     "tags": [
       "settings"
@@ -19742,7 +19796,7 @@
   {
     "term": "Printer reachable",
     "context": "Printer reachable",
-    "reference": "Modules/Settings/PrinterTab.qml:656",
+    "reference": "Modules/Settings/PrinterTab.qml:647",
     "comment": "Status message when test connection to printer succeeds",
     "tags": [
       "settings"
@@ -19751,7 +19805,7 @@
   {
     "term": "Printers",
     "context": "Printers",
-    "reference": "Modals/Settings/SettingsSidebar.qml:373, Modules/Settings/PrinterTab.qml:222, Modules/Settings/PrinterTab.qml:888, Modules/ControlCenter/Models/WidgetModel.qml:257, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:16, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:19",
+    "reference": "Modals/Settings/SettingsSidebar.qml:373, Modules/Settings/PrinterTab.qml:222, Modules/Settings/PrinterTab.qml:870, Modules/ControlCenter/Models/WidgetModel.qml:257, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:16, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:19",
     "comment": "",
     "tags": [
       "settings",
@@ -19950,7 +20004,7 @@
   {
     "term": "Protocol",
     "context": "Protocol",
-    "reference": "Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:565, Modules/ControlCenter/Details/VpnProfileDelegate.qml:68",
+    "reference": "Modules/Settings/NetworkVpnTab.qml:440, Modules/Settings/PrinterTab.qml:556, Modules/ControlCenter/Details/VpnProfileDelegate.qml:68",
     "comment": "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket",
     "tags": [
       "settings",
@@ -20005,7 +20059,7 @@
   {
     "term": "Quality",
     "context": "Quality",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:248",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:249",
     "comment": "",
     "tags": [
       "settings"
@@ -20086,7 +20140,7 @@
   {
     "term": "Rain Chance",
     "context": "Rain Chance",
-    "reference": "Modules/Settings/TimeWeatherTab.qml:1180",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:946",
     "comment": "",
     "tags": [
       "settings"
@@ -20176,7 +20230,7 @@
   {
     "term": "Ready",
     "context": "Ready",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:280, Modules/ControlCenter/Details/NetworkDetail.qml:295",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:290, Modules/ControlCenter/Details/NetworkDetail.qml:305",
     "comment": "hotspot ready status",
     "tags": [
       "shell"
@@ -20185,7 +20239,7 @@
   {
     "term": "Reason",
     "context": "Reason",
-    "reference": "Modules/Settings/PrinterTab.qml:1173",
+    "reference": "Modules/Settings/PrinterTab.qml:1155",
     "comment": "",
     "tags": [
       "settings"
@@ -20194,7 +20248,7 @@
   {
     "term": "Reboot",
     "context": "Reboot",
-    "reference": "Services/SessionService.qml:570, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:570, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -20240,7 +20294,7 @@
   {
     "term": "Recommended available",
     "context": "Recommended available",
-    "reference": "Modules/Settings/PrinterTab.qml:733",
+    "reference": "Modules/Settings/PrinterTab.qml:724",
     "comment": "",
     "tags": [
       "settings"
@@ -20249,7 +20303,7 @@
   {
     "term": "Reduce Motion",
     "context": "Reduce Motion",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:342, Modules/Settings/DankIslandTab.qml:524",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:344, Modules/Settings/DankIslandTab.qml:577",
     "comment": "island settings: reduce motion toggle",
     "tags": [
       "settings"
@@ -20277,7 +20331,7 @@
   {
     "term": "Refresh Weather",
     "context": "Refresh Weather",
-    "reference": "Modules/DankDash/WeatherTab.qml:163, Modules/DankDash/WeatherTab.qml:865",
+    "reference": "Modules/DankDash/WeatherTab.qml:162, Modules/DankDash/WeatherTab.qml:852",
     "comment": "",
     "tags": [
       "shell"
@@ -20331,7 +20385,7 @@
   {
     "term": "Reject Jobs",
     "context": "Reject Jobs",
-    "reference": "Modules/Settings/PrinterTab.qml:1325",
+    "reference": "Modules/Settings/PrinterTab.qml:1307",
     "comment": "",
     "tags": [
       "settings"
@@ -20358,7 +20412,7 @@
   {
     "term": "Release to confirm",
     "context": "Release to confirm",
-    "reference": "Modules/PowerMenu/PowerMenuContent.qml:759",
+    "reference": "Modules/PowerMenu/PowerMenuContent.qml:715",
     "comment": "",
     "tags": [
       "shell"
@@ -20692,7 +20746,7 @@
   {
     "term": "Require holding button/key to confirm power off, restart, suspend, hibernate and logout",
     "context": "Require holding button/key to confirm power off, restart, suspend, hibernate and logout",
-    "reference": "Modules/Settings/PowerSleepTab.qml:518",
+    "reference": "Modules/Settings/PowerSleepTab.qml:502",
     "comment": "",
     "tags": [
       "settings"
@@ -20801,7 +20855,7 @@
   {
     "term": "Reserved Height",
     "context": "Reserved Height",
-    "reference": "Modules/Settings/DankIslandTab.qml:104",
+    "reference": "Modules/Settings/DankIslandTab.qml:105",
     "comment": "island settings: reserved strip height slider",
     "tags": [
       "settings"
@@ -20810,7 +20864,7 @@
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modals/DankLauncherV2/AppEditView.qml:259, Modules/Settings/WidgetsTab.qml:1285, Modules/Settings/KeybindsTab.qml:122, Modules/Settings/DankDashTab.qml:249, Modules/Settings/DankDashTab.qml:264, Modules/Settings/Widgets/SettingsSliderRow.qml:134, Modules/Settings/Widgets/SettingsSliderCard.qml:122, Modules/ControlCenter/Components/EditControls.qml:306",
+    "reference": "Modals/DankLauncherV2/AppEditView.qml:259, Modules/Settings/WidgetsTab.qml:1285, Modules/Settings/KeybindsTab.qml:122, Modules/Settings/DankDashTab.qml:249, Modules/Settings/DankDashTab.qml:264, Modules/Settings/Widgets/SettingsSliderRow.qml:135, Modules/Settings/Widgets/SettingsSliderCard.qml:122, Modules/ControlCenter/Components/EditControls.qml:306",
     "comment": "",
     "tags": [
       "settings",
@@ -20874,7 +20928,7 @@
   {
     "term": "Resize the resting island to align with nearby widgets",
     "context": "Resize the resting island to align with nearby widgets",
-    "reference": "Modules/Settings/DankIslandTab.qml:120",
+    "reference": "Modules/Settings/DankIslandTab.qml:121",
     "comment": "island settings: compact height description",
     "tags": [
       "settings"
@@ -20910,7 +20964,7 @@
   {
     "term": "Restart DMS",
     "context": "Restart DMS",
-    "reference": "Services/SessionService.qml:612, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:612, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -20920,7 +20974,7 @@
   {
     "term": "Restart the DankMaterialShell",
     "context": "Restart the DankMaterialShell",
-    "reference": "Modules/Settings/PowerSleepTab.qml:459",
+    "reference": "Modules/Settings/PowerSleepTab.qml:443",
     "comment": "",
     "tags": [
       "settings"
@@ -20929,7 +20983,7 @@
   {
     "term": "Restart userspace without rebooting the kernel, requires systemd",
     "context": "Restart userspace without rebooting the kernel, requires systemd",
-    "reference": "Modules/Settings/PowerSleepTab.qml:475",
+    "reference": "Modules/Settings/PowerSleepTab.qml:459",
     "comment": "",
     "tags": [
       "settings"
@@ -20974,7 +21028,7 @@
   {
     "term": "Resume",
     "context": "Resume",
-    "reference": "Modules/Settings/PrinterTab.qml:1251, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
+    "reference": "Modules/Settings/PrinterTab.qml:1233, Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:138",
     "comment": "",
     "tags": [
       "settings",
@@ -21021,7 +21075,7 @@
   {
     "term": "Reverse two-finger scrolling direction",
     "context": "Reverse two-finger scrolling direction",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:206",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:204",
     "comment": "",
     "tags": [
       "settings"
@@ -21057,8 +21111,8 @@
   {
     "term": "Right",
     "context": "Right",
-    "reference": "Modules/Notepad/NotepadSettings.qml:434, Modules/Settings/DockTab.qml:126, Modules/Settings/DankIslandTab.qml:179, Modules/Settings/DankIslandTab.qml:192, Modules/Settings/DankIslandTab.qml:205, Modules/Settings/DankBarTab.qml:97, Modules/Settings/DankBarTab.qml:397",
-    "comment": "island settings: battery or control center slot right of the clock | island settings: media or launcher slot right of the clock | island settings: weather slot right of the clock | screen edge position",
+    "reference": "Modules/Notepad/NotepadSettings.qml:434, Modules/Settings/DockTab.qml:126, Modules/Settings/DankIslandTab.qml:180, Modules/Settings/DankIslandTab.qml:193, Modules/Settings/DankIslandTab.qml:206, Modules/Settings/DankIslandTab.qml:219, Modules/Settings/DankIslandTab.qml:245, Modules/Settings/DankBarTab.qml:97, Modules/Settings/DankBarTab.qml:397",
+    "comment": "island settings: battery or control center slot right of the clock | island settings: brightness slot right of the clock | island settings: media or launcher slot right of the clock | island settings: volume slot right of the clock | island settings: weather slot right of the clock | screen edge position",
     "tags": [
       "settings",
       "shell"
@@ -21139,7 +21193,7 @@
   {
     "term": "Ripple Effects",
     "context": "Ripple Effects",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:572",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:574",
     "comment": "",
     "tags": [
       "settings"
@@ -21283,7 +21337,7 @@
   {
     "term": "Running",
     "context": "Running",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:277",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:287",
     "comment": "hotspot active status",
     "tags": [
       "shell"
@@ -21319,7 +21373,7 @@
   {
     "term": "Running in terminal",
     "context": "Running in terminal",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:608",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:595",
     "comment": "",
     "tags": [
       "shell"
@@ -21373,7 +21427,7 @@
   {
     "term": "Satellite Widgets",
     "context": "Satellite Widgets",
-    "reference": "Modules/Settings/DankIslandTab.qml:354",
+    "reference": "Modules/Settings/DankIslandTab.qml:407",
     "comment": "island settings: satellite widgets card title",
     "tags": [
       "settings"
@@ -21382,7 +21436,7 @@
   {
     "term": "Satellites widget to place left or right of the island",
     "context": "Satellites widget to place left or right of the island",
-    "reference": "Modules/Settings/DankIslandTab.qml:447",
+    "reference": "Modules/Settings/DankIslandTab.qml:500",
     "comment": "island settings: satellite widgets hint",
     "tags": [
       "settings"
@@ -21528,7 +21582,7 @@
   {
     "term": "Saved",
     "context": "Saved",
-    "reference": "Modals/Clipboard/ClipboardHeader.qml:55, Modules/Notepad/NotepadTextEditor.qml:1025, Modules/Settings/NetworkWifiTab.qml:572, Modules/ControlCenter/Details/NetworkDetail.qml:1183",
+    "reference": "Modals/Clipboard/ClipboardHeader.qml:55, Modules/Notepad/NotepadTextEditor.qml:1025, Modules/Settings/NetworkWifiTab.qml:572, Modules/ControlCenter/Details/NetworkDetail.qml:1193",
     "comment": "",
     "tags": [
       "settings",
@@ -21565,7 +21619,7 @@
   {
     "term": "Saved item deleted",
     "context": "Saved item deleted",
-    "reference": "Services/ClipboardService.qml:291",
+    "reference": "Services/ClipboardService.qml:293",
     "comment": "",
     "tags": [
       "shell"
@@ -21658,7 +21712,7 @@
   {
     "term": "Screen Edges",
     "context": "Screen Edges",
-    "reference": "Modules/Settings/DankIslandTab.qml:422",
+    "reference": "Modules/Settings/DankIslandTab.qml:475",
     "comment": "island settings: satellites sit at screen edges",
     "tags": [
       "settings"
@@ -21712,7 +21766,7 @@
   {
     "term": "Scroll Method",
     "context": "Scroll Method",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:106, Modules/Settings/MouseTouchpadTab.qml:227",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:110, Modules/Settings/MouseTouchpadTab.qml:229",
     "comment": "",
     "tags": [
       "settings"
@@ -21766,7 +21820,7 @@
   {
     "term": "Scrolling Speed",
     "context": "Scrolling Speed",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:93, Modules/Settings/MouseTouchpadTab.qml:214",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:93, Modules/Settings/MouseTouchpadTab.qml:212",
     "comment": "",
     "tags": [
       "settings"
@@ -21874,7 +21928,7 @@
   {
     "term": "Search themes...",
     "context": "Search themes...",
-    "reference": "Modules/Settings/ThemeBrowser.qml:408",
+    "reference": "Modules/Settings/ThemeBrowser.qml:407",
     "comment": "theme search placeholder",
     "tags": [
       "settings"
@@ -21883,7 +21937,7 @@
   {
     "term": "Search when idle, visualizer when media is playing",
     "context": "Search when idle, visualizer when media is playing",
-    "reference": "Modules/Settings/DankIslandTab.qml:178",
+    "reference": "Modules/Settings/DankIslandTab.qml:179",
     "comment": "island settings: media slot description",
     "tags": [
       "settings"
@@ -21950,7 +22004,7 @@
   {
     "term": "Secured",
     "context": "Secured",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:962, Modules/ControlCenter/Details/NetworkDetail.qml:1177",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:559, Modules/Settings/NetworkWifiTab.qml:962, Modules/ControlCenter/Details/NetworkDetail.qml:1187",
     "comment": "",
     "tags": [
       "settings",
@@ -22240,7 +22294,7 @@
   {
     "term": "Select driver...",
     "context": "Select driver...",
-    "reference": "Modules/Settings/PrinterTab.qml:733",
+    "reference": "Modules/Settings/PrinterTab.qml:724",
     "comment": "",
     "tags": [
       "settings"
@@ -22565,7 +22619,7 @@
   {
     "term": "Set up hotspot",
     "context": "Set up hotspot",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:261",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:271",
     "comment": "hotspot setup action label",
     "tags": [
       "shell"
@@ -22574,7 +22628,7 @@
   {
     "term": "Set up hotspot in Settings",
     "context": "Set up hotspot in Settings",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:273",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:283",
     "comment": "unconfigured hotspot status message",
     "tags": [
       "shell"
@@ -22629,7 +22683,7 @@
   {
     "term": "Setup",
     "context": "Setup",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:433, Modules/Settings/WindowRulesTab.qml:526, Modules/Settings/KeybindsTab.qml:421, Modules/Settings/CompositorLayoutTab.qml:227, Modules/Settings/DisplayConfig/IncludeWarningBox.qml:79, Modules/Settings/Widgets/NiriInputSetupBanner.qml:148, Modules/ControlCenter/Details/NetworkDetail.qml:328",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:433, Modules/Settings/WindowRulesTab.qml:526, Modules/Settings/KeybindsTab.qml:421, Modules/Settings/CompositorLayoutTab.qml:227, Modules/Settings/DisplayConfig/IncludeWarningBox.qml:79, Modules/Settings/Widgets/NiriInputSetupBanner.qml:148, Modules/ControlCenter/Details/NetworkDetail.qml:338",
     "comment": "hotspot setup action",
     "tags": [
       "settings",
@@ -22776,7 +22830,7 @@
   {
     "term": "Short",
     "context": "Short",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:361, Modules/Settings/TypographyMotionTab.qml:444, Modules/Settings/TypographyMotionTab.qml:513, Modules/Settings/NotificationsTab.qml:379",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:363, Modules/Settings/TypographyMotionTab.qml:446, Modules/Settings/TypographyMotionTab.qml:515, Modules/Settings/NotificationsTab.qml:379",
     "comment": "",
     "tags": [
       "settings"
@@ -22866,7 +22920,7 @@
   {
     "term": "Show Badge",
     "context": "Show Badge",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:4086, Modules/Settings/DankIslandTab.qml:334",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:4086, Modules/Settings/DankIslandTab.qml:387",
     "comment": "island settings: unread notification count on the home face",
     "tags": [
       "settings"
@@ -23010,7 +23064,7 @@
   {
     "term": "Show Hibernate",
     "context": "Show Hibernate",
-    "reference": "Modules/Settings/PowerSleepTab.qml:468",
+    "reference": "Modules/Settings/PowerSleepTab.qml:452",
     "comment": "",
     "tags": [
       "settings"
@@ -23082,7 +23136,7 @@
   {
     "term": "Show Lock",
     "context": "Show Lock",
-    "reference": "Modules/Settings/PowerSleepTab.qml:450",
+    "reference": "Modules/Settings/PowerSleepTab.qml:434",
     "comment": "",
     "tags": [
       "settings"
@@ -23091,7 +23145,7 @@
   {
     "term": "Show Log Out",
     "context": "Show Log Out",
-    "reference": "Modules/Settings/PowerSleepTab.qml:442",
+    "reference": "Modules/Settings/PowerSleepTab.qml:426",
     "comment": "",
     "tags": [
       "settings"
@@ -23100,7 +23154,7 @@
   {
     "term": "Show Material Design ripple animations on interactive elements",
     "context": "Show Material Design ripple animations on interactive elements",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:581",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:583",
     "comment": "",
     "tags": [
       "settings"
@@ -23226,7 +23280,7 @@
   {
     "term": "Show Power Off",
     "context": "Show Power Off",
-    "reference": "Modules/Settings/PowerSleepTab.qml:446",
+    "reference": "Modules/Settings/PowerSleepTab.qml:430",
     "comment": "",
     "tags": [
       "settings"
@@ -23262,7 +23316,7 @@
   {
     "term": "Show Reboot",
     "context": "Show Reboot",
-    "reference": "Modules/Settings/PowerSleepTab.qml:438",
+    "reference": "Modules/Settings/PowerSleepTab.qml:422",
     "comment": "",
     "tags": [
       "settings"
@@ -23280,7 +23334,7 @@
   {
     "term": "Show Restart DMS",
     "context": "Show Restart DMS",
-    "reference": "Modules/Settings/PowerSleepTab.qml:458",
+    "reference": "Modules/Settings/PowerSleepTab.qml:442",
     "comment": "",
     "tags": [
       "settings"
@@ -23289,7 +23343,7 @@
   {
     "term": "Show Satellite Widgets",
     "context": "Show Satellite Widgets",
-    "reference": "Modules/Settings/DankIslandTab.qml:363",
+    "reference": "Modules/Settings/DankIslandTab.qml:416",
     "comment": "island settings: satellite widgets toggle",
     "tags": [
       "settings"
@@ -23316,7 +23370,7 @@
   {
     "term": "Show Soft Reboot",
     "context": "Show Soft Reboot",
-    "reference": "Modules/Settings/PowerSleepTab.qml:474",
+    "reference": "Modules/Settings/PowerSleepTab.qml:458",
     "comment": "",
     "tags": [
       "settings"
@@ -23334,7 +23388,7 @@
   {
     "term": "Show Suspend",
     "context": "Show Suspend",
-    "reference": "Modules/Settings/PowerSleepTab.qml:454",
+    "reference": "Modules/Settings/PowerSleepTab.qml:438",
     "comment": "",
     "tags": [
       "settings"
@@ -23352,7 +23406,7 @@
   {
     "term": "Show Switch User",
     "context": "Show Switch User",
-    "reference": "Modules/Settings/PowerSleepTab.qml:463",
+    "reference": "Modules/Settings/PowerSleepTab.qml:447",
     "comment": "",
     "tags": [
       "settings"
@@ -23469,7 +23523,7 @@
   {
     "term": "Show a clickable clock beside compact media details",
     "context": "Show a clickable clock beside compact media details",
-    "reference": "Modules/Settings/DankIslandTab.qml:295",
+    "reference": "Modules/Settings/DankIslandTab.qml:348",
     "comment": "island settings: media clock description",
     "tags": [
       "settings"
@@ -23992,7 +24046,7 @@
   {
     "term": "Smooth",
     "context": "Smooth",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:329",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:331",
     "comment": "",
     "tags": [
       "settings"
@@ -24001,7 +24055,7 @@
   {
     "term": "Smooth cubic deceleration in, quick snap out, clean, elegant curves.",
     "context": "Smooth cubic deceleration in, quick snap out, clean, elegant curves.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:274",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:276",
     "comment": "",
     "tags": [
       "settings"
@@ -24019,7 +24073,7 @@
   {
     "term": "Snap spring-driven motion straight to its target without physics travel",
     "context": "Snap spring-driven motion straight to its target without physics travel",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:343",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:345",
     "comment": "",
     "tags": [
       "settings"
@@ -24037,7 +24091,7 @@
   {
     "term": "Soft Reboot",
     "context": "Soft Reboot",
-    "reference": "Services/SessionService.qml:576, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:576, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -24047,7 +24101,7 @@
   {
     "term": "Solid",
     "context": "Solid",
-    "reference": "Modules/Settings/DankIslandTab.qml:306",
+    "reference": "Modules/Settings/DankIslandTab.qml:359",
     "comment": "island settings: filled battery meter style",
     "tags": [
       "settings"
@@ -24056,7 +24110,7 @@
   {
     "term": "Solid material type or Outline",
     "context": "Solid material type or Outline",
-    "reference": "Modules/Settings/DankIslandTab.qml:304",
+    "reference": "Modules/Settings/DankIslandTab.qml:357",
     "comment": "island settings: battery style description",
     "tags": [
       "settings"
@@ -24182,7 +24236,7 @@
   {
     "term": "Space kept clear for compact island and satellites",
     "context": "Space kept clear for compact island and satellites",
-    "reference": "Modules/Settings/DankIslandTab.qml:105",
+    "reference": "Modules/Settings/DankIslandTab.qml:106",
     "comment": "island settings: reserved height description",
     "tags": [
       "settings"
@@ -24218,7 +24272,7 @@
   {
     "term": "Speed",
     "context": "Speed",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:360, Modules/Settings/TypographyMotionTab.qml:443, Modules/Settings/TypographyMotionTab.qml:512, Modules/Settings/NetworkEthernetTab.qml:302",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:362, Modules/Settings/TypographyMotionTab.qml:445, Modules/Settings/TypographyMotionTab.qml:514, Modules/Settings/NetworkEthernetTab.qml:302",
     "comment": "",
     "tags": [
       "settings"
@@ -24272,7 +24326,7 @@
   {
     "term": "Spring Damping",
     "context": "Spring Damping",
-    "reference": "Modules/Settings/DankIslandTab.qml:547",
+    "reference": "Modules/Settings/DankIslandTab.qml:600",
     "comment": "island settings: spring damping slider",
     "tags": [
       "settings"
@@ -24281,7 +24335,7 @@
   {
     "term": "Spring Mass",
     "context": "Spring Mass",
-    "reference": "Modules/Settings/DankIslandTab.qml:561",
+    "reference": "Modules/Settings/DankIslandTab.qml:614",
     "comment": "island settings: spring mass slider",
     "tags": [
       "settings"
@@ -24290,7 +24344,7 @@
   {
     "term": "Spring Motion",
     "context": "Spring Motion",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:318",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:320",
     "comment": "",
     "tags": [
       "settings"
@@ -24299,7 +24353,7 @@
   {
     "term": "Spring Stiffness",
     "context": "Spring Stiffness",
-    "reference": "Modules/Settings/DankIslandTab.qml:533",
+    "reference": "Modules/Settings/DankIslandTab.qml:586",
     "comment": "island settings: spring stiffness slider",
     "tags": [
       "settings"
@@ -24308,7 +24362,7 @@
   {
     "term": "Spring bezier with overshoot, entry briefly exceeds its target then settles.",
     "context": "Spring bezier with overshoot, entry briefly exceeds its target then settles.",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:276",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:278",
     "comment": "",
     "tags": [
       "settings"
@@ -24317,7 +24371,7 @@
   {
     "term": "Springs carry extra energy and visibly bounce before settling",
     "context": "Springs carry extra energy and visibly bounce before settling",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:324",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:326",
     "comment": "",
     "tags": [
       "settings"
@@ -24344,7 +24398,7 @@
   {
     "term": "Stage the Wayland overlay layer to remain visible over fullscreen apps",
     "context": "Stage the Wayland overlay layer to remain visible over fullscreen apps",
-    "reference": "Modules/Settings/DankIslandTab.qml:96",
+    "reference": "Modules/Settings/DankIslandTab.qml:97",
     "comment": "island settings: overlay layer description",
     "tags": [
       "settings"
@@ -24353,7 +24407,7 @@
   {
     "term": "Standard",
     "context": "Standard",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modals/Greeter/GreeterCompletePage.qml:70, Modules/Settings/TypographyMotionTab.qml:305",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:19, Modals/Greeter/GreeterCompletePage.qml:70, Modules/Settings/TypographyMotionTab.qml:307",
     "comment": "",
     "tags": [
       "plugin-dankdesktopweather",
@@ -24364,7 +24418,7 @@
   {
     "term": "Start",
     "context": "Start",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1452, Modules/Settings/GammaControlTab.qml:239, Modules/Settings/NetworkWifiTab.qml:1291, Modules/Settings/NetworkWifiTab.qml:1600, Modules/ControlCenter/Details/NetworkDetail.qml:86, Modules/DankDash/Overview/CalendarEventEditor.qml:254",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1452, Modules/Settings/GammaControlTab.qml:275, Modules/Settings/NetworkWifiTab.qml:1291, Modules/Settings/NetworkWifiTab.qml:1600, Modules/ControlCenter/Details/NetworkDetail.qml:86, Modules/DankDash/Overview/CalendarEventEditor.qml:254",
     "comment": "hotspot start confirmation action | start hotspot action",
     "tags": [
       "settings",
@@ -24420,7 +24474,7 @@
   {
     "term": "Starting...",
     "context": "Starting...",
-    "reference": "Modules/Settings/NetworkWifiTab.qml:1599, Modules/ControlCenter/Details/NetworkDetail.qml:275",
+    "reference": "Modules/Settings/NetworkWifiTab.qml:1599, Modules/ControlCenter/Details/NetworkDetail.qml:285",
     "comment": "hotspot activation status",
     "tags": [
       "settings",
@@ -24430,7 +24484,7 @@
   {
     "term": "State",
     "context": "State",
-    "reference": "Modules/Settings/PrinterTab.qml:1168, Modules/Settings/NetworkEthernetTab.qml:316",
+    "reference": "Modules/Settings/PrinterTab.qml:1150, Modules/Settings/NetworkEthernetTab.qml:316",
     "comment": "",
     "tags": [
       "settings"
@@ -24457,7 +24511,7 @@
   {
     "term": "Stop ignoring %1",
     "context": "Stop ignoring %1",
-    "reference": "Modules/Settings/SystemUpdaterTab.qml:318, Modules/DankBar/Popouts/SystemUpdatePopout.qml:586",
+    "reference": "Modules/Settings/SystemUpdaterTab.qml:318, Modules/DankBar/Popouts/SystemUpdatePopout.qml:573",
     "comment": "",
     "tags": [
       "settings",
@@ -24557,7 +24611,7 @@
   {
     "term": "Sunrise",
     "context": "Sunrise",
-    "reference": "Services/WeatherService.qml:249, Modules/DankDash/WeatherTab.qml:121, Modules/Settings/GammaControlTab.qml:491",
+    "reference": "Services/WeatherService.qml:249, Modules/DankDash/WeatherTab.qml:121, Modules/Settings/GammaControlTab.qml:527",
     "comment": "",
     "tags": [
       "settings",
@@ -24567,7 +24621,7 @@
   {
     "term": "Sunset",
     "context": "Sunset",
-    "reference": "Services/WeatherService.qml:274, Modules/DankDash/WeatherTab.qml:126, Modules/Settings/GammaControlTab.qml:529",
+    "reference": "Services/WeatherService.qml:274, Modules/DankDash/WeatherTab.qml:126, Modules/Settings/GammaControlTab.qml:565",
     "comment": "",
     "tags": [
       "settings",
@@ -24731,7 +24785,7 @@
   {
     "term": "Suspend",
     "context": "Suspend",
-    "reference": "Services/SessionService.qml:600, Modules/Settings/PowerSleepTab.qml:347, Modules/Settings/PowerSleepTab.qml:406",
+    "reference": "Services/SessionService.qml:600, Modules/Settings/PowerSleepTab.qml:350, Modules/Settings/PowerSleepTab.qml:390",
     "comment": "",
     "tags": [
       "settings",
@@ -24741,7 +24795,7 @@
   {
     "term": "Suspend behavior",
     "context": "Suspend behavior",
-    "reference": "Modules/Settings/PowerSleepTab.qml:346",
+    "reference": "Modules/Settings/PowerSleepTab.qml:349",
     "comment": "",
     "tags": [
       "settings"
@@ -24759,7 +24813,7 @@
   {
     "term": "Suspend then Hibernate",
     "context": "Suspend then Hibernate",
-    "reference": "Modules/Settings/PowerSleepTab.qml:347",
+    "reference": "Modules/Settings/PowerSleepTab.qml:350",
     "comment": "",
     "tags": [
       "settings"
@@ -24786,7 +24840,7 @@
   {
     "term": "Sweep the background into the screen edges",
     "context": "Sweep the background into the screen edges",
-    "reference": "Modules/Settings/DankIslandTab.qml:383",
+    "reference": "Modules/Settings/DankIslandTab.qml:436",
     "comment": "island settings: satellite goth corners description",
     "tags": [
       "settings"
@@ -24867,7 +24921,7 @@
   {
     "term": "Sync Popouts & Modals",
     "context": "Sync Popouts & Modals",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:424",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:426",
     "comment": "",
     "tags": [
       "settings"
@@ -24957,7 +25011,7 @@
   {
     "term": "System",
     "context": "System",
-    "reference": "Modals/ProcessListModal.qml:313, Modals/ProcessListModal.qml:371, Services/AppSearchService.qml:786, Modals/Settings/SettingsSidebar.qml:334, Modules/ProcessList/ProcessListPopout.qml:170, Modules/DankBar/Popouts/SystemUpdatePopout.qml:99, Modules/DankBar/Popouts/SystemUpdatePopout.qml:217",
+    "reference": "Modals/ProcessListModal.qml:313, Modals/ProcessListModal.qml:371, Services/AppSearchService.qml:786, Modals/Settings/SettingsSidebar.qml:334, Modules/ProcessList/ProcessListPopout.qml:170, Modules/DankBar/Popouts/SystemUpdatePopout.qml:99, Modules/DankBar/Popouts/SystemUpdatePopout.qml:204",
     "comment": "",
     "tags": [
       "settings",
@@ -25184,7 +25238,7 @@
   {
     "term": "Tap and Drag",
     "context": "Tap and Drag",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:153",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:151",
     "comment": "",
     "tags": [
       "settings"
@@ -25193,7 +25247,7 @@
   {
     "term": "Tap and drag on the touchpad to move items",
     "context": "Tap and drag on the touchpad to move items",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:154",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:152",
     "comment": "",
     "tags": [
       "settings"
@@ -25202,7 +25256,7 @@
   {
     "term": "Tap the touchpad surface to trigger left click clicks",
     "context": "Tap the touchpad surface to trigger left click clicks",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:145",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:143",
     "comment": "",
     "tags": [
       "settings"
@@ -25211,7 +25265,7 @@
   {
     "term": "Tap to Click",
     "context": "Tap to Click",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:144",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:142",
     "comment": "",
     "tags": [
       "settings"
@@ -25312,7 +25366,7 @@
   {
     "term": "Test Connection",
     "context": "Test Connection",
-    "reference": "Modules/Settings/PrinterTab.qml:597",
+    "reference": "Modules/Settings/PrinterTab.qml:588",
     "comment": "Button to test connection to a printer by IP address",
     "tags": [
       "settings"
@@ -25321,7 +25375,7 @@
   {
     "term": "Test Page",
     "context": "Test Page",
-    "reference": "Modules/Settings/PrinterTab.qml:1291",
+    "reference": "Modules/Settings/PrinterTab.qml:1273",
     "comment": "",
     "tags": [
       "settings"
@@ -25339,7 +25393,7 @@
   {
     "term": "Testing...",
     "context": "Testing...",
-    "reference": "Modules/Settings/PrinterTab.qml:597",
+    "reference": "Modules/Settings/PrinterTab.qml:588",
     "comment": "Button state while testing printer connection",
     "tags": [
       "settings"
@@ -25667,7 +25721,7 @@
   {
     "term": "This will delete all unpinned entries. %1 pinned entries will be kept.",
     "context": "This will delete all unpinned entries. %1 pinned entries will be kept.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:156, Modules/DankBar/DankBarContent.qml:921",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:160, Modules/DankBar/DankBarContent.qml:921",
     "comment": "",
     "tags": [
       "shell"
@@ -25676,7 +25730,7 @@
   {
     "term": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
     "context": "This will delete the %1 entries matching the current filter. Pinned entries are kept.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:150",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:154",
     "comment": "clipboard modal: clear confirmation while a search filter is active, %1 is the number of matching entries",
     "tags": [
       "shell"
@@ -25695,7 +25749,7 @@
   {
     "term": "This will permanently delete all clipboard history.",
     "context": "This will permanently delete all clipboard history.",
-    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:156, Modules/DankBar/DankBarContent.qml:921",
+    "reference": "Modals/Clipboard/ClipboardHistoryContent.qml:160, Modules/DankBar/DankBarContent.qml:921",
     "comment": "",
     "tags": [
       "shell"
@@ -25704,7 +25758,7 @@
   {
     "term": "This will permanently remove this saved clipboard item. This action cannot be undone.",
     "context": "This will permanently remove this saved clipboard item. This action cannot be undone.",
-    "reference": "Services/ClipboardService.qml:281",
+    "reference": "Services/ClipboardService.qml:283",
     "comment": "",
     "tags": [
       "shell"
@@ -25786,7 +25840,7 @@
   {
     "term": "Time",
     "context": "Time",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1384, Modules/Settings/GammaControlTab.qml:171, Modules/Settings/WallpaperTab.qml:969",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1384, Modules/Settings/GammaControlTab.qml:207, Modules/Settings/WallpaperTab.qml:969",
     "comment": "theme auto mode tab | wallpaper cycling mode tab",
     "tags": [
       "settings"
@@ -25804,7 +25858,7 @@
   {
     "term": "Time & Weather",
     "context": "Time & Weather",
-    "reference": "Modals/Settings/SettingsSidebar.qml:105, Modules/Settings/DankIslandTab.qml:238",
+    "reference": "Modals/Settings/SettingsSidebar.qml:105, Modules/Settings/DankIslandTab.qml:291",
     "comment": "island settings: button to weather tab",
     "tags": [
       "settings"
@@ -26111,7 +26165,7 @@
   {
     "term": "Tools icon opens Control Center",
     "context": "Tools icon opens Control Center",
-    "reference": "Modules/Settings/DankIslandTab.qml:191",
+    "reference": "Modules/Settings/DankIslandTab.qml:192",
     "comment": "island settings: status slot description without battery",
     "tags": [
       "settings"
@@ -26219,7 +26273,7 @@
   {
     "term": "Touchpad Settings",
     "context": "Touchpad Settings",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:137",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:135",
     "comment": "",
     "tags": [
       "settings"
@@ -26228,7 +26282,7 @@
   {
     "term": "Touchpad Speed",
     "context": "Touchpad Speed",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:171",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:169",
     "comment": "",
     "tags": [
       "settings"
@@ -26246,7 +26300,7 @@
   {
     "term": "Transition Duration",
     "context": "Transition Duration",
-    "reference": "Modules/Settings/GammaControlTab.qml:326",
+    "reference": "Modules/Settings/GammaControlTab.qml:362",
     "comment": "",
     "tags": [
       "settings"
@@ -26430,7 +26484,7 @@
   {
     "term": "Two Finger",
     "context": "Two Finger",
-    "reference": "Modules/Settings/MouseTouchpadTab.qml:229",
+    "reference": "Modules/Settings/MouseTouchpadTab.qml:231",
     "comment": "",
     "tags": [
       "settings"
@@ -26511,7 +26565,7 @@
   {
     "term": "Unavailable",
     "context": "Unavailable",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:214, Modules/Settings/WidgetsTab.qml:990, Modules/Settings/NetworkCellularTab.qml:52, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:963, Modules/ControlCenter/Details/AudioPortSelector.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:575, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:117",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:459, Modules/Settings/NetworkVpnTab.qml:82, Modules/Settings/PrinterTab.qml:214, Modules/Settings/WidgetsTab.qml:990, Modules/Settings/NetworkCellularTab.qml:52, Modules/Settings/NetworkEthernetTab.qml:167, Modules/Settings/NetworkWifiTab.qml:963, Modules/ControlCenter/Details/AudioPortSelector.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:585, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:117",
     "comment": "Phone Connect unavailable status | audio port availability status",
     "tags": [
       "plugin-dankkdeconnect",
@@ -26594,7 +26648,7 @@
   {
     "term": "Unknown",
     "context": "Unknown",
-    "reference": "Common/Theme.qml:1561, Services/WeatherService.qml:155, Services/WeatherService.qml:736, Services/WeatherService.qml:737, Services/WeatherService.qml:778, Services/WeatherService.qml:779, Services/WeatherService.qml:814, Services/WeatherService.qml:815, Services/WeatherService.qml:1018, Services/WeatherService.qml:1019, Services/BatteryService.qml:452, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:534, Modules/Lock/LockScreenContent.qml:654, Modules/Lock/LockScreenContent.qml:750, Modules/Settings/PluginBrowser.qml:1355, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:124, Modules/Settings/PrinterTab.qml:1659, Modules/Settings/PluginCard.qml:240, Modules/Settings/WidgetsTab.qml:987, Modules/Settings/NetworkCellularTab.qml:142, Modules/Settings/NetworkCellularTab.qml:153, Modules/Settings/NetworkCellularTab.qml:269, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:471, Modules/Settings/NotificationsTab.qml:789, Modules/Settings/NetworkWifiTab.qml:530, Modules/Settings/NetworkWifiTab.qml:940, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Details/NetworkDetail.qml:666, Modules/ControlCenter/Details/NetworkDetail.qml:715, Modules/ControlCenter/Components/HeaderPane.qml:73, Modules/ControlCenter/Components/DragDropGrid.qml:511, Modules/ControlCenter/Components/DragDropGrid.qml:767, Modules/DankDash/Overview/MediaOverviewCard.qml:77, Modules/DankBar/Popouts/BatteryPopout.qml:342, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:16, Modules/DankBar/Widgets/SystemTrayBar.qml:1894",
+    "reference": "Common/Theme.qml:1561, Services/WeatherService.qml:155, Services/WeatherService.qml:736, Services/WeatherService.qml:737, Services/WeatherService.qml:778, Services/WeatherService.qml:779, Services/WeatherService.qml:814, Services/WeatherService.qml:815, Services/WeatherService.qml:1018, Services/WeatherService.qml:1019, Services/BatteryService.qml:452, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1582, dms-plugins/DankKDEConnect/components/DeviceCard.qml:298, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:741, Modules/Lock/LockScreenContent.qml:534, Modules/Lock/LockScreenContent.qml:654, Modules/Lock/LockScreenContent.qml:750, Modules/Settings/PluginBrowser.qml:1355, Modules/Settings/NetworkStatusTab.qml:79, Modules/Settings/NetworkStatusTab.qml:124, Modules/Settings/PrinterTab.qml:1641, Modules/Settings/PluginCard.qml:240, Modules/Settings/WidgetsTab.qml:987, Modules/Settings/NetworkCellularTab.qml:142, Modules/Settings/NetworkCellularTab.qml:153, Modules/Settings/NetworkCellularTab.qml:269, Modules/Settings/NetworkEthernetTab.qml:146, Modules/Settings/NetworkEthernetTab.qml:169, Modules/Settings/NetworkEthernetTab.qml:317, Modules/Settings/NetworkEthernetTab.qml:428, Modules/Settings/NotificationsTab.qml:471, Modules/Settings/NotificationsTab.qml:789, Modules/Settings/NetworkWifiTab.qml:530, Modules/Settings/NetworkWifiTab.qml:940, Modules/ControlCenter/Details/BatteryDetail.qml:184, Modules/ControlCenter/Details/NetworkDetail.qml:676, Modules/ControlCenter/Details/NetworkDetail.qml:725, Modules/ControlCenter/Components/HeaderPane.qml:73, Modules/ControlCenter/Components/DragDropGrid.qml:511, Modules/ControlCenter/Components/DragDropGrid.qml:767, Modules/DankDash/Overview/MediaOverviewCard.qml:76, Modules/DankBar/Popouts/BatteryPopout.qml:342, Modules/DankBar/Widgets/FocusedWindowContextMenu.qml:16, Modules/DankBar/Widgets/SystemTrayBar.qml:1894",
     "comment": "KDE Connect unknown device status | Status | battery status | power profile option | unknown author | widget status",
     "tags": [
       "plugin-dankkdeconnect",
@@ -26614,8 +26668,8 @@
   {
     "term": "Unknown Artist",
     "context": "Unknown Artist",
-    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1836, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1842, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, Modules/DankDash/MediaPlayerIslandChrome.qml:27, Modules/DankDash/MediaDropdownOverlay.qml:611, Modules/DankDash/MediaPlayerTab.qml:615, Modules/DankIsland/IslandMediaSource.qml:16, Modules/OSD/MediaPlaybackOSD.qml:380, Modules/DankDash/Overview/MediaOverviewCard.qml:88",
-    "comment": "island media face: fallback artist | island media player: fallback artist",
+    "reference": "dms-plugins/DankKDEConnect/DankKDEConnect.qml:1836, dms-plugins/DankKDEConnect/DankKDEConnect.qml:1842, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1388, dms-plugins/DankKDEConnect/components/KDEConnectDetailContent.qml:1394, Modules/DankDash/MediaPlayerIslandChrome.qml:27, Modules/DankDash/MediaDropdownOverlay.qml:620, Modules/DankDash/MediaPlayerDashChrome.qml:85, Modules/DankIsland/IslandMediaSource.qml:16, Modules/OSD/MediaPlaybackOSD.qml:380, Modules/DankDash/Overview/MediaOverviewCard.qml:87",
+    "comment": "island media face: fallback artist",
     "tags": [
       "plugin-dankkdeconnect",
       "shell"
@@ -26624,7 +26678,7 @@
   {
     "term": "Unknown Config",
     "context": "Unknown Config",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:858",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:868",
     "comment": "",
     "tags": [
       "shell"
@@ -26669,7 +26723,7 @@
   {
     "term": "Unknown Network",
     "context": "Unknown Network",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:1120",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:1130",
     "comment": "",
     "tags": [
       "shell"
@@ -26687,8 +26741,8 @@
   {
     "term": "Unknown Track",
     "context": "Unknown Track",
-    "reference": "Modules/DankDash/MediaPlayerIslandChrome.qml:26, Modules/DankDash/MediaPlayerTab.qml:603, Modules/DankIsland/IslandMediaSource.qml:15",
-    "comment": "island media face: fallback title | island media player: fallback title",
+    "reference": "Modules/DankDash/MediaPlayerIslandChrome.qml:26, Modules/DankDash/MediaPlayerDashChrome.qml:73, Modules/DankIsland/IslandMediaSource.qml:15",
+    "comment": "island media face: fallback title",
     "tags": [
       "shell"
     ]
@@ -26750,7 +26804,7 @@
   {
     "term": "Unpin",
     "context": "Unpin",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:32",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:165, Modals/Clipboard/ClipboardContextMenu.qml:33",
     "comment": "",
     "tags": [
       "plugin-danklauncherkeys",
@@ -26769,7 +26823,7 @@
   {
     "term": "Unread notification count beside the clock",
     "context": "Unread notification count beside the clock",
-    "reference": "Modules/Settings/DankIslandTab.qml:335",
+    "reference": "Modules/Settings/DankIslandTab.qml:388",
     "comment": "island settings: notification badge description",
     "tags": [
       "settings"
@@ -26879,7 +26933,7 @@
   {
     "term": "Update All",
     "context": "Update All",
-    "reference": "Modules/Settings/PluginsTab.qml:293, Modules/Settings/PluginUpdatesDialog.qml:292, Modules/DankBar/Popouts/SystemUpdatePopout.qml:253",
+    "reference": "Modules/Settings/PluginsTab.qml:293, Modules/Settings/PluginUpdatesDialog.qml:292, Modules/DankBar/Popouts/SystemUpdatePopout.qml:240",
     "comment": "",
     "tags": [
       "settings",
@@ -26989,7 +27043,7 @@
   {
     "term": "Use Grid Layout",
     "context": "Use Grid Layout",
-    "reference": "Modules/Settings/PowerSleepTab.qml:395",
+    "reference": "Modules/Settings/PowerSleepTab.qml:379",
     "comment": "",
     "tags": [
       "settings"
@@ -27052,7 +27106,7 @@
   {
     "term": "Use Overlay Layer",
     "context": "Use Overlay Layer",
-    "reference": "Modules/Settings/DockTab.qml:95, Modules/Settings/LauncherTab.qml:175, Modules/Settings/DankIslandTab.qml:95, Modules/Settings/DankBarTab.qml:881, Modules/Settings/ClipboardTab.qml:490",
+    "reference": "Modules/Settings/DockTab.qml:95, Modules/Settings/LauncherTab.qml:175, Modules/Settings/DankIslandTab.qml:96, Modules/Settings/DankBarTab.qml:881, Modules/Settings/ClipboardTab.qml:490",
     "comment": "bar layer toggle: use Wayland overlay layer | clipboard layer toggle: use Wayland overlay layer | dock layer toggle: use Wayland overlay layer | island layer toggle: use Wayland overlay layer | launcher layer toggle: use Wayland overlay layer",
     "tags": [
       "settings"
@@ -27431,7 +27485,7 @@
   {
     "term": "Uses sunrise/sunset times to automatically adjust night mode based on your location.",
     "context": "Uses sunrise/sunset times to automatically adjust night mode based on your location.",
-    "reference": "Modules/Settings/GammaControlTab.qml:340",
+    "reference": "Modules/Settings/GammaControlTab.qml:376",
     "comment": "",
     "tags": [
       "settings"
@@ -27668,7 +27722,7 @@
   {
     "term": "Very High",
     "context": "Very High",
-    "reference": "Modules/Settings/TypographyMotionTab.qml:249",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:250",
     "comment": "quality level option",
     "tags": [
       "settings"
@@ -27732,7 +27786,7 @@
   {
     "term": "Visibility",
     "context": "Visibility",
-    "reference": "Modules/DankDash/WeatherForecastCard.qml:100, Modules/Settings/DockTab.qml:40, Modules/Settings/TimeWeatherTab.qml:1226, Modules/Settings/DankBarTab.qml:703",
+    "reference": "Modules/DankDash/WeatherForecastCard.qml:100, Modules/Settings/DockTab.qml:40, Modules/Settings/TimeWeatherTab.qml:951, Modules/Settings/DankBarTab.qml:703",
     "comment": "",
     "tags": [
       "settings",
@@ -27778,8 +27832,8 @@
   {
     "term": "Volume",
     "context": "Volume",
-    "reference": "Modules/DankIsland/IslandSystemSource.qml:22, Modules/Settings/WidgetsTabSection.qml:2298, Modules/Settings/WidgetsTabSection.qml:2511, Modules/Settings/OSDTab.qml:93",
-    "comment": "island system face: volume title",
+    "reference": "Modules/DankIsland/IslandSystemSource.qml:22, Modules/Settings/WidgetsTabSection.qml:2298, Modules/Settings/WidgetsTabSection.qml:2511, Modules/Settings/DankIslandTab.qml:217, Modules/Settings/OSDTab.qml:93",
+    "comment": "island settings: volume slot row | island system face: volume title",
     "tags": [
       "settings",
       "shell"
@@ -27801,6 +27855,15 @@
     "comment": "",
     "tags": [
       "shell"
+    ]
+  },
+  {
+    "term": "Volume Style",
+    "context": "Volume Style",
+    "reference": "Modules/Settings/DankIslandTab.qml:230",
+    "comment": "island settings: volume display mode row",
+    "tags": [
+      "settings"
     ]
   },
   {
@@ -27852,7 +27915,7 @@
   {
     "term": "Wallpaper",
     "context": "Wallpaper",
-    "reference": "Modals/Greeter/GreeterCompletePage.qml:539, Modals/Settings/SettingsSidebar.qml:87, Modules/DankIsland/DankIslandSurface.qml:482, Modules/Settings/DisplayWidgetsTab.qml:47, Modules/Settings/WallpaperTab.qml:63, Modules/Settings/KeybindItem.qml:1143, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1159",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:539, Modals/Settings/SettingsSidebar.qml:87, Modules/DankIsland/DankIslandSurface.qml:403, Modules/Settings/DisplayWidgetsTab.qml:47, Modules/Settings/WallpaperTab.qml:63, Modules/Settings/KeybindItem.qml:1143, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1159",
     "comment": "greeter settings link | island compact face: wallpaper picker label",
     "tags": [
       "settings",
@@ -27917,7 +27980,7 @@
   {
     "term": "Warm color temperature to apply",
     "context": "Warm color temperature to apply",
-    "reference": "Modules/Settings/GammaControlTab.qml:94",
+    "reference": "Modules/Settings/GammaControlTab.qml:130",
     "comment": "",
     "tags": [
       "settings"
@@ -27953,7 +28016,7 @@
   {
     "term": "Weather",
     "context": "Weather",
-    "reference": "Modules/DankDash/DankDashPopout.qml:30, Modules/DankIsland/DankIslandSurface.qml:502, Modules/Settings/GreeterTab.qml:537, Modules/Settings/TimeWeatherTab.qml:465, Modules/Settings/LockScreenTab.qml:347, Modules/Settings/DankIslandTab.qml:203, Modules/Settings/KeybindItem.qml:1145, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1162, Modules/Settings/DankDashTab.qml:37",
+    "reference": "Modules/DankDash/DankDashPopout.qml:30, Modules/DankIsland/DankIslandSurface.qml:423, Modules/Settings/GreeterTab.qml:537, Modules/Settings/TimeWeatherTab.qml:465, Modules/Settings/LockScreenTab.qml:347, Modules/Settings/DankIslandTab.qml:204, Modules/Settings/KeybindItem.qml:1145, Modules/Settings/KeybindItem.qml:1150, Modules/Settings/KeybindItem.qml:1162, Modules/Settings/DankDashTab.qml:37",
     "comment": "Enable weather display on the lock screen window | Enable weather display on the login screen | island compact face: weather label | island settings: weather slot row",
     "tags": [
       "settings",
@@ -27972,7 +28035,7 @@
   {
     "term": "Weather icon and temperature open the weather activity",
     "context": "Weather icon and temperature open the weather activity",
-    "reference": "Modules/Settings/DankIslandTab.qml:204",
+    "reference": "Modules/Settings/DankIslandTab.qml:205",
     "comment": "island settings: weather slot description",
     "tags": [
       "settings"
@@ -28080,7 +28143,7 @@
   {
     "term": "WiFi",
     "context": "WiFi",
-    "reference": "Modals/Settings/SettingsSidebar.qml:279, Modules/Settings/NetworkStatusTab.qml:118, Modules/Settings/NetworkStatusTab.qml:177, Modules/Settings/NetworkWifiTab.qml:79, Modules/ControlCenter/Details/NetworkDetail.qml:176",
+    "reference": "Modals/Settings/SettingsSidebar.qml:279, Modules/Settings/NetworkStatusTab.qml:118, Modules/Settings/NetworkStatusTab.qml:177, Modules/Settings/NetworkWifiTab.qml:79, Modules/ControlCenter/Details/NetworkDetail.qml:186",
     "comment": "",
     "tags": [
       "settings",
@@ -28108,7 +28171,7 @@
   {
     "term": "WiFi disabled",
     "context": "WiFi disabled",
-    "reference": "Services/DMSNetworkService.qml:784, Modules/ControlCenter/Details/NetworkDetail.qml:279",
+    "reference": "Services/DMSNetworkService.qml:784, Modules/ControlCenter/Details/NetworkDetail.qml:289",
     "comment": "hotspot unavailable status",
     "tags": [
       "shell"
@@ -28145,7 +28208,7 @@
   {
     "term": "WiFi is off",
     "context": "WiFi is off",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:456",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:466",
     "comment": "",
     "tags": [
       "shell"
@@ -28316,7 +28379,7 @@
   {
     "term": "Will disconnect \"%1\"",
     "context": "Will disconnect \"%1\"",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:310",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:320",
     "comment": "hotspot WiFi disconnection warning",
     "tags": [
       "shell"
@@ -28325,7 +28388,7 @@
   {
     "term": "Wind",
     "context": "Wind",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:106, Modules/Settings/TimeWeatherTab.qml:1069",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:425, Modules/DankDash/WeatherTab.qml:106, Modules/Settings/TimeWeatherTab.qml:936",
     "comment": "",
     "tags": [
       "plugin-dankdesktopweather",
@@ -28611,7 +28674,7 @@
   {
     "term": "Yes",
     "context": "Yes",
-    "reference": "Modules/Settings/PrinterTab.qml:1188, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2200, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2220, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2222",
+    "reference": "Modules/Settings/PrinterTab.qml:1170, Modules/Settings/WindowRulesTab.qml:77, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2196, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2200, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2210, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2220, Modules/Settings/DisplayConfig/DisplayConfigState.qml:2222",
     "comment": "",
     "tags": [
       "settings"
@@ -28701,7 +28764,7 @@
   {
     "term": "Your system is up to date!",
     "context": "Your system is up to date!",
-    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:357",
+    "reference": "Modules/DankBar/Popouts/SystemUpdatePopout.qml:344",
     "comment": "",
     "tags": [
       "shell"

@@ -73,7 +73,6 @@ Singleton {
 
     Component.onCompleted: {
         fetchOutputs();
-        Paths.mkdir(screenshotsDir);
         generateNiriInputConfig();
     }
 

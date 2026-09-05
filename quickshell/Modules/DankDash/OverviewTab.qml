@@ -49,7 +49,7 @@ Item {
         UserInfoCard {
             x: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.2 - Theme.spacingM
             y: 0
-            width: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.8
+            width: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.8 + Theme.spacingM
             height: 100
             live: root.live
         }

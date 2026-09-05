@@ -60,11 +60,22 @@ Item {
     }
 
     signal closeRequested
-    signal deviceSelected(var device)
-    signal playerSelected(var player)
-    signal volumeChanged(real volume)
     signal panelEntered
     signal panelExited
+
+    function applyVolume(volume) {
+        if (usePlayerVolume) {
+            activePlayer.volume = volume;
+            return;
+        }
+        if (AudioService.sink?.audio)
+            AudioService.sink.audio.volume = volume;
+    }
+
+    function selectPlayer(player) {
+        MprisController.switchActivePlayer(player);
+        root.closeRequested();
+    }
 
     property int __panelHoverCount: 0
 
@@ -100,7 +111,7 @@ Item {
         _wheelAccum -= notches * 120;
         SessionData.suppressOSDTemporarily();
         const next = currentVolume + notches * AudioService.wheelVolumeStep / 100;
-        root.volumeChanged(Math.max(0, Math.min(1, next)));
+        root.applyVolume(Math.max(0, Math.min(1, next)));
     }
 
     readonly property Item activePanel: __activePanel
@@ -257,7 +268,7 @@ Item {
                             return;
                         const ratio = 1.0 - (mouse.y / height);
                         const volume = Math.max(0, Math.min(1, ratio));
-                        root.volumeChanged(volume);
+                        root.applyVolume(volume);
                     }
                 }
             }
@@ -464,10 +475,8 @@ Item {
                                         }
                                         return;
                                     }
-                                    if (modelData && modelData.name) {
+                                    if (modelData && modelData.name)
                                         AudioService.setDefaultSinkByName(modelData.name);
-                                        root.deviceSelected(modelData);
-                                    }
                                 }
                                 onEntered: panelAreaEntered()
                                 onExited: panelAreaExited()
@@ -648,9 +657,8 @@ Item {
                                         }
                                         return;
                                     }
-                                    if (modelData?.identity) {
-                                        root.playerSelected(modelData);
-                                    }
+                                    if (modelData?.identity)
+                                        root.selectPlayer(modelData);
                                 }
                                 onEntered: panelAreaEntered()
                                 onExited: panelAreaExited()

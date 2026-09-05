@@ -454,7 +454,7 @@ Item {
     readonly property real _wingR: Math.max(0, wingtipsRadius)
 
     // Shadow buffer: extra window space for shadow to render beyond bar bounds
-    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (renderBarConfig?.shadowIntensity ?? 0) > 0
+    readonly property bool _shadowActive: Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)
     readonly property real _shadowBuffer: {
         if (!_shadowActive)
             return 0;
@@ -602,7 +602,7 @@ Item {
     }
 
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.snap(Math.max(barWindow.widgetThickness + (barConfig?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))), _dpr)
+    readonly property real effectiveBarThickness: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameBarSize : Theme.barThickness(barConfig?.innerPadding ?? 4, _dpr)
     readonly property real effectiveBarLengthPadding: {
         if ((FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) || (flattenForMaximizedWindow && hasMaximizedToplevel))
             return 0;
@@ -610,8 +610,8 @@ Item {
         const length = isVertical ? height : width;
         return length > 0 ? Math.min(pad, Math.max(0, length / 2 - effectiveSpacing)) : pad;
     }
-    readonly property bool effectiveOpenOnOverview: FrameTransitionState.effectiveFrameEnabled ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
-    readonly property real widgetThickness: Theme.snap(Math.max(20, 26 + (barConfig?.innerPadding ?? 4) * 0.6), _dpr)
+    readonly property bool effectiveOpenOnOverview: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? SettingsData.frameShowOnOverview : (barConfig?.openOnOverview ?? false)
+    readonly property real widgetThickness: Theme.barWidgetThickness(barConfig?.innerPadding ?? 4, _dpr)
 
     readonly property bool hasAdjacentTopBar: {
         if (barConfig?.autoHide ?? false)
@@ -629,12 +629,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Top && bc.position !== 0)
                 return false;
-            const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
-            if (!onThisScreen)
-                return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
-                return false;
-            return true;
+            return SettingsData.barConfigCoversScreen(bc, barWindow.screen);
         });
     }
 
@@ -654,12 +649,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Bottom && bc.position !== 1)
                 return false;
-            const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
-            if (!onThisScreen)
-                return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
-                return false;
-            return true;
+            return SettingsData.barConfigCoversScreen(bc, barWindow.screen);
         });
         return result;
     }
@@ -680,12 +670,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Left && bc.position !== 2)
                 return false;
-            const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
-            if (!onThisScreen)
-                return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
-                return false;
-            return true;
+            return SettingsData.barConfigCoversScreen(bc, barWindow.screen);
         });
         return result;
     }
@@ -706,12 +691,7 @@ Item {
                 return false;
             if (bc.position !== SettingsData.Position.Right && bc.position !== 3)
                 return false;
-            const onThisScreen = bc.screenPreferences.includes(screenName) || bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all");
-            if (!onThisScreen)
-                return false;
-            if (bc.showOnLastDisplay && screenName !== barWindow.screenName)
-                return false;
-            return true;
+            return SettingsData.barConfigCoversScreen(bc, barWindow.screen);
         });
         return result;
     }

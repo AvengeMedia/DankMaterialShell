@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Програми та команди для автоматичного запуску при вході в систему"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Застосується під час наступної синхронізації вікна входу"
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "Межа з фоном"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Знизу"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "Повзунок яскравості"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Значення яскравості"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "Поточний робочий простір"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "Відображення поточного часу та дати"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "Ігри"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Керування гамою"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "Повзунок гучності"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Гучність, яскравість та інші системні екранні індикатори"

@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 const niriScreenshotTimeout = 5 * time.Second
@@ -24,11 +26,7 @@ func CaptureNiriWindowImage(showPointer bool) (image.Image, error) {
 		return nil, fmt.Errorf("NIRI_SOCKET not set")
 	}
 
-	dir := os.Getenv("XDG_RUNTIME_DIR")
-	if dir == "" {
-		dir = os.TempDir()
-	}
-	path := filepath.Join(dir, fmt.Sprintf("dms-window-%d.png", os.Getpid()))
+	path := filepath.Join(utils.RuntimeDir(), fmt.Sprintf("dms-window-%d.png", os.Getpid()))
 
 	events, err := subscribeNiriEvents(socket)
 	if err != nil {
@@ -156,7 +154,11 @@ func (s *Screenshoter) captureNiriWindow() (*CaptureResult, error) {
 	}
 
 	return &CaptureResult{
-		Buffer:    buf,
+		Buffer: buf,
+		Region: Region{
+			Width:  int32(img.Bounds().Dx()),
+			Height: int32(img.Bounds().Dy()),
+		},
 		YInverted: false,
 		Format:    uint32(FormatARGB8888),
 		Scale:     scale,

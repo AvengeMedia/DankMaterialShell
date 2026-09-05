@@ -19,13 +19,10 @@ if [[ -n "${QS_ARGS:-}" ]]; then
     # shellcheck disable=SC2206
     qs_args=($QS_ARGS)
 else
-    repo_shell="$(cd "$(dirname "$0")/.." && pwd)/quickshell/shell.qml"
-    config_path="$("$QS_BIN" list --all 2>/dev/null | awk -F': ' -v want="$repo_shell" '/Config path:/ { if ($2 == want) { print $2; found = 1; exit } if (!first) first = $2 } END { if (!found) print first }')"
-    if [[ -n "$config_path" ]]; then
-        qs_args=(-p "$config_path")
-    else
-        qs_args=(-c dms)
-    fi
+    state_file="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/danklinux.path"
+    config_path="$(cat "$state_file" 2>/dev/null || true)"
+    [[ -n "$config_path" ]] || { echo "no running dms shell ($state_file missing)" >&2; exit 1; }
+    qs_args=(-p "$config_path")
 fi
 
 run_dms() { "$DMS_BIN" ipc call "${call[@]}"; }

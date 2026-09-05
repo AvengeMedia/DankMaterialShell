@@ -193,10 +193,10 @@ Item {
                                 onClicked: PopoutService.showHiddenNetworkModal()
                             }
 
-                            DankActionButton {
-                                iconName: "refresh"
+                            DankRefreshButton {
                                 buttonSize: 32
-                                visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling && !NetworkService.isScanning
+                                visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
+                                busy: NetworkService.isScanning
                                 onClicked: NetworkService.scanWifi()
                             }
 

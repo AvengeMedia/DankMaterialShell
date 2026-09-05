@@ -202,7 +202,7 @@ StyledRect {
                         onClicked: {
                             const currentPluginName = root.pluginName;
                             const currentPluginId = root.pluginId;
-                            DMSService.update(currentPluginName, response => {
+                            DMSService.update(currentPluginId, response => {
                                 if (response.error) {
                                     ToastService.showError(I18n.tr("Update failed: %1").arg(response.error));
                                     return;
@@ -244,8 +244,9 @@ StyledRect {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            const currentPluginId = root.pluginId;
                             const currentPluginName = root.pluginName;
-                            DMSService.uninstall(currentPluginName, response => {
+                            DMSService.uninstall(currentPluginId, response => {
                                 if (response.error) {
                                     ToastService.showError(I18n.tr("Uninstall failed: %1").arg(response.error));
                                     return;

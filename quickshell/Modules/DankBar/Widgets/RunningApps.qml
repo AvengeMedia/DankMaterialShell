@@ -34,9 +34,7 @@ BasePill {
         if (barThickness > 0 && barSpacing > 0) {
             return barThickness + barSpacing;
         }
-        const innerPadding = barConfig?.innerPadding ?? 4;
-        const spacing = barConfig?.spacing ?? 4;
-        return Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding)) + spacing;
+        return Theme.barThickness(barConfig?.innerPadding ?? 4, CompositorService.getScreenScale(parentScreen)) + (barConfig?.spacing ?? 4);
     }
 
     readonly property var barBounds: {
@@ -784,7 +782,7 @@ BasePill {
                 if (triggerBarThickness > 0 && triggerBarSpacing > 0) {
                     return triggerBarThickness + triggerBarSpacing;
                 }
-                return Math.max(26 + (barConfig?.innerPadding ?? 4) * 0.6, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))) + (barConfig?.spacing ?? 4);
+                return Theme.barThickness(barConfig?.innerPadding ?? 4, CompositorService.getScreenScale(contextMenuWindow.screen)) + (barConfig?.spacing ?? 4);
             }
 
             property var barBounds: {

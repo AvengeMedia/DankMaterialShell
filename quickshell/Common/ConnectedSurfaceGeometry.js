@@ -38,8 +38,8 @@ function animatedBodyRect(descriptor, dpr) {
     return {
         "x": snap(rect.x + (side === "right" ? dx : 0), dpr),
         "y": snap(rect.y + (side === "bottom" ? dy : 0), dpr),
-        "width": Math.max(0, snap(rect.width - Math.abs(dx), dpr)),
-        "height": Math.max(0, snap(rect.height - Math.abs(dy), dpr)),
+        "width": Math.max(0, snap(rect.width - (side === "left" ? -dx : dx), dpr)),
+        "height": Math.max(0, snap(rect.height - (side === "top" ? -dy : dy), dpr)),
         "dx": snap(dx, dpr),
         "dy": snap(dy, dpr)
     };

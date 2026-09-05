@@ -698,6 +698,9 @@
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "登入時自動啟動的應用程式與指令"
   },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
+  },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
   },
@@ -1259,6 +1262,9 @@
   "Border with Background": {
     "Border with Background": "帶背景邊框"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "下方"
   },
@@ -1285,6 +1291,9 @@
   },
   "Brightness Slider": {
     "Brightness Slider": "亮度滑桿"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "亮度值"
@@ -2158,6 +2167,12 @@
   },
   "Current Workspace": {
     "Current Workspace": "目前工作區"
+  },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
   },
   "Current time and date display": {
     "Current time and date display": "目前日期時間顯示"
@@ -3829,6 +3844,9 @@
   },
   "Games": {
     "Games": "遊戲"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Gamma 控制"
@@ -9256,6 +9274,9 @@
   },
   "Volume Slider": {
     "Volume Slider": "音量滑桿"
+  },
+  "Volume Style": {
+    "Volume Style": ""
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、亮度及其他系統OSD"

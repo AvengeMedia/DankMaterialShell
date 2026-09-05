@@ -44,6 +44,7 @@ Item {
     readonly property real baseAppHeight: iconSize
 
     clip: false
+    property bool _switchingPosition: false
     implicitWidth: isVertical ? appLayout.height : appLayout.width
     implicitHeight: isVertical ? appLayout.width : appLayout.height
 
@@ -77,6 +78,7 @@ Item {
         height: layoutFlow.height
 
         Behavior on width {
+            enabled: !root._switchingPosition
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Easing.OutCubic
@@ -84,16 +86,13 @@ Item {
         }
 
         Behavior on height {
+            enabled: !root._switchingPosition
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Easing.OutCubic
             }
         }
-        anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
-        anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
-        anchors.left: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined
-        anchors.right: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined
-        anchors.top: root.isVertical ? undefined : parent.top
+        anchors.centerIn: parent
 
         Flow {
             id: layoutFlow
@@ -722,6 +721,12 @@ Item {
 
     Connections {
         target: SettingsData
+        function onDockPositionChanged() {
+            root._switchingPosition = true;
+            Qt.callLater(() => {
+                root._switchingPosition = false;
+            });
+        }
         function onDockIsolateDisplaysChanged() {
             repeater.updateModel();
         }

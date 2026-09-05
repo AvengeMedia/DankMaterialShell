@@ -3,6 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/DateOnly.js" as DateOnly
 
 Rectangle {
     id: root
@@ -35,53 +36,39 @@ Rectangle {
         return weekStartQt() % 7;
     }
 
-    function startOfWeek(dateObj) {
-        const d = new Date(dateObj);
-        const jsDow = d.getDay();
-        const diff = (jsDow - weekStartJs() + 7) % 7;
-        d.setDate(d.getDate() - diff);
-        return d;
+    function startOfWeek(dateOnly) {
+        const diff = (dateOnly.dayOfWeek() - weekStartJs() + 7) % 7;
+        return dateOnly.addDays(-diff);
     }
 
-    function endOfWeek(dateObj) {
-        const d = new Date(dateObj);
-        const jsDow = d.getDay();
-        const add = (weekStartJs() + 6 - jsDow + 7) % 7;
-        d.setDate(d.getDate() + add);
-        return d;
+    function endOfWeek(dateOnly) {
+        const add = (weekStartJs() + 6 - dateOnly.dayOfWeek() + 7) % 7;
+        return dateOnly.addDays(add);
     }
 
-    function getWeekNumber(dateObj) {
-        // Set time to noon to avoid potential Daylight Saving Time related bugs
-        const weekStartDay = startOfWeek(dateObj);
-        weekStartDay.setHours(12, 0, 0, 0);
+    function getWeekNumber(dateOnly) {
+        const weekStartDay = startOfWeek(dateOnly);
 
         let week1Start;
 
         if (weekStartJs() === 1) {
             // ISO 8601 Standard, week start on Monday
             // A week belongs to the year its Thursday falls in
-            // So we have to get the yearTarget from weekStartDay instead of dateObj
-            let yearTarget = weekStartDay;
-            yearTarget.setDate(yearTarget.getDate() + 3); // Monday + 3 = Thursday
+            // So we have to get the yearTarget from weekStartDay instead of dateOnly
+            const yearTarget = weekStartDay.addDays(3); // Monday + 3 = Thursday
 
             // Week 1 is the week containing Jan 4th
-            const jan4 = new Date(yearTarget.getFullYear(), 0, 4);
-            week1Start = startOfWeek(jan4);
+            week1Start = startOfWeek(DateOnly.of(yearTarget.year, 0, 4));
         } else {
             // Traditional / US Standard, week start on Sunday
             // A week belongs to the year its Sunday falls in
-            let yearTarget = weekStartDay;
-            yearTarget.setDate(yearTarget.getDate() + 6); // Monday + 6 = Sunday
+            const yearTarget = weekStartDay.addDays(6); // Monday + 6 = Sunday
 
             // Week 1 is the week containing Jan 1st
-            const jan1 = new Date(yearTarget.getFullYear(), 0, 1);
-            week1Start = startOfWeek(jan1);
+            week1Start = startOfWeek(DateOnly.of(yearTarget.year, 0, 1));
         }
 
-        week1Start.setHours(12, 0, 0, 0);
-
-        const diffDays = Math.round((weekStartDay.getTime() - week1Start.getTime()) / 86400000); // Number of miliseconds in a day
+        const diffDays = week1Start.daysUntil(weekStartDay);
         return Math.floor(diffDays / 7) + 1;
     }
 
@@ -97,16 +84,16 @@ Rectangle {
             return;
         }
 
-        const firstOfMonth = new Date(calendarGrid.displayDate.getFullYear(), calendarGrid.displayDate.getMonth(), 1);
-        const lastOfMonth = new Date(calendarGrid.displayDate.getFullYear(), calendarGrid.displayDate.getMonth() + 1, 0);
+        const year = calendarGrid.displayDate.getFullYear();
+        const month = calendarGrid.displayDate.getMonth();
 
-        const startDate = startOfWeek(firstOfMonth);
-        startDate.setDate(startDate.getDate() - 7);
+        const firstOfMonth = DateOnly.firstOfMonth(year, month);
+        const lastOfMonth = DateOnly.lastOfMonth(year, month);
 
-        const endDate = endOfWeek(lastOfMonth);
-        endDate.setDate(endDate.getDate() + 7);
+        const startDate = startOfWeek(firstOfMonth).addDays(-7);
+        const endDate = endOfWeek(lastOfMonth).addDays(7);
 
-        CalendarService.loadEvents(startDate, endDate);
+        CalendarService.loadEvents(startDate.toDate(), endDate.toDate());
     }
 
     function goToToday() {
@@ -118,11 +105,11 @@ Rectangle {
     }
 
     function moveSelection(days) {
-        let d = new Date(calendarGrid.selectedDate);
-        d.setDate(d.getDate() + days);
+        const moved = DateOnly.fromDate(calendarGrid.selectedDate).addDays(days);
+        const d = moved.toDate();
         calendarGrid.selectedDate = d;
         root.selectedDate = d;
-        if (d.getMonth() !== calendarGrid.displayDate.getMonth() || d.getFullYear() !== calendarGrid.displayDate.getFullYear()) {
+        if (moved.month !== calendarGrid.displayDate.getMonth() || moved.year !== calendarGrid.displayDate.getFullYear()) {
             calendarGrid.displayDate = d;
             loadEventsForMonth();
         }
@@ -349,10 +336,27 @@ Rectangle {
             }
 
             DankActionButton {
+                readonly property bool isToday: {
+                    const now = systemClock.date;
+                    const disp = calendarGrid.displayDate;
+                    const sel = calendarGrid.selectedDate;
+                    return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth() && sel.getFullYear() === now.getFullYear() && sel.getMonth() === now.getMonth() && sel.getDate() === now.getDate();
+                }
+
                 buttonSize: 28
                 iconSize: 14
                 iconName: "today"
-                iconColor: Theme.primary
+                iconColor: enabled ? Theme.primary : Theme.surfaceTextMedium
+                enabled: !isToday
+                opacity: enabled ? 1 : 0.38
+                tooltipText: I18n.tr("Today")
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                    }
+                }
+
                 onClicked: root.goToToday()
             }
 
@@ -399,8 +403,7 @@ Rectangle {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: {
-                                    const rowDate = new Date(calendarGrid.firstDay);
-                                    rowDate.setDate(rowDate.getDate() + index * 7);
+                                    const rowDate = calendarGrid.firstDay.addDays(index * 7);
                                     return root.getWeekNumber(rowDate);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
@@ -458,8 +461,8 @@ Rectangle {
                     property date displayDate: systemClock.date
                     property date selectedDate: systemClock.date
 
-                    readonly property date firstDay: {
-                        const firstOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
+                    readonly property var firstDay: {
+                        const firstOfMonth = DateOnly.firstOfMonth(displayDate.getFullYear(), displayDate.getMonth());
                         return startOfWeek(firstOfMonth);
                     }
 
@@ -467,14 +470,10 @@ Rectangle {
                         model: 42
 
                         Rectangle {
-                            readonly property date dayDate: {
-                                const date = new Date(parent.firstDay);
-                                date.setDate(date.getDate() + index);
-                                return date;
-                            }
-                            readonly property bool isCurrentMonth: dayDate.getMonth() === calendarGrid.displayDate.getMonth()
-                            readonly property bool isToday: dayDate.toDateString() === new Date().toDateString()
-                            readonly property bool isSelected: dayDate.toDateString() === calendarGrid.selectedDate.toDateString()
+                            readonly property var dayDate: calendarGrid.firstDay.addDays(index)
+                            readonly property bool isCurrentMonth: dayDate.month === calendarGrid.displayDate.getMonth()
+                            readonly property bool isToday: dayDate.equals(DateOnly.fromDate(systemClock.date))
+                            readonly property bool isSelected: dayDate.equals(DateOnly.fromDate(calendarGrid.selectedDate))
 
                             width: parent.width / 7
                             height: parent.height / 6
@@ -491,7 +490,7 @@ Rectangle {
 
                                 StyledText {
                                     anchors.centerIn: parent
-                                    text: dayDate.getDate()
+                                    text: dayDate.day
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Theme.surfaceVariantText
                                     font.weight: isToday ? Font.Medium : Font.Normal
@@ -502,11 +501,11 @@ Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.bottomMargin: 3
                                     spacing: Theme.spacingXXS
-                                    visible: CalendarService && CalendarService.calendarAvailable && CalendarService.hasEventsForDate(dayDate)
+                                    visible: CalendarService && CalendarService.calendarAvailable && CalendarService.hasEventsForDate(dayDate.toDate())
 
                                     Repeater {
                                         model: {
-                                            const evs = CalendarService.getEventsForDate(dayDate);
+                                            const evs = CalendarService.getEventsForDate(dayDate.toDate());
                                             const seen = [];
                                             for (let i = 0; i < evs.length && seen.length < 3; i++) {
                                                 const c = (evs[i].color && evs[i].color.length) ? evs[i].color : "primary";
@@ -533,8 +532,8 @@ Rectangle {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    calendarGrid.selectedDate = dayDate;
-                                    root.selectedDate = dayDate;
+                                    calendarGrid.selectedDate = dayDate.toDate();
+                                    root.selectedDate = dayDate.toDate();
                                     root.showEventDetails = true;
                                 }
                             }

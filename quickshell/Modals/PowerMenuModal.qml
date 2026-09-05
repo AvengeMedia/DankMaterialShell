@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modals.Common
+import qs.Services
 import qs.Modules.PowerMenu
 
 DankModal {
@@ -38,8 +39,7 @@ DankModal {
     customPosition: {
         if (parentBounds.width > 0) {
             const bar = SettingsData.getPrimaryBarConfig();
-            const barPadding = bar?.innerPadding ?? 4;
-            const effectiveBarThickness = Math.max(26 + barPadding * 0.6 + barPadding + 4, Theme.barHeight - 4 - (8 - barPadding));
+            const effectiveBarThickness = Theme.barThickness(bar?.innerPadding ?? 4, CompositorService.getScreenScale(parentScreen));
             const barExclusionZone = effectiveBarThickness + (bar?.spacing ?? 4) + (bar?.bottomGap ?? 0);
             const barPosition = bar?.position ?? SettingsData.Position.Top;
             const screenW = parentScreen?.width ?? 1920;
@@ -51,9 +51,14 @@ DankModal {
 
             const topChrome = Math.max(bar && barPosition === SettingsData.Position.Top ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "top"));
             const bottomChrome = Math.max(bar && barPosition === SettingsData.Position.Bottom ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "bottom"));
+            const leftChrome = Math.max(bar && barPosition === SettingsData.Position.Left ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "left"));
+            const rightChrome = Math.max(bar && barPosition === SettingsData.Position.Right ? barExclusionZone : 0, SettingsData.dankIslandEdgeOffset(parentScreen, "right"));
             const minY = topChrome + margin;
             const maxY = screenH - modalHeight - bottomChrome - margin;
+            const minX = leftChrome + margin;
+            const maxX = screenW - modalWidth - rightChrome - margin;
 
+            targetX = Math.max(minX, Math.min(maxX, targetX));
             targetY = Math.max(minY, Math.min(maxY, targetY));
 
             return Qt.point(targetX, targetY);

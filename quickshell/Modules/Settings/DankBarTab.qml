@@ -50,41 +50,58 @@ Item {
         const pos = selectedBarConfig?.position ?? SettingsData.Position.Top;
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
-    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
-
-    // The selected instance is itself the island, so bar-surface settings do not apply to it.
-    readonly property bool selectedBarIsIsland: {
-        SettingsData.dankIslandBarId;
-        selectedBarId;
-        return !!selectedBarId && selectedBarId === SettingsData.dankIslandBarId;
-    }
-    readonly property bool islandShadowsSelectedBar: {
-        SettingsData.dankIslandBarId;
+    readonly property var selectedBarScreens: {
         SettingsData.barConfigs;
         Quickshell.screens;
         selectedBarId;
-        if (!selectedBarConfig || dankBarTab.selectedBarIsIsland)
-            return false;
-        const edge = SettingsData.positionToSide(selectedBarConfig.position ?? SettingsData.Position.Top);
-        return Quickshell.screens.some(screen => SettingsData.barConfigCoversScreen(selectedBarConfig, screen) && SettingsData.dankIslandOwnsEdge(screen, edge));
+        if (!selectedBarConfig)
+            return [];
+        return Quickshell.screens.filter(screen => SettingsData.barConfigCoversScreen(selectedBarConfig, screen));
     }
+
+    // The selected instance is itself the island, so bar-surface settings do not apply to it.
+    readonly property bool selectedBarIsIsland: {
+        SettingsData.barConfigs;
+        selectedBarId;
+        return SettingsData.isIslandBarConfig(selectedBarConfig);
+    }
+    readonly property int islandShadowedScreenCount: {
+        SettingsData.barConfigs;
+        if (!selectedBarConfig || dankBarTab.selectedBarIsIsland)
+            return 0;
+        const edge = SettingsData.positionToSide(selectedBarConfig.position ?? SettingsData.Position.Top);
+        return dankBarTab.selectedBarScreens.filter(screen => SettingsData.dankIslandOwnsEdge(screen, edge)).length;
+    }
+    readonly property bool islandShadowsSelectedBar: dankBarTab.islandShadowedScreenCount > 0 && dankBarTab.islandShadowedScreenCount === dankBarTab.selectedBarScreens.length
     readonly property bool islandOwnsSelectedBarTop: dankBarTab.selectedBarIsIsland || dankBarTab.islandShadowsSelectedBar
+    readonly property int frameStyledScreenCount: {
+        SettingsData.frameScreenPreferences;
+        if (!SettingsData.frameEnabled)
+            return 0;
+        return dankBarTab.selectedBarScreens.filter(screen => SettingsData.isScreenInPreferences(screen, SettingsData.frameScreenPreferences)).length;
+    }
+    readonly property bool selectedBarFrameStyled: SettingsData.frameEnabled && dankBarTab.frameStyledScreenCount === dankBarTab.selectedBarScreens.length
+    // Connected mode sanitizes shadow/corner/border fields on every config, so those stay frame-managed shell-wide.
+    readonly property bool selectedBarFrameSanitized: SettingsData.connectedFrameModeActive || dankBarTab.selectedBarFrameStyled
+    // An edge another island already holds on every covered screen would just stack on top of it.
     readonly property var positionChoices: {
-        SettingsData.dankIslandBarId;
         SettingsData.barConfigs;
         Quickshell.screens;
         selectedBarId;
         const all = [SettingsData.Position.Top, SettingsData.Position.Bottom, SettingsData.Position.Left, SettingsData.Position.Right];
-        if (dankBarTab.selectedBarIsIsland)
-            return [SettingsData.Position.Top, SettingsData.Position.Bottom];
         if (!selectedBarConfig)
+            return all;
+        const screens = dankBarTab.selectedBarScreens;
+        if (screens.length === 0)
             return all;
         const current = selectedBarConfig.position ?? SettingsData.Position.Top;
         return all.filter(pos => {
             if (pos === current)
                 return true;
             const edge = SettingsData.positionToSide(pos);
-            return !Quickshell.screens.some(screen => SettingsData.barConfigCoversScreen(selectedBarConfig, screen) && SettingsData.dankIslandOwnsEdge(screen, edge));
+            if (dankBarTab.selectedBarIsIsland)
+                return !screens.some(screen => SettingsData.islandEdgeTakenFor(selectedBarConfig, screen, edge));
+            return !screens.every(screen => SettingsData.dankIslandOwnsEdge(screen, edge));
         });
     }
     function positionLabel(pos) {
@@ -100,7 +117,7 @@ Item {
     }
 
     // Bar Inset Padding: resolve the "auto" sentinel (stored < 0) to each mode's natural inset for the slider display.
-    readonly property real insetPadAutoUI: SettingsData.connectedFrameModeActive ? SettingsData.frameThickness : (selectedBarIsVertical ? Theme.spacingXS : Math.max(Theme.spacingXS, (selectedBarConfig?.innerPadding ?? 4) * 0.8))
+    readonly property real insetPadAutoUI: (SettingsData.connectedFrameModeActive && dankBarTab.selectedBarFrameStyled) ? SettingsData.frameThickness : (selectedBarIsVertical ? Theme.spacingXS : Math.max(Theme.spacingXS, (selectedBarConfig?.innerPadding ?? 4) * 0.8))
     readonly property int insetPadDisplayValue: {
         const raw = SettingsData.barInsetPaddingSyncAll ? SettingsData.barInsetPaddingShared : (selectedBarConfig?.barInsetPadding ?? -1);
         return raw < 0 ? Math.round(insetPadAutoUI) : raw;
@@ -236,14 +253,14 @@ Item {
     function deleteBar(barId) {
         if (barId === "default")
             return;
-        if (SettingsData.getBarKindConfigs().length <= 1 && barId !== SettingsData.dankIslandBarId)
+        if (SettingsData.getBarKindConfigs().length <= 1 && !SettingsData.isIslandBarConfig(SettingsData.getBarConfig(barId)))
             return;
         SettingsData.deleteBarConfig(barId);
         selectedBarId = "default";
     }
 
     function toggleBarEnabled(barId) {
-        if (barId === "default" && barId !== SettingsData.dankIslandBarId)
+        if (barId === "default" && !SettingsData.isIslandBarConfig(SettingsData.getBarConfig(barId)))
             return;
         const config = SettingsData.getBarConfig(barId);
         if (!config)
@@ -290,6 +307,15 @@ Item {
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
+
+            SettingsCard {
+                iconName: "toolbar"
+                title: I18n.tr("Layout")
+                settingKey: "barLayout"
+                tags: ["layout", "standard", "frame", "island", "mode", "bar"]
+
+                SettingsLayoutPicker {}
+            }
 
             SettingsCard {
                 tab: "appearance"
@@ -475,7 +501,7 @@ Item {
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
                                             horizontalAlignment: Text.AlignLeft
-                                            visible: SettingsData.dankIslandBarId === barCard.modelData.id
+                                            visible: SettingsData.isIslandBarConfig(barCard.modelData)
                                         }
 
                                         StyledText {
@@ -484,7 +510,7 @@ Item {
                                             font.weight: Font.Medium
                                             color: Theme.primary
                                             horizontalAlignment: Text.AlignLeft
-                                            visible: SettingsData.dankIslandBarId === barCard.modelData.id
+                                            visible: SettingsData.isIslandBarConfig(barCard.modelData)
                                         }
                                     }
                                 }
@@ -497,7 +523,7 @@ Item {
                                     backgroundColor: Theme.withAlpha(Theme.error, 0.15)
                                     iconColor: Theme.error
                                     visible: barCard.modelData.id !== "default"
-                                    enabled: SettingsData.getBarKindConfigs().length > 1 || SettingsData.dankIslandBarId === barCard.modelData.id
+                                    enabled: SettingsData.getBarKindConfigs().length > 1 || SettingsData.isIslandBarConfig(barCard.modelData)
                                     anchors.verticalCenter: parent.verticalCenter
                                     onClicked: dankBarTab.deleteBar(barCard.modelData.id)
                                 }
@@ -554,14 +580,16 @@ Item {
                     target: "island"
                     visible: dankBarTab.selectedBarIsIsland
                     parentModal: dankBarTab.parentModal
+                    section: "islandPlacement"
                     settingLabel: I18n.tr("Island placement")
-                    reason: I18n.tr("The Island anchors to the top or bottom edge")
+                    reason: I18n.tr("The Island anchors to one screen edge")
                 }
 
                 SettingsControlledBy {
                     target: "island"
-                    visible: dankBarTab.islandShadowsSelectedBar
+                    visible: dankBarTab.islandShadowedScreenCount > 0
                     parentModal: dankBarTab.parentModal
+                    section: "islandPlacement"
                     settingLabel: I18n.tr("%1 position").arg(dankBarTab.positionLabel(selectedBarConfig?.position ?? SettingsData.Position.Top))
                     reason: I18n.tr("The Island holds this edge on a display this bar covers, so the bar stays hidden there")
                 }
@@ -710,6 +738,7 @@ Item {
                     target: "island"
                     visible: dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: "islandPlacement"
                     settingLabel: I18n.tr("Bar visibility")
                     reason: I18n.tr("Additional settings are managed by the Island")
                 }
@@ -853,10 +882,10 @@ Item {
                     tags: ["bar", "overview", "niri", "show", "frame"]
                     visible: CompositorService.isNiri && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Show on Overview")
-                    description: SettingsData.frameEnabled ? I18n.tr("Show during Niri overview") : I18n.tr("Show the bar when niri overview is active")
-                    checked: SettingsData.frameEnabled ? SettingsData.frameShowOnOverview : (selectedBarConfig?.openOnOverview ?? false)
+                    description: dankBarTab.selectedBarFrameStyled ? I18n.tr("Show during Niri overview") : I18n.tr("Show the bar when niri overview is active")
+                    checked: dankBarTab.selectedBarFrameStyled ? SettingsData.frameShowOnOverview : (selectedBarConfig?.openOnOverview ?? false)
                     onToggled: toggled => {
-                        if (SettingsData.frameEnabled) {
+                        if (dankBarTab.selectedBarFrameStyled) {
                             SettingsData.set("frameShowOnOverview", toggled);
                             return;
                         }
@@ -899,7 +928,7 @@ Item {
 
                 SettingsSliderRow {
                     id: barTransparencySlider
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameStyled && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Bar Opacity")
                     value: (selectedBarConfig?.transparency ?? 1.0) * 100
                     minimum: 0
@@ -943,18 +972,11 @@ Item {
                 }
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: dankBarTab.selectedBarFrameStyled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: dankBarTab.selectedBarFrameStyled ? "frameOpacity" : "dankIslandAppearance"
                     settingLabel: I18n.tr("Bar Opacity")
-                    reason: I18n.tr("Managed by Frame")
-                }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar Opacity")
-                    reason: I18n.tr("The island draws its own surface")
+                    reason: dankBarTab.selectedBarFrameStyled ? I18n.tr("Managed by Frame") : I18n.tr("The island draws its own surface")
                 }
             }
 
@@ -966,15 +988,16 @@ Item {
                 visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false)
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: dankBarTab.selectedBarFrameStyled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: dankBarTab.selectedBarFrameStyled ? "frameBorder" : "dankIslandPlacement"
                     settingLabel: I18n.tr("Bar Spacing")
-                    reason: I18n.tr("Edge spacing, exclusive zone, and popup gaps are managed by Frame")
+                    reason: dankBarTab.selectedBarFrameStyled ? I18n.tr("Edge spacing, exclusive zone, and popup gaps are managed by Frame") : I18n.tr("Some settings are managed by the island")
                 }
 
                 SettingsSliderRow {
                     id: edgeSpacingSlider
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameStyled && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Edge Spacing")
                     description: I18n.tr("Space between the bar and screen edges")
                     value: selectedBarConfig?.spacing ?? 4
@@ -1000,7 +1023,7 @@ Item {
                     id: exclusiveZoneSlider
                     settingKey: "barExclusiveZone"
                     tags: ["exclusive", "zone", "reserved", "offset"]
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameStyled && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Exclusive Zone Offset")
                     description: I18n.tr("Fine-tune the space reserved for the bar from the screen edge")
                     value: selectedBarConfig?.bottomGap ?? 0
@@ -1026,7 +1049,7 @@ Item {
                     id: sizeSlider
                     settingKey: "barSize"
                     tags: ["size", "thickness", "height", "inner"]
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     text: I18n.tr("Size")
                     description: I18n.tr("Adjust the bar height via inner padding")
                     value: selectedBarConfig?.innerPadding ?? 4
@@ -1050,7 +1073,7 @@ Item {
 
                 SettingsSliderRow {
                     id: widgetPaddingSlider
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     text: I18n.tr("Padding")
                     description: I18n.tr("Inner padding applied to each widget")
                     value: selectedBarConfig?.widgetPadding ?? 8
@@ -1079,12 +1102,12 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                 }
 
                 SettingsSliderRow {
                     id: barInsetPaddingSlider
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     text: I18n.tr("Bar Inset Padding")
                     description: I18n.tr("Gap between the end widgets and the bar ends (0 = edge-to-edge)")
                     tags: ["bar", "padding", "inset", "edge", "corner", "end"]
@@ -1113,7 +1136,7 @@ Item {
                 SettingsSliderRow {
                     id: barLengthPaddingSlider
                     settingKey: "barLengthPadding"
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameStyled && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Bar Length Padding")
                     description: I18n.tr("Reduce the visible bar length from both ends")
                     tags: ["bar", "length", "padding", "size", "shorter"]
@@ -1135,7 +1158,7 @@ Item {
                 }
 
                 SettingsToggleRow {
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     text: I18n.tr("Sync Bar Inset Padding")
                     description: I18n.tr("Use one inset value for every bar")
                     tags: ["bar", "padding", "inset", "edge", "sync", "all", "global"]
@@ -1148,11 +1171,11 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                 }
 
                 SettingsToggleRow {
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     text: I18n.tr("Auto Popup Gaps")
                     description: I18n.tr("Automatically calculate popup gap based on bar spacing")
                     checked: selectedBarConfig?.popupGapsAuto ?? true
@@ -1167,7 +1190,7 @@ Item {
                     width: parent.width
                     leftPadding: Theme.spacingM
                     spacing: Theme.spacingM
-                    visible: !SettingsData.frameEnabled && !(selectedBarConfig?.popupGapsAuto ?? true)
+                    visible: !dankBarTab.selectedBarFrameStyled && !(selectedBarConfig?.popupGapsAuto ?? true)
 
                     Rectangle {
                         width: parent.width - parent.leftPadding
@@ -1198,14 +1221,6 @@ Item {
                             restoreMode: Binding.RestoreBinding
                         }
                     }
-                }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar Spacing")
-                    reason: I18n.tr("Some settings are managed by the island")
                 }
             }
 
@@ -1273,18 +1288,11 @@ Item {
                 visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled
 
                 SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
+                    visible: dankBarTab.selectedBarFrameStyled || dankBarTab.islandOwnsSelectedBarTop
                     parentModal: dankBarTab.parentModal
+                    section: dankBarTab.selectedBarFrameStyled ? "frameBorder" : "dankIslandAppearance"
                     settingLabel: I18n.tr("Bar corners and background")
-                    reason: I18n.tr("Managed by Frame")
-                }
-
-                SettingsControlledBy {
-                    target: "island"
-                    visible: !SettingsData.frameEnabled && dankBarTab.islandOwnsSelectedBarTop
-                    parentModal: dankBarTab.parentModal
-                    settingLabel: I18n.tr("Bar corners")
-                    reason: I18n.tr("Corner style applies to the bar surface")
+                    reason: dankBarTab.selectedBarFrameStyled ? I18n.tr("Managed by Frame") : I18n.tr("Corner style applies to the bar surface")
                 }
 
                 SettingsToggleRow {
@@ -1292,7 +1300,7 @@ Item {
                     tags: ["transparent", "background", "invisible"]
                     text: I18n.tr("No Background")
                     description: I18n.tr("Make the bar background fully transparent")
-                    visible: !SettingsData.frameEnabled
+                    visible: !dankBarTab.selectedBarFrameStyled
                     checked: selectedBarConfig?.noBackground ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             noBackground: checked
@@ -1344,7 +1352,7 @@ Item {
                     tags: ["rounded", "attached", "square", "corners", "edge", "screen", "flush"]
                     text: I18n.tr("Corner Style")
                     description: I18n.tr("Choose how the bar meets the screen edge")
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameSanitized && !dankBarTab.islandOwnsSelectedBarTop
                     model: [I18n.tr("Rounded", "bar corner style option"), I18n.tr("Flush", "bar corner style option"), I18n.tr("Square", "bar corner style option")]
                     currentIndex: {
                         if (selectedBarConfig?.squareCorners ?? false)
@@ -1368,7 +1376,7 @@ Item {
                     tags: ["goth", "corners", "concave", "cutout"]
                     text: I18n.tr("Goth Corners")
                     description: I18n.tr("Apply inverse concave corner cutouts to the bar")
-                    visible: !SettingsData.frameEnabled && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: !dankBarTab.selectedBarFrameSanitized && !dankBarTab.islandOwnsSelectedBarTop
                     checked: selectedBarConfig?.gothCornersEnabled ?? false
                     onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                             gothCornersEnabled: checked
@@ -1476,6 +1484,29 @@ Item {
 
             SettingsCard {
                 tab: "appearance"
+                iconName: "battery_horiz_075"
+                title: I18n.tr("Battery Colors", "bar appearance: battery indicator color card")
+                settingKey: "batteryColorMode"
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled && BatteryService.batteryAvailable
+
+                SettingsButtonGroupRow {
+                    tags: ["battery", "color", "level", "theme", "icon", "meter", "indicator"]
+                    text: I18n.tr("Indicator Colors", "battery settings: battery indicator color mode")
+                    description: I18n.tr("Follow the theme accent, or step from green to red as the battery drains.", "battery settings: indicator color mode description")
+                    model: [I18n.tr("Theme", "battery settings: theme accent indicator colors"), I18n.tr("Level", "battery settings: charge level indicator colors")]
+                    currentIndex: (dankBarTab.selectedBarConfig?.batteryColorMode ?? "theme") === "level" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.updateBarConfig(dankBarTab.selectedBarId, {
+                                batteryColorMode: index === 1 ? "level" : "theme"
+                            });
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "appearance"
                 iconName: "filter_b_and_w"
                 title: I18n.tr("System Tray Icon Tint")
                 settingKey: "trayIconTint"
@@ -1579,7 +1610,7 @@ Item {
                 settingKey: "barBorder"
                 iconName: "border_style"
                 title: I18n.tr("Border")
-                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled && !dankBarTab.connectedFrameModeActive && !dankBarTab.islandOwnsSelectedBarTop
+                visible: dankBarTab.appearanceOnly && selectedBarConfig?.enabled && !dankBarTab.selectedBarFrameSanitized && !dankBarTab.islandOwnsSelectedBarTop
                 checked: selectedBarConfig?.borderEnabled ?? false
                 onToggled: checked => SettingsData.updateBarConfig(selectedBarId, {
                         borderEnabled: checked
@@ -1763,18 +1794,11 @@ Item {
             }
 
             SettingsControlledBy {
-                visible: dankBarTab.appearanceOnly && dankBarTab.connectedFrameModeActive
+                visible: dankBarTab.appearanceOnly && (dankBarTab.selectedBarFrameSanitized || dankBarTab.islandOwnsSelectedBarTop)
                 parentModal: dankBarTab.parentModal
+                section: dankBarTab.selectedBarFrameSanitized ? "frameBorder" : "dankIslandAppearance"
                 settingLabel: I18n.tr("Bar shadow, border, and corners")
-                reason: I18n.tr("Managed by Frame in Connected Mode")
-            }
-
-            SettingsControlledBy {
-                target: "island"
-                visible: dankBarTab.appearanceOnly && !dankBarTab.connectedFrameModeActive && dankBarTab.islandOwnsSelectedBarTop
-                parentModal: dankBarTab.parentModal
-                settingLabel: I18n.tr("Bar border and shadow")
-                reason: I18n.tr("These style the bar surface, which the Island replaces")
+                reason: SettingsData.connectedFrameModeActive ? I18n.tr("Managed by Frame in Connected Mode") : (dankBarTab.selectedBarFrameStyled ? I18n.tr("Managed by Frame") : I18n.tr("These style the bar surface, which the Island replaces"))
             }
 
             SettingsCard {
@@ -1785,15 +1809,16 @@ Item {
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: false
-                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !dankBarTab.connectedFrameModeActive && !dankBarTab.islandOwnsSelectedBarTop
+                visible: dankBarTab.appearanceOnly && (selectedBarConfig?.enabled ?? false) && !dankBarTab.selectedBarFrameSanitized && !dankBarTab.islandOwnsSelectedBarTop
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
+                readonly property bool barShadowsEnabled: (SettingsData.m3ElevationEnabled ?? true) && (SettingsData.barElevationEnabled ?? true)
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
                 readonly property string directionSource: selectedBarConfig?.shadowDirectionMode ?? "inherit"
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.")
+                    text: shadowCard.barShadowsEnabled ? I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.") : I18n.tr("Requires Bar Shadows to be enabled in Theme & Colors.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap

@@ -10,16 +10,18 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type Config struct {
-	Format       OutputFormat
-	CustomFormat string
-	Lowercase    bool
-	Autocopy     bool
-	Notify       bool
+	Format        OutputFormat
+	CustomFormat  string
+	Lowercase     bool
+	Autocopy      bool
+	Notify        bool
+	AllowMultiple bool
 }
 
 type Output struct {
@@ -91,6 +93,14 @@ func New(config Config) *Picker {
 }
 
 func (p *Picker) Run() (*Color, error) {
+	if !p.config.AllowMultiple {
+		lock, err := utils.LockSelectionOverlay()
+		if err != nil {
+			return nil, err
+		}
+		defer lock.Release()
+	}
+
 	if err := p.connect(); err != nil {
 		return nil, fmt.Errorf("wayland connect: %w", err)
 	}

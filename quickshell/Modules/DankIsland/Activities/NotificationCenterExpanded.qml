@@ -17,7 +17,7 @@ FocusScope {
 
     clip: true
 
-    function focusList() {
+    function focusFace() {
         root.forceActiveFocus();
         keyboardController.rebuildFlatNavigation();
         return true;

@@ -26,7 +26,7 @@ repos:
         name: settings search index is up to date
         entry: bash -c 'python3 quickshell/translations/extract_settings_index.py >/dev/null || exit 1; if ! git diff --exit-code -- quickshell/translations/settings_search_index.json; then echo "settings_search_index.json is out of date; run quickshell/translations/extract_settings_index.py and stage the result" >&2; exit 1; fi'
         language: system
-        files: ^quickshell/(Modules/Settings/.*\.qml|Modals/Settings/SettingsSidebar\.qml|translations/extract_settings_index\.py)$
+        files: ^quickshell/(Modules/Settings/.*\.qml|Common/SettingsTabs\.qml|Services/SettingsSearchService\.qml|translations/(extract_settings_index\.py|en\.json))$
         pass_filenames: false
   - repo: local
     hooks:

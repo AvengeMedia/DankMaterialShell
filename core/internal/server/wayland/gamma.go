@@ -127,7 +127,11 @@ func calcWhitepoint(temp int) rgb {
 	return wpRGB
 }
 
-func GenerateGammaRamp(size uint32, temp int, gamma float64) GammaRamp {
+func applyContrast(val, contrast float64) float64 {
+	return clamp01((val-0.5)*contrast + 0.5)
+}
+
+func GenerateGammaRamp(size uint32, temp int, gamma, contrast float64) GammaRamp {
 	ramp := GammaRamp{
 		Red:   make([]uint16, size),
 		Green: make([]uint16, size),
@@ -137,7 +141,7 @@ func GenerateGammaRamp(size uint32, temp int, gamma float64) GammaRamp {
 	wp := calcWhitepoint(temp)
 
 	for i := range size {
-		val := float64(i) / float64(size-1)
+		val := applyContrast(float64(i)/float64(size-1), contrast)
 		ramp.Red[i] = uint16(clamp01(math.Pow(val*wp.r, 1.0/gamma)) * 65535.0)
 		ramp.Green[i] = uint16(clamp01(math.Pow(val*wp.g, 1.0/gamma)) * 65535.0)
 		ramp.Blue[i] = uint16(clamp01(math.Pow(val*wp.b, 1.0/gamma)) * 65535.0)

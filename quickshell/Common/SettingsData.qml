@@ -8,6 +8,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Common.settings
 import qs.Services
+import "GSettings.js" as GSettings
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
 
@@ -15,7 +16,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 16
+    readonly property int settingsConfigVersion: 18
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -169,6 +170,7 @@ Singleton {
     property bool generateThemeAtStartup: true
     property string matugenScheme: "scheme-tonal-spot"
     property bool matugenSmartMode: false
+    property string matugenSourceMode: "dominant"
     property real matugenContrast: 0
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
@@ -510,6 +512,7 @@ Singleton {
     property bool mediaAdaptiveWidthEnabled: true
     property bool audioVisualizerEnabled: true
     property bool mediaUseAlbumArtAccent: false
+    property bool mediaWallpaperEnabled: true
     property bool appleMusicAnimatedArtEnabled: false
     property string audioScrollMode: "volume"
     property int audioWheelScrollAmount: 5
@@ -816,7 +819,7 @@ Singleton {
     property bool showBatteryTimeOnlyOnBattery: false
     property bool showBatteryPowerCharging: false
     property bool showBatteryPowerDischarging: false
-    property bool batteryPillStyle: false
+    property string batteryStyle: "icon"
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: true
@@ -986,50 +989,160 @@ Singleton {
     property var notificationRules: []
     property bool notificationDndAllowCritical: true
     property bool notificationFocusedMonitor: false
-    // Names the bar config rendered as Dank Island instead of a DankBar. Empty = no island.
-    property string dankIslandBarId: ""
-    readonly property var islandBarConfig: dankIslandBarId ? (barConfigs.find(cfg => cfg.id === dankIslandBarId) || null) : null
-    readonly property bool dankIslandEnabled: !!islandBarConfig && (islandBarConfig.enabled ?? false)
-    readonly property int dankIslandPosition: islandBarConfig?.position ?? SettingsData.Position.Top
-    readonly property string dankIslandEdge: dankIslandPosition === SettingsData.Position.Bottom ? "bottom" : "top"
-    readonly property int dankIslandReservedStripHeight: {
-        const reserve = Math.max(24, Math.min(128, dankIslandReserveHeight));
-        const compact = Math.max(24, Math.min(72, dankIslandCompactHeight));
-        const gap = Math.max(0, Math.min(48, dankIslandOuterGap));
+    // Island is a per-instance render mode: any bar config with island:true draws as an island
+    // instead of a DankBar, and carries its own island* look settings.
+    readonly property var islandBarConfigs: {
+        barConfigs;
+        return (barConfigs || []).filter(cfg => cfg && cfg.island === true);
+    }
+    readonly property bool dankIslandEnabled: islandBarConfigs.some(cfg => cfg.enabled ?? false)
+    readonly property var islandDefaults: ({
+            "islandFloating": false,
+            "islandUseOverlayLayer": false,
+            "islandReserveThickness": 40,
+            "islandCompactThickness": 38,
+            "islandOuterGap": 4,
+            "islandAlongOffset": 0,
+            "islandInteractionMode": "hybrid",
+            "islandHoverOpenDelay": 150,
+            "islandHoverCloseDelay": 150,
+            "islandPalette": "default",
+            "islandTransparency": 1,
+            "islandCornerRadius": 34,
+            "islandHighContrast": false,
+            "islandMediaClockVisible": true,
+            "islandNotificationBadgeClearOnOpen": false,
+            "islandNotificationExpand": false,
+            "islandHomeCompactTight": false,
+            "islandHomeClockDisplay": "both",
+            "islandHomeVolumeDisplay": "both",
+            "islandHomeBrightnessDisplay": "both",
+            "islandBatteryStyle": "solid",
+            "islandSatellitesEnabled": true,
+            "islandSatellitePosition": "edges",
+            "islandSatelliteGap": 12,
+            "islandSatelliteBackground": false,
+            "islandSatelliteGothCorners": true,
+            "islandSatelliteTransparency": 1,
+            "islandSatelliteSwoopRadius": 24,
+            "islandReducedMotion": false,
+            "islandSpringStiffness": 560,
+            "islandSpringDamping": 37,
+            "islandSpringMass": 1
+        })
+
+    function islandSetting(bc, key) {
+        const value = bc?.[key];
+        return value === undefined || value === null ? islandDefaults[key] : value;
+    }
+
+    function islandLevelDisplay(bc, key) {
+        const value = islandSetting(bc, key);
+        return value === "icon" || value === "percentage" || value === "both" ? value : "both";
+    }
+
+    function islandClockDisplay(bc) {
+        const value = islandSetting(bc, "islandHomeClockDisplay");
+        return value === "time" || value === "date" || value === "both" ? value : "both";
+    }
+
+    function islandEdge(bc) {
+        return positionToSide(bc?.position ?? SettingsData.Position.Top) || "top";
+    }
+
+    function islandVertical(bc) {
+        const edge = islandEdge(bc);
+        return edge === "left" || edge === "right";
+    }
+
+    function islandStripThickness(bc) {
+        const reserve = Math.max(24, Math.min(128, islandSetting(bc, "islandReserveThickness")));
+        const compact = Math.max(24, Math.min(72, islandSetting(bc, "islandCompactThickness")));
+        const gap = Math.max(0, Math.min(48, islandSetting(bc, "islandOuterGap")));
         return Math.max(reserve, gap + compact);
     }
-    property bool dankIslandFloating: false
-    property bool dankIslandUseOverlayLayer: false
-    property int dankIslandReserveHeight: 40
-    property int dankIslandCompactHeight: 38
-    property int dankIslandOuterGap: 4
-    property int dankIslandHorizontalOffset: 0
-    property string dankIslandInteractionMode: "hybrid"
-    property int dankIslandHoverOpenDelay: 150
-    property int dankIslandHoverCloseDelay: 150
-    property string dankIslandPalette: "default"
-    property real dankIslandTransparency: 1
-    property bool dankIslandHighContrast: false
-    property bool dankIslandMediaClockVisible: true
-    property bool dankIslandHomeNotificationBadge: true
-    property bool dankIslandNotificationBadgeClearOnOpen: false
-    property bool dankIslandNotificationExpand: false
-    property string dankIslandHomeMediaSlot: "left"
-    property string dankIslandHomeStatusSlot: "hidden"
-    property string dankIslandHomeWeatherSlot: "hidden"
-    property bool dankIslandHomeCompactTight: false
-    property string dankIslandBatteryStyle: "solid"
-    property bool dankIslandSatellitesEnabled: true
-    property string dankIslandSatellitePosition: "edges"
-    property int dankIslandSatelliteGap: 12
-    property bool dankIslandSatelliteBackground: false
-    property bool dankIslandSatelliteGothCorners: true
-    property real dankIslandSatelliteTransparency: 1
-    property int dankIslandSatelliteSwoopRadius: 24
-    property bool dankIslandReducedMotion: false
-    property real dankIslandSpringStiffness: 560
-    property real dankIslandSpringDamping: 37
-    property real dankIslandSpringMass: 1
+    readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
+    readonly property var _islandHomeLayoutDefault: [
+        {
+            "id": "media",
+            "enabled": true
+        },
+        {
+            "id": "clock",
+            "enabled": true
+        },
+        {
+            "id": "weather",
+            "enabled": false
+        },
+        {
+            "id": "status",
+            "enabled": false
+        },
+        {
+            "id": "volume",
+            "enabled": false
+        },
+        {
+            "id": "brightness",
+            "enabled": false
+        },
+        {
+            "id": "notifications",
+            "enabled": true
+        }
+    ]
+    function getIslandHomeLayout(bc) {
+        const stored = Array.isArray(bc?.islandHomeLayout) ? bc.islandHomeLayout : [];
+        const result = [];
+        const seen = {};
+        for (const entry of stored) {
+            const id = entry && entry.id;
+            if (_islandHomeGroupIds.indexOf(id) < 0 || seen[id])
+                continue;
+            seen[id] = true;
+            result.push({
+                "id": id,
+                "enabled": id === "clock" || entry.enabled !== false
+            });
+        }
+        for (const fallback of _islandHomeLayoutDefault) {
+            if (!seen[fallback.id])
+                result.push({
+                    "id": fallback.id,
+                    "enabled": fallback.enabled
+                });
+        }
+        return result;
+    }
+
+    function islandHomeGroupEnabled(bc, id) {
+        const entry = getIslandHomeLayout(bc).find(g => g.id === id);
+        return entry ? entry.enabled : false;
+    }
+
+    function setIslandHomeLayoutOrder(barId, ids) {
+        const current = getIslandHomeLayout(getBarConfig(barId));
+        const ordered = ids.map(id => current.find(g => g.id === id)).filter(g => g);
+        for (const entry of current) {
+            if (ids.indexOf(entry.id) < 0)
+                ordered.push(entry);
+        }
+        updateBarConfig(barId, {
+            islandHomeLayout: ordered
+        });
+    }
+
+    function setIslandHomeGroupEnabled(barId, id, on) {
+        if (id === "clock")
+            return;
+        updateBarConfig(barId, {
+            islandHomeLayout: getIslandHomeLayout(getBarConfig(barId)).map(g => g.id === id ? {
+                    "id": g.id,
+                    "enabled": on
+                } : g)
+        });
+    }
 
     property bool osdAlwaysShowValue: false
     property int osdPosition: SettingsData.Position.BottomCenter
@@ -1102,6 +1215,7 @@ Singleton {
             "maximizeWidgetText": false,
             "removeWidgetPadding": false,
             "widgetPadding": 8,
+            "batteryColorMode": "theme",
             "gothCornersEnabled": false,
             "gothCornerRadiusOverride": false,
             "gothCornerRadiusValue": 12,
@@ -1442,11 +1556,7 @@ Singleton {
             return;
         if (!SessionData.lastAppliedIconTheme)
             return;
-        const script = `if command -v gsettings >/dev/null 2>&1; then
-        gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
-        elif command -v dconf >/dev/null 2>&1; then
-        dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
-        fi`;
+        const script = GSettings.getCmd("org.gnome.desktop.interface", "icon-theme");
 
         Proc.runCommand("iconThemeDriftCheck", ["sh", "-c", script], (output, exitCode) => {
             const platform = (output || "").trim();
@@ -1484,11 +1594,7 @@ Singleton {
         const resolved = resolveIconTheme();
         let cosmicThemeName = (resolved === "System Default") ? systemDefaultIconTheme : resolved;
         if (!cosmicThemeName || cosmicThemeName === "System Default") {
-            const detectScript = `if command -v gsettings >/dev/null 2>&1; then
-            gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
-            elif command -v dconf >/dev/null 2>&1; then
-            dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
-            fi`;
+            const detectScript = GSettings.getCmd("org.gnome.desktop.interface", "icon-theme");
 
             Proc.runCommand("detectCosmicIconTheme", ["sh", "-c", detectScript], (output, exitCode) => {
                 if (exitCode !== 0)
@@ -1550,11 +1656,7 @@ Singleton {
         fi
         done
 
-        if command -v gsettings >/dev/null 2>&1; then
-        gsettings set org.gnome.desktop.interface icon-theme '${gtkThemeName}' 2>/dev/null || true
-        elif command -v dconf >/dev/null 2>&1; then
-        dconf write /org/gnome/desktop/interface/icon-theme "'${gtkThemeName}'" 2>/dev/null || true
-        fi
+        ${GSettings.setCmd("org.gnome.desktop.interface", "icon-theme", gtkThemeName)} || true
 
         pkill -HUP -f 'gtk' 2>/dev/null || true`;
 
@@ -1657,13 +1759,21 @@ Singleton {
         })
 
     function set(key, value) {
-        if (key === "dankIslandInteractionMode" && value !== "click" && value !== "hybrid")
-            value = "hybrid";
         Spec.set(root, key, value, saveSettings, _hooks);
-        if (key === "dankIslandBarId" && value && frameEnabled)
-            set("frameEnabled", false);
-        if (key === "frameEnabled" && value && dankIslandBarId)
-            set("dankIslandBarId", "");
+        if (key === "frameEnabled" && value)
+            clearIslandBars();
+    }
+
+    // Frame mode hosts bars inside the frame surface, which has nowhere to put an island.
+    function clearIslandBars() {
+        const islands = islandBarConfigs;
+        if (islands.length === 0)
+            return;
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        for (const cfg of configs)
+            delete cfg.island;
+        barConfigs = configs;
+        updateBarConfigs();
     }
 
     function loadSettings() {
@@ -1718,8 +1828,8 @@ Singleton {
             Store.parse(root, obj);
 
             // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
-            if (frameEnabled && dankIslandBarId)
-                dankIslandBarId = "";
+            if (frameEnabled && islandBarConfigs.length > 0)
+                clearIslandBars();
 
             if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
                 frameMode = "connected";
@@ -2050,7 +2160,7 @@ Singleton {
         const pathsArg = iconPaths.join(" ");
 
         const script = `
-            echo "SYSDEFAULT:$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g" || echo '')"
+            echo "SYSDEFAULT:$(${GSettings.getCmd("org.gnome.desktop.interface", "icon-theme")})"
             for dir in ${pathsArg}; do
                 [ -d "$dir" ] || continue
                 for theme in "$dir"/*/; do
@@ -2089,7 +2199,7 @@ Singleton {
         const pathsArg = cursorPaths.join(" ");
 
         const script = `
-            echo "SYSDEFAULT:$(gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | sed "s/'//g" || echo '')"
+            echo "SYSDEFAULT:$(${GSettings.getCmd("org.gnome.desktop.interface", "cursor-theme")})"
             for dir in ${pathsArg}; do
                 [ -d "$dir" ] || continue
                 for theme in "$dir"/*/; do
@@ -2220,15 +2330,11 @@ Singleton {
                 continue;
             if (other.autoHide)
                 continue;
-            const otherScreens = other.screenPreferences || ["all"];
-            const barScreens = barConfig.screenPreferences || ["all"];
-            const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") || otherScreens.some(s => isScreenInPreferences(screen, [s]));
-
-            if (!onSameScreen)
+            if (!barConfigCoversScreen(other, screen))
                 continue;
             const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
             const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-            const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing;
+            const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing;
 
             const useAutoGaps = other.popupGapsAuto !== undefined ? other.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
             const manualGap = other.popupGapsManual !== undefined ? other.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
@@ -2252,12 +2358,10 @@ Singleton {
 
         // The island is not a bar, but it is chrome: popouts still have to clear its strip.
         if (!isIslandBarConfig(barConfig)) {
-            const islandTop = dankIslandEdgeOffset(screen, "top");
-            const islandBottom = dankIslandEdgeOffset(screen, "bottom");
-            if (islandTop > 0)
-                topBar = Math.max(topBar, islandTop);
-            if (islandBottom > 0)
-                bottomBar = Math.max(bottomBar, islandBottom);
+            topBar = Math.max(topBar, dankIslandEdgeOffset(screen, "top"));
+            bottomBar = Math.max(bottomBar, dankIslandEdgeOffset(screen, "bottom"));
+            leftBar = Math.max(leftBar, dankIslandEdgeOffset(screen, "left"));
+            rightBar = Math.max(rightBar, dankIslandEdgeOffset(screen, "right"));
         }
 
         return {
@@ -2300,15 +2404,11 @@ Singleton {
                 const other = enabledBars[i];
                 if (other.id === barConfig.id)
                     continue;
-                const otherScreens = other.screenPreferences || ["all"];
-                const barScreens = barConfig.screenPreferences || ["all"];
-                const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") || otherScreens.some(s => isScreenInPreferences(screen, [s]));
-
-                if (!onSameScreen)
+                if (!barConfigCoversScreen(other, screen))
                     continue;
                 const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
                 const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-                const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize;
+                const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing + wingSize;
                 const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
 
                 switch (other.position) {
@@ -2397,6 +2497,22 @@ Singleton {
         return barConfigs.find(cfg => cfg.id === barId) || null;
     }
 
+    function setBarIsland(barId, on) {
+        const config = getBarConfig(barId);
+        if (!config || (config.island === true) === (on === true))
+            return;
+        const updates = {
+            island: on === true
+        };
+        if (on === true) {
+            if (!config.enabled)
+                updates.enabled = true;
+            if ((config.screenPreferences ?? []).length === 0)
+                updates.screenPreferences = ["all"];
+        }
+        updateBarConfig(barId, updates);
+    }
+
     function isBarIpcRevealed(barId) {
         if (!barId)
             return false;
@@ -2404,7 +2520,7 @@ Singleton {
     }
 
     function setBarIpcReveal(barId, revealed) {
-        if (!barId || barId === dankIslandBarId)
+        if (!barId || isIslandBarConfig(getBarConfig(barId)))
             return;
         const nextRevealed = !!revealed;
         if (!!barIpcRevealStates[barId] === nextRevealed)
@@ -2438,8 +2554,6 @@ Singleton {
         const index = configs.findIndex(cfg => cfg.id === barId);
         if (index === -1)
             return;
-        if (isIslandBarConfig(configs[index]) && updates.position !== undefined && updates.position !== SettingsData.Position.Top && updates.position !== SettingsData.Position.Bottom)
-            delete updates.position;
         const positionChanged = updates.position !== undefined && configs[index].position !== updates.position;
         if (updates.autoHide === false || updates.visible === false)
             setBarIpcReveal(barId, false);
@@ -2458,8 +2572,6 @@ Singleton {
             return;
         const configs = barConfigs.filter(cfg => cfg.id !== barId);
         barConfigs = configs;
-        if (dankIslandBarId === barId)
-            dankIslandBarId = "";
         if (connectedFrameBarStyleBackups?.[barId] !== undefined) {
             const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
             delete nextBackups[barId];
@@ -2469,7 +2581,7 @@ Singleton {
         updateBarConfigs();
     }
 
-    // Bar-kind instances only. The island reserves its own edge via dankIslandOwnsEdge.
+    // Bar-kind instances only. Islands reserve their own edges via dankIslandOwnsEdge.
     function getEnabledBarConfigs() {
         return barConfigs.filter(cfg => cfg.enabled && !isIslandBarConfig(cfg));
     }
@@ -2638,105 +2750,78 @@ Singleton {
     }
 
     function isIslandBarConfig(bc) {
-        return !!bc && !!dankIslandBarId && bc.id === dankIslandBarId;
+        return !!bc && bc.island === true;
     }
 
-    function getIslandScreens() {
-        const cfg = islandBarConfig;
-        if (!cfg || !(cfg.enabled ?? false))
+    function activeIslandConfigsForScreen(screen) {
+        if (!screen)
             return [];
-        return Quickshell.screens.filter(screen => barConfigCoversScreen(cfg, screen));
+        return islandBarConfigs.filter(cfg => (cfg.enabled ?? false) && barConfigCoversScreen(cfg, screen));
+    }
+
+    // Only the first island claiming an edge renders there; the rest would stack on top of it.
+    function islandConfigForEdge(screen, edge) {
+        return activeIslandConfigsForScreen(screen).find(cfg => islandEdge(cfg) === edge) ?? null;
     }
 
     function dankIslandCoversScreen(screen) {
-        const cfg = islandBarConfig;
-        return !!screen && !!cfg && (cfg.enabled ?? false) && barConfigCoversScreen(cfg, screen);
+        return activeIslandConfigsForScreen(screen).length > 0;
     }
 
     function dankIslandOwnsEdge(screen, edge) {
-        return dankIslandCoversScreen(screen) && dankIslandEdge === edge;
+        return islandConfigForEdge(screen, edge) !== null;
     }
 
     // Painted strip thickness on `edge`, including when floating drops the exclusive zone.
     function dankIslandEdgeOffset(screen, edge) {
-        return dankIslandOwnsEdge(screen, edge) ? dankIslandReservedStripHeight : 0;
+        const cfg = islandConfigForEdge(screen, edge);
+        return cfg ? islandStripThickness(cfg) : 0;
     }
 
     function dankIslandIsSoleBarForScreen(screen) {
         return dankIslandCoversScreen(screen) && getActiveBarEdgesForScreen(screen).length === 0;
     }
 
+    // Edges an island already holds on every screen this config covers, so a second island
+    // instance cannot be dropped on top of it.
+    function islandEdgeTakenFor(bc, screen, edge) {
+        const owner = islandConfigForEdge(screen, edge);
+        return !!owner && owner.id !== bc?.id;
+    }
+
     function getActiveBarEdgesForScreen(screen) {
-        if (!screen)
-            return [];
-        var edges = [];
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled)
-                continue;
-            if (!barConfigCoversScreen(bc, screen))
-                continue;
-            if (isIslandBarConfig(bc))
-                continue;
-            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
-                continue;
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:
-                edges.push("top");
-                break;
-            case SettingsData.Position.Bottom:
-                edges.push("bottom");
-                break;
-            case SettingsData.Position.Left:
-                edges.push("left");
-                break;
-            case SettingsData.Position.Right:
-                edges.push("right");
-                break;
-            }
-        }
-        return edges;
+        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).length > 0);
     }
 
     function getOverlayBarEdgesForScreen(screen) {
-        if (!screen)
-            return [];
-        var edges = [];
-        for (var i = 0; i < barConfigs.length; i++) {
-            var bc = barConfigs[i];
-            if (!bc.enabled || !(bc.useOverlayLayer ?? false))
-                continue;
-            if (!barConfigCoversScreen(bc, screen))
-                continue;
-            if (isIslandBarConfig(bc))
-                continue;
-            if (dankIslandOwnsEdge(screen, positionToSide(bc.position ?? SettingsData.Position.Top)))
-                continue;
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Top:
-                edges.push("top");
-                break;
-            case SettingsData.Position.Bottom:
-                edges.push("bottom");
-                break;
-            case SettingsData.Position.Left:
-                edges.push("left");
-                break;
-            case SettingsData.Position.Right:
-                edges.push("right");
-                break;
-            }
-        }
-        return edges;
+        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).some(bc => bc.useOverlayLayer ?? false));
     }
 
     readonly property real frameBarContentGap: frameBarInsetPadding < 0 ? frameThickness : frameBarInsetPadding
     readonly property real frameBarContentGapExtra: Math.max(0, frameBarContentGap - frameThickness)
 
+    function getActiveBarConfigsForEdge(screen, edge) {
+        if (!screen)
+            return [];
+        const sidePos = _sideToPosition(edge);
+        if (sidePos < 0 || dankIslandOwnsEdge(screen, edge))
+            return [];
+        return barConfigs.filter(bc => bc.enabled && (bc.position ?? SettingsData.Position.Top) === sidePos && !isIslandBarConfig(bc) && barConfigCoversScreen(bc, screen));
+    }
+
+    function getFrameHostedBarConfigsForEdge(screen, edge) {
+        return getActiveBarConfigsForEdge(screen, edge).filter(bc => !(bc.useOverlayLayer ?? false));
+    }
+
+    // Connected mode hosts one row per non-overlay bar; an edge holding only overlay bars keeps one band.
     function frameEdgeReservation(screen, edge) {
         if (!screen)
             return 0;
-        return getActiveBarEdgesForScreen(screen).includes(edge) ? frameBarSize : frameThickness;
+        const active = getActiveBarConfigsForEdge(screen, edge);
+        if (active.length === 0)
+            return frameThickness;
+        const rows = FrameTransitionState.effectiveConnectedFrameModeActive ? active.filter(bc => !(bc.useOverlayLayer ?? false)) : active;
+        return frameBarSize * Math.max(1, rows.length);
     }
 
     function frameEdgeInsetForSide(screen, side) {
@@ -2759,6 +2844,17 @@ Singleton {
         if (matugenSmartMode === enabled)
             return;
         set("matugenSmartMode", enabled);
+    }
+
+    function setMatugenSourceMode(mode) {
+        var normalized = mode || "dominant";
+        if (matugenSourceMode === normalized)
+            return;
+        // Regeneration comes from the regenSystemThemes onChange hook in
+        // SettingsSpec.js, which set() dispatches. matugenScheme above also
+        // calls Theme.generateSystemThemesFromCurrentTheme() directly, which is
+        // redundant with its own hook.
+        set("matugenSourceMode", normalized);
     }
 
     function setMatugenContrast(value) {
