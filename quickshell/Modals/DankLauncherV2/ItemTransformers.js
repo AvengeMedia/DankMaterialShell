@@ -238,6 +238,7 @@ function transformPluginItem(item, pluginId, selectLabel) {
         type: "plugin",
         name: item.name || "",
         subtitle: item.comment || item.description || "",
+        badgeLabel: item.badgeLabel || "",
         icon: icon,
         iconType: iconType,
         section: "plugin_" + pluginId,
