@@ -260,7 +260,7 @@ DankPopout {
                                 terminal: SessionData.terminalOverride
                             };
                             if (updaterPanel.upgradeRunsInTerminal) {
-                                systemUpdatePopout._reopenAfterUpgrade = true;
+                                systemUpdatePopout._reopenAfterUpgrade = SettingsData.updaterReopenAfterUpgrade;
                                 SystemUpdateService.runUpdates(opts);
                                 systemUpdatePopout.close();
                                 return;

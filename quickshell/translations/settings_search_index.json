@@ -8226,6 +8226,30 @@
     "description": "Apply Flatpak updates alongside system updates when running "
   },
   {
+    "section": "systemUpdaterReopenAfterUpgrade",
+    "label": "Reopen panel after update",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "after",
+      "closes",
+      "once",
+      "packages",
+      "panel",
+      "popout",
+      "reopen",
+      "running",
+      "system",
+      "terminal",
+      "update",
+      "updater",
+      "updates",
+      "upgrade",
+      "window"
+    ],
+    "description": "Reopen the update panel once the terminal window closes after running updates."
+  },
+  {
     "section": "systemUpdater",
     "label": "System Updater",
     "tabIndex": 20,
