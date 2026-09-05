@@ -27,14 +27,12 @@ Scope {
         return choices[Math.floor(Math.random() * choices.length)];
     }
 
-    function show(force) {
-        if (!force && !SettingsData.screensaverEnabled)
-            return false;
+    function show() {
         if (!["text", "ascii"].includes(contentType)) {
             log.warn("unsupported screensaver content type:", contentType);
             return false;
         }
-        if (IdleService.isShellLocked || IdleService.externalLockerActive)
+        if (IdleService.isShellLocked)
             return false;
 
         if (SettingsData.screensaverEffect === "omarchy") {
@@ -60,7 +58,7 @@ Scope {
         target: IdleService
 
         function onScreensaverRequested() {
-            root.show(false);
+            root.show();
         }
 
         function onDismissScreensaver() {
@@ -70,11 +68,6 @@ Scope {
 
     Connections {
         target: SettingsData
-
-        function onScreensaverEnabledChanged() {
-            if (!SettingsData.screensaverEnabled)
-                root.hide();
-        }
 
         function onScreensaverEffectChanged() {
             if (root.active)
@@ -282,8 +275,25 @@ Scope {
     IpcHandler {
         target: "screensaver"
 
+        function open(): string {
+            return root.show() ? "Screensaver opened" : "Screensaver could not open";
+        }
+
+        function close(): string {
+            root.hide();
+            return "Screensaver closed";
+        }
+
+        function toggle(): string {
+            if (root.active) {
+                root.hide();
+                return "Screensaver closed";
+            }
+            return root.show() ? "Screensaver opened" : "Screensaver could not open";
+        }
+
         function start(): string {
-            return root.show(true) ? "Screensaver started" : "Screensaver could not start";
+            return root.show() ? "Screensaver started" : "Screensaver could not start";
         }
 
         function stop(): string {

@@ -18,7 +18,6 @@ Singleton {
 
     readonly property bool isOnBattery: BatteryService.batteryAvailable && !BatteryService.isPluggedIn
     readonly property int monitorTimeout: isOnBattery ? SettingsData.batteryMonitorTimeout : SettingsData.acMonitorTimeout
-    readonly property int screensaverTimeout: isOnBattery ? SettingsData.batteryScreensaverTimeout : SettingsData.acScreensaverTimeout
     readonly property int lockTimeout: isOnBattery ? SettingsData.batteryLockTimeout : SettingsData.acLockTimeout
     readonly property int suspendTimeout: isOnBattery ? SettingsData.batterySuspendTimeout : SettingsData.acSuspendTimeout
     readonly property int suspendBehavior: isOnBattery ? SettingsData.batterySuspendBehavior : SettingsData.acSuspendBehavior
@@ -30,7 +29,6 @@ Singleton {
     onEnabledChanged: _applyMonitorEnableds()
     onPostLockMonitorActiveChanged: _applyMonitorEnableds()
     onMonitorTimeoutChanged: _rearmIdleMonitors()
-    onScreensaverTimeoutChanged: _rearmIdleMonitors()
     onLockTimeoutChanged: _rearmIdleMonitors()
     onSuspendTimeoutChanged: _rearmIdleMonitors()
     onPostLockMonitorTimeoutChanged: _rearmIdleMonitors()
@@ -48,7 +46,6 @@ Singleton {
         const base = enabled && !SessionService.idleInhibited && !externalInhibitActive;
         monitorOffMonitor.enabled = base && monitorTimeout > 0 && !postLockMonitorActive;
         postLockMonitorOffMonitor.enabled = enabled && postLockMonitorActive;
-        screensaverMonitor.enabled = base && SettingsData.screensaverEnabled && screensaverTimeout > 0 && !isShellLocked && !externalLockerActive;
         lockMonitor.enabled = base && lockTimeout > 0;
         suspendMonitor.enabled = base && suspendTimeout > 0;
     }
@@ -56,7 +53,6 @@ Singleton {
     function _rearmIdleMonitors() {
         monitorOffMonitor.enabled = false;
         postLockMonitorOffMonitor.enabled = false;
-        screensaverMonitor.enabled = false;
         lockMonitor.enabled = false;
         suspendMonitor.enabled = false;
         Qt.callLater(_applyMonitorEnableds);
@@ -77,7 +73,6 @@ Singleton {
     property var lockComponent: null
     property bool monitorsOff: false
     property bool isShellLocked: false
-    property bool externalLockerActive: false
     property bool lockPowerOffRequested: false
 
     function reapplyDpmsIfNeeded() {
@@ -106,21 +101,6 @@ Singleton {
                 }
                 root.requestMonitorOn();
             }
-        }
-    }
-
-    IdleMonitor {
-        id: screensaverMonitor
-        timeout: root.screensaverTimeout > 0 ? root.screensaverTimeout : 86400
-        respectInhibitors: root.respectInhibitors
-        enabled: false
-        onIsIdleChanged: {
-            if (!enabled)
-                return;
-            if (isIdle)
-                root.screensaverRequested();
-            else
-                root.dismissScreensaver();
         }
     }
 
@@ -201,16 +181,6 @@ Singleton {
     }
 
     Connections {
-        target: SettingsData
-
-        function onScreensaverEnabledChanged() {
-            if (!SettingsData.screensaverEnabled)
-                root.dismissScreensaver();
-            root._rearmIdleMonitors();
-        }
-    }
-
-    Connections {
         target: root
         function onRequestMonitorOff() {
             monitorsOff = true;
@@ -235,12 +205,6 @@ Singleton {
         } else {
             log.info("External idle inhibit released");
         }
-        _rearmIdleMonitors();
-    }
-
-    onExternalLockerActiveChanged: {
-        if (externalLockerActive)
-            dismissScreensaver();
         _rearmIdleMonitors();
     }
 

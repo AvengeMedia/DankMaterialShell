@@ -205,36 +205,6 @@ Item {
                 }
 
                 SettingsDropdownRow {
-                    id: screensaverTimeoutDropdown
-                    settingKey: "screensaverTimeout"
-                    tags: ["screensaver", "idle", "timeout", "animation", "automatic"]
-                    text: I18n.tr("Start screensaver after", "Idle timeout setting title under Power & Sleep")
-                    options: root.timeoutOptions
-                    visible: SettingsData.screensaverEnabled
-
-                    Connections {
-                        target: powerCategory
-                        function onCurrentIndexChanged() {
-                            const currentTimeout = powerCategory.currentIndex === 0 ? SettingsData.acScreensaverTimeout : SettingsData.batteryScreensaverTimeout;
-                            screensaverTimeoutDropdown.currentValue = root.timeoutOptions[root.getTimeoutIndex(currentTimeout)];
-                        }
-                    }
-
-                    Component.onCompleted: {
-                        const currentTimeout = powerCategory.currentIndex === 0 ? SettingsData.acScreensaverTimeout : SettingsData.batteryScreensaverTimeout;
-                        currentValue = root.timeoutOptions[root.getTimeoutIndex(currentTimeout)];
-                    }
-
-                    onValueChanged: value => {
-                        const index = root.timeoutOptions.indexOf(value);
-                        if (index < 0)
-                            return;
-                        const timeout = root.timeoutValues[index];
-                        SettingsData.set(powerCategory.currentIndex === 0 ? "acScreensaverTimeout" : "batteryScreensaverTimeout", timeout);
-                    }
-                }
-
-                SettingsDropdownRow {
                     id: lockDropdown
                     settingKey: "lockTimeout"
                     tags: ["lock", "timeout", "idle", "automatic", "security"]
@@ -395,15 +365,6 @@ Item {
                 title: I18n.tr("Screensaver", "Settings card title under Power & Sleep")
                 settingKey: "screensaver"
 
-                SettingsToggleRow {
-                    settingKey: "screensaverEnabled"
-                    tags: ["screensaver", "idle", "text", "ascii", "animation"]
-                    text: I18n.tr("Enable Screensaver", "Toggle title under Power & Sleep")
-                    description: I18n.tr("Show animated content while idle without changing or replacing the lock screen", "Description for the standalone screensaver toggle")
-                    checked: SettingsData.screensaverEnabled
-                    onToggled: checked => SettingsData.set("screensaverEnabled", checked)
-                }
-
                 SettingsDropdownRow {
                     id: screensaverTypeDropdown
                     settingKey: "screensaverType"
@@ -412,7 +373,6 @@ Item {
                     property var typeValues: ["text", "ascii"]
 
                     text: I18n.tr("Content Type", "Screensaver content setting title")
-                    visible: SettingsData.screensaverEnabled
                     options: typeLabels
                     currentValue: typeLabels[Math.max(0, typeValues.indexOf(SettingsData.screensaverType))]
                     onValueChanged: value => {
@@ -431,7 +391,6 @@ Item {
 
                     text: I18n.tr("Animation Effect", "Screensaver animation setting title")
                     description: SettingsData.screensaverEffect === "omarchy" ? I18n.tr("Uses your default terminal with the lightweight ttfx engine: matrix, decrypt, fireworks, burn, blackhole, VHS and more", "Description for the Omarchy Screensaver animation option") : I18n.tr("Simple Random rotates between native effects every 12 seconds", "Description for the built-in screensaver animation options")
-                    visible: SettingsData.screensaverEnabled
                     options: effectLabels
                     currentValue: effectLabels[Math.max(0, effectValues.indexOf(SettingsData.screensaverEffect))]
                     onValueChanged: value => {
@@ -444,7 +403,7 @@ Item {
                 Column {
                     width: parent.width
                     spacing: Theme.spacingXS
-                    visible: SettingsData.screensaverEnabled && (SettingsData.screensaverType === "text" || SettingsData.screensaverType === "ascii")
+                    visible: SettingsData.screensaverType === "text" || SettingsData.screensaverType === "ascii"
 
                     StyledText {
                         text: SettingsData.screensaverType === "ascii" ? I18n.tr("ASCII Art", "Screensaver content field label") : I18n.tr("Text", "Screensaver content field label")
@@ -467,39 +426,8 @@ Item {
                 }
 
                 DankButton {
-                    id: previewScreensaverButton
-                    property bool busy: false
-
-                    text: busy ? "" : I18n.tr("Preview Screensaver", "Button to start a screensaver preview")
-                    visible: SettingsData.screensaverEnabled
-                    enabled: !busy
-                    onClicked: {
-                        busy = true;
-                        previewLoadingTimer.restart();
-                        IdleService.screensaverRequested();
-                    }
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "progress_activity"
-                        size: Theme.iconSize
-                        color: previewScreensaverButton.textColor
-                        visible: previewScreensaverButton.busy
-
-                        RotationAnimation on rotation {
-                            running: previewScreensaverButton.busy
-                            from: 0
-                            to: 360
-                            duration: 850
-                            loops: Animation.Infinite
-                        }
-                    }
-
-                    Timer {
-                        id: previewLoadingTimer
-                        interval: 5000
-                        onTriggered: previewScreensaverButton.busy = false
-                    }
+                    text: I18n.tr("Start Screensaver", "Button to start the screensaver")
+                    onClicked: IdleService.screensaverRequested()
                 }
             }
 

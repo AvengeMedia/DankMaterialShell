@@ -15,6 +15,7 @@ Rectangle {
 
     signal powerButtonClicked
     signal lockRequested
+    signal screensaverRequested
     signal editModeToggled
     signal settingsButtonClicked
     signal headerTapped
@@ -93,6 +94,16 @@ Rectangle {
             onClicked: {
                 root.lockRequested();
             }
+        }
+
+        DankActionButton {
+            buttonSize: 36
+            iconName: "animation"
+            iconSize: Theme.iconSize - 4
+            iconColor: Theme.surfaceText
+            backgroundColor: "transparent"
+            tooltipText: I18n.tr("Start Screensaver", "Control Center header button tooltip")
+            onClicked: root.screensaverRequested()
         }
 
         DankActionButton {

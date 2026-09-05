@@ -240,7 +240,7 @@ dms ipc call lock isLocked
 
 ## Target: `screensaver`
 
-Standalone idle screensaver control. This does not lock or unlock the session.
+Standalone manual screensaver control. This does not lock or unlock the session.
 The optional `Omarchy Screensaver` animation mode uses the MIT-licensed `ttfx`
 engine in the user's configured/default terminal to cycle through its
 character-level effects. Text and ASCII are used as terminal art; normal text
@@ -249,12 +249,24 @@ is expanded into a large adaptive block banner. This mode requires `ttfx`,
 
 ### Functions
 
+**`open`**
+- Show the screensaver immediately
+- Returns: Open result message
+
+**`close`**
+- Dismiss the screensaver
+- Returns: Close result message
+
+**`toggle`**
+- Show or dismiss the screensaver
+- Returns: Toggle result message
+
 **`start`**
-- Show the screensaver immediately, even when its automatic idle trigger is disabled
+- Backwards-compatible alias for opening the screensaver
 - Returns: Start result message
 
 **`stop`**
-- Dismiss the screensaver
+- Backwards-compatible alias for closing the screensaver
 - Returns: Stop result message
 
 **`status`**
@@ -263,8 +275,9 @@ is expanded into a large adaptive block banner. This mode requires `ttfx`,
 
 ### Examples
 ```bash
-dms ipc call screensaver start
-dms ipc call screensaver stop
+dms ipc call screensaver open
+dms ipc call screensaver close
+dms ipc call screensaver toggle
 dms ipc call screensaver status
 ```
 

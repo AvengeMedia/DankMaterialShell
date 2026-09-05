@@ -97,7 +97,6 @@ Scope {
 
     function spawnCustomLocker() {
         IdleService.lockPowerOffRequested = false;
-        IdleService.externalLockerActive = true;
         IdleService.dismissScreensaver();
         Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock]);
         // The custom locker manages its own surface; DMS never engages
@@ -179,7 +178,6 @@ Scope {
         pendingLock = false;
         shouldLock = false;
         customLockerSpawned = false;
-        IdleService.externalLockerActive = false;
         resetLockRetry();
         resetPowerOffFade();
         IdleService.lockPowerOffRequested = false;
@@ -209,7 +207,6 @@ Scope {
 
         function onSessionUnlocked() {
             customLockerSpawned = false;
-            IdleService.externalLockerActive = false;
             if (pendingLock) {
                 pendingLock = false;
                 lockInitiatedLocally = false;

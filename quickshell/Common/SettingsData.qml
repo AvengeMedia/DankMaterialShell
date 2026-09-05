@@ -790,14 +790,12 @@ Singleton {
     property bool muteSoundsWhenMediaPlaying: true
 
     property int acMonitorTimeout: 0
-    property int acScreensaverTimeout: 120
     property int acLockTimeout: 0
     property int acSuspendTimeout: 0
     property int acSuspendBehavior: SettingsData.SuspendBehavior.Suspend
     property string acProfileName: ""
     property int acPostLockMonitorTimeout: 0
     property int batteryMonitorTimeout: 0
-    property int batteryScreensaverTimeout: 120
     property int batteryLockTimeout: 0
     property int batterySuspendTimeout: 0
     property int batterySuspendBehavior: SettingsData.SuspendBehavior.Suspend
@@ -823,7 +821,6 @@ Singleton {
     property string batteryStyle: "icon"
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
-    property bool screensaverEnabled: false
     property string screensaverType: "text"
     property string screensaverText: "DankMaterialShell"
     property string screensaverEffect: "random"
