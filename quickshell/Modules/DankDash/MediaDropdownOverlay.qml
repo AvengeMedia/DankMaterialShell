@@ -69,7 +69,7 @@ Item {
             return;
         }
         if (AudioService.sink?.audio)
-            AudioService.sink.audio.volume = volume;
+            AudioService.setVolume(Math.round(volume * 100));
     }
 
     function selectPlayer(player) {
