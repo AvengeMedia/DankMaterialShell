@@ -834,6 +834,8 @@ Item {
                 }
 
                 Rectangle {
+                    id: passwordBox
+
                     property bool showPassword: false
 
                     Layout.fillWidth: true
@@ -1230,61 +1232,100 @@ Item {
                         }
                     }
 
-                    StyledText {
-                        id: passwordDisplay
+                    Item {
+                        id: passwordViewport
+
+                        property real scrollX: 0
+                        property real scrollY: 0
+
+                        function followCursor() {
+                            const rect = passwordDisplay.cursorRectangle;
+                            const contentWidth = passwordDisplay.contentWidth + passwordCursor.width;
+                            const contentHeight = passwordDisplay.contentHeight;
+                            scrollX = followAxis(scrollX, rect.x, rect.x + passwordCursor.width, contentWidth, width);
+                            scrollY = contentHeight < height ? (height - contentHeight) / 2 : followAxis(scrollY, rect.y, rect.y + rect.height, contentHeight, height);
+                        }
+
+                        function followAxis(offset, start, end, contentSize, viewSize) {
+                            if (contentSize <= viewSize)
+                                return 0;
+                            if (start + offset < 0)
+                                return -start;
+                            if (end + offset > viewSize)
+                                return viewSize - end;
+                            return Math.max(viewSize - contentSize, Math.min(0, offset));
+                        }
 
                         anchors.left: lockIconContainer.right
                         anchors.leftMargin: Theme.spacingM
                         anchors.right: (revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (securityKeyButton.visible ? securityKeyButton.left : (enterButton.visible ? enterButton.left : (loadingSpinner.visible ? loadingSpinner.left : parent.right)))))
                         anchors.rightMargin: 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: {
-                            if (demoMode) {
-                                return "••••••••";
-                            }
-                            if (parent.showPassword) {
-                                return root.passwordBuffer;
-                            }
-                            return "•".repeat(root.passwordBuffer.length);
-                        }
-                        color: Theme.surfaceText
-                        font.pixelSize: parent.showPassword ? Theme.fontSizeMedium : Theme.fontSizeLarge
-                        opacity: (demoMode || root.passwordBuffer.length > 0) ? 1 : 0
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.topMargin: Theme.spacingXS
+                        anchors.bottomMargin: Theme.spacingXS
                         clip: true
-                        elide: Text.ElideNone
-                        horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignLeft
 
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                                easing.type: Theme.standardEasing
+                        onWidthChanged: followCursor()
+                        onHeightChanged: followCursor()
+
+                        TextEdit {
+                            id: passwordDisplay
+
+                            x: passwordViewport.scrollX
+                            y: passwordViewport.scrollY
+                            width: wrapMode === TextEdit.NoWrap ? implicitWidth : passwordViewport.width
+                            readOnly: true
+                            activeFocusOnPress: false
+                            selectByMouse: false
+                            wrapMode: passwordBox.showPassword ? TextEdit.Wrap : TextEdit.NoWrap
+                            text: {
+                                if (demoMode) {
+                                    return "••••••••";
+                                }
+                                if (passwordBox.showPassword) {
+                                    return root.passwordBuffer;
+                                }
+                                return "•".repeat(root.passwordBuffer.length);
+                            }
+                            color: Theme.surfaceText
+                            font.family: Theme.fontFamily
+                            font.weight: Theme.fontWeight
+                            font.pixelSize: passwordBox.showPassword ? Theme.fontSizeMedium : Theme.fontSizeLarge
+                            opacity: (demoMode || root.passwordBuffer.length > 0) ? 1 : 0
+
+                            onTextChanged: cursorPosition = passwordField.cursorPosition
+                            onCursorRectangleChanged: passwordViewport.followCursor()
+                            onContentWidthChanged: passwordViewport.followCursor()
+                            onContentHeightChanged: passwordViewport.followCursor()
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.standardEasing
+                                }
                             }
                         }
-                    }
 
-                    TextMetrics {
-                        id: passwordCursorMetrics
-                        font: passwordDisplay.font
-                        text: passwordDisplay.text.slice(0, passwordField.cursorPosition)
-                    }
+                        DankTextCursor {
+                            id: passwordCursor
 
-                    DankTextCursor {
-                        id: passwordCursor
+                            x: passwordDisplay.x + passwordDisplay.cursorRectangle.x
+                            y: passwordDisplay.y + passwordDisplay.cursorRectangle.y
+                            height: passwordDisplay.cursorRectangle.height
+                            shown: !demoMode && passwordField.activeFocus && !pam.passwd.active && !pam.u2fPending && !root.unlocking
 
-                        x: passwordDisplay.x + passwordCursorMetrics.advanceWidth + Math.min(0, passwordDisplay.width - passwordDisplay.implicitWidth)
-                        anchors.verticalCenter: parent.verticalCenter
-                        height: passwordDisplay.font.pixelSize + 4
-                        shown: !demoMode && passwordField.activeFocus && !pam.passwd.active && !pam.u2fPending && !root.unlocking
+                            Connections {
+                                target: passwordField
 
-                        Connections {
-                            target: passwordField
+                                function onCursorPositionChanged() {
+                                    passwordDisplay.cursorPosition = passwordField.cursorPosition;
+                                    passwordCursor.resetBlink();
+                                }
 
-                            function onCursorPositionChanged() {
-                                passwordCursor.resetBlink();
-                            }
-
-                            function onTextChanged() {
-                                passwordCursor.resetBlink();
+                                function onTextChanged() {
+                                    passwordCursor.resetBlink();
+                                }
                             }
                         }
                     }
