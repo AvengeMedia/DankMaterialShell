@@ -106,6 +106,15 @@ Item {
         pam.u2f.startForAlternativeAuth();
     }
 
+    function canSubmitPassword() {
+        // Submitting an empty buffer spends a PAM attempt that cannot succeed,
+        // pushing the session towards a faillock lockout for nothing. The
+        // exception is a PAM stack DMS does not own: there the conversation
+        // itself may prompt (inline u2f/fprint), so an empty response is
+        // meaningful and Enter is how the user starts it.
+        return passwordBuffer.length > 0 || SettingsData.lockPamExternallyManaged || (pam && pam.customPamActive);
+    }
+
     function securityKeyShortcutMatches(event) {
         return SettingsData.lockScreenSecurityKeyShortcutEnabled && KeyUtils.eventMatchesCombo(event, SettingsData.lockScreenSecurityKeyShortcut);
     }
@@ -992,7 +1001,7 @@ Item {
                         activeFocusOnTab: !demoMode
                         onTextChanged: cursorPosition = text.length
                         onAccepted: {
-                            if (!demoMode && !root.unlocking && !pam.passwd.active && !pam.u2fPending) {
+                            if (!demoMode && !root.unlocking && !pam.passwd.active && !pam.u2fPending && root.canSubmitPassword()) {
                                 pam.passwd.start();
                             }
                         }
@@ -1427,7 +1436,7 @@ Item {
                         visible: (demoMode || (!pam.passwd.active && !root.unlocking && !pam.u2fPending))
                         enabled: !demoMode
                         onClicked: {
-                            if (!demoMode && !root.unlocking && !pam.u2fPending) {
+                            if (!demoMode && !root.unlocking && !pam.u2fPending && root.canSubmitPassword()) {
                                 pam.passwd.start();
                             }
                         }
