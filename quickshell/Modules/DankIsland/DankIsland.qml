@@ -9,6 +9,8 @@ import qs.Services
 Item {
     id: root
 
+    property var hyprlandOverviewLoader: null
+
     // One host per (island instance, screen), skipping a screen edge another island already holds.
     readonly property var hostSlots: {
         SettingsData.barConfigs;
@@ -58,7 +60,6 @@ Item {
         }
         return null;
     }
-
 
     function hostForScreenName(screenName) {
         for (const host of hosts()) {
@@ -258,6 +259,7 @@ Item {
 
             screen: modelData.screen
             barId: modelData.barId
+            hyprlandOverviewLoader: root.hyprlandOverviewLoader
         }
     }
 
