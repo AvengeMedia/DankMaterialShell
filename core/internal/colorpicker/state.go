@@ -266,7 +266,7 @@ func (s *SurfaceState) OnPointerButton(button, state uint32) {
 	}
 }
 
-func (s *SurfaceState) OnKey(key, state uint32) {
+func (s *SurfaceState) OnKey(sym string, state uint32) {
 	if state != 1 {
 		return
 	}
@@ -274,10 +274,10 @@ func (s *SurfaceState) OnKey(key, state uint32) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	switch key {
-	case 1: // KEY_ESC
+	switch sym {
+	case "Escape":
 		s.cancelled = true
-	case 28: // KEY_ENTER
+	case "Return", "KP_Enter":
 		if s.readyForDisplay && s.screenBuf != nil {
 			s.colorPicked = true
 		}

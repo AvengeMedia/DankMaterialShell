@@ -104,7 +104,7 @@ func TestSurfaceState_ConcurrentIsDone(t *testing.T) {
 	for range goroutines / 3 {
 		wg.Go(func() {
 			for range iterations {
-				s.OnKey(1, 1)
+				s.OnKey("Escape", 1)
 			}
 		})
 	}
