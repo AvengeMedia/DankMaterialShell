@@ -146,3 +146,23 @@ func TestNetworkManagerBackend_UpdateWiFiState_PicksConnectedDevice(t *testing.T
 	assert.True(t, backend.state.WiFiConnected)
 	assert.Equal(t, "wlan1", backend.state.WiFiDevice)
 }
+
+func TestForgetOnConnectFailure(t *testing.T) {
+	tests := []struct {
+		name        string
+		reasonCode  string
+		preExisting bool
+		want        bool
+	}{
+		{"cancelled prompt on freshly created profile", errdefs.ErrUserCanceled, false, true},
+		{"no-secrets failure on saved profile", errdefs.ErrUserCanceled, true, false},
+		{"bad credentials on freshly created profile", errdefs.ErrBadCredentials, false, false},
+		{"generic failure on saved profile", errdefs.ErrConnectionFailed, true, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, forgetOnConnectFailure(tt.reasonCode, tt.preExisting))
+		})
+	}
+}

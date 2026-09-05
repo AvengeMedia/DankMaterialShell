@@ -183,6 +183,12 @@ func (b *NetworkManagerBackend) classifyNMStateReason(reason uint32) string {
 	}
 }
 
+// NM raises NO_SECRETS once auth retries run out on a saved profile too, not only
+// on a dismissed prompt (nm-device-wifi.c handle_8021x_or_psk_auth_fail, #3313).
+func forgetOnConnectFailure(reasonCode string, preExisting bool) bool {
+	return reasonCode == errdefs.ErrUserCanceled && !preExisting
+}
+
 // With several adapters, state must follow the associated device, not whichever
 // enumerated first (#2460).
 func (b *NetworkManagerBackend) wifiDeviceForState() (gonetworkmanager.Device, gonetworkmanager.DeviceWireless) {
@@ -321,7 +327,7 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 			b.state.ConnectingSSID = ""
 			b.state.LastError = reasonCode
 
-			if reasonCode == errdefs.ErrUserCanceled {
+			if forgetOnConnectFailure(reasonCode, b.state.ConnectingPreExisting) {
 				forgetSSID = connectingSSID
 			}
 
