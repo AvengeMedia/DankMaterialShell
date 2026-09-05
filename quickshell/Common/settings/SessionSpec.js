@@ -4,6 +4,9 @@ var SPEC = {
     isLightMode: { def: false },
     doNotDisturb: { def: false },
     doNotDisturbUntil: { def: 0 },
+    doNotDisturbHeldByScreenShare: { def: false },
+    screenShareDndDismissed: { def: false },
+    screenShareDismissedIds: { def: [] },
     idleInhibited: { def: false },
     terminalOverride: { def: "" },
 
