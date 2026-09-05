@@ -238,6 +238,36 @@ dms ipc call lock lock
 dms ipc call lock isLocked
 ```
 
+## Target: `screensaver`
+
+Standalone idle screensaver control. This does not lock or unlock the session.
+The optional `Omarchy Screensaver` animation mode uses the MIT-licensed `ttfx`
+engine in the user's configured/default terminal to cycle through its
+character-level effects. Text and ASCII are used as terminal art; normal text
+is expanded into a large adaptive block banner. This mode requires `ttfx`,
+`jq`, and `python3`; the built-in effects have no external dependencies.
+
+### Functions
+
+**`start`**
+- Show the screensaver immediately, even when its automatic idle trigger is disabled
+- Returns: Start result message
+
+**`stop`**
+- Dismiss the screensaver
+- Returns: Stop result message
+
+**`status`**
+- Check whether the screensaver is visible
+- Returns: `active` or `inactive`
+
+### Examples
+```bash
+dms ipc call screensaver start
+dms ipc call screensaver stop
+dms ipc call screensaver status
+```
+
 ## Target: `sessions`
 
 Logind session enumeration and seat-local session switching. Wraps `loginctl list-sessions` and `loginctl activate`. Only switches between sessions that are *already running* on the current seat — creating a fresh login as another user requires a multi-session greeter setup (greetd-flexiserver / GDM / LightDM) and is out of scope.
