@@ -430,6 +430,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "notificationDndWhileScreenSharing"
+                    tags: ["notification", "dnd", "screenshare", "sharing", "privacy"]
+                    text: I18n.tr("Automatically enable while screen sharing", "do not disturb auto enable while screen sharing toggle")
+                    description: I18n.tr("Turn on Do Not Disturb while a screen share is active", "do not disturb auto enable while screen sharing description")
+                    checked: SettingsData.notificationDndWhileScreenSharing
+                    onToggled: checked => SettingsData.set("notificationDndWhileScreenSharing", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "notificationDndAllowCritical"
                     tags: ["notification", "dnd", "critical", "priority", "urgent", "bypass"]
                     text: I18n.tr("Critical Priority")

@@ -532,6 +532,7 @@ var SPEC = {
     notificationHistorySaveCritical: { def: true },
     notificationRules: { def: [] },
     notificationDndAllowCritical: { def: true },
+    notificationDndWhileScreenSharing: { def: true },
     notificationFocusedMonitor: { def: false },
 
 

@@ -36,6 +36,9 @@ Singleton {
     property bool isLightMode: false
     property bool doNotDisturb: false
     property real doNotDisturbUntil: 0
+    property bool doNotDisturbHeldByScreenShare: false
+    property bool screenShareDndDismissed: false
+    property var screenShareDismissedIds: []
     property bool idleInhibited: false
     property string terminalOverride: ""
     property bool isSwitchingMode: false
@@ -71,7 +74,15 @@ Singleton {
         id: dndExpireTimer
         repeat: false
         running: false
-        onTriggered: root.setDoNotDisturb(false)
+        onTriggered: root.setDoNotDisturb(false, 0, "timer")
+    }
+
+    Timer {
+        id: screenShareReleaseTimer
+        interval: 4000
+        repeat: false
+        running: false
+        onTriggered: root._endScreenShareDnd()
     }
 
     function _armDndExpireTimer() {
@@ -80,7 +91,7 @@ Singleton {
             return;
         const remaining = doNotDisturbUntil - Date.now();
         if (remaining <= 0) {
-            setDoNotDisturb(false);
+            setDoNotDisturb(false, 0, "timer");
             return;
         }
         dndExpireTimer.interval = remaining;
@@ -108,6 +119,21 @@ Singleton {
             root.suppressOSD = true;
             osdSuppressTimer.restart();
             root._applyDndExpirySanity();
+            Qt.callLater(root._syncScreenShareDnd);
+        }
+    }
+
+    Connections {
+        target: (!root.isGreeterMode && typeof SettingsData !== "undefined" && SettingsData.notificationDndWhileScreenSharing && typeof PrivacyService !== "undefined") ? PrivacyService : null
+        function onScreensharingActiveChanged() {
+            root._syncScreenShareDnd();
+        }
+    }
+
+    Connections {
+        target: typeof SettingsData !== "undefined" ? SettingsData : null
+        function onNotificationDndWhileScreenSharingChanged() {
+            root._syncScreenShareDnd();
         }
     }
 
@@ -309,6 +335,7 @@ Singleton {
                 Theme.generateSystemThemesFromCurrentTheme();
 
             loaded();
+            Qt.callLater(root._syncScreenShareDnd);
 
             _checkSessionWritable();
         } catch (e) {
@@ -390,6 +417,7 @@ Singleton {
                 Theme.generateSystemThemesFromCurrentTheme();
 
             loaded();
+            Qt.callLater(root._syncScreenShareDnd);
         } catch (e) {
             _parseError = true;
             const msg = e.message;
@@ -633,11 +661,24 @@ Singleton {
         });
     }
 
-    function setDoNotDisturb(enabled, durationMinutes) {
+    function setDoNotDisturb(enabled, durationMinutes, origin) {
+        const src = origin || "user";
+        if (src === "user") {
+            if (!enabled && _screenShareShouldHold()) {
+                screenShareDndDismissed = true;
+                screenShareDismissedIds = _screencastIds();
+            }
+            if (doNotDisturbHeldByScreenShare)
+                doNotDisturbHeldByScreenShare = false;
+        }
+
         const minutes = Number(durationMinutes) || 0;
         doNotDisturb = enabled;
         doNotDisturbUntil = (enabled && minutes > 0) ? Date.now() + minutes * 60 * 1000 : 0;
         saveSettings();
+
+        if (src !== "screenshare")
+            Qt.callLater(_syncScreenShareDnd);
     }
 
     function setIdleInhibited(enabled) {
@@ -654,9 +695,90 @@ Singleton {
             setDoNotDisturb(false);
             return;
         }
+        if (doNotDisturbHeldByScreenShare)
+            doNotDisturbHeldByScreenShare = false;
         doNotDisturb = true;
         doNotDisturbUntil = target;
         saveSettings();
+    }
+
+    function _screenShareShouldHold() {
+        if (isGreeterMode)
+            return false;
+        if (typeof SettingsData === "undefined" || !SettingsData.notificationDndWhileScreenSharing)
+            return false;
+        if (typeof PrivacyService === "undefined" || !PrivacyService.screensharingActive)
+            return false;
+        return true;
+    }
+
+    function _screencastIds() {
+        return (typeof PrivacyService !== "undefined") ? PrivacyService.screencastSourceIds() : [];
+    }
+
+    function _dismissalApplies() {
+        if (!screenShareDndDismissed)
+            return false;
+        const dismissed = screenShareDismissedIds || [];
+        if (!dismissed.length)
+            return true;
+        const current = _screencastIds();
+        if (!current.length)
+            return true;
+        return current.some(id => dismissed.indexOf(id) !== -1);
+    }
+
+    function _releaseScreenShareDndHold() {
+        if (!doNotDisturbHeldByScreenShare)
+            return;
+        doNotDisturbHeldByScreenShare = false;
+        if (!doNotDisturb || doNotDisturbUntil > 0) {
+            saveSettings();
+            return;
+        }
+        setDoNotDisturb(false, 0, "screenshare");
+    }
+
+    function _endScreenShareDnd() {
+        _clearScreenShareDismissal();
+        _releaseScreenShareDndHold();
+    }
+
+    function _clearScreenShareDismissal() {
+        if (!screenShareDndDismissed)
+            return;
+        screenShareDndDismissed = false;
+        screenShareDismissedIds = [];
+        saveSettings();
+    }
+
+    function _syncScreenShareDnd() {
+        if (isGreeterMode)
+            return;
+
+        if (!_screenShareShouldHold()) {
+            if (!doNotDisturbHeldByScreenShare && !screenShareDndDismissed)
+                return;
+            const settingOn = typeof SettingsData !== "undefined" && SettingsData.notificationDndWhileScreenSharing;
+            if (!settingOn) {
+                screenShareReleaseTimer.stop();
+                _endScreenShareDnd();
+                return;
+            }
+            screenShareReleaseTimer.restart();
+            return;
+        }
+
+        screenShareReleaseTimer.stop();
+
+        if (!_dismissalApplies())
+            _clearScreenShareDismissal();
+
+        if (screenShareDndDismissed || doNotDisturb)
+            return;
+
+        doNotDisturbHeldByScreenShare = true;
+        setDoNotDisturb(true, 0, "screenshare");
     }
 
     function setWallpaper(imagePath) {

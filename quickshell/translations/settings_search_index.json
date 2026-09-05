@@ -7097,6 +7097,32 @@
     "description": "Control animation duration for notification popups and history"
   },
   {
+    "section": "notificationDndWhileScreenSharing",
+    "label": "Automatically enable while screen sharing",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "active",
+      "alerts",
+      "automatically",
+      "disturb",
+      "dnd",
+      "enable",
+      "messages",
+      "notification",
+      "notifications",
+      "privacy",
+      "screen",
+      "screenshare",
+      "share",
+      "sharing",
+      "toast",
+      "turn",
+      "while"
+    ],
+    "description": "Turn on Do Not Disturb while a screen share is active"
+  },
+  {
     "section": "notificationPopupBodyInvokesAction",
     "label": "Body Click Runs Default Action",
     "tabIndex": 17,

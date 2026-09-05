@@ -987,6 +987,7 @@ Singleton {
     property bool notificationHistorySaveCritical: true
     property var notificationRules: []
     property bool notificationDndAllowCritical: true
+    property bool notificationDndWhileScreenSharing: true
     property bool notificationFocusedMonitor: false
     // Island is a per-instance render mode: any bar config with island:true draws as an island
     // instead of a DankBar, and carries its own island* look settings.
