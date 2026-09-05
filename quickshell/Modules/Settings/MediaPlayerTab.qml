@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import qs.Common
 import qs.Widgets
 import qs.Modules.Settings.Widgets
@@ -9,9 +10,36 @@ Item {
 
     property var desktopApps: []
     property var parentModal: null
+    property bool mprisProxyRunning: false
 
     Component.onCompleted: {
         desktopApps = AppSearchService.getVisibleApplications() || [];
+        if (visible)
+            checkMprisProxy();
+    }
+    onVisibleChanged: checkMprisProxy()
+
+    function checkMprisProxy(): void {
+        if (!root.visible || !SettingsData.bluetoothMprisEnabled) {
+            mprisProxyRunning = false;
+            return;
+        }
+        if (!mprisProxyCheck.running)
+            mprisProxyCheck.running = true;
+    }
+
+    Connections {
+        target: SettingsData
+        function onBluetoothMprisEnabledChanged() {
+            root.checkMprisProxy();
+        }
+    }
+
+    Process {
+        id: mprisProxyCheck
+        command: ["sh", "-c", "systemctl --user --quiet is-active mpris-proxy.service 2>/dev/null || pgrep -U \"$(id -u)\" -x mpris-proxy >/dev/null"]
+        running: false
+        onExited: exitCode => root.mprisProxyRunning = root.visible && SettingsData.bluetoothMprisEnabled && exitCode === 0
     }
 
     Component.onDestruction: {
@@ -170,6 +198,24 @@ Item {
                     description: I18n.tr("Allow adjusting device volume by scrolling on the right half of items in the device list")
                     checked: SettingsData.audioDeviceScrollVolumeEnabled
                     onToggled: checked => SettingsData.set("audioDeviceScrollVolumeEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "bluetoothMpris"
+                    tags: ["bluetooth", "headphones", "media", "mpris", "avrcp"]
+                    text: I18n.tr("Bluetooth media controls", "Title for the setting that routes Bluetooth headset media buttons through DMS")
+                    description: I18n.tr("Route Bluetooth headset controls to the active DMS media player", "Description of how Bluetooth headset media buttons select a player")
+                    checked: SettingsData.bluetoothMprisEnabled
+                    onToggled: checked => SettingsData.set("bluetoothMprisEnabled", checked)
+                }
+
+                StyledText {
+                    visible: SettingsData.bluetoothMprisEnabled && root.mprisProxyRunning
+                    width: parent.width
+                    text: I18n.tr("mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service", "Warning shown when the legacy BlueZ MPRIS proxy conflicts with DMS Bluetooth media controls")
+                    color: Theme.error
+                    font.pixelSize: Theme.fontSizeSmall
+                    wrapMode: Text.WordWrap
                 }
             }
 

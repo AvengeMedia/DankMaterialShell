@@ -570,21 +570,15 @@ Item {
         }
 
         function play(): void {
-            if (MprisController.activePlayer && MprisController.activePlayer.canPlay) {
-                MprisController.activePlayer.play();
-            }
+            MprisController.play();
         }
 
         function pause(): void {
-            if (MprisController.activePlayer && MprisController.activePlayer.canPause) {
-                MprisController.activePlayer.pause();
-            }
+            MprisController.pause();
         }
 
         function playPause(): void {
-            if (MprisController.activePlayer && MprisController.activePlayer.canTogglePlaying) {
-                MprisController.activePlayer.togglePlaying();
-            }
+            MprisController.playPause();
         }
 
         function previous(): void {
@@ -596,9 +590,7 @@ Item {
         }
 
         function stop(): void {
-            if (MprisController.activePlayer) {
-                MprisController.activePlayer.stop();
-            }
+            MprisController.stop();
         }
 
         function increment(step: string): string {

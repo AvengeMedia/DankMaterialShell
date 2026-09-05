@@ -6868,6 +6868,30 @@
     "description": "Show cava audio visualizer in media widget"
   },
   {
+    "section": "bluetoothMpris",
+    "label": "Bluetooth media controls",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "active",
+      "audio",
+      "avrcp",
+      "bluetooth",
+      "bt",
+      "controls",
+      "headphones",
+      "headset",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "route",
+      "spotify"
+    ],
+    "description": "Route Bluetooth headset controls to the active DMS media player"
+  },
+  {
     "section": "mediaDeviceScrollVolume",
     "label": "Device list scroll volume",
     "tabIndex": 16,
