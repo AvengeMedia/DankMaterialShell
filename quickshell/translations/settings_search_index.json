@@ -4177,6 +4177,33 @@
     ]
   },
   {
+    "section": "generateThemeAtStartup",
+    "label": "Generate Theme at Startup",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "browse",
+      "colors",
+      "colour",
+      "custom",
+      "dynamic",
+      "generate",
+      "look",
+      "material",
+      "matugen",
+      "never",
+      "runs",
+      "scheme",
+      "startup",
+      "style",
+      "theme",
+      "themes",
+      "wallpaper colors"
+    ],
+    "description": "Matugen never runs on startup for Custom or Browse themes."
+  },
+  {
     "section": "matugenTemplateGhostty",
     "label": "Ghostty",
     "tabIndex": 10,
@@ -4783,6 +4810,36 @@
       "wallpaper"
     ],
     "description": "Select which color is extracted from the wallpaper to seed the palette"
+  },
+  {
+    "section": "themeStartupBehavior",
+    "label": "Startup Behavior",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "behavior",
+      "browse",
+      "colors",
+      "colour",
+      "custom",
+      "dynamic",
+      "look",
+      "material",
+      "matugen",
+      "never",
+      "runs",
+      "scheme",
+      "startup",
+      "style",
+      "theme",
+      "themes",
+      "theming",
+      "wallpaper colors"
+    ],
+    "icon": "power_settings_new",
+    "description": "Matugen never runs on startup for Custom or Browse themes.",
+    "conditionKey": "matugenAvailable"
   },
   {
     "section": "blurBorderColor",

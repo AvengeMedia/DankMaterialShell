@@ -1320,6 +1320,27 @@ Item {
 
             SettingsCard {
                 tab: "theme"
+                tags: ["matugen", "startup", "theming"]
+                title: I18n.tr("Startup Behavior", "settings card title")
+                settingKey: "themeStartupBehavior"
+                iconName: "power_settings_new"
+                visible: Theme.matugenAvailable
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["matugen", "startup", "generate"]
+                    settingKey: "generateThemeAtStartup"
+                    text: I18n.tr("Generate Theme at Startup", "toggle label")
+                    description: Theme.currentTheme === Theme.custom ? I18n.tr("Matugen never runs on startup for Custom or Browse themes.", "toggle disabled explanation") : I18n.tr("Regenerate matugen colors when DMS starts.", "toggle description")
+                    checked: SettingsData.generateThemeAtStartup && Theme.currentTheme !== Theme.custom
+                    enabled: Theme.currentTheme !== Theme.custom
+                    opacity: enabled ? 1 : 0.4
+                    onToggled: checked => SettingsData.set("generateThemeAtStartup", checked)
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
                 tags: ["light", "dark", "mode", "appearance", "automatic", "color", "schedule", "sunrise", "sunset"]
                 title: I18n.tr("Color Mode")
                 settingKey: "colorMode"
