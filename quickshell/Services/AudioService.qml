@@ -992,6 +992,21 @@ EOFCONFIG
         objects: Pipewire.nodes.values.filter(node => node.audio && (SettingsData.audioShowStreamDevices || !node.isStream))
     }
 
+    // Some BlueZ/PipeWire sinks do not reliably apply the QML volume property
+    // setter. Keep the fallback here so every DMS volume surface shares it.
+    Process {
+        id: sinkVolumeProcess
+        running: false
+    }
+
+    function setSinkVolume(volume) {
+        if (!root.sink?.name)
+            return false;
+        sinkVolumeProcess.command = ["pactl", "set-sink-volume", root.sink.name, Math.round(volume * 100) + "%"];
+        sinkVolumeProcess.running = true;
+        return true;
+    }
+
     function setVolume(percentage) {
         if (!root.sink?.audio)
             return "No audio sink available";
@@ -1000,7 +1015,8 @@ EOFCONFIG
 
         const maxVol = root.sinkMaxVolume;
         const clampedVolume = Math.max(0, Math.min(maxVol, percentage));
-        root.sink.audio.volume = clampedVolume / 100;
+        if (!setSinkVolume(clampedVolume / 100))
+            root.sink.audio.volume = clampedVolume / 100;
         return `Volume set to ${clampedVolume}%`;
     }
 
@@ -1019,7 +1035,8 @@ EOFCONFIG
         if (audio.muted)
             audio.muted = false;
 
-        audio.volume = newVolume / 100;
+        if (!setSinkVolume(newVolume / 100))
+            audio.volume = newVolume / 100;
         return newVolume;
     }
 
