@@ -294,32 +294,7 @@ Singleton {
         if (currentTheme === "custom") {
             return customThemeData || StockThemes.getThemeByName("purple", isLightMode);
         } else if (currentTheme === dynamic) {
-            return {
-                "primary": getMatugenColor("primary", "#42a5f5"),
-                "primaryText": getMatugenColor("on_primary", "#ffffff"),
-                "primaryContainer": getMatugenColor("primary_container", "#1976d2"),
-                "secondary": getMatugenColor("secondary", "#8ab4f8"),
-                "secondaryContainer": getMatugenColor("secondary_container", getMatugenColor("surface_container_high", "#292b2f")),
-                "tertiary": getMatugenColor("tertiary", "#efb8c8"),
-                "tertiaryContainer": getMatugenColor("tertiary_container", getMatugenColor("surface_container_high", "#292b2f")),
-                "surface": getMatugenColor("surface", "#1a1c1e"),
-                "surfaceText": getMatugenColor("on_background", "#e3e8ef"),
-                "surfaceVariant": getMatugenColor("surface_variant", "#44464f"),
-                "surfaceVariantText": getMatugenColor("on_surface_variant", "#c4c7c5"),
-                "surfaceTint": getMatugenColor("surface_tint", "#8ab4f8"),
-                "background": getMatugenColor("background", "#1a1c1e"),
-                "backgroundText": getMatugenColor("on_background", "#e3e8ef"),
-                "outline": getMatugenColor("outline", "#8e918f"),
-                "surfaceContainerLowest": getMatugenColor("surface_container_lowest", "#0e1013"),
-                "surfaceContainerLow": getMatugenColor("surface_container_low", "#181a1d"),
-                "surfaceContainer": getMatugenColor("surface_container", "#1e2023"),
-                "surfaceContainerHigh": getMatugenColor("surface_container_high", "#292b2f"),
-                "surfaceContainerHighest": getMatugenColor("surface_container_highest", "#343740"),
-                "error": "#F2B8B5",
-                "warning": "#FF9800",
-                "info": "#2196F3",
-                "success": "#4CAF50"
-            };
+            return buildExtractedDynamicMode(isLightMode ? "light" : "dark", "Dynamic");
         } else {
             return StockThemes.getThemeByName(currentTheme, isLightMode);
         }
