@@ -203,9 +203,12 @@ Rectangle {
     border.width: 1
 
     Column {
+        id: cardColumn
         anchors.fill: parent
         anchors.margins: Theme.spacingM
         spacing: Theme.spacingS
+
+        readonly property real warningInset: dankWarning.visible ? dankWarning.height + spacing : 0
 
         Rectangle {
             id: dankWarning
@@ -371,7 +374,7 @@ Rectangle {
 
         Row {
             width: parent.width
-            height: parent.height - 28 - Theme.spacingS
+            height: parent.height - 28 - Theme.spacingS - cardColumn.warningInset
             visible: !showEventDetails
             spacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
 
@@ -546,7 +549,7 @@ Rectangle {
         Flickable {
             id: flickableArea
             width: parent.width - Theme.spacingS * 2
-            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS
+            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS - cardColumn.warningInset
             anchors.horizontalCenter: parent.horizontalCenter
             visible: showEventDetails
             clip: true
