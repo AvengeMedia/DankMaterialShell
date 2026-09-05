@@ -543,6 +543,7 @@ Item {
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: row.selected ? Font.DemiBold : Font.Medium
                     elide: Text.ElideRight
+                    maximumLineCount: 1
                 }
 
                 StyledText {
@@ -551,6 +552,7 @@ Item {
                     color: Theme.surfaceTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                     elide: Text.ElideRight
+                    maximumLineCount: 1
                     visible: text.length > 0
                 }
             }
