@@ -121,6 +121,22 @@ For screenshots use `dms screenshot window --seat SEAT` or
 active-window capture errors. Selected-output routing still works on empty
 workspaces and during layer focus.
 
+WorkspaceSwitcher consumes a shared service-owned view for Aqueous and
+ext-workspace. Aqueous rows include authoritative window membership and captured
+session identities. Ext rows use native object identity, including when IDs are
+absent or names repeat; membership remains unknown rather than being guessed from
+Aqueous labels. Padding, labels, activation and wheel navigation share the same
+widget path. Aqueous icon grouping, sizing and occupancy use the same eligible
+window list, with captured window actions retained through rendering.
+
+Set `DMS_FORCE_EXTWS=1` in the shell's launch environment to select ext-workspace
+even when the Aqueous adapter is healthy. If the protocol is unavailable, the
+forced Aqueous workspace view is unavailable. Without the override, a disconnected
+Aqueous adapter falls back to ext-workspace when available and returns to its
+richer model after reconnection. The override changes workspace selection only;
+other Aqueous consumers and native overview remain available. Ext activation uses
+the protocol's native method and does not expose explicit-seat selection.
+
 Native overview controls are available through workspace right-click and:
 
 ```sh
@@ -166,6 +182,15 @@ The following passed against the pinned build on 2026-09-05:
   switching, overview, active-window crops, helper validation/save/conflicts,
   keybind writes, one QML-owned watcher, reconnect after killing the watcher,
   orderly logout and process cleanup.
+- Shared workspace tests reproduce the prior override, padding and icon-count
+  failures. The corrected default and forced-ext paths pass real QML widget checks
+  for activation/wheel navigation, duplicate-name renames, output-following and
+  independent overview. Default mode additionally checks grouping, padding,
+  horizontal/vertical sizing, actual icon actions and stale cached actions across
+  fallback/reconnect. Forced-ext also passed with XWayland capture.
+
+Specialized Niri/Hyprland/Mango/I3-family selection was checked with synthetic inputs;
+new live sessions for those compositors were not available for this correction.
 
 The UI runs included the ungrouped taskbar, dock and keyboard widget.
 The XWayland DMS run also captured a synthetic XWayland window (632×612), with
@@ -179,6 +204,7 @@ synthetic fixtures, not universal expected window sizes.
 Reproduce the focused desktop checks with a Pixman-compatible diagnostic build:
 
 ```sh
+node quickshell/tests/workspace-view.test.mjs
 node quickshell/tests/aqueous-service.test.mjs
 python3 scripts/test-aqueous-service.py
 node quickshell/tests/display-apply.test.mjs
@@ -186,6 +212,7 @@ node quickshell/tests/aqueous-displays.test.mjs
 LD_LIBRARY_PATH=/path/to/patched-wlroots/lib \
   python3 scripts/test-aqueous-integration.py \
   --aqueous-source /path/to/Aqueous --bin-dir /path/to/matching/binaries
+# Add --force-ext to verify the shared widget through ext-workspace.
 # Add --frame to exercise connected frame reservations.
 # Add --xwayland for the XWayland capture check (positive output origins).
 ```

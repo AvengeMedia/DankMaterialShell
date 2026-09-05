@@ -44,7 +44,42 @@ Singleton {
         const window = windows.find(w => w.id === seat?.window);
         return window ? windowFacade(window) : null;
     }
-    readonly property var toplevels: windows.filter(w => !w.skip_taskbar && (w.visible || w.minimized || !workspaces.find(ws => ws.id === w.workspace)?.active)).map(w => windowFacade(w))
+    readonly property var toplevels: windows.filter(w => taskbarEligible(w)).map(w => windowFacade(w))
+
+    function taskbarEligible(window) {
+        return !window.skip_taskbar && (window.visible || window.minimized || !workspaces.find(ws => ws.id === window.workspace)?.active);
+    }
+
+    function workspaceRowsForOutput(name, generation) {
+        const capturedSession = session;
+        const actionable = available && capabilities.commands === true && !locked && !!seat;
+        const liveWindows = toplevels;
+        return workspacesForOutput(name).map(workspace => ({
+                    key: capturedSession + ":workspace:" + workspace.id,
+                    name: workspace.name,
+                    number: workspace.number,
+                    active: workspace.active,
+                    urgent: workspace.urgent,
+                    canActivate: actionable,
+                    placeholder: false,
+                    windows: liveWindows.filter(w => w.aqueousWorkspaceId === workspace.id).map(window => Object.assign({}, window, {
+                            key: window.aqueousKey,
+                            activate: function () {
+                                if (CompositorService.workspaceBackend !== "aqueous" || generation !== CompositorService.workspaceViewGeneration)
+                                    return;
+                                window.activate();
+                            }
+                        })),
+                    activate: function () {
+                        if (CompositorService.workspaceBackend !== "aqueous" || generation !== CompositorService.workspaceViewGeneration)
+                            return;
+                        root.command("workspace.activate", {
+                            id: workspace.id,
+                            session: capturedSession
+                        });
+                    }
+                }));
+    }
 
     function outputId(name) {
         return outputs.find(o => o.name === name)?.id || "";

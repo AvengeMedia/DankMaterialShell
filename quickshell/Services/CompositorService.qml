@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.I3
+import Quickshell.WindowManager
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
@@ -24,6 +25,92 @@ Singleton {
     property bool isAqueous: false
     property string compositor: "unknown"
     property bool compositorDetected: false
+    readonly property string workspaceBackend: selectWorkspaceBackend(compositor, compositorDetected, Quickshell.env("DMS_FORCE_EXTWS") === "1", (WindowManager.windowsets?.length ?? 0) > 0, isAqueous && AqueousService.available)
+    property int workspaceViewGeneration: 0
+    onWorkspaceBackendChanged: workspaceViewGeneration++
+
+    function selectWorkspaceBackend(compositor, detected, forceExt, extAvailable, aqueousAvailable) {
+        if (forceExt && extAvailable)
+            return "ext";
+        if (!detected)
+            return "none";
+        if (compositor === "aqueous") {
+            if (forceExt)
+                return "none";
+            return aqueousAvailable ? "aqueous" : extAvailable ? "ext" : "none";
+        }
+        if (["niri", "hyprland", "mango", "sway", "scroll", "miracle"].includes(compositor))
+            return "legacy";
+        return extAvailable ? "ext" : "none";
+    }
+
+    function extWorkspaceRows(handles, generation) {
+        const visible = handles.filter(ws => ws.shouldDisplay);
+        visible.sort((a, b) => {
+            const ac = a.coordinates || [];
+            const bc = b.coordinates || [];
+            for (let i = 0; i < Math.max(ac.length, bc.length); i++) {
+                const difference = (ac[i] || 0) - (bc[i] || 0);
+                if (difference)
+                    return difference;
+            }
+            return 0;
+        });
+        return visible.map((handle, index) => ({
+                    key: handle,
+                    name: handle.name,
+                    number: index + 1,
+                    active: handle.active,
+                    urgent: handle.urgent,
+                    canActivate: handle.canActivate,
+                    windows: null,
+                    placeholder: false,
+                    activate: function () {
+                        if (root.workspaceBackend !== "ext" || generation !== root.workspaceViewGeneration || !WindowManager.windowsets.includes(handle) || !handle.canActivate)
+                            return;
+                        handle.activate();
+                    }
+                }));
+    }
+
+    function workspaceViewForOutput(name) {
+        const backend = workspaceBackend;
+        const generation = workspaceViewGeneration;
+        const screen = Quickshell.screens.find(s => s.name === name);
+        if (!screen)
+            return {
+                backend: backend,
+                rows: []
+            };
+        if (backend === "aqueous")
+            return {
+                backend: backend,
+                rows: AqueousService.workspaceRowsForOutput(name, generation)
+            };
+        if (backend !== "ext")
+            return {
+                backend: backend,
+                rows: []
+            };
+        const projection = WindowManager.screenProjection(screen);
+        return {
+            backend: backend,
+            rows: extWorkspaceRows(projection?.windowsets || [], generation)
+        };
+    }
+
+    function toggleWorkspaceOverview(screenName) {
+        if (isAqueous) {
+            AqueousService.toggleOverview(screenName);
+            return true;
+        }
+        if (isNiri) {
+            NiriService.toggleOverview();
+            return true;
+        }
+        return false;
+    }
+
     property bool outputPowerAvailable: false
     readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle
     onGenericPowerBackendChanged: probeOutputPower()
