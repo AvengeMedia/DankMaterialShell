@@ -262,7 +262,7 @@ Item {
                     const separatePinnedAndRunning = SettingsData.dockSeparatePinnedAndRunningApps;
 
                     sortedToplevels.forEach((toplevel, index) => {
-                        let uniqueKey = "window_" + index;
+                        let uniqueKey = toplevel.aqueousKey || "window_" + index;
                         if (CompositorService.isHyprland && Hyprland.toplevels) {
                             const hyprlandToplevels = Array.from(Hyprland.toplevels.values);
                             for (let i = 0; i < hyprlandToplevels.length; i++) {

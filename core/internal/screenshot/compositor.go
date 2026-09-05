@@ -1,6 +1,7 @@
 package screenshot
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -21,12 +22,23 @@ const (
 	CompositorScroll
 	CompositorMiracle
 	CompositorMango
+	CompositorAqueous
 )
 
 var detectedCompositor Compositor = -1
 
 func DetectCompositor() Compositor {
 	if detectedCompositor >= 0 {
+		return detectedCompositor
+	}
+	owner := waylandSocketOwner()
+	known := map[string]Compositor{"aqueous": CompositorAqueous, "hyprland": CompositorHyprland, "niri": CompositorNiri, "sway": CompositorSway, "scroll": CompositorScroll, "miracle-wm": CompositorMiracle, "mango": CompositorMango}
+	if compositor, ok := known[owner]; ok {
+		detectedCompositor = compositor
+		return compositor
+	}
+	if owner != "" {
+		detectedCompositor = CompositorUnknown
 		return detectedCompositor
 	}
 
@@ -78,6 +90,12 @@ func GetActiveWindow() (*WindowGeometry, error) {
 		return getHyprlandActiveWindow()
 	case CompositorMango:
 		return getMangoActiveWindow()
+	case CompositorAqueous:
+		model, err := aqueousSnapshot(context.Background())
+		if err != nil {
+			return nil, err
+		}
+		return aqueousWindowGeometry(model, "")
 	default:
 		return nil, fmt.Errorf("window capture requires Hyprland, Mango, or niri")
 	}
@@ -355,6 +373,9 @@ func getNiriFocusedMonitor() string {
 
 func GetFocusedMonitor() string {
 	switch DetectCompositor() {
+	case CompositorAqueous:
+		name, _ := aqueousFocusedOutput("")
+		return name
 	case CompositorHyprland:
 		return getHyprlandFocusedMonitor()
 	case CompositorSway:

@@ -20,6 +20,7 @@ import (
 
 var (
 	ssOutputName  string
+	ssSeat        string
 	ssCursor      string
 	ssFormat      string
 	ssQuality     int
@@ -58,7 +59,7 @@ Modes:
   full        - Capture the focused output
   all         - Capture all outputs combined
   output      - Capture a specific output by name
-  window      - Capture the focused window (Hyprland/Mango/niri)
+  window      - Capture the focused window (Hyprland/Mango/niri/Aqueous)
   last        - Capture the last selected region
   scroll      - Select a region, then scroll to capture a stitched tall image
 
@@ -72,7 +73,7 @@ Examples:
   dms screenshot full                # Full screen of focused output
   dms screenshot all                 # All screens combined
   dms screenshot output -o DP-1      # Specific output
-  dms screenshot window              # Focused window (Hyprland)
+  dms screenshot window              # Focused window
   dms screenshot last                # Last region (pre-selected)
   dms screenshot --reset             # Reset last region pre-selection
   dms screenshot --no-clipboard      # Save file only
@@ -122,7 +123,7 @@ If no previous region exists, falls back to interactive selection.`,
 var ssWindowCmd = &cobra.Command{
 	Use:   "window",
 	Short: "Capture the focused window",
-	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, and niri.`,
+	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, niri, and Aqueous. Aqueous crops the composed output including borders and occluders.`,
 	Run:   runScreenshotWindow,
 }
 
@@ -165,6 +166,7 @@ var notifyActionCmd = &cobra.Command{
 
 func init() {
 	screenshotCmd.PersistentFlags().StringVarP(&ssOutputName, "output", "o", "", "Output name for 'output' mode")
+	screenshotCmd.PersistentFlags().StringVar(&ssSeat, "seat", "", "Seat for Aqueous capture (required with multiple seats)")
 	screenshotCmd.PersistentFlags().StringVar(&ssCursor, "cursor", "off", "Include cursor in screenshot (on/off)")
 	screenshotCmd.PersistentFlags().StringVarP(&ssFormat, "format", "f", "png", "Output format (png, jpg, ppm)")
 	screenshotCmd.PersistentFlags().IntVarP(&ssQuality, "quality", "q", 90, "JPEG quality (1-100)")
@@ -198,6 +200,7 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config := screenshot.DefaultConfig()
 	config.Mode = mode
 	config.OutputName = ssOutputName
+	config.Seat = ssSeat
 	if strings.EqualFold(ssCursor, "on") {
 		config.Cursor = screenshot.CursorOn
 	}

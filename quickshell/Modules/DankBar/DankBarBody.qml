@@ -496,7 +496,7 @@ Item {
             hasMaximizedToplevel = false;
             return;
         }
-        if (!CompositorService.isHyprland && !CompositorService.isNiri) {
+        if (!CompositorService.isHyprland && !CompositorService.isNiri && !CompositorService.isAqueous) {
             hasMaximizedToplevel = false;
             return;
         }
@@ -520,7 +520,7 @@ Item {
             shouldHideForWindows = false;
             return;
         }
-        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango) {
+        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango && !CompositorService.isAqueous) {
             shouldHideForWindows = false;
             return;
         }
@@ -795,7 +795,7 @@ Item {
         readonly property int barThickness: Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)
         readonly property int lengthPaddingPx: Theme.px(barWindow.effectiveBarLengthPadding, barWindow._dpr)
 
-        readonly property bool inOverviewWithShow: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
+        readonly property bool inOverviewWithShow: CompositorService.overviewActiveOnScreen(barWindow.screenName) && barWindow.effectiveOpenOnOverview
         readonly property bool effectiveVisible: (barConfig?.visible ?? true) || inOverviewWithShow
         readonly property bool showing: effectiveVisible && (topBarCore.reveal || inOverviewWithShow)
 
@@ -986,7 +986,7 @@ Item {
         }
 
         property bool reveal: {
-            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
+            const inOverviewWithShow = CompositorService.overviewActiveOnScreen(barWindow.screenName) && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
 
@@ -997,7 +997,7 @@ Item {
                 return true;
             }
 
-            if (CompositorService.isNiri && NiriService.inOverview)
+            if (CompositorService.overviewActiveOnScreen(barWindow.screenName))
                 return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
 
             return (barConfig?.visible ?? true) && (!autoHide || hoverReveal || popoutPinsReveal || revealSticky || ipcReveal);
@@ -1062,7 +1062,7 @@ Item {
                 top: barWindow.isVertical ? parent.top : undefined
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
-            readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview
+            readonly property bool inOverview: CompositorService.overviewActiveOnScreen(barWindow.screenName) && barWindow.effectiveOpenOnOverview
             hoverEnabled: (barConfig?.autoHide ?? false) && !inOverview && !topBarCore.popoutPinsReveal
             acceptedButtons: barWindow.clickThroughEnabled ? Qt.NoButton : Qt.RightButton
             enabled: !inOverview && ((barConfig?.autoHide ?? false) || !barWindow.clickThroughEnabled)

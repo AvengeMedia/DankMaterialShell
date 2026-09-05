@@ -176,20 +176,20 @@ Singleton {
 
     Process {
         id: uwsmLogout
+        property bool notRunning: false
         command: ["uwsm", "stop"]
         running: false
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                if (data.trim().toLowerCase().includes("not running")) {
-                    _logout();
-                }
+                if (data.trim().toLowerCase().includes("not running"))
+                    uwsmLogout.notRunning = true;
             }
         }
 
         onExited: function (exitCode) {
-            if (exitCode === 0) {
+            if (exitCode === 0 && !notRunning) {
                 return;
             }
             _logout();
@@ -393,13 +393,21 @@ Singleton {
     // * Session management
     function logout() {
         if (hasUwsm) {
+            if (uwsmLogout.running)
+                return;
+            uwsmLogout.notRunning = false;
             uwsmLogout.running = true;
+            return;
         }
         _logout();
     }
 
     function _logout() {
         if (SettingsData.customPowerActionLogout.length === 0) {
+            if (CompositorService.isAqueous) {
+                AqueousService.quit();
+                return;
+            }
             if (CompositorService.isNiri) {
                 NiriService.quit();
                 return;

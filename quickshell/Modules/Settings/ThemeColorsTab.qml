@@ -455,6 +455,17 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
+            Loader {
+                width: parent.width
+                active: CompositorService.isAqueous
+                sourceComponent: AqueousAppearanceSettings {
+                    cursor: true
+                    settingKey: "aqueousCursor"
+                    title: I18n.tr("Cursor Theme") + " · Aqueous"
+                    visible: CompositorService.isAqueous
+                }
+            }
+
             SettingsCard {
                 tab: "theme"
                 tags: ["color", "palette", "theme", "appearance"]

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "session": "0123456789abcdef0123456789abcdef",
+  "max_batch_bytes": 4194304,
+  "state": true,
+  "commands": true,
+  "keyboard": true,
+  "overview": true,
+  "shortcut_inhibition": true,
+  "geometry": "committed-content-global-logical"
+}

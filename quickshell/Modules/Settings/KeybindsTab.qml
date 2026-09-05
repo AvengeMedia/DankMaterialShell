@@ -296,8 +296,8 @@ Item {
                             }
 
                             StyledText {
-                                readonly property string bindsFile: KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
-                                text: KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                readonly property string bindsFile: KeybindsService.currentProvider === "aqueous" ? "aqueous-config" : KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
+                                text: KeybindsService.currentProvider === "aqueous" ? I18n.tr("Click any shortcut to edit Aqueous configuration") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap

@@ -160,7 +160,7 @@ PanelWindow {
                         return [];
 
                     const toplevels = [];
-                    const allToplevels = ToplevelManager.toplevels.values;
+                    const allToplevels = CompositorService.isAqueous && AqueousService.available ? CompositorService.sortedToplevels : ToplevelManager.toplevels.values;
                     for (let i = 0; i < allToplevels.length; i++) {
                         const toplevel = allToplevels[i];
                         if (toplevel.appId === root.appData.appId) {

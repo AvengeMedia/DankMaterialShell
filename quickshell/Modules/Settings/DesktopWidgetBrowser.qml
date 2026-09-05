@@ -14,7 +14,11 @@ DankFloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
-    parentWindow: parentModal
+    Binding {
+        target: "parentWindow" in root ? root : null
+        property: "parentWindow"
+        value: root.parentModal
+    }
 
     signal widgetAdded(string widgetType)
 

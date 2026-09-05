@@ -66,6 +66,7 @@ var keybindsResetCmd = &cobra.Command{
 }
 
 func init() {
+	keybindsCmd.PersistentFlags().String("expected-generation", "", "Configuration generation observed when editing Aqueous bindings")
 	keybindsListCmd.Flags().BoolP("json", "j", false, "Output as JSON")
 	keybindsShowCmd.Flags().String("path", "", "Override config path for the provider")
 	keybindsSetCmd.Flags().String("desc", "", "Description for hotkey overlay")
@@ -93,6 +94,9 @@ func initializeProviders() {
 	registry := keybinds.GetDefaultRegistry()
 
 	hyprlandProvider := providers.NewHyprlandProvider("")
+	if err := registry.Register(providers.NewAqueousProvider()); err != nil {
+		log.Warnf("Failed to register Aqueous provider: %v", err)
+	}
 	if err := registry.Register(hyprlandProvider); err != nil {
 		log.Warnf("Failed to register Hyprland provider: %v", err)
 	}
@@ -219,6 +223,10 @@ func getWritableProvider(name string) keybinds.WritableProvider {
 }
 
 func runKeybindsSet(cmd *cobra.Command, args []string) {
+	if args[0] == "aqueous" {
+		runAqueousBindEdit(cmd, args, false)
+		return
+	}
 	providerName, key, action := args[0], args[1], args[2]
 	writable := getWritableProvider(providerName)
 
@@ -257,7 +265,11 @@ func runKeybindsSet(cmd *cobra.Command, args []string) {
 	fmt.Fprintln(os.Stdout, string(output))
 }
 
-func runKeybindsRemove(_ *cobra.Command, args []string) {
+func runKeybindsRemove(cmd *cobra.Command, args []string) {
+	if args[0] == "aqueous" {
+		runAqueousBindEdit(cmd, args, true)
+		return
+	}
 	providerName, key := args[0], args[1]
 	writable := getWritableProvider(providerName)
 
@@ -273,7 +285,11 @@ func runKeybindsRemove(_ *cobra.Command, args []string) {
 	fmt.Fprintln(os.Stdout, string(output))
 }
 
-func runKeybindsReset(_ *cobra.Command, args []string) {
+func runKeybindsReset(cmd *cobra.Command, args []string) {
+	if args[0] == "aqueous" {
+		runAqueousBindEdit(cmd, args, true)
+		return
+	}
 	providerName, key := args[0], args[1]
 	writable := getWritableProvider(providerName)
 

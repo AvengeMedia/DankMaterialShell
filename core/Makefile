@@ -50,7 +50,7 @@ sync-shell:
 	@rm -rf $(EMBED_DIR)
 	@mkdir -p $(EMBED_DIR)
 	@tar -C $(SHELL_SRC) --exclude=.qmlls.ini -chf - . | tar -C $(EMBED_DIR) -xf -
-	@rm -rf $(EMBED_DIR)/.git* $(EMBED_DIR)/.github
+	@rm -rf $(EMBED_DIR)/.git* $(EMBED_DIR)/.github $(EMBED_DIR)/tests
 	@find $(EMBED_DIR) -type d \( -name .claude -o -name .vscode \) -prune -exec rm -rf {} +
 	@rm -f $(EMBED_DIR)/AGENTS.md $(EMBED_DIR)/qmlformat-all.sh
 	@rm -f $(EMBED_DIR)/scripts/i18nsync.py $(EMBED_DIR)/scripts/build-vscode-vsix.sh $(EMBED_DIR)/scripts/qmllint-entrypoints.sh

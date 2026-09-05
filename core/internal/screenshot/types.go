@@ -56,6 +56,7 @@ type Output struct {
 }
 
 type Config struct {
+	Seat          string
 	Mode          Mode
 	OutputName    string
 	Cursor        CursorMode

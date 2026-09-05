@@ -16,6 +16,8 @@ BasePill {
     property bool showIcon: widgetData?.keyboardLayoutNameShowIcon !== undefined ? widgetData.keyboardLayoutNameShowIcon : SettingsData.keyboardLayoutNameShowIcon
     readonly property var validVariants: ["US", "UK", "GB", "AZERTY", "QWERTY", "Dvorak", "Colemak", "Mac", "Intl", "International"]
     property string currentLayout: {
+        if (CompositorService.isAqueous)
+            return AqueousService.keyboardLayout;
         if (CompositorService.isNiri) {
             return NiriService.getCurrentKeyboardLayoutName();
         } else if (CompositorService.isMango) {
@@ -25,7 +27,7 @@ BasePill {
     }
     property string hyprlandKeyboard: ""
     property var hyprlandLayoutLabels: []
-    readonly property var _allLayoutLabels: CompositorService.isNiri ? (NiriService.keyboardLayoutNames || []).map(n => displayLabel(n)) : hyprlandLayoutLabels
+    readonly property var _allLayoutLabels: CompositorService.isAqueous ? AqueousService.keyboardLayouts.map(n => displayLabel(n)) : CompositorService.isNiri ? (NiriService.keyboardLayoutNames || []).map(n => displayLabel(n)) : hyprlandLayoutLabels
     readonly property string reserveLabel: widestLabel(_allLayoutLabels)
     readonly property string verticalReserveLabel: widestLabel(_allLayoutLabels.map(n => LayoutCodes.layoutCode(n)))
 
@@ -131,6 +133,8 @@ BasePill {
         onClicked: {
             if (CompositorService.isNiri) {
                 NiriService.cycleKeyboardLayout();
+            } else if (CompositorService.isAqueous) {
+                AqueousService.cycleKeyboardLayout();
             } else if (CompositorService.isHyprland) {
                 Quickshell.execDetached(["hyprctl", "switchxkblayout", root.hyprlandKeyboard, "next"]);
             } else if (CompositorService.isMango) {

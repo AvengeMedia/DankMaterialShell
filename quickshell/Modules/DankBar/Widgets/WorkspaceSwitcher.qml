@@ -24,6 +24,7 @@ Item {
     property real crossEdgeExtension: 0
 
     readonly property bool isMango: CompositorService.isMango
+    readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available
 
     readonly property real _leftMargin: {
         if (isVertical)
@@ -84,6 +85,8 @@ Item {
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
     readonly property bool useExtWorkspace: {
+        if (useAqueous)
+            return false;
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
         if (!CompositorService.compositorDetected)
@@ -117,6 +120,8 @@ Item {
     }
 
     property var currentWorkspace: {
+        if (useAqueous)
+            return AqueousService.workspacesForOutput(effectiveScreenName).find(w => w.active)?.id || "";
         if (useExtWorkspace)
             return getExtWorkspaceActiveWorkspace();
 
@@ -143,6 +148,8 @@ Item {
         return [];
     }
     property var workspaceList: {
+        if (useAqueous)
+            return AqueousService.workspacesForOutput(effectiveScreenName);
         if (useExtWorkspace) {
             const baseList = getExtWorkspaceWorkspaces();
             return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
@@ -327,7 +334,9 @@ Item {
         }
 
         let targetWorkspaceId;
-        if (CompositorService.isNiri) {
+        if (useAqueous) {
+            targetWorkspaceId = ws.id;
+        } else if (CompositorService.isNiri) {
             if (!ws || typeof ws !== "object") {
                 const wsNumber = typeof ws === "number" ? ws : -1;
                 if (wsNumber <= 0) {
@@ -387,7 +396,9 @@ Item {
                     return;
             } else {
                 let winWs = null;
-                if (CompositorService.isNiri) {
+                if (useAqueous) {
+                    winWs = w.aqueousWorkspaceId;
+                } else if (CompositorService.isNiri) {
                     winWs = w.workspace_id;
                 } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                     winWs = w.workspace?.num;
@@ -405,7 +416,7 @@ Item {
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
             const moddedId = Paths.moddedAppId(keyBase);
             const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
-            const key = groupThisWs ? moddedId : `${moddedId}_${i}`;
+            const key = groupThisWs ? moddedId : (w.aqueousKey || `${moddedId}_${i}`);
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
@@ -677,6 +688,11 @@ Item {
         if (!data)
             return;
 
+        if (useAqueous) {
+            AqueousService.activateWorkspace(data);
+            return;
+        }
+
         if (root.useExtWorkspace) {
             if (typeof data.activate === "function")
                 data.activate();
@@ -727,6 +743,14 @@ Item {
     }
 
     function switchWorkspace(direction) {
+        if (useAqueous) {
+            const workspaces = getRealWorkspaces();
+            const index = workspaces.findIndex(w => w.id === currentWorkspace);
+            const next = Math.max(0, Math.min(workspaces.length - 1, index + (direction > 0 ? 1 : -1)));
+            if (next !== index)
+                AqueousService.activateWorkspace(workspaces[next]);
+            return;
+        }
         if (useExtWorkspace) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -812,6 +836,8 @@ Item {
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
+        if (useAqueous)
+            return modelData?.number ?? "";
         if (root.useExtWorkspace)
             return index + 1;
         if (CompositorService.isNiri)
@@ -868,7 +894,7 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: useAqueous || CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
@@ -962,7 +988,9 @@ Item {
             const rootPos = edgeMouseArea.mapToItem(root, mouse.x, mouse.y);
             switch (mouse.button) {
             case Qt.RightButton:
-                if (CompositorService.isNiri) {
+                if (root.useAqueous) {
+                    AqueousService.toggleOverview(root.effectiveScreenName);
+                } else if (CompositorService.isNiri) {
                     NiriService.toggleOverview();
                 } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                     root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
@@ -1144,6 +1172,8 @@ Item {
                 }
 
                 property bool isActive: {
+                    if (root.useAqueous)
+                        return modelData?.active === true;
                     if (root.useExtWorkspace)
                         return (modelData?.id || modelData?.name) === root.currentWorkspace;
                     if (CompositorService.isNiri)
@@ -1157,6 +1187,8 @@ Item {
                     return modelData === root.currentWorkspace;
                 }
                 property bool isOccupied: {
+                    if (root.useAqueous)
+                        return AqueousService.windows.some(w => w.workspace === modelData?.id && !w.skip_taskbar);
                     if (CompositorService.isHyprland)
                         return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
                     if (root.isMango)
@@ -1183,6 +1215,8 @@ Item {
                 property var loadedWorkspaceData: null
                 property bool loadedIsUrgent: false
                 property bool isUrgent: {
+                    if (root.useAqueous)
+                        return modelData?.urgent === true;
                     if (root.useExtWorkspace)
                         return modelData?.urgent ?? false;
                     if (CompositorService.isHyprland)
@@ -1481,7 +1515,9 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             if (delegateRoot.focusWindowAt(mouse.x, mouse.y))
                                 return;
-                            if (root.useExtWorkspace) {
+                            if (root.useAqueous) {
+                                AqueousService.activateWorkspace(modelData);
+                            } else if (root.useExtWorkspace) {
                                 if (typeof modelData?.activate === "function")
                                     modelData.activate();
                             } else if (CompositorService.isNiri) {
@@ -1496,7 +1532,9 @@ Item {
                                 CompositorService.dispatchSwayWorkspace(modelData);
                             }
                         } else if (mouse.button === Qt.RightButton) {
-                            if (CompositorService.isNiri) {
+                            if (root.useAqueous) {
+                                AqueousService.toggleOverview(root.effectiveScreenName);
+                            } else if (CompositorService.isNiri) {
                                 NiriService.toggleOverview();
                             } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
@@ -1568,6 +1606,10 @@ Item {
                     const winId = delegateRoot.windowIdAt(x, y);
                     if (!winId)
                         return false;
+                    if (root.useAqueous) {
+                        AqueousService.command("window.activate", {id: winId});
+                        return true;
+                    }
                     if (CompositorService.isHyprland) {
                         HyprlandService.focusWindow(winId);
                         return true;

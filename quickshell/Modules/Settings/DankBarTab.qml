@@ -874,15 +874,15 @@ Item {
                     height: 1
                     color: Theme.outline
                     opacity: 0.15
-                    visible: CompositorService.isNiri && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: (CompositorService.isNiri || CompositorService.isAqueous) && !dankBarTab.islandOwnsSelectedBarTop
                 }
 
                 SettingsToggleRow {
                     settingKey: "barOpenOnOverview"
                     tags: ["bar", "overview", "niri", "show", "frame"]
-                    visible: CompositorService.isNiri && !dankBarTab.islandOwnsSelectedBarTop
+                    visible: (CompositorService.isNiri || CompositorService.isAqueous) && !dankBarTab.islandOwnsSelectedBarTop
                     text: I18n.tr("Show on Overview")
-                    description: dankBarTab.selectedBarFrameStyled ? I18n.tr("Show during Niri overview") : I18n.tr("Show the bar when niri overview is active")
+                    description: CompositorService.isAqueous ? I18n.tr("Show on Overview") : dankBarTab.selectedBarFrameStyled ? I18n.tr("Show during Niri overview") : I18n.tr("Show the bar when niri overview is active")
                     checked: dankBarTab.selectedBarFrameStyled ? SettingsData.frameShowOnOverview : (selectedBarConfig?.openOnOverview ?? false)
                     onToggled: toggled => {
                         if (dankBarTab.selectedBarFrameStyled) {

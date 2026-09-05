@@ -1240,7 +1240,6 @@
     "category": "Bar",
     "keywords": [
       "bar",
-      "during",
       "frame",
       "niri",
       "overview",
@@ -1249,8 +1248,8 @@
       "statusbar",
       "topbar"
     ],
-    "description": "Show during Niri overview",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "barSize",
@@ -2015,7 +2014,7 @@
       "windows"
     ],
     "description": "Show dock when floating windows don",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "dockIsolateDisplays",
@@ -2311,17 +2310,15 @@
     "tabIndex": 5,
     "category": "Dock",
     "keywords": [
-      "always",
       "dock",
       "launcher bar",
       "niri",
       "overview",
-      "panel",
       "show",
       "taskbar"
     ],
-    "description": "Always show the dock when niri",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "dockLauncherLogoSizeOffset",
@@ -3847,6 +3844,24 @@
       "theme"
     ],
     "description": "Mouse pointer size in pixels"
+  },
+  {
+    "section": "aqueousCursor",
+    "label": "Cursor Theme",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "aqueous",
+      "colors",
+      "colour",
+      "cursor",
+      "look",
+      "scheme",
+      "style",
+      "theme"
+    ],
+    "conditionKey": "isAqueous"
   },
   {
     "section": "cursorTheme",
@@ -6551,6 +6566,24 @@
       "typography"
     ],
     "icon": "text_format"
+  },
+  {
+    "section": "aqueousTypography",
+    "label": "Typography",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "appearance",
+      "aqueous",
+      "font",
+      "fonts",
+      "motion",
+      "text",
+      "typeface",
+      "typography"
+    ],
+    "conditionKey": "isAqueous"
   },
   {
     "section": "typography",
@@ -9962,7 +9995,6 @@
     "keywords": [
       "border",
       "decoration",
-      "during",
       "frame",
       "hide",
       "integrations",
@@ -9972,8 +10004,8 @@
       "window"
     ],
     "icon": "toolbar",
-    "description": "Show during Niri overview",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "frameLauncherEmergeSide",
@@ -10056,7 +10088,6 @@
     "keywords": [
       "border",
       "decoration",
-      "during",
       "frame",
       "hide",
       "niri",
@@ -10064,7 +10095,7 @@
       "show",
       "window"
     ],
-    "description": "Show during Niri overview",
+    "description": "Show on Overview",
     "conditionKey": "frameEnabled"
   },
   {

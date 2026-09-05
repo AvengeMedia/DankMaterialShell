@@ -151,7 +151,7 @@ Item {
                 }
                 hasChanges = false;
                 _actionType = Actions.getActionType(editAction);
-                useCustomCompositor = _actionType === "compositor" && editAction && !Actions.isKnownCompositorAction(KeybindsService.currentProvider, editAction);
+                useCustomCompositor = _actionType === "compositor" && editAction && !KeybindsService.isKnownCompositorAction(editAction);
                 return;
             }
         }
@@ -175,7 +175,7 @@ Item {
         editAllowInhibiting = editingKeyIndex >= 0 ? keys[editingKeyIndex].allowInhibiting : undefined;
         hasChanges = false;
         _actionType = Actions.getActionType(editAction);
-        useCustomCompositor = _actionType === "compositor" && editAction && !Actions.isKnownCompositorAction(KeybindsService.currentProvider, editAction);
+        useCustomCompositor = _actionType === "compositor" && editAction && !KeybindsService.isKnownCompositorAction(editAction);
     }
 
     function startAddingNewKey() {

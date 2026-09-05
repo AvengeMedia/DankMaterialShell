@@ -99,6 +99,25 @@ Item {
                 width: parent.width
             }
 
+            Column {
+                width: parent.width
+                spacing: Theme.spacingS
+                visible: CompositorService.isAqueous && DisplayConfigState.validationError !== ""
+
+                StyledText {
+                    width: parent.width
+                    text: DisplayConfigState.validationError
+                    color: Theme.error
+                    wrapMode: Text.WordWrap
+                }
+
+                DankButton {
+                    text: I18n.tr("Discard draft and reload")
+                    enabled: !DisplayConfigState.validatingConfig
+                    onClicked: DisplayConfigState.discardAqueousPreview()
+                }
+            }
+
             StyledRect {
                 width: parent.width
                 height: profileSection.implicitHeight + Theme.spacingL * 2

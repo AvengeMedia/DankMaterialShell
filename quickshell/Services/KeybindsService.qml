@@ -14,8 +14,10 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("KeybindsService")
 
-    property bool available: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+    property bool available: CompositorService.isAqueous || CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
     property string currentProvider: {
+        if (CompositorService.isAqueous)
+            return "aqueous";
         if (CompositorService.isNiri)
             return "niri";
         if (CompositorService.isHyprland)
@@ -26,6 +28,8 @@ Singleton {
     }
 
     readonly property string cheatsheetProvider: {
+        if (CompositorService.isAqueous)
+            return "aqueous";
         if (CompositorService.isNiri)
             return "niri";
         if (CompositorService.isHyprland)
@@ -119,7 +123,7 @@ Singleton {
     Connections {
         target: CompositorService
         function onCompositorChanged() {
-            if (!CompositorService.isNiri && !CompositorService.isMango)
+            if (!CompositorService.isNiri && !CompositorService.isMango && !CompositorService.isAqueous)
                 return;
             Qt.callLater(root.loadBinds);
         }
@@ -213,6 +217,7 @@ Singleton {
     Process {
         id: removeProcess
         running: false
+        property string pendingKey: ""
 
         stderr: StdioCollector {
             onStreamFinished: {
@@ -229,6 +234,10 @@ Singleton {
                 return;
             }
             root.lastError = "";
+            if (pendingKey) {
+                root.bindRemoved(pendingKey);
+                pendingKey = "";
+            }
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
             root.loadBinds(false);
@@ -512,7 +521,11 @@ Singleton {
         if (!bindData.key || !Actions.isValidAction(bindData.action))
             return;
         saving = true;
-        const cmd = ["dms", "keybinds", "set", currentProvider, bindData.key, bindData.action, "--desc", bindData.desc || ""];
+        const cmd = ["dms", "keybinds", "set", currentProvider, bindData.key, bindData.action];
+        if (currentProvider === "aqueous")
+            cmd.push("--expected-generation", _rawData?.generation || "");
+        else
+            cmd.push("--desc", bindData.desc || "");
         if (originalKey && originalKey !== bindData.key)
             cmd.push("--replace-key", originalKey);
         if (bindData.cooldownMs > 0)
@@ -553,6 +566,8 @@ Singleton {
     }
 
     function removeBind(key) {
+        if (removeProcess.running)
+            return;
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
@@ -560,11 +575,18 @@ Singleton {
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "remove", currentProvider, key];
+        if (currentProvider === "aqueous")
+            removeProcess.command = removeProcess.command.concat(["--expected-generation", _rawData?.generation || ""]);
         removeProcess.running = true;
-        bindRemoved(key);
+        if (currentProvider === "aqueous")
+            removeProcess.pendingKey = key;
+        else
+            bindRemoved(key);
     }
 
     function resetBind(key) {
+        if (removeProcess.running)
+            return;
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
@@ -572,19 +594,43 @@ Singleton {
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "reset", currentProvider, key];
+        if (currentProvider === "aqueous")
+            removeProcess.command = removeProcess.command.concat(["--expected-generation", _rawData?.generation || ""]);
         removeProcess.running = true;
-        bindRemoved(key);
+        if (currentProvider === "aqueous")
+            removeProcess.pendingKey = key;
+        else
+            bindRemoved(key);
     }
 
     function getActionLabel(action) {
+        if (currentProvider === "aqueous")
+            return (_rawData?.binds?.Compositor || []).find(b => b.action === action)?.desc || Actions.getActionLabel(action, currentProvider);
         return Actions.getActionLabel(action, currentProvider);
     }
 
+    function isKnownCompositorAction(action) {
+        if (currentProvider === "aqueous")
+            return (_rawData?.binds?.Compositor || []).some(b => b.action === action);
+        return Actions.isKnownCompositorAction(currentProvider, action);
+    }
+
     function getCompositorCategories() {
+        if (currentProvider === "aqueous")
+            return ["Compositor"];
         return Actions.getCompositorCategories(currentProvider);
     }
 
     function getCompositorActions(category) {
+        if (currentProvider === "aqueous") {
+            const seen = new Set();
+            return (_rawData?.binds?.Compositor || []).filter(b => {
+                if (seen.has(b.action))
+                    return false;
+                seen.add(b.action);
+                return true;
+            }).map(b => ({id: b.action, label: b.desc}));
+        }
         return Actions.getCompositorActions(currentProvider, category);
     }
 

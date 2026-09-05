@@ -1,0 +1,210 @@
+# Aqueous integration
+
+This working tree integrates DMS with Aqueous master
+`2d8b07fb1ff2354ea0c3acddd5cc84ceb823d6eb`. It is development-build support;
+no released minimum Aqueous or DMS version has been established.
+
+The tested DMS baseline is `5baef07048656867a374d210d4305911b8a76e4f`, with
+common QML `26396ce432d6c71c3f5367438f96f4a8d667e160` plus the working-tree
+optional `parentWindow` compatibility fix. The runtime was Arch's
+`noctalia-qs 0.0.12`; its version output supplies no source revision.
+The Aqueous compositor, CLI and `aqueous-config` helper were built from the same
+pinned master. The helper reports 0.7.1, protocol 1. The system-installed older
+Aqueous and helper binaries were not used for integration testing.
+The installed Quickshell toplevel metadata exposes no foreign-toplevel identifier,
+so the adapter uses Aqueous's own model without a native Quickshell binding change.
+
+## Implemented paths
+
+| Work | Implementation |
+| --- | --- |
+| P0–P2 | Socket-owner detection, capability discovery, orderly logout, bounded atomic stream reducer, reconnect, stable window/workspace identities, selected-seat output routing, taskbars/docks, focused app and workspace controls. |
+| P3 | Effective keyboard group/layout state and runtime switching with explicit seat/group identities. |
+| P4 | Active-window and selected-output screenshots. Window capture crops the composed output's outer bounds, including compositor borders and occluders. |
+| P5 | Generic output-power discovery and DPMS dispatch, preserving specialized compositor paths. |
+| P6 | Actual asynchronous display results, request timeouts, cancellation and suppression of late callbacks. |
+| P7 | Helper-backed keybinding inventory, unbound built-ins, multiple bindings, custom commands, edits/removal and generation conflicts. |
+| P8 | Runtime test/apply and Keep/Revert; generation-checked persistence of supported monitor mode, position and transform changes. Unsupported helper operations fail explicitly. |
+| P9 | Manual cursor and typography Apply, adapter reports, partial-success retry and generation checking. |
+| P10 | Native compositor overview control/state and existing connected-frame reservations. No extra margin protocol or persistent gap writes. |
+
+The native DMS appearance provider performs no background synchronization. The
+existing Aqueous Settings plugin retains ownership of any automatic synchronization
+the user enabled there. Opening either settings frontend does not save Aqueous
+configuration. Both frontends must use the helper's observed generation when saving.
+The independent portal plugin and its enablement preference are unchanged.
+
+## Runtime and configuration
+
+Put the matching `aqueousctl` and optional `aqueous-config` binaries on DMS's PATH.
+Start DMS in the Aqueous session using the project's existing direct-session or
+UWSM launch arrangement. Run only one DMS instance for that session.
+Other compositors do not launch the Aqueous watcher or configuration helper.
+
+`AqueousService.qml` owns one persistent `aqueousctl shell watch --json` process.
+Its reducer validates schema, string IDs/sequences and delta continuity, applies
+full replacements/removals atomically, and shares the authoritative model with
+shell consumers. Discovery, reconnect backoff with jitter, seat selection and
+short-lived action processes also live in this service. There is no Aqueous core
+manager, subscription or server API. Backend changes and shell shutdown stop its
+processes; a quiet established watcher has no timer or polling subprocess.
+
+Quickshell's `SplitParser` reassembles complete lines, preserving split UTF-8.
+The pinned `aqueousctl` validates bounded UTF-8 batches before emitting NDJSON;
+QML additionally checks complete record and retained model sizes. Quickshell does
+not expose a pre-delimiter byte limit or raw-byte validity check on this parser.
+Consequently the direct service relies on the supported CLI for those guarantees;
+it does not independently bound a broken CLI's unterminated output. Enforcing that
+boundary independently requires a Quickshell parser capability.
+
+Mutation arguments are arrays, never shell command strings. The service validates
+the captured session, explicit seat, capabilities, lock and current target before
+dispatch. Disconnects disable stale-ID actions and require a fresh snapshot.
+Commands connect directly through `aqueousctl`; the current CLI has no expected-session
+argument, so a restart between validation and the child connecting cannot be made
+atomic by QML. Close and exit return `accepted`, while window removal follows the
+stream. Timed-out mutations are not automatically retried. Qt may exit on Wayland
+disconnect before the shell can display the orderly-logout acknowledgement.
+
+Standalone screenshots obtain one fresh snapshot in `core/internal/screenshot`.
+Core keybind tooling invokes the helper from its existing provider package. Their
+only shared process utility is a bounded, short-lived JSON command runner.
+
+All persistent writes go through `aqueous-config validate/apply --shell dms
+--request -`, with JSON on stdin and `expected_generation`. Backups go into
+`$XDG_CONFIG_HOME/DankMaterialShell/aqueous-backups`. There is no DMS TOML writer.
+Display previews retain the previous live configuration and refuse to revert over
+external changes or output recreation. A failed/uncertain preview is reconciled
+against live state before offering Keep/Revert. A conflict retains the draft until
+the user explicitly discards it and reloads.
+
+### Limitations in the pinned helper
+
+`plugin/helper/src/main.zig::applyMonitorChanges` accepts monitor ID/name, position,
+transform and mode. It does not apply scale, enablement or adaptive-sync fields.
+`writeConfiguredMonitors` also requires a name and omits EDID-only entries.
+DMS rejects unsupported persistence, EDID edits and ambiguous wildcard monitor
+configuration instead of sending fields the helper would silently ignore.
+Offline entries and unrelated fields remain owned by the helper.
+
+Completing those P8 cases requires an Aqueous helper change, tests demonstrating
+preservation of EDID/offline entries, and capability discovery for the expanded
+request. Native DMS can then use that verified contract. Runtime scale/rotation
+preview and capture work independently of this persistence limitation.
+
+DMS typography represents family, weight and scale. Exact face/slant/width and
+separately scaled bars may differ. Toolkit synchronization can partially fail after
+the canonical save; inspect the adapter report and use explicit Retry.
+
+## Diagnostics
+
+Run these inside the session being diagnosed:
+
+```sh
+aqueousctl shell capabilities --json
+aqueousctl shell snapshot --json
+aqueousctl shell watch --json
+aqueous-config version
+aqueous-config snapshot --shell dms
+dms ipc call aqueous status
+```
+
+The watch command remains running until interrupted. Redact window titles and
+configuration paths before sharing output. Missing CLI/protocol/helper support is
+reported as unavailable; a similarly numbered executable is not proof that the
+running compositor has the required capabilities.
+
+Multiple seats require a choice. For shell widgets use
+`dms ipc call aqueous selectSeat SEAT`; this selection lasts for the shell session.
+For screenshots use `dms screenshot window --seat SEAT` or
+`dms screenshot full --seat SEAT`. Layer focus and no eligible window produce
+active-window capture errors. Selected-output routing still works on empty
+workspaces and during layer focus.
+
+Native overview controls are available through workspace right-click and:
+
+```sh
+dms ipc call aqueous overview show DP-1
+dms ipc call aqueous overview hide DP-1
+dms ipc call aqueous overview toggle DP-1
+```
+
+`OVERVIEW_REQUESTED` means dispatch, not committed success; `aqueous status`
+reports the authoritative output/selection and command failures produce a toast.
+The output argument is a connector label; entity identity remains the runtime ID.
+
+There are no Aqueous methods on the core socket. UI consumers call the singleton's
+typed `command` method; output runtime IDs are resolved to connector names there.
+Settings use `AqueousConfigService` and direct stdin helper requests. See the
+[complete contract and schema](aqueous-integration-plan.md) for protocol semantics.
+
+## Verification
+
+The following passed against the pinned build on 2026-09-05:
+
+- Aqueous `zig build test`: 393 tests.
+- Aqueous native and XWayland `scripts/test-shell-integration.py`: state/actions,
+  keyboard, inhibition, flow control, four-edge reservations and cleanup, lock,
+  overview and orderly exit.
+- Real helper DMS-mode integration suite: validation, persistence, stale generation,
+  toolkit retry and monitor requests.
+- DMS Go suite and focused race tests for the JSON process utility, keybind provider and screenshots.
+- Embedded and distro DMS builds, dankinstall, FreeBSD cross-builds, QML entrypoint
+  lint, `go mod tidy`, generated settings search index and translation-term checks.
+- Production QML reducer/command/helper tests: atomicity, reference migration,
+  Unicode, string sequences above 2^53, full replacement, stale IDs, capabilities,
+  command results and generation preservation.
+- An offscreen Quickshell process harness loads the production services with fake
+  CLI fixtures: split/coalesced writes, Unicode, malformed/oversize records,
+  continuity mismatch, EOF, retry backoff, uncertain command timeout, idle behavior
+  and child cleanup. This does not test a parser byte bound before a delimiter.
+- JavaScript tests executing production display methods: delayed success/failure,
+  supersession, timeout, late callback and disconnect cleanup; display identity,
+  clipping-related configuration values, conflicts and helper capability limits.
+- Real DMS daemon and Quickshell on two private Aqueous headless outputs, both
+  standalone bars and connected frame: duplicate window titles/app IDs, keyboard
+  switching, overview, active-window crops, helper validation/save/conflicts,
+  keybind writes, one QML-owned watcher, reconnect after killing the watcher,
+  orderly logout and process cleanup.
+
+The UI runs included the ungrouped taskbar, dock and keyboard widget.
+The XWayland DMS run also captured a synthetic XWayland window (632×612), with
+rotated/fractional native capture at 350×1145 and positive output origins.
+
+Earlier standalone-bar runs produced 632×660 and 350×1205 window crops. The connected
+frame run produced 616×648 and 330×1190 crops; the latter used scale 1.25,
+90° rotation and output origin (-3000, -100). These are dimensions from those
+synthetic fixtures, not universal expected window sizes.
+
+Reproduce the focused desktop checks with a Pixman-compatible diagnostic build:
+
+```sh
+node quickshell/tests/aqueous-service.test.mjs
+python3 scripts/test-aqueous-service.py
+node quickshell/tests/display-apply.test.mjs
+node quickshell/tests/aqueous-displays.test.mjs
+LD_LIBRARY_PATH=/path/to/patched-wlroots/lib \
+  python3 scripts/test-aqueous-integration.py \
+  --aqueous-source /path/to/Aqueous --bin-dir /path/to/matching/binaries
+# Add --frame to exercise connected frame reservations.
+# Add --xwayland for the XWayland capture check (positive output origins).
+```
+
+The binary directory must contain `aqueous`, `aqueousctl`, `aqueous-config` and
+the DMS build under test. The harness compiles Aqueous's existing synthetic client
+from the supplied source; it never connects to the user's display. It retains
+logs, PNGs and helper snapshots in the printed temporary directory.
+`qmlformat` 6.11.2 exits unsuccessfully without diagnostics for both the unchanged
+baseline and modified `WorkspaceSwitcher.qml`; the other changed QML files parse,
+and entrypoint lint and the real widget runs pass.
+
+Physical DPMS off/wake, hotplug/resume, physical mixed-scale rendering, decorations
+across real applications, direct/nested/UWSM logout combinations and full lock UI
+integration still need desktop verification. Browser/recorder portal streaming is
+a separate release gate. Headless checks do not establish those results.
+DankLinux-Docs support tables, packaging and plugin registry publication remain
+work for their owning repositories after release dependencies are established.
+
+Keep the generic DPMS/result fixes and optional `parentWindow` compatibility changes
+independently reviewable. The common-QML fix is an uncommitted submodule change;
+an upstream landing will need a common-QML commit and coordinated dependency pin.
