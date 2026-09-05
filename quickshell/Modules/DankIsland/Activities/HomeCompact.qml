@@ -374,7 +374,19 @@ Item {
             height: root.height
             enabled: !item.isClock
             controller: root.controller
-            onClicked: root.activateGroup(item.groupId)
+            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+            onClicked: (event) => {
+                if (event.button === Qt.MiddleButton) {
+                    if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
+                        MprisController.activePlayer.togglePlaying();
+                    if (item.isVolume && AudioService.sink?.audio) {
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.toggleMute();
+                    }
+                    return;
+                }
+                root.activateGroup(item.groupId)
+            }
             onWheel: wheel => {
                 if (!item.isVolume && !item.isBrightness)
                     return;
@@ -568,7 +580,19 @@ Item {
             height: parent.height + item.leadPad + item.trailPad
             enabled: !item.isClock
             controller: root.controller
-            onClicked: root.activateGroup(item.groupId)
+            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+            onClicked: (event) => {
+                if (event.button === Qt.MiddleButton) {
+                    if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
+                        MprisController.activePlayer.togglePlaying();
+                    if (item.isVolume && AudioService.sink?.audio) {
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.toggleMute();
+                    }
+                    return;
+                }
+                root.activateGroup(item.groupId)
+            }
             onWheel: wheel => {
                 if (!item.isVolume && !item.isBrightness)
                     return;
