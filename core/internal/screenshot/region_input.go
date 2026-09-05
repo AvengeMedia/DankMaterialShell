@@ -3,6 +3,7 @@ package screenshot
 import (
 	"math"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
@@ -432,52 +433,60 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 		}
 	})
 
+	r.keyboard.SetKeymapHandler(func(e client.KeyboardKeymapEvent) {
+		r.keymap = keymap.FromEvent(e)
+	})
+
 	r.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
-		switch e.Key {
-		case 29, 97: // Ctrl left/right
-			ctrl := e.State != 0
-			if ctrl != r.ctrlHeld {
-				r.ctrlHeld = ctrl
-				r.refreshCursor()
-				if r.selection.hasSelection {
-					for _, os := range r.surfaces {
-						r.redrawSurface(os)
-					}
+		r.handleKey(r.keymap.Keysym(e.Key), e.State)
+	})
+}
+
+func (r *RegionSelector) handleKey(sym string, state uint32) {
+	held := state != 0
+	switch sym {
+	case "Control_L", "Control_R":
+		if held != r.ctrlHeld {
+			r.ctrlHeld = held
+			r.refreshCursor()
+			if r.selection.hasSelection {
+				for _, os := range r.surfaces {
+					r.redrawSurface(os)
 				}
 			}
-		case 56, 100: // Alt left/right
-			r.altHeld = e.State != 0
 		}
-		if e.State != 1 {
-			return
-		}
+	case "Alt_L", "Alt_R":
+		r.altHeld = held
+	}
+	if state != 1 {
+		return
+	}
 
-		if r.phase == phaseScroll {
-			switch e.Key {
-			case 1:
-				r.cancelled = true
-				r.running = false
-			case 28, 96:
-				r.finishScroll()
-			}
-			return
-		}
-
-		switch e.Key {
-		case 1:
+	if r.phase == phaseScroll {
+		switch sym {
+		case "Escape":
 			r.cancelled = true
 			r.running = false
-		case 25:
-			r.showCapturedCursor = !r.showCapturedCursor
-			for _, os := range r.surfaces {
-				r.redrawSurface(os)
-			}
-		case 28, 57, 96:
-			if r.selection.hasSelection {
-				r.finishSelection()
-			}
+		case "Return", "KP_Enter":
+			r.finishScroll()
 		}
-	})
+		return
+	}
+
+	switch sym {
+	case "Escape":
+		r.cancelled = true
+		r.running = false
+	case "p":
+		r.showCapturedCursor = !r.showCapturedCursor
+		for _, os := range r.surfaces {
+			r.redrawSurface(os)
+		}
+	case "Return", "space", "KP_Enter":
+		if r.selection.hasSelection {
+			r.finishSelection()
+		}
+	}
 }
 
 func (r *RegionSelector) selectionDeviceRect() (*OutputSurface, int, int, int, int) {

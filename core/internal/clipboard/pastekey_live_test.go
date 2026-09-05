@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 	"golang.org/x/sys/unix"
 )
@@ -32,20 +33,20 @@ func TestLiveSeatKeymapResolution(t *testing.T) {
 	}
 	defer keyboard.Release()
 
-	var keymap *wlclient.KeyboardKeymapEvent
+	var seatKeymap *wlclient.KeyboardKeymapEvent
 	keyboard.SetKeymapHandler(func(e wlclient.KeyboardKeymapEvent) {
-		if keymap == nil {
-			keymap = &e
+		if seatKeymap == nil {
+			seatKeymap = &e
 		}
 	})
 	s.display.Roundtrip()
 
-	if keymap == nil {
+	if seatKeymap == nil {
 		t.Fatal("no keymap event")
 	}
-	defer unix.Close(keymap.Fd)
+	defer unix.Close(seatKeymap.Fd)
 
-	text, err := readKeymap(keymap.Fd, keymap.Size)
+	text, err := keymap.Read(seatKeymap.Fd, seatKeymap.Size)
 	if err != nil {
 		t.Fatalf("read keymap: %v", err)
 	}
@@ -56,10 +57,7 @@ func TestLiveSeatKeymapResolution(t *testing.T) {
 		}
 	}
 
-	keys := resolveKeycodes(text)
-	t.Logf("keymap size=%d resolved ctrl=%d shift=%d v=%d", keymap.Size, keys.ctrl, keys.shift, keys.v)
-
-	if keys.ctrl == fallbackCtrlKey && keys.shift == fallbackShiftKey && keys.v == fallbackVKey {
-		t.Log("all keycodes are fallbacks - parsing may not have matched the live keymap")
-	}
+	keys := keymap.Parse(text)
+	t.Logf("keymap size=%d resolved ctrl=%d shift=%d v=%d", seatKeymap.Size,
+		keys.Keycode("Control_L"), keys.Keycode("Shift_L"), keys.Keycode("v"))
 }

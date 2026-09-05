@@ -12,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_cursor_shape"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
@@ -108,6 +109,7 @@ type RegionSelector struct {
 	seat       *client.Seat
 	pointer    *client.Pointer
 	keyboard   *client.Keyboard
+	keymap     *keymap.Keymap
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter

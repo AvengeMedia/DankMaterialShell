@@ -12,6 +12,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
@@ -64,6 +65,7 @@ type Picker struct {
 	seat       *client.Seat
 	pointer    *client.Pointer
 	keyboard   *client.Keyboard
+	keymap     *keymap.Keymap
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter
@@ -738,9 +740,14 @@ func (p *Picker) setupPointerHandlers() {
 }
 
 func (p *Picker) setupKeyboardHandlers() {
+	p.keyboard.SetKeymapHandler(func(e client.KeyboardKeymapEvent) {
+		p.keymap = keymap.FromEvent(e)
+	})
+
 	p.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
+		sym := p.keymap.Keysym(e.Key)
 		for _, ls := range p.surfaces {
-			ls.state.OnKey(e.Key, e.State)
+			ls.state.OnKey(sym, e.State)
 		}
 	})
 }
