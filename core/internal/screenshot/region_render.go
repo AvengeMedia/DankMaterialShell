@@ -6,7 +6,21 @@ import (
 	"slices"
 )
 
-var fontGlyphs = map[rune][12]uint8{
+const (
+	fontCharW = 8
+	fontCharH = 12
+	fontStep  = fontCharW + 1
+)
+
+func scaleFactor(scale float64) int {
+	s := int(math.Round(scale))
+	if s < 1 {
+		return 1
+	}
+	return s
+}
+
+var fontGlyphs = map[rune][fontCharH]uint8{
 	'0': {0x3C, 0x66, 0x66, 0x6E, 0x76, 0x66, 0x66, 0x66, 0x66, 0x3C, 0x00, 0x00},
 	'1': {0x18, 0x38, 0x78, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x7E, 0x00, 0x00},
 	'2': {0x3C, 0x66, 0x66, 0x06, 0x0C, 0x18, 0x30, 0x60, 0x66, 0x7E, 0x00, 0x00},
@@ -593,12 +607,11 @@ func (r *RegionSelector) drawScrollPreview(data []byte, stride, bufW, bufH int, 
 func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, format uint32) {
 	s := r.scroll
 	style := LoadOverlayStyle()
-	const charH = 12
 
 	r.fillRect(data, stride, bufW, bufH, s.barX, s.barY, s.barW, s.barH,
 		style.BackgroundR, style.BackgroundG, style.BackgroundB, 245, format)
 
-	labelY := s.doneY + (s.btnH-charH)/2
+	labelY := s.doneY + (s.btnH-fontCharH)/2
 	r.fillRect(data, stride, bufW, bufH, s.doneX, s.doneY, s.doneW, s.btnH,
 		style.AccentR, style.AccentG, style.AccentB, 255, format)
 	r.drawText(data, stride, bufW, bufH, s.doneX+12, labelY, "done", 10, 10, 10, format)
@@ -617,9 +630,15 @@ func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, form
 		style.TextR, style.TextG, style.TextB, format)
 }
 
-func (r *RegionSelector) hudDimensions(bufW, bufH int) (hudX, hudY, hudW, hudH int) {
-	const charW, charH, padding, itemSpacing = 8, 12, 12, 24
+type hudItem struct {
+	key, desc string
+}
 
+func (h hudItem) width(step int) int {
+	return (len(h.key) + 1 + len(h.desc)) * step
+}
+
+func (r *RegionSelector) hudItems() []hudItem {
 	cursorLabel := "hide"
 	if !r.showCapturedCursor {
 		cursorLabel = "show"
@@ -629,16 +648,25 @@ func (r *RegionSelector) hudDimensions(bufW, bufH int) (hudX, hudY, hudW, hudH i
 		captureKey = "Drag+Release"
 	}
 
-	items := []struct{ key, desc string }{
+	return []hudItem{
 		{captureKey, "capture"},
 		{"Ctrl", "resize/move"},
 		{"P", cursorLabel + " cursor"},
 		{"Esc", "cancel"},
 	}
+}
 
+func (r *RegionSelector) hudDimensions(bufW, bufH, scale int) (hudX, hudY, hudW, hudH int) {
+	scale = scaleFactor(float64(scale))
+	charH := fontCharH * scale
+	padding, itemSpacing := 12*scale, 24*scale
+	margin := 20 * scale
+
+	items := r.hudItems()
 	totalW := 0
+	step := fontStep * scale
 	for i, item := range items {
-		totalW += len(item.key)*(charW+1) + (1+len(item.desc))*(charW+1)
+		totalW += item.width(step)
 		if i < len(items)-1 {
 			totalW += itemSpacing
 		}
@@ -647,46 +675,32 @@ func (r *RegionSelector) hudDimensions(bufW, bufH int) (hudX, hudY, hudW, hudH i
 	hudW = totalW + padding*2
 	hudH = charH + padding*2
 	hudX = (bufW - hudW) / 2
-	hudY = bufH - hudH - 20
+	hudY = bufH - hudH - margin
 	return hudX, hudY, hudW, hudH
 }
 
-func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32) {
+func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32, scale int) {
 	if r.selection.dragging {
 		return
 	}
 
-	hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH)
+	scale = scaleFactor(float64(scale))
+	hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH, scale)
 	style := LoadOverlayStyle()
 	r.fillRect(data, stride, bufW, bufH, hudX, hudY, hudW, hudH,
 		style.BackgroundR, style.BackgroundG, style.BackgroundB, style.BackgroundA, format)
 
-	const charW, padding, itemSpacing = 8, 12, 24
-	cursorLabel := "hide"
-	if !r.showCapturedCursor {
-		cursorLabel = "show"
-	}
-	captureKey := "Space/Enter"
-	if r.screenshoter != nil && r.screenshoter.config.NoConfirm {
-		captureKey = "Drag+Release"
-	}
-
-	items := []struct{ key, desc string }{
-		{captureKey, "capture"},
-		{"Ctrl", "resize/move"},
-		{"P", cursorLabel + " cursor"},
-		{"Esc", "cancel"},
-	}
+	padding, itemSpacing := 12*scale, 24*scale
+	step := fontStep * scale
+	items := r.hudItems()
 
 	tx, ty := hudX+padding, hudY+padding
 	for i, item := range items {
-		r.drawText(data, stride, bufW, bufH, tx, ty, item.key,
-			style.AccentR, style.AccentG, style.AccentB, format)
-		tx += len(item.key) * (charW + 1)
-
-		r.drawText(data, stride, bufW, bufH, tx, ty, " "+item.desc,
-			style.TextR, style.TextG, style.TextB, format)
-		tx += (1 + len(item.desc)) * (charW + 1)
+		r.drawTextScaled(data, stride, bufW, bufH, tx, ty, item.key,
+			style.AccentR, style.AccentG, style.AccentB, format, scale)
+		r.drawTextScaled(data, stride, bufW, bufH, tx+len(item.key)*step, ty, " "+item.desc,
+			style.TextR, style.TextG, style.TextB, format, scale)
+		tx += item.width(step)
 
 		if i < len(items)-1 {
 			tx += itemSpacing
@@ -741,24 +755,29 @@ func (r *RegionSelector) drawVLine(data []byte, stride, bufW, bufH, x, y, length
 }
 
 func labelRect(b selectionRenderBounds, bufW, bufH int) (dirtyRect, string) {
+	scale := scaleFactor(b.scaleX)
 	text := b.labelText
-
-	const charW, charH = 8, 12
-	textW := len(text) * (charW + 1)
+	charH := fontCharH * scale
+	step := fontStep * scale
+	textW := len(text) * step
+	padX := 4 * scale
+	padY := 2 * scale
+	offsetY := 8 * scale
 
 	tx := b.x + (b.w-textW)/2
-	ty := b.y + b.h + 8
+	ty := b.y + b.h + offsetY
 	if ty+charH > bufH {
-		ty = b.y - charH - 8
+		ty = b.y - charH - offsetY
 	}
 	tx = clamp(tx, 0, bufW-textW)
-	return dirtyRect{x1: tx - 4, y1: ty - 2, x2: tx + textW + 4, y2: ty + charH + 2}, text
+	return dirtyRect{x1: tx - padX, y1: ty - padY, x2: tx + textW + padX, y2: ty + charH + padY}, text
 }
 
 func (r *RegionSelector) drawLabel(data []byte, stride, bufW, bufH int, o *overlay, format uint32) {
+	scale := scaleFactor(o.scaleX)
 	l := o.label
 	r.fillRect(data, stride, bufW, bufH, l.x1, l.y1, l.x2-l.x1, l.y2-l.y1, 0, 0, 0, 200, format)
-	r.drawText(data, stride, bufW, bufH, l.x1+4, l.y1+2, o.text, 255, 255, 255, format)
+	r.drawTextScaled(data, stride, bufW, bufH, l.x1+4*scale, l.y1+2*scale, o.text, 255, 255, 255, format, scale)
 }
 
 func formatIsBGR(format uint32) bool {
@@ -795,41 +814,55 @@ func (r *RegionSelector) fillRect(data []byte, stride, bufW, bufH, x, y, w, h in
 }
 
 func (r *RegionSelector) drawText(data []byte, stride, bufW, bufH, x, y int, text string, cr, cg, cb uint8, format uint32) {
+	r.drawTextScaled(data, stride, bufW, bufH, x, y, text, cr, cg, cb, format, 1)
+}
+
+func (r *RegionSelector) drawTextScaled(data []byte, stride, bufW, bufH, x, y int, text string, cr, cg, cb uint8, format uint32, scale int) {
+	scale = scaleFactor(float64(scale))
+	step := fontStep * scale
 	for i, ch := range text {
-		r.drawChar(data, stride, bufW, bufH, x+i*9, y, ch, cr, cg, cb, format)
+		r.drawChar(data, stride, bufW, bufH, x+i*step, y, ch, cr, cg, cb, format, scale)
 	}
 }
 
-func (r *RegionSelector) drawChar(data []byte, stride, bufW, bufH, x, y int, ch rune, cr, cg, cb uint8, format uint32) {
+func (r *RegionSelector) drawChar(data []byte, stride, bufW, bufH, x, y int, ch rune, cr, cg, cb uint8, format uint32, scale int) {
 	glyph, ok := fontGlyphs[ch]
 	if !ok {
 		return
 	}
+
+	scale = scaleFactor(float64(scale))
 
 	c0, c2 := cb, cr
 	if formatIsBGR(format) {
 		c0, c2 = cr, cb
 	}
 
-	for row := range 12 {
-		py := y + row
-		if py < 0 || py >= bufH {
-			continue
-		}
+	for row := range fontCharH {
 		bits := glyph[row]
-		for col := range 8 {
-			if (bits & (1 << (7 - col))) == 0 {
+		for dy := range scale {
+			py := y + row*scale + dy
+			if py < 0 || py >= bufH {
 				continue
 			}
-			px := x + col
-			if px < 0 || px >= bufW {
-				continue
+			rowOff := py * stride
+			for col := range fontCharW {
+				if (bits & (1 << (7 - col))) == 0 {
+					continue
+				}
+				baseX := x + col*scale
+				for dx := range scale {
+					px := baseX + dx
+					if px < 0 || px >= bufW {
+						continue
+					}
+					off := rowOff + px*4
+					if off+3 >= len(data) {
+						continue
+					}
+					data[off], data[off+1], data[off+2], data[off+3] = c0, cg, c2, 255
+				}
 			}
-			off := py*stride + px*4
-			if off+3 >= len(data) {
-				continue
-			}
-			data[off], data[off+1], data[off+2], data[off+3] = c0, cg, c2, 255
 		}
 	}
 }
