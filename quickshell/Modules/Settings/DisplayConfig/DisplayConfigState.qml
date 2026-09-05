@@ -530,20 +530,23 @@ Singleton {
         const outputKeys = Object.keys(configEntry.outputs || {});
         if (outputKeys.length === 0)
             return false;
-        const hasEnabledReal = outputKeys.some(k => {
-            const o = configEntry.outputs[k];
-            return !o.disabled && o.make && o.model;
-        });
+        const hasEnabledReal = outputKeys.some(k => !configEntry.outputs[k].disabled && profileOutputIsReal(k));
         if (hasEnabledReal)
             return false;
-        for (const k of outputKeys) {
-            const o = configEntry.outputs[k];
-            if (o.make && o.model) {
-                delete o.disabled;
-                return true;
-            }
+        const firstReal = outputKeys.find(k => profileOutputIsReal(k));
+        if (!firstReal)
+            return false;
+        delete configEntry.outputs[firstReal].disabled;
+        return true;
+    }
+
+    function profileOutputIsReal(outputId) {
+        for (const name in outputs) {
+            if (!profileKeyMatchesOutput(outputId, outputs[name], name))
+                continue;
+            return !!(outputs[name].make && outputs[name].model);
         }
-        return false;
+        return true;
     }
 
     function applyConfigEntry(configEntry, configId, profileName, isManual) {
@@ -556,26 +559,6 @@ Singleton {
             showHyprlandReadOnlyWarning();
             return;
         }
-        ensureEnabledOutput(configEntry);
-        const outputKeys = Object.keys(configEntry.outputs || {});
-        const hasRealOutput = outputKeys.some(k => {
-            const o = configEntry.outputs[k];
-            return o.make && o.model;
-        });
-        if (!hasRealOutput) {
-            backendWriteOutputsConfig({}, null, success => {
-                if (success) {
-                    SettingsData.setActiveDisplayProfile(CompositorService.compositor, configId);
-                    WlrOutputService.requestState();
-                }
-            });
-            return;
-        }
-        // Capture the entry being applied so disabled-output settings fields can read
-        // scale/position/transform back even when wlr reports no logical viewport.
-        root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
-        const outputsData = generateOutputsDataFromConfig(configEntry);
-
         const onWriteFailed = () => {
             if (isManual) {
                 profilesLoading = false;
@@ -583,6 +566,17 @@ Singleton {
                 profileError(I18n.tr("Failed to apply profile"));
             }
         };
+
+        ensureEnabledOutput(configEntry);
+        if (!Object.keys(configEntry.outputs || {}).some(k => profileOutputIsReal(k))) {
+            log.warn("Profile", configId, "has no real outputs, not applying");
+            onWriteFailed();
+            return;
+        }
+        // Capture the entry being applied so disabled-output settings fields can read
+        // scale/position/transform back even when wlr reports no logical viewport.
+        root.lastAppliedEntry = JSON.parse(JSON.stringify(configEntry));
+        const outputsData = generateOutputsDataFromConfig(configEntry);
         const onWriteSuccess = () => {
             SessionData.setActiveDisplayProfile(CompositorService.compositor, configId);
             publishActiveProfileModes();
@@ -806,19 +800,17 @@ Singleton {
 
             const outputConfigs = buildCurrentOutputConfigs();
             const id = generateAutoProfileId(currentOutputSet);
+            const entry = {
+                "id": id,
+                "name": "",
+                "outputs": outputConfigs
+            };
+            ensureEnabledOutput(entry);
             const existingIdx = data.configurations.findIndex(c => c.id === id);
             if (existingIdx >= 0)
-                data.configurations[existingIdx] = {
-                    "id": id,
-                    "name": "",
-                    "outputs": outputConfigs
-                };
+                data.configurations[existingIdx] = entry;
             else
-                data.configurations.push({
-                    "id": id,
-                    "name": "",
-                    "outputs": outputConfigs
-                });
+                data.configurations.push(entry);
             writeMonitorsJson(data, success => {
                 if (!success)
                     return;
@@ -939,7 +931,7 @@ Singleton {
     }
 
     Connections {
-        target: SettingsData
+        target: SessionData
         function onActiveDisplayProfileChanged() {
             root.publishActiveProfileModes();
         }
