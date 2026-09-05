@@ -1177,6 +1177,7 @@ Singleton {
     property int updaterIntervalSeconds: 1800
     property bool updaterIncludeFlatpak: true
     property bool updaterAllowAUR: true
+    property bool updaterReopenAfterUpgrade: true
     property var updaterIgnoredPackages: []
 
     property string displayNameMode: "system"

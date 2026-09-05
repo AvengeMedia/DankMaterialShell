@@ -187,6 +187,16 @@ Item {
                     onToggled: checked => SettingsData.set("updaterAllowAUR", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "systemUpdaterReopenAfterUpgrade"
+                    tags: ["reopen", "popout", "terminal", "upgrade"]
+                    text: I18n.tr("Reopen panel after update")
+                    description: I18n.tr("Reopen the update panel once the terminal window closes after running updates.")
+                    visible: SystemUpdateService.useCustomCommand || (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
+                    checked: SettingsData.updaterReopenAfterUpgrade
+                    onToggled: checked => SettingsData.set("updaterReopenAfterUpgrade", checked)
+                }
+
                 TerminalPickerRow {}
             }
 
