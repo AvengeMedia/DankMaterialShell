@@ -1,6 +1,7 @@
 package network
 
 import (
+	"strings"
 	"testing"
 
 	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
@@ -915,4 +916,49 @@ func TestGetHotspotSecrets(t *testing.T) {
 		_, err = backend.GetHotspotSecrets()
 		assert.Error(t, err)
 	})
+}
+
+func TestValidateHotspotPassword(t *testing.T) {
+	hex64 := strings.Repeat("0123456789abcdef", 4)
+	cases := []struct {
+		name     string
+		password string
+		valid    bool
+	}{
+		{"open network", "", true},
+		{"three digits", "123", false},
+		{"seven chars", "testing", false},
+		{"eight chars", "testing1", true},
+		{"sixty three chars", strings.Repeat("a", 63), true},
+		{"sixty four hex", hex64, true},
+		{"sixty four hex uppercase", strings.ToUpper(hex64), true},
+		{"sixty four non-hex", strings.Repeat("g", 64), false},
+		{"sixty five chars", strings.Repeat("a", 65), false},
+		{"multibyte counts bytes", "ääää", true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := validateHotspotPassword(tc.password)
+			if tc.valid {
+				assert.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "8 to 63 characters")
+		})
+	}
+}
+
+func TestConfigureHotspotRejectsShortPasswordBeforeTouchingNetworkManager(t *testing.T) {
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockSettings := mock_gonetworkmanager.NewMockSettings(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	require.NoError(t, err)
+	backend.settings = mockSettings
+
+	err = backend.ConfigureHotspot(HotspotRequest{SSID: "DMS Hotspot", Password: "123", Device: "wlan0"})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "8 to 63 characters")
 }

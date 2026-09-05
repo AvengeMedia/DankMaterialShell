@@ -1277,6 +1277,7 @@ Item {
                 property int passwordRequestId: 0
                 property int passwordEditRevision: 0
                 readonly property bool showForm: !NetworkService.hotspotConfigured || editing
+                readonly property bool passwordValid: password.length === 0 || (password.length >= 8 && password.length <= 63) || /^[0-9a-fA-F]{64}$/.test(password)
                 readonly property bool starting: NetworkService.hotspotBusy || NetworkService.hotspotActivating
                 property var startConfirm: ConfirmModal {}
 
@@ -1358,7 +1359,7 @@ Item {
                 }
 
                 function buildCanConfigure() {
-                    return ssid.trim().length > 0 && passwordResolved && !passwordLoading && !NetworkService.hotspotBusy && !NetworkService.hotspotEnabled && !NetworkService.hotspotActivating;
+                    return ssid.trim().length > 0 && passwordValid && passwordResolved && !passwordLoading && !NetworkService.hotspotBusy && !NetworkService.hotspotEnabled && !NetworkService.hotspotActivating;
                 }
 
                 function explainWiFiDisabled() {
@@ -1518,6 +1519,15 @@ Item {
                                     hotspotCard.passwordResolved = true;
                             }
                             onAccepted: hotspotCard.saveOnly()
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Password must be 8 to 63 characters, or a 64-digit hex key.", "hotspot password length requirement")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.error
+                            wrapMode: Text.WordWrap
+                            visible: !hotspotCard.passwordValid
                         }
 
                         Row {
