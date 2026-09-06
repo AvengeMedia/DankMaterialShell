@@ -22,8 +22,15 @@ COMMON_POEXPORTS_DIR = COMMON_ROOT / "DankCommon" / "translations" / "poexports"
 
 # Plugin checkouts under quickshell/ are scanned by extraction (terms tagged
 # plugin-<dir>); their per-language exports are written back into each
-# checkout's translations/ dir, which ships with the plugin repo.
-PLUGIN_CHECKOUT_DIRS = [REPO_ROOT / "dms-plugins", REPO_ROOT / "dms-plugins-external"]
+# checkout's translations/ dir, which ships with the plugin repo. sync
+# clones and fast-forwards them: the official monorepo plus every registry
+# plugin flagged "i18n": true, keyed by plugin id.
+OFFICIAL_PLUGINS_REPO = "https://github.com/AvengeMedia/dms-plugins.git"
+PLUGIN_REGISTRY_REPO = "https://github.com/AvengeMedia/dms-plugin-registry.git"
+OFFICIAL_PLUGINS_DIR = REPO_ROOT / "dms-plugins"
+EXTERNAL_PLUGINS_DIR = REPO_ROOT / "dms-plugins-external"
+REGISTRY_DIR = EXTERNAL_PLUGINS_DIR / ".registry"
+PLUGIN_CHECKOUT_DIRS = [OFFICIAL_PLUGINS_DIR, EXTERNAL_PLUGINS_DIR]
 
 # Flip once official plugins ship their own translations/ dirs: app poexports
 # then stop carrying terms owned exclusively by plugins.
@@ -137,6 +144,45 @@ def load_greeter_entries(api_token, project_id):
 
 def entry_keys(entries):
     return {(e.get('context') or e['term'], e['term']) for e in entries}
+
+def git(args, cwd):
+    result = subprocess.run(['git', *args], cwd=cwd, capture_output=True, text=True)
+    if result.returncode != 0:
+        error(f"git {' '.join(args)} in {cwd} failed:\n{result.stderr.strip()}")
+
+def clone_or_update(url, path):
+    rel = path.relative_to(REPO_ROOT)
+    if not (path / '.git').is_dir():
+        info(f"Cloning {url} -> {rel}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        git(['clone', '--quiet', url, str(path)], REPO_ROOT)
+        return
+    info(f"Updating {rel}")
+    git(['pull', '--quiet', '--ff-only'], path)
+
+def i18n_registry_plugins():
+    plugins = []
+    for entry_file in sorted((REGISTRY_DIR / 'plugins').glob('*.json')):
+        with open(entry_file) as f:
+            entry = json.load(f)
+        if entry.get('i18n') is not True:
+            continue
+        if not entry.get('id') or not entry.get('repo'):
+            error(f"Registry entry {entry_file.name} has i18n set but no id or repo")
+        plugins.append((entry['id'], entry['repo']))
+    return plugins
+
+def update_plugin_checkouts():
+    clone_or_update(OFFICIAL_PLUGINS_REPO, OFFICIAL_PLUGINS_DIR)
+    clone_or_update(PLUGIN_REGISTRY_REPO, REGISTRY_DIR)
+    plugins = i18n_registry_plugins()
+    for plugin_id, repo in plugins:
+        clone_or_update(repo, EXTERNAL_PLUGINS_DIR / plugin_id)
+    approved = {plugin_id for plugin_id, _ in plugins}
+    for child in EXTERNAL_PLUGINS_DIR.iterdir():
+        if child.is_dir() and not child.name.startswith('.') and child.name not in approved:
+            warn(f"dms-plugins-external/{child.name} is not flagged i18n in the registry but its terms still get uploaded; remove it if it was unapproved")
+    success(f"Plugin checkouts current: official + {len(plugins)} registry plugins")
 
 def plugin_checkouts():
     checkouts = {}
@@ -440,7 +486,7 @@ def main():
         prune = "--prune" in sys.argv[2:]
         if prune:
             warn("--prune deletes every POEditor term missing from the local en.json, including its translations.")
-            warn("Terms from dms-plugins/ and dms-plugins-external/ are machine-dependent: make sure all official and approved external plugins are present before pruning.")
+            warn("Plugin checkouts are refreshed from the registry first, so pruning keeps terms of official and i18n-approved plugins; a plugin removed from the registry loses its terms.")
             warn("dank-qml-common terms are included from the submodule, so pruning keeps them as long as the submodule is current.")
             warn("dms-greeter terms are fetched from POEditor and re-included, so pruning keeps them.")
 
@@ -449,6 +495,7 @@ def main():
         greeter_entries = load_greeter_entries(api_token, project_id)
         greeter_keys = entry_keys(greeter_entries)
 
+        update_plugin_checkouts()
         extract_strings()
 
         current_en = normalize_json(EN_JSON)
