@@ -39,6 +39,7 @@ Item {
             applyIndexLayout();
         }
         updateContentExtent();
+        blurBarWindow?.refreshBlurRegion?.();
     }
 
     function updateContentExtent() {

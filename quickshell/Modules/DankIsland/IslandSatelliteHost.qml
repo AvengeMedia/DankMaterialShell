@@ -166,6 +166,9 @@ Item {
         function unregisterBlurWidget(item) {
             root.unregisterBlurWidget(item);
         }
+        function refreshBlurRegion() {
+            root.kickBlur();
+        }
     }
 
     property var _blurWidgetItems: []
