@@ -22,7 +22,7 @@ Item {
     property real clipWidth: blurWidth
     property real clipHeight: blurHeight
 
-    readonly property bool _active: blurEnabled && BlurService.protocolEnabled && !!targetWindow
+    readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
 
     Region {
         id: blurRegion

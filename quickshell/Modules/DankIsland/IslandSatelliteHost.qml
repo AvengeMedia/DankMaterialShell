@@ -195,7 +195,7 @@ Item {
             root._blurRegion = null;
             old.destroy();
         }
-        if (!BlurService.protocolEnabled)
+        if (!BlurService.enabled)
             return;
         const widgets = root.chromeCoversWidgets ? [] : root._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
         const chromes = [leadingChrome, trailingChrome].filter(c => root.chromeTranslucent && c.visible);
@@ -252,7 +252,7 @@ Item {
     Connections {
         target: BlurService
 
-        function onProtocolEnabledChanged() {
+        function onEnabledChanged() {
             blurRebuildTimer.restart();
         }
     }

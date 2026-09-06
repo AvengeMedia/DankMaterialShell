@@ -12,10 +12,8 @@ Singleton {
     readonly property var log: Log.scoped("BlurService")
 
     property bool compositorSupported: false
-    property bool probeFinished: false
-    readonly property bool available: compositorSupported || AqueousBlurService.available
-    readonly property bool enabled: available && (SettingsData.blurEnabled ?? false) && (compositorSupported || AqueousBlurService.appliedEnabled)
-    readonly property bool protocolEnabled: compositorSupported && enabled
+    readonly property bool available: compositorSupported
+    readonly property bool enabled: available && (SettingsData.blurEnabled ?? false)
 
     // These settings predate non-blurred surface borders, so keep their keys for compatibility.
     readonly property color borderColor: {
@@ -65,7 +63,6 @@ Singleton {
         }
 
         onExited: exitCode => {
-            root.probeFinished = true;
             if (exitCode !== 0)
                 log.warn("blur probe failed with code:", exitCode);
         }

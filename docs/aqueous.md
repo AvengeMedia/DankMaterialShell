@@ -75,8 +75,8 @@ only shared process utility is a bounded, short-lived JSON command runner.
 All persistent writes go through `aqueous-config validate/apply --shell dms
 --request -`, with JSON on stdin and `expected_generation`. The backup directory
 passed to the helper is `$XDG_CONFIG_HOME/DankMaterialShell/aqueous-backups`;
-the helper decides when backups are required. Blur supplies a managed TOML block
-through the helper's `raw_files.rules` request; DMS never writes the file directly.
+the helper decides when backups are required. Background blur uses the Wayland
+protocol and does not invoke the helper or write compositor configuration.
 Display previews retain the previous live configuration and refuse to revert over
 external changes or output recreation. A failed/uncertain preview is reconciled
 against live state before offering Keep/Revert. A conflict retains the draft until
@@ -84,58 +84,49 @@ the user explicitly discards it and reloads.
 
 ### Background blur
 
-When `ext-background-effect-v1` is unavailable, DMS can control Aqueous layer blur
-through its existing Background Blur toggle. This path was tested with the pinned
-0.7.1 helper. It requires an active Aqueous shell connection and a helper exposing
-the validated DMS-mode configuration contract, `raw_files.rules`, and the
-`blur.enabled` schema field. Older helpers without that contract remain unavailable.
+DMS uses its standard `ext-background-effect-v1` path on Aqueous. Native support
+was added in Aqueous `c6e5e566f892db1d7b2944f31404d037884fb0c6`; use a Vulkan
+effects build and a Quickshell version providing `BackgroundEffect.blurRegion`.
+Older Aqueous versions and builds without effects report blur as unavailable.
 
-Enable global blur in Aqueous's `wm.toml` first:
+Enable global blur in Aqueous's `wm.toml` first, with positive radius and passes:
 
 ```toml
 [blur]
 enabled = true
+radius = 8
+passes = 2
 ```
 
-Use Reload in DMS's Background Blur settings after changing Aqueous configuration.
-Set DMS surface opacity below 100% to see the effect. DMS does not alter Aqueous's
-global blur setting or application rules.
+Then enable Background Blur in DMS and set surface opacity below 100%. The
+separate frame blur preference still controls frame regions. DMS supplies exact
+regions, including rounded corners and clipping, through Quickshell. Requests
+are per surface; popups need their own regions. No DMS namespace rule is required.
+User-authored deny rules and Aqueous's global blur setting remain authoritative.
 
-The backend prepends a block delimited by `# BEGIN DMS BACKGROUND BLUR` and
-`# END DMS BACKGROUND BLUR` to `rules.toml`. Aqueous uses the first matching layer
-rule, so the block controls `dms:*` namespaces before user wildcard rules. It
-excludes click catchers, dismissal surfaces, exclusion zones, wallpaper blur,
-lock/DPMS fades, desktop widgets and monitor identification. The separate frame
-blur preference controls `dms:frame`. Layer-owned XDG popups follow their parent.
-Regions, clipping and rounded blur shapes are deliberately not reproduced.
+`dms blur check` detects the protocol global, not the runtime compositor blur
+setting. It can report `supported` while global blur is disabled. DMS does not
+change that setting, create layer rules, or run a configuration helper when blur
+is toggled or the shell starts. Existing DMS blur preferences are preserved.
 
-Existing content outside the block is retained byte-for-byte. Keep the managed
-block at the start of the file; malformed or moved markers produce an error.
-Rules files with root-level assignments cannot be safely prefixed and are rejected.
-Disabling blur writes explicit false rules so later wildcard rules cannot force it
-back on. An initially disabled preference with no managed block does not write.
-The rules persist across DMS restarts; protocol support, if available later, removes
-the managed block and restores the standard protocol path.
-
-Changes use fresh snapshots and generation-checked validate/apply calls. Errors
-appear in settings with explicit Retry; failed or uncertain writes are not retried
-automatically. Updates run on startup, setting changes, reconnect and explicit
-Reload/Retry. There is no polling process or idle timer. External rule edits are
-reconciled on the next such event.
-
-Run the focused tests with:
+Run Aqueous's protocol and pixel regression suite against this checkout:
 
 ```sh
-node quickshell/tests/aqueous-blur.test.mjs
-AQUEOUS_BLUR_TEST_HELPER=/path/to/aqueous-config \
-  node quickshell/tests/aqueous-blur.test.mjs
+cd /path/to/Aqueous/compositor
+LD_LIBRARY_PATH="$PWD/.deps/wlroots-render-hook/lib" \
+  DMS_SOURCE=/path/to/DankMaterialShell \
+  python3 scripts/test-background-effect.py
 ```
 
-The optional helper test writes only to a temporary configuration directory. It
-checks validation without writes, enable/disable, stale generations and preservation
-of unrelated rules and global blur. Offscreen QML verification also exercised the
-production services together with the real helper: startup, toggle/frame updates,
-idle behavior and disconnect. These checks do not verify compositor rendering.
+Use the updated DMS fixture that reads `BlurService.enabled`. The suite needs
+matching Aqueous binaries, `qs`, `dms`, a C compiler, Wayland development files,
+`wayland-scanner`, `grim`, and Python/Pillow. It runs on private outputs with
+isolated configuration and checks protocol discovery, rounded/intersected regions,
+toggles, hide/remap, and configuration preservation. The compositor checks also
+cover popup/subsurface masks, policy reload, fractional output transforms, and
+cached/uncached rendering. A separate `-Dvulkan-effects=false` build can be checked
+with `AQUEOUS_TEST_NO_EFFECTS=1` and `AQUEOUS_COMPOSITOR_BIN=/path/to/aqueous`.
+These headless checks do not establish physical mixed-scale or HDR rendering.
 
 ### Limitations in the pinned helper
 
@@ -165,7 +156,7 @@ controls live in KeybindsTab; KeybindsService handles the provider's snapshot,
 generation and reconciliation checks.
 
 Save, Remove and Reset read fresh bindings before dispatch. If only unrelated
-configuration changed (for example, DMS blur rules), the operation uses the new
+configuration changed (for example, user layer rules), the operation uses the new
 generation. Actual keybinding changes open a review state without writing.
 
 Reload retains the proposal and displays the previous/current bindings and
