@@ -23,7 +23,7 @@ function service() {
     });
     context.root = context;
     // Execute the actual JS event handlers with their QML property storage mocked.
-    for (const name of ['setWorkspaces', 'handleWorkspacesChanged', 'handleWindowFocusChanged', 'handleWorkspaceActiveWindowChanged']) {
+    for (const name of ['setWorkspaces', 'updateWorkspace', 'handleWorkspacesChanged', 'handleWindowFocusChanged', 'handleWorkspaceActiveWindowChanged']) {
         const match = source.match(new RegExp(`    function ${name}\\([^]*?(?=\\n    function )`));
         assert.ok(match, `event handler ${name} exists`);
         vm.runInContext(match[0], context);
