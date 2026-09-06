@@ -20,6 +20,10 @@ Item {
     readonly property bool split: effect === "splitBloom"
     readonly property bool orbit: effect === "orbitAssemble"
     readonly property bool wave: effect === "colorWave"
+    readonly property bool prism: effect === "prismEcho"
+    readonly property bool radial: effect === "radialBurst"
+    readonly property bool wipe: effect === "elasticWipe"
+    readonly property bool stack: effect === "kineticStack"
     readonly property real entrance: Math.min(1, phase * 2.2)
     readonly property real energy: Math.sin(phase * Math.PI * 2)
 
@@ -79,6 +83,36 @@ Item {
         clip: true
 
         Rectangle {
+            visible: root.radial
+            anchors.centerIn: parent
+            width: Math.max(parent.width, parent.height) * 1.45
+            height: width
+            radius: width / 2
+            color: Theme.primaryContainer
+            scale: 0.02 + root.entrance * 0.98
+            opacity: 0.18 + root.entrance * 0.72
+        }
+
+        Repeater {
+            model: root.radial && root.showShapes ? 12 : 0
+
+            Rectangle {
+                required property int index
+                readonly property real angle: index / 12 * Math.PI * 2
+                readonly property real distance: Math.min(textViewport.width, textViewport.height) * (0.08 + root.entrance * 0.44)
+                width: index % 3 === 0 ? Theme.spacingL : Theme.spacingM
+                height: index % 2 === 0 ? width : width * 2.2
+                radius: width / 2
+                color: index % 3 === 0 ? Theme.primary : index % 3 === 1 ? Theme.secondaryContainer : Theme.tertiaryContainer
+                x: textViewport.width / 2 + Math.cos(angle) * distance - width / 2
+                y: textViewport.height / 2 + Math.sin(angle) * distance - height / 2
+                rotation: angle * 180 / Math.PI + 90
+                opacity: Math.sin(root.entrance * Math.PI) * 0.92
+                scale: 0.25 + Math.sin(root.entrance * Math.PI) * 0.75
+            }
+        }
+
+        Rectangle {
             visible: root.sweep || root.wave
             x: -width + (parent.width + width) * root.phase
             width: Math.max(parent.width * 0.28, 180)
@@ -99,7 +133,7 @@ Item {
         Text {
             id: baseText
             anchors.fill: parent
-            visible: !root.split
+            visible: !root.split && !root.wipe
             text: root.content || "DankMaterialShell"
             textFormat: Text.PlainText
             color: root.morph ? Theme.primaryText : root.wave && root.phase > 0.42 && root.phase < 0.78 ? Theme.tertiary : Theme.primary
@@ -116,6 +150,87 @@ Item {
             scale: root.typography ? 0.82 + root.entrance * 0.18 + Math.sin(root.phase * Math.PI * 3) * (1 - root.phase) * 0.05 : 1
             transform: Translate {
                 y: root.wave ? Math.sin(root.phase * Math.PI * 4) * Theme.spacingL : 0
+            }
+        }
+
+        Text {
+            anchors.fill: parent
+            visible: root.prism || root.stack
+            text: baseText.text
+            textFormat: Text.PlainText
+            color: Theme.secondary
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.Wrap
+            font: baseText.font
+            opacity: root.prism ? 0.74 : 0.5
+            transform: Translate {
+                x: root.prism ? Math.sin(root.phase * Math.PI * 8) * Theme.spacingXL * (1 - root.phase * 0.72)
+                   : -(1 - root.entrance) * Theme.spacingXL * 5
+                y: root.prism ? Math.cos(root.phase * Math.PI * 6) * Theme.spacingM
+                   : -(1 - root.entrance) * Theme.spacingXL * 2
+            }
+        }
+
+        Text {
+            anchors.fill: parent
+            visible: root.prism || root.stack
+            text: baseText.text
+            textFormat: Text.PlainText
+            color: Theme.tertiary
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.Wrap
+            font: baseText.font
+            opacity: root.prism ? 0.7 : 0.5
+            transform: Translate {
+                x: root.prism ? -Math.cos(root.phase * Math.PI * 7) * Theme.spacingXL * (1 - root.phase * 0.72)
+                   : (1 - root.entrance) * Theme.spacingXL * 5
+                y: root.prism ? -Math.sin(root.phase * Math.PI * 5) * Theme.spacingM
+                   : (1 - root.entrance) * Theme.spacingXL * 2
+            }
+        }
+
+        Text {
+            anchors.fill: parent
+            visible: root.prism || root.stack
+            text: baseText.text
+            textFormat: Text.PlainText
+            color: Theme.primary
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.Wrap
+            font: baseText.font
+            opacity: root.entrance
+            scale: root.stack ? 0.72 + root.entrance * 0.28 : 1
+        }
+
+        Item {
+            anchors.centerIn: parent
+            visible: root.wipe
+            width: parent.width * root.entrance
+            height: parent.height * (0.2 + root.entrance * 0.8)
+            clip: true
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: Theme.primaryContainer
+                opacity: 0.9
+            }
+
+            Text {
+                width: textViewport.width
+                height: textViewport.height
+                x: -(textViewport.width - parent.width) / 2
+                y: -(textViewport.height - parent.height) / 2
+                text: baseText.text
+                textFormat: Text.PlainText
+                color: Theme.primaryText
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.Wrap
+                font: baseText.font
             }
         }
 
@@ -183,8 +298,13 @@ Item {
             property: "phase"
             from: 0
             to: 1
-            duration: root.typography || root.wave ? 5200 : root.sweep ? 3600 : 2600
-            easing.type: root.morph || root.orbit || root.split ? Easing.OutBack : Easing.InOutCubic
+            duration: root.prism ? 5800
+                      : root.typography || root.wave ? 5200
+                      : root.radial || root.stack ? 4200
+                      : root.sweep ? 3600
+                      : root.wipe ? 3200
+                      : 2600
+            easing.type: root.morph || root.orbit || root.split || root.radial || root.wipe || root.stack ? Easing.OutBack : Easing.InOutCubic
         }
     }
 }

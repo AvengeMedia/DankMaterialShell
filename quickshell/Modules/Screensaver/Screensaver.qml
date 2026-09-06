@@ -22,8 +22,8 @@ Scope {
     readonly property bool showShapes: SettingsData.screensaverShowShapes
     readonly property bool reducedMotion: SettingsData.reduceMotion || Theme.springMotionDisabled
     readonly property int cycleInterval: animationSpeed === "calm" ? 11000 : animationSpeed === "lively" ? 6000 : 8200
-    readonly property var textEffects: ["materialMorph", "expressiveTypography", "tonalSweep", "splitBloom", "orbitAssemble", "colorWave"]
-    readonly property var asciiEffects: ["asciiReveal", "asciiAssemble", "asciiDrift", "asciiDecrypt", "asciiPour", "asciiScatter", "asciiWave"]
+    readonly property var textEffects: ["materialMorph", "expressiveTypography", "tonalSweep", "splitBloom", "orbitAssemble", "colorWave", "prismEcho", "radialBurst", "elasticWipe", "kineticStack"]
+    readonly property var asciiEffects: ["asciiReveal", "asciiAssemble", "asciiDrift", "asciiDecrypt", "asciiPour", "asciiScatter", "asciiWave", "asciiLaserEtch", "asciiRings", "asciiFireworks", "asciiCrumble", "asciiVhs"]
 
     function effectDeck() {
         return contentMode === "ascii" ? asciiEffects : textEffects;
@@ -51,6 +51,17 @@ Scope {
         if (IdleService.isShellLocked)
             return false;
         currentEffect = chooseNextEffect();
+        cycleRevision++;
+        active = true;
+        return true;
+    }
+
+    function showEffect(effectName) {
+        const effects = effectDeck();
+        if (!effects.includes(effectName) || IdleService.isShellLocked)
+            return false;
+        previousEffect = currentEffect;
+        currentEffect = effectName;
         cycleRevision++;
         active = true;
         return true;
@@ -133,6 +144,17 @@ Scope {
                 mode: root.contentMode,
                 effect: root.currentEffect
             });
+        }
+
+        function effects(): string {
+            return JSON.stringify({
+                text: root.textEffects,
+                ascii: root.asciiEffects
+            });
+        }
+
+        function openEffect(effectName: string): string {
+            return root.showEffect(effectName) ? "Screensaver opened" : "Unknown or unavailable effect";
         }
     }
 }

@@ -270,12 +270,22 @@ effects and respects the reduced-motion setting. It has no external dependencies
 - Check whether the screensaver is visible
 - Returns: JSON containing visibility, detected content mode, and current effect
 
+**`effects`**
+- List the available text and ASCII effects
+- Returns: JSON arrays grouped by content mode
+
+**`openEffect effectName`**
+- Open a specific effect supported by the current content mode
+- Returns: Open result message
+
 ### Examples
 ```bash
 dms ipc call screensaver open
 dms ipc call screensaver close
 dms ipc call screensaver toggle
 dms ipc call screensaver status
+dms ipc call screensaver effects
+dms ipc call screensaver openEffect asciiRings
 ```
 
 ## Target: `sessions`
