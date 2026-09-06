@@ -33,14 +33,6 @@ Item {
     onRevisionChanged: restart()
     Component.onCompleted: restart()
 
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius * 2
-        color: Theme.surfaceContainer
-        border.width: 1
-        border.color: Theme.outlineVariant
-    }
-
     Item {
         id: viewport
         anchors.fill: parent
@@ -97,7 +89,7 @@ Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 width: parent.width * (1 - root.phase)
-                color: Theme.surfaceContainer
+                color: Theme.surfaceContainerLowest
             }
         }
     }

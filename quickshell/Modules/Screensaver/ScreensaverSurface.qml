@@ -46,7 +46,7 @@ PanelWindow {
         mouseInitialized = false;
         lastMousePosition = Qt.point(-1, -1);
         inputEnableTimer.restart();
-        Qt.callLater(inputScope.forceActiveFocus);
+        Qt.callLater(() => inputScope.forceActiveFocus());
     }
 
     Timer {
@@ -98,8 +98,8 @@ PanelWindow {
         hoverEnabled: true
         cursorShape: Qt.BlankCursor
 
-        onPressed: root.controller.close()
-        onWheel: root.controller.close()
+        onPressed: root.controller.hide()
+        onWheel: root.controller.hide()
         onPositionChanged: mouse => {
             if (!root.mouseInitialized) {
                 root.lastMousePosition = Qt.point(mouse.x, mouse.y);
@@ -108,7 +108,7 @@ PanelWindow {
             }
             if (Math.abs(mouse.x - root.lastMousePosition.x) <= 5 && Math.abs(mouse.y - root.lastMousePosition.y) <= 5)
                 return;
-            root.controller.close();
+            root.controller.hide();
         }
     }
 
@@ -118,9 +118,7 @@ PanelWindow {
         focus: root.visible
 
         Keys.onPressed: event => {
-            if (!root.inputEnabled)
-                return;
-            root.controller.close();
+            root.controller.hide();
             event.accepted = true;
         }
     }
