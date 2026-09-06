@@ -769,11 +769,7 @@ Singleton {
         return results;
     }
 
-    function getCategoriesForApp(app) {
-        if (!app?.categories)
-            return [];
-
-        const categoryMap = {
+    readonly property var _categoryMap: ({
             "AudioVideo": I18n.tr("Media"),
             "Audio": I18n.tr("Media"),
             "Video": I18n.tr("Media"),
@@ -798,15 +794,20 @@ Singleton {
             "Accessories": I18n.tr("Utilities"),
             "FileManager": I18n.tr("Utilities"),
             "TerminalEmulator": I18n.tr("Utilities")
-        };
+        })
+
+    on_CategoryMapChanged: _cachedCategories = null
+
+    function getCategoriesForApp(app) {
+        if (!app?.categories)
+            return [];
 
         const mappedCategories = new Set();
-
         for (const cat of app.categories) {
-            if (categoryMap[cat])
-                mappedCategories.add(categoryMap[cat]);
+            const mapped = _categoryMap[cat];
+            if (mapped)
+                mappedCategories.add(mapped);
         }
-
         return Array.from(mappedCategories);
     }
 
