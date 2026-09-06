@@ -924,7 +924,7 @@ Item {
                 return error;
             if (SettingsData.isIslandBarConfig(barConfig))
                 return "BAR_IS_ISLAND";
-            if (!barConfig.autoHide)
+            if (!barConfig.autoHide && !BarWidgetService.dankBarItems[barConfig.id]?.fullscreenAutoHide)
                 return "BAR_AUTO_HIDE_DISABLED";
             if (!(barConfig.visible ?? true)) {
                 SettingsData.updateBarConfig(barConfig.id, {

@@ -1238,6 +1238,7 @@ Singleton {
             "popupGapsManual": 4,
             "maximizeDetection": true,
             "useOverlayLayer": false,
+            "hideOnFullscreen": false,
             "scrollEnabled": true,
             "scrollXBehavior": "column",
             "scrollYBehavior": "workspace",
