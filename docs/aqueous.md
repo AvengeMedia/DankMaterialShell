@@ -155,6 +155,55 @@ DMS typography represents family, weight and scale. Exact face/slant/width and
 separately scaled bars may differ. Toolkit synchronization can partially fail after
 the canonical save; inspect the adapter report and use explicit Retry.
 
+### Keybind conflict recovery
+
+Aqueous uses the same inline KeybindItem rows, new-binding form, confirmation
+dialog and service save/remove/reset entry points as Hyprland and Niri. The tab
+retains one Aqueous draft independently of the binding list, including its original
+chord/action, compositor session and observed inventory. Draft state and review
+controls live in KeybindsTab; KeybindsService handles the provider's snapshot,
+generation and reconciliation checks.
+
+Save, Remove and Reset read fresh bindings before dispatch. If only unrelated
+configuration changed (for example, DMS blur rules), the operation uses the new
+generation. Actual keybinding changes open a review state without writing.
+
+Reload retains the proposal and displays the previous/current bindings and
+destination chord. Accept reviewed changes adopts that baseline; Save still
+performs a fresh check. Removal requires a new confirmation after review.
+Deleted targets and duplicate/occupied chords must be resolved explicitly, or
+the draft can be discarded. Session/provider changes invalidate pending work
+while retaining the draft text. Filtering, collapsing the row and hiding/reopening
+the tab do not reset it. Cancelling removal leaves the original edit intact.
+
+Configuration changes between preparation and helper validation/apply still
+produce a conflict. Failed and uncertain mutations are never automatically
+replayed. Successful saves clear the draft even if the subsequent list refresh
+fails, and failed operations cannot emit a later success event merely because
+the list was refreshed. Refreshes run on session readiness, tab visibility,
+explicit actions and mutation completion; there is no idle polling.
+
+The UI and CLI must be updated together. Aqueous mutation commands support
+`--json` to return `success`, `code` and a failure `message` or successful
+`generation`. Failure exit codes remain nonzero. `external_change` identifies a
+generation conflict; `uncertain` means helper application lacked a reliable
+acknowledgement. CLI callers must still supply their observed
+`--expected-generation`; only the UI has the retained baseline needed to compare
+inventories before updating that generation.
+
+Focused verification:
+
+```sh
+node quickshell/tests/aqueous-keybinds.test.mjs
+python3 scripts/test-aqueous-keybinds.py --bin-dir /path/to/test/binaries
+```
+
+The integration test requires a Pixman-compatible Aqueous build, `aqueousctl`,
+`aqueous-config`, Quickshell and the matching DMS binary. It creates a private
+headless display and temporary configuration, then exercises the real Keybinds
+tab, draft editing, blur-only changes, review/save/discard, removal reconfirmation,
+structured CLI failures and idle behavior. It never connects to the user's display.
+
 ## Diagnostics
 
 Run these inside the session being diagnosed:

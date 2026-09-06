@@ -22,6 +22,9 @@ Item {
     property bool recording: false
     property bool isNew: false
     property bool readOnly: false
+    property bool saveBlocked: false
+    property var retainedEdit: null
+    readonly property bool retainEdits: retainedEdit !== null
     property string restoreKey: ""
 
     property int editingKeyIndex: -1
@@ -70,6 +73,7 @@ Item {
     signal removeBind(string key)
     signal resetBind(string key)
     signal cancelEdit
+    signal editChanged
 
     clip: true
 
@@ -91,7 +95,9 @@ Item {
     }
 
     Component.onCompleted: {
-        if (isNew && isExpanded)
+        if (retainedEdit && isExpanded)
+            restoreRetainedEdit();
+        else if (isNew && isExpanded)
             resetEdits();
     }
 
@@ -99,6 +105,10 @@ Item {
         _userToggledExpand = true;
         if (!isExpanded)
             return;
+        if (retainedEdit) {
+            restoreRetainedEdit();
+            return;
+        }
         if (restoreKey) {
             restoreToKey(restoreKey);
         } else {
@@ -110,6 +120,13 @@ Item {
         if (!isExpanded || !restoreKey)
             return;
         restoreToKey(restoreKey);
+    }
+
+    function restoreRetainedEdit() {
+        const retained = retainedEdit;
+        editingKeyIndex = keys.findIndex(key => key.key === retained.originalKey);
+        addingNewKey = !retained.originalKey;
+        updateEdit(retained.data);
     }
 
     function restoreToKey(keyToFind) {
@@ -152,6 +169,7 @@ Item {
                 hasChanges = false;
                 _actionType = Actions.getActionType(editAction);
                 useCustomCompositor = _actionType === "compositor" && editAction && !KeybindsService.isKnownCompositorAction(editAction);
+                editChanged();
                 return;
             }
         }
@@ -176,6 +194,7 @@ Item {
         hasChanges = false;
         _actionType = Actions.getActionType(editAction);
         useCustomCompositor = _actionType === "compositor" && editAction && !KeybindsService.isKnownCompositorAction(editAction);
+        editChanged();
     }
 
     function startAddingNewKey() {
@@ -187,6 +206,7 @@ Item {
         editingKeyIndex = -1;
         editKey = "";
         hasChanges = true;
+        editChanged();
     }
 
     function selectKeyForEdit(index) {
@@ -202,6 +222,7 @@ Item {
         editRepeat = keys[index].repeat;
         editAllowInhibiting = keys[index].allowInhibiting;
         hasChanges = false;
+        editChanged();
     }
 
     function updateEdit(changes) {
@@ -232,10 +253,11 @@ Item {
         const origRepeat = hasKey ? keys[editingKeyIndex].repeat : undefined;
         const origAllowInhibiting = hasKey ? keys[editingKeyIndex].allowInhibiting : undefined;
         hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== origDesc || editCooldownMs !== origCooldown || editFlags !== origFlags || editAllowWhenLocked !== origAllowWhenLocked || editRepeat !== origRepeat || editAllowInhibiting !== origAllowInhibiting;
+        editChanged();
     }
 
     function canSave() {
-        if (readOnly)
+        if (readOnly || saveBlocked)
             return false;
         if (!editKey)
             return false;
@@ -270,8 +292,10 @@ Item {
             "repeat": editRepeat,
             "allowInhibiting": editAllowInhibiting
         });
-        hasChanges = false;
-        addingNewKey = false;
+        if (!retainEdits) {
+            hasChanges = false;
+            addingNewKey = false;
+        }
     }
 
     ShortcutInhibitor {
@@ -2007,9 +2031,9 @@ Item {
                         buttonHeight: root._buttonHeight
                         backgroundColor: Theme.floatingWindowFieldColor
                         textColor: Theme.surfaceText
-                        visible: root.hasChanges || root.isNew
+                        visible: root.hasChanges || root.isNew || root.retainEdits
                         onClicked: {
-                            if (root.isNew) {
+                            if (root.isNew || root.retainEdits) {
                                 root.cancelEdit();
                             } else {
                                 root.resetEdits();

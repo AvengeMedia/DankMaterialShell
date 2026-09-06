@@ -1,8 +1,12 @@
 package providers
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -68,5 +72,41 @@ func TestAqueousBindingConflictAndRemove(t *testing.T) {
 	data, _ := json.Marshal(request["custom_keybind_changes"])
 	if string(data) != `[{"id":"custom:12","op":"delete"}]` {
 		t.Fatalf("wrong removal: %s", data)
+	}
+}
+
+func TestAqueousGenerationConflictCode(t *testing.T) {
+	for _, generation := range []string{"", "stale"} {
+		_, err := AqueousBindRequest(aqueousFixture(t), AqueousBindEdit{Generation: generation, Key: "Super+R", Remove: true})
+		var conflict *AqueousError
+		if !errors.As(err, &conflict) || conflict.Code != "external_change" {
+			t.Fatalf("expected structured generation conflict, got %v", err)
+		}
+	}
+}
+
+func TestAqueousHelperFailureCodes(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		script string
+		code   string
+	}{
+		{"conflict", `printf '%s' '{"ok":false,"code":"external_change","message":"changed"}'; exit 1`, "external_change"},
+		{"missing_ack", "exit 0", "uncertain"},
+		{"failed_process", "exit 1", "uncertain"},
+		{"malformed_ack", "printf '{'", "uncertain"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			if err := os.WriteFile(filepath.Join(dir, "aqueous-config"), []byte("#!/bin/sh\n"+tc.script+"\n"), 0o755); err != nil {
+				t.Fatal(err)
+			}
+			t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+			_, err := helperResult(context.Background(), "apply", nil)
+			var failure *AqueousError
+			if !errors.As(err, &failure) || failure.Code != tc.code {
+				t.Fatalf("expected %s, got %v", tc.code, err)
+			}
+		})
 	}
 }

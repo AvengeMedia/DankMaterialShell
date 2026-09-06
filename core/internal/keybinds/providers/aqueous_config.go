@@ -21,15 +21,25 @@ func helperResult(ctx context.Context, verb string, input []byte) (aqueousConfig
 	err := utils.RunJSON(ctx, "aqueous-config", args, input, &result)
 	if err != nil || !result.Bool("ok") {
 		if result.String("code") != "" {
-			return result, fmt.Errorf("%s: %s", result.String("code"), result.String("message"))
+			return result, &AqueousError{Code: result.String("code"), Message: result.String("message")}
 		}
 		if err != nil {
+			if verb == "apply" {
+				return result, &AqueousError{Code: "uncertain", Message: err.Error()}
+			}
 			return result, err
 		}
 		return result, errors.New("aqueous-config rejected the request")
 	}
 	return result, nil
 }
+
+type AqueousError struct {
+	Code    string
+	Message string
+}
+
+func (e *AqueousError) Error() string { return e.Code + ": " + e.Message }
 
 func requireAqueousCapabilities(result aqueousConfig, required ...string) error {
 	if result.Number("protocol") != 1 {

@@ -27,8 +27,153 @@ Item {
     property bool _preserveScroll: false
     property string _editingKey: ""
 
+    property var editDraft: null
+    property var reviewSnapshot: null
+    property bool reviewingEdit: false
+    property bool editBusy: false
+    property string editError: ""
+    property int _editRequest: 0
+    property bool _editAlive: true
+    readonly property bool hasEditDraft: editDraft !== null
+    readonly property bool editInvalidated: hasEditDraft && (editDraft.provider !== KeybindsService.currentProvider || !KeybindsService.bindEditSession || editDraft.session !== KeybindsService.bindEditSession)
+
+    onEditInvalidatedChanged: {
+        if (!editInvalidated)
+            return;
+        _editRequest++;
+        editBusy = false;
+        reviewingEdit = true;
+        reviewSnapshot = null;
+        editError = KeybindsService.bindEditError("invalidated");
+    }
+
+    Component.onDestruction: {
+        _editAlive = false;
+        _editRequest++;
+    }
+
+    function beginEdit(binding, key) {
+        if (hasEditDraft || editBusy || KeybindsService.bindMutationBusy) {
+            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut."));
+            return false;
+        }
+        try {
+            editDraft = KeybindsService.captureBindEdit(binding, key);
+            editError = "";
+            reviewSnapshot = null;
+            reviewingEdit = false;
+            return true;
+        } catch (e) {
+            ToastService.showError(I18n.tr("Failed to load keybinds"), String(e));
+            return false;
+        }
+    }
+
+    function updateEditDraft(originalKey, data) {
+        if (!editDraft || editDraft.operation !== "set" || editBusy || editInvalidated)
+            return;
+        editDraft = KeybindsService.updateBindEdit(editDraft, originalKey, data);
+    }
+
+    function submitEdit() {
+        if (!editDraft || editBusy || reviewingEdit || editInvalidated || KeybindsService.bindMutationBusy)
+            return;
+        editBusy = true;
+        editError = "";
+        const token = ++_editRequest;
+        const complete = result => {
+            if (!keybindsTab._editAlive || token !== keybindsTab._editRequest)
+                return;
+            keybindsTab.editBusy = false;
+            if (result.success) {
+                const key = keybindsTab.editDraft.operation === "set" ? keybindsTab.editDraft.data.key : "";
+                const action = keybindsTab.editDraft.data.action;
+                keybindsTab.editDraft = null;
+                keybindsTab.reviewSnapshot = null;
+                keybindsTab.reviewingEdit = false;
+                keybindsTab._editingKey = key;
+                keybindsTab.expandedKey = action;
+                return;
+            }
+            keybindsTab.reviewSnapshot = result.snapshot || null;
+            keybindsTab.reviewingEdit = result.code !== "load_failed" && result.code !== "busy";
+            keybindsTab.editError = KeybindsService.bindEditError(result.code) + (result.message ? "\n" + result.message : "");
+        };
+        switch (editDraft.operation) {
+        case "set":
+            KeybindsService.saveBind(editDraft.originalKey, editDraft.data, editDraft, complete);
+            return;
+        case "remove":
+            KeybindsService.removeBind(editDraft.originalKey, editDraft, complete);
+            return;
+        case "reset":
+            KeybindsService.resetBind(editDraft.originalKey, editDraft, complete);
+            return;
+        }
+    }
+
+    function reloadEdit() {
+        if (!editDraft || editBusy || editInvalidated)
+            return;
+        editBusy = true;
+        reviewingEdit = true;
+        const token = ++_editRequest;
+        KeybindsService.loadBindReview((snapshot, message) => {
+            if (!keybindsTab._editAlive || token !== keybindsTab._editRequest)
+                return;
+            keybindsTab.editBusy = false;
+            keybindsTab.reviewSnapshot = snapshot;
+            keybindsTab.editError = message;
+        });
+    }
+
+    function acceptReview() {
+        if (!editDraft || !reviewSnapshot || editBusy || editInvalidated)
+            return;
+        const result = KeybindsService.reconcileBindEdit(editDraft, reviewSnapshot);
+        if (!result.draft) {
+            editError = KeybindsService.bindEditError(result.code);
+            return;
+        }
+        editDraft = result.draft;
+        reviewingEdit = false;
+        editError = "";
+        if (editDraft.operation !== "set")
+            confirmEditRemoval();
+    }
+
+    function confirmEditRemoval() {
+        if (!editDraft)
+            return;
+        if (editDraft.operation === "reset")
+            confirmResetBind(editDraft.originalKey, "");
+        else
+            confirmRemoveBind(editDraft.originalKey, "");
+    }
+
+    function discardEdit() {
+        if (editBusy || KeybindsService.bindMutationBusy)
+            return;
+        _editRequest++;
+        editDraft = null;
+        reviewSnapshot = null;
+        reviewingEdit = false;
+        editError = "";
+        expandedKey = "";
+        showingNewBind = false;
+        _editingKey = "";
+        KeybindsService.loadBinds(false);
+    }
+
     function _updateFiltered() {
-        const allBinds = KeybindsService.getFlatBinds();
+        let allBinds = KeybindsService.getFlatBinds();
+        if (keybindsTab.editDraft?.action) {
+            const binding = keybindsTab.editDraft.binding;
+            const found = allBinds.some(bind => bind.action === binding.action);
+            allBinds = allBinds.map(bind => bind.action === binding.action ? binding : bind);
+            if (!found)
+                allBinds.push(binding);
+        }
         if (!searchQuery && !selectedCategory) {
             _filteredBinds = allBinds;
             return;
@@ -80,6 +225,14 @@ Item {
     }
 
     function toggleExpanded(action) {
+        if (KeybindsService.requiresBindReview && !keybindsTab.hasEditDraft) {
+            const binding = KeybindsService.getFlatBinds().find(bind => bind.action === action);
+            if (!binding || !keybindsTab.beginEdit(binding, binding.keys[0]?.key || ""))
+                return;
+        } else if (keybindsTab.hasEditDraft && action !== keybindsTab.editDraft.action) {
+            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut."));
+            return;
+        }
         expandedKey = expandedKey === action ? "" : action;
     }
 
@@ -88,27 +241,59 @@ Item {
             KeybindsService.showHyprlandReadOnlyWarning();
             return;
         }
+        if (KeybindsService.requiresBindReview) {
+            if (!keybindsTab.beginEdit({
+                action: "",
+                desc: ""
+            }, ""))
+                return;
+            newBindItem.resetEdits();
+        }
         showingNewBind = true;
         expandedKey = "";
     }
 
     function cancelNewBind() {
+        if (keybindsTab.hasEditDraft) {
+            keybindsTab.discardEdit();
+            return;
+        }
         showingNewBind = false;
     }
 
     function saveNewBind(bindData) {
-        KeybindsService.saveBind("", bindData);
+        saveBind("", bindData);
+    }
+
+    function saveBind(originalKey, bindData) {
+        if (KeybindsService.requiresBindReview) {
+            keybindsTab.updateEditDraft(originalKey, bindData);
+            keybindsTab.submitEdit();
+            return;
+        }
+        KeybindsService.saveBind(originalKey, bindData);
         _editingKey = bindData.key;
         expandedKey = bindData.action;
     }
 
     function confirmRemoveBind(key, remainingKey) {
+        const draft = KeybindsService.requiresBindReview ? prepareRemoval(key, "remove") : null;
+        if (KeybindsService.requiresBindReview && !draft)
+            return;
+        const baselineDraft = keybindsTab.editDraft;
         removeBindConfirm.showWithOptions({
             title: I18n.tr("Remove Shortcut?"),
             message: KeybindsService.currentProvider === "hyprland" ? I18n.tr("Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.").arg(key) : I18n.tr("Remove the shortcut %1?").arg(key),
             confirmText: I18n.tr("Remove"),
             confirmColor: Theme.primary,
             onConfirm: () => {
+                if (draft) {
+                    if (keybindsTab.editDraft !== baselineDraft)
+                        return;
+                    keybindsTab.editDraft = draft;
+                    keybindsTab.submitEdit();
+                    return;
+                }
                 KeybindsService.removeBind(key);
                 keybindsTab._editingKey = remainingKey;
             }
@@ -116,16 +301,38 @@ Item {
     }
 
     function confirmResetBind(key, remainingKey) {
+        const draft = KeybindsService.requiresBindReview ? prepareRemoval(key, "reset") : null;
+        if (KeybindsService.requiresBindReview && !draft)
+            return;
+        const baselineDraft = keybindsTab.editDraft;
         removeBindConfirm.showWithOptions({
             title: I18n.tr("Reset to default"),
             message: I18n.tr("Drop your override for %1 so the DMS default action re-applies?").arg(key),
             confirmText: I18n.tr("Reset"),
             confirmColor: Theme.primary,
             onConfirm: () => {
+                if (draft) {
+                    if (keybindsTab.editDraft !== baselineDraft)
+                        return;
+                    keybindsTab.editDraft = draft;
+                    keybindsTab.submitEdit();
+                    return;
+                }
                 KeybindsService.resetBind(key);
                 keybindsTab._editingKey = remainingKey;
             }
         });
+    }
+
+    function prepareRemoval(key, operation) {
+        if (!hasEditDraft) {
+            const binding = KeybindsService.getFlatBinds().find(bind => bind.keys.some(entry => entry.key === key));
+            if (!binding || !beginEdit(binding, key))
+                return null;
+        }
+        if (editBusy || reviewingEdit || editInvalidated)
+            return null;
+        return KeybindsService.updateBindEdit(editDraft, key, null, operation);
     }
 
     function _onSaveSuccess() {
@@ -198,6 +405,11 @@ Item {
     function _ensureCurrentProvider() {
         if (!KeybindsService.available)
             return;
+        if (KeybindsService.requiresBindReview) {
+            if (!keybindsTab.hasEditDraft && !KeybindsService.bindMutationBusy)
+                KeybindsService.loadBinds(false);
+            return;
+        }
         const cachedProvider = KeybindsService.keybinds?.provider;
         const targetProvider = KeybindsService.currentProvider;
         if (cachedProvider !== targetProvider || KeybindsService._dataVersion === 0) {
@@ -296,8 +508,8 @@ Item {
                             }
 
                             StyledText {
-                                readonly property string bindsFile: KeybindsService.currentProvider === "aqueous" ? "aqueous-config" : KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
-                                text: KeybindsService.currentProvider === "aqueous" ? I18n.tr("Click any shortcut to edit Aqueous configuration") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                readonly property string bindsFile: KeybindsService.requiresBindReview ? "aqueous-config" : KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
+                                text: KeybindsService.requiresBindReview ? I18n.tr("Click any shortcut to edit Aqueous configuration") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -508,6 +720,56 @@ Item {
                 }
             }
 
+            Column {
+                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: keybindsTab.hasEditDraft && (keybindsTab.reviewingEdit || keybindsTab.editError !== "" || keybindsTab.editDraft.operation !== "set")
+                spacing: Theme.spacingM
+
+                StyledText {
+                    width: parent.width
+                    visible: keybindsTab.reviewingEdit || keybindsTab.editError !== ""
+                    text: keybindsTab.editError || I18n.tr("Review the current bindings before saving your retained edit.")
+                    color: Theme.error
+                    wrapMode: Text.WordWrap
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
+                    text: KeybindsService.describeBindReview(keybindsTab.editDraft, keybindsTab.reviewSnapshot)
+                    color: Theme.surfaceText
+                    wrapMode: Text.WordWrap
+                }
+
+                Flow {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    DankButton {
+                        text: I18n.tr("Reload")
+                        enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
+                        onClicked: keybindsTab.reloadEdit()
+                    }
+                    DankButton {
+                        text: I18n.tr("Accept reviewed changes")
+                        visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
+                        enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
+                        onClicked: keybindsTab.acceptReview()
+                    }
+                    DankButton {
+                        text: I18n.tr("Discard")
+                        enabled: !keybindsTab.editBusy && !KeybindsService.bindMutationBusy
+                        onClicked: keybindsTab.discardEdit()
+                    }
+                    DankButton {
+                        text: I18n.tr("Remove")
+                        visible: keybindsTab.hasEditDraft && keybindsTab.editDraft.operation !== "set"
+                        enabled: !keybindsTab.editBusy && !keybindsTab.reviewingEdit && !keybindsTab.editInvalidated
+                        onClicked: keybindsTab.confirmEditRemoval()
+                    }
+                }
+            }
+
             StyledRect {
                 width: Math.min(650, parent.width - Theme.spacingL * 2)
                 height: newBindSection.implicitHeight + Theme.spacingL * 2
@@ -545,6 +807,7 @@ Item {
                     }
 
                     KeybindItem {
+                        id: newBindItem
                         width: parent.width
                         isNew: true
                         isExpanded: true
@@ -561,6 +824,17 @@ Item {
                             })
                         panelWindow: keybindsTab.parentModal
                         readOnly: KeybindsService.readOnly
+                        retainedEdit: keybindsTab.hasEditDraft && keybindsTab.showingNewBind ? keybindsTab.editDraft : null
+                        saveBlocked: retainEdits && (keybindsTab.reviewingEdit || keybindsTab.editDraft.operation !== "set")
+                        enabled: !retainEdits || (!keybindsTab.editBusy && !keybindsTab.editInvalidated && !KeybindsService.bindMutationBusy)
+                        onEditChanged: {
+                            if (retainEdits)
+                                keybindsTab.updateEditDraft("", {
+                                    key: editKey,
+                                    action: editAction,
+                                    desc: editDesc
+                                });
+                        }
                         onSaveBind: (originalKey, newData) => keybindsTab.saveNewBind(newData)
                         onCancelEdit: keybindsTab.cancelNewBind()
                     }
@@ -670,13 +944,25 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             bindData: modelData
                             isExpanded: keybindsTab.expandedKey === modelData.action
+                            retainedEdit: keybindsTab.hasEditDraft && keybindsTab.editDraft.action === modelData.action ? keybindsTab.editDraft : null
+                            saveBlocked: retainEdits && (keybindsTab.reviewingEdit || keybindsTab.editDraft.operation !== "set")
+                            enabled: !retainEdits || (!keybindsTab.editBusy && !keybindsTab.editInvalidated && !KeybindsService.bindMutationBusy)
+                            onEditChanged: {
+                                if (KeybindsService.requiresBindReview && isExpanded && hasChanges && !keybindsTab.hasEditDraft)
+                                    keybindsTab.beginEdit(bindData, addingNewKey ? "" : _originalKey);
+                                if (retainEdits)
+                                    keybindsTab.updateEditDraft(addingNewKey ? "" : _originalKey, {
+                                        key: editKey,
+                                        action: editAction,
+                                        desc: editDesc
+                                    });
+                            }
+                            onCancelEdit: keybindsTab.discardEdit()
                             panelWindow: keybindsTab.parentModal
                             readOnly: KeybindsService.readOnly
                             onToggleExpand: keybindsTab.toggleExpanded(modelData.action)
                             onSaveBind: (originalKey, newData) => {
-                                KeybindsService.saveBind(originalKey, newData);
-                                keybindsTab._editingKey = newData.key;
-                                keybindsTab.expandedKey = newData.action;
+                                keybindsTab.saveBind(originalKey, newData);
                             }
                             onRemoveBind: key => {
                                 const remainingKey = bindItem.keys.find(k => k.key !== key)?.key ?? "";

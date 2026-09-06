@@ -67,6 +67,9 @@ var keybindsResetCmd = &cobra.Command{
 
 func init() {
 	keybindsCmd.PersistentFlags().String("expected-generation", "", "Configuration generation observed when editing Aqueous bindings")
+	for _, command := range []*cobra.Command{keybindsSetCmd, keybindsRemoveCmd, keybindsResetCmd} {
+		command.Flags().Bool("json", false, "Return structured Aqueous mutation results, including errors")
+	}
 	keybindsListCmd.Flags().BoolP("json", "j", false, "Output as JSON")
 	keybindsShowCmd.Flags().String("path", "", "Override config path for the provider")
 	keybindsSetCmd.Flags().String("desc", "", "Description for hotkey overlay")

@@ -9,6 +9,7 @@ import qs.Common
 import qs.Services
 import "../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 import "../Common/KeybindActions.js" as Actions
+import "../Common/AqueousKeybinds.js" as AqueousKeybinds
 
 Singleton {
     id: root
@@ -70,6 +71,23 @@ Singleton {
     property var displayList: []
     property int _dataVersion: 0
     property string _pendingSavedKey: ""
+    readonly property bool requiresBindReview: currentProvider === "aqueous"
+    readonly property string bindEditSession: requiresBindReview ? aqueousSession : currentProvider
+    readonly property bool bindMutationBusy: aqueousBusy || saving || removeProcess.running
+    property bool aqueousBusy: false
+    property bool _aqueousLoading: false
+    property bool _loadPending: false
+    property int _aqueousRequest: 0
+    readonly property string aqueousSession: currentProvider === "aqueous" ? AqueousService.session : ""
+    onCurrentProviderChanged: _pendingSavedKey = ""
+
+    onAqueousSessionChanged: {
+        _aqueousRequest++;
+        aqueousBusy = false;
+        _pendingSavedKey = "";
+        if (aqueousSession)
+            Qt.callLater(root.loadBinds, false);
+    }
 
     readonly property var categoryOrder: Actions.getCategoryOrder()
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
@@ -165,9 +183,12 @@ Singleton {
     Process {
         id: loadProcess
         running: false
+        property string provider: ""
 
         stdout: StdioCollector {
             onStreamFinished: {
+                if (loadProcess.provider !== root.currentProvider)
+                    return;
                 try {
                     root._rawData = JSON.parse(text);
                     root._processData();
@@ -179,6 +200,8 @@ Singleton {
         }
 
         onExited: exitCode => {
+            if (provider !== root.currentProvider)
+                return;
             if (exitCode !== 0) {
                 log.warn("Load process failed with code:", exitCode);
                 root.loading = false;
@@ -189,9 +212,13 @@ Singleton {
     Process {
         id: saveProcess
         running: false
+        property string savedKey: ""
+        property string provider: ""
 
         stderr: StdioCollector {
             onStreamFinished: {
+                if (saveProcess.provider !== root.currentProvider)
+                    return;
                 if (!text.trim())
                     return;
                 root.lastError = text.trim();
@@ -201,12 +228,20 @@ Singleton {
 
         onExited: exitCode => {
             root.saving = false;
+            if (provider !== root.currentProvider) {
+                savedKey = "";
+                return;
+            }
             if (exitCode !== 0) {
+                root._pendingSavedKey = "";
+                savedKey = "";
                 log.error("Save failed with code:", exitCode);
                 root.bindSaveCompleted(false);
                 return;
             }
             root.lastError = "";
+            root._pendingSavedKey = savedKey;
+            savedKey = "";
             root.bindSaveCompleted(true);
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
@@ -217,10 +252,12 @@ Singleton {
     Process {
         id: removeProcess
         running: false
-        property string pendingKey: ""
+        property string provider: ""
 
         stderr: StdioCollector {
             onStreamFinished: {
+                if (removeProcess.provider !== root.currentProvider)
+                    return;
                 if (!text.trim())
                     return;
                 root.lastError = text.trim();
@@ -229,15 +266,13 @@ Singleton {
         }
 
         onExited: exitCode => {
+            if (provider !== root.currentProvider)
+                return;
             if (exitCode !== 0) {
                 log.error("Remove failed with code:", exitCode);
                 return;
             }
             root.lastError = "";
-            if (pendingKey) {
-                root.bindRemoved(pendingKey);
-                pendingKey = "";
-            }
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
             root.loadBinds(false);
@@ -348,12 +383,243 @@ Singleton {
     }
 
     function loadBinds(showLoading) {
+        if (currentProvider === "aqueous") {
+            _loadPending = true;
+            if (_aqueousLoading || aqueousBusy)
+                return;
+            _loadPending = false;
+            _aqueousLoading = true;
+            loading = true;
+            readAqueousBinds((snapshot, error) => {
+                root._aqueousLoading = false;
+                root.loading = false;
+                if (snapshot) {
+                    root.lastError = "";
+                    root._rawData = snapshot;
+                    root._processData();
+                } else {
+                    root.lastError = error;
+                    root._pendingSavedKey = "";
+                }
+                if (root._loadPending) {
+                    root._loadPending = false;
+                    Qt.callLater(root.loadBinds, false);
+                }
+            });
+            return;
+        }
         if (loadProcess.running || !available)
             return;
         const hasData = Object.keys(_allBinds).length > 0;
         loading = showLoading !== false && !hasData;
         loadProcess.command = ["dms", "keybinds", "show", currentProvider];
+        loadProcess.provider = currentProvider;
         loadProcess.running = true;
+    }
+
+    function readAqueousBinds(callback) {
+        const session = aqueousSession;
+        if (!session) {
+            callback(null, I18n.tr("Unavailable"));
+            return;
+        }
+        AqueousService.runJson(["dms", "keybinds", "show", "aqueous"], null, (snapshot, error) => {
+            if (session !== root.aqueousSession) {
+                callback(null, I18n.tr("Configuration changed. Reload to continue."));
+                return;
+            }
+            try {
+                if (error)
+                    throw new Error(error);
+                AqueousKeybinds.inventory(snapshot);
+            } catch (e) {
+                callback(null, String(e));
+                return;
+            }
+            callback(snapshot, "");
+        });
+    }
+
+    function captureBindEdit(binding, key) {
+        if (!requiresBindReview)
+            return null;
+        AqueousKeybinds.inventory(_rawData);
+        if (!bindEditSession)
+            throw new Error(I18n.tr("Unavailable"));
+        return {
+            provider: currentProvider,
+            session: bindEditSession,
+            action: binding.action || "",
+            binding: AqueousKeybinds.copy(binding),
+            baseline: AqueousKeybinds.copy(_rawData),
+            originalKey: key || "",
+            originalAction: binding.action || "",
+            operation: "set",
+            data: {
+                key: key || "",
+                action: binding.action || "",
+                desc: binding.desc || ""
+            }
+        };
+    }
+
+    function updateBindEdit(draft, key, data, operation) {
+        const originals = AqueousKeybinds.bindings(draft.baseline, key);
+        return Object.assign({}, draft, {
+            operation: operation || draft.operation,
+            originalKey: key,
+            originalAction: originals.length ? originals[0].action : "",
+            data: AqueousKeybinds.copy(data || draft.data)
+        });
+    }
+
+    function loadBindReview(callback) {
+        if (requiresBindReview) {
+            readAqueousBinds(callback);
+            return;
+        }
+        callback(null, I18n.tr("Unavailable"));
+    }
+
+    function reconcileBindEdit(draft, snapshot) {
+        const issue = AqueousKeybinds.issue(draft, snapshot, true);
+        if (issue)
+            return {
+                code: issue
+            };
+        const originals = AqueousKeybinds.bindings(snapshot, draft.originalKey);
+        return {
+            draft: Object.assign({}, draft, {
+                baseline: AqueousKeybinds.copy(snapshot),
+                originalAction: originals.length ? originals[0].action : ""
+            })
+        };
+    }
+
+    function bindEditError(code) {
+        switch (code) {
+        case "external_change":
+            return I18n.tr("Keybindings changed. Reload and review your edit before saving.");
+        case "target_removed":
+            return I18n.tr("The original shortcut was removed. Discard this edit or explicitly add a new shortcut.");
+        case "ambiguous_target":
+            return I18n.tr("Multiple bindings use the original shortcut. Resolve the duplicate bindings first.");
+        case "destination_occupied":
+            return I18n.tr("The new shortcut is already in use. Choose another shortcut.");
+        case "target_changed":
+            return I18n.tr("The original shortcut changed. Reload and review your edit.");
+        case "invalidated":
+            return I18n.tr("The compositor session changed. Your draft is retained; discard it before starting a new edit.");
+        case "uncertain":
+            return I18n.tr("The save result is unknown. Reload and inspect the current bindings before continuing.");
+        case "invalid_action":
+            return I18n.tr("The selected action is no longer available.");
+        default:
+            return I18n.tr("Failed to save keybind");
+        }
+    }
+
+    function describeBindReview(draft, current) {
+        if (!draft || !current)
+            return "";
+        const describe = (snapshot, key) => {
+            const matches = AqueousKeybinds.bindings(snapshot, key);
+            return matches.length ? matches.map(bind => bind.key + " → " + bind.action).join("\n") : I18n.tr("None");
+        };
+        const original = describe(draft.baseline, draft.originalKey);
+        const currentBind = describe(current, draft.originalKey);
+        const proposed = draft.operation === "set" ? draft.data.key + " → " + draft.data.action : I18n.tr("Remove");
+        const destination = draft.operation === "set" ? describe(current, draft.data.key) : I18n.tr("None");
+        const describeChange = bind => bind ? (bind[0] || I18n.tr("Unbound")) + " → " + bind[1] : I18n.tr("None");
+        const changes = AqueousKeybinds.changes(draft.baseline, current).map(change => I18n.tr("Previous: %1\nCurrent: %2").arg(describeChange(change.before)).arg(describeChange(change.after))).join("\n\n");
+        return I18n.tr("Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4").arg(original).arg(currentBind).arg(proposed).arg(destination) + (changes ? "\n\n" + changes : "");
+    }
+
+    function _mutateAqueous(draft, callback) {
+        if (aqueousBusy || saving || removeProcess.running) {
+            callback({
+                success: false,
+                code: "busy"
+            });
+            return;
+        }
+        if (!draft?.baseline || !aqueousSession || draft.session !== aqueousSession) {
+            callback({
+                success: false,
+                code: "invalidated"
+            });
+            return;
+        }
+        const edit = AqueousKeybinds.copy(draft);
+        const request = ++_aqueousRequest;
+        aqueousBusy = true;
+        const complete = result => {
+            if (request !== root._aqueousRequest)
+                return;
+            root.aqueousBusy = false;
+            callback(result);
+            if (result.success || root._loadPending) {
+                root._loadPending = false;
+                Qt.callLater(root.loadBinds, false);
+            }
+        };
+        readAqueousBinds((snapshot, error) => {
+            if (request !== root._aqueousRequest)
+                return;
+            if (error) {
+                complete({
+                    success: false,
+                    code: "load_failed",
+                    message: error
+                });
+                return;
+            }
+            try {
+                if (!AqueousKeybinds.unchanged(edit.baseline, snapshot)) {
+                    complete({
+                        success: false,
+                        code: "external_change",
+                        snapshot: snapshot
+                    });
+                    return;
+                }
+                const issue = AqueousKeybinds.issue(edit, snapshot, false);
+                if (issue) {
+                    complete({
+                        success: false,
+                        code: issue,
+                        snapshot: snapshot
+                    });
+                    return;
+                }
+            } catch (e) {
+                complete({
+                    success: false,
+                    code: "invalid_snapshot",
+                    message: String(e)
+                });
+                return;
+            }
+            AqueousService.runJson(AqueousKeybinds.argumentsFor(edit, snapshot.generation), null, (result, error) => {
+                if (request !== root._aqueousRequest)
+                    return;
+                if (error || result?.success !== true || !result.generation) {
+                    complete({
+                        success: false,
+                        code: result?.success === false && result.code ? result.code : "uncertain",
+                        message: result?.message || error
+                    });
+                    return;
+                }
+                if (edit.operation === "set")
+                    root._pendingSavedKey = edit.data.key;
+                complete(result);
+                if (edit.operation === "set")
+                    root.bindSaveCompleted(true);
+                else
+                    root.bindRemoved(edit.originalKey);
+            });
+        });
     }
 
     function _processData() {
@@ -513,7 +779,11 @@ Singleton {
         return [];
     }
 
-    function saveBind(originalKey, bindData) {
+    function saveBind(originalKey, bindData, draft, callback) {
+        if (currentProvider === "aqueous") {
+            _mutateAqueous(draft, callback || (() => {}));
+            return;
+        }
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
@@ -522,10 +792,7 @@ Singleton {
             return;
         saving = true;
         const cmd = ["dms", "keybinds", "set", currentProvider, bindData.key, bindData.action];
-        if (currentProvider === "aqueous")
-            cmd.push("--expected-generation", _rawData?.generation || "");
-        else
-            cmd.push("--desc", bindData.desc || "");
+        cmd.push("--desc", bindData.desc || "");
         if (originalKey && originalKey !== bindData.key)
             cmd.push("--replace-key", originalKey);
         if (bindData.cooldownMs > 0)
@@ -539,8 +806,9 @@ Singleton {
         if (bindData.flags)
             cmd.push("--flags", bindData.flags);
         saveProcess.command = cmd;
+        saveProcess.provider = currentProvider;
+        saveProcess.savedKey = bindData.key;
         saveProcess.running = true;
-        _pendingSavedKey = bindData.key;
     }
 
     property bool _hyprlandLegacyWarnShown: false
@@ -565,9 +833,11 @@ Singleton {
         ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings."), "dms setup", "hyprland-migration");
     }
 
-    function removeBind(key) {
-        if (currentProvider === "aqueous" && removeProcess.running)
+    function removeBind(key, draft, callback) {
+        if (currentProvider === "aqueous") {
+            _mutateAqueous(draft, callback || (() => {}));
             return;
+        }
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
@@ -575,18 +845,16 @@ Singleton {
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "remove", currentProvider, key];
-        if (currentProvider === "aqueous")
-            removeProcess.command = removeProcess.command.concat(["--expected-generation", _rawData?.generation || ""]);
+        removeProcess.provider = currentProvider;
         removeProcess.running = true;
-        if (currentProvider === "aqueous")
-            removeProcess.pendingKey = key;
-        else
-            bindRemoved(key);
+        bindRemoved(key);
     }
 
-    function resetBind(key) {
-        if (currentProvider === "aqueous" && removeProcess.running)
+    function resetBind(key, draft, callback) {
+        if (currentProvider === "aqueous") {
+            _mutateAqueous(draft, callback || (() => {}));
             return;
+        }
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
@@ -594,13 +862,9 @@ Singleton {
         if (!key)
             return;
         removeProcess.command = ["dms", "keybinds", "reset", currentProvider, key];
-        if (currentProvider === "aqueous")
-            removeProcess.command = removeProcess.command.concat(["--expected-generation", _rawData?.generation || ""]);
+        removeProcess.provider = currentProvider;
         removeProcess.running = true;
-        if (currentProvider === "aqueous")
-            removeProcess.pendingKey = key;
-        else
-            bindRemoved(key);
+        bindRemoved(key);
     }
 
     function getActionLabel(action) {

@@ -83,7 +83,7 @@ type AqueousBindEdit struct {
 
 func AqueousBindRequest(snapshot aqueousConfig, edit AqueousBindEdit) (aqueousConfig, error) {
 	if edit.Generation == "" || edit.Generation != snapshot.String("generation") {
-		return nil, errors.New("external_change: reload and reconcile the retained keybind draft")
+		return nil, &AqueousError{Code: "external_change", Message: "reload and reconcile the retained keybind draft"}
 	}
 	if err := requireAqueousCapabilities(snapshot, "keybinds"); err != nil {
 		return nil, err
