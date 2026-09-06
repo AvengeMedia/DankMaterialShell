@@ -63,7 +63,12 @@ Item {
         })
     property var screen: null
     readonly property bool useBackgroundWindow: false
-    readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.triggerUsesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
+    // Layer shell cannot restack: set_layer re-inserts a surface at the top of the
+    // destination layer, so a frame that follows us to the overlay layer ends up
+    // above the content it should sit behind. Stay on the frame's layer while it
+    // owns our chrome; creation order then keeps the content on top.
+    readonly property bool effectiveOverlayLayer: triggerUsesOverlayLayer && !frameOwnsConnectedChrome
+    readonly property var effectivePopoutLayer: LayerShell.fromEnv("DMS_POPOUT_LAYER", root.effectiveOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top, {
         "allow": ["top", "overlay"],
         "invalidLayer": WlrLayer.Top,
         "label": "popouts"
@@ -266,7 +271,7 @@ Item {
             "phase": phase,
             "visible": visible,
             "presented": presented,
-            "layer": root.triggerUsesOverlayLayer ? "overlay" : "top",
+            "layer": root.effectiveOverlayLayer ? "overlay" : "top",
             "barSide": contentContainer.connectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,

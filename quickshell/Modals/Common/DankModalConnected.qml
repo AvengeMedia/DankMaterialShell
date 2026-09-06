@@ -55,6 +55,12 @@ Item {
         return false;
     }
 
+    // Layer shell cannot restack: set_layer re-inserts a surface at the top of the
+    // destination layer, so a frame that follows us to the overlay layer ends up
+    // above the content it should sit behind. Stay on the frame's layer while it
+    // owns our chrome; creation order then keeps the content on top.
+    readonly property bool effectiveOverlayLayer: useOverlayLayer && !frameOwnsConnectedChrome
+
     readonly property bool _dockBlocksEmergence: frameOwnsConnectedChrome && _dockOccupiesSide(resolvedConnectedBarSide)
 
     readonly property bool connectedMotionParity: frameOwnsConnectedChrome
@@ -140,7 +146,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
-            "layer": root.useOverlayLayer ? "overlay" : "top",
+            "layer": root.effectiveOverlayLayer ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
@@ -397,7 +403,7 @@ Item {
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: root.useOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
+        WlrLayershell.layer: root.effectiveOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
             "allow": ["top", "overlay"],
             "invalidLayer": WlrLayer.Top,
             "label": "modals",
