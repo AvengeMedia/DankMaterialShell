@@ -49,7 +49,8 @@ PanelWindow {
         return body.containsGlobalPoint(gx, gy, padding);
     }
 
-    readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
+    // Niri covers the top layer immediately when a client enters fullscreen.
+    readonly property bool usesOverlayLayer: CompositorService.isNiri || CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (barConfig?.useOverlayLayer ?? false)
     readonly property var dBarLayer: LayerShell.fromEnv("DMS_DANKBAR_LAYER", barWindow.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
 
     screen: modelData

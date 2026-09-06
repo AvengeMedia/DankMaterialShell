@@ -19,6 +19,7 @@ Item {
     property var rightWidgetsModel
 
     readonly property bool barRevealed: inputMask.showing
+    readonly property bool hiddenForFullscreen: CompositorService.isNiri && !NiriService.inOverview && CompositorService.fullscreenToplevelOnScreen(barWindow.screen)
 
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
@@ -986,6 +987,9 @@ Item {
         }
 
         property bool reveal: {
+            if (barWindow.hiddenForFullscreen)
+                return false;
+
             const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && barWindow.effectiveOpenOnOverview;
             if (inOverviewWithShow)
                 return true;
