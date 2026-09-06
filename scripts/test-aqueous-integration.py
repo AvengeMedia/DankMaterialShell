@@ -158,18 +158,32 @@ def main():
     harness = """
     property var aqueousTestReply: null
     property var rememberedWorkspace: null
-    WorkspaceWidgets.WorkspaceSwitcher {
-        id: workspaceTest
-        parentScreen: Quickshell.screens.find(s => s.name === screenName) || null
-        screenName: Quickshell.screens[0]?.name || ""
-        widgetHeight: 30
-        barThickness: 48
+    PanelWindow {
+        screen: workspaceTest.parentScreen
+        implicitWidth: Math.max(1, workspaceTest.width)
+        implicitHeight: Math.max(1, workspaceTest.height)
+        color: "transparent"
+        anchors { top: true; left: true }
+        WlrLayershell.namespace: "dms:aqueous-workspace-test"
+        exclusiveZone: 0
+        WorkspaceWidgets.WorkspaceSwitcher {
+            id: workspaceTest
+            parentScreen: Quickshell.screens.find(s => s.name === screenName) || null
+            screenName: Quickshell.screens[0]?.name || ""
+            widgetHeight: 30
+            barThickness: 48
+        }
     }
     function activateWorkspaceIcon(item, windowId) {
         for (const child of item.children || []) {
-            if (child.windowId === windowId && typeof child.windowAction === "function") {
-                child.windowAction();
-                return true;
+            if (child.windowId === windowId && child.windowSession) {
+                let delegate = child.parent;
+                while (delegate && typeof delegate.focusWindowAt !== "function")
+                    delegate = delegate.parent;
+                if (!delegate)
+                    return false;
+                const point = child.mapToItem(delegate, child.width / 2, child.height / 2);
+                return delegate.focusWindowAt(point.x, point.y);
             }
             if (activateWorkspaceIcon(child, windowId))
                 return true;
@@ -181,8 +195,8 @@ def main():
         for (const child of item.children || []) {
             if (child.stableIconCount !== undefined) {
                 result.push({active: child.isActive, placeholder: child.isPlaceholder,
-                    occupied: child.isOccupied, known: child.occupancyKnown, rawWindows: child.workspaceRowData?.windows?.length ?? null, count: child.stableIconCount,
-                    icons: child.workspaceIcons.length, width: child.width, height: child.height,
+                    occupied: child.isOccupied, known: !workspaceTest.useExtWorkspace, count: child.stableIconCount,
+                    icons: child.loadedIcons.length, width: child.width, height: child.height,
                     extraWidth: child.iconsExtraWidth, extraHeight: child.iconsExtraHeight});
             } else {
                 result = result.concat(workspaceDelegates(child));
@@ -194,9 +208,9 @@ def main():
         target: "aqueousTest"
         function state(): string { return JSON.stringify(AqueousService.state); }
         function workspaceStatus(): string {
-            return JSON.stringify({backend: CompositorService.workspaceBackend, output: workspaceTest.effectiveScreenName,
+            return JSON.stringify({backend: workspaceTest.useAqueous ? "aqueous" : workspaceTest.useExtWorkspace ? "ext" : "none", output: workspaceTest.effectiveScreenName,
                 rows: workspaceTest.workspaceList.map(w => ({name: w.name, active: w.active, number: w.number,
-                    placeholder: w.placeholder, windows: w.windows?.length ?? null, canActivate: w.canActivate})),
+                    placeholder: !!w._placeholder, windows: workspaceTest.useAqueous ? AqueousService.toplevels.filter(t => t.aqueousWorkspaceId === w.id).length : null})),
                 delegates: entrypoint.workspaceDelegates(workspaceTest)});
         }
         function workspaceOptions(options: string): string {
@@ -217,11 +231,11 @@ def main():
         function workspaceWheel(direction: string): string { workspaceTest.switchWorkspace(direction === "previous" ? -1 : 1); return "REQUESTED"; }
         function workspaceIcon(windowId: string): string { return String(entrypoint.activateWorkspaceIcon(workspaceTest, windowId)); }
         function workspaceRemember(): string {
-            entrypoint.rememberedWorkspace = workspaceTest.workspaceList.find(w => !w.active && !w.placeholder);
+            entrypoint.rememberedWorkspace = workspaceTest.workspaceList.find(w => !w.active && !w._placeholder);
             return String(!!entrypoint.rememberedWorkspace);
         }
-        function workspaceReplay(): string { entrypoint.rememberedWorkspace.activate(); return "REQUESTED"; }
-        function workspaceOverview(): string { return String(CompositorService.toggleWorkspaceOverview(workspaceTest.effectiveScreenName)); }
+        function workspaceReplay(): string { AqueousService.activateWorkspace(entrypoint.rememberedWorkspace); return "REQUESTED"; }
+        function workspaceOverview(): string { AqueousService.toggleOverview(workspaceTest.effectiveScreenName); return "true"; }
         function result(offset: int): string {
             const text = JSON.stringify(entrypoint.aqueousTestReply);
             return JSON.stringify({data: text.slice(offset, offset + 8192), complete: offset + 8192 >= text.length});
@@ -242,7 +256,7 @@ def main():
         }
     }
     """
-    source_shell = (root / "quickshell/shell.qml").read_text().replace("import Quickshell\n", "import Quickshell\nimport Quickshell.Io\nimport qs.Modules.DankBar.Widgets as WorkspaceWidgets\n")
+    source_shell = (root / "quickshell/shell.qml").read_text().replace("import Quickshell\n", "import Quickshell\nimport Quickshell.Io\nimport Quickshell.Wayland\nimport qs.Modules.DankBar.Widgets as WorkspaceWidgets\n")
     (shell / "shell.qml").write_text(source_shell.replace("    id: entrypoint", "    id: entrypoint\n" + harness))
 
     try:
@@ -325,7 +339,10 @@ def main():
         workspace_options(output=output["name"])
         if not args.force_ext:
             command("window.activate", id=window, seat=seat)
-            wait_for(lambda: ipc("aqueousTest", "workspaceIcon", clients[1]["id"]) == "true")
+            def activate_icon():
+                workspace_status()
+                return ipc("aqueousTest", "workspaceIcon", clients[1]["id"]) == "true"
+            wait_for(activate_icon)
             wait_for(lambda: next(s for s in entities("seat") if s["id"] == seat)["window"] == clients[1]["id"])
             command("window.activate", id=window, seat=seat)
         assert ipc("aqueousTest", "workspaceOverview") == "true"
@@ -378,17 +395,17 @@ def main():
         watch_pids = watchers()
         assert len(watch_pids) == 1, watch_pids
         assert ipc("aqueousTest", "workspaceRemember") == "true"
+        active_before = [w["id"] for w in entities("workspace") if w["active"]]
         os.kill(int(watch_pids[0]), signal.SIGKILL)
         wait_for(lambda: not state().get("available", False))
+        if not args.force_ext:
+            assert ipc("aqueousTest", "workspaceReplay") == "REQUESTED"
         wait_for(lambda: workspace_status()["backend"] == "ext")
         wait_for(lambda: state().get("available", False))
         assert json.loads(ipc("aqueous", "status"))["session"] == session
         if not args.force_ext:
             wait_for(lambda: workspace_status()["backend"] == "aqueous")
-            before = [r["number"] for r in workspace_status()["rows"] if r["active"]]
-            assert ipc("aqueousTest", "workspaceReplay") == "REQUESTED"
-            time.sleep(.2)
-            assert [r["number"] for r in workspace_status()["rows"] if r["active"]] == before, "cached row survived backend generation change"
+            assert [w["id"] for w in entities("workspace") if w["active"]] == active_before, "unavailable workspace action was replayed after reconnect"
         restarted_pids = watchers()
         assert len(restarted_pids) == 1 and restarted_pids != watch_pids
         watch_pids += restarted_pids

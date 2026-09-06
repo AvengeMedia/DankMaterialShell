@@ -2,129 +2,102 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import vm from "node:vm";
 
-function methods(context, path, names) {
-    const source = readFileSync(new URL(path, import.meta.url), "utf8");
+const source = readFileSync(new URL("../Modules/DankBar/Widgets/WorkspaceSwitcher.qml", import.meta.url), "utf8");
+function methods(context, text, names, indent = "    ") {
     for (const name of names) {
-        const start = source.indexOf("    function " + name + "(");
+        const start = text.indexOf(indent + "function " + name + "(");
         assert.notEqual(start, -1, name);
-        const end = source.indexOf("\n    }", start) + 6;
-        vm.runInContext(source.slice(start, end), context);
+        const end = text.indexOf("\n" + indent + "}", start) + indent.length + 2;
+        vm.runInContext(text.slice(start, end), context);
     }
 }
-function property(context, name, prefix = "    property var ", indent = "    ") {
-    const source = readFileSync(new URL("../Modules/DankBar/Widgets/WorkspaceSwitcher.qml", import.meta.url), "utf8");
-    const token = prefix + name + ": {";
-    const start = source.indexOf(token);
-    assert.notEqual(start, -1, name);
+function property(context, name, type = "property var", indent = "    ") {
+    const token = indent + type + " " + name + ": ";
+    const start = source.indexOf(token) + token.length;
+    assert(start >= token.length, name);
+    if (source[start] !== "{")
+        return vm.runInContext(source.slice(start, source.indexOf("\n", start)), context);
     const end = source.indexOf("\n" + indent + "}", start);
-    return vm.runInContext("(function(){" + source.slice(start + token.length, end) + "})()", context);
+    return vm.runInContext("(function()" + source.slice(start, end) + "})()", context);
 }
-const context = vm.createContext({workspaceBackend: "ext", workspaceViewGeneration: 1, WindowManager: {windowsets: []}, Quickshell: {screens: [{name: "DP-1"}, {name: "DP-2"}]}});
-context.root = context;
-methods(context, "../Services/CompositorService.qml", ["selectWorkspaceBackend", "extWorkspaceRows", "workspaceViewForOutput"]);
-for (const [inputs, expected] of [
-    [["aqueous", true, true, true, true], "ext"],
-    [["aqueous", true, true, false, true], "none"],
-    [["aqueous", true, false, true, true], "aqueous"],
-    [["aqueous", true, false, true, false], "ext"],
-    [["aqueous", true, false, false, false], "none"],
-    [["unknown", false, false, true, true], "none"],
-    [["unknown", false, true, true, false], "ext"],
-    [["labwc", true, false, true, false], "ext"],
-]) assert.equal(context.selectWorkspaceBackend(...inputs), expected);
-for (const backend of ["niri", "hyprland", "mango", "sway", "scroll", "miracle"]) {
-    assert.equal(context.selectWorkspaceBackend(backend, true, false, true, false), "legacy");
-    assert.equal(context.selectWorkspaceBackend(backend, true, true, true, false), "ext");
-    assert.equal(context.selectWorkspaceBackend(backend, true, true, false, false), "legacy");
-}
-let activations = 0;
-const handle = {id: "", name: "same", active: true, urgent: false, canActivate: true, shouldDisplay: true, coordinates: [1], activate() {activations++;}};
-const second = {...handle, coordinates: [0]};
-context.WindowManager.windowsets = [handle, second];
-let rows = context.extWorkspaceRows([handle, second], 1);
-assert.equal(rows[0].key, second);
-assert.equal(rows[1].key, handle);
-assert.notEqual(rows[0].key, rows[1].key, "duplicate names were used as identity");
-assert.equal(rows[0].windows, null);
-handle.name = "renamed"; handle.urgent = true;
-let updated = context.extWorkspaceRows([handle], 1)[0];
-assert.equal(updated.key, handle);
-assert.equal(updated.urgent, true);
-assert.equal(updated.name, "renamed");
-rows[1].activate(); assert.equal(activations, 1);
-handle.canActivate = false; rows[1].activate(); assert.equal(activations, 1);
-handle.canActivate = true;
-context.WindowManager.windowsets = [second]; rows[1].activate(); assert.equal(activations, 1);
-context.WindowManager.windowsets = [handle];
-context.workspaceViewGeneration = 2; rows[1].activate(); assert.equal(activations, 1);
-context.WindowManager.screenProjection = screen => ({windowsets: screen.name === "DP-1" ? [handle] : []});
-assert.equal(context.workspaceViewForOutput("DP-2").rows.length, 0, "empty output switched backend");
-assert.equal(context.workspaceViewForOutput("removed").rows.length, 0);
-
-const actions = [];
-const aq = vm.createContext({available: true, capabilities: {commands: true}, locked: false, seat: {id: "seat0"}, session: "session-a", CompositorService: {workspaceBackend: "aqueous", workspaceViewGeneration: 1},
-    workspaces: [{id: "w", name: "same", number: 1, output: "o1", active: true, urgent: false}],
-    outputs: [{id: "o1", name: "DP-1"}], focusedOutput: "DP-1", command: (...args) => actions.push(args)});
-aq.root = aq;
-methods(aq, "../Services/AqueousService.qml", ["taskbarEligible", "workspaceRowsForOutput", "workspacesForOutput", "outputId", "windowFacade"]);
-aq.seat = {id: "seat0", window: "window-a"};
-aq.Quickshell = {screens: [{name: "DP-1"}]};
-const window = {id: "window-a", workspace: "w", output: "o1", app_id: "demo", visible: true, can_activate: true};
-aq.toplevels = [aq.windowFacade(window)];
-rows = aq.workspaceRowsForOutput("DP-1", 1);
-assert.equal(rows[0].key, "session-a:workspace:w");
-assert.equal(rows[0].windows[0].key, "session-a:window:window-a");
-rows[0].activate(); assert.equal(actions[0][1].session, "session-a");
-aq.session = "session-b";
-rows[0].windows[0].activate(); assert.equal(actions[1][1].session, "session-a", "cached icon adopted a new session");
-aq.CompositorService.workspaceViewGeneration = 2;
-rows[0].activate(); rows[0].windows[0].activate(); assert.equal(actions.length, 2, "cached action survived backend change");
-aq.locked = true;
-assert.equal(aq.workspaceRowsForOutput("DP-1", 2)[0].canActivate, false);
-aq.locked = false; aq.seat = null;
-assert.equal(aq.workspaceRowsForOutput("DP-1", 2)[0].canActivate, false);
-aq.seat = {id: "seat0"}; aq.capabilities.commands = false;
-assert.equal(aq.workspaceRowsForOutput("DP-1", 2)[0].canActivate, false);
-assert(aq.taskbarEligible({...window, minimized: true, visible: false}));
-assert(!aq.taskbarEligible({...window, skip_taskbar: true}));
-assert(!aq.taskbarEligible({...window, visible: false}));
-aq.workspaces[0].active = false;
-assert(aq.taskbarEligible({...window, visible: false}));
-
-const settings = {showWorkspacePadding: true, showOccupiedWorkspacesOnly: false, showWorkspaceApps: true, groupWorkspaceApps: false, groupActiveWorkspaceApps: false, showWorkspaceName: true, showWorkspaceIndex: true};
-const widget = vm.createContext({usesWorkspaceView: true, workspaceView: {rows: []}, _placeholderPool: [], SettingsData: settings, CompositorService: {},
+const settings = {showWorkspacePadding: true, showOccupiedWorkspacesOnly: false, showWorkspaceApps: true,
+    groupWorkspaceApps: false, groupActiveWorkspaceApps: false, showWorkspaceName: true, showWorkspaceIndex: true};
+let forced = "0";
+const aq = {available: true, toplevels: []};
+const compositor = {compositor: "aqueous", compositorDetected: true, isAqueous: true};
+const widget = vm.createContext({AqueousService: aq, CompositorService: compositor, SettingsData: settings,
+    Quickshell: {env: () => forced}, WindowManager: {windowsets: [{}]}, _placeholderPool: [], effectiveScreenName: "DP-1",
     DesktopEntries: {heuristicLookup: id => ({id})}, Paths: {moddedAppId: id => id, isSteamApp: () => false, getAppIcon: id => id, getAppName: id => id}, _desktopEntriesUpdateTrigger: 0});
 widget.root = widget;
-methods(widget, "../Modules/DankBar/Widgets/WorkspaceSwitcher.qml", ["padWorkspaces", "_makePlaceholder", "getRealWorkspaces", "switchToWorkspaceByModelData", "switchWorkspace", "getWorkspaceIcons", "getWorkspaceIndex", "getWorkspaceIndexFallback"]);
+methods(widget, source, ["padWorkspaces", "_makePlaceholder", "getRealWorkspaces", "switchToWorkspaceByModelData", "switchWorkspace", "getWorkspaceIcons", "getWorkspaceIndex", "getWorkspaceIndexFallback", "getExtWorkspaceActiveWorkspace"]);
+for (const [name, force, available, expectedAq, expectedExt] of [
+    ["aqueous", "0", true, true, false], ["aqueous", "1", true, false, true],
+    ["aqueous", "0", false, false, true], ["labwc", "0", false, false, true],
+    ...["niri", "hyprland", "mango", "sway", "scroll", "miracle"].flatMap(n => [[n, "0", false, false, false], [n, "1", false, false, true]])
+]) {
+    Object.assign(compositor, {compositor: name, isAqueous: name === "aqueous"});
+    forced = force; aq.available = available;
+    widget.useAqueous = property(widget, "useAqueous", "readonly property bool");
+    widget.useExtWorkspace = property(widget, "useExtWorkspace", "readonly property bool");
+    assert.equal(widget.useAqueous, expectedAq, name);
+    assert.equal(widget.useExtWorkspace, expectedExt, name);
+}
+Object.assign(compositor, {compositor: "aqueous", isAqueous: true});
+Object.assign(widget, {useAqueous: true, useExtWorkspace: false});
 let clicked = [];
-const windowFacade = (key, appId) => ({key, id: key, appId, activate: () => clicked.push(key)});
-const first = {key: "one", name: "1", number: 1, active: true, windows: [windowFacade("a", "demo"), windowFacade("b", "demo")], canActivate: true, activate: () => clicked.push("one")};
-const other = {key: "two", name: "1", number: 2, active: false, windows: [], canActivate: true, activate: () => clicked.push("two")};
-widget.workspaceView.rows = [first, other];
+const first = {id: "one", aqueousSession: "session-a", name: "1", number: 1, active: true};
+const other = {id: "two", aqueousSession: "session-a", name: "1", number: 2, active: false};
+aq.workspacesForOutput = () => [first, other];
+aq.activateWorkspace = w => clicked.push(w);
+aq.toplevels = ["a", "b"].map(id => ({id, aqueousKey: "session-a:window:" + id, aqueousSession: "session-a", aqueousWorkspaceId: "one", appId: "demo"}));
+compositor.sortedToplevels = aq.toplevels;
 widget.workspaceList = property(widget, "workspaceList");
-assert.equal(widget.workspaceList.length, 3, "Aqueous padding was skipped");
+assert.equal(widget.workspaceList.length, 3);
 const placeholder = widget.workspaceList[2];
 widget.switchToWorkspaceByModelData(placeholder); assert.equal(clicked.length, 0);
 widget.currentWorkspace = "one";
 widget.switchWorkspace(-1); assert.equal(clicked.length, 0);
-widget.switchWorkspace(1); assert.deepEqual(clicked, ["two"]);
+widget.switchWorkspace(1); assert.equal(clicked[0], other);
 widget.currentWorkspace = "two"; widget.switchWorkspace(1); assert.equal(clicked.length, 1);
-widget.currentWorkspace = null; widget.switchWorkspace(-1); assert.equal(clicked.at(-1), "one");
 assert.equal(widget.getWorkspaceIndex(other, 1), "2: 1");
 assert.equal(widget.getWorkspaceIndex(placeholder, 2), 3);
 let icons = widget.getWorkspaceIcons(first);
 assert.equal(icons.length, 2);
-Object.assign(widget, {workspaceIcons: icons, isPlaceholder: false});
-assert.equal(property(widget, "stableIconCount", "                readonly property int ", "                "), icons.length, "icon count disagrees with renderer");
-icons[0].windowAction(); assert.equal(clicked.at(-1), "a");
+assert.equal(icons[0].windowSession, "session-a");
+Object.assign(widget, {modelData: first, isPlaceholder: false, loadedIcons: icons});
+assert.equal(property(widget, "stableIconCount", "readonly property int", "                "), icons.length);
 settings.groupWorkspaceApps = true; settings.groupActiveWorkspaceApps = true;
-icons = widget.getWorkspaceIcons(first); assert.equal(icons.length, 1); assert.equal(icons[0].count, 2);
-assert.equal(widget.getWorkspaceIcons({...first, windows: null}).length, 0, "ext membership was guessed");
+assert.equal(widget.getWorkspaceIcons(first).length, 1);
 settings.showOccupiedWorkspacesOnly = true;
-widget.workspaceView.rows = [first, other, {...other, key: "unknown", windows: null}];
-assert.equal(property(widget, "workspaceList").filter(row => !row.placeholder).length, 2, "unknown occupancy was treated as empty");
+assert.equal(property(widget, "workspaceList").length, 3);
 settings.showWorkspacePadding = false;
-assert.equal(property(widget, "workspaceList").length, 2);
-widget.workspaceView.rows = [];
-assert.equal(property(widget, "workspaceList").length, 0, "empty output fabricated a workspace");
-console.log("PASS: workspace selection, identities, stale actions, padding, navigation, icons and legacy backend selection");
+assert.equal(property(widget, "workspaceList").length, 1);
+aq.workspacesForOutput = () => [];
+assert.equal(property(widget, "workspaceList").length, 0);
+
+// Native handles remain authoritative even with missing IDs and duplicate names.
+Object.assign(widget, {useAqueous: false, useExtWorkspace: true});
+const handles = [0, 1].map(i => ({id: "", name: "Duplicate", active: i === 0, activate: () => clicked.push(i)}));
+widget.extProjection = {windowsets: handles}; widget.workspaceList = handles;
+widget.currentWorkspace = widget.getExtWorkspaceActiveWorkspace();
+assert.equal(widget.currentWorkspace, handles[0]);
+widget.switchWorkspace(1); assert.equal(clicked.at(-1), 1);
+assert.equal(widget.getWorkspaceIcons(handles[0]).length, 0);
+
+// Rendered icons carry their old session into the command validator after restart.
+Object.assign(widget, {useAqueous: true, useExtWorkspace: false, appIconsLoader: {item: {iconsLayout: {
+    mapFromItem: () => ({x: 0, y: 0}), childAt: () => ({windowId: icons[0].windowId, windowSession: icons[0].windowSession})
+}}}, mouseArea: {}});
+widget.delegateRoot = widget;
+methods(widget, source, ["windowIdAt", "focusWindowAt"], "                ");
+aq.command = (action, fields) => clicked.push({action, fields});
+assert(widget.focusWindowAt(0, 0));
+assert.equal(clicked.at(-1).fields.session, "session-a");
+const service = vm.createContext({available: true, session: "session-b", seat: {id: "seat0"}, command: null});
+service.root = service;
+const serviceSource = readFileSync(new URL("../Services/AqueousService.qml", import.meta.url), "utf8");
+methods(service, serviceSource, ["activateWorkspace", "commandArguments"]);
+service.command = (action, fields) => assert.throws(() => service.commandArguments(action, fields), /stale session/);
+service.activateWorkspace(first);
+assert.throws(() => service.commandArguments(clicked.at(-1).action, clicked.at(-1).fields), /stale session/);
+process.stdout.write("PASS: existing backend selection, Aqueous padding/icons, native handle identity and captured sessions\n");

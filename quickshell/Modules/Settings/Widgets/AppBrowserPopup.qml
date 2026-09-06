@@ -12,11 +12,7 @@ DankFloatingWindow {
     property bool keyboardNavigationActive: false
     property var appsModel: []
     property var parentModal: null
-    Binding {
-        target: "parentWindow" in root ? root : null
-        property: "parentWindow"
-        value: root.parentModal
-    }
+    parentWindow: parentModal
 
     signal appSelected(string appId)
 

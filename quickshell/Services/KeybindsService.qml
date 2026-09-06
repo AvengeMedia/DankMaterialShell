@@ -566,7 +566,7 @@ Singleton {
     }
 
     function removeBind(key) {
-        if (removeProcess.running)
+        if (currentProvider === "aqueous" && removeProcess.running)
             return;
         if (readOnly) {
             showHyprlandReadOnlyWarning();
@@ -585,7 +585,7 @@ Singleton {
     }
 
     function resetBind(key) {
-        if (removeProcess.running)
+        if (currentProvider === "aqueous" && removeProcess.running)
             return;
         if (readOnly) {
             showHyprlandReadOnlyWarning();

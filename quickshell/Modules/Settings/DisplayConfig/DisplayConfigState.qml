@@ -1801,19 +1801,10 @@ Singleton {
         const callback = typeof settingsOrCallback === "function" ? settingsOrCallback : maybeCallback;
         const hasExplicitSettings = settings !== null && settings !== undefined;
 
-        if (_cancelOutputWrite)
-            _cancelOutputWrite();
-        let completed = false;
-
         function finish(success) {
-            if (completed)
-                return;
-            completed = true;
-            root._cancelOutputWrite = null;
             if (callback)
                 callback(success);
         }
-        _cancelOutputWrite = () => finish(false);
 
         switch (CompositorService.compositor) {
         case "niri":
@@ -1843,8 +1834,21 @@ Singleton {
             MangoService.generateOutputsConfig(outputsData, finish);
             break;
         default:
-            WlrOutputService.applyOutputsConfig(outputsData, outputs, finish);
-            break;
+            {
+                if (_cancelOutputWrite)
+                    _cancelOutputWrite();
+                let completed = false;
+                const complete = success => {
+                    if (completed)
+                        return;
+                    completed = true;
+                    root._cancelOutputWrite = null;
+                    finish(success);
+                };
+                _cancelOutputWrite = () => complete(false);
+                WlrOutputService.applyOutputsConfig(outputsData, outputs, complete);
+                break;
+            }
         }
         return true;
     }
@@ -2362,6 +2366,15 @@ Singleton {
         }
 
         const mergedOutputs = buildOutputsWithPendingChanges();
+        if (CompositorService.isHyprland || CompositorService.isMango) {
+            changesApplied(changeDescriptions);
+            if (formatChanged)
+                SettingsData.saveSettings();
+            if (CompositorService.isHyprland)
+                commitHyprlandSettingsChanges();
+            backendWriteOutputsConfig(mergedOutputs);
+            return;
+        }
         validatingConfig = true;
         backendWriteOutputsConfig(mergedOutputs, success => {
             validatingConfig = false;
@@ -2371,8 +2384,6 @@ Singleton {
             }
             if (formatChanged)
                 SettingsData.saveSettings();
-            if (CompositorService.isHyprland)
-                commitHyprlandSettingsChanges();
             changesApplied(changeDescriptions);
         });
     }

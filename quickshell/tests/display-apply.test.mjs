@@ -35,6 +35,17 @@ callbacks[2](false);
 assert.deepEqual(results.at(-1), ["third", true]);
 assert.equal(results.length, 3, "callback fired twice");
 
+// Existing compositor writers retain independent callbacks and are not superseded.
+const mangoCallbacks = [];
+context.CompositorService.compositor = "mango";
+context.MangoService = {generateOutputsConfig: (_, callback) => mangoCallbacks.push(callback)};
+const mangoResults = [];
+context.backendWriteOutputsConfig({}, result => mangoResults.push(["first", result]));
+context.backendWriteOutputsConfig({}, result => mangoResults.push(["second", result]));
+assert.equal(mangoResults.length, 0);
+mangoCallbacks[1](true); mangoCallbacks[0](false);
+assert.deepEqual(mangoResults, [["second", true], ["first", false]]);
+
 const requests = [];
 const timers = [];
 const transport = vm.createContext({

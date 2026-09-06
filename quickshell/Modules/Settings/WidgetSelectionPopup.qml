@@ -13,11 +13,7 @@ DankFloatingWindow {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
-    Binding {
-        target: "parentWindow" in root ? root : null
-        property: "parentWindow"
-        value: root.parentModal
-    }
+    parentWindow: parentModal
     readonly property bool blurActive: Theme.blurLayersActive
     readonly property bool floatingForegroundLayers: Theme.floatingWindowForegroundLayers
     readonly property bool transparentBlurLayers: Theme.blurLayersActive && !floatingForegroundLayers

@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Hyprland
 import Quickshell.I3
+import Quickshell.WindowManager
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -23,13 +24,7 @@ Item {
     property real crossEdgeExtension: 0
 
     readonly property bool isMango: CompositorService.isMango
-    readonly property bool usesWorkspaceView: CompositorService.workspaceBackend !== "legacy"
-    readonly property var workspaceView: usesWorkspaceView ? CompositorService.workspaceViewForOutput(effectiveScreenName) : null
-
-    onWorkspaceViewChanged: {
-        dragSourceIndex = -1;
-        dragTargetIndex = -1;
-    }
+    readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1"
 
     readonly property real _leftMargin: {
         if (isVertical)
@@ -88,6 +83,27 @@ Item {
     }
     readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
 
+    readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(CompositorService.isAqueous ? Quickshell.screens.find(s => s.name === effectiveScreenName) || parentScreen : parentScreen) : null
+    readonly property bool useExtWorkspace: {
+        if (useAqueous)
+            return false;
+        if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
+            return (WindowManager.windowsets?.length ?? 0) > 0;
+        if (!CompositorService.compositorDetected)
+            return false;
+        switch (CompositorService.compositor) {
+        case "niri":
+        case "hyprland":
+        case "mango":
+        case "sway":
+        case "scroll":
+        case "miracle":
+            return false;
+        default:
+            return (WindowManager.windowsets?.length ?? 0) > 0;
+        }
+    }
+
     Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
@@ -101,14 +117,13 @@ Item {
             root._placeholderPool = [];
             root._hyprSlotPool = {};
         }
-        function onWorkspaceBackendChanged() {
-            root._placeholderPool = [];
-        }
     }
 
     property var currentWorkspace: {
-        if (usesWorkspaceView)
-            return workspaceView.rows.find(w => w.active)?.key ?? null;
+        if (useAqueous)
+            return AqueousService.workspacesForOutput(effectiveScreenName).find(w => w.active)?.id || "";
+        if (useExtWorkspace)
+            return getExtWorkspaceActiveWorkspace();
 
         switch (CompositorService.compositor) {
         case "niri":
@@ -133,9 +148,13 @@ Item {
         return [];
     }
     property var workspaceList: {
-        if (usesWorkspaceView) {
-            const baseList = workspaceView.rows.filter(w => !SettingsData.showOccupiedWorkspacesOnly || w.active || w.windows === null || w.windows.length > 0);
-            return baseList.length && SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
+        if (useAqueous) {
+            const baseList = AqueousService.workspacesForOutput(effectiveScreenName).filter(ws => !SettingsData.showOccupiedWorkspacesOnly || ws.active || AqueousService.toplevels.some(w => w.aqueousWorkspaceId === ws.id));
+            return SettingsData.showWorkspacePadding && baseList.length ? padWorkspaces(baseList) : baseList;
+        }
+        if (useExtWorkspace) {
+            const baseList = getExtWorkspaceWorkspaces();
+            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
         }
 
         let baseList;
@@ -312,14 +331,13 @@ Item {
 
     function getWorkspaceIcons(ws) {
         _desktopEntriesUpdateTrigger;
-        if (!SettingsData.showWorkspaceApps || !ws) {
+        if (!SettingsData.showWorkspaceApps || !ws || useExtWorkspace || (useAqueous && ws._placeholder)) {
             return [];
         }
 
         let targetWorkspaceId;
-        if (usesWorkspaceView) {
-            if (ws.windows == null)
-                return [];
+        if (useAqueous) {
+            targetWorkspaceId = ws.id;
         } else if (CompositorService.isNiri) {
             if (!ws || typeof ws !== "object") {
                 const wsNumber = typeof ws === "number" ? ws : -1;
@@ -350,13 +368,11 @@ Item {
             return [];
         }
 
-        const wins = usesWorkspaceView ? ws.windows : CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
+        const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
 
         const byApp = {};
         let isActiveWs = false;
-        if (usesWorkspaceView) {
-            isActiveWs = ws.active;
-        } else if (CompositorService.isNiri) {
+        if (CompositorService.isNiri) {
             isActiveWs = NiriService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active);
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
@@ -376,13 +392,15 @@ Item {
                 return;
             }
 
-            if (!usesWorkspaceView && CompositorService.isMango) {
+            if (CompositorService.isMango) {
                 // mangoTags are 1-based; targetWorkspaceId is 0-based.
                 if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
                     return;
-            } else if (!usesWorkspaceView) {
+            } else {
                 let winWs = null;
-                if (CompositorService.isNiri) {
+                if (useAqueous) {
+                    winWs = w.aqueousWorkspaceId;
+                } else if (CompositorService.isNiri) {
                     winWs = w.workspace_id;
                 } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                     winWs = w.workspace?.num;
@@ -400,7 +418,7 @@ Item {
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
             const moddedId = Paths.moddedAppId(keyBase);
             const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
-            const key = groupThisWs ? moddedId : (w.key || `${moddedId}_${i}`);
+            const key = groupThisWs ? moddedId : (w.aqueousKey || `${moddedId}_${i}`);
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
@@ -416,7 +434,7 @@ Item {
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
-                    "windowAction": usesWorkspaceView ? w.activate : null,
+                    "windowSession": useAqueous ? w.aqueousSession : "",
                     "fallbackText": appName || ""
                 };
             } else {
@@ -431,8 +449,13 @@ Item {
     }
 
     function _makePlaceholder() {
-        if (usesWorkspaceView)
-            return {key: {}, name: "", active: false, urgent: false, placeholder: true, canActivate: false, windows: null};
+        if (useAqueous || useExtWorkspace)
+            return {
+                "id": "",
+                "name": "",
+                "active": false,
+                "_placeholder": true
+            };
         if (CompositorService.isNiri)
             return {
                 "id": -1,
@@ -608,6 +631,40 @@ Item {
         return MangoService.getActiveTags(root.effectiveScreenName);
     }
 
+    function getExtWorkspaceWorkspaces() {
+        const fallback = [
+            {
+                "id": "1",
+                "name": "1",
+                "active": false
+            }
+        ];
+        if (!extProjection)
+            return fallback;
+
+        let visible = extProjection.windowsets.filter(ws => ws.shouldDisplay);
+
+        const hasValidCoordinates = visible.some(ws => ws.coordinates && ws.coordinates.length > 0);
+        if (hasValidCoordinates) {
+            visible = visible.slice().sort((a, b) => {
+                const coordsA = a.coordinates || [0, 0];
+                const coordsB = b.coordinates || [0, 0];
+                if (coordsA[0] !== coordsB[0])
+                    return coordsA[0] - coordsB[0];
+                return coordsA[1] - coordsB[1];
+            });
+        }
+
+        return visible.length > 0 ? visible : fallback;
+    }
+
+    function getExtWorkspaceActiveWorkspace() {
+        if (!extProjection)
+            return "";
+        const activeWs = extProjection.windowsets.find(ws => ws.active);
+        return activeWs || null;
+    }
+
     readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
     readonly property real padding: (root.barConfig?.removeWidgetPadding ?? false) ? 0 : Theme.snap((root.barConfig?.widgetPadding ?? 12) * (widgetHeight / 30), dpr)
     readonly property real visualWidth: isVertical ? widgetHeight : (workspaceRow.implicitWidth + padding * 2)
@@ -616,8 +673,8 @@ Item {
 
     function getRealWorkspaces() {
         return root.workspaceList.filter(ws => {
-            if (usesWorkspaceView)
-                return ws && !ws.placeholder;
+            if (useAqueous || useExtWorkspace)
+                return ws && !ws._placeholder;
             if (CompositorService.isNiri)
                 return ws && ws.idx !== -1;
             if (CompositorService.isHyprland)
@@ -631,11 +688,16 @@ Item {
     }
 
     function switchToWorkspaceByModelData(data) {
-        if (!data)
+        if (!data || data._placeholder)
             return;
 
-        if (usesWorkspaceView) {
-            if (!data.placeholder && data.canActivate && typeof data.activate === "function")
+        if (useAqueous) {
+            AqueousService.activateWorkspace(data);
+            return;
+        }
+
+        if (root.useExtWorkspace) {
+            if (typeof data.activate === "function")
                 data.activate();
             return;
         }
@@ -684,14 +746,31 @@ Item {
     }
 
     function switchWorkspace(direction) {
-        if (usesWorkspaceView) {
-            const rows = getRealWorkspaces();
-            if (!rows.length)
+        if (useAqueous) {
+            const workspaces = getRealWorkspaces();
+            const index = workspaces.findIndex(w => w.id === currentWorkspace);
+            const next = Math.max(0, Math.min(workspaces.length - 1, index + (direction > 0 ? 1 : -1)));
+            if (next !== index)
+                AqueousService.activateWorkspace(workspaces[next]);
+            return;
+        }
+        if (useExtWorkspace) {
+            const realWorkspaces = getRealWorkspaces();
+            if (realWorkspaces.length < 2) {
                 return;
-            const currentIndex = rows.findIndex(w => w.key === currentWorkspace);
-            const nextIndex = currentIndex < 0 ? 0 : Math.max(0, Math.min(rows.length - 1, currentIndex + (direction > 0 ? 1 : -1)));
-            if (nextIndex !== currentIndex)
-                switchToWorkspaceByModelData(rows[nextIndex]);
+            }
+
+            const currentIndex = realWorkspaces.findIndex(ws => ws === root.currentWorkspace);
+            const validIndex = currentIndex === -1 ? 0 : currentIndex;
+            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
+
+            if (nextIndex === validIndex) {
+                return;
+            }
+
+            const nextWorkspace = realWorkspaces[nextIndex];
+            if (typeof nextWorkspace.activate === "function")
+                nextWorkspace.activate();
         } else if (CompositorService.isNiri) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
@@ -760,8 +839,10 @@ Item {
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
-        if (usesWorkspaceView)
+        if (useAqueous)
             return modelData?.number ?? "";
+        if (root.useExtWorkspace)
+            return index + 1;
         if (CompositorService.isNiri)
             return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
         if (CompositorService.isHyprland)
@@ -775,8 +856,8 @@ Item {
 
     function getWorkspaceIndex(modelData, index) {
         let isPlaceholder;
-        if (usesWorkspaceView) {
-            isPlaceholder = modelData?.placeholder === true;
+        if (root.useAqueous || root.useExtWorkspace) {
+            isPlaceholder = modelData?._placeholder === true;
         } else if (CompositorService.isNiri) {
             isPlaceholder = modelData?.idx === -1;
         } else if (CompositorService.isHyprland) {
@@ -816,9 +897,9 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: useAqueous || CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
-    readonly property bool shouldShow: usesWorkspaceView ? hasWorkspaces : hasNativeWorkspaceSupport
+    readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
     width: shouldShow ? (isVertical ? barThickness : visualWidth) : 0
     height: shouldShow ? (isVertical ? visualHeight : barThickness) : 0
@@ -910,9 +991,11 @@ Item {
             const rootPos = edgeMouseArea.mapToItem(root, mouse.x, mouse.y);
             switch (mouse.button) {
             case Qt.RightButton:
-                if (CompositorService.toggleWorkspaceOverview(root.effectiveScreenName))
-                    break;
-                if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
+                if (CompositorService.isAqueous) {
+                    AqueousService.toggleOverview(root.effectiveScreenName);
+                } else if (CompositorService.isNiri) {
+                    NiriService.toggleOverview();
+                } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                     root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
                 }
                 break;
@@ -1031,7 +1114,6 @@ Item {
             id: workspaceRepeater
             model: ScriptModel {
                 values: root.workspaceList
-                objectProp: root.usesWorkspaceView ? "key" : ""
             }
 
             Item {
@@ -1093,8 +1175,10 @@ Item {
                 }
 
                 property bool isActive: {
-                    if (root.usesWorkspaceView)
+                    if (root.useAqueous)
                         return modelData?.active === true;
+                    if (root.useExtWorkspace)
+                        return modelData === root.currentWorkspace;
                     if (CompositorService.isNiri)
                         return !!(modelData && modelData.idx === root.currentWorkspace);
                     if (CompositorService.isHyprland)
@@ -1106,8 +1190,8 @@ Item {
                     return modelData === root.currentWorkspace;
                 }
                 property bool isOccupied: {
-                    if (root.usesWorkspaceView)
-                        return modelData?.windows != null && modelData.windows.length > 0;
+                    if (root.useAqueous)
+                        return AqueousService.toplevels.some(w => w.aqueousWorkspaceId === modelData?.id);
                     if (CompositorService.isHyprland)
                         return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
                     if (root.isMango)
@@ -1117,8 +1201,8 @@ Item {
                     return false;
                 }
                 property bool isPlaceholder: {
-                    if (root.usesWorkspaceView)
-                        return modelData?.placeholder === true;
+                    if (root.useAqueous || root.useExtWorkspace)
+                        return !!(modelData && modelData._placeholder);
                     if (CompositorService.isNiri)
                         return !!(modelData && modelData.idx === -1);
                     if (CompositorService.isHyprland)
@@ -1134,8 +1218,10 @@ Item {
                 property var loadedWorkspaceData: null
                 property bool loadedIsUrgent: false
                 property bool isUrgent: {
-                    if (root.usesWorkspaceView)
+                    if (root.useAqueous)
                         return modelData?.urgent === true;
+                    if (root.useExtWorkspace)
+                        return modelData?.urgent ?? false;
                     if (CompositorService.isHyprland)
                         return modelData?.urgent ?? false;
                     if (CompositorService.isNiri)
@@ -1156,18 +1242,18 @@ Item {
                 }
                 readonly property bool loadedHasIcon: loadedIconData !== null
                 property var loadedIcons: []
-                readonly property var workspaceIcons: root.usesWorkspaceView ? root.getWorkspaceIcons(modelData) : loadedIcons
-                readonly property bool occupancyKnown: !root.usesWorkspaceView || modelData?.windows != null
 
                 readonly property int stableIconCount: {
                     if (!SettingsData.showWorkspaceApps || isPlaceholder)
                         return 0;
 
-                    if (root.usesWorkspaceView)
-                        return workspaceIcons.length;
+                    if (root.useAqueous)
+                        return loadedIcons.length;
 
                     let targetWorkspaceId;
-                    if (CompositorService.isNiri) {
+                    if (root.useExtWorkspace) {
+                        targetWorkspaceId = modelData?.id || modelData?.name;
+                    } else if (CompositorService.isNiri) {
                         targetWorkspaceId = modelData?.id;
                     } else if (CompositorService.isHyprland) {
                         targetWorkspaceId = modelData?.id;
@@ -1221,7 +1307,7 @@ Item {
                 readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5) : (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2))
                 readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2)) : (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5)
                 readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
-                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (root.usesWorkspaceView || CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
+                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (root.useAqueous || CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                 readonly property real contentImplicitWidth: appIconsLoader.item?.contentWidth ?? 0
                 readonly property real contentImplicitHeight: appIconsLoader.item?.contentHeight ?? 0
 
@@ -1377,7 +1463,7 @@ Item {
                     }
 
                     onPositionChanged: mouse => {
-                        if (root.usesWorkspaceView || !mousePressed || !CompositorService.isNiri || !SettingsData.workspaceDragReorder || isPlaceholder)
+                        if (!mousePressed || !CompositorService.isNiri || !SettingsData.workspaceDragReorder || isPlaceholder)
                             return;
 
                         if (!dragHandler.dragging) {
@@ -1435,8 +1521,11 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             if (delegateRoot.focusWindowAt(mouse.x, mouse.y))
                                 return;
-                            if (root.usesWorkspaceView) {
+                            if (root.useAqueous) {
                                 root.switchToWorkspaceByModelData(modelData);
+                            } else if (root.useExtWorkspace) {
+                                if (typeof modelData?.activate === "function")
+                                    modelData.activate();
                             } else if (CompositorService.isNiri) {
                                 if (modelData && modelData.id !== undefined) {
                                     NiriService.switchToWorkspace(modelData.id);
@@ -1449,9 +1538,11 @@ Item {
                                 CompositorService.dispatchSwayWorkspace(modelData);
                             }
                         } else if (mouse.button === Qt.RightButton) {
-                            if (CompositorService.toggleWorkspaceOverview(root.effectiveScreenName))
-                                return;
-                            if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
+                            if (CompositorService.isAqueous) {
+                                AqueousService.toggleOverview(root.effectiveScreenName);
+                            } else if (CompositorService.isNiri) {
+                                NiriService.toggleOverview();
+                            } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
                             } else if (root.isMango && modelData?.tag !== undefined) {
                                 MangoService.toggleTag(root.screenName, modelData.tag);
@@ -1472,7 +1563,7 @@ Item {
                         }
 
                         var wsData = null;
-                        if (root.usesWorkspaceView) {
+                        if (root.useAqueous || root.useExtWorkspace) {
                             wsData = modelData;
                         } else if (CompositorService.isNiri) {
                             wsData = modelData || null;
@@ -1491,9 +1582,7 @@ Item {
                             delegateRoot.loadedIsUrgent = wsData?.urgent ?? false;
                         }
 
-                        if (root.usesWorkspaceView) {
-                            delegateRoot.loadedIcons = [];
-                        } else if (SettingsData.showWorkspaceApps) {
+                        if (SettingsData.showWorkspaceApps) {
                             if (root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
                             } else if (CompositorService.isNiri) {
@@ -1508,35 +1597,28 @@ Item {
                 }
 
                 function updateAllData() {
-                    if (root.usesWorkspaceView) {
-                        dataUpdateTimer.stop();
-                        loadedWorkspaceData = isPlaceholder ? null : modelData;
-                        loadedIsUrgent = modelData?.urgent === true;
-                        loadedIcons = [];
-                        return;
-                    }
                     dataUpdateTimer.restart();
                 }
 
-                function windowIconAt(x, y) {
+                function windowIdAt(x, y) {
                     const layout = appIconsLoader.item?.iconsLayout;
                     if (!layout)
                         return null;
                     const point = layout.mapFromItem(mouseArea, x, y);
-                    return layout.childAt(point.x, point.y);
+                    const icon = layout.childAt(point.x, point.y);
+                    if (root.useAqueous)
+                        return icon?.windowId ? {id: icon.windowId, session: icon.windowSession} : null;
+                    return icon?.windowId ?? null;
                 }
 
                 function focusWindowAt(x, y) {
-                    const icon = delegateRoot.windowIconAt(x, y);
-                    if (root.usesWorkspaceView) {
-                        if (typeof icon?.windowAction !== "function")
-                            return false;
-                        icon.windowAction();
-                        return true;
-                    }
-                    const winId = icon?.windowId;
+                    const winId = delegateRoot.windowIdAt(x, y);
                     if (!winId)
                         return false;
+                    if (root.useAqueous) {
+                        AqueousService.command("window.activate", winId);
+                        return true;
+                    }
                     if (CompositorService.isHyprland) {
                         HyprlandService.focusWindow(winId);
                         return true;
@@ -1684,7 +1766,7 @@ Item {
                                 id: rowLayout
                                 Row {
                                     spacing: Theme.spacingXS
-                                    visible: workspaceIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -1733,13 +1815,13 @@ Item {
 
                                     Repeater {
                                         model: ScriptModel {
-                                            values: workspaceIcons.slice(0, SettingsData.maxWorkspaceIcons)
+                                            values: loadedIcons.slice(0, SettingsData.maxWorkspaceIcons)
                                         }
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
-                                            readonly property var windowAction: modelData.windowAction
+                                            readonly property string windowSession: modelData.windowSession || ""
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
@@ -1860,7 +1942,7 @@ Item {
                                 id: columnLayout
                                 Column {
                                     spacing: Theme.spacingXS
-                                    visible: workspaceIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     DankIcon {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -1891,13 +1973,13 @@ Item {
 
                                     Repeater {
                                         model: ScriptModel {
-                                            values: workspaceIcons.slice(0, SettingsData.maxWorkspaceIcons)
+                                            values: loadedIcons.slice(0, SettingsData.maxWorkspaceIcons)
                                         }
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
-                                            readonly property var windowAction: modelData.windowAction
+                                            readonly property string windowSession: modelData.windowSession || ""
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
@@ -2094,18 +2176,17 @@ Item {
                         delegateRoot.updateAllData();
                     }
                 }
-                readonly property var workspaceRowData: root.usesWorkspaceView ? modelData : null
-                onWorkspaceRowDataChanged: {
-                    if (!root.usesWorkspaceView || !dataUpdateTimer || !mouseArea || !dragHandler)
-                        return;
-                    dataUpdateTimer.stop();
-                    loadedWorkspaceData = null;
-                    loadedIsUrgent = false;
-                    loadedIcons = [];
-                    mouseArea.mousePressed = false;
-                    dragHandler.dragging = false;
-                    dragHandler.dragAxisOffset = 0;
-                    updateAllData();
+                Connections {
+                    target: AqueousService
+                    function onStateChanged() {
+                        if (root.useAqueous)
+                            delegateRoot.updateAllData();
+                    }
+                }
+                property var _extWindowsetsTrigger: root.useExtWorkspace ? WindowManager.windowsets : null
+                on_ExtWindowsetsTriggerChanged: {
+                    if (root.useExtWorkspace)
+                        delegateRoot.updateAllData();
                 }
             }
         }

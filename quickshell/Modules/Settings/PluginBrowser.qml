@@ -17,11 +17,7 @@ DankFloatingWindow {
     property bool keyboardNavigationActive: false
     property bool isLoading: false
     property var parentModal: null
-    Binding {
-        target: "parentWindow" in root ? root : null
-        property: "parentWindow"
-        value: root.parentModal
-    }
+    parentWindow: parentModal
     property bool pendingInstallHandled: false
     property string typeFilter: ""
     property string categoryFilter: "all"
@@ -1543,11 +1539,7 @@ DankFloatingWindow {
         DankFloatingWindow {
             id: thirdPartyConfirmModal
 
-            Binding {
-                target: "parentWindow" in thirdPartyConfirmModal ? thirdPartyConfirmModal : null
-                property: "parentWindow"
-                value: root
-            }
+            parentWindow: root
 
             function show() {
                 visible = true;

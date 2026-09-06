@@ -31,14 +31,8 @@ func DetectCompositor() Compositor {
 	if detectedCompositor >= 0 {
 		return detectedCompositor
 	}
-	owner := waylandSocketOwner()
-	known := map[string]Compositor{"aqueous": CompositorAqueous, "hyprland": CompositorHyprland, "niri": CompositorNiri, "sway": CompositorSway, "scroll": CompositorScroll, "miracle-wm": CompositorMiracle, "mango": CompositorMango}
-	if compositor, ok := known[owner]; ok {
-		detectedCompositor = compositor
-		return compositor
-	}
-	if owner != "" {
-		detectedCompositor = CompositorUnknown
+	if waylandSocketOwner() == "aqueous" {
+		detectedCompositor = CompositorAqueous
 		return detectedCompositor
 	}
 
