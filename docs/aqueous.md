@@ -73,12 +73,69 @@ Core keybind tooling invokes the helper from its existing provider package. Thei
 only shared process utility is a bounded, short-lived JSON command runner.
 
 All persistent writes go through `aqueous-config validate/apply --shell dms
---request -`, with JSON on stdin and `expected_generation`. Backups go into
-`$XDG_CONFIG_HOME/DankMaterialShell/aqueous-backups`. There is no DMS TOML writer.
+--request -`, with JSON on stdin and `expected_generation`. The backup directory
+passed to the helper is `$XDG_CONFIG_HOME/DankMaterialShell/aqueous-backups`;
+the helper decides when backups are required. Blur supplies a managed TOML block
+through the helper's `raw_files.rules` request; DMS never writes the file directly.
 Display previews retain the previous live configuration and refuse to revert over
 external changes or output recreation. A failed/uncertain preview is reconciled
 against live state before offering Keep/Revert. A conflict retains the draft until
 the user explicitly discards it and reloads.
+
+### Background blur
+
+When `ext-background-effect-v1` is unavailable, DMS can control Aqueous layer blur
+through its existing Background Blur toggle. This path was tested with the pinned
+0.7.1 helper. It requires an active Aqueous shell connection and a helper exposing
+the validated DMS-mode configuration contract, `raw_files.rules`, and the
+`blur.enabled` schema field. Older helpers without that contract remain unavailable.
+
+Enable global blur in Aqueous's `wm.toml` first:
+
+```toml
+[blur]
+enabled = true
+```
+
+Use Reload in DMS's Background Blur settings after changing Aqueous configuration.
+Set DMS surface opacity below 100% to see the effect. DMS does not alter Aqueous's
+global blur setting or application rules.
+
+The backend prepends a block delimited by `# BEGIN DMS BACKGROUND BLUR` and
+`# END DMS BACKGROUND BLUR` to `rules.toml`. Aqueous uses the first matching layer
+rule, so the block controls `dms:*` namespaces before user wildcard rules. It
+excludes click catchers, dismissal surfaces, exclusion zones, wallpaper blur,
+lock/DPMS fades, desktop widgets and monitor identification. The separate frame
+blur preference controls `dms:frame`. Layer-owned XDG popups follow their parent.
+Regions, clipping and rounded blur shapes are deliberately not reproduced.
+
+Existing content outside the block is retained byte-for-byte. Keep the managed
+block at the start of the file; malformed or moved markers produce an error.
+Rules files with root-level assignments cannot be safely prefixed and are rejected.
+Disabling blur writes explicit false rules so later wildcard rules cannot force it
+back on. An initially disabled preference with no managed block does not write.
+The rules persist across DMS restarts; protocol support, if available later, removes
+the managed block and restores the standard protocol path.
+
+Changes use fresh snapshots and generation-checked validate/apply calls. Errors
+appear in settings with explicit Retry; failed or uncertain writes are not retried
+automatically. Updates run on startup, setting changes, reconnect and explicit
+Reload/Retry. There is no polling process or idle timer. External rule edits are
+reconciled on the next such event.
+
+Run the focused tests with:
+
+```sh
+node quickshell/tests/aqueous-blur.test.mjs
+AQUEOUS_BLUR_TEST_HELPER=/path/to/aqueous-config \
+  node quickshell/tests/aqueous-blur.test.mjs
+```
+
+The optional helper test writes only to a temporary configuration directory. It
+checks validation without writes, enable/disable, stale generations and preservation
+of unrelated rules and global blur. Offscreen QML verification also exercised the
+production services together with the real helper: startup, toggle/frame updates,
+idle behavior and disconnect. These checks do not verify compositor rendering.
 
 ### Limitations in the pinned helper
 

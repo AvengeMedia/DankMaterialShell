@@ -271,7 +271,7 @@ Column {
                     menuRoot.closed();
             }
 
-            BackgroundEffect.blurRegion: visible ? menuBlurRegion : null
+            BackgroundEffect.blurRegion: visible && BlurService.protocolEnabled ? menuBlurRegion : null
 
             Region {
                 id: menuBlurRegion

@@ -288,7 +288,7 @@ PanelWindow {
         return Math.max(0, Math.min(requested, maxRadius));
     }
 
-    readonly property bool _blurSurfacesActive: BlurService.enabled && SettingsData.frameBlurEnabled && win._frameActive
+    readonly property bool _blurSurfacesActive: BlurService.protocolEnabled && SettingsData.frameBlurEnabled && win._frameActive
     readonly property int _blurCutoutCompensation: SettingsData.frameOpacity <= 0.2 ? 1 : 0
     readonly property int _blurCutoutLeft: Math.max(0, win.cutoutLeftInset - win._blurCutoutCompensation)
     readonly property int _blurCutoutTop: Math.max(0, win.cutoutTopInset - win._blurCutoutCompensation)
@@ -1012,7 +1012,7 @@ PanelWindow {
 
     function _buildBlur(forceRepublish) {
         try {
-            if (!BlurService.enabled || !SettingsData.frameBlurEnabled || !win._frameActive || !win.visible) {
+            if (!BlurService.protocolEnabled || !SettingsData.frameBlurEnabled || !win._frameActive || !win.visible) {
                 win.BackgroundEffect.blurRegion = null;
                 return;
             }
@@ -1105,7 +1105,7 @@ PanelWindow {
 
     Connections {
         target: BlurService
-        function onEnabledChanged() {
+        function onProtocolEnabledChanged() {
             win._scheduleBlurRebuild();
         }
     }

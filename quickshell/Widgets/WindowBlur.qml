@@ -22,7 +22,7 @@ Item {
     property real clipWidth: blurWidth
     property real clipHeight: blurHeight
 
-    readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
+    readonly property bool _active: blurEnabled && BlurService.protocolEnabled && !!targetWindow
 
     Region {
         id: blurRegion
@@ -73,7 +73,7 @@ Item {
     onClipHeightChanged: settleKickAction.restart()
 
     function _runSettleKick() {
-        if (!targetWindow?.visible)
+        if (!BlurService.compositorSupported || !targetWindow?.visible)
             return;
         kick();
         settleRepeatTimer.restart();

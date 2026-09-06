@@ -2114,10 +2114,34 @@ Item {
                     tags: ["blur", "background", "transparency", "glass", "frosted"]
                     settingKey: "blurEnabled"
                     text: I18n.tr("Background Blur")
-                    description: !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.")
+                    description: {
+                        if (CompositorService.isAqueous && !BlurService.compositorSupported) {
+                            if (!AqueousBlurService.supported)
+                                return I18n.tr("Aqueous blur requires a compatible aqueous-config helper.");
+                            if (!AqueousBlurService.globalEnabled)
+                                return I18n.tr("Enable background blur in Aqueous, then reload to control blur for DMS surfaces.");
+                            return I18n.tr("Blur DMS surfaces using Aqueous layer rules. Adjust Opacity accordingly.");
+                        }
+                        return !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.");
+                    }
                     checked: SettingsData.blurEnabled ?? false
-                    enabled: BlurService.available
+                    enabled: BlurService.available && !AqueousBlurService.busy
                     onToggled: checked => SettingsData.set("blurEnabled", checked)
+                }
+
+                StyledText {
+                    width: parent.width
+                    visible: CompositorService.isAqueous && AqueousBlurService.error !== ""
+                    text: I18n.tr("Failed to update Aqueous blur rules: %1").arg(AqueousBlurService.error)
+                    color: Theme.error
+                    wrapMode: Text.WordWrap
+                }
+
+                DankButton {
+                    visible: CompositorService.isAqueous
+                    text: AqueousBlurService.error ? I18n.tr("Retry") : I18n.tr("Reload")
+                    enabled: !AqueousBlurService.busy && AqueousBlurService.contextKey !== ""
+                    onClicked: AqueousBlurService.refresh()
                 }
 
                 Item {

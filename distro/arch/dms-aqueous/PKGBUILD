@@ -1,0 +1,79 @@
+# Seafoam Labs' DMS fork, built from master with the shell embedded.
+pkgname=dms-aqueous
+pkgver=1.7beta.r4697.ga39196e9
+pkgrel=2
+pkgdesc='DankMaterialShell with Aqueous support from Seafoam Labs'
+arch=('x86_64' 'aarch64')
+url='https://github.com/Seafoam-Labs/DankMaterialShell'
+license=('MIT')
+depends=('accountsservice' 'quickshell>=0.3.1')
+makedepends=('git' 'go')
+optdepends=(
+    'cava: Audio visualizer'
+    'cups-pk-helper: Printer management'
+    'i2c-tools: External monitor brightness control'
+    'iwd: Network management through iwd'
+    'matugen: Dynamic wallpaper-based theming'
+    'networkmanager: Network management through NetworkManager'
+    'power-profiles-daemon: Power profile control'
+    'qt6-multimedia: Sound effects'
+    'qt6ct: Qt application theming'
+    'systemd: User service and systemd-networkd integration'
+    'wtype: Paste from clipboard history and plugins'
+)
+provides=("dms=${pkgver}" "dms-shell=${pkgver}" "dms-cli=${pkgver}")
+conflicts=('dms' 'dms-git' 'dms-bin' 'dms-shell' 'dms-shell-git' 'dms-shell-bin' 'dms-cli')
+source=(
+    "DankMaterialShell::git+${url}.git#branch=master"
+    'dank-qml-common::git+https://github.com/AvengeMedia/dank-qml-common.git'
+)
+sha256sums=('SKIP' 'SKIP')
+
+pkgver() {
+    cd "${srcdir}/DankMaterialShell"
+    local version
+    version=$(sed 's/^v//; s/-//g' quickshell/VERSION)
+    printf '%s.r%s.g%s' "${version}" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    cd "${srcdir}/DankMaterialShell"
+    git submodule init
+    git config submodule.dank-qml-common.url "${srcdir}/dank-qml-common"
+    git -c protocol.file.allow=always submodule update --init dank-qml-common
+    make -C core sync-shell
+}
+
+build() {
+    cd "${srcdir}/DankMaterialShell/core"
+    export CGO_ENABLED=1
+    export CGO_CPPFLAGS="${CPPFLAGS}"
+    export CGO_CFLAGS="${CFLAGS}"
+    export CGO_CXXFLAGS="${CXXFLAGS}"
+    local commit build_time
+    commit=$(git rev-parse HEAD)
+    build_time=$(date -u -d "@${SOURCE_DATE_EPOCH}" '+%Y-%m-%d_%H:%M:%S')
+    go build -trimpath -buildmode=pie -mod=readonly -modcacherw \
+        -tags 'distro_binary withshell' \
+        -ldflags="-s -w -linkmode=external -extldflags '${LDFLAGS}' -X main.Version=${pkgver} -X main.commit=${commit} -X main.buildTime=${build_time}" \
+        -o bin/dms ./cmd/dms
+}
+
+package() {
+    cd "${srcdir}/DankMaterialShell"
+    install -Dm755 core/bin/dms "${pkgdir}/usr/bin/dms"
+    install -Dm644 assets/systemd/dms.service "${pkgdir}/usr/lib/systemd/user/dms.service"
+    install -Dm644 assets/danklogo.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/danklogo.svg"
+    install -Dm644 -t "${pkgdir}/usr/share/applications" \
+        assets/dms-open.desktop assets/com.danklinux.dms.desktop assets/com.danklinux.dms.notepad.desktop
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 dank-qml-common/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/dank-qml-common-LICENSE"
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+    cp -r docs/. "${pkgdir}/usr/share/doc/${pkgname}/"
+
+    install -dm755 "${pkgdir}/usr/share/bash-completion/completions" \
+        "${pkgdir}/usr/share/zsh/site-functions" "${pkgdir}/usr/share/fish/vendor_completions.d"
+    core/bin/dms completion bash > "${pkgdir}/usr/share/bash-completion/completions/dms"
+    core/bin/dms completion zsh > "${pkgdir}/usr/share/zsh/site-functions/_dms"
+    core/bin/dms completion fish > "${pkgdir}/usr/share/fish/vendor_completions.d/dms.fish"
+}
