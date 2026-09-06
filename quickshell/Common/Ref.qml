@@ -3,6 +3,7 @@ import Quickshell
 
 QtObject {
     required property Singleton service
+    property var modules: null
     property bool active: true
 
     property bool _held: false
@@ -11,7 +12,15 @@ QtObject {
         if (wanted === _held)
             return;
         _held = wanted;
-        service.refCount += wanted ? 1 : -1;
+        if (modules === null) {
+            service.refCount += wanted ? 1 : -1;
+            return;
+        }
+        if (wanted) {
+            service.addRef(modules);
+            return;
+        }
+        service.removeRef(modules);
     }
 
     onActiveChanged: sync(active)
