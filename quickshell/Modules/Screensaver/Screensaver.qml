@@ -22,8 +22,8 @@ Scope {
     readonly property bool showShapes: SettingsData.screensaverShowShapes
     readonly property bool reducedMotion: SettingsData.reduceMotion || Theme.springMotionDisabled
     readonly property int cycleInterval: animationSpeed === "calm" ? 11000 : animationSpeed === "lively" ? 6000 : 8200
-    readonly property var textEffects: ["materialMorph", "expressiveTypography", "tonalSweep"]
-    readonly property var asciiEffects: ["asciiReveal", "asciiAssemble", "asciiDrift"]
+    readonly property var textEffects: ["materialMorph", "expressiveTypography", "tonalSweep", "splitBloom", "orbitAssemble", "colorWave"]
+    readonly property var asciiEffects: ["asciiReveal", "asciiAssemble", "asciiDrift", "asciiDecrypt", "asciiPour", "asciiScatter", "asciiWave"]
 
     function effectDeck() {
         return contentMode === "ascii" ? asciiEffects : textEffects;
