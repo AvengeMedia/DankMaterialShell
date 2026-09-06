@@ -47,6 +47,7 @@ Singleton {
             "isAqueous": () => CompositorService.isAqueous,
             "nativeOverviewCapable": () => CompositorService.isNiri || CompositorService.isAqueous,
             "smartDockCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous,
+            "workspaceFollowFocusCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isAqueous,
             "isHyprlandOrNiri": () => CompositorService.isHyprland || CompositorService.isNiri,
             "windowRulesCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,
             "layoutCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,

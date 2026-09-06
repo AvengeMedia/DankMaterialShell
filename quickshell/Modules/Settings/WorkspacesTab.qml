@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -61,7 +62,8 @@ Item {
                     text: I18n.tr("Show Workspace Apps")
                     description: I18n.tr("Display application icons in workspace indicators")
                     checked: SettingsData.showWorkspaceApps
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous
+                    enabled: !CompositorService.isAqueous || (AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1")
                     onToggled: checked => SettingsData.set("showWorkspaceApps", checked)
                 }
 
@@ -153,7 +155,7 @@ Item {
                     text: I18n.tr("Follow Monitor Focus")
                     description: I18n.tr("Show workspaces of the currently focused monitor")
                     checked: SettingsData.workspaceFollowFocus
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isAqueous
                     onToggled: checked => SettingsData.set("workspaceFollowFocus", checked)
                 }
 
@@ -163,7 +165,8 @@ Item {
                     text: I18n.tr("Show Occupied Workspaces Only")
                     description: I18n.tr("Display only workspaces that contain windows")
                     checked: SettingsData.showOccupiedWorkspacesOnly
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous
+                    enabled: !CompositorService.isAqueous || (AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1")
                     onToggled: checked => SettingsData.set("showOccupiedWorkspacesOnly", checked)
                 }
 
@@ -173,7 +176,7 @@ Item {
                     text: I18n.tr("Reverse Scrolling Direction")
                     description: I18n.tr("Reverse workspace switch direction when scrolling over the bar")
                     checked: SettingsData.reverseScrolling
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous
                     onToggled: checked => SettingsData.set("reverseScrolling", checked)
                 }
 

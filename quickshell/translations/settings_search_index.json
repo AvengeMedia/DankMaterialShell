@@ -1462,7 +1462,7 @@
       "workspaces"
     ],
     "description": "Show workspaces of the currently focused monitor",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "workspaceFollowFocusCapable"
   },
   {
     "section": "workspaceSettings",
@@ -1487,7 +1487,7 @@
     ],
     "icon": "view_module",
     "description": "Show workspace index numbers in the top bar workspace switcher",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "groupActiveWorkspaceApps",
@@ -1610,7 +1610,7 @@
       "workspace"
     ],
     "description": "Reverse workspace switch direction when scrolling over the bar",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "workspaceUnfocusedMonitorSeparateAppearance",
@@ -1695,7 +1695,7 @@
       "workspaces"
     ],
     "description": "Display only workspaces that contain windows",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "showWorkspaceApps",
@@ -1724,7 +1724,7 @@
       "workspace"
     ],
     "description": "Display application icons in workspace indicators",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "showWorkspaceIndex",

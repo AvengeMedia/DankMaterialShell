@@ -5,9 +5,11 @@ This working tree integrates DMS with Aqueous master
 no released minimum Aqueous or DMS version has been established.
 
 The tested DMS baseline is `5baef07048656867a374d210d4305911b8a76e4f`, with
-common QML `26396ce432d6c71c3f5367438f96f4a8d667e160` plus the working-tree
-optional `parentWindow` compatibility fix. The runtime was Arch's
-`noctalia-qs 0.0.12`; its version output supplies no source revision.
+common QML `26396ce432d6c71c3f5367438f96f4a8d667e160` unchanged. The current
+verification uses Quickshell `2d3b3e9c70ef380dff751b61d334dc88df016c29`, built
+locally with its existing `parentWindow` API. Earlier runs used Arch's
+`noctalia-qs 0.0.12` with temporary popup compatibility edits; those edits have
+been removed. See [the implementation audit](aqueous-minimal-change-audit.md).
 The Aqueous compositor, CLI and `aqueous-config` helper were built from the same
 pinned master. The helper reports 0.7.1, protocol 1. The system-installed older
 Aqueous and helper binaries were not used for integration testing.
@@ -121,21 +123,40 @@ For screenshots use `dms screenshot window --seat SEAT` or
 active-window capture errors. Selected-output routing still works on empty
 workspaces and during layer focus.
 
-WorkspaceSwitcher consumes a shared service-owned view for Aqueous and
-ext-workspace. Aqueous rows include authoritative window membership and captured
-session identities. Ext rows use native object identity, including when IDs are
-absent or names repeat; membership remains unknown rather than being guessed from
-Aqueous labels. Padding, labels, activation and wheel navigation share the same
-widget path. Aqueous icon grouping, sizing and occupancy use the same eligible
-window list, with captured window actions retained through rendering.
+WorkspaceSwitcher uses direct Aqueous branches alongside its existing compositor
+branches. AqueousService supplies authoritative window/workspace membership and
+session identities; the existing ext-workspace path keeps native handles. No
+shared workspace adapter or new provider interface is required. Aqueous icons
+reuse the widget's existing grouping, cached icon list, sizing and hit-test path,
+carrying the captured session with the window ID.
 
 Set `DMS_FORCE_EXTWS=1` in the shell's launch environment to select ext-workspace
 even when the Aqueous adapter is healthy. If the protocol is unavailable, the
-forced Aqueous workspace view is unavailable. Without the override, a disconnected
+forced workspace path is unavailable. Without the override, a disconnected
 Aqueous adapter falls back to ext-workspace when available and returns to its
 richer model after reconnection. The override changes workspace selection only;
 other Aqueous consumers and native overview remain available. Ext activation uses
 the protocol's native method and does not expose explicit-seat selection.
+
+Workspace settings expose app icons, follow-monitor-focus, occupied-only filtering,
+reverse scrolling and workspace state colors. The app-icon and occupied-only
+switches are disabled while the Aqueous model is unavailable or `DMS_FORCE_EXTWS=1`,
+because the generic workspace path has no authoritative window membership.
+Saved preferences are retained for when the Aqueous model is used again.
+
+The existing workspace rename dialog supports Aqueous:
+
+```sh
+dms ipc call workspace-rename open
+dms ipc call workspace-rename toggle
+dms ipc call workspace-rename close
+```
+
+Opening captures the selected seat's active workspace ID and compositor session.
+Changing focus while the dialog is open does not redirect the rename. The dialog
+closes after an `applied` result and retains the draft on failure. Missing state,
+ambiguous seat selection, lock or observation-only policy prevents opening it.
+Rename changes runtime state; it does not write persistent configuration.
 
 Native overview controls are available through workspace right-click and:
 
@@ -182,18 +203,20 @@ The following passed against the pinned build on 2026-09-05:
   switching, overview, active-window crops, helper validation/save/conflicts,
   keybind writes, one QML-owned watcher, reconnect after killing the watcher,
   orderly logout and process cleanup.
-- Shared workspace tests reproduce the prior override, padding and icon-count
-  failures. The corrected default and forced-ext paths pass real QML widget checks
-  for activation/wheel navigation, duplicate-name renames, output-following and
-  independent overview. Default mode additionally checks grouping, padding,
-  horizontal/vertical sizing, actual icon actions and stale cached actions across
-  fallback/reconnect. Forced-ext also passed with XWayland capture.
+- Workspace tests exercise the established compositor selection, the forced-ext
+  override, Aqueous padding/grouping/icon counts, native handle identity and
+  captured sessions. The runtime harness exercises the actual icon hit test,
+  duplicate-name renames, output following and fallback/reconnect. Settings/dialog
+  tests cover control visibility and search conditions, forced-ext membership
+  controls, captured rename targets, retained drafts, lock/stale-target rejection
+  and late callbacks after reopening. Real UI runs exercise the settings controls
+  and rename IPC/dialog, including focus changes and correction after failure.
 
 Specialized Niri/Hyprland/Mango/I3-family selection was checked with synthetic inputs;
 new live sessions for those compositors were not available for this correction.
 
 The UI runs included the ungrouped taskbar, dock and keyboard widget.
-The XWayland DMS run also captured a synthetic XWayland window (632×612), with
+The XWayland DMS run also captured a synthetic XWayland window (404×304), with
 rotated/fractional native capture at 350×1145 and positive output origins.
 
 Earlier standalone-bar runs produced 632×660 and 350×1205 window crops. The connected
@@ -205,6 +228,7 @@ Reproduce the focused desktop checks with a Pixman-compatible diagnostic build:
 
 ```sh
 node quickshell/tests/workspace-view.test.mjs
+node quickshell/tests/workspace-settings.test.mjs
 node quickshell/tests/aqueous-service.test.mjs
 python3 scripts/test-aqueous-service.py
 node quickshell/tests/display-apply.test.mjs
@@ -212,7 +236,7 @@ node quickshell/tests/aqueous-displays.test.mjs
 LD_LIBRARY_PATH=/path/to/patched-wlroots/lib \
   python3 scripts/test-aqueous-integration.py \
   --aqueous-source /path/to/Aqueous --bin-dir /path/to/matching/binaries
-# Add --force-ext to verify the shared widget through ext-workspace.
+# Add --force-ext to verify the workspace widget through ext-workspace.
 # Add --frame to exercise connected frame reservations.
 # Add --xwayland for the XWayland capture check (positive output origins).
 ```
@@ -232,6 +256,5 @@ a separate release gate. Headless checks do not establish those results.
 DankLinux-Docs support tables, packaging and plugin registry publication remain
 work for their owning repositories after release dependencies are established.
 
-Keep the generic DPMS/result fixes and optional `parentWindow` compatibility changes
-independently reviewable. The common-QML fix is an uncommitted submodule change;
-an upstream landing will need a common-QML commit and coordinated dependency pin.
+Keep the generic DPMS/result and UWSM logout fixes independently reviewable.
+Popup compatibility changes are outside this integration and have been removed.

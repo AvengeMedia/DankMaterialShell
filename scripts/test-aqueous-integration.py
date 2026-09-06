@@ -204,9 +204,50 @@ def main():
         }
         return result;
     }
+    function renameModal() {
+        return dmsShellLoader.item?.children.find(c => c.workspaceRenameModalLoader !== undefined)?.workspaceRenameModalLoader?.item;
+    }
+    function renameInput(item) {
+        if (!item)
+            return null;
+        if (item.placeholderText === I18n.tr("Workspace name"))
+            return item;
+        for (const child of item.children || []) {
+            const found = renameInput(child);
+            if (found)
+                return found;
+        }
+        return null;
+    }
     IpcHandler {
         target: "aqueousTest"
         function state(): string { return JSON.stringify(AqueousService.state); }
+        function workspaceSetting(key: string): string {
+            const row = SettingsSearchService.registeredCards[key]?.item;
+            return JSON.stringify(row ? {visible: row.visible, enabled: row.enabled, checked: row.checked} : {visible: false, tab: PopoutService.settingsModal?.currentTabIndex, registered: Object.keys(SettingsSearchService.registeredCards)});
+        }
+        function toggleWorkspaceSetting(key: string): string {
+            const row = SettingsSearchService.registeredCards[key]?.item;
+            if (!row?.visible || !row.enabled)
+                return "UNAVAILABLE";
+            row.toggled(!row.checked);
+            return "TOGGLED";
+        }
+        function renameStatus(): string {
+            const modal = entrypoint.renameModal();
+            const input = entrypoint.renameInput(modal?.contentItem);
+            return JSON.stringify(modal ? {visible: modal.visible, pending: modal.renaming,
+                target: modal.aqueousWorkspace, text: input?.text, inputEnabled: input?.enabled} : null);
+        }
+        function renameSubmit(name: string): string {
+            const modal = entrypoint.renameModal();
+            const input = entrypoint.renameInput(modal?.contentItem);
+            if (!modal?.visible || !input)
+                return "UNAVAILABLE";
+            input.text = name;
+            modal.submitAndClose();
+            return "REQUESTED";
+        }
         function workspaceStatus(): string {
             return JSON.stringify({backend: workspaceTest.useAqueous ? "aqueous" : workspaceTest.useExtWorkspace ? "ext" : "none", output: workspaceTest.effectiveScreenName,
                 rows: workspaceTest.workspaceList.map(w => ({name: w.name, active: w.active, number: w.number,
@@ -281,9 +322,23 @@ def main():
         assert len(view["delegates"]) == len(view["rows"]), view
         if args.frame:
             wait_for(lambda: len(entities("output")) == 2 and all(o["usable_bounds"]["width"] < o["bounds"]["width"] and o["usable_bounds"]["height"] < o["bounds"]["height"] for o in entities("output")))
-        wait_for(lambda: ipc("settings", "openWith", "typography").startswith("SETTINGS_OPEN_SUCCESS"))
+        wait_for(lambda: ipc("settings", "openWith", "workspaces").startswith("SETTINGS_OPEN_SUCCESS"))
         time.sleep(2)
         assert "Type SettingsModal unavailable" not in (base / "dms.log").read_text()
+        for key in ("showWorkspaceApps", "workspaceFollowFocus", "showOccupiedWorkspacesOnly", "reverseScrolling"):
+            def setting_state():
+                value = json.loads(ipc("aqueousTest", "workspaceSetting", key))
+                (base / "workspace-setting.json").write_text(json.dumps(dict(key=key, state=value), indent=2))
+                return value
+            control = wait_for(lambda: (value if (value := setting_state()) and value["visible"] else None))
+            assert control["enabled"] == (not args.force_ext or key not in ("showWorkspaceApps", "showOccupiedWorkspacesOnly")), (key, control)
+            if control["enabled"]:
+                assert ipc("aqueousTest", "toggleWorkspaceSetting", key) == "TOGGLED"
+                wait_for(lambda: setting_state()["checked"] != control["checked"])
+                assert ipc("aqueousTest", "toggleWorkspaceSetting", key) == "TOGGLED"
+                wait_for(lambda: setting_state()["checked"] == control["checked"])
+            else:
+                assert ipc("aqueousTest", "toggleWorkspaceSetting", key) == "UNAVAILABLE"
         assert ipc("settings", "close") == "SETTINGS_CLOSE_SUCCESS"
         windows = [spawn([str(fixture), "window"], f"window-{i}.log") for i in range(2)]
         clients = wait_for(lambda: (w if len(w := [w for w in entities("window") if w["app_id"] == "aq-shell-test"]) == 2 else None))
@@ -353,6 +408,34 @@ def main():
         assert ipc("aqueous", "overview", "hide", output["name"]) == "OVERVIEW_REQUESTED"
         wait_for(lambda: entities("session")[0]["overview_output"] is None)
 
+        # Use the real rename IPC/dialog and keep its captured target across a focus change.
+        def rename_status():
+            value = json.loads(ipc("aqueousTest", "renameStatus"))
+            (base / "rename-status.json").write_text(json.dumps(value, indent=2))
+            return value
+        target = next(w for w in entities("workspace") if w["output"] == output["id"] and w["active"])
+        destination = next(w for w in entities("workspace") if w["output"] == output["id"] and w["id"] != target["id"])
+        assert ipc("workspace-rename", "open") == "WORKSPACE_RENAME_MODAL_OPENED"
+        draft = wait_for(lambda: (value if (value := rename_status()) and value["visible"] else None))
+        assert draft["target"] == dict(id=target["id"], session=session), draft
+        assert draft["text"] == target["name"], draft
+        command("workspace.activate", id=destination["id"], seat=seat)
+        assert ipc("aqueousTest", "renameSubmit", "日本語 🫧") == "REQUESTED"
+        wait_for(lambda: not rename_status()["visible"])
+        wait_for(lambda: next(w for w in entities("workspace") if w["id"] == target["id"])["name"] == "日本語 🫧")
+        assert next(w for w in entities("workspace") if w["id"] == destination["id"])["name"] == destination["name"]
+        assert ipc("workspace-rename", "toggle") == "WORKSPACE_RENAME_MODAL_OPENED"
+        wait_for(lambda: rename_status()["visible"])
+        assert rename_status()["target"]["id"] == destination["id"]
+        invalid_name = "x" * 1025
+        assert ipc("aqueousTest", "renameSubmit", invalid_name) == "REQUESTED"
+        draft = rename_status()
+        assert draft["visible"] and not draft["pending"] and draft["text"] == invalid_name, draft
+        assert ipc("aqueousTest", "renameSubmit", "Renamed after error") == "REQUESTED"
+        wait_for(lambda: not rename_status()["visible"])
+        wait_for(lambda: next(w for w in entities("workspace") if w["id"] == destination["id"])["name"] == "Renamed after error")
+        command("window.activate", id=window, seat=seat)
+
         def capture(name):
             command("window.activate", id=window, seat=seat)
             run([str(binaries / "dms"), "screenshot", "window", "--seat", seat, "--no-clipboard", "--no-notify", "--dir", str(base), "--filename", name])
@@ -420,7 +503,7 @@ def main():
         os.killpg(dms.pid, signal.SIGTERM)
         dms.wait(timeout=10)
         assert not any(Path("/proc", pid).exists() for pid in watch_pids), "watcher survived DMS shutdown"
-        print("PASS: daemon/UI, duplicate identities, keyboard, overview, screenshots, helper conflicts, keybinds, single watcher, workspace widget and orderly exit", flush=True)
+        print("PASS: daemon/UI, duplicate identities, keyboard, overview, screenshots, helper conflicts, keybinds, single watcher, workspace settings/widget/rename and orderly exit", flush=True)
     finally:
         for child in reversed(children):
             if child.poll() is None:
