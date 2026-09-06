@@ -369,8 +369,8 @@ Item {
                     id: screensaverTypeDropdown
                     settingKey: "screensaverType"
                     tags: ["screensaver", "content", "text", "ascii"]
-                    property var typeLabels: [I18n.tr("Text", "Screensaver content type"), I18n.tr("ASCII Art", "Screensaver content type")]
-                    property var typeValues: ["text", "ascii"]
+                    property var typeLabels: [I18n.tr("Auto", "Screensaver content type"), I18n.tr("Text", "Screensaver content type"), I18n.tr("ASCII Art", "Screensaver content type")]
+                    property var typeValues: ["auto", "text", "ascii"]
 
                     text: I18n.tr("Content Type", "Screensaver content setting title")
                     options: typeLabels
@@ -383,38 +383,47 @@ Item {
                 }
 
                 SettingsDropdownRow {
-                    id: screensaverEffectDropdown
-                    settingKey: "screensaverEffect"
-                    tags: ["screensaver", "animation", "omarchy", "ttfx", "matrix", "decrypt", "fireworks", "random", "drift", "bounce", "pulse", "reveal"]
-                    property var effectLabels: [I18n.tr("Omarchy Screensaver", "Screensaver animation option using ttfx"), I18n.tr("Simple Random", "Screensaver animation option"), I18n.tr("Drift", "Screensaver animation option"), I18n.tr("Bounce", "Screensaver animation option"), I18n.tr("Pulse", "Screensaver animation option"), I18n.tr("Reveal", "Screensaver animation option")]
-                    property var effectValues: ["omarchy", "random", "drift", "bounce", "pulse", "reveal"]
+                    id: screensaverSpeedDropdown
+                    settingKey: "screensaverSpeed"
+                    tags: ["screensaver", "animation", "speed", "calm", "lively"]
+                    property var speedLabels: [I18n.tr("Calm", "Screensaver animation speed"), I18n.tr("Normal", "Screensaver animation speed"), I18n.tr("Lively", "Screensaver animation speed")]
+                    property var speedValues: ["calm", "normal", "lively"]
 
-                    text: I18n.tr("Animation Effect", "Screensaver animation setting title")
-                    description: SettingsData.screensaverEffect === "omarchy" ? I18n.tr("Uses your default terminal with the lightweight ttfx engine: matrix, decrypt, fireworks, burn, blackhole, VHS and more", "Description for the Omarchy Screensaver animation option") : I18n.tr("Simple Random rotates between native effects every 12 seconds", "Description for the built-in screensaver animation options")
-                    options: effectLabels
-                    currentValue: effectLabels[Math.max(0, effectValues.indexOf(SettingsData.screensaverEffect))]
+                    text: I18n.tr("Animation Speed", "Screensaver animation setting title")
+                    description: I18n.tr("Effects rotate without immediately repeating", "Description for the screensaver animation speed")
+                    options: speedLabels
+                    currentValue: speedLabels[Math.max(0, speedValues.indexOf(SettingsData.screensaverSpeed))]
                     onValueChanged: value => {
-                        const index = effectLabels.indexOf(value);
+                        const index = speedLabels.indexOf(value);
                         if (index >= 0)
-                            SettingsData.set("screensaverEffect", effectValues[index]);
+                            SettingsData.set("screensaverSpeed", speedValues[index]);
                     }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "screensaverShowShapes"
+                    tags: ["screensaver", "expressive", "shapes", "material"]
+                    text: I18n.tr("Expressive Shapes", "Screensaver shapes setting title")
+                    description: I18n.tr("Show a few large tonal shapes around text", "Description for screensaver shapes setting")
+                    checked: SettingsData.screensaverShowShapes
+                    onToggled: checked => SettingsData.set("screensaverShowShapes", checked)
                 }
 
                 Column {
                     width: parent.width
                     spacing: Theme.spacingXS
-                    visible: SettingsData.screensaverType === "text" || SettingsData.screensaverType === "ascii"
+                    visible: ["auto", "text", "ascii"].includes(SettingsData.screensaverType)
 
                     StyledText {
-                        text: SettingsData.screensaverType === "ascii" ? I18n.tr("ASCII Art", "Screensaver content field label") : I18n.tr("Text", "Screensaver content field label")
+                        text: SettingsData.screensaverType === "ascii" ? I18n.tr("ASCII Art", "Screensaver content field label") : I18n.tr("Custom Content", "Screensaver content field label")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                     }
 
                     DankTextEdit {
                         width: parent.width
-                        height: SettingsData.screensaverType === "ascii" ? 180 : 100
-                        placeholderText: SettingsData.screensaverType === "ascii" ? I18n.tr("Paste ASCII art here", "Placeholder for screensaver ASCII art content") : I18n.tr("Enter screensaver text", "Placeholder for screensaver text content")
+                        height: SettingsData.screensaverType === "text" ? 100 : 180
+                        placeholderText: SettingsData.screensaverType === "text" ? I18n.tr("Enter screensaver text", "Placeholder for screensaver text content") : I18n.tr("Enter text or paste ASCII art", "Placeholder for screensaver content")
                         text: SettingsData.screensaverText
                         font.family: SettingsData.screensaverType === "ascii" ? Theme.monoFontFamily : Theme.fontFamily
                         backgroundColor: Theme.floatingWindowFieldColor

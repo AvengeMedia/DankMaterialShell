@@ -3,54 +3,60 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import "ContentClassifier.js" as ContentClassifier
 
 Scope {
     id: root
-    readonly property var log: Log.scoped("Screensaver")
 
     property bool active: false
-    property bool externalActive: false
-    property string activeEffect: "drift"
+    property int cycleRevision: 0
+    property int zoneIndex: 4
+    property string currentEffect: ""
+    property string previousEffect: ""
 
-    readonly property string contentType: SettingsData.screensaverType === "ascii" ? "ascii" : "text"
-    readonly property string configuredText: SettingsData.screensaverText || "DankMaterialShell"
+    readonly property string configuredContent: SettingsData.screensaverText || "DankMaterialShell"
+    readonly property string contentMode: ContentClassifier.classify(configuredContent, SettingsData.screensaverType)
+    readonly property string animationSpeed: SettingsData.screensaverSpeed
+    readonly property bool showShapes: SettingsData.screensaverShowShapes
+    readonly property bool reducedMotion: SettingsData.reduceMotion || Theme.springMotionDisabled
+    readonly property int cycleInterval: animationSpeed === "calm" ? 11000 : animationSpeed === "lively" ? 6000 : 8200
+    readonly property var textEffects: ["materialMorph", "expressiveTypography", "tonalSweep"]
+    readonly property var asciiEffects: ["asciiReveal", "asciiAssemble", "asciiDrift"]
 
-    function chooseEffect() {
-        const configured = SettingsData.screensaverEffect;
-        if (["drift", "bounce", "pulse", "reveal"].includes(configured))
-            return configured;
-        const effects = ["drift", "bounce", "pulse", "reveal"];
-        const choices = effects.filter(effect => effect !== activeEffect);
-        return choices[Math.floor(Math.random() * choices.length)];
+    function effectDeck() {
+        return contentMode === "ascii" ? asciiEffects : textEffects;
+    }
+
+    function chooseNextEffect() {
+        const deck = effectDeck();
+        if (reducedMotion)
+            return deck[0];
+        const candidates = deck.filter(effect => effect !== currentEffect);
+        return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    function advanceScene() {
+        previousEffect = currentEffect;
+        currentEffect = chooseNextEffect();
+        let nextZone = zoneIndex;
+        while (nextZone === zoneIndex)
+            nextZone = Math.floor(Math.random() * 9);
+        zoneIndex = nextZone;
+        cycleRevision++;
     }
 
     function show() {
-        if (!["text", "ascii"].includes(contentType)) {
-            log.warn("unsupported screensaver content type:", contentType);
-            return false;
-        }
         if (IdleService.isShellLocked)
             return false;
-
-        if (SettingsData.screensaverEffect === "omarchy") {
-            externalActive = true;
-            active = true;
-            Quickshell.execDetached(["bash", Quickshell.shellDir + "/scripts/screensaver-ttfx.sh", "start", SessionData.resolveTerminal()]);
-            return true;
-        }
-
-        activeEffect = chooseEffect();
+        currentEffect = chooseNextEffect();
+        cycleRevision++;
         active = true;
         return true;
     }
 
     function hide() {
-        if (externalActive)
-            Quickshell.execDetached(["bash", Quickshell.shellDir + "/scripts/screensaver-ttfx.sh", "stop"]);
-        externalActive = false;
         active = false;
     }
 
@@ -64,216 +70,37 @@ Scope {
         function onDismissScreensaver() {
             root.hide();
         }
-    }
 
-    Connections {
-        target: SettingsData
-
-        function onScreensaverEffectChanged() {
-            if (root.active)
-                root.hide();
+        function onLockRequested() {
+            root.hide();
         }
     }
 
+    onContentModeChanged: {
+        if (active)
+            advanceScene();
+    }
+
     Timer {
-        interval: 12000
+        interval: root.cycleInterval
         repeat: true
-        running: root.active && SettingsData.screensaverEffect === "random"
-        onTriggered: root.activeEffect = root.chooseEffect()
+        running: root.active && !root.reducedMotion
+        onTriggered: root.advanceScene()
     }
 
     Variants {
         model: Quickshell.screens
 
-        delegate: PanelWindow {
-            id: panel
+        delegate: ScreensaverSurface {
             required property var modelData
-
-            property bool inputEnabled: false
-            property bool mouseInitialized: false
-            property point lastMousePosition: Qt.point(-1, -1)
-            property int visibleCharacters: 0
-            property real offsetX: 0
-            property real offsetY: 0
-            property real contentScale: 1
-            property real contentOpacity: 1
-
-            readonly property string renderedText: root.activeEffect === "reveal" ? root.configuredText.substring(0, visibleCharacters) : root.configuredText
-
-            function resetAnimationState() {
-                offsetX = 0;
-                offsetY = 0;
-                contentScale = 1;
-                contentOpacity = 1;
-                visibleCharacters = root.activeEffect === "reveal" ? 0 : root.configuredText.length;
-            }
-
-            function prepareInput() {
-                inputEnabled = false;
-                mouseInitialized = false;
-                lastMousePosition = Qt.point(-1, -1);
-                inputEnableTimer.restart();
-                Qt.callLater(inputScope.forceActiveFocus);
-            }
-
             screen: modelData
-            visible: root.active && !root.externalActive
-            color: "black"
-
-            anchors {
-                top: true
-                bottom: true
-                left: true
-                right: true
-            }
-
-            WlrLayershell.namespace: "dms:screensaver"
-            WlrLayershell.layer: WlrLayershell.Overlay
-            WlrLayershell.exclusiveZone: -1
-            WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-
-            onVisibleChanged: {
-                if (!visible)
-                    return;
-                resetAnimationState();
-                prepareInput();
-            }
-
-            Connections {
-                target: root
-
-                function onActiveEffectChanged() {
-                    panel.resetAnimationState();
-                }
-            }
-
-            Timer {
-                id: inputEnableTimer
-                interval: 500
-                repeat: false
-                onTriggered: panel.inputEnabled = true
-            }
-
-            Timer {
-                interval: 45
-                repeat: true
-                running: root.active && root.activeEffect === "reveal" && panel.visibleCharacters < root.configuredText.length
-                onTriggered: panel.visibleCharacters += Math.max(1, Math.ceil(root.configuredText.length / 50))
-            }
-
-            Item {
-                anchors.centerIn: parent
-                width: Math.min(parent.width * 0.82, 1100)
-                height: Math.min(parent.height * 0.62, 700)
-                opacity: panel.contentOpacity
-                scale: panel.contentScale
-                layer.enabled: root.active
-                transform: Translate {
-                    x: panel.offsetX
-                    y: panel.offsetY
-                }
-
-                Text {
-                    anchors.fill: parent
-                    text: panel.renderedText
-                    color: Theme.primary
-                    textFormat: Text.PlainText
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    wrapMode: root.contentType === "ascii" ? Text.NoWrap : Text.Wrap
-                    font.family: root.contentType === "ascii" ? Theme.monoFontFamily : Theme.fontFamily
-                    font.pixelSize: root.contentType === "ascii" ? 42 : 112
-                    fontSizeMode: Text.Fit
-                    minimumPixelSize: 8
-                }
-            }
-
-            SequentialAnimation {
-                running: root.active && root.activeEffect === "drift"
-                loops: Animation.Infinite
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "offsetX"; from: -40; to: 40; duration: 7000; easing.type: Easing.InOutSine }
-                    NumberAnimation { target: panel; property: "offsetY"; from: 24; to: -24; duration: 7000; easing.type: Easing.InOutSine }
-                }
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "offsetX"; from: 40; to: -40; duration: 7000; easing.type: Easing.InOutSine }
-                    NumberAnimation { target: panel; property: "offsetY"; from: -24; to: 24; duration: 7000; easing.type: Easing.InOutSine }
-                }
-            }
-
-            SequentialAnimation {
-                running: root.active && root.activeEffect === "bounce"
-                loops: Animation.Infinite
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "offsetX"; from: -panel.width * 0.08; to: panel.width * 0.08; duration: 5200; easing.type: Easing.InOutQuad }
-                    NumberAnimation { target: panel; property: "offsetY"; from: -panel.height * 0.1; to: panel.height * 0.1; duration: 4100; easing.type: Easing.InOutQuad }
-                }
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "offsetX"; from: panel.width * 0.08; to: -panel.width * 0.08; duration: 5200; easing.type: Easing.InOutQuad }
-                    NumberAnimation { target: panel; property: "offsetY"; from: panel.height * 0.1; to: -panel.height * 0.1; duration: 4100; easing.type: Easing.InOutQuad }
-                }
-            }
-
-            SequentialAnimation {
-                running: root.active && root.activeEffect === "pulse"
-                loops: Animation.Infinite
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "contentScale"; from: 0.94; to: 1.04; duration: 2200; easing.type: Easing.InOutSine }
-                    NumberAnimation { target: panel; property: "contentOpacity"; from: 0.62; to: 1; duration: 2200; easing.type: Easing.InOutSine }
-                }
-                ParallelAnimation {
-                    NumberAnimation { target: panel; property: "contentScale"; from: 1.04; to: 0.94; duration: 2200; easing.type: Easing.InOutSine }
-                    NumberAnimation { target: panel; property: "contentOpacity"; from: 1; to: 0.62; duration: 2200; easing.type: Easing.InOutSine }
-                }
-            }
-
-            SequentialAnimation {
-                running: root.active && root.activeEffect === "reveal"
-                loops: Animation.Infinite
-                NumberAnimation { target: panel; property: "contentOpacity"; from: 0.25; to: 1; duration: 1400; easing.type: Easing.OutCubic }
-                PauseAnimation { duration: 3800 }
-                NumberAnimation { target: panel; property: "contentOpacity"; from: 1; to: 0.25; duration: 800; easing.type: Easing.InCubic }
-                ScriptAction { script: panel.visibleCharacters = 0 }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: root.active && panel.inputEnabled
-                hoverEnabled: true
-                cursorShape: Qt.BlankCursor
-
-                onPressed: root.hide()
-                onClicked: root.hide()
-                onWheel: root.hide()
-                onPositionChanged: mouse => {
-                    if (!panel.mouseInitialized) {
-                        panel.lastMousePosition = Qt.point(mouse.x, mouse.y);
-                        panel.mouseInitialized = true;
-                        return;
-                    }
-                    if (Math.abs(mouse.x - panel.lastMousePosition.x) <= 5 && Math.abs(mouse.y - panel.lastMousePosition.y) <= 5)
-                        return;
-                    root.hide();
-                }
-            }
-
-            FocusScope {
-                id: inputScope
-                anchors.fill: parent
-                focus: root.active
-
-                Keys.onPressed: event => {
-                    if (!root.active || !panel.inputEnabled)
-                        return;
-                    root.hide();
-                    event.accepted = true;
-                }
-            }
+            controller: root
         }
     }
 
     IpcHandler {
         target: "screensaver"
+        enabled: true
 
         function open(): string {
             return root.show() ? "Screensaver opened" : "Screensaver could not open";
@@ -289,20 +116,23 @@ Scope {
                 root.hide();
                 return "Screensaver closed";
             }
-            return root.show() ? "Screensaver opened" : "Screensaver could not open";
+            return open();
         }
 
         function start(): string {
-            return root.show() ? "Screensaver started" : "Screensaver could not start";
+            return open();
         }
 
         function stop(): string {
-            root.hide();
-            return "Screensaver stopped";
+            return close();
         }
 
         function status(): string {
-            return root.active ? "active" : "inactive";
+            return JSON.stringify({
+                active: root.active,
+                mode: root.contentMode,
+                effect: root.currentEffect
+            });
         }
     }
 }

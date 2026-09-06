@@ -241,11 +241,8 @@ dms ipc call lock isLocked
 ## Target: `screensaver`
 
 Standalone manual screensaver control. This does not lock or unlock the session.
-The optional `Omarchy Screensaver` animation mode uses the MIT-licensed `ttfx`
-engine in the user's configured/default terminal to cycle through its
-character-level effects. Text and ASCII are used as terminal art; normal text
-is expanded into a large adaptive block banner. This mode requires `ttfx`,
-`jq`, and `python3`; the built-in effects have no external dependencies.
+The theme-aware Material renderer automatically selects dedicated text or ASCII
+effects and respects the reduced-motion setting. It has no external dependencies.
 
 ### Functions
 
@@ -271,7 +268,7 @@ is expanded into a large adaptive block banner. This mode requires `ttfx`,
 
 **`status`**
 - Check whether the screensaver is visible
-- Returns: `active` or `inactive`
+- Returns: JSON containing visibility, detected content mode, and current effect
 
 ### Examples
 ```bash
