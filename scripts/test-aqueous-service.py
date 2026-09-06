@@ -64,6 +64,13 @@ ShellRoot {
                 (ok, message) => { shell.reply = {ok: ok, message: message}; });
             return "REQUESTED";
         }
+        function json(mode: string): string {
+            shell.reply = {pending: true};
+            AqueousService.runJson(["aqueousctl", "test-json", mode], null,
+                (result, error) => { shell.reply = {error: error, length: result?.payload?.length,
+                    tail: result?.payload?.slice(-7)}; });
+            return "REQUESTED";
+        }
         function result(): string { return JSON.stringify(shell.reply); }
     }
 }''')
@@ -79,6 +86,18 @@ args = sys.argv[1:]
 mode = (base / "mode").read_text()
 with (base / "calls").open("a") as f:
     f.write(json.dumps({"args": args, "pid": os.getpid()}) + "\\n")
+if args[0] == "test-json":
+    if args[1] == "oversize":
+        sys.stdout.write("x" * (5 * 1024 * 1024))
+        sys.stdout.flush()
+        time.sleep(30)
+        sys.exit(0)
+    data = json.dumps({"payload": "x" * (2 * 1024 * 1024) + "🫧 日本語"}, ensure_ascii=False).encode()
+    for offset in range(0, len(data), 65537):
+        sys.stdout.buffer.write(data[offset:offset + 65537])
+        sys.stdout.buffer.flush()
+        time.sleep(.002)
+    sys.exit(0)
 if args[:2] == ["shell", "capabilities"]:
     caps = json.loads((base / "capabilities.json").read_text())
     if mode == "unsupported": caps["schema"] = 2
@@ -116,7 +135,7 @@ time.sleep(60)
         env.pop(name, None)
     env.update(AQ_TEST_DIR=str(base), PATH=str(base / "bin") + ":/usr/bin", HOME=str(base / "home"),
                XDG_RUNTIME_DIR=str(base / "runtime"), XDG_CONFIG_HOME=str(base / "config"), XDG_CACHE_HOME=str(base / "cache"),
-               QT_QPA_PLATFORM="offscreen", QT_QUICK_BACKEND="software")
+               QT_QPA_PLATFORM="offscreen", QT_QUICK_BACKEND="software", QT_QPA_PLATFORMTHEME="generic", QT_STYLE_OVERRIDE="Fusion")
     (base / "mode").write_text("normal")
     (base / "calls").touch()
     qs = shutil.which("qs") or shutil.which("quickshell")
@@ -155,6 +174,15 @@ time.sleep(60)
             assert state()["available"] and len(calls()) == count, "quiet stream spawned subprocesses"
             ipc("command")
             assert "locked" in wait_for(reply)["message"]
+            ipc("json", "large")
+            response = wait_for(reply)
+            assert response == {"error": "", "length": 2 * 1024 * 1024 + 6, "tail": "x🫧 日本語"}, response
+            ipc("json", "oversize")
+            response = wait_for(reply)
+            assert response["error"] == "process output exceeds 4 MiB", response
+            wait_for(lambda: not state()["pending"] and not any(
+                Path("/proc", str(call["pid"])).exists() for call in calls() if call["args"][0] == "test-json"))
+            assert state()["available"], "JSON helper failure disconnected the watch stream"
             for mode in ("malformed", "mismatch", "oversize", "eof", "unsupported"):
                 stop()
                 (base / "mode").write_text(mode)
@@ -192,7 +220,7 @@ time.sleep(60)
             os.killpg(process.pid, signal.SIGTERM)
             process.wait(timeout=5)
     wait_for(lambda: not any(Path("/proc", str(call["pid"])).exists() for call in calls()))
-    print("PASS: QML process framing, Unicode, continuity, errors, retry, timeout, idle and cleanup", flush=True)
+    print("PASS: QML process framing, large JSON, streaming size guard, Unicode, continuity, errors, retry, timeout, idle and cleanup", flush=True)
 
 
 if __name__ == "__main__":

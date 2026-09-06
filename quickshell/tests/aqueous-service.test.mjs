@@ -23,6 +23,7 @@ const batches = readFileSync(new URL("fixtures/aqueous/watch.ndjson", import.met
 let live;
 for (const batch of batches) {
     context.acceptLine(JSON.stringify(batch));
+    assert.equal(context.state.batch.modelBytes, Buffer.byteLength(JSON.stringify(context.state.batch.model)));
     if (batch.upsert.some(e => e.kind === "window"))
         live = clone(context.state.batch);
 }
@@ -65,6 +66,39 @@ const outputs = old.upsert.filter(e => e.kind === "output");
 const migrating = old.upsert.filter(e => e.output === outputs[0].id).map(e => ({...e, output: outputs[1].id}));
 const migrated = context.reduceBatch(old, {...change, upsert: migrating, removed: ["output:" + outputs[0].id]});
 assert.equal(migrated.model["output:" + outputs[0].id], undefined);
+
+const bounded = vm.createContext({maxBatchBytes: old.modelBytes + 3000, state: {}, capabilities: caps});
+loadMethods(bounded, "../Services/AqueousService.qml", ["byteLength", "parseJson", "validateEntity", "reduceBatch", "acceptLine"]);
+bounded.acceptLine(JSON.stringify(first));
+const updateModel = (upsert, removed = []) => {
+    const previous = bounded.state.batch;
+    const line = JSON.stringify({...change, sequence: String(Number(previous.sequence) + 1), base_sequence: previous.sequence, upsert, removed});
+    assert(Buffer.byteLength(line) < bounded.maxBatchBytes, "individual batch exceeded the test limit");
+    bounded.acceptLine(line);
+    assert.equal(bounded.state.batch.modelBytes, Buffer.byteLength(JSON.stringify(bounded.state.batch.model)));
+};
+const added = {...workspace, id: 'extra-🫧"\\', name: "日".repeat(300)};
+updateModel([added]);
+updateModel([{...added, name: "short"}]);
+updateModel([added]);
+updateModel([], ["workspace:" + added.id, "workspace:absent"]);
+assert.equal(bounded.state.batch.modelBytes, old.modelBytes);
+assert.deepEqual(clone(bounded.state.batch.entityBytes), clone(old.entityBytes));
+updateModel([added]);
+updateModel([{...added, id: "second"}]);
+const beforeOverflow = JSON.stringify(bounded.state);
+assert.throws(() => updateModel([{...added, id: "third"}]), /model exceeds/);
+assert.equal(JSON.stringify(bounded.state), beforeOverflow, "overflow changed published model or byte accounting");
+const limit = bounded.maxBatchBytes;
+bounded.maxBatchBytes = bounded.state.batch.modelBytes;
+updateModel([]);
+assert.throws(() => updateModel([{...added, name: added.name + "x"}]), /model exceeds/);
+bounded.maxBatchBytes = limit;
+// Removing another entity in the same batch can make room for an upsert.
+updateModel([{...added, name: added.name + "x".repeat(1000)}], ["workspace:second"]);
+bounded.acceptLine(JSON.stringify(first));
+assert.equal(bounded.state.batch.modelBytes, old.modelBytes, "snapshot retained old byte accounting");
+assert.deepEqual(clone(bounded.state.batch.entityBytes), clone(old.entityBytes));
 
 Object.assign(context, {
     available: true, locked: false, session: live.session, entities: live.upsert,

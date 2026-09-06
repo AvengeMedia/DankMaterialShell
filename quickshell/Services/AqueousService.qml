@@ -137,6 +137,8 @@ Singleton {
         if (batch.type === "delta" && (!previous || batch.session !== previous.session || batch.base_sequence !== previous.sequence || batch.sequence === previous.sequence))
             throw new Error("shell delta continuity mismatch");
         const model = Object.assign({}, batch.type === "delta" ? previous.model : {});
+        const entityBytes = Object.assign({}, batch.type === "delta" ? previous.entityBytes : {});
+        let modelBytes = batch.type === "delta" ? previous.modelBytes : 1;
         const seen = new Set();
         for (const entity of batch.upsert) {
             validateEntity(entity);
@@ -144,12 +146,18 @@ Singleton {
             if (seen.has(key))
                 throw new Error("duplicate entity key");
             seen.add(key);
+            // Include the separator; the required session makes the model nonempty.
+            const size = byteLength(JSON.stringify(key) + ":" + JSON.stringify(entity)) + 1;
+            modelBytes += size - (entityBytes[key] || 0);
+            entityBytes[key] = size;
             model[key] = entity;
         }
         for (const key of batch.removed) {
             if (typeof key !== "string" || !/^(output|workspace|window|seat|keyboard|keyboard_device|session):.+$/.test(key) || seen.has(key))
                 throw new Error("invalid or duplicate removal");
             seen.add(key);
+            modelBytes -= entityBytes[key] || 0;
+            delete entityBytes[key];
             delete model[key];
         }
         if (!model["session:session"])
@@ -189,12 +197,14 @@ Singleton {
                     throw new Error("dangling " + entity.kind + "." + field);
             }
         }
-        if (byteLength(JSON.stringify(model)) > maxBatchBytes)
+        if (modelBytes > maxBatchBytes)
             throw new Error("shell model exceeds size bound");
         return {
             session: batch.session,
             sequence: batch.sequence,
             model: model,
+            entityBytes: entityBytes,
+            modelBytes: modelBytes,
             upsert: Object.values(model)
         };
     }
