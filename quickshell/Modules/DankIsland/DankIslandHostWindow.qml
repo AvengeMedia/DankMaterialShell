@@ -176,6 +176,7 @@ PanelWindow {
         compactThickness: root.compactThickness
         cornerRadius: Math.max(0, Math.min(64, root.setting("islandCornerRadius")))
         homeCompactTight: root.setting("islandHomeCompactTight")
+        homeStatusContent: SettingsData.islandHomeStatusContent(root.barConfig)
         homeClockDisplay: SettingsData.islandClockDisplay(root.barConfig)
         homeVolumeDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeVolumeDisplay")
         homeBrightnessDisplay: SettingsData.islandLevelDisplay(root.barConfig, "islandHomeBrightnessDisplay")

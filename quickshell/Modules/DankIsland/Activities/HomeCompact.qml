@@ -127,6 +127,61 @@ Item {
         DisplayService.setBrightness(next, root.brightnessDevice.id, true);
     }
 
+    function connectivityIconName(type) {
+        if (type === "wifi") {
+            if (!NetworkService.wifiAvailable || !NetworkService.networkAvailable)
+                return "wifi_off";
+            if (NetworkService.wifiToggling)
+                return "sync";
+            if (!NetworkService.wifiEnabled)
+                return "wifi_off";
+            return NetworkService.wifiSignalIcon;
+        }
+
+        if (!BluetoothService.available)
+            return "bluetooth_disabled";
+        return BluetoothService.connected ? "bluetooth_connected" : "bluetooth";
+    }
+
+    function connectivityIconColor(type) {
+        if (type === "wifi") {
+            if (!NetworkService.wifiAvailable || !NetworkService.networkAvailable)
+                return Theme.surfaceTextMedium;
+            if (NetworkService.wifiToggling || NetworkService.isWifiConnecting || NetworkService.wifiConnected)
+                return Theme.primary;
+            if (!NetworkService.wifiEnabled)
+                return Theme.surfaceTextMedium;
+            return Theme.surfaceText;
+        }
+
+        if (!BluetoothService.available || !BluetoothService.enabled)
+            return Theme.surfaceTextMedium;
+        return (BluetoothService.connected || BluetoothService.connecting) ? Theme.primary : Theme.surfaceText;
+    }
+
+    function connectivityIconOpacity(type) {
+        if (type === "wifi")
+            return NetworkService.wifiAvailable && NetworkService.networkAvailable && (NetworkService.wifiEnabled || NetworkService.wifiToggling) ? 1 : 0.5;
+        return BluetoothService.available && BluetoothService.enabled ? 1 : 0.5;
+    }
+
+    function connectivityBusy(type) {
+        return type === "wifi" ? (NetworkService.wifiToggling || NetworkService.isWifiConnecting) : BluetoothService.connecting;
+    }
+
+    function toggleConnectivity(type) {
+        if (type === "wifi") {
+            if (!NetworkService.wifiAvailable || !NetworkService.networkAvailable || NetworkService.wifiToggling || NetworkService.isWifiConnecting)
+                return;
+            NetworkService.toggleWifiRadio();
+            return;
+        }
+
+        if (!BluetoothService.available || BluetoothService.connecting)
+            return;
+        BluetoothService.toggleBluetooth();
+    }
+
     function syncWeatherRef(wanted) {
         if (wanted === weatherRefHeld)
             return;
@@ -197,7 +252,8 @@ Item {
         readonly property bool isNotifications: item.groupId === "notifications"
         readonly property bool isVolume: item.groupId === "volume"
         readonly property bool isBrightness: item.groupId === "brightness"
-        readonly property bool usesBattery: item.isStatus && BatteryService.batteryAvailable
+        readonly property bool usesConnectivity: item.isStatus && root.controller.homeStatusContent === "connectivity"
+        readonly property bool usesBattery: item.isStatus && !item.usesConnectivity && BatteryService.batteryAvailable
 
         width: {
             if (item.isMedia)
@@ -209,7 +265,7 @@ Item {
             if (item.isVolume || item.isBrightness)
                 return systemLevelRow.implicitWidth;
             if (item.isStatus)
-                return item.usesBattery ? batteryMeter.width : root.iconSize;
+                return item.usesConnectivity ? connectivityRow.implicitWidth : (item.usesBattery ? batteryMeter.width : root.iconSize);
             return clockRow.implicitWidth;
         }
         height: root.slotSize
@@ -357,9 +413,57 @@ Item {
             levelColors: (root.controller.barConfig?.batteryColorMode ?? "theme") === "level"
         }
 
+        Row {
+            id: connectivityRow
+
+            anchors.centerIn: parent
+            visible: item.usesConnectivity
+            spacing: Theme.spacingXXS
+
+            Item {
+                width: root.iconSize
+                height: root.iconSize
+
+                DankIcon {
+                    id: wifiIcon
+
+                    anchors.centerIn: parent
+                    name: root.connectivityIconName("wifi")
+                    size: root.statusIconSize
+                    color: root.connectivityIconColor("wifi")
+                    opacity: root.connectivityIconOpacity("wifi")
+
+                    DankBlink {
+                        target: wifiIcon
+                        running: item.usesConnectivity && root.connectivityBusy("wifi")
+                    }
+                }
+            }
+
+            Item {
+                width: root.iconSize
+                height: root.iconSize
+
+                DankIcon {
+                    id: bluetoothIcon
+
+                    anchors.centerIn: parent
+                    name: root.connectivityIconName("bluetooth")
+                    size: root.statusIconSize
+                    color: root.connectivityIconColor("bluetooth")
+                    opacity: root.connectivityIconOpacity("bluetooth")
+
+                    DankBlink {
+                        target: bluetoothIcon
+                        running: item.usesConnectivity && root.connectivityBusy("bluetooth")
+                    }
+                }
+            }
+        }
+
         DankIcon {
             anchors.centerIn: parent
-            visible: item.isStatus && !item.usesBattery
+            visible: item.isStatus && !item.usesBattery && !item.usesConnectivity
             name: "tune"
             size: root.iconSize
             color: Theme.surfaceText
@@ -375,7 +479,16 @@ Item {
             enabled: !item.isClock
             controller: root.controller
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-            onClicked: (event) => {
+            onClicked: event => {
+                if (item.usesConnectivity) {
+                    const type = event.x < item.leadPad + item.width / 2 ? "wifi" : "bluetooth";
+                    if (event.button === Qt.MiddleButton) {
+                        root.toggleConnectivity(type);
+                        return;
+                    }
+                    root.controller.requestControlCenter("", false);
+                    return;
+                }
                 if (event.button === Qt.MiddleButton) {
                     if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
                         MprisController.activePlayer.togglePlaying();
@@ -385,7 +498,7 @@ Item {
                     }
                     return;
                 }
-                root.activateGroup(item.groupId)
+                root.activateGroup(item.groupId);
             }
             onWheel: wheel => {
                 if (!item.isVolume && !item.isBrightness)
@@ -412,7 +525,8 @@ Item {
         readonly property bool isNotifications: item.groupId === "notifications"
         readonly property bool isVolume: item.groupId === "volume"
         readonly property bool isBrightness: item.groupId === "brightness"
-        readonly property bool usesBattery: item.isStatus && BatteryService.batteryAvailable
+        readonly property bool usesConnectivity: item.isStatus && root.controller.homeStatusContent === "connectivity"
+        readonly property bool usesBattery: item.isStatus && !item.usesConnectivity && BatteryService.batteryAvailable
 
         width: root.width
         height: stack.implicitHeight
@@ -562,9 +676,55 @@ Item {
                 levelColors: (root.controller.barConfig?.batteryColorMode ?? "theme") === "level"
             }
 
+            Column {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: item.usesConnectivity
+                spacing: Theme.spacingXXS
+
+                Item {
+                    width: root.iconSize
+                    height: root.iconSize
+
+                    DankIcon {
+                        id: verticalWifiIcon
+
+                        anchors.centerIn: parent
+                        name: root.connectivityIconName("wifi")
+                        size: root.statusIconSize
+                        color: root.connectivityIconColor("wifi")
+                        opacity: root.connectivityIconOpacity("wifi")
+
+                        DankBlink {
+                            target: verticalWifiIcon
+                            running: item.usesConnectivity && root.connectivityBusy("wifi")
+                        }
+                    }
+                }
+
+                Item {
+                    width: root.iconSize
+                    height: root.iconSize
+
+                    DankIcon {
+                        id: verticalBluetoothIcon
+
+                        anchors.centerIn: parent
+                        name: root.connectivityIconName("bluetooth")
+                        size: root.statusIconSize
+                        color: root.connectivityIconColor("bluetooth")
+                        opacity: root.connectivityIconOpacity("bluetooth")
+
+                        DankBlink {
+                            target: verticalBluetoothIcon
+                            running: item.usesConnectivity && root.connectivityBusy("bluetooth")
+                        }
+                    }
+                }
+            }
+
             DankIcon {
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isStatus && !item.usesBattery
+                visible: item.isStatus && !item.usesBattery && !item.usesConnectivity
                 name: "tune"
                 size: root.iconSize
                 color: Theme.surfaceText
@@ -581,7 +741,16 @@ Item {
             enabled: !item.isClock
             controller: root.controller
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-            onClicked: (event) => {
+            onClicked: event => {
+                if (item.usesConnectivity) {
+                    const type = event.y < item.leadPad + item.height / 2 ? "wifi" : "bluetooth";
+                    if (event.button === Qt.MiddleButton) {
+                        root.toggleConnectivity(type);
+                        return;
+                    }
+                    root.controller.requestControlCenter("", false);
+                    return;
+                }
                 if (event.button === Qt.MiddleButton) {
                     if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
                         MprisController.activePlayer.togglePlaying();
@@ -591,7 +760,7 @@ Item {
                     }
                     return;
                 }
-                root.activateGroup(item.groupId)
+                root.activateGroup(item.groupId);
             }
             onWheel: wheel => {
                 if (!item.isVolume && !item.isBrightness)
