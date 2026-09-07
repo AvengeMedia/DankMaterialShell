@@ -33,6 +33,41 @@ Singleton {
     property var cellularDevices: []
     property var cellularConnections: []
 
+    readonly property var activeCellularDevice: {
+        const devices = cellularDevices || [];
+        for (const device of devices) {
+            if (device.connected) {
+                return device;
+            }
+        }
+        return devices.length > 0 ? devices[0] : null;
+    }
+    readonly property int cellularSignalStrength: activeCellularDevice?.signalQuality ?? 0
+    readonly property string cellularAccessTech: activeCellularDevice?.accessTech ?? ""
+    readonly property bool cellularAvailable: (cellularDevices?.length ?? 0) > 0
+    readonly property string cellularSignalIcon: {
+        if (!cellularAvailable || !cellularEnabled || !cellularHardwareEnabled) {
+            return "signal_cellular_off";
+        }
+        // Daemons older than the ModemManager metrics don't send signalQuality.
+        if (activeCellularDevice.signalQuality === undefined) {
+            return "network_cell";
+        }
+        if (cellularSignalStrength >= 80) {
+            return "signal_cellular_4_bar";
+        }
+        if (cellularSignalStrength >= 60) {
+            return "signal_cellular_3_bar";
+        }
+        if (cellularSignalStrength >= 40) {
+            return "signal_cellular_2_bar";
+        }
+        if (cellularSignalStrength >= 20) {
+            return "signal_cellular_1_bar";
+        }
+        return "signal_cellular_0_bar";
+    }
+
     property string wifiIP: ""
     property string wifiInterface: ""
     property bool wifiConnected: false

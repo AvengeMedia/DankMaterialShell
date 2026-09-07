@@ -30,6 +30,10 @@ Singleton {
     property string cellularConnectionUuid: activeService?.cellularConnectionUuid ?? ""
     property var cellularDevices: activeService?.cellularDevices ?? []
     property var cellularConnections: activeService?.cellularConnections ?? []
+    property bool cellularAvailable: activeService?.cellularAvailable ?? false
+    property int cellularSignalStrength: activeService?.cellularSignalStrength ?? 0
+    property string cellularAccessTech: activeService?.cellularAccessTech ?? ""
+    property string cellularSignalIcon: activeService?.cellularSignalIcon ?? "signal_cellular_off"
 
     property string wifiIP: activeService?.wifiIP ?? ""
     property string wifiInterface: activeService?.wifiInterface ?? ""
