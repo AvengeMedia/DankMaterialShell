@@ -821,24 +821,15 @@ Item {
             }
 
             if (isCategoryFiltered) {
-                var categoryPluginId = AppSearchService.getPluginIdForCategory(appCategory);
-                if (categoryPluginId) {
-                    var pluginCategoryItems = getPluginItems(categoryPluginId, "");
-                    for (var i = 0; i < pluginCategoryItems.length; i++) {
-                        allItems.push(pluginCategoryItems[i]);
-                    }
-                } else {
-                    var rawApps = AppSearchService.getAppsInCategory(appCategory);
-                    for (var i = 0; i < rawApps.length; i++) {
-                        allItems.push(getOrTransformApp(rawApps[i]));
-                    }
-                    // Also include core apps (DMS Settings etc.) that match this category
-                    var allCoreApps = AppSearchService.getCoreApps("");
-                    for (var i = 0; i < allCoreApps.length; i++) {
-                        var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
-                        if (coreAppCats.indexOf(appCategory) !== -1)
-                            allItems.push(transformCoreApp(allCoreApps[i]));
-                    }
+                var rawApps = AppSearchService.getAppsInCategory(appCategory);
+                for (var i = 0; i < rawApps.length; i++) {
+                    allItems.push(getOrTransformApp(rawApps[i]));
+                }
+                var allCoreApps = AppSearchService.getCoreApps("");
+                for (var i = 0; i < allCoreApps.length; i++) {
+                    var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
+                    if (coreAppCats.indexOf(appCategory) !== -1)
+                        allItems.push(transformCoreApp(allCoreApps[i]));
                 }
             } else {
                 var apps = searchApps(searchQuery);
