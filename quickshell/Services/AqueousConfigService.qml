@@ -94,6 +94,51 @@ Singleton {
         });
     }
 
+    function buildOutputsConfig(snapshot, outputs, original) {
+        if (!snapshot.capabilities?.includes("monitor_modes"))
+            throw new Error("unsupported: monitor_modes");
+        const raw = (snapshot.raw_files?.outputs || "") + "\n" + (snapshot.raw_files?.wm || "");
+        if (/^\s*edid\s*=/m.test(raw))
+            throw new Error("unsupported: this aqueous-config version does not expose EDID monitor edits");
+        const transforms = ["normal", "90", "180", "270", "flipped", "flipped-90", "flipped-180", "flipped-270"];
+        const changes = [];
+        if ((snapshot.monitors || []).some(m => /[*?\[]/.test(m.name)))
+            throw new Error("unsupported: reconcile wildcard monitor configuration before persisting displays");
+        for (const output of outputs) {
+            const before = original.find(o => o.name === output.name);
+            if (!before)
+                throw new Error("conflict: output changed during preview");
+            if (output.enabled !== before.enabled)
+                throw new Error("unsupported: this aqueous-config version cannot persist output enablement");
+            if (output.adaptiveSync !== before.adaptiveSync)
+                throw new Error("unsupported: this aqueous-config version cannot persist adaptive sync");
+            if (!output.enabled)
+                continue;
+            const configured = (snapshot.monitors || []).filter(m => m.name === output.name);
+            if (configured.length > 1)
+                throw new Error("conflict: multiple configured monitor entries");
+            const monitor = configured[0];
+            if (Math.abs(output.scale - (monitor?.scale ?? 1)) > 0.0001)
+                throw new Error("unsupported: this aqueous-config version cannot persist output scale");
+            const mode = output.currentMode;
+            if (!mode)
+                throw new Error("unavailable: output mode");
+            changes.push({
+                id: monitor?.id || "live:" + output.name,
+                name: output.name,
+                x: output.x,
+                y: output.y,
+                transform: transforms[output.transform],
+                mode: mode.width + "x" + mode.height + "@" + (mode.refresh / 1000)
+            });
+        }
+        return {
+            expected_generation: snapshot.generation,
+            monitor_changes: changes,
+            create_user_override: true
+        };
+    }
+
     function load(callback) {
         request("snapshot", null, callback);
     }

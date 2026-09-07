@@ -9,7 +9,6 @@ import qs.Common
 import qs.Services
 import "../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
 import "../Common/KeybindActions.js" as Actions
-import "../Common/AqueousKeybinds.js" as AqueousKeybinds
 
 Singleton {
     id: root
@@ -431,7 +430,7 @@ Singleton {
             try {
                 if (error)
                     throw new Error(error);
-                AqueousKeybinds.inventory(snapshot);
+                bindInventory(snapshot);
             } catch (e) {
                 log.warn("Failed to read Aqueous keybindings:", e);
                 callback(null, AqueousService.errorMessage(String(e)));
@@ -441,18 +440,78 @@ Singleton {
         });
     }
 
+    function bindInventory(snapshot) {
+        if (snapshot?.provider !== "aqueous" || typeof snapshot.generation !== "string" || !snapshot.generation || !snapshot.binds || Array.isArray(snapshot.binds))
+            throw new Error("invalid Aqueous keybind snapshot");
+        if (!Array.isArray(snapshot.binds.Compositor) || !Array.isArray(snapshot.binds.Custom))
+            throw new Error("missing Aqueous keybind inventory");
+        return Object.keys(snapshot.binds).sort().map(category => {
+            if (!Array.isArray(snapshot.binds[category]))
+                throw new Error("invalid Aqueous keybind category");
+            return [category, snapshot.binds[category].map(bind => {
+                    if (typeof bind.key !== "string" || typeof bind.action !== "string")
+                        throw new Error("invalid Aqueous binding");
+                    return [bind.key, bind.action, bind.source || ""];
+                })];
+        });
+    }
+
+    function bindInventoryChanges(baseline, current) {
+        const flatten = snapshot => bindInventory(snapshot).reduce((all, group) => all.concat(group[1].map(bind => [group[0], bind])), []);
+        const before = flatten(baseline);
+        const after = flatten(current);
+        const differences = [];
+        for (let i = 0; i < Math.max(before.length, after.length); i++) {
+            if (JSON.stringify(before[i]) === JSON.stringify(after[i]))
+                continue;
+            differences.push({
+                before: before[i]?.[1] || null,
+                after: after[i]?.[1] || null
+            });
+        }
+        return differences;
+    }
+
+    function bindingsForKey(snapshot, key) {
+        if (!key)
+            return [];
+        bindInventory(snapshot);
+        return Object.values(snapshot.binds).reduce((matches, category) => matches.concat(category.filter(bind => bind.key === key)), []);
+    }
+
+    function bindEditIssue(draft, current, reviewing) {
+        bindInventory(current);
+        if (!["set", "remove", "reset"].includes(draft.operation))
+            return "invalid_binding";
+        const original = bindingsForKey(current, draft.originalKey);
+        if (draft.originalKey && original.length !== 1)
+            return original.length ? "ambiguous_target" : "target_removed";
+        if (!reviewing && draft.originalKey && original[0].action !== draft.originalAction)
+            return "target_changed";
+        if (draft.operation !== "set")
+            return draft.originalKey ? "" : "target_removed";
+        const data = draft.data;
+        if (!data?.key || !data.action)
+            return "invalid_binding";
+        if (data.key !== draft.originalKey && bindingsForKey(current, data.key).length)
+            return "destination_occupied";
+        if (!data.action.startsWith("spawn ") && !current.binds.Compositor.some(bind => bind.action === data.action))
+            return "invalid_action";
+        return "";
+    }
+
     function captureBindEdit(binding, key) {
         if (!requiresBindReview)
             return null;
-        AqueousKeybinds.inventory(_rawData);
+        bindInventory(_rawData);
         if (!bindEditSession)
             throw new Error(I18n.tr("Unavailable"));
         return {
             provider: currentProvider,
             session: bindEditSession,
             action: binding.action || "",
-            binding: AqueousKeybinds.copy(binding),
-            baseline: AqueousKeybinds.copy(_rawData),
+            binding: JSON.parse(JSON.stringify(binding)),
+            baseline: JSON.parse(JSON.stringify(_rawData)),
             originalKey: key || "",
             originalAction: binding.action || "",
             operation: "set",
@@ -465,12 +524,12 @@ Singleton {
     }
 
     function updateBindEdit(draft, key, data, operation) {
-        const originals = AqueousKeybinds.bindings(draft.baseline, key);
+        const originals = bindingsForKey(draft.baseline, key);
         return Object.assign({}, draft, {
             operation: operation || draft.operation,
             originalKey: key,
             originalAction: originals.length ? originals[0].action : "",
-            data: AqueousKeybinds.copy(data || draft.data)
+            data: JSON.parse(JSON.stringify(data || draft.data))
         });
     }
 
@@ -483,15 +542,15 @@ Singleton {
     }
 
     function reconcileBindEdit(draft, snapshot) {
-        const issue = AqueousKeybinds.issue(draft, snapshot, true);
+        const issue = bindEditIssue(draft, snapshot, true);
         if (issue)
             return {
                 code: issue
             };
-        const originals = AqueousKeybinds.bindings(snapshot, draft.originalKey);
+        const originals = bindingsForKey(snapshot, draft.originalKey);
         return {
             draft: Object.assign({}, draft, {
-                baseline: AqueousKeybinds.copy(snapshot),
+                baseline: JSON.parse(JSON.stringify(snapshot)),
                 originalAction: originals.length ? originals[0].action : ""
             })
         };
@@ -524,7 +583,7 @@ Singleton {
         if (!draft || !current)
             return "";
         const describe = (snapshot, key) => {
-            const matches = AqueousKeybinds.bindings(snapshot, key);
+            const matches = bindingsForKey(snapshot, key);
             return matches.length ? matches.map(bind => bind.key + " → " + bind.action).join("\n") : I18n.tr("None");
         };
         const original = describe(draft.baseline, draft.originalKey);
@@ -532,7 +591,7 @@ Singleton {
         const proposed = draft.operation === "set" ? draft.data.key + " → " + draft.data.action : I18n.tr("Remove");
         const destination = draft.operation === "set" ? describe(current, draft.data.key) : I18n.tr("None");
         const describeChange = bind => bind ? (bind[0] || I18n.tr("Not bound")) + " → " + bind[1] : I18n.tr("None");
-        const changes = AqueousKeybinds.changes(draft.baseline, current).map(change => I18n.tr("Previous: %1\nCurrent: %2", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings").arg(describeChange(change.before)).arg(describeChange(change.after))).join("\n\n");
+        const changes = bindInventoryChanges(draft.baseline, current).map(change => I18n.tr("Previous: %1\nCurrent: %2", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings").arg(describeChange(change.before)).arg(describeChange(change.after))).join("\n\n");
         return I18n.tr("Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings").arg(original).arg(currentBind).arg(proposed).arg(destination) + (changes ? "\n\n" + changes : "");
     }
 
@@ -551,7 +610,7 @@ Singleton {
             });
             return;
         }
-        const edit = AqueousKeybinds.copy(draft);
+        const edit = JSON.parse(JSON.stringify(draft));
         const request = ++_aqueousRequest;
         aqueousBusy = true;
         const complete = result => {
@@ -576,7 +635,7 @@ Singleton {
                 return;
             }
             try {
-                if (!AqueousKeybinds.unchanged(edit.baseline, snapshot)) {
+                if (JSON.stringify(bindInventory(edit.baseline)) !== JSON.stringify(bindInventory(snapshot))) {
                     complete({
                         success: false,
                         code: "external_change",
@@ -584,7 +643,7 @@ Singleton {
                     });
                     return;
                 }
-                const issue = AqueousKeybinds.issue(edit, snapshot, false);
+                const issue = bindEditIssue(edit, snapshot, false);
                 if (issue) {
                     complete({
                         success: false,
@@ -601,7 +660,14 @@ Singleton {
                 });
                 return;
             }
-            AqueousService.runJson(AqueousKeybinds.argumentsFor(edit, snapshot.generation), null, (result, error) => {
+            const args = ["dms", "keybinds", edit.operation, currentProvider, edit.operation === "set" ? edit.data.key : edit.originalKey];
+            if (edit.operation === "set") {
+                args.push(edit.data.action);
+                if (edit.originalKey && edit.originalKey !== edit.data.key)
+                    args.push("--replace-key", edit.originalKey);
+            }
+            args.push("--expected-generation", snapshot.generation, "--json");
+            AqueousService.runJson(args, null, (result, error) => {
                 if (request !== root._aqueousRequest)
                     return;
                 if (error || result?.success !== true || !result.generation) {

@@ -8,7 +8,6 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "../../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
-import "../../../Common/AqueousDisplays.js" as AqueousDisplays
 
 Singleton {
     id: root
@@ -45,6 +44,49 @@ Singleton {
     property var _cancelOutputWrite: null
     property var aqueousPreview: null
 
+    function outputFingerprint(outputs) {
+        return JSON.stringify(outputs.map(o => ({
+                    name: o.name,
+                    id: o.id,
+                    enabled: o.enabled,
+                    x: o.x,
+                    y: o.y,
+                    scale: o.scale,
+                    transform: o.transform,
+                    mode: o.currentMode ? [o.currentMode.width, o.currentMode.height, o.currentMode.refresh] : null,
+                    adaptiveSync: o.adaptiveSync
+                })).sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    function outputHeads(outputs) {
+        return outputs.map(o => ({
+                    name: o.name,
+                    enabled: o.enabled,
+                    modeId: o.currentMode?.id,
+                    position: {
+                        x: o.x,
+                        y: o.y
+                    },
+                    scale: o.scale,
+                    transform: o.transform,
+                    adaptiveSync: o.adaptiveSync
+                }));
+    }
+
+    function outputHeadsMatch(candidate, actual, original) {
+        if (candidate.length !== actual.length || original.length !== actual.length || original.some(o => !actual.some(a => a.id === o.id && a.name === o.name)))
+            return false;
+        return candidate.every(h => {
+            const output = actual.find(o => o.name === h.name);
+            if (!output || output.enabled !== h.enabled)
+                return false;
+            if (!h.enabled)
+                return true;
+            const mode = h.customMode || original.find(o => o.name === h.name)?.modes?.find(m => m.id === h.modeId);
+            return output.x === h.position.x && output.y === h.position.y && Math.abs(output.scale - h.scale) < 0.0001 && output.transform === h.transform && (h.adaptiveSync === undefined || output.adaptiveSync === h.adaptiveSync) && !!mode && output.currentMode?.width === mode.width && output.currentMode?.height === mode.height && output.currentMode?.refresh === mode.refresh;
+        });
+    }
+
     function freshAqueousOutputs(callback) {
         DMSService.sendRequest("wlroutput.getState", null, response => {
             callback(response.result?.outputs || null, response.error || "");
@@ -61,6 +103,7 @@ Singleton {
         if (validatingConfig)
             return;
         aqueousPreview = null;
+        restoreDisplayNameMode();
         validationError = "";
         clearPendingChanges();
         WlrOutputService.requestState();
@@ -124,13 +167,13 @@ Singleton {
         freshAqueousOutputs((actual, error) => {
             if (aqueousPreview !== preview)
                 return;
-            if (!actual || AqueousService.session !== preview.session || !AqueousDisplays.matches(preview.heads, actual, preview.original)) {
-                if (actual && AqueousDisplays.fingerprint(actual) === AqueousDisplays.fingerprint(preview.original))
+            if (!actual || AqueousService.session !== preview.session || !outputHeadsMatch(preview.heads, actual, preview.original)) {
+                if (actual && outputFingerprint(actual) === outputFingerprint(preview.original))
                     aqueousPreview = null;
                 aqueousDisplayError(error || applyError || "conflict: display preview changed externally");
                 return;
             }
-            preview.fingerprint = AqueousDisplays.fingerprint(actual);
+            preview.fingerprint = outputFingerprint(actual);
             validatingConfig = false;
             validationError = applyError ? AqueousService.errorMessage(applyError) : "";
             changesApplied(descriptions);
@@ -143,14 +186,14 @@ Singleton {
         const preview = aqueousPreview;
         validatingConfig = true;
         freshAqueousOutputs((actual, error) => {
-            if (!actual || AqueousService.session !== preview.session || AqueousDisplays.fingerprint(actual) !== preview.fingerprint) {
+            if (!actual || AqueousService.session !== preview.session || outputFingerprint(actual) !== preview.fingerprint) {
                 aqueousDisplayError(error || "conflict: output configuration changed after preview");
                 return;
             }
             if (keep) {
                 let draft;
                 try {
-                    draft = AqueousDisplays.request(preview.snapshot, actual, preview.original);
+                    draft = AqueousConfigService.buildOutputsConfig(preview.snapshot, actual, preview.original);
                 } catch (e) {
                     aqueousDisplayError(String(e));
                     return;
@@ -161,10 +204,12 @@ Singleton {
                         return;
                     }
                     aqueousPreview = null;
+                    if (formatChanged)
+                        SettingsData.saveSettings();
                     clearPendingChanges();
                     freshAqueousOutputs((live, error) => {
                         validatingConfig = false;
-                        if (!live || AqueousService.session !== preview.session || AqueousDisplays.fingerprint(live) !== preview.fingerprint) {
+                        if (!live || AqueousService.session !== preview.session || outputFingerprint(live) !== preview.fingerprint) {
                             aqueousDisplayError("conflict: configuration saved but live display state changed");
                             return;
                         }
@@ -173,13 +218,14 @@ Singleton {
                 });
                 return;
             }
-            WlrOutputService.applyConfiguration(AqueousDisplays.heads(preview.original), (success, message) => {
+            WlrOutputService.applyConfiguration(outputHeads(preview.original), (success, message) => {
                 if (!success) {
                     aqueousDisplayError(message);
                     return;
                 }
                 validatingConfig = false;
                 aqueousPreview = null;
+                restoreDisplayNameMode();
                 clearPendingChanges();
                 WlrOutputService.requestState();
                 changesReverted();
@@ -2302,11 +2348,15 @@ Singleton {
         originalDisplayNameMode = "";
     }
 
+    function restoreDisplayNameMode() {
+        if (originalDisplayNameMode === "")
+            return;
+        SettingsData.displayNameMode = originalDisplayNameMode;
+        SettingsData.saveSettings();
+    }
+
     function discardChanges() {
-        if (originalDisplayNameMode !== "") {
-            SettingsData.displayNameMode = originalDisplayNameMode;
-            SettingsData.saveSettings();
-        }
+        restoreDisplayNameMode();
         backendFetchOutputs();
         clearPendingChanges();
     }
@@ -2557,10 +2607,7 @@ Singleton {
         const hadNiriChanges = originalNiriSettings !== null;
         const hadHyprlandChanges = originalHyprlandSettings !== null;
 
-        if (hadFormatChange) {
-            SettingsData.displayNameMode = originalDisplayNameMode;
-            SettingsData.saveSettings();
-        }
+        restoreDisplayNameMode();
 
         if (hadNiriChanges) {
             SessionData.niriOutputSettings = JSON.parse(JSON.stringify(originalNiriSettings));

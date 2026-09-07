@@ -23,6 +23,8 @@ Singleton {
     readonly property bool validSocketPath: Ipc.socketPath(socketPath, runtimePath)
     property bool watching: false
     property bool recovering: false
+    property bool reconnecting: false
+    property int reconnectAttempt: 0
     property var commandQueue: []
     property var currentCommand: null
     readonly property bool commandPending: currentCommand !== null
@@ -65,12 +67,8 @@ Singleton {
         return workspaces.filter(w => w.output === id).sort((a, b) => a.number - b.number);
     }
 
-    function byteLength(text) {
-        return encodeURIComponent(text).replace(/%[0-9A-F]{2}/g, "x").length;
-    }
-
     function parseJson(text) {
-        if (byteLength(text) > maxBatchBytes + (text.endsWith("\n") ? 1 : 0))
+        if (Ipc.byteLength(text) > maxBatchBytes + (text.endsWith("\n") ? 1 : 0))
             throw new Error("JSON exceeds 4 MiB");
         return JSON.parse(text);
     }
@@ -140,7 +138,7 @@ Singleton {
             if (seen.has(key))
                 throw new Error("duplicate entity key");
             seen.add(key);
-            const size = byteLength(JSON.stringify(key) + ":" + JSON.stringify(entity)) + 1;
+            const size = Ipc.byteLength(JSON.stringify(key) + ":" + JSON.stringify(entity)) + 1;
             modelBytes += size - (entityBytes[key] || 0);
             entityBytes[key] = size;
             model[key] = entity;
@@ -206,6 +204,7 @@ Singleton {
         if (batch.session !== capabilities.session)
             throw new Error("shell session changed after discovery");
         const next = reduceBatch(state.available ? state.batch : null, batch);
+        reconnectAttempt = 0;
         state = {
             available: true,
             batch: next
@@ -226,7 +225,7 @@ Singleton {
         if (!capabilities[capability])
             throw new Error("unsupported: " + capability);
         for (const key of ["id", "seat", "group", "output", "workspace", "name"]) {
-            if (request[key] !== undefined && (typeof request[key] !== "string" || byteLength(request[key]) > 1024))
+            if (request[key] !== undefined && (typeof request[key] !== "string" || Ipc.byteLength(request[key]) > 1024))
                 throw new Error("invalid: command string");
         }
         const target = entities.find(e => e.kind === kind && e.id === request.id);
@@ -445,7 +444,7 @@ Singleton {
             callback(null, "unavailable");
             return;
         }
-        if (input !== null && byteLength(input) > maxBatchBytes) {
+        if (input !== null && Ipc.byteLength(input) > maxBatchBytes) {
             callback(null, "request exceeds 4 MiB");
             return;
         }
@@ -504,8 +503,12 @@ Singleton {
             error: error
         };
         discoveredCapabilities = ({});
-        requestConnection.reconnect();
-        eventConnection.reconnect();
+        reconnecting = true;
+        requestConnection.clear();
+        eventConnection.clear();
+        const delay = Math.min(400 * Math.pow(2, Math.min(reconnectAttempt++, 6)), 15000);
+        reconnectTimer.interval = delay + Math.floor(Math.random() * delay / 4);
+        reconnectTimer.restart();
         failCommands(error);
         recovering = false;
     }
@@ -514,6 +517,11 @@ Singleton {
         recovering = true;
         lifecycle++;
         watching = false;
+        reconnectTimer.stop();
+        reconnecting = false;
+        reconnectAttempt = 0;
+        requestConnection.clear();
+        eventConnection.clear();
         state = ({});
         discoveredCapabilities = ({});
         failCommands("backend changed or shell stopped");
@@ -529,19 +537,19 @@ Singleton {
     Component.onCompleted: startWatching()
     Component.onDestruction: stopWatching()
 
-    AqueousConnection {
+    IpcConnection {
         id: requestConnection
         path: root.socketPath
-        connected: root.watching
+        connected: root.watching && !root.reconnecting
         onHelloReceived: root.handshakesReady()
         onReply: (result, error) => root.completeCommand(result, error)
         onFailed: error => root.disconnected(error)
     }
 
-    AqueousConnection {
+    IpcConnection {
         id: eventConnection
         path: root.socketPath
-        connected: root.watching
+        connected: root.watching && !root.reconnecting
         events: true
         onHelloReceived: root.handshakesReady()
         onBatchReceived: batch => {
@@ -552,6 +560,173 @@ Singleton {
             }
         }
         onFailed: error => root.disconnected(error)
+    }
+
+    Timer {
+        id: reconnectTimer
+        onTriggered: root.reconnecting = false
+    }
+
+    component IpcConnection: DankSocket {
+        id: connection
+        property bool events: false
+        property var handshake: null
+        property var pending: null
+        property string lastId: "0"
+        property bool subscribed: false
+        property bool installed: false
+        property string lastDelivery: ""
+        property var frameParser: null
+        readonly property bool ready: linkUp && handshake !== null
+
+        signal helloReceived
+        signal batchReceived(var batch)
+        signal reply(var result, string error)
+        signal failed(string error)
+
+        function clear() {
+            const previousParser = frameParser;
+            frameParser = null;
+            if (previousParser)
+                previousParser.destroy();
+            deadline.stop();
+            initialDeadline.stop();
+            pending = null;
+            handshake = null;
+            subscribed = false;
+            installed = false;
+            lastId = "0";
+            lastDelivery = "";
+        }
+
+        function fail(error) {
+            if (connected && !root.recovering)
+                failed(error);
+        }
+
+        function request(op, params) {
+            if (!linkUp || pending || (op !== "hello" && !handshake))
+                throw new Error("unavailable: IPC connection");
+            const id = Ipc.nextId(lastId);
+            const message = {
+                ipc: 1,
+                id: id,
+                op: op,
+                params: params
+            };
+            if (op !== "hello")
+                message.session = handshake.session;
+            const text = JSON.stringify(message);
+            if (Ipc.byteLength(text) > (handshake?.max_request_bytes || 65536))
+                throw new Error("invalid: IPC request exceeds size bound");
+            lastId = id;
+            pending = {
+                id: id,
+                op: op,
+                params: params
+            };
+            deadline.restart();
+            send(text);
+        }
+
+        function receive(line) {
+            try {
+                const value = Ipc.envelope(line, handshake?.max_frame_bytes || 4259840);
+                if (value.event !== undefined) {
+                    if (!events || !subscribed || pending || value.event !== "state" || !Ipc.decimal(value.delivery) || value.delivery === lastDelivery || value.id !== undefined || value.ok !== undefined || !Ipc.object(value.batch))
+                        throw new Error("unexpected IPC state event");
+                    if (!installed && value.batch.type !== "snapshot")
+                        throw new Error("missing initial snapshot");
+                    if (value.batch.session !== handshake.session || Ipc.byteLength(JSON.stringify(value.batch)) > handshake.max_batch_bytes)
+                        throw new Error("invalid IPC batch identity or size");
+                    batchReceived(value.batch);
+                    if (!ready || root.recovering)
+                        return;
+                    installed = true;
+                    initialDeadline.stop();
+                    lastDelivery = value.delivery;
+                    request("ack", {
+                        delivery: value.delivery
+                    });
+                    return;
+                }
+                if (!pending)
+                    throw new Error("unsolicited IPC response");
+                const error = Ipc.response(value, pending.id);
+                const operation = pending;
+                pending = null;
+                deadline.stop();
+                if (operation.op === "command") {
+                    reply(value.result || null, error);
+                    return;
+                }
+                if (error)
+                    throw new Error(error);
+                switch (operation.op) {
+                case "hello":
+                    handshake = Ipc.hello(value.result);
+                    helloReceived();
+                    break;
+                case "subscribe":
+                    if (value.result.subscribed !== true)
+                        throw new Error("invalid subscription response");
+                    subscribed = true;
+                    break;
+                case "ack":
+                    if (value.result.acked !== operation.params.delivery)
+                        throw new Error("invalid ack response");
+                    break;
+                default:
+                    throw new Error("unexpected IPC operation");
+                }
+            } catch (e) {
+                fail(String(e));
+            }
+        }
+
+        function subscribe() {
+            initialDeadline.restart();
+            request("subscribe", {});
+        }
+
+        onConnectionStateChanged: {
+            clear();
+            if (root.recovering)
+                return;
+            if (!linkUp) {
+                fail("IPC stream disconnected");
+                return;
+            }
+            frameParser = parserComponent.createObject(connection);
+            try {
+                request("hello", {});
+            } catch (e) {
+                fail(String(e));
+            }
+        }
+        parser: frameParser
+
+        Component {
+            id: parserComponent
+            SplitParser {
+                id: lineParser
+                onRead: line => {
+                    if (connection.frameParser === lineParser)
+                        connection.receive(line);
+                }
+            }
+        }
+
+        Timer {
+            id: deadline
+            interval: 5000
+            onTriggered: connection.fail("IPC request timed out")
+        }
+        Timer {
+            id: initialDeadline
+            interval: 8000
+            onTriggered: connection.fail("IPC initial snapshot timed out")
+        }
     }
 
     function windowFacade(window) {

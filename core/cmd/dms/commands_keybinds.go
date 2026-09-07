@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,7 +47,7 @@ var keybindsSetCmd = &cobra.Command{
 	Short: "Set a keybind override",
 	Long:  "Create or update a keybind override for the specified provider",
 	Args:  cobra.ExactArgs(3),
-	Run:   runKeybindsSet,
+	Run:   runKeybindsEdit,
 }
 
 var keybindsRemoveCmd = &cobra.Command{
@@ -54,7 +55,7 @@ var keybindsRemoveCmd = &cobra.Command{
 	Short: "Remove a keybind",
 	Long:  "Remove a keybind. For Hyprland this writes a negative override to dms/binds-user.lua so the key stays unbound across DMS updates. For other providers it deletes the entry from the managed file.",
 	Args:  cobra.ExactArgs(2),
-	Run:   runKeybindsRemove,
+	Run:   runKeybindsEdit,
 }
 
 var keybindsResetCmd = &cobra.Command{
@@ -62,13 +63,13 @@ var keybindsResetCmd = &cobra.Command{
 	Short: "Reset a keybind override to its DMS default",
 	Long:  "Drop the user override for the given key so the DMS default re-applies. For providers without a separate default file (Niri, MangoWC) this is equivalent to remove.",
 	Args:  cobra.ExactArgs(2),
-	Run:   runKeybindsReset,
+	Run:   runKeybindsEdit,
 }
 
 func init() {
 	keybindsCmd.PersistentFlags().String("expected-generation", "", "Configuration generation observed when editing Aqueous bindings")
 	for _, command := range []*cobra.Command{keybindsSetCmd, keybindsRemoveCmd, keybindsResetCmd} {
-		command.Flags().Bool("json", false, "Return structured Aqueous mutation results, including errors")
+		command.Flags().Bool("json", false, "Return structured mutation results, including errors")
 	}
 	keybindsListCmd.Flags().BoolP("json", "j", false, "Output as JSON")
 	keybindsShowCmd.Flags().String("path", "", "Override config path for the provider")
@@ -213,97 +214,92 @@ func runKeybindsShow(cmd *cobra.Command, args []string) {
 	printCheatSheet(provider)
 }
 
-func getWritableProvider(name string) keybinds.WritableProvider {
-	provider, err := keybinds.GetDefaultRegistry().Get(name)
+func keybindEditFailure(err error) map[string]any {
+	code := "command_failed"
+	var helperError *providers.AqueousError
+	if errors.As(err, &helperError) {
+		code = helperError.Code
+	}
+	return map[string]any{"success": false, "code": code, "message": err.Error()}
+}
+
+func runKeybindsEdit(cmd *cobra.Command, args []string) {
+	result, err := editKeybind(cmd, args)
+	if err == nil {
+		_ = json.NewEncoder(cmd.OutOrStdout()).Encode(result)
+		return
+	}
+	structured, _ := cmd.Flags().GetBool("json")
+	if !structured {
+		log.Fatalf("Failed to save keybind: %v", err)
+		return
+	}
+	_ = json.NewEncoder(cmd.OutOrStdout()).Encode(keybindEditFailure(err))
+	os.Exit(1)
+}
+
+func editKeybind(cmd *cobra.Command, args []string) (map[string]any, error) {
+	provider, err := keybinds.GetDefaultRegistry().Get(args[0])
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		return nil, err
+	}
+	key := args[1]
+	if aqueous, ok := provider.(*providers.AqueousProvider); ok {
+		generation, _ := cmd.Flags().GetString("expected-generation")
+		edit := providers.AqueousBindEdit{Generation: generation, Key: key, Remove: cmd.Name() != "set"}
+		if !edit.Remove {
+			for _, flag := range []string{"desc", "allow-when-locked", "cooldown-ms", "no-repeat", "no-inhibiting", "flags"} {
+				if cmd.Flags().Changed(flag) {
+					return nil, fmt.Errorf("aqueous does not support --%s in this provider", flag)
+				}
+			}
+			edit.Action = args[2]
+			edit.OriginalKey, _ = cmd.Flags().GetString("replace-key")
+		}
+		result, err := aqueous.Edit(cmd.Context(), edit)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"success": true, "code": "applied", "generation": result.String("generation"), "key": key}, nil
 	}
 	writable, ok := provider.(keybinds.WritableProvider)
 	if !ok {
-		log.Fatalf("Provider %s does not support writing keybinds", name)
+		return nil, fmt.Errorf("provider %s does not support writing keybinds", args[0])
 	}
-	return writable
-}
-
-func runKeybindsSet(cmd *cobra.Command, args []string) {
-	if args[0] == "aqueous" {
-		runAqueousBindEdit(cmd, args, false)
-		return
+	result := map[string]any{"success": true, "key": key}
+	switch cmd.Name() {
+	case "set":
+		options := make(map[string]any)
+		if v, _ := cmd.Flags().GetBool("allow-when-locked"); v {
+			options["allow-when-locked"] = true
+		}
+		if v, _ := cmd.Flags().GetInt("cooldown-ms"); v > 0 {
+			options["cooldown-ms"] = v
+		}
+		if v, _ := cmd.Flags().GetBool("no-repeat"); v {
+			options["repeat"] = false
+		}
+		if v, _ := cmd.Flags().GetBool("no-inhibiting"); v {
+			options["allow-inhibiting"] = false
+		}
+		if v, _ := cmd.Flags().GetString("flags"); v != "" {
+			options["flags"] = v
+		}
+		if replaceKey, _ := cmd.Flags().GetString("replace-key"); replaceKey != "" && replaceKey != key {
+			_ = writable.RemoveBind(replaceKey)
+		}
+		desc, _ := cmd.Flags().GetString("desc")
+		err = writable.SetBind(key, args[2], desc, options)
+		result["action"] = args[2]
+		result["path"] = writable.GetOverridePath()
+	case "remove":
+		err = writable.RemoveBind(key)
+		result["removed"] = true
+	case "reset":
+		err = writable.ResetBind(key)
+		result["reset"] = true
+	default:
+		return nil, fmt.Errorf("unsupported keybind operation: %s", cmd.Name())
 	}
-	providerName, key, action := args[0], args[1], args[2]
-	writable := getWritableProvider(providerName)
-
-	if replaceKey, _ := cmd.Flags().GetString("replace-key"); replaceKey != "" && replaceKey != key {
-		_ = writable.RemoveBind(replaceKey)
-	}
-
-	options := make(map[string]any)
-	if v, _ := cmd.Flags().GetBool("allow-when-locked"); v {
-		options["allow-when-locked"] = true
-	}
-	if v, _ := cmd.Flags().GetInt("cooldown-ms"); v > 0 {
-		options["cooldown-ms"] = v
-	}
-	if v, _ := cmd.Flags().GetBool("no-repeat"); v {
-		options["repeat"] = false
-	}
-	if v, _ := cmd.Flags().GetBool("no-inhibiting"); v {
-		options["allow-inhibiting"] = false
-	}
-	if v, _ := cmd.Flags().GetString("flags"); v != "" {
-		options["flags"] = v
-	}
-
-	desc, _ := cmd.Flags().GetString("desc")
-	if err := writable.SetBind(key, action, desc, options); err != nil {
-		log.Fatalf("Error setting keybind: %v", err)
-	}
-
-	output, _ := json.MarshalIndent(map[string]any{
-		"success": true,
-		"key":     key,
-		"action":  action,
-		"path":    writable.GetOverridePath(),
-	}, "", "  ")
-	fmt.Fprintln(os.Stdout, string(output))
-}
-
-func runKeybindsRemove(cmd *cobra.Command, args []string) {
-	if args[0] == "aqueous" {
-		runAqueousBindEdit(cmd, args, true)
-		return
-	}
-	providerName, key := args[0], args[1]
-	writable := getWritableProvider(providerName)
-
-	if err := writable.RemoveBind(key); err != nil {
-		log.Fatalf("Error removing keybind: %v", err)
-	}
-
-	output, _ := json.MarshalIndent(map[string]any{
-		"success": true,
-		"key":     key,
-		"removed": true,
-	}, "", "  ")
-	fmt.Fprintln(os.Stdout, string(output))
-}
-
-func runKeybindsReset(cmd *cobra.Command, args []string) {
-	if args[0] == "aqueous" {
-		runAqueousBindEdit(cmd, args, true)
-		return
-	}
-	providerName, key := args[0], args[1]
-	writable := getWritableProvider(providerName)
-
-	if err := writable.ResetBind(key); err != nil {
-		log.Fatalf("Error resetting keybind: %v", err)
-	}
-
-	output, _ := json.MarshalIndent(map[string]any{
-		"success": true,
-		"key":     key,
-		"reset":   true,
-	}, "", "  ")
-	fmt.Fprintln(os.Stdout, string(output))
+	return result, err
 }

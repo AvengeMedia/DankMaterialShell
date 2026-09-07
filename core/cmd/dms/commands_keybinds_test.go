@@ -8,7 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds/providers"
 )
 
-func TestAqueousBindFailure(t *testing.T) {
+func TestKeybindEditFailure(t *testing.T) {
 	for _, tc := range []struct {
 		err  error
 		code string
@@ -17,7 +17,7 @@ func TestAqueousBindFailure(t *testing.T) {
 		{fmt.Errorf("helper: %w", &providers.AqueousError{Code: "read_only", Message: "denied"}), "read_only"},
 		{errors.New("transport failed"), "command_failed"},
 	} {
-		result := aqueousBindFailure(tc.err)
+		result := keybindEditFailure(tc.err)
 		if result["success"] != false || result["code"] != tc.code || result["message"] != tc.err.Error() {
 			t.Fatalf("unexpected failure result: %#v", result)
 		}
