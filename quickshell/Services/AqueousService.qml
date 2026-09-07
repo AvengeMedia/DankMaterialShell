@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/AqueousIpc.js" as Ipc
 
 Singleton {
     id: root
@@ -13,15 +14,20 @@ Singleton {
     property var state: ({})
     property string seatName: ""
     readonly property bool enabled: CompositorService.isAqueous
-    readonly property bool available: enabled && state.available === true
+    readonly property bool available: enabled && requestConnection.ready && eventConnection.ready && state.available === true
     property var discoveredCapabilities: ({})
-    property var watchProcess: null
     property var pendingProcesses: []
     property int lifecycle: 0
-    property bool discovering: false
-    property bool commandPending: false
-    property int retryDelay: 500
+    readonly property string socketPath: Quickshell.env("AQUEOUS_SOCKET")
+    readonly property string runtimePath: Quickshell.env("XDG_RUNTIME_DIR")
+    readonly property bool validSocketPath: Ipc.socketPath(socketPath, runtimePath)
+    property bool watching: false
+    property bool recovering: false
+    property var commandQueue: []
+    property var currentCommand: null
+    readonly property bool commandPending: currentCommand !== null
     readonly property int maxBatchBytes: 4 * 1024 * 1024
+    readonly property int maxModelBytes: 2 * 1024 * 1024
     readonly property var capabilities: discoveredCapabilities
     readonly property string session: available ? state.batch.session : ""
     readonly property string sequence: available ? state.batch.sequence : ""
@@ -67,18 +73,6 @@ Singleton {
         if (byteLength(text) > maxBatchBytes + (text.endsWith("\n") ? 1 : 0))
             throw new Error("JSON exceeds 4 MiB");
         return JSON.parse(text);
-    }
-
-    function validateCapabilities(value) {
-        if (!value || value.schema !== 1 || typeof value.session !== "string" || !/^[0-9a-f]{32}$/.test(value.session) || !Number.isInteger(value.max_batch_bytes) || value.max_batch_bytes <= 0 || value.max_batch_bytes > maxBatchBytes)
-            throw new Error("unsupported: Aqueous shell capabilities");
-        for (const name of ["state", "commands", "keyboard", "overview", "shortcut_inhibition"]) {
-            if (typeof value[name] !== "boolean")
-                throw new Error("unsupported: missing capability " + name);
-        }
-        if (!value.state)
-            throw new Error("unsupported: shell state");
-        return value;
     }
 
     function validateEntity(entity) {
@@ -197,7 +191,7 @@ Singleton {
                     throw new Error("dangling " + entity.kind + "." + field);
             }
         }
-        if (modelBytes > maxBatchBytes)
+        if (modelBytes > maxModelBytes)
             throw new Error("shell model exceeds size bound");
         return {
             session: batch.session,
@@ -209,10 +203,7 @@ Singleton {
         };
     }
 
-    function acceptLine(line) {
-        if (byteLength(line) > capabilities.max_batch_bytes)
-            throw new Error("shell batch exceeds advertised limit");
-        const batch = parseJson(line);
+    function acceptBatch(batch) {
         if (batch.session !== capabilities.session)
             throw new Error("shell session changed after discovery");
         const next = reduceBatch(state.available ? state.batch : null, batch);
@@ -222,7 +213,7 @@ Singleton {
         };
     }
 
-    function commandArguments(action, fields) {
+    function commandPayload(action, fields) {
         const request = Object.assign({
             session: session,
             seat: seat?.id || ""
@@ -244,7 +235,7 @@ Singleton {
             throw new Error("not_found");
         const selectedSeat = request.seat ? seats.find(s => s.id === request.seat) : (seats.length === 1 ? seats[0] : null);
         const output = outputs.find(o => o.id === request.output);
-        let args;
+        let payload;
         switch (action) {
         case "window.activate":
         case "workspace.activate":
@@ -252,10 +243,15 @@ Singleton {
                 throw new Error(request.seat ? "not_found: seat" : "ambiguous_seat");
             if (kind === "window" && !target.can_activate)
                 throw new Error("unavailable: window activation");
-            args = [kind, operation, "--id", target.id, "--seat", selectedSeat.id];
+            payload = {
+                id: target.id,
+                seat: selectedSeat.id
+            };
             break;
         case "window.close":
-            args = ["window", "close", "--id", target.id];
+            payload = {
+                id: target.id
+            };
             break;
         case "window.minimized":
         case "window.maximized":
@@ -264,7 +260,10 @@ Singleton {
                 throw new Error("invalid: missing state");
             if (operation !== "fullscreen" && !target["can_" + operation.slice(0, -1)])
                 throw new Error("unavailable: window state");
-            args = ["window", "state", "--id", target.id, "--" + operation, String(request.value)];
+            payload = {
+                id: target.id,
+                value: request.value
+            };
             break;
         case "window.move":
             if (!!request.workspace === !!request.output)
@@ -273,12 +272,18 @@ Singleton {
                 throw new Error("not_found: workspace");
             if (request.output && !output)
                 throw new Error("not_found: output");
-            args = ["window", "move", "--id", target.id, request.workspace ? "--workspace-id" : "--output", request.workspace || output.name];
+            payload = {
+                id: target.id
+            };
+            payload[request.workspace ? "workspace" : "output"] = request.workspace || output.id;
             break;
         case "workspace.rename":
             if (typeof request.name !== "string" || /[\r\n]/.test(request.name))
                 throw new Error("invalid: workspace name");
-            args = ["workspace", "rename", "--id", target.id, "--name", request.name];
+            payload = {
+                id: target.id,
+                name: request.name
+            };
             break;
         case "keyboard.set":
         case "keyboard.next":
@@ -288,38 +293,44 @@ Singleton {
                 const group = entities.find(e => e.kind === "keyboard" && e.id === (request.group || selectedSeat.keyboard) && e.seat === selectedSeat.id);
                 if (!group)
                     throw new Error("not_found: keyboard group");
-                args = ["keyboard", operation, "--seat", selectedSeat.id, "--group", group.id];
+                payload = {
+                    seat: selectedSeat.id,
+                    group: group.id
+                };
                 if (operation === "set") {
                     if (!Number.isInteger(request.index) || request.index < 0 || request.index >= group.layouts.length)
                         throw new Error("invalid: keyboard index");
-                    args.push("--index", String(request.index));
+                    payload.index = request.index;
                 }
                 break;
             }
         case "overview.show":
         case "overview.toggle":
         case "overview.hide":
-            args = ["overview", operation];
+            payload = {};
             if (operation !== "hide") {
                 if (!output)
                     throw new Error("not_found: output");
-                args.push("--output", output.name);
+                payload.output = output.id;
             }
             break;
         case "session.exit":
-            args = ["session", "exit"];
+            payload = {};
             break;
         default:
             throw new Error("unsupported: action");
         }
-        return ["aqueousctl"].concat(args, ["--json"]);
+        return {
+            action: action,
+            fields: payload
+        };
     }
 
     function commandResult(action, result, error) {
         if (error)
             return error;
         const status = action === "window.close" || action === "session.exit" ? "accepted" : "applied";
-        if (result?.ok !== true || result.status !== status || typeof result.sequence !== "string" || !/^[0-9]+$/.test(result.sequence))
+        if (result?.status !== status || (status === "applied" || result.sequence !== undefined) && (typeof result.sequence !== "string" || !/^[0-9]{1,20}$/.test(result.sequence)))
             return result?.status || "missing command acknowledgement";
         return "";
     }
@@ -335,20 +346,76 @@ Singleton {
     }
 
     function command(action, fields, callback) {
-        let args;
         try {
-            if (commandPending)
-                throw new Error("busy");
-            args = commandArguments(action, fields);
+            commandPayload(action, fields);
+            if (commandQueue.length >= 32)
+                throw new Error("busy: command queue full");
         } catch (e) {
             reportCommand(action, null, String(e), callback);
             return;
         }
-        commandPending = true;
-        runJson(args, null, (result, error) => {
-            commandPending = false;
-            reportCommand(action, result, error, callback);
-        });
+        commandQueue = commandQueue.concat([
+            {
+                action: action,
+                fields: Object.assign({
+                    session: session,
+                    seat: seat?.id || ""
+                }, fields || {}),
+                callback: callback,
+                generation: lifecycle,
+                queuedAt: Date.now()
+            }
+        ]);
+        drainCommands();
+    }
+
+    function drainCommands() {
+        if (currentCommand || recovering)
+            return;
+        while (commandQueue.length) {
+            const next = commandQueue[0];
+            commandQueue = commandQueue.slice(1);
+            try {
+                if (next.generation !== lifecycle || Date.now() - next.queuedAt >= 5000)
+                    throw new Error("unavailable: queued command expired before sending");
+                const payload = commandPayload(next.action, next.fields);
+                currentCommand = next;
+                requestConnection.request("command", payload);
+                return;
+            } catch (e) {
+                currentCommand = null;
+                reportCommand(next.action, null, String(e), next.callback);
+            }
+        }
+    }
+
+    function completeCommand(result, error) {
+        const current = currentCommand;
+        currentCommand = null;
+        if (!current || current.generation !== lifecycle)
+            return;
+        if (!error && commandResult(current.action, result, "")) {
+            reportCommand(current.action, null, "command completion uncertain: invalid acknowledgement", current.callback);
+            disconnected("invalid command acknowledgement");
+            return;
+        }
+        reportCommand(current.action, result, error, current.callback);
+        if (error.startsWith("stale_session:")) {
+            disconnected(error);
+            return;
+        }
+        drainCommands();
+    }
+
+    function failCommands(error) {
+        const current = currentCommand;
+        const queued = commandQueue;
+        currentCommand = null;
+        commandQueue = [];
+        if (current)
+            reportCommand(current.action, null, "command completion uncertain: " + error, current.callback);
+        for (const command of queued)
+            reportCommand(command.action, null, "unavailable: command not sent: " + error, command.callback);
     }
 
     function runJson(args, input, callback) {
@@ -371,60 +438,99 @@ Singleton {
     }
 
     function startWatching() {
-        if (!enabled || discovering || watchProcess)
+        if (!enabled)
             return;
-        discovering = true;
-        const attempt = lifecycle;
-        runJson(["aqueousctl", "shell", "capabilities", "--json"], null, (result, error) => {
-            if (attempt !== lifecycle)
-                return;
-            discovering = false;
-            try {
-                if (error)
-                    throw new Error(error);
-                discoveredCapabilities = validateCapabilities(result);
-                watchProcess = watchComponent.createObject(root);
-                watchProcess.running = true;
-                watchProcess.deadline.start();
-            } catch (e) {
-                disconnected(String(e));
-            }
+        if (!validSocketPath) {
+            state = {
+                error: "unavailable: missing or invalid AQUEOUS_SOCKET"
+            };
+            return;
+        }
+        state = {
+            error: "unavailable: connecting to Aqueous IPC"
+        };
+        watching = true;
+    }
+
+    function handshakesReady() {
+        if (!requestConnection.ready || !eventConnection.ready)
+            return;
+        const first = requestConnection.handshake;
+        const second = eventConnection.handshake;
+        if (first.session !== second.session || Object.keys(first.capabilities).some(key => first.capabilities[key] !== second.capabilities[key]) || first.schema !== second.schema) {
+            disconnected("IPC connection sessions or capabilities disagree");
+            return;
+        }
+        discoveredCapabilities = Object.assign({}, first.capabilities, {
+            session: first.session,
+            schema: first.schema,
+            max_batch_bytes: Math.min(first.max_batch_bytes, second.max_batch_bytes)
         });
+        try {
+            eventConnection.subscribe();
+        } catch (e) {
+            disconnected(String(e));
+        }
     }
 
     function disconnected(error) {
+        if (recovering || !watching)
+            return;
+        recovering = true;
+        lifecycle++;
         state = {
             error: error
         };
-        if (!enabled || retryTimer.running)
-            return;
-        retryTimer.interval = Math.floor(retryDelay * (0.8 + Math.random() * 0.2));
-        retryDelay = Math.min(retryDelay * 2, 30000);
-        retryTimer.start();
+        discoveredCapabilities = ({});
+        requestConnection.reconnect();
+        eventConnection.reconnect();
+        failCommands(error);
+        recovering = false;
     }
 
     function stopWatching() {
+        recovering = true;
         lifecycle++;
-        retryTimer.stop();
+        watching = false;
         state = ({});
         discoveredCapabilities = ({});
-        discovering = false;
-        if (watchProcess)
-            watchProcess.finish("unavailable");
+        failCommands("backend changed or shell stopped");
         for (const process of pendingProcesses.slice())
             process.finish(null, "unavailable: backend changed or shell stopped");
-        retryTimer.stop();
-        commandPending = false;
-        retryDelay = 500;
+        recovering = false;
     }
 
     onEnabledChanged: {
         stopWatching();
-        if (enabled)
-            startWatching();
+        startWatching();
     }
     Component.onCompleted: startWatching()
     Component.onDestruction: stopWatching()
+
+    AqueousConnection {
+        id: requestConnection
+        path: root.socketPath
+        connected: root.watching
+        onHelloReceived: root.handshakesReady()
+        onReply: (result, error) => root.completeCommand(result, error)
+        onFailed: error => root.disconnected(error)
+    }
+
+    AqueousConnection {
+        id: eventConnection
+        path: root.socketPath
+        connected: root.watching
+        events: true
+        onHelloReceived: root.handshakesReady()
+        onBatchReceived: batch => {
+            try {
+                root.acceptBatch(batch);
+            } catch (e) {
+                root.disconnected(String(e));
+            }
+        }
+        onFailed: error => root.disconnected(error)
+    }
 
     function windowFacade(window) {
         const windowSession = session;
@@ -572,69 +678,6 @@ Singleton {
                 return x < width && x + box.width > width - thickness;
             return y < height && y + box.height > height - thickness;
         });
-    }
-
-    Timer {
-        id: retryTimer
-        onTriggered: root.startWatching()
-    }
-
-    Component {
-        id: watchComponent
-        Process {
-            id: watcher
-            command: ["aqueousctl", "shell", "watch", "--json"]
-            property bool finished: false
-            property double establishedAt: 0
-            property Timer deadline: Timer {
-                id: initialDeadline
-                interval: 8000
-                onTriggered: watcher.finish("shell initial snapshot timed out")
-            }
-
-            function finish(error) {
-                if (finished)
-                    return;
-                finished = true;
-                initialDeadline.stop();
-                if (running)
-                    signal(9);
-                if (root.watchProcess === watcher) {
-                    root.watchProcess = null;
-                    if (establishedAt && Date.now() - establishedAt >= 60000)
-                        root.retryDelay = 500;
-                    root.disconnected(error);
-                }
-                Qt.callLater(() => watcher.destroy());
-            }
-
-            stdout: SplitParser {
-                onRead: line => {
-                    if (watcher.finished)
-                        return;
-                    try {
-                        root.acceptLine(line);
-                        initialDeadline.stop();
-                        if (!watcher.establishedAt)
-                            watcher.establishedAt = Date.now();
-                    } catch (e) {
-                        watcher.finish(String(e));
-                    }
-                }
-            }
-            // Drain diagnostics without retaining an unbounded history.
-            stderr: SplitParser {
-                splitMarker: ""
-            }
-            onExited: code => finish("shell stream disconnected (" + code + ")")
-            onRunningChanged: {
-                if (!running)
-                    Qt.callLater(() => {
-                        if (!watcher.finished)
-                            watcher.finish("aqueousctl could not start");
-                    });
-            }
-        }
     }
 
     Component {

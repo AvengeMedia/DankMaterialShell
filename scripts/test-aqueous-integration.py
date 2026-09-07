@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import socket
 import struct
 import subprocess
 import tempfile
@@ -39,7 +40,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     base = Path(tempfile.mkdtemp(prefix="dms-aqueous-integration-"))
     print(f"Evidence: {base}", flush=True)
-    for name in ("runtime", "config", "state", "cache", "home", "protocols"):
+    for name in ("runtime", "config", "state", "cache", "home", "protocols", "bin"):
         (base / name).mkdir(mode=0o700)
     env = dict(os.environ)
     for key in list(env):
@@ -47,12 +48,27 @@ def main():
             env.pop(key)
     env.update(HOME=str(base / "home"), XDG_RUNTIME_DIR=str(base / "runtime"),
                XDG_CONFIG_HOME=str(base / "config"), XDG_STATE_HOME=str(base / "state"),
-               XDG_CACHE_HOME=str(base / "cache"), PATH=str(binaries) + ":" + env["PATH"],
+               XDG_CACHE_HOME=str(base / "cache"), PATH=str(base / "bin") + ":" + str(binaries) + ":" + env["PATH"],
                WLR_BACKENDS="headless", WLR_HEADLESS_OUTPUTS="2", WLR_RENDERER="pixman",
                QT_QPA_PLATFORM="wayland", QT_QUICK_BACKEND="software", GSETTINGS_BACKEND="memory",
                DMS_FORCE_EXTWS="1" if args.force_ext else "0", DMS_NO_DDC="1", DMS_DISABLE_MATUGEN="1", DMS_DISABLE_HOT_RELOAD="1",
                DBUS_SESSION_BUS_ADDRESS="unix:path=" + str(base / "missing-session-bus"),
                DBUS_SYSTEM_BUS_ADDRESS="unix:path=" + str(base / "missing-system-bus"))
+    (base / "runtime-helper-calls").touch()
+    env["AQ_TEST_REAL_CTL"] = str(binaries / "aqueousctl")
+    (base / "bin/aqueousctl").write_text('''#!/usr/bin/python3
+import json, os, sys
+from pathlib import Path
+parent = Path("/proc", str(os.getppid()), "cmdline").read_bytes().split(b"\\0")
+record = {"args": sys.argv[1:], "parent": os.fsdecode(parent[0]), "pid": os.getpid()}
+with (Path(os.environ["XDG_RUNTIME_DIR"]).parent / "runtime-helper-calls").open("a") as log:
+    log.write(json.dumps(record) + "\\n")
+if Path(record["parent"]).name != "aqueous-config":
+    sys.exit(99)
+real = os.environ["AQ_TEST_REAL_CTL"]
+os.execv(real, [real, *sys.argv[1:]])
+''')
+    (base / "bin/aqueousctl").chmod(0o755)
     config = base / "config/aqueous"
     config.mkdir()
     shell_config = base / "config/DankMaterialShell"
@@ -72,6 +88,8 @@ def main():
         env["AQUEOUS_" + ("CONFIG" if name == "wm" else name.upper())] = str(path)
 
     protocols = {
+        "xdg-activation": Path("/usr/share/wayland-protocols/staging/xdg-activation/xdg-activation-v1.xml"),
+        "pointer-constraints": Path("/usr/share/wayland-protocols/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml"),
         "xdg-shell": Path("/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"),
         "shortcuts": Path("/usr/share/wayland-protocols/unstable/keyboard-shortcuts-inhibit/keyboard-shortcuts-inhibit-unstable-v1.xml"),
         "virtual-keyboard": source / "protocol/upstream/virtual-keyboard-unstable-v1.xml",
@@ -130,24 +148,6 @@ def main():
 
     def command(action, success=True, **fields):
         return rpc("aqueous.command", dict(action=action, session=session, **fields), success)
-
-    def watchers():
-        result = []
-        for process in Path("/proc").iterdir():
-            if not process.name.isdigit():
-                continue
-            try:
-                argv = (process / "cmdline").read_bytes().split(b"\0")
-                if argv[1:4] != [b"shell", b"watch", b"--json"]:
-                    continue
-                environment = (process / "environ").read_bytes().split(b"\0")
-            except OSError:
-                continue
-            if argv[1:4] == [b"shell", b"watch", b"--json"] and ("XDG_RUNTIME_DIR=" + str(base / "runtime")).encode() in environment:
-                parent = next(line.split()[1] for line in (process / "status").read_text().splitlines() if line.startswith("PPid:"))
-                assert "dms" not in Path("/proc", parent, "comm").read_text().lower(), "core owns the watcher"
-                result.append(process.name)
-        return result
 
     # Test-only IPC invokes the production singleton inside the actual shell.
     shell = base / "shell"
@@ -275,6 +275,7 @@ def main():
             entrypoint.rememberedWorkspace = workspaceTest.workspaceList.find(w => !w.active && !w._placeholder);
             return String(!!entrypoint.rememberedWorkspace);
         }
+        function reconnect(): string { AqueousService.disconnected("test stream disconnected"); return "OK"; }
         function workspaceReplay(): string { AqueousService.activateWorkspace(entrypoint.rememberedWorkspace); return "REQUESTED"; }
         function workspaceOverview(): string { AqueousService.toggleOverview(workspaceTest.effectiveScreenName); return "true"; }
         function result(offset: int): string {
@@ -302,9 +303,17 @@ def main():
 
     try:
         compositor = spawn([str(binaries / "aqueous"), *([] if args.xwayland else ["-no-xwayland"]),
-                            "-c", 'printf %s "$DISPLAY" > "$XDG_RUNTIME_DIR/test-display"'], "compositor.log")
+                            "-c", 'printf %s "$DISPLAY" > "$XDG_RUNTIME_DIR/test-display"; printf %s "$AQUEOUS_SOCKET" > "$XDG_RUNTIME_DIR/test-ipc"'], "compositor.log")
         display = wait_for(lambda: next((p for p in (base / "runtime").glob("wayland-*") if p.is_socket()), None))
         env["WAYLAND_DISPLAY"] = display.name
+        env["AQUEOUS_SOCKET"] = wait_for(lambda: (base / "runtime/test-ipc").read_text() if (base / "runtime/test-ipc").exists() else None)
+        with socket.socket(socket.AF_UNIX) as probe:
+            probe.settimeout(5)
+            probe.connect(env["AQUEOUS_SOCKET"])
+            probe.sendall(b'{"ipc":1,"id":"1","op":"hello","params":{}}\n')
+            hello = json.loads(probe.makefile("rb").readline(65536))
+            assert hello["ok"] and hello["result"]["schema"] == 1, hello
+            (base / "hello.json").write_text(json.dumps(hello, indent=2))
         env["DMS_SHELL_DIR"] = str(shell)
         dms = spawn([str(binaries / "dms"), "-c", str(shell), "run"], "dms.log")
         wait_for(lambda: subprocess.run([str(binaries / "dms"), "ipc", "call", "aqueous", "status"], env=env, capture_output=True, text=True, timeout=5).returncode == 0)
@@ -347,6 +356,29 @@ def main():
         window = clients[0]["id"]
         assert command("window.activate", id=window, seat=seat)["status"] == "applied"
         wait_for(lambda: next(s for s in entities("seat") if s["id"] == seat)["window"] == window)
+        def current_window():
+            return next(w for w in entities("window") if w["id"] == window)
+        original_workspace = current_window()["workspace"]
+        other_output = next(o for o in entities("output") if o["id"] != current_window()["output"])["id"]
+        for field in ("fullscreen", "maximized", "minimized"):
+            if field != "fullscreen" and not current_window()["can_" + field[:-1]]:
+                assert "unavailable" in command("window." + field, id=window, value=True, success=False)
+                continue
+            for value in (True, False):
+                assert command("window." + field, id=window, value=value)["status"] == "applied"
+                wait_for(lambda: current_window()[field] == value)
+        assert command("window.move", id=window, output=other_output)["status"] == "applied"
+        wait_for(lambda: current_window()["output"] == other_output)
+        assert command("window.move", id=window, workspace=original_workspace)["status"] == "applied"
+        wait_for(lambda: current_window()["workspace"] == original_workspace)
+        locker = spawn([str(fixture), "lock"], "lock.log")
+        wait_for(lambda: entities("session")[0]["locked"])
+        assert "locked" in command("window.activate", id=window, seat=seat, success=False)
+        locker.stdin.write(b"unlock\n")
+        locker.stdin.flush()
+        assert locker.wait(timeout=5) == 0
+        wait_for(lambda: not entities("session")[0]["locked"])
+        command("window.activate", id=window, seat=seat)
         group = next(s for s in entities("seat") if s["id"] == seat)["keyboard"]
         assert command("keyboard.set", seat=seat, group=group, index=1)["status"] == "applied"
         wait_for(lambda: next(k for k in entities("keyboard") if k["id"] == group)["index"] == 1)
@@ -475,11 +507,9 @@ def main():
         assert "not_found" in command("window.activate", id="removed-window", seat=seat, success=False)
         assert "stale session" in rpc("aqueous.command", dict(action="window.close", session="0" * 32, id=window), success=False)
 
-        watch_pids = watchers()
-        assert len(watch_pids) == 1, watch_pids
         assert ipc("aqueousTest", "workspaceRemember") == "true"
         active_before = [w["id"] for w in entities("workspace") if w["active"]]
-        os.kill(int(watch_pids[0]), signal.SIGKILL)
+        assert ipc("aqueousTest", "reconnect") == "OK"
         wait_for(lambda: not state().get("available", False))
         if not args.force_ext:
             assert ipc("aqueousTest", "workspaceReplay") == "REQUESTED"
@@ -489,11 +519,8 @@ def main():
         if not args.force_ext:
             wait_for(lambda: workspace_status()["backend"] == "aqueous")
             assert [w["id"] for w in entities("workspace") if w["active"]] == active_before, "unavailable workspace action was replayed after reconnect"
-        restarted_pids = watchers()
-        assert len(restarted_pids) == 1 and restarted_pids != watch_pids
-        watch_pids += restarted_pids
         time.sleep(1)
-        assert state()["available"], "quiet watch became unavailable"
+        assert state()["available"], "quiet subscription became unavailable"
         for client in clients:
             assert command("window.close", id=client["id"])["status"] == "accepted"
         wait_for(lambda: not [w for w in entities("window") if w["app_id"] == "aq-shell-test"])
@@ -502,8 +529,10 @@ def main():
         assert compositor.wait(timeout=10) == 0
         os.killpg(dms.pid, signal.SIGTERM)
         dms.wait(timeout=10)
-        assert not any(Path("/proc", pid).exists() for pid in watch_pids), "watcher survived DMS shutdown"
-        print("PASS: daemon/UI, duplicate identities, keyboard, overview, screenshots, helper conflicts, keybinds, single watcher, workspace settings/widget/rename and orderly exit", flush=True)
+        launches = [json.loads(line) for line in (base / "runtime-helper-calls").read_text().splitlines()]
+        assert all(Path(call["parent"]).name == "aqueous-config" for call in launches), launches
+        print(f"Retained configuration helper aqueousctl launches: {len(launches)}", flush=True)
+        print("PASS: daemon/UI, duplicate identities, state/move eligibility, lock/unlock, keyboard, overview, screenshots, helper conflicts, keybinds, persistent IPC and zero runtime aqueousctl launches, workspace settings/widget/rename and orderly exit", flush=True)
     finally:
         for child in reversed(children):
             if child.poll() is None:

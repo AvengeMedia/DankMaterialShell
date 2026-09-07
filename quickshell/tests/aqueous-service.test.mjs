@@ -12,17 +12,15 @@ function loadMethods(context, path, names) {
     }
 }
 const clone = value => JSON.parse(JSON.stringify(value));
-const context = vm.createContext({maxBatchBytes: 4 * 1024 * 1024, state: {}});
+const context = vm.createContext({maxBatchBytes: 4 * 1024 * 1024, maxModelBytes: 2 * 1024 * 1024, state: {}});
 context.root = context;
-loadMethods(context, "../Services/AqueousService.qml", ["byteLength", "parseJson", "validateCapabilities", "validateEntity", "reduceBatch", "acceptLine", "commandArguments", "commandResult"]);
+loadMethods(context, "../Services/AqueousService.qml", ["byteLength", "parseJson", "validateEntity", "reduceBatch", "acceptBatch", "commandPayload", "commandResult"]);
 const caps = JSON.parse(readFileSync(new URL("fixtures/aqueous/capabilities.json", import.meta.url)));
-context.capabilities = context.validateCapabilities(caps);
-assert.throws(() => context.validateCapabilities({...caps, schema: 2}), /unsupported/);
-assert.throws(() => context.validateCapabilities({...caps, commands: undefined}), /capability/);
+context.capabilities = caps;
 const batches = readFileSync(new URL("fixtures/aqueous/watch.ndjson", import.meta.url), "utf8").trim().split("\n").map(JSON.parse);
 let live;
 for (const batch of batches) {
-    context.acceptLine(JSON.stringify(batch));
+    context.acceptBatch(batch);
     assert.equal(context.state.batch.modelBytes, Buffer.byteLength(JSON.stringify(context.state.batch.model)));
     if (batch.upsert.some(e => e.kind === "window"))
         live = clone(context.state.batch);
@@ -67,14 +65,14 @@ const migrating = old.upsert.filter(e => e.output === outputs[0].id).map(e => ({
 const migrated = context.reduceBatch(old, {...change, upsert: migrating, removed: ["output:" + outputs[0].id]});
 assert.equal(migrated.model["output:" + outputs[0].id], undefined);
 
-const bounded = vm.createContext({maxBatchBytes: old.modelBytes + 3000, state: {}, capabilities: caps});
-loadMethods(bounded, "../Services/AqueousService.qml", ["byteLength", "parseJson", "validateEntity", "reduceBatch", "acceptLine"]);
-bounded.acceptLine(JSON.stringify(first));
+const bounded = vm.createContext({maxBatchBytes: 4 * 1024 * 1024, maxModelBytes: old.modelBytes + 3000, state: {}, capabilities: caps});
+loadMethods(bounded, "../Services/AqueousService.qml", ["byteLength", "parseJson", "validateEntity", "reduceBatch", "acceptBatch"]);
+bounded.acceptBatch(first);
 const updateModel = (upsert, removed = []) => {
     const previous = bounded.state.batch;
     const line = JSON.stringify({...change, sequence: String(Number(previous.sequence) + 1), base_sequence: previous.sequence, upsert, removed});
     assert(Buffer.byteLength(line) < bounded.maxBatchBytes, "individual batch exceeded the test limit");
-    bounded.acceptLine(line);
+    bounded.acceptBatch(JSON.parse(line));
     assert.equal(bounded.state.batch.modelBytes, Buffer.byteLength(JSON.stringify(bounded.state.batch.model)));
 };
 const added = {...workspace, id: 'extra-🫧"\\', name: "日".repeat(300)};
@@ -89,14 +87,14 @@ updateModel([{...added, id: "second"}]);
 const beforeOverflow = JSON.stringify(bounded.state);
 assert.throws(() => updateModel([{...added, id: "third"}]), /model exceeds/);
 assert.equal(JSON.stringify(bounded.state), beforeOverflow, "overflow changed published model or byte accounting");
-const limit = bounded.maxBatchBytes;
-bounded.maxBatchBytes = bounded.state.batch.modelBytes;
+const limit = bounded.maxModelBytes;
+bounded.maxModelBytes = bounded.state.batch.modelBytes;
 updateModel([]);
 assert.throws(() => updateModel([{...added, name: added.name + "x"}]), /model exceeds/);
-bounded.maxBatchBytes = limit;
+bounded.maxModelBytes = limit;
 // Removing another entity in the same batch can make room for an upsert.
 updateModel([{...added, name: added.name + "x".repeat(1000)}], ["workspace:second"]);
-bounded.acceptLine(JSON.stringify(first));
+bounded.acceptBatch(first);
 assert.equal(bounded.state.batch.modelBytes, old.modelBytes, "snapshot retained old byte accounting");
 assert.deepEqual(clone(bounded.state.batch.entityBytes), clone(old.entityBytes));
 
@@ -107,10 +105,10 @@ Object.assign(context, {
 });
 context.seat = context.seats[0];
 const window = live.upsert.find(e => e.kind === "window" && e.can_activate);
-const args = (action, fields) => clone(context.commandArguments(action, fields));
-assert.deepEqual(args("window.activate", {id: window.id}), ["aqueousctl", "window", "activate", "--id", window.id, "--seat", context.seat.id, "--json"]);
-assert.deepEqual(args("window.move", {id: window.id, output: context.outputs[0].id}), ["aqueousctl", "window", "move", "--id", window.id, "--output", context.outputs[0].name, "--json"]);
-assert.deepEqual(args("workspace.rename", {id: workspace.id, name: "a; $(echo unsafe)"}).slice(-3), ["--name", "a; $(echo unsafe)", "--json"]);
+const args = (action, fields) => clone(context.commandPayload(action, fields));
+assert.deepEqual(args("window.activate", {id: window.id}), {action: "window.activate", fields: {id: window.id, seat: context.seat.id}});
+assert.deepEqual(args("window.move", {id: window.id, output: context.outputs[0].id}), {action: "window.move", fields: {id: window.id, output: context.outputs[0].id}});
+assert.equal(args("workspace.rename", {id: workspace.id, name: "a; $(echo unsafe)"}).fields.name, "a; $(echo unsafe)");
 assert.throws(() => args("window.close", {id: window.id, session: "old"}), /stale session/);
 assert.throws(() => args("window.close", {id: "removed"}), /not_found/);
 assert.throws(() => args("window.fullscreen", {id: window.id, value: "true"}), /missing state/);
@@ -120,7 +118,7 @@ assert.throws(() => args("keyboard.set", {group: "removed", index: 0}), /group/)
 context.seats = [...context.seats, {...context.seat, id: "seat2"}];
 context.seat = null;
 assert.throws(() => args("window.activate", {id: window.id}), /ambiguous_seat/);
-assert(args("window.activate", {id: window.id, seat: context.seats[0].id}).includes(context.seats[0].id));
+assert.equal(args("window.activate", {id: window.id, seat: context.seats[0].id}).fields.seat, context.seats[0].id);
 context.locked = true;
 assert.throws(() => args("window.close", {id: window.id}), /locked/);
 context.locked = false;

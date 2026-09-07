@@ -1,20 +1,15 @@
 # Aqueous integration
 
-This working tree integrates DMS with Aqueous master
-`2d8b07fb1ff2354ea0c3acddd5cc84ceb823d6eb`. It is development-build support;
-no released minimum Aqueous or DMS version has been established.
+DMS uses Aqueous runtime IPC v1 through the existing QML `DankSocket` and
+`SplitParser` stack, as used by the other compositor services. Build a compositor
+that exports `AQUEOUS_SOCKET` and verify its `hello`; an installed executable's
+version does not establish support. No released minimum version is established.
 
-The tested DMS baseline is `5baef07048656867a374d210d4305911b8a76e4f`, with
-common QML `26396ce432d6c71c3f5367438f96f4a8d667e160` unchanged. The current
-verification uses Quickshell `2d3b3e9c70ef380dff751b61d334dc88df016c29`, built
-locally with its existing `parentWindow` API. Earlier runs used Arch's
-`noctalia-qs 0.0.12` with temporary popup compatibility edits; those edits have
-been removed. See [the implementation audit](aqueous-minimal-change-audit.md).
-The Aqueous compositor, CLI and `aqueous-config` helper were built from the same
-pinned master. The helper reports 0.7.1, protocol 1. The system-installed older
-Aqueous and helper binaries were not used for integration testing.
-The installed Quickshell toplevel metadata exposes no foreign-toplevel identifier,
-so the adapter uses Aqueous's own model without a native Quickshell binding change.
+Earlier desktop integration was tested against Aqueous
+`2d8b07fb1ff2354ea0c3acddd5cc84ceb823d6eb`. The runtime socket checks below use the
+new IPC build, with Quickshell `2d3b3e9c70ef380dff751b61d334dc88df016c29` and its
+existing `parentWindow` API. No native Quickshell module or shared QML submodule
+change is needed for this migration.
 
 ## Implemented paths
 
@@ -38,39 +33,55 @@ The independent portal plugin and its enablement preference are unchanged.
 
 ## Runtime and configuration
 
-Put the matching `aqueousctl` and optional `aqueous-config` binaries on DMS's PATH.
-Start DMS in the Aqueous session using the project's existing direct-session or
-UWSM launch arrangement. Run only one DMS instance for that session.
-Other compositors do not launch the Aqueous watcher or configuration helper.
+Start DMS as an Aqueous session child, inheriting `AQUEOUS_SOCKET` and
+`XDG_RUNTIME_DIR`. The endpoint is an absolute path under
+`$XDG_RUNTIME_DIR/aqueous/<instance>/ipc.sock`. DMS does not scan sessions or use
+subprocess discovery. A new compositor instance needs DMS relaunched with its new
+environment. Keep `aqueous-config` and its matching `aqueousctl` on PATH for the
+retained configuration paths.
 
-`AqueousService.qml` owns one persistent `aqueousctl shell watch --json` process.
-Its reducer validates schema, string IDs/sequences and delta continuity, applies
-full replacements/removals atomically, and shares the authoritative model with
-shell consumers. Discovery, reconnect backoff with jitter, seat selection and
-short-lived action processes also live in this service. There is no Aqueous core
-manager, subscription or server API. Backend changes and shell shutdown stop its
-processes; a quiet established watcher has no timer or polling subprocess.
+`AqueousService.qml` owns two persistent QML connections: one for hello/commands,
+one for hello/subscription/acks. `AqueousConnection.qml` separates wire validation,
+request correlation and deadlines from the service's atomic entity reducer and
+existing UI facades. Both handshakes must agree on session, schema and capabilities;
+readiness requires a validated initial snapshot. Events are acknowledged only after
+installation. A broken stream invalidates the model, discards its parser and
+baseline, and reconnects through `DankSocket`'s existing backoff with jitter.
+There is no heartbeat, snapshot polling, watch process or runtime core manager.
 
-Quickshell's `SplitParser` reassembles complete lines, preserving split UTF-8.
-The pinned `aqueousctl` validates bounded UTF-8 batches before emitting NDJSON;
-QML additionally checks complete record and retained model sizes. Quickshell does
-not expose a pre-delimiter byte limit or raw-byte validity check on this parser.
-Consequently the direct service relies on the supported CLI for those guarantees;
-it does not independently bound a broken CLI's unterminated output. Enforcing that
-boundary independently requires a Quickshell parser capability.
+Commands use JSON action/field objects and runtime output IDs directly. One request
+is outstanding, with at most 32 waiting commands. The service revalidates the
+captured session, seat, capability, lock and target before dispatch. Waiting
+commands expire after five seconds when dequeued. Replies complete callbacks;
+`applied` confirms commitment without waiting for the other connection's sequence,
+and close/exit use `accepted`. A sent command without a valid acknowledgement has
+an uncertain outcome and is never replayed. Unsent commands fail separately.
+Handshake and request deadlines are five seconds; the initial subscription has an
+eight-second deadline. Established subscriptions have no idle deadline.
 
-Mutation arguments are arrays, never shell command strings. The service validates
-the captured session, explicit seat, capabilities, lock and current target before
-dispatch. Disconnects disable stale-ID actions and require a fresh snapshot.
-Commands connect directly through `aqueousctl`; the current CLI has no expected-session
-argument, so a restart between validation and the child connecting cannot be made
-atomic by QML. Close and exit return `accepted`, while window removal follows the
-stream. Timed-out mutations are not automatically retried. Qt may exit on Wayland
-disconnect before the shell can display the orderly-logout acknowledgement.
+The QML client checks complete frame sizes (4 MiB + 64 KiB), request sizes
+(64 KiB), nesting, envelopes and advertised limits. Its retained entity model is
+limited to 2 MiB. `SplitParser` preserves fragmented UTF-8 while assembling lines,
+but does **not** expose a byte limit before LF, strict raw UTF-8 validation or peer
+credentials. This QML implementation therefore relies on the compositor's bounded
+output and private socket directory for those boundaries; it does not claim the
+native framing/peer-verification guarantees in the original handoff. There is no
+native transport dependency or subprocess fallback.
 
-Standalone screenshots obtain one fresh snapshot in `core/internal/screenshot`.
-Core keybind tooling invokes the helper from its existing provider package. Their
-only shared process utility is a bounded, short-lived JSON command runner.
+Standalone screenshots use the Linux-only `core/internal/aqueous_ipc.go`.
+A short-lived Go Unix connection performs hello and snapshot, then closes. It enforces bounded framing
+before LF, strict UTF-8, private directory/socket modes, peer UID and context
+cancellation. Snapshot state enters the existing screenshot parser; composed pixel
+capture, outer geometry, clipping and transforms are unchanged.
+
+Settings and keybind editing remain a separate delivery. `AqueousConfigService`
+still runs `aqueous-config`; `KeybindsService` still calls `dms keybinds`, whose Go
+provider runs that helper. The helper itself currently invokes `aqueousctl outputs`
+and `aqueousctl cursor`. These calls are outside the migrated runtime paths and
+were observed by the integration launch counter. `AqueousService.runJson` remains
+for these consumers. The separately shipped Aqueous settings plugin also remains
+owned by Aqueous. A configuration socket contract is required before migrating
+these operations.
 
 All persistent writes go through `aqueous-config validate/apply --shell dms
 --request -`, with JSON on stdin and `expected_generation`. The backup directory
@@ -209,7 +220,7 @@ dms ipc call aqueous status
 ```
 
 The watch command remains running until interrupted. Redact window titles and
-configuration paths before sharing output. Missing CLI/protocol/helper support is
+configuration paths before sharing output. Missing socket/protocol/helper support is
 reported as unavailable; a similarly numbered executable is not proof that the
 running compositor has the required capabilities.
 
@@ -268,13 +279,14 @@ reports the authoritative output/selection and command failures produce a toast.
 The output argument is a connector label; entity identity remains the runtime ID.
 
 There are no Aqueous methods on the core socket. UI consumers call the singleton's
-typed `command` method; output runtime IDs are resolved to connector names there.
+typed `command` method; output runtime IDs are sent directly to the compositor.
 Settings use `AqueousConfigService` and direct stdin helper requests. See the
 [complete contract and schema](aqueous-integration-plan.md) for protocol semantics.
 
 ## Verification
 
-The following passed against the pinned build on 2026-09-05:
+The following historical checks passed against the pre-IPC pinned build on 2026-09-05
+(the watcher-specific checks describe the earlier transport):
 
 - Aqueous `zig build test`: 393 tests.
 - Aqueous native and XWayland `scripts/test-shell-integration.py`: state/actions,
@@ -327,6 +339,7 @@ Reproduce the focused desktop checks with a Pixman-compatible diagnostic build:
 node quickshell/tests/workspace-view.test.mjs
 node quickshell/tests/workspace-settings.test.mjs
 node quickshell/tests/aqueous-service.test.mjs
+node quickshell/tests/aqueous-ipc.test.mjs
 python3 scripts/test-aqueous-service.py
 node quickshell/tests/display-apply.test.mjs
 node quickshell/tests/aqueous-displays.test.mjs
@@ -355,3 +368,55 @@ work for their owning repositories after release dependencies are established.
 
 Keep the generic DPMS/result and UWSM logout fixes independently reviewable.
 Popup compatibility changes are outside this integration and have been removed.
+
+## Runtime IPC verification (2026-09-06)
+
+The QML reducer, protocol, workspace, keybind and display JavaScript tests pass.
+The offscreen socket harness checks hello, mismatched sessions, unsupported schema,
+fragmented Unicode, coalesced response/events, ack ordering, malformed/oversized
+complete frames, mid-frame disconnects, broken deltas, command queue limits, before/after-send timeouts,
+accepted logout, unavailable startup and same-endpoint recovery. Its private
+`aqueousctl` interceptor records zero launches. It tests the production QML files,
+without connecting to the user's Wayland display or DMS sockets.
+
+The two-second idle sample after fault/reconnect tests recorded zero CPU ticks,
+zero socket bytes and no child processes. RSS remained 104524 KiB and voluntary
+context-switch count did not change in the final offscreen sample. These numbers describe
+the offscreen harness process, including Qt and prior oversized-frame allocations;
+they are not whole-desktop resource measurements. Each run retains `/proc` samples,
+traffic counters and QML logs in its printed temporary evidence directory.
+
+Go socket and screenshot tests pass with the race detector
+(`cd core && go test -race ./internal ./internal/screenshot`). They share the QML
+hello fixture and cover bounded fake Unix servers, fragmented/coalesced frames,
+malformed/truncated/oversized input, exact string sequences, stale-session errors,
+cancellation and snapshot parsing.
+
+The full DMS integration passed on two private headless outputs using:
+
+```sh
+# Build the modified DMS binary; the directory also needs the matching
+# freshly built aqueous, aqueousctl and aqueous-config binaries.
+cd core
+go build -o /tmp/dms-aqueous-ipc-bin/dms ./cmd/dms
+cd ..
+LD_LIBRARY_PATH=/path/to/Aqueous/compositor/.deps/wlroots-render-hook/lib \
+  python3 scripts/test-aqueous-integration.py \
+  --aqueous-source /path/to/Aqueous --bin-dir /tmp/dms-aqueous-ipc-bin
+```
+
+The verified run used `/tmp/aqueous-ipc-build/bin/aqueous` and `aqueousctl`, with
+`aqueous-config` from `/home/zoey/RiderProjects/Aqueous/plugin/helper/zig-out/bin`.
+The harness obtains the socket path from the private compositor's child environment
+and saves a successful hello before starting DMS. It exercises window activation,
+close/fullscreen/move and eligibility failures, workspace widget/rename, keyboard selection, overview, screenshot
+geometry, retained helper conflicts, lock/unlock, reconnect and orderly session exit. Native
+window captures were 632×612 and 350×1145 for the rotated/fractional negative-origin
+case. Runtime and screenshot state paths launched zero `aqueousctl` processes;
+22 calls were attributed to retained `aqueous-config` output/cursor operations.
+The interceptor saves argv and parent executable for every launch and fails if the
+parent is outside that retained helper. Evidence: `/tmp/dms-aqueous-integration-0_4nvb4o`.
+
+Physical hotplug, full lock UI, mixed-scale hardware and new-instance desktop
+relaunch remain manual verification. The QML transport limitations above are
+explicit deviations from the native hardening requirements in the original plan.

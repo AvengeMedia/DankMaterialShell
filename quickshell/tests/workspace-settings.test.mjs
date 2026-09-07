@@ -52,10 +52,10 @@ const service = vm.createContext({available: true, locked: false, session: "sess
         {kind: "workspace", id: "two", output: "output-b", active: true, name: "Duplicate", aqueousSession: "session-a"}
     ]});
 service.entities = service.workspaces; service.seats = [service.seat];
-methods(service, read("../Services/AqueousService.qml"), ["commandArguments", "byteLength"]);
+methods(service, read("../Services/AqueousService.qml"), ["commandPayload", "byteLength"]);
 const callbacks = [], commands = [], errors = [], legacy = [];
 service.command = (action, fields, callback) => {
-    try { commands.push(service.commandArguments(action, fields)); callbacks.push(callback); }
+    try { commands.push(service.commandPayload(action, fields)); callbacks.push(callback); }
     catch (error) { errors.push(String(error)); callback(false); }
 };
 const modal = vm.createContext({CompositorService: {isAqueous: true}, AqueousService: service,
@@ -76,7 +76,7 @@ service.seat.output = "output-b";
 modal.nameInput.text = "日本語 🫧";
 modal.submitAndClose(); modal.submitAndClose();
 assert.equal(commands.length, 1, "double submission");
-assert.deepEqual(Array.from(commands[0]), ["aqueousctl", "workspace", "rename", "--id", "one", "--name", "日本語 🫧", "--json"]);
+assert.deepEqual(JSON.parse(JSON.stringify(commands[0])), {action: "workspace.rename", fields: {id: "one", name: "日本語 🫧"}});
 assert(modal.visible && modal.renaming, "closed before command result");
 callbacks.shift()(false);
 assert(modal.visible && !modal.renaming);

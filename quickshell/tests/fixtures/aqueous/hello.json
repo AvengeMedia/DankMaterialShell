@@ -1,0 +1,20 @@
+{
+  "ipc": 1,
+  "id": "1",
+  "ok": true,
+  "result": {
+    "session": "0123456789abcdef0123456789abcdef",
+    "schema": 1,
+    "max_batch_bytes": 4194304,
+    "max_request_bytes": 65536,
+    "max_frame_bytes": 4259840,
+    "max_pending_requests": 1,
+    "capabilities": {
+      "state": true,
+      "commands": true,
+      "keyboard": true,
+      "overview": true,
+      "shortcut_inhibition": true
+    }
+  }
+}

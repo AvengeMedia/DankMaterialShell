@@ -2,7 +2,6 @@ package screenshot
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"math"
@@ -98,12 +97,4 @@ func parseAqueousSnapshot(data []byte) (aqueousSnapshotModel, error) {
 		return aqueousSnapshotModel{}, errors.New("missing session entity")
 	}
 	return model, nil
-}
-
-func aqueousSnapshot(ctx context.Context) (aqueousSnapshotModel, error) {
-	var data json.RawMessage
-	if err := utils.RunJSON(ctx, "aqueousctl", []string{"shell", "snapshot", "--json"}, nil, &data); err != nil {
-		return aqueousSnapshotModel{}, err
-	}
-	return parseAqueousSnapshot(data)
 }

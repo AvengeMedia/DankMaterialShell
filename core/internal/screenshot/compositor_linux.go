@@ -1,13 +1,16 @@
 package screenshot
 
 import (
-	"golang.org/x/sys/unix"
+	"context"
 	"net"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal"
+	"golang.org/x/sys/unix"
 )
 
 func waylandSocketOwner() string {
@@ -42,4 +45,12 @@ func waylandSocketOwner() string {
 		return ""
 	}
 	return strings.ToLower(strings.TrimSpace(string(comm)))
+}
+
+func aqueousSnapshot(ctx context.Context) (aqueousSnapshotModel, error) {
+	data, err := internal.AqueousSnapshot(ctx)
+	if err != nil {
+		return aqueousSnapshotModel{}, err
+	}
+	return parseAqueousSnapshot(data)
 }
