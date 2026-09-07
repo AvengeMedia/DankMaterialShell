@@ -4,6 +4,7 @@ import sys
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 from urllib import request, parse
 
@@ -35,6 +36,11 @@ PLUGIN_CHECKOUT_DIRS = [OFFICIAL_PLUGINS_DIR, EXTERNAL_PLUGINS_DIR]
 # Flip once official plugins ship their own translations/ dirs: app poexports
 # then stop carrying terms owned exclusively by plugins.
 EXCLUDE_PLUGIN_ONLY_TERMS = False
+
+RATE_LIMIT_CODE = '4048'
+UPLOAD_MIN_INTERVAL = 25
+UPLOAD_RETRIES = 4
+_last_upload = 0.0
 
 LANGUAGES = {
     "ja": "ja.json",
@@ -194,6 +200,37 @@ def plugin_checkouts():
                 checkouts['plugin-' + child.name.lower()] = child
     return checkouts
 
+def checkout_translations(checkout, filename):
+    result = subprocess.run(
+        ['git', 'show', f'HEAD:translations/{filename}'],
+        cwd=checkout, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return {}
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        warn(f"{checkout.name}/translations/{filename} is not valid JSON in git HEAD")
+        return {}
+
+def keep_existing_translations(existing, incoming):
+    return {
+        context: {term: value or existing.get(context, {}).get(term, "") for term, value in bucket.items()}
+        for context, bucket in incoming.items()
+    }
+
+def missing_from_poeditor(existing, incoming):
+    gaps = {}
+    for context, bucket in incoming.items():
+        for term, value in bucket.items():
+            if value:
+                continue
+            local = existing.get(context, {}).get(term, "")
+            if not local:
+                continue
+            gaps[(context, term)] = local
+    return gaps
+
 def plugin_term_owners(entries):
     owners = {}
     excluded = set()
@@ -240,6 +277,63 @@ def split_export(data, common_keys, greeter_keys, plugin_owners, plugin_excluded
             app_part.setdefault(context, {})[term] = value
     return app_part, common_part, plugin_parts
 
+def _throttle_upload():
+    global _last_upload
+    gap = UPLOAD_MIN_INTERVAL - (time.monotonic() - _last_upload)
+    if gap <= 0:
+        return
+    info(f"Waiting {gap:.0f}s for the POEditor upload rate limit...")
+    time.sleep(gap)
+
+def poeditor_upload(fields, payload, filename, required=True):
+    global _last_upload
+    boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW'
+    head = ''.join(
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="{name}"\r\n\r\n'
+        f'{value}\r\n'
+        for name, value in fields.items()
+    ) + (
+        f'--{boundary}\r\n'
+        f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'
+        f'Content-Type: application/json\r\n\r\n'
+    )
+    body = head.encode() + json.dumps(payload, ensure_ascii=False).encode() + f'\r\n--{boundary}--\r\n'.encode()
+
+    for attempt in range(UPLOAD_RETRIES):
+        _throttle_upload()
+        req = request.Request(
+            'https://api.poeditor.com/v2/projects/upload',
+            data=body,
+            headers={'Content-Type': f'multipart/form-data; boundary={boundary}'}
+        )
+
+        try:
+            with request.urlopen(req) as response:
+                result = json.loads(response.read().decode())
+        except Exception as e:
+            _last_upload = time.monotonic()
+            if required:
+                error(f"Upload failed: {e}")
+            warn(f"Upload failed: {e}")
+            return None
+
+        _last_upload = time.monotonic()
+        if result.get('response', {}).get('status') == 'success':
+            return result.get('result', {})
+
+        if result.get('response', {}).get('code') != RATE_LIMIT_CODE:
+            break
+
+        if attempt + 1 < UPLOAD_RETRIES:
+            _last_upload += UPLOAD_MIN_INTERVAL * (attempt + 1)
+            warn(f"POEditor rate limited the upload, retrying ({attempt + 2}/{UPLOAD_RETRIES})")
+
+    if required:
+        error(f"POEditor upload failed: {result}")
+    warn(f"POEditor upload failed: {result}")
+    return None
+
 def upload_source_strings(api_token, project_id, entries, prune=False):
     if not entries:
         warn("No terms to upload")
@@ -247,55 +341,47 @@ def upload_source_strings(api_token, project_id, entries, prune=False):
 
     info("Uploading source strings to POEditor..." + (" (pruning terms not present locally)" if prune else ""))
 
-    upload_bytes = json.dumps(entries, ensure_ascii=False).encode()
-    boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW'
-    sync_part = (
-        f'--{boundary}\r\n'
-        f'Content-Disposition: form-data; name="sync_terms"\r\n\r\n'
-        f'1\r\n'
-    ) if prune else ''
-    body = (
-        f'--{boundary}\r\n'
-        f'Content-Disposition: form-data; name="api_token"\r\n\r\n'
-        f'{api_token}\r\n'
-        f'--{boundary}\r\n'
-        f'Content-Disposition: form-data; name="id"\r\n\r\n'
-        f'{project_id}\r\n'
-        f'--{boundary}\r\n'
-        f'Content-Disposition: form-data; name="updating"\r\n\r\n'
-        f'terms\r\n'
-        f'{sync_part}'
-        f'--{boundary}\r\n'
-        f'Content-Disposition: form-data; name="file"; filename="en.json"\r\n'
-        f'Content-Type: application/json\r\n\r\n'
-    ).encode() + upload_bytes + f'\r\n--{boundary}--\r\n'.encode()
+    fields = {'api_token': api_token, 'id': project_id, 'updating': 'terms'}
+    if prune:
+        fields['sync_terms'] = '1'
 
-    req = request.Request(
-        'https://api.poeditor.com/v2/projects/upload',
-        data=body,
-        headers={'Content-Type': f'multipart/form-data; boundary={boundary}'}
-    )
-
-    try:
-        with request.urlopen(req) as response:
-            result = json.loads(response.read().decode())
-    except Exception as e:
-        error(f"Upload failed: {e}")
-
-    if result.get('response', {}).get('status') != 'success':
-        error(f"POEditor upload failed: {result}")
-
-    terms = result.get('result', {}).get('terms', {})
+    terms = poeditor_upload(fields, entries, 'en.json').get('terms', {})
     added = terms.get('added', 0)
     updated = terms.get('updated', 0)
     deleted = terms.get('deleted', 0)
 
-    if added or updated or deleted:
-        success(f"POEditor updated: {added} added, {updated} updated, {deleted} deleted")
-        return True
-    else:
+    if not (added or updated or deleted):
         info("No changes uploaded to POEditor")
         return False
+
+    success(f"POEditor updated: {added} added, {updated} updated, {deleted} deleted")
+    return True
+
+def seed_plugin_translations(api_token, project_id, plugin_seed):
+    seeded = {}
+    for po_lang, values in sorted(plugin_seed.items()):
+        entries = [
+            {'term': term, 'context': context, 'translation': {'content': value}}
+            for (context, term), value in sorted(values.items())
+        ]
+        info(f"Seeding {len(entries)} plugin-authored translations into POEditor ({po_lang})...")
+        result = poeditor_upload({
+            'api_token': api_token,
+            'id': project_id,
+            'updating': 'translations',
+            'language': po_lang,
+            'overwrite': '0',
+            'fuzzy_trigger': '0'
+        }, entries, LANGUAGES[po_lang], required=False)
+        if not result:
+            continue
+        translations = result.get('translations', {})
+        applied = translations.get('added', 0) + translations.get('updated', 0)
+        if not applied:
+            warn(f"POEditor accepted the {po_lang} seed but applied nothing: {translations}")
+            continue
+        seeded[po_lang] = applied
+    return seeded
 
 def write_if_changed(repo_file, new_data):
     if not json_changed(repo_file, new_data):
@@ -314,6 +400,7 @@ def download_translations(api_token, project_id, common_keys, greeter_keys, plug
     any_changed = False
     common_changed = []
     plugin_changed = {}
+    plugin_seed = {}
 
     for po_lang, filename in LANGUAGES.items():
         repo_file = POEXPORTS_DIR / filename
@@ -362,11 +449,15 @@ def download_translations(api_token, project_id, common_keys, greeter_keys, plug
                 continue
             target_dir = checkout / "translations"
             target_dir.mkdir(parents=True, exist_ok=True)
-            if write_if_changed(target_dir / filename, part):
+            existing = checkout_translations(checkout, filename)
+            gaps = missing_from_poeditor(existing, part)
+            if gaps:
+                plugin_seed.setdefault(po_lang, {}).update(gaps)
+            if write_if_changed(target_dir / filename, keep_existing_translations(existing, part)):
                 success(f"Updated {checkout.name} {filename}")
                 plugin_changed.setdefault(checkout.name, []).append(filename)
 
-    return any_changed, common_changed, plugin_changed
+    return any_changed, common_changed, plugin_changed, plugin_seed
 
 def check_sync_status():
     api_token = get_env_or_error('POEDITOR_API_TOKEN')
@@ -529,7 +620,8 @@ def main():
             info("No changes in source strings")
 
         plugin_owners, plugin_excluded = plugin_term_owners(current_en)
-        translations_changed, common_files_changed, plugin_files_changed = download_translations(api_token, project_id, common_keys, greeter_keys, plugin_owners, plugin_excluded)
+        translations_changed, common_files_changed, plugin_files_changed, plugin_seed = download_translations(api_token, project_id, common_keys, greeter_keys, plugin_owners, plugin_excluded)
+        seeded = seed_plugin_translations(api_token, project_id, plugin_seed)
 
         if strings_changed or translations_changed:
             subprocess.run(['git', 'add', 'translations/'], cwd=REPO_ROOT)
@@ -542,6 +634,9 @@ def main():
         if common_files_changed:
             info(f"dank-qml-common poexports updated: {', '.join(common_files_changed)}")
             info("Commit those in dank-qml-common and bump the pointer here (make update-common).")
+
+        if seeded:
+            info("Plugin-authored translations adopted into POEditor: " + ", ".join(f"{lang} +{count}" for lang, count in sorted(seeded.items())))
 
         for checkout_name, files in sorted(plugin_files_changed.items()):
             info(f"{checkout_name} translations updated: {', '.join(files)}")
