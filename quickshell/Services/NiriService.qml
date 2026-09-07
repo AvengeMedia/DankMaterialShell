@@ -61,7 +61,6 @@ Singleton {
 
     signal windowUrgentChanged
     signal configReloaded
-    signal workspaceActivated(var workspace, bool focused)
 
     function setWorkspaces(newMap) {
         root.workspaces = newMap;
@@ -480,10 +479,6 @@ Singleton {
         }
 
         updateCurrentOutputWorkspaces();
-        const activatedWs = root.workspaces[data.id];
-        if (activatedWs) {
-            root.workspaceActivated(activatedWs, data.focused ?? true);
-        }
     }
 
     function handleWindowFocusChanged(data) {

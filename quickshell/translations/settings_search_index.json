@@ -8078,8 +8078,7 @@
       "switch",
       "virtual",
       "workspace"
-    ],
-    "conditionKey": "isNiri"
+    ]
   },
   {
     "section": "appIdSubstitutions",

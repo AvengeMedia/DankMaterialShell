@@ -1242,7 +1242,7 @@ Item {
                 }
 
                 Variants {
-                    model: (CompositorService.isNiri && SettingsData.osdWorkspaceEnabled) ? SettingsData.getFilteredScreens("osd") : []
+                    model: SettingsData.osdWorkspaceEnabled ? SettingsData.getFilteredScreens("osd") : []
 
                     delegate: WorkspaceOSD {}
                 }
