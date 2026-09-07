@@ -78,7 +78,10 @@ Singleton {
         function onLowerDisplayRefreshRateOnBatteryChanged() {
             root.requestSync("setting-change");
         }
+    }
 
+    Connections {
+        target: SessionData
         function onActiveDisplayProfileChanged() {
             root.requestSync("profile-change");
         }
