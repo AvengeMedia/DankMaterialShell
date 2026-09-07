@@ -1729,6 +1729,7 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: Theme.spacingM
+                    visible: KeybindsService.currentProvider !== "aqueous"
 
                     StyledText {
                         text: I18n.tr("Title")

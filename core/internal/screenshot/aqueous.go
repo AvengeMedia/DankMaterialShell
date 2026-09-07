@@ -76,7 +76,6 @@ func (s *Screenshoter) captureAqueousWindow() (*CaptureResult, error) {
 		return nil, err
 	}
 	defer result.Buffer.Close()
-	// captureWholeOutput already normalizes inversion and output transform.
 	rect := aqueousCropRect(geom, image.Rect(0, 0, result.Buffer.Width, result.Buffer.Height))
 	if rect.Empty() {
 		return nil, errors.New("active window is outside the output")

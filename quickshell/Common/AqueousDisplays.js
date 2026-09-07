@@ -14,7 +14,7 @@ function heads(outputs) {
 }
 
 function matches(candidate, actual, original) {
-    if (original.length !== actual.length || original.some(o => !actual.some(a => a.id === o.id && a.name === o.name)))
+    if (candidate.length !== actual.length || original.length !== actual.length || original.some(o => !actual.some(a => a.id === o.id && a.name === o.name)))
         return false;
     return candidate.every(h => {
         const output = actual.find(o => o.name === h.name);
@@ -25,6 +25,7 @@ function matches(candidate, actual, original) {
         const mode = h.customMode || original.find(o => o.name === h.name)?.modes?.find(m => m.id === h.modeId);
         return output.x === h.position.x && output.y === h.position.y
             && Math.abs(output.scale - h.scale) < 0.0001 && output.transform === h.transform
+            && (h.adaptiveSync === undefined || output.adaptiveSync === h.adaptiveSync)
             && !!mode && output.currentMode?.width === mode.width && output.currentMode?.height === mode.height
             && output.currentMode?.refresh === mode.refresh;
     });

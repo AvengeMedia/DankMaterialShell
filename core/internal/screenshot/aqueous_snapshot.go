@@ -2,13 +2,28 @@ package screenshot
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
+	"os"
 	"regexp"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
+
+func aqueousSnapshot(ctx context.Context) (aqueousSnapshotModel, error) {
+	executable, err := os.Executable()
+	if err != nil {
+		return aqueousSnapshotModel{}, err
+	}
+	var data json.RawMessage
+	if err := utils.RunJSON(ctx, executable, []string{"ipc", "call", "aqueous", "snapshot", os.Getenv("AQUEOUS_SOCKET")}, nil, &data); err != nil {
+		return aqueousSnapshotModel{}, fmt.Errorf("get Aqueous state from DMS; a shell must be running in this session: %w", err)
+	}
+	return parseAqueousSnapshot(data)
+}
 
 type aqueousBox struct {
 	X, Y, Width, Height int64
@@ -69,6 +84,7 @@ func (m aqueousSnapshotModel) Seat(name string) (*aqueousCaptureEntity, error) {
 
 func parseAqueousSnapshot(data []byte) (aqueousSnapshotModel, error) {
 	var batch struct {
+		Error        string                 `json:"error"`
 		Schema       int                    `json:"schema"`
 		Session      string                 `json:"session"`
 		Sequence     string                 `json:"sequence"`
@@ -80,6 +96,9 @@ func parseAqueousSnapshot(data []byte) (aqueousSnapshotModel, error) {
 	var model aqueousSnapshotModel
 	if err := utils.DecodeJSON(data, &batch); err != nil {
 		return model, err
+	}
+	if batch.Error != "" {
+		return model, errors.New("Aqueous state is unavailable in the running DMS shell")
 	}
 	if batch.Schema != 1 || batch.Type != "snapshot" || !bytes.Equal(batch.BaseSequence, []byte("null")) || batch.Upsert == nil || batch.Removed == nil || len(batch.Removed) != 0 || !regexp.MustCompile(`^[0-9a-f]{32}$`).MatchString(batch.Session) || !regexp.MustCompile(`^[0-9]+$`).MatchString(batch.Sequence) {
 		return model, errors.New("invalid Aqueous shell snapshot")

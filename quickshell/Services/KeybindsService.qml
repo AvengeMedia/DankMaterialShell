@@ -425,7 +425,7 @@ Singleton {
         }
         AqueousService.runJson(["dms", "keybinds", "show", "aqueous"], null, (snapshot, error) => {
             if (session !== root.aqueousSession) {
-                callback(null, I18n.tr("Configuration changed. Reload to continue."));
+                callback(null, I18n.tr("Configuration changed. Refresh to continue.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings"));
                 return;
             }
             try {
@@ -433,7 +433,8 @@ Singleton {
                     throw new Error(error);
                 AqueousKeybinds.inventory(snapshot);
             } catch (e) {
-                callback(null, String(e));
+                log.warn("Failed to read Aqueous keybindings:", e);
+                callback(null, AqueousService.errorMessage(String(e)));
                 return;
             }
             callback(snapshot, "");
@@ -499,21 +500,21 @@ Singleton {
     function bindEditError(code) {
         switch (code) {
         case "external_change":
-            return I18n.tr("Keybindings changed. Reload and review your edit before saving.");
+            return I18n.tr("Keybindings changed. Refresh and review your edit before saving.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "target_removed":
-            return I18n.tr("The original shortcut was removed. Discard this edit or explicitly add a new shortcut.");
+            return I18n.tr("The original shortcut was removed. Discard this edit or add a new shortcut.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "ambiguous_target":
-            return I18n.tr("Multiple bindings use the original shortcut. Resolve the duplicate bindings first.");
+            return I18n.tr("Multiple bindings use the original shortcut. Resolve the duplicate bindings first.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "destination_occupied":
-            return I18n.tr("The new shortcut is already in use. Choose another shortcut.");
+            return I18n.tr("The new shortcut is already in use. Choose another shortcut.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "target_changed":
-            return I18n.tr("The original shortcut changed. Reload and review your edit.");
+            return I18n.tr("The original shortcut changed. Refresh and review your edit.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "invalidated":
-            return I18n.tr("The compositor session changed. Your draft is retained; discard it before starting a new edit.");
+            return I18n.tr("The compositor session changed. Discard this edit before starting a new one.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "uncertain":
-            return I18n.tr("The save result is unknown. Reload and inspect the current bindings before continuing.");
+            return I18n.tr("The save result is unknown. Refresh and check the current bindings.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         case "invalid_action":
-            return I18n.tr("The selected action is no longer available.");
+            return I18n.tr("The selected action is no longer available.", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings");
         default:
             return I18n.tr("Failed to save keybind");
         }
@@ -530,9 +531,9 @@ Singleton {
         const currentBind = describe(current, draft.originalKey);
         const proposed = draft.operation === "set" ? draft.data.key + " → " + draft.data.action : I18n.tr("Remove");
         const destination = draft.operation === "set" ? describe(current, draft.data.key) : I18n.tr("None");
-        const describeChange = bind => bind ? (bind[0] || I18n.tr("Unbound")) + " → " + bind[1] : I18n.tr("None");
-        const changes = AqueousKeybinds.changes(draft.baseline, current).map(change => I18n.tr("Previous: %1\nCurrent: %2").arg(describeChange(change.before)).arg(describeChange(change.after))).join("\n\n");
-        return I18n.tr("Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4").arg(original).arg(currentBind).arg(proposed).arg(destination) + (changes ? "\n\n" + changes : "");
+        const describeChange = bind => bind ? (bind[0] || I18n.tr("Not bound")) + " → " + bind[1] : I18n.tr("None");
+        const changes = AqueousKeybinds.changes(draft.baseline, current).map(change => I18n.tr("Previous: %1\nCurrent: %2", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings").arg(describeChange(change.before)).arg(describeChange(change.after))).join("\n\n");
+        return I18n.tr("Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4", "Aqueous keyboard shortcut editor, explaining a conflict or comparing an unsaved edit with current bindings").arg(original).arg(currentBind).arg(proposed).arg(destination) + (changes ? "\n\n" + changes : "");
     }
 
     function _mutateAqueous(draft, callback) {
@@ -893,7 +894,10 @@ Singleton {
                     return false;
                 seen.add(b.action);
                 return true;
-            }).map(b => ({id: b.action, label: b.desc}));
+            }).map(b => ({
+                        id: b.action,
+                        label: b.desc
+                    }));
         }
         return Actions.getCompositorActions(currentProvider, category);
     }

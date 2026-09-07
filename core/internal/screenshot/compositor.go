@@ -31,16 +31,13 @@ func DetectCompositor() Compositor {
 	if detectedCompositor >= 0 {
 		return detectedCompositor
 	}
-	if waylandSocketOwner() == "aqueous" {
-		detectedCompositor = CompositorAqueous
-		return detectedCompositor
-	}
 
 	candidates := []struct {
 		socket     string
 		needsStat  bool
 		compositor Compositor
 	}{
+		{os.Getenv("AQUEOUS_SOCKET"), true, CompositorAqueous},
 		{os.Getenv("MANGO_INSTANCE_SIGNATURE"), true, CompositorMango},
 		{os.Getenv("NIRI_SOCKET"), true, CompositorNiri},
 		{os.Getenv("SCROLLSOCK"), true, CompositorScroll},
@@ -91,7 +88,7 @@ func GetActiveWindow() (*WindowGeometry, error) {
 		}
 		return aqueousWindowGeometry(model, "")
 	default:
-		return nil, fmt.Errorf("window capture requires Hyprland, Mango, or niri")
+		return nil, fmt.Errorf("window capture requires Hyprland, Mango, niri, or Aqueous")
 	}
 }
 

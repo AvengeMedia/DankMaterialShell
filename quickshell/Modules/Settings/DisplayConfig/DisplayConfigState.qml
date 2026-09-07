@@ -53,8 +53,8 @@ Singleton {
 
     function aqueousDisplayError(message) {
         validatingConfig = false;
-        validationError = message;
-        ToastService.showError(I18n.tr("Error"), message);
+        validationError = AqueousService.errorMessage(message);
+        ToastService.showError(I18n.tr("Error"), validationError, message);
     }
 
     function discardAqueousPreview() {
@@ -69,10 +69,15 @@ Singleton {
     function previewAqueousOutputs(descriptions) {
         if (validatingConfig)
             return;
+        if (!AqueousService.available) {
+            aqueousDisplayError("unavailable: compositor state");
+            return;
+        }
         if (aqueousPreview) {
             observeAqueousPreview(aqueousPreview, descriptions, "");
             return;
         }
+        const session = AqueousService.session;
         validatingConfig = true;
         AqueousConfigService.load((snapshot, error) => {
             if (!snapshot) {
@@ -80,18 +85,31 @@ Singleton {
                 return;
             }
             freshAqueousOutputs((original, error) => {
+                if (AqueousService.session !== session) {
+                    aqueousDisplayError("conflict: compositor session changed");
+                    return;
+                }
                 if (!original) {
                     aqueousDisplayError(error);
                     return;
                 }
                 const candidate = WlrOutputService.outputsConfigHeads(buildOutputsWithPendingChanges(), outputs);
                 WlrOutputService.testConfiguration(candidate, (success, message) => {
+                    if (AqueousService.session !== session) {
+                        aqueousDisplayError("conflict: compositor session changed");
+                        return;
+                    }
                     if (!success) {
                         aqueousDisplayError(message);
                         return;
                     }
-                    const preview = {snapshot: snapshot, original: original, heads: candidate,
-                        fingerprint: null, session: AqueousService.session};
+                    const preview = {
+                        snapshot: snapshot,
+                        original: original,
+                        heads: candidate,
+                        fingerprint: null,
+                        session: session
+                    };
                     aqueousPreview = preview;
                     WlrOutputService.applyConfiguration(candidate, (success, message) => {
                         observeAqueousPreview(preview, descriptions, success ? "" : message);
@@ -109,12 +127,12 @@ Singleton {
             if (!actual || AqueousService.session !== preview.session || !AqueousDisplays.matches(preview.heads, actual, preview.original)) {
                 if (actual && AqueousDisplays.fingerprint(actual) === AqueousDisplays.fingerprint(preview.original))
                     aqueousPreview = null;
-                aqueousDisplayError(error || applyError || I18n.tr("Display preview changed externally; review the current configuration"));
+                aqueousDisplayError(error || applyError || "conflict: display preview changed externally");
                 return;
             }
             preview.fingerprint = AqueousDisplays.fingerprint(actual);
             validatingConfig = false;
-            validationError = applyError;
+            validationError = applyError ? AqueousService.errorMessage(applyError) : "";
             changesApplied(descriptions);
         });
     }
@@ -147,7 +165,7 @@ Singleton {
                     freshAqueousOutputs((live, error) => {
                         validatingConfig = false;
                         if (!live || AqueousService.session !== preview.session || AqueousDisplays.fingerprint(live) !== preview.fingerprint) {
-                            aqueousDisplayError(I18n.tr("Configuration saved, but live display state changed; refresh displays"));
+                            aqueousDisplayError("conflict: configuration saved but live display state changed");
                             return;
                         }
                         changesConfirmed();

@@ -57,14 +57,33 @@ function envelope(line, limit) {
     let depth = 0, quoted = false, escaped = false;
     for (const c of line) {
         if (quoted) {
-            if (escaped) escaped = false;
-            else if (c === "\\") escaped = true;
-            else if (c === '"') quoted = false;
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            switch (c) {
+            case "\\":
+                escaped = true;
+                break;
+            case '"':
+                quoted = false;
+                break;
+            }
             continue;
         }
-        if (c === '"') quoted = true;
-        if (c === "{" || c === "[") depth++;
-        if (c === "}" || c === "]") depth--;
+        switch (c) {
+        case '"':
+            quoted = true;
+            break;
+        case "{":
+        case "[":
+            depth++;
+            break;
+        case "}":
+        case "]":
+            depth--;
+            break;
+        }
         if (depth > 32)
             throw new Error("IPC nesting exceeds limit");
     }

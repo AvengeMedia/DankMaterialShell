@@ -61,7 +61,7 @@ Item {
                 active: CompositorService.isAqueous
                 sourceComponent: AqueousAppearanceSettings {
                     settingKey: "aqueousTypography"
-                    title: I18n.tr("Typography") + " · Aqueous"
+                    title: I18n.tr("Aqueous typography", "Aqueous compositor font synchronization settings")
                     visible: CompositorService.isAqueous
                 }
             }

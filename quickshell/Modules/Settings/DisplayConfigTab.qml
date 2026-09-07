@@ -112,7 +112,7 @@ Item {
                 }
 
                 DankButton {
-                    text: I18n.tr("Discard draft and reload")
+                    text: I18n.tr("Discard draft and reload", "Discard unsaved Aqueous display settings and refresh the current display state")
                     enabled: !DisplayConfigState.validatingConfig
                     onClicked: DisplayConfigState.discardAqueousPreview()
                 }

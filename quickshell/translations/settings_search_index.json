@@ -3613,6 +3613,23 @@
     "description": "Sync dark mode with settings portals for system-wide theme hints"
   },
   {
+    "section": "aqueousCursor",
+    "label": "Aqueous cursor",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "aqueous",
+      "colors",
+      "cursor",
+      "look",
+      "scheme",
+      "style",
+      "theme"
+    ],
+    "conditionKey": "isAqueous"
+  },
+  {
     "section": "matugenSmartMode",
     "label": "Auto From Wallpaper",
     "tabIndex": 10,
@@ -3844,24 +3861,6 @@
       "theme"
     ],
     "description": "Mouse pointer size in pixels"
-  },
-  {
-    "section": "aqueousCursor",
-    "label": "Cursor Theme",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "aqueous",
-      "colors",
-      "colour",
-      "cursor",
-      "look",
-      "scheme",
-      "style",
-      "theme"
-    ],
-    "conditionKey": "isAqueous"
   },
   {
     "section": "cursorTheme",
@@ -6270,6 +6269,24 @@
     "description": "Globally scale animation durations with geometric motion & spring based physics with bezier curves"
   },
   {
+    "section": "aqueousTypography",
+    "label": "Aqueous typography",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "appearance",
+      "aqueous",
+      "font",
+      "fonts",
+      "motion",
+      "text",
+      "typeface",
+      "typography"
+    ],
+    "conditionKey": "isAqueous"
+  },
+  {
     "section": "modalCustomAnimationDuration",
     "label": "Custom Duration",
     "tabIndex": 14,
@@ -6566,24 +6583,6 @@
       "typography"
     ],
     "icon": "text_format"
-  },
-  {
-    "section": "aqueousTypography",
-    "label": "Typography",
-    "tabIndex": 14,
-    "category": "Typography & Motion",
-    "keywords": [
-      "animation",
-      "appearance",
-      "aqueous",
-      "font",
-      "fonts",
-      "motion",
-      "text",
-      "typeface",
-      "typography"
-    ],
-    "conditionKey": "isAqueous"
   },
   {
     "section": "typography",

@@ -42,7 +42,7 @@ Singleton {
     function setOutputPower(on) {
         Proc.runCommand("output-power-action", [Proc.dmsBin, "dpms", on ? "on" : "off"], (output, code) => {
             if (code !== 0)
-                ToastService.showError(I18n.tr("Error"), I18n.tr("Failed to change display power"));
+                ToastService.showError(I18n.tr("Error"), I18n.tr("Failed to change display power", "Error shown when changing monitor power fails"));
         }, 0, 12000);
     }
 
@@ -1066,7 +1066,14 @@ Singleton {
     // of winning on a stale env var.
     function _envDetectionCandidates() {
         const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "";
+        const aqueousSocket = Quickshell.env("AQUEOUS_SOCKET") || "";
         return [
+            {
+                name: "aqueous",
+                present: !!aqueousSocket,
+                test: ["test", "-S", aqueousSocket],
+                detail: "AQUEOUS_SOCKET " + aqueousSocket
+            },
             {
                 name: "mango",
                 present: !!mangoSignature,

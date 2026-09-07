@@ -140,7 +140,6 @@ Singleton {
             if (seen.has(key))
                 throw new Error("duplicate entity key");
             seen.add(key);
-            // Include the separator; the required session makes the model nonempty.
             const size = byteLength(JSON.stringify(key) + ":" + JSON.stringify(entity)) + 1;
             modelBytes += size - (entityBytes[key] || 0);
             entityBytes[key] = size;
@@ -339,10 +338,33 @@ Singleton {
         const failure = commandResult(action, result, error);
         if (failure) {
             log.warn("command failed:", action, failure);
-            ToastService.showError(I18n.tr("Error"), failure);
+            ToastService.showError(I18n.tr("Error"), errorMessage(failure), failure);
         }
         if (callback)
             callback(!failure, failure || result.status);
+    }
+
+    function errorMessage(error) {
+        const code = String(error).replace(/^Error: /, "").split(":")[0];
+        switch (code) {
+        case "busy":
+            return I18n.tr("Another Aqueous operation is in progress.", "Aqueous request rejected because another operation is running");
+        case "locked":
+        case "unavailable":
+        case "not_found":
+            return I18n.tr("Unavailable");
+        case "unsupported":
+            return I18n.tr("This operation is not supported by the installed Aqueous version.", "Aqueous compositor or configuration helper lacks a required capability");
+        case "conflict":
+        case "external_change":
+        case "stale_session":
+            return I18n.tr("Configuration changed. Refresh to continue.", "Aqueous configuration or compositor session changed while editing");
+        case "uncertain":
+        case "command completion uncertain":
+            return I18n.tr("The result is unknown. Refresh before trying again.", "An Aqueous operation may have completed without a reply");
+        default:
+            return I18n.tr("The Aqueous operation failed.", "Fallback error for an Aqueous compositor or configuration request");
+        }
     }
 
     function command(action, fields, callback) {
@@ -625,8 +647,27 @@ Singleton {
         command("session.exit");
     }
 
+    function snapshot(path) {
+        if (!available || path !== socketPath)
+            return JSON.stringify({
+                error: "unavailable"
+            });
+        return JSON.stringify({
+            schema: 1,
+            session: session,
+            sequence: sequence,
+            type: "snapshot",
+            base_sequence: null,
+            upsert: entities,
+            removed: []
+        });
+    }
+
     IpcHandler {
         target: "aqueous"
+        function snapshot(path: string): string {
+            return root.snapshot(path);
+        }
         function status(): string {
             return JSON.stringify({
                 available: root.available,
@@ -670,13 +711,16 @@ Singleton {
             const box = w.outer_geometry;
             const x = box.x - output.bounds.x;
             const y = box.y - output.bounds.y;
-            if (position === SettingsData.Position.Top)
+            switch (position) {
+            case SettingsData.Position.Top:
                 return y < thickness && y + box.height > 0;
-            if (position === SettingsData.Position.Left)
+            case SettingsData.Position.Left:
                 return x < thickness && x + box.width > 0;
-            if (position === SettingsData.Position.Right)
+            case SettingsData.Position.Right:
                 return x < width && x + box.width > width - thickness;
-            return y < height && y + box.height > height - thickness;
+            default:
+                return y < height && y + box.height > height - thickness;
+            }
         });
     }
 

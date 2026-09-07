@@ -461,7 +461,7 @@ Item {
                 sourceComponent: AqueousAppearanceSettings {
                     cursor: true
                     settingKey: "aqueousCursor"
-                    title: I18n.tr("Cursor Theme") + " · Aqueous"
+                    title: I18n.tr("Aqueous cursor", "Aqueous compositor cursor synchronization settings")
                     visible: CompositorService.isAqueous
                 }
             }

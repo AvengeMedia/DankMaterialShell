@@ -16,6 +16,8 @@ Item {
     property bool subscribed: false
     property bool installed: false
     property bool resetting: false
+    property bool retrying: false
+    property int reconnectAttempt: 0
     property string lastDelivery: ""
     property var frameParser: null
     readonly property bool ready: socket.linkUp && handshake !== null
@@ -43,7 +45,10 @@ Item {
     function reconnect() {
         resetting = true;
         clear();
-        socket.reconnect();
+        retrying = true;
+        const delay = Math.min(400 * Math.pow(2, Math.min(reconnectAttempt++, 6)), 15000);
+        reconnectTimer.interval = delay + Math.floor(Math.random() * delay / 4);
+        reconnectTimer.restart();
         resetting = false;
     }
 
@@ -91,6 +96,7 @@ Item {
                 if (!ready || resetting)
                     return;
                 installed = true;
+                reconnectAttempt = 0;
                 initialDeadline.stop();
                 lastDelivery = value.delivery;
                 request("ack", {
@@ -105,6 +111,7 @@ Item {
             pending = null;
             deadline.stop();
             if (operation.op === "command") {
+                reconnectAttempt = 0;
                 reply(value.result || null, error);
                 return;
             }
@@ -138,14 +145,18 @@ Item {
     }
 
     onConnectedChanged: {
-        if (!connected)
-            clear();
+        if (connected)
+            return;
+        reconnectTimer.stop();
+        retrying = false;
+        reconnectAttempt = 0;
+        clear();
     }
 
     DankSocket {
         id: socket
         path: root.path
-        connected: root.connected
+        connected: root.connected && !root.retrying
         onConnectionStateChanged: {
             if (root.resetting)
                 return;
@@ -175,6 +186,10 @@ Item {
         }
     }
 
+    Timer {
+        id: reconnectTimer
+        onTriggered: root.retrying = false
+    }
     Timer {
         id: deadline
         interval: 5000

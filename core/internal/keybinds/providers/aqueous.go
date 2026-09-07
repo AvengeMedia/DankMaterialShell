@@ -95,6 +95,29 @@ func AqueousBindRequest(snapshot aqueousConfig, edit AqueousBindEdit) (aqueousCo
 	if original == "" {
 		original = edit.Key
 	}
+	originalCount := 0
+	for _, field := range aqueousObjects(snapshot, "fields") {
+		if field.String("category") != "keybinds" || field.String("type") != "string_list" {
+			continue
+		}
+		values, _ := field["value"].([]any)
+		for _, value := range values {
+			if value == original {
+				originalCount++
+			}
+		}
+	}
+	for _, binding := range aqueousObjects(snapshot, "custom_keybinds") {
+		if binding.String("chord") == original {
+			originalCount++
+		}
+	}
+	if originalCount > 1 {
+		return nil, &AqueousError{Code: "ambiguous_target", Message: "multiple bindings use the original shortcut"}
+	}
+	if originalCount == 0 && (edit.Remove || edit.OriginalKey != "") {
+		return nil, &AqueousError{Code: "target_removed", Message: "the original shortcut no longer exists"}
+	}
 	changes := []any{}
 	customChanges := []any{}
 	foundAction := false

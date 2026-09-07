@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func aqueousFixture(t *testing.T) aqueousConfig {
@@ -82,6 +83,26 @@ func TestAqueousGenerationConflictCode(t *testing.T) {
 		if !errors.As(err, &conflict) || conflict.Code != "external_change" {
 			t.Fatalf("expected structured generation conflict, got %v", err)
 		}
+	}
+}
+
+func TestAqueousBindingRequiresUniqueOriginal(t *testing.T) {
+	for _, edit := range []AqueousBindEdit{
+		{Generation: "abc", Key: "Super+Missing", Remove: true},
+		{Generation: "abc", OriginalKey: "Super+Missing", Key: "Super+X", Action: "spawn_terminal"},
+	} {
+		_, err := AqueousBindRequest(aqueousFixture(t), edit)
+		var conflict *AqueousError
+		if !errors.As(err, &conflict) || conflict.Code != "target_removed" {
+			t.Fatalf("expected missing original, got %v", err)
+		}
+	}
+	snapshot := aqueousFixture(t)
+	snapshot["custom_keybinds"] = append(snapshot["custom_keybinds"].([]any), map[string]any{"id": "duplicate", "chord": "Super+T", "command": "echo duplicate"})
+	_, err := AqueousBindRequest(snapshot, AqueousBindEdit{Generation: "abc", Key: "Super+T", Remove: true})
+	var conflict *AqueousError
+	if !errors.As(err, &conflict) || conflict.Code != "ambiguous_target" {
+		t.Fatalf("expected ambiguous original, got %v", err)
 	}
 }
 

@@ -54,7 +54,7 @@ Item {
 
     function beginEdit(binding, key) {
         if (hasEditDraft || editBusy || KeybindsService.bindMutationBusy) {
-            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut."));
+            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut.", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings"));
             return false;
         }
         try {
@@ -64,7 +64,7 @@ Item {
             reviewingEdit = false;
             return true;
         } catch (e) {
-            ToastService.showError(I18n.tr("Failed to load keybinds"), String(e));
+            ToastService.showError(I18n.tr("Failed to load keybinds", "Aqueous shortcut editor could not load the current bindings"), AqueousService.errorMessage(String(e)), String(e));
             return false;
         }
     }
@@ -97,7 +97,7 @@ Item {
             }
             keybindsTab.reviewSnapshot = result.snapshot || null;
             keybindsTab.reviewingEdit = result.code !== "load_failed" && result.code !== "busy";
-            keybindsTab.editError = KeybindsService.bindEditError(result.code) + (result.message ? "\n" + result.message : "");
+            keybindsTab.editError = KeybindsService.bindEditError(result.code);
         };
         switch (editDraft.operation) {
         case "set":
@@ -145,10 +145,11 @@ Item {
     function confirmEditRemoval() {
         if (!editDraft)
             return;
-        if (editDraft.operation === "reset")
+        if (editDraft.operation === "reset") {
             confirmResetBind(editDraft.originalKey, "");
-        else
-            confirmRemoveBind(editDraft.originalKey, "");
+            return;
+        }
+        confirmRemoveBind(editDraft.originalKey, "");
     }
 
     function discardEdit() {
@@ -230,7 +231,7 @@ Item {
             if (!binding || !keybindsTab.beginEdit(binding, binding.keys[0]?.key || ""))
                 return;
         } else if (keybindsTab.hasEditDraft && action !== keybindsTab.editDraft.action) {
-            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut."));
+            ToastService.showInfo(I18n.tr("Save or discard the current edit before editing another shortcut.", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings"));
             return;
         }
         expandedKey = expandedKey === action ? "" : action;
@@ -509,7 +510,7 @@ Item {
 
                             StyledText {
                                 readonly property string bindsFile: KeybindsService.requiresBindReview ? "aqueous-config" : KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
-                                text: KeybindsService.requiresBindReview ? I18n.tr("Click any shortcut to edit Aqueous configuration") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                text: KeybindsService.requiresBindReview ? I18n.tr("Click any shortcut to edit Aqueous configuration", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -729,7 +730,7 @@ Item {
                 StyledText {
                     width: parent.width
                     visible: keybindsTab.reviewingEdit || keybindsTab.editError !== ""
-                    text: keybindsTab.editError || I18n.tr("Review the current bindings before saving your retained edit.")
+                    text: keybindsTab.editError || I18n.tr("Review the current bindings before saving this edit.", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
                     color: Theme.error
                     wrapMode: Text.WordWrap
                 }
@@ -746,12 +747,12 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
                     DankButton {
-                        text: I18n.tr("Reload")
+                        text: I18n.tr("Refresh")
                         enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
                         onClicked: keybindsTab.reloadEdit()
                     }
                     DankButton {
-                        text: I18n.tr("Accept reviewed changes")
+                        text: I18n.tr("Accept reviewed changes", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
                         visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
                         enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
                         onClicked: keybindsTab.acceptReview()

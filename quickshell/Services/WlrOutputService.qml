@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Common
 import qs.Services
 
 Singleton {
@@ -109,7 +110,7 @@ Singleton {
     function applyConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected");
+                callback(false, I18n.tr("Not connected"));
             }
             return;
         }
@@ -141,7 +142,7 @@ Singleton {
     function testConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected");
+                callback(false, I18n.tr("Not connected"));
             }
             return;
         }
@@ -285,13 +286,13 @@ Singleton {
     function applyOutputsConfig(outputsData, connectedOutputs, callback) {
         if (!wlrOutputAvailable) {
             if (callback)
-                callback(false, "Not connected");
+                callback(false, I18n.tr("Not connected"));
             return;
         }
         const heads = outputsConfigHeads(outputsData, connectedOutputs);
         if (heads.length === 0) {
             if (callback)
-                callback(false, "No connected outputs");
+                callback(false, I18n.tr("No monitors"));
             return;
         }
         applyConfiguration(heads, callback);

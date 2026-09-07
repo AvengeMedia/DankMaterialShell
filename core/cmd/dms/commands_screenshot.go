@@ -123,7 +123,7 @@ If no previous region exists, falls back to interactive selection.`,
 var ssWindowCmd = &cobra.Command{
 	Use:   "window",
 	Short: "Capture the focused window",
-	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, niri, and Aqueous. Aqueous crops the composed output including borders and occluders.`,
+	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, niri, and Aqueous. Aqueous requires a running DMS shell and crops the output including borders and overlapping windows.`,
 	Run:   runScreenshotWindow,
 }
 
