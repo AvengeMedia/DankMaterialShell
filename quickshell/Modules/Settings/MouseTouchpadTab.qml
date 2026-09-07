@@ -238,6 +238,25 @@ Item {
                     }
                 }
 
+                SettingsDropdownRow {
+                    id: touchpadClickMethodRow
+
+                    readonly property var methods: ["default", "button-areas", "clickfinger"]
+
+                    tags: ["touchpad", "click", "method"]
+                    settingKey: "touchpadClickMethod"
+                    text: I18n.tr("Click Method")
+                    description: I18n.tr("Button areas determines click type by position; Clickfinger by finger count")
+                    options: [I18n.tr("Default"), I18n.tr("Button areas"), I18n.tr("Clickfinger")]
+                    currentValue: options[Math.max(0, methods.indexOf(SettingsData.touchpadClickMethod))]
+                    onValueChanged: value => {
+                        const index = touchpadClickMethodRow.options.indexOf(value);
+                        if (index < 0)
+                            return;
+                        SettingsData.set("touchpadClickMethod", touchpadClickMethodRow.methods[index]);
+                    }
+                }
+
                 SettingsToggleRow {
                     tags: ["touchpad", "disable", "typing", "dwt"]
                     settingKey: "touchpadDisableWhileTyping"
