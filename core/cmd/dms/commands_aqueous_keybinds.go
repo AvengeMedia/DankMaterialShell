@@ -36,7 +36,7 @@ func runAqueousBindEdit(cmd *cobra.Command, args []string, remove bool) {
 	if !remove {
 		for _, flag := range []string{"desc", "allow-when-locked", "cooldown-ms", "no-repeat", "no-inhibiting", "flags"} {
 			if cmd.Flags().Changed(flag) {
-				failAqueousBindEdit(cmd, fmt.Errorf("Aqueous does not support --%s in this provider", flag))
+				failAqueousBindEdit(cmd, fmt.Errorf("aqueous does not support --%s in this provider", flag))
 				return
 			}
 		}

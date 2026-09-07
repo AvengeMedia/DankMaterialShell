@@ -98,7 +98,7 @@ func parseAqueousSnapshot(data []byte) (aqueousSnapshotModel, error) {
 		return model, err
 	}
 	if batch.Error != "" {
-		return model, errors.New("Aqueous state is unavailable in the running DMS shell")
+		return model, errors.New("aqueous state is unavailable in the running DMS shell")
 	}
 	if batch.Schema != 1 || batch.Type != "snapshot" || !bytes.Equal(batch.BaseSequence, []byte("null")) || batch.Upsert == nil || batch.Removed == nil || len(batch.Removed) != 0 || !regexp.MustCompile(`^[0-9a-f]{32}$`).MatchString(batch.Session) || !regexp.MustCompile(`^[0-9]+$`).MatchString(batch.Sequence) {
 		return model, errors.New("invalid Aqueous shell snapshot")
