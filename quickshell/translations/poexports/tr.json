@@ -131,6 +131,9 @@
   "0 = square corners": {
     "0 = square corners": "0 = kare köşeler"
   },
+  "1 Connecting Line": {
+    "1 Connecting Line": ""
+  },
   "1 day": {
     "1 day": "1 gün"
   },
@@ -190,6 +193,9 @@
   },
   "180°": {
     "180°": "180°"
+  },
+  "2 Connecting Lines": {
+    "2 Connecting Lines": ""
   },
   "2 hours": {
     "2 hours": ""
@@ -332,6 +338,9 @@
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
     "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": ""
   },
+  "AUTO": {
+    "AUTO": ""
+  },
   "Aborted": {
     "Aborted": "Durduruldu"
   },
@@ -374,6 +383,9 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": ""
   },
+  "Action when Enter": {
+    "Action when Enter": ""
+  },
   "Activate": {
     "Activate": "Etkinleştir"
   },
@@ -398,6 +410,9 @@
   "Active VPN": {
     "Active VPN": ""
   },
+  "Active Window": {
+    "Active Window": ""
+  },
   "Active in Column": {
     "Active in Column": ""
   },
@@ -418,6 +433,9 @@
   },
   "Adaptive": {
     "Adaptive": ""
+  },
+  "Adaptive (DMS Theme)": {
+    "Adaptive (DMS Theme)": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": ""
@@ -445,6 +463,9 @@
   },
   "Add Printer": {
     "Add Printer": "Yazıcı Ekle"
+  },
+  "Add Text Note": {
+    "Add Text Note": ""
   },
   "Add Title": {
     "Add Title": ""
@@ -538,6 +559,12 @@
   },
   "All": {
     "All": "Tümü"
+  },
+  "All Combined Outputs": {
+    "All Combined Outputs": ""
+  },
+  "All Outputs": {
+    "All Outputs": ""
   },
   "All checks passed": {
     "All checks passed": ""
@@ -640,6 +667,15 @@
   },
   "Animation Style": {
     "Animation Style": ""
+  },
+  "Annotating": {
+    "Annotating": ""
+  },
+  "Annotation Tools": {
+    "Annotation Tools": ""
+  },
+  "Anonymous Copy (stripped metadata)": {
+    "Anonymous Copy (stripped metadata)": ""
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Anonim Kimlik"
@@ -773,6 +809,18 @@
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Ekranları düzenleyin ve çözünürlüğü, yenileme hızını ve VRR'yi yapılandırın"
   },
+  "Arrow (3)": {
+    "Arrow (3)": ""
+  },
+  "Arrow Color": {
+    "Arrow Color": ""
+  },
+  "Arrow Thickness": {
+    "Arrow Thickness": ""
+  },
+  "Arrow Vector": {
+    "Arrow Vector": ""
+  },
   "At Startup": {
     "At Startup": ""
   },
@@ -787,6 +835,9 @@
   },
   "Audio": {
     "Audio": "Ses"
+  },
+  "Audio & Overlay": {
+    "Audio & Overlay": ""
   },
   "Audio Codec": {
     "Audio Codec": "Ses Codec'i"
@@ -872,8 +923,14 @@
   "Auto (Wide)": {
     "Auto (Wide)": "Oto (Geniş)"
   },
+  "Auto Balance": {
+    "Auto Balance": ""
+  },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": ""
+  },
+  "Auto Detect": {
+    "Auto Detect": ""
   },
   "Auto From Wallpaper": {
     "Auto From Wallpaper": ""
@@ -908,11 +965,17 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": ""
   },
+  "Auto-apply background defaults": {
+    "Auto-apply background defaults": ""
+  },
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "Uygulamaları başlatınca Niri genel görünümünü otomatik kapat."
+  },
+  "Auto-close the loop when ending near the start point.": {
+    "Auto-close the loop when ending near the start point.": ""
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Bildirimler şundan eskiyse otomatik sil"
@@ -935,8 +998,17 @@
   "Auto-login on startup": {
     "Auto-login on startup": ""
   },
+  "Auto-minimize": {
+    "Auto-minimize": ""
+  },
   "Auto-save to disk": {
     "Auto-save to disk": ""
+  },
+  "Auto-select a tool preset on hover, without releasing the mouse.": {
+    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+  },
+  "Auto-tiling": {
+    "Auto-tiling": ""
   },
   "Autoconnect": {
     "Autoconnect": "Otomatik Bağlan"
@@ -986,11 +1058,17 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Sistem askıya alınmaya hazırlanırken ekranı otomatik olarak kilitle"
   },
+  "Automatically minimize the float window after a delay": {
+    "Automatically minimize the float window after a delay": ""
+  },
   "Automatically picks the scheme variant based on the wallpaper.": {
     "Automatically picks the scheme variant based on the wallpaper.": ""
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
+  },
+  "Automatically stack windows to avoid overlap": {
+    "Automatically stack windows to avoid overlap": ""
   },
   "Automatically turn on Num Lock at startup": {
     "Automatically turn on Num Lock at startup": ""
@@ -1034,11 +1112,17 @@
   "Back": {
     "Back": "Geri"
   },
+  "Back to Annotation (B)": {
+    "Back to Annotation (B)": ""
+  },
   "Backend": {
     "Backend": "Arka Uç"
   },
   "Background": {
     "Background": ""
+  },
+  "Background (B)": {
+    "Background (B)": ""
   },
   "Background Blur": {
     "Background Blur": ""
@@ -1046,11 +1130,23 @@
   "Background Color": {
     "Background Color": ""
   },
+  "Background Defaults": {
+    "Background Defaults": ""
+  },
   "Background Effect": {
     "Background Effect": ""
   },
+  "Background Image Folder": {
+    "Background Image Folder": ""
+  },
+  "Background Images": {
+    "Background Images": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Arkaplan Opaklığı"
+  },
+  "Background Presets": {
+    "Background Presets": ""
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": ""
@@ -1081,6 +1177,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": ""
+  },
+  "Bar Interactions": {
+    "Bar Interactions": ""
   },
   "Bar Length Padding": {
     "Bar Length Padding": ""
@@ -1127,11 +1226,17 @@
   "Battery Charge Limit": {
     "Battery Charge Limit": "Batarya Şarj Sınırı"
   },
+  "Battery Colors": {
+    "Battery Colors": ""
+  },
   "Battery Health": {
     "Battery Health": ""
   },
   "Battery Power": {
     "Battery Power": ""
+  },
+  "Battery Style": {
+    "Battery Style": ""
   },
   "Battery and power management": {
     "Battery and power management": "Batarya ve güç yönetimi"
@@ -1172,6 +1277,9 @@
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": ""
   },
+  "Blink Recording Dot": {
+    "Blink Recording Dot": ""
+  },
   "Block %1 in Do Not Disturb": {
     "Block %1 in Do Not Disturb": ""
   },
@@ -1202,11 +1310,17 @@
   "Blur": {
     "Blur": ""
   },
+  "Blur Background Image": {
+    "Blur Background Image": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Bulanık Duvar Kağıdı Katmanı"
   },
   "Blur on Overview": {
     "Blur on Overview": "Genel Görünümde Bulanıklık"
+  },
+  "Blur the album art behind the media player": {
+    "Blur the album art behind the media player": ""
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
@@ -1355,11 +1469,26 @@
   "CUPS not available": {
     "CUPS not available": "CUPS kullanılamıyor"
   },
+  "CUST": {
+    "CUST": ""
+  },
   "Calendar": {
     "Calendar": ""
   },
   "Calendar Backend": {
     "Calendar Backend": ""
+  },
+  "Callout": {
+    "Callout": ""
+  },
+  "Callout (Z) | Hold G for Loupe": {
+    "Callout (Z) | Hold G for Loupe": ""
+  },
+  "Callout Zoom": {
+    "Callout Zoom": ""
+  },
+  "Callout, Background (Z, B)": {
+    "Callout, Background (Z, B)": ""
   },
   "Calls / Headset": {
     "Calls / Headset": ""
@@ -1406,11 +1535,26 @@
   "Caps Lock is on": {
     "Caps Lock is on": ""
   },
+  "Capture": {
+    "Capture": ""
+  },
+  "Capture Actions": {
+    "Capture Actions": ""
+  },
+  "Capture Options": {
+    "Capture Options": ""
+  },
+  "Capturing...": {
+    "Capturing...": ""
+  },
   "Cast Target": {
     "Cast Target": ""
   },
   "Category": {
     "Category": ""
+  },
+  "Catppuccin": {
+    "Catppuccin": ""
   },
   "Cellular": {
     "Cellular": ""
@@ -1420,6 +1564,15 @@
   },
   "Cellular enabled": {
     "Cellular enabled": ""
+  },
+  "Center": {
+    "Center": ""
+  },
+  "Center Left": {
+    "Center Left": ""
+  },
+  "Center Right": {
+    "Center Right": ""
   },
   "Center Section": {
     "Center Section": "Orta Bölüm"
@@ -1538,6 +1691,12 @@
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": ""
   },
+  "Choose notifications shown after copy or save.": {
+    "Choose notifications shown after copy or save.": ""
+  },
+  "Choose the editor shape for portrait or landscape screens.": {
+    "Choose the editor shape for portrait or landscape screens.": ""
+  },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "DankBar'daki başlatıcı düğmesinde görüntülenen logoyu seçin"
   },
@@ -1553,6 +1712,9 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "Ekran gösterimlerinin ekranda nerede gösterileceğini seç"
   },
+  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+  },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": ""
   },
@@ -1561,6 +1723,9 @@
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Bu widget'ı hangi ekranlarda göstereceğinizi seçin"
+  },
+  "Choose which monitor to capture during full screen recording.": {
+    "Choose which monitor to capture during full screen recording.": ""
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
@@ -1582,6 +1747,12 @@
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": ""
+  },
+  "Classic (Tailwind)": {
+    "Classic (Tailwind)": ""
+  },
+  "Clean Text Eraser": {
+    "Clean Text Eraser": ""
   },
   "Clear": {
     "Clear": "Temizle"
@@ -1609,6 +1780,9 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "Başlangıçta Temizle"
+  },
+  "Clear saved region selection before each capture": {
+    "Clear saved region selection before each capture": ""
   },
   "Clears the badge on open but keeps notifications active": {
     "Clears the badge on open but keeps notifications active": ""
@@ -1691,6 +1865,9 @@
   "Close All Windows": {
     "Close All Windows": ""
   },
+  "Close Annotator": {
+    "Close Annotator": ""
+  },
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
@@ -1730,11 +1907,23 @@
   "Color Override": {
     "Color Override": "Renk Değiştirme"
   },
+  "Color Palette": {
+    "Color Palette": ""
+  },
   "Color Picker": {
     "Color Picker": "Renk Seçici"
   },
+  "Color Picker (F for RGB | Eyedropper)": {
+    "Color Picker (F for RGB | Eyedropper)": ""
+  },
+  "Color Picker, Eraser (F, T)": {
+    "Color Picker, Eraser (F, T)": ""
+  },
   "Color Temperature": {
     "Color Temperature": "Renk Sıcaklığı"
+  },
+  "Color copied to clipboard: %1": {
+    "Color copied to clipboard: %1": ""
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "Kilit ekranı olmayan monitörlerde görüntülenen renk"
@@ -1808,8 +1997,14 @@
   "Compact Island Height": {
     "Compact Island Height": ""
   },
+  "Compact Island Width": {
+    "Compact Island Width": ""
+  },
   "Compact Mode": {
     "Compact Mode": "Kompakt Mod"
+  },
+  "Compact Pill": {
+    "Compact Pill": ""
   },
   "Compact home clock pill in both width and height": {
     "Compact home clock pill in both width and height": ""
@@ -1865,6 +2060,9 @@
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": ""
   },
+  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": ""
   },
@@ -1891,6 +2089,9 @@
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Şununla çakışıyor: %1"
+  },
+  "Conic Gradient": {
+    "Conic Gradient": ""
   },
   "Connect": {
     "Connect": "Bağlan"
@@ -1934,6 +2135,9 @@
   "Connection failed": {
     "Connection failed": ""
   },
+  "Container Format": {
+    "Container Format": ""
+  },
   "Contains": {
     "Contains": ""
   },
@@ -1951,6 +2155,9 @@
   },
   "Contributor": {
     "Contributor": ""
+  },
+  "Contributors": {
+    "Contributors": ""
   },
   "Control Center": {
     "Control Center": "Kontrol Merkezi"
@@ -1994,14 +2201,29 @@
   "Controls the outline of popouts, modals, and other shell surfaces": {
     "Controls the outline of popouts, modals, and other shell surfaces": ""
   },
+  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+  },
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
   "Convert to DMS": {
     "Convert to DMS": ""
   },
+  "Converting recording to GIF...": {
+    "Converting recording to GIF...": ""
+  },
   "Cooldown": {
     "Cooldown": "Bekleme"
+  },
+  "Copied": {
+    "Copied": ""
+  },
+  "Copied & saved": {
+    "Copied & saved": ""
+  },
+  "Copied Anonymously": {
+    "Copied Anonymously": ""
   },
   "Copied GIF": {
     "Copied GIF": ""
@@ -2018,11 +2240,26 @@
   "Copied!": {
     "Copied!": "Kopyalandı!"
   },
+  "Copied:": {
+    "Copied:": ""
+  },
   "Copy": {
     "Copy": ""
   },
+  "Copy & Save": {
+    "Copy & Save": ""
+  },
+  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
+  },
+  "Copy Color": {
+    "Copy Color": ""
+  },
   "Copy Content": {
     "Copy Content": ""
+  },
+  "Copy Current Palette": {
+    "Copy Current Palette": ""
   },
   "Copy Full Command": {
     "Copy Full Command": ""
@@ -2039,8 +2276,14 @@
   "Copy Text": {
     "Copy Text": ""
   },
+  "Copy and customize this preset": {
+    "Copy and customize this preset": ""
+  },
   "Copy target (%1)": {
     "Copy target (%1)": ""
+  },
+  "Copy vector / Paste / Duplicate": {
+    "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
     "Corner Radius": "Köşe Yarıçapı"
@@ -2117,6 +2360,12 @@
   "Critical Threshold": {
     "Critical Threshold": ""
   },
+  "Crop / Resize": {
+    "Crop / Resize": ""
+  },
+  "Crop / Resize Area": {
+    "Crop / Resize Area": ""
+  },
   "Ctrl + Shift": {
     "Ctrl + Shift": ""
   },
@@ -2177,6 +2426,9 @@
   "Current time and date display": {
     "Current time and date display": "Güncel saat ve tarih göstergesi"
   },
+  "Current time and date pill": {
+    "Current time and date pill": ""
+  },
   "Current weather conditions and temperature": {
     "Current weather conditions and temperature": "Mevcut hava koşulları ve sıcaklık"
   },
@@ -2209,6 +2461,9 @@
   },
   "Custom Color": {
     "Custom Color": ""
+  },
+  "Custom Colors": {
+    "Custom Colors": ""
   },
   "Custom Duration": {
     "Custom Duration": "Özel Süre"
@@ -2245,6 +2500,9 @@
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "Özel Askıya Al Komutu"
+  },
+  "Custom Tool": {
+    "Custom Tool": ""
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
@@ -2339,11 +2597,17 @@
   "Dank Dash": {
     "Dank Dash": ""
   },
+  "Dank Island": {
+    "Dank Island": ""
+  },
   "Dank Island - Beta": {
     "Dank Island - Beta": ""
   },
   "Dank Island instance": {
     "Dank Island instance": ""
+  },
+  "Dank Violet": {
+    "Dank Violet": ""
   },
   "DankBar": {
     "DankBar": ""
@@ -2363,6 +2627,9 @@
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell & Sistem İkonları (yeniden başlatma gerekir)"
   },
+  "Dark": {
+    "Dark": ""
+  },
   "Dark Mode": {
     "Dark Mode": "Karanlık Mod"
   },
@@ -2381,8 +2648,20 @@
   "Darken Modal Background": {
     "Darken Modal Background": "Koyu Modal Arkaplanı"
   },
+  "Darken the image to improve foreground contrast": {
+    "Darken the image to improve foreground contrast": ""
+  },
+  "Darkest": {
+    "Darkest": ""
+  },
   "Dashboard": {
     "Dashboard": ""
+  },
+  "Dashed Line": {
+    "Dashed Line": ""
+  },
+  "Date": {
+    "Date": ""
   },
   "Date First": {
     "Date First": ""
@@ -2426,8 +2705,38 @@
   "Default (Global)": {
     "Default (Global)": ""
   },
+  "Default Alignment": {
+    "Default Alignment": ""
+  },
   "Default Apps": {
     "Default Apps": ""
+  },
+  "Default Aspect Ratio": {
+    "Default Aspect Ratio": ""
+  },
+  "Default Background Image": {
+    "Default Background Image": ""
+  },
+  "Default Background Mode": {
+    "Default Background Mode": ""
+  },
+  "Default Bold Text": {
+    "Default Bold Text": ""
+  },
+  "Default Corner Radius": {
+    "Default Corner Radius": ""
+  },
+  "Default Gradient Angle": {
+    "Default Gradient Angle": ""
+  },
+  "Default Gradient End": {
+    "Default Gradient End": ""
+  },
+  "Default Gradient Start": {
+    "Default Gradient Start": ""
+  },
+  "Default Italic Text": {
+    "Default Italic Text": ""
   },
   "Default Launcher": {
     "Default Launcher": ""
@@ -2435,14 +2744,41 @@
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": ""
   },
+  "Default Microphone": {
+    "Default Microphone": ""
+  },
   "Default Mode": {
     "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": ""
   },
+  "Default Output": {
+    "Default Output": ""
+  },
+  "Default Padding": {
+    "Default Padding": ""
+  },
+  "Default Shadow Strength": {
+    "Default Shadow Strength": ""
+  },
+  "Default Solid Color": {
+    "Default Solid Color": ""
+  },
   "Default Task List": {
     "Default Task List": ""
+  },
+  "Default Text Background": {
+    "Default Text Background": ""
+  },
+  "Default Text Font Size": {
+    "Default Text Font Size": ""
+  },
+  "Default Underline Text": {
+    "Default Underline Text": ""
+  },
+  "Default Watermark": {
+    "Default Watermark": ""
   },
   "Default Width (%)": {
     "Default Width (%)": "Varsayılan Genişlik (%)"
@@ -2576,6 +2912,18 @@
   "Dim": {
     "Dim": ""
   },
+  "Dim Background Image": {
+    "Dim Background Image": ""
+  },
+  "Dim Intensity": {
+    "Dim Intensity": ""
+  },
+  "Dimming Opacity": {
+    "Dimming Opacity": ""
+  },
+  "Direct": {
+    "Direct": ""
+  },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
@@ -2629,6 +2977,12 @@
   },
   "Discard": {
     "Discard": "Yok Say"
+  },
+  "Discard & Close": {
+    "Discard & Close": ""
+  },
+  "Discard & Close (Esc)": {
+    "Discard & Close (Esc)": ""
   },
   "Discharging": {
     "Discharging": ""
@@ -2768,20 +3122,41 @@
   "Domain (optional)": {
     "Domain (optional)": "Etki alanı (isteğe bağlı)"
   },
+  "Dominant": {
+    "Dominant": ""
+  },
   "Don't Change": {
     "Don't Change": "Değiştirme"
   },
   "Don't Save": {
     "Don't Save": "Kaydetme"
   },
+  "Done": {
+    "Done": ""
+  },
+  "Done (Action based on settings)": {
+    "Done (Action based on settings)": ""
+  },
   "Door Open": {
     "Door Open": "Kapı Açık"
+  },
+  "Dotted Line": {
+    "Dotted Line": ""
+  },
+  "Dracula": {
+    "Dracula": ""
+  },
+  "Drag Image": {
+    "Drag Image": ""
   },
   "Drag Lock": {
     "Drag Lock": ""
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
+  },
+  "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": {
+    "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": ""
   },
   "Drag to Reorder": {
     "Drag to Reorder": ""
@@ -2801,6 +3176,9 @@
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
+  "Draw an outer ring using the stamp number color": {
+    "Draw an outer ring using the stamp number color": ""
+  },
   "Draw an outline and use the highest-contrast surface tone": {
     "Draw an outline and use the highest-contrast surface tone": ""
   },
@@ -2812,6 +3190,9 @@
   },
   "Drop here": {
     "Drop here": ""
+  },
+  "Drop image onto bar icon to annotate it": {
+    "Drop image onto bar icon to annotate it": ""
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": ""
@@ -2858,6 +3239,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
   },
+  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
+  },
   "Edge": {
     "Edge": ""
   },
@@ -2882,8 +3266,20 @@
   "Edit Clipboard": {
     "Edit Clipboard": ""
   },
+  "Edit Color Palette": {
+    "Edit Color Palette": ""
+  },
+  "Edit Image from Clipboard — Edit": {
+    "Edit Image from Clipboard — Edit": ""
+  },
+  "Edit Image from Clipboard — Float": {
+    "Edit Image from Clipboard — Float": ""
+  },
   "Edit Rule": {
     "Edit Rule": ""
+  },
+  "Edit Text Note": {
+    "Edit Text Note": ""
   },
   "Edit Window Rule": {
     "Edit Window Rule": ""
@@ -2897,8 +3293,41 @@
   "Editing changes on %1": {
     "Editing changes on %1": ""
   },
+  "Editor": {
+    "Editor": ""
+  },
+  "Editor Aspect Ratio": {
+    "Editor Aspect Ratio": ""
+  },
+  "Editor Display Mode": {
+    "Editor Display Mode": ""
+  },
+  "Editor Display Screen": {
+    "Editor Display Screen": ""
+  },
+  "Editor Preview Quality": {
+    "Editor Preview Quality": ""
+  },
   "Education": {
     "Education": "Eğitim"
+  },
+  "Ellipse": {
+    "Ellipse": ""
+  },
+  "Ellipse / Circle": {
+    "Ellipse / Circle": ""
+  },
+  "Ellipse / Circle (Q)": {
+    "Ellipse / Circle (Q)": ""
+  },
+  "Ellipse Color": {
+    "Ellipse Color": ""
+  },
+  "Ellipse Thickness": {
+    "Ellipse Thickness": ""
+  },
+  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
   },
   "Empty": {
     "Empty": "Boş"
@@ -2962,6 +3391,9 @@
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": ""
+  },
+  "Enable background automatically when opening the editor": {
+    "Enable background automatically when opening the editor": ""
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Kompozitör tarafından hedeflenebilir bulanıklık katmanını etkinleştir (isim alanı: dms:blurwallpaper). Manuel Niri yapılandırması gerektirir."
@@ -3077,6 +3509,9 @@
   "Environment Variables": {
     "Environment Variables": ""
   },
+  "Eraser": {
+    "Eraser": ""
+  },
   "Error": {
     "Error": "Hata"
   },
@@ -3091,6 +3526,9 @@
   },
   "Event title": {
     "Event title": ""
+  },
+  "Everforest": {
+    "Everforest": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": ""
@@ -3215,8 +3653,14 @@
   "Failed to connect to %1": {
     "Failed to connect to %1": "%1 bağlanılamadı"
   },
+  "Failed to convert recording to GIF.": {
+    "Failed to convert recording to GIF.": ""
+  },
   "Failed to copy entry": {
     "Failed to copy entry": "Kayıt kopyalanamadı"
+  },
+  "Failed to copy screenshot to clipboard.": {
+    "Failed to copy screenshot to clipboard.": ""
   },
   "Failed to create printer": {
     "Failed to create printer": "Yazıcı oluşturulamadı"
@@ -3271,6 +3715,9 @@
   },
   "Failed to generate QR code: %1": {
     "Failed to generate QR code: %1": ""
+  },
+  "Failed to generate blurred background image": {
+    "Failed to generate blurred background image": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": ""
@@ -3368,6 +3815,12 @@
   "Failed to save profile": {
     "Failed to save profile": ""
   },
+  "Failed to save screenshot": {
+    "Failed to save screenshot": ""
+  },
+  "Failed to save screenshot file.": {
+    "Failed to save screenshot file.": ""
+  },
   "Failed to send SMS": {
     "Failed to send SMS": ""
   },
@@ -3415,6 +3868,9 @@
   },
   "Failed to switch codec": {
     "Failed to switch codec": ""
+  },
+  "Failed to switch output": {
+    "Failed to switch output": ""
   },
   "Failed to switch port": {
     "Failed to switch port": ""
@@ -3563,6 +4019,12 @@
   "Flatpak": {
     "Flatpak": ""
   },
+  "Flip Horiz": {
+    "Flip Horiz": ""
+  },
+  "Flip Vert": {
+    "Flip Vert": ""
+  },
   "Flipped": {
     "Flipped": "Döndürülmüş"
   },
@@ -3580,6 +4042,12 @@
   },
   "Float Anchor": {
     "Float Anchor": ""
+  },
+  "Float Image": {
+    "Float Image": ""
+  },
+  "Float Window": {
+    "Float Window": ""
   },
   "Float X": {
     "Float X": ""
@@ -3638,6 +4106,9 @@
   "Focused Monitor Only": {
     "Focused Monitor Only": ""
   },
+  "Focused Screen": {
+    "Focused Screen": ""
+  },
   "Focused Window": {
     "Focused Window": "Odaklanılmış Pencere"
   },
@@ -3659,6 +4130,9 @@
   "Follow focus": {
     "Follow focus": "Odağı takip et"
   },
+  "Follow the theme accent, or step from green to red as the battery drains.": {
+    "Follow the theme accent, or step from green to red as the battery drains.": ""
+  },
   "Follows the default launcher choice selected above.": {
     "Follows the default launcher choice selected above.": ""
   },
@@ -3676,6 +4150,9 @@
   },
   "Font Weight": {
     "Font Weight": "Yazı Tipi Ağırlığı"
+  },
+  "Font family used for number stamp labels": {
+    "Font family used for number stamp labels": ""
   },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": ""
@@ -3701,6 +4178,12 @@
   "For editing plain text files": {
     "For editing plain text files": ""
   },
+  "Force Copy & Save": {
+    "Force Copy & Save": ""
+  },
+  "Force Copy to Clipboard": {
+    "Force Copy to Clipboard": ""
+  },
   "Force HDR": {
     "Force HDR": "Zorla HDR"
   },
@@ -3712,6 +4195,9 @@
   },
   "Force RGBX": {
     "Force RGBX": ""
+  },
+  "Force Save to File": {
+    "Force Save to File": ""
   },
   "Force Wide Color": {
     "Force Wide Color": "Geniş Rengi Zorla"
@@ -3761,6 +4247,12 @@
   "Format the date on the login screen": {
     "Format the date on the login screen": ""
   },
+  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+  },
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  },
   "Forward 10s": {
     "Forward 10s": ""
   },
@@ -3779,14 +4271,32 @@
   "Frame Xray": {
     "Frame Xray": ""
   },
+  "Framerate": {
+    "Framerate": ""
+  },
+  "Free": {
+    "Free": ""
+  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+  },
+  "Freehand Pen": {
+    "Freehand Pen": ""
+  },
+  "Freehand Pen (1)": {
+    "Freehand Pen (1)": ""
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": ""
   },
   "Frequency": {
     "Frequency": "Frekans"
+  },
+  "From Clipboard": {
+    "From Clipboard": ""
+  },
+  "From File": {
+    "From File": ""
   },
   "Fruit Salad": {
     "Fruit Salad": ""
@@ -3802,6 +4312,12 @@
   },
   "Full Day & Month": {
     "Full Day & Month": ""
+  },
+  "Full Screen": {
+    "Full Screen": ""
+  },
+  "Full Screen Target": {
+    "Full Screen Target": ""
   },
   "Full Size": {
     "Full Size": ""
@@ -3823,6 +4339,9 @@
   },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: ızgara • Z/X: boyut"
+  },
+  "GIF Framerate": {
+    "GIF Framerate": ""
   },
   "GPU": {
     "GPU": "GPU"
@@ -3862,6 +4381,9 @@
   },
   "General": {
     "General": ""
+  },
+  "General Shortcuts": {
+    "General Shortcuts": ""
   },
   "Generate Override": {
     "Generate Override": ""
@@ -3989,6 +4511,9 @@
   "Groups": {
     "Groups": ""
   },
+  "Gruvbox Material": {
+    "Gruvbox Material": ""
+  },
   "H": {
     "H": ""
   },
@@ -4070,6 +4595,12 @@
   "Hide App": {
     "Hide App": ""
   },
+  "Hide Control Center": {
+    "Hide Control Center": ""
+  },
+  "Hide Control Center by Default": {
+    "Hide Control Center by Default": ""
+  },
   "Hide Delay": {
     "Hide Delay": "Gizleme Gecikmesi"
   },
@@ -4138,6 +4669,18 @@
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": ""
+  },
+  "Highlighter": {
+    "Highlighter": ""
+  },
+  "Highlighter (S)": {
+    "Highlighter (S)": ""
+  },
+  "Highlighter Color": {
+    "Highlighter Color": ""
+  },
+  "Highlighter Thickness": {
+    "Highlighter Thickness": ""
   },
   "History": {
     "History": ""
@@ -4211,6 +4754,9 @@
   "Hover Popouts": {
     "Hover Popouts": ""
   },
+  "Hover Trigger Delay": {
+    "Hover Trigger Delay": ""
+  },
   "How layout changes are remembered across apps": {
     "How layout changes are remembered across apps": ""
   },
@@ -4267,6 +4813,9 @@
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
     "IP sharing setup failed. Check that dnsmasq is installed.": ""
+  },
+  "IPC Commands": {
+    "IPC Commands": ""
   },
   "ISO Date": {
     "ISO Date": ""
@@ -4346,11 +4895,26 @@
   "Image": {
     "Image": "Resim"
   },
+  "Image + Text": {
+    "Image + Text": ""
+  },
+  "Image Background": {
+    "Image Background": ""
+  },
+  "Image Error": {
+    "Image Error": ""
+  },
+  "Image Size": {
+    "Image Size": ""
+  },
   "Image Viewer": {
     "Image Viewer": ""
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Görüntü panoya kopyalandı"
+  },
+  "Image selected automatically when using Image Background mode": {
+    "Image selected automatically when using Image Background mode": ""
   },
   "Import": {
     "Import": "İçe Aktar"
@@ -4363,6 +4927,9 @@
   },
   "Include AUR updates": {
     "Include AUR updates": ""
+  },
+  "Include Cursor": {
+    "Include Cursor": ""
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": ""
@@ -4394,6 +4961,9 @@
   "Index Centering": {
     "Index Centering": ""
   },
+  "Indicator Colors": {
+    "Indicator Colors": ""
+  },
   "Indicator Style": {
     "Indicator Style": "Gösterge Stili"
   },
@@ -4415,8 +4985,14 @@
   "Inhibitable": {
     "Inhibitable": ""
   },
+  "Initial Width": {
+    "Initial Width": ""
+  },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
     "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": ""
+  },
+  "Initial state for the Control Center toggle.": {
+    "Initial state for the Control Center toggle.": ""
   },
   "Initialised": {
     "Initialised": ""
@@ -4433,8 +5009,14 @@
   "Input Devices": {
     "Input Devices": "Giriş Aygıtları"
   },
+  "Input Mode": {
+    "Input Mode": ""
+  },
   "Input Volume Slider": {
     "Input Volume Slider": "Giriş Ses Seviyesi Kaydırıcı"
+  },
+  "Insert Image": {
+    "Insert Image": ""
   },
   "Insert your security key...": {
     "Insert your security key...": ""
@@ -4505,6 +5087,12 @@
   "Intensity": {
     "Intensity": ""
   },
+  "Interaction / Result": {
+    "Interaction / Result": ""
+  },
+  "Interactive Region": {
+    "Interactive Region": ""
+  },
   "Interface:": {
     "Interface:": "Arayüz:"
   },
@@ -4556,6 +5144,9 @@
   "Isolate Displays": {
     "Isolate Displays": "İzole Ekranlar"
   },
+  "JPEG Quality": {
+    "JPEG Quality": ""
+  },
   "Jobs": {
     "Jobs": "İşler"
   },
@@ -4567,6 +5158,9 @@
   },
   "Jump to page (1 - %1)": {
     "Jump to page (1 - %1)": ""
+  },
+  "Kanagawa": {
+    "Kanagawa": ""
   },
   "Keep Awake": {
     "Keep Awake": "Uyanık Tut"
@@ -4676,11 +5270,23 @@
   "LabWC Website": {
     "LabWC Website": ""
   },
+  "Landscape": {
+    "Landscape": ""
+  },
   "Large": {
     "Large": ""
   },
   "Largest": {
     "Largest": ""
+  },
+  "Last Reg": {
+    "Last Reg": ""
+  },
+  "Last Region": {
+    "Last Region": ""
+  },
+  "Last Selected Region": {
+    "Last Selected Region": ""
   },
   "Last hour": {
     "Last hour": ""
@@ -4742,17 +5348,26 @@
   "Layout Overrides": {
     "Layout Overrides": "Düzen geçersiz kılmaları"
   },
+  "Least Saturated": {
+    "Least Saturated": ""
+  },
   "Left": {
     "Left": "Sol"
   },
   "Left Center": {
     "Left Center": ""
   },
+  "Left Click": {
+    "Left Click": ""
+  },
   "Left Section": {
     "Left Section": "Sol Bölüm"
   },
   "Left-Handed Mode": {
     "Left-Handed Mode": ""
+  },
+  "Level": {
+    "Level": ""
   },
   "Light": {
     "Light": ""
@@ -4781,6 +5396,9 @@
   "Light mode harmony": {
     "Light mode harmony": ""
   },
+  "Lightest": {
+    "Lightest": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": ""
   },
@@ -4790,17 +5408,29 @@
   "Line": {
     "Line": ""
   },
+  "Line Color": {
+    "Line Color": ""
+  },
+  "Line Thickness": {
+    "Line Thickness": ""
+  },
   "Line: %1": {
     "Line: %1": ""
   },
   "Linear": {
     "Linear": "Doğrusal"
   },
+  "Linear Gradient": {
+    "Linear Gradient": ""
+  },
   "Lines: %1": {
     "Lines: %1": "Satırlar: %1"
   },
   "List": {
     "List": "Liste"
+  },
+  "Live Preview": {
+    "Live Preview": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Doygun vurgularla canlı renk paleti."
@@ -4810,6 +5440,9 @@
   },
   "Loading codecs...": {
     "Loading codecs...": "Kodekler yükleniyor..."
+  },
+  "Loading contributors...": {
+    "Loading contributors...": ""
   },
   "Loading keybinds...": {
     "Loading keybinds...": "Tuş kombinasyonları yükleniyor..."
@@ -4903,6 +5536,9 @@
   },
   "MTU": {
     "MTU": "MTU"
+  },
+  "Magnifier Loupe": {
+    "Magnifier Loupe": ""
   },
   "Mail": {
     "Mail": ""
@@ -5045,6 +5681,9 @@
   "Max H": {
     "Max H": ""
   },
+  "Max Height (0 = no limit)": {
+    "Max Height (0 = no limit)": ""
+  },
   "Max Pinned Apps": {
     "Max Pinned Apps": ""
   },
@@ -5153,11 +5792,17 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Bellek kullanım göstergesi"
   },
+  "Menu Item Right Click": {
+    "Menu Item Right Click": ""
+  },
   "Merge indexed file results into the All tab (requires dsearch).": {
     "Merge indexed file results into the All tab (requires dsearch).": ""
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
     "Merge indexed folder results into the All tab (requires dsearch).": ""
+  },
+  "Merging audio tracks...": {
+    "Merging audio tracks...": ""
   },
   "Message": {
     "Message": ""
@@ -5167,6 +5812,9 @@
   },
   "Microphone": {
     "Microphone": "Mikrofon"
+  },
+  "Microphone Device": {
+    "Microphone Device": ""
   },
   "Microphone Mute": {
     "Microphone Mute": "Microfon Sessiz"
@@ -5179,6 +5827,12 @@
   },
   "Microphone volume control": {
     "Microphone volume control": "Mikrofon ses seviyesi kontrolü"
+  },
+  "Middle Click": {
+    "Middle Click": ""
+  },
+  "Middle Click Action": {
+    "Middle Click Action": ""
   },
   "Middle Click Emulation": {
     "Middle Click Emulation": ""
@@ -5198,6 +5852,9 @@
   "Minimize": {
     "Minimize": ""
   },
+  "Minimize Delay": {
+    "Minimize Delay": ""
+  },
   "Minute": {
     "Minute": "Dakika"
   },
@@ -5206,6 +5863,9 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": ""
+  },
+  "Modal": {
+    "Modal": ""
   },
   "Modal Background": {
     "Modal Background": "Modal Arkaplanı"
@@ -5252,8 +5912,17 @@
   "Month Date": {
     "Month Date": ""
   },
+  "More Tools": {
+    "More Tools": ""
+  },
   "Morning": {
     "Morning": "Sabah"
+  },
+  "Most Saturated": {
+    "Most Saturated": ""
+  },
+  "Most Vivid": {
+    "Most Vivid": ""
   },
   "Motion": {
     "Motion": ""
@@ -5287,6 +5956,9 @@
   },
   "Move island and satellites left or right from display center": {
     "Move island and satellites left or right from display center": ""
+  },
+  "Move island and satellites up or down from display center": {
+    "Move island and satellites up or down from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Duraklatılıyor"
@@ -5438,6 +6110,9 @@
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": ""
   },
+  "Niri Binding Example": {
+    "Niri Binding Example": ""
+  },
   "Niri Integration": {
     "Niri Integration": "Niri Entegrasyonu"
   },
@@ -5482,6 +6157,9 @@
   },
   "No History": {
     "No History": ""
+  },
+  "No Image Specified": {
+    "No Image Specified": ""
   },
   "No Media": {
     "No Media": "Medya Yok"
@@ -5651,6 +6329,9 @@
   "No other active sessions on this seat": {
     "No other active sessions on this seat": ""
   },
+  "No output available": {
+    "No output available": ""
+  },
   "No output device": {
     "No output device": ""
   },
@@ -5699,6 +6380,9 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": ""
   },
+  "No saved images yet": {
+    "No saved images yet": ""
+  },
   "No screenshot provided": {
     "No screenshot provided": ""
   },
@@ -5710,6 +6394,9 @@
   },
   "No status output.": {
     "No status output.": ""
+  },
+  "No supported images found": {
+    "No supported images found": ""
   },
   "No supported package manager found.": {
     "No supported package manager found.": ""
@@ -5765,8 +6452,14 @@
   "None": {
     "None": "Hiçbiri"
   },
+  "None / Disabled": {
+    "None / Disabled": ""
+  },
   "None active": {
     "None active": ""
+  },
+  "Nord": {
+    "Nord": ""
   },
   "Normal": {
     "Normal": "Normal"
@@ -5806,6 +6499,9 @@
   },
   "Not set": {
     "Not set": ""
+  },
+  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
   },
   "Notepad": {
     "Notepad": "Not Defteri"
@@ -5858,11 +6554,23 @@
   "Now playing and media controls": {
     "Now playing and media controls": ""
   },
+  "Number Stamp": {
+    "Number Stamp": ""
+  },
   "Numeric (D/M)": {
     "Numeric (D/M)": ""
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": ""
+  },
+  "OCR": {
+    "OCR": ""
+  },
+  "OCR Result": {
+    "OCR Result": ""
+  },
+  "OCR Text Recognition": {
+    "OCR Text Recognition": ""
   },
   "OK": {
     "OK": "Tamam"
@@ -5957,6 +6665,9 @@
   "Open Dir": {
     "Open Dir": ""
   },
+  "Open Folder": {
+    "Open Folder": ""
+  },
   "Open Frame": {
     "Open Frame": ""
   },
@@ -5968,6 +6679,15 @@
   },
   "Open Notepad File": {
     "Open Notepad File": "Not Defteri Dosyası Aç"
+  },
+  "Open Quick Capture menu (Popout)": {
+    "Open Quick Capture menu (Popout)": ""
+  },
+  "Open Specific Image Path — Edit": {
+    "Open Specific Image Path — Edit": ""
+  },
+  "Open Specific Image Path — Float": {
+    "Open Specific Image Path — Float": ""
   },
   "Open Trash": {
     "Open Trash": ""
@@ -6059,6 +6779,9 @@
   "Outline": {
     "Outline": ""
   },
+  "Outline Variant": {
+    "Outline Variant": ""
+  },
   "Outline around shell surfaces": {
     "Outline around shell surfaces": ""
   },
@@ -6074,8 +6797,20 @@
   "Output Devices": {
     "Output Devices": ""
   },
+  "Output Format": {
+    "Output Format": ""
+  },
   "Output Tray Missing": {
     "Output Tray Missing": "Çıktı Tepsisi Yok"
+  },
+  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+  },
+  "Output switched": {
+    "Output switched": ""
+  },
+  "Outputs": {
+    "Outputs": ""
   },
   "Overcast": {
     "Overcast": ""
@@ -6085,6 +6820,9 @@
   },
   "Overlay": {
     "Overlay": ""
+  },
+  "Overlay Opacity": {
+    "Overlay Opacity": ""
   },
   "Overridden by config": {
     "Overridden by config": "Yapılandırma tarafından geçersiz kılınmıştır"
@@ -6134,6 +6872,9 @@
   "PAM already provides security-key auth. Enable this to show it at login.": {
     "PAM already provides security-key auth. Enable this to show it at login.": ""
   },
+  "PAUSED": {
+    "PAUSED": ""
+  },
   "PDF Reader": {
     "PDF Reader": ""
   },
@@ -6142,6 +6883,9 @@
   },
   "PIN": {
     "PIN": "PİN"
+  },
+  "PRIMARY": {
+    "PRIMARY": ""
   },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": ""
@@ -6182,6 +6926,9 @@
   "Palette": {
     "Palette": ""
   },
+  "Palette Preset": {
+    "Palette Preset": ""
+  },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
     "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
   },
@@ -6205,6 +6952,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": ""
+  },
+  "Password must be 8 to 63 characters, or a 64-digit hex key.": {
+    "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
   },
   "Password set": {
     "Password set": ""
@@ -6235,6 +6985,18 @@
   },
   "Paused": {
     "Paused": "Duraklatıldı"
+  },
+  "Pen Auto-Close": {
+    "Pen Auto-Close": ""
+  },
+  "Pen Color": {
+    "Pen Color": ""
+  },
+  "Pen Thickness": {
+    "Pen Thickness": ""
+  },
+  "Pen, Line, Arrow, Rect": {
+    "Pen, Line, Arrow, Rect": ""
   },
   "Pending": {
     "Pending": "Beklemede"
@@ -6278,11 +7040,17 @@
   "Phone number": {
     "Phone number": ""
   },
+  "Pick Color": {
+    "Pick Color": ""
+  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": ""
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": ""
+  },
+  "Pick a palette preset or customize individual color slots.": {
+    "Pick a palette preset or customize individual color slots.": ""
   },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": ""
@@ -6305,8 +7073,17 @@
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": ""
   },
+  "Pixel Intensity": {
+    "Pixel Intensity": ""
+  },
   "Pixelate": {
     "Pixelate": ""
+  },
+  "Pixelate (E)": {
+    "Pixelate (E)": ""
+  },
+  "Pixelate Intensity": {
+    "Pixelate Intensity": ""
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": ""
@@ -6431,6 +7208,9 @@
   "Popular Plugins": {
     "Popular Plugins": ""
   },
+  "Popup Input": {
+    "Popup Input": ""
+  },
   "Popup Only": {
     "Popup Only": ""
   },
@@ -6458,6 +7238,9 @@
   "Portal": {
     "Portal": ""
   },
+  "Portrait": {
+    "Portrait": ""
+  },
   "Position": {
     "Position": "Pozisyon"
   },
@@ -6466,6 +7249,9 @@
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "Olası Geçersiz Kılma Çakışmaları"
+  },
+  "Post-Capture Notification": {
+    "Post-Capture Notification": ""
   },
   "Power": {
     "Power": "Güç"
@@ -6524,6 +7310,42 @@
   "Preference": {
     "Preference": "Tercih"
   },
+  "Preset %1": {
+    "Preset %1": ""
+  },
+  "Preset 1": {
+    "Preset 1": ""
+  },
+  "Preset 2": {
+    "Preset 2": ""
+  },
+  "Preset 3": {
+    "Preset 3": ""
+  },
+  "Preset 4": {
+    "Preset 4": ""
+  },
+  "Preset 5": {
+    "Preset 5": ""
+  },
+  "Preset 6": {
+    "Preset 6": ""
+  },
+  "Preset 7": {
+    "Preset 7": ""
+  },
+  "Preset 8": {
+    "Preset 8": ""
+  },
+  "Preset Color": {
+    "Preset Color": ""
+  },
+  "Preset Thickness": {
+    "Preset Thickness": ""
+  },
+  "Preset Tool": {
+    "Preset Tool": ""
+  },
   "Preset Widths (%)": {
     "Preset Widths (%)": "Ön Ayarlı Genişlik (%)"
   },
@@ -6574,6 +7396,9 @@
   },
   "Primary Container": {
     "Primary Container": ""
+  },
+  "Primary Screen": {
+    "Primary Screen": ""
   },
   "Print Server Management": {
     "Print Server Management": "Yazdırma Sunucusu Yönetimi"
@@ -6671,6 +7496,9 @@
   "QR Generator": {
     "QR Generator": ""
   },
+  "QR Result": {
+    "QR Result": ""
+  },
   "Qt": {
     "Qt": ""
   },
@@ -6689,6 +7517,12 @@
   "Quality": {
     "Quality": ""
   },
+  "Quick Capture": {
+    "Quick Capture": ""
+  },
+  "Quick Capture Error": {
+    "Quick Capture Error": ""
+  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Uygulama başlatıcısına hızlı erişim"
   },
@@ -6704,8 +7538,26 @@
   "Quick system toggles": {
     "Quick system toggles": ""
   },
+  "RECORDING": {
+    "RECORDING": ""
+  },
   "RGB": {
     "RGB": "RGB"
+  },
+  "Radial Gradient": {
+    "Radial Gradient": ""
+  },
+  "Radial Menu": {
+    "Radial Menu": ""
+  },
+  "Radial Menu Opacity": {
+    "Radial Menu Opacity": ""
+  },
+  "Radial Menu Settings": {
+    "Radial Menu Settings": ""
+  },
+  "Radial Preset": {
+    "Radial Preset": ""
   },
   "Radius": {
     "Radius": ""
@@ -6727,6 +7579,9 @@
   },
   "Rate": {
     "Rate": "Oran"
+  },
+  "Ratio": {
+    "Ratio": ""
   },
   "Re-enter password": {
     "Re-enter password": ""
@@ -6755,6 +7610,9 @@
   "Recent Colors": {
     "Recent Colors": "Son Renkler"
   },
+  "Recent Edits": {
+    "Recent Edits": ""
+  },
   "Recent Images": {
     "Recent Images": ""
   },
@@ -6763,6 +7621,60 @@
   },
   "Recommended available": {
     "Recommended available": "Önerilen mevcut"
+  },
+  "Record Microphone": {
+    "Record Microphone": ""
+  },
+  "Record Mouse Cursor": {
+    "Record Mouse Cursor": ""
+  },
+  "Record System Audio": {
+    "Record System Audio": ""
+  },
+  "Recording": {
+    "Recording": ""
+  },
+  "Recording Folder": {
+    "Recording Folder": ""
+  },
+  "Recording ended with error code %1.": {
+    "Recording ended with error code %1.": ""
+  },
+  "Recording...": {
+    "Recording...": ""
+  },
+  "Recordings Directory": {
+    "Recordings Directory": ""
+  },
+  "Rectangle": {
+    "Rectangle": ""
+  },
+  "Rectangle Color": {
+    "Rectangle Color": ""
+  },
+  "Rectangle Outline": {
+    "Rectangle Outline": ""
+  },
+  "Rectangle Outline (4)": {
+    "Rectangle Outline (4)": ""
+  },
+  "Rectangle Thickness": {
+    "Rectangle Thickness": ""
+  },
+  "Redact": {
+    "Redact": ""
+  },
+  "Redact (R)": {
+    "Redact (R)": ""
+  },
+  "Redact Thickness": {
+    "Redact Thickness": ""
+  },
+  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
+  },
+  "Redo last undone stroke": {
+    "Redo last undone stroke": ""
   },
   "Reduce Motion": {
     "Reduce Motion": ""
@@ -6781,6 +7693,9 @@
   },
   "Regex": {
     "Regex": ""
+  },
+  "Region": {
+    "Region": ""
   },
   "Registries": {
     "Registries": ""
@@ -6926,6 +7841,9 @@
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "'dgop' aracını gerektirir"
   },
+  "Requires Bar Shadows to be enabled in Theme & Colors.": {
+    "Requires Bar Shadows to be enabled in Theme & Colors.": ""
+  },
   "Requires DMS %1": {
     "Requires DMS %1": "DMS %1 gerektirir"
   },
@@ -6953,8 +7871,14 @@
   "Reserved Height": {
     "Reserved Height": ""
   },
+  "Reserved Width": {
+    "Reserved Width": ""
+  },
   "Reset": {
     "Reset": "Sıfırla"
+  },
+  "Reset Last Region": {
+    "Reset Last Region": ""
   },
   "Reset Position": {
     "Reset Position": "Pozisyonu Sıfırla"
@@ -7040,6 +7964,12 @@
   "Right Center": {
     "Right Center": ""
   },
+  "Right Click": {
+    "Right Click": ""
+  },
+  "Right Click Action": {
+    "Right Click Action": ""
+  },
   "Right Section": {
     "Right Section": "Sağ Bölüm"
   },
@@ -7067,8 +7997,26 @@
   "Root Filesystem": {
     "Root Filesystem": "Kök Dosya Sistemi"
   },
+  "Rosé Pine": {
+    "Rosé Pine": ""
+  },
+  "Rotate L": {
+    "Rotate L": ""
+  },
+  "Rotate R": {
+    "Rotate R": ""
+  },
+  "Round Highlighter Tips": {
+    "Round Highlighter Tips": ""
+  },
+  "Round Rectangle Corners": {
+    "Round Rectangle Corners": ""
+  },
   "Rounded": {
     "Rounded": ""
+  },
+  "Rounded Rectangle": {
+    "Rounded Rectangle": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Pencereler için yuvarlatılmış köşeler"
@@ -7151,14 +8099,26 @@
   "Save & Start": {
     "Save & Start": ""
   },
+  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
+  },
+  "Save Directory": {
+    "Save Directory": ""
+  },
   "Save Extracted Theme": {
     "Save Extracted Theme": ""
+  },
+  "Save Filename Pattern": {
+    "Save Filename Pattern": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Not Defteri Dosyasını Kaydet"
   },
   "Save QR Code": {
     "Save QR Code": ""
+  },
+  "Save Screenshot As": {
+    "Save Screenshot As": ""
   },
   "Save and close": {
     "Save and close": ""
@@ -7190,6 +8150,9 @@
   "Saved": {
     "Saved": "Kaydedildi"
   },
+  "Saved %1 (%2)": {
+    "Saved %1 (%2)": ""
+  },
   "Saved Configurations": {
     "Saved Configurations": "Kaydedilen Yapılandırmalar"
   },
@@ -7201,6 +8164,9 @@
   },
   "Saved item deleted": {
     "Saved item deleted": ""
+  },
+  "Saving": {
+    "Saving": ""
   },
   "Saving...": {
     "Saving...": ""
@@ -7214,11 +8180,17 @@
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": ""
   },
+  "Scale Editor to Screenshot Size": {
+    "Scale Editor to Screenshot Size": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Kabuk genelinde tüm yazı tipi boyutlarını ölçeklendir"
   },
   "Scan": {
     "Scan": "Tara"
+  },
+  "Scan QR": {
+    "Scan QR": ""
   },
   "Scanning...": {
     "Scanning...": "Taranıyor..."
@@ -7229,11 +8201,128 @@
   "Score": {
     "Score": ""
   },
+  "Screen": {
+    "Screen": ""
+  },
   "Screen Edges": {
     "Screen Edges": ""
   },
+  "Screen Recorder": {
+    "Screen Recorder": ""
+  },
+  "Screen Recording (Cancel)": {
+    "Screen Recording (Cancel)": ""
+  },
+  "Screen Recording (Full Screen)": {
+    "Screen Recording (Full Screen)": ""
+  },
+  "Screen Recording (Interactive Region)": {
+    "Screen Recording (Interactive Region)": ""
+  },
+  "Screen Recording (Pause / Resume)": {
+    "Screen Recording (Pause / Resume)": ""
+  },
+  "Screen Recording (Stop & Save)": {
+    "Screen Recording (Stop & Save)": ""
+  },
+  "Screen Recording (Toggle Start / Stop)": {
+    "Screen Recording (Toggle Start / Stop)": ""
+  },
+  "Screen Recording (Window / Portal)": {
+    "Screen Recording (Window / Portal)": ""
+  },
+  "Screen Recording Error": {
+    "Screen Recording Error": ""
+  },
+  "Screen Recording Saved": {
+    "Screen Recording Saved": ""
+  },
+  "Screen recording timed out or was cancelled.": {
+    "Screen recording timed out or was cancelled.": ""
+  },
   "Screen sharing": {
     "Screen sharing": "Ekran paylaşımı"
+  },
+  "Screen: %1 (%2x%3)": {
+    "Screen: %1 (%2x%3)": ""
+  },
+  "Screenshot (All Combined Outputs) — Edit": {
+    "Screenshot (All Combined Outputs) — Edit": ""
+  },
+  "Screenshot (All Combined Outputs) — Float": {
+    "Screenshot (All Combined Outputs) — Float": ""
+  },
+  "Screenshot (Focused Window) — Edit": {
+    "Screenshot (Focused Window) — Edit": ""
+  },
+  "Screenshot (Focused Window) — Float": {
+    "Screenshot (Focused Window) — Float": ""
+  },
+  "Screenshot (Full Screen) — Edit": {
+    "Screenshot (Full Screen) — Edit": ""
+  },
+  "Screenshot (Full Screen) — Float": {
+    "Screenshot (Full Screen) — Float": ""
+  },
+  "Screenshot (Interactive Region) — Edit": {
+    "Screenshot (Interactive Region) — Edit": ""
+  },
+  "Screenshot (Interactive Region) — Float": {
+    "Screenshot (Interactive Region) — Float": ""
+  },
+  "Screenshot (Last Selected Region) — Edit": {
+    "Screenshot (Last Selected Region) — Edit": ""
+  },
+  "Screenshot (Last Selected Region) — Float": {
+    "Screenshot (Last Selected Region) — Float": ""
+  },
+  "Screenshot (Scrolling Capture) — Edit": {
+    "Screenshot (Scrolling Capture) — Edit": ""
+  },
+  "Screenshot (Scrolling Capture) — Float": {
+    "Screenshot (Scrolling Capture) — Float": ""
+  },
+  "Screenshot (Specific Output) — Edit": {
+    "Screenshot (Specific Output) — Edit": ""
+  },
+  "Screenshot (Specific Output) — Float": {
+    "Screenshot (Specific Output) — Float": ""
+  },
+  "Screenshot Copied": {
+    "Screenshot Copied": ""
+  },
+  "Screenshot Folder": {
+    "Screenshot Folder": ""
+  },
+  "Screenshot Saved": {
+    "Screenshot Saved": ""
+  },
+  "Screenshot copied anonymously with randomized name and stripped metadata.": {
+    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+  },
+  "Screenshot copied to clipboard and saved to %1": {
+    "Screenshot copied to clipboard and saved to %1": ""
+  },
+  "Screenshot copied to clipboard but failed to save file: %1": {
+    "Screenshot copied to clipboard but failed to save file: %1": ""
+  },
+  "Screenshot copied to clipboard.": {
+    "Screenshot copied to clipboard.": ""
+  },
+  "Screenshot copied with randomized name.": {
+    "Screenshot copied with randomized name.": ""
+  },
+  "Screenshot failed (mode: %1).": {
+    "Screenshot failed (mode: %1).": ""
+  },
+  "Screenshot saved": {
+    "Screenshot saved": ""
+  },
+  "Screenshot saved to %1": {
+    "Screenshot saved to %1": ""
+  },
+  "Screenshot saved to %1/%2": {
+    "Screenshot saved to %1/%2": ""
   },
   "Screenshot unavailable": {
     "Screenshot unavailable": ""
@@ -7247,11 +8336,17 @@
   "Scroll GitHub": {
     "Scroll GitHub": ""
   },
+  "Scroll Interval": {
+    "Scroll Interval": ""
+  },
   "Scroll Method": {
     "Scroll Method": ""
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Kaydırma Tekerleği"
+  },
+  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scroll song title": {
     "Scroll song title": "Şarkı başlığını kaydır"
@@ -7264,6 +8359,9 @@
   },
   "Scrolling": {
     "Scrolling": "Kaydırma"
+  },
+  "Scrolling Capture": {
+    "Scrolling Capture": ""
   },
   "Scrolling Speed": {
     "Scrolling Speed": ""
@@ -7355,20 +8453,41 @@
   "Select": {
     "Select": ""
   },
+  "Select / Move stroke": {
+    "Select / Move stroke": ""
+  },
   "Select Application": {
     "Select Application": "Uygulama Seç"
   },
   "Select Bar": {
     "Select Bar": "Bar Seç"
   },
+  "Select Color Slots 1 - 4": {
+    "Select Color Slots 1 - 4": ""
+  },
+  "Select Color Slots 5 - 8 (Q, W, E, R)": {
+    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
+  },
   "Select Custom Theme": {
     "Select Custom Theme": "Özel Tema Seç"
+  },
+  "Select Directory": {
+    "Select Directory": ""
   },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": ""
   },
   "Select File to Send": {
     "Select File to Send": ""
+  },
+  "Select Image File — Edit": {
+    "Select Image File — Edit": ""
+  },
+  "Select Image File — Float": {
+    "Select Image File — Float": ""
+  },
+  "Select Image to Annotate": {
+    "Select Image to Annotate": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Başlatıcı Logosu Seç"
@@ -7445,6 +8564,9 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Duvar kağıdı tabanlı renkler için kullanılan palet algoritmasını seçin"
   },
+  "Select which color is extracted from the wallpaper to seed the palette": {
+    "Select which color is extracted from the wallpaper to seed the palette": ""
+  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": ""
   },
@@ -7453,6 +8575,9 @@
   },
   "Select...": {
     "Select...": "Seç..."
+  },
+  "Selected Tool / Action": {
+    "Selected Tool / Action": ""
   },
   "Selected image file not found.": {
     "Selected image file not found.": "Seçilen resim dosyası bulunamadı."
@@ -7580,6 +8705,9 @@
   "Shadows": {
     "Shadows": ""
   },
+  "Shapes": {
+    "Shapes": ""
+  },
   "Share": {
     "Share": ""
   },
@@ -7603,6 +8731,9 @@
   },
   "Shortcut (%1)": {
     "Shortcut (%1)": ""
+  },
+  "Shortcut Action": {
+    "Shortcut Action": ""
   },
   "Shortcut that opens this settings window": {
     "Shortcut that opens this settings window": ""
@@ -7642,6 +8773,9 @@
   },
   "Show Charge Rate": {
     "Show Charge Rate": ""
+  },
+  "Show Control Center": {
+    "Show Control Center": ""
   },
   "Show Date": {
     "Show Date": "Tarihi Göster"
@@ -7690,6 +8824,9 @@
   },
   "Show Icon": {
     "Show Icon": ""
+  },
+  "Show Keyboard Shortcut Hints": {
+    "Show Keyboard Shortcut Hints": ""
   },
   "Show Launcher Button": {
     "Show Launcher Button": ""
@@ -7745,6 +8882,9 @@
   "Show Percentage": {
     "Show Percentage": ""
   },
+  "Show Pill Border": {
+    "Show Pill Border": ""
+  },
   "Show Power Actions": {
     "Show Power Actions": "Güç Eylemlerini Göster"
   },
@@ -7763,6 +8903,12 @@
   "Show Reboot": {
     "Show Reboot": "Yeniden Başlatı Göster"
   },
+  "Show Recent Edits History": {
+    "Show Recent Edits History": ""
+  },
+  "Show Region Border": {
+    "Show Region Border": ""
+  },
   "Show Remaining Time": {
     "Show Remaining Time": ""
   },
@@ -7774,6 +8920,9 @@
   },
   "Show Saved Items": {
     "Show Saved Items": ""
+  },
+  "Show Screenshot Border": {
+    "Show Screenshot Border": ""
   },
   "Show Seconds": {
     "Show Seconds": "Saniyeleri Göster"
@@ -7801,6 +8950,12 @@
   },
   "Show System Time": {
     "Show System Time": "Sistem Zamanını Göster"
+  },
+  "Show Toolbar": {
+    "Show Toolbar": ""
+  },
+  "Show Toolbar Border": {
+    "Show Toolbar Border": ""
   },
   "Show Top Processes": {
     "Show Top Processes": "En Üst İşlemleri Göster"
@@ -7910,6 +9065,9 @@
   "Show on screens:": {
     "Show on screens:": "Şu ekranda göster:"
   },
+  "Show only the image on a transparent background": {
+    "Show only the image on a transparent background": ""
+  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": ""
   },
@@ -7979,6 +9137,9 @@
   "Skip": {
     "Skip": ""
   },
+  "Skip Confirmation": {
+    "Skip Confirmation": ""
+  },
   "Skip confirmation": {
     "Skip confirmation": ""
   },
@@ -7990,6 +9151,30 @@
   },
   "Slideout": {
     "Slideout": ""
+  },
+  "Slot 1": {
+    "Slot 1": ""
+  },
+  "Slot 2": {
+    "Slot 2": ""
+  },
+  "Slot 3": {
+    "Slot 3": ""
+  },
+  "Slot 4": {
+    "Slot 4": ""
+  },
+  "Slot 5": {
+    "Slot 5": ""
+  },
+  "Slot 6": {
+    "Slot 6": ""
+  },
+  "Slot 7": {
+    "Slot 7": ""
+  },
+  "Slot 8": {
+    "Slot 8": ""
   },
   "Small": {
     "Small": ""
@@ -8018,11 +9203,26 @@
   "Soft Reboot": {
     "Soft Reboot": ""
   },
+  "Soften image details so screenshot content stands out": {
+    "Soften image details so screenshot content stands out": ""
+  },
   "Solid": {
     "Solid": ""
   },
+  "Solid Color": {
+    "Solid Color": ""
+  },
+  "Solid Fill": {
+    "Solid Fill": ""
+  },
+  "Solid Line": {
+    "Solid Line": ""
+  },
   "Solid material type or Outline": {
     "Solid material type or Outline": ""
+  },
+  "Solid or outlined material meter, or a circular gauge": {
+    "Solid or outlined material meter, or a circular gauge": ""
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Bazı eklentiler daha yeni bir DMS sürümü gerektirir:"
@@ -8044,6 +9244,9 @@
   },
   "Sounds": {
     "Sounds": "Sesler"
+  },
+  "Source Color": {
+    "Source Color": ""
   },
   "Source: %1": {
     "Source: %1": ""
@@ -8069,8 +9272,14 @@
   "Spacing": {
     "Spacing": "Boşluk"
   },
+  "Spawn Position": {
+    "Spawn Position": ""
+  },
   "Speaker settings": {
     "Speaker settings": "Hoparlör ayarları"
+  },
+  "Specific Output": {
+    "Specific Output": ""
   },
   "Speed": {
     "Speed": "Hız"
@@ -8081,11 +9290,17 @@
   "Spotlight": {
     "Spotlight": ""
   },
+  "Spotlight (D)": {
+    "Spotlight (D)": ""
+  },
   "Spotlight Bar": {
     "Spotlight Bar": ""
   },
   "Spotlight Bar Shortcut": {
     "Spotlight Bar Shortcut": ""
+  },
+  "Spotlight Opacity": {
+    "Spotlight Opacity": ""
   },
   "Spotlight Search": {
     "Spotlight Search": ""
@@ -8120,6 +9335,24 @@
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
     "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
   },
+  "Stamp (A)": {
+    "Stamp (A)": ""
+  },
+  "Stamp Color": {
+    "Stamp Color": ""
+  },
+  "Stamp Contrast Ring": {
+    "Stamp Contrast Ring": ""
+  },
+  "Stamp Number Font": {
+    "Stamp Number Font": ""
+  },
+  "Stamp Size": {
+    "Stamp Size": ""
+  },
+  "Stamp, Highlighter, Spotlight (A, S, D)": {
+    "Stamp, Highlighter, Spotlight (A, S, D)": ""
+  },
   "Standard": {
     "Standard": ""
   },
@@ -8141,6 +9374,15 @@
   "Start typing your notes here...": {
     "Start typing your notes here...": "Notunuzu buraya yazmaya başlayın..."
   },
+  "Starting Preset": {
+    "Starting Preset": ""
+  },
+  "Starting Tool": {
+    "Starting Tool": ""
+  },
+  "Starting Tool Mode": {
+    "Starting Tool Mode": ""
+  },
   "Starting hotspot...": {
     "Starting hotspot...": ""
   },
@@ -8156,6 +9398,9 @@
   "Stop": {
     "Stop": ""
   },
+  "Stop & Save": {
+    "Stop & Save": ""
+  },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
   },
@@ -8167,6 +9412,12 @@
   },
   "Stopping": {
     "Stopping": "Durduruluyor"
+  },
+  "Straight Line": {
+    "Straight Line": ""
+  },
+  "Straight Line (2)": {
+    "Straight Line (2)": ""
   },
   "Stretch": {
     "Stretch": ""
@@ -8222,6 +9473,9 @@
   "Surface Container": {
     "Surface Container": ""
   },
+  "Surface Container Highest": {
+    "Surface Container Highest": ""
+  },
   "Surface High": {
     "Surface High": ""
   },
@@ -8273,8 +9527,14 @@
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
     "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": ""
   },
+  "Switch to Select Tool": {
+    "Switch to Select Tool": ""
+  },
   "Switch to power profile": {
     "Switch to power profile": "Güç profiline geç"
+  },
+  "Switch to your custom preset": {
+    "Switch to your custom preset": ""
   },
   "Sync": {
     "Sync": ""
@@ -8318,8 +9578,14 @@
   "Syncing...": {
     "Syncing...": ""
   },
+  "Synthwave Electric": {
+    "Synthwave Electric": ""
+  },
   "System App Theming": {
     "System App Theming": "Sistem Uygulama Teması"
+  },
+  "System Audio Device": {
+    "System Audio Device": ""
   },
   "System Check": {
     "System Check": ""
@@ -8402,6 +9668,9 @@
   "Tap to Click": {
     "Tap to Click": ""
   },
+  "Target Output Name": {
+    "Target Output Name": ""
+  },
   "Task list used when adding tasks from the dash calendar": {
     "Task list used when adding tasks from the dash calendar": ""
   },
@@ -8450,20 +9719,38 @@
   "Text": {
     "Text": "Metin"
   },
+  "Text (W)": {
+    "Text (W)": ""
+  },
+  "Text Background Roundness": {
+    "Text Background Roundness": ""
+  },
   "Text Color": {
     "Text Color": ""
   },
   "Text Editor": {
     "Text Editor": ""
   },
+  "Text Font": {
+    "Text Font": ""
+  },
+  "Text Note": {
+    "Text Note": ""
+  },
   "Text Rendering": {
     "Text Rendering": ""
+  },
+  "Text Size": {
+    "Text Size": ""
   },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": ""
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET ortam değişkeni ayarlanmamış veya soket kullanılamıyor. Otomatik eklenti yönetimi için DMS_SOCKET gereklidir."
+  },
+  "The Island anchors to one screen edge": {
+    "The Island anchors to one screen edge": ""
   },
   "The Island anchors to the top or bottom edge": {
     "The Island anchors to the top or bottom edge": ""
@@ -8498,11 +9785,17 @@
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
+  "Theme": {
+    "Theme": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "Tema & Renkler"
   },
   "Theme Color": {
     "Theme Color": "Tema Rengi"
+  },
+  "Theme Primary Color": {
+    "Theme Primary Color": ""
   },
   "Theme Registry": {
     "Theme Registry": ""
@@ -8554,6 +9847,9 @@
   },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": ""
+  },
+  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": ""
@@ -8675,8 +9971,14 @@
   "Today": {
     "Today": "Bugün"
   },
+  "Toggle Hide/Show Annotations": {
+    "Toggle Hide/Show Annotations": ""
+  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": ""
+  },
+  "Toggle between 2 latest presets": {
+    "Toggle between 2 latest presets": ""
   },
   "Toggle fonts": {
     "Toggle fonts": ""
@@ -8689,6 +9991,9 @@
   },
   "Toggling...": {
     "Toggling...": "Geçiş yapılıyor..."
+  },
+  "Tokyo Night": {
+    "Tokyo Night": ""
   },
   "Tomorrow": {
     "Tomorrow": "Yarın"
@@ -8704,6 +10009,18 @@
   },
   "Too many attempts - locked out": {
     "Too many attempts - locked out": ""
+  },
+  "Tool Defaults": {
+    "Tool Defaults": ""
+  },
+  "Toolbar": {
+    "Toolbar": ""
+  },
+  "Toolbar Palette": {
+    "Toolbar Palette": ""
+  },
+  "Toolbar Position": {
+    "Toolbar Position": ""
   },
   "Tools": {
     "Tools": ""
@@ -8762,6 +10079,12 @@
   "Transparency": {
     "Transparency": "Transparanlık"
   },
+  "Transparent": {
+    "Transparent": ""
+  },
+  "Transparent Background": {
+    "Transparent Background": ""
+  },
   "Trash": {
     "Trash": ""
   },
@@ -8780,8 +10103,17 @@
   "Trigger": {
     "Trigger": ""
   },
+  "Trigger Middle-Click Action (Default: Interactive Region)": {
+    "Trigger Middle-Click Action (Default: Interactive Region)": ""
+  },
   "Trigger Prefix": {
     "Trigger Prefix": ""
+  },
+  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
+  },
+  "Trigger on Hover": {
+    "Trigger on Hover": ""
   },
   "Trigger: %1": {
     "Trigger: %1": ""
@@ -8822,6 +10154,9 @@
   "Type at least 2 characters to search files.": {
     "Type at least 2 characters to search files.": ""
   },
+  "Type note...": {
+    "Type note...": ""
+  },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": ""
   },
@@ -8842,6 +10177,12 @@
   },
   "Uncategorized": {
     "Uncategorized": ""
+  },
+  "Undo (Ctrl+Z)": {
+    "Undo (Ctrl+Z)": ""
+  },
+  "Undo last stroke": {
+    "Undo last stroke": ""
   },
   "Unfocused Color": {
     "Unfocused Color": ""
@@ -8996,6 +10337,9 @@
   "Urgent Color": {
     "Urgent Color": ""
   },
+  "Usage Guide": {
+    "Usage Guide": ""
+  },
   "Usage Tips": {
     "Usage Tips": ""
   },
@@ -9004,6 +10348,12 @@
   },
   "Use Custom Command": {
     "Use Custom Command": "Özel Komut Kullan"
+  },
+  "Use Existing Custom": {
+    "Use Existing Custom": ""
+  },
+  "Use Floating Editor": {
+    "Use Floating Editor": ""
   },
   "Use Grid Layout": {
     "Use Grid Layout": "Izgara Düzeni Kullan"
@@ -9022,6 +10372,9 @@
   },
   "Use Inline Expansion": {
     "Use Inline Expansion": ""
+  },
+  "Use Modal Editor": {
+    "Use Modal Editor": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Sabit Aralıklı Yazı Tipi Kullan"
@@ -9224,6 +10577,9 @@
   "Vertical Grid": {
     "Vertical Grid": "Dikey Izgara"
   },
+  "Vertical Offset": {
+    "Vertical Offset": ""
+  },
   "Vertical Scrolling": {
     "Vertical Scrolling": "Dikey Kaydırma"
   },
@@ -9239,14 +10595,23 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Oynak doygunluğa sahip canlı palet"
   },
+  "Video Codec": {
+    "Video Codec": ""
+  },
   "Video Path": {
     "Video Path": ""
   },
   "Video Player": {
     "Video Player": ""
   },
+  "Video Quality": {
+    "Video Quality": ""
+  },
   "Video Screensaver": {
     "Video Screensaver": ""
+  },
+  "Video Settings": {
+    "Video Settings": ""
   },
   "View Mode": {
     "View Mode": ""
@@ -9326,6 +10691,18 @@
   "Warnings": {
     "Warnings": ""
   },
+  "Watermark": {
+    "Watermark": ""
+  },
+  "Watermark Image": {
+    "Watermark Image": ""
+  },
+  "Watermark Text": {
+    "Watermark Text": ""
+  },
+  "Watermark Type": {
+    "Watermark Type": ""
+  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Dalga İlerleme Çubukları"
   },
@@ -9341,6 +10718,9 @@
   "Web Browser": {
     "Web Browser": ""
   },
+  "WebP Quality": {
+    "WebP Quality": ""
+  },
   "Welcome": {
     "Welcome": ""
   },
@@ -9355,6 +10735,9 @@
   },
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
     "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
+  },
+  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
   },
   "When locked": {
     "When locked": ""
@@ -9461,6 +10844,9 @@
   "Wind Speed in m/s": {
     "Wind Speed in m/s": ""
   },
+  "Window": {
+    "Window": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Pencere Köşe Yarıçapı"
   },
@@ -9488,6 +10874,12 @@
   "Working...": {
     "Working...": ""
   },
+  "Workspace %1": {
+    "Workspace %1": ""
+  },
+  "Workspace %1: %2": {
+    "Workspace %1: %2": ""
+  },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Çalışma Alanı Sıra Numarası"
   },
@@ -9496,6 +10888,9 @@
   },
   "Workspace Padding": {
     "Workspace Padding": "Çalışma Alanı Dolgusu"
+  },
+  "Workspace Switch": {
+    "Workspace Switch": ""
   },
   "Workspace Switcher": {
     "Workspace Switcher": "Çalışma Alanı Değiştirici"
@@ -9577,6 +10972,9 @@
   },
   "Your system is up to date!": {
     "Your system is up to date!": ""
+  },
+  "Zoom Level": {
+    "Zoom Level": ""
   },
   "admin": {
     "admin": ""
@@ -9664,6 +11062,9 @@
   },
   "featured": {
     "featured": ""
+  },
+  "gpu-screen-recorder is not installed. Please install it first.": {
+    "gpu-screen-recorder is not installed. Please install it first.": ""
   },
   "khal": {
     "khal": ""
