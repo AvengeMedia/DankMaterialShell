@@ -14,6 +14,7 @@ USER_HOME := $(if $(SUDO_USER),$(shell getent passwd $(SUDO_USER) | cut -d: -f6)
 SYSTEMD_USER_DIR=$(USER_HOME)/.config/systemd/user
 
 SHELL_DIR=quickshell
+QMLTESTRUNNER ?= qmltestrunner
 SHELL_INSTALL_DIR=$(DATA_DIR)/quickshell/dms
 ASSETS_DIR=assets
 APPLICATIONS_DIR=$(DATA_DIR)/applications
@@ -40,6 +41,10 @@ clean:
 
 lint-qml:
 	@./quickshell/scripts/qmllint-entrypoints.sh
+
+.PHONY: test-qml
+test-qml:
+	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -input quickshell/tests -o -,txt
 
 # Pull the latest dank-qml-common and pin it everywhere it is consumed
 # (submodule pointer + nix flake input). Commit both in one change.
@@ -147,6 +152,7 @@ help:
 	@echo "  build                - Same as 'all'"
 	@echo "  clean                - Clean build artifacts"
 	@echo "  lint-qml             - Run qmllint on shell entrypoints using the Quickshell tooling VFS"
+	@echo "  test-qml             - Run QML unit tests with Qt 6 qmltestrunner"
 	@echo ""
 	@echo "Install:"
 	@echo "  install              - Build and install everything (requires sudo)"

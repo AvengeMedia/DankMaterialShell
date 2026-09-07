@@ -76,7 +76,8 @@ override_dh_auto_install:
 	fi
 
 	rm -rf debian/dms/usr/share/quickshell/dms/core \
-		debian/dms/usr/share/quickshell/dms/distro
+		debian/dms/usr/share/quickshell/dms/distro \
+		debian/dms/usr/share/quickshell/dms/tests
 
 override_dh_auto_clean:
 	rm -f dms

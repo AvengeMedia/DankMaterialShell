@@ -1944,6 +1944,10 @@ Item {
     }
 
     IpcHandler {
+        function cycle(): string {
+            return NiriService.cycleSingleOutput();
+        }
+
         function listProfiles(): string {
             const profiles = DisplayConfigState.validatedProfiles;
             const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);
