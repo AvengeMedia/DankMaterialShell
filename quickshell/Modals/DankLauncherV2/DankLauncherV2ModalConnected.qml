@@ -85,7 +85,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && effectiveLauncherLayer === WlrLayer.Top && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
     readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
@@ -246,7 +246,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
-            "layer": root.usesOverlayLayer ? "overlay" : "top",
+            "layer": root.effectiveLauncherLayer === WlrLayer.Overlay ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
