@@ -531,7 +531,7 @@ jobs:
         repo:
           - dgop
           - dankgo
-          - dank-qml-common
+#          - dank-qml-common
           - dankcalendar
           - danksearch
           - dank-greeter
