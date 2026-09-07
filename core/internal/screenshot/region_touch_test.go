@@ -106,3 +106,47 @@ func TestTouchCancel(t *testing.T) {
 		t.Fatalf("expected touch point and dragging to be cleared on cancel")
 	}
 }
+
+func TestTouchUpScrollPhase(t *testing.T) {
+	surface := newTestSurface(100)
+
+	os := &OutputSurface{
+		output: &WaylandOutput{
+			x: 0,
+			y: 0,
+		},
+		logicalW:  1920,
+		logicalH:  1080,
+		wlSurface: surface,
+	}
+
+	sc := &Screenshoter{
+		config: Config{NoConfirm: true},
+	}
+
+	r := &RegionSelector{
+		screenshoter: sc,
+		phase:        phaseScroll,
+		running:      true,
+		surfaces:     []*OutputSurface{os},
+		selection: SelectionState{
+			hasSelection: true,
+			surface:      os,
+		},
+	}
+
+	r.hasTouchPoint = true
+	r.touchPointId = 3
+	r.selection.dragging = true
+
+	r.handleTouchUp(3)
+
+	if r.hasTouchPoint || r.selection.dragging {
+		t.Fatalf("expected touch point and dragging cleared")
+	}
+
+	// In scroll phase with NoConfirm, handleTouchUp must not call finishSelection / change running state
+	if !r.running {
+		t.Fatalf("expected running to stay true, did not expect finishSelection side-effects")
+	}
+}

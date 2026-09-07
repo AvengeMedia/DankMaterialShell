@@ -261,6 +261,10 @@ func (r *RegionSelector) handleTouchUp(touchId int32) {
 	r.movingSelection = false
 	r.resizingHandle = handleNone
 
+	if r.phase == phaseScroll {
+		return
+	}
+
 	for _, os := range r.surfaces {
 		r.redrawSurface(os)
 	}
