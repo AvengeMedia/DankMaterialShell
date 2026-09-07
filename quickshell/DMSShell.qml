@@ -1240,6 +1240,12 @@ Item {
 
                     delegate: AudioOutputOSD {}
                 }
+
+                Variants {
+                    model: SettingsData.osdWorkspaceEnabled ? SettingsData.getFilteredScreens("osd") : []
+
+                    delegate: WorkspaceOSD {}
+                }
             }
         }
     }

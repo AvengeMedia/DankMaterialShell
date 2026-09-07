@@ -189,6 +189,26 @@ Singleton {
         }
     }
 
+    readonly property var _termIndexes: new WeakMap()
+
+    function _termIndex(table) {
+        const cached = _termIndexes.get(table);
+        if (cached)
+            return cached;
+        const index = {};
+        for (const c in table) {
+            const bucket = table[c];
+            if (!bucket)
+                continue;
+            for (const term in bucket) {
+                if (!index[term] && bucket[term])
+                    index[term] = bucket[term];
+            }
+        }
+        _termIndexes.set(table, index);
+        return index;
+    }
+
     function _lookup(table, term, context) {
         if (!table)
             return "";
@@ -196,11 +216,7 @@ Singleton {
             return table[context][term];
         if (table[term] && table[term][term])
             return table[term][term];
-        for (const c in table) {
-            if (table[c] && table[c][term])
-                return table[c][term];
-        }
-        return "";
+        return _termIndex(table)[term] || "";
     }
 
     // isRealContext is consumed by translations/extract_translations.py only:

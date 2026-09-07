@@ -108,6 +108,7 @@ type RegionSelector struct {
 	shm        *client.Shm
 	seat       *client.Seat
 	pointer    *client.Pointer
+	touch      *client.Touch
 	keyboard   *client.Keyboard
 	keymap     *keymap.Keymap
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
@@ -138,6 +139,8 @@ type RegionSelector struct {
 	selection          SelectionState
 	pointerX           float64
 	pointerY           float64
+	hasTouchPoint      bool
+	touchPointId       int32
 	preSelect          Region
 	showCapturedCursor bool
 	shiftHeld          bool
@@ -1102,6 +1105,9 @@ func (r *RegionSelector) cleanup() {
 	}
 	if r.pointer != nil {
 		r.pointer.Release()
+	}
+	if r.touch != nil {
+		_ = r.touch.Release()
 	}
 	if r.keyboard != nil {
 		r.keyboard.Release()

@@ -164,6 +164,12 @@ Item {
         _blurRebuildTimer.restart();
     }
 
+    function refreshBlurRegion() {
+        if (!blurRegion)
+            return;
+        blurRegion.changed();
+    }
+
     Timer {
         id: _blurRebuildTimer
         interval: 1
@@ -386,12 +392,26 @@ Item {
         Connections {
             target: topBarSlide
             function onXChanged() {
-                if (barWindow.blurRegion)
-                    barWindow.blurRegion.changed();
+                barWindow.refreshBlurRegion();
             }
             function onYChanged() {
-                if (barWindow.blurRegion)
-                    barWindow.blurRegion.changed();
+                barWindow.refreshBlurRegion();
+            }
+        }
+
+        Connections {
+            target: barUnitInset
+            function onXChanged() {
+                barWindow.refreshBlurRegion();
+            }
+            function onYChanged() {
+                barWindow.refreshBlurRegion();
+            }
+            function onWidthChanged() {
+                barWindow.refreshBlurRegion();
+            }
+            function onHeightChanged() {
+                barWindow.refreshBlurRegion();
             }
         }
 
@@ -401,8 +421,7 @@ Item {
                 _blurRebuildTimer.restart();
             }
             function onWingChanged() {
-                if (barWindow.blurRegion)
-                    barWindow.blurRegion.changed();
+                barWindow.refreshBlurRegion();
             }
         }
 

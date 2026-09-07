@@ -131,6 +131,9 @@
   "0 = square corners": {
     "0 = square corners": "۰ = گوشه‌های مربعی"
   },
+  "1 Connecting Line": {
+    "1 Connecting Line": ""
+  },
   "1 day": {
     "1 day": "۱ روز"
   },
@@ -190,6 +193,9 @@
   },
   "180°": {
     "180°": "۱۸۰°"
+  },
+  "2 Connecting Lines": {
+    "2 Connecting Lines": ""
   },
   "2 hours": {
     "2 hours": "۲ ساعت"
@@ -332,6 +338,9 @@
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
     "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "کمکی‌های AUR تعاملی هستند — برای درخواست‌ها به پنجره ترمینال مراجعه کنید. این پاپ‌آپ هنگامی که ارتقا خارج می‌شود به حالت بیکار بازمی‌گردد."
   },
+  "AUTO": {
+    "AUTO": ""
+  },
   "Aborted": {
     "Aborted": "لغو شد"
   },
@@ -374,6 +383,9 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": ""
   },
+  "Action when Enter": {
+    "Action when Enter": ""
+  },
   "Activate": {
     "Activate": "فعال‌سازی"
   },
@@ -398,6 +410,9 @@
   "Active VPN": {
     "Active VPN": "VPN فعال"
   },
+  "Active Window": {
+    "Active Window": ""
+  },
   "Active in Column": {
     "Active in Column": ""
   },
@@ -418,6 +433,9 @@
   },
   "Adaptive": {
     "Adaptive": ""
+  },
+  "Adaptive (DMS Theme)": {
+    "Adaptive (DMS Theme)": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "پهنای رسانه سازگار"
@@ -445,6 +463,9 @@
   },
   "Add Printer": {
     "Add Printer": "افزودن چاپگر"
+  },
+  "Add Text Note": {
+    "Add Text Note": ""
   },
   "Add Title": {
     "Add Title": "افزودن عنوان"
@@ -538,6 +559,12 @@
   },
   "All": {
     "All": "همه"
+  },
+  "All Combined Outputs": {
+    "All Combined Outputs": ""
+  },
+  "All Outputs": {
+    "All Outputs": ""
   },
   "All checks passed": {
     "All checks passed": "همه بررسی‌ها با موفقیت انجام شد"
@@ -640,6 +667,15 @@
   },
   "Animation Style": {
     "Animation Style": "استایل انیمیشن"
+  },
+  "Annotating": {
+    "Annotating": ""
+  },
+  "Annotation Tools": {
+    "Annotation Tools": ""
+  },
+  "Anonymous Copy (stripped metadata)": {
+    "Anonymous Copy (stripped metadata)": ""
   },
   "Anonymous Identity": {
     "Anonymous Identity": "هویت ناشناس"
@@ -773,6 +809,18 @@
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "چیدمان نمایشگرها و پیکربندی وضوح، نرخ تازه‌سازی و VRR"
   },
+  "Arrow (3)": {
+    "Arrow (3)": ""
+  },
+  "Arrow Color": {
+    "Arrow Color": ""
+  },
+  "Arrow Thickness": {
+    "Arrow Thickness": ""
+  },
+  "Arrow Vector": {
+    "Arrow Vector": ""
+  },
   "At Startup": {
     "At Startup": ""
   },
@@ -787,6 +835,9 @@
   },
   "Audio": {
     "Audio": "صدا"
+  },
+  "Audio & Overlay": {
+    "Audio & Overlay": ""
   },
   "Audio Codec": {
     "Audio Codec": "کدک صوتی"
@@ -872,8 +923,14 @@
   "Auto (Wide)": {
     "Auto (Wide)": "خودکار (عریض)"
   },
+  "Auto Balance": {
+    "Auto Balance": ""
+  },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": ""
+  },
+  "Auto Detect": {
+    "Auto Detect": ""
   },
   "Auto From Wallpaper": {
     "Auto From Wallpaper": ""
@@ -908,11 +965,17 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "وقفه پنهان خودکار"
   },
+  "Auto-apply background defaults": {
+    "Auto-apply background defaults": ""
+  },
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
   "Auto-close Niri overview when launching apps.": {
     "Auto-close Niri overview when launching apps.": "هنگام اجرای برنامه‌ها نمای کلی نیری را خودکار ببند."
+  },
+  "Auto-close the loop when ending near the start point.": {
+    "Auto-close the loop when ending near the start point.": ""
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "اعلان‌های قدیمی تر از این را خودکار حذف کن"
@@ -935,8 +998,17 @@
   "Auto-login on startup": {
     "Auto-login on startup": ""
   },
+  "Auto-minimize": {
+    "Auto-minimize": ""
+  },
   "Auto-save to disk": {
     "Auto-save to disk": ""
+  },
+  "Auto-select a tool preset on hover, without releasing the mouse.": {
+    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+  },
+  "Auto-tiling": {
+    "Auto-tiling": ""
   },
   "Autoconnect": {
     "Autoconnect": "اتصال خودکار"
@@ -986,11 +1058,17 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "صفحه را هنگام آماده‌شدن سیستم برای تعلیق به صورت خودکار قفل کن"
   },
+  "Automatically minimize the float window after a delay": {
+    "Automatically minimize the float window after a delay": ""
+  },
   "Automatically picks the scheme variant based on the wallpaper.": {
     "Automatically picks the scheme variant based on the wallpaper.": ""
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": ""
+  },
+  "Automatically stack windows to avoid overlap": {
+    "Automatically stack windows to avoid overlap": ""
   },
   "Automatically turn on Num Lock at startup": {
     "Automatically turn on Num Lock at startup": ""
@@ -1034,11 +1112,17 @@
   "Back": {
     "Back": "بازگشت"
   },
+  "Back to Annotation (B)": {
+    "Back to Annotation (B)": ""
+  },
   "Backend": {
     "Backend": "بک‌اند"
   },
   "Background": {
     "Background": "پس‌زمینه"
+  },
+  "Background (B)": {
+    "Background (B)": ""
   },
   "Background Blur": {
     "Background Blur": "تاری پس‌زمینه"
@@ -1046,11 +1130,23 @@
   "Background Color": {
     "Background Color": ""
   },
+  "Background Defaults": {
+    "Background Defaults": ""
+  },
   "Background Effect": {
     "Background Effect": "افکت پس‌زمینه"
   },
+  "Background Image Folder": {
+    "Background Image Folder": ""
+  },
+  "Background Images": {
+    "Background Images": ""
+  },
   "Background Opacity": {
     "Background Opacity": "شفافیت پس‌زمینه"
+  },
+  "Background Presets": {
+    "Background Presets": ""
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": "همگام‌سازی احراز هویت در پس‌زمینه ناموفق بود. درحال تلاش در حالت ترمینال."
@@ -1081,6 +1177,9 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": ""
+  },
+  "Bar Interactions": {
+    "Bar Interactions": ""
   },
   "Bar Length Padding": {
     "Bar Length Padding": ""
@@ -1127,11 +1226,17 @@
   "Battery Charge Limit": {
     "Battery Charge Limit": "محدودیت شارژ باتری"
   },
+  "Battery Colors": {
+    "Battery Colors": ""
+  },
   "Battery Health": {
     "Battery Health": ""
   },
   "Battery Power": {
     "Battery Power": ""
+  },
+  "Battery Style": {
+    "Battery Style": ""
   },
   "Battery and power management": {
     "Battery and power management": "مدیریت باتری و پاور"
@@ -1172,6 +1277,9 @@
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": ""
   },
+  "Blink Recording Dot": {
+    "Blink Recording Dot": ""
+  },
   "Block %1 in Do Not Disturb": {
     "Block %1 in Do Not Disturb": ""
   },
@@ -1202,11 +1310,17 @@
   "Blur": {
     "Blur": "تاری"
   },
+  "Blur Background Image": {
+    "Blur Background Image": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "لایه تصویر پس‌زمینه تار"
   },
   "Blur on Overview": {
     "Blur on Overview": "لایه تار در نمای کلی"
+  },
+  "Blur the album art behind the media player": {
+    "Blur the album art behind the media player": ""
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": ""
@@ -1355,11 +1469,26 @@
   "CUPS not available": {
     "CUPS not available": "CUPS در دسترس نیست"
   },
+  "CUST": {
+    "CUST": ""
+  },
   "Calendar": {
     "Calendar": "گاه‌شمار"
   },
   "Calendar Backend": {
     "Calendar Backend": ""
+  },
+  "Callout": {
+    "Callout": ""
+  },
+  "Callout (Z) | Hold G for Loupe": {
+    "Callout (Z) | Hold G for Loupe": ""
+  },
+  "Callout Zoom": {
+    "Callout Zoom": ""
+  },
+  "Callout, Background (Z, B)": {
+    "Callout, Background (Z, B)": ""
   },
   "Calls / Headset": {
     "Calls / Headset": ""
@@ -1406,11 +1535,26 @@
   "Caps Lock is on": {
     "Caps Lock is on": "قفل حروف بزرگ روشن است"
   },
+  "Capture": {
+    "Capture": ""
+  },
+  "Capture Actions": {
+    "Capture Actions": ""
+  },
+  "Capture Options": {
+    "Capture Options": ""
+  },
+  "Capturing...": {
+    "Capturing...": ""
+  },
   "Cast Target": {
     "Cast Target": ""
   },
   "Category": {
     "Category": ""
+  },
+  "Catppuccin": {
+    "Catppuccin": ""
   },
   "Cellular": {
     "Cellular": ""
@@ -1420,6 +1564,15 @@
   },
   "Cellular enabled": {
     "Cellular enabled": ""
+  },
+  "Center": {
+    "Center": ""
+  },
+  "Center Left": {
+    "Center Left": ""
+  },
+  "Center Right": {
+    "Center Right": ""
   },
   "Center Section": {
     "Center Section": "بخش مرکزی"
@@ -1538,6 +1691,12 @@
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": ""
   },
+  "Choose notifications shown after copy or save.": {
+    "Choose notifications shown after copy or save.": ""
+  },
+  "Choose the editor shape for portrait or landscape screens.": {
+    "Choose the editor shape for portrait or landscape screens.": ""
+  },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "لوگوی نمایش‌داده شده بر دکمه‌ی لانچر در نوار دَنک را انتخاب کنید"
   },
@@ -1553,6 +1712,9 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "انتخاب کنید که کدام نمایشگر‌های بر صفحه نمایان شوند"
   },
+  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+  },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": ""
   },
@@ -1561,6 +1723,9 @@
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "انتخاب کنید که کدام نمایشگر‌ها این ابزارک را نشان دهند"
+  },
+  "Choose which monitor to capture during full screen recording.": {
+    "Choose which monitor to capture during full screen recording.": ""
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
@@ -1582,6 +1747,12 @@
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "رجکس کلاس (مانند ^firefox$)"
+  },
+  "Classic (Tailwind)": {
+    "Classic (Tailwind)": ""
+  },
+  "Clean Text Eraser": {
+    "Clean Text Eraser": ""
   },
   "Clear": {
     "Clear": "پاک‌کردن"
@@ -1609,6 +1780,9 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "پاک‌کردن در هنگام راه‌اندازی"
+  },
+  "Clear saved region selection before each capture": {
+    "Clear saved region selection before each capture": ""
   },
   "Clears the badge on open but keeps notifications active": {
     "Clears the badge on open but keeps notifications active": ""
@@ -1691,6 +1865,9 @@
   "Close All Windows": {
     "Close All Windows": "بستن همه پنجره‌ها"
   },
+  "Close Annotator": {
+    "Close Annotator": ""
+  },
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
@@ -1730,11 +1907,23 @@
   "Color Override": {
     "Color Override": "رنگ جایگزین"
   },
+  "Color Palette": {
+    "Color Palette": ""
+  },
   "Color Picker": {
     "Color Picker": "انتخابگر رنگ"
   },
+  "Color Picker (F for RGB | Eyedropper)": {
+    "Color Picker (F for RGB | Eyedropper)": ""
+  },
+  "Color Picker, Eraser (F, T)": {
+    "Color Picker, Eraser (F, T)": ""
+  },
   "Color Temperature": {
     "Color Temperature": "دمای رنگ"
+  },
+  "Color copied to clipboard: %1": {
+    "Color copied to clipboard: %1": ""
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "رنگ نمایش داده شده در مانیتورهای بدون صفحه قفل"
@@ -1808,8 +1997,14 @@
   "Compact Island Height": {
     "Compact Island Height": ""
   },
+  "Compact Island Width": {
+    "Compact Island Width": ""
+  },
   "Compact Mode": {
     "Compact Mode": "حالت فشرده"
+  },
+  "Compact Pill": {
+    "Compact Pill": ""
   },
   "Compact home clock pill in both width and height": {
     "Compact home clock pill in both width and height": ""
@@ -1865,6 +2060,9 @@
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "یکی را در تنظیمات ← داک ← زباله‌دان، پیکربندی کنید."
   },
+  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "تنظیم کنید که کدام نمایشگر‌ها «%1» را نشان دهند"
   },
@@ -1891,6 +2089,9 @@
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "تداخل با: %1"
+  },
+  "Conic Gradient": {
+    "Conic Gradient": ""
   },
   "Connect": {
     "Connect": "اتصال"
@@ -1934,6 +2135,9 @@
   "Connection failed": {
     "Connection failed": "اتصال ناموفق بود"
   },
+  "Container Format": {
+    "Container Format": ""
+  },
   "Contains": {
     "Contains": "شامل"
   },
@@ -1951,6 +2155,9 @@
   },
   "Contributor": {
     "Contributor": ""
+  },
+  "Contributors": {
+    "Contributors": ""
   },
   "Control Center": {
     "Control Center": "مرکز کنترل"
@@ -1994,14 +2201,29 @@
   "Controls the outline of popouts, modals, and other shell surfaces": {
     "Controls the outline of popouts, modals, and other shell surfaces": ""
   },
+  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+  },
   "Convenience options for the login screen": {
     "Convenience options for the login screen": ""
   },
   "Convert to DMS": {
     "Convert to DMS": ""
   },
+  "Converting recording to GIF...": {
+    "Converting recording to GIF...": ""
+  },
   "Cooldown": {
     "Cooldown": "زمان باقی‌مانده"
+  },
+  "Copied": {
+    "Copied": ""
+  },
+  "Copied & saved": {
+    "Copied & saved": ""
+  },
+  "Copied Anonymously": {
+    "Copied Anonymously": ""
   },
   "Copied GIF": {
     "Copied GIF": "گیف کپی شد"
@@ -2018,11 +2240,26 @@
   "Copied!": {
     "Copied!": "کپی شد!"
   },
+  "Copied:": {
+    "Copied:": ""
+  },
   "Copy": {
     "Copy": "کپی"
   },
+  "Copy & Save": {
+    "Copy & Save": ""
+  },
+  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
+  },
+  "Copy Color": {
+    "Copy Color": ""
+  },
   "Copy Content": {
     "Copy Content": "کپی محتوا"
+  },
+  "Copy Current Palette": {
+    "Copy Current Palette": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "کپی دستور کامل"
@@ -2039,8 +2276,14 @@
   "Copy Text": {
     "Copy Text": "کپی متن"
   },
+  "Copy and customize this preset": {
+    "Copy and customize this preset": ""
+  },
   "Copy target (%1)": {
     "Copy target (%1)": ""
+  },
+  "Copy vector / Paste / Duplicate": {
+    "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
     "Corner Radius": "شعاع گوشه"
@@ -2117,6 +2360,12 @@
   "Critical Threshold": {
     "Critical Threshold": ""
   },
+  "Crop / Resize": {
+    "Crop / Resize": ""
+  },
+  "Crop / Resize Area": {
+    "Crop / Resize Area": ""
+  },
   "Ctrl + Shift": {
     "Ctrl + Shift": ""
   },
@@ -2177,6 +2426,9 @@
   "Current time and date display": {
     "Current time and date display": "نمایش زمان و تاریخ کنونی"
   },
+  "Current time and date pill": {
+    "Current time and date pill": ""
+  },
   "Current weather conditions and temperature": {
     "Current weather conditions and temperature": "وضعیت آب و هوا و دمای کنونی"
   },
@@ -2209,6 +2461,9 @@
   },
   "Custom Color": {
     "Custom Color": "رنگ سفارشی"
+  },
+  "Custom Colors": {
+    "Custom Colors": ""
   },
   "Custom Duration": {
     "Custom Duration": "مدت زمان سفارشی"
@@ -2245,6 +2500,9 @@
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "دستور تعلیق سفارشی"
+  },
+  "Custom Tool": {
+    "Custom Tool": ""
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": ""
@@ -2339,11 +2597,17 @@
   "Dank Dash": {
     "Dank Dash": ""
   },
+  "Dank Island": {
+    "Dank Island": ""
+  },
   "Dank Island - Beta": {
     "Dank Island - Beta": ""
   },
   "Dank Island instance": {
     "Dank Island instance": ""
+  },
+  "Dank Violet": {
+    "Dank Violet": ""
   },
   "DankBar": {
     "DankBar": "نوار دَنک"
@@ -2363,6 +2627,9 @@
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "آیکون‌های DankShell و سیستم (نیازمند راه‌اندازی مجدد)"
   },
+  "Dark": {
+    "Dark": ""
+  },
   "Dark Mode": {
     "Dark Mode": "حالت تاریک"
   },
@@ -2381,8 +2648,20 @@
   "Darken Modal Background": {
     "Darken Modal Background": "تیره‌کردن پس‌زمینه مودال"
   },
+  "Darken the image to improve foreground contrast": {
+    "Darken the image to improve foreground contrast": ""
+  },
+  "Darkest": {
+    "Darkest": ""
+  },
   "Dashboard": {
     "Dashboard": ""
+  },
+  "Dashed Line": {
+    "Dashed Line": ""
+  },
+  "Date": {
+    "Date": ""
   },
   "Date First": {
     "Date First": ""
@@ -2426,8 +2705,38 @@
   "Default (Global)": {
     "Default (Global)": "پیش‌فرض (سراسری)"
   },
+  "Default Alignment": {
+    "Default Alignment": ""
+  },
   "Default Apps": {
     "Default Apps": "برنامه‌های پیش‌فرض"
+  },
+  "Default Aspect Ratio": {
+    "Default Aspect Ratio": ""
+  },
+  "Default Background Image": {
+    "Default Background Image": ""
+  },
+  "Default Background Mode": {
+    "Default Background Mode": ""
+  },
+  "Default Bold Text": {
+    "Default Bold Text": ""
+  },
+  "Default Corner Radius": {
+    "Default Corner Radius": ""
+  },
+  "Default Gradient Angle": {
+    "Default Gradient Angle": ""
+  },
+  "Default Gradient End": {
+    "Default Gradient End": ""
+  },
+  "Default Gradient Start": {
+    "Default Gradient Start": ""
+  },
+  "Default Italic Text": {
+    "Default Italic Text": ""
   },
   "Default Launcher": {
     "Default Launcher": "لانچر پیش‌فرض"
@@ -2435,14 +2744,41 @@
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "میانبر پیش‌فرض لانچر"
   },
+  "Default Microphone": {
+    "Default Microphone": ""
+  },
   "Default Mode": {
     "Default Mode": ""
   },
   "Default Opens": {
     "Default Opens": ""
   },
+  "Default Output": {
+    "Default Output": ""
+  },
+  "Default Padding": {
+    "Default Padding": ""
+  },
+  "Default Shadow Strength": {
+    "Default Shadow Strength": ""
+  },
+  "Default Solid Color": {
+    "Default Solid Color": ""
+  },
   "Default Task List": {
     "Default Task List": ""
+  },
+  "Default Text Background": {
+    "Default Text Background": ""
+  },
+  "Default Text Font Size": {
+    "Default Text Font Size": ""
+  },
+  "Default Underline Text": {
+    "Default Underline Text": ""
+  },
+  "Default Watermark": {
+    "Default Watermark": ""
   },
   "Default Width (%)": {
     "Default Width (%)": "طول پیش‌فرض (%)"
@@ -2576,6 +2912,18 @@
   "Dim": {
     "Dim": ""
   },
+  "Dim Background Image": {
+    "Dim Background Image": ""
+  },
+  "Dim Intensity": {
+    "Dim Intensity": ""
+  },
+  "Dimming Opacity": {
+    "Dimming Opacity": ""
+  },
+  "Direct": {
+    "Direct": ""
+  },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
   },
@@ -2629,6 +2977,12 @@
   },
   "Discard": {
     "Discard": "نادیده‌گرفتن"
+  },
+  "Discard & Close": {
+    "Discard & Close": ""
+  },
+  "Discard & Close (Esc)": {
+    "Discard & Close (Esc)": ""
   },
   "Discharging": {
     "Discharging": "تخلیه شارژ"
@@ -2768,20 +3122,41 @@
   "Domain (optional)": {
     "Domain (optional)": "دامنه (اختیاری)"
   },
+  "Dominant": {
+    "Dominant": ""
+  },
   "Don't Change": {
     "Don't Change": "تغییر نده"
   },
   "Don't Save": {
     "Don't Save": "ذخیره نکن"
   },
+  "Done": {
+    "Done": ""
+  },
+  "Done (Action based on settings)": {
+    "Done (Action based on settings)": ""
+  },
   "Door Open": {
     "Door Open": "درب باز"
+  },
+  "Dotted Line": {
+    "Dotted Line": ""
+  },
+  "Dracula": {
+    "Dracula": ""
+  },
+  "Drag Image": {
+    "Drag Image": ""
   },
   "Drag Lock": {
     "Drag Lock": ""
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": ""
+  },
+  "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": {
+    "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": ""
   },
   "Drag to Reorder": {
     "Drag to Reorder": "نگه‌داشتن برای بازآرایی"
@@ -2801,6 +3176,9 @@
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
+  "Draw an outer ring using the stamp number color": {
+    "Draw an outer ring using the stamp number color": ""
+  },
   "Draw an outline and use the highest-contrast surface tone": {
     "Draw an outline and use the highest-contrast surface tone": ""
   },
@@ -2812,6 +3190,9 @@
   },
   "Drop here": {
     "Drop here": ""
+  },
+  "Drop image onto bar icon to annotate it": {
+    "Drop image onto bar icon to annotate it": ""
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "جایگزینی شما برای %1 حذف شود تا عملکرد پیش‌فرض DMS دوباره اعمال گردد؟"
@@ -2858,6 +3239,9 @@
   "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
     "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
   },
+  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
+  },
   "Edge": {
     "Edge": ""
   },
@@ -2882,8 +3266,20 @@
   "Edit Clipboard": {
     "Edit Clipboard": "ویرایش کلیپ‌بورد"
   },
+  "Edit Color Palette": {
+    "Edit Color Palette": ""
+  },
+  "Edit Image from Clipboard — Edit": {
+    "Edit Image from Clipboard — Edit": ""
+  },
+  "Edit Image from Clipboard — Float": {
+    "Edit Image from Clipboard — Float": ""
+  },
   "Edit Rule": {
     "Edit Rule": ""
+  },
+  "Edit Text Note": {
+    "Edit Text Note": ""
   },
   "Edit Window Rule": {
     "Edit Window Rule": "ویرایش قاعده پنجره"
@@ -2897,8 +3293,41 @@
   "Editing changes on %1": {
     "Editing changes on %1": ""
   },
+  "Editor": {
+    "Editor": ""
+  },
+  "Editor Aspect Ratio": {
+    "Editor Aspect Ratio": ""
+  },
+  "Editor Display Mode": {
+    "Editor Display Mode": ""
+  },
+  "Editor Display Screen": {
+    "Editor Display Screen": ""
+  },
+  "Editor Preview Quality": {
+    "Editor Preview Quality": ""
+  },
   "Education": {
     "Education": "آموزش"
+  },
+  "Ellipse": {
+    "Ellipse": ""
+  },
+  "Ellipse / Circle": {
+    "Ellipse / Circle": ""
+  },
+  "Ellipse / Circle (Q)": {
+    "Ellipse / Circle (Q)": ""
+  },
+  "Ellipse Color": {
+    "Ellipse Color": ""
+  },
+  "Ellipse Thickness": {
+    "Ellipse Thickness": ""
+  },
+  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
   },
   "Empty": {
     "Empty": "خالی"
@@ -2962,6 +3391,9 @@
   },
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "یک جایگزینی سفارشی در زیر فعال کنید تا شدت سایه، شفافیت و رنگ به ازای هر نوار تنظیم شود."
+  },
+  "Enable background automatically when opening the editor": {
+    "Enable background automatically when opening the editor": ""
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "فعال‌سازی لایه تار قابل کنترل توسط کامپازیتور (namespace: dms:blurwallpaper). نیازمند پیکربندی دستی niri است."
@@ -3077,6 +3509,9 @@
   "Environment Variables": {
     "Environment Variables": "متغیر‌های محیطی"
   },
+  "Eraser": {
+    "Eraser": ""
+  },
   "Error": {
     "Error": "خطا"
   },
@@ -3091,6 +3526,9 @@
   },
   "Event title": {
     "Event title": ""
+  },
+  "Everforest": {
+    "Everforest": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "هر ۱۵ دقیقه"
@@ -3215,8 +3653,14 @@
   "Failed to connect to %1": {
     "Failed to connect to %1": "اتصال به %1 ناموفق بود"
   },
+  "Failed to convert recording to GIF.": {
+    "Failed to convert recording to GIF.": ""
+  },
   "Failed to copy entry": {
     "Failed to copy entry": "کپی مدخل ناموفق بود"
+  },
+  "Failed to copy screenshot to clipboard.": {
+    "Failed to copy screenshot to clipboard.": ""
   },
   "Failed to create printer": {
     "Failed to create printer": "ایجاد چاپگر ناموفق بود"
@@ -3271,6 +3715,9 @@
   },
   "Failed to generate QR code: %1": {
     "Failed to generate QR code: %1": ""
+  },
+  "Failed to generate blurred background image": {
+    "Failed to generate blurred background image": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": ""
@@ -3368,6 +3815,12 @@
   "Failed to save profile": {
     "Failed to save profile": "ذخیره پروفایل ناموفق بود"
   },
+  "Failed to save screenshot": {
+    "Failed to save screenshot": ""
+  },
+  "Failed to save screenshot file.": {
+    "Failed to save screenshot file.": ""
+  },
   "Failed to send SMS": {
     "Failed to send SMS": ""
   },
@@ -3415,6 +3868,9 @@
   },
   "Failed to switch codec": {
     "Failed to switch codec": ""
+  },
+  "Failed to switch output": {
+    "Failed to switch output": ""
   },
   "Failed to switch port": {
     "Failed to switch port": ""
@@ -3563,6 +4019,12 @@
   "Flatpak": {
     "Flatpak": ""
   },
+  "Flip Horiz": {
+    "Flip Horiz": ""
+  },
+  "Flip Vert": {
+    "Flip Vert": ""
+  },
   "Flipped": {
     "Flipped": "وارونه"
   },
@@ -3580,6 +4042,12 @@
   },
   "Float Anchor": {
     "Float Anchor": ""
+  },
+  "Float Image": {
+    "Float Image": ""
+  },
+  "Float Window": {
+    "Float Window": ""
   },
   "Float X": {
     "Float X": ""
@@ -3638,6 +4106,9 @@
   "Focused Monitor Only": {
     "Focused Monitor Only": "فقط مانیتور فوکوس شده"
   },
+  "Focused Screen": {
+    "Focused Screen": ""
+  },
   "Focused Window": {
     "Focused Window": "پنجره فوکوس‌شده"
   },
@@ -3659,6 +4130,9 @@
   "Follow focus": {
     "Follow focus": "پیروی از فوکوس"
   },
+  "Follow the theme accent, or step from green to red as the battery drains.": {
+    "Follow the theme accent, or step from green to red as the battery drains.": ""
+  },
   "Follows the default launcher choice selected above.": {
     "Follows the default launcher choice selected above.": ""
   },
@@ -3676,6 +4150,9 @@
   },
   "Font Weight": {
     "Font Weight": "وزن قلم"
+  },
+  "Font family used for number stamp labels": {
+    "Font family used for number stamp labels": ""
   },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": ""
@@ -3701,6 +4178,12 @@
   "For editing plain text files": {
     "For editing plain text files": "برای ویرایش کردن فایل‌های متنی ساده"
   },
+  "Force Copy & Save": {
+    "Force Copy & Save": ""
+  },
+  "Force Copy to Clipboard": {
+    "Force Copy to Clipboard": ""
+  },
   "Force HDR": {
     "Force HDR": "اجبار HDR"
   },
@@ -3712,6 +4195,9 @@
   },
   "Force RGBX": {
     "Force RGBX": ""
+  },
+  "Force Save to File": {
+    "Force Save to File": ""
   },
   "Force Wide Color": {
     "Force Wide Color": "اجبار رنگ عریض"
@@ -3761,6 +4247,12 @@
   "Format the date on the login screen": {
     "Format the date on the login screen": ""
   },
+  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+  },
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  },
   "Forward 10s": {
     "Forward 10s": ""
   },
@@ -3779,14 +4271,32 @@
   "Frame Xray": {
     "Frame Xray": ""
   },
+  "Framerate": {
+    "Framerate": ""
+  },
+  "Free": {
+    "Free": ""
+  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "هنگامی که لانچر بسته شد VRAM/حافظه را آزاد کن. ممکن است باعث اندکی تأخیر هنگام باز کردن مجدد شود."
+  },
+  "Freehand Pen": {
+    "Freehand Pen": ""
+  },
+  "Freehand Pen (1)": {
+    "Freehand Pen (1)": ""
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "باران‌ریزه یخ‌زن"
   },
   "Frequency": {
     "Frequency": "فرکانس"
+  },
+  "From Clipboard": {
+    "From Clipboard": ""
+  },
+  "From File": {
+    "From File": ""
   },
   "Fruit Salad": {
     "Fruit Salad": "رنگارنگ"
@@ -3802,6 +4312,12 @@
   },
   "Full Day & Month": {
     "Full Day & Month": "روز کامل و ماه"
+  },
+  "Full Screen": {
+    "Full Screen": ""
+  },
+  "Full Screen Target": {
+    "Full Screen Target": ""
   },
   "Full Size": {
     "Full Size": ""
@@ -3823,6 +4339,9 @@
   },
   "G: grid • Z/X: size": {
     "G: grid • Z/X: size": "G: جدول • Z/X: اندازه"
+  },
+  "GIF Framerate": {
+    "GIF Framerate": ""
   },
   "GPU": {
     "GPU": "GPU"
@@ -3862,6 +4381,9 @@
   },
   "General": {
     "General": ""
+  },
+  "General Shortcuts": {
+    "General Shortcuts": ""
   },
   "Generate Override": {
     "Generate Override": ""
@@ -3989,6 +4511,9 @@
   "Groups": {
     "Groups": "گروه‌ها"
   },
+  "Gruvbox Material": {
+    "Gruvbox Material": ""
+  },
   "H": {
     "H": ""
   },
@@ -4070,6 +4595,12 @@
   "Hide App": {
     "Hide App": "پنهان کردن برنامه"
   },
+  "Hide Control Center": {
+    "Hide Control Center": ""
+  },
+  "Hide Control Center by Default": {
+    "Hide Control Center by Default": ""
+  },
   "Hide Delay": {
     "Hide Delay": "تأخیر پنهان‌شدن"
   },
@@ -4138,6 +4669,18 @@
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "برنامه فوکوس شده فعلی درون نشانگرهای محیط‌کار را برجسته کن"
+  },
+  "Highlighter": {
+    "Highlighter": ""
+  },
+  "Highlighter (S)": {
+    "Highlighter (S)": ""
+  },
+  "Highlighter Color": {
+    "Highlighter Color": ""
+  },
+  "Highlighter Thickness": {
+    "Highlighter Thickness": ""
   },
   "History": {
     "History": "تاریخچه"
@@ -4211,6 +4754,9 @@
   "Hover Popouts": {
     "Hover Popouts": ""
   },
+  "Hover Trigger Delay": {
+    "Hover Trigger Delay": ""
+  },
   "How layout changes are remembered across apps": {
     "How layout changes are remembered across apps": ""
   },
@@ -4267,6 +4813,9 @@
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
     "IP sharing setup failed. Check that dnsmasq is installed.": ""
+  },
+  "IPC Commands": {
+    "IPC Commands": ""
   },
   "ISO Date": {
     "ISO Date": "تاریخ ISO"
@@ -4346,11 +4895,26 @@
   "Image": {
     "Image": "تصویر"
   },
+  "Image + Text": {
+    "Image + Text": ""
+  },
+  "Image Background": {
+    "Image Background": ""
+  },
+  "Image Error": {
+    "Image Error": ""
+  },
+  "Image Size": {
+    "Image Size": ""
+  },
   "Image Viewer": {
     "Image Viewer": "نمایشگر تصویر"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "تصویر در کلیپ‌بورد کپی شد"
+  },
+  "Image selected automatically when using Image Background mode": {
+    "Image selected automatically when using Image Background mode": ""
   },
   "Import": {
     "Import": "وارد کردن"
@@ -4363,6 +4927,9 @@
   },
   "Include AUR updates": {
     "Include AUR updates": "بروزرسانی‌های AUR شامل شود"
+  },
+  "Include Cursor": {
+    "Include Cursor": ""
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": "فایل‌ها را در تب همه شامل کن"
@@ -4394,6 +4961,9 @@
   "Index Centering": {
     "Index Centering": ""
   },
+  "Indicator Colors": {
+    "Indicator Colors": ""
+  },
   "Indicator Style": {
     "Indicator Style": "استایل نشانگر"
   },
@@ -4415,8 +4985,14 @@
   "Inhibitable": {
     "Inhibitable": "قابل جلوگیری"
   },
+  "Initial Width": {
+    "Initial Width": ""
+  },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
     "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": ""
+  },
+  "Initial state for the Control Center toggle.": {
+    "Initial state for the Control Center toggle.": ""
   },
   "Initialised": {
     "Initialised": ""
@@ -4433,8 +5009,14 @@
   "Input Devices": {
     "Input Devices": "دستگاه‌های ورودی"
   },
+  "Input Mode": {
+    "Input Mode": ""
+  },
   "Input Volume Slider": {
     "Input Volume Slider": "اسلایدر حجم صدای ورودی"
+  },
+  "Insert Image": {
+    "Insert Image": ""
   },
   "Insert your security key...": {
     "Insert your security key...": "کلید امنیتی خود را وارد کنید..."
@@ -4505,6 +5087,12 @@
   "Intensity": {
     "Intensity": "شدت"
   },
+  "Interaction / Result": {
+    "Interaction / Result": ""
+  },
+  "Interactive Region": {
+    "Interactive Region": ""
+  },
   "Interface:": {
     "Interface:": "رابط:"
   },
@@ -4556,6 +5144,9 @@
   "Isolate Displays": {
     "Isolate Displays": "ایزوله‌کردن نمایشگر‌ها"
   },
+  "JPEG Quality": {
+    "JPEG Quality": ""
+  },
   "Jobs": {
     "Jobs": "کار‌های چاپ"
   },
@@ -4567,6 +5158,9 @@
   },
   "Jump to page (1 - %1)": {
     "Jump to page (1 - %1)": ""
+  },
+  "Kanagawa": {
+    "Kanagawa": ""
   },
   "Keep Awake": {
     "Keep Awake": "بیدار نگه‌ دار"
@@ -4676,11 +5270,23 @@
   "LabWC Website": {
     "LabWC Website": "وبسایت LabWC"
   },
+  "Landscape": {
+    "Landscape": ""
+  },
   "Large": {
     "Large": "بزرگ"
   },
   "Largest": {
     "Largest": "بزرگ‌ترین"
+  },
+  "Last Reg": {
+    "Last Reg": ""
+  },
+  "Last Region": {
+    "Last Region": ""
+  },
+  "Last Selected Region": {
+    "Last Selected Region": ""
   },
   "Last hour": {
     "Last hour": "ساعت گذشته"
@@ -4742,17 +5348,26 @@
   "Layout Overrides": {
     "Layout Overrides": "جایگزینی‌های چیدمان"
   },
+  "Least Saturated": {
+    "Least Saturated": ""
+  },
   "Left": {
     "Left": "چپ"
   },
   "Left Center": {
     "Left Center": "چپ وسط"
   },
+  "Left Click": {
+    "Left Click": ""
+  },
   "Left Section": {
     "Left Section": "بخش چپ"
   },
   "Left-Handed Mode": {
     "Left-Handed Mode": ""
+  },
+  "Level": {
+    "Level": ""
   },
   "Light": {
     "Light": "کم‌رنگ"
@@ -4781,6 +5396,9 @@
   "Light mode harmony": {
     "Light mode harmony": "هارمونی حالت روشن"
   },
+  "Lightest": {
+    "Lightest": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": ""
   },
@@ -4790,17 +5408,29 @@
   "Line": {
     "Line": "خط"
   },
+  "Line Color": {
+    "Line Color": ""
+  },
+  "Line Thickness": {
+    "Line Thickness": ""
+  },
   "Line: %1": {
     "Line: %1": "خط: %1"
   },
   "Linear": {
     "Linear": "خطی"
   },
+  "Linear Gradient": {
+    "Linear Gradient": ""
+  },
   "Lines: %1": {
     "Lines: %1": "خط: %1"
   },
   "List": {
     "List": "فهرست"
+  },
+  "Live Preview": {
+    "Live Preview": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "پالت رنگی زنده با رنگ‌های تأکیدی اشباع شده."
@@ -4810,6 +5440,9 @@
   },
   "Loading codecs...": {
     "Loading codecs...": "بارگذاری کدک‌ها..."
+  },
+  "Loading contributors...": {
+    "Loading contributors...": ""
   },
   "Loading keybinds...": {
     "Loading keybinds...": "بارگذاری نگاشت‌کلید..."
@@ -4903,6 +5536,9 @@
   },
   "MTU": {
     "MTU": "MTU"
+  },
+  "Magnifier Loupe": {
+    "Magnifier Loupe": ""
   },
   "Mail": {
     "Mail": "نامه"
@@ -5045,6 +5681,9 @@
   "Max H": {
     "Max H": "بیشینه H"
   },
+  "Max Height (0 = no limit)": {
+    "Max Height (0 = no limit)": ""
+  },
   "Max Pinned Apps": {
     "Max Pinned Apps": "بیشینه برنامه‌های سنجاق شده"
   },
@@ -5153,11 +5792,17 @@
   "Memory usage indicator": {
     "Memory usage indicator": "نشانگر میزان مصرف حافظه"
   },
+  "Menu Item Right Click": {
+    "Menu Item Right Click": ""
+  },
   "Merge indexed file results into the All tab (requires dsearch).": {
     "Merge indexed file results into the All tab (requires dsearch).": ""
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
     "Merge indexed folder results into the All tab (requires dsearch).": ""
+  },
+  "Merging audio tracks...": {
+    "Merging audio tracks...": ""
   },
   "Message": {
     "Message": "پیام"
@@ -5167,6 +5812,9 @@
   },
   "Microphone": {
     "Microphone": "میکروفون"
+  },
+  "Microphone Device": {
+    "Microphone Device": ""
   },
   "Microphone Mute": {
     "Microphone Mute": "میکروفون بی‌صدا"
@@ -5179,6 +5827,12 @@
   },
   "Microphone volume control": {
     "Microphone volume control": "کنترل حجم صدای میکروفون"
+  },
+  "Middle Click": {
+    "Middle Click": ""
+  },
+  "Middle Click Action": {
+    "Middle Click Action": ""
   },
   "Middle Click Emulation": {
     "Middle Click Emulation": ""
@@ -5198,6 +5852,9 @@
   "Minimize": {
     "Minimize": ""
   },
+  "Minimize Delay": {
+    "Minimize Delay": ""
+  },
   "Minute": {
     "Minute": "دقیقه"
   },
@@ -5206,6 +5863,9 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "متغیر‌های محیطی یافت نشد"
+  },
+  "Modal": {
+    "Modal": ""
   },
   "Modal Background": {
     "Modal Background": "پس‌زمینه مودال"
@@ -5252,8 +5912,17 @@
   "Month Date": {
     "Month Date": "تاریخ ماه"
   },
+  "More Tools": {
+    "More Tools": ""
+  },
   "Morning": {
     "Morning": "صبح"
+  },
+  "Most Saturated": {
+    "Most Saturated": ""
+  },
+  "Most Vivid": {
+    "Most Vivid": ""
   },
   "Motion": {
     "Motion": ""
@@ -5287,6 +5956,9 @@
   },
   "Move island and satellites left or right from display center": {
     "Move island and satellites left or right from display center": ""
+  },
+  "Move island and satellites up or down from display center": {
+    "Move island and satellites up or down from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "انتقال به حالت متوقف شده"
@@ -5438,6 +6110,9 @@
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": ""
   },
+  "Niri Binding Example": {
+    "Niri Binding Example": ""
+  },
   "Niri Integration": {
     "Niri Integration": "همگام‌سازی نیری"
   },
@@ -5482,6 +6157,9 @@
   },
   "No History": {
     "No History": "بدون تاریخچه"
+  },
+  "No Image Specified": {
+    "No Image Specified": ""
   },
   "No Media": {
     "No Media": "رسانه‌ای یافت نشد"
@@ -5651,6 +6329,9 @@
   "No other active sessions on this seat": {
     "No other active sessions on this seat": "هیچ نشست فعال دیگری در این ورودی وجود ندارد"
   },
+  "No output available": {
+    "No output available": ""
+  },
   "No output device": {
     "No output device": "بدون دستگاه خروجی"
   },
@@ -5699,6 +6380,9 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "هیچ مدخل کلیپ‌بوردی ذخیره نشده است"
   },
+  "No saved images yet": {
+    "No saved images yet": ""
+  },
   "No screenshot provided": {
     "No screenshot provided": ""
   },
@@ -5710,6 +6394,9 @@
   },
   "No status output.": {
     "No status output.": "وضعیتی برای نمایش نیست."
+  },
+  "No supported images found": {
+    "No supported images found": ""
   },
   "No supported package manager found.": {
     "No supported package manager found.": "هیچ مدیر بسته پشتیبانی‌شده‌ای یافت نشد."
@@ -5765,8 +6452,14 @@
   "None": {
     "None": "هیچکدام"
   },
+  "None / Disabled": {
+    "None / Disabled": ""
+  },
   "None active": {
     "None active": "هیچکدام فعال نیستند"
+  },
+  "Nord": {
+    "Nord": ""
   },
   "Normal": {
     "Normal": "عادی"
@@ -5806,6 +6499,9 @@
   },
   "Not set": {
     "Not set": "تنظیم نشده"
+  },
+  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
   },
   "Notepad": {
     "Notepad": "دفترچه یادداشت"
@@ -5858,11 +6554,23 @@
   "Now playing and media controls": {
     "Now playing and media controls": ""
   },
+  "Number Stamp": {
+    "Number Stamp": ""
+  },
   "Numeric (D/M)": {
     "Numeric (D/M)": "عددی (ماه/روز)"
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "عددی (روز/ماه)"
+  },
+  "OCR": {
+    "OCR": ""
+  },
+  "OCR Result": {
+    "OCR Result": ""
+  },
+  "OCR Text Recognition": {
+    "OCR Text Recognition": ""
   },
   "OK": {
     "OK": "خوب"
@@ -5957,6 +6665,9 @@
   "Open Dir": {
     "Open Dir": "باز کردن مسیر"
   },
+  "Open Folder": {
+    "Open Folder": ""
+  },
   "Open Frame": {
     "Open Frame": "باز کردن قاب"
   },
@@ -5968,6 +6679,15 @@
   },
   "Open Notepad File": {
     "Open Notepad File": "باز‌ کردن فایل دفترچه یادداشت"
+  },
+  "Open Quick Capture menu (Popout)": {
+    "Open Quick Capture menu (Popout)": ""
+  },
+  "Open Specific Image Path — Edit": {
+    "Open Specific Image Path — Edit": ""
+  },
+  "Open Specific Image Path — Float": {
+    "Open Specific Image Path — Float": ""
   },
   "Open Trash": {
     "Open Trash": "باز کردن زباله‌دان"
@@ -6059,6 +6779,9 @@
   "Outline": {
     "Outline": "خط بیرونی"
   },
+  "Outline Variant": {
+    "Outline Variant": ""
+  },
   "Outline around shell surfaces": {
     "Outline around shell surfaces": ""
   },
@@ -6074,8 +6797,20 @@
   "Output Devices": {
     "Output Devices": "دستگاه‌های خروجی"
   },
+  "Output Format": {
+    "Output Format": ""
+  },
   "Output Tray Missing": {
     "Output Tray Missing": "سینی خروج موجود نیست"
+  },
+  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+  },
+  "Output switched": {
+    "Output switched": ""
+  },
+  "Outputs": {
+    "Outputs": ""
   },
   "Overcast": {
     "Overcast": "کاملاْ ابری"
@@ -6085,6 +6820,9 @@
   },
   "Overlay": {
     "Overlay": ""
+  },
+  "Overlay Opacity": {
+    "Overlay Opacity": ""
   },
   "Overridden by config": {
     "Overridden by config": "جایگزین شده توسط پیکربندی"
@@ -6134,6 +6872,9 @@
   "PAM already provides security-key auth. Enable this to show it at login.": {
     "PAM already provides security-key auth. Enable this to show it at login.": "درحال حاضر PAM احراز هویت کلید امنیتی را ارائه می‌دهد. این را برای نمایش در ورود فعال کنید."
   },
+  "PAUSED": {
+    "PAUSED": ""
+  },
   "PDF Reader": {
     "PDF Reader": "PDF خوان"
   },
@@ -6142,6 +6883,9 @@
   },
   "PIN": {
     "PIN": "PIN"
+  },
+  "PRIMARY": {
+    "PRIMARY": ""
   },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": ""
@@ -6182,6 +6926,9 @@
   "Palette": {
     "Palette": ""
   },
+  "Palette Preset": {
+    "Palette Preset": ""
+  },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
     "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
   },
@@ -6205,6 +6952,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": "تغییر گذرواژه ناموفق بود (خروجی %1)"
+  },
+  "Password must be 8 to 63 characters, or a 64-digit hex key.": {
+    "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
   },
   "Password set": {
     "Password set": "گذرواژه تنظیم شد"
@@ -6235,6 +6985,18 @@
   },
   "Paused": {
     "Paused": "متوقف شده"
+  },
+  "Pen Auto-Close": {
+    "Pen Auto-Close": ""
+  },
+  "Pen Color": {
+    "Pen Color": ""
+  },
+  "Pen Thickness": {
+    "Pen Thickness": ""
+  },
+  "Pen, Line, Arrow, Rect": {
+    "Pen, Line, Arrow, Rect": ""
   },
   "Pending": {
     "Pending": "در حال بررسی"
@@ -6278,11 +7040,17 @@
   "Phone number": {
     "Phone number": "شماره تلفن"
   },
+  "Pick Color": {
+    "Pick Color": ""
+  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "یک برنامه مدیریت فایل متفاوت در تنظیمات ← داک ← زباله‌دان، انتخاب کنید."
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "هر بار یک ویدئوی تصادفی از همان پوشه انتخاب کن"
+  },
+  "Pick a palette preset or customize individual color slots.": {
+    "Pick a palette preset or customize individual color slots.": ""
   },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "انتخاب کنید که اعلان‌ها چه مدت متوقف شوند"
@@ -6305,8 +7073,17 @@
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": "برنامه‌های سنجاق شده و درحال اجرا به همراه کشیدن و رها کردن"
   },
+  "Pixel Intensity": {
+    "Pixel Intensity": ""
+  },
   "Pixelate": {
     "Pixelate": "پیکسلی کردن"
+  },
+  "Pixelate (E)": {
+    "Pixelate (E)": ""
+  },
+  "Pixelate Intensity": {
+    "Pixelate Intensity": ""
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "یک زباله‌دان در آخر داک قرار بده"
@@ -6431,6 +7208,9 @@
   "Popular Plugins": {
     "Popular Plugins": ""
   },
+  "Popup Input": {
+    "Popup Input": ""
+  },
   "Popup Only": {
     "Popup Only": "فقط پاپ‌آپ"
   },
@@ -6458,6 +7238,9 @@
   "Portal": {
     "Portal": "پورتال"
   },
+  "Portrait": {
+    "Portrait": ""
+  },
   "Position": {
     "Position": "مکان"
   },
@@ -6466,6 +7249,9 @@
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "امکان تداخل جایگزین‌ها"
+  },
+  "Post-Capture Notification": {
+    "Post-Capture Notification": ""
   },
   "Power": {
     "Power": "پاور"
@@ -6524,6 +7310,42 @@
   "Preference": {
     "Preference": "تنظیمات"
   },
+  "Preset %1": {
+    "Preset %1": ""
+  },
+  "Preset 1": {
+    "Preset 1": ""
+  },
+  "Preset 2": {
+    "Preset 2": ""
+  },
+  "Preset 3": {
+    "Preset 3": ""
+  },
+  "Preset 4": {
+    "Preset 4": ""
+  },
+  "Preset 5": {
+    "Preset 5": ""
+  },
+  "Preset 6": {
+    "Preset 6": ""
+  },
+  "Preset 7": {
+    "Preset 7": ""
+  },
+  "Preset 8": {
+    "Preset 8": ""
+  },
+  "Preset Color": {
+    "Preset Color": ""
+  },
+  "Preset Thickness": {
+    "Preset Thickness": ""
+  },
+  "Preset Tool": {
+    "Preset Tool": ""
+  },
   "Preset Widths (%)": {
     "Preset Widths (%)": "عرض‌های از پیش تعیین شده (%)"
   },
@@ -6574,6 +7396,9 @@
   },
   "Primary Container": {
     "Primary Container": "زمینه اصلی"
+  },
+  "Primary Screen": {
+    "Primary Screen": ""
   },
   "Print Server Management": {
     "Print Server Management": "مدیریت سرور چاپ"
@@ -6671,6 +7496,9 @@
   "QR Generator": {
     "QR Generator": ""
   },
+  "QR Result": {
+    "QR Result": ""
+  },
   "Qt": {
     "Qt": ""
   },
@@ -6689,6 +7517,12 @@
   "Quality": {
     "Quality": "کمیت"
   },
+  "Quick Capture": {
+    "Quick Capture": ""
+  },
+  "Quick Capture Error": {
+    "Quick Capture Error": ""
+  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "دسترسی سریع به لانچر برنامه"
   },
@@ -6704,8 +7538,26 @@
   "Quick system toggles": {
     "Quick system toggles": "تنظیمات سریع"
   },
+  "RECORDING": {
+    "RECORDING": ""
+  },
   "RGB": {
     "RGB": "RGB"
+  },
+  "Radial Gradient": {
+    "Radial Gradient": ""
+  },
+  "Radial Menu": {
+    "Radial Menu": ""
+  },
+  "Radial Menu Opacity": {
+    "Radial Menu Opacity": ""
+  },
+  "Radial Menu Settings": {
+    "Radial Menu Settings": ""
+  },
+  "Radial Preset": {
+    "Radial Preset": ""
   },
   "Radius": {
     "Radius": "شعاع"
@@ -6727,6 +7579,9 @@
   },
   "Rate": {
     "Rate": "نرخ انتقال"
+  },
+  "Ratio": {
+    "Ratio": ""
   },
   "Re-enter password": {
     "Re-enter password": "گذرواژه را دوباره وارد کنید"
@@ -6755,6 +7610,9 @@
   "Recent Colors": {
     "Recent Colors": "رنگ‌های اخیر"
   },
+  "Recent Edits": {
+    "Recent Edits": ""
+  },
   "Recent Images": {
     "Recent Images": ""
   },
@@ -6763,6 +7621,60 @@
   },
   "Recommended available": {
     "Recommended available": "پیشنهادی موجود است"
+  },
+  "Record Microphone": {
+    "Record Microphone": ""
+  },
+  "Record Mouse Cursor": {
+    "Record Mouse Cursor": ""
+  },
+  "Record System Audio": {
+    "Record System Audio": ""
+  },
+  "Recording": {
+    "Recording": ""
+  },
+  "Recording Folder": {
+    "Recording Folder": ""
+  },
+  "Recording ended with error code %1.": {
+    "Recording ended with error code %1.": ""
+  },
+  "Recording...": {
+    "Recording...": ""
+  },
+  "Recordings Directory": {
+    "Recordings Directory": ""
+  },
+  "Rectangle": {
+    "Rectangle": ""
+  },
+  "Rectangle Color": {
+    "Rectangle Color": ""
+  },
+  "Rectangle Outline": {
+    "Rectangle Outline": ""
+  },
+  "Rectangle Outline (4)": {
+    "Rectangle Outline (4)": ""
+  },
+  "Rectangle Thickness": {
+    "Rectangle Thickness": ""
+  },
+  "Redact": {
+    "Redact": ""
+  },
+  "Redact (R)": {
+    "Redact (R)": ""
+  },
+  "Redact Thickness": {
+    "Redact Thickness": ""
+  },
+  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
+  },
+  "Redo last undone stroke": {
+    "Redo last undone stroke": ""
   },
   "Reduce Motion": {
     "Reduce Motion": ""
@@ -6781,6 +7693,9 @@
   },
   "Regex": {
     "Regex": "رجکس"
+  },
+  "Region": {
+    "Region": ""
   },
   "Registries": {
     "Registries": ""
@@ -6926,6 +7841,9 @@
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "به ابزار 'dgop' نیاز دارد"
   },
+  "Requires Bar Shadows to be enabled in Theme & Colors.": {
+    "Requires Bar Shadows to be enabled in Theme & Colors.": ""
+  },
   "Requires DMS %1": {
     "Requires DMS %1": "به DMS %1 نیاز دارد"
   },
@@ -6953,8 +7871,14 @@
   "Reserved Height": {
     "Reserved Height": ""
   },
+  "Reserved Width": {
+    "Reserved Width": ""
+  },
   "Reset": {
     "Reset": "تنظیم مجدد"
+  },
+  "Reset Last Region": {
+    "Reset Last Region": ""
   },
   "Reset Position": {
     "Reset Position": "تنظیم مجدد مکان"
@@ -7040,6 +7964,12 @@
   "Right Center": {
     "Right Center": "راست وسط"
   },
+  "Right Click": {
+    "Right Click": ""
+  },
+  "Right Click Action": {
+    "Right Click Action": ""
+  },
   "Right Section": {
     "Right Section": "بخش راست"
   },
@@ -7067,8 +7997,26 @@
   "Root Filesystem": {
     "Root Filesystem": "سیستم فایل ریشه"
   },
+  "Rosé Pine": {
+    "Rosé Pine": ""
+  },
+  "Rotate L": {
+    "Rotate L": ""
+  },
+  "Rotate R": {
+    "Rotate R": ""
+  },
+  "Round Highlighter Tips": {
+    "Round Highlighter Tips": ""
+  },
+  "Round Rectangle Corners": {
+    "Round Rectangle Corners": ""
+  },
   "Rounded": {
     "Rounded": ""
+  },
+  "Rounded Rectangle": {
+    "Rounded Rectangle": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "گوشه‌های گرد برای پنجره‌ها"
@@ -7151,14 +8099,26 @@
   "Save & Start": {
     "Save & Start": ""
   },
+  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
+  },
+  "Save Directory": {
+    "Save Directory": ""
+  },
   "Save Extracted Theme": {
     "Save Extracted Theme": ""
+  },
+  "Save Filename Pattern": {
+    "Save Filename Pattern": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "ذخیره فایل دفترچه یادداشت"
   },
   "Save QR Code": {
     "Save QR Code": "ذخیره کد QR"
+  },
+  "Save Screenshot As": {
+    "Save Screenshot As": ""
   },
   "Save and close": {
     "Save and close": "ذخیره و بستن"
@@ -7190,6 +8150,9 @@
   "Saved": {
     "Saved": "ذخیره شد"
   },
+  "Saved %1 (%2)": {
+    "Saved %1 (%2)": ""
+  },
   "Saved Configurations": {
     "Saved Configurations": "پیکربندی‌های ذخیره شده"
   },
@@ -7201,6 +8164,9 @@
   },
   "Saved item deleted": {
     "Saved item deleted": "مورد ذخیره شده حذف شد"
+  },
+  "Saving": {
+    "Saving": ""
   },
   "Saving...": {
     "Saving...": "درحال ذخیره..."
@@ -7214,11 +8180,17 @@
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": "اندازه آیکون‌های نوار دَنک را به صورت مستقل مقیاس کن"
   },
+  "Scale Editor to Screenshot Size": {
+    "Scale Editor to Screenshot Size": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "تمام اندازه‌های قلم در سراسر شِل مقیاس کن"
   },
   "Scan": {
     "Scan": "اسکن"
+  },
+  "Scan QR": {
+    "Scan QR": ""
   },
   "Scanning...": {
     "Scanning...": "درحال اسکن..."
@@ -7229,11 +8201,128 @@
   "Score": {
     "Score": "امتیاز"
   },
+  "Screen": {
+    "Screen": ""
+  },
   "Screen Edges": {
     "Screen Edges": ""
   },
+  "Screen Recorder": {
+    "Screen Recorder": ""
+  },
+  "Screen Recording (Cancel)": {
+    "Screen Recording (Cancel)": ""
+  },
+  "Screen Recording (Full Screen)": {
+    "Screen Recording (Full Screen)": ""
+  },
+  "Screen Recording (Interactive Region)": {
+    "Screen Recording (Interactive Region)": ""
+  },
+  "Screen Recording (Pause / Resume)": {
+    "Screen Recording (Pause / Resume)": ""
+  },
+  "Screen Recording (Stop & Save)": {
+    "Screen Recording (Stop & Save)": ""
+  },
+  "Screen Recording (Toggle Start / Stop)": {
+    "Screen Recording (Toggle Start / Stop)": ""
+  },
+  "Screen Recording (Window / Portal)": {
+    "Screen Recording (Window / Portal)": ""
+  },
+  "Screen Recording Error": {
+    "Screen Recording Error": ""
+  },
+  "Screen Recording Saved": {
+    "Screen Recording Saved": ""
+  },
+  "Screen recording timed out or was cancelled.": {
+    "Screen recording timed out or was cancelled.": ""
+  },
   "Screen sharing": {
     "Screen sharing": "اشتراک‌گذاری صفحه"
+  },
+  "Screen: %1 (%2x%3)": {
+    "Screen: %1 (%2x%3)": ""
+  },
+  "Screenshot (All Combined Outputs) — Edit": {
+    "Screenshot (All Combined Outputs) — Edit": ""
+  },
+  "Screenshot (All Combined Outputs) — Float": {
+    "Screenshot (All Combined Outputs) — Float": ""
+  },
+  "Screenshot (Focused Window) — Edit": {
+    "Screenshot (Focused Window) — Edit": ""
+  },
+  "Screenshot (Focused Window) — Float": {
+    "Screenshot (Focused Window) — Float": ""
+  },
+  "Screenshot (Full Screen) — Edit": {
+    "Screenshot (Full Screen) — Edit": ""
+  },
+  "Screenshot (Full Screen) — Float": {
+    "Screenshot (Full Screen) — Float": ""
+  },
+  "Screenshot (Interactive Region) — Edit": {
+    "Screenshot (Interactive Region) — Edit": ""
+  },
+  "Screenshot (Interactive Region) — Float": {
+    "Screenshot (Interactive Region) — Float": ""
+  },
+  "Screenshot (Last Selected Region) — Edit": {
+    "Screenshot (Last Selected Region) — Edit": ""
+  },
+  "Screenshot (Last Selected Region) — Float": {
+    "Screenshot (Last Selected Region) — Float": ""
+  },
+  "Screenshot (Scrolling Capture) — Edit": {
+    "Screenshot (Scrolling Capture) — Edit": ""
+  },
+  "Screenshot (Scrolling Capture) — Float": {
+    "Screenshot (Scrolling Capture) — Float": ""
+  },
+  "Screenshot (Specific Output) — Edit": {
+    "Screenshot (Specific Output) — Edit": ""
+  },
+  "Screenshot (Specific Output) — Float": {
+    "Screenshot (Specific Output) — Float": ""
+  },
+  "Screenshot Copied": {
+    "Screenshot Copied": ""
+  },
+  "Screenshot Folder": {
+    "Screenshot Folder": ""
+  },
+  "Screenshot Saved": {
+    "Screenshot Saved": ""
+  },
+  "Screenshot copied anonymously with randomized name and stripped metadata.": {
+    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+  },
+  "Screenshot copied to clipboard and saved to %1": {
+    "Screenshot copied to clipboard and saved to %1": ""
+  },
+  "Screenshot copied to clipboard but failed to save file: %1": {
+    "Screenshot copied to clipboard but failed to save file: %1": ""
+  },
+  "Screenshot copied to clipboard.": {
+    "Screenshot copied to clipboard.": ""
+  },
+  "Screenshot copied with randomized name.": {
+    "Screenshot copied with randomized name.": ""
+  },
+  "Screenshot failed (mode: %1).": {
+    "Screenshot failed (mode: %1).": ""
+  },
+  "Screenshot saved": {
+    "Screenshot saved": ""
+  },
+  "Screenshot saved to %1": {
+    "Screenshot saved to %1": ""
+  },
+  "Screenshot saved to %1/%2": {
+    "Screenshot saved to %1/%2": ""
   },
   "Screenshot unavailable": {
     "Screenshot unavailable": ""
@@ -7247,11 +8336,17 @@
   "Scroll GitHub": {
     "Scroll GitHub": "گیتهاب اسکرول"
   },
+  "Scroll Interval": {
+    "Scroll Interval": ""
+  },
   "Scroll Method": {
     "Scroll Method": ""
   },
   "Scroll Wheel": {
     "Scroll Wheel": "چرخ اسکرول"
+  },
+  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scroll song title": {
     "Scroll song title": "حرکت عنوان آهنگ"
@@ -7264,6 +8359,9 @@
   },
   "Scrolling": {
     "Scrolling": "اسکرولینگ"
+  },
+  "Scrolling Capture": {
+    "Scrolling Capture": ""
   },
   "Scrolling Speed": {
     "Scrolling Speed": ""
@@ -7355,20 +8453,41 @@
   "Select": {
     "Select": "انتخاب"
   },
+  "Select / Move stroke": {
+    "Select / Move stroke": ""
+  },
   "Select Application": {
     "Select Application": "انتخاب برنامه"
   },
   "Select Bar": {
     "Select Bar": "انتخاب نوار"
   },
+  "Select Color Slots 1 - 4": {
+    "Select Color Slots 1 - 4": ""
+  },
+  "Select Color Slots 5 - 8 (Q, W, E, R)": {
+    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
+  },
   "Select Custom Theme": {
     "Select Custom Theme": "انتخاب تم سفارشی"
+  },
+  "Select Directory": {
+    "Select Directory": ""
   },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "لوگوی لانچر داک را انتخاب کنید"
   },
   "Select File to Send": {
     "Select File to Send": "فایل را برای ارسال انتخاب کنید"
+  },
+  "Select Image File — Edit": {
+    "Select Image File — Edit": ""
+  },
+  "Select Image File — Float": {
+    "Select Image File — Float": ""
+  },
+  "Select Image to Annotate": {
+    "Select Image to Annotate": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "انتخاب لوگوی لانچر"
@@ -7445,6 +8564,9 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "انتخاب الگوریتم پالت رنگی استفاده شده برای رنگ‌های بر اساس تصویر پس‌زمینه"
   },
+  "Select which color is extracted from the wallpaper to seed the palette": {
+    "Select which color is extracted from the wallpaper to seed the palette": ""
+  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "انتخاب کنید که کدام ارائه دهنده نگاشت‌کلید‌ها include شود"
   },
@@ -7453,6 +8575,9 @@
   },
   "Select...": {
     "Select...": "انتخاب..."
+  },
+  "Selected Tool / Action": {
+    "Selected Tool / Action": ""
   },
   "Selected image file not found.": {
     "Selected image file not found.": "فایل تصویر انتخاب شده یافت نشد."
@@ -7580,6 +8705,9 @@
   "Shadows": {
     "Shadows": "سایه‌ها"
   },
+  "Shapes": {
+    "Shapes": ""
+  },
   "Share": {
     "Share": "اشتراک‌گذاری"
   },
@@ -7603,6 +8731,9 @@
   },
   "Shortcut (%1)": {
     "Shortcut (%1)": "میانبر (%1)"
+  },
+  "Shortcut Action": {
+    "Shortcut Action": ""
   },
   "Shortcut that opens this settings window": {
     "Shortcut that opens this settings window": ""
@@ -7642,6 +8773,9 @@
   },
   "Show Charge Rate": {
     "Show Charge Rate": ""
+  },
+  "Show Control Center": {
+    "Show Control Center": ""
   },
   "Show Date": {
     "Show Date": "نمایش تاریخ"
@@ -7690,6 +8824,9 @@
   },
   "Show Icon": {
     "Show Icon": ""
+  },
+  "Show Keyboard Shortcut Hints": {
+    "Show Keyboard Shortcut Hints": ""
   },
   "Show Launcher Button": {
     "Show Launcher Button": "دکمه لانچر را نمایش بده"
@@ -7745,6 +8882,9 @@
   "Show Percentage": {
     "Show Percentage": ""
   },
+  "Show Pill Border": {
+    "Show Pill Border": ""
+  },
   "Show Power Actions": {
     "Show Power Actions": "نمایش اقدام‌های پاور"
   },
@@ -7763,6 +8903,12 @@
   "Show Reboot": {
     "Show Reboot": "نمایش راه‌اندازی مجدد"
   },
+  "Show Recent Edits History": {
+    "Show Recent Edits History": ""
+  },
+  "Show Region Border": {
+    "Show Region Border": ""
+  },
   "Show Remaining Time": {
     "Show Remaining Time": ""
   },
@@ -7774,6 +8920,9 @@
   },
   "Show Saved Items": {
     "Show Saved Items": "نمایش موارد ذخیره شده"
+  },
+  "Show Screenshot Border": {
+    "Show Screenshot Border": ""
   },
   "Show Seconds": {
     "Show Seconds": "نمایش ثانیه‌ها"
@@ -7801,6 +8950,12 @@
   },
   "Show System Time": {
     "Show System Time": "نمایش زمان سیستم"
+  },
+  "Show Toolbar": {
+    "Show Toolbar": ""
+  },
+  "Show Toolbar Border": {
+    "Show Toolbar Border": ""
   },
   "Show Top Processes": {
     "Show Top Processes": "نمایش فرایند‌های مهم"
@@ -7910,6 +9065,9 @@
   "Show on screens:": {
     "Show on screens:": "نمایش روی صفحات:"
   },
+  "Show only the image on a transparent background": {
+    "Show only the image on a transparent background": ""
+  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": "نوار را هنگامی که هیچ پنجره‌ای باز نیست نمایش بده"
   },
@@ -7979,6 +9137,9 @@
   "Skip": {
     "Skip": "رد کردن"
   },
+  "Skip Confirmation": {
+    "Skip Confirmation": ""
+  },
   "Skip confirmation": {
     "Skip confirmation": "رد کردن تأیید"
   },
@@ -7990,6 +9151,30 @@
   },
   "Slideout": {
     "Slideout": ""
+  },
+  "Slot 1": {
+    "Slot 1": ""
+  },
+  "Slot 2": {
+    "Slot 2": ""
+  },
+  "Slot 3": {
+    "Slot 3": ""
+  },
+  "Slot 4": {
+    "Slot 4": ""
+  },
+  "Slot 5": {
+    "Slot 5": ""
+  },
+  "Slot 6": {
+    "Slot 6": ""
+  },
+  "Slot 7": {
+    "Slot 7": ""
+  },
+  "Slot 8": {
+    "Slot 8": ""
   },
   "Small": {
     "Small": "کوچک"
@@ -8018,11 +9203,26 @@
   "Soft Reboot": {
     "Soft Reboot": ""
   },
+  "Soften image details so screenshot content stands out": {
+    "Soften image details so screenshot content stands out": ""
+  },
   "Solid": {
     "Solid": ""
   },
+  "Solid Color": {
+    "Solid Color": ""
+  },
+  "Solid Fill": {
+    "Solid Fill": ""
+  },
+  "Solid Line": {
+    "Solid Line": ""
+  },
   "Solid material type or Outline": {
     "Solid material type or Outline": ""
+  },
+  "Solid or outlined material meter, or a circular gauge": {
+    "Solid or outlined material meter, or a circular gauge": ""
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "برخی افزونه‌ها نیازمند نسخه جدیدتر DMS هستند:"
@@ -8044,6 +9244,9 @@
   },
   "Sounds": {
     "Sounds": "صدا‌ها"
+  },
+  "Source Color": {
+    "Source Color": ""
   },
   "Source: %1": {
     "Source: %1": ""
@@ -8069,8 +9272,14 @@
   "Spacing": {
     "Spacing": "فاصله گذاری"
   },
+  "Spawn Position": {
+    "Spawn Position": ""
+  },
   "Speaker settings": {
     "Speaker settings": "تنظیمات بلندگو"
+  },
+  "Specific Output": {
+    "Specific Output": ""
   },
   "Speed": {
     "Speed": "سرعت"
@@ -8081,11 +9290,17 @@
   "Spotlight": {
     "Spotlight": "اسپات‌لایت"
   },
+  "Spotlight (D)": {
+    "Spotlight (D)": ""
+  },
   "Spotlight Bar": {
     "Spotlight Bar": "نوار اسپات‌لایت"
   },
   "Spotlight Bar Shortcut": {
     "Spotlight Bar Shortcut": "میانبر نوار اسپات‌لایت"
+  },
+  "Spotlight Opacity": {
+    "Spotlight Opacity": ""
   },
   "Spotlight Search": {
     "Spotlight Search": "جستجوی اسپات‌لایت"
@@ -8120,6 +9335,24 @@
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
     "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
   },
+  "Stamp (A)": {
+    "Stamp (A)": ""
+  },
+  "Stamp Color": {
+    "Stamp Color": ""
+  },
+  "Stamp Contrast Ring": {
+    "Stamp Contrast Ring": ""
+  },
+  "Stamp Number Font": {
+    "Stamp Number Font": ""
+  },
+  "Stamp Size": {
+    "Stamp Size": ""
+  },
+  "Stamp, Highlighter, Spotlight (A, S, D)": {
+    "Stamp, Highlighter, Spotlight (A, S, D)": ""
+  },
   "Standard": {
     "Standard": "استاندارد"
   },
@@ -8141,6 +9374,15 @@
   "Start typing your notes here...": {
     "Start typing your notes here...": "تایپ‌کردن یادداشت‌هایتان را اینجا شروع کنید..."
   },
+  "Starting Preset": {
+    "Starting Preset": ""
+  },
+  "Starting Tool": {
+    "Starting Tool": ""
+  },
+  "Starting Tool Mode": {
+    "Starting Tool Mode": ""
+  },
   "Starting hotspot...": {
     "Starting hotspot...": ""
   },
@@ -8156,6 +9398,9 @@
   "Stop": {
     "Stop": ""
   },
+  "Stop & Save": {
+    "Stop & Save": ""
+  },
   "Stop ignoring %1": {
     "Stop ignoring %1": ""
   },
@@ -8167,6 +9412,12 @@
   },
   "Stopping": {
     "Stopping": "درحال توقف"
+  },
+  "Straight Line": {
+    "Straight Line": ""
+  },
+  "Straight Line (2)": {
+    "Straight Line (2)": ""
   },
   "Stretch": {
     "Stretch": "کشیده"
@@ -8222,6 +9473,9 @@
   "Surface Container": {
     "Surface Container": ""
   },
+  "Surface Container Highest": {
+    "Surface Container Highest": ""
+  },
   "Surface High": {
     "Surface High": ""
   },
@@ -8273,8 +9527,14 @@
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
     "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": ""
   },
+  "Switch to Select Tool": {
+    "Switch to Select Tool": ""
+  },
   "Switch to power profile": {
     "Switch to power profile": "تغییر به پروفایل پاور"
+  },
+  "Switch to your custom preset": {
+    "Switch to your custom preset": ""
   },
   "Sync": {
     "Sync": "همگام‌سازی"
@@ -8318,8 +9578,14 @@
   "Syncing...": {
     "Syncing...": ""
   },
+  "Synthwave Electric": {
+    "Synthwave Electric": ""
+  },
   "System App Theming": {
     "System App Theming": "تم‌دادن برنامه‌ سیستمی"
+  },
+  "System Audio Device": {
+    "System Audio Device": ""
   },
   "System Check": {
     "System Check": "بررسی سیستم"
@@ -8402,6 +9668,9 @@
   "Tap to Click": {
     "Tap to Click": ""
   },
+  "Target Output Name": {
+    "Target Output Name": ""
+  },
   "Task list used when adding tasks from the dash calendar": {
     "Task list used when adding tasks from the dash calendar": ""
   },
@@ -8450,20 +9719,38 @@
   "Text": {
     "Text": "متن"
   },
+  "Text (W)": {
+    "Text (W)": ""
+  },
+  "Text Background Roundness": {
+    "Text Background Roundness": ""
+  },
   "Text Color": {
     "Text Color": "رنگ متن"
   },
   "Text Editor": {
     "Text Editor": "ویرایشگر متن"
   },
+  "Text Font": {
+    "Text Font": ""
+  },
+  "Text Note": {
+    "Text Note": ""
+  },
   "Text Rendering": {
     "Text Rendering": "نماپردازی متن"
+  },
+  "Text Size": {
+    "Text Size": ""
   },
   "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
     "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "ابزار «dgop» برای نظارت سیستم نیاز است.\nلطفا برای استفاده از این قابلیت dgop را نصب کنید."
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "متغیر محیطی DMS_SOCKET تنظیم نشده یا سوکت موجود نیست. مدیریت افزونه خودکار به DMS_SOCKET نیاز دارد."
+  },
+  "The Island anchors to one screen edge": {
+    "The Island anchors to one screen edge": ""
   },
   "The Island anchors to the top or bottom edge": {
     "The Island anchors to the top or bottom edge": ""
@@ -8498,11 +9785,17 @@
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
   },
+  "Theme": {
+    "Theme": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "تم و رنگ‌ها"
   },
   "Theme Color": {
     "Theme Color": "رنگ تم"
+  },
+  "Theme Primary Color": {
+    "Theme Primary Color": ""
   },
   "Theme Registry": {
     "Theme Registry": "مخزن تم‌ها"
@@ -8554,6 +9847,9 @@
   },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "این خروجی در پروفایل کنونی غیرفعال است"
+  },
+  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "این افزونه اجازه «settings_write» را ندارد.\n\nبه plugins.json خط \"permissions\": [\"settings_read\", \"settings_write\"] را اضافه کنید"
@@ -8675,8 +9971,14 @@
   "Today": {
     "Today": "امروز"
   },
+  "Toggle Hide/Show Annotations": {
+    "Toggle Hide/Show Annotations": ""
+  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "وضعیت دید نوار به صورت دستی از طریق IPC تغییر دهید"
+  },
+  "Toggle between 2 latest presets": {
+    "Toggle between 2 latest presets": ""
   },
   "Toggle fonts": {
     "Toggle fonts": "تغییر وضعیت قلم‌ها"
@@ -8689,6 +9991,9 @@
   },
   "Toggling...": {
     "Toggling...": "در حال تغییر وضعیت..."
+  },
+  "Tokyo Night": {
+    "Tokyo Night": ""
   },
   "Tomorrow": {
     "Tomorrow": "فردا"
@@ -8704,6 +10009,18 @@
   },
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "تلاش‌های بیش از حد - حساب بسته شد"
+  },
+  "Tool Defaults": {
+    "Tool Defaults": ""
+  },
+  "Toolbar": {
+    "Toolbar": ""
+  },
+  "Toolbar Palette": {
+    "Toolbar Palette": ""
+  },
+  "Toolbar Position": {
+    "Toolbar Position": ""
   },
   "Tools": {
     "Tools": "ابزارها"
@@ -8762,6 +10079,12 @@
   "Transparency": {
     "Transparency": "شفافیت"
   },
+  "Transparent": {
+    "Transparent": ""
+  },
+  "Transparent Background": {
+    "Transparent Background": ""
+  },
   "Trash": {
     "Trash": "زباله‌دان"
   },
@@ -8780,8 +10103,17 @@
   "Trigger": {
     "Trigger": "راه‌انداز"
   },
+  "Trigger Middle-Click Action (Default: Interactive Region)": {
+    "Trigger Middle-Click Action (Default: Interactive Region)": ""
+  },
   "Trigger Prefix": {
     "Trigger Prefix": "پیشوند راه‌انداز"
+  },
+  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
+  },
+  "Trigger on Hover": {
+    "Trigger on Hover": ""
   },
   "Trigger: %1": {
     "Trigger: %1": "راه‌انداز: %1"
@@ -8822,6 +10154,9 @@
   "Type at least 2 characters to search files.": {
     "Type at least 2 characters to search files.": "حداقل ۲ کاراکتر برای جستجوی فایل‌ها تایپ کنید."
   },
+  "Type note...": {
+    "Type note...": ""
+  },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "این پیشوند را برای جستجوی نگاشت‌کلیدها تایپ کنید"
   },
@@ -8842,6 +10177,12 @@
   },
   "Uncategorized": {
     "Uncategorized": ""
+  },
+  "Undo (Ctrl+Z)": {
+    "Undo (Ctrl+Z)": ""
+  },
+  "Undo last stroke": {
+    "Undo last stroke": ""
   },
   "Unfocused Color": {
     "Unfocused Color": "رنگ فوکوس نشده"
@@ -8996,6 +10337,9 @@
   "Urgent Color": {
     "Urgent Color": "رنگ ضروری"
   },
+  "Usage Guide": {
+    "Usage Guide": ""
+  },
   "Usage Tips": {
     "Usage Tips": "راهنمای استفاده"
   },
@@ -9004,6 +10348,12 @@
   },
   "Use Custom Command": {
     "Use Custom Command": "استفاده از دستور سفارشی"
+  },
+  "Use Existing Custom": {
+    "Use Existing Custom": ""
+  },
+  "Use Floating Editor": {
+    "Use Floating Editor": ""
   },
   "Use Grid Layout": {
     "Use Grid Layout": "استفاده از چیدمان جدولی"
@@ -9022,6 +10372,9 @@
   },
   "Use Inline Expansion": {
     "Use Inline Expansion": "از گسترش درون‌خطی استفاده کن"
+  },
+  "Use Modal Editor": {
+    "Use Modal Editor": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "استفاده از قلم monospace"
@@ -9224,6 +10577,9 @@
   "Vertical Grid": {
     "Vertical Grid": "جدول عمودی"
   },
+  "Vertical Offset": {
+    "Vertical Offset": ""
+  },
   "Vertical Scrolling": {
     "Vertical Scrolling": "اسکرولینگ عمودی"
   },
@@ -9239,14 +10595,23 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "پالتر رنگی پر جنب و جوش با اشباع رنگی سرزنده."
   },
+  "Video Codec": {
+    "Video Codec": ""
+  },
   "Video Path": {
     "Video Path": "مسیر ویدئو"
   },
   "Video Player": {
     "Video Player": "پخش‌کننده ویدئو"
   },
+  "Video Quality": {
+    "Video Quality": ""
+  },
   "Video Screensaver": {
     "Video Screensaver": "محافظ صفحه ویدئویی"
+  },
+  "Video Settings": {
+    "Video Settings": ""
   },
   "View Mode": {
     "View Mode": "حالت نمایش"
@@ -9326,6 +10691,18 @@
   "Warnings": {
     "Warnings": "اخطار‌ها"
   },
+  "Watermark": {
+    "Watermark": ""
+  },
+  "Watermark Image": {
+    "Watermark Image": ""
+  },
+  "Watermark Text": {
+    "Watermark Text": ""
+  },
+  "Watermark Type": {
+    "Watermark Type": ""
+  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "نوار‌های پیشرفت موجی"
   },
@@ -9341,6 +10718,9 @@
   "Web Browser": {
     "Web Browser": "مرورگر وب"
   },
+  "WebP Quality": {
+    "WebP Quality": ""
+  },
   "Welcome": {
     "Welcome": "خوش آمدید"
   },
@@ -9355,6 +10735,9 @@
   },
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
     "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": ""
+  },
+  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
   },
   "When locked": {
     "When locked": "هنگام قفل شدن"
@@ -9461,6 +10844,9 @@
   "Wind Speed in m/s": {
     "Wind Speed in m/s": "سرعت باد به m/s"
   },
+  "Window": {
+    "Window": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "شعاع گوشه پنجره‌ها"
   },
@@ -9488,6 +10874,12 @@
   "Working...": {
     "Working...": ""
   },
+  "Workspace %1": {
+    "Workspace %1": ""
+  },
+  "Workspace %1: %2": {
+    "Workspace %1: %2": ""
+  },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "شماره شاخص محیط‌کارها"
   },
@@ -9496,6 +10888,9 @@
   },
   "Workspace Padding": {
     "Workspace Padding": "فاصله درونی محیط‌کار"
+  },
+  "Workspace Switch": {
+    "Workspace Switch": ""
   },
   "Workspace Switcher": {
     "Workspace Switcher": "تغییردهنده محیط‌کار"
@@ -9577,6 +10972,9 @@
   },
   "Your system is up to date!": {
     "Your system is up to date!": "سیستم شما بروز است!"
+  },
+  "Zoom Level": {
+    "Zoom Level": ""
   },
   "admin": {
     "admin": "ادمین"
@@ -9664,6 +11062,9 @@
   },
   "featured": {
     "featured": "پیشنهادی"
+  },
+  "gpu-screen-recorder is not installed. Please install it first.": {
+    "gpu-screen-recorder is not installed. Please install it first.": ""
   },
   "khal": {
     "khal": ""

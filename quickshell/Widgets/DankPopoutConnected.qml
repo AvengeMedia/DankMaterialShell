@@ -272,6 +272,7 @@ Item {
             "visible": visible,
             "presented": presented,
             "layer": root.effectiveOverlayLayer ? "overlay" : "top",
+            "layer": root.effectivePopoutLayer === WlrLayer.Overlay ? "overlay" : "top",
             "barSide": contentContainer.connectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
@@ -428,7 +429,7 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: CompositorService.usesConnectedFrameChromeForScreen(root.screen)
+    readonly property bool frameOwnsConnectedChrome: effectivePopoutLayer === WlrLayer.Top && CompositorService.usesConnectedFrameChromeForScreen(root.screen)
     readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()

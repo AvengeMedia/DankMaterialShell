@@ -67,11 +67,10 @@ CompoundPill {
         return Theme.surfaceText;
     }
 
-    Component.onCompleted: {
-        DgopService.addRef(["diskmounts"]);
-    }
-    Component.onDestruction: {
-        DgopService.removeRef(["diskmounts"]);
+    Ref {
+        service: DgopService
+        modules: ["diskmounts"]
+        active: root.visible && (root.Window.window?.visible ?? false)
     }
 
     onToggled: {

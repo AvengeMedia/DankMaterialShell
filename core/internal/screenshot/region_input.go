@@ -19,6 +19,12 @@ func (r *RegionSelector) setupInput() {
 				r.setupPointerHandlers()
 			}
 		}
+		if e.Capabilities&uint32(client.SeatCapabilityTouch) != 0 && r.touch == nil {
+			if touch, err := r.seat.GetTouch(); err == nil {
+				r.touch = touch
+				r.setupTouchHandlers()
+			}
+		}
 		if e.Capabilities&uint32(client.SeatCapabilityKeyboard) != 0 && r.keyboard == nil {
 			if keyboard, err := r.seat.GetKeyboard(); err == nil {
 				r.keyboard = keyboard
@@ -144,6 +150,143 @@ func (r *RegionSelector) setupPointerHandlers() {
 			r.running = false
 		}
 	})
+}
+
+func (r *RegionSelector) setupTouchHandlers() {
+	r.touch.SetDownHandler(func(e client.TouchDownEvent) {
+		r.handleTouchDown(e.Surface, e.Id, e.X, e.Y)
+	})
+
+	r.touch.SetMotionHandler(func(e client.TouchMotionEvent) {
+		r.handleTouchMotion(e.Id, e.X, e.Y)
+	})
+
+	r.touch.SetUpHandler(func(e client.TouchUpEvent) {
+		r.handleTouchUp(e.Id)
+	})
+
+	r.touch.SetCancelHandler(func(e client.TouchCancelEvent) {
+		r.handleTouchCancel()
+	})
+}
+
+func (r *RegionSelector) handleTouchDown(surface *client.Surface, touchId int32, x, y float64) {
+	if r.hasTouchPoint {
+		return
+	}
+
+	r.activeSurface = nil
+	for _, os := range r.surfaces {
+		if os.wlSurface != nil && surface != nil && os.wlSurface.ID() == surface.ID() {
+			r.activeSurface = os
+			break
+		}
+	}
+
+	if r.activeSurface == nil {
+		return
+	}
+
+	r.hasTouchPoint = true
+	r.touchPointId = touchId
+
+	if r.phase == phaseScroll {
+		if r.activeSurface != r.selection.surface {
+			return
+		}
+		switch r.scrollBarHit(x, y) {
+		case "done", "preview":
+			r.finishScroll()
+		case "cancel":
+			r.cancelled = true
+			r.running = false
+		}
+		return
+	}
+
+	touchX := x + float64(r.activeSurface.output.x)
+	touchY := y + float64(r.activeSurface.output.y)
+
+	if r.ctrlHeld && r.selection.hasSelection {
+		if handle := r.resizeHandleAt(touchX, touchY); handle != handleNone {
+			if r.beginSelectionResize(handle, touchX, touchY) {
+				return
+			}
+		}
+		if r.beginSelectionMove(touchX, touchY) {
+			r.selection.dragging = true
+			return
+		}
+	}
+
+	r.preSelect = Region{}
+	r.movingSelection = false
+	r.resizingHandle = handleNone
+	r.selection.hasSelection = true
+	r.selection.dragging = true
+	r.selection.surface = r.activeSurface
+	r.selection.anchorX = touchX
+	r.selection.anchorY = touchY
+	r.selection.currentX = r.selection.anchorX
+	r.selection.currentY = r.selection.anchorY
+
+	for _, os := range r.surfaces {
+		r.redrawSurface(os)
+	}
+}
+
+func (r *RegionSelector) handleTouchMotion(touchId int32, x, y float64) {
+	if !r.hasTouchPoint || touchId != r.touchPointId || r.activeSurface == nil {
+		return
+	}
+
+	if r.phase == phaseScroll {
+		return
+	}
+
+	if !r.selection.dragging {
+		return
+	}
+
+	r.updateSelectionCurrent(r.activeSurface, x, y)
+}
+
+func (r *RegionSelector) handleTouchUp(touchId int32) {
+	if !r.hasTouchPoint || touchId != r.touchPointId {
+		return
+	}
+
+	r.hasTouchPoint = false
+	r.selection.dragging = false
+	r.movingSelection = false
+	r.resizingHandle = handleNone
+
+	if r.phase == phaseScroll {
+		return
+	}
+
+	for _, os := range r.surfaces {
+		r.redrawSurface(os)
+	}
+
+	if r.screenshoter != nil && r.screenshoter.config.NoConfirm && r.selection.hasSelection {
+		r.finishSelection()
+	}
+}
+
+func (r *RegionSelector) handleTouchCancel() {
+	if !r.hasTouchPoint {
+		return
+	}
+
+	r.hasTouchPoint = false
+	r.selection.dragging = false
+	r.movingSelection = false
+	r.resizingHandle = handleNone
+
+	for _, os := range r.surfaces {
+		r.redrawSurface(os)
+	}
 }
 
 func (r *RegionSelector) updateSelectionCurrent(os *OutputSurface, surfaceX, surfaceY float64) {

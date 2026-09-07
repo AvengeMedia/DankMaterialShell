@@ -19,8 +19,11 @@ Rectangle {
     signal settingsButtonClicked
     signal headerTapped
 
-    Component.onCompleted: DgopService.addRef("system")
-    Component.onDestruction: DgopService.removeRef("system")
+    Ref {
+        service: DgopService
+        modules: "system"
+        active: root.visible && (root.Window.window?.visible ?? false)
+    }
 
     implicitHeight: 70
     radius: Theme.cornerRadius

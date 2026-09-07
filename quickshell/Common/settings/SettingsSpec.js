@@ -546,6 +546,7 @@ var SPEC = {
     osdCapsLockEnabled: { def: true },
     osdPowerProfileEnabled: { def: false },
     osdAudioOutputEnabled: { def: true },
+    osdWorkspaceEnabled: { def: false },
 
     powerActionConfirm: { def: true },
     powerActionHoldDuration: { def: 0.5 },

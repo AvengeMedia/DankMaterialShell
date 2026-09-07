@@ -150,6 +150,13 @@ Item {
                     checked: SettingsData.osdAudioOutputEnabled
                     onToggled: checked => SettingsData.set("osdAudioOutputEnabled", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "osdWorkspaceEnabled"
+                    text: I18n.tr("Workspace Switch", "toggle label for workspace change OSD")
+                    checked: SettingsData.osdWorkspaceEnabled
+                    onToggled: checked => SettingsData.set("osdWorkspaceEnabled", checked)
+                }
             }
         }
     }

@@ -8064,6 +8064,23 @@
     ]
   },
   {
+    "section": "osdWorkspaceEnabled",
+    "label": "Workspace Switch",
+    "tabIndex": 18,
+    "category": "On-screen Displays",
+    "keywords": [
+      "desktop",
+      "displays",
+      "indicator",
+      "osd",
+      "popup",
+      "screen",
+      "switch",
+      "virtual",
+      "workspace"
+    ]
+  },
+  {
     "section": "appIdSubstitutions",
     "label": "App ID Substitutions",
     "tabIndex": 19,

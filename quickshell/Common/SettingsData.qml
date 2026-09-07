@@ -1155,6 +1155,7 @@ Singleton {
     property bool osdCapsLockEnabled: true
     property bool osdPowerProfileEnabled: true
     property bool osdAudioOutputEnabled: true
+    property bool osdWorkspaceEnabled: false
 
     property bool powerActionConfirm: true
     property real powerActionHoldDuration: 0.5

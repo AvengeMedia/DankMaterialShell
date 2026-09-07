@@ -19,7 +19,10 @@ Rectangle {
 
     signal showPortSelector(var node)
 
-    Component.onCompleted: AudioService.refreshSinkPorts()
+    Component.onCompleted: {
+        AudioService.refreshSinkPorts();
+        AudioService.refreshCards();
+    }
 
     implicitHeight: headerRow.height + (!hasVolumeSliderInCC ? volumeSlider.height : 0) + audioContent.height + Theme.spacingM
     radius: Theme.cornerRadius
@@ -362,6 +365,78 @@ Rectangle {
                                 AudioService.setDefaultSinkByName(modelData.name);
                             }
                         }
+                    }
+                }
+            }
+            Repeater {
+                model: ScriptModel {
+                    values: AudioService.switchableOutputPorts
+                }
+
+                delegate: Rectangle {
+                    id: portDelegate
+                    required property var modelData
+
+                    width: parent.width
+                    height: 50
+                    radius: Theme.cornerRadius
+                    color: portMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: Theme.outlineLight
+                    border.width: 1
+
+                    DankRipple {
+                        id: portRipple
+                        cornerRadius: portDelegate.radius
+                    }
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.rightMargin: Theme.spacingM
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: portDelegate.modelData.icon
+                            size: Theme.iconSize - 4
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - Theme.iconSize - parent.spacing
+
+                            StyledText {
+                                text: portDelegate.modelData.title
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
+                                elide: Text.ElideRight
+                                width: parent.width
+                                wrapMode: Text.NoWrap
+                                horizontalAlignment: Text.AlignLeft
+                            }
+
+                            StyledText {
+                                text: portDelegate.modelData.cardDescription
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                elide: Text.ElideRight
+                                width: parent.width
+                                wrapMode: Text.NoWrap
+                                horizontalAlignment: Text.AlignLeft
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: portMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => portRipple.trigger(mouse.x, mouse.y)
+                        onClicked: AudioService.activateOutputPort(portDelegate.modelData, (ok, message) => ToastService.showToast(message, ok ? ToastService.levelInfo : ToastService.levelError))
                     }
                 }
             }
