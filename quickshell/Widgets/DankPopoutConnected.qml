@@ -423,7 +423,7 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: effectivePopoutLayer === WlrLayer.Top && CompositorService.usesConnectedFrameChromeForScreen(root.screen)
+    readonly property bool frameOwnsConnectedChrome: effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
     readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()

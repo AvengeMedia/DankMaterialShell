@@ -203,12 +203,14 @@ def main():
     en_json_path = translations_dir / 'en.json'
     with open(en_json_path, 'w', encoding='utf-8') as f:
         json.dump(poeditor_data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
     print(f"Created source language file: {en_json_path}")
 
     template_data = create_template_json(translations)
     template_json_path = translations_dir / 'template.json'
     with open(template_json_path, 'w', encoding='utf-8') as f:
         json.dump(template_data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
     print(f"Created template file: {template_json_path}")
 
     print("\nSummary:")

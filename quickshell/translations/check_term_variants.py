@@ -18,6 +18,8 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 
+EXTERNAL_PLUGIN_PREFIX = "dms-plugins-external/"
+
 # Intentional pairs that survive normalization on purpose.
 ALLOWED = [
     {"PIN", "Pin"},            # WPS PIN acronym vs the verb "pin"
@@ -33,8 +35,19 @@ def normalize(term):
     return t + "..." if ellipsis else t
 
 
+def owned_occurrences(data):
+    return [occ for occ in data["occurrences"]
+            if not occ["file"].startswith(EXTERNAL_PLUGIN_PREFIX)]
+
+
 def main():
-    translations = extract_qstr_strings(ROOT_DIR)
+    extracted = extract_qstr_strings(ROOT_DIR)
+    translations = {}
+    for term, data in extracted.items():
+        occurrences = owned_occurrences(data)
+        if occurrences:
+            translations[term] = occurrences
+
     groups = defaultdict(set)
     for term in translations:
         groups[normalize(term)].add(term)
@@ -59,7 +72,7 @@ def main():
     for variants in sorted(failures):
         print(f"  {variants}", file=sys.stderr)
         for v in variants:
-            for occ in translations[v]["occurrences"][:3]:
+            for occ in translations[v][:3]:
                 print(f"      {v!r}: {occ['file']}:{occ['line']}", file=sys.stderr)
     return 1
 
