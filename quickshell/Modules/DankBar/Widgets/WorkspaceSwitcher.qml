@@ -25,44 +25,19 @@ Item {
 
     readonly property bool isMango: CompositorService.isMango
 
-    readonly property real _leftMargin: {
-        if (isVertical)
-            return 0;
-        root.x;
-        if (!root.parent)
-            return 0;
-        const gap = root.mapToItem(null, 0, 0).x;
-        return (gap > 0 && gap < 30) ? gap + 5 : 0;
-    }
-    readonly property real _rightMargin: {
-        if (isVertical)
-            return 0;
-        root.x;
-        root.width;
-        if (!root.parent || !blurBarWindow)
-            return 0;
-        const gap = blurBarWindow.width - root.mapToItem(null, root.width, 0).x;
-        return (gap > 0 && gap < 30) ? gap + 5 : 0;
-    }
-    readonly property real _topMargin: {
-        if (!isVertical)
-            return axis?.edge === "top" ? crossEdgeExtension : 0;
-        root.y;
-        if (!root.parent)
-            return 0;
-        const gap = root.mapToItem(null, 0, 0).y;
-        return (gap > 0 && gap < 30) ? gap + 5 : 0;
-    }
-    readonly property real _bottomMargin: {
-        if (!isVertical)
-            return axis?.edge === "bottom" ? crossEdgeExtension : 0;
-        root.y;
-        root.height;
-        if (!root.parent || !blurBarWindow)
-            return 0;
-        const gap = blurBarWindow.height - root.mapToItem(null, 0, root.height).y;
-        return (gap > 0 && gap < 30) ? gap + 5 : 0;
-    }
+    property bool isFirst: false
+    property bool isLast: false
+    property real sectionSpacing: 0
+    property bool isLeftBarEdge: false
+    property bool isRightBarEdge: false
+    property bool isTopBarEdge: false
+    property bool isBottomBarEdge: false
+
+    readonly property real barEdgeExtension: 1000
+    readonly property real _leftMargin: isVertical ? 0 : (isLeftBarEdge && isFirst ? barEdgeExtension : (isFirst ? sectionSpacing : sectionSpacing / 2))
+    readonly property real _rightMargin: isVertical ? 0 : (isRightBarEdge && isLast ? barEdgeExtension : (isLast ? sectionSpacing : sectionSpacing / 2))
+    readonly property real _topMargin: isVertical ? (isTopBarEdge && isFirst ? barEdgeExtension : (isFirst ? sectionSpacing : sectionSpacing / 2)) : (axis?.edge === "top" ? crossEdgeExtension : 0)
+    readonly property real _bottomMargin: isVertical ? (isBottomBarEdge && isLast ? barEdgeExtension : (isLast ? sectionSpacing : sectionSpacing / 2)) : (axis?.edge === "bottom" ? crossEdgeExtension : 0)
 
     property int _desktopEntriesUpdateTrigger: 0
     readonly property var sortedToplevels: {
