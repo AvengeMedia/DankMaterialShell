@@ -33,6 +33,9 @@ EXTERNAL_PLUGINS_DIR = REPO_ROOT / "dms-plugins-external"
 REGISTRY_DIR = EXTERNAL_PLUGINS_DIR / ".registry"
 PLUGIN_CHECKOUT_DIRS = [OFFICIAL_PLUGINS_DIR, EXTERNAL_PLUGINS_DIR]
 
+PLUGIN_PR_BRANCH = "i18n/poeditor-sync"
+PLUGIN_PR_TITLE = "i18n: sync translations from POEditor"
+
 # Flip once official plugins ship their own translations/ dirs: app poexports
 # then stop carrying terms owned exclusively by plugins.
 EXCLUDE_PLUGIN_ONLY_TERMS = False
@@ -200,6 +203,103 @@ def plugin_checkouts():
                 checkouts['plugin-' + child.name.lower()] = child
     return checkouts
 
+def gh(args, cwd=None, required=True):
+    result = subprocess.run(['gh', *args], cwd=cwd, capture_output=True, text=True)
+    if result.returncode == 0:
+        return result.stdout.strip()
+    if required:
+        error(f"gh {' '.join(args)} failed:\n{result.stderr.strip()}")
+    return None
+
+def git_output(args, cwd):
+    result = subprocess.run(['git', *args], cwd=cwd, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+def repo_slug(checkout):
+    url = git_output(['remote', 'get-url', 'origin'], checkout) or ""
+    if 'github.com' not in url:
+        return None
+    return url.removesuffix('.git').split('github.com', 1)[1].lstrip(':/')
+
+def default_branch(checkout):
+    ref = git_output(['symbolic-ref', '--short', 'refs/remotes/origin/HEAD'], checkout)
+    if not ref:
+        return 'main'
+    return ref.split('/', 1)[-1]
+
+def pending_translation_files(checkout):
+    out = git_output(['status', '--porcelain', '--untracked-files=all', '--', 'translations'], checkout)
+    if not out:
+        return []
+    names = (line[3:].rsplit('/', 1)[-1] for line in out.splitlines())
+    return sorted(name for name in names if name.endswith('.json'))
+
+def pending_plugin_prs():
+    external = []
+    official = []
+    for checkout in sorted(plugin_checkouts().values(), key=lambda path: path.name):
+        files = pending_translation_files(checkout)
+        if not files:
+            continue
+        if checkout.parent == EXTERNAL_PLUGINS_DIR:
+            external.append((checkout, files))
+        else:
+            official.append((checkout, files))
+    return external, official
+
+def plugin_pr_body(files):
+    return (
+        "Translations synced from the DMS POEditor project, where this plugin's strings "
+        "are tagged and translated alongside the shell.\n\n"
+        f"Updated: {', '.join(sorted(files))}\n\n"
+        "Strings this repo already shipped were uploaded to POEditor before the export, "
+        "so existing translations are preserved rather than overwritten.\n"
+    )
+
+def open_plugin_pr(checkout, files):
+    slug = repo_slug(checkout)
+    if not slug:
+        warn(f"{checkout.name}: origin is not a github remote, skipping PR")
+        return
+
+    login = gh(['api', 'user', '-q', '.login'])
+    fork = f"{login}/{slug.split('/', 1)[1]}"
+    if gh(['repo', 'view', fork, '--json', 'name'], required=False) is None:
+        info(f"Forking {slug} -> {fork}")
+        gh(['repo', 'fork', slug, '--clone=false', '--remote=false'])
+
+    base = default_branch(checkout)
+    git(['checkout', '--quiet', '-B', PLUGIN_PR_BRANCH], checkout)
+    git(['add', 'translations'], checkout)
+
+    committed = subprocess.run(
+        ['git', 'commit', '--quiet', '-m', PLUGIN_PR_TITLE],
+        cwd=checkout, capture_output=True, text=True
+    )
+    if committed.returncode != 0:
+        git(['checkout', '--quiet', base], checkout)
+        warn(f"{checkout.name}: nothing to commit, skipping PR")
+        return
+
+    git(['push', '--quiet', '--force', f'git@github.com:{fork}.git', PLUGIN_PR_BRANCH], checkout)
+    git(['checkout', '--quiet', base], checkout)
+
+    existing = gh([
+        'pr', 'list', '--repo', slug, '--head', f'{login}:{PLUGIN_PR_BRANCH}',
+        '--state', 'open', '--json', 'url', '-q', '.[0].url'
+    ], required=False)
+    if existing:
+        success(f"{checkout.name}: updated {existing}")
+        return
+
+    url = gh([
+        'pr', 'create', '--repo', slug, '--base', base, '--head', f'{login}:{PLUGIN_PR_BRANCH}',
+        '--title', PLUGIN_PR_TITLE, '--body', plugin_pr_body(files)
+    ])
+    success(f"{checkout.name}: opened {url}")
+
 def checkout_translations(checkout, filename):
     result = subprocess.run(
         ['git', 'show', f'HEAD:translations/{filename}'],
@@ -361,7 +461,7 @@ def seed_plugin_translations(api_token, project_id, plugin_seed):
     seeded = {}
     for po_lang, values in sorted(plugin_seed.items()):
         entries = [
-            {'term': term, 'context': context, 'translation': {'content': value}}
+            {'term': term, 'context': context, 'definition': value}
             for (context, term), value in sorted(values.items())
         ]
         info(f"Seeding {len(entries)} plugin-authored translations into POEditor ({po_lang})...")
@@ -537,7 +637,7 @@ def save_sync_state():
 
 def main():
     if len(sys.argv) < 2:
-        error("Usage: i18nsync.py [check|sync [--prune]|test|local]")
+        error("Usage: i18nsync.py [check|sync [--prune] [--pr] [--seed]|pr|test|local]")
 
     command = sys.argv[1]
 
@@ -575,6 +675,8 @@ def main():
         api_token = get_env_or_error('POEDITOR_API_TOKEN')
         project_id = get_env_or_error('POEDITOR_PROJECT_ID')
         prune = "--prune" in sys.argv[2:]
+        open_prs = "--pr" in sys.argv[2:]
+        seed = "--seed" in sys.argv[2:]
         if prune:
             warn("--prune deletes every POEditor term missing from the local en.json, including its translations.")
             warn("Plugin checkouts are refreshed from the registry first, so pruning keeps terms of official and i18n-approved plugins; a plugin removed from the registry loses its terms.")
@@ -621,7 +723,6 @@ def main():
 
         plugin_owners, plugin_excluded = plugin_term_owners(current_en)
         translations_changed, common_files_changed, plugin_files_changed, plugin_seed = download_translations(api_token, project_id, common_keys, greeter_keys, plugin_owners, plugin_excluded)
-        seeded = seed_plugin_translations(api_token, project_id, plugin_seed)
 
         if strings_changed or translations_changed:
             subprocess.run(['git', 'add', 'translations/'], cwd=REPO_ROOT)
@@ -635,13 +736,44 @@ def main():
             info(f"dank-qml-common poexports updated: {', '.join(common_files_changed)}")
             info("Commit those in dank-qml-common and bump the pointer here (make update-common).")
 
-        if seeded:
-            info("Plugin-authored translations adopted into POEditor: " + ", ".join(f"{lang} +{count}" for lang, count in sorted(seeded.items())))
-
         for checkout_name, files in sorted(plugin_files_changed.items()):
             info(f"{checkout_name} translations updated: {', '.join(files)}")
-        if plugin_files_changed:
-            info("Commit those in each plugin checkout - they ship with the plugin repo, not with DMS.")
+
+        pending_prs, official_pending = pending_plugin_prs()
+
+        for checkout, files in official_pending:
+            info(f"{checkout.name}: {len(files)} translation files to commit in dms-plugins")
+
+        if open_prs:
+            for checkout, files in pending_prs:
+                open_plugin_pr(checkout, files)
+        elif pending_prs:
+            for checkout, files in pending_prs:
+                info(f"{checkout.name} has {len(files)} uncommitted translation files")
+            info("Re-run with --pr to push them to your fork and open the PRs upstream.")
+
+        pending_seed = sum(len(values) for values in plugin_seed.values())
+        if pending_seed and not seed:
+            info(f"{pending_seed} plugin-authored translations are missing from POEditor across {len(plugin_seed)} languages.")
+            info("Re-run with --seed to adopt them (one throttled upload per language).")
+
+        if pending_seed and seed:
+            seeded = seed_plugin_translations(api_token, project_id, plugin_seed)
+            if seeded:
+                info("Plugin-authored translations adopted into POEditor: " + ", ".join(f"{lang} +{count}" for lang, count in sorted(seeded.items())))
+
+    elif command == "pr":
+        pending_prs, official_pending = pending_plugin_prs()
+
+        for checkout, files in official_pending:
+            info(f"{checkout.name}: {len(files)} translation files to commit in dms-plugins")
+
+        if not pending_prs:
+            info("No plugin checkout has uncommitted translations")
+            sys.exit(0)
+
+        for checkout, files in pending_prs:
+            open_plugin_pr(checkout, files)
 
     elif command == "local":
         info("Updating en.json locally (no POEditor sync)")
