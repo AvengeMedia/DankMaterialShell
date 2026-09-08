@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import qs.Services
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -54,6 +55,16 @@ Item {
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
+
+            Loader {
+                width: parent.width
+                active: CompositorService.isAqueous
+                sourceComponent: AqueousAppearanceSettings {
+                    settingKey: "aqueousTypography"
+                    title: I18n.tr("Aqueous typography", "Aqueous compositor font synchronization settings")
+                    visible: CompositorService.isAqueous
+                }
+            }
 
             SettingsCard {
                 tab: "typography"

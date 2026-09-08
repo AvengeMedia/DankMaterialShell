@@ -163,7 +163,7 @@ BasePill {
         const deltaY = wheelEvent.angleDelta.y;
         const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
 
-        const windows = root.sortedToplevels;
+        const windows = root.sortedToplevels.filter(w => !w.skipSwitcher);
         if (windows.length < 2)
             return;
 
@@ -236,7 +236,7 @@ BasePill {
                 id: windowRepeater
                 model: ScriptModel {
                     values: _groupByApp ? groupedWindows : sortedToplevels
-                    objectProp: _groupByApp ? "appId" : "address"
+                    objectProp: _groupByApp ? "appId" : (CompositorService.isAqueous && AqueousService.available ? "aqueousKey" : "address")
                 }
 
                 delegate: Item {
@@ -494,7 +494,7 @@ BasePill {
                 id: windowRepeater
                 model: ScriptModel {
                     values: _groupByApp ? groupedWindows : sortedToplevels
-                    objectProp: _groupByApp ? "appId" : "address"
+                    objectProp: _groupByApp ? "appId" : (CompositorService.isAqueous && AqueousService.available ? "aqueousKey" : "address")
                 }
 
                 delegate: Item {

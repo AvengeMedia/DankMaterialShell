@@ -135,9 +135,11 @@ Singleton {
         return screens.length > 0 ? widgetRegistry[widgetId][screens[0]] : null;
     }
 
-    readonly property bool focusedScreenDetectionSupported: CompositorService.isHyprland || CompositorService.isNiri || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool focusedScreenDetectionSupported: (CompositorService.isAqueous && AqueousService.available) || CompositorService.isHyprland || CompositorService.isNiri || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
 
     function getFocusedScreenName() {
+        if (CompositorService.isAqueous && AqueousService.available)
+            return AqueousService.focusedOutput;
         if (CompositorService.isHyprland && Hyprland.focusedWorkspace?.monitor)
             return Hyprland.focusedWorkspace.monitor.name;
         if (CompositorService.isNiri && NiriService.currentOutput)

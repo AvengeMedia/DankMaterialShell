@@ -18,6 +18,7 @@ Item {
     property bool isMiracle: CompositorService.isMiracle
     property bool isMango: CompositorService.isMango
     property bool isLabwc: CompositorService.isLabwc
+    property bool isAqueous: CompositorService.isAqueous
 
     property string compositorName: {
         if (isHyprland)
@@ -32,6 +33,8 @@ Item {
             return "mangowc";
         if (isLabwc)
             return "labwc";
+        if (isAqueous)
+            return "aqueous";
         return "niri";
     }
 
@@ -48,6 +51,8 @@ Item {
             return "/assets/mango.png";
         if (isLabwc)
             return "/assets/labwc.png";
+        if (isAqueous)
+            return "/assets/aqueous.svg";
         return "/assets/niri.svg";
     }
 
@@ -64,6 +69,8 @@ Item {
             return "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
             return "https://labwc.github.io/";
+        if (isAqueous)
+            return "";
         return "https://github.com/niri-wm/niri";
     }
 
@@ -80,6 +87,8 @@ Item {
             return I18n.tr("mangowc GitHub");
         if (isLabwc)
             return I18n.tr("LabWC Website");
+        if (isAqueous)
+            return "Aqueous";
         return I18n.tr("niri GitHub");
     }
 
@@ -376,11 +385,15 @@ Item {
 
                             MouseArea {
                                 anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
+                                cursorShape: compositorUrl === "" ? Qt.ArrowCursor : Qt.PointingHandCursor
                                 hoverEnabled: true
                                 onEntered: parent.hovered = true
                                 onExited: parent.hovered = false
-                                onClicked: Qt.openUrlExternally(compositorUrl)
+                                onClicked: {
+                                    if (compositorUrl === "")
+                                        return;
+                                    Qt.openUrlExternally(compositorUrl);
+                                }
                             }
                         }
 

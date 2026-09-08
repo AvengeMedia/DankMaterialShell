@@ -73,7 +73,7 @@ Item {
     onClipHeightChanged: settleKickAction.restart()
 
     function _runSettleKick() {
-        if (!targetWindow?.visible)
+        if (!BlurService.compositorSupported || !targetWindow?.visible)
             return;
         kick();
         settleRepeatTimer.restart();

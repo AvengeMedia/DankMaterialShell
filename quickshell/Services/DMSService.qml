@@ -402,7 +402,16 @@ Singleton {
         }
     }
 
-    function sendRequest(method, params, callback) {
+    Component {
+        id: requestTimeoutComponent
+        Timer {
+            property var requestId
+            repeat: false
+            onTriggered: root.handleResponse({id: requestId, error: "Request timed out; operation completion is uncertain"})
+        }
+    }
+
+    function sendRequest(method, params, callback, timeoutMs) {
         if (!isConnected) {
             log.warn("DMSService.sendRequest: Not connected, method:", method);
             if (callback) {
@@ -424,8 +433,19 @@ Singleton {
             request.params = params;
         }
 
-        if (callback)
-            pendingRequests[id] = callback;
+        if (callback) {
+            if (timeoutMs > 0) {
+                const timeout = requestTimeoutComponent.createObject(root, {requestId: id, interval: timeoutMs});
+                pendingRequests[id] = response => {
+                    timeout.stop();
+                    timeout.destroy();
+                    callback(response);
+                };
+                timeout.start();
+            } else {
+                pendingRequests[id] = callback;
+            }
+        }
 
         if (method.startsWith("clipboard")) {
             clipboardRequestIds[id] = true;

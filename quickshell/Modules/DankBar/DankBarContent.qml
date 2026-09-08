@@ -156,6 +156,8 @@ Item {
 
     function getRealWorkspaces() {
         const screenName = _barScreenName;
+        if (CompositorService.isAqueous && AqueousService.available)
+            return AqueousService.workspacesForOutput(SettingsData.workspaceFollowFocus ? AqueousService.focusedOutput : screenName);
         if (CompositorService.isNiri) {
             const fallbackWorkspaces = [
                 {
@@ -238,6 +240,8 @@ Item {
 
     function getCurrentWorkspace() {
         const screenName = _barScreenName;
+        if (CompositorService.isAqueous && AqueousService.available)
+            return getRealWorkspaces().find(ws => ws.active)?.id || "";
         if (CompositorService.isNiri) {
             if (!screenName || SettingsData.workspaceFollowFocus) {
                 return NiriService.getCurrentWorkspaceNumber();
@@ -279,7 +283,14 @@ Item {
             return;
         }
 
-        if (CompositorService.isNiri) {
+        if (CompositorService.isAqueous && AqueousService.available) {
+            const index = realWorkspaces.findIndex(ws => ws.id === getCurrentWorkspace());
+            if (index < 0)
+                return;
+            const next = Math.max(0, Math.min(realWorkspaces.length - 1, index + (direction > 0 ? 1 : -1)));
+            if (next !== index)
+                AqueousService.activateWorkspace(realWorkspaces[next]);
+        } else if (CompositorService.isNiri) {
             const currentWs = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(ws => ws && ws.idx === currentWs);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
@@ -323,7 +334,7 @@ Item {
     }
 
     function switchApp(deltaY) {
-        const windows = sortedToplevels;
+        const windows = sortedToplevels.filter(w => !w.skipSwitcher);
         if (windows.length < 2) {
             return;
         }

@@ -31,7 +31,7 @@ BasePill {
     property int availableWidth: maxWidth
     readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth, availableWidth))
     readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2)
-    property Toplevel activeWindow: null
+    property var activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
@@ -99,6 +99,11 @@ BasePill {
     }
 
     function updateActiveWindow() {
+        if (CompositorService.isAqueous && AqueousService.available) {
+            const focused = AqueousService.focusedWindow;
+            activeWindow = focused && (!parentScreen || focused.screens.some(s => s.name === parentScreen.name)) ? focused : null;
+            return;
+        }
         let active = ToplevelManager.activeToplevel;
 
         if (!active && CompositorService.isNiri) {

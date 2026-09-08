@@ -21,8 +21,47 @@ Singleton {
     property bool isScroll: false
     property bool isMiracle: false
     property bool isLabwc: false
+    property bool isAqueous: false
     property string compositor: "unknown"
     property bool compositorDetected: false
+    property bool outputPowerAvailable: false
+    readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc
+    onGenericPowerBackendChanged: probeOutputPower()
+
+    function probeOutputPower() {
+        outputPowerAvailable = false;
+        if (!genericPowerBackend)
+            return;
+        const backend = compositor;
+        Proc.runCommand("output-power-probe", [Proc.dmsBin, "dpms", "list"], (output, code) => {
+            if (root.compositor === backend && root.genericPowerBackend)
+                root.outputPowerAvailable = code === 0;
+        }, 0, 5000);
+    }
+
+    function setOutputPower(on) {
+        Proc.runCommand("output-power-action", [Proc.dmsBin, "dpms", on ? "on" : "off"], (output, code) => {
+            if (code !== 0)
+                ToastService.showError(I18n.tr("Error"), I18n.tr("Failed to change display power", "Error shown when changing monitor power fails"));
+        }, 0, 12000);
+    }
+
+    Connections {
+        target: DMSService
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected)
+                root.probeOutputPower();
+            else
+                root.outputPowerAvailable = false;
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            root.probeOutputPower();
+        }
+    }
     readonly property bool frameCompositorLayoutReady: (!isNiri || NiriService.frameLayoutReady) && (!isHyprland || HyprlandService.frameLayoutReady)
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
@@ -45,9 +84,19 @@ Singleton {
 
     signal toplevelsChanged
 
-    readonly property bool supportsMinimize: DankCommon.Compositor.supportsMinimize
+    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DankCommon.Compositor.supportsMinimize
+
+    Connections {
+        target: AqueousService
+        function onStateChanged() {
+            if (root.isAqueous)
+                root.scheduleSort();
+        }
+    }
 
     function canMinimize(toplevel) {
+        if (isAqueous && toplevel?.aqueousWindowId)
+            return AqueousService.available && !AqueousService.locked && AqueousService.capabilities.commands && toplevel.canMinimize;
         return supportsMinimize && toplevel && toplevel.minimized !== undefined;
     }
 
@@ -59,6 +108,10 @@ Singleton {
     function activateToplevel(toplevel) {
         if (!toplevel)
             return;
+        if (isAqueous && toplevel.aqueousWindowId) {
+            toplevel.activate();
+            return;
+        }
         closeNiriOverviewOnWindowFocus();
         if (canMinimize(toplevel) && toplevel.minimized)
             toplevel.minimized = false;
@@ -147,7 +200,9 @@ Singleton {
 
     function getFocusedScreen() {
         let screenName = "";
-        if (isHyprland && Hyprland.focusedWorkspace?.monitor)
+        if (isAqueous && AqueousService.available)
+            screenName = AqueousService.focusedOutput;
+        else if (isHyprland && Hyprland.focusedWorkspace?.monitor)
             screenName = Hyprland.focusedWorkspace.monitor.name;
         else if (isNiri && NiriService.currentOutput)
             screenName = NiriService.currentOutput;
@@ -267,6 +322,8 @@ Singleton {
     }
 
     function computeSortedToplevels() {
+        if (isAqueous && AqueousService.available)
+            return AqueousService.toplevels;
         if (!ToplevelManager.toplevels || !ToplevelManager.toplevels.values)
             return [];
 
@@ -517,6 +574,10 @@ Singleton {
     }
 
     function filterCurrentWorkspace(toplevels, screen) {
+        if (isAqueous && AqueousService.available) {
+            const active = AqueousService.workspacesForOutput(_screenName(screen)).filter(w => w.active).map(w => w.id);
+            return toplevels.filter(t => active.includes(t.aqueousWorkspaceId));
+        }
         if (useNiriSorting)
             return NiriService.filterCurrentWorkspace(toplevels, screen);
         if (useMangoSorting)
@@ -528,6 +589,8 @@ Singleton {
 
     function fullscreenToplevelOnScreen(screenOrName) {
         const screenName = _screenName(screenOrName);
+        if (isAqueous && AqueousService.available)
+            return AqueousService.windows.some(w => w.output === AqueousService.outputId(screenName) && w.visible && w.fullscreen);
         if (!screenName || !ToplevelManager.toplevels?.values)
             return false;
 
@@ -655,6 +718,12 @@ Singleton {
 
     function frameWindowVisibleForScreen(screenOrName) {
         return frameConfiguredForScreen(screenOrName);
+    }
+
+    function overviewActiveOnScreen(screenOrName) {
+        if (isAqueous && AqueousService.available)
+            return !!AqueousService.sessionState.overview_output && AqueousService.sessionState.overview_output === AqueousService.outputId(_screenName(screenOrName));
+        return isNiri && NiriService.inOverview;
     }
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
@@ -945,6 +1014,8 @@ Singleton {
             return "miracle";
         case "labwc":
             return "labwc";
+        case "aqueous":
+            return "aqueous";
         default:
             return "";
         }
@@ -958,6 +1029,7 @@ Singleton {
         isScroll = name === "scroll";
         isMiracle = name === "miracle";
         isLabwc = name === "labwc";
+        isAqueous = name === "aqueous";
         compositor = name;
         compositorDetected = true;
         if (isNiri)
@@ -1009,7 +1081,14 @@ Singleton {
     // of winning on a stale env var.
     function _envDetectionCandidates() {
         const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "";
+        const aqueousSocket = Quickshell.env("AQUEOUS_SOCKET") || "";
         return [
+            {
+                name: "aqueous",
+                present: !!aqueousSocket,
+                test: ["test", "-S", aqueousSocket],
+                detail: "AQUEOUS_SOCKET " + aqueousSocket
+            },
             {
                 name: "mango",
                 present: !!mangoSignature,
@@ -1091,6 +1170,11 @@ Singleton {
         }
         if (isLabwc) {
             Quickshell.execDetached(["dms", "dpms", "off"]);
+            return;
+        }
+        if (outputPowerAvailable) {
+            setOutputPower(false);
+            return;
         }
         log.warn("Cannot power off monitors, unknown compositor");
     }
@@ -1110,6 +1194,11 @@ Singleton {
         }
         if (isLabwc) {
             Quickshell.execDetached(["dms", "dpms", "on"]);
+            return;
+        }
+        if (outputPowerAvailable) {
+            setOutputPower(true);
+            return;
         }
         log.warn("Cannot power on monitors, unknown compositor");
     }

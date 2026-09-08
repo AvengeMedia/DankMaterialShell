@@ -30,6 +30,7 @@ type DMSBindsStatus struct {
 }
 
 type CheatSheet struct {
+	Generation       string               `json:"generation,omitempty"`
 	Title            string               `json:"title"`
 	Provider         string               `json:"provider"`
 	ModKey           string               `json:"modKey,omitempty"`
