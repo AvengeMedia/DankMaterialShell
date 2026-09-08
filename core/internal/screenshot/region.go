@@ -85,9 +85,10 @@ type OutputSurface struct {
 	slots      [3]*RenderSlot
 	slotsReady bool
 
-	shown        *overlay
-	framePending bool
-	redrawQueued bool
+	shown           *overlay
+	framePending    bool
+	redrawQueued    bool
+	committedCursor bool
 }
 
 type PreCapture struct {
@@ -988,7 +989,10 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		case r.compositorVersion >= 4:
 			fullDamage = false
 			damage = overlayDamage(os.shown, cur)
-			if len(damage) == 0 {
+			if os.committedCursor != r.showCapturedCursor {
+				fullDamage = true
+				damage = nil
+			} else if len(damage) == 0 {
 				return
 			}
 		}
@@ -1032,6 +1036,7 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		})
 	}
 	_ = os.wlSurface.Commit()
+	os.committedCursor = r.showCapturedCursor
 
 	// Mark this slot as busy until compositor releases it
 	slot.busy = true
