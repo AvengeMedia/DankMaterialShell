@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 ventanas"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "¿Agregar \"%1\" al grupo %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "¿Agregar \"%1\" al grupo %2? Deben cerrar sesión y volver a iniciar, luego ejecutar dms greeter sync --profile para publicar su tema de pantalla de inicio."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "¿Agregar \"%1\" al grupo %2? Deben cerrar sesión y volver a iniciar, luego ejecutar dms-greeter sync --profile para publicar su tema de pantalla de inicio."
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Agregar notas"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Agregar el nuevo usuario al grupo %1 para que pueda ejecutar dms greeter sync --profile."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Agregar el nuevo usuario al grupo %1 para que pueda ejecutar dms-greeter sync --profile."
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "Nombre de la aplicación"
   },
-  "App Theming": {
-    "App Theming": "Tema de la app"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Nombre o identidad de aplicación (ej., firefox)"
   },
@@ -720,7 +714,7 @@
     "Appearance": "Apariencia"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "Covers animados de Apple Music"
   },
   "Application": {
     "Application": "Aplicación"
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Autenticar"
   },
-  "Authenticated!": {
-    "Authenticated!": "¡Autenticado!"
-  },
   "Authentication": {
     "Authentication": "Autenticación"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Cierre automático de la vista general de Niri al iniciar aplicaciones."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1022,9 +1010,6 @@
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Autocompletar última consulta recordada al abrir"
   },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Modo de color automático"
-  },
   "Automatic Control": {
     "Automatic Control": "Control Automático"
   },
@@ -1071,7 +1056,7 @@
     "Automatically stack windows to avoid overlap": ""
   },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "Encender automáticament Num Lock al inicio"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Activar automáticamente el perfil de ahorro de energía cuando la batería está baja."
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "Espaciado de la barra"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "Esquinas y fondo de la barra"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Sección central"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "Columna central única"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": "Nivel de carga"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Límite de carga alcanzado"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Elegir qué monitores muestran la interfaz de pantalla de bloqueo. Otros monitores mostrarán un color sólido para protección contra quemado de OLED."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "Estilo cromático"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Cerrar vista general al iniciar"
-  },
   "Close Window": {
     "Close Window": "Cerrar ventana"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "El cambio de códec no está disponible porque no se encontró WirePlumber"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "El cambio de códec no está disponible porque no se encontró pactl"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "El cambio de códec no está disponible. No se encontró WirePlumber wpexec."
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "Temas de la comunidad"
-  },
   "Compact": {
     "Compact": "Compacto"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Contraste"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "Colaborador"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Curva: rasterizador de curvas."
-  },
   "Custom": {
     "Custom": "Personalizado"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar no está ejecutándose"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell está listo para utilizarse"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "Dank Shell e Iconos del Sistema (requiere reinicio)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "Profundidad"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Profundidad: Los paneles se escalan desde pequeño al deslizarse — un efecto de profundidad dramático."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Colores que reflejan fielmente la imagen original."
   },
@@ -2933,9 +2876,6 @@
   "Directional": {
     "Directional": "Direccional"
   },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Direccional: Los paneles se deslizan desde mayor distancia a tamaño completo — sin cambio de escala, movimiento puro y limpio."
-  },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Desactivar conexión automática"
   },
@@ -2949,7 +2889,7 @@
     "Disable Output": "Desabilitar salida"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "Deshabilitar mientras escribes"
   },
   "Disable on External Mouse": {
     "Disable on External Mouse": ""
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Arrastra los indicadores de espacio de trabajo para reordenarlos"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Dibujar un borde de marco conectado alrededor de toda la pantalla"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Colores y esquemas dinámicos"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dinámico: Bezier de resorte con sobrepaso — la entrada supera brevemente su objetivo y se asienta. Expresivo y vivo."
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Editar regla"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Activar \"No Molestar\""
-  },
-  "Enable Frame": {
-    "Enable Frame": "Habilitar marco"
   },
   "Enable History": {
     "Enable History": "Activar historial"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Fallo al añadir la inclusion de binds"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Error al agregar la impresora a la clase"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Error al aplicar colores de %1"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Fallo al cargar la configuración del portapapeles"
   },
-  "Failed to move job": {
-    "Failed to move job": "Error al mover el trabajo"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Error al mover a la papelera"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Fallo al eliminar atajo de tecla"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Error al quitar la impresora de la clase"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Error al reiniciar el sistema de audio"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Error al hacer sonar el dispositivo"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Error al ejecutar 'dms greeter status'. Asegúrese de que DMS esté instalado y que dms esté en PATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Error al ejecutar 'dms-greeter status'. Asegúrese de que el paquete dms-greeter esté instalado."
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Error al actualizar portapapeles"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Error al actualizar la descripción"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Error al actualizar la ubicación"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Error al actualizar la compartición"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Error al escribir entrada de inicio automático"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "Fluido"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluido: Desaceleración cúbica suave, salida rápida — curvas limpias y elegantes."
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Completamente cargado"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: cuadrícula - Z/X: tamaño"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "Colores GTK aplicados con éxito"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDE y más"
   },
   "Games": {
     "Games": "Juegos"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Generar override"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Escalar globalmente todas las duraciones de animación"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Tipografía del greeter"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Los miembros del grupo greeter pueden sincronizar su tema de pantalla de inicio con dms greeter sync --profile después de cerrar sesión y volver a iniciar."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Los miembros del grupo greeter pueden sincronizar su tema de pantalla de inicio con dms-greeter sync --profile después de cerrar sesión y volver a iniciar."
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "Ocultar instalados"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Ocultar contenido de notificación hasta expandir"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Ocultar contenido de notificación hasta expandir; las ventanas emergentes se muestran colapsadas por defecto"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Instalar"
   },
-  "Install Greeter": {
-    "Install Greeter": "Instalar Greeter"
-  },
   "Install Plugin": {
     "Install Plugin": "Instalar complemento"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Instalar tema de colores desde el repositorio de temas de DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Instalación completa. Greeter ha sido instalado."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Instale dsearch para buscar archivos."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Instalar complementos de los registros de complementos DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "¿Instalar el greeter de DMS? Se abrirá una terminal para autenticación de sudo."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "¿Instalar el tema '%1' desde el registro DMS?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Nombre de paquete inválido — solo letras, dígitos y @._+:-."
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Contraseña inválida para %1"
   },
   "Invalid username": {
     "Invalid username": "Nombre de usuario inválido"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Gestionado por la fuente PAM principal"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Gestionado por la fuente PAM principal."
-  },
   "Management": {
     "Management": "Gestión"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Estilo de batería Material"
-  },
   "Material Colors": {
     "Material Colors": "Colores Material"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Sombras y elevación inspiradas en Material en modales, popouts y diálogos"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Curvas bezier expresivas de Material Design 3. La sensación predeterminada de DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Contraste de Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "Nativo"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Nativo: renderizador de plataforma (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": ""
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Mostrar velocidad de descarga y subida de la red"
-  },
-  "Network not found": {
-    "Network not found": "Red no encontrada"
   },
   "Neutral": {
     "Neutral": "Neutral"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Integración con Niri"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Acciones del compositor Niri (enfocar,mover, etc.)"
   },
   "No": {
     "No": "No"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Notificaciones emergentes"
   },
-  "Notification Settings": {
-    "Notification Settings": "Ajustes de notificaciones"
-  },
   "Notification Type": {
     "Notification Type": "Tipo de notificación"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Abrir papelera"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Anular la configuración de diseño global para esta salida"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Sobrescribir transparencia global para Notas"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Sobrescribir terminal con un comando o script personalizado"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": ""
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Parcialmente nublado"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Pausar"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Pausado"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Primario"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "Contenedor primario"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Colores Qt aplicados con éxito"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: renderizador de campo de distancia."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia no está disponible"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Quitar administrador"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Quitar el redondeo de esquinas de la barra"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Eliminar espacios y bordes cuando las ventanas estan maximizadas"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Seguridad"
   },
-  "Security & privacy": {
-    "Security & privacy": "Seguridad y privacidad"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "Fuente PAM de clave de seguridad"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Seleccionar archivo para enviar"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "Esquinas cuadradas"
-  },
   "Stacked": {
     "Stacked": "Apilado"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Estandar"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Estándar: Material Design 3 clásico — los paneles surgen desde abajo con una escala sutil. El predeterminado de DMS."
-  },
   "Start": {
     "Start": "Empezar"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "¿Iniciar hotspot?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Sincronizar posición en todas las pantallas"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Sincronizar aplica tu tema y ajustes a la pantalla de inicio de sesión. Los usuarios compartidos deben ejecutar dms greeter sync --profile en lugar de una sincronización de usuario principal."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Sincronizar aplica tu tema y ajustes a la pantalla de inicio de sesión. Los usuarios compartidos deben ejecutar dms-greeter sync --profile en lugar de una sincronización de usuario principal."
   },
@@ -9666,7 +9426,7 @@
     "Tap the touchpad surface to trigger left click clicks": ""
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "Tocar para hacer click"
   },
   "Target Output Name": {
     "Target Output Name": ""
@@ -9682,9 +9442,6 @@
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "La terminal alternativa falló. Instale un emulador de terminal compatible o ejecute 'dms auth sync' manualmente."
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "La terminal alternativa falló. Instale uno de los emuladores de terminal compatibles o ejecute 'dms greeter sync' manualmente."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "La terminal alternativa falló. Instale uno de los emuladores de terminal compatibles o ejecute 'dms-greeter sync' manually."
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "La herramienta 'dgop' es necesaria para el monitoreo del sistema.\nPor favor instala dgop para usar esta función."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La variable de entorno DMS_SOCKET no está configurada o el socket no está disponible. La gestión automática de complementos requiere DMS_SOCKET."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "El adaptador WiFi no pudo iniciar el modo punto de acceso."
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Los siguientes ajustes modificarán tu configuración de GTK y Qt. Si deseas conservar tu configuración actual, haz una copia de seguridad de los archivos (qt5ct.conf | qt6ct.conf y ~/.config/gtk-3.0 | gtk-4.0)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9783,7 +9531,7 @@
     "The rule applies to any window matching one of these.": "La regla se aplica a cualquier ventana que coincida con una de estas."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "El certificado del servidor ha cambiado desde la última vez que fue reconocido. Solo continua si conoces la nueva huella digital."
   },
   "Theme": {
     "Theme": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Registro de Temas"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Color del tema usado para el borde"
@@ -9974,6 +9719,9 @@
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
   },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
+  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Alternar visibilidad de la barra manualmente vía IPC"
   },
@@ -10062,10 +9810,10 @@
     "Touch your security key...": "Toca tu clave de seguridad..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "Ajustes del Touchpad"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "Velocidad del Touchpad"
   },
   "Transform": {
     "Transform": "Transformar"
@@ -10146,7 +9894,7 @@
     "Turn off now": "Apagar ahora"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "Dos dedos"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Escribe al menos 2 caracteres"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Sin agrupar"
   },
-  "Uninstall": {
-    "Uninstall": "Desinstalar"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Desinstalar Greeter"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Desinstalar complemento"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Desinstalación completa. Greeter ha sido eliminado."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Desinstalacion fallida: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "¿Desinstalar el greeter de DMS? Esto eliminará la configuración y restaurará su gestor de pantalla anterior. Se abrirá una terminal para autenticación de sudo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Desinstalado: %1"
@@ -10302,7 +10038,7 @@
     "Untrust": "No confiar"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "Certificado VPN desconocido"
   },
   "Up to date": {
     "Up to date": "Actualizado"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "W"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1 cuerpo"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Radio de la esquina de la ventana"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Tienes cambios sin guardar. ¿Guardar antes de continuar?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Necesitas configurar:\nQT_QPA_PLATFORMTHEME=gtk3 O\nQT_QPA_PLATFORMTHEME=qt6ct\ncomo variables de entorno, y luego reiniciar el shell.\n\nqt6ct requiere que qt6ct-kde esté instalado."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "adjuntado"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

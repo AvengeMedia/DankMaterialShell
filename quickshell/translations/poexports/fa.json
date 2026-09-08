@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 پنجره"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": ""
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "«%1» به گروه %2 افزوده شود؟"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "«%1» به گروه %2 افزوده شود؟ کاربر باید خارج و دوباره وارد شود، سپس دستور dms greeter sync --profile را اجرا کند تا تم صفحه‌ی ورود خود را منتشر کند."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": ""
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "کاربر جدید را به گروه %1 اضافه کنید تا بتواند dms greeter sync --profile را اجرا کند."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "نام برنامه‌ها"
   },
-  "App Theming": {
-    "App Theming": "تم برنامه"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": ""
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "احراز هویت"
   },
-  "Authenticated!": {
-    "Authenticated!": ""
-  },
   "Authentication": {
     "Authentication": "احراز هویت"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "هنگام اجرای برنامه‌ها نمای کلی نیری را خودکار ببند."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "هنگام باز شدن آخرین پرس‌وجو به خاطر سپرده شده را خودکار وارد کن"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "حالت رنگ خودکار"
   },
   "Automatic Control": {
     "Automatic Control": "کنترل خودکار"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": ""
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "گوشه‌ها و پس‌زمینه نوار"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "بخش مرکزی"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "تک ستون مرکزی"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": ""
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": ""
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "استایل رنگی"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "بستن نمای کلی هنگام اجرا"
-  },
   "Close Window": {
     "Close Window": "بستن پنجره"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": ""
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "تم‌های کامیونیتی"
-  },
   "Compact": {
     "Compact": "فشرده"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "کنتراست"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": ""
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": ""
-  },
   "Custom": {
     "Custom": "سفارشی"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": ""
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "دَنک متریال شل آماده استفاده می‌باشد"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "آیکون‌های DankShell و سیستم (نیازمند راه‌اندازی مجدد)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "عمق"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": ""
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "رنگ‌هایی را استخراج می‌کند که با تصویر زیرین مطابقت نزدیکی دارند."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "جهت‌دار"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "جهت‌دار: پنل‌ها از فاصله‌ای بیشتر و با اندازه کامل وارد می‌شوند — بدون تغییر مقیاس، حرکتی کاملاً تمیز."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "غیرفعال کردن اتصال خودکار"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "نگه‌داشتن نشانگر محیط‌کارها برای بازآرایی آنها"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": ""
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "رنگ‌های پویا، پیش‌تنظیم‌ها"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": ""
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": ""
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "فعال‌کردن مزاحم نشوید"
-  },
-  "Enable Frame": {
-    "Enable Frame": "فعال کردن قاب"
   },
   "Enable History": {
     "Enable History": "فعال‌کردن تاریخچه"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "افزودن include نگاشت‌ها ناموفق بود"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "افزودن چاپگر به کلاس ناموفق بود"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": ""
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "بارگذاری پیکربندی کلیپ‌بورد ناموفق بود."
   },
-  "Failed to move job": {
-    "Failed to move job": "انتقال کار چاپ ناموفق بود"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "انتقال به زباله‌دان ناموفق بود"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "حذف نگاشت‌کلید ناموفق بود"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "حذف چاپگر از کلاس ناموفق بود"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "راه‌اندازی مجدد سیستم صوتی ناموفق بود"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "زنگ زدن دستگاه ناموفق بود"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "اجرای 'dms greeter status' ناموفق بود. از نصب DMS و بودن dms در PATH اطمینان حاصل نمایید."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "بروزرسانی کلیپ‌بورد ناموفق بود"
-  },
-  "Failed to update description": {
-    "Failed to update description": "بروزرسانی توضیحات ناموفق بود"
-  },
-  "Failed to update location": {
-    "Failed to update location": "بروزرسانی مکان ناموفق بود"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "بروزرسانی اشتراک‌گذاری ناموفق بود"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": ""
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "فلوئنت"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "فلوئنت: شتاب مکعبی نرم آهسته در ورود، خروج سریع و ناگهانی — منحنی‌های تمیز و زیبا"
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "کاملا شارژ شده"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: جدول • Z/X: اندازه"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "رنگ‌های GTK با موفقیت اعمال شدند"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK، Qt، IDEها و بیشتر"
   },
   "Games": {
     "Games": "بازی‌ها"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": ""
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "مدت تمام انیمیشن‌ها را سراسری مقیاس کن"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "قلم صفحه خوش‌آمدگویی"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "اعضای گروه صفحه خوش‌آمد‌گویی می‌توانند تم صفحه ورود خود را با dms greeter sync --profile پس از خروج و ورود مجدد همگام‌سازی کنند."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": ""
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "پنهان کردن محتوای اعلان را تا هنگام گسترش"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "محتوای اعلان را تا هنگام گسترش پنهان کن؛ پاپ‌آپ‌ها به طور پیش‌فرض گسترش‌یافته نمایش داده می‌شوند"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "نصب"
   },
-  "Install Greeter": {
-    "Install Greeter": "نصب صفحه خوش‌آمدگویی"
-  },
   "Install Plugin": {
     "Install Plugin": "نصب افزونه"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "نصب تم رنگ‌ها از مخزن تم DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "نصب به اتمام رسید. صفحه خوش‌آمدگویی نصب شد."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "برای جستجوی فایل‌ها dsearch را نصب کنید."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "نصب افزونه‌ها از مخزن افزونه DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "صفحه خوش‌آمدگویی DMS نصب شود؟ یک ترمینال برای احراز هویت sudo باز خواهد شد."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "آیا می‌خواهید تم '%1' را از مخزن DMS نصب کنید؟"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": ""
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "گذرواژه نامعتبر برای %1"
   },
   "Invalid username": {
     "Invalid username": "نام‌کاربری نامعتبر"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": ""
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
-  },
   "Management": {
     "Management": "مدیریت"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": ""
-  },
   "Material Colors": {
     "Material Colors": "رنگ‌های Material"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "سایه‌ها و ارتفاع الهام‌گرفته از متریال در مودال‌ها، پنجره‌های بازشو و دیالوگ‌ها"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "متریال: منحنی‌های بزیه بیانی Material Design 3. حس پیش‌فرض DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "کنتراست Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": ""
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "محلی: نماپرداز سکو (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": ""
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "نمایش سرعت بارگیری و بارگذاری شبکه"
-  },
-  "Network not found": {
-    "Network not found": "شبکه یافت نشد"
   },
   "Neutral": {
     "Neutral": "خنثی"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "همگام‌سازی نیری"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "اقدام‌های کامپازیتور نیری (focus، move و غیره)"
   },
   "No": {
     "No": "خیر"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "پاپ‌آپ اعلان‌ها"
   },
-  "Notification Settings": {
-    "Notification Settings": "تنظیمات اعلان‌ها"
-  },
   "Notification Type": {
     "Notification Type": ""
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "باز کردن زباله‌دان"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "تنظیمات چیدمان سراسری را برای این خروجی جایگزین کن"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "شفافیت سراسری را برای دفترچه یادداشت جایگزین کن"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "ترمینال را با دستور سفارشی یا اسکریپت جایگزین کن"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": ""
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "نیمه ابری"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "توقف"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "متوقف شده"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "اصلی"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "زمینه اصلی"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "رنگ‌های Qt با موفقیت اعمال شدند"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: نماپرداز میدان فاصله."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia در دسترس نیست"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "حذف ادمین"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "گردی گوشه را از نوار حذف کن"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "حذف فاصله‌ها و حاشیه هنگام بزرگ‌کردن پنجره‌ها"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "امنیت"
   },
-  "Security & privacy": {
-    "Security & privacy": "امنیت و حریم خصوصی"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "فایل را برای ارسال انتخاب کنید"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "گوشه‌های مربعی"
-  },
   "Stacked": {
     "Stacked": "انباشته"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "استاندارد"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "استاندارد: "
-  },
   "Start": {
     "Start": "شروع"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": ""
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "همگام‌سازی مکان در تمامی صفحات"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": ""
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "ترمینال پشتیبان ناموفق بود. یکی از شبیه‌سازی ترمینال‌های پشتیبانی شده را نصب یا به صورت دستی 'dms greeter sync' را اجرا کنید."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "ابزار «dgop» برای نظارت سیستم نیاز است.\nلطفا برای استفاده از این قابلیت dgop را نصب کنید."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "متغیر محیطی DMS_SOCKET تنظیم نشده یا سوکت موجود نیست. مدیریت افزونه خودکار به DMS_SOCKET نیاز دارد."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "تنظیمات پایین، تنظیمات Qt و GTK شما را تغییر می‌دهند. اگر می‌خواهید تنظیمات کنونی خود را نگه دارید، لطفا از آنها نسخه پشتیبان تهیه کنید (qt5ctl.conf |qt6ctl.conf و ~/.config/gtk-3.0|gtk-4.0)"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "مخزن تم‌ها"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "رنگ تم استفاده شده برای حاشیه"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "وضعیت دید نوار به صورت دستی از طریق IPC تغییر دهید"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "گروه‌بندی نشده"
   },
-  "Uninstall": {
-    "Uninstall": "حذف"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "حذف نصب صفحه خوش‌آمدگویی"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "حذف افزونه"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "حذف نصب به اتمام رسید. صفحه خوش‌آمدگویی حذف شد."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "حذف ناموفق بود: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "صفحه خوش‌آمد‌گویی DMS حذف شود؟ این پیکربندی را حذف و مدیریت نمایشگر قبلی را بازیابی خواهد کرد. یک ترمینال برای احراز هویت sudo باز خواهد شد."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "حذف شده: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": ""
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": ""
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "شعاع گوشه پنجره‌ها"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شوند؟"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "لازم است یکی از مقادیر زیر را به عنوان متغیر محیطی تنظیم نمایید:\nQT_QPA_PLATFORMTHEME=gtk3 یا\nQT_QPA_PLATFORMTHEME=qt6ct\nو پس از آن، شل را مجدداً راه‌اندازی کنید.\n\nبسته qt6ct نیازمند نصب qt6ct-kde می‌باشد."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "پیوست شد"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "براندون"

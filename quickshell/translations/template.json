@@ -252,6 +252,13 @@
     "comment": ""
   },
   {
+    "term": "%1 — %2",
+    "translation": "",
+    "context": "%1 — %2",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1: %2",
     "translation": "",
     "context": "%1: %2",
@@ -7518,16 +7525,9 @@
     "comment": ""
   },
   {
-    "term": "Edit Image from Clipboard — Edit",
+    "term": "Edit Image from Clipboard",
     "translation": "",
-    "context": "Edit Image from Clipboard — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Edit Image from Clipboard — Float",
-    "translation": "",
-    "context": "Edit Image from Clipboard — Float",
+    "context": "Edit Image from Clipboard",
     "reference": "",
     "comment": ""
   },
@@ -15372,16 +15372,9 @@
     "comment": ""
   },
   {
-    "term": "Open Specific Image Path — Edit",
+    "term": "Open Specific Image Path",
     "translation": "",
-    "context": "Open Specific Image Path — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Open Specific Image Path — Float",
-    "translation": "",
-    "context": "Open Specific Image Path — Float",
+    "context": "Open Specific Image Path",
     "reference": "",
     "comment": ""
   },
@@ -16056,6 +16049,13 @@
     "context": "Pause",
     "reference": "",
     "comment": "Media pause tooltip"
+  },
+  {
+    "term": "Pause / Resume",
+    "translation": "",
+    "context": "Pause / Resume",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Paused",
@@ -18928,51 +18928,9 @@
     "comment": ""
   },
   {
-    "term": "Screen Recording (Cancel)",
+    "term": "Screen Recording (%1)",
     "translation": "",
-    "context": "Screen Recording (Cancel)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Full Screen)",
-    "translation": "",
-    "context": "Screen Recording (Full Screen)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Interactive Region)",
-    "translation": "",
-    "context": "Screen Recording (Interactive Region)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Pause / Resume)",
-    "translation": "",
-    "context": "Screen Recording (Pause / Resume)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Stop & Save)",
-    "translation": "",
-    "context": "Screen Recording (Stop & Save)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Toggle Start / Stop)",
-    "translation": "",
-    "context": "Screen Recording (Toggle Start / Stop)",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screen Recording (Window / Portal)",
-    "translation": "",
-    "context": "Screen Recording (Window / Portal)",
+    "context": "Screen Recording (%1)",
     "reference": "",
     "comment": ""
   },
@@ -19012,100 +18970,9 @@
     "comment": ""
   },
   {
-    "term": "Screenshot (All Combined Outputs) — Edit",
+    "term": "Screenshot (%1) — %2",
     "translation": "",
-    "context": "Screenshot (All Combined Outputs) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (All Combined Outputs) — Float",
-    "translation": "",
-    "context": "Screenshot (All Combined Outputs) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Focused Window) — Edit",
-    "translation": "",
-    "context": "Screenshot (Focused Window) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Focused Window) — Float",
-    "translation": "",
-    "context": "Screenshot (Focused Window) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Full Screen) — Edit",
-    "translation": "",
-    "context": "Screenshot (Full Screen) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Full Screen) — Float",
-    "translation": "",
-    "context": "Screenshot (Full Screen) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Interactive Region) — Edit",
-    "translation": "",
-    "context": "Screenshot (Interactive Region) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Interactive Region) — Float",
-    "translation": "",
-    "context": "Screenshot (Interactive Region) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Last Selected Region) — Edit",
-    "translation": "",
-    "context": "Screenshot (Last Selected Region) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Last Selected Region) — Float",
-    "translation": "",
-    "context": "Screenshot (Last Selected Region) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Scrolling Capture) — Edit",
-    "translation": "",
-    "context": "Screenshot (Scrolling Capture) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Scrolling Capture) — Float",
-    "translation": "",
-    "context": "Screenshot (Scrolling Capture) — Float",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Specific Output) — Edit",
-    "translation": "",
-    "context": "Screenshot (Specific Output) — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Screenshot (Specific Output) — Float",
-    "translation": "",
-    "context": "Screenshot (Specific Output) — Float",
+    "context": "Screenshot (%1) — %2",
     "reference": "",
     "comment": ""
   },
@@ -19565,16 +19432,9 @@
     "comment": "KDE Connect file browser title"
   },
   {
-    "term": "Select Image File — Edit",
+    "term": "Select Image File",
     "translation": "",
-    "context": "Select Image File — Edit",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Select Image File — Float",
-    "translation": "",
-    "context": "Select Image File — Float",
+    "context": "Select Image File",
     "reference": "",
     "comment": ""
   },
@@ -23023,6 +22883,13 @@
     "comment": ""
   },
   {
+    "term": "Toggle Start / Stop",
+    "translation": "",
+    "context": "Toggle Start / Stop",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Toggle bar visibility manually via IPC",
     "translation": "",
     "context": "Toggle bar visibility manually via IPC",
@@ -25028,6 +24895,13 @@
     "term": "Window",
     "translation": "",
     "context": "Window",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Window / Portal",
+    "translation": "",
+    "context": "Window / Portal",
     "reference": "",
     "comment": ""
   },
