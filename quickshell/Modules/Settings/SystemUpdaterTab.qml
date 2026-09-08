@@ -179,10 +179,10 @@ Item {
 
                 SettingsToggleRow {
                     settingKey: "systemUpdaterAUR"
-                    tags: ["aur", "paru", "yay"]
+                    tags: ["aur", "paru", "yay", "shelly"]
                     text: I18n.tr("Include AUR updates")
-                    description: I18n.tr("Run paru/yay with AUR enabled when 'Update All' is clicked.")
-                    visible: (SystemUpdateService.backends || []).some(b => b.id === "paru" || b.id === "yay")
+                    description: I18n.tr("Apply AUR updates alongside system updates when running 'Update All'.")
+                    visible: (SystemUpdateService.backends || []).some(b => ["paru", "yay", "shelly"].includes(b.id))
                     checked: SettingsData.updaterAllowAUR
                     onToggled: checked => SettingsData.set("updaterAllowAUR", checked)
                 }
@@ -198,17 +198,21 @@ Item {
                 settingKey: "systemUpdaterIgnoredPackages"
                 tags: ["system", "update", "package", "ignore"]
 
+                property bool errorIsInvalidName: false
+
                 function addIgnoredPackage() {
                     const name = newIgnoredPackageField.text.trim();
                     if (name === "") {
                         return;
                     }
-                    if (!/^[A-Za-z0-9@._+:-]+$/.test(name)) {
+                    errorIsInvalidName = !/^[A-Za-z0-9@._+:-]+$/.test(name);
+                    if (errorIsInvalidName) {
                         ignoredPackageError.visible = true;
                         return;
                     }
-                    ignoredPackageError.visible = false;
-                    SystemUpdateService.ignorePackage(name);
+                    ignoredPackageError.visible = !SystemUpdateService.ignorePackage(name);
+                    if (ignoredPackageError.visible)
+                        return;
                     newIgnoredPackageField.text = "";
                 }
 
@@ -221,6 +225,9 @@ Item {
                         text: {
                             if (SettingsData.updaterUseCustomCommand) {
                                 return I18n.tr("Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.");
+                            }
+                            if (SystemUpdateService.pkgManager === "shelly") {
+                                return I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.");
                             }
                             return (SettingsData.updaterIgnoredPackages || []).length > 0 ? I18n.tr("Ignored packages are hidden from the updater and skipped by 'Update All'.") : I18n.tr("No packages ignored. Add one here or hover an update in the popout and click the hide button.");
                         }
@@ -258,10 +265,12 @@ Item {
 
                     StyledText {
                         id: ignoredPackageError
+                        width: parent.width
                         visible: false
-                        text: I18n.tr("Invalid package name — letters, digits and @._+:- only.")
+                        text: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:- only.") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.error
+                        wrapMode: Text.WordWrap
                     }
 
                     SettingsCard {

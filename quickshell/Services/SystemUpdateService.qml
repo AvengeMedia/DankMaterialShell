@@ -35,14 +35,14 @@ Singleton {
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
     readonly property bool useCustomCommand: SettingsData.updaterUseCustomCommand && (SettingsData.updaterCustomCommand || "").trim().length > 0
 
-    // Dont allow partial updates on arch, if they wanna break their system they can do it outside of DMS:
-    // https://wiki.archlinux.org/title/System_maintenance#Partial_upgrades_are_unsupported
-    // AUR/Flatpak packages stay ignorable — holding those cannot break the repo dependency graph.
-    readonly property bool systemHoldsAllowed: !["pacman", "paru", "yay"].includes(pkgManager)
+    // Arch repository packages must upgrade together.
+    readonly property bool systemHoldsAllowed: !["pacman", "paru", "yay", "shelly"].includes(pkgManager)
 
     function canIgnorePackage(pkg) {
         if (!pkg)
             return false;
+        if (pkgManager === "shelly")
+            return pkg.repo === "flatpak";
         return systemHoldsAllowed || pkg.repo !== "system";
     }
 
@@ -181,12 +181,15 @@ Singleton {
 
     function ignorePackage(name) {
         if (!name)
-            return;
+            return false;
+        if (pkgManager === "shelly" && !_rawUpdates.some(p => p.name === name && canIgnorePackage(p)))
+            return false;
         const list = (SettingsData.updaterIgnoredPackages || []).slice();
         if (list.indexOf(name) !== -1)
-            return;
+            return true;
         list.push(name);
         SettingsData.set("updaterIgnoredPackages", list);
+        return true;
     }
 
     function unignorePackage(name) {
