@@ -198,12 +198,15 @@ Item {
                 settingKey: "systemUpdaterIgnoredPackages"
                 tags: ["system", "update", "package", "ignore"]
 
+                property bool errorIsInvalidName: false
+
                 function addIgnoredPackage() {
                     const name = newIgnoredPackageField.text.trim();
                     if (name === "") {
                         return;
                     }
-                    if (!/^[A-Za-z0-9@._+:-]+$/.test(name)) {
+                    errorIsInvalidName = !/^[A-Za-z0-9@._+:-]+$/.test(name);
+                    if (errorIsInvalidName) {
                         ignoredPackageError.visible = true;
                         return;
                     }
@@ -264,7 +267,7 @@ Item {
                         id: ignoredPackageError
                         width: parent.width
                         visible: false
-                        text: SystemUpdateService.pkgManager === "shelly" ? I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.") : I18n.tr("Invalid package name — letters, digits and @._+:- only.")
+                        text: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:- only.") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.error
                         wrapMode: Text.WordWrap
