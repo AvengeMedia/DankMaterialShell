@@ -661,9 +661,12 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 	if existingData != "" {
 		existingConfig = existingData
 		cd.log(fmt.Sprintf("Found existing Hyprland configuration at %s", existingPath))
-
-		result.BackupPath = filepath.Join(backupDir, filepath.Base(existingPath))
-		if err := backupHyprlandConfigFile(existingPath, result.BackupPath, []byte(existingData), strings.EqualFold(filepath.Ext(existingPath), ".conf")); err != nil {
+	}
+	// A legacy hyprland.conf is only backed up once hyprland.lua is in place; Hyprland
+	// watches the live config and regenerates a stub one if it disappears first.
+	if existingData != "" && !strings.EqualFold(filepath.Ext(existingPath), ".conf") {
+		result.BackupPath, err = backupHyprlandConfigFile(filepath.Join(backupDir, filepath.Base(existingPath)), []byte(existingData))
+		if err != nil {
 			result.Error = fmt.Errorf("failed to create backup: %w", err)
 			return result, result.Error
 		}
@@ -711,10 +714,14 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 		}
 	}
 
-	movedLegacy, err := backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir)
+	movedLegacy, mainConfBackup, err := backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to back up legacy hyprlang configs: %w", err)
 		return result, result.Error
+	}
+	if mainConfBackup != "" && result.BackupPath == "" {
+		result.BackupPath = mainConfBackup
+		cd.log(fmt.Sprintf("Backed up existing config to %s", mainConfBackup))
 	}
 	if movedLegacy > 0 {
 		if result.BackupPath == "" {
@@ -737,42 +744,53 @@ func (cd *ConfigDeployer) deployHyprlandConfig(terminal deps.Terminal, useSystem
 	return result, nil
 }
 
-func backupHyprlandConfigFile(src, dst string, data []byte, removeSource bool) error {
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return err
+func uniqueBackupPath(dst string) string {
+	if _, err := os.Lstat(dst); err != nil {
+		return dst
 	}
-	if err := os.WriteFile(dst, data, 0o644); err != nil {
-		return err
-	}
-	if removeSource {
-		if err := os.Remove(src); err != nil && !os.IsNotExist(err) {
-			return err
+	for i := 1; i < 1000; i++ {
+		candidate := fmt.Sprintf("%s.%d", dst, i)
+		if _, err := os.Lstat(candidate); err != nil {
+			return candidate
 		}
 	}
-	return nil
+	return fmt.Sprintf("%s.%d", dst, time.Now().UnixNano())
 }
 
-func backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir string) (int, error) {
-	legacyPaths := []string{filepath.Join(configDir, "hyprland.conf")}
+func backupHyprlandConfigFile(dst string, data []byte) (string, error) {
+	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+		return "", err
+	}
+	dst = uniqueBackupPath(dst)
+	if err := os.WriteFile(dst, data, 0o644); err != nil {
+		return "", err
+	}
+	return dst, nil
+}
+
+func backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir string) (int, string, error) {
+	mainConf := filepath.Join(configDir, "hyprland.conf")
+	legacyPaths := []string{mainConf}
 	dmsConfPaths, err := filepath.Glob(filepath.Join(dmsDir, "*.conf"))
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	legacyPaths = append(legacyPaths, dmsConfPaths...)
 	backupPaths, err := adjacentHyprlandBackupFiles(configDir, dmsDir)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	legacyPaths = append(legacyPaths, backupPaths...)
 
 	moved := 0
+	mainConfBackup := ""
 	for _, src := range legacyPaths {
 		info, err := os.Lstat(src)
 		if os.IsNotExist(err) {
 			continue
 		}
 		if err != nil {
-			return moved, err
+			return moved, mainConfBackup, err
 		}
 		if info.IsDir() {
 			continue
@@ -782,21 +800,28 @@ func backupLegacyHyprlandConfFiles(configDir, dmsDir, backupDir string) (int, er
 		if err != nil {
 			rel = filepath.Base(src)
 		}
-		dst := filepath.Join(backupDir, rel)
-		if err := moveHyprlandConfigFile(src, dst); err != nil {
-			return moved, err
+		dst, err := moveHyprlandConfigFile(src, filepath.Join(backupDir, rel))
+		if err != nil {
+			return moved, mainConfBackup, err
+		}
+		if src == mainConf {
+			mainConfBackup = dst
 		}
 		moved++
 	}
 
-	return moved, nil
+	return moved, mainConfBackup, nil
 }
 
-func moveHyprlandConfigFile(src, dst string) error {
+func moveHyprlandConfigFile(src, dst string) (string, error) {
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return err
+		return "", err
 	}
-	return os.Rename(src, dst)
+	dst = uniqueBackupPath(dst)
+	if err := os.Rename(src, dst); err != nil {
+		return "", err
+	}
+	return dst, nil
 }
 
 func adjacentHyprlandBackupFiles(configDir, dmsDir string) ([]string, error) {
