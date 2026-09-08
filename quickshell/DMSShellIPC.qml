@@ -1863,6 +1863,8 @@ Item {
         function open(): string {
             root.workspaceRenameModalLoader.active = true;
             if (root.workspaceRenameModalLoader.item) {
+                if (CompositorService.isAqueous)
+                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
                 root.workspaceRenameModalLoader.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
@@ -1885,6 +1887,8 @@ Item {
                     root.workspaceRenameModalLoader.item.hide();
                     return "WORKSPACE_RENAME_MODAL_CLOSED";
                 }
+                if (CompositorService.isAqueous)
+                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
                 root.workspaceRenameModalLoader.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";

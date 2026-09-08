@@ -9,6 +9,8 @@ DankFloatingWindow {
     readonly property var log: Log.scoped("WorkspaceRenameModal")
 
     readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
+    property var aqueousWorkspace: null
+    property bool renaming: false
 
     objectName: "workspaceRenameModal"
     title: I18n.tr("Rename Workspace")
@@ -19,9 +21,24 @@ DankFloatingWindow {
     onClosed: hide()
 
     function show(name) {
+        if (CompositorService.isAqueous) {
+            if (renaming)
+                return false;
+            const workspace = AqueousService.workspaces.find(ws => ws.output === AqueousService.seat?.output && ws.active);
+            if (!AqueousService.available || !AqueousService.seat || !workspace || !AqueousService.capabilities.commands || AqueousService.locked) {
+                ToastService.showError(I18n.tr("Error"), I18n.tr("Unavailable"));
+                return false;
+            }
+            aqueousWorkspace = {
+                id: workspace.id,
+                session: workspace.aqueousSession
+            };
+            name = workspace.name;
+        }
         nameInput.text = name;
         visible = true;
         Qt.callLater(() => nameInput.forceActiveFocus());
+        return true;
     }
 
     function hide() {
@@ -29,6 +46,24 @@ DankFloatingWindow {
     }
 
     function submitAndClose() {
+        if (aqueousWorkspace || CompositorService.isAqueous) {
+            if (!aqueousWorkspace || renaming)
+                return;
+            const target = aqueousWorkspace;
+            renaming = true;
+            AqueousService.command("workspace.rename", {
+                id: target.id,
+                session: target.session,
+                name: nameInput.text
+            }, success => {
+                if (root.aqueousWorkspace !== target)
+                    return;
+                root.renaming = false;
+                if (success)
+                    root.hide();
+            });
+            return;
+        }
         renameWorkspace(nameInput.text);
         hide();
     }
@@ -49,6 +84,8 @@ DankFloatingWindow {
             return;
         }
         nameInput.text = "";
+        aqueousWorkspace = null;
+        renaming = false;
     }
 
     FocusScope {
@@ -133,7 +170,7 @@ DankFloatingWindow {
                     textColor: Theme.surfaceText
                     placeholderText: I18n.tr("Workspace name")
                     backgroundColor: "transparent"
-                    enabled: root.visible
+                    enabled: root.visible && !root.renaming
                     onAccepted: submitAndClose()
                 }
             }
@@ -190,6 +227,7 @@ DankFloatingWindow {
 
                         MouseArea {
                             id: renameArea
+                            enabled: !root.renaming
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor

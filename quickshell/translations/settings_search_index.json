@@ -1240,7 +1240,6 @@
     "category": "Bar",
     "keywords": [
       "bar",
-      "during",
       "frame",
       "niri",
       "overview",
@@ -1249,8 +1248,8 @@
       "statusbar",
       "topbar"
     ],
-    "description": "Show during Niri overview",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "barSize",
@@ -1463,7 +1462,7 @@
       "workspaces"
     ],
     "description": "Show workspaces of the currently focused monitor",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "workspaceFollowFocusCapable"
   },
   {
     "section": "workspaceSettings",
@@ -1488,7 +1487,7 @@
     ],
     "icon": "view_module",
     "description": "Show workspace index numbers in the top bar workspace switcher",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "groupActiveWorkspaceApps",
@@ -1611,7 +1610,7 @@
       "workspace"
     ],
     "description": "Reverse workspace switch direction when scrolling over the bar",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "workspaceUnfocusedMonitorSeparateAppearance",
@@ -1696,7 +1695,7 @@
       "workspaces"
     ],
     "description": "Display only workspaces that contain windows",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "showWorkspaceApps",
@@ -1725,7 +1724,7 @@
       "workspace"
     ],
     "description": "Display application icons in workspace indicators",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "showWorkspaceIndex",
@@ -2015,7 +2014,7 @@
       "windows"
     ],
     "description": "Show dock when floating windows don",
-    "conditionKey": "windowRulesCapable"
+    "conditionKey": "smartDockCapable"
   },
   {
     "section": "dockIsolateDisplays",
@@ -2311,17 +2310,15 @@
     "tabIndex": 5,
     "category": "Dock",
     "keywords": [
-      "always",
       "dock",
       "launcher bar",
       "niri",
       "overview",
-      "panel",
       "show",
       "taskbar"
     ],
-    "description": "Always show the dock when niri",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "dockLauncherLogoSizeOffset",
@@ -3614,6 +3611,23 @@
     ],
     "icon": "apps",
     "description": "Sync dark mode with settings portals for system-wide theme hints"
+  },
+  {
+    "section": "aqueousCursor",
+    "label": "Aqueous cursor",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "aqueous",
+      "colors",
+      "cursor",
+      "look",
+      "scheme",
+      "style",
+      "theme"
+    ],
+    "conditionKey": "isAqueous"
   },
   {
     "section": "matugenSmartMode",
@@ -6253,6 +6267,24 @@
     ],
     "icon": "animation",
     "description": "Globally scale animation durations with geometric motion & spring based physics with bezier curves"
+  },
+  {
+    "section": "aqueousTypography",
+    "label": "Aqueous typography",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "appearance",
+      "aqueous",
+      "font",
+      "fonts",
+      "motion",
+      "text",
+      "typeface",
+      "typography"
+    ],
+    "conditionKey": "isAqueous"
   },
   {
     "section": "modalCustomAnimationDuration",
@@ -9979,7 +10011,6 @@
     "keywords": [
       "border",
       "decoration",
-      "during",
       "frame",
       "hide",
       "integrations",
@@ -9989,8 +10020,8 @@
       "window"
     ],
     "icon": "toolbar",
-    "description": "Show during Niri overview",
-    "conditionKey": "isNiri"
+    "description": "Show on Overview",
+    "conditionKey": "nativeOverviewCapable"
   },
   {
     "section": "frameLauncherEmergeSide",
@@ -10073,7 +10104,6 @@
     "keywords": [
       "border",
       "decoration",
-      "during",
       "frame",
       "hide",
       "niri",
@@ -10081,7 +10111,7 @@
       "show",
       "window"
     ],
-    "description": "Show during Niri overview",
+    "description": "Show on Overview",
     "conditionKey": "frameEnabled"
   },
   {

@@ -67,7 +67,7 @@ PanelWindow {
     implicitWidth: body.surfaceImplicitWidth
     exclusiveZone: body.surfaceExclusiveZone
 
-    BackgroundEffect.blurRegion: body.blurRegion
+    BackgroundEffect.blurRegion: BlurService.enabled ? body.blurRegion : null
 
     Component.onCompleted: {
         KeyboardFocus.registerBarWindow(barWindow);

@@ -24,6 +24,7 @@ Item {
     property real crossEdgeExtension: 0
 
     readonly property bool isMango: CompositorService.isMango
+    readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1"
 
     property bool isFirst: false
     property bool isLast: false
@@ -57,8 +58,10 @@ Item {
     }
     readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
 
-    readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(parentScreen) : null
+    readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(CompositorService.isAqueous ? Quickshell.screens.find(s => s.name === effectiveScreenName) || parentScreen : parentScreen) : null
     readonly property bool useExtWorkspace: {
+        if (useAqueous)
+            return false;
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
         if (!CompositorService.compositorDetected)
@@ -92,6 +95,8 @@ Item {
     }
 
     property var currentWorkspace: {
+        if (useAqueous)
+            return AqueousService.workspacesForOutput(effectiveScreenName).find(w => w.active)?.id || "";
         if (useExtWorkspace)
             return getExtWorkspaceActiveWorkspace();
 
@@ -118,6 +123,10 @@ Item {
         return [];
     }
     property var workspaceList: {
+        if (useAqueous) {
+            const baseList = AqueousService.workspacesForOutput(effectiveScreenName).filter(ws => !SettingsData.showOccupiedWorkspacesOnly || ws.active || AqueousService.toplevels.some(w => w.aqueousWorkspaceId === ws.id));
+            return SettingsData.showWorkspacePadding && baseList.length ? padWorkspaces(baseList) : baseList;
+        }
         if (useExtWorkspace) {
             const baseList = getExtWorkspaceWorkspaces();
             return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
@@ -297,12 +306,14 @@ Item {
 
     function getWorkspaceIcons(ws) {
         _desktopEntriesUpdateTrigger;
-        if (!SettingsData.showWorkspaceApps || !ws) {
+        if (!SettingsData.showWorkspaceApps || !ws || useExtWorkspace || (useAqueous && ws._placeholder)) {
             return [];
         }
 
         let targetWorkspaceId;
-        if (CompositorService.isNiri) {
+        if (useAqueous) {
+            targetWorkspaceId = ws.id;
+        } else if (CompositorService.isNiri) {
             if (!ws || typeof ws !== "object") {
                 const wsNumber = typeof ws === "number" ? ws : -1;
                 if (wsNumber <= 0) {
@@ -362,7 +373,9 @@ Item {
                     return;
             } else {
                 let winWs = null;
-                if (CompositorService.isNiri) {
+                if (useAqueous) {
+                    winWs = w.aqueousWorkspaceId;
+                } else if (CompositorService.isNiri) {
                     winWs = w.workspace_id;
                 } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                     winWs = w.workspace?.num;
@@ -380,7 +393,7 @@ Item {
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
             const moddedId = Paths.moddedAppId(keyBase);
             const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
-            const key = groupThisWs ? moddedId : `${moddedId}_${i}`;
+            const key = groupThisWs ? moddedId : (w.aqueousKey || `${moddedId}_${i}`);
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell" || keyBase === "com.danklinux.dms";
@@ -396,6 +409,7 @@ Item {
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
+                    "windowSession": useAqueous ? w.aqueousSession : "",
                     "fallbackText": appName || ""
                 };
             } else {
@@ -410,7 +424,7 @@ Item {
     }
 
     function _makePlaceholder() {
-        if (useExtWorkspace)
+        if (useAqueous || useExtWorkspace)
             return {
                 "id": "",
                 "name": "",
@@ -623,7 +637,7 @@ Item {
         if (!extProjection)
             return "";
         const activeWs = extProjection.windowsets.find(ws => ws.active);
-        return activeWs ? (activeWs.id || activeWs.name || "") : "";
+        return activeWs || null;
     }
 
     readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
@@ -634,7 +648,7 @@ Item {
 
     function getRealWorkspaces() {
         return root.workspaceList.filter(ws => {
-            if (useExtWorkspace)
+            if (useAqueous || useExtWorkspace)
                 return ws && !ws._placeholder;
             if (CompositorService.isNiri)
                 return ws && ws.idx !== -1;
@@ -649,8 +663,13 @@ Item {
     }
 
     function switchToWorkspaceByModelData(data) {
-        if (!data)
+        if (!data || data._placeholder)
             return;
+
+        if (useAqueous) {
+            AqueousService.activateWorkspace(data);
+            return;
+        }
 
         if (root.useExtWorkspace) {
             if (typeof data.activate === "function")
@@ -702,13 +721,21 @@ Item {
     }
 
     function switchWorkspace(direction) {
+        if (useAqueous) {
+            const workspaces = getRealWorkspaces();
+            const index = workspaces.findIndex(w => w.id === currentWorkspace);
+            const next = Math.max(0, Math.min(workspaces.length - 1, index + (direction > 0 ? 1 : -1)));
+            if (next !== index)
+                AqueousService.activateWorkspace(workspaces[next]);
+            return;
+        }
         if (useExtWorkspace) {
             const realWorkspaces = getRealWorkspaces();
             if (realWorkspaces.length < 2) {
                 return;
             }
 
-            const currentIndex = realWorkspaces.findIndex(ws => (ws.id || ws.name) === root.currentWorkspace);
+            const currentIndex = realWorkspaces.findIndex(ws => ws === root.currentWorkspace);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
             const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
 
@@ -787,6 +814,8 @@ Item {
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
+        if (useAqueous)
+            return modelData?.number ?? "";
         if (root.useExtWorkspace)
             return index + 1;
         if (CompositorService.isNiri)
@@ -802,8 +831,8 @@ Item {
 
     function getWorkspaceIndex(modelData, index) {
         let isPlaceholder;
-        if (root.useExtWorkspace) {
-            isPlaceholder = modelData?.hidden === true;
+        if (root.useAqueous || root.useExtWorkspace) {
+            isPlaceholder = modelData?._placeholder === true;
         } else if (CompositorService.isNiri) {
             isPlaceholder = modelData?.idx === -1;
         } else if (CompositorService.isHyprland) {
@@ -843,7 +872,7 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
+    readonly property bool hasNativeWorkspaceSupport: useAqueous || CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
 
@@ -937,7 +966,9 @@ Item {
             const rootPos = edgeMouseArea.mapToItem(root, mouse.x, mouse.y);
             switch (mouse.button) {
             case Qt.RightButton:
-                if (CompositorService.isNiri) {
+                if (CompositorService.isAqueous) {
+                    AqueousService.toggleOverview(root.effectiveScreenName);
+                } else if (CompositorService.isNiri) {
                     NiriService.toggleOverview();
                 } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                     root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
@@ -1119,8 +1150,10 @@ Item {
                 }
 
                 property bool isActive: {
+                    if (root.useAqueous)
+                        return modelData?.active === true;
                     if (root.useExtWorkspace)
-                        return (modelData?.id || modelData?.name) === root.currentWorkspace;
+                        return modelData === root.currentWorkspace;
                     if (CompositorService.isNiri)
                         return !!(modelData && modelData.idx === root.currentWorkspace);
                     if (CompositorService.isHyprland)
@@ -1132,6 +1165,8 @@ Item {
                     return modelData === root.currentWorkspace;
                 }
                 property bool isOccupied: {
+                    if (root.useAqueous)
+                        return AqueousService.toplevels.some(w => w.aqueousWorkspaceId === modelData?.id);
                     if (CompositorService.isHyprland)
                         return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
                     if (root.isMango)
@@ -1141,7 +1176,7 @@ Item {
                     return false;
                 }
                 property bool isPlaceholder: {
-                    if (root.useExtWorkspace)
+                    if (root.useAqueous || root.useExtWorkspace)
                         return !!(modelData && modelData._placeholder);
                     if (CompositorService.isNiri)
                         return !!(modelData && modelData.idx === -1);
@@ -1158,6 +1193,8 @@ Item {
                 property var loadedWorkspaceData: null
                 property bool loadedIsUrgent: false
                 property bool isUrgent: {
+                    if (root.useAqueous)
+                        return modelData?.urgent === true;
                     if (root.useExtWorkspace)
                         return modelData?.urgent ?? false;
                     if (CompositorService.isHyprland)
@@ -1184,6 +1221,9 @@ Item {
                 readonly property int stableIconCount: {
                     if (!SettingsData.showWorkspaceApps || isPlaceholder)
                         return 0;
+
+                    if (root.useAqueous)
+                        return loadedIcons.length;
 
                     let targetWorkspaceId;
                     if (root.useExtWorkspace) {
@@ -1242,7 +1282,7 @@ Item {
                 readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5) : (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2))
                 readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2)) : (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5)
                 readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
-                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
+                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (root.useAqueous || CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                 readonly property real contentImplicitWidth: appIconsLoader.item?.contentWidth ?? 0
                 readonly property real contentImplicitHeight: appIconsLoader.item?.contentHeight ?? 0
 
@@ -1456,7 +1496,9 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             if (delegateRoot.focusWindowAt(mouse.x, mouse.y))
                                 return;
-                            if (root.useExtWorkspace) {
+                            if (root.useAqueous) {
+                                root.switchToWorkspaceByModelData(modelData);
+                            } else if (root.useExtWorkspace) {
                                 if (typeof modelData?.activate === "function")
                                     modelData.activate();
                             } else if (CompositorService.isNiri) {
@@ -1471,7 +1513,9 @@ Item {
                                 CompositorService.dispatchSwayWorkspace(modelData);
                             }
                         } else if (mouse.button === Qt.RightButton) {
-                            if (CompositorService.isNiri) {
+                            if (CompositorService.isAqueous) {
+                                AqueousService.toggleOverview(root.effectiveScreenName);
+                            } else if (CompositorService.isNiri) {
                                 NiriService.toggleOverview();
                             } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
                                 root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
@@ -1494,7 +1538,7 @@ Item {
                         }
 
                         var wsData = null;
-                        if (root.useExtWorkspace) {
+                        if (root.useAqueous || root.useExtWorkspace) {
                             wsData = modelData;
                         } else if (CompositorService.isNiri) {
                             wsData = modelData || null;
@@ -1536,13 +1580,20 @@ Item {
                     if (!layout)
                         return null;
                     const point = layout.mapFromItem(mouseArea, x, y);
-                    return layout.childAt(point.x, point.y)?.windowId ?? null;
+                    const icon = layout.childAt(point.x, point.y);
+                    if (root.useAqueous)
+                        return icon?.windowId ? {id: icon.windowId, session: icon.windowSession} : null;
+                    return icon?.windowId ?? null;
                 }
 
                 function focusWindowAt(x, y) {
                     const winId = delegateRoot.windowIdAt(x, y);
                     if (!winId)
                         return false;
+                    if (root.useAqueous) {
+                        AqueousService.command("window.activate", winId);
+                        return true;
+                    }
                     if (CompositorService.isHyprland) {
                         HyprlandService.focusWindow(winId);
                         return true;
@@ -1745,6 +1796,7 @@ Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
+                                            readonly property string windowSession: modelData.windowSession || ""
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
@@ -1902,6 +1954,7 @@ Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
+                                            readonly property string windowSession: modelData.windowSession || ""
                                             readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
@@ -2096,6 +2149,13 @@ Item {
                     enabled: (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
                     function onValuesChanged() {
                         delegateRoot.updateAllData();
+                    }
+                }
+                Connections {
+                    target: AqueousService
+                    function onStateChanged() {
+                        if (root.useAqueous)
+                            delegateRoot.updateAllData();
                     }
                 }
                 property var _extWindowsetsTrigger: root.useExtWorkspace ? WindowManager.windowsets : null

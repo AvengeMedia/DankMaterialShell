@@ -249,7 +249,7 @@ Item {
     readonly property bool shouldHideForWindows: {
         if (!SettingsData.dockSmartAutoHide)
             return false;
-        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
+        if (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango && !CompositorService.isAqueous)
             return false;
 
         const screenName = dock.modelData?.name ?? "";
@@ -313,6 +313,9 @@ Item {
             return false;
         }
 
+        if (CompositorService.isAqueous && AqueousService.available)
+            return AqueousService.overlapsDock(screenName, SettingsData.dockPosition, dockThickness, screenWidth, screenHeight);
+
         if (CompositorService.isMango) {
             MangoService.windows;
             MangoService.outputs;
@@ -348,7 +351,7 @@ Item {
         onTriggered: dock.startupRevealDone = true
     }
 
-    readonly property bool overviewReveal: CompositorService.isNiri && NiriService.inOverview && SettingsData.dockOpenOnOverview
+    readonly property bool overviewReveal: CompositorService.overviewActiveOnScreen(screenName) && SettingsData.dockOpenOnOverview
     readonly property bool hoverOrActive: dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky
 
     onOverviewRevealChanged: {
