@@ -420,8 +420,8 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
 			m.failCustomUpgrade(ErrCodeCancelled, err)
 			return
 		}
-		// exit status reflects the trailing `read`, not the update command
-		m.appendLog(fmt.Sprintf("Terminal exited early: %v", err))
+		m.failCustomUpgrade(ErrCodeBackendFailed, err)
+		return
 	}
 
 	m.finishSuccessfulUpgrade(false)
