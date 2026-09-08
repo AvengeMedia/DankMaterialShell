@@ -35,10 +35,8 @@ Singleton {
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
     readonly property bool useCustomCommand: SettingsData.updaterUseCustomCommand && (SettingsData.updaterCustomCommand || "").trim().length > 0
 
-    // Dont allow partial updates on arch, if they wanna break their system they can do it outside of DMS:
-    // https://wiki.archlinux.org/title/System_maintenance#Partial_upgrades_are_unsupported
-    // AUR/Flatpak packages stay ignorable — holding those cannot break the repo dependency graph.
-    readonly property bool systemHoldsAllowed: !["pacman", "paru", "yay"].includes(pkgManager)
+    // Arch repository packages must upgrade together.
+    readonly property bool systemHoldsAllowed: !["pacman", "paru", "yay", "shelly"].includes(pkgManager)
 
     function canIgnorePackage(pkg) {
         if (!pkg)

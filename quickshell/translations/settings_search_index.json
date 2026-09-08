@@ -8242,18 +8242,21 @@
     "tabIndex": 20,
     "category": "System Updater",
     "keywords": [
+      "alongside",
+      "apply",
       "aur",
-      "enabled",
       "include",
       "packages",
       "paru",
+      "running",
+      "shelly",
       "system",
       "updater",
       "updates",
       "upgrade",
       "yay"
     ],
-    "description": "Run paru/yay with AUR enabled when "
+    "description": "Apply AUR updates alongside system updates when running "
   },
   {
     "section": "systemUpdaterFlatpak",

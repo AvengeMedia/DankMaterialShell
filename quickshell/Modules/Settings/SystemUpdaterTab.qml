@@ -179,10 +179,10 @@ Item {
 
                 SettingsToggleRow {
                     settingKey: "systemUpdaterAUR"
-                    tags: ["aur", "paru", "yay"]
+                    tags: ["aur", "paru", "yay", "shelly"]
                     text: I18n.tr("Include AUR updates")
-                    description: I18n.tr("Run paru/yay with AUR enabled when 'Update All' is clicked.")
-                    visible: (SystemUpdateService.backends || []).some(b => b.id === "paru" || b.id === "yay")
+                    description: I18n.tr("Apply AUR updates alongside system updates when running 'Update All'.")
+                    visible: (SystemUpdateService.backends || []).some(b => ["paru", "yay", "shelly"].includes(b.id))
                     checked: SettingsData.updaterAllowAUR
                     onToggled: checked => SettingsData.set("updaterAllowAUR", checked)
                 }
