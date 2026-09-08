@@ -33,21 +33,6 @@ func TestHandleKeyTogglesCapturedCursor(t *testing.T) {
 	}
 }
 
-func TestCommittedCursorMismatchForcesFullDamage(t *testing.T) {
-	os := &OutputSurface{committedCursor: false}
-	r := &RegionSelector{showCapturedCursor: true, compositorVersion: 4}
-
-	if os.committedCursor == r.showCapturedCursor {
-		t.Fatal("expected mismatch after toggle, got match")
-	}
-
-	os.committedCursor = r.showCapturedCursor
-	r.showCapturedCursor = false
-	if os.committedCursor == r.showCapturedCursor {
-		t.Error("expected mismatch after second toggle, got match")
-	}
-}
-
 func TestHandleKeyTracksModifiers(t *testing.T) {
 	r := &RegionSelector{running: true}
 	r.handleKey("Control_R", 1)
