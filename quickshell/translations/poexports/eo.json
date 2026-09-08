@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 fenestroj"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": ""
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Ĉu aldoni \"%1\" al la grupo %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Ĉu aldoni \"%1\" al la grupo %2? "
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Aldoni noto-blokon"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Aldonu la novan uzanton al la grupo %1 por ke ili povu ruli dms greeter sync --profile."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "Nomoj de aplikaĵoj"
   },
-  "App Theming": {
-    "App Theming": "Etosigo de aplikaĵoj"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": ""
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Aŭtentigi"
   },
-  "Authenticated!": {
-    "Authenticated!": ""
-  },
   "Authentication": {
     "Authentication": "Aŭtentigo"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Aŭtomate fermi la superrigardon de Niri kiam oni lanĉas aplikaĵojn."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Aŭtomate plenigis lastan memoritan serĉmendon kiam malfermita"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Aŭtomata kolora reĝimo"
   },
   "Automatic Control": {
     "Automatic Control": "Aŭtomata regado"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": ""
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "Trinkejo anguloj kaj fono"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Centra sekcio"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "Centrigi unuopan kolumnon"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": ""
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": ""
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "Kroma Stilo"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Fermi superrigardon dum lanĉo"
-  },
   "Close Window": {
     "Close Window": "Fermi fenestron"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": ""
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "Komunumaj etosoj"
-  },
   "Compact": {
     "Compact": "Kompakta"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Kontrasto"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "kontribuanto"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Kurbo: kurba rasterigilo."
-  },
   "Custom": {
     "Custom": "Propra"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar ne funkcias"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell pretas por uzo"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell- kaj sistem-piktogramoj (postulas restarton)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "profundeco"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Profundo: Paneloj pligrandiĝas de malgrandaj dum ili glitas enen - drameca pop-antaŭa profunda efiko."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Derivas kolorojn kiuj proksime kongruas kun la suba bildo."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "unudirekta"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Direkte: Paneloj glitas enen de pli granda distanco je plena grandeco - neniu skaloŝanĝo, pura pura moviĝo."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Malŝalti aŭtomatan konekton"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Trenu laborspacajn indikilojn por reordigi ilin"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Desegnu ligitan bild-kadran randon ĉirkaŭ la tuta ekrano"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dinamikaj koloroj, antaŭagordoj"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dinamika: Printempa bezier kun superfluo — eniro nelonge superas sian celon kaj poste ekloĝas. "
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Redakti Regulon"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Ŝalti \"ne ĝenu\""
-  },
-  "Enable Frame": {
-    "Enable Frame": "Ebligu Kadron"
   },
   "Enable History": {
     "Enable History": "Ŝalti historion"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Malsukcesis aldoni lig-inkluzivon"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Malsukcesis aldoni presilon al klaso"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": ""
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Malsukcesis ŝargi tondujan agordon."
   },
-  "Failed to move job": {
-    "Failed to move job": "Malsukcesis movi taskon"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Malsukcesis movi al rubujo"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Malsukcesis forigi klavkombinon"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Malsukcesis forigi presilon el klaso"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Malsukcesis restartigi sonsistemon"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Malsukcesis sonorigi aparaton"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Malsukcesis lanĉi 'dms greeter status'. Certigu ke DMS estas instalita kaj ke dms estas en PATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Malsukcesis ĝisdatigi la tondujo"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Malsukcesis ĝisdatigi priskribon"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Malsukcesis ĝisdatigi lokon"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Malsukcesis ĝisdatigi dividon"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Malsukcesis skribi aŭtomatan enskribon"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "rutinhava"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Flua: Glata kuba malrapidiĝo enen, rapida klakado - puraj, elegantaj kurboj."
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Tute ŝargita"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: krado • Z/X: grando"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "GTK-koloroj aplikitaj sukcese"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, redaktiloj (IDE), pli"
   },
   "Games": {
     "Games": "Ludoj"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Generu Override"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Globale skali ĉiujn animaciajn daŭrojn"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Tiparo de salutekrano"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Greeter-grupanoj povas sinkronigi sian ensalut-ekranan temon kun dms greeter sync --profile post elsalutiĝo kaj reeniro."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": ""
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Kaŝi sciigan enhavon ĝis etendo"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Kaŝi sciigan enhavon ĝis etendo; ŝprucfenestroj montriĝas kolapsitaj defaŭlte"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Instali"
   },
-  "Install Greeter": {
-    "Install Greeter": "Instali salutekranon"
-  },
   "Install Plugin": {
     "Install Plugin": "Instali kromprogramon"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Instali kolor-etosojn el la DMS-etosa registro"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Instalado finita. Salutekrano estis instalita."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Instalu dsearch por serĉi dosierojn."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Instali kromprogramojn el la DMS-kromprograma registro"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Ĉu instali la DMS-salutekranon? Terminalo malfermiĝos por sudo-aŭtentigo."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Ĉu instali etoson '%1' el la DMS-registro?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": ""
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Nevalida pasvorto por %1"
   },
   "Invalid username": {
     "Invalid username": "Nevalida uzantnomo"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": ""
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
-  },
   "Management": {
     "Management": "Mastrumado"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": ""
-  },
   "Material Colors": {
     "Material Colors": "Materiaj koloroj"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Ombroj kaj altigo inspiritaj de Material sur modaloj, ŝprucfenestroj, kaj dialogoj"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Materialo: Materiala Dezajno 3 Esprimplenaj bezier-kurboj. "
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Kontrasto de Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "operaciuma"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Denaska: platforma bildilo (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": ""
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Vidigo de reta elŝuta kaj alŝuta rapido"
-  },
-  "Network not found": {
-    "Network not found": "Reto ne trovita"
   },
   "Neutral": {
     "Neutral": "Neŭtra"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Niri-integriĝo"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Niri-komponilaj agoj (fokuso, movo, ktp.)"
   },
   "No": {
     "No": "Ne"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Sciigaj ŝprucfenestroj"
   },
-  "Notification Settings": {
-    "Notification Settings": "Sciigaj agordoj"
-  },
   "Notification Type": {
     "Notification Type": ""
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Malfermu Rubujon"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Preterpasi globalajn aranĝajn agordojn por ĉi tiu eligo"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Anstataŭigi tutmondan travideblecon por Notepad"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Preterpasi terminalon per propra komando aŭ skripto"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": ""
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Parte nuba"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Paŭzigi"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Paŭzita"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Ĉefa"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "Ĉefa ujo"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Qt-koloroj aplikitaj sukcese"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: distanca-kampa bildilo."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia ne disponeblas"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Forigi administranton"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Forigu angulon de la stango"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Forigi breĉojn kaj bordon kiam fenestroj estas maksimumigitaj"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Sekureco"
   },
-  "Security & privacy": {
-    "Security & privacy": "Sekureco kaj privateco"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Elektu Dosieron por Sendi"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "Rektaj anguloj"
-  },
   "Stacked": {
     "Stacked": "Stakita"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Norma"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Normo: Klasika Materiala Dezajno 3 - paneloj leviĝas de malsupre kun subtila skalo. "
-  },
   "Start": {
     "Start": "Komenco"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": ""
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Sinkronigi pozicion tra ekranoj"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Terminala retropaŝo malsukcesis. Instalu subtenatan terminal-imitilon aŭ lanĉu 'dms auth sync' mane."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminala retropaŝo malsukcesis. Instalu unu el la subtenataj terminal-imitiloj aŭ lanĉu 'dms greeter sync' mane."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "La ilo 'dgop' estas postulata por sistem-monitorado.\nBonvolu instali dgop por uzi ĉi tiun trajton."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "La media variablo DMS_SOCKET ne estas agordita aŭ la kontaktskatolo ne estas disponebla. Aŭtomata mastrumado de kromprogramoj postulas la DMS_SOCKET."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "La subaj agordoj modifos viajn agordojn de GTK kaj Qt. Se vi volas konservi viajn aktualajn agordojn, bonvolu fari sekurkopiojn de ili (qt5ct.conf|qt6ct.conf kaj ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Etosa registro"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Temokoloro uzata por la limo"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Ŝaltigu la videblecon permane per IPC"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Negrupigitaj"
   },
-  "Uninstall": {
-    "Uninstall": "Malinstali"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Malinstali salutekranon"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Malinstali kromprogramon"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Malinstalado finita. La salutekrano estis forigita."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Malinstalado malsukcesis: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Ĉu malinstali la DMS-salutekranon? Ĉi tio forigos agordon kaj restarigos vian antaŭan seancmastrumilon. Terminalo malfermiĝos por sudo-aŭtentigo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Malinstalita: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": ""
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": ""
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Angula radiuso de fenestroj"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Vi havas nekonservitajn ŝanĝojn. Ĉu konservi antaŭ ol daŭrigi?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Vi devas agordi ĉu:\nQT_QPA_PLATFORMTHEME=gtk3 AŬ\nQT_QPA_PLATFORMTHEME=qt6ct\nkiel mediajn variablojn, kaj poste restartigi la ŝelon.\n\nqt6ct postulas, ke qt6ct-kde estu instalita."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "aligita"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

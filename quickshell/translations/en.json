@@ -324,6 +324,15 @@
     ]
   },
   {
+    "term": "%1 — %2",
+    "context": "%1 — %2",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3699, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3703, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3708, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3712, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3717, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3721",
+    "comment": "",
+    "tags": [
+      "plugin-quickcapture"
+    ]
+  },
+  {
     "term": "%1: %2",
     "context": "%1: %2",
     "reference": "Services/DMSNetworkService.qml:472",
@@ -1694,7 +1703,7 @@
   {
     "term": "All Combined Outputs",
     "context": "All Combined Outputs",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:509, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:529",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:509, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:529, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3654, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3658",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -4503,7 +4512,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:696, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1614, dms-plugins-external/quickCapture/components/misc/PaletteWarningDialog.qml:186, dms-plugins-external/quickCapture/components/toolbar/CropToolbar.qml:140, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:33, Modals/Common/ConfirmDialogOverlay.qml:10, Modals/Common/ConfirmDialogOverlay.qml:31, Modals/Common/ConfirmDialogContent.qml:11, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1649, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:190, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1572, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:240",
+    "reference": "DMSShell.qml:377, Modals/WindowRuleModal.qml:1937, Modals/PolkitAuthContent.qml:321, Modals/WorkspaceRenameModal.qml:161, Modals/BluetoothPairingModal.qml:267, Modals/WifiPasswordModal.qml:802, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:696, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1614, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3756, dms-plugins-external/quickCapture/components/misc/PaletteWarningDialog.qml:186, dms-plugins-external/quickCapture/components/toolbar/CropToolbar.qml:140, Modals/DankLauncherV2/AppEditView.qml:283, Modals/Common/ConfirmModal.qml:15, Modals/Common/ConfirmModal.qml:33, Modals/Common/ConfirmDialogOverlay.qml:10, Modals/Common/ConfirmDialogOverlay.qml:31, Modals/Common/ConfirmDialogContent.qml:11, Modals/Clipboard/ClipboardEditor.qml:281, Modules/Settings/PluginBrowser.qml:473, Modules/Settings/PluginBrowser.qml:1649, Modules/Settings/GreeterTab.qml:121, Modules/Settings/PluginUpdatesDialog.qml:284, Modules/Settings/ThemeBrowser.qml:190, Modules/Settings/DisplayConfigTab.qml:287, Modules/Settings/DisplayConfigTab.qml:332, Modules/Settings/DisplayConfigTab.qml:416, Modules/Settings/AudioTab.qml:744, Modules/Settings/KeybindItem.qml:2006, Modules/Settings/NetworkWifiTab.qml:1572, Modules/DankDash/Overview/CalendarEventEditor.qml:342, Modules/DankBar/Popouts/SystemUpdatePopout.qml:240",
     "comment": "cancel hotspot editing action",
     "tags": [
       "plugin-quickcapture",
@@ -9754,9 +9763,10 @@
   {
     "term": "Edit",
     "context": "Edit",
-    "reference": "Modals/Clipboard/ClipboardContextMenu.qml:65, Modules/Settings/ClipboardTab.qml:156, Modules/Settings/NetworkWifiTab.qml:1582, Modules/DankDash/Overview/CalendarEventDetail.qml:361",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3636, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3645, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3654, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3663, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3672, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3681, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3690, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3699, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3708, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3717, Modals/Clipboard/ClipboardContextMenu.qml:65, Modules/Settings/ClipboardTab.qml:156, Modules/Settings/NetworkWifiTab.qml:1582, Modules/DankDash/Overview/CalendarEventDetail.qml:361",
     "comment": "edit hotspot action",
     "tags": [
+      "plugin-quickcapture",
       "settings",
       "shell"
     ]
@@ -9789,18 +9799,9 @@
     ]
   },
   {
-    "term": "Edit Image from Clipboard — Edit",
-    "context": "Edit Image from Clipboard — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3708",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Edit Image from Clipboard — Float",
-    "context": "Edit Image from Clipboard — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3712",
+    "term": "Edit Image from Clipboard",
+    "context": "Edit Image from Clipboard",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3708, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3712",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -12033,7 +12034,7 @@
   {
     "term": "Float",
     "context": "Float",
-    "reference": "Modals/WindowRuleModal.qml:958, Modals/WindowRuleModal.qml:968, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:546, Modules/Settings/DankIslandTab.qml:145, Modules/Settings/WindowRulesTab.qml:95",
+    "reference": "Modals/WindowRuleModal.qml:958, Modals/WindowRuleModal.qml:968, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:546, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3640, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3649, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3658, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3667, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3676, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3685, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3694, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3703, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3712, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3721, Modules/Settings/DankIslandTab.qml:145, Modules/Settings/WindowRulesTab.qml:95",
     "comment": "island settings: float toggle",
     "tags": [
       "plugin-quickcapture",
@@ -12246,7 +12247,7 @@
   {
     "term": "Focused Window",
     "context": "Focused Window",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:511, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:531, Modules/Settings/WidgetsTab.qml:98",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:511, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:531, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3672, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3676, Modules/Settings/WidgetsTab.qml:98",
     "comment": "",
     "tags": [
       "plugin-quickcapture",
@@ -12863,7 +12864,7 @@
   {
     "term": "Full Screen",
     "context": "Full Screen",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:381, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:715, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1465, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:508, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:528",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:381, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:715, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1465, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:508, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:528, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3645, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3649, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3740",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -15175,7 +15176,7 @@
   {
     "term": "Interactive Region",
     "context": "Interactive Region",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:507, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:527",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:507, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:527, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3636, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3640, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3736",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -15756,7 +15757,7 @@
   {
     "term": "Last Selected Region",
     "context": "Last Selected Region",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:512, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:532",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:512, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:532, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3681, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3685",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -20005,18 +20006,9 @@
     ]
   },
   {
-    "term": "Open Specific Image Path — Edit",
-    "context": "Open Specific Image Path — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3717",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Open Specific Image Path — Float",
-    "context": "Open Specific Image Path — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3721",
+    "term": "Open Specific Image Path",
+    "context": "Open Specific Image Path",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3717, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3721",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -20897,6 +20889,15 @@
       "plugin-quickcapture",
       "settings",
       "shell"
+    ]
+  },
+  {
+    "term": "Pause / Resume",
+    "context": "Pause / Resume",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3752",
+    "comment": "",
+    "tags": [
+      "plugin-quickcapture"
     ]
   },
   {
@@ -24632,63 +24633,9 @@
     ]
   },
   {
-    "term": "Screen Recording (Cancel)",
-    "context": "Screen Recording (Cancel)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3756",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Full Screen)",
-    "context": "Screen Recording (Full Screen)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3740",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Interactive Region)",
-    "context": "Screen Recording (Interactive Region)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3736",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Pause / Resume)",
-    "context": "Screen Recording (Pause / Resume)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3752",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Stop & Save)",
-    "context": "Screen Recording (Stop & Save)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3748",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Toggle Start / Stop)",
-    "context": "Screen Recording (Toggle Start / Stop)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3760",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screen Recording (Window / Portal)",
-    "context": "Screen Recording (Window / Portal)",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3744",
+    "term": "Screen Recording (%1)",
+    "context": "Screen Recording (%1)",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3736, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3740, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3744, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3748, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3752, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3756, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3760",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -24740,126 +24687,9 @@
     ]
   },
   {
-    "term": "Screenshot (All Combined Outputs) — Edit",
-    "context": "Screenshot (All Combined Outputs) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3654",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (All Combined Outputs) — Float",
-    "context": "Screenshot (All Combined Outputs) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3658",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Focused Window) — Edit",
-    "context": "Screenshot (Focused Window) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3672",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Focused Window) — Float",
-    "context": "Screenshot (Focused Window) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3676",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Full Screen) — Edit",
-    "context": "Screenshot (Full Screen) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3645",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Full Screen) — Float",
-    "context": "Screenshot (Full Screen) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3649",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Interactive Region) — Edit",
-    "context": "Screenshot (Interactive Region) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3636",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Interactive Region) — Float",
-    "context": "Screenshot (Interactive Region) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3640",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Last Selected Region) — Edit",
-    "context": "Screenshot (Last Selected Region) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3681",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Last Selected Region) — Float",
-    "context": "Screenshot (Last Selected Region) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3685",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Scrolling Capture) — Edit",
-    "context": "Screenshot (Scrolling Capture) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3690",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Scrolling Capture) — Float",
-    "context": "Screenshot (Scrolling Capture) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3694",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Specific Output) — Edit",
-    "context": "Screenshot (Specific Output) — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3663",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Screenshot (Specific Output) — Float",
-    "context": "Screenshot (Specific Output) — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3667",
+    "term": "Screenshot (%1) — %2",
+    "context": "Screenshot (%1) — %2",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3636, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3640, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3645, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3649, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3654, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3658, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3663, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3667, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3672, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3676, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3681, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3685, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3690, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3694",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -25086,7 +24916,7 @@
   {
     "term": "Scrolling Capture",
     "context": "Scrolling Capture",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:513, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:533",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:513, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:533, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3690, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3694",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -25460,18 +25290,9 @@
     ]
   },
   {
-    "term": "Select Image File — Edit",
-    "context": "Select Image File — Edit",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3699",
-    "comment": "",
-    "tags": [
-      "plugin-quickcapture"
-    ]
-  },
-  {
-    "term": "Select Image File — Float",
-    "context": "Select Image File — Float",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3703",
+    "term": "Select Image File",
+    "context": "Select Image File",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3699, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3703",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -27874,7 +27695,7 @@
   {
     "term": "Specific Output",
     "context": "Specific Output",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:432, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:510, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:530",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:432, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:510, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:530, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3663, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3667",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -28222,7 +28043,7 @@
   {
     "term": "Stop & Save",
     "context": "Stop & Save",
-    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:684, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1605",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:684, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1605, dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3748",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -29936,6 +29757,15 @@
     "term": "Toggle Hide/Show Annotations",
     "context": "Toggle Hide/Show Annotations",
     "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3583",
+    "comment": "",
+    "tags": [
+      "plugin-quickcapture"
+    ]
+  },
+  {
+    "term": "Toggle Start / Stop",
+    "context": "Toggle Start / Stop",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3760",
     "comment": "",
     "tags": [
       "plugin-quickcapture"
@@ -32555,6 +32385,15 @@
     "term": "Window",
     "context": "Window",
     "reference": "dms-plugins-external/quickCapture/QuickCaptureWidget.qml:716, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1466, dms-plugins-external/quickCapture/QuickCaptureWidget.qml:1637",
+    "comment": "",
+    "tags": [
+      "plugin-quickcapture"
+    ]
+  },
+  {
+    "term": "Window / Portal",
+    "context": "Window / Portal",
+    "reference": "dms-plugins-external/quickCapture/QuickCaptureSettings.qml:3744",
     "comment": "",
     "tags": [
       "plugin-quickcapture"

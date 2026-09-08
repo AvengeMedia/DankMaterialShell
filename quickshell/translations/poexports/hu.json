@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 ablak"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Hozzáadod a(z) „%1” felhasználót a(z) %2 csoporthoz?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Hozzáadod a(z) „%1” felhasználót a(z) %2 csoporthoz? Ki és be kell jelentkezniük, majd futtatniuk kell a dms greeter sync --profile parancsot a bejelentkezési képernyő témájának közzétételéhez."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Hozzáadod a(z) „%1” felhasználót a(z) %2 csoporthoz? Ki kell jelentkeznie, majd újra be kell jelentkeznie, ezután futtatnia kell a dms-greeter sync --profile parancsot a bejelentkezési képernyő témájának közzétételéhez."
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Jegyzetek hozzáadása"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Add hozzá az új felhasználót a(z) %1 csoporthoz, hogy futtathassák a „dms greeter sync --profile” parancsot."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Add hozzá az új felhasználót a(z) %1 csoporthoz, hogy futtathassa a dms-greeter sync --profile parancsot."
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "Alkalmazásnevek"
   },
-  "App Theming": {
-    "App Theming": "Alkalmazás témázása"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Alkalmazás neve vagy azonosítója (pl. firefox)"
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Hitelesítés"
   },
-  "Authenticated!": {
-    "Authenticated!": "Hitelesítve!"
-  },
   "Authentication": {
     "Authentication": "Hitelesítés"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": "Niri-áttekintés automatikus bezárása, ha a DMS elindul vagy fókuszba helyez egy ablakot."
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "A Niri-áttekintés automatikus bezárása alkalmazások indításakor."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Megnyitáskor az utoljára megjegyzett lekérdezés automatikus kitöltése"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Automatikus színmód"
   },
   "Automatic Control": {
     "Automatic Control": "Automatikus vezérlés"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "Sávok közötti térköz"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": "Sáv kerete és árnyéka"
-  },
-  "Bar corners": {
-    "Bar corners": "Sáv sarkai"
   },
   "Bar corners and background": {
     "Bar corners and background": "Sáv sarkok és háttér"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Középső rész"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": "Középső szakasz - Dank Island által fenntartva"
-  },
   "Center Single Column": {
     "Center Single Column": "Középső egyoszlopos"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": "Karakterek másodpercenként billentyű nyomva tartásakor"
-  },
-  "Charge Level": {
-    "Charge Level": "Töltési szint"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Töltési korlát elérve"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Mely monitorok jelenítsék meg a lezárási képernyő felületét. A többi monitor egyszínű képet jelenít meg az OLED beégés elleni védelem érdekében."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": "Mely parancsikonok legyenek az órától balra vagy jobbra"
   },
   "Chroma Style": {
     "Chroma Style": "Chroma stílus"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": "Niri áttekintés bezárása ablak fókuszba kerülésekor"
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Áttekintés bezárása indításkor"
-  },
   "Close Window": {
     "Close Window": "Ablak bezárása"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "A kodekváltás nem érhető el, mert a WirePlumber nem található"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "A kodekváltás nem érhető el, mert a pactl nem található"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "A kodekváltás nem érhető el. A WirePlumber wpexec nem található."
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": "Közösségi kedvencek a kezdéshez"
   },
-  "Community themes": {
-    "Community themes": "Közösségi témák"
-  },
   "Compact": {
     "Compact": "Kompakt"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": "Kompakt óra kapszula"
   },
   "Compact Island Height": {
     "Compact Island Height": "Kompakt szigetmagasság"
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Kontraszt"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": "Kontraszt variáns szerint"
   },
   "Contributor": {
     "Contributor": "Közreműködő"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": "Görbe raszterizáló."
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Görbe: görberaszterező."
-  },
   "Custom": {
     "Custom": "Egyéni"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": "Dank Island - Béta"
-  },
   "Dank Island instance": {
     "Dank Island instance": "Dank Island példány"
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "A DankCalendar nem fut"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "A DankMaterialShell használatra kész"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell és Rendszerikonok (újraindítást igényel)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "Mélység"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Mélység: A panelek kicsiből felskálázódnak beúszáskor — látványos előreugró mélységeffektus."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Az alapul szolgáló képhez szorosan illeszkedő színek levezetése."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "Irányított"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Irányított: A panelek nagyobb távolságról úsznak be teljes méretben — nincs méretváltozás, tiszta mozgás."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Automatikus csatlakozás letiltása"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Húzd a munkaterület-jelzőket az átrendezéshez"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Összefüggő képkeret-szegély rajzolása a teljes kijelző köré"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": "Sziget-stílusú háttér rajzolása a műholdas widgetek mögé"
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dinamikus színek, előbeállítások"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dinamikus: Rugós Bézier-görbe túllövéssel — a belépés rövid ideig túllépi a célt, majd beáll. Kifejező és élettel teli."
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Szabály szerkesztése"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Ne zavarjanak engedélyezése"
-  },
-  "Enable Frame": {
-    "Enable Frame": "Keret engedélyezése"
   },
   "Enable History": {
     "Enable History": "Előzmények engedélyezése"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Nem sikerült hozzáadni a gyorsbillentyűk include bejegyzést"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Nem sikerült a nyomtatót osztályhoz adni"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Nem sikerült alkalmazni a %1 színeit"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Nem sikerült betölteni a vágólap-beállításokat."
   },
-  "Failed to move job": {
-    "Failed to move job": "Nem sikerült a feladat áthelyezése"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Nem sikerült a kukába helyezés"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Nem sikerült eltávolítani a gyorsbillentyűt"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Nem sikerült eltávolítani a nyomtatót az osztályból"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Nem sikerült újraindítani a hangrendszert"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Nem sikerült az eszköz megcsöngetése"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Nem sikerült futtatni a „dms greeter status” parancsot. Győződj meg róla, hogy a DMS telepítve van, és a dms benne van a PATH környezeti változóban."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Nem sikerült futtatni a 'dms-greeter status' parancsot. Győződj meg arról, hogy a dms-greeter csomag telepítve van."
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Nem sikerült frissíteni a vágólapot"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Nem sikerült frissíteni a leírást"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Nem sikerült frissíteni a helyet"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Nem sikerült frissíteni a megosztás állapotát"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Nem sikerült írni az automatikus indítási bejegyzést"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "Fluent"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Sima köbös lassulás befelé, gyors pattanás kifelé — tiszta, elegáns görbék."
   },
   "Flush": {
     "Flush": "Szintezett"
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Teljesen feltöltve"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: rács • Z/X: méret"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "A GTK-színek alkalmazása sikeres"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDE-k és egyebek"
   },
   "Games": {
     "Games": "Játékok"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Felülbírálás létrehozása"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Alapszintű GTK3/4 vagy QT5/QT6 (qt6ct-kde szükséges) konfigurációk előállítása a DMS színeinek követéséhez. Csak egyszer szükséges.<br /><br />Javasoljuk a %1 konfigurálását a GTK témák alkalmazása előtt."
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Alapszintű GTK3/4-, QT5/QT6- vagy qtengine-konfigurációk létrehozása a DMS színeinek követéséhez (csak a qt6ct-hez szükséges a qt6ct-kde). Csak egyszer szükséges.<br /><br />Javasoljuk a(z) %1 konfigurálását a GTK témák alkalmazása előtt."
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": "Globálisan"
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Az összes animáció időtartamának globális méretezése"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Animáció időtartamának globális skálázása geometriai mozgással és rugó-alapú fizikával, Bézier-görbékkel"
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Üdvözlőképernyő betűtípusa"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Az üdvözlőképernyő-csoport tagjai a ki- és bejelentkezés után a dms greeter sync --profile paranccsal szinkronizálhatják a bejelentkezési képernyő témáját."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "A greeter csoport tagjai kijelentkezés és újbóli bejelentkezés után a dms-greeter sync --profile paranccsal szinkronizálhatják a bejelentkezési képernyő témáját."
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "Telepítettek elrejtése"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Értesítés tartalmának elrejtése a kibontásig"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Értesítés tartalmának elrejtése a kibontásig; a felugró ablakok alapértelmezés szerint összecsukva jelennek meg"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Telepítés"
   },
-  "Install Greeter": {
-    "Install Greeter": "Üdvözlőképernyő telepítése"
-  },
   "Install Plugin": {
     "Install Plugin": "Bővítmény telepítése"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Színtémák telepítése a DMS-témaregiszterből"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Telepítés befejezve. Az üdvözlőképernyő telepítve lett."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Telepítsd a dsearch eszközt a fájlok kereséséhez."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Bővítmények telepítése a DMS-bővítményregiszterből"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Telepíted a DMS-üdvözlőképernyőt? Egy terminál fog megnyílni a sudo hitelesítéshez."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Telepíted a(z) „%1” témát a DMS-regiszterből?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Érvénytelen csomagnév — csak betűk, számjegyek és @._+:- használhatók."
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Érvénytelen jelszó ehhez: %1"
   },
   "Invalid username": {
     "Invalid username": "Érvénytelen felhasználónév"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Az elsődleges PAM forrás által felügyelt"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Az elsődleges PAM-forrás által felügyelt."
-  },
   "Management": {
     "Management": "Kezelés"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": "A Material 3 Expressive panelek alulról emelkednek fel finom skálázással, alapértelmezett."
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Material akkumulátorstílus"
-  },
   "Material Colors": {
     "Material Colors": "Material színek"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Material stílusú árnyékok és emelések a modális ablakokon, felugrókon és párbeszédpaneleken"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Material Design 3 kifejező Bézier-görbék. A DMS alapértelmezett érzete."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen kontraszt"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "Natív"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Natív: platformmegjelenítő (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": "Természetes görgetés"
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Hálózati le- és feltöltési sebesség kijelzése"
-  },
-  "Network not found": {
-    "Network not found": "Hálózat nem található"
   },
   "Neutral": {
     "Neutral": "Semleges"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Niri integráció"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Niri-kompozitorműveletek (fókusz, áthelyezés, stb.)"
   },
   "No": {
     "No": "Nem"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Felugró értesítések"
   },
-  "Notification Settings": {
-    "Notification Settings": "Értesítési beállítások"
-  },
   "Notification Type": {
     "Notification Type": "Értesítés típusa"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Kuka megnyitása"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Globális elrendezési beállítások felülbírálása ehhez a kimenethez"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Globális átlátszóság felülbírálása a Jegyzetömbnél"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Terminál felülbírálása egyéni paranccsal vagy szkripttel"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "A panelek kicsiből felskálázódnak beúszás közben, drámai, előreugró mélységhatást keltve."
   },
-  "Partial": {
-    "Partial": "Részleges"
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Részben felhős"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Szüneteltetés"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Szüneteltetve"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Elsődleges"
   },
-  "Primary Bar": {
-    "Primary Bar": "Elsődleges sáv"
-  },
   "Primary Container": {
     "Primary Container": "Elsődleges tároló"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "A Qt-színek alkalmazása sikeres"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: távolságmező-alapú megjelenítő."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "A QtMultimedia nem érhető el"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Rendszergazda eltávolítása"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Sarokkerekítés eltávolítása a sávról"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Rések és szegély eltávolítása az ablakok maximalizálásakor"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Biztonság"
   },
-  "Security & privacy": {
-    "Security & privacy": "Biztonság és adatvédelem"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "Biztonsági kulcs PAM forrás"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Küldendő fájl kiválasztása"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": "Szilárd anyagtípus vagy Körvonal"
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": "Szögletes"
   },
-  "Square Corners": {
-    "Square Corners": "Szögletes sarkok"
-  },
   "Stacked": {
     "Stacked": "Halmozott"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Standard"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standard: Klasszikus Material Design 3 — a panelek alulról emelkednek fel finom skálázással. A DMS alapértelmezett beállítása."
-  },
   "Start": {
     "Start": "Indítás"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": "A bővítmény használatához indítsd el a DankConnect, KDE Connect vagy Valent alkalmazást"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Elindítod a hotspotot?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Pozíció szinkronizálása a képernyők között"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "A szinkronizálás alkalmazza a témáját és a beállításait a bejelentkezési képernyőre. A megosztott felhasználóknak a dms greeter sync --profile parancsot kell futtatniuk az elsődleges felhasználói szinkronizálás helyett."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "A szinkronizálás alkalmazza a témáját és a beállításait a bejelentkezési képernyőre. A megosztott felhasználóknak a dms-greeter sync --profile parancsot kell futtatniuk az elsődleges felhasználói szinkronizálás helyett."
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "A tartalék terminál megnyitása sikertelen. Telepíts egy támogatott terminálemulátort, vagy futtasd a 'dms auth sync' parancsot."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "A tartalék terminál megnyitása sikertelen. Telepíts egyet a támogatott terminálemulátorok közül, vagy futtasd a „dms greeter sync” parancsot."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Terminál helyettesítési kísérlet sikertelen. Telepítsd a támogatott terminálemulátorok egyikét, vagy futtasd a 'dms-greeter sync' parancsot."
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "A rendszerfigyeléshez a „dgop” eszköz szükséges.\nTelepítsd a dgop-ot a funkció használatához."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem érhető el. Az automatizált bővítménykezeléshez DMS_SOCKET szükséges."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": "A sziget a felső vagy alsó szélhez rögzül"
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "A sziget megtartja ezt a szélt a sáv által lefedett kijelzőn, így a sáv ott rejtve marad"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "A Wi-Fi kártya nem tudott hozzáférési pont módba lépni."
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Az alábbi beállítások módosítják a GTK és Qt beállításokat. Ha meg szeretnéd őrizni a jelenlegi konfigurációt, készíts róluk biztonsági másolatot (qt5ct.conf|qt6ct.conf és ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Az alábbi beállítások módosítják a GTK és Qt beállításokat. Ha meg szeretnéd őrizni jelenlegi konfigurációidat, készíts róluk biztonsági mentést (qt5ct.conf|qt6ct.conf|qtengine/config.json és ~/.config/gtk-3.0|gtk-4.0)."
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Témanyilvántartás"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "A kerethez használt témaszín"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "A sáv láthatóságának kézi váltása IPC-n keresztül"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Csoportosítatlan"
   },
-  "Uninstall": {
-    "Uninstall": "Eltávolítás"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Üdvözlőképernyő eltávolítása"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Bővítmény eltávolítása"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Az eltávolítás befejeződött. Az üdvözlőképernyő el lett távolítva."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Az eltávolítás sikertelen: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Eltávolítod a DMS-üdvözlőképernyőt? Ez törli a beállításokat és visszaállítja az előző megjelenítéskezelőt. Egy terminál fog megnyílni a sudo hitelesítéshez."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Eltávolítva: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "H"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1 szövegtörzs"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Ablaksarok sugara"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Nem mentett változtatásaid vannak. Szeretnél menteni a folytatás előtt?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Be kell állítanod a\nQT_QPA_PLATFORMTHEME=gtk3\nvagy a\nQT_QPA_PLATFORMTHEME=qt6ct\nkörnyezeti változót, majd indítsd újra a héjat.\n\nA qt6ct-hez telepíteni kell a qt6ct-kde csomagot."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Be kell állítanod a következők egyikét:\nQT_QPA_PLATFORMTHEME=gtk3 VAGY\nQT_QPA_PLATFORMTHEME=qt6ct VAGY\nQT_QPA_PLATFORMTHEME=qtengine\nkörnyezeti változóként, majd újra kell indítanod a héjat.\n\nCsak a qt6ct igényeli a qt6ct-kde telepítését."
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "csatolva"
-  },
-  "below AA": {
-    "below AA": "AA alatt"
   },
   "brandon": {
     "brandon": "brandon"

@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 個視窗"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": ""
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "將「%1」加入至 %2 群組嗎？"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "將「%1」加入至 %2 群組嗎？他們必須登出並重新登入，然後執行 dms greeter sync --profile 以發佈他們的登入畫面主題。"
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": ""
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "將新使用者加入至 %1 群組，以便他們可以執行 dms greeter sync --profile。"
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "應用程式名稱"
   },
-  "App Theming": {
-    "App Theming": "應用程式主題"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": ""
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "驗證"
   },
-  "Authenticated!": {
-    "Authenticated!": ""
-  },
   "Authentication": {
     "Authentication": "驗證"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "啟動應用程式時自動關閉 Niri 總覽。"
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "開啟時自動填入上次記住的查詢"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "自動顏色模式"
   },
   "Automatic Control": {
     "Automatic Control": "自動控制"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": ""
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "長條角落和背景"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "中間區塊"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "中央單欄"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": ""
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": ""
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "色度樣式"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "啟動時關閉概覽"
-  },
   "Close Window": {
     "Close Window": "關閉視窗"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": ""
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "社群主題"
-  },
   "Compact": {
     "Compact": "精簡"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "對比"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "貢獻者"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "曲線：曲線光柵化器。"
-  },
   "Custom": {
     "Custom": "自訂"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": ""
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell 已可使用"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell 和系統圖示（需要重新啟動）"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "深度"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "深度：面板滑入時從小尺寸放大 — 產生戲劇性的向前彈出深度效果。"
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "提取與底層圖像高度匹配的顏色。"
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "方向性"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "方向性：面板從較遠的距離以完整尺寸滑入 — 沒有縮放變化，純粹流暢的運動。"
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "關閉自動連線"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "拖曳工作區指示器以重新排序"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "在整個顯示器周圍繪製一個連接的畫框邊界"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "動態顏色、預設集"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "動態：帶有過衝的彈簧貝茲曲線 — 進入時會短暫超出目標然後穩定下來。富有表現力且生動。"
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "編輯規則"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "啟用勿擾模式"
-  },
-  "Enable Frame": {
-    "Enable Frame": "啟用框架"
   },
   "Enable History": {
     "Enable History": "啟用歷史記錄"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "新增綁定包含失敗"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "無法將印表機新增至類別"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": ""
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "載入剪貼簿組態失敗。"
   },
-  "Failed to move job": {
-    "Failed to move job": "無法移動工作"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "移動到垃圾桶失敗"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "移除按鍵綁定失敗"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "無法從類別中移除印表機"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "無法重新啟動音訊系統"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "無法讓裝置響鈴"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "執行 'dms greeter status' 失敗。請確保 DMS 已安裝且 dms 位於 PATH 中。"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "更新剪貼簿失敗"
-  },
-  "Failed to update description": {
-    "Failed to update description": "無法更新描述"
-  },
-  "Failed to update location": {
-    "Failed to update location": "無法更新位置"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "無法更新分享設定"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "寫入自動啟動項目失敗"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "流暢"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "流暢：平滑的三次減速進入，快速彈出 — 簡潔、優雅的曲線。"
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "已充飽電"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G：網格 • Z/X：大小"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "GTK 顏色已成功套用"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK、Qt、IDE 等"
   },
   "Games": {
     "Games": "遊戲"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "產生覆蓋檔"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "全域縮放所有動畫持續時間"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "歡迎畫面字體"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "歡迎畫面群組成員可以在登出並重新登入後，使用 dms greeter sync --profile 同步他們的登入畫面主題。"
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": ""
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "展開前隱藏通知內容"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "展開前隱藏通知內容；彈出視窗預設顯示為摺疊狀態"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "安裝"
   },
-  "Install Greeter": {
-    "Install Greeter": "安裝歡迎畫面"
-  },
   "Install Plugin": {
     "Install Plugin": "安裝外掛"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "從 DMS 主題登錄檔安裝色彩主題"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "安裝完成。歡迎畫面已安裝。"
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "安裝 dsearch 以搜尋檔案。"
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "從 DMS 插件註冊表安裝插件"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "安裝 DMS 歡迎畫面？將開啟終端機以進行 sudo 驗證。"
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "要從 DMS 登錄檔安裝主題「%1」嗎？"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": ""
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "%1 的密碼無效"
   },
   "Invalid username": {
     "Invalid username": "無效的使用者名稱"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": ""
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
-  },
   "Management": {
     "Management": "管理"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": ""
-  },
   "Material Colors": {
     "Material Colors": "手動調整顏色"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "受 Material Design 啟發的陰影和抬升效果，應用於模態框、彈出視窗和對話框"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "材質：Material Design 3 表現力貝茲曲線。DMS 的預設感受。"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen 對比度"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "原生"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "原生：平台渲染器 (FreeType)。"
-  },
   "Natural Scrolling": {
     "Natural Scrolling": ""
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "顯示網路下載跟上傳速度"
-  },
-  "Network not found": {
-    "Network not found": "找不到網路"
   },
   "Neutral": {
     "Neutral": "中性"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Niri 整合"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Niri 合成器動作 (焦點、移動等)"
   },
   "No": {
     "No": "否"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "通知彈窗"
   },
-  "Notification Settings": {
-    "Notification Settings": "通知設定"
-  },
   "Notification Type": {
     "Notification Type": ""
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "開啟垃圾桶"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "覆寫此輸出的全域版面配置設定"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "覆寫記事本的全域透明度"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "使用自訂指令或腳本覆蓋終端機"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": ""
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "多雲"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "暫停"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "暫停"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "主要"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "主要容器"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Qt 顏色已成功套用"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt：距離場渲染器。"
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia 不可用"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "移除管理員"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "移除工具列的圓角"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "視窗最大化時移除間距與邊框"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "安全性"
   },
-  "Security & privacy": {
-    "Security & privacy": "安全與隱私"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "選取要傳送的檔案"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "方角"
-  },
   "Stacked": {
     "Stacked": "堆疊"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "標準"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "標準：經典 Material Design 3 — 面板從下方升起，帶有輕微的縮放。DMS 的預設值。"
-  },
   "Start": {
     "Start": "開始"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": ""
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "跨螢幕同步位置"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "終端機備用失敗。請安裝支援的終端機模擬器或手動執行 'dms auth sync'。"
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "終端機回退失敗。請安裝受支援的終端模擬器之一，或手動執行 'dms greeter sync'。"
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "系統監控需要 'dgop' 工具。\n請安裝 dgop 以使用此功能。"
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET 環境變數未設定或套接字不可用。自動插件管理需要 DMS_SOCKET。"
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下設定將修改您的 GTK 和 Qt 設定。如果您希望保留目前配置，請備份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "主題註冊"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "用於邊框的主題顏色"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "透過 IPC 手動切換工具列的可見度"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "未分組"
   },
-  "Uninstall": {
-    "Uninstall": "解除安裝"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "解除安裝歡迎畫面"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "解除安裝插件"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "解除安裝完成。歡迎畫面已移除。"
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "解除安裝失敗：%1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "解除安裝 DMS 歡迎畫面？這將移除設定並還原您之前的顯示管理器。將會開啟一個終端機以進行 sudo 驗證。"
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "已解除安裝：%1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": ""
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": ""
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "視窗圓角半徑"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "您有未儲存的變更。是否先保存再繼續？"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "您需要設定以下其中一個環境變數並重新啟動 shell：\nQT_QPA_PLATFORMTHEME=gtk3 或\nQT_QPA_PLATFORMTHEME=qt6ct\n\nqt6ct 需要安裝 qt6ct-kde。"
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "已附加"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "布蘭登"

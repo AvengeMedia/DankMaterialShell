@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 cửa sổ"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Thêm \"%1\" vào nhóm %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Thêm \"%1\" vào nhóm %2? Họ phải đăng xuất và đăng nhập lại, sau đó chạy dms greeter sync --profile để công bố chủ đề màn hình đăng nhập của mình."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Thêm \"%1\" vào nhóm %2? Họ phải đăng xuất và quay lại, sau đó chạy dms-greeter sync --profile để xuất bản chủ đề màn hình đăng nhập của họ."
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Thêm ghi chú"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Thêm người dùng mới vào nhóm %1 để họ có thể chạy dms greeter sync --profile."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Thêm người dùng mới vào nhóm %1 để họ có thể chạy dms-greeter sync --profile."
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "Tên ứng dụng"
   },
-  "App Theming": {
-    "App Theming": "Chủ đề ứng dụng"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Tên ứng dụng hoặc danh tính (ví dụ: firefox)"
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Xác thực"
   },
-  "Authenticated!": {
-    "Authenticated!": "Đã xác thực!"
-  },
   "Authentication": {
     "Authentication": "Xác thực"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Tự động đóng phần tổng quan Niri khi khởi chạy ứng dụng."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Tự động điền truy vấn ghi nhớ cuối cùng khi mở"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Chế độ màu tự động"
   },
   "Automatic Control": {
     "Automatic Control": "Điều khiển tự động"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "Khoảng Cách Thanh"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "Góc và nền của thanh"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Phần trung tâm"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "Một cột ở giữa"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": "Mức Sạc"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Đạt Giới Hạn Sạc"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Chọn màn hình nào sẽ hiển thị giao diện màn hình khóa. Các màn hình khác sẽ hiển thị một màu đơn sắc để bảo vệ màn hình OLED khỏi hiện tượng lưu ảnh."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "Kiểu sắc độ"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Đóng phần tổng quan khi khởi chạy"
-  },
   "Close Window": {
     "Close Window": "Đóng cửa sổ"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "Chuyển đổi codec không khả dụng vì không tìm thấy WirePlumber"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "Chuyển đổi codec không khả dụng vì không tìm thấy pactl"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "Chuyển đổi codec không khả dụng. WirePlumber wpexec không được tìm thấy."
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "Các chủ đề cộng đồng"
-  },
   "Compact": {
     "Compact": "Thu gọn"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Độ tương phản"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": "Tương phản theo biến thể"
   },
   "Contributor": {
     "Contributor": "Người đóng góp"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Đường cong: trình rasterizer đường cong."
-  },
   "Custom": {
     "Custom": "Tuỳ chỉnh"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar hiện không chạy"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell đã sẵn sàng sử dụng"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "Biểu tượng hệ thống & DankShell (yêu cầu khởi động lại)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "Độ sâu"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Độ sâu: Các bảng phóng to từ kích thước nhỏ khi trượt vào — một hiệu ứng độ sâu bật lên ấn tượng."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Lấy màu phù hợp với ảnh nền."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "Theo hướng"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Theo hướng: Các bảng trượt vào từ khoảng cách xa hơn ở kích thước đầy đủ — không thay đổi tỷ lệ, chuyển động mượt mà thuần túy."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Tắt Tự động kết nối"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Kéo các chỉ báo không gian làm việc để sắp xếp lại chúng"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Vẽ một viền khung ảnh kết nối xung quanh toàn bộ màn hình"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Màu động, các bộ đặt trước"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Động: Đường cong bezier lò xo với độ vọt lố — phần nhập vượt quá mục tiêu một thời gian ngắn rồi ổn định. Sống động và đầy biểu cảm."
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Chỉnh sửa quy tắc"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Bật Chế độ không làm phiền"
-  },
-  "Enable Frame": {
-    "Enable Frame": "Bật khung"
   },
   "Enable History": {
     "Enable History": "Bật lịch sử"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Thêm phần bao gồm phím tắt thất bại"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Thêm máy in vào lớp thất bại"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Không thể áp dụng màu %1"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Tải cấu hình bảng nhớ tạm thất bại."
   },
-  "Failed to move job": {
-    "Failed to move job": "Di chuyển công việc thất bại"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Di chuyển vào thùng rác thất bại"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Xóa phím tắt thất bại"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Xóa máy in khỏi lớp thất bại"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Khởi động lại hệ thống âm thanh thất bại"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Đổ chuông thiết bị thất bại"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Chạy 'dms greeter status' thất bại. Đảm bảo DMS đã được cài đặt và dms có trong PATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Không thể chạy 'dms-greeter status'. Đảm bảo gói dms-greeter được cài đặt."
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Cập nhật bảng nhớ tạm thất bại"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Cập nhật mô tả thất bại"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Cập nhật vị trí thất bại"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Cập nhật chia sẻ thất bại"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Không thể ghi mục tự khởi động"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "Trôi chảy"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Trôi chảy: Giảm tốc khối mượt mà khi vào, bật ra nhanh chóng — những đường cong sạch sẽ, thanh lịch."
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Đã sạc đầy"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: lưới • Z/X: kích thước"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "Màu GTK đã được áp dụng thành công"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDE, và hơn thế nữa"
   },
   "Games": {
     "Games": "Trò chơi"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Tạo ghi đè"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Tỷ lệ toàn cầu cho tất cả thời lượng ảnh động"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Phông chữ Màn hình chào"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Các thành viên của nhóm màn hình chào có thể đồng bộ chủ đề màn hình đăng nhập của họ bằng dms greeter sync --profile sau khi đăng xuất và đăng nhập lại."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Các thành viên nhóm Greeter có thể đồng bộ hóa chủ đề màn hình đăng nhập của họ với dms-greeter sync --profile sau khi đăng xuất và quay lại."
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "Ẩn đã cài đặt"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Ẩn nội dung thông báo cho đến khi được mở rộng"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Ẩn nội dung thông báo cho đến khi được mở rộng; thông báo nổi hiển thị ở dạng thu gọn theo mặc định"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Cài đặt"
   },
-  "Install Greeter": {
-    "Install Greeter": "Cài đặt Màn hình chào"
-  },
   "Install Plugin": {
     "Install Plugin": "Cài đặt Plugin"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Cài đặt các chủ đề màu từ kho chủ đề DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Cài đặt hoàn tất. Màn hình chào đã được cài đặt."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Cài đặt dsearch để tìm kiếm tệp."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Cài plugin từ kho plugin DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Cài đặt DMS màn hình chào? Một cửa sổ dòng lệnh sẽ mở ra để xác thực sudo."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Cài đặt chủ đề '%1' từ kho lưu trữ DMS?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Tên gói không hợp lệ — chỉ chữ cái, chữ số và @._+:-."
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Mật khẩu không hợp lệ cho %1"
   },
   "Invalid username": {
     "Invalid username": "Tên người dùng không hợp lệ"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Được quản lý bởi nguồn PAM chính"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Được quản lý bởi nguồn PAM chính."
-  },
   "Management": {
     "Management": "Quản lý"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Kiểu dáng pin chất liệu"
-  },
   "Material Colors": {
     "Material Colors": "Màu Material"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Đổ bóng và độ cao lấy cảm hứng từ Material trên các bảng thông báo, cửa sổ nổi và hộp thoại"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Các đường cong bezier đầy biểu cảm của Material Design 3. Cảm giác mặc định của DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Độ tương phản Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "Gốc"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Gốc: trình kết xuất nền tảng (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": "Cuộn Tự nhiên"
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Hiển thị tốc độ mạng (tải lên & tải xuống)"
-  },
-  "Network not found": {
-    "Network not found": "Không tìm thấy mạng"
   },
   "Neutral": {
     "Neutral": "Trung tính"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Tích hợp Niri"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Các hành động compositor Niri (tập trung, di chuyển, v.v.)"
   },
   "No": {
     "No": "Không"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Thông báo nổi"
   },
-  "Notification Settings": {
-    "Notification Settings": "Cài đặt thông báo"
-  },
   "Notification Type": {
     "Notification Type": "Loại Thông báo"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Mở thùng rác"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Ghi đè cài đặt bố cục toàn cầu cho đầu ra này"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Ghi đè độ trong suốt toàn cầu cho Ghi chú"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Ghi đè cửa sổ dòng lệnh bằng một lệnh hoặc tập lệnh tùy chỉnh"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": "Một phần"
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Có mây rải rác"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Tạm dừng"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Đã tạm dừng"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Chính"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "Container chính"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Màu Qt đã được áp dụng thành công"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: trình kết xuất distance-field."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia không khả dụng"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Gỡ quyền quản trị"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Gỡ bo góc khỏi thanh"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Gỡ khoảng cách và viền khi cửa sổ được phóng to tối đa"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Bảo mật"
   },
-  "Security & privacy": {
-    "Security & privacy": "Bảo mật & riêng tư"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "Nguồn PAM Khóa Bảo mật"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Chọn tệp để gửi"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "Bo góc vuông"
-  },
   "Stacked": {
     "Stacked": "Xếp chồng"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Tiêu chuẩn"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Tiêu chuẩn: Material Design 3 cổ điển — các bảng nâng lên từ bên dưới với tỷ lệ tinh tế. Mặc định của DMS."
-  },
   "Start": {
     "Start": "Bắt đầu"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Bắt đầu Điểm nóng?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Đồng bộ vị trí qua các màn hình"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Đồng bộ hóa áp dụng chủ đề và cài đặt của bạn vào màn hình đăng nhập. Những người dùng chia sẻ nên chạy dms greeter sync --profile thay vì đồng bộ hóa người dùng chính."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Đồng bộ hóa áp dụng chủ đề và cài đặt của bạn vào màn hình đăng nhập. Những người dùng chia sẻ nên chạy dms-greeter sync --profile thay vì đồng bộ hóa người dùng chính."
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Chế độ dự phòng dòng lệnh thất bại. Hãy cài đặt một trình giả lập dòng lệnh được hỗ trợ hoặc chạy 'dms auth sync' thủ công."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Chế độ dự phòng dòng lệnh thất bại. Hãy cài đặt một trong những trình giả lập dòng lệnh được hỗ trợ hoặc chạy 'dms greeter sync' thủ công."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Fallback Terminal thất bại. Cài đặt một trong các trình giả lập terminal được hỗ trợ hoặc chạy 'dms-greeter sync' theo cách thủ công."
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Công cụ 'dgop' là bắt buộc để giám sát hệ thống.\nVui lòng cài đặt dgop để sử dụng tính năng này."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET chưa được thiết lập hoặc socket không khả dụng. Quản lý plugin tự động cần DMS_SOCKET."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "Bộ điều hợp WiFi không thể bắt đầu chế độ điểm truy cập."
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Các thiết lập dưới đây sẽ thay đổi GTK và Qt. Hãy sao lưu cấu hình hiện tại nếu cần (qt5ct.conf|qt6ct.conf và ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Kho lưu trữ chủ đề"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Màu chủ đề dùng cho viền"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Bật tắt hiển thị thanh thủ công qua IPC"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Không được nhóm"
   },
-  "Uninstall": {
-    "Uninstall": "Gỡ cài đặt"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Gỡ cài đặt Màn hình chào"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Gỡ cài đặt plugin"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Gỡ cài đặt hoàn tất. Màn hình chào đã được gỡ bỏ."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Gỡ cài đặt thất bại: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Gỡ cài đặt DMS màn hình chào? Việc này sẽ xóa cấu hình và khôi phục trình quản lý hiển thị trước đó của bạn. Một cửa sổ dòng lệnh sẽ mở ra để xác thực sudo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Đã gỡ cài đặt: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "W"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1 body"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Bán kính góc cửa sổ"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Bạn có những thay đổi chưa lưu. Lưu trước khi tiếp tục?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Bạn cần đặt một trong hai:\nQT_QPA_PLATFORMTHEME=gtk3 HOẶC\nQT_QPA_PLATFORMTHEME=qt6ct\nlàm biến môi trường, sau đó khởi động lại shell.\n\nqt6ct yêu cầu cài đặt qt6ct-kde."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "đã đính kèm"
-  },
-  "below AA": {
-    "below AA": "dưới AA"
   },
   "brandon": {
     "brandon": "brandon (Kiểu)"

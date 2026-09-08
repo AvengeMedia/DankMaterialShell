@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "ウィンドウ %1 個"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "\"%1\" を %2 グループに追加しますか？"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "\"%1\" を %2 グループに追加しますか？ログイン画面のテーマを公開するには、一度ログアウトして再ログインし、dms greeter sync --profile を実行する必要があります。"
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": ""
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "メモを追加"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "新しいユーザーを %1 グループに追加して、dms greeter sync --profile を実行できるようにします。"
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": ""
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "アプリ名"
   },
-  "App Theming": {
-    "App Theming": "アプリテーマ"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": ""
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "認証"
   },
-  "Authenticated!": {
-    "Authenticated!": ""
-  },
   "Authentication": {
     "Authentication": "認証"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "アプリ起動時に Niri の概要を自動的に閉じます。"
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "開いたときに最後に記憶したクエリを自動入力"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "自動カラーモード"
   },
   "Automatic Control": {
     "Automatic Control": "自動制御"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "バーの間隔"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "バーの角と背景"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "センターセクション"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "中央の単一列"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": "充電レベル"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "充電上限に到達"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "彩度スタイル"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "起動中のときに概要を閉じる"
-  },
   "Close Window": {
     "Close Window": "ウィンドウを閉じる"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": ""
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": ""
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "コミュニティテーマ"
-  },
   "Compact": {
     "Compact": "コンパクト"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "コントラスト"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": ""
   },
   "Contributor": {
     "Contributor": "貢献者"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "曲線：曲線ラスタライザー。"
-  },
   "Custom": {
     "Custom": "カスタム"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar が実行されていません"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell は使用可能です"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell とシステムアイコン（再起動が必要）"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "深さ"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "奥行き：パネルはスライドインするにつれて小さくなり、劇的な奥行き感のある立体感を生み出します。"
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "下にある画像に密接に一致する色を導き出します。"
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "方向性"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "方向性：パネルはフルサイズでより遠い距離から滑らかに動き込みます。スケールの変化はなく、純粋でスムーズな動きです。"
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "自動接続を無効"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "ワークスペースインジケーターをドラッグして並べ替え"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "ディスプレイ全体を囲むように、繋がった額縁の枠線を描画します。"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "動的カラー、プリセット"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "ダイナミック：オーバーシュート付きスプリングベジェ曲線 ― 開始点が目標値を一時的に超えた後、落ち着きます。表現力豊かで生き生きとした曲線です。"
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "ルールを編集"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "サイレントモードを有効にする"
-  },
-  "Enable Frame": {
-    "Enable Frame": "フレームを有効にする"
   },
   "Enable History": {
     "Enable History": "履歴を有効にする"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "binds include の追加に失敗しました"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "クラスへのプリンター追加に失敗しました"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": ""
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "クリップボード設定の読み込みに失敗しました。"
   },
-  "Failed to move job": {
-    "Failed to move job": "ジョブの移動に失敗しました"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "ゴミ箱への移動に失敗しました"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "キーバインドの削除に失敗しました"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "クラスからのプリンター削除に失敗しました"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "オーディオシステムの再起動に失敗しました"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "デバイスの呼び出しに失敗しました"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "'dms greeter status' の実行に失敗しました。DMS がインストールされ、dms が PATH にあることを確認してください。"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": ""
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "クリップボードの更新に失敗しました"
-  },
-  "Failed to update description": {
-    "Failed to update description": "説明の更新に失敗しました"
-  },
-  "Failed to update location": {
-    "Failed to update location": "位置情報の更新に失敗しました"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "共有設定の更新に失敗しました"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "自動起動エントリの書き込みに失敗しました"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": " Fluent"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "流麗：滑らかな三次減速から素早い加速まで、クリーンで優雅な曲線を描く。"
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "フル充電"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: グリッド • Z/X: サイズ"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "GTK カラーが正常に適用されました"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK、Qt、IDE など"
   },
   "Games": {
     "Games": "ゲーム"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Override を生成"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": ""
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "すべてのアニメーション時間を全体的にスケール"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Greeter フォント"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Greeter グループのメンバーは、ログアウトして再ログインしたあと dms greeter sync --profile でログイン画面テーマを同期できます。"
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": ""
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "インストール済みを隠す"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "展開するまで通知内容を非表示"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "展開するまで通知内容を非表示にします。ポップアップはデフォルトで折りたたんで表示されます"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "インストール"
   },
-  "Install Greeter": {
-    "Install Greeter": "Greeter をインストール"
-  },
   "Install Plugin": {
     "Install Plugin": "プラグインをインストール"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "DMS テーマレジストリからカラーテーマをインストール"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "インストールが完了しました。Greeter がインストールされました。"
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "ファイル検索には dsearch をインストールしてください。"
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "DMSプラグインレジストリからプラグインをインストールする"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "DMS Greeter をインストールしますか? sudo 認証用の端末が開きます。"
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "DMS レジストリからテーマ '%1' をインストールしますか?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": ""
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "%1 のパスワードが無効"
   },
   "Invalid username": {
     "Invalid username": "無効なユーザー名"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": ""
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": ""
-  },
   "Management": {
     "Management": "管理"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": ""
-  },
   "Material Colors": {
     "Material Colors": "Material Colors"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "モーダル、ポップアウト、ダイアログに Material 風の影とエレベーションを適用"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "素材：マテリアルデザイン3　表現力豊かなベジェ曲線。DMSのデフォルト感。"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen コントラスト"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "ネイティブ"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "ネイティブ: プラットフォームレンダラー (FreeType)。"
-  },
   "Natural Scrolling": {
     "Natural Scrolling": ""
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "ネットワークのダウンロードおよびアップロード速度を表示"
-  },
-  "Network not found": {
-    "Network not found": "ネットワークが見つかりません"
   },
   "Neutral": {
     "Neutral": "中立"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Niri 統合"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Niri コンポジターアクション（フォーカス、移動など）"
   },
   "No": {
     "No": "いいえ"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "通知ポップアップ"
   },
-  "Notification Settings": {
-    "Notification Settings": "通知設定"
-  },
   "Notification Type": {
     "Notification Type": "通知タイプ"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "ゴミ箱を開く"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "この出力用にグローバルレイアウト設定を上書き"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "メモ帳のグローバルな透明度を上書きする"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "カスタムコマンドまたはスクリプトで端末を上書き"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": ""
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "晴れ時々曇り"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "一時停止"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "一時停止"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "プライマリー"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "プライマリーコンテナー"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Qt カラーが正常に適用されました"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: 距離場レンダラー。"
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia は利用できません"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "管理者から外す"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "バーの角丸をなくす"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "ウィンドウ最大化時にギャップと境界線を削除"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "セキュリティ"
   },
-  "Security & privacy": {
-    "Security & privacy": "セキュリティとプライバシー"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "送信するファイルを選択"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "四角コーナー"
-  },
   "Stacked": {
     "Stacked": "スタック"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "標準"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "標準：クラシックマテリアルデザイン3 ― パネルが下から微妙なスケールで立ち上がる。DMSのデフォルト設定。"
-  },
   "Start": {
     "Start": "始める"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": ""
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "画面間で位置を同期"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": ""
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": ""
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "端末フォールバックに失敗しました。対応する端末エミュレーターをインストールするか、'dms auth sync' を手動で実行してください。"
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "端末フォールバックに失敗しました。対応する端末エミュレーターのいずれかをインストールするか、'dms greeter sync' を手動で実行してください。"
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": ""
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "システム監視には 'dgop' ツールが必要です。\nこの機能を使うには dgop をインストールしてください。"
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "DMS_SOCKET環境変数が設定されていないか、ソケットが利用できません。自動プラグイン管理にはDMS_SOCKETが必要です。"
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下の設定は、GTK と Qt の設定を変更します。現在の設定を維持したい場合は、バックアップを作成してください（qt5ct.conf|qt6ct.conf および ~/.config/gtk-3.0|gtk-4.0）。"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "テーマレジストリ"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "境界線に使うテーマ色"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "IPC でバーの表示を手動切替"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "グループ化なし"
   },
-  "Uninstall": {
-    "Uninstall": "アンインストール"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Greeter をアンインストール"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "プラグインをアンインストール"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "アンインストールが完了しました。Greeter は削除されました。"
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "アンインストールに失敗しました: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "DMS Greeter をアンインストールしますか ?  設定を削除し、以前のディスプレイマネージャーを復元します。sudo 認証のために端末が開きます。"
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "アンインストールしました: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": ""
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": ""
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "ウィンドウの角の半径"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "保存されていない変更があります。続行する前に保存しますか?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "環境変数として以下のいずれかを設定し、その後シェルを再起動する必要があります。\nQT_QPA_PLATFORMTHEME=gtk3 または\nQT_QPA_PLATFORMTHEME=qt6ct\n\nqt6ct には qt6ct-kde のインストールが必要です。"
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "接続済み"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"

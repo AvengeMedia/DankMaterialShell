@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 вікон"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Додати «%1» до групи %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти та знову увійти в систему, а потім виконати 'dms greeter sync --profile' для публікації теми екрана входу"
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Додати «%1» до групи %2? Користувач має вийти з системи та увійти знову, а потім запустити 'dms-greeter sync --profile', щоб опублікувати тему екрана входу"
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Додати нотатки"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Додайте нового користувача до групи %1, щоб він міг запустити 'dms greeter sync --profile'"
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Додайте нового користувача до групи %1, щоб він міг запустити 'dms-greeter sync --profile'"
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "Назви програм"
   },
-  "App Theming": {
-    "App Theming": "Теми програм"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Назва або ідентифікатор програми (напр., firefox)"
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Підтвердити особу"
   },
-  "Authenticated!": {
-    "Authenticated!": "Автентифіковано!"
-  },
   "Authentication": {
     "Authentication": "Автентифікація"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": "Автоматично закривати огляд Niri, коли DMS запускає або фокусує вікно"
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Автоматично закривати огляд Niri при запуску програм"
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Автозаповнення останнього запам'ятованого запиту при відкритті"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Автоматичний режим кольорів"
   },
   "Automatic Control": {
     "Automatic Control": "Автоматичне керування"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "Проміжки панелі"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": "Межа та тінь панелі"
-  },
-  "Bar corners": {
-    "Bar corners": "Кути панелі"
   },
   "Bar corners and background": {
     "Bar corners and background": "Кути та фон панелі"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Центральна секція"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": "Центральна секція — зарезервована для Острова"
-  },
   "Center Single Column": {
     "Center Single Column": "Центрувати одну колонку"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": "Кількість символів за секунду при утриманні клавіші"
-  },
-  "Charge Level": {
-    "Charge Level": "Рівень заряду"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Досягнуто ліміту заряду"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Оберіть монітори для інтерфейсу екрана блокування. Інші монітори показуватимуть суцільний колір для захисту OLED від вигоряння."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": "Виберіть, які ярлики розміщувати ліворуч або праворуч від годинника"
   },
   "Chroma Style": {
     "Chroma Style": "Стиль Chroma"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": "Закривати огляд Niri при фокусуванні вікна"
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Закривати огляд при запуску"
-  },
   "Close Window": {
     "Close Window": "Закрити вікно"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "Зміна кодека недоступна, оскільки WirePlumber не знайдено"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "Перемикання кодеків недоступне, оскільки pactl не знайдено"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "Зміна кодека недоступна, оскільки wpexec не знайдено"
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": "Вподобання загалу для швидкого початку"
   },
-  "Community themes": {
-    "Community themes": "Спільнотні теми"
-  },
   "Compact": {
     "Compact": "Компактний"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": "Компактний годинник у вигляді капсули"
   },
   "Compact Island Height": {
     "Compact Island Height": "Компактна висота Острова"
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Контраст"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": "Контрастність за варіантом"
   },
   "Contributor": {
     "Contributor": "Контриб'ютор"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": "Растеризатор кривих"
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Крива: растризація кривих"
-  },
   "Custom": {
     "Custom": "Власний"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": "Острів — Бета"
-  },
   "Dank Island instance": {
     "Dank Island instance": "Екземпляр Острова"
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar не запущено"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell готовий до роботи"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "Значки DankShell та системні (потребує перезапуску)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "Глибина"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Глибина: панелі збільшуються, коли висуваються — ефект драматичного висування вперед"
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Отримує кольори, що максимально відповідають фоновому зображенню"
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "Спрямований"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Спрямований: панелі ковзають з більшої відстані в повному розмірі — без зміни масштабу, чистий рух"
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Вимкнути автопідключення"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Перетягніть індикатори робочих просторів, щоб змінити їх порядок"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Намалювати суцільну рамку навколо всього дисплея"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": "Малювати фон у стилі острова за супутниковими віджетами"
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Динамічні кольори, пресети"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамічний: пружинний Безьє з перельотом — елемент коротко виходить за ціль, а потім стабілізується. Експресивно та живо"
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Редагувати правило"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Увімкнути режим «Не турбувати»"
-  },
-  "Enable Frame": {
-    "Enable Frame": "Увімкнути рамку"
   },
   "Enable History": {
     "Enable History": "Увімкнути історію"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Не вдалося додати включення прив'язок"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Не вдалося додати принтер до класу"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Не вдалося застосувати кольори %1"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Не вдалося завантажити конфігурацію буфера обміну"
   },
-  "Failed to move job": {
-    "Failed to move job": "Не вдалося перемістити завдання"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Не вдалося перемістити в кошик"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Не вдалося видалити комбінацію клавіш"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Не вдалося видалити принтер із класу"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Не вдалося перезапустити аудіосистему"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Не вдалося викликати пристрій (дзвінок)"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не вдалося виконати 'dms greeter status'. Переконайтеся, що DMS встановлено і dms додано до PATH"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Не вдалося запустити 'dms-greeter status'. Переконайтеся, що пакет dms-greeter встановлено"
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Не вдалося оновити буфер обміну"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Не вдалося оновити опис"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Не вдалося оновити розташування"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Не вдалося оновити спільний доступ"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Не вдалося записати запис в автозапуск"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "Плавний"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Плавне кубічне сповільнення при вході, швидкий вихід — чисті, елегантні криві"
   },
   "Flush": {
     "Flush": "Врівень"
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Повністю заряджено"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: сітка • Z/X: розмір"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "Кольори GTK успішно застосовано"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDE та інше"
   },
   "Games": {
     "Games": "Ігри"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Створити override"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Створити базові конфігурації GTK3/4 або QT5/QT6 (потрібен qt6ct-kde), щоб вони відповідали кольорам DMS. Потрібно виконати лише один раз<br/><br/>Рекомендується налаштувати %1 перед застосуванням тем GTK"
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Згенерувати базові конфігурації GTK3/4, QT5/QT6 або qtengine, щоб відповідати кольорам DMS (лише qt6ct потребує qt6ct-kde). Потрібно лише один раз<br /><br />Рекомендовано налаштувати %1 перед застосуванням GTK-тем"
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": "Глобально"
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Глобально масштабувати тривалість усіх анімацій"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "Глобально масштабувати тривалість анімацій із геометричним рухом і пружинною фізикою за допомогою кривих Безьє"
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Шрифт екрану входу"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Члени групи greeter можуть синхронізувати тему екрана входу за допомогою 'dms greeter sync --profile' після виходу та повторного входу"
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Учасники групи вітального екрана можуть синхронізувати тему екрана входу за допомогою 'dms-greeter sync --profile' після виходу та повторного входу в систему"
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "Приховати встановлені"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Приховати вміст сповіщення до його розгортання"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Приховати вміст сповіщення до розгортання; спливаючі вікна за замовчуванням відображаються згорнутими"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Встановити"
   },
-  "Install Greeter": {
-    "Install Greeter": "Встановити Greeter"
-  },
   "Install Plugin": {
     "Install Plugin": "Встановити плагін"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Встановити кольорові теми з реєстру тем DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Встановлення завершено.  Екран входу встановлено"
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Встановіть dsearch для пошуку файлів"
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Встановити плагіни з реєстру плагінів DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Встановити DMS greeter? Відкриється термінал для sudo-автентифікації"
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Встановити тему «%1» з реєстру DMS?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Неправильна назва пакета — дозволені лише літери, цифри та @._+:-"
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Неправильний пароль для %1"
   },
   "Invalid username": {
     "Invalid username": "Неправильне ім'я користувача"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Керується основним джерелом PAM"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Керується основним джерелом PAM"
-  },
   "Management": {
     "Management": "Управління"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": "Експресивні панелі Material 3 піднімаються знизу з легким масштабуванням (типово)"
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Стиль батареї Material"
-  },
   "Material Colors": {
     "Material Colors": "Кольори Material"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Тіні та підняття у стилі Material для модальних вікон, спливаючих елементів та діалогів"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Експресивні криві Безьє Material Design 3. Типове відчуття DMS"
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Контраст Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "Звичайний"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Звичайний: системний рендерер (FreeType)"
-  },
   "Natural Scrolling": {
     "Natural Scrolling": "Природне прокручування"
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Відображення швидкості завантаження та вивантаження мережі"
-  },
-  "Network not found": {
-    "Network not found": "Мережу не знайдено"
   },
   "Neutral": {
     "Neutral": "Нейтральний"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Інтеграція з Niri"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Дії композитора Niri (фокус, переміщення тощо)"
   },
   "No": {
     "No": "Ні"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Спливаючі сповіщення"
   },
-  "Notification Settings": {
-    "Notification Settings": "Налаштування сповіщень"
-  },
   "Notification Type": {
     "Notification Type": "Тип сповіщення"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Відкрити кошик"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Перевизначити глобальні налаштування макета для цього виходу"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Перевизначити глобальну прозорість для Блокнота"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Замінити термінал власною командою або скриптом"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "Панелі збільшуються від маленького розміру під час ковзання, створюючи ефект глибини з висуванням вперед"
   },
-  "Partial": {
-    "Partial": "Частково"
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Частково хмарно"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Призупинити"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Призупинено"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Основний"
   },
-  "Primary Bar": {
-    "Primary Bar": "Основна панель"
-  },
   "Primary Container": {
     "Primary Container": "Основний контейнер"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Кольори Qt успішно застосовано"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: рендерер distance-field"
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia недоступний"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Видалити адміністратора"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Прибрати заокруглення кутів панелі"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Прибирати проміжки та рамки, коли вікна максимізовані"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Безпека"
   },
-  "Security & privacy": {
-    "Security & privacy": "Безпека та приватність"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "Джерело PAM для ключа безпеки"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Оберіть файл для надсилання"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": "Суцільний матеріал або контури"
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": "Прямі"
   },
-  "Square Corners": {
-    "Square Corners": "Квадратні кути"
-  },
   "Stacked": {
     "Stacked": "Один над одним"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Стандарт"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандарт: Класичний Material Design 3 — панелі піднімаються знизу з легким масштабуванням. Типово у DMS"
-  },
   "Start": {
     "Start": "Запустити"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": "Запустіть DankConnect, KDE Connect або Valent, щоб використовувати цей плагін"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Запустити точку доступу?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Синхронізувати позицію між екранами"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Синхронізація застосовує вашу тему та налаштування до екрана входу. Спільним користувачам слід використовувати 'dms greeter sync --profile' замість синхронізації основного користувача"
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Синхронізація застосовує вашу тему та налаштування до екрана входу. Спільні користувачі мають запускати 'dms-greeter sync --profile' замість синхронізації основного користувача"
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Резервний запуск термінала не вдався. Встановіть підтримуваний емулятор термінала або запустіть 'dms auth sync' вручну"
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Резервний запуск термінала не вдався. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms greeter sync' вручну"
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Невдалий запуск резервного терміналу. Встановіть один із підтримуваних емуляторів термінала або запустіть 'dms-greeter sync' вручну"
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Для моніторингу системи потрібен dgop.\nБудь ласка, встановіть його, щоб використовувати цю функцію"
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Змінна середовища DMS_SOCKET не встановлена або сокет недоступний. Для автоматичного керування плагінами потрібен DMS_SOCKET"
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": "Острів закріплюється за верхнім або нижнім краєм"
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "Острів утримує край на дисплеї, який покриває ця панель, тому панель там залишається прихованою"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "WiFi-адаптер не зміг запустити режим точки доступу"
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Наведені нижче налаштування змінять ваші параметри GTK та Qt. Якщо ви бажаєте зберегти поточні конфігурації, будь ласка, створіть їх резервну копію (qt5ct.conf|qt6ct.conf та ~/.config/gtk-3.0|gtk-4.0)"
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Налаштування нижче змінюватимуть ваші параметри GTK та Qt. Якщо ви хочете зберегти поточні конфігурації, зробіть їхню резервну копію (qt5ct.conf|qt6ct.conf|qtengine/config.json та ~/.config/gtk-3.0|gtk-4.0)."
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Реєстр тем"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Колір теми для межі"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Перемикати видимість панелі вручну через IPC"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Негрупований"
   },
-  "Uninstall": {
-    "Uninstall": "Видалити"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Видалити Greeter"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Видалити плагін"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Видалення завершено. Екрану входу було видалено"
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Помилка видалення: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Видалити DMS greeter? Це видалить конфігурацію та відновить ваш попередній менеджер дисплеїв. Відкриється термінал для sudo-автентифікації"
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Видалено: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "Вт"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1 тло"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Радіус кутів вікна"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "Ви маєте незбережені зміни. Зберегти їх, щоб продовжити?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Вам потрібно встановити або:\nQT_QPA_PLATFORMTHEME=gtk3 АБО\nQT_QPA_PLATFORMTHEME=qt6ct\nяк змінні середовища, а потім перезапустити оболонку\n\nДля qt6ct необхідно встановити qt6ct-kde"
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Вам потрібно встановити одне з:\nQT_QPA_PLATFORMTHEME=gtk3 АБО\nQT_QPA_PLATFORMTHEME=qt6ct АБО\nQT_QPA_PLATFORMTHEME=qtengine\nяк змінні середовища, а потім перезапустити оболонку\n\nЛише qt6ct потребує встановленого qt6ct-kde"
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "приєднано"
-  },
-  "below AA": {
-    "below AA": "нижче рівня AA"
   },
   "brandon": {
     "brandon": "брандон"

@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 חלונות"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "להוסיף את \"%1\" לקבוצה %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "להוסיף את \"%1\" לקבוצה %2? עליהם להתנתק ולהתחבר מחדש, ולאחר מכן להריץ את הפקודה dms greeter sync --profile כדי לפרסם את ערכת הנושא שלהם למסך ההתחברות."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "להוסיף את \"%1\" לקבוצה %2? עליהם להתנתק ולהתחבר מחדש, ולאחר מכן להריץ את הפקודה dms-greeter sync --profile כדי לפרסם את ערכת הנושא שלהם למסך ההתחברות."
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "הוסף/י הערות"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "הוסף/י את המשתמש/ת החדש/ה לקבוצה %1 כדי שיוכלו להריץ את הפקודה dms greeter sync --profile."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "הוסף/י את המשתמש/ת החדש/ה לקבוצה %1 כדי שיוכלו להריץ את הפקודה dms-greeter sync --profile."
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "שמות האפליקציות"
   },
-  "App Theming": {
-    "App Theming": "עיצוב לאפליקציות"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "שם האפליקציה או זהות (לדוגמה firefox)"
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "אימות"
   },
-  "Authenticated!": {
-    "Authenticated!": "האימות הושלם!"
-  },
   "Authentication": {
     "Authentication": "אימות"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": "סגור/י אוטומטית את הסקירה של niri כאשר DMS מופעל או מתמקד בחלון."
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "סגור/י אוטומטית את הסקירה של niri כשמופעלות אפליקציות."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "מילוי אוטומטי של השאילתה האחרונה שנשמרה בעת הפתיחה"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "מצב צבע אוטומטי"
   },
   "Automatic Control": {
     "Automatic Control": "בקרה אוטומטית"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "ריווח הסרגל"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": "מסגרת וצל של הסרגל"
-  },
-  "Bar corners": {
-    "Bar corners": "פינות הסרגל"
   },
   "Bar corners and background": {
     "Bar corners and background": "פינות ורקע הסרגל"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "קטע אמצעי"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": "קטע אמצעי - שמור על ידי Dank Island"
-  },
   "Center Single Column": {
     "Center Single Column": "מרכוז של עמודה בודדת"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": "תווים לשנייה בעת החזקת מקש לחוץ"
-  },
-  "Charge Level": {
-    "Charge Level": "רמת טעינה"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "הגעה למגבלת הטעינה"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "בחר/י אילו מסכים יציגו את ממשק מסך הנעילה. מסכים אחרים יציגו צבע אחיד כהגנה מפני צריבת מסכי OLED."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": "בחר/י אילו קיצורי דרך ישבו משמאל או מימין לשעון"
   },
   "Chroma Style": {
     "Chroma Style": "סגנון Chroma"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": "סגירת הסקירה של niri בעת התמקדות בחלון"
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "סגירת הסקירה בעת ההפעלה"
-  },
   "Close Window": {
     "Close Window": "סגור/י חלון"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "החלפת קודק אינה זמינה מכיוון שלא ניתן היה למצוא את WirePlumber"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "החלפת קודק אינה זמינה מכיוון שלא ניתן היה למצוא את pactl"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "החלפת קודק אינה זמינה. לא ניתן היה למצוא את WirePlumber wpexec."
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "ערכות נושא קהילתיות"
-  },
   "Compact": {
     "Compact": "קומפקטי"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": "כפתור שעון קומפקטי"
   },
   "Compact Island Height": {
     "Compact Island Height": "גובה קומפקטי לאי"
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "ניגודיות"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": "ניגודיות לפי גרסה"
   },
   "Contributor": {
     "Contributor": "תורם/ת"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": "המרה לפי עקומות."
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "מעוקם: המרה לפי עקומות."
-  },
   "Custom": {
     "Custom": "מותאם אישית"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": "Dank Island - בטא"
-  },
   "Dank Island instance": {
     "Dank Island instance": "מופע של Dank Island"
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar אינו פועל"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell מוכן לשימוש"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "סמלי DankShell ומערכת (דורש הפעלה מחדש)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "עומק"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "עומק: הפאנלים גדלים תוך כדי החלקה פנימה - אפקט עומק דרמטי שבולט קדימה."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "גוזר צבעים התואמים באופן הדוק לתמונה שמתחת."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "כיווני"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "כיווני: הפאנלים מחליקים פנימה ממרחק גדול יותר בגודל מלא - ללא שינוי קנה מידה, תנועה חלקה ונקייה."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "השבת/י התחברות אוטומטית"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "גרור/גררי את מחווני סביבות העבודה כדי לסדר אותם מחדש"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "צייר/י מסגרת תמונה מחוברת סביב כל התצוגה"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": "צייר/י רקע בסגנון Island מאחורי ווידג׳טי הלוויין"
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "צבעים דינמיים, הגדרות מוכנות"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "דינמי: עקומת Bezier של קפיץ עם חריגה - הכניסה חורגת לרגע מהיעד ואז מתייצבת. אקספרסיבי ומלא חיים."
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "עריכת חוק"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "הפעלה של מצב ״נא לא להפריע״"
-  },
-  "Enable Frame": {
-    "Enable Frame": "הפעלת המסגרת"
   },
   "Enable History": {
     "Enable History": "הפעלת ההיסטוריה"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "הוספת קובץ includes של קיצורי מקלדת נכשלה"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "הוספת המדפסת לסוג נכשלה"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "החלת צבעי %1 נכשלה"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "טעינת הגדרות לוח ההעתקה נכשלה."
   },
-  "Failed to move job": {
-    "Failed to move job": "העברת העבודה נכשלה"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "העברה לאשפה נכשלה"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "הסרת קיצור המקלדת נכשלה"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "הסרת המדפסת מהסוג נכשלה"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "הפעלת מערכת השמע מחדש נכשלה"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "שליחת הצלצול להתקן נכשלה"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "הרצת הפקודה 'dms greeter status' נכשלה. ודא/י שDMS מותקן ושdms נמצא בPATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "הרצת הפקודה 'dms-greeter status' נכשלה. ודא/י שהחבילה dms-greeter מותקנת."
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "עדכון לוח ההעתקה נכשל"
-  },
-  "Failed to update description": {
-    "Failed to update description": "עדכון התיאור נכשל"
-  },
-  "Failed to update location": {
-    "Failed to update location": "עדכון המיקום נכשל"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "עדכון השיתוף נכשל"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "כתיבת רשומת ההפעלה האוטומטית נכשלה"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "שוטף"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "שוטף: האטה חלקה פנימה, יציאה מהירה - עקומות נקיות ואלגנטיות."
   },
   "Flush": {
     "Flush": "צמוד"
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "טעונה במלואה"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: רשת • Z/X: גודל"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "צבעי GTK הוחלו בהצלחה"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "Qt, GTK, סביבות פיתוח, ועוד"
   },
   "Games": {
     "Games": "משחקים"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "יצירת דריסה"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "צור/צרי תצורות בסיס של GTK3/4 או QT5/QT6 (החבילה qt6ct-kde נדרשת) כדי לעקוב אחר הצבעים של DMS. צריך ליצור את התצורות רק פעם אחת.<br /><br />מומלץ להגדיר את %1 לפני החלת ערכות נושא של GTK."
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "צור/צרי תצורות בסיס עבור GTK3/4, QT5/QT6, או qtengine (לה qt6ct-kde נדרשת רק כשמשתמשים ב qt6ct) כדי לעקוב אחר הצבעים של DMS. צריך ליצור את התבנית רק פעם אחת.<br /><br />מומלץ להגדיר את %1 לפני החלת ערכות נושא על GTK."
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": "באופן גלובלי"
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "התאם/י גלובלית את כל משכי הזמן לאנימציה"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": "התאם/י גלובלית את משכי הזמן לאנימציה עם תנועה גיאומטרית ופיזיקה מבוססת קפיץ עם עקומות Bezier"
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "גופן מסך ההתחברות"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "חברי קבוצת greeter יכולים לסנכרן את ערכת הנושא שלהם למסך ההתחברות באמצעות dms greeter sync --profile לאחר התנתקות והתחברות מחדש."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "חברי קבוצת greeter יכולים לסנכרן את ערכת הנושא שלהם למסך ההתחברות באמצעות dms-greeter sync --profile לאחר התנתקות והתחברות מחדש."
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "הסתר/י תוספים מותקנים"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "הסתר/י את תוכן ההתראה עד להרחבה"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "הסתר/י את תוכן ההתראה עד להרחבה; חלונות קופצים מוצגים כמכווצים כברירת מחדל"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "התקן/י"
   },
-  "Install Greeter": {
-    "Install Greeter": "התקן/י את מסך ההתחברות"
-  },
   "Install Plugin": {
     "Install Plugin": "התקן/י תוסף"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "התקן/י ערכות צבעים ממאגר ערכות הנושא של DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "ההתקנה הושלמה. מסך ההתחברות הותקן."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "התקן/י את dsearch לחיפוש קבצים."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "התקן/י תוספים ממאגר התוספים של DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "להתקין את מסך ההתחברות של DMS? ייפתח מסוף לאימות עם sudo."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "להתקין את ערכת הנושא '%1' מהמאגר של DMS?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "שם חבילה לא חוקי - אותיות, ספרות והתווים @._+:- בלבד."
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "סיסמה שגויה עבור %1"
   },
   "Invalid username": {
     "Invalid username": "שם משתמש לא חוקי"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "מנוהל על ידי מקור הPAM הראשי"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "מנוהל על ידי מקור הPAM הראשי."
-  },
   "Management": {
     "Management": "ניהול"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": "פאנלים אקספרסיביים של Material 3 עולים מלמטה עם שינוי קנה מידה עדין, ברירת מחדל."
   },
-  "Material Battery Style": {
-    "Material Battery Style": "סגנון סוללה חומרי (Material)"
-  },
   "Material Colors": {
     "Material Colors": "צבעי Material"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "הצללות והגבהה בהשראת Material Design על חלוניות, חלונות קופצים ותיבות דו-שיח"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "חומרי: עקומות Bezier אקספרסיביות של Material Design 3. תחושת ברירת המחדל של DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "ניגודיות Matugen"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "מובנה"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "מובנה: מעבד הפלטפורמה המובנה (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": "גלילה טבעית"
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "תצוגת מהירות הורדה והעלאה ברשת"
-  },
-  "Network not found": {
-    "Network not found": "הרשת לא נמצאה"
   },
   "Neutral": {
     "Neutral": "נייטרלי"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "אינטגרציה עם niri"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "פעולות קומפוזיטור של niri (מיקוד, הזזה וכו')"
   },
   "No": {
     "No": "לא"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "חלוניות התראה קופצות"
   },
-  "Notification Settings": {
-    "Notification Settings": "הגדרות התראות"
-  },
   "Notification Type": {
     "Notification Type": "סוג התראה"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "פתח/י אשפה"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "דרוס/דרסי הגדרות פריסה גלובליות לפלט זה"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "דריסת שקיפות גלובלית עבור פנקס"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "דרוס/דרסי את המסוף עם פקודה או תסריט מותאמים אישית"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "הפאנלים גדלים תוך כדי החלקה פנימה, אפקט עומק דרמטי שבולט קדימה."
   },
-  "Partial": {
-    "Partial": "חלקי"
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "מעונן חלקית"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "השהיה"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "מושהה"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "ראשי"
   },
-  "Primary Bar": {
-    "Primary Bar": "סרגל ראשי"
-  },
   "Primary Container": {
     "Primary Container": "מיכל ראשי"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "צבעי Qt הוחלו בהצלחה"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "ספריית Qt: מעבד מרחק-שדה של Qt."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia אינו זמין"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "הסר/י מנהל/ת"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "הסר/י עיגול פינות מהסרגל"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "הסר/י רווחים ומסגרת כאשר חלונות ממוקסמים"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "אבטחה"
   },
-  "Security & privacy": {
-    "Security & privacy": "אבטחה ופרטיות"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "מקור PAM של מפתח אבטחה"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "בחר/י קובץ לשליחה"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": "סוג חומר מלא או קו מתאר"
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": "מרובע"
   },
-  "Square Corners": {
-    "Square Corners": "פינות ישרות"
-  },
   "Stacked": {
     "Stacked": "בערימה"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "רגיל"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "סטנדרטי: עיצוב Material Design 3 קלאסי - הפאנלים עולים מלמטה עם שינוי גודל עדין. ברירת המחדל של DMS."
-  },
   "Start": {
     "Start": "התחל/י"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": "הפעל/י את DankConnect, KDE Connect, או Valent כדי להשתמש בתוסף זה"
   },
   "Start Hotspot?": {
     "Start Hotspot?": "להפעיל את הנקודה החמה?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "סנכרון המיקום בין מסכים"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "הסנכרון מחיל את ערכת הנושא וההגדרות שלך על מסך ההתחברות. משתמשים משותפים צריכים להריץ dms greeter sync --profile במקום סנכרון של המשתמש הראשי."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "הסנכרון מחיל את ערכת הנושא וההגדרות שלך על מסך ההתחברות. משתמשים משותפים צריכים להריץ dms-greeter sync --profile במקום סנכרון של המשתמש הראשי."
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י יישום מסוף נתמך או הרץ/י את הפקודה 'dms auth sync' באופן ידני."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י את אחד מיישומי המסוף הנתמכים או הרץ/י את הפקודה 'dms greeter sync' באופן ידני."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "המעבר למסוף כגיבוי נכשל. התקן/י את אחד מיישומי המסוף הנתמכים או הרץ/י את הפקודה 'dms-greeter sync' באופן ידני."
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "כלי 'dgop' נדרש לניטור מערכת.\nאנא התקן/י dgop כדי להשתמש בתכונה זו."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "משתנה הסביבה DMS_SOCKET אינו מוגדר או שהsocket אינו זמין. ניהול תוספים אוטומטי דורש את DMS_SOCKET."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": "האי מעוגן לקצה העליון או התחתון"
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "האי תופס את הקצה הזה במסך שהסרגל הזה מכסה, ולכן הסרגל נשאר מוסתר שם"
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "מתאם הWiFi לא הצליח להפעיל מצב נקודת גישה."
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "ההגדרות הבאות ישנו את הגדרות ה GTK וQt שלך. אם ברצונך לשמור על התצורות הנוכחיות, אנא גבה/י אותן (הקבצים הם: qt5ct.conf|qt6ct.conf וconfig/gtk-3.0|gtk-4.0./~)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "ההגדרות הבאות ישנו את הגדרות ה GTK וQt שלך. אם ברצונך לשמור על התצורות הנוכחיות, אנא גבה/י אותן (הקבצים הם: qt5ct.conf|qt6ct.conf|qtengine/config.json וconfig/gtk-3.0|gtk-4.0./~)."
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "מאגר ערכות הנושא"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "צבע ערכת הנושא שמשמש למסגרת"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "שנה/י את הנראות של הסרגל באופן ידני דרך IPC"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "לא בקבוצה"
   },
-  "Uninstall": {
-    "Uninstall": "הסר/י התקנה"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "הסר/י את מסך ההתחברות"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "הסר/י תוסף"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "ההסרה הושלמה. מסך ההתחברות הוסר."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "הסרת ההתקנה נכשלה: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "להסיר את מסך ההתחברות של DMS? זה יסיר את ההגדרות וישחזר את מנהל התצוגה הקודם שלך. ייפתח חלון מסוף לאימות עם sudo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "הוסר: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "רוחב"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "טקסט גוף בתקן WCAG %1"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "רדיוס הפינות של החלון"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "יש לך שינויים שלא נשמרו. האם ברצונך לשמור אותם לפני שממשיכים?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "עליך להגדיר את אחד מהמשתנים הבאים:\nQT_QPA_PLATFORMTHEME=gtk3 או\nQT_QPA_PLATFORMTHEME=qt6ct\nכמשתני סביבה ולאחר מכן להפעיל מחדש את DMS.\n\n* qt6ct דורש התקנה של qt6ct-kde."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "עליך להגדיר את אחד מהמשתנים הבאים:\nQT_QPA_PLATFORMTHEME=gtk3 או\nQT_QPA_PLATFORMTHEME=qt6ct או\nQT_QPA_PLATFORMTHEME=qtengine\nכמשתני סביבה ולאחר מכן להפעיל מחדש את DMS.\n\n* רק שימוש בqt6ct דורש התקנה של qt6ct-kde."
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "מחובר"
-  },
-  "below AA": {
-    "below AA": "מתחת לAA"
   },
   "brandon": {
     "brandon": "brandon"

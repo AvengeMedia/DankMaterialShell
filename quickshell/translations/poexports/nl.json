@@ -107,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 vensters"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -446,9 +449,6 @@
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "\"%1\" toevoegen aan de groep %2?"
   },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "\"%1\" toevoegen aan de groep %2? Ze moeten uitloggen en opnieuw inloggen, en vervolgens 'dms greeter sync --profile' uitvoeren om hun inlogscherm-thema te publiceren."
-  },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "\"%1\" toevoegen aan de %2-groep? Zij moeten uit- en weer inloggen en daarna 'dms-greeter sync --profile' uitvoeren om hun thema voor het aanmeldscherm te publiceren."
   },
@@ -502,9 +502,6 @@
   },
   "Add notes": {
     "Add notes": "Notities toevoegen"
-  },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Voeg de nieuwe gebruiker toe aan de groep %1 zodat zij 'dms greeter sync --profile' kunnen uitvoeren."
   },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Voeg de nieuwe gebruiker toe aan de %1-groep zodat deze 'dms-greeter sync --profile' kan uitvoeren."
@@ -710,9 +707,6 @@
   "App Names": {
     "App Names": "App-namen"
   },
-  "App Theming": {
-    "App Theming": "App-thema's"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "App-naam of identiteit (bijv. firefox)"
   },
@@ -878,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Authenticeren"
   },
-  "Authenticated!": {
-    "Authenticated!": "Geauthenticeerd!"
-  },
   "Authentication": {
     "Authentication": "Authenticatie"
   },
@@ -971,9 +962,6 @@
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Niri-overzicht automatisch sluiten bij starten van apps."
-  },
   "Auto-close the loop when ending near the start point.": {
     "Auto-close the loop when ending near the start point.": ""
   },
@@ -1021,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Laatst onthouden zoekopdracht automatisch invullen bij openen"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Automatische kleurmodus"
   },
   "Automatic Control": {
     "Automatic Control": "Automatische regeling"
@@ -1192,12 +1177,6 @@
   },
   "Bar Spacing": {
     "Bar Spacing": "Paneelafstand"
-  },
-  "Bar border and shadow": {
-    "Bar border and shadow": ""
-  },
-  "Bar corners": {
-    "Bar corners": ""
   },
   "Bar corners and background": {
     "Bar corners and background": "Hoeken en achtergrond van de balk"
@@ -1577,9 +1556,6 @@
   "Center Section": {
     "Center Section": "Middensectie"
   },
-  "Center Section - Reserved by Dank Island": {
-    "Center Section - Reserved by Dank Island": ""
-  },
   "Center Single Column": {
     "Center Single Column": "Enkele kolom centreren"
   },
@@ -1606,9 +1582,6 @@
   },
   "Characters per second while holding down key": {
     "Characters per second while holding down key": "Tekens per seconde bij het ingedrukt houden van een toets"
-  },
-  "Charge Level": {
-    "Charge Level": "Laadniveau"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Laadlimiet bereikt"
@@ -1729,9 +1702,6 @@
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Kies welke monitoren de interface van het vergrendelscherm tonen. Andere monitoren tonen een effen kleur voor OLED-inbrandbeveiliging."
-  },
-  "Choose which shortcuts sit left or right of the clock": {
-    "Choose which shortcuts sit left or right of the clock": ""
   },
   "Chroma Style": {
     "Chroma Style": "Chroma-stijl"
@@ -1871,9 +1841,6 @@
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Overzicht sluiten bij starten"
-  },
   "Close Window": {
     "Close Window": "Venster sluiten"
   },
@@ -1882,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "Codec wisselen is niet beschikbaar omdat WirePlumber niet is gevonden"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "Wisselen van codec is niet beschikbaar omdat pactl niet is gevonden"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "Codec wisselen is niet beschikbaar. WirePlumber wpexec is niet gevonden."
@@ -1985,14 +1949,8 @@
   "Community favorites to get you started": {
     "Community favorites to get you started": ""
   },
-  "Community themes": {
-    "Community themes": "Community-thema's"
-  },
   "Compact": {
     "Compact": "Compact"
-  },
-  "Compact Clock Pill": {
-    "Compact Clock Pill": ""
   },
   "Compact Island Height": {
     "Compact Island Height": ""
@@ -2149,9 +2107,6 @@
   },
   "Contrast": {
     "Contrast": "Contrast"
-  },
-  "Contrast by variant": {
-    "Contrast by variant": "Contrast per variant"
   },
   "Contributor": {
     "Contributor": "Bijdrager"
@@ -2447,9 +2402,6 @@
   "Curve rasterizer.": {
     "Curve rasterizer.": ""
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Curve: curve-rasterizer."
-  },
   "Custom": {
     "Custom": "Aangepast"
   },
@@ -2600,9 +2552,6 @@
   "Dank Island": {
     "Dank Island": ""
   },
-  "Dank Island - Beta": {
-    "Dank Island - Beta": ""
-  },
   "Dank Island instance": {
     "Dank Island instance": ""
   },
@@ -2620,9 +2569,6 @@
   },
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar is niet actief"
-  },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell is klaar voor gebruik"
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell- & systeempictogrammen (vereist herstart)"
@@ -2849,9 +2795,6 @@
   "Depth": {
     "Depth": "Diepte"
   },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Diepte: Panelen schalen op van klein terwijl ze binnenglijden — een dramatisch pop-forward diepte-effect."
-  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Leidt kleuren af die nauw aansluiten bij de onderliggende afbeelding."
   },
@@ -2932,9 +2875,6 @@
   },
   "Directional": {
     "Directional": "Directioneel"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Directioneel: Panelen glijden over een grotere afstand op ware grootte naar binnen — geen verandering van schaal, pure en vloeiende beweging."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Automatisch verbinden uitschakelen"
@@ -3170,9 +3110,6 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Sleep werkbladindicatoren om ze te rangschikken"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Teken een aaneengesloten rand als een schilderijlijst rond het hele scherm"
-  },
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": ""
   },
@@ -3236,9 +3173,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dynamische kleuren, voorinstellingen"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Dynamisch: Verende bézier met doorschieten — de binnenkomst gaat kort voorbij het doel en komt dan tot rust. Expressief en levendig."
-  },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
@@ -3269,11 +3203,8 @@
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Rule": {
     "Edit Rule": "Regel bewerken"
@@ -3355,9 +3286,6 @@
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Niet storen inschakelen"
-  },
-  "Enable Frame": {
-    "Enable Frame": "Frame inschakelen"
   },
   "Enable History": {
     "Enable History": "Geschiedenis inschakelen"
@@ -3620,9 +3548,6 @@
   "Failed to add binds include": {
     "Failed to add binds include": "Toevoegen van binds-include mislukt"
   },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Toevoegen van printer aan klasse mislukt"
-  },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Toepassen van %1-kleuren mislukt"
   },
@@ -3737,9 +3662,6 @@
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Laden van klembordconfiguratie mislukt."
   },
-  "Failed to move job": {
-    "Failed to move job": "Verplaatsen van taak mislukt"
-  },
   "Failed to move to trash": {
     "Failed to move to trash": "Verplaatsen naar prullenbak mislukt"
   },
@@ -3773,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Verwijderen van sneltoets mislukt"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Verwijderen van printer uit klasse mislukt"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Audiosysteem herstarten mislukt"
   },
@@ -3787,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Klingelen van apparaat mislukt"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Uitvoeren van 'dms greeter status' mislukt. Zorg ervoor dat DMS is geïnstalleerd en dms in het PATH staat."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Uitvoeren van 'dms-greeter status' mislukt. Zorg dat het pakket 'dms-greeter' is geïnstalleerd."
@@ -3892,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Bijwerken klembord mislukt"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Bijwerken van beschrijving mislukt"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Bijwerken van locatie mislukt"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Bijwerken van delen mislukt"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Schrijven van autostart-item mislukt"
@@ -4072,9 +3979,6 @@
   },
   "Fluent": {
     "Fluent": "Fluent"
-  },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: Vloeiende kubische vertraging bij binnenkomst, snelle verdwijning — strakke, elegante rondingen."
   },
   "Flush": {
     "Flush": ""
@@ -4337,9 +4241,6 @@
   "Fully Charged": {
     "Fully Charged": "Volledig opgeladen"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: raster • Z/X: grootte"
-  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -4357,9 +4258,6 @@
   },
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "GTK-kleuren succesvol toegepast"
-  },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDE's, meer"
   },
   "Games": {
     "Games": "Spellen"
@@ -4388,9 +4286,6 @@
   "Generate Override": {
     "Generate Override": "Override genereren"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Genereer basisconfiguraties voor GTK3/4 of QT5/QT6 (vereist qt6ct-kde) om de DMS-kleuren te volgen. Dit is slechts eenmaal nodig.<br /><br />Het wordt aanbevolen om %1 te configureren voordat je GTK-thema's toepast."
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
   },
@@ -4411,9 +4306,6 @@
   },
   "Globally": {
     "Globally": "Globaal"
-  },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Alle animatieduren globaal schalen"
   },
   "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
     "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
@@ -4462,9 +4354,6 @@
   },
   "Greeter font": {
     "Greeter font": "Lettertype Greeter"
-  },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Leden van de greeter-groep kunnen hun inlogscherm-thema synchroniseren met 'dms greeter sync --profile' na het uit- en inloggen."
   },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Leden van de greeter-groep kunnen hun thema voor het aanmeldscherm synchroniseren met 'dms-greeter sync --profile' na het uit- en opnieuw inloggen."
@@ -4627,9 +4516,6 @@
   },
   "Hide installed": {
     "Hide installed": "Geïnstalleerde verbergen"
-  },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Meldingsinhoud verbergen tot uitgevouwen"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Meldingsinhoud verbergen tot uitgevouwen; pop-ups worden standaard ingeklapt weergegeven"
@@ -5027,9 +4913,6 @@
   "Install": {
     "Install": "Installeren"
   },
-  "Install Greeter": {
-    "Install Greeter": "Greeter installeren"
-  },
   "Install Plugin": {
     "Install Plugin": "Plug-in installeren"
   },
@@ -5038,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Installeer kleurthema's uit het DMS-themaregister"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Installatie voltooid. Greeter is geïnstalleerd."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Installeer dsearch om bestanden te zoeken."
@@ -5056,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Plug-ins installeren uit het DMS-plug-inregister"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "De DMS Greeter installeren? Er wordt een terminal geopend voor sudo-authenticatie."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Thema '%1' installeren uit het DMS-register?"
@@ -5113,9 +4990,6 @@
   },
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Ongeldige pakketnaam — alleen letters, cijfers en @._+:- toegestaan."
-  },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Ongeldig wachtwoord voor %1"
   },
   "Invalid username": {
     "Invalid username": "Ongeldige gebruikersnaam"
@@ -5567,9 +5441,6 @@
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Beheerd door de primaire PAM-bron"
   },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Beheerd door de primaire PAM-bron."
-  },
   "Management": {
     "Management": "Beheer"
   },
@@ -5642,9 +5513,6 @@
   "Material 3 Expressive panels rise from below with a subtle scale, default.": {
     "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Material-accustijl"
-  },
   "Material Colors": {
     "Material Colors": "Material-kleuren"
   },
@@ -5656,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Op Material Design geïnspireerde schaduwen en diepte (elevation) op modale vensters, pop-outs en dialoogvensters"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: Material Design 3 expressieve bézier-curven. De standaard DMS-ervaring."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Matugen Contrast"
@@ -6008,9 +5873,6 @@
   "Native": {
     "Native": "Systeemeigen"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Native: platform-renderer (FreeType)."
-  },
   "Natural Scrolling": {
     "Natural Scrolling": "Natuurlijk scrollen"
   },
@@ -6046,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Weergave van download- en uploadsnelheid"
-  },
-  "Network not found": {
-    "Network not found": "Netwerk niet gevonden"
   },
   "Neutral": {
     "Neutral": "Neutraal"
@@ -6115,9 +5974,6 @@
   },
   "Niri Integration": {
     "Niri Integration": "Niri-integratie"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Niri-compositoracties (focus, verplaatsen, enz.)"
   },
   "No": {
     "No": "Nee"
@@ -6536,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Meldingen-popups"
   },
-  "Notification Settings": {
-    "Notification Settings": "Meldinginstellingen"
-  },
   "Notification Type": {
     "Notification Type": "Meldingstype"
   },
@@ -6683,11 +6536,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Prullenbak openen"
@@ -6842,9 +6692,6 @@
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Globale indelingsinstellingen overschrijven voor deze uitvoer"
   },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Globale transparantie overschrijven voor Notepad"
-  },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Terminal overschrijven met een aangepaste opdracht of script"
   },
@@ -6935,9 +6782,6 @@
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
-  "Partial": {
-    "Partial": "Gedeeltelijk"
-  },
   "Partly Cloudy": {
     "Partly Cloudy": "Half bewolkt"
   },
@@ -6982,6 +6826,9 @@
   },
   "Pause": {
     "Pause": "Pauzeren"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Paused": {
     "Paused": "Gepauzeerd"
@@ -7391,9 +7238,6 @@
   "Primary": {
     "Primary": "Primair"
   },
-  "Primary Bar": {
-    "Primary Bar": ""
-  },
   "Primary Container": {
     "Primary Container": "Primaire container"
   },
@@ -7504,9 +7348,6 @@
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Qt-kleuren succesvol toegepast"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: distance-field-renderer."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia is niet beschikbaar"
@@ -7765,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Beheerder ontnemen"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Hoekafronding van de balk verwijderen"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Tussenruimte en rand verwijderen wanneer vensters gemaximaliseerd zijn"
@@ -8210,26 +8048,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -8246,47 +8066,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -8426,9 +8207,6 @@
   "Security": {
     "Security": "Beveiliging"
   },
-  "Security & privacy": {
-    "Security & privacy": "Beveiliging & privacy"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "PAM-bron voor beveiligingssleutel"
   },
@@ -8480,11 +8258,8 @@
   "Select File to Send": {
     "Select File to Send": "Selecteer bestand om te verzenden"
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -9218,9 +8993,6 @@
   "Solid Line": {
     "Solid Line": ""
   },
-  "Solid material type or Outline": {
-    "Solid material type or Outline": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": ""
   },
@@ -9326,9 +9098,6 @@
   "Square": {
     "Square": ""
   },
-  "Square Corners": {
-    "Square Corners": "Vierkante hoeken"
-  },
   "Stacked": {
     "Stacked": "Gestapeld"
   },
@@ -9356,14 +9125,8 @@
   "Standard": {
     "Standard": "Standaard"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Standaard: Klassiek Material Design 3 — panelen komen van onderaf omhoog met een subtiele schaalvergroting. De DMS-standaard."
-  },
   "Start": {
     "Start": "Start"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Hotspot starten?"
@@ -9551,9 +9314,6 @@
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Positie synchroniseren over schermen"
   },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Synchronisatie past uw thema en instellingen toe op het aanmeldscherm. Gedeelde gebruikers moeten 'dms greeter sync --profile' uitvoeren in plaats van een primaire gebruikerssynchronisatie."
-  },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Synchronisatie past je thema en instellingen toe op het aanmeldscherm. Andere gebruikers moeten 'dms-greeter sync --profile' uitvoeren in plaats van een synchronisatie voor de hoofdgebruiker."
   },
@@ -9683,9 +9443,6 @@
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Terminal-terugval mislukt. Installeer een ondersteunde terminalemulator of voer handmatig 'dms auth sync' uit."
   },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Terminal fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer handmatig 'dms greeter sync' uit."
-  },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Terminal-fallback mislukt. Installeer een van de ondersteunde terminal-emulators of voer 'dms-greeter sync' handmatig uit."
   },
@@ -9743,26 +9500,17 @@
   "Text Size": {
     "Text Size": ""
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "De tool 'dgop' is vereist voor systeembewaking.\nInstalleer dgop om deze functie te gebruiken."
-  },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "De DMS_SOCKET omgevingsvariabele is niet ingesteld of de socket is niet beschikbaar. Geautomatiseerd plug-inbeheer vereist de DMS_SOCKET."
   },
   "The Island anchors to one screen edge": {
     "The Island anchors to one screen edge": ""
   },
-  "The Island anchors to the top or bottom edge": {
-    "The Island anchors to the top or bottom edge": ""
-  },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
   },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "De wifi-adapter kon de accesspoint-modus niet starten."
-  },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "De onderstaande instellingen wijzigen uw GTK- en Qt-instellingen. Als u uw huidige configuraties wilt behouden, maak er dan een back-up van (qt5ct.conf|qt6ct.conf en ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
@@ -9796,9 +9544,6 @@
   },
   "Theme Primary Color": {
     "Theme Primary Color": ""
-  },
-  "Theme Registry": {
-    "Theme Registry": "Themaregister"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Themakleur gebruikt voor de rand"
@@ -9973,6 +9718,9 @@
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Balkzichtbaarheid handmatig omschakelen via IPC"
@@ -10193,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Niet gegroepeerd"
   },
-  "Uninstall": {
-    "Uninstall": "Verwijderen"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Greeter verwijderen"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Plug-in verwijderen"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Verwijderen voltooid. Greeter is verwijderd."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Verwijderen mislukt: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "De DMS Greeter verwijderen? Dit verwijdert de configuratie en herstelt je vorige display manager. Er wordt een terminal geopend voor sudo-authenticatie."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Verwijderd: %1"
@@ -10652,9 +10388,6 @@
   "W": {
     "W": "B"
   },
-  "WCAG %1 body": {
-    "WCAG %1 body": "WCAG %1-body"
-  },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
   },
@@ -10847,6 +10580,9 @@
   "Window": {
     "Window": ""
   },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Vensterhoekradius"
   },
@@ -10946,9 +10682,6 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "U hebt niet-opgeslagen wijzigingen. Opslaan voordat u doorgaat?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "U moet het volgende instellen:\nQT_QPA_PLATFORMTHEME=gtk3 OF\nQT_QPA_PLATFORMTHEME=qt6ct\nals omgevingsvariabelen, en daarna de shell herstarten.\n\nqt6ct vereist dat qt6ct-kde is geïnstalleerd."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
     "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
   },
@@ -10981,9 +10714,6 @@
   },
   "attached": {
     "attached": "gekoppeld"
-  },
-  "below AA": {
-    "below AA": "onder AA"
   },
   "brandon": {
     "brandon": "brandon"
