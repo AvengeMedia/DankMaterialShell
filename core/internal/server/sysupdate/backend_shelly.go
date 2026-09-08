@@ -129,7 +129,7 @@ func (b shellyBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 		}
 		for _, pkg := range aur {
 			if slices.Contains(opts.Ignored, pkg.Name) {
-				return fmt.Errorf("Shelly cannot exclude held AUR package %q; disable AUR updates or remove its DMS hold before updating", pkg.Name)
+				return fmt.Errorf("shelly cannot exclude held AUR package %q; disable AUR updates or remove its DMS hold before updating", pkg.Name)
 			}
 		}
 	}
