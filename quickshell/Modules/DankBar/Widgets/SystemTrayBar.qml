@@ -1899,6 +1899,8 @@ BasePill {
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceTextMedium
                                     elide: Text.ElideMiddle
+                                    wrapMode: Text.NoWrap
+                                    maximumLineCount: 1
                                     width: parent.width - Theme.spacingS * 2 - (Theme.iconSizeSmall + Theme.spacingS)
                                 }
 
