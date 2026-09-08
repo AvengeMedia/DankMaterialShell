@@ -119,31 +119,11 @@ func (b shellyBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 	if !BackendHasTargets(b, opts.Targets, opts.IncludeAUR, opts.IncludeFlatpak) {
 		return nil
 	}
-	if opts.DryRun {
-		pkgs, err := b.checkUpdates(ctx, RepoSystem)
-		if err != nil {
-			return err
-		}
-		if opts.IncludeAUR {
-			aur, err := b.checkUpdates(ctx, RepoAUR)
-			if err != nil {
-				return err
-			}
-			pkgs = append(pkgs, aur...)
-		}
-		for _, pkg := range pkgs {
-			if pkg.Repo == RepoAUR && slices.Contains(opts.Ignored, pkg.Name) {
-				continue
-			}
-			if onLine != nil {
-				onLine(fmt.Sprintf("%s %s -> %s", pkg.Name, pkg.FromVersion, pkg.ToVersion))
-			}
-		}
-		return nil
-	}
-	if opts.IncludeAUR && len(opts.Ignored) > 0 {
+	var aur []Package
+	if opts.IncludeAUR && (opts.DryRun || len(opts.Ignored) > 0) {
 		// The manager has already removed held packages from opts.Targets.
-		aur, err := b.checkUpdates(ctx, RepoAUR)
+		var err error
+		aur, err = b.checkUpdates(ctx, RepoAUR)
 		if err != nil {
 			return err
 		}
@@ -152,6 +132,19 @@ func (b shellyBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine 
 				return fmt.Errorf("Shelly cannot exclude held AUR package %q; disable AUR updates or remove its DMS hold before updating", pkg.Name)
 			}
 		}
+	}
+	if opts.DryRun {
+		pkgs, err := b.checkUpdates(ctx, RepoSystem)
+		if err != nil {
+			return err
+		}
+		pkgs = append(pkgs, aur...)
+		for _, pkg := range pkgs {
+			if onLine != nil {
+				onLine(fmt.Sprintf("%s %s -> %s", pkg.Name, pkg.FromVersion, pkg.ToVersion))
+			}
+		}
+		return nil
 	}
 	argv := shellyUpgradeArgv(opts.IncludeAUR)
 	if opts.AttachStdio {

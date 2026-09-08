@@ -41,6 +41,8 @@ Singleton {
     function canIgnorePackage(pkg) {
         if (!pkg)
             return false;
+        if (pkgManager === "shelly")
+            return pkg.repo === "flatpak";
         return systemHoldsAllowed || pkg.repo !== "system";
     }
 
@@ -179,12 +181,15 @@ Singleton {
 
     function ignorePackage(name) {
         if (!name)
-            return;
+            return false;
+        if (pkgManager === "shelly" && !_rawUpdates.some(p => p.name === name && canIgnorePackage(p)))
+            return false;
         const list = (SettingsData.updaterIgnoredPackages || []).slice();
         if (list.indexOf(name) !== -1)
-            return;
+            return true;
         list.push(name);
         SettingsData.set("updaterIgnoredPackages", list);
+        return true;
     }
 
     function unignorePackage(name) {

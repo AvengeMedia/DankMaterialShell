@@ -207,8 +207,9 @@ Item {
                         ignoredPackageError.visible = true;
                         return;
                     }
-                    ignoredPackageError.visible = false;
-                    SystemUpdateService.ignorePackage(name);
+                    ignoredPackageError.visible = !SystemUpdateService.ignorePackage(name);
+                    if (ignoredPackageError.visible)
+                        return;
                     newIgnoredPackageField.text = "";
                 }
 
@@ -221,6 +222,9 @@ Item {
                         text: {
                             if (SettingsData.updaterUseCustomCommand) {
                                 return I18n.tr("Ignored packages only apply to the built-in updater. Your custom command controls its own exclusions.");
+                            }
+                            if (SystemUpdateService.pkgManager === "shelly") {
+                                return I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.");
                             }
                             return (SettingsData.updaterIgnoredPackages || []).length > 0 ? I18n.tr("Ignored packages are hidden from the updater and skipped by 'Update All'.") : I18n.tr("No packages ignored. Add one here or hover an update in the popout and click the hide button.");
                         }
@@ -258,10 +262,12 @@ Item {
 
                     StyledText {
                         id: ignoredPackageError
+                        width: parent.width
                         visible: false
-                        text: I18n.tr("Invalid package name — letters, digits and @._+:- only.")
+                        text: SystemUpdateService.pkgManager === "shelly" ? I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.") : I18n.tr("Invalid package name — letters, digits and @._+:- only.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.error
+                        wrapMode: Text.WordWrap
                     }
 
                     SettingsCard {

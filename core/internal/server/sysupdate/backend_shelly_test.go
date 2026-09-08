@@ -197,30 +197,56 @@ func TestShellyUpgradeHolds(t *testing.T) {
 		includeAUR bool
 		ignored    []string
 		wantError  bool
+		dryRun     bool
 	}{
-		{"held aur", true, []string{"example-git"}, true},
-		{"repository only", false, []string{"example-git"}, false},
-		{"repository hold cannot exclude system upgrade", true, []string{"linux"}, false},
-		{"unrelated hold", true, []string{"org.example.Flatpak"}, false},
+		{"held aur", true, []string{"example-git"}, true, false},
+		{"repository only", false, []string{"example-git"}, false, false},
+		{"repository hold cannot exclude system upgrade", true, []string{"linux"}, false, false},
+		{"unrelated hold", true, []string{"org.example.Flatpak"}, false, false},
+		{"dry held aur", true, []string{"example-git"}, true, true},
+		{"dry repository only", false, []string{"example-git"}, false, true},
+		{"dry repository hold", true, []string{"linux"}, false, true},
+		{"dry unrelated hold", true, []string{"org.example.Flatpak"}, false, true},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			_, log := fakeShelly(t)
 			t.Setenv("DMS_FORCE_PKEXEC", "1")
-			opts := UpgradeOptions{IncludeAUR: tt.includeAUR, Ignored: tt.ignored, Targets: []Package{{Name: "linux", Backend: "shelly", Repo: RepoSystem}}}
+			opts := UpgradeOptions{DryRun: tt.dryRun, IncludeAUR: tt.includeAUR, Ignored: tt.ignored, Targets: []Package{{Name: "linux", Backend: "shelly", Repo: RepoSystem}}}
 			err := (shellyBackend{}).Upgrade(t.Context(), opts, nil)
+			calls := readUpdateCalls(t, log)
+			if strings.Count(calls, "list-updates aur --json") > 1 {
+				t.Fatalf("duplicate AUR check: %q", calls)
+			}
 			if tt.wantError {
-				if err == nil || !strings.Contains(err.Error(), "disable AUR updates") || strings.Contains(readUpdateCalls(t, log), "upgrade ") {
+				if err == nil || err.Error() != `Shelly cannot exclude held AUR package "example-git"; disable AUR updates or remove its DMS hold before updating` || strings.Contains(calls, "upgrade ") {
 					t.Fatalf("held AUR package must block upgrade, got %v, calls %q", err, readUpdateCalls(t, log))
 				}
 				return
 			}
-			if err != nil || !strings.Contains(readUpdateCalls(t, log), "upgrade ") {
-				t.Fatalf("expected upgrade, got %v, calls %q", err, readUpdateCalls(t, log))
+			if err != nil || strings.Contains(calls, "upgrade ") == tt.dryRun {
+				t.Fatalf("unexpected result for dryRun=%v: %v, calls %q", tt.dryRun, err, calls)
 			}
 		})
 	}
 	if !isPacmanFamily(shellyBackend{}) {
 		t.Fatal("Shelly must enforce repository hold restrictions")
+	}
+}
+
+func TestShellyHoldCheckFailure(t *testing.T) {
+	for _, dryRun := range []bool{false, true} {
+		dir, log := fakeShelly(t)
+		writeUpdateExecutable(t, dir, "shelly", `printf '%s\n' "$*" >> "$DMS_TEST_SHELLY_LOG"
+echo 'AUR unavailable' >&2
+exit 1`)
+		opts := UpgradeOptions{DryRun: dryRun, IncludeAUR: true, Ignored: []string{"example-git"}, Targets: []Package{{Name: "linux", Backend: "shelly", Repo: RepoSystem}}}
+		err := (shellyBackend{}).Upgrade(t.Context(), opts, nil)
+		if err == nil || !strings.Contains(err.Error(), "AUR unavailable") {
+			t.Fatalf("dryRun=%v: expected AUR query error, got %v", dryRun, err)
+		}
+		if calls := readUpdateCalls(t, log); calls != "list-updates aur --json\n" {
+			t.Fatalf("query failure must stop the operation: %q", calls)
+		}
 	}
 }
 
@@ -235,7 +261,7 @@ func TestShellyDryRun(t *testing.T) {
 		wantCalls := "list-updates standard --json|\n"
 		wantLines := []string{"linux 2:6.18-1 -> 2:6.19-1"}
 		if includeAUR {
-			wantCalls += "list-updates aur --json|\n"
+			wantCalls = "list-updates aur --json|\n" + wantCalls
 			wantLines = append(wantLines, "example-git r1-1 -> r2-1")
 		}
 		if got := readUpdateCalls(t, log); got != wantCalls || !reflect.DeepEqual(lines, wantLines) {
