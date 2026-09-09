@@ -110,7 +110,7 @@ Rectangle {
                 StyledText {
                     text: {
                         if (!SessionService.idleInhibited)
-                            return I18n.tr("Pick how long to stay awake");
+                            return I18n.tr("Pick how long to stay awake", "idle inhibitor detail subtitle shown while keep awake is off");
                         if (SessionData.idleInhibitedUntil <= 0)
                             return I18n.tr("On indefinitely");
                         const remaining = Math.max(0, SessionData.idleInhibitedUntil - root.nowMs);

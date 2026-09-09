@@ -51,11 +51,11 @@ Rectangle {
             "minutes": 60
         },
         {
-            "label": I18n.tr("For 2 hours"),
+            "label": I18n.tr("For 2 hours", "idle inhibit duration menu option"),
             "minutes": 120
         },
         {
-            "label": I18n.tr("For 4 hours"),
+            "label": I18n.tr("For 4 hours", "idle inhibit duration menu option"),
             "minutes": 240
         },
         {
