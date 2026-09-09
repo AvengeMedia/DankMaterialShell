@@ -133,16 +133,15 @@ TestCase {
         compareRequests([["DP-1", "On"], ["eDP-1", "Off"]]);
     }
 
-    function test_initialSelectionRecoversDisabledHeadAfterUnplug() {
+    function test_initialSelectionLeavesDisabledHeadAloneAfterUnplug() {
         start([head("DP-1", true), head("eDP-1", false)], "DP-1");
         compareRequests([]);
 
         wlr.publish([head("eDP-1", false)]);
-        compareRequests([["eDP-1", "On"]]);
+        compareRequests([]);
 
-        wlr.publish([head("eDP-1", true)]);
-        compareRequests([["eDP-1", "On"]]);
-        compare(adapter.cycleSingleOutput(), "OUTPUT_CYCLE_NOOP");
+        wlr.publish([head("DP-1", true), head("eDP-1", false)]);
+        compareRequests([]);
     }
 
     function test_unpluggedPendingTargetCancelsAndNewHeadJoinsCycle() {

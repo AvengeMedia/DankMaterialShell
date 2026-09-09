@@ -118,9 +118,9 @@ The command returns immediately with one of these statuses:
 - `OUTPUT_CYCLE_NOOP` — fewer than two outputs are connected, or DMS could not start switching outputs.
 - `OUTPUT_CYCLE_UNSUPPORTED` — the active compositor is not Niri, its IPC socket is unavailable, or DMS output-state notifications are unavailable.
 
-If the selected output disconnects and no connected output is enabled, DMS enables the previous connected output in the cycle.
-This fallback also works before the first cycle command and leaves any already-enabled outputs unchanged.
-DMS keeps this cycle order in memory until it restarts.
+If the selected output disconnects and no connected output is enabled, DMS re-enables the previous output in the cycle, but only if a cycle command disabled it.
+Outputs that were already off, such as those disabled in display settings, are never enabled by this fallback.
+DMS keeps this cycle order and the list of outputs it disabled in memory until it restarts.
 
 ### Niri keybinding example
 
