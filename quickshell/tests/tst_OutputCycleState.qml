@@ -95,7 +95,7 @@ TestCase {
     }
 
     function test_disabledFallbackOnlyEnablesPreviousOutput() {
-        const state = { ring: ["DP-1", "HDMI-A-1", "eDP-1"], selected: "HDMI-A-1", pending: "" };
+        const state = { ring: ["DP-1", "HDMI-A-1", "eDP-1"], selected: "HDMI-A-1", pending: "", original: { "DP-1": true, "eDP-1": true } };
         const result = OutputCycleState.handleOutputsChanged(state, [
             output("DP-1", false),
             output("eDP-1", false)
@@ -127,18 +127,54 @@ TestCase {
     }
 
     function test_fallbackConfirmationDoesNotDisableNewlyEnabledPeer() {
-        const state = OutputCycleState.handleOutputsChanged(OutputCycleState.emptyState(), [
-            output("DP-1", true), output("DP-2", false), output("eDP-1", false)
-        ]).state;
-        const unplugged = OutputCycleState.handleOutputsChanged(state, [
-            output("DP-2", false), output("eDP-1", false)
+        const heads = [output("DP-1", true), output("DP-2", false), output("eDP-1", false)];
+        const initial = OutputCycleState.handleOutputsChanged(OutputCycleState.emptyState(), heads).state;
+
+        const cycle = OutputCycleState.requestCycle(initial, heads, "DP-1");
+        compare(cycle.intents, [{ id: "DP-2", enabled: true }]);
+        const cycled = OutputCycleState.handleOutputsChanged(cycle.state, [
+            output("DP-1", true), output("DP-2", true), output("eDP-1", false)
         ]);
-        compare(unplugged.intents, [{ id: "eDP-1", enabled: true }]);
+        compare(cycled.intents, [{ id: "DP-1", enabled: false }]);
+
+        const unplugged = OutputCycleState.handleOutputsChanged(cycled.state, [
+            output("DP-1", false), output("eDP-1", false)
+        ]);
+        compare(unplugged.intents, [{ id: "DP-1", enabled: true }]);
         const confirmed = OutputCycleState.handleOutputsChanged(unplugged.state, [
-            output("DP-2", true), output("eDP-1", true)
+            output("DP-1", true), output("eDP-1", false)
         ]);
         compare(confirmed.intents, []);
         compare(confirmed.state.pending, "");
+        compare(confirmed.state.original, { "DP-2": false });
+    }
+
+    function test_unplugWithoutCycleLeavesDisabledOutputAlone() {
+        const state = OutputCycleState.handleOutputsChanged(OutputCycleState.emptyState(), [
+            output("DP-2", true), output("HDMI-A-2", false)
+        ]).state;
+        const asleep = OutputCycleState.handleOutputsChanged(state, [output("HDMI-A-2", false)]);
+        compare(asleep.intents, []);
+        const awake = OutputCycleState.handleOutputsChanged(asleep.state, [
+            output("DP-2", true), output("HDMI-A-2", false)
+        ]);
+        compare(awake.intents, []);
+    }
+
+    function test_cycleRoundTripForgetsOutputDmsEnabled() {
+        let state = OutputCycleState.handleOutputsChanged(OutputCycleState.emptyState(), [
+            output("DP-2", true), output("HDMI-A-2", false)
+        ]).state;
+        state = OutputCycleState.requestCycle(state, [output("DP-2", true), output("HDMI-A-2", false)], "DP-2").state;
+        state = OutputCycleState.handleOutputsChanged(state, [output("DP-2", true), output("HDMI-A-2", true)]).state;
+        state = OutputCycleState.handleOutputsChanged(state, [output("DP-2", false), output("HDMI-A-2", true)]).state;
+        state = OutputCycleState.requestCycle(state, [output("DP-2", false), output("HDMI-A-2", true)], "HDMI-A-2").state;
+        state = OutputCycleState.handleOutputsChanged(state, [output("DP-2", true), output("HDMI-A-2", true)]).state;
+        state = OutputCycleState.handleOutputsChanged(state, [output("DP-2", true), output("HDMI-A-2", false)]).state;
+        compare(state.original, {});
+
+        const asleep = OutputCycleState.handleOutputsChanged(state, [output("HDMI-A-2", false)]);
+        compare(asleep.intents, []);
     }
 
     function test_missingPendingTargetCancelsWithoutIntent() {
