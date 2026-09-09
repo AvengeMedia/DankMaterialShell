@@ -265,6 +265,14 @@ Singleton {
         connected: CompositorService.isNiri
     }
 
+    NiriOutputCycle {
+        id: outputCycle
+        wlrOutputService: WlrOutputService
+        socket: requestSocket
+        isNiri: CompositorService.isNiri
+        currentOutput: root.currentOutput
+    }
+
     function fetchOutputs() {
         if (!CompositorService.isNiri)
             return;
@@ -285,6 +293,10 @@ Singleton {
                 log.warn("Failed to parse outputs:", e);
             }
         });
+    }
+
+    function cycleSingleOutput() {
+        return outputCycle.cycleSingleOutput();
     }
 
     function updateDisplayScales() {

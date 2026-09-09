@@ -143,7 +143,9 @@ touch .qmlls.ini
 
 5. Run `make lint-qml` from the repo root to lint QML entrypoints (requires the `.qmlls.ini` generated above). The script needs the **Qt 6** `qmllint`; it checks `qmllint6`, Fedora's `qmllint-qt6`, `/usr/lib/qt6/bin/qmllint`, then `qmllint` in `PATH`. If your Qt 6 binary lives elsewhere, set `QMLLINT=/path/to/qmllint`.
 
-6. Make your changes, test, and open a pull request.
+6. Run `make test-qml` for QML unit tests (`nix develop --command make test-qml` with Nix). These use Qt 6 `qmltestrunner` offscreen and do not require a running shell. Set `QMLTESTRUNNER=/path/to/qmltestrunner` if needed.
+
+7. Make your changes, test, and open a pull request.
 
 ### I18n/Localization
 

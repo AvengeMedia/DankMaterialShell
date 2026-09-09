@@ -103,6 +103,35 @@ dms ipc call brightness increment 10 ""
 dms ipc call brightness decrement 5 "intel_backlight"
 ```
 
+## Target: `outputs`
+
+### `cycle`
+
+Cycles through connected outputs on Niri in stable name order, leaving one enabled after a successful switch.
+If the next output is disabled, DMS enables it and waits for confirmation before disabling the others.
+If it is already enabled, DMS disables the others immediately.
+
+The command returns immediately with one of these statuses:
+
+- `OUTPUT_CYCLE_ACCEPTED` — DMS started switching outputs; this does not confirm completion.
+- `OUTPUT_CYCLE_BUSY` — DMS is still waiting for the previously selected output to become enabled.
+- `OUTPUT_CYCLE_NOOP` — fewer than two outputs are connected, or DMS could not start switching outputs.
+- `OUTPUT_CYCLE_UNSUPPORTED` — the active compositor is not Niri, its IPC socket is unavailable, or DMS output-state notifications are unavailable.
+
+If the selected output disconnects and no connected output is enabled, DMS enables the previous connected output in the cycle.
+This fallback also works before the first cycle command and leaves any already-enabled outputs unchanged.
+DMS keeps this cycle order in memory until it restarts.
+
+### Niri keybinding example
+
+Add this binding to your Niri configuration:
+
+```kdl
+binds {
+    Super+P { spawn "dms" "ipc" "call" "outputs" "cycle"; }
+}
+```
+
 ## Target: `night`
 
 Night mode (gamma/color temperature) control.

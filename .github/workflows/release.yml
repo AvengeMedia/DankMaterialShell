@@ -378,6 +378,7 @@ jobs:
           # Tar the CONTENTS of quickshell/, not the directory itself
           (cd quickshell && tar --exclude='.git' \
               --exclude='.github' \
+              --exclude='./tests' \
               --exclude='*.tar.gz' \
               -czf ../_release_assets/dms-qml.tar.gz .)
 

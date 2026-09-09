@@ -69,6 +69,7 @@ override_dh_auto_install:
 	rm -rf debian/dms/usr/share/quickshell/dms/core
 	rm -rf debian/dms/usr/share/quickshell/dms/distro
 	rm -rf debian/dms/usr/share/quickshell/dms/assets
+	rm -rf debian/dms/usr/share/quickshell/dms/tests
 
 	# Create VERSION file for Quickshell (stable release format)
 	echo "$(BASE_VERSION)" > debian/dms/usr/share/quickshell/dms/VERSION
