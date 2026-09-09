@@ -11797,7 +11797,7 @@
       "touchpad",
       "type"
     ],
-    "description": "Button areas determines click type by position; Clickfinger by finger count",
+    "description": "Button areas determines click type by finger position; Clickfinger by finger count",
     "conditionKey": "isNiri"
   },
   {

@@ -245,9 +245,12 @@ Item {
 
                     tags: ["touchpad", "click", "method"]
                     settingKey: "touchpadClickMethod"
-                    text: I18n.tr("Click Method")
-                    description: I18n.tr("Button areas determines click type by position; Clickfinger by finger count")
-                    options: [I18n.tr("Default"), I18n.tr("Button areas"), I18n.tr("Clickfinger")]
+                    text: I18n.tr("Click Method", "Rules by which touchpad input determines left, right and middle click")
+                    description: I18n.tr("Button areas determines click type by finger position; Clickfinger by finger count")
+                    options: [
+                        I18n.tr("Default"),
+                        I18n.tr("Button areas", "Touchpad click method: click type is determined by finger position"),
+                        I18n.tr("Clickfinger", "Touchpad click method: click type is determined by finger count")]
                     currentValue: options[Math.max(0, methods.indexOf(SettingsData.touchpadClickMethod))]
                     onValueChanged: value => {
                         const index = touchpadClickMethodRow.options.indexOf(value);
