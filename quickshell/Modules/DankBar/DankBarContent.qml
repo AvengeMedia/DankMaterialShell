@@ -19,6 +19,8 @@ Item {
     property var leftWidgetsModel
     property var centerWidgetsModel
     property var rightWidgetsModel
+    property var widgetOwner: null
+    property var hoverSections: null
     property bool _animateFrameInsets: false
 
     readonly property real innerPadding: barConfig?.innerPadding ?? 4
@@ -84,6 +86,34 @@ Item {
     property alias vLeftSection: vLeftSection
     property alias vCenterSection: vCenterSection
     property alias vRightSection: vRightSection
+
+    readonly property var _defaultHoverSections: barWindow.isVertical ? [
+        {
+            section: vLeftSection,
+            name: "left"
+        },
+        {
+            section: vCenterSection,
+            name: "center"
+        },
+        {
+            section: vRightSection,
+            name: "right"
+        }
+    ] : [
+        {
+            section: hLeftSection,
+            name: "left"
+        },
+        {
+            section: hCenterSection,
+            name: "center"
+        },
+        {
+            section: hRightSection,
+            name: "right"
+        }
+    ]
 
     anchors.fill: parent
     anchors.leftMargin: _leftMargin
@@ -413,12 +443,8 @@ Item {
         barContent: topBarContent
         barWindow: topBarContent.barWindow
         barConfig: topBarContent.barConfig
-        hLeftSection: topBarContent.hLeftSection
-        hCenterSection: topBarContent.hCenterSection
-        hRightSection: topBarContent.hRightSection
-        vLeftSection: topBarContent.vLeftSection
-        vCenterSection: topBarContent.vCenterSection
-        vRightSection: topBarContent.vRightSection
+        widgetOwner: topBarContent.widgetOwner
+        sections: topBarContent.hoverSections || topBarContent._defaultHoverSections
         leftWidgetsModel: topBarContent.leftWidgetsModel
         centerWidgetsModel: topBarContent.centerWidgetsModel
         rightWidgetsModel: topBarContent.rightWidgetsModel
@@ -426,6 +452,28 @@ Item {
 
     readonly property string activeHoverTrigger: hoverController.activeHoverTrigger
     readonly property bool hoverPopoutsEnabled: hoverController.hoverPopoutsEnabled
+
+    function mapItemToScreen(item, x, y) {
+        if (!item || typeof item.mapToItem !== "function")
+            return null;
+        try {
+            const raw = item.mapToItem(null, x ?? 0, y ?? 0);
+            if (!raw)
+                return null;
+            return Qt.point(raw.x + (barWindow?.hostOriginX ?? 0), raw.y + (barWindow?.hostOriginY ?? 0));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function queueHoverFromItem(item, point) {
+        if (!point)
+            return;
+        const gp = mapItemToScreen(item, point.position.x, point.position.y);
+        if (!gp)
+            return;
+        queueHoverPopout(gp.x, gp.y);
+    }
 
     function queueHoverPopout(gx, gy) {
         hoverController.queueHoverPoint(gx, gy);
@@ -447,6 +495,10 @@ Item {
         hoverController.updateBarHovered(hovered);
     }
 
+    function invalidateHoverCandidateCache() {
+        hoverController.invalidateCandidateCache();
+    }
+
     function resetHoverForBarGeometryChange() {
         hoverController.resetForBarGeometryChange();
     }
@@ -465,14 +517,13 @@ Item {
             const centerSection = barWindow.isVertical ? vCenterSection : hCenterSection;
             if (centerSection) {
                 if (barWindow.isVertical) {
-                    const centerY = centerSection.height / 2;
                     return {
-                        triggerPos: centerSection.mapToItem(null, 0, centerY),
+                        triggerPos: mapItemToScreen(centerSection, 0, centerSection.height / 2),
                         triggerWidth: centerSection.height
                     };
                 }
                 return {
-                    triggerPos: centerSection.mapToItem(null, 0, 0),
+                    triggerPos: mapItemToScreen(centerSection, 0, 0),
                     triggerWidth: centerSection.width
                 };
             }
@@ -480,7 +531,7 @@ Item {
         const ref = opts.visualItem || widgetItem.visualContent || widgetItem;
         const w = opts.triggerWidth !== undefined ? opts.triggerWidth : (widgetItem.visualWidth !== undefined ? widgetItem.visualWidth : widgetItem.width);
         return {
-            triggerPos: ref.mapToItem(null, 0, 0),
+            triggerPos: mapItemToScreen(ref, 0, 0),
             triggerWidth: w
         };
     }
@@ -987,7 +1038,9 @@ Item {
                 if (loader.item.setBarContext)
                     loader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
                 if (loader.item.setTriggerPosition) {
-                    const globalPos = launcherButton.visualContent.mapToItem(null, 0, 0);
+                    const globalPos = topBarContent.mapItemToScreen(launcherButton.visualContent, 0, 0);
+                    if (!globalPos)
+                        return false;
                     const currentScreen = barWindow.screen;
                     const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, launcherButton.visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
                     loader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);

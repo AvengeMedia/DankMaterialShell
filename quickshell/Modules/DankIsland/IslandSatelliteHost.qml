@@ -153,6 +153,9 @@ Item {
         property bool hasAdjacentLeftBar: false
         property bool hasAdjacentRightBar: false
         property var hyprlandOverviewLoader: root.hyprlandOverviewLoader
+        property var hostWindow: root.hostWindow
+        readonly property int hostOriginX: hostWindow?.hostOriginX ?? 0
+        readonly property int hostOriginY: hostWindow?.hostOriginY ?? 0
         property var controlCenterButtonRef: null
         property var clockButtonRef: null
         property var systemUpdateButtonRef: null
@@ -269,7 +272,14 @@ Item {
                 return;
             blurRebuildTimer.restart();
             blurTrailTimer.restart();
+            componentProvider.invalidateHoverCandidateCache();
         }
+    }
+
+    function onSatelliteRowMoved() {
+        kickBlur();
+        if (!root.motionRunning)
+            componentProvider.invalidateHoverCandidateCache();
     }
 
     function kickBlur() {
@@ -412,10 +422,25 @@ Item {
         barWindow: satelliteBarWindow
         rootWindow: root.hostWindow
         barConfig: root.satelliteConfig
+        widgetOwner: root
+        hoverSections: [
+            {
+                section: leadingWidgetSection,
+                name: "left"
+            },
+            {
+                section: trailingWidgetSection,
+                name: "right"
+            }
+        ]
         leftWidgetsModel: emptyWidgetsModel
         centerWidgetsModel: emptyWidgetsModel
         rightWidgetsModel: emptyWidgetsModel
     }
+
+    readonly property bool satelliteHoverTracking: root.visible && componentProvider.hoverPopoutsEnabled && !root.controller.inputSuspended
+    readonly property bool satellitesHovered: satelliteHoverTracking && (leadingEnvelopeHoverHandler.hovered || trailingEnvelopeHoverHandler.hovered || leadingWidgetHoverHandler.hovered || trailingWidgetHoverHandler.hovered)
+    onSatellitesHoveredChanged: componentProvider.updateHoverBarHovered(satellitesHovered)
 
     Item {
         id: leadingInputEnvelope
@@ -429,6 +454,12 @@ Item {
         y: root.isVertical ? alongPos : crossPos
         width: root.isVertical ? crossSize : alongSize
         height: root.isVertical ? alongSize : crossSize
+
+        HoverHandler {
+            id: leadingEnvelopeHoverHandler
+            enabled: root.satelliteHoverTracking
+            onPointChanged: componentProvider.queueHoverFromItem(leadingInputEnvelope, point)
+        }
     }
 
     Item {
@@ -444,6 +475,12 @@ Item {
         y: root.isVertical ? alongPos : crossPos
         width: root.isVertical ? crossSize : alongSize
         height: root.isVertical ? alongSize : crossSize
+
+        HoverHandler {
+            id: trailingEnvelopeHoverHandler
+            enabled: root.satelliteHoverTracking
+            onPointChanged: componentProvider.queueHoverFromItem(trailingInputEnvelope, point)
+        }
     }
 
     IslandSatelliteChrome {
@@ -500,8 +537,10 @@ Item {
         y: root.isVertical ? alongPos : root.rowCross
         width: root.isVertical ? crossSize : alongSize
         height: root.isVertical ? alongSize : crossSize
-        onAlongPosChanged: root.kickBlur()
-        onAlongSizeChanged: root.kickBlur()
+        onXChanged: root.onSatelliteRowMoved()
+        onYChanged: root.onSatelliteRowMoved()
+        onWidthChanged: root.onSatelliteRowMoved()
+        onHeightChanged: root.onSatelliteRowMoved()
 
         LeftSection {
             id: leadingWidgetSection
@@ -521,6 +560,12 @@ Item {
             crossEdgeExtension: root.crossEdgeExtension
             edgeIsScreenEdge: root.edgeAligned
         }
+
+        HoverHandler {
+            id: leadingWidgetHoverHandler
+            enabled: root.satelliteHoverTracking
+            onPointChanged: componentProvider.queueHoverFromItem(leadingInput, point)
+        }
     }
 
     Item {
@@ -534,8 +579,10 @@ Item {
         y: root.isVertical ? alongPos : root.rowCross
         width: root.isVertical ? crossSize : alongSize
         height: root.isVertical ? alongSize : crossSize
-        onAlongPosChanged: root.kickBlur()
-        onAlongSizeChanged: root.kickBlur()
+        onXChanged: root.onSatelliteRowMoved()
+        onYChanged: root.onSatelliteRowMoved()
+        onWidthChanged: root.onSatelliteRowMoved()
+        onHeightChanged: root.onSatelliteRowMoved()
 
         RightSection {
             id: trailingWidgetSection
@@ -554,6 +601,12 @@ Item {
             blurBarWindow: satelliteBarWindow
             crossEdgeExtension: root.crossEdgeExtension
             edgeIsScreenEdge: root.edgeAligned
+        }
+
+        HoverHandler {
+            id: trailingWidgetHoverHandler
+            enabled: root.satelliteHoverTracking
+            onPointChanged: componentProvider.queueHoverFromItem(trailingInput, point)
         }
     }
 }

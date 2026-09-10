@@ -1168,20 +1168,8 @@ Item {
                     HoverHandler {
                         id: hoverPopoutHandler
                         enabled: (barConfig?.hoverPopouts ?? false) && !barWindow.clickThroughEnabled
-
-                        property real lastGlobalX: 0
-                        property real lastGlobalY: 0
-
-                        onPointChanged: {
-                            const gp = barUnitInset.mapToItem(null, point.position.x, point.position.y);
-                            lastGlobalX = gp.x;
-                            lastGlobalY = gp.y;
-                            topBarContent.queueHoverPopout(gp.x, gp.y);
-                        }
-
-                        onHoveredChanged: {
-                            topBarContent.updateHoverBarHovered(hovered);
-                        }
+                        onPointChanged: topBarContent.queueHoverFromItem(barUnitInset, point)
+                        onHoveredChanged: topBarContent.updateHoverBarHovered(hovered)
                     }
                 }
             }
