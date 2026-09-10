@@ -222,6 +222,17 @@ Singleton {
                 viewModeEnforced: true,
                 defaultSectionPriority: 2.3
             },
+            "dms_vpn": {
+                id: "dms_vpn",
+                name: I18n.tr("VPN"),
+                cornerIcon: "vpn_key",
+                comment: "DMS",
+                defaultTrigger: "",
+                isLauncher: true,
+                viewMode: "list",
+                viewModeEnforced: true,
+                defaultSectionPriority: 2.4
+            },
             "dms_qr_generator": {
                 id: "dms_qr_generator",
                 name: I18n.tr("QR Generator"),
@@ -378,6 +389,34 @@ Singleton {
                     }));
         }
 
+        if (pluginId === "dms_vpn") {
+            if (!DMSNetworkService.vpnAvailable)
+                return [];
+            const q = (query || "").toString().trim().toLowerCase();
+            return (DMSNetworkService.profiles || []).map(profile => {
+                const id = profile.uuid || profile.name || "";
+                const active = DMSNetworkService.isActiveVpnUuid(id);
+                const connecting = DMSNetworkService.isVpnConnectingUuid(id);
+                const typeLabel = VPNService.getVpnTypeFromProfile(profile);
+                return {
+                    name: profile.name || I18n.tr("VPN"),
+                    icon: active ? "material:vpn_lock" : "material:vpn_key_off",
+                    comment: typeLabel,
+                    action: "vpn:" + id,
+                    keywords: ["vpn", typeLabel, active ? "disconnect" : "connect"],
+                    badgeLabel: connecting ? I18n.tr("Connecting...") : (active ? I18n.tr("Connected") : I18n.tr("Disconnected")),
+                    isBuiltInLauncher: true,
+                    builtInPluginId: pluginId
+                };
+            }).filter(item => {
+                if (!q)
+                    return true;
+                if (item.name.toLowerCase().includes(q))
+                    return true;
+                return item.keywords.some(k => k.toLowerCase().includes(q));
+            });
+        }
+
         if (pluginId === "dms_qr_generator") {
             const text = (query || "").toString().trim();
             return [
@@ -437,6 +476,14 @@ Singleton {
             return true;
         case "power":
             return executePowerLauncherAction(parts.slice(1).join(":"));
+        case "vpn":
+            {
+                const id = parts.slice(1).join(":");
+                if (!id)
+                    return false;
+                DMSNetworkService.toggleVpn(id);
+                return true;
+            }
         }
         return false;
     }
