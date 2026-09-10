@@ -638,17 +638,46 @@ Singleton {
     // * Idle Inhibitor
     signal inhibitorChanged
 
-    // The inhibitor is a state the user turns on explicitly, so it is persisted in the session
-    // like the other Control Center toggles (doNotDisturb, nightModeEnabled, ...). Without this
-    // it lived only in memory and every shell restart silently cleared it.
-    //
-    // Both entry points are needed because the two singletons are lazily created and the order is
-    // not fixed: onLoaded covers "service first, session file read later", the restore below
-    // covers "session already loaded by the time the service is instantiated". enableIdleInhibit
-    // is idempotent, so whichever runs second does nothing.
+    readonly property int _maxExpireInterval: 86400000
+
+    Timer {
+        id: inhibitExpireTimer
+        repeat: false
+        running: false
+        onTriggered: root._armExpireTimer()
+    }
+
+    // Timers use a monotonic clock that stops across suspend, so the deadline is
+    // re-checked against the wall clock on resume and after each chunk.
+    function _armExpireTimer() {
+        inhibitExpireTimer.stop();
+        if (!idleInhibited || SessionData.idleInhibitedUntil <= 0)
+            return;
+        const remaining = SessionData.idleInhibitedUntil - Date.now();
+        if (remaining <= 0) {
+            disableIdleInhibit();
+            return;
+        }
+        inhibitExpireTimer.interval = Math.min(remaining, _maxExpireInterval);
+        inhibitExpireTimer.start();
+    }
+
+    onSessionResumed: _armExpireTimer()
+
+    function _setIdleInhibited(enabled) {
+        if (idleInhibited === enabled)
+            return;
+        idleInhibited = enabled;
+        inhibitorChanged();
+    }
+
+    // Both entry points are deliberate: the singletons are created lazily in no fixed order, so
+    // whichever of these runs once the session is loaded does the restore; the other no-ops.
     function _restoreIdleInhibit() {
-        if (SessionData.idleInhibited && !idleInhibited)
-            enableIdleInhibit();
+        if (!SessionData._hasLoaded)
+            return;
+        _setIdleInhibited(SessionData.idleInhibited);
+        _armExpireTimer();
     }
 
     Connections {
@@ -661,20 +690,16 @@ Singleton {
 
     Component.onCompleted: _restoreIdleInhibit()
 
-    function enableIdleInhibit() {
-        if (idleInhibited)
-            return;
-        idleInhibited = true;
-        SessionData.setIdleInhibited(true);
-        inhibitorChanged();
+    function enableIdleInhibit(durationMinutes) {
+        SessionData.setIdleInhibited(true, durationMinutes);
+        _setIdleInhibited(true);
+        _armExpireTimer();
     }
 
     function disableIdleInhibit() {
-        if (!idleInhibited)
-            return;
-        idleInhibited = false;
         SessionData.setIdleInhibited(false);
-        inhibitorChanged();
+        _setIdleInhibited(false);
+        _armExpireTimer();
     }
 
     function toggleIdleInhibit() {

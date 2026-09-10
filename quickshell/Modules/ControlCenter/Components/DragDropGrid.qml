@@ -260,6 +260,8 @@ Column {
             return widgetWidth <= 25 ? smallColorPickerComponent : colorPickerPillComponent;
         case "doNotDisturb":
             return widgetWidth <= 25 ? smallToggleComponent : dndPillComponent;
+        case "idleInhibitor":
+            return widgetWidth <= 25 ? smallToggleComponent : idleInhibitorPillComponent;
         default:
             return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
         }
@@ -715,6 +717,22 @@ Column {
     }
 
     Component {
+        id: idleInhibitorPillComponent
+        IdleInhibitorPill {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 60
+
+            onExpandClicked: {
+                if (!root.editMode) {
+                    root.expandClicked(widgetData, widgetIndex);
+                }
+            }
+        }
+    }
+
+    Component {
         id: smallBatteryComponent
         SmallBatteryButton {
             property var widgetData: parent.widgetData || {}
@@ -744,8 +762,6 @@ Column {
                     return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode";
                 case "darkMode":
                     return "contrast";
-                case "idleInhibitor":
-                    return "motion_sensor_active";
                 default:
                     return "help";
                 }
@@ -761,8 +777,6 @@ Column {
                             return SessionData.isLightMode ? I18n.tr("Auto (Light Mode)", "dark mode toggle label when matugen smart mode resolved light") : I18n.tr("Auto (Dark Mode)", "dark mode toggle label when matugen smart mode resolved dark");
                         return I18n.tr("Dark Mode");
                     }
-                case "idleInhibitor":
-                    return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake");
                 default:
                     return I18n.tr("Unknown", "widget status");
                 }
@@ -783,8 +797,6 @@ Column {
                     return DisplayService.nightModeEnabled || false;
                 case "darkMode":
                     return !SessionData.isLightMode;
-                case "idleInhibitor":
-                    return SessionService.idleInhibited || false;
                 default:
                     return false;
                 }
@@ -807,11 +819,6 @@ Column {
                         const newMode = !SessionData.isLightMode;
                         Theme.screenTransition();
                         Theme.setLightMode(newMode);
-                        break;
-                    }
-                case "idleInhibitor":
-                    {
-                        SessionService.toggleIdleInhibit();
                         break;
                     }
                 }

@@ -37,6 +37,7 @@ Singleton {
     property bool doNotDisturb: false
     property real doNotDisturbUntil: 0
     property bool idleInhibited: false
+    property real idleInhibitedUntil: 0
     property string terminalOverride: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
@@ -301,6 +302,7 @@ Singleton {
 
             Store.parse(root, obj);
             _applyDndExpirySanity();
+            _applyIdleInhibitExpirySanity();
 
             _loadedSessionSnapshot = getCurrentSessionJson();
             _hasLoaded = true;
@@ -382,6 +384,7 @@ Singleton {
 
             Store.parse(root, obj);
             _applyDndExpirySanity();
+            _applyIdleInhibitExpirySanity();
 
             _loadedSessionSnapshot = getCurrentSessionJson();
             _hasLoaded = true;
@@ -406,6 +409,15 @@ Singleton {
             doNotDisturbUntil = 0;
         }
         _armDndExpireTimer();
+    }
+
+    function _applyIdleInhibitExpirySanity() {
+        if (idleInhibited && idleInhibitedUntil > 0 && Date.now() >= idleInhibitedUntil) {
+            idleInhibited = false;
+            idleInhibitedUntil = 0;
+        } else if (!idleInhibited && idleInhibitedUntil !== 0) {
+            idleInhibitedUntil = 0;
+        }
     }
 
     function saveSettings() {
@@ -640,11 +652,14 @@ Singleton {
         saveSettings();
     }
 
-    function setIdleInhibited(enabled) {
+    function setIdleInhibited(enabled, durationMinutes) {
         const next = !!enabled;
-        if (idleInhibited === next)
+        const minutes = Number(durationMinutes) || 0;
+        const nextUntil = (next && minutes > 0) ? Date.now() + minutes * 60 * 1000 : 0;
+        if (idleInhibited === next && idleInhibitedUntil === nextUntil)
             return;
         idleInhibited = next;
+        idleInhibitedUntil = nextUntil;
         saveSettings();
     }
 

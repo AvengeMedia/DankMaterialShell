@@ -101,6 +101,28 @@ Item {
         return `DEFAULTAPP_LAUNCH_REQUESTED: ${appName}`;
     }
 
+    function parseIdleInhibitMinutes(duration) {
+        if (duration === undefined || duration === null)
+            return -1;
+        const trimmed = String(duration).trim();
+        if (!trimmed)
+            return -1;
+        const minutes = parseInt(trimmed, 10);
+        if (isNaN(minutes) || minutes <= 0 || String(minutes) !== trimmed)
+            return -1;
+        return minutes;
+    }
+
+    function idleInhibitStatusMessage() {
+        if (!SessionService.idleInhibited)
+            return "Idle inhibit is disabled";
+        if (SessionData.idleInhibitedUntil <= 0)
+            return "Idle inhibit is enabled indefinitely";
+        const remainingMs = Math.max(0, SessionData.idleInhibitedUntil - Date.now());
+        const remainingMin = Math.ceil(remainingMs / 60000);
+        return `Idle inhibit is enabled for ${remainingMin} more minute${remainingMin === 1 ? "" : "s"}`;
+    }
+
     IpcHandler {
         function browser(): string {
             return root.launchDefaultMimeApp("browser", root.defaultAppMimeTypes.browser);
@@ -535,21 +557,29 @@ Item {
     IpcHandler {
         function toggle(): string {
             SessionService.toggleIdleInhibit();
-            return SessionService.idleInhibited ? "Idle inhibit enabled" : "Idle inhibit disabled";
+            return root.idleInhibitStatusMessage();
         }
 
         function enable(): string {
             SessionService.enableIdleInhibit();
-            return "Idle inhibit enabled";
+            return root.idleInhibitStatusMessage();
+        }
+
+        function enableFor(minutes: string): string {
+            const parsed = root.parseIdleInhibitMinutes(minutes);
+            if (parsed < 0)
+                return "Invalid duration. Use minutes, e.g. 60.";
+            SessionService.enableIdleInhibit(parsed);
+            return root.idleInhibitStatusMessage();
         }
 
         function disable(): string {
             SessionService.disableIdleInhibit();
-            return "Idle inhibit disabled";
+            return "Idle inhibit is disabled";
         }
 
         function status(): string {
-            return SessionService.idleInhibited ? "Idle inhibit is enabled" : "Idle inhibit is disabled";
+            return root.idleInhibitStatusMessage();
         }
 
         function reason(newReason: string): string {

@@ -210,6 +210,9 @@ Item {
         case "doNotDisturb":
             coreDetailLoader.sourceComponent = doNotDisturbDetailComponent;
             break;
+        case "idleInhibitor":
+            coreDetailLoader.sourceComponent = idleInhibitorDetailComponent;
+            break;
         default:
             return;
         }
@@ -260,6 +263,11 @@ Item {
     Component {
         id: doNotDisturbDetailComponent
         DoNotDisturbDetail {}
+    }
+
+    Component {
+        id: idleInhibitorDetailComponent
+        IdleInhibitorDetail {}
     }
 
     Component {

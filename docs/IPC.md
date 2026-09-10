@@ -324,17 +324,27 @@ Idle inhibitor control to prevent automatic sleep/lock.
 - Returns: Current inhibit state message
 
 **`enable`**
-- Enable idle inhibit (prevent sleep/lock)
-- Returns: Confirmation message
+- Enable idle inhibit indefinitely (prevent sleep/lock)
+- Returns: Current inhibit state message
+
+**`enableFor <minutes>`**
+- Enable idle inhibit for a number of minutes
+- Returns: Current inhibit state message
 
 **`disable`**
 - Disable idle inhibit (allow sleep/lock)
 - Returns: Confirmation message
 
+**`status`**
+- Report whether idle inhibit is on, and remaining time when a timer is set
+- Returns: Current inhibit state message
+
 ### Examples
 ```bash
 dms ipc call inhibit toggle
 dms ipc call inhibit enable
+dms ipc call inhibit enableFor 60
+dms ipc call inhibit status
 ```
 
 ## Target: `powerprofile`
