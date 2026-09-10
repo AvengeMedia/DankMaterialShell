@@ -111,7 +111,10 @@ type pendingVPNCredentials struct {
 	// falls back to Password under the "password" key when empty.
 	Secrets           map[string]string
 	PersistentSecrets map[string]string
-	SavePassword      bool
+	// PersistentData holds non-secret vpn data entries to merge on success,
+	// such as a server certificate the user chose to trust.
+	PersistentData map[string]string
+	SavePassword   bool
 }
 
 type cachedVPNCredentials struct {
