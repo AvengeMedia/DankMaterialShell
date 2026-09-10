@@ -15,11 +15,6 @@ layout(std140, binding = 0) uniform buf {
     vec4 surfaceColor;  // straight (non-premultiplied) rgba
 } ubuf;
 
-float sdBox(vec2 p, vec2 c, vec2 hs) {
-    vec2 q = abs(p - c) - hs;
-    return min(max(q.x, q.y), 0.0) + length(max(q, vec2(0.0)));
-}
-
 float sdRoundBox(vec2 p, vec2 c, vec2 hs, float r) {
     r = min(r, min(hs.x, hs.y));
     vec2 q = abs(p - c) - hs + r;
@@ -28,12 +23,9 @@ float sdRoundBox(vec2 p, vec2 c, vec2 hs, float r) {
 
 void main() {
     vec2 px = qt_TexCoord0 * vec2(ubuf.widthPx, ubuf.heightPx);
-    vec2 sc = vec2(ubuf.widthPx, ubuf.heightPx) * 0.5;
-    float dOuter = sdBox(px, sc, sc);
     vec2 cutC = vec2((ubuf.cutout.x + ubuf.cutout.z) * 0.5, (ubuf.cutout.y + ubuf.cutout.w) * 0.5);
     vec2 cutH = vec2((ubuf.cutout.z - ubuf.cutout.x) * 0.5, (ubuf.cutout.w - ubuf.cutout.y) * 0.5);
-    float dCut = sdRoundBox(px, cutC, cutH, ubuf.cutoutRadius);
-    float d = max(dOuter, -dCut);
+    float d = -sdRoundBox(px, cutC, cutH, ubuf.cutoutRadius);
 
     float fw = max(fwidth(d), 1e-4);
     float cov = 1.0 - smoothstep(-fw, fw, d);

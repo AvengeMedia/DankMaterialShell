@@ -37,11 +37,6 @@ layout(std140, binding = 0) uniform buf {
     vec4 chromeParam3;
 } ubuf;
 
-float sdBox(vec2 p, vec2 c, vec2 hs) {
-    vec2 q = abs(p - c) - hs;
-    return min(max(q.x, q.y), 0.0) + length(max(q, vec2(0.0)));
-}
-
 float sdRoundBox(vec2 p, vec2 c, vec2 hs, float r) {
     r = min(r, min(hs.x, hs.y));
     vec2 q = abs(p - c) - hs + r;
@@ -73,12 +68,9 @@ float chromeK(vec2 px, vec4 rect, vec4 ks) {
 }
 
 float sceneDist(vec2 px) {
-    vec2 sc = vec2(ubuf.widthPx, ubuf.heightPx) * 0.5;
-    float dOuter = sdBox(px, sc, sc);
     vec2 cutC = vec2((ubuf.cutout.x + ubuf.cutout.z) * 0.5, (ubuf.cutout.y + ubuf.cutout.w) * 0.5);
     vec2 cutH = vec2((ubuf.cutout.z - ubuf.cutout.x) * 0.5, (ubuf.cutout.w - ubuf.cutout.y) * 0.5);
-    float dCut = sdRoundBox(px, cutC, cutH, ubuf.cutoutRadius);
-    float d = max(dOuter, -dCut);
+    float d = -sdRoundBox(px, cutC, cutH, ubuf.cutoutRadius);
 
     if (ubuf.chromeParam0.x > 0.5)
         d = smin(d, chromeDist(px, ubuf.chromeRect0, ubuf.chromeCorner0), chromeK(px, ubuf.chromeRect0, ubuf.chromeK0));
