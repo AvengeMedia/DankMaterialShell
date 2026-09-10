@@ -16,22 +16,43 @@ Item {
         return Theme.surfaceText;
     }
 
+    // The sysfs names DMS can write, in the order they are tried. Hardware that
+    // exposes none of them, a Lenovo IdeaPad on ideapad_laptop for instance,
+    // used to run the apply script to completion without writing anything, and
+    // sh exiting 0 was indistinguishable from a successful write.
+    readonly property string thresholdFileList: "charge_control_limit_max charge_stop_threshold charge_control_end_threshold"
+    readonly property int noThresholdExitCode: 2
+
+    property bool chargeLimitSupported: true
+
+    Process {
+        id: thresholdProbe
+        running: Qt.platform.os === "linux"
+        command: ["sh", "-c", "for bat in /sys/class/power_supply/BAT*; do for file in " + root.thresholdFileList + "; do [ -f \"$bat/$file\" ] && exit 0; done; done; exit 1"]
+        onExited: exitCode => root.chargeLimitSupported = exitCode === 0
+    }
+
     Process {
         id: applyLimitProcess
         command: ["pkexec", "sh", "-c", "
+found=0
 for bat in /sys/class/power_supply/BAT*; do
-  if [ -f \"$bat/charge_control_limit_max\" ]; then
-    echo " + SettingsData.batteryChargeLimit + " > \"$bat/charge_control_limit_max\"
-  elif [ -f \"$bat/charge_stop_threshold\" ]; then
-    echo " + SettingsData.batteryChargeLimit + " > \"$bat/charge_stop_threshold\"
-  elif [ -f \"$bat/charge_control_end_threshold\" ]; then
-    echo " + SettingsData.batteryChargeLimit + " > \"$bat/charge_control_end_threshold\"
-  fi
+  for file in " + root.thresholdFileList + "; do
+    if [ -f \"$bat/$file\" ]; then
+      found=1
+      echo " + SettingsData.batteryChargeLimit + " > \"$bat/$file\" || exit 1
+      break
+    fi
+  done
 done
+[ \"$found\" = 1 ] || exit " + root.noThresholdExitCode + "
 "]
         running: false
         onExited: exitCode => {
-            if (exitCode !== 0) {
+            if (exitCode === root.noThresholdExitCode) {
+                root.chargeLimitSupported = false;
+                ToastService.showError(I18n.tr("Charge limit not supported on this hardware", "battery settings: toast title when sysfs has no charge threshold"), I18n.tr("No writable charge threshold file was found under /sys/class/power_supply.", "battery settings: why the charge limit could not be applied"));
+            } else if (exitCode !== 0) {
                 ToastService.showError(I18n.tr("Failed to apply charge limit to system"), I18n.tr("Process exited with code %1").arg(exitCode));
             } else {
                 ToastService.showInfo(I18n.tr("Charge limit applied successfully"), I18n.tr("Limit set to %1%").arg(SettingsData.batteryChargeLimit));
@@ -214,9 +235,18 @@ done
                     onSliderValueChanged: newValue => SettingsData.set("batteryChargeLimit", newValue)
                 }
 
+                StyledText {
+                    width: parent.width
+                    visible: Qt.platform.os === "linux" && !root.chargeLimitSupported
+                    text: I18n.tr("No writable charge threshold file was found under /sys/class/power_supply.", "battery settings: why the charge limit could not be applied")
+                    wrapMode: Text.WordWrap
+                    color: Theme.surfaceVariantText
+                    font.pixelSize: Theme.fontSizeMedium
+                }
+
                 Row {
                     // charge_control_* live in Linux sysfs; no BSD equivalent
-                    visible: Qt.platform.os === "linux"
+                    visible: Qt.platform.os === "linux" && root.chargeLimitSupported
                     width: parent.width
                     height: applyButton.height
                     layoutDirection: I18n.isRtl ? Qt.LeftToRight : Qt.RightToLeft
