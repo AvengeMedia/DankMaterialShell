@@ -382,6 +382,39 @@ Item {
     }
 
     LazyLoader {
+        id: uninstallAppConfirmLoader
+        active: false
+        readonly property ConfirmModal loadedModal: item as ConfirmModal
+
+        ConfirmModal {
+            id: uninstallAppConfirm
+        }
+    }
+
+    Connections {
+        target: AppSearchService
+        function onUninstallAppConfirmRequested(appId, appName, flatpakId) {
+            uninstallAppConfirmLoader.active = true;
+            const showDialog = () => {
+                if (uninstallAppConfirmLoader.loadedModal) {
+                    uninstallAppConfirmLoader.loadedModal.showWithOptions({
+                        title: I18n.tr("Uninstall %1?", "modal title for app uninstallation").arg(appName),
+                        message: I18n.tr("%1 will be removed from your system.", "modal confirmation text for uninstalling an app").arg(appName),
+                        confirmText: I18n.tr("Uninstall", "confirm button label to proceed with uninstallation"),
+                        cancelText: I18n.tr("Cancel"),
+                        confirmColor: Theme.error,
+                        onConfirm: () => AppSearchService.uninstallFlatpak(appId, appName, flatpakId)
+                    });
+                }
+            };
+            if (uninstallAppConfirmLoader.loadedModal)
+                showDialog();
+            else
+                Qt.callLater(showDialog);
+        }
+    }
+
+    LazyLoader {
         id: notificationCenterLoader
 
         active: false

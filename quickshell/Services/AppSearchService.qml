@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Services
 
@@ -1003,5 +1004,69 @@ Singleton {
         } catch (e) {
             log.warn("Error setting category on plugin", pluginId, ":", e);
         }
+    }
+
+    signal uninstallAppConfirmRequested(string appId, string appName, string flatpakId)
+
+    property string _uninstallingAppId: ""
+    property string _uninstallingAppName: ""
+    property string _uninstallingStderr: ""
+
+    Process {
+        id: flatpakUninstallProc
+        running: false
+        command: []
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                root._uninstallingStderr = (text || "").trim();
+            }
+        }
+
+        onExited: exitCode => {
+            const appName = root._uninstallingAppName;
+            const appId = root._uninstallingAppId;
+            const err = root._uninstallingStderr;
+            root._uninstallingAppName = "";
+            root._uninstallingAppId = "";
+            root._uninstallingStderr = "";
+
+            if (exitCode === 0) {
+                ToastService.showInfo(I18n.tr("Uninstalled: %1", "uninstallation success").arg(appName));
+                if (appId) {
+                    SessionData.removePinnedApp(appId);
+                    SessionData.removeBarPinnedApp(appId);
+                }
+                root.refreshApplications();
+            } else {
+                ToastService.showError(
+                    I18n.tr("Uninstall failed: %1", "uninstallation error").arg(appName),
+                    err
+                );
+            }
+        }
+    }
+
+    function requestUninstallFlatpak(appId, appName, flatpakId) {
+        if (!flatpakId)
+            return;
+        uninstallAppConfirmRequested(appId, appName, flatpakId);
+    }
+
+    function uninstallFlatpak(appId, appName, flatpakId) {
+        if (!flatpakId)
+            return;
+        if (flatpakUninstallProc.running) {
+            ToastService.showWarning(I18n.tr("An uninstallation is already in progress", "toast warning message"));
+            return;
+        }
+
+        _uninstallingAppId = appId || "";
+        _uninstallingAppName = appName || flatpakId;
+        _uninstallingStderr = "";
+        flatpakUninstallProc.command = ["flatpak", "uninstall", "-y", "--app", flatpakId];
+        flatpakUninstallProc.running = true;
+
+        ToastService.showInfo(I18n.tr("Uninstalling: %1", "uninstallation progress").arg(_uninstallingAppName));
     }
 }

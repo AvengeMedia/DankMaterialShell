@@ -28,6 +28,7 @@ function transformApp(app, override, defaultActions, primaryActionLabel) {
         keywords: app.keywords || [],
         actions: actions,
         source: Utils.classifyAppSource(app),
+        flatpakId: Utils.classifyAppSource(app) === "flatpak" ? Utils.extractFlatpakAppId(app) : "",
         primaryAction: {
             name: primaryActionLabel,
             icon: "open_in_new",
