@@ -141,7 +141,7 @@ func TestNetworkManagerBackend_UpdateVPNConnectionState_EmptyUUID(t *testing.T) 
 	})
 }
 
-func TestDetectVPNAuthAction_FortinetPasswordOnly(t *testing.T) {
+func TestDetectVPNAuthAction_Fortinet(t *testing.T) {
 	service := "org.freedesktop.NetworkManager.openconnect"
 
 	assert.Equal(t, "openconnect_password", detectVPNAuthAction(service, map[string]string{
@@ -152,9 +152,13 @@ func TestDetectVPNAuthAction_FortinetPasswordOnly(t *testing.T) {
 		"protocol": "anyconnect",
 		"authtype": "password",
 	}))
-	assert.Empty(t, detectVPNAuthAction(service, map[string]string{
+	assert.Equal(t, "fortinet_saml", detectVPNAuthAction(service, map[string]string{
 		"protocol": "fortinet",
 		"authtype": "saml",
+	}))
+	assert.Equal(t, "fortinet_saml", detectVPNAuthAction(service, map[string]string{
+		"protocol":         "fortinet",
+		"saml-auth-method": "REDIRECT",
 	}))
 }
 

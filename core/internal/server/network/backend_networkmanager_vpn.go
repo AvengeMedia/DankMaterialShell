@@ -350,6 +350,25 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 		if err != nil {
 			return fmt.Errorf("OpenConnect authentication failed: %w", err)
 		}
+	case "fortinet_saml":
+		if err := b.ensureOpenConnectAgentFlags(targetConn, vpnData); err != nil {
+			return fmt.Errorf("failed to prepare Fortinet connection: %w", err)
+		}
+
+		log.Infof("[ConnectVPN] Fortinet SAML/SSO authentication required for %s (gateway=%s)", connName, vpnData["gateway"])
+
+		samlCtx, samlCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		openConnectAuth, err = b.authenticateFortinetSAML(samlCtx, fortinetAuthTarget{
+			ConnName:       connName,
+			ConnUUID:       targetUUID,
+			ConnectionPath: string(targetConn.GetPath()),
+			VpnService:     vpnServiceType,
+			Data:           vpnData,
+		})
+		samlCancel()
+		if err != nil {
+			return fmt.Errorf("SAML authentication failed for the Fortinet gateway: %w", err)
+		}
 	case "gp_saml":
 		gateway := vpnData["gateway"]
 		protocol := vpnData["protocol"]
@@ -446,8 +465,10 @@ func detectVPNAuthAction(serviceType string, data map[string]string) string {
 			switch protocol {
 			case "gp":
 				return "gp_saml"
+			case "fortinet":
+				return "fortinet_saml"
 			default:
-				log.Infof("[VPN] External browser auth detected for protocol '%s' but only GlobalProtect (gp) is currently supported", protocol)
+				log.Infof("[VPN] External browser auth detected for protocol '%s' but only GlobalProtect (gp) and Fortinet are currently supported", protocol)
 			}
 		}
 		if protocol == "fortinet" && data["authtype"] == "password" {
@@ -1087,6 +1108,8 @@ func (b *NetworkManagerBackend) saveVPNCredentials(creds *pendingVPNCredentials)
 		log.Infof("[saveVPNCredentials] Saving username")
 	}
 
+	maps.Copy(data, creds.PersistentData)
+
 	secs := map[string]string{}
 	if len(creds.PersistentSecrets) > 0 {
 		var stored map[string]map[string]dbus.Variant
@@ -1253,14 +1276,14 @@ func (b *NetworkManagerBackend) ImportVPN(filePath string, name string) (*VPNImp
 		}, nil
 	}
 
-	ext := strings.ToLower(filepath.Ext(filePath))
-
-	switch ext {
-	case ".ovpn", ".conf":
-		return b.importVPNWithNmcli(filePath, name)
-	default:
-		return b.importVPNWithNmcli(filePath, name)
+	if cfg := readOpenfortivpnConfig(filePath); cfg != nil {
+		if name == "" {
+			name = vpnNameFromPath(filePath)
+		}
+		return b.importOpenfortivpnConfig(cfg, name)
 	}
+
+	return b.importVPNWithNmcli(filePath, name)
 }
 
 func (b *NetworkManagerBackend) importVPNWithNmcli(filePath string, name string) (*VPNImportResult, error) {

@@ -315,6 +315,38 @@ func (a *SecretAgent) GetSecrets(
 		}
 		a.backend.cachedOpenConnectMu.Unlock()
 
+		if len(fields) == 1 && fields[0] == "fortinet-saml" {
+			data := vpnDataFromSettings(conn)
+
+			log.Infof("[SecretAgent] Starting Fortinet SAML authentication for gateway=%s", data["gateway"])
+
+			samlCtx, samlCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+			defer samlCancel()
+
+			authResult, err := a.backend.authenticateFortinetSAML(samlCtx, fortinetAuthTarget{
+				ConnName:       displayName,
+				ConnUUID:       connUuid,
+				ConnectionPath: string(path),
+				VpnService:     vpnSvc,
+				Data:           data,
+			})
+			if err != nil {
+				log.Warnf("[SecretAgent] Fortinet SAML authentication failed: %v", err)
+				return nil, dbus.MakeFailedError(fmt.Errorf("SAML authentication failed for the Fortinet gateway: %w", err))
+			}
+
+			a.backend.cachedOpenConnectMu.Lock()
+			a.backend.cachedOpenConnectAuth = &cachedOpenConnectAuth{
+				ConnectionUUID: connUuid,
+				Cookie:         authResult.Cookie,
+				Host:           authResult.Host,
+				Fingerprint:    authResult.Fingerprint,
+			}
+			a.backend.cachedOpenConnectMu.Unlock()
+
+			return buildOpenConnectSecretsResponse(settingName, authResult.Cookie, authResult.Host, authResult.Fingerprint), nil
+		}
+
 		if len(fields) == 1 && fields[0] == "gp-saml" {
 			gateway := ""
 			protocol := ""
@@ -876,6 +908,22 @@ func buildFieldsInfo(setting string, fields []string, vpnService string) []Field
 	return result
 }
 
+func vpnDataFromSettings(conn map[string]nmVariantMap) map[string]string {
+	vpnSettings, ok := conn["vpn"]
+	if !ok {
+		return map[string]string{}
+	}
+	dataVariant, ok := vpnSettings["data"]
+	if !ok {
+		return map[string]string{}
+	}
+	dataMap, ok := dataVariant.Value().(map[string]string)
+	if !ok {
+		return map[string]string{}
+	}
+	return dataMap
+}
+
 func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 	fields := []string{"password"}
 
@@ -911,8 +959,11 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 			case "gp":
 				log.Infof("[SecretAgent] GlobalProtect SAML auth detected")
 				return []string{"gp-saml"}
+			case "fortinet":
+				log.Infof("[SecretAgent] Fortinet SAML auth detected")
+				return []string{"fortinet-saml"}
 			default:
-				log.Infof("[SecretAgent] External browser auth detected for protocol '%s' but only GlobalProtect (gp) SAML is currently supported, falling back to credentials", protocol)
+				log.Infof("[SecretAgent] External browser auth detected for protocol '%s' but only GlobalProtect (gp) and Fortinet SAML are currently supported, falling back to credentials", protocol)
 			}
 		}
 
@@ -989,6 +1040,8 @@ func vpnFieldMeta(field, _ string) (label string, isSecret bool) {
 	switch field {
 	case "gp-saml":
 		return "GlobalProtect SAML/SSO", false
+	case "fortinet-saml":
+		return "Fortinet SAML/SSO", false
 	case "key_pass":
 		return "PIN", true
 	case "password":

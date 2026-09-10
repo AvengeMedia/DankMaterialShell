@@ -189,10 +189,12 @@ Singleton {
     }
 
     function getFileFilter() {
+        // openfortivpn configs are conventionally extensionless, so the browser
+        // has to offer every file; core sniffs the contents on import.
         if (allExtensions.length === 0) {
-            return ["*.ovpn", "*.conf"];
+            return ["*.ovpn", "*.conf", "*"];
         }
-        return allExtensions.map(e => "*" + e);
+        return allExtensions.map(e => "*" + e).concat(["*"]);
     }
 
     function getExtensionsForPlugin(serviceType) {
