@@ -10,12 +10,8 @@ Item {
     required property var barContent
     required property var barWindow
     required property var barConfig
-    required property var hLeftSection
-    required property var hCenterSection
-    required property var hRightSection
-    required property var vLeftSection
-    required property var vCenterSection
-    required property var vRightSection
+    property var widgetOwner: null
+    property var sections: []
 
     property var leftWidgetsModel
     property var centerWidgetsModel
@@ -46,6 +42,7 @@ Item {
     onLeftWidgetsModelChanged: invalidateCandidateCache()
     onCenterWidgetsModelChanged: invalidateCandidateCache()
     onRightWidgetsModelChanged: invalidateCandidateCache()
+    onSectionsChanged: invalidateCandidateCache()
 
     onHoverPopoutsEnabledChanged: {
         if (hoverPopoutsEnabled)
@@ -62,7 +59,7 @@ Item {
     Component.onDestruction: _disconnectCandidateWatchers()
 
     Connections {
-        target: root.barContent
+        target: root.widgetOwner || root.barContent
 
         function onWidthChanged() {
             root.invalidateCandidateCache();
@@ -227,41 +224,12 @@ Item {
     }
 
     function _getBarSections() {
-        if (barWindow.isVertical) {
-            return [
-                {
-                    section: vLeftSection,
-                    name: "left"
-                },
-                {
-                    section: vCenterSection,
-                    name: "center"
-                },
-                {
-                    section: vRightSection,
-                    name: "right"
-                }
-            ];
-        }
-        return [
-            {
-                section: hLeftSection,
-                name: "left"
-            },
-            {
-                section: hCenterSection,
-                name: "center"
-            },
-            {
-                section: hRightSection,
-                name: "right"
-            }
-        ];
+        return root.sections || [];
     }
 
     // The widget registry is keyed by (widgetId, screenName)
     function _itemBelongsToThisBar(item) {
-        const owner = barContent;
+        const owner = root.widgetOwner || barContent;
         if (!owner || !item)
             return true;
         let node = item;
@@ -489,17 +457,15 @@ Item {
     }
 
     function _globalItemBounds(item) {
-        try {
-            const topLeft = item.mapToItem(null, 0, 0);
-            return {
-                x: topLeft.x,
-                y: topLeft.y,
-                width: item.width,
-                height: item.height
-            };
-        } catch (e) {
+        const topLeft = barContent.mapItemToScreen(item, 0, 0);
+        if (!topLeft)
             return null;
-        }
+        return {
+            x: topLeft.x,
+            y: topLeft.y,
+            width: item.width,
+            height: item.height
+        };
     }
 
     function _hitBoundsForWidget(widgetItem, wrapper) {
