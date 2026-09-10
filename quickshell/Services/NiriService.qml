@@ -1676,6 +1676,7 @@ window-rule {
         const defaultMouseScrollMethod = "default";
         const defaultMouseSpeed = 0.0;
 
+        const defaultTouchpadClickMethod = "default";
         const defaultTouchpadDisableOnExternalMouse = false;
         const defaultTouchpadDisableWhileTyping = true;
         const defaultTouchpadDragLock = false;
@@ -1696,6 +1697,7 @@ window-rule {
         const mouseScrollMethod = typeof SettingsData !== "undefined" ? SettingsData.mouseScrollMethod : defaultMouseScrollMethod;
         const mouseSpeed = typeof SettingsData !== "undefined" ? SettingsData.mouseAccelSpeed : defaultMouseSpeed;
 
+        const touchpadClickMethod = typeof SettingsData !== "undefined" ? SettingsData.touchpadClickMethod : defaultTouchpadClickMethod;
         const touchpadDisableOnExternalMouse = typeof SettingsData !== "undefined" ? SettingsData.touchpadDisableOnExternalMouse : defaultTouchpadDisableOnExternalMouse;
         const touchpadDisableWhileTyping = typeof SettingsData !== "undefined" ? SettingsData.touchpadDisableWhileTyping : defaultTouchpadDisableWhileTyping;
         const touchpadDragLock = typeof SettingsData !== "undefined" ? SettingsData.touchpadDragLock : defaultTouchpadDragLock;
@@ -1758,6 +1760,9 @@ window-rule {
         inputContent += `        accel-speed ${touchpadSpeed.toFixed(1)}\n`;
         if (touchpadProfile !== "default") {
             inputContent += `        accel-profile "${touchpadProfile}"\n`;
+        }
+        if (touchpadClickMethod !== "default") {
+            inputContent += `        click-method "${touchpadClickMethod}"\n`;
         }
         if (touchpadNaturalScroll) {
             inputContent += "        natural-scroll\n";

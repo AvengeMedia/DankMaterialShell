@@ -11811,6 +11811,29 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "touchpadClickMethod",
+    "label": "Click Method",
+    "tabIndex": 44,
+    "category": "System",
+    "keywords": [
+      "areas",
+      "button",
+      "click",
+      "clickfinger",
+      "count",
+      "determines",
+      "finger",
+      "linux",
+      "method",
+      "os",
+      "system",
+      "touchpad",
+      "type"
+    ],
+    "description": "Button areas determines click type by finger position; Clickfinger by finger count",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "touchpadDisableWhileTyping",
     "label": "Disable While Typing",
     "tabIndex": 44,

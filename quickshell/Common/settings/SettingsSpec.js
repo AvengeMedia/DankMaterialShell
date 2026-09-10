@@ -56,6 +56,7 @@ var SPEC = {
     mouseScrollMethod: { def: "default", onChange: "updateCompositorInput" },
     touchpadAccelProfile: { def: "default", onChange: "updateCompositorInput" },
     touchpadAccelSpeed: { def: 0.0, onChange: "updateCompositorInput" },
+    touchpadClickMethod: { def: "default", onChange: "updateCompositorInput" },
     touchpadDisableOnExternalMouse: { def: false, onChange: "updateCompositorInput" },
     touchpadDisableWhileTyping: { def: true, onChange: "updateCompositorInput" },
     touchpadDragLock: { def: false, onChange: "updateCompositorInput" },

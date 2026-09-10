@@ -209,6 +209,7 @@ Singleton {
     property string mouseScrollMethod: "default"
     property string touchpadAccelProfile: "default"
     property real touchpadAccelSpeed: 0.0
+    property string touchpadClickMethod: "default"
     property bool touchpadDisableOnExternalMouse: false
     property bool touchpadDisableWhileTyping: true
     property bool touchpadDragLock: false
