@@ -162,6 +162,7 @@ StyledRect {
                 spacing: Theme.spacingM
 
                 DankSpinner {
+                    size: Theme.iconSize
                     running: root.isUpdating
                     anchors.verticalCenter: parent.verticalCenter
                 }
