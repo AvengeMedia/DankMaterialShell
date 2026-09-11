@@ -237,7 +237,10 @@ done
 
                 StyledText {
                     width: parent.width
-                    visible: Qt.platform.os === "linux" && !root.chargeLimitSupported
+                    // A machine without a battery has no charge threshold to
+                    // write to either, but saying so there would be noise: the
+                    // limit was never applicable in the first place.
+                    visible: Qt.platform.os === "linux" && BatteryService.batteryAvailable && !root.chargeLimitSupported
                     text: I18n.tr("No writable charge threshold file was found under /sys/class/power_supply.", "battery settings: why the charge limit could not be applied")
                     wrapMode: Text.WordWrap
                     color: Theme.surfaceVariantText
@@ -245,8 +248,11 @@ done
                 }
 
                 Row {
-                    // charge_control_* live in Linux sysfs; no BSD equivalent
-                    visible: Qt.platform.os === "linux" && root.chargeLimitSupported
+                    // charge_control_* live in Linux sysfs; no BSD equivalent.
+                    // Without a battery the apply button cannot do anything,
+                    // and offering it anyway is what produced the false
+                    // success this change is about.
+                    visible: Qt.platform.os === "linux" && BatteryService.batteryAvailable && root.chargeLimitSupported
                     width: parent.width
                     height: applyButton.height
                     layoutDirection: I18n.isRtl ? Qt.LeftToRight : Qt.RightToLeft
