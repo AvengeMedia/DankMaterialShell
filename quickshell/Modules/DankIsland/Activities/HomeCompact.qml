@@ -423,6 +423,7 @@ Item {
             Item {
                 width: root.iconSize
                 height: root.iconSize
+                opacity: root.connectivityIconOpacity("wifi")
 
                 DankIcon {
                     id: wifiIcon
@@ -431,7 +432,6 @@ Item {
                     name: root.connectivityIconName("wifi")
                     size: root.statusIconSize
                     color: root.connectivityIconColor("wifi")
-                    opacity: root.connectivityIconOpacity("wifi")
 
                     DankBlink {
                         target: wifiIcon
@@ -443,6 +443,7 @@ Item {
             Item {
                 width: root.iconSize
                 height: root.iconSize
+                opacity: root.connectivityIconOpacity("bluetooth")
 
                 DankIcon {
                     id: bluetoothIcon
@@ -451,7 +452,6 @@ Item {
                     name: root.connectivityIconName("bluetooth")
                     size: root.statusIconSize
                     color: root.connectivityIconColor("bluetooth")
-                    opacity: root.connectivityIconOpacity("bluetooth")
 
                     DankBlink {
                         target: bluetoothIcon
@@ -684,6 +684,7 @@ Item {
                 Item {
                     width: root.iconSize
                     height: root.iconSize
+                    opacity: root.connectivityIconOpacity("wifi")
 
                     DankIcon {
                         id: verticalWifiIcon
@@ -692,7 +693,6 @@ Item {
                         name: root.connectivityIconName("wifi")
                         size: root.statusIconSize
                         color: root.connectivityIconColor("wifi")
-                        opacity: root.connectivityIconOpacity("wifi")
 
                         DankBlink {
                             target: verticalWifiIcon
@@ -704,6 +704,7 @@ Item {
                 Item {
                     width: root.iconSize
                     height: root.iconSize
+                    opacity: root.connectivityIconOpacity("bluetooth")
 
                     DankIcon {
                         id: verticalBluetoothIcon
@@ -712,7 +713,6 @@ Item {
                         name: root.connectivityIconName("bluetooth")
                         size: root.statusIconSize
                         color: root.connectivityIconColor("bluetooth")
-                        opacity: root.connectivityIconOpacity("bluetooth")
 
                         DankBlink {
                             target: verticalBluetoothIcon
