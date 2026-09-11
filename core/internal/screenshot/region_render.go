@@ -632,6 +632,11 @@ func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, form
 		style.TextR, style.TextG, style.TextB, format)
 }
 
+const (
+	minHUDScale = 1
+	maxHUDScale = 4
+)
+
 func (r *RegionSelector) hudScale(effectiveScale float64) int {
 	hudOpt := "auto"
 	if r.screenshoter != nil && r.screenshoter.config.HUD != "" {
@@ -641,15 +646,15 @@ func (r *RegionSelector) hudScale(effectiveScale float64) int {
 	case "off", "none", "false", "0":
 		return 0
 	case "", "auto":
-		return scaleFactor(effectiveScale)
+		return min(scaleFactor(effectiveScale), maxHUDScale)
 	default:
 		if val, err := strconv.ParseFloat(hudOpt, 64); err == nil {
 			if val <= 0 {
 				return 0
 			}
-			return scaleFactor(val)
+			return min(max(scaleFactor(val), minHUDScale), maxHUDScale)
 		}
-		return scaleFactor(effectiveScale)
+		return min(scaleFactor(effectiveScale), maxHUDScale)
 	}
 }
 
