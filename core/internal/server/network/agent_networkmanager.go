@@ -110,11 +110,17 @@ func NewSecretAgent(prompts PromptBroker, manager *Manager, backend *NetworkMana
 		return nil, fmt.Errorf("failed to register agent with NetworkManager: %w", call.Err)
 	}
 
+	if backend != nil {
+		backend.reopenOpenConnectHelperAttempts()
+	}
 	log.Infof("[SecretAgent] Registered with NetworkManager (id=%s, unique name=%s, fixed path=%s)", sa.id, c.Names()[0], sa.objPath)
 	return sa, nil
 }
 
 func (a *SecretAgent) Close() {
+	if a.backend != nil {
+		a.backend.cancelAllOpenConnectHelperAttempts()
+	}
 	if a.conn == nil {
 		return
 	}
@@ -153,10 +159,16 @@ func (a *SecretAgent) GetSecrets(
 	connUuid := readConnUUID(conn)
 
 	if a.backend != nil && connType == "vpn" && settingName == "vpn" &&
-		vpnSvc == "org.freedesktop.NetworkManager.openconnect" && len(hints) == 0 &&
+		vpnSvc == openConnectHelperService && len(hints) == 0 &&
 		flags == nmSecretAgentFlagUserRequested && a.backend.isReadingOpenConnectSecrets(connUuid, path) {
 		// NM needs the nested empty dictionary to return its system-owned secrets.
 		return nmSettingMap{"vpn": {"secrets": dbus.MakeVariant(map[string]string{})}}, nil
+	}
+
+	if a.backend != nil && connType == "vpn" && settingName == "vpn" && vpnSvc == openConnectHelperService && len(hints) == 0 {
+		if response, dbusErr, handled := a.backend.getOpenConnectHelperSecrets(conn, path, displayName, connUuid, flags); handled {
+			return response, dbusErr
+		}
 	}
 
 	if a.backend != nil && settingName == "vpn" && flags&nmSecretAgentFlagRequestNew != 0 {
@@ -319,9 +331,10 @@ func (a *SecretAgent) GetSecrets(
 		}
 		a.backend.cachedVPNCredsMu.Unlock()
 
+		openConnectData, _ := readOpenConnectDataAndSecrets(conn)
 		a.backend.cachedOpenConnectMu.Lock()
 		cachedOpenConnect := a.backend.cachedOpenConnectAuth
-		if cachedOpenConnect != nil && cachedOpenConnect.ConnectionUUID == connUuid {
+		if cachedOpenConnect != nil && cachedOpenConnect.ConnectionUUID == connUuid && !isOpenConnectHelperEligible(vpnSvc, openConnectData) {
 			if path.IsValid() && path != "/" {
 				cachedOpenConnect.ConnectionPath = path
 			}
@@ -683,6 +696,7 @@ func (a *SecretAgent) CancelGetSecrets(path dbus.ObjectPath, settingName string)
 	log.Infof("[SecretAgent] CancelGetSecrets called: path=%s, setting=%s", path, settingName)
 
 	if a.backend != nil && settingName == "vpn" {
+		a.backend.cancelOpenConnectHelperAttempts(path)
 		a.backend.cachedOpenConnectMu.Lock()
 		if cached := a.backend.cachedOpenConnectAuth; cached != nil && path.IsValid() && path != "/" && cached.ConnectionPath == path {
 			a.backend.cachedOpenConnectAuth = nil
