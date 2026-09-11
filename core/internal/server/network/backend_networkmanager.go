@@ -100,6 +100,9 @@ type NetworkManagerBackend struct {
 	cachedWiFiSecret      *cachedWiFiSecret
 	cachedWiFiSecretMu    sync.Mutex
 
+	openConnectSecretReads  map[openConnectSecretRead]uint
+	openConnectSecretReadMu sync.Mutex
+
 	onStateChange func()
 }
 
@@ -138,9 +141,11 @@ type cachedWiFiSecret struct {
 }
 
 type cachedOpenConnectAuth struct {
+	ConnectionPath dbus.ObjectPath
 	ConnectionUUID string
 	Cookie         string
 	Host           string
+	Resolve        string
 	User           string
 	Fingerprint    string
 }
