@@ -3,12 +3,34 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Common
 import qs.Services
 
 Item {
     id: root
 
-    property var screenModel: Quickshell.screens
+    property var hyprlandOverviewLoader: null
+
+    // One host per (island instance, screen), skipping a screen edge another island already holds.
+    readonly property var hostSlots: {
+        SettingsData.barConfigs;
+        Quickshell.screens;
+        const slots = [];
+        for (const screen of Quickshell.screens) {
+            const claimed = {};
+            for (const config of SettingsData.activeIslandConfigsForScreen(screen)) {
+                const edge = SettingsData.islandEdge(config);
+                if (claimed[edge])
+                    continue;
+                claimed[edge] = true;
+                slots.push({
+                    "barId": config.id,
+                    "screen": screen
+                });
+            }
+        }
+        return slots;
+    }
 
     readonly property bool launcherOpen: root.activityOpen("launcher")
     readonly property bool controlCenterOpen: root.activityOpen("controlcenter")
@@ -217,7 +239,7 @@ Item {
             "notificationCenterAvailable": true,
             "launcherInputFocused": host.islandController.launcherInputFocused,
             "launcherResultCount": host.launcherResultCount,
-            "compactHeight": host.islandController.compactHeight
+            "compactHeight": host.islandController.compactThickness
         });
     }
 
@@ -230,12 +252,14 @@ Item {
     Variants {
         id: islandVariants
 
-        model: root.screenModel
+        model: root.hostSlots
 
         delegate: DankIslandHostWindow {
             required property var modelData
 
-            screen: modelData
+            screen: modelData.screen
+            barId: modelData.barId
+            hyprlandOverviewLoader: root.hyprlandOverviewLoader
         }
     }
 

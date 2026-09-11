@@ -1029,3 +1029,57 @@ func TestSyncAuthConfigWithDeps(t *testing.T) {
 		}
 	})
 }
+
+func writeLockscreenFixture(t *testing.T) *pamTestEnv {
+	t.Helper()
+	env := newPamTestEnv(t)
+	env.writePamFile(t, "login", "#%PAM-1.0\nauth include system-auth\naccount include system-auth\n")
+	env.writePamFile(t, "system-auth", "auth required pam_unix.so\naccount required pam_unix.so\n")
+	return env
+}
+
+func TestWriteUserLockscreenPamConfigWritesOtherFallback(t *testing.T) {
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	env := writeLockscreenFixture(t)
+
+	path, err := writeUserLockscreenPamConfig(nil, []string{env.pamDir}, os.ReadFile)
+	if err != nil {
+		t.Fatalf("WriteUserLockscreenPamConfig: %v", err)
+	}
+
+	dir := UserLockscreenPamDir()
+	if filepath.Dir(path) != dir {
+		t.Fatalf("service written to %s, want a file in %s", path, dir)
+	}
+
+	fallback := filepath.Join(dir, UserLockscreenPamFallbackService)
+	data, err := os.ReadFile(fallback)
+	if err != nil {
+		t.Fatalf("pam_start_confdir needs an %q service alongside %q: %v", UserLockscreenPamFallbackService, UserLockscreenPamService, err)
+	}
+	if string(data) != userLockscreenPamFallbackContent {
+		t.Fatalf("fallback content:\n%s\nwant:\n%s", data, userLockscreenPamFallbackContent)
+	}
+	for _, phase := range []string{"auth", "account", "password", "session"} {
+		if !strings.Contains(string(data), phase+" ") {
+			t.Errorf("fallback is missing a %s rule, so PAM would fall through", phase)
+		}
+	}
+}
+
+func TestWriteUserLockscreenPamConfigIsIdempotent(t *testing.T) {
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	env := writeLockscreenFixture(t)
+
+	if _, err := writeUserLockscreenPamConfig(nil, []string{env.pamDir}, os.ReadFile); err != nil {
+		t.Fatalf("first write: %v", err)
+	}
+
+	logged := 0
+	if _, err := writeUserLockscreenPamConfig(func(string) { logged++ }, []string{env.pamDir}, os.ReadFile); err != nil {
+		t.Fatalf("second write: %v", err)
+	}
+	if logged != 0 {
+		t.Errorf("unchanged config logged %d times, want 0 (inotify churn)", logged)
+	}
+}

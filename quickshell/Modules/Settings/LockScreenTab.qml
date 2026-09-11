@@ -294,6 +294,20 @@ Item {
                     onToggled: checked => SettingsData.set("lockScreenShowTime", checked)
                 }
 
+                SettingsButtonGroupRow {
+                    settingKey: "lockScreenClockStyle"
+                    tags: ["lock", "screen", "time", "clock", "style", "vertical"]
+                    text: I18n.tr("Clock Style", "lock screen clock layout setting")
+                    visible: SettingsData.lockScreenShowTime
+                    model: [I18n.tr("Horizontal", "lock screen clock style option"), I18n.tr("Vertical", "lock screen clock style option")]
+                    currentIndex: SettingsData.lockScreenClockStyle === "vertical" ? 1 : 0
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        SettingsData.set("lockScreenClockStyle", index === 1 ? "vertical" : "horizontal");
+                    }
+                }
+
                 SettingsToggleRow {
                     settingKey: "lockScreenShowDate"
                     tags: ["lock", "screen", "date", "calendar", "display"]
@@ -325,6 +339,14 @@ Item {
                     text: I18n.tr("Show Media Player", "Enable media player controls on the lock screen window")
                     checked: SettingsData.lockScreenShowMediaPlayer
                     onToggled: checked => SettingsData.set("lockScreenShowMediaPlayer", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "lockScreenShowWeather"
+                    tags: ["lock", "screen", "weather", "temperature", "forecast"]
+                    text: I18n.tr("Weather", "Enable weather display on the lock screen window")
+                    checked: SettingsData.lockScreenShowWeather
+                    onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
                 }
 
                 SettingsDropdownRow {

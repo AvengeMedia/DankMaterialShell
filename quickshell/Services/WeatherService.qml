@@ -5,10 +5,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Modules.Greetd
 import "../Common/suncalc.js" as SunCalc
 
 Singleton {
     id: root
+    readonly property var log: Log.scoped("WeatherService")
 
     property int refCount: 0
 
@@ -469,7 +471,7 @@ Singleton {
     }
 
     function getConfiguredLocationName() {
-        return SettingsData.weatherLocation;
+        return SessionData.isGreeterMode ? SessionData.weatherLocation : SettingsData.weatherLocation;
     }
 
     function setLocation(lat, lon, city, country) {
@@ -522,9 +524,9 @@ Singleton {
     }
 
     function updateLocation() {
-        const useAuto = SettingsData.useAutoLocation;
-        const coords = SettingsData.weatherCoordinates;
-        const cityName = SettingsData.weatherLocation;
+        const useAuto = SessionData.isGreeterMode ? GreetdSettings.useAutoLocation : SettingsData.useAutoLocation;
+        const coords = SessionData.isGreeterMode ? SessionData.weatherCoordinates : SettingsData.weatherCoordinates;
+        const cityName = SessionData.isGreeterMode ? SessionData.weatherLocation : SettingsData.weatherLocation;
 
         if (useAuto) {
             getLocationFromService();
@@ -684,12 +686,17 @@ Singleton {
         }
     }
 
-    function handleWeatherFailure() {
+    property string lastFetchError: ""
+
+    function handleWeatherFailure(reason) {
+        if (reason)
+            root.lastFetchError = reason;
         root.retryAttempts++;
         if (root.retryAttempts < root.maxRetryAttempts) {
             retryTimer.start();
         } else {
             root.retryAttempts = 0;
+            log.warn("Weather fetch failed:", root.lastFetchError || "no output from fetcher");
             if (!root.weather.available) {
                 root.weather.loading = false;
             }
@@ -841,7 +848,7 @@ Singleton {
                         throw new Error("Missing or invalid location data");
                     }
 
-                    setLocation(lat, lon, city, data.countryName || "");
+                    setLocation(lat, lon, city, data.country || "");
                     fetchWeather(lat, lon);
                 } catch (e) {
                     root.handleWeatherFailure();
@@ -904,11 +911,15 @@ Singleton {
         id: weatherFetcher
         running: false
 
+        stderr: StdioCollector {
+            id: weatherFetchErr
+        }
+
         stdout: StdioCollector {
             onStreamFinished: {
                 const raw = text.trim();
                 if (!raw || raw[0] !== "{") {
-                    root.handleWeatherFailure();
+                    root.handleWeatherFailure(weatherFetchErr.text.trim());
                     return;
                 }
 
@@ -989,6 +1000,7 @@ Singleton {
                     const feelsLikeC = current.apparent_temperature || tempC;
                     const feelsLikeF = feelsLikeC * 9 / 5 + 32;
 
+                    root.lastFetchError = "";
                     root.weather = {
                         "available": true,
                         "loading": false,
@@ -1029,7 +1041,7 @@ Singleton {
     Timer {
         id: updateTimer
         interval: nextInterval()
-        running: root.refCount > 0 && SettingsData.weatherEnabled
+        running: root.refCount > 0 && SettingsData.weatherEnabled && !SessionData.isGreeterMode
         repeat: true
         triggeredOnStart: true
         onTriggered: {

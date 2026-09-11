@@ -23,7 +23,7 @@ func QtengineActive() bool {
 
 // QtengineConfigPath returns the config qtengine serves both Qt5 and Qt6 from.
 func QtengineConfigPath() string {
-	return filepath.Join(utils.XDGConfigHome(), "qtengine", "config.json")
+	return qtengineConfigPath("")
 }
 
 // SyncQtengineConfig merges the DMS colour scheme path and icon theme into
@@ -32,7 +32,14 @@ func QtengineConfigPath() string {
 // Map round trip rather than a typed struct so keys from qtengine versions we
 // have not seen survive.
 func SyncQtengineConfig(iconTheme string) error {
-	path := QtengineConfigPath()
+	return SyncQtengineConfigAt("", iconTheme)
+}
+
+// SyncQtengineConfigAt behaves like SyncQtengineConfig but writes below the
+// explicitly supplied config directory. An empty directory follows
+// XDG_CONFIG_HOME, preserving the standalone CLI's default behaviour.
+func SyncQtengineConfigAt(configDir, iconTheme string) error {
+	path := qtengineConfigPath(configDir)
 
 	// Empty file and JSON null are both "not set" to qtengine; a top-level null
 	// unmarshals to a nil map, which would panic on write.
@@ -107,4 +114,11 @@ func SyncQtengineConfig(iconTheme string) error {
 	}
 
 	return nil
+}
+
+func qtengineConfigPath(configDir string) string {
+	if configDir == "" {
+		configDir = utils.XDGConfigHome()
+	}
+	return filepath.Join(configDir, "qtengine", "config.json")
 }

@@ -70,7 +70,7 @@ Item {
                     text: I18n.tr("Intelligent Auto-hide")
                     description: I18n.tr("Show dock when floating windows don't overlap its area")
                     checked: SettingsData.dockSmartAutoHide
-                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)
+                    visible: SettingsData.showDock && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous)
                     onToggled: checked => {
                         if (checked && SettingsData.dockAutoHide) {
                             SettingsData.set("dockAutoHide", false);
@@ -83,9 +83,9 @@ Item {
                     settingKey: "dockOpenOnOverview"
                     tags: ["dock", "overview", "niri"]
                     text: I18n.tr("Show on Overview")
-                    description: I18n.tr("Always show the dock when niri's overview is open")
+                    description: CompositorService.isAqueous ? I18n.tr("Show on Overview") : I18n.tr("Always show the dock when niri's overview is open")
                     checked: SettingsData.dockOpenOnOverview
-                    visible: CompositorService.isNiri
+                    visible: CompositorService.isNiri || CompositorService.isAqueous
                     onToggled: checked => SettingsData.set("dockOpenOnOverview", checked)
                 }
 
@@ -97,6 +97,16 @@ Item {
                     checked: SettingsData.dockUseOverlayLayer
                     visible: SettingsData.showDock
                     onToggled: checked => SettingsData.set("dockUseOverlayLayer", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "dockShowOnFullscreen"
+                    tags: ["dock", "fullscreen", "overlay", "show", "visibility"]
+                    text: I18n.tr("Show Dock Over Fullscreen", "dock visibility toggle")
+                    description: I18n.tr("Keep the dock visible above fullscreen applications", "dock visibility toggle description")
+                    checked: SettingsData.dockShowOnFullscreen
+                    visible: SettingsData.showDock
+                    onToggled: checked => SettingsData.set("dockShowOnFullscreen", checked)
                 }
             }
 
@@ -708,6 +718,7 @@ Item {
             SettingsControlledBy {
                 visible: root.connectedFrameModeActive
                 parentModal: root.parentModal
+                section: "frameBorder"
                 settingLabel: I18n.tr("Dock margin, opacity, and border")
                 reason: I18n.tr("Managed by Frame in Connected Mode")
             }

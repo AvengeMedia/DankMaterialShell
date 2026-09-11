@@ -40,6 +40,29 @@ func TestGetCapabilities(t *testing.T) {
 	})
 }
 
+func TestCupsCapabilityIsSticky(t *testing.T) {
+	originalEverAvailable := cupsEverAvailable
+	originalSubscriberCount := cupsSubscriberCount
+	defer func() {
+		cupsEverAvailable = originalEverAvailable
+		cupsSubscriberCount = originalSubscriberCount
+	}()
+
+	cupsEverAvailable = false
+	assert.NotContains(t, getCapabilities().Capabilities, "cups")
+
+	cupsEverAvailable = true
+	cupsSubscriberCount = 1
+	assert.Contains(t, getCapabilities().Capabilities, "cups")
+
+	releaseCupsSubscriber()
+	assert.Equal(t, 0, cupsSubscriberCount)
+	assert.Contains(t, getCapabilities().Capabilities, "cups", "capability must survive the manager shutting down")
+
+	releaseCupsSubscriber()
+	assert.Equal(t, 0, cupsSubscriberCount, "release must not drive the subscriber count negative")
+}
+
 type mockConn struct {
 	net.Conn
 	written []byte

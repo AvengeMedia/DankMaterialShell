@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Services
 
@@ -210,6 +211,17 @@ Singleton {
                 defaultTrigger: "",
                 isLauncher: false
             },
+            "dms_power": {
+                id: "dms_power",
+                name: I18n.tr("Power"),
+                cornerIcon: "power_settings_new",
+                comment: "DMS",
+                defaultTrigger: "pw",
+                isLauncher: true,
+                viewMode: "list",
+                viewModeEnforced: true,
+                defaultSectionPriority: 2.3
+            },
             "dms_qr_generator": {
                 id: "dms_qr_generator",
                 name: I18n.tr("QR Generator"),
@@ -308,7 +320,51 @@ Singleton {
         return result;
     }
 
+    readonly property var powerLauncherKeywords: ({
+            lock: ["lock"],
+            logout: ["logout", "exit", "sign out"],
+            suspend: ["suspend", "sleep"],
+            hibernate: ["hibernate"],
+            reboot: ["reboot", "restart"],
+            softreboot: ["soft reboot"],
+            poweroff: ["poweroff", "shutdown", "halt"],
+            restart: ["restart", "shell", "reload"]
+        })
+
+    function getPowerLauncherActions() {
+        const ids = ["lock", "logout", "suspend", "hibernate", "reboot", "softreboot", "poweroff", "restart"];
+        const customIds = (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i);
+        return ids.filter(a => SessionService.isPowerActionSupported(a)).concat(customIds).map(a => {
+            const data = SessionService.getPowerActionData(a);
+            return {
+                action: a,
+                name: data.label,
+                icon: data.icon,
+                keywords: powerLauncherKeywords[a] || []
+            };
+        }).filter(a => a.name);
+    }
+
     function getBuiltInLauncherItems(pluginId, query) {
+        if (pluginId === "dms_power") {
+            const q = (query || "").toString().trim().toLowerCase();
+            return getPowerLauncherActions().filter(a => {
+                if (!q)
+                    return true;
+                if (a.name.toLowerCase().includes(q))
+                    return true;
+                return a.keywords.some(k => k.includes(q));
+            }).map(a => ({
+                        name: a.name,
+                        icon: "material:" + a.icon,
+                        comment: I18n.tr("Power"),
+                        action: "power:" + a.action,
+                        keywords: a.keywords,
+                        isBuiltInLauncher: true,
+                        builtInPluginId: pluginId
+                    }));
+        }
+
         if (pluginId === "dms_clipboard_search") {
             const trimmed = (query || "").toString().trim();
             const entries = ClipboardService.getCachedLauncherSearchEntries(trimmed, 20).slice().sort((a, b) => {
@@ -379,8 +435,18 @@ Singleton {
         case "qr_generate":
             PopoutService.showQRGeneratorModal(parts.slice(1).join(":"));
             return true;
+        case "power":
+            return executePowerLauncherAction(parts.slice(1).join(":"));
         }
         return false;
+    }
+
+    function executePowerLauncherAction(action) {
+        if (action === "lock") {
+            IdleService.lockRequested();
+            return true;
+        }
+        return SessionService.executePowerAction(action);
     }
 
     function getCoreApps(query) {
@@ -422,6 +488,16 @@ Singleton {
         target: DesktopEntries
         function onApplicationsChanged() {
             root.refreshApplications();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onBuiltInPluginSettingsChanged() {
+            root.invalidateLauncherCache();
+        }
+        function onLauncherPluginVisibilityChanged() {
+            root.invalidateLauncherCache();
         }
     }
 
@@ -694,11 +770,7 @@ Singleton {
         return results;
     }
 
-    function getCategoriesForApp(app) {
-        if (!app?.categories)
-            return [];
-
-        const categoryMap = {
+    readonly property var _categoryMap: ({
             "AudioVideo": I18n.tr("Media"),
             "Audio": I18n.tr("Media"),
             "Video": I18n.tr("Media"),
@@ -723,15 +795,20 @@ Singleton {
             "Accessories": I18n.tr("Utilities"),
             "FileManager": I18n.tr("Utilities"),
             "TerminalEmulator": I18n.tr("Utilities")
-        };
+        })
+
+    on_CategoryMapChanged: _cachedCategories = null
+
+    function getCategoriesForApp(app) {
+        if (!app?.categories)
+            return [];
 
         const mappedCategories = new Set();
-
         for (const cat of app.categories) {
-            if (categoryMap[cat])
-                mappedCategories.add(categoryMap[cat]);
+            const mapped = _categoryMap[cat];
+            if (mapped)
+                mappedCategories.add(mapped);
         }
-
         return Array.from(mappedCategories);
     }
 
@@ -767,14 +844,10 @@ Singleton {
             appCategories.forEach(cat => categories.add(cat));
         }
 
-        // Include categories from core apps (e.g. DMS Settings)
         for (const app of coreApps) {
             const appCategories = getCategoriesForApp(app);
             appCategories.forEach(cat => categories.add(cat));
         }
-
-        const pluginCategories = getPluginCategories();
-        pluginCategories.forEach(cat => categories.add(cat));
 
         _cachedCategories = Array.from(categories).sort();
         return _cachedCategories;
@@ -931,5 +1004,69 @@ Singleton {
         } catch (e) {
             log.warn("Error setting category on plugin", pluginId, ":", e);
         }
+    }
+
+    signal uninstallAppConfirmRequested(string appId, string appName, string flatpakId)
+
+    property string _uninstallingAppId: ""
+    property string _uninstallingAppName: ""
+    property string _uninstallingStderr: ""
+
+    Process {
+        id: flatpakUninstallProc
+        running: false
+        command: []
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                root._uninstallingStderr = (text || "").trim();
+            }
+        }
+
+        onExited: exitCode => {
+            const appName = root._uninstallingAppName;
+            const appId = root._uninstallingAppId;
+            const err = root._uninstallingStderr;
+            root._uninstallingAppName = "";
+            root._uninstallingAppId = "";
+            root._uninstallingStderr = "";
+
+            if (exitCode === 0) {
+                ToastService.showInfo(I18n.tr("Uninstalled: %1", "uninstallation success").arg(appName));
+                if (appId) {
+                    SessionData.removePinnedApp(appId);
+                    SessionData.removeBarPinnedApp(appId);
+                }
+                root.refreshApplications();
+            } else {
+                ToastService.showError(
+                    I18n.tr("Uninstall failed: %1", "uninstallation error").arg(appName),
+                    err
+                );
+            }
+        }
+    }
+
+    function requestUninstallFlatpak(appId, appName, flatpakId) {
+        if (!flatpakId)
+            return;
+        uninstallAppConfirmRequested(appId, appName, flatpakId);
+    }
+
+    function uninstallFlatpak(appId, appName, flatpakId) {
+        if (!flatpakId)
+            return;
+        if (flatpakUninstallProc.running) {
+            ToastService.showWarning(I18n.tr("An uninstallation is already in progress", "toast warning message"));
+            return;
+        }
+
+        _uninstallingAppId = appId || "";
+        _uninstallingAppName = appName || flatpakId;
+        _uninstallingStderr = "";
+        flatpakUninstallProc.command = ["flatpak", "uninstall", "-y", "--app", flatpakId];
+        flatpakUninstallProc.running = true;
+
+        ToastService.showInfo(I18n.tr("Uninstalling: %1", "uninstallation progress").arg(_uninstallingAppName));
     }
 }

@@ -11,31 +11,22 @@ import (
 )
 
 type gccVersionCheckMsg struct {
-	version string
-	major   int
-	err     error
+	major int
+	err   error
 }
 
 func (m Model) viewGentooGCCCheck() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("GCC Version Check Failed")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("GCC Version Check Failed"))
 	b.WriteString("\n\n")
-
-	error := m.styles.Error.Render("⚠ Hyprland requires GCC 15 or newer")
-	b.WriteString(error)
+	b.WriteString(m.styles.Error.Render("⚠ Hyprland requires GCC 15 or newer"))
 	b.WriteString("\n\n")
-
-	info := m.styles.Normal.Render("Your current GCC version is too old. Please upgrade GCC before continuing.")
-	b.WriteString(info)
+	b.WriteString(m.styles.Normal.Render("Your current GCC version is too old. Please upgrade GCC before continuing."))
 	b.WriteString("\n\n")
-
-	instructionsTitle := m.styles.Subtle.Render("To upgrade GCC:")
-	b.WriteString(instructionsTitle)
+	b.WriteString(m.styles.Subtle.Render("To upgrade GCC:"))
 	b.WriteString("\n\n")
 
 	steps := []string{
@@ -50,35 +41,27 @@ func (m Model) viewGentooGCCCheck() string {
 		"",
 		"4. Restart this installer",
 	}
-
 	for _, step := range steps {
-		stepLine := m.styles.Subtle.Render(step)
-		b.WriteString(stepLine)
-		b.WriteString("\n")
+		b.WriteString(m.styles.Subtle.Render(step))
+		b.WriteByte('\n')
 	}
 
-	b.WriteString("\n")
-	help := m.styles.Subtle.Render("Press Esc to go back, Ctrl+C to exit")
-	b.WriteString(help)
-
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Subtle.Render("Press Esc to go back, Ctrl+C to exit"))
 	return b.String()
 }
 
 func (m Model) updateGentooGCCCheckState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
-		case "esc":
-			m.state = StateSelectWindowManager
-			return m, nil
-		}
+	if keyMsg, ok := msg.(tea.KeyMsg); ok && keyMsg.String() == "esc" {
+		m.state = StateSelectWindowManager
+		return m, nil
 	}
 	return m, m.listenForLogs()
 }
 
 func (m Model) checkGCCVersion() tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.CommandContext(context.Background(), "gcc", "-dumpversion")
-		output, err := cmd.Output()
+		output, err := exec.CommandContext(context.Background(), "gcc", "-dumpversion").Output()
 		if err != nil {
 			return gccVersionCheckMsg{err: err}
 		}
@@ -93,11 +76,6 @@ func (m Model) checkGCCVersion() tea.Cmd {
 		if err != nil {
 			return gccVersionCheckMsg{err: err}
 		}
-
-		return gccVersionCheckMsg{
-			version: version,
-			major:   major,
-			err:     nil,
-		}
+		return gccVersionCheckMsg{major: major}
 	}
 }

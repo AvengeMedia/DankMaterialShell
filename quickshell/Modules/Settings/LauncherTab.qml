@@ -72,6 +72,7 @@ Item {
                 SettingsControlledBy {
                     visible: SettingsData.connectedFrameModeActive
                     parentModal: root.parentModal
+                    section: "frameConnectedOptions"
                     settingLabel: I18n.tr("Default Launcher")
                     reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
                 }
@@ -756,6 +757,7 @@ Item {
                 SettingsControlledBy {
                     visible: SettingsData.frameEnabled
                     parentModal: root.parentModal
+                    section: "frameBorder"
                     settingLabel: I18n.tr("Darken Modal Background")
                     reason: I18n.tr("Disabled by Frame Mode")
                 }
@@ -813,7 +815,7 @@ Item {
                     spacing: Theme.spacingS
 
                     Repeater {
-                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_colorpicker", "dms_qr_generator"]
+                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_power", "dms_colorpicker", "dms_qr_generator"]
 
                         delegate: Rectangle {
                             id: pluginDelegate

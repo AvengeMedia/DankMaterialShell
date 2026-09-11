@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net"
+	"os"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -344,6 +345,135 @@ func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
 	assert.Nil(t, resp.Result)
 }
 
+func storeTestEntry(t *testing.T, m *Manager, text string) uint64 {
+	t.Helper()
+
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte(text),
+		MimeType:  "text/plain;charset=utf-8",
+		Preview:   text,
+		Size:      len(text),
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	}))
+
+	for _, entry := range m.GetHistory() {
+		if entry.Preview == text {
+			return entry.ID
+		}
+	}
+
+	t.Fatalf("stored entry %q not found in history", text)
+	return 0
+}
+
+func TestDeleteEntries_DeletesRequestedKeepsRest(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	first := storeTestEntry(t, m, "first")
+	second := storeTestEntry(t, m, "second")
+	third := storeTestEntry(t, m, "third")
+
+	deleted, err := m.DeleteEntries([]uint64{first, third})
+	require.NoError(t, err)
+	assert.Equal(t, 2, deleted)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, second, history[0].ID)
+}
+
+func TestDeleteEntries_SkipsPinnedEntries(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	unpinned := storeTestEntry(t, m, "unpinned")
+	pinned := storeTestEntry(t, m, "pinned")
+	require.NoError(t, m.PinEntry(pinned))
+
+	deleted, err := m.DeleteEntries([]uint64{unpinned, pinned})
+	require.NoError(t, err)
+	assert.Equal(t, 1, deleted)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.True(t, history[0].Pinned)
+}
+
+func TestDeleteEntries_IgnoresUnknownIDs(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	only := storeTestEntry(t, m, "only")
+
+	deleted, err := m.DeleteEntries([]uint64{only, only + 1000})
+	require.NoError(t, err)
+	assert.Equal(t, 1, deleted)
+	assert.Empty(t, m.GetHistory())
+}
+
+func TestDeleteEntries_EmptyListIsNoOp(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	storeTestEntry(t, m, "keep me")
+
+	deleted, err := m.DeleteEntries(nil)
+	require.NoError(t, err)
+	assert.Equal(t, 0, deleted)
+	assert.Len(t, m.GetHistory(), 1)
+}
+
+func TestHandleDeleteEntries_ReportsDeletedCount(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	first := storeTestEntry(t, m, "first")
+	second := storeTestEntry(t, m, "second")
+
+	mc := newClipboardTestConn()
+	conn := models.NewConn(mc)
+	handleDeleteEntries(conn, models.Request{
+		ID:     1,
+		Params: map[string]any{"ids": []any{float64(first), float64(second)}},
+	}, m)
+
+	var resp models.Response[map[string]int]
+	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.Equal(t, 2, (*resp.Result)["deleted"])
+	assert.Empty(t, m.GetHistory())
+}
+
+func TestHandleDeleteEntries_RejectsBadParams(t *testing.T) {
+	tests := []struct {
+		name   string
+		params map[string]any
+	}{
+		{"missing ids", map[string]any{}},
+		{"ids not an array", map[string]any{"ids": float64(1)}},
+		{"negative id", map[string]any{"ids": []any{float64(-1)}}},
+		{"fractional id", map[string]any{"ids": []any{float64(1.5)}}},
+		{"id of the wrong type", map[string]any{"ids": []any{"1"}}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := newTestManagerWithDB(t)
+			kept := storeTestEntry(t, m, "kept")
+
+			mc := newClipboardTestConn()
+			conn := models.NewConn(mc)
+			handleDeleteEntries(conn, models.Request{ID: 1, Params: tt.params}, m)
+
+			var resp models.Response[any]
+			require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+			assert.NotEmpty(t, resp.Error)
+
+			history := m.GetHistory()
+			require.Len(t, history, 1)
+			assert.Equal(t, kept, history[0].ID)
+		})
+	}
+}
+
 func TestUnpinEntry_KeepsTopUnpinnedDuplicate(t *testing.T) {
 	m := newTestManagerWithDB(t)
 
@@ -562,7 +692,6 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 func TestManager_ConcurrentOfferAccess(t *testing.T) {
 	m := &Manager{
 		offerMimeTypes: make(map[any][]string),
-		offerRegistry:  make(map[uint32]any),
 	}
 
 	var wg sync.WaitGroup
@@ -577,17 +706,14 @@ func TestManager_ConcurrentOfferAccess(t *testing.T) {
 
 			for range iterations {
 				m.offerMutex.Lock()
-				m.offerRegistry[key] = struct{}{}
 				m.offerMimeTypes[key] = []string{"text/plain"}
 				m.offerMutex.Unlock()
 
 				m.offerMutex.RLock()
-				_ = m.offerRegistry[key]
 				_ = m.offerMimeTypes[key]
 				m.offerMutex.RUnlock()
 
 				m.offerMutex.Lock()
-				delete(m.offerRegistry, key)
 				delete(m.offerMimeTypes, key)
 				m.offerMutex.Unlock()
 			}
@@ -791,4 +917,95 @@ func TestManager_ConcurrentPostWithMock(t *testing.T) {
 
 	wg.Wait()
 	assert.Equal(t, int32(100), postCount.Load())
+}
+
+// zero padding in a fresh db, never a valid page
+const corruptRootPgid = 7
+
+func corruptInlineBucketRoot(t *testing.T, path string, rootPgid byte) {
+	t.Helper()
+
+	f, err := os.OpenFile(path, os.O_RDWR, 0o644)
+	require.NoError(t, err)
+	defer f.Close()
+
+	// flips the inline bucket root pgid to an unwritten page, per issue #3232
+	_, err = f.WriteAt([]byte{rootPgid}, int64(4*os.Getpagesize()+32+9))
+	require.NoError(t, err)
+}
+
+// bbolt maps to the next power of two, so the root stays mapped but past EOF: fault, not panic
+func dropPage(t *testing.T, path string, pgid byte) {
+	t.Helper()
+
+	require.NoError(t, os.Truncate(path, int64(pgid)*int64(os.Getpagesize())))
+}
+
+func newCorruptDB(t *testing.T, pastEOF bool) string {
+	t.Helper()
+
+	path := filepath.Join(t.TempDir(), "db")
+
+	db, err := openDB(path)
+	require.NoError(t, err)
+	require.NoError(t, db.Close())
+
+	corruptInlineBucketRoot(t, path, corruptRootPgid)
+	if pastEOF {
+		dropPage(t, path, corruptRootPgid)
+	}
+
+	return path
+}
+
+var corruptDBCases = []struct {
+	name    string
+	pastEOF bool
+}{
+	{"root page unwritten", false},
+	{"root page past end of file", true},
+}
+
+func TestOpenDB_HealsCorruptedBucketPage(t *testing.T) {
+	for _, tt := range corruptDBCases {
+		t.Run(tt.name, func(t *testing.T) {
+			path := newCorruptDB(t, tt.pastEOF)
+
+			db, err := openDB(path)
+			require.NoError(t, err)
+			defer db.Close()
+
+			m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+			require.NoError(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+			assert.Len(t, m.GetHistory(), 1)
+		})
+	}
+}
+
+func TestOpenDB_HealsGarbageFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "db")
+	require.NoError(t, os.WriteFile(path, bytes.Repeat([]byte{0xAB}, 64<<10), 0o644))
+
+	db, err := openDB(path)
+	require.NoError(t, err)
+	defer db.Close()
+
+	_, err = os.Stat(path + ".corrupt")
+	require.NoError(t, err)
+}
+
+func TestStoreEntry_CorruptDBReturnsErrorNotPanic(t *testing.T) {
+	for _, tt := range corruptDBCases {
+		t.Run(tt.name, func(t *testing.T) {
+			path := newCorruptDB(t, tt.pastEOF)
+
+			db, err := bolt.Open(path, 0o644, &bolt.Options{Timeout: time.Second})
+			require.NoError(t, err)
+			defer db.Close()
+
+			m := &Manager{config: DefaultConfig(), db: db, dbPath: path}
+			assert.Error(t, m.storeEntry(Entry{Data: []byte("x"), MimeType: "text/plain"}))
+			assert.Empty(t, m.GetHistory())
+		})
+	}
 }

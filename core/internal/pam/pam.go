@@ -797,6 +797,15 @@ func moduleReferenceExists(ref string, deps lockscreenPamValidateDeps) bool {
 
 const UserLockscreenPamService = "dankshell"
 
+const UserLockscreenPamFallbackService = "other"
+
+const userLockscreenPamFallbackContent = `#%PAM-1.0
+auth     required    pam_deny.so
+account  required    pam_deny.so
+password required    pam_deny.so
+session  required    pam_deny.so
+`
+
 func UserLockscreenPamDir() string {
 	return filepath.Join(utils.XDGStateHome(), "DankMaterialShell", "pam")
 }
@@ -806,7 +815,11 @@ func UserLockscreenPamDir() string {
 // (reads world-readable PAM dirs, writes the user's own state dir). Rewrites
 // only on change to avoid inotify churn. Returns the written path.
 func WriteUserLockscreenPamConfig(logFunc func(string)) (string, error) {
-	content, err := buildManagedLockscreenPamContent(lockscreenPamBaseDirs, os.ReadFile)
+	return writeUserLockscreenPamConfig(logFunc, lockscreenPamBaseDirs, os.ReadFile)
+}
+
+func writeUserLockscreenPamConfig(logFunc func(string), baseDirs []string, readFile func(string) ([]byte, error)) (string, error) {
+	content, err := buildManagedLockscreenPamContent(baseDirs, readFile)
 	if err != nil {
 		return "", fmt.Errorf("failed to resolve system PAM auth stack: %w", err)
 	}
@@ -816,18 +829,32 @@ func WriteUserLockscreenPamConfig(logFunc func(string)) (string, error) {
 		return "", fmt.Errorf("failed to create %s: %w", dir, err)
 	}
 
-	path := filepath.Join(dir, UserLockscreenPamService)
-	if existing, err := os.ReadFile(path); err == nil && string(existing) == content {
-		return path, nil
-	}
-	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
-		return "", fmt.Errorf("failed to write %s: %w", path, err)
+	// pam_start_confdir warns "no default config other" and can stall without it.
+	fallback := filepath.Join(dir, UserLockscreenPamFallbackService)
+	if _, err := writePamFileIfChanged(fallback, userLockscreenPamFallbackContent); err != nil {
+		return "", err
 	}
 
-	if logFunc != nil {
+	path := filepath.Join(dir, UserLockscreenPamService)
+	changed, err := writePamFileIfChanged(path, content)
+	if err != nil {
+		return "", err
+	}
+
+	if changed && logFunc != nil {
 		logFunc("✓ Wrote lock-screen PAM config " + path)
 	}
 	return path, nil
+}
+
+func writePamFileIfChanged(path, content string) (bool, error) {
+	if existing, err := os.ReadFile(path); err == nil && string(existing) == content {
+		return false, nil
+	}
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		return false, fmt.Errorf("failed to write %s: %w", path, err)
+	}
+	return true, nil
 }
 
 func buildManagedLockscreenU2FPamContent() string {

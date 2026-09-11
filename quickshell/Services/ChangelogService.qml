@@ -12,7 +12,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("ChangelogService")
 
-    readonly property string currentVersion: "1.5"
+    readonly property string currentVersion: "1.6"
     readonly property bool changelogEnabled: false
 
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/DankMaterialShell"

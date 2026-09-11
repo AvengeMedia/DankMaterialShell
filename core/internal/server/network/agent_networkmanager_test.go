@@ -353,6 +353,29 @@ func TestInferVPNFields_GPSaml(t *testing.T) {
 			expectedLen: 1,
 			shouldHave:  []string{"password"},
 		},
+		{
+			name:       "Fortinet SAML",
+			vpnService: "org.freedesktop.NetworkManager.openconnect",
+			dataMap: map[string]string{
+				"protocol": "fortinet",
+				"authtype": "saml",
+				"gateway":  "vpn.example.com",
+			},
+			expectedLen: 1,
+			shouldHave:  []string{"fortinet-saml"},
+		},
+		{
+			name:       "Fortinet password auth is not SAML",
+			vpnService: "org.freedesktop.NetworkManager.openconnect",
+			dataMap: map[string]string{
+				"protocol": "fortinet",
+				"authtype": "password",
+				"username": "john",
+				"gateway":  "vpn.example.com",
+			},
+			expectedLen: 1,
+			shouldHave:  []string{"password"},
+		},
 	}
 
 	for _, tt := range tests {

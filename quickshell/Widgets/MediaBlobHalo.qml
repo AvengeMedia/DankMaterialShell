@@ -152,6 +152,6 @@ Item {
             }
         }
 
-        fragmentShader: Qt.resolvedUrl("../../../Shaders/qsb/blob.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("../Shaders/qsb/blob.frag.qsb")
     }
 }

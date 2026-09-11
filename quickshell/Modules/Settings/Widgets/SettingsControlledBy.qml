@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 StyledRect {
@@ -10,13 +11,15 @@ StyledRect {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property string target: "frame"
+    property string target: ""
+    property string section: ""
     property string settingLabel: ""
     property string reason: ""
     property var parentModal: null
 
+    readonly property string resolvedTarget: target || (SettingsData.frameEnabled ? "frame" : "island")
     readonly property string iconName: {
-        switch (target) {
+        switch (resolvedTarget) {
         case "island":
             return "view_in_ar";
         default:
@@ -24,7 +27,7 @@ StyledRect {
         }
     }
     readonly property string buttonText: {
-        switch (target) {
+        switch (resolvedTarget) {
         case "island":
             return I18n.tr("Open Island", "settings: button that opens the Dank Island tab");
         default:
@@ -32,7 +35,7 @@ StyledRect {
         }
     }
     readonly property string tabName: {
-        switch (target) {
+        switch (resolvedTarget) {
         case "island":
             return "dank_island";
         default:
@@ -98,6 +101,8 @@ StyledRect {
             onClicked: {
                 if (!root.parentModal)
                     return;
+                if (root.section)
+                    SettingsSearchService.navigateToSection(root.section);
                 root.parentModal.showWithTabName(root.tabName);
             }
         }

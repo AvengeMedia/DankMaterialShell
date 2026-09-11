@@ -2,6 +2,11 @@ package matugen
 
 import (
 	"encoding/json"
+	"fmt"
+	"image"
+	stdcolor "image/color"
+	"image/png"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +15,7 @@ import (
 
 	mocks_utils "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	matcolor "github.com/Nadim147c/material/v3/color"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -325,6 +331,264 @@ func TestAppendConfigFileDoesNotExist(t *testing.T) {
 	if len(output) != 0 {
 		t.Errorf("expected no config when file doesn't exist, got: %q", string(output))
 	}
+}
+
+func TestSourceSelectionArgs(t *testing.T) {
+	tests := []struct {
+		name           string
+		sourceMode     string
+		supportsPrefer bool
+		expected       []string
+	}{
+		{"darkness", "darkness", true, []string{"--prefer", "darkness"}},
+		{"lightness", "lightness", true, []string{"--prefer", "lightness"}},
+		{"saturation", "saturation", true, []string{"--prefer", "saturation"}},
+		{"less-saturation", "less-saturation", true, []string{"--prefer", "less-saturation"}},
+		{"value", "value", true, []string{"--prefer", "value"}},
+		{"empty falls back to dominant", "", true, []string{"--source-color-index", "0"}},
+		{"dominant falls back", "dominant", true, []string{"--source-color-index", "0"}},
+		{"colorful falls back (resolved to hex before this is reached)", "colorful", true, []string{"--source-color-index", "0"}},
+		{"typo falls back", "bogus", true, []string{"--source-color-index", "0"}},
+		{"wrong case is not allowlisted", "DARKNESS", true, []string{"--source-color-index", "0"}},
+		{"closest-to-fallback is deliberately excluded", "closest-to-fallback", true, []string{"--source-color-index", "0"}},
+		{"injection-shaped value cannot escape the allowlist", "value; --exec touch /tmp/pwned", true, []string{"--source-color-index", "0"}},
+		// matugen 4.0.x has --source-color-index but not --prefer, and aborts on
+		// an unknown argument. Every prefer mode must degrade, not fail.
+		{"4.0.x: darkness degrades", "darkness", false, []string{"--source-color-index", "0"}},
+		{"4.0.x: lightness degrades", "lightness", false, []string{"--source-color-index", "0"}},
+		{"4.0.x: saturation degrades", "saturation", false, []string{"--source-color-index", "0"}},
+		{"4.0.x: less-saturation degrades", "less-saturation", false, []string{"--source-color-index", "0"}},
+		{"4.0.x: value degrades", "value", false, []string{"--source-color-index", "0"}},
+		{"4.0.x: colorful is unaffected", "colorful", false, []string{"--source-color-index", "0"}},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := sourceSelectionArgs(tc.sourceMode, tc.supportsPrefer)
+			assert.Equal(t, tc.expected, result)
+			if !tc.supportsPrefer {
+				assert.NotContains(t, result, "--prefer", "matugen 4.0.x must never see --prefer")
+			}
+		})
+	}
+}
+
+func TestBuildMatugenArgsSourceModes(t *testing.T) {
+	baseArgs := []string{"-c", "/tmp/merged.toml", "-t", "scheme-tonal-spot"}
+	modes := []string{"dominant", "colorful", "darkness", "lightness", "saturation", "less-saturation", "value"}
+
+	for _, mode := range modes {
+		t.Run("v4/"+mode, func(t *testing.T) {
+			args := buildMatugenArgs(baseArgs, matugenFlags{isV4: true, supportsPrefer: true}, mode)
+			expected := append(append([]string{}, baseArgs...), sourceSelectionArgs(mode, true)...)
+			assert.Equal(t, expected, args)
+		})
+
+		t.Run("v4.0/"+mode, func(t *testing.T) {
+			// matugen 4.0.x: --source-color-index exists, --prefer does not.
+			args := buildMatugenArgs(baseArgs, matugenFlags{isV4: true, supportsPrefer: false}, mode)
+			expected := append(append([]string{}, baseArgs...), "--source-color-index", "0")
+			assert.Equal(t, expected, args)
+			assert.NotContains(t, args, "--prefer")
+		})
+
+		t.Run("v3/"+mode, func(t *testing.T) {
+			// matugen 3 has neither --prefer nor --source-color-index. Adding
+			// either would break every user still on it, so under isV4=false
+			// no source-selection args may appear for any mode.
+			args := buildMatugenArgs(baseArgs, matugenFlags{isV4: false}, mode)
+			assert.Equal(t, baseArgs, args)
+			assert.NotContains(t, args, "--prefer")
+			assert.NotContains(t, args, "--source-color-index")
+		})
+	}
+}
+
+func TestBuildMatugenArgsDefaultPreservesExistingBehavior(t *testing.T) {
+	baseArgs := []string{"-c", "/tmp/merged.toml", "-t", "scheme-tonal-spot"}
+
+	args := buildMatugenArgs(baseArgs, matugenFlags{isV4: true, supportsPrefer: true}, "")
+
+	expected := append(append([]string{}, baseArgs...), "--source-color-index", "0")
+	assert.Equal(t, expected, args, "empty source mode must produce byte-identical args to pre-feature behavior")
+}
+
+func TestBuildImportData(t *testing.T) {
+	const dank16 = `{"color0":"#000000"}`
+
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}}`, buildImportData(dank16, ""),
+		"no image must produce byte-identical import data to pre-feature behavior")
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/My Wallpaper.png"}`,
+		buildImportData(dank16, "/home/u/My Wallpaper.png"))
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/a\"b\\c.png"}`,
+		buildImportData(dank16, `/home/u/a"b\c.png`), "paths must be escaped, not interpolated raw")
+}
+
+// writeTestPNG encodes img as a PNG at path, failing the test on any error.
+func writeTestPNG(t *testing.T, path string, img image.Image) {
+	t.Helper()
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatalf("failed to create test image: %v", err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, img); err != nil {
+		t.Fatalf("failed to encode test image: %v", err)
+	}
+}
+
+func TestExtractSourceColorPrefersVividOverDull(t *testing.T) {
+	dir := t.TempDir()
+
+	const w, h = 50, 50
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	dull := stdcolor.RGBA{R: 190, G: 200, B: 210, A: 255} // pale grey-blue, low chroma
+	vivid := stdcolor.RGBA{R: 255, G: 140, B: 0, A: 255}  // strong warm orange
+
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			img.Set(x, y, dull)
+		}
+	}
+	// ~19% of the image, in a corner, well clear of 80/20.
+	const vividSize = 22
+	for y := 0; y < vividSize; y++ {
+		for x := 0; x < vividSize; x++ {
+			img.Set(x, y, vivid)
+		}
+	}
+
+	path := filepath.Join(dir, "mixed.png")
+	writeTestPNG(t, path, img)
+
+	seed, err := ExtractSourceColor(path)
+	if err != nil {
+		t.Fatalf("ExtractSourceColor returned an error: %v", err)
+	}
+
+	var r, g, b uint8
+	if _, err := fmt.Sscanf(seed, "#%02x%02x%02x", &r, &g, &b); err != nil {
+		t.Fatalf("seed %q is not a #RRGGBB hex string: %v", seed, err)
+	}
+	hct := matcolor.NewARGB(255, r, g, b).ToHct()
+
+	dullHue := matcolor.NewARGB(255, dull.R, dull.G, dull.B).ToHct().Hue
+
+	// The failure this feature targets is landing on the large dull region.
+	// Assert the hue family, not an exact value: it must be nowhere near the
+	// dull blue-grey (~240) and it must sit in the warm orange/yellow band
+	// the vivid region occupies (~58, with generous tolerance either side).
+	assert.InDelta(t, 58.0, hct.Hue, 40.0, "expected the seed's hue to be in the vivid orange family, got hue=%.2f from %s", hct.Hue, seed)
+	assert.Greater(t, hueDistance(hct.Hue, dullHue), 60.0, "seed hue %.2f should not be in the dull region's hue family (%.2f)", hct.Hue, dullHue)
+}
+
+// hueDistance is the shortest angular distance between two hues on a 360
+// degree wheel.
+func hueDistance(a, b float64) float64 {
+	d := math.Abs(a - b)
+	if d > 180 {
+		d = 360 - d
+	}
+	return d
+}
+
+func TestExtractSourceColorDeterministic(t *testing.T) {
+	dir := t.TempDir()
+
+	const w, h = 50, 50
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			if x < 22 && y < 22 {
+				img.Set(x, y, stdcolor.RGBA{R: 255, G: 140, B: 0, A: 255})
+			} else {
+				img.Set(x, y, stdcolor.RGBA{R: 190, G: 200, B: 210, A: 255})
+			}
+		}
+	}
+	path := filepath.Join(dir, "deterministic.png")
+	writeTestPNG(t, path, img)
+
+	first, err := ExtractSourceColor(path)
+	if err != nil {
+		t.Fatalf("ExtractSourceColor returned an error: %v", err)
+	}
+
+	for i := 0; i < 3; i++ {
+		next, err := ExtractSourceColor(path)
+		if err != nil {
+			t.Fatalf("ExtractSourceColor returned an error on repeat run %d: %v", i, err)
+		}
+		assert.Equal(t, first, next, "the same wallpaper must yield a byte-identical seed every run")
+	}
+}
+
+func TestExtractSourceColorNonexistentPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "does-not-exist.png")
+
+	seed, err := ExtractSourceColor(path)
+
+	assert.Error(t, err)
+	assert.Empty(t, seed)
+	assert.Contains(t, err.Error(), "open")
+}
+
+func TestExtractSourceColorNonImageFile(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "not-an-image.jpg")
+	if err := os.WriteFile(path, []byte("this is plain text, not an image"), 0o644); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
+
+	seed, err := ExtractSourceColor(path)
+
+	assert.Error(t, err)
+	assert.Empty(t, seed)
+	assert.Contains(t, err.Error(), "decode")
+}
+
+func TestExtractSourceColorFullyTransparentImage(t *testing.T) {
+	dir := t.TempDir()
+	// image.NewRGBA zero-values to fully transparent black.
+	img := image.NewRGBA(image.Rect(0, 0, 8, 8))
+	path := filepath.Join(dir, "transparent.png")
+	writeTestPNG(t, path, img)
+
+	seed, err := ExtractSourceColor(path)
+
+	assert.Error(t, err)
+	assert.Empty(t, seed)
+	assert.Contains(t, err.Error(), "no opaque pixels")
+}
+
+func TestExtractSourceColorAllBlackImage(t *testing.T) {
+	dir := t.TempDir()
+	img := image.NewRGBA(image.Rect(0, 0, 8, 8))
+	for y := 0; y < 8; y++ {
+		for x := 0; x < 8; x++ {
+			img.Set(x, y, stdcolor.RGBA{R: 0, G: 0, B: 0, A: 255})
+		}
+	}
+	path := filepath.Join(dir, "black.png")
+	writeTestPNG(t, path, img)
+
+	seed, err := ExtractSourceColor(path)
+
+	assert.Error(t, err)
+	assert.Empty(t, seed)
+	assert.Contains(t, err.Error(), "no usable color")
+}
+
+func TestExtractSourceColorOnePixelDoesNotPanic(t *testing.T) {
+	dir := t.TempDir()
+	img := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	img.Set(0, 0, stdcolor.RGBA{R: 255, G: 0, B: 0, A: 255})
+	path := filepath.Join(dir, "one-pixel.png")
+	writeTestPNG(t, path, img)
+
+	assert.NotPanics(t, func() {
+		_, _ = ExtractSourceColor(path)
+	})
 }
 
 func TestSubstituteVars(t *testing.T) {
@@ -860,6 +1124,46 @@ func TestSyncQtengineConfig(t *testing.T) {
 	}
 }
 
+func TestSyncQtengineConfigAtUsesExplicitConfigDir(t *testing.T) {
+	tempDir := t.TempDir()
+	xdgConfigDir := filepath.Join(tempDir, "xdg-config")
+	explicitConfigDir := filepath.Join(tempDir, "explicit-config")
+	dataHome := filepath.Join(tempDir, "data")
+	t.Setenv("XDG_CONFIG_HOME", xdgConfigDir)
+	t.Setenv("XDG_DATA_HOME", dataHome)
+
+	scheme := filepath.Join(dataHome, "color-schemes", "DankMatugen.colors")
+	if err := os.MkdirAll(filepath.Dir(scheme), 0o755); err != nil {
+		t.Fatalf("failed to create color-schemes dir: %v", err)
+	}
+	if err := os.WriteFile(scheme, []byte("[Colors:Window]\n"), 0o644); err != nil {
+		t.Fatalf("failed to write color scheme: %v", err)
+	}
+
+	if err := SyncQtengineConfigAt(explicitConfigDir, "Papirus-Dark"); err != nil {
+		t.Fatalf("sync with explicit config dir failed: %v", err)
+	}
+
+	explicitPath := filepath.Join(explicitConfigDir, "qtengine", "config.json")
+	data, err := os.ReadFile(explicitPath)
+	if err != nil {
+		t.Fatalf("failed to read config from explicit directory: %v", err)
+	}
+	var cfg map[string]any
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		t.Fatalf("written config is not valid JSON: %v", err)
+	}
+	theme, ok := cfg["theme"].(map[string]any)
+	if !ok {
+		t.Fatalf("written config has no theme object: %#v", cfg["theme"])
+	}
+	assert.Equal(t, scheme, theme["colorScheme"])
+	assert.Equal(t, "Papirus-Dark", theme["iconTheme"])
+
+	_, err = os.Stat(filepath.Join(xdgConfigDir, "qtengine", "config.json"))
+	assert.ErrorIs(t, err, os.ErrNotExist, "explicit config dir must take precedence over XDG_CONFIG_HOME")
+}
+
 // The appended entry is the only thing driving the settings row's indicator.
 func TestCheckTemplatesIncludesQtengine(t *testing.T) {
 	tests := []struct {
@@ -929,4 +1233,170 @@ func TestSyncQtengineConfigBumpsMtime(t *testing.T) {
 		t.Fatalf("failed to re-read config: %v", err)
 	}
 	assert.Equal(t, string(before), string(after))
+}
+
+func TestExtractTopLevelString(t *testing.T) {
+	tests := []struct {
+		name    string
+		jsonStr string
+		key     string
+		want    string
+	}{
+		{name: "returns top-level string key", jsonStr: `{"mode":"light","colors":{}}`, key: "mode", want: "light"},
+		{name: "empty for missing key", jsonStr: `{"mode":"dark"}`, key: "is_dark_mode", want: ""},
+		{name: "empty for non-string value", jsonStr: `{"mode":42}`, key: "mode", want: ""},
+		{name: "empty for invalid json", jsonStr: `{mode`, key: "mode", want: ""},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, extractTopLevelString(tc.jsonStr, tc.key))
+		})
+	}
+}
+
+func TestResolveSmartMode(t *testing.T) {
+	tests := []struct {
+		name        string
+		mode        ColorMode
+		matugenType string
+		kind        string
+		stockColors string
+		isV42       bool
+		wantErr     string
+		wantMode    ColorMode
+	}{
+		{
+			name:     "concrete mode passes through untouched",
+			mode:     ColorModeLight,
+			kind:     "image",
+			isV42:    true,
+			wantMode: ColorModeLight,
+		},
+		{
+			name:    "smart mode errors on old matugen",
+			mode:    ColorModeSmart,
+			kind:    "image",
+			isV42:   false,
+			wantErr: "smart mode requires matugen 4.2+",
+		},
+		{
+			name:        "scheme-smart errors on old matugen",
+			mode:        ColorModeDark,
+			matugenType: "scheme-smart",
+			kind:        "image",
+			isV42:       false,
+			wantErr:     "scheme-smart requires matugen 4.2+",
+		},
+		{
+			name:     "smart falls back to dark for non-image kind",
+			mode:     ColorModeSmart,
+			kind:     "hex",
+			isV42:    true,
+			wantMode: ColorModeDark,
+		},
+		{
+			name:        "smart falls back to dark for stock colors",
+			mode:        ColorModeSmart,
+			kind:        "image",
+			stockColors: `{"primary":{}}`,
+			isV42:       true,
+			wantMode:    ColorModeDark,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			opts := &Options{
+				Mode:        tc.mode,
+				MatugenType: tc.matugenType,
+				Kind:        tc.kind,
+				StockColors: tc.stockColors,
+			}
+			if opts.MatugenType == "" {
+				opts.MatugenType = "scheme-tonal-spot"
+			}
+
+			err := resolveSmartMode(opts, matugenFlags{isV42: tc.isV42})
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantMode, opts.Mode)
+		})
+	}
+}
+
+func writeUserMatugenConfig(t *testing.T, configDir, content string) {
+	t.Helper()
+	dir := filepath.Join(configDir, "matugen")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatalf("failed to create matugen config dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "config.toml"), []byte(content), 0o644); err != nil {
+		t.Fatalf("failed to write user config: %v", err)
+	}
+}
+
+func TestWriteDryRunConfigAlwaysDeclaresConfigAndTemplates(t *testing.T) {
+	tests := []struct {
+		name             string
+		userConfig       string
+		runUserTemplates bool
+		wantContains     []string
+		wantNotContains  []string
+	}{
+		{
+			name:             "comment only user config",
+			userConfig:       "# nothing here\n",
+			runUserTemplates: true,
+			wantNotContains:  []string{"# nothing here"},
+		},
+		{
+			name:             "user config section is carried over",
+			userConfig:       "[config]\nfallback_color = \"#ff0000\"\n\n[templates.mine]\ninput_path = 'in'\noutput_path = 'out'\n",
+			runUserTemplates: true,
+			wantContains:     []string{"fallback_color = \"#ff0000\""},
+			wantNotContains:  []string{"[templates.mine]"},
+		},
+		{
+			name:            "user templates disabled",
+			userConfig:      "[config]\nfallback_color = \"#ff0000\"\n",
+			wantNotContains: []string{"fallback_color"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			configDir := filepath.Join(t.TempDir(), "config")
+			writeUserMatugenConfig(t, configDir, tc.userConfig)
+
+			opts := &Options{ConfigDir: configDir, RunUserTemplates: tc.runUserTemplates}
+			cfgPath, err := writeDryRunConfig(opts)
+			if err != nil {
+				t.Fatalf("writeDryRunConfig failed: %v", err)
+			}
+			defer os.Remove(cfgPath)
+
+			data, err := os.ReadFile(cfgPath)
+			if err != nil {
+				t.Fatalf("failed to read dry-run config: %v", err)
+			}
+
+			content := string(data)
+			assert.Contains(t, content, "[config]")
+			assert.Contains(t, content, "[templates]")
+			for _, want := range tc.wantContains {
+				assert.Contains(t, content, want)
+			}
+			for _, unwanted := range tc.wantNotContains {
+				assert.NotContains(t, content, unwanted)
+			}
+		})
+	}
+}
+
+func TestUserConfigSectionWithoutConfigDir(t *testing.T) {
+	assert.Equal(t, "[config]\n\n", userConfigSection(&Options{RunUserTemplates: true}))
 }

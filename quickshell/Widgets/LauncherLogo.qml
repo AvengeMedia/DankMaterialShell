@@ -20,7 +20,7 @@ Item {
     property string customPath: ""
     property bool fallbackToApps: false
 
-    readonly property bool compositorAvailable: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc
+    readonly property bool compositorAvailable: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc || CompositorService.isAqueous
     readonly property bool colorize: colorOverride !== ""
     readonly property string resolvedMode: {
         const fallback = fallbackToApps ? "apps" : "";
@@ -53,6 +53,8 @@ Item {
             return "file://" + Theme.shellDir + "/assets/miraclewm.svg";
         case "labwc":
             return "file://" + Theme.shellDir + "/assets/labwc.png";
+        case "aqueous":
+            return "file://" + Theme.shellDir + "/assets/aqueous.svg";
         default:
             return "";
         }

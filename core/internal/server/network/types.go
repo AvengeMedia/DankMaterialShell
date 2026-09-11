@@ -13,6 +13,7 @@ const (
 	StatusDisconnected NetworkStatus = "disconnected"
 	StatusEthernet     NetworkStatus = "ethernet"
 	StatusWiFi         NetworkStatus = "wifi"
+	StatusCellular     NetworkStatus = "cellular"
 	StatusVPN          NetworkStatus = "vpn"
 )
 
@@ -22,6 +23,7 @@ const (
 	PreferenceAuto     ConnectionPreference = "auto"
 	PreferenceWiFi     ConnectionPreference = "wifi"
 	PreferenceEthernet ConnectionPreference = "ethernet"
+	PreferenceCellular ConnectionPreference = "cellular"
 )
 
 type WiFiNetwork struct {
@@ -65,6 +67,16 @@ type EthernetDevice struct {
 	Driver    string `json:"driver,omitempty"`
 }
 
+type CellularDevice struct {
+	Name        string `json:"name"`
+	HwAddress   string `json:"hwAddress"`
+	State       string `json:"state"`
+	Connected   bool   `json:"connected"`
+	IP          string `json:"ip,omitempty"`
+	Driver      string `json:"driver,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
 type VPNProfile struct {
 	Name        string            `json:"name"`
 	UUID        string            `json:"uuid"`
@@ -97,43 +109,51 @@ type VPNState struct {
 }
 
 type NetworkState struct {
-	Backend                string               `json:"backend"`
-	NetworkStatus          NetworkStatus        `json:"networkStatus"`
-	Preference             ConnectionPreference `json:"preference"`
-	EthernetIP             string               `json:"ethernetIP"`
-	EthernetDevice         string               `json:"ethernetDevice"`
-	EthernetConnected      bool                 `json:"ethernetConnected"`
-	EthernetConnectionUuid string               `json:"ethernetConnectionUuid"`
-	EthernetDevices        []EthernetDevice     `json:"ethernetDevices"`
-	WiFiIP                 string               `json:"wifiIP"`
-	WiFiDevice             string               `json:"wifiDevice"`
-	WiFiConnected          bool                 `json:"wifiConnected"`
-	WiFiEnabled            bool                 `json:"wifiEnabled"`
-	WiFiSSID               string               `json:"wifiSSID"`
-	WiFiBSSID              string               `json:"wifiBSSID"`
-	WiFiSignal             uint8                `json:"wifiSignal"`
-	WiFiNetworks           []WiFiNetwork        `json:"wifiNetworks"`
-	SavedWiFiNetworks      []WiFiNetwork        `json:"savedWifiNetworks"`
-	WiFiDevices            []WiFiDevice         `json:"wifiDevices"`
-	HotspotSupported       bool                 `json:"hotspotSupported"`
-	HotspotAvailable       bool                 `json:"hotspotAvailable"`
-	HotspotConfigured      bool                 `json:"hotspotConfigured"`
-	HotspotEnabled         bool                 `json:"hotspotEnabled"`
-	HotspotActivating      bool                 `json:"hotspotActivating"`
-	HotspotSecured         bool                 `json:"hotspotSecured"`
-	HotspotSSID            string               `json:"hotspotSSID"`
-	HotspotDevice          string               `json:"hotspotDevice"`
-	HotspotBand            string               `json:"hotspotBand"`
-	HotspotLastError       string               `json:"hotspotLastError"`
-	WiredConnections       []WiredConnection    `json:"wiredConnections"`
-	VPNProfiles            []VPNProfile         `json:"vpnProfiles"`
-	VPNActive              []VPNActive          `json:"vpnActive"`
-	IsConnecting           bool                 `json:"isConnecting"`
-	ConnectingSSID         string               `json:"connectingSSID"`
-	ConnectingDevice       string               `json:"connectingDevice,omitempty"`
-	LastError              string               `json:"lastError"`
-	VPNError               string               `json:"vpnError"`
-	VPNErrorUuid           string               `json:"vpnErrorUuid"`
+	Backend                 string               `json:"backend"`
+	NetworkStatus           NetworkStatus        `json:"networkStatus"`
+	Preference              ConnectionPreference `json:"preference"`
+	EthernetIP              string               `json:"ethernetIP"`
+	EthernetDevice          string               `json:"ethernetDevice"`
+	EthernetConnected       bool                 `json:"ethernetConnected"`
+	EthernetConnectionUuid  string               `json:"ethernetConnectionUuid"`
+	EthernetDevices         []EthernetDevice     `json:"ethernetDevices"`
+	CellularIP              string               `json:"cellularIP"`
+	CellularDevice          string               `json:"cellularDevice"`
+	CellularConnected       bool                 `json:"cellularConnected"`
+	CellularEnabled         bool                 `json:"cellularEnabled"`
+	CellularHardwareEnabled bool                 `json:"cellularHardwareEnabled"`
+	CellularConnectionUuid  string               `json:"cellularConnectionUuid"`
+	CellularDevices         []CellularDevice     `json:"cellularDevices"`
+	CellularConnections     []WiredConnection    `json:"cellularConnections"`
+	WiFiIP                  string               `json:"wifiIP"`
+	WiFiDevice              string               `json:"wifiDevice"`
+	WiFiConnected           bool                 `json:"wifiConnected"`
+	WiFiEnabled             bool                 `json:"wifiEnabled"`
+	WiFiSSID                string               `json:"wifiSSID"`
+	WiFiBSSID               string               `json:"wifiBSSID"`
+	WiFiSignal              uint8                `json:"wifiSignal"`
+	WiFiNetworks            []WiFiNetwork        `json:"wifiNetworks"`
+	SavedWiFiNetworks       []WiFiNetwork        `json:"savedWifiNetworks"`
+	WiFiDevices             []WiFiDevice         `json:"wifiDevices"`
+	HotspotSupported        bool                 `json:"hotspotSupported"`
+	HotspotAvailable        bool                 `json:"hotspotAvailable"`
+	HotspotConfigured       bool                 `json:"hotspotConfigured"`
+	HotspotEnabled          bool                 `json:"hotspotEnabled"`
+	HotspotActivating       bool                 `json:"hotspotActivating"`
+	HotspotSecured          bool                 `json:"hotspotSecured"`
+	HotspotSSID             string               `json:"hotspotSSID"`
+	HotspotDevice           string               `json:"hotspotDevice"`
+	HotspotBand             string               `json:"hotspotBand"`
+	HotspotLastError        string               `json:"hotspotLastError"`
+	WiredConnections        []WiredConnection    `json:"wiredConnections"`
+	VPNProfiles             []VPNProfile         `json:"vpnProfiles"`
+	VPNActive               []VPNActive          `json:"vpnActive"`
+	IsConnecting            bool                 `json:"isConnecting"`
+	ConnectingSSID          string               `json:"connectingSSID"`
+	ConnectingDevice        string               `json:"connectingDevice,omitempty"`
+	LastError               string               `json:"lastError"`
+	VPNError                string               `json:"vpnError"`
+	VPNErrorUuid            string               `json:"vpnErrorUuid"`
 }
 
 type ConnectionRequest struct {
@@ -179,6 +199,7 @@ type Manager struct {
 	subscribers           syncmap.Map[string, chan NetworkState]
 	stopChan              chan struct{}
 	dirty                 chan struct{}
+	priorityMutex         sync.Mutex
 	notifierWg            sync.WaitGroup
 	lastNotifiedState     *NetworkState
 	credentialSubscribers syncmap.Map[string, chan CredentialPrompt]

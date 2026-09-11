@@ -27,6 +27,7 @@ Singleton {
     property int totalCount: 0
     property string searchText: ""
     property string activeFilter: "all"
+    readonly property bool filterActive: searchText.trim().length > 0 || activeFilter !== "all"
     property int selectedIndex: 0
     property bool keyboardNavigationActive: false
     property int refCount: 0
@@ -201,15 +202,17 @@ Singleton {
         unpinnedEntries = [];
     }
 
-    function copyEntry(entry, closeCallback) {
+    function copyEntry(entry, closeCallback, textOnly) {
+        const asText = textOnly === true;
         DMSService.sendRequest("clipboard.copyEntry", {
-            "id": entry.id
+            "id": entry.id,
+            "textOnly": asText
         }, function (response) {
             if (response.error) {
                 ToastService.showError(I18n.tr("Failed to copy entry"));
                 return;
             }
-            ToastService.showInfo(entry.isImage ? I18n.tr("Image copied to clipboard") : I18n.tr("Copied to clipboard"));
+            ToastService.showInfo(entry.isImage && !asText ? I18n.tr("Image copied to clipboard") : I18n.tr("Copied to clipboard"));
             historyCopied();
             if (closeCallback) {
                 closeCallback();
@@ -344,6 +347,23 @@ Singleton {
             if (hasPinned) {
                 ToastService.showInfo(I18n.tr("History cleared. %1 pinned entries kept.").arg(savedCount));
             }
+        });
+    }
+
+    function clearFiltered() {
+        const ids = unpinnedEntries.map(entry => entry.id);
+        if (ids.length === 0) {
+            return;
+        }
+        DMSService.sendRequest("clipboard.deleteEntries", {
+            "ids": ids
+        }, function (response) {
+            if (response.error) {
+                log.warn("Failed to clear filtered entries:", response.error);
+                return;
+            }
+            refresh();
+            historyCleared();
         });
     }
 

@@ -18,6 +18,38 @@ func (b *WpaSupplicantBackend) ActivateWiredConnection(uuid string) error {
 	return fmt.Errorf("wired control not supported by wpa_supplicant backend")
 }
 
+func (b *WpaSupplicantBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *WpaSupplicantBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular radio control not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular radio control not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) GetCellularConnections() ([]WiredConnection, error) {
+	return nil, fmt.Errorf("cellular connections not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) ConnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular connections not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular connections not supported by wpa_supplicant backend")
+}
+
+func (b *WpaSupplicantBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular connections not supported by wpa_supplicant backend")
+}
+
 func (b *WpaSupplicantBackend) ListVPNProfiles() ([]VPNProfile, error) {
 	return nil, fmt.Errorf("VPN not supported by wpa_supplicant backend")
 }

@@ -2,17 +2,19 @@
 #
 # DankMaterialShell stable release
 #
-# NOTE: the binary is built with the `distro_binary` build tag, which is the
-# packaged variant upstream ships (it drops the in-app self-update command).
+# NOTE: the binary is built with the `distro_binary` build tag (drops the
+# in-app self-update command) and `withshell` (embeds the Quickshell UI; the
+# shell no longer discovers an installed tree, so an unembedded binary has no UI).
 # CI rewrites version/checksum from the selected release tag before building.
 pkgname=dms
 version=1.5.0
 revision=2
 build_style=go
 build_wrksrc="core"
+hostmakedepends="make tar"
 go_import_path="github.com/AvengeMedia/DankMaterialShell/core"
 go_package="${go_import_path}/cmd/dms"
-go_build_tags="distro_binary"
+go_build_tags="distro_binary withshell"
 go_ldflags="-X main.Version=${version}"
 short_desc="DankMaterialShell — Material 3 desktop shell for Wayland"
 maintainer="AvengeMedia <AvengeMedia.US@gmail.com>"
@@ -25,11 +27,11 @@ checksum=14f2678d6a15223ba069d1b8c8a21a5564b735d190c231f62ed44fd8bf48677c
 # Optional feature deps are listed in distro/void/README.md.
 depends="quickshell accountsservice dgop matugen dbus elogind mesa-dri"
 
-post_install() {
-	# QML shell tree (build_style=go already installed the dms binary)
-	vmkdir usr/share/quickshell/dms
-	vcopy "${wrksrc}/quickshell/*" usr/share/quickshell/dms
+pre_build() {
+	make sync-shell
+}
 
+post_install() {
 	# Desktop entry + icon
 	vinstall "${wrksrc}/assets/dms-open.desktop" 644 usr/share/applications
 	vinstall "${wrksrc}/assets/com.danklinux.dms.desktop" 644 usr/share/applications

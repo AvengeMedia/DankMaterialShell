@@ -20,11 +20,12 @@ Column {
 
     function loadValue() {
         const settings = QmlUtils.findSettings(root.parent);
-        if (settings && settings.pluginService) {
-            const loadedValue = settings.loadValue(settingKey, defaultValue);
-            value = loadedValue;
-            isInitialized = true;
-        }
+        if (!settings || !settings.pluginService)
+            return;
+        const loadedValue = settings.loadValue(settingKey, defaultValue);
+        // pre-fix saves persisted the QColor as {}, which throws when assigned to a color property
+        value = typeof loadedValue === "string" ? loadedValue : defaultValue;
+        isInitialized = true;
     }
 
     Component.onCompleted: {
@@ -36,7 +37,7 @@ Column {
             return;
         const settings = QmlUtils.findSettings(root.parent);
         if (settings) {
-            settings.saveValue(settingKey, value);
+            settings.saveValue(settingKey, value.toString());
         }
     }
 

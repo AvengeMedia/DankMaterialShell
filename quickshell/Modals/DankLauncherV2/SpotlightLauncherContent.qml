@@ -22,6 +22,7 @@ FocusScope {
     readonly property real _searchBarH: 56
     readonly property real _searchAreaH: _searchBarH
     readonly property alias searchAreaHeight: root._searchAreaH
+    readonly property real actionPanelHeight: actionPanel.height
     readonly property real _statusH: 92
     readonly property real _rowH: 64
     readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.min(430, (parentModal?.screenHeight ?? 900) * 0.55)
@@ -47,7 +48,7 @@ FocusScope {
         return Theme.surfaceContainer;
     }
 
-    implicitHeight: _searchAreaH + resultsContainer.height
+    implicitHeight: _searchAreaH + resultsContainer.height + actionPanel.height
 
     property bool _animateResize: false
 
@@ -71,6 +72,7 @@ FocusScope {
 
     function closeTransientUi() {
         transientSurfaceTracker?.closeAll?.();
+        actionPanel.hide();
         root.enabled = true;
     }
 
@@ -117,6 +119,11 @@ FocusScope {
 
         switch (event.key) {
         case Qt.Key_Escape:
+            if (actionPanel.expanded) {
+                actionPanel.hide();
+                event.accepted = true;
+                return;
+            }
             if (root.controller.clearPluginFilter()) {
                 event.accepted = true;
                 return;
@@ -169,17 +176,29 @@ FocusScope {
             }
             break;
         case Qt.Key_Tab:
-            _cycleCategory(false);
+            if (hasCtrl) {
+                actionPanel.hide();
+                _cycleCategory(false);
+            } else if (actionPanel.hasActions) {
+                actionPanel.expanded ? actionPanel.cycleAction() : actionPanel.show();
+            }
             event.accepted = true;
             return;
         case Qt.Key_Backtab:
-            _cycleCategory(true);
+            if (hasCtrl) {
+                actionPanel.hide();
+                _cycleCategory(true);
+            } else if (actionPanel.hasActions) {
+                actionPanel.expanded ? actionPanel.cycleAction(true) : actionPanel.show();
+            }
             event.accepted = true;
             return;
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (event.modifiers & Qt.ShiftModifier) {
                 root.controller.pasteSelected();
+            } else if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
+                actionPanel.executeSelectedAction();
             } else {
                 root.controller.executeSelected();
             }
@@ -265,6 +284,11 @@ FocusScope {
 
     Connections {
         target: root.controller
+
+        function onSelectedItemChanged() {
+            if (actionPanel.expanded)
+                actionPanel.hide();
+        }
 
         function onItemExecuted() {
             root.parentModal?.hide();
@@ -411,6 +435,7 @@ FocusScope {
                 onTextChanged: {
                     if (root.suspendSearchUpdates)
                         return;
+                    actionPanel.hide();
                     if (text.length > 0) {
                         root.controller.setSearchQuery(text);
                     } else {
@@ -455,6 +480,15 @@ FocusScope {
                 root._showContextMenu(item, sceneX, sceneY, false);
             }
         }
+    }
+
+    ActionPanel {
+        id: actionPanel
+        anchors.top: resultsContainer.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        selectedItem: root.controller.selectedItem
+        controller: root.controller
     }
 
     readonly property var _categoryModel: [

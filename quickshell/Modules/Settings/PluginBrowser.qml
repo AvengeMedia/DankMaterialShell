@@ -24,8 +24,8 @@ DankFloatingWindow {
     property var categoryFilterOptions: []
     property var availableLetters: []
     property string detailPluginId: ""
+    property string loadError: ""
 
-    readonly property string previewApiBase: "https://api.danklinux.com/previews/"
     readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
     readonly property bool showCategoryFilters: activeCategorySort && categoryFilterOptions.length > 1
@@ -96,99 +96,6 @@ DankFloatingWindow {
 
     function pluginReviewed(plugin) {
         return (plugin.status || []).indexOf("reviewed") !== -1;
-    }
-
-    function statusTone(status) {
-        switch (status) {
-        case "broken":
-            return "error";
-        case "unmaintained":
-            return "warning";
-        case "reviewed":
-            return "info";
-        default:
-            return "outline";
-        }
-    }
-
-    function badgeTone(tone) {
-        switch (tone) {
-        case "secondary":
-            return Theme.secondary;
-        case "warning":
-            return Theme.warning;
-        case "error":
-            return Theme.error;
-        case "info":
-            return Theme.info;
-        case "outline":
-            return Theme.outline;
-        default:
-            return Theme.primary;
-        }
-    }
-
-    function statusLabel(status) {
-        switch (status) {
-        case "broken":
-            return I18n.tr("broken", "plugin status");
-        case "unmaintained":
-            return I18n.tr("unmaintained", "plugin status");
-        case "deprecated":
-            return I18n.tr("deprecated", "plugin status");
-        case "reviewed":
-            return I18n.tr("reviewed", "plugin status");
-        default:
-            return status;
-        }
-    }
-
-    function badgeModel(plugin) {
-        if (!plugin || (!plugin.id && !plugin.name))
-            return [];
-        var badges = [];
-        if (plugin.featured)
-            badges.push({
-                label: I18n.tr("featured"),
-                icon: "star",
-                tone: "secondary"
-            });
-        if (plugin.firstParty)
-            badges.push({
-                label: I18n.tr("official"),
-                icon: "verified",
-                tone: "primary"
-            });
-        else
-            badges.push({
-                label: I18n.tr("3rd party"),
-                icon: "",
-                tone: "warning"
-            });
-        var status = plugin.status || [];
-        for (var i = 0; i < status.length; i++)
-            badges.push({
-                label: statusLabel(status[i]),
-                icon: "",
-                tone: statusTone(status[i])
-            });
-        return badges;
-    }
-
-    function previewUrl(plugin) {
-        if (!plugin)
-            return "";
-        if (plugin.previewUrl)
-            return plugin.previewUrl;
-        if (plugin.id)
-            return previewApiBase + plugin.id;
-        return plugin.screenshot || "";
-    }
-
-    function heroUrl(plugin) {
-        if (!plugin)
-            return "";
-        return plugin.screenshot || previewUrl(plugin);
     }
 
     function relatedPlugins(plugin) {
@@ -527,33 +434,28 @@ DankFloatingWindow {
         ensureSelectedVisible();
     }
 
-    function installPlugin(pluginName, enableAfterInstall) {
-        ToastService.showInfo(I18n.tr("Installing: %1", "installation progress").arg(pluginName));
-        DMSService.install(pluginName, response => {
-            if (response.error) {
-                ToastService.showError(I18n.tr("Install failed: %1", "installation error").arg(response.error));
+    function installPlugin(pluginId, pluginName, enableAfterInstall) {
+        PluginService.installFromRegistry(pluginId, pluginName, enableAfterInstall, success => {
+            if (!success)
                 return;
-            }
-            ToastService.showInfo(I18n.tr("Installed: %1", "installation success").arg(pluginName));
-            PluginService.scanPlugins();
             refreshPlugins();
-            if (enableAfterInstall) {
-                Qt.callLater(() => {
-                    PluginService.enablePlugin(pluginName);
-                    const plugin = PluginService.availablePlugins[pluginName];
-                    if (plugin?.type === "desktop") {
-                        const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(pluginName);
-                        SettingsData.createDesktopWidgetInstance(pluginName, plugin.name || pluginName, defaultConfig);
-                    }
-                    hide();
-                });
-            }
+            if (enableAfterInstall)
+                hide();
         });
     }
 
     function refreshPlugins() {
         isLoading = true;
-        DMSService.listPlugins();
+        loadError = "";
+        DMSService.listPlugins(response => {
+            isLoading = false;
+            if (response.error) {
+                loadError = response.error;
+                return;
+            }
+            allPlugins = response.result || [];
+            updateFilteredPlugins();
+        });
         if (DMSService.apiVersion >= 8)
             DMSService.listInstalled();
     }
@@ -569,7 +471,7 @@ DankFloatingWindow {
             "message": I18n.tr("Install plugin '%1' from the DMS registry?", "plugin installation confirmation").arg(pluginId),
             "confirmText": I18n.tr("Install", "install action button"),
             "cancelText": I18n.tr("Cancel"),
-            "onConfirm": () => installPlugin(pluginId, true),
+            "onConfirm": () => installPlugin(pluginId, pluginId, true),
             "onCancel": () => hide()
         });
     }
@@ -577,7 +479,12 @@ DankFloatingWindow {
     function show() {
         if (parentModal)
             parentModal.shouldHaveFocus = false;
+        const wasVisible = visible;
         visible = true;
+        if (wasVisible && PopoutService.pendingPluginInstall) {
+            pendingInstallHandled = false;
+            checkPendingInstall();
+        }
         Qt.callLater(() => browserSearchField.forceActiveFocus());
     }
 
@@ -627,17 +534,12 @@ DankFloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         isLoading = false;
+        loadError = "";
         detailPluginId = "";
     }
 
     Connections {
         target: DMSService
-
-        function onPluginsListReceived(plugins) {
-            root.isLoading = false;
-            root.allPlugins = plugins;
-            root.updateFilteredPlugins();
-        }
 
         function onInstalledPluginsReceived(plugins) {
             var pluginMap = {};
@@ -659,8 +561,10 @@ DankFloatingWindow {
         }
     }
 
-    ConfirmModal {
+    ConfirmDialogOverlay {
         id: urlInstallConfirm
+
+        onDialogClosed: Qt.callLater(() => browserSearchField.forceActiveFocus())
     }
 
     FocusScope {
@@ -1037,245 +941,18 @@ DankFloatingWindow {
                         required property var modelData
                         required property int index
 
-                        property bool isInstalled: modelData.installed || false
-                        property bool isCompatible: PluginService.checkPluginCompatibility(modelData.requires_dms)
-                        property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-
                         width: pluginGrid.cellWidth
                         height: pluginGrid.cellHeight
 
-                        Rectangle {
-                            id: card
+                        PluginCard {
                             anchors.fill: parent
                             anchors.margins: pluginGrid.cardSpacing / 2
-                            radius: Theme.cornerRadius
-                            color: cardMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.5) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
-                            border.color: cardCell.isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
-                            border.width: cardCell.isSelected ? 2 : 1
-                            scale: cardMouseArea.containsMouse ? 1.012 : 1
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            Behavior on scale {
-                                NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-
-                            MouseArea {
-                                id: cardMouseArea
-                                z: 0
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPressed: mouse => cardRipple.trigger(mouse.x, mouse.y)
-                                onClicked: root.openPluginDetail(cardCell.modelData)
-                            }
-
-                            DankRipple {
-                                id: cardRipple
-                                cornerRadius: card.radius
-                                rippleColor: Theme.surfaceVariantText
-                            }
-
-                            Item {
-                                id: previewArea
-                                z: 1
-                                anchors.top: parent.top
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.margins: Theme.spacingS
-                                height: pluginGrid.previewHeight
-
-                                ClippingRectangle {
-                                    anchors.fill: parent
-                                    radius: Theme.cornerRadius - 2
-                                    color: Theme.floatingWindowNestedSurface
-
-                                    CachingImage {
-                                        id: cardPreview
-                                        anchors.fill: parent
-                                        imagePath: root.previewUrl(cardCell.modelData)
-                                        maxCacheSize: 640
-                                        fillMode: Image.PreserveAspectCrop
-                                        animate: false
-                                        visible: status === Image.Ready
-                                    }
-
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: cardCell.modelData.icon || "extension"
-                                        size: Theme.iconSize + 12
-                                        color: Theme.withAlpha(Theme.outline, 0.6)
-                                        visible: cardPreview.status !== Image.Ready
-                                    }
-
-                                    DankSpinner {
-                                        anchors.centerIn: parent
-                                        running: cardPreview.status === Image.Loading
-                                        visible: running
-                                    }
-                                }
-
-                                Row {
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
-                                    anchors.margins: Theme.spacingXS
-                                    spacing: Theme.spacingXXS
-
-                                    Repeater {
-                                        model: root.badgeModel(cardCell.modelData)
-
-                                        PluginBadge {
-                                            required property var modelData
-                                            label: modelData.label
-                                            iconName: modelData.icon
-                                            tone: root.badgeTone(modelData.tone)
-                                            onImage: true
-                                        }
-                                    }
-                                }
-
-                                PluginBadge {
-                                    anchors.top: parent.top
-                                    anchors.right: parent.right
-                                    anchors.margins: Theme.spacingXS
-                                    iconName: "thumb_up"
-                                    label: cardCell.modelData.upvotes || 0
-                                    tone: Theme.primary
-                                    onImage: true
-                                    visible: !!cardCell.modelData.issueUrl
-                                }
-                            }
-
-                            Column {
-                                z: 1
-                                anchors.top: previewArea.bottom
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.topMargin: Theme.spacingS
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.rightMargin: Theme.spacingM
-                                spacing: Theme.spacingXXS
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    DankIcon {
-                                        id: cardIcon
-                                        name: cardCell.modelData.icon || "extension"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        width: parent.width - cardIcon.width - installAction.width - Theme.spacingS * 2
-                                        text: cardCell.modelData.name || ""
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        elide: Text.ElideRight
-                                        maximumLineCount: 1
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Rectangle {
-                                        id: installAction
-
-                                        property string buttonState: {
-                                            if (cardCell.isInstalled)
-                                                return "installed";
-                                            if (!cardCell.isCompatible)
-                                                return "incompatible";
-                                            return "available";
-                                        }
-
-                                        width: 28
-                                        height: 28
-                                        radius: 14
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: {
-                                            switch (buttonState) {
-                                            case "installed":
-                                                return Theme.surfaceVariant;
-                                            case "incompatible":
-                                                return Theme.withAlpha(Theme.warning, 0.15);
-                                            default:
-                                                return Theme.primary;
-                                            }
-                                        }
-                                        opacity: buttonState === "available" && installMouseArea.containsMouse ? 0.85 : 1
-
-                                        Behavior on opacity {
-                                            NumberAnimation {
-                                                duration: Theme.shortDuration
-                                                easing.type: Theme.standardEasing
-                                            }
-                                        }
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            size: 15
-                                            name: {
-                                                switch (installAction.buttonState) {
-                                                case "installed":
-                                                    return "check";
-                                                case "incompatible":
-                                                    return "warning";
-                                                default:
-                                                    return "download";
-                                                }
-                                            }
-                                            color: {
-                                                switch (installAction.buttonState) {
-                                                case "installed":
-                                                    return Theme.surfaceText;
-                                                case "incompatible":
-                                                    return Theme.warning;
-                                                default:
-                                                    return Theme.surface;
-                                                }
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: installMouseArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: installAction.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            enabled: installAction.buttonState === "available"
-                                            onClicked: root.installPlugin(cardCell.modelData.name, cardCell.modelData.type === "desktop")
-                                        }
-                                    }
-                                }
-
-                                StyledText {
-                                    width: parent.width
-                                    text: I18n.tr("by %1", "author attribution").arg(cardCell.modelData.author || I18n.tr("Unknown", "unknown author"))
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.outline
-                                    elide: Text.ElideRight
-                                    maximumLineCount: 1
-                                }
-
-                                StyledText {
-                                    width: parent.width
-                                    text: cardCell.modelData.description || ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    wrapMode: Text.WordWrap
-                                    elide: Text.ElideRight
-                                    maximumLineCount: 2
-                                }
-                            }
+                            plugin: cardCell.modelData
+                            previewHeight: pluginGrid.previewHeight
+                            installed: cardCell.modelData.installed || false
+                            selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
+                            onClicked: root.openPluginDetail(cardCell.modelData)
+                            onInstallRequested: root.installPlugin(cardCell.modelData.id, cardCell.modelData.name, cardCell.modelData.type === "desktop")
                         }
                     }
                 }
@@ -1319,7 +996,7 @@ DankFloatingWindow {
                 Column {
                     anchors.centerIn: parent
                     spacing: Theme.spacingS
-                    visible: !root.isLoading && root.filteredPlugins.length === 0
+                    visible: !root.isLoading && root.loadError === "" && root.filteredPlugins.length === 0
 
                     DankIcon {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -1333,6 +1010,42 @@ DankFloatingWindow {
                         text: I18n.tr("No plugins found", "empty plugin list")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceVariantText
+                    }
+                }
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingS
+                    visible: !root.isLoading && root.loadError !== ""
+
+                    DankIcon {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        name: "cloud_off"
+                        size: Theme.iconSize + 16
+                        color: Theme.outline
+                    }
+
+                    StyledText {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: I18n.tr("Couldn't load plugins", "plugin registry fetch error")
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceVariantText
+                    }
+
+                    StyledText {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: root.loadError
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.outline
+                    }
+
+                    DankButton {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: I18n.tr("Retry", "retry failed action button")
+                        iconName: "refresh"
+                        backgroundColor: Theme.surfaceContainerHighest
+                        textColor: Theme.surfaceText
+                        onClicked: root.refreshPlugins()
                     }
                 }
             }
@@ -1523,7 +1236,7 @@ DankFloatingWindow {
                             hoverEnabled: true
                             cursorShape: detailInstallButton.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
                             enabled: detailInstallButton.buttonState === "available"
-                            onClicked: root.installPlugin(detailPane.plugin.name, detailPane.plugin.type === "desktop")
+                            onClicked: root.installPlugin(detailPane.plugin.id, detailPane.plugin.name, detailPane.plugin.type === "desktop")
                         }
                     }
                 }
@@ -1562,7 +1275,7 @@ DankFloatingWindow {
                                 CachingImage {
                                     id: heroImage
                                     anchors.fill: parent
-                                    imagePath: detailPane.heroFallback ? root.previewUrl(detailPane.plugin) : root.heroUrl(detailPane.plugin)
+                                    imagePath: detailPane.heroFallback ? PluginService.previewUrl(detailPane.plugin) : PluginService.heroUrl(detailPane.plugin)
                                     maxCacheSize: 1600
                                     fillMode: Image.PreserveAspectFit
                                     visible: status === Image.Ready
@@ -1606,13 +1319,13 @@ DankFloatingWindow {
                             spacing: Theme.spacingXS
 
                             Repeater {
-                                model: root.badgeModel(detailPane.plugin)
+                                model: PluginService.badgeModel(detailPane.plugin)
 
                                 PluginBadge {
                                     required property var modelData
                                     label: modelData.label
                                     iconName: modelData.icon
-                                    tone: root.badgeTone(modelData.tone)
+                                    tone: PluginService.badgeTone(modelData.tone)
                                 }
                             }
 

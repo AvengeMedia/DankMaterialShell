@@ -24,6 +24,7 @@ Singleton {
     property bool isConnected: false
     readonly property bool isConnecting: requestSocket.connected && !requestSocket.linkUp
     property bool subscribeConnected: false
+    property bool matugenSmartSupported: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -71,6 +72,7 @@ Singleton {
     property var screensaverInhibitors: []
 
     property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "wallpaper", "bluetooth", "bluetooth.pairing", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "sysupdate"]
+    property var connectionCapabilities: null
 
     Component.onCompleted: {
         if (!socketPath || socketPath.length === 0)
@@ -150,6 +152,7 @@ Singleton {
                 root.isConnected = true;
                 root.connectionStateChanged();
                 subscribeSocket.connected = true;
+                root.refreshMatugenStatus();
                 return;
             }
             root.isConnected = false;
@@ -188,8 +191,10 @@ Singleton {
 
         onConnectionStateChanged: {
             root.subscribeConnected = linkUp;
-            if (!linkUp)
+            if (!linkUp) {
+                root.connectionCapabilities = null;
                 return;
+            }
             sendSubscribeRequest();
         }
 
@@ -212,6 +217,13 @@ Singleton {
         }
     }
 
+    function refreshMatugenStatus() {
+        sendRequest("matugen.status", null, response => {
+            if (!response.error && response.result)
+                matugenSmartSupported = response.result.smartSupported === true;
+        });
+    }
+
     function sendSubscribeRequest() {
         const request = {
             "method": "subscribe",
@@ -230,11 +242,34 @@ Singleton {
         subscribeSocket.send(request);
     }
 
+    property bool _resubscribePending: false
+
+    // Deferred so the socket is not torn down inside its own parser callback.
+    // Qt.callLater collapses a same-tick capability burst into one re-dial.
+    function _resubscribeNow() {
+        if (!_resubscribePending)
+            return;
+        _resubscribePending = false;
+        subscribe(activeSubscriptions);
+    }
+
+    function _capabilityNeeded(capability) {
+        return activeSubscriptions.includes("all") || activeSubscriptions.includes(capability);
+    }
+
+    // Only a capability that was missing when this connection was made can be worth re-dialing for.
+    function _hasNewNeededCapability(newCapabilities) {
+        if (!connectionCapabilities)
+            return false;
+        return newCapabilities.some(c => !connectionCapabilities.includes(c) && _capabilityNeeded(c));
+    }
+
     function subscribe(services) {
         if (!Array.isArray(services)) {
             services = [services];
         }
 
+        _resubscribePending = false;
         activeSubscriptions = services;
 
         if (subscribeConnected) {
@@ -289,7 +324,6 @@ Singleton {
         const data = response.result.data;
 
         if (service === "server") {
-            const prevCapabilities = capabilities;
             apiVersion = data.apiVersion || 0;
             cliVersion = data.cliVersion || "";
             capabilities = data.capabilities || [];
@@ -302,10 +336,13 @@ Singleton {
 
             capabilitiesReceived();
 
-            const capabilitiesChanged = prevCapabilities.length !== capabilities.length || capabilities.some(c => !prevCapabilities.includes(c));
-            if (prevCapabilities.length > 0 && capabilitiesChanged) {
-                log.info("Capabilities changed, resubscribing");
-                subscribe(activeSubscriptions);
+            const needsResubscribe = _hasNewNeededCapability(capabilities);
+            if (!connectionCapabilities)
+                connectionCapabilities = capabilities;
+            if (needsResubscribe && !_resubscribePending) {
+                log.info("Subscribed capability appeared, resubscribing");
+                _resubscribePending = true;
+                Qt.callLater(root._resubscribeNow);
             }
         } else if (service === "network") {
             networkStateUpdate(data);
@@ -365,7 +402,16 @@ Singleton {
         }
     }
 
-    function sendRequest(method, params, callback) {
+    Component {
+        id: requestTimeoutComponent
+        Timer {
+            property var requestId
+            repeat: false
+            onTriggered: root.handleResponse({id: requestId, error: "Request timed out; operation completion is uncertain"})
+        }
+    }
+
+    function sendRequest(method, params, callback, timeoutMs) {
         if (!isConnected) {
             log.warn("DMSService.sendRequest: Not connected, method:", method);
             if (callback) {
@@ -387,8 +433,19 @@ Singleton {
             request.params = params;
         }
 
-        if (callback)
-            pendingRequests[id] = callback;
+        if (callback) {
+            if (timeoutMs > 0) {
+                const timeout = requestTimeoutComponent.createObject(root, {requestId: id, interval: timeoutMs});
+                pendingRequests[id] = response => {
+                    timeout.stop();
+                    timeout.destroy();
+                    callback(response);
+                };
+                timeout.start();
+            } else {
+                pendingRequests[id] = callback;
+            }
+        }
 
         if (method.startsWith("clipboard")) {
             clipboardRequestIds[id] = true;

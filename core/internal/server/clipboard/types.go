@@ -134,7 +134,6 @@ type Manager struct {
 	mimeTypes      []string
 	offerMimeTypes map[any][]string
 	offerMutex     sync.RWMutex
-	offerRegistry  map[uint32]any
 
 	isOwner        bool
 	ownerLock      sync.Mutex

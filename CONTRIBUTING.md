@@ -143,7 +143,9 @@ touch .qmlls.ini
 
 5. Run `make lint-qml` from the repo root to lint QML entrypoints (requires the `.qmlls.ini` generated above). The script needs the **Qt 6** `qmllint`; it checks `qmllint6`, Fedora's `qmllint-qt6`, `/usr/lib/qt6/bin/qmllint`, then `qmllint` in `PATH`. If your Qt 6 binary lives elsewhere, set `QMLLINT=/path/to/qmllint`.
 
-6. Make your changes, test, and open a pull request.
+6. Run `make test-qml` for QML unit tests (`nix develop --command make test-qml` with Nix). These use Qt 6 `qmltestrunner` offscreen and do not require a running shell. Set `QMLTESTRUNNER=/path/to/qmltestrunner` if needed.
+
+7. Make your changes, test, and open a pull request.
 
 ### I18n/Localization
 
@@ -185,6 +187,15 @@ mockery
 ```
 
 `core/.mockery.yml` lists every mocked interface and where its mock goes (e.g. `network.Backend` -> `internal/mocks/network/mock_Backend.go`). To mock a new interface, add it there under its package and regenerate.
+
+## Generative AI
+
+Using an LLM to help write code, issues, or comments is fine. Submitting its output unread is not.
+
+- You are responsible for every line you submit. You have read it, tested it, and can explain it in review.
+- Say in the PR when a meaningful part of it was AI generated.
+- Do not file issues or leave comments you have not verified yourself. Reports that do not reproduce get closed.
+- PRs that read like unreviewed output, with narrating comments, invented APIs, or style that ignores the file they are in, get closed without review.
 
 ## Pull request
 

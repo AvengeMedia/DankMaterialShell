@@ -29,7 +29,9 @@ BasePill {
         }
     }
     property int availableWidth: maxWidth
-    property Toplevel activeWindow: null
+    readonly property real effectiveHorizontalWidth: Math.max(0, Math.min(maxWidth, availableWidth))
+    readonly property real effectiveHorizontalInnerWidth: Math.max(0, effectiveHorizontalWidth - horizontalPadding * 2)
+    property var activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
@@ -78,18 +80,52 @@ BasePill {
         return 0;
     }
 
+    function isWindowAlive(win) {
+        if (!win)
+            return false;
+        const alive = ToplevelManager.toplevels?.values;
+        return !!alive && Array.from(alive).some(t => t === win);
+    }
+
+    function getNiriFocusedWindow() {
+        if (!CompositorService.isNiri)
+            return null;
+        const focused = NiriService.windows.find(w => w.is_focused);
+        if (focused)
+            return focused;
+        if (!focusedWindowPopoutLoader.item?.shouldBeVisible || NiriService.lastFocusedWindowId === null)
+            return null;
+        return NiriService.windows.find(w => w.id === NiriService.lastFocusedWindowId) || null;
+    }
+
     function updateActiveWindow() {
-        const active = ToplevelManager.activeToplevel;
+        if (CompositorService.isAqueous && AqueousService.available) {
+            const focused = AqueousService.focusedWindow;
+            activeWindow = focused && (!parentScreen || focused.screens.some(s => s.name === parentScreen.name)) ? focused : null;
+            return;
+        }
+        let active = ToplevelManager.activeToplevel;
+
+        if (!active && CompositorService.isNiri) {
+            const focusedWin = getNiriFocusedWindow();
+            if (focusedWin) {
+                const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
+                if (screenWsIds.has(focusedWin.workspace_id)) {
+                    const sortedMatch = (CompositorService.sortedToplevels || []).find(st => st.niriWindowId === focusedWin.id);
+                    active = sortedMatch?.sourceToplevel || (Array.from(ToplevelManager.toplevels?.values || []).find(t => t.appId === focusedWin.app_id && (!focusedWin.title || t.title === focusedWin.title)) || null);
+                }
+            }
+        }
 
         if (!active) {
             if (activeWindow) {
                 if (CompositorService.isNiri) {
-                    if (NiriService.currentOutput === (parentScreen?.name ?? ""))
+                    const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
+                    const wsWindows = currentWs ? NiriService.windows.filter(w => w.workspace_id === currentWs.id) : [];
+                    if (!isWindowAlive(activeWindow) || wsWindows.length === 0)
                         activeWindow = null;
-                } else {
-                    const alive = ToplevelManager.toplevels?.values;
-                    if (alive && !Array.from(alive).some(t => t === activeWindow))
-                        activeWindow = null;
+                } else if (!isWindowAlive(activeWindow)) {
+                    activeWindow = null;
                 }
             }
             return;
@@ -97,10 +133,8 @@ BasePill {
 
         if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
             activeWindow = active;
-        } else if (activeWindow) {
-            const alive = ToplevelManager.toplevels?.values;
-            if (alive && !Array.from(alive).some(t => t === activeWindow))
-                activeWindow = null;
+        } else if (!isWindowAlive(activeWindow)) {
+            activeWindow = null;
         }
     }
 
@@ -112,8 +146,7 @@ BasePill {
     Connections {
         target: ToplevelManager
         function onActiveToplevelChanged() {
-            if (!CompositorService.isNiri)
-                root.updateActiveWindow();
+            root.updateActiveWindow();
         }
     }
 
@@ -132,6 +165,9 @@ BasePill {
         function onCurrentOutputChanged() {
             root.updateActiveWindow();
         }
+        function onAllWorkspacesChanged() {
+            root.updateActiveWindow();
+        }
     }
 
     Connections {
@@ -141,10 +177,30 @@ BasePill {
         }
     }
 
+    function syncPopoutState() {
+        const popout = focusedWindowPopoutLoader.item;
+        if (!popout || !activeWindow || !root.parentScreen)
+            return;
+        popout.currentWindow = activeWindow;
+        popout.processId = root.resolveActiveWindowPid();
+        const globalPos = root.visualContent.mapToItem(null, 0, 0);
+        const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+        const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
+        popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+    }
+
     Connections {
         target: root
         function onActiveWindowChanged() {
             root.updateDesktopEntry();
+            if (focusedWindowPopoutLoader.item?.shouldBeVisible) {
+                if (root.activeWindow) {
+                    root.syncPopoutState();
+                    Qt.callLater(() => root.syncPopoutState());
+                } else {
+                    focusedWindowPopoutLoader.item.close();
+                }
+            }
         }
     }
 
@@ -169,10 +225,12 @@ BasePill {
                 return false;
             if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
                 return true;
-            const focusedWin = NiriService.windows.find(w => w.is_focused);
-            if (!focusedWin)
-                return false;
-            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === parentScreen.name).map(ws => ws.id));
+            const focusedWin = getNiriFocusedWindow();
+            if (!focusedWin) {
+                const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
+                return !!currentWs && NiriService.windows.some(w => w.workspace_id === currentWs.id);
+            }
+            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
             return screenWsIds.has(focusedWin.workspace_id);
         }
 
@@ -200,9 +258,9 @@ BasePill {
         return activeWindow && (activeWindow.title || activeWindow.appId);
     }
 
-    width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : visualWidth) : 0
+    width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : (effectiveHorizontalInnerWidth > 0 ? visualWidth : 0)) : 0
     height: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? visualHeight : barThickness) : 0
-    visible: hasWindowsOnCurrentWorkspace
+    visible: hasWindowsOnCurrentWorkspace && (isVerticalOrientation || effectiveHorizontalInnerWidth > 0)
 
     content: Component {
         Item {
@@ -211,8 +269,9 @@ BasePill {
                     return 0;
                 if (root.isVerticalOrientation)
                     return root.widgetThickness - root.horizontalPadding * 2;
-                return contentRow.implicitWidth;
+                return Math.min(contentRow.implicitWidth, root.effectiveHorizontalInnerWidth);
             }
+            width: root.isVerticalOrientation ? root.widgetThickness - root.horizontalPadding * 2 : Math.min(implicitWidth, root.effectiveHorizontalInnerWidth)
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
             clip: false
 
@@ -261,117 +320,134 @@ BasePill {
                 color: Theme.widgetTextColor
             }
 
-            Row {
-                id: contentRow
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
-                visible: !root.isVerticalOrientation
+            Item {
+                clip: true
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
+                height: root.barThickness
 
-                readonly property real iconSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-
-                IconImage {
-                    id: horizontalAppIcon
-                    width: contentRow.iconSize
-                    height: contentRow.iconSize
+                Row {
+                    id: contentRow
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: root.showIcon && activeWindow && status === Image.Ready
-                    source: {
-                        if (!activeWindow || !activeWindow.appId)
-                            return "";
-                        return Paths.getAppIcon(activeWindow.appId, activeDesktopEntry);
+                    anchors.left: parent.left
+                    spacing: Theme.spacingS
+                    visible: !root.isVerticalOrientation
+
+                    readonly property real iconSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+
+                    IconImage {
+                        id: horizontalAppIcon
+                        width: contentRow.iconSize
+                        height: contentRow.iconSize
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: root.showIcon && activeWindow && status === Image.Ready
+                        source: {
+                            if (!activeWindow || !activeWindow.appId)
+                                return "";
+                            return Paths.getAppIcon(activeWindow.appId, activeDesktopEntry);
+                        }
+                        smooth: true
+                        mipmap: true
+                        asynchronous: true
+                        layer.enabled: activeWindow && (activeWindow.appId === "org.quickshell" || activeWindow.appId === "com.danklinux.dms")
+                        layer.smooth: true
+                        layer.mipmap: true
+                        layer.effect: MultiEffect {
+                            saturation: 0
+                            colorization: 1
+                            colorizationColor: Theme.primary
+                        }
                     }
-                    smooth: true
-                    mipmap: true
-                    asynchronous: true
-                    layer.enabled: activeWindow && (activeWindow.appId === "org.quickshell" || activeWindow.appId === "com.danklinux.dms")
-                    layer.smooth: true
-                    layer.mipmap: true
-                    layer.effect: MultiEffect {
-                        saturation: 0
-                        colorization: 1
-                        colorizationColor: Theme.primary
+
+                    DankIcon {
+                        id: horizontalSteamIcon
+                        width: contentRow.iconSize
+                        size: contentRow.iconSize
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "sports_esports"
+                        color: Theme.widgetTextColor
+                        visible: root.showIcon && activeWindow && activeWindow.appId && horizontalAppIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
                     }
-                }
 
-                DankIcon {
-                    id: horizontalSteamIcon
-                    width: contentRow.iconSize
-                    size: contentRow.iconSize
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "sports_esports"
-                    color: Theme.widgetTextColor
-                    visible: root.showIcon && activeWindow && activeWindow.appId && horizontalAppIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
-                }
-
-                StyledText {
-                    id: appText
-                    text: {
-                        if (compactMode || !activeWindow || !activeWindow.appId)
-                            return "";
-                        return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                    StyledText {
+                        id: appText
+                        text: {
+                            if (compactMode || !activeWindow || !activeWindow.appId)
+                                return "";
+                            return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                        }
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        color: Theme.widgetTextColor
+                        anchors.verticalCenter: parent.verticalCenter
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        width: {
+                            const sp = contentRow.spacing;
+                            let used = 0;
+                            if (horizontalAppIcon.visible)
+                                used += horizontalAppIcon.width + sp;
+                            else if (horizontalSteamIcon.visible)
+                                used += horizontalSteamIcon.width + sp;
+                            const budget = Math.max(0, root.effectiveHorizontalInnerWidth - used);
+                            return Math.min(implicitWidth, compactMode ? 80 : 180, budget);
+                        }
+                        visible: text.length > 0
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    width: Math.min(implicitWidth, compactMode ? 80 : 180)
-                    visible: text.length > 0
-                }
 
-                StyledText {
-                    id: appSeparator
-                    text: compactMode ? "" : "•"
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.outlineButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: !compactMode && appText.text && titleText.text
-                }
+                    StyledText {
+                        id: appSeparator
+                        text: compactMode ? "" : "•"
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        color: Theme.outlineButton
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: !compactMode && appText.text && titleText.text
+                    }
 
-                StyledText {
-                    id: titleText
-                    text: {
-                        const title = activeWindow && activeWindow.title ? activeWindow.title : "";
-                        const appName = appText.text;
+                    StyledText {
+                        id: titleText
+                        text: {
+                            const title = activeWindow && activeWindow.title ? activeWindow.title : "";
+                            const appName = appText.text;
 
-                        if (compactMode) {
-                            if (!title || title === appName)
-                                return title || appName;
+                            if (compactMode) {
+                                if (!title || title === appName)
+                                    return title || appName;
+                                if (title.endsWith(appName))
+                                    return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "") || appName;
+                                return title;
+                            }
+
+                            if (!title || !appName)
+                                return title;
+
                             if (title.endsWith(appName))
-                                return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "") || appName;
+                                return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "");
+
                             return title;
                         }
-
-                        if (!title || !appName)
-                            return title;
-
-                        if (title.endsWith(appName))
-                            return title.substring(0, title.length - appName.length).replace(/ (-|—) $/, "");
-
-                        return title;
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        color: Theme.widgetTextColor
+                        anchors.verticalCenter: parent.verticalCenter
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        width: {
+                            const sp = contentRow.spacing;
+                            let used = 0;
+                            if (horizontalAppIcon.visible)
+                                used += horizontalAppIcon.width + sp;
+                            else if (horizontalSteamIcon.visible)
+                                used += horizontalSteamIcon.width + sp;
+                            if (appText.visible)
+                                used += appText.width + sp;
+                            if (appSeparator.visible)
+                                used += appSeparator.width + sp;
+                            const budget = root.effectiveHorizontalInnerWidth - used;
+                            return Math.min(implicitWidth, Math.max(0, budget));
+                        }
+                        visible: text.length > 0
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    width: {
-                        const sp = contentRow.spacing;
-                        let used = 0;
-                        if (horizontalAppIcon.visible)
-                            used += horizontalAppIcon.width + sp;
-                        else if (horizontalSteamIcon.visible)
-                            used += horizontalSteamIcon.width + sp;
-                        if (appText.visible)
-                            used += appText.width + sp;
-                        if (appSeparator.visible)
-                            used += appSeparator.width + sp;
-                        const budget = root.maxWidth - root.horizontalPadding * 2 - used;
-                        return Math.min(implicitWidth, Math.max(0, budget));
-                    }
-                    visible: text.length > 0
                 }
             }
         }
@@ -422,14 +498,8 @@ BasePill {
             if (!focusedWindowPopoutLoader.item)
                 return;
 
-            const globalPos = root.visualContent.mapToItem(null, 0, 0);
-            const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
-            const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
-            const popout = focusedWindowPopoutLoader.item;
-            popout.currentWindow = activeWindow;
-            popout.processId = root.resolveActiveWindowPid();
-            popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
-            popout.toggle();
+            root.syncPopoutState();
+            focusedWindowPopoutLoader.item.toggle();
         }
     }
 
@@ -443,5 +513,16 @@ BasePill {
         id: focusedWindowPopoutLoader
         active: false
         sourceComponent: FocusedWindowContextMenu {}
+    }
+
+    Connections {
+        target: focusedWindowPopoutLoader.item
+        function onShouldBeVisibleChanged() {
+            if (!focusedWindowPopoutLoader.item?.shouldBeVisible)
+                root.updateActiveWindow();
+        }
+        function onPopoutClosed() {
+            root.updateActiveWindow();
+        }
     }
 }

@@ -70,7 +70,7 @@ Item {
         wrapMode: Text.NoWrap
         width: root.needsScrolling ? implicitWidth : root.width
         elide: root.needsScrolling ? Text.ElideNone : Text.ElideRight
-        x: Math.round((root.needsScrolling ? -root.scrollOffset : 0) + root.textShift)
+        x: Math.round((root.needsScrolling ? -Math.min(root.scrollOffset, root.maxScrollOffset) : 0) + root.textShift)
         opacity: 1
 
         onTextChanged: {

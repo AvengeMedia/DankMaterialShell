@@ -160,15 +160,20 @@ func (b *DDCBackend) getDDCName(bus int) string {
 }
 
 func (b *DDCBackend) readInitialBrightness(fd int, dev *ddcDevice) {
-	cap, err := b.getVCPFeature(fd, VCP_BRIGHTNESS)
-	if err != nil {
+	for attempt := 0; attempt < 3; attempt++ {
+		cap, err := b.getVCPFeature(fd, VCP_BRIGHTNESS)
+		if err == nil {
+			dev.max = cap.max
+			dev.lastBrightness = cap.current
+			log.Debugf("initialized %s with brightness %d/%d", dev.name, cap.current, cap.max)
+			return
+		}
+		if attempt < 2 {
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
 		log.Debugf("failed to read initial brightness for %s: %v", dev.name, err)
-		return
 	}
-
-	dev.max = cap.max
-	dev.lastBrightness = cap.current
-	log.Debugf("initialized %s with brightness %d/%d", dev.name, cap.current, cap.max)
 }
 
 func (b *DDCBackend) GetDevices() ([]Device, error) {

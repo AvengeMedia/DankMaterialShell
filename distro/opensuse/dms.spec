@@ -71,6 +71,7 @@ install -Dm644 assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalabl
 
 install -dm755 %{buildroot}%{_datadir}/quickshell/dms
 cp -r quickshell/* %{buildroot}%{_datadir}/quickshell/dms/
+rm -rf %{buildroot}%{_datadir}/quickshell/dms/tests
 
 rm -rf %{buildroot}%{_datadir}/quickshell/dms/.git*
 rm -f %{buildroot}%{_datadir}/quickshell/dms/.gitignore

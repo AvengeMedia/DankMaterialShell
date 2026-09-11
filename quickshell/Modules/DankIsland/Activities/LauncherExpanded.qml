@@ -19,8 +19,9 @@ FocusScope {
 
     clip: true
 
-    function focusSearch() {
+    function focusFace() {
         launcherContent.searchField.forceActiveFocus();
+        return true;
     }
 
     function initializeSession() {
@@ -42,7 +43,7 @@ FocusScope {
             launcherController.performSearch();
 
         launcherContent.resetScroll();
-        root.focusSearch();
+        root.focusFace();
         if (!root.controller.launcherPendingQuery) {
             launcherContent.searchField.selectAll();
             return;
@@ -79,7 +80,7 @@ FocusScope {
         controllerOverride: root.launcherController
         transientSurfaceTracker: root.transientSurfaceTracker
         showResultsWithoutQuery: true
-        maxResultsHeight: Math.max(120, root.controller.launcherExpandedTarget.height - Theme.spacingM - root.bottomInset - launcherContent.searchAreaHeight)
+        maxResultsHeight: Math.max(120, root.controller.launcherExpandedTarget.height - Theme.spacingM - root.bottomInset - launcherContent.searchAreaHeight - launcherContent.actionPanelHeight)
     }
 
     onActiveFocusChanged: root.controller.launcherInputFocused = activeFocus

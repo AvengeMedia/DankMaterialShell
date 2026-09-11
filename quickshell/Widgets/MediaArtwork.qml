@@ -7,8 +7,7 @@ import qs.Common
 Item {
     id: root
 
-    property var mediaModel: null
-    property string artUrl: mediaModel?.artUrl ?? ""
+    property string artUrl: ""
     property real placeholderIconSize: Math.min(width, height) * 0.46
     property real cornerRadius: Math.min(width, height) * 0.22
     readonly property int artPixelSize: Math.max(1, Math.round(Math.max(width, height) * 2))

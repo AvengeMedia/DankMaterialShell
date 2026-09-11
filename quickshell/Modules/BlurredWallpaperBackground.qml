@@ -199,6 +199,10 @@ Variants {
                 function onHeightChanged() {
                     root.regenerate();
                 }
+            }
+
+            Connections {
+                target: blurWallpaperWindow
                 function onResourcesLost() {
                     root.frozenValid = false;
                     root.regenerate();

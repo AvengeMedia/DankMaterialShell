@@ -25,6 +25,12 @@ const (
 const (
 	scrollMaxFailures = 5
 	scrollSeamTicks   = 4
+
+	scrollPreviewMarginLogical    = 16
+	scrollPreviewPaddingLogical   = 6
+	scrollPreviewMinImageWLogical = 80
+	scrollPreviewMaxImageWLogical = 240
+	scrollPreviewMaxImageHLogical = 360
 )
 
 type scrollSession struct {
@@ -60,6 +66,11 @@ type scrollSession struct {
 	cancelX, cancelY       int
 	cancelW                int
 	btnH                   int
+
+	// preview panel geometry and window in overlay buffer pixels
+	previewX, previewY, previewW, previewH int
+	previewStartRow, previewRows           int
+	hasPreview                             bool
 
 	sigCh     chan os.Signal
 	keysBound bool
@@ -195,9 +206,12 @@ func (r *RegionSelector) layoutScrollBar(os *OutputSurface) {
 
 	borderX1, borderY1 := s.holeX-3, s.holeY-3
 	borderX2, borderY2 := s.holeX+s.holeW+3, s.holeY+s.holeH+3
-	overlaps := s.barX < borderX2 && s.barX+s.barW > borderX1 &&
+	overlapsHole := s.barX < borderX2 && s.barX+s.barW > borderX1 &&
 		s.barY < borderY2 && s.barY+s.barH > borderY1
-	if overlaps {
+	overlapsPreview := s.hasPreview &&
+		s.barX < s.previewX+s.previewW && s.barX+s.barW > s.previewX &&
+		s.barY < s.previewY+s.previewH && s.barY+s.barH > s.previewY
+	if overlapsHole || overlapsPreview {
 		s.barY = 24
 	}
 
@@ -207,7 +221,108 @@ func (r *RegionSelector) layoutScrollBar(os *OutputSurface) {
 	s.cancelY = s.doneY
 }
 
+func (r *RegionSelector) scrollPreviewPanel(os *OutputSurface) (x, y, w, h int, startRow, previewRows int, ok bool) {
+	s := r.scroll
+	if s == nil || s.st == nil || s.frameW <= 0 || s.st.rows() <= 0 || os == nil || os.screenBuf == nil {
+		return 0, 0, 0, 0, 0, 0, false
+	}
+
+	bufW, bufH := os.screenBuf.Width, os.screenBuf.Height
+	scale := 1.0
+	if os.logicalW > 0 {
+		scale = float64(bufW) / float64(os.logicalW)
+	}
+	if scale <= 0 {
+		scale = 1.0
+	}
+
+	margin := int(float64(scrollPreviewMarginLogical) * scale)
+	padding := int(float64(scrollPreviewPaddingLogical) * scale)
+	minImageW := int(float64(scrollPreviewMinImageWLogical) * scale)
+	maxImageW := int(float64(scrollPreviewMaxImageWLogical) * scale)
+	maxImageH := int(float64(scrollPreviewMaxImageHLogical) * scale)
+
+	selX := s.holeX
+	selY := s.holeY
+	selW := s.holeW
+	selH := s.holeH
+
+	leftGap := selX
+	rightGap := bufW - (selX + selW)
+	if leftGap < 0 {
+		leftGap = 0
+	}
+	if rightGap < 0 {
+		rightGap = 0
+	}
+
+	onLeft := leftGap >= rightGap
+	sideGap := rightGap
+	if onLeft {
+		sideGap = leftGap
+	}
+
+	maxHeight := min(maxImageH, bufH-margin*2)
+	availableWidth := sideGap - (margin*2 + padding*2)
+	if maxHeight <= 0 || availableWidth < minImageW {
+		return 0, 0, 0, 0, 0, 0, false
+	}
+
+	totalRows := s.st.rows()
+	maxPreviewRows := int(float64(s.frameW) * float64(maxHeight) / float64(minImageW))
+	startRow = 0
+	previewRows = totalRows
+	if maxPreviewRows > 0 && totalRows > maxPreviewRows {
+		startRow = totalRows - maxPreviewRows
+		previewRows = maxPreviewRows
+	}
+
+	aspect := float64(s.frameW) / float64(previewRows)
+	imageWidth := int(float64(maxHeight)*aspect + 0.5)
+	imageWidth = min(imageWidth, maxImageW)
+	imageWidth = min(imageWidth, availableWidth)
+	if imageWidth < minImageW {
+		return 0, 0, 0, 0, 0, 0, false
+	}
+
+	imageHeight := max(int(float64(imageWidth)/aspect+0.5), 1)
+	panelWidth := imageWidth + padding*2
+	panelHeight := imageHeight + padding*2
+
+	var panelX int
+	if onLeft {
+		panelX = selX - margin - panelWidth
+	} else {
+		panelX = selX + selW + margin
+	}
+
+	panelY := selY + (selH-panelHeight)/2
+	panelY = clamp(panelY, margin, bufH-margin-panelHeight)
+
+	return panelX, panelY, panelWidth, panelHeight, startRow, previewRows, true
+}
+
+func (r *RegionSelector) updateScrollPreviewLayout(os *OutputSurface) {
+	s := r.scroll
+	if s == nil || os == nil {
+		return
+	}
+	px, py, pw, ph, startRow, previewRows, ok := r.scrollPreviewPanel(os)
+	changed := s.hasPreview != ok || s.previewX != px || s.previewY != py || s.previewW != pw || s.previewH != ph
+	s.previewX, s.previewY, s.previewW, s.previewH = px, py, pw, ph
+	s.previewStartRow, s.previewRows = startRow, previewRows
+	s.hasPreview = ok
+
+	if changed {
+		r.layoutScrollBar(os)
+		r.setInputPassthrough(os, true)
+	}
+}
+
 func (r *RegionSelector) setInputPassthrough(os *OutputSurface, withBar bool) {
+	if r.compositor == nil || os == nil || os.wlSurface == nil {
+		return
+	}
 	reg, err := r.compositor.CreateRegion()
 	if err != nil {
 		return
@@ -218,6 +333,10 @@ func (r *RegionSelector) setInputPassthrough(os *OutputSurface, withBar bool) {
 		scaleY := float64(os.logicalH) / float64(os.screenBuf.Height)
 		_ = reg.Add(int32(float64(s.barX)*scaleX), int32(float64(s.barY)*scaleY),
 			int32(float64(s.barW)*scaleX)+1, int32(float64(s.barH)*scaleY)+1)
+		if s.hasPreview {
+			_ = reg.Add(int32(float64(s.previewX)*scaleX), int32(float64(s.previewY)*scaleY),
+				int32(float64(s.previewW)*scaleX)+1, int32(float64(s.previewH)*scaleY)+1)
+		}
 	}
 	_ = os.wlSurface.SetInputRegion(reg)
 	_ = reg.Destroy()
@@ -304,6 +423,8 @@ func (r *RegionSelector) scrollBarHit(x, y float64) string {
 		return "done"
 	case bx >= s.cancelX && bx < s.cancelX+s.cancelW && by >= s.cancelY && by < s.cancelY+s.btnH:
 		return "cancel"
+	case s.hasPreview && bx >= s.previewX && bx < s.previewX+s.previewW && by >= s.previewY && by < s.previewY+s.previewH:
+		return "preview"
 	default:
 		return ""
 	}
@@ -468,6 +589,7 @@ func (r *RegionSelector) handleScrollFrame() {
 	}
 	s.kept++
 	if r.selection.surface != nil {
+		r.updateScrollPreviewLayout(r.selection.surface)
 		r.redrawSurface(r.selection.surface)
 	}
 }

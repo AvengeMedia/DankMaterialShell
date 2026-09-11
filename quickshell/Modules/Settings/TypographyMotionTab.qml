@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import qs.Services
 import qs.Modules.Settings.Widgets
 
 Item {
@@ -54,6 +55,16 @@ Item {
             width: Math.min(550, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
+
+            Loader {
+                width: parent.width
+                active: CompositorService.isAqueous
+                sourceComponent: AqueousAppearanceSettings {
+                    settingKey: "aqueousTypography"
+                    title: I18n.tr("Aqueous typography", "Aqueous compositor font synchronization settings")
+                    visible: CompositorService.isAqueous
+                }
+            }
 
             SettingsCard {
                 tab: "typography"
@@ -241,15 +252,17 @@ Item {
                     }
                 }
 
-                SettingsButtonGroupRow {
+                SettingsDropdownRow {
+                    id: renderQualityRow
                     tab: "typography"
                     tags: ["text", "render", "quality", "level"]
                     settingKey: "textRenderQuality"
                     text: I18n.tr("Quality")
-                    model: [I18n.tr("Default"), I18n.tr("Low", "quality level option"), I18n.tr("Normal", "quality level option"), I18n.tr("High", "quality level option"), I18n.tr("Very High", "quality level option")]
-                    currentIndex: SettingsData.textRenderQuality
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
+                    options: [I18n.tr("Default"), I18n.tr("Low", "quality level option"), I18n.tr("Normal", "quality level option"), I18n.tr("High", "quality level option"), I18n.tr("Very High", "quality level option")]
+                    currentValue: options[SettingsData.textRenderQuality] ?? options[0]
+                    onValueChanged: value => {
+                        const index = renderQualityRow.options.indexOf(value);
+                        if (index < 0)
                             return;
                         SettingsData.set("textRenderQuality", index);
                     }

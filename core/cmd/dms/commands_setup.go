@@ -356,22 +356,18 @@ func runSetup() error {
 		}
 	}()
 
-	ctx := context.Background()
 	var results []config.DeploymentResult
 	var err error
 
-	if wmSelected && terminalSelected {
-		results, err = deployer.DeployConfigurationsWithSystemd(ctx, wm, terminal, useSystemd)
-	} else if wmSelected {
-		results, err = deployer.DeployConfigurationsWithSystemd(ctx, wm, deps.TerminalGhostty, useSystemd)
-		if len(results) > 1 {
-			results = results[:1]
-		}
-	} else if terminalSelected {
-		results, err = deployer.DeployConfigurationsWithSystemd(ctx, deps.WindowManagerNiri, terminal, useSystemd)
-		if len(results) > 0 && results[0].ConfigType == "Niri" {
-			results = results[1:]
-		}
+	if wmSelected {
+		var result config.DeploymentResult
+		result, err = deployer.DeployCompositor(wm, terminal, useSystemd)
+		results = append(results, result)
+	}
+	if err == nil && terminalSelected {
+		var terminalResults []config.DeploymentResult
+		terminalResults, err = deployer.DeployTerminal(terminal)
+		results = append(results, terminalResults...)
 	}
 
 	close(logChan)
@@ -495,49 +491,54 @@ func promptSystemd() bool {
 }
 
 func checkExistingConfigs(wm deps.WindowManager, wmSelected bool, terminal deps.Terminal, terminalSelected bool) bool {
+	if wmSelected && firstExistingPath(compositorPrimaryPaths(wm)) != "" {
+		return true
+	}
+	return terminalSelected && firstExistingPath([]string{terminalPrimaryPath(terminal)}) != ""
+}
+
+func compositorPrimaryPaths(wm deps.WindowManager) []string {
 	homeDir := os.Getenv("HOME")
-	willBackup := false
-
-	if wmSelected {
-		var configPaths []string
-		switch wm {
-		case deps.WindowManagerNiri:
-			configPaths = []string{filepath.Join(homeDir, ".config", "niri", "config.kdl")}
-		case deps.WindowManagerHyprland:
-			configPaths = []string{
-				filepath.Join(homeDir, ".config", "hypr", "hyprland.lua"),
-				filepath.Join(homeDir, ".config", "hypr", "hyprland.conf"),
-			}
-		case deps.WindowManagerMango:
-			configPaths = []string{
-				filepath.Join(homeDir, ".config", "mango", "config.conf"),
-				filepath.Join(homeDir, ".config", "mango", "mango.conf"),
-			}
+	switch wm {
+	case deps.WindowManagerNiri:
+		return []string{filepath.Join(homeDir, ".config", "niri", "config.kdl")}
+	case deps.WindowManagerHyprland:
+		return []string{
+			filepath.Join(homeDir, ".config", "hypr", "hyprland.lua"),
+			filepath.Join(homeDir, ".config", "hypr", "hyprland.conf"),
 		}
+	case deps.WindowManagerMango:
+		return []string{
+			filepath.Join(homeDir, ".config", "mango", "config.conf"),
+			filepath.Join(homeDir, ".config", "mango", "mango.conf"),
+		}
+	default:
+		return nil
+	}
+}
 
-		for _, configPath := range configPaths {
-			if _, err := os.Stat(configPath); err == nil {
-				willBackup = true
-				break
-			}
+func terminalPrimaryPath(terminal deps.Terminal) string {
+	homeDir := os.Getenv("HOME")
+	switch terminal {
+	case deps.TerminalGhostty:
+		return filepath.Join(homeDir, ".config", "ghostty", "config")
+	case deps.TerminalKitty:
+		return filepath.Join(homeDir, ".config", "kitty", "kitty.conf")
+	case deps.TerminalAlacritty:
+		return filepath.Join(homeDir, ".config", "alacritty", "alacritty.toml")
+	default:
+		return ""
+	}
+}
+
+func firstExistingPath(paths []string) string {
+	for _, path := range paths {
+		if path == "" {
+			continue
+		}
+		if _, err := os.Stat(path); err == nil {
+			return path
 		}
 	}
-
-	if terminalSelected {
-		var configPath string
-		switch terminal {
-		case deps.TerminalGhostty:
-			configPath = filepath.Join(homeDir, ".config", "ghostty", "config")
-		case deps.TerminalKitty:
-			configPath = filepath.Join(homeDir, ".config", "kitty", "kitty.conf")
-		case deps.TerminalAlacritty:
-			configPath = filepath.Join(homeDir, ".config", "alacritty", "alacritty.toml")
-		}
-
-		if _, err := os.Stat(configPath); err == nil {
-			willBackup = true
-		}
-	}
-
-	return willBackup
+	return ""
 }

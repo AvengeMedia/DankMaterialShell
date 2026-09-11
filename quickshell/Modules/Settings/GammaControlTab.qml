@@ -57,6 +57,42 @@ Item {
                         }
                     }
 
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        leftPadding: Theme.spacingM
+                        rightPadding: Theme.spacingM
+                        visible: DisplayService.gammaAdjustAvailable
+
+                        SettingsSliderRow {
+                            settingKey: "displayGamma"
+                            tags: ["gamma", "display", "panel", "washed out", "brightness"]
+                            width: parent.width - parent.leftPadding - parent.rightPadding
+                            text: I18n.tr("Gamma")
+                            description: I18n.tr("Applied independently of night mode")
+                            minimum: 50
+                            maximum: 200
+                            step: 5
+                            unit: ""
+                            decimals: 2
+                            value: Math.round(SessionData.displayGamma * 100)
+                            onSliderValueChanged: newValue => DisplayService.setDisplayGamma(newValue / 100)
+                        }
+
+                        SettingsSliderRow {
+                            settingKey: "displayContrast"
+                            tags: ["contrast", "display", "panel", "washed out"]
+                            width: parent.width - parent.leftPadding - parent.rightPadding
+                            text: I18n.tr("Contrast")
+                            minimum: 50
+                            maximum: 200
+                            step: 5
+                            unit: "%"
+                            value: Math.round(SessionData.displayContrast * 100)
+                            onSliderValueChanged: newValue => DisplayService.setDisplayContrast(newValue / 100)
+                        }
+                    }
+
                     DankToggle {
                         id: nightModeToggle
 
@@ -317,6 +353,20 @@ Item {
                                         }
                                     }
                                 }
+                            }
+
+                            SettingsSliderRow {
+                                settingKey: "nightModeTransitionMinutes"
+                                tags: ["gamma", "night", "transition", "duration", "fade"]
+                                width: parent.width
+                                text: I18n.tr("Transition Duration")
+                                minimum: 0
+                                maximum: 180
+                                step: 5
+                                unit: "min"
+                                value: SessionData.nightModeTransitionMinutes
+                                visible: DMSService.apiVersion >= 32
+                                onSliderValueChanged: newValue => SessionData.setNightModeTransitionMinutes(newValue)
                             }
                         }
 

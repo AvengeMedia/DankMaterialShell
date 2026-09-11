@@ -11,35 +11,88 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("IconThemeService")
 
-    readonly property string managedTheme: {
+    readonly property string settingsTheme: {
         if (typeof SettingsData === "undefined")
             return "";
         const t = SettingsData.resolveIconTheme();
         return (!t || t === "System Default") ? "" : t;
     }
+    property string systemProbedTheme: ""
+    readonly property string managedTheme: settingsTheme || systemProbedTheme
 
     property var _searchDirs: []
     property string _dirsForTheme: ""
     property var _cache: ({})
+    property var _looseIconPaths: ({})
+    property int _cacheGeneration: 0
+    property int _rebuildGeneration: 0
+    property int _looseIndexGeneration: 0
     property int revision: 0
     property bool _bumpPending: false
 
-    readonly property var _baseDirs: {
-        const xdg = Quickshell.env("XDG_DATA_DIRS") || "";
+    // XDG icon spec order: user dirs win over system ones, so overrides in ~/.local/share/icons beat installed themes.
+    readonly property var _userIconRoots: {
         const localData = Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation));
         const home = Paths.strip(StandardPaths.writableLocation(StandardPaths.HomeLocation));
-        const dataDirs = xdg.trim() !== "" ? xdg.split(":").concat([localData]) : ["/usr/share", "/usr/local/share", localData];
+        return [home + "/.icons", localData + "/icons"];
+    }
+
+    readonly property var _dataDirs: {
+        const xdg = Quickshell.env("XDG_DATA_DIRS") || "";
+        const localData = Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation));
+        const dataDirs = xdg.trim() !== "" ? [localData].concat(xdg.split(":")) : [localData, "/usr/local/share", "/usr/share"];
         for (const flatpak of [localData + "/flatpak/exports/share", "/var/lib/flatpak/exports/share"]) {
             if (!dataDirs.includes(flatpak))
                 dataDirs.push(flatpak);
         }
-        return dataDirs.map(d => d + "/icons").concat([home + "/.icons"]);
+        return dataDirs.filter((dir, index) => dir && dataDirs.indexOf(dir) === index);
+    }
+
+    readonly property var _baseDirs: {
+        const bases = [..._userIconRoots];
+        for (const d of _dataDirs) {
+            const icons = d + "/icons";
+            if (!bases.includes(icons))
+                bases.push(icons);
+        }
+        return bases;
+    }
+
+    // Loose icon files (AppImage managers, legacy /usr/share/pixmaps installs) live outside any theme.
+    readonly property var _looseDirs: {
+        const dirs = _userIconRoots.concat(_dataDirs.map(d => d + "/pixmaps"));
+        return dirs.filter((dir, index) => dirs.indexOf(dir) === index);
     }
 
     onManagedThemeChanged: _rebuild()
     Component.onCompleted: {
         Paths.iconResolver = name => resolve(name);
+        _probeSystemTheme();
         _rebuild();
+    }
+
+    Connections {
+        target: DesktopEntries
+
+        function onApplicationsChanged() {
+            root._indexLooseIcons(() => root._invalidateMisses());
+        }
+    }
+
+    // "System Default" leaves Qt's lookup, which sees only hicolor unless a Qt platform theme or QS_ICON_THEME is configured.
+    function _probeSystemTheme() {
+        if (Quickshell.env("QS_ICON_THEME"))
+            return;
+        const script = `v=$(sed -n 's/^gtk-icon-theme-name *= *//p' "\${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0/settings.ini" 2>/dev/null | head -1)
+[ -z "$v" ] && v=$(${GSettings.getCmd("org.gnome.desktop.interface", "icon-theme")})
+printf '%s' "$v" | tr -d "'\\""`;
+
+        Proc.runCommand("iconThemeProbe", ["sh", "-c", script], (out, code) => {
+            const theme = (out || "").trim();
+            if (!theme)
+                return;
+            root.systemProbedTheme = theme;
+        });
     }
 
     function _bumpRevision() {
@@ -52,36 +105,76 @@ Singleton {
         });
     }
 
+    function _invalidateMisses() {
+        const c = {};
+        let changed = false;
+        for (const name in _cache) {
+            if (_cache[name])
+                c[name] = _cache[name];
+            else
+                changed = true;
+        }
+        if (!changed)
+            return;
+        _cacheGeneration++;
+        _cache = c;
+        _bumpRevision();
+    }
+
+    function _indexLooseIcons(callback) {
+        const generation = ++_looseIndexGeneration;
+        const args = ["find", "-L"].concat(_looseDirs, ["-maxdepth", "1", "(", "-name", "*.svg", "-o", "-name", "*.png", "-o", "-name", "*.xpm", ")"]);
+        Proc.runCommand("iconLooseIndex", args, (out, code) => {
+            if (root._looseIndexGeneration !== generation)
+                return;
+            const index = {};
+            const paths = (out || "").trim().split("\n").filter(s => s);
+            for (const path of paths) {
+                const fileName = path.substring(path.lastIndexOf("/") + 1);
+                const name = fileName.replace(/\.(svg|png|xpm)$/, "");
+                const current = index[name];
+                index[name] = current ? root._pickBest([current, path]) : path;
+            }
+            root._looseIconPaths = index;
+            if (callback)
+                callback();
+        }, 0);
+    }
+
     function _rebuild() {
+        const rebuildGeneration = ++_rebuildGeneration;
+        _cacheGeneration++;
         _cache = ({});
+        _dirsForTheme = "";
+        _indexLooseIcons(() => root._invalidateMisses());
         if (!managedTheme) {
             _searchDirs = [];
-            _dirsForTheme = "";
             _bumpRevision();
             return;
         }
         const theme = managedTheme;
-        const bases = _baseDirs.join(" ");
-        const script = `BASES="${bases}"
-find_index() { for b in $BASES; do [ -f "$b/$1/index.theme" ] && { echo "$b/$1/index.theme"; return 0; }; done; return 1; }
-visited=""; queue="${theme}"; order=""
+        const script = `theme=$1
+shift
+find_index() { target=$1; shift; for b; do [ -f "$b/$target/index.theme" ] && { echo "$b/$target/index.theme"; return 0; }; done; return 1; }
+visited=""; queue="$theme"; order=""
 while [ -n "$queue" ]; do
-  cur=\${queue%% *}; rest=\${queue#"$cur"}; queue=\${rest# }
-  [ -z "$cur" ] && continue
-  case " $visited " in *" $cur "*) continue;; esac
-  visited="$visited $cur"; order="$order $cur"
-  idx=$(find_index "$cur") || continue
-  inh=$(sed -n 's/^Inherits=//p' "$idx" | head -1 | tr -d '"' | tr ',' ' ')
-  queue="$queue $inh"
+cur=\${queue%% *}; rest=\${queue#"$cur"}; queue=\${rest# }
+[ -z "$cur" ] && continue
+case " $visited " in *" $cur "*) continue;; esac
+visited="$visited $cur"; order="$order $cur"
+idx=$(find_index "$cur" "$@") || continue
+inh=$(sed -n 's/^Inherits=//p' "$idx" | head -1 | tr -d '"' | tr ',' ' ')
+queue="$queue $inh"
 done
 case " $visited " in *" hicolor "*) ;; *) order="$order hicolor";; esac
-for t in $order; do for b in $BASES; do d="$b/$t"; [ -d "$d" ] && echo "$d"; done; done`;
+for t in $order; do for b; do d="$b/$t"; [ -d "$d" ] && echo "$d"; done; done`;
 
-        Proc.runCommand("iconChain:" + theme, ["sh", "-c", script], (out, code) => {
-            if (root.managedTheme !== theme)
+        Proc.runCommand("iconChain:" + theme, ["sh", "-c", script, "icon-chain", theme].concat(_baseDirs), (out, code) => {
+            if (root.managedTheme !== theme || root._rebuildGeneration !== rebuildGeneration)
                 return;
             root._searchDirs = (out || "").trim().split("\n").filter(s => s);
             root._dirsForTheme = theme;
+            root._cacheGeneration++;
             root._cache = ({});
             root._bumpRevision();
         });
@@ -95,7 +188,7 @@ for t in $order; do for b in $BASES; do d="$b/$t"; [ -d "$d" ] && echo "$d"; don
             return "";
         if (!/^[\w.+-]+$/.test(name))
             return "";
-        if (_dirsForTheme !== managedTheme || _searchDirs.length === 0)
+        if (_dirsForTheme !== managedTheme)
             return "";
         if (name in _cache)
             return _cache[name] || "";
@@ -105,15 +198,27 @@ for t in $order; do for b in $BASES; do d="$b/$t"; [ -d "$d" ] && echo "$d"; don
     }
 
     function _resolveAsync(name) {
-        const dirs = _searchDirs.join(" ");
-        const script = `find -L ${dirs} \\( -name '${name}.svg' -o -name '${name}.png' \\) 2>/dev/null`;
-        Proc.runCommand("iconResolve:" + name, ["sh", "-c", script], (out, code) => {
-            const paths = (out || "").trim().split("\n").filter(s => s);
-            const best = root._pickBest(paths);
+        const generation = _cacheGeneration;
+
+        function finish(paths) {
+            if (root._cacheGeneration !== generation)
+                return;
+            const best = paths.length > 0 ? root._pickBest(paths) : root._looseIconPaths[name] || "";
             const c = root._cache;
             c[name] = best ? Paths.toFileUrl(best) : "";
             root._cache = c;
             root._bumpRevision();
+        }
+
+        if (_searchDirs.length === 0) {
+            finish([]);
+            return;
+        }
+
+        const args = ["find", "-L"].concat(_searchDirs, ["(", "-name", name + ".svg", "-o", "-name", name + ".png", ")"]);
+        Proc.runCommand("iconResolveTheme:" + name, args, (out, code) => {
+            const paths = (out || "").trim().split("\n").filter(s => s);
+            finish(paths);
         }, 0);
     }
 
@@ -135,7 +240,11 @@ for t in $order; do for b in $BASES; do d="$b/$t"; [ -d "$d" ] && echo "$d"; don
             if (path.startsWith(_searchDirs[i] + "/"))
                 return i;
         }
-        return _searchDirs.length;
+        for (let i = 0; i < _looseDirs.length; i++) {
+            if (path.startsWith(_looseDirs[i] + "/"))
+                return _searchDirs.length + i;
+        }
+        return _searchDirs.length + _looseDirs.length;
     }
 
     function _score(path) {
@@ -147,7 +256,7 @@ for t in $order; do for b in $BASES; do d="$b/$t"; [ -d "$d" ] && echo "$d"; don
         else if (path.includes("/places/") || path.includes("/devices/") || path.includes("/mimetypes/") || path.includes("/status/") || path.includes("/actions/"))
             s += 100000000;
 
-        s += Math.max(0, (64 - _chainIndex(path))) * 1000000;
+        s += Math.min(99, Math.max(0, _searchDirs.length + _looseDirs.length - _chainIndex(path))) * 1000000;
 
         if (path.endsWith(".svg"))
             s += 100000;

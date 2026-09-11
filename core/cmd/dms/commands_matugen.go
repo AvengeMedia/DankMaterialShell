@@ -63,21 +63,24 @@ func init() {
 		cmd.Flags().String("config-dir", "", "User config directory")
 		cmd.Flags().String("kind", "image", "Source type: image or hex")
 		cmd.Flags().String("value", "", "Wallpaper path or hex color")
-		cmd.Flags().String("mode", "dark", "Color mode: dark or light")
+		cmd.Flags().String("mode", "dark", "Color mode: dark, light, or smart (smart requires matugen 4.2+ and an image source)")
 		cmd.Flags().String("icon-theme", "System Default", "Icon theme name")
-		cmd.Flags().String("matugen-type", "scheme-tonal-spot", "Matugen scheme type")
+		cmd.Flags().String("matugen-type", "scheme-tonal-spot", "Matugen scheme type (supports scheme-smart on matugen 4.2+)")
 		cmd.Flags().Bool("run-user-templates", true, "Run user matugen templates")
 		cmd.Flags().String("stock-colors", "", "Stock theme colors JSON")
 		cmd.Flags().Bool("sync-mode-with-portal", false, "Sync color scheme with GNOME portal")
 		cmd.Flags().Bool("terminals-always-dark", false, "Force terminal themes to dark variant")
 		cmd.Flags().String("skip-templates", "", "Comma-separated list of templates to skip")
 		cmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
+		cmd.Flags().String("source-mode", "", "Source color selection: dominant, colorful, darkness, lightness, saturation, less-saturation, value")
 	}
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
 	matugenQueueCmd.Flags().Duration("timeout", 90*time.Second, "Timeout for waiting")
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
+	matugenPreviewCmd.Flags().String("image", "", "Wallpaper image used to resolve the scheme-smart preview")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
+	matugenQtengineCmd.Flags().String("config-dir", "", "User config directory")
 	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }
 
@@ -96,6 +99,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 	terminalsAlwaysDark, _ := cmd.Flags().GetBool("terminals-always-dark")
 	skipTemplates, _ := cmd.Flags().GetString("skip-templates")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
+	sourceMode, _ := cmd.Flags().GetString("source-mode")
 
 	return matugen.Options{
 		StateDir:            stateDir,
@@ -112,6 +116,7 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 		SyncModeWithPortal:  syncModeWithPortal,
 		TerminalsAlwaysDark: terminalsAlwaysDark,
 		SkipTemplates:       skipTemplates,
+		SourceMode:          sourceMode,
 	}
 }
 
@@ -149,6 +154,7 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 			"terminalsAlwaysDark": opts.TerminalsAlwaysDark,
 			"skipTemplates":       opts.SkipTemplates,
 			"contrast":            opts.Contrast,
+			"sourceMode":          opts.SourceMode,
 			"wait":                wait,
 		},
 	}
@@ -220,8 +226,9 @@ func runMatugenCheck(cmd *cobra.Command, args []string) {
 
 func runMatugenPreview(cmd *cobra.Command, args []string) {
 	sourceColor, _ := cmd.Flags().GetString("source-color")
+	imagePath, _ := cmd.Flags().GetString("image")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
-	previews, err := matugen.PreviewSchemes(sourceColor, contrast)
+	previews, err := matugen.PreviewSchemes(sourceColor, contrast, imagePath)
 	if err != nil {
 		log.Fatalf("Failed to generate Matugen previews: %v", err)
 	}
@@ -233,9 +240,10 @@ func runMatugenPreview(cmd *cobra.Command, args []string) {
 }
 
 func runMatugenQtengine(cmd *cobra.Command, args []string) {
+	configDir, _ := cmd.Flags().GetString("config-dir")
 	iconTheme, _ := cmd.Flags().GetString("icon-theme")
 
-	if err := matugen.SyncQtengineConfig(iconTheme); err != nil {
+	if err := matugen.SyncQtengineConfigAt(configDir, iconTheme); err != nil {
 		log.Fatalf("Failed to sync qtengine config: %v", err)
 	}
 }

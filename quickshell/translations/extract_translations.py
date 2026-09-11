@@ -87,6 +87,12 @@ def extract_qstr_strings(root_dir):
         if relative_path.parts[0] == 'PLUGINS':
             continue
 
+        # Modules/Greetd terms are owned by the dank-greeter repo (tagged
+        # dms-greeter in POEditor); the embedded copy exists only for
+        # archinstall compatibility and must not upload untagged duplicates.
+        if relative_path.parts[:2] == ('Modules', 'Greetd'):
+            continue
+
         with open(qml_file, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
                 for pattern, quote in qstr_patterns:
@@ -197,12 +203,14 @@ def main():
     en_json_path = translations_dir / 'en.json'
     with open(en_json_path, 'w', encoding='utf-8') as f:
         json.dump(poeditor_data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
     print(f"Created source language file: {en_json_path}")
 
     template_data = create_template_json(translations)
     template_json_path = translations_dir / 'template.json'
     with open(template_json_path, 'w', encoding='utf-8') as f:
         json.dump(template_data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
     print(f"Created template file: {template_json_path}")
 
     print("\nSummary:")

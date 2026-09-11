@@ -122,7 +122,7 @@ BasePill {
         Item {
             id: contentRoot
             readonly property real measuredTextWidth: {
-                if (!root.playerAvailable || root.maxTextWidth <= 0 || !textContainer.visible)
+                if (!root.playerAvailable || root.maxTextWidth <= 0)
                     return 0;
                 // Preserve the fixed-width text slot even if metadata is briefly empty.
                 if (!root.adaptiveWidthEnabled)
@@ -293,10 +293,7 @@ BasePill {
                         anchors.verticalCenter: parent.verticalCenter
                         width: contentRoot.measuredTextWidth
                         height: root.widgetThickness
-                        visible: {
-                            const size = widgetData?.mediaSize !== undefined ? widgetData.mediaSize : SettingsData.mediaSize;
-                            return size > 0;
-                        }
+                        visible: root.maxTextWidth > 0
                         clip: true
                         color: "transparent"
 

@@ -65,7 +65,7 @@ DankOSD {
 
             OsdLevelRow {
                 anchors.fill: parent
-                iconName: AudioService.sink?.audio?.muted ? "volume_off" : "volume_up"
+                iconName: AudioService.sinkVolumeIconName
                 iconInteractive: true
                 value: root._displayVolume
                 minimum: 0
@@ -108,7 +108,7 @@ DankOSD {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: AudioService.sink?.audio?.muted ? "volume_off" : "volume_up"
+                    name: AudioService.sinkVolumeIconName
                     size: Theme.iconSize
                     color: muteButtonVert.containsMouse ? Theme.primary : Theme.surfaceText
                 }

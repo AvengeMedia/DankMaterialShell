@@ -12,12 +12,14 @@ func TestNetworkStatus_Constants(t *testing.T) {
 	assert.Equal(t, NetworkStatus("disconnected"), StatusDisconnected)
 	assert.Equal(t, NetworkStatus("ethernet"), StatusEthernet)
 	assert.Equal(t, NetworkStatus("wifi"), StatusWiFi)
+	assert.Equal(t, NetworkStatus("cellular"), StatusCellular)
 }
 
 func TestConnectionPreference_Constants(t *testing.T) {
 	assert.Equal(t, ConnectionPreference("auto"), PreferenceAuto)
 	assert.Equal(t, ConnectionPreference("wifi"), PreferenceWiFi)
 	assert.Equal(t, ConnectionPreference("ethernet"), PreferenceEthernet)
+	assert.Equal(t, ConnectionPreference("cellular"), PreferenceCellular)
 }
 
 func TestEventType_Constants(t *testing.T) {

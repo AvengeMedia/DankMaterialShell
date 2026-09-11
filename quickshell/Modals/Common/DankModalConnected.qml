@@ -37,7 +37,7 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && CompositorService.usesConnectedFrameChromeForScreen(effectiveScreen)
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && effectiveModalLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
 
     function _dockOccupiesSide(side) {
         if (!SettingsData.showDock)
@@ -83,6 +83,12 @@ Item {
     property bool keepPopoutsOpen: false
     property var customKeyboardFocus: null
     property bool useOverlayLayer: false
+    readonly property var effectiveModalLayer: root.useOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
+        "allow": ["top", "overlay"],
+        "invalidLayer": WlrLayer.Top,
+        "label": "modals",
+        "error": true
+    })
     property real frozenMotionOffsetX: 0
     property real frozenMotionOffsetY: 0
     readonly property alias contentWindow: contentWindow
@@ -140,7 +146,7 @@ Item {
             "phase": phase,
             "visible": presented,
             "presented": presented,
-            "layer": root.useOverlayLayer ? "overlay" : "top",
+            "layer": root.effectiveModalLayer === WlrLayer.Overlay ? "overlay" : "top",
             "barSide": resolvedConnectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
@@ -397,12 +403,7 @@ Item {
         }
 
         WlrLayershell.namespace: root.layerNamespace
-        WlrLayershell.layer: root.useOverlayLayer ? WlrLayer.Overlay : LayerShell.fromEnv("DMS_MODAL_LAYER", WlrLayer.Top, {
-            "allow": ["top", "overlay"],
-            "invalidLayer": WlrLayer.Top,
-            "label": "modals",
-            "error": true
-        })
+        WlrLayershell.layer: root.effectiveModalLayer
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(shouldHaveFocus, customKeyboardFocus)
 

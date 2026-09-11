@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Services
 
 FloatingWindow {
     id: root
@@ -16,7 +15,6 @@ FloatingWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: Theme.cornerRadius
         color: root.surfaceColor
     }
 
@@ -26,7 +24,6 @@ FloatingWindow {
         blurY: 0
         blurWidth: root.visible ? root.width : 0
         blurHeight: root.visible ? root.height : 0
-        blurRadius: Theme.cornerRadius
     }
 
     Item {
@@ -35,15 +32,5 @@ FloatingWindow {
         property bool disablePopupTransparency: true
 
         anchors.fill: parent
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: "transparent"
-        border.color: BlurService.borderColor
-        border.width: BlurService.borderWidth
-        antialiasing: true
-        z: 100
     }
 }

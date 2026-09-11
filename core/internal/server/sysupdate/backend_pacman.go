@@ -17,6 +17,7 @@ import (
 func init() {
 	RegisterSystemBackend(func() Backend { return &archHelperBackend{id: "paru"} })
 	RegisterSystemBackend(func() Backend { return &archHelperBackend{id: "yay"} })
+	RegisterSystemBackend(func() Backend { return &shellyBackend{} })
 	RegisterSystemBackend(func() Backend { return &pacmanBackend{} })
 }
 
@@ -53,9 +54,7 @@ func pacmanUpgradeArgv(opts UpgradeOptions) []string {
 	return privilegedArgv(opts, "pacman", "-Syu", "--noconfirm", "--needed")
 }
 
-// Dont allow partial updates on arch, if they wanna break their system they can do it outside of DMS:
-// https://wiki.archlinux.org/title/System_maintenance#Partial_upgrades_are_unsupported
-// AUR packages are exempt — holding those cannot break the repo dependency graph.
+// Arch repository packages must upgrade together; AUR packages may be held.
 func dropPacmanRepoIgnores(ignored []string, pending []Package) []string {
 	if len(ignored) == 0 {
 		return ignored
@@ -81,7 +80,7 @@ func isPacmanFamily(b Backend) bool {
 		return false
 	}
 	switch b.ID() {
-	case "pacman", "paru", "yay":
+	case "pacman", "paru", "yay", "shelly":
 		return true
 	default:
 		return false

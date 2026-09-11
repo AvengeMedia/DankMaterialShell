@@ -104,8 +104,7 @@ Item {
     }
 
     readonly property real effectiveBarThickness: {
-        const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
-        return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing;
+        return Theme.barThickness(storedBarConfig?.innerPadding ?? 4, dpr) + storedBarSpacing;
     }
 
     readonly property var barBounds: {
@@ -314,7 +313,6 @@ Item {
     }
 
     onAlignedYChanged: {
-        geometryYSpring.retarget(root.alignedY)
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
@@ -397,6 +395,19 @@ Item {
         closeTimer.restart();
     }
 
+    function instantClose() {
+        closeTimer.stop();
+        animationsEnabled = false;
+        isClosing = false;
+        shouldBeVisible = false;
+        _primeContent = false;
+        contentWindow.visible = false;
+        backgroundWindow.visible = false;
+        PopoutManager.hidePopout(popoutHandle);
+        popoutClosed();
+        Qt.callLater(() => animationsEnabled = true);
+    }
+
     function toggle() {
         shouldBeVisible ? close() : open();
     }
@@ -448,36 +459,33 @@ Item {
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
 
-    SpringMotion {
-        id: geometryYSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedY
-    }
-
-    SpringMotion {
-        id: geometryHSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedHeight
-    }
-
-    property real renderedAlignedY: geometryYSpring.value
-    property real renderedAlignedHeight: geometryHSpring.value
+    property real renderedAlignedY: alignedY
+    property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
     // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation.
-    readonly property bool _settlingToOpen: _fullHeight && shouldBeVisible && morph.running
+    // Positioner-based content lays out in the polish pass after open(), so first-open height lands late for every popout, not just full-height ones.
+    readonly property bool _settlingToOpen: shouldBeVisible && morph.running
+
+    // content animates on these curves; springs here drift and overshoot it
+    Behavior on renderedAlignedY {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
+
+    Behavior on renderedAlignedHeight {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
 
     onAlignedHeightChanged: {
-        geometryHSpring.retarget(root.alignedHeight)
         if (shouldBeVisible)
             _setAnimatedSurfaceEnvelope();
         _kickBlurCommit();
@@ -507,7 +515,7 @@ Item {
 
     Timer {
         id: surfaceSettleTimer
-        interval: Math.max(Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing) + 32, geometryHSpring.settleDurationMs + 32)
+        interval: Math.max(0, Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing) + 32)
         repeat: false
         onTriggered: root._setSettledSurfaceGeometry()
     }

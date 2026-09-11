@@ -85,6 +85,7 @@ func NewManager() (*Manager, error) {
 			Preference:        PreferenceAuto,
 			WiFiNetworks:      []WiFiNetwork{},
 			SavedWiFiNetworks: []WiFiNetwork{},
+			CellularDevices:   []CellularDevice{},
 		},
 		stateMutex: sync.RWMutex{},
 
@@ -136,6 +137,14 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.EthernetConnected = backendState.EthernetConnected
 	m.state.EthernetConnectionUuid = backendState.EthernetConnectionUuid
 	m.state.EthernetDevices = backendState.EthernetDevices
+	m.state.CellularIP = backendState.CellularIP
+	m.state.CellularDevice = backendState.CellularDevice
+	m.state.CellularConnected = backendState.CellularConnected
+	m.state.CellularEnabled = backendState.CellularEnabled
+	m.state.CellularHardwareEnabled = backendState.CellularHardwareEnabled
+	m.state.CellularConnectionUuid = backendState.CellularConnectionUuid
+	m.state.CellularDevices = backendState.CellularDevices
+	m.state.CellularConnections = backendState.CellularConnections
 	m.state.WiFiIP = backendState.WiFiIP
 	m.state.WiFiDevice = backendState.WiFiDevice
 	m.state.WiFiConnected = backendState.WiFiConnected
@@ -209,6 +218,8 @@ func (m *Manager) snapshotState() NetworkState {
 	s.WiFiDevices = append([]WiFiDevice(nil), m.state.WiFiDevices...)
 	s.WiredConnections = append([]WiredConnection(nil), m.state.WiredConnections...)
 	s.EthernetDevices = append([]EthernetDevice(nil), m.state.EthernetDevices...)
+	s.CellularConnections = append([]WiredConnection(nil), m.state.CellularConnections...)
+	s.CellularDevices = append([]CellularDevice(nil), m.state.CellularDevices...)
 	s.VPNProfiles = append([]VPNProfile(nil), m.state.VPNProfiles...)
 	s.VPNActive = append([]VPNActive(nil), m.state.VPNActive...)
 	return s
@@ -225,6 +236,18 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		return true
 	}
 	if old.EthernetIP != new.EthernetIP {
+		return true
+	}
+	if old.CellularConnected != new.CellularConnected {
+		return true
+	}
+	if old.CellularEnabled != new.CellularEnabled {
+		return true
+	}
+	if old.CellularHardwareEnabled != new.CellularHardwareEnabled {
+		return true
+	}
+	if old.CellularIP != new.CellularIP {
 		return true
 	}
 	if old.WiFiConnected != new.WiFiConnected {
@@ -302,6 +325,12 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 	if len(old.EthernetDevices) != len(new.EthernetDevices) {
 		return true
 	}
+	if len(old.CellularDevices) != len(new.CellularDevices) {
+		return true
+	}
+	if len(old.CellularConnections) != len(new.CellularConnections) {
+		return true
+	}
 
 	for i := range old.WiFiNetworks {
 		oldNet := &old.WiFiNetworks[i]
@@ -373,6 +402,34 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 	for i := range old.EthernetDevices {
 		oldDev := &old.EthernetDevices[i]
 		newDev := &new.EthernetDevices[i]
+		if oldDev.Name != newDev.Name {
+			return true
+		}
+		if oldDev.Connected != newDev.Connected {
+			return true
+		}
+		if oldDev.State != newDev.State {
+			return true
+		}
+		if oldDev.IP != newDev.IP {
+			return true
+		}
+	}
+
+	for i := range old.CellularConnections {
+		oldNet := &old.CellularConnections[i]
+		newNet := &new.CellularConnections[i]
+		if oldNet.ID != newNet.ID {
+			return true
+		}
+		if oldNet.IsActive != newNet.IsActive {
+			return true
+		}
+	}
+
+	for i := range old.CellularDevices {
+		oldDev := &old.CellularDevices[i]
+		newDev := &new.CellularDevices[i]
 		if oldDev.Name != newDev.Name {
 			return true
 		}
@@ -634,6 +691,38 @@ func (m *Manager) DisableWiFi() error {
 	return nil
 }
 
+func (m *Manager) ToggleCellular() error {
+	enabled, err := m.backend.GetCellularEnabled()
+	if err != nil {
+		return fmt.Errorf("failed to get cellular state: %w", err)
+	}
+
+	err = m.backend.SetCellularEnabled(!enabled)
+	if err != nil {
+		return fmt.Errorf("failed to toggle cellular: %w", err)
+	}
+
+	return nil
+}
+
+func (m *Manager) EnableCellular() error {
+	err := m.backend.SetCellularEnabled(true)
+	if err != nil {
+		return fmt.Errorf("failed to enable cellular: %w", err)
+	}
+
+	return nil
+}
+
+func (m *Manager) DisableCellular() error {
+	err := m.backend.SetCellularEnabled(false)
+	if err != nil {
+		return fmt.Errorf("failed to disable cellular: %w", err)
+	}
+
+	return nil
+}
+
 func (m *Manager) ConnectWiFi(req ConnectionRequest) error {
 	return m.backend.ConnectWiFi(req)
 }
@@ -741,8 +830,32 @@ func (m *Manager) GetEthernetDevices() []EthernetDevice {
 	return devices
 }
 
+func (m *Manager) ConnectCellular() error {
+	return m.backend.ConnectCellular()
+}
+
+func (m *Manager) DisconnectCellular() error {
+	return m.backend.DisconnectCellular()
+}
+
+func (m *Manager) DisconnectCellularDevice(device string) error {
+	return m.backend.DisconnectCellularDevice(device)
+}
+
+func (m *Manager) GetCellularDevices() []CellularDevice {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	devices := make([]CellularDevice, len(m.state.CellularDevices))
+	copy(devices, m.state.CellularDevices)
+	return devices
+}
+
 func (m *Manager) activateConnection(uuid string) error {
 	return m.backend.ActivateWiredConnection(uuid)
+}
+
+func (m *Manager) activateCellularConnection(uuid string) error {
+	return m.backend.ActivateCellularConnection(uuid)
 }
 
 func (m *Manager) ListVPNProfiles() ([]VPNProfile, error) {

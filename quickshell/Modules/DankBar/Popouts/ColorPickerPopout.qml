@@ -20,7 +20,7 @@ DankPopout {
             anchors.fill: parent
             initialColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary
             onCloseRequested: root.close()
-            onHideRequested: root.close()
+            onHideRequested: root.instantClose()
             onShowRequested: root.open()
         }
     }

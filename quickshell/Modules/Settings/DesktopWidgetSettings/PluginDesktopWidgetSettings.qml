@@ -15,7 +15,11 @@ Column {
     property var widgetDef: null
 
     readonly property var cfg: instanceData?.config ?? {}
-    readonly property string settingsPath: widgetDef?.settingsComponent ?? ""
+    readonly property string settingsPath: {
+        const path = widgetDef?.settingsComponent ?? "";
+        // absolute paths must load via file: or sibling plugin types resolve against the qs: scheme and fail
+        return path.startsWith("/") ? "file://" + path : path;
+    }
 
     function updateConfig(key, value) {
         if (!instanceId)

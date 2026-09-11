@@ -1,6 +1,7 @@
 package wayland
 
 import (
+	"math"
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -22,7 +23,7 @@ func TestGenerateGammaRamp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ramp := GenerateGammaRamp(tt.size, tt.temp, tt.gamma)
+			ramp := GenerateGammaRamp(tt.size, tt.temp, tt.gamma, 1.0)
 
 			if len(ramp.Red) != int(tt.size) {
 				t.Errorf("expected %d red values, got %d", tt.size, len(ramp.Red))
@@ -116,5 +117,42 @@ func TestClamp(t *testing.T) {
 			t.Errorf("clamp(%f, %f, %f) = %f, want %f",
 				tt.val, tt.min, tt.max, result, tt.expected)
 		}
+	}
+}
+
+func TestGenerateGammaRamp_NeutralContrastMatchesLegacy(t *testing.T) {
+	legacy := GenerateGammaRamp(256, 4000, 1.2, 1.0)
+	for i := range legacy.Red {
+		want := uint16(clamp01(math.Pow(float64(i)/255.0*calcWhitepoint(4000).r, 1.0/1.2)) * 65535.0)
+		if legacy.Red[i] != want {
+			t.Fatalf("index %d: got %d want %d", i, legacy.Red[i], want)
+		}
+	}
+}
+
+func TestGenerateGammaRamp_ContrastPivotsAtMidGray(t *testing.T) {
+	const size = 257
+	mid := size / 2
+
+	for _, contrast := range []float64{0.5, 1.0, 2.0} {
+		ramp := GenerateGammaRamp(size, 6500, 1.0, contrast)
+		if ramp.Red[mid] != 32767 {
+			t.Errorf("contrast %.1f: mid-gray moved to %d", contrast, ramp.Red[mid])
+		}
+		for i := 1; i < size; i++ {
+			if ramp.Red[i] < ramp.Red[i-1] {
+				t.Fatalf("contrast %.1f: not monotonic at %d", contrast, i)
+			}
+		}
+	}
+
+	high := GenerateGammaRamp(size, 6500, 1.0, 2.0)
+	if high.Red[size/4] != 0 || high.Red[size*3/4] != 65535 {
+		t.Errorf("contrast 2.0 should clip quarter points, got %d and %d", high.Red[size/4], high.Red[size*3/4])
+	}
+
+	low := GenerateGammaRamp(size, 6500, 1.0, 0.5)
+	if low.Red[0] != 16383 || low.Red[size-1] != 49151 {
+		t.Errorf("contrast 0.5 should compress endpoints to quarter points, got %d and %d", low.Red[0], low.Red[size-1])
 	}
 }

@@ -93,22 +93,6 @@ Item {
 
                 GreeterFeatureCard {
                     width: (parent.width - Theme.spacingS * 2) / 3
-                    iconName: "format_paint"
-                    title: I18n.tr("App Theming", "greeter feature card title")
-                    description: I18n.tr("GTK, Qt, IDEs, more", "greeter feature card description")
-                    onClicked: PopoutService.openSettingsWithTab("theme")
-                }
-
-                GreeterFeatureCard {
-                    width: (parent.width - Theme.spacingS * 2) / 3
-                    iconName: "download"
-                    title: I18n.tr("Theme Registry", "greeter feature card title")
-                    description: I18n.tr("Community themes", "greeter feature card description")
-                    onClicked: PopoutService.openSettingsWithTab("theme")
-                }
-
-                GreeterFeatureCard {
-                    width: (parent.width - Theme.spacingS * 2) / 3
                     iconName: "view_carousel"
                     title: I18n.tr("DankBar", "greeter feature card title")
                     description: I18n.tr("Modular widget bar", "greeter feature card description")
@@ -148,14 +132,6 @@ Item {
                     title: I18n.tr("Control Center", "greeter feature card title")
                     description: I18n.tr("Quick system toggles", "greeter feature card description")
                     onClicked: BarWidgetService.getBarWindowOnFocusedScreen()?.triggerControlCenter()
-                }
-
-                GreeterFeatureCard {
-                    width: (parent.width - Theme.spacingS * 2) / 3
-                    iconName: "lock"
-                    title: I18n.tr("Lock Screen", "greeter feature card title")
-                    description: I18n.tr("Security & privacy", "greeter feature card description")
-                    onClicked: PopoutService.openSettingsWithTab("lock_screen")
                 }
             }
         }

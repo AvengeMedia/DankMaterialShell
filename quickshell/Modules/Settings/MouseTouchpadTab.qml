@@ -100,24 +100,22 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.set("mouseScrollFactor", newValue / 10.0)
                 }
 
-                SettingsButtonGroupRow {
+                SettingsDropdownRow {
+                    id: mouseScrollMethodRow
+
+                    readonly property var methods: ["default", "no-scroll", "on-button-down"]
+
                     tags: ["mouse", "scroll", "method"]
                     settingKey: "mouseScrollMethod"
                     text: I18n.tr("Scroll Method")
                     description: I18n.tr("Choose when to generate scrolling events")
-                    model: [I18n.tr("Default"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
-                    currentIndex: {
-                        if (SettingsData.mouseScrollMethod === "no-scroll")
-                            return 1;
-                        if (SettingsData.mouseScrollMethod === "on-button-down")
-                            return 2;
-                        return 0;
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
+                    options: [I18n.tr("Default"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
+                    currentValue: options[Math.max(0, methods.indexOf(SettingsData.mouseScrollMethod))]
+                    onValueChanged: value => {
+                        const index = mouseScrollMethodRow.options.indexOf(value);
+                        if (index < 0)
                             return;
-                        const methods = ["default", "no-scroll", "on-button-down"];
-                        SettingsData.set("mouseScrollMethod", methods[index]);
+                        SettingsData.set("mouseScrollMethod", mouseScrollMethodRow.methods[index]);
                     }
                 }
 
@@ -221,28 +219,44 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.set("touchpadScrollFactor", newValue / 10.0)
                 }
 
-                SettingsButtonGroupRow {
+                SettingsDropdownRow {
+                    id: touchpadScrollMethodRow
+
+                    readonly property var methods: ["default", "two-finger", "edge", "no-scroll", "on-button-down"]
+
                     tags: ["touchpad", "scroll", "method"]
                     settingKey: "touchpadScrollMethod"
                     text: I18n.tr("Scroll Method")
                     description: I18n.tr("Choose when to generate scrolling events")
-                    model: [I18n.tr("Default"), I18n.tr("Two Finger"), I18n.tr("Edge"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
-                    currentIndex: {
-                        if (SettingsData.touchpadScrollMethod === "two-finger")
-                            return 1;
-                        if (SettingsData.touchpadScrollMethod === "edge")
-                            return 2;
-                        if (SettingsData.touchpadScrollMethod === "no-scroll")
-                            return 3;
-                        if (SettingsData.touchpadScrollMethod === "on-button-down")
-                            return 4;
-                        return 0;
-                    }
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
+                    options: [I18n.tr("Default"), I18n.tr("Two Finger"), I18n.tr("Edge"), I18n.tr("No Scroll"), I18n.tr("On Button Down")]
+                    currentValue: options[Math.max(0, methods.indexOf(SettingsData.touchpadScrollMethod))]
+                    onValueChanged: value => {
+                        const index = touchpadScrollMethodRow.options.indexOf(value);
+                        if (index < 0)
                             return;
-                        const methods = ["default", "two-finger", "edge", "no-scroll", "on-button-down"];
-                        SettingsData.set("touchpadScrollMethod", methods[index]);
+                        SettingsData.set("touchpadScrollMethod", touchpadScrollMethodRow.methods[index]);
+                    }
+                }
+
+                SettingsDropdownRow {
+                    id: touchpadClickMethodRow
+
+                    readonly property var methods: ["default", "button-areas", "clickfinger"]
+
+                    tags: ["touchpad", "click", "method"]
+                    settingKey: "touchpadClickMethod"
+                    text: I18n.tr("Click Method", "Rules by which touchpad input determines left, right and middle click")
+                    description: I18n.tr("Button areas determines click type by finger position; Clickfinger by finger count")
+                    options: [
+                        I18n.tr("Default"),
+                        I18n.tr("Button areas", "Touchpad click method: click type is determined by finger position"),
+                        I18n.tr("Clickfinger", "Touchpad click method: click type is determined by finger count")]
+                    currentValue: options[Math.max(0, methods.indexOf(SettingsData.touchpadClickMethod))]
+                    onValueChanged: value => {
+                        const index = touchpadClickMethodRow.options.indexOf(value);
+                        if (index < 0)
+                            return;
+                        SettingsData.set("touchpadClickMethod", touchpadClickMethodRow.methods[index]);
                     }
                 }
 

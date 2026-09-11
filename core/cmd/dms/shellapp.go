@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/gpu"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/shellembed"
@@ -13,15 +14,17 @@ import (
 )
 
 var shellApp = shellapp.New(shellapp.Config{
-	ID:        "danklinux",
-	EnvPrefix: "DMS",
-	QSAppID:   "com.danklinux.dms",
-	Version:   Version,
-	Embedded:  embeddedShell{},
-	Boot:      bootBackend,
-	PreLaunch: preLaunch,
-	ExtraEnv:  dmsExtraEnv,
-	OnUIExit:  logStartupFailure,
+	ID:                     "danklinux",
+	EnvPrefix:              "DMS",
+	QSAppID:                "com.danklinux.dms",
+	Version:                Version,
+	Embedded:               embeddedShell{},
+	Boot:                   bootBackend,
+	PreLaunch:              preLaunch,
+	ExtraEnv:               dmsExtraEnv,
+	OnUIExit:               logStartupFailure,
+	SessionRestartExitCode: dmsSessionRestartExitCode,
+	TryManagedRestart:      trySystemdRestart,
 })
 
 type embeddedShell struct{}
@@ -81,5 +84,6 @@ func dmsExtraEnv(string) []string {
 	if _, set := os.LookupEnv("MALLOC_CONF"); !set {
 		env = append(env, "MALLOC_CONF=thp:never,narenas:4,dirty_decay_ms:3000")
 	}
+	env = append(env, gpu.EGLVendorEnv()...)
 	return env
 }

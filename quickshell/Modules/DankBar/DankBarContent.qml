@@ -19,6 +19,8 @@ Item {
     property var leftWidgetsModel
     property var centerWidgetsModel
     property var rightWidgetsModel
+    property var widgetOwner: null
+    property var hoverSections: null
     property bool _animateFrameInsets: false
 
     readonly property real innerPadding: barConfig?.innerPadding ?? 4
@@ -67,14 +69,14 @@ Item {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentTopBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetResolved;
+            return hasAdjacentTopBarLive ? (_edgeBaseMargin + SettingsData.frameEdgeReservation(barWindow.screen, "top") + _frameInsetExtra) : _frameInsetResolved;
         return Math.max(0, _barInsetPadding);
     }
     readonly property real _bottomMargin: {
         if (!_barIsVertical)
             return 0;
         if (_usesFrameBarChrome)
-            return hasAdjacentBottomBarLive ? (_edgeBaseMargin + SettingsData.frameBarSize + _frameInsetExtra) : _frameInsetResolved;
+            return hasAdjacentBottomBarLive ? (_edgeBaseMargin + SettingsData.frameEdgeReservation(barWindow.screen, "bottom") + _frameInsetExtra) : _frameInsetResolved;
         return Math.max(0, _barInsetPadding);
     }
 
@@ -84,6 +86,34 @@ Item {
     property alias vLeftSection: vLeftSection
     property alias vCenterSection: vCenterSection
     property alias vRightSection: vRightSection
+
+    readonly property var _defaultHoverSections: barWindow.isVertical ? [
+        {
+            section: vLeftSection,
+            name: "left"
+        },
+        {
+            section: vCenterSection,
+            name: "center"
+        },
+        {
+            section: vRightSection,
+            name: "right"
+        }
+    ] : [
+        {
+            section: hLeftSection,
+            name: "left"
+        },
+        {
+            section: hCenterSection,
+            name: "center"
+        },
+        {
+            section: hRightSection,
+            name: "right"
+        }
+    ]
 
     anchors.fill: parent
     anchors.leftMargin: _leftMargin
@@ -156,6 +186,8 @@ Item {
 
     function getRealWorkspaces() {
         const screenName = _barScreenName;
+        if (CompositorService.isAqueous && AqueousService.available)
+            return AqueousService.workspacesForOutput(SettingsData.workspaceFollowFocus ? AqueousService.focusedOutput : screenName);
         if (CompositorService.isNiri) {
             const fallbackWorkspaces = [
                 {
@@ -238,6 +270,8 @@ Item {
 
     function getCurrentWorkspace() {
         const screenName = _barScreenName;
+        if (CompositorService.isAqueous && AqueousService.available)
+            return getRealWorkspaces().find(ws => ws.active)?.id || "";
         if (CompositorService.isNiri) {
             if (!screenName || SettingsData.workspaceFollowFocus) {
                 return NiriService.getCurrentWorkspaceNumber();
@@ -279,7 +313,14 @@ Item {
             return;
         }
 
-        if (CompositorService.isNiri) {
+        if (CompositorService.isAqueous && AqueousService.available) {
+            const index = realWorkspaces.findIndex(ws => ws.id === getCurrentWorkspace());
+            if (index < 0)
+                return;
+            const next = Math.max(0, Math.min(realWorkspaces.length - 1, index + (direction > 0 ? 1 : -1)));
+            if (next !== index)
+                AqueousService.activateWorkspace(realWorkspaces[next]);
+        } else if (CompositorService.isNiri) {
             const currentWs = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(ws => ws && ws.idx === currentWs);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;
@@ -323,7 +364,7 @@ Item {
     }
 
     function switchApp(deltaY) {
-        const windows = sortedToplevels;
+        const windows = sortedToplevels.filter(w => !w.skipSwitcher);
         if (windows.length < 2) {
             return;
         }
@@ -402,12 +443,8 @@ Item {
         barContent: topBarContent
         barWindow: topBarContent.barWindow
         barConfig: topBarContent.barConfig
-        hLeftSection: topBarContent.hLeftSection
-        hCenterSection: topBarContent.hCenterSection
-        hRightSection: topBarContent.hRightSection
-        vLeftSection: topBarContent.vLeftSection
-        vCenterSection: topBarContent.vCenterSection
-        vRightSection: topBarContent.vRightSection
+        widgetOwner: topBarContent.widgetOwner
+        sections: topBarContent.hoverSections || topBarContent._defaultHoverSections
         leftWidgetsModel: topBarContent.leftWidgetsModel
         centerWidgetsModel: topBarContent.centerWidgetsModel
         rightWidgetsModel: topBarContent.rightWidgetsModel
@@ -415,6 +452,28 @@ Item {
 
     readonly property string activeHoverTrigger: hoverController.activeHoverTrigger
     readonly property bool hoverPopoutsEnabled: hoverController.hoverPopoutsEnabled
+
+    function mapItemToScreen(item, x, y) {
+        if (!item || typeof item.mapToItem !== "function")
+            return null;
+        try {
+            const raw = item.mapToItem(null, x ?? 0, y ?? 0);
+            if (!raw)
+                return null;
+            return Qt.point(raw.x + (barWindow?.hostOriginX ?? 0), raw.y + (barWindow?.hostOriginY ?? 0));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function queueHoverFromItem(item, point) {
+        if (!point)
+            return;
+        const gp = mapItemToScreen(item, point.position.x, point.position.y);
+        if (!gp)
+            return;
+        queueHoverPopout(gp.x, gp.y);
+    }
 
     function queueHoverPopout(gx, gy) {
         hoverController.queueHoverPoint(gx, gy);
@@ -436,12 +495,16 @@ Item {
         hoverController.updateBarHovered(hovered);
     }
 
+    function invalidateHoverCandidateCache() {
+        hoverController.invalidateCandidateCache();
+    }
+
     function resetHoverForBarGeometryChange() {
         hoverController.resetForBarGeometryChange();
     }
 
-    function _dashTriggerSource(section, tabIndex) {
-        return hoverController.dashTriggerSource(section, tabIndex);
+    function _dashTriggerSource(section, tabId) {
+        return hoverController.dashTriggerSource(section, tabId);
     }
 
     function getBarPosition() {
@@ -454,14 +517,13 @@ Item {
             const centerSection = barWindow.isVertical ? vCenterSection : hCenterSection;
             if (centerSection) {
                 if (barWindow.isVertical) {
-                    const centerY = centerSection.height / 2;
                     return {
-                        triggerPos: centerSection.mapToItem(null, 0, centerY),
+                        triggerPos: mapItemToScreen(centerSection, 0, centerSection.height / 2),
                         triggerWidth: centerSection.height
                     };
                 }
                 return {
-                    triggerPos: centerSection.mapToItem(null, 0, 0),
+                    triggerPos: mapItemToScreen(centerSection, 0, 0),
                     triggerWidth: centerSection.width
                 };
             }
@@ -469,7 +531,7 @@ Item {
         const ref = opts.visualItem || widgetItem.visualContent || widgetItem;
         const w = opts.triggerWidth !== undefined ? opts.triggerWidth : (widgetItem.visualWidth !== undefined ? widgetItem.visualWidth : widgetItem.width);
         return {
-            triggerPos: ref.mapToItem(null, 0, 0),
+            triggerPos: mapItemToScreen(ref, 0, 0),
             triggerWidth: w
         };
     }
@@ -493,7 +555,7 @@ Item {
         if (loader.item)
             return loader.item;
 
-        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout], [PopoutService.colorPickerPopoutLoader, PopoutService.colorPickerPopout]];
+        const pairs = [[PopoutService.appDrawerLoader, PopoutService.appDrawerPopout], [PopoutService.batteryPopoutLoader, PopoutService.batteryPopout], [PopoutService.clipboardHistoryPopoutLoader, PopoutService.clipboardHistoryPopout], [PopoutService.controlCenterLoader, PopoutService.controlCenterPopout], [PopoutService.dankDashPopoutLoader, PopoutService.dankDashPopout], [PopoutService.layoutPopoutLoader, PopoutService.layoutPopout], [PopoutService.notificationCenterLoader, PopoutService.notificationCenterPopout], [PopoutService.processListPopoutLoader, PopoutService.processListPopout], [PopoutService.systemUpdateLoader, PopoutService.systemUpdatePopout], [PopoutService.vpnPopoutLoader, PopoutService.vpnPopout], [PopoutService.colorPickerPopoutLoader, PopoutService.colorPickerPopout], [PopoutService.powerMenuPopoutLoader, PopoutService.powerMenuPopout]];
         for (let i = 0; i < pairs.length; i++) {
             if (loader === pairs[i][0] && pairs[i][1])
                 return pairs[i][1];
@@ -932,23 +994,21 @@ Item {
         id: powerMenuButtonComponent
 
         PowerMenuButton {
+            id: powerMenuWidget
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent)
             parentScreen: barWindow.screen
+            isActive: PopoutService.powerMenuPopoutLoader?.item ? PopoutService.powerMenuPopoutLoader?.item.shouldBeVisible : false
             onClicked: {
-                const loader = PopoutService.powerMenuModalLoader;
-                if (!loader)
-                    return;
-                loader.active = true;
-                if (!loader.item)
-                    return;
-                if (loader.item.shouldBeVisible) {
-                    loader.item.close();
-                    return;
-                }
-                loader.item.openCentered();
+                topBarContent.openWidgetPopout({
+                    loader: PopoutService.powerMenuPopoutLoader,
+                    widgetItem: powerMenuWidget,
+                    section: topBarContent.getWidgetSection(parent) || "right",
+                    triggerSource: "powerMenu",
+                    mode: "click"
+                });
             }
         }
     }
@@ -978,7 +1038,9 @@ Item {
                 if (loader.item.setBarContext)
                     loader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
                 if (loader.item.setTriggerPosition) {
-                    const globalPos = launcherButton.visualContent.mapToItem(null, 0, 0);
+                    const globalPos = topBarContent.mapItemToScreen(launcherButton.visualContent, 0, 0);
+                    if (!globalPos)
+                        return false;
                     const currentScreen = barWindow.screen;
                     const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, launcherButton.visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
                     loader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
@@ -1040,8 +1102,19 @@ Item {
         id: focusedWindowComponent
 
         FocusedApp {
+            id: focusedWindowWidget
             axis: barWindow.axis
-            availableWidth: topBarContent.leftToMediaGap
+            availableWidth: {
+                const configuredWidth = focusedWindowWidget.maxWidth;
+                const focusedWidgetContainer = focusedWindowWidget.parent?.parent;
+                if (barWindow.axis?.isVertical || topBarContent.getWidgetSection(focusedWindowWidget) !== "left" || hCenterSection.contentSize <= 0 || !focusedWidgetContainer)
+                    return configuredWidth;
+
+                // Read Row coordinates directly so this binding tracks reflow.
+                const focusedWidgetLeft = hLeftSection.x + focusedWidgetContainer.x;
+                const centerContentLeft = hCenterSection.x + hCenterSection.contentStart;
+                return Math.max(0, centerContentLeft - focusedWidgetLeft);
+            }
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             barSpacing: barConfig?.spacing ?? 4
@@ -1477,6 +1550,8 @@ Item {
 
         IdleInhibitor {
             widgetThickness: barWindow.widgetThickness
+            barThickness: barWindow.effectiveBarThickness
+            axis: barWindow.axis
             section: topBarContent.getWidgetSection(parent) || "right"
             parentScreen: barWindow.screen
         }

@@ -14,10 +14,6 @@ Column {
     property string title: ""
     property string titleIcon: "widgets"
     property string sectionId: ""
-    property bool readOnly: false
-
-    enabled: !readOnly
-    opacity: readOnly ? 0.55 : 1.0
 
     DankTooltipV2 {
         id: sharedTooltip
@@ -275,7 +271,7 @@ Column {
                     menuRoot.closed();
             }
 
-            BackgroundEffect.blurRegion: visible ? menuBlurRegion : null
+            BackgroundEffect.blurRegion: visible && BlurService.enabled ? menuBlurRegion : null
 
             Region {
                 id: menuBlurRegion
@@ -3345,26 +3341,26 @@ Column {
                     width: parent.width
                     height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: batteryPillArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
+                    color: batteryPowerChargingArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
 
                     Row {
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingS
-                        anchors.right: batteryPillToggle.left
+                        anchors.right: batteryPowerChargingToggle.left
                         anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingS
                         clip: true
 
                         DankIcon {
-                            name: "battery_horiz_075"
+                            name: "bolt"
                             size: 18
                             color: Theme.outline
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StyledText {
-                            text: I18n.tr("Material Battery Style")
+                            text: I18n.tr("Show Charge Rate", "Battery bar widget setting: show how many watts are going into the battery while charging")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal
@@ -3376,26 +3372,141 @@ Column {
                     }
 
                     DankToggle {
-                        id: batteryPillToggle
+                        id: batteryPowerChargingToggle
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         width: 40
                         height: 20
-                        checked: batteryContextMenu.currentWidgetData?.batteryPillStyle ?? SettingsData.batteryPillStyle
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryPowerCharging ?? SettingsData.showBatteryPowerCharging
                         onToggled: {
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillStyle", toggled);
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPowerCharging", toggled);
                         }
                     }
 
                     MouseArea {
-                        id: batteryPillArea
+                        id: batteryPowerChargingArea
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onPressed: {
-                            batteryPillToggle.checked = !batteryPillToggle.checked;
-                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryPillStyle", batteryPillToggle.checked);
+                            batteryPowerChargingToggle.checked = !batteryPowerChargingToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPowerCharging", batteryPowerChargingToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(18, Theme.fontSizeSmall) + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: batteryPowerDischargingArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.right: batteryPowerDischargingToggle.left
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+                        clip: true
+
+                        DankIcon {
+                            name: "battery_5_bar"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Discharge Rate", "Battery bar widget setting: show how many watts the system is drawing from the battery")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
+                            width: parent.width - 18 - Theme.spacingS
+                        }
+                    }
+
+                    DankToggle {
+                        id: batteryPowerDischargingToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: batteryContextMenu.currentWidgetData?.showBatteryPowerDischarging ?? SettingsData.showBatteryPowerDischarging
+                        onToggled: {
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPowerDischarging", toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: batteryPowerDischargingArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            batteryPowerDischargingToggle.checked = !batteryPowerDischargingToggle.checked;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "showBatteryPowerDischarging", batteryPowerDischargingToggle.checked);
+                        }
+                    }
+                }
+
+                Column {
+                    id: batteryStyleBlock
+
+                    width: parent.width
+                    leftPadding: Theme.spacingS
+                    rightPadding: Theme.spacingS
+                    topPadding: Theme.spacingXS
+                    bottomPadding: Theme.spacingXS
+                    spacing: Theme.spacingXS
+
+                    Row {
+                        width: batteryStyleBlock.width - Theme.spacingS * 2
+                        spacing: Theme.spacingS
+                        clip: true
+
+                        DankIcon {
+                            name: "battery_horiz_075"
+                            size: 18
+                            color: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Battery Style")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
+                            width: parent.width - 18 - Theme.spacingS
+                        }
+                    }
+
+                    DankButtonGroup {
+                        id: batteryStyleGroup
+
+                        readonly property var values: ["icon", "solid", "outline", "ring"]
+
+                        model: [I18n.tr("Icon", "battery widget: system battery glyph"), I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style")]
+                        buttonHeight: 24
+                        minButtonWidth: 44
+                        maximumWidth: batteryStyleBlock.width - Theme.spacingS * 2
+                        buttonPadding: 6
+                        checkIconSize: 10
+                        textSize: 10
+                        spacing: 2
+                        currentIndex: Math.max(0, batteryStyleGroup.values.indexOf(batteryContextMenu.currentWidgetData?.batteryStyle ?? SettingsData.batteryStyle))
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            root.overflowSettingChanged(batteryContextMenu.sectionId, batteryContextMenu.widgetIndex, "batteryStyle", batteryStyleGroup.values[index] ?? "icon");
                         }
                     }
                 }

@@ -78,7 +78,10 @@ Singleton {
         function onLowerDisplayRefreshRateOnBatteryChanged() {
             root.requestSync("setting-change");
         }
+    }
 
+    Connections {
+        target: SessionData
         function onActiveDisplayProfileChanged() {
             root.requestSync("profile-change");
         }
@@ -120,6 +123,7 @@ Singleton {
     property real gammaSunPosition: gammaState?.sunPosition ?? 0
     property int gammaLowTemp: gammaState?.config?.LowTemp ?? 0
     property int gammaHighTemp: gammaState?.config?.HighTemp ?? 0
+    property bool gammaAdjustAvailable: gammaControlAvailable && DMSService.apiVersion >= 34
 
     function syncRefreshRates(isPluggedIn, reason) {
         if (!SettingsData.lowerDisplayRefreshRateOnBattery) {
@@ -1113,6 +1117,30 @@ Singleton {
         }
     }
 
+    function applyGammaAdjustments() {
+        if (!gammaAdjustAvailable)
+            return;
+
+        DMSService.sendRequest("wayland.gamma.setGamma", {
+            "gamma": SessionData.displayGamma,
+            "contrast": SessionData.displayContrast
+        }, response => {
+            if (!response.error)
+                return;
+            log.error("Failed to set gamma adjustments:", response.error);
+        });
+    }
+
+    function setDisplayGamma(gamma) {
+        SessionData.setDisplayGamma(gamma);
+        gammaAdjustTimer.restart();
+    }
+
+    function setDisplayContrast(contrast) {
+        SessionData.setDisplayContrast(contrast);
+        gammaAdjustTimer.restart();
+    }
+
     function applyNightModeDirectly() {
         const temperature = SessionData.nightModeTemperature || 4000;
 
@@ -1196,7 +1224,8 @@ Singleton {
 
                 DMSService.sendRequest("wayland.gamma.setManualTimes", {
                     "sunrise": sunrise,
-                    "sunset": sunset
+                    "sunset": sunset,
+                    "durationMinutes": SessionData.nightModeTransitionMinutes
                 }, response => {
                     if (response.error) {
                         log.error("Failed to set manual times:", response.error);
@@ -1319,6 +1348,7 @@ Singleton {
             } else {
                 gammaControlAvailable = true;
                 automationAvailable = true;
+                applyGammaAdjustments();
 
                 if (nightModeEnabled) {
                     DMSService.sendRequest("wayland.gamma.setEnabled", {
@@ -1334,6 +1364,13 @@ Singleton {
                 }
             }
         });
+    }
+
+    Timer {
+        id: gammaAdjustTimer
+        interval: 250
+        repeat: false
+        onTriggered: applyGammaAdjustments()
     }
 
     Timer {
@@ -1534,6 +1571,9 @@ Singleton {
         function onNightModeEndMinuteChanged() {
             evaluateNightMode();
         }
+        function onNightModeTransitionMinutesChanged() {
+            evaluateNightMode();
+        }
         function onNightModeTemperatureChanged() {
             evaluateNightMode();
         }
@@ -1724,6 +1764,11 @@ Singleton {
 
             parts.push("Target night temperature: " + SessionData.nightModeTemperature + "K");
 
+            if (root.gammaAdjustAvailable) {
+                parts.push("Gamma: " + SessionData.displayGamma);
+                parts.push("Contrast: " + SessionData.displayContrast);
+            }
+
             if (SessionData.nightModeAutoEnabled) {
                 parts.push("Target day temperature: " + SessionData.nightModeHighTemperature + "K");
                 parts.push("Automation: " + SessionData.nightModeAutoMode);
@@ -1738,6 +1783,34 @@ Singleton {
             }
 
             return parts.join("\n");
+        }
+
+        function gamma(value: string): string {
+            if (!root.gammaAdjustAvailable)
+                return "Gamma adjustment not available (requires DMS API v34+)";
+            if (!value)
+                return SessionData.displayGamma.toString();
+
+            const gamma = parseFloat(value);
+            if (isNaN(gamma) || gamma < 0.5 || gamma > 2.0)
+                return "Gamma must be between 0.5 and 2.0";
+
+            root.setDisplayGamma(gamma);
+            return "Gamma set to " + gamma;
+        }
+
+        function contrast(value: string): string {
+            if (!root.gammaAdjustAvailable)
+                return "Contrast adjustment not available (requires DMS API v34+)";
+            if (!value)
+                return SessionData.displayContrast.toString();
+
+            const contrast = parseFloat(value);
+            if (isNaN(contrast) || contrast < 0.5 || contrast > 2.0)
+                return "Contrast must be between 0.5 and 2.0";
+
+            root.setDisplayContrast(contrast);
+            return "Contrast set to " + contrast;
         }
 
         function getCurrentTemp(): string {

@@ -60,11 +60,22 @@ Item {
     }
 
     signal closeRequested
-    signal deviceSelected(var device)
-    signal playerSelected(var player)
-    signal volumeChanged(real volume)
     signal panelEntered
     signal panelExited
+
+    function applyVolume(volume) {
+        if (usePlayerVolume) {
+            activePlayer.volume = volume;
+            return;
+        }
+        if (AudioService.sink?.audio)
+            AudioService.sink.audio.volume = volume;
+    }
+
+    function selectPlayer(player) {
+        MprisController.switchActivePlayer(player);
+        root.closeRequested();
+    }
 
     property int __panelHoverCount: 0
 
@@ -100,7 +111,7 @@ Item {
         _wheelAccum -= notches * 120;
         SessionData.suppressOSDTemporarily();
         const next = currentVolume + notches * AudioService.wheelVolumeStep / 100;
-        root.volumeChanged(Math.max(0, Math.min(1, next)));
+        root.applyVolume(Math.max(0, Math.min(1, next)));
     }
 
     readonly property Item activePanel: __activePanel
@@ -257,7 +268,7 @@ Item {
                             return;
                         const ratio = 1.0 - (mouse.y / height);
                         const volume = Math.max(0, Math.min(1, ratio));
-                        root.volumeChanged(volume);
+                        root.applyVolume(volume);
                     }
                 }
             }
@@ -464,10 +475,8 @@ Item {
                                         }
                                         return;
                                     }
-                                    if (modelData && modelData.name) {
+                                    if (modelData && modelData.name)
                                         AudioService.setDefaultSinkByName(modelData.name);
-                                        root.deviceSelected(modelData);
-                                    }
                                 }
                                 onEntered: panelAreaEntered()
                                 onExited: panelAreaExited()
@@ -578,7 +587,7 @@ Item {
                                 anchors.leftMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingM
-                                width: parent.width - Theme.spacingM * 2
+                                width: parent.width - Theme.spacingM * 2 - pinIndicator.width - Theme.spacingS
 
                                 DankIcon {
                                     name: "music_note"
@@ -618,15 +627,38 @@ Item {
                                 }
                             }
 
+                            Rectangle {
+                                id: pinIndicator
+                                readonly property bool pinned: !!modelData?.identity && MprisController.pinnedIdentity === modelData.identity
+                                anchors.right: parent.right
+                                anchors.rightMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 12
+                                height: 12
+                                radius: 6
+                                color: pinned ? Theme.primary : "transparent"
+                                border.color: pinned ? Theme.primary : Theme.outlineHeavy
+                                border.width: 2
+                            }
+
                             MouseArea {
                                 id: playerMouseArea
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (modelData?.identity) {
-                                        root.playerSelected(modelData);
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        if (modelData?.identity) {
+                                            if (MprisController.pinnedIdentity === modelData.identity)
+                                                MprisController.setPinned("");
+                                            else
+                                                MprisController.setPinned(modelData.identity);
+                                        }
+                                        return;
                                     }
+                                    if (modelData?.identity)
+                                        root.selectPlayer(modelData);
                                 }
                                 onEntered: panelAreaEntered()
                                 onExited: panelAreaExited()

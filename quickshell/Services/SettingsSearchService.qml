@@ -44,6 +44,10 @@ Singleton {
             "isNiri": () => CompositorService.isNiri,
             "isHyprland": () => CompositorService.isHyprland,
             "isMango": () => CompositorService.isMango,
+            "isAqueous": () => CompositorService.isAqueous,
+            "nativeOverviewCapable": () => CompositorService.isNiri || CompositorService.isAqueous,
+            "smartDockCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous,
+            "workspaceFollowFocusCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isAqueous,
             "isHyprlandOrNiri": () => CompositorService.isHyprland || CompositorService.isNiri,
             "windowRulesCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,
             "layoutCapable": () => CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango,
@@ -53,7 +57,10 @@ Singleton {
             "networkAvailable": () => NetworkService.networkAvailable,
             "dmsConnected": () => DMSService.isConnected && DMSService.apiVersion >= 23,
             "matugenAvailable": () => Theme.matugenAvailable,
-            "greeterAvailable": () => GreeterService.available
+            "greeterAvailable": () => GreeterService.available,
+            "frameEnabled": () => SettingsData.frameEnabled,
+            "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
+            "cellularAvailable": () => (NetworkService.cellularDevices?.length ?? 0) > 0
         })
 
     Component.onCompleted: indexFile.reload()

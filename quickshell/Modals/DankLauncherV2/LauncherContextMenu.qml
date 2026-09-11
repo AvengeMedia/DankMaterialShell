@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "ControllerUtils.js" as Utils
 
 Item {
     id: root
@@ -99,6 +100,8 @@ Item {
     }
     readonly property bool isPinned: appId ? SessionData.isPinnedApp(appId) : false
     readonly property bool isRegularApp: item?.type === "app" && !item.isCore && desktopEntry
+    readonly property bool isFlatpakApp: isRegularApp && (item?.source === "flatpak" || !!item?.flatpakId || Utils.classifyAppSource(desktopEntry) === "flatpak")
+    readonly property string flatpakAppId: item?.flatpakId || (isFlatpakApp ? Utils.extractFlatpakAppId(desktopEntry) : "")
     readonly property bool isPluginItem: item?.type === "plugin"
 
     function getPluginContextMenuActions() {
@@ -231,6 +234,19 @@ Item {
             action: launchApp
         });
 
+        if (isFlatpakApp && flatpakAppId) {
+            items.push({
+                type: "separator"
+            });
+            items.push({
+                type: "item",
+                icon: "delete",
+                text: I18n.tr("Uninstall…", "context menu action to uninstall app"),
+                isDestructive: true,
+                action: uninstallCurrentApp
+            });
+        }
+
         return items;
     }
 
@@ -305,6 +321,18 @@ Item {
             return;
         editAppRequested(desktopEntry);
         hide();
+    }
+
+    function uninstallCurrentApp() {
+        if (!isFlatpakApp || !flatpakAppId)
+            return;
+        const targetFlatpakId = flatpakAppId;
+        const appName = item?.name || desktopEntry?.name || flatpakAppId;
+        const currentAppId = appId;
+        hide();
+        if (controller)
+            controller.itemExecuted();
+        AppSearchService.requestUninstallFlatpak(currentAppId, appName, targetFlatpakId);
     }
 
     function launchApp() {
@@ -619,10 +647,14 @@ Item {
                                     height: parent.height
                                     radius: Theme.cornerRadius
                                     color: {
+                                        const isDestructive = menuItemDelegate.modelData?.isDestructive ?? false;
                                         if (root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex) {
-                                            return Theme.primaryPressed;
+                                            return isDestructive ? Theme.withAlpha(Theme.error, 0.25) : Theme.primaryPressed;
                                         }
-                                        return itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
+                                        if (itemMouseArea.containsMouse) {
+                                            return isDestructive ? Theme.withAlpha(Theme.error, 0.15) : BlurService.hoverColor(Theme.widgetBaseHoverColor);
+                                        }
+                                        return Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                                     }
 
                                     Row {
@@ -642,8 +674,8 @@ Item {
                                                 visible: (menuItemDelegate.modelData?.icon ?? "").length > 0
                                                 name: menuItemDelegate.modelData?.icon ?? ""
                                                 size: Theme.iconSize - 2
-                                                color: Theme.surfaceText
-                                                opacity: 0.7
+                                                color: (menuItemDelegate.modelData?.isDestructive ?? false) ? Theme.error : Theme.surfaceText
+                                                opacity: (menuItemDelegate.modelData?.isDestructive ?? false) ? 1.0 : 0.7
                                                 anchors.verticalCenter: parent.verticalCenter
                                             }
                                         }
@@ -651,7 +683,7 @@ Item {
                                         StyledText {
                                             text: menuItemDelegate.modelData.text || ""
                                             font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceText
+                                            color: (menuItemDelegate.modelData?.isDestructive ?? false) ? Theme.error : Theme.surfaceText
                                             font.weight: Font.Normal
                                             anchors.verticalCenter: parent.verticalCenter
                                             elide: Text.ElideRight
@@ -661,7 +693,7 @@ Item {
 
                                     DankRipple {
                                         id: menuItemRipple
-                                        rippleColor: Theme.surfaceText
+                                        rippleColor: (menuItemDelegate.modelData?.isDestructive ?? false) ? Theme.error : Theme.surfaceText
                                         cornerRadius: Theme.cornerRadius
                                     }
 

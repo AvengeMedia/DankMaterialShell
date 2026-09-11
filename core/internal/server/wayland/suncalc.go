@@ -54,23 +54,30 @@ func sunDeclination(orbitAngle float64) float64 {
 		0.00148*math.Sin(3*orbitAngle)
 }
 
-func sunHourAngle(latRad, declination, targetSunRad float64) float64 {
-	return math.Acos(math.Cos(targetSunRad)/
-		math.Cos(latRad)*math.Cos(declination) -
-		math.Tan(latRad)*math.Tan(declination))
+type thresholdState int
+
+const (
+	thresholdCrosses thresholdState = iota
+	thresholdAlwaysAbove
+	thresholdAlwaysBelow
+)
+
+func sunHourAngle(latRad, declination, targetSunRad float64) (float64, thresholdState) {
+	cosH := math.Cos(targetSunRad)/
+		(math.Cos(latRad)*math.Cos(declination)) -
+		math.Tan(latRad)*math.Tan(declination)
+	switch {
+	case cosH < -1:
+		return math.Pi, thresholdAlwaysAbove
+	case cosH > 1:
+		return 0, thresholdAlwaysBelow
+	default:
+		return math.Acos(cosH), thresholdCrosses
+	}
 }
 
 func hourAngleToSeconds(hourAngle, eqtime float64) float64 {
 	return radToDeg * (4.0*math.Pi - 4*hourAngle - eqtime) * 60
-}
-
-func sunCondition(latRad, declination float64) SunCondition {
-	signLat := latRad >= 0
-	signDecl := declination >= 0
-	if signLat == signDecl {
-		return SunMidnightSun
-	}
-	return SunPolarNight
 }
 
 func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwilight, elevDaylight float64) (SunTimes, SunCondition) {
@@ -78,21 +85,42 @@ func CalculateSunTimesWithTwilight(lat, lon float64, date time.Time, elevTwiligh
 	elevTwilightRad := (90.833 - elevTwilight) * degToRad
 	elevDaylightRad := (90.833 - elevDaylight) * degToRad
 
-	utc := date.UTC()
-	orbitAngle := dateOrbitAngle(utc)
+	lonOffset := time.Duration(-lon*4) * time.Minute
+
+	// The event seconds below are local mean solar time and lonOffset converts
+	// them to UTC, so the reference day has to be the *solar* day the caller's
+	// civil day falls in. Reading it off date.UTC() returned the neighbouring
+	// day's times whenever the local and UTC dates disagree, which is most of
+	// the day for large offsets (#3179).
+	//
+	// For nearly every zone the solar day and the civil day are the same date,
+	// but a zone can be shifted a full day away from its own meridian: Apia,
+	// Kiritimati, Tongatapu and the Chathams all sit on west longitudes while
+	// keeping a UTC+12:45..+14 offset. Taking the civil date directly puts
+	// every event there a day late, and the caller then sees no daylight at
+	// all. Anchoring on the caller's local noon and converting that to mean
+	// solar time picks the right day in both cases.
+	//
+	// dayStart stays at UTC midnight so the lonOffset arithmetic is unchanged.
+	year, month, day := date.Date()
+	localNoon := time.Date(year, month, day, 12, 0, 0, 0, date.Location())
+	refYear, refMonth, refDay := localNoon.UTC().Add(-lonOffset).Date()
+	dayStart := time.Date(refYear, refMonth, refDay, 0, 0, 0, 0, time.UTC)
+
+	// Declination and the equation of time belong to the same reference day.
+	orbitAngle := dateOrbitAngle(dayStart)
 	decl := sunDeclination(orbitAngle)
 	eqtime := equationOfTime(orbitAngle)
 
-	haTwilight := sunHourAngle(latRad, decl, elevTwilightRad)
-	haDaylight := sunHourAngle(latRad, decl, elevDaylightRad)
+	haTwilight, twilightState := sunHourAngle(latRad, decl, elevTwilightRad)
+	haDaylight, daylightState := sunHourAngle(latRad, decl, elevDaylightRad)
 
-	if math.IsNaN(haTwilight) || math.IsNaN(haDaylight) {
-		cond := sunCondition(latRad, decl)
-		return SunTimes{}, cond
+	if daylightState == thresholdAlwaysAbove {
+		return SunTimes{}, SunMidnightSun
 	}
-
-	dayStart := time.Date(utc.Year(), utc.Month(), utc.Day(), 0, 0, 0, 0, time.UTC)
-	lonOffset := time.Duration(-lon*4) * time.Minute
+	if twilightState == thresholdAlwaysBelow {
+		return SunTimes{}, SunPolarNight
+	}
 
 	dawnSecs := hourAngleToSeconds(math.Abs(haTwilight), eqtime)
 	sunriseSecs := hourAngleToSeconds(math.Abs(haDaylight), eqtime)

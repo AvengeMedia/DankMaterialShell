@@ -32,9 +32,8 @@ Item {
             for (let i = 0; i < root.dankBarRepeater.count; i++)
                 bars.push(...(root.dankBarRepeater.itemAt(i)?.item?.barVariants?.instances || []));
         }
-        const frameBars = BarWidgetService.frameHostedBars;
-        for (const screenName in frameBars)
-            bars.push(frameBars[screenName]);
+        for (const screenName in BarWidgetService.frameHostedBars)
+            bars.push(...BarWidgetService.frameBarsForScreen(screenName));
 
         let currentBar = null;
         for (const bar of bars) {
@@ -100,6 +99,28 @@ Item {
         });
 
         return `DEFAULTAPP_LAUNCH_REQUESTED: ${appName}`;
+    }
+
+    function parseIdleInhibitMinutes(duration) {
+        if (duration === undefined || duration === null)
+            return -1;
+        const trimmed = String(duration).trim();
+        if (!trimmed)
+            return -1;
+        const minutes = parseInt(trimmed, 10);
+        if (isNaN(minutes) || minutes <= 0 || String(minutes) !== trimmed)
+            return -1;
+        return minutes;
+    }
+
+    function idleInhibitStatusMessage() {
+        if (!SessionService.idleInhibited)
+            return "Idle inhibit is disabled";
+        if (SessionData.idleInhibitedUntil <= 0)
+            return "Idle inhibit is enabled indefinitely";
+        const remainingMs = Math.max(0, SessionData.idleInhibitedUntil - Date.now());
+        const remainingMin = Math.ceil(remainingMs / 60000);
+        return `Idle inhibit is enabled for ${remainingMin} more minute${remainingMin === 1 ? "" : "s"}`;
     }
 
     IpcHandler {
@@ -536,21 +557,29 @@ Item {
     IpcHandler {
         function toggle(): string {
             SessionService.toggleIdleInhibit();
-            return SessionService.idleInhibited ? "Idle inhibit enabled" : "Idle inhibit disabled";
+            return root.idleInhibitStatusMessage();
         }
 
         function enable(): string {
             SessionService.enableIdleInhibit();
-            return "Idle inhibit enabled";
+            return root.idleInhibitStatusMessage();
+        }
+
+        function enableFor(minutes: string): string {
+            const parsed = root.parseIdleInhibitMinutes(minutes);
+            if (parsed < 0)
+                return "Invalid duration. Use minutes, e.g. 60.";
+            SessionService.enableIdleInhibit(parsed);
+            return root.idleInhibitStatusMessage();
         }
 
         function disable(): string {
             SessionService.disableIdleInhibit();
-            return "Idle inhibit disabled";
+            return "Idle inhibit is disabled";
         }
 
         function status(): string {
-            return SessionService.idleInhibited ? "Idle inhibit is enabled" : "Idle inhibit is disabled";
+            return root.idleInhibitStatusMessage();
         }
 
         function reason(newReason: string): string {
@@ -965,9 +994,6 @@ Item {
             const posValue = positionMap[position.toLowerCase()];
             if (posValue === undefined)
                 return "BAR_INVALID_POSITION";
-            // The island silhouette only anchors top or bottom.
-            if (SettingsData.isIslandBarConfig(barConfig) && posValue !== SettingsData.Position.Top && posValue !== SettingsData.Position.Bottom)
-                return "BAR_IS_ISLAND";
             SettingsData.updateBarConfig(barConfig.id, {
                 position: posValue
             });
@@ -1061,11 +1087,8 @@ Item {
         }
 
         function tabs(): string {
-            if (!PopoutService.settingsModal)
-                return "wallpaper\ntheme\ntypography\ntime_weather\nsounds\ndankbar\ndankbar_settings\ndankbar_appearance\ndankbar_widgets\nframe\nworkspaces\ncompositor\nmedia_player\nnotifications\nosd\nrunning_apps\nupdater\ndock\nlauncher\nkeybinds\ndisplays\nnetwork\nnetwork_status\nnetwork_ethernet\nnetwork_wifi\nnetwork_vpn\nprinters\nlock_screen\npower_sleep\nplugins\nabout";
-            var modal = PopoutService.settingsModal;
             var ids = [];
-            var structure = modal.sidebar?.categoryStructure ?? [];
+            var structure = SettingsTabs.structure;
             for (var i = 0; i < structure.length; i++) {
                 var cat = structure[i];
                 if (cat.separator)
@@ -1088,6 +1111,10 @@ Item {
 
         function dump(): string {
             return SettingsData.getCurrentSettingsJson();
+        }
+
+        function dumpSession(): string {
+            return SessionData.getCurrentSessionJson();
         }
 
         function set(key: string, value: string): string {
@@ -1866,6 +1893,8 @@ Item {
         function open(): string {
             root.workspaceRenameModalLoader.active = true;
             if (root.workspaceRenameModalLoader.item) {
+                if (CompositorService.isAqueous)
+                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
                 root.workspaceRenameModalLoader.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
@@ -1888,6 +1917,8 @@ Item {
                     root.workspaceRenameModalLoader.item.hide();
                     return "WORKSPACE_RENAME_MODAL_CLOSED";
                 }
+                if (CompositorService.isAqueous)
+                    return root.workspaceRenameModalLoader.item.show("") ? "WORKSPACE_RENAME_MODAL_OPENED" : "WORKSPACE_RENAME_UNAVAILABLE";
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
                 root.workspaceRenameModalLoader.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
@@ -1947,6 +1978,10 @@ Item {
     }
 
     IpcHandler {
+        function cycle(): string {
+            return NiriService.cycleSingleOutput();
+        }
+
         function listProfiles(): string {
             const profiles = DisplayConfigState.validatedProfiles;
             const activeId = SessionData.getActiveDisplayProfile(CompositorService.compositor);

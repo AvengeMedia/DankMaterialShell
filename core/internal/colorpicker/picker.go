@@ -10,16 +10,19 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_screencopy"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_color_management"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wp_viewporter"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	wlhelpers "github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	"github.com/AvengeMedia/dankgo/wayland/client"
 )
 
 type Config struct {
-	Format       OutputFormat
-	CustomFormat string
-	Lowercase    bool
-	Autocopy     bool
-	Notify       bool
+	Format        OutputFormat
+	CustomFormat  string
+	Lowercase     bool
+	Autocopy      bool
+	Notify        bool
+	AllowMultiple bool
 }
 
 type Output struct {
@@ -62,6 +65,7 @@ type Picker struct {
 	seat       *client.Seat
 	pointer    *client.Pointer
 	keyboard   *client.Keyboard
+	keymap     *keymap.Keymap
 	layerShell *wlr_layer_shell.ZwlrLayerShellV1
 	screencopy *wlr_screencopy.ZwlrScreencopyManagerV1
 	viewporter *wp_viewporter.WpViewporter
@@ -91,6 +95,14 @@ func New(config Config) *Picker {
 }
 
 func (p *Picker) Run() (*Color, error) {
+	if !p.config.AllowMultiple {
+		lock, err := utils.LockSelectionOverlay()
+		if err != nil {
+			return nil, err
+		}
+		defer lock.Release()
+	}
+
 	if err := p.connect(); err != nil {
 		return nil, fmt.Errorf("wayland connect: %w", err)
 	}
@@ -728,9 +740,14 @@ func (p *Picker) setupPointerHandlers() {
 }
 
 func (p *Picker) setupKeyboardHandlers() {
+	p.keyboard.SetKeymapHandler(func(e client.KeyboardKeymapEvent) {
+		p.keymap = keymap.FromEvent(e)
+	})
+
 	p.keyboard.SetKeyHandler(func(e client.KeyboardKeyEvent) {
+		sym := p.keymap.Keysym(e.Key)
 		for _, ls := range p.surfaces {
-			ls.state.OnKey(e.Key, e.State)
+			ls.state.OnKey(sym, e.State)
 		}
 	})
 }

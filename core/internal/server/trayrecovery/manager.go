@@ -71,6 +71,51 @@ func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 	})
 }
 
+// A restarted shell brings up an empty watcher, and clients that ignore
+// NameOwnerChanged never re-register (#1142).
+func (m *Manager) WatchWatcherOwner() {
+	if err := m.conn.AddMatchSignal(
+		dbus.WithMatchInterface(dbusIface),
+		dbus.WithMatchMember("NameOwnerChanged"),
+		dbus.WithMatchArg(0, sniWatcherDest),
+	); err != nil {
+		log.Warnf("TrayRecoveryService: NameOwnerChanged match failed: %v", err)
+		return
+	}
+
+	ch := make(chan *dbus.Signal, 16)
+	m.conn.Signal(ch)
+
+	m.wg.Go(func() {
+		defer m.conn.RemoveSignal(ch)
+		hadOwner := m.getNameOwner(sniWatcherDest) != ""
+		for {
+			select {
+			case <-m.stopChan:
+				return
+			case sig, ok := <-ch:
+				if !ok {
+					return
+				}
+				if sig.Name != dbusIface+".NameOwnerChanged" || len(sig.Body) < 3 {
+					continue
+				}
+				name, _ := sig.Body[0].(string)
+				newOwner, _ := sig.Body[2].(string)
+				if name != sniWatcherDest || newOwner == "" {
+					continue
+				}
+				if !hadOwner {
+					hadOwner = true
+					continue
+				}
+				log.Info("TrayRecoveryService: StatusNotifierWatcher changed hands, scheduling rescan")
+				go m.scheduleRecovery()
+			}
+		}
+	})
+}
+
 func (m *Manager) scheduleRecovery() {
 	select {
 	case <-time.After(resumeDelay):

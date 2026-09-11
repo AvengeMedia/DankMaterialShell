@@ -28,6 +28,7 @@ func TestManager_GetConnectionPreference(t *testing.T) {
 		{"auto", PreferenceAuto},
 		{"wifi", PreferenceWiFi},
 		{"ethernet", PreferenceEthernet},
+		{"cellular", PreferenceCellular},
 	}
 
 	for _, tt := range tests {

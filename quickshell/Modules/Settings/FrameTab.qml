@@ -30,18 +30,12 @@ Item {
 
             SettingsCard {
                 width: parent.width
-                iconName: "frame_source"
-                title: I18n.tr("General")
+                iconName: "toolbar"
+                title: I18n.tr("Layout")
                 settingKey: "frameEnabled"
+                tags: ["frame", "layout", "standard", "island", "mode", "bar"]
 
-                SettingsToggleRow {
-                    settingKey: "frameEnable"
-                    tags: ["frame", "border", "outline", "display"]
-                    text: I18n.tr("Enable Frame")
-                    description: I18n.tr("Draw a connected picture-frame border around the entire display")
-                    checked: SettingsData.frameEnabled
-                    onToggled: checked => SettingsData.set("frameEnabled", checked)
-                }
+                SettingsLayoutPicker {}
             }
 
             SettingsCard {
@@ -375,13 +369,13 @@ Item {
                 settingKey: "frameBarIntegration"
                 collapsible: true
                 expanded: true
-                visible: SettingsData.frameEnabled && CompositorService.isNiri
+                visible: SettingsData.frameEnabled && (CompositorService.isNiri || CompositorService.isAqueous)
 
                 SettingsToggleRow {
                     settingKey: "frameShowOnOverview"
                     tags: ["frame", "overview", "show", "hide", "niri"]
                     text: I18n.tr("Show on Overview")
-                    description: I18n.tr("Show during Niri overview")
+                    description: CompositorService.isAqueous ? I18n.tr("Show on Overview") : I18n.tr("Show during Niri overview")
                     checked: SettingsData.frameShowOnOverview
                     onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
                 }

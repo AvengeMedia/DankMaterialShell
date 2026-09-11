@@ -24,6 +24,8 @@ import (
 
 const animKelvinStep = 25
 
+const neutralTemp = 6500
+
 func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
@@ -73,21 +75,13 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 	m.wg.Add(1)
 	go m.waylandActor()
 
-	if config.Enabled {
+	if m.needsControls() {
 		m.post(func() {
 			if m.controlsInitialized {
 				return
 			}
 			log.Info("Gamma control enabled at startup")
-			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
-			m.availOutputsMu.RLock()
-			outs := slices.Clone(m.availableOutputs)
-			m.availOutputsMu.RUnlock()
-			if err := m.setupOutputControls(outs, gammaMgr); err != nil {
-				log.Errorf("Failed to initialize gamma controls: %v", err)
-				return
-			}
-			m.controlsInitialized = true
+			m.createControls()
 		})
 	}
 
@@ -178,11 +172,7 @@ func (m *Manager) setupRegistry() error {
 			}
 			m.outputRegNames.Store(outputID, e.Name)
 
-			m.configMutex.RLock()
-			enabled := m.config.Enabled
-			m.configMutex.RUnlock()
-
-			if !enabled {
+			if !m.needsControls() {
 				return
 			}
 			m.post(func() {
@@ -736,11 +726,7 @@ func (m *Manager) tomorrow(now time.Time) time.Time {
 func (m *Manager) schedulerLoop() {
 	defer m.wg.Done()
 
-	m.configMutex.RLock()
-	enabled := m.config.Enabled
-	m.configMutex.RUnlock()
-
-	if enabled {
+	if m.needsControls() {
 		m.post(func() { m.applyCurrentTemp("startup") })
 	}
 
@@ -775,17 +761,11 @@ func (m *Manager) schedulerLoop() {
 			m.scheduleMutex.Unlock()
 			m.recalcSchedule(time.Now())
 			m.updateStateFromSchedule()
-			m.configMutex.RLock()
-			enabled := m.config.Enabled
-			m.configMutex.RUnlock()
-			if enabled {
+			if m.needsControls() {
 				m.post(func() { m.applyCurrentTemp("updateTrigger") })
 			}
 		case <-timer.C:
-			m.configMutex.RLock()
-			enabled := m.config.Enabled
-			m.configMutex.RUnlock()
-			if enabled {
+			if m.needsControls() {
 				m.post(func() { m.applyCurrentTemp("timer") })
 			}
 		}
@@ -801,8 +781,15 @@ func (m *Manager) applyCurrentTemp(_ string) {
 	m.recalcSchedule(time.Now())
 
 	m.configMutex.RLock()
+	enabled := m.config.Enabled
 	low, high := m.config.LowTemp, m.config.HighTemp
 	m.configMutex.RUnlock()
+
+	if !enabled {
+		m.applyGamma(neutralTemp)
+		m.updateStateFromSchedule()
+		return
+	}
 
 	if low == high {
 		m.applyGamma(low)
@@ -825,7 +812,7 @@ func (m *Manager) applyCurrentTemp(_ string) {
 
 func (m *Manager) applyGamma(temp int) {
 	m.configMutex.RLock()
-	gamma := m.config.Gamma
+	gamma, contrast := m.config.Gamma, m.config.Contrast
 	m.configMutex.RUnlock()
 
 	switch {
@@ -858,12 +845,12 @@ func (m *Manager) applyGamma(temp int) {
 			continue
 		case out.gammaControl == nil:
 			continue
-		case out.lastTemp == temp && out.lastGamma == gamma:
+		case out.rampCurrent(temp, gamma, contrast):
 			continue
 		case !m.outputStillValid(out):
 			continue
 		}
-		ramp := GenerateGammaRamp(out.rampSize, temp, gamma)
+		ramp := GenerateGammaRamp(out.rampSize, temp, gamma, contrast)
 		buf := bytes.NewBuffer(make([]byte, 0, int(out.rampSize)*6))
 		for _, v := range ramp.Red {
 			binary.Write(buf, binary.LittleEndian, v)
@@ -882,6 +869,7 @@ func (m *Manager) applyGamma(temp int) {
 		if err == nil {
 			j.out.lastTemp = temp
 			j.out.lastGamma = gamma
+			j.out.lastContrast = contrast
 			continue
 		}
 		log.Warnf("gamma: failed to set output %d: %v", j.out.id, err)
@@ -893,6 +881,10 @@ func (m *Manager) applyGamma(temp int) {
 			return
 		}
 	}
+}
+
+func (out *outputState) rampCurrent(temp int, gamma, contrast float64) bool {
+	return out.lastTemp == temp && out.lastGamma == gamma && out.lastContrast == contrast
 }
 
 func (m *Manager) setGammaBytes(out *outputState, data []byte) error {
@@ -1044,10 +1036,7 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 	if !ok || preparing {
 		return
 	}
-	m.configMutex.RLock()
-	enabled := m.config.Enabled
-	m.configMutex.RUnlock()
-	if !enabled {
+	if !m.needsControls() {
 		return
 	}
 	time.AfterFunc(500*time.Millisecond, func() {
@@ -1056,12 +1045,8 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 }
 
 func (m *Manager) handleResume() {
-	m.configMutex.RLock()
-	stillEnabled := m.config.Enabled
-	m.configMutex.RUnlock()
-
 	switch {
-	case !stillEnabled:
+	case !m.needsControls():
 		return
 	case !m.controlsInitialized:
 		return
@@ -1157,17 +1142,19 @@ func (m *Manager) SetUseIPLocation(use bool) {
 	m.triggerUpdate()
 }
 
-func (m *Manager) SetManualTimes(sunrise, sunset time.Time) error {
+func (m *Manager) SetManualTimes(sunrise, sunset time.Time, duration *time.Duration) error {
 	m.configMutex.Lock()
 	if m.config.ManualSunrise != nil && m.config.ManualSunset != nil &&
 		m.config.ManualSunrise.Hour() == sunrise.Hour() && m.config.ManualSunrise.Minute() == sunrise.Minute() &&
-		m.config.ManualSunset.Hour() == sunset.Hour() && m.config.ManualSunset.Minute() == sunset.Minute() {
+		m.config.ManualSunset.Hour() == sunset.Hour() && m.config.ManualSunset.Minute() == sunset.Minute() &&
+		durationEqual(m.config.ManualDuration, duration) {
 		m.configMutex.Unlock()
 		return nil
 	}
 	updated := m.config
 	updated.ManualSunrise = &sunrise
 	updated.ManualSunset = &sunset
+	updated.ManualDuration = duration
 	if err := updated.Validate(); err != nil {
 		m.configMutex.Unlock()
 		return err
@@ -1180,77 +1167,104 @@ func (m *Manager) SetManualTimes(sunrise, sunset time.Time) error {
 
 func (m *Manager) ClearManualTimes() {
 	m.configMutex.Lock()
-	if m.config.ManualSunrise == nil && m.config.ManualSunset == nil {
+	if m.config.ManualSunrise == nil && m.config.ManualSunset == nil && m.config.ManualDuration == nil {
 		m.configMutex.Unlock()
 		return
 	}
 	m.config.ManualSunrise = nil
 	m.config.ManualSunset = nil
+	m.config.ManualDuration = nil
 	m.configMutex.Unlock()
 	m.triggerUpdate()
 }
 
-func (m *Manager) SetGamma(gamma float64) error {
+func durationEqual(a, b *time.Duration) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+	return *a == *b
+}
+
+func (m *Manager) Adjustments() (gamma, contrast float64) {
+	m.configMutex.RLock()
+	defer m.configMutex.RUnlock()
+	return m.config.Gamma, m.config.Contrast
+}
+
+func (m *Manager) SetAdjustments(gamma, contrast float64) error {
 	m.configMutex.Lock()
-	if m.config.Gamma == gamma {
+	if m.config.Gamma == gamma && m.config.Contrast == contrast {
 		m.configMutex.Unlock()
 		return nil
 	}
 	updated := m.config
 	updated.Gamma = gamma
+	updated.Contrast = contrast
 	if err := updated.Validate(); err != nil {
 		m.configMutex.Unlock()
 		return err
 	}
 	m.config = updated
 	m.configMutex.Unlock()
-	m.triggerUpdate()
+	m.syncControls()
 	return nil
 }
 
 func (m *Manager) SetEnabled(enabled bool) {
 	m.configMutex.Lock()
-	wasEnabled := m.config.Enabled
-	if wasEnabled == enabled {
+	if m.config.Enabled == enabled {
 		m.configMutex.Unlock()
 		return
 	}
 	m.config.Enabled = enabled
-	highTemp := m.config.HighTemp
 	m.configMutex.Unlock()
+	m.syncControls()
+}
 
-	switch {
-	case enabled && !m.controlsInitialized:
-		m.post(func() {
-			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
-			m.availOutputsMu.RLock()
-			outs := slices.Clone(m.availableOutputs)
-			m.availOutputsMu.RUnlock()
-			if err := m.setupOutputControls(outs, gammaMgr); err != nil {
-				log.Errorf("gamma: failed to create controls: %v", err)
-				return
-			}
-			m.controlsInitialized = true
+func (m *Manager) needsControls() bool {
+	m.configMutex.RLock()
+	defer m.configMutex.RUnlock()
+	return m.config.Enabled || m.config.Gamma != 1.0 || m.config.Contrast != 1.0
+}
+
+func (m *Manager) syncControls() {
+	m.post(func() {
+		switch {
+		case m.needsControls() && !m.controlsInitialized:
+			m.createControls()
+		case !m.needsControls() && m.controlsInitialized:
+			m.destroyControls()
+		default:
 			m.triggerUpdate()
-		})
-	case enabled && !wasEnabled:
-		m.triggerUpdate()
-	case !enabled && m.controlsInitialized:
-		m.post(func() {
-			m.outputs.Range(func(id uint32, out *outputState) bool {
-				if out.gammaControl != nil {
-					out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
-				}
-				return true
-			})
-			m.outputs.Range(func(key uint32, _ *outputState) bool {
-				m.outputs.Delete(key)
-				return true
-			})
-			m.controlsInitialized = false
-		})
-		_ = highTemp
+		}
+	})
+}
+
+func (m *Manager) createControls() {
+	gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
+	m.availOutputsMu.RLock()
+	outs := slices.Clone(m.availableOutputs)
+	m.availOutputsMu.RUnlock()
+	if err := m.setupOutputControls(outs, gammaMgr); err != nil {
+		log.Errorf("gamma: failed to create controls: %v", err)
+		return
 	}
+	m.controlsInitialized = true
+	m.triggerUpdate()
+}
+
+func (m *Manager) destroyControls() {
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		if out.gammaControl != nil {
+			out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
+		}
+		return true
+	})
+	m.outputs.Range(func(key uint32, _ *outputState) bool {
+		m.outputs.Delete(key)
+		return true
+	})
+	m.controlsInitialized = false
 }
 
 func (m *Manager) Close() {

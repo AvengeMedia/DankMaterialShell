@@ -29,6 +29,7 @@ FocusScope {
     readonly property var unpinnedEntries: ClipboardService.unpinnedEntries
     readonly property int selectedIndex: ClipboardService.selectedIndex
     readonly property bool keyboardNavigationActive: ClipboardService.keyboardNavigationActive
+    readonly property bool clearsFilteredOnly: activeTab === "recents" && ClipboardService.filterActive
 
     readonly property var modalFocusScope: root
     property alias searchField: historyContent.searchField
@@ -107,6 +108,10 @@ FocusScope {
         ClipboardService.copyEntry(entry, () => root.requestClose(false));
     }
 
+    function copyEntryAsText(entry) {
+        ClipboardService.copyEntry(entry, () => root.requestClose(false), true);
+    }
+
     function selectedEntry() {
         const entries = activeTab === "saved" ? pinnedEntries : unpinnedEntries;
         if (!entries || entries.length === 0 || selectedIndex < 0 || selectedIndex >= entries.length)
@@ -134,7 +139,23 @@ FocusScope {
         ClipboardService.clearAll();
     }
 
+    function clearFiltered() {
+        ClipboardService.clearFiltered();
+    }
+
     function confirmClearAll() {
+        if (clearsFilteredOnly) {
+            // The list is filtered, so clear what it shows and leave the modal
+            // open on the filter the user is working through. A filter that
+            // matches nothing must never fall back to clearing everything.
+            if (unpinnedEntries.length === 0) {
+                return;
+            }
+            clearConfirmDialog.show(I18n.tr("Clear History?"), I18n.tr("This will delete the %1 entries matching the current filter. Pinned entries are kept.", "clipboard modal: clear confirmation while a search filter is active, %1 is the number of matching entries").arg(unpinnedEntries.length), function () {
+                clearFiltered();
+            }, function () {});
+            return;
+        }
         const hasPinned = pinnedCount > 0;
         const message = hasPinned ? I18n.tr("This will delete all unpinned entries. %1 pinned entries will be kept.").arg(pinnedCount) : I18n.tr("This will permanently delete all clipboard history.");
         clearConfirmDialog.show(I18n.tr("Clear History?"), message, function () {

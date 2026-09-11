@@ -1,8 +1,10 @@
 package clipboard
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 
 	clipboardstore "github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -19,6 +21,8 @@ func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
 		handleGetEntry(conn, req, m)
 	case "clipboard.deleteEntry":
 		handleDeleteEntry(conn, req, m)
+	case "clipboard.deleteEntries":
+		handleDeleteEntries(conn, req, m)
 	case "clipboard.clearHistory":
 		handleClearHistory(conn, req, m)
 	case "clipboard.copy":
@@ -103,6 +107,71 @@ func handleDeleteEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "entry deleted"})
 }
 
+func handleDeleteEntries(conn *models.Conn, req models.Request, m *Manager) {
+	raw, ok := params.Any(req.Params, "ids")
+	if !ok {
+		models.RespondError(conn, req.ID, "missing 'ids' parameter")
+		return
+	}
+
+	list, ok := raw.([]any)
+	if !ok {
+		models.RespondError(conn, req.ID, "'ids' must be an array")
+		return
+	}
+
+	ids := make([]uint64, 0, len(list))
+	for _, item := range list {
+		id, err := toEntryID(item)
+		if err != nil {
+			models.RespondError(conn, req.ID, err.Error())
+			return
+		}
+		ids = append(ids, id)
+	}
+
+	deleted, err := m.DeleteEntries(ids)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, map[string]int{"deleted": deleted})
+}
+
+// toEntryID accepts the shapes a clipboard entry id can arrive in: JSON decodes
+// numbers as float64, while Go callers and tests pass the integer types
+// directly.
+func toEntryID(value any) (uint64, error) {
+	switch v := value.(type) {
+	case float64:
+		if v < 0 || v != math.Trunc(v) {
+			return 0, fmt.Errorf("invalid entry id: %v", v)
+		}
+		return uint64(v), nil
+	case json.Number:
+		id, err := v.Int64()
+		if err != nil || id < 0 {
+			return 0, fmt.Errorf("invalid entry id: %v", v)
+		}
+		return uint64(id), nil
+	case int:
+		if v < 0 {
+			return 0, fmt.Errorf("invalid entry id: %v", v)
+		}
+		return uint64(v), nil
+	case int64:
+		if v < 0 {
+			return 0, fmt.Errorf("invalid entry id: %v", v)
+		}
+		return uint64(v), nil
+	case uint64:
+		return v, nil
+	default:
+		return 0, fmt.Errorf("invalid entry id: %v", value)
+	}
+}
+
 func handleClearHistory(conn *models.Conn, req models.Request, m *Manager) {
 	m.ClearHistory()
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "history cleared"})
@@ -136,6 +205,8 @@ func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
 		return
 	}
 
+	textOnly := params.BoolOpt(req.Params, "textOnly", false) && entry.AltMimeType != ""
+
 	if entry.AltMimeType == "" {
 		filePath := m.EntryToFile(entry)
 		if filePath != "" {
@@ -151,8 +222,15 @@ func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
 		}
 	}
 
-	if err := m.SetClipboardEntry(entry); err != nil {
-		models.RespondError(conn, req.ID, err.Error())
+	var setErr error
+	switch {
+	case textOnly:
+		setErr = m.SetClipboard(entry.AltData, entry.AltMimeType)
+	default:
+		setErr = m.SetClipboardEntry(entry)
+	}
+	if setErr != nil {
+		models.RespondError(conn, req.ID, setErr.Error())
 		return
 	}
 

@@ -22,6 +22,7 @@ QtObject {
     property string fallbackText: ""
     property string actionLabel: ""
     property bool critical: false
+    property bool important: false
 
     readonly property bool hasAction: actionLabel.length > 0
     readonly property bool wrapperTimeoutHeld: (controller.notificationActive && controller.timeoutSuspended) || controller.notificationHeldForSystem
@@ -42,6 +43,7 @@ QtObject {
         fallbackText = "";
         actionLabel = "";
         critical = false;
+        important = false;
     }
 
     function wrapperTimeout(wrapper) {
@@ -87,6 +89,7 @@ QtObject {
         fallbackIcon = wrapper.fallbackIconName || "material:notifications";
         fallbackText = appName.charAt(0).toUpperCase();
         critical = isCritical;
+        important = !isCritical && wrapper.urgency === NotificationUrgency.Normal && fallbackIcon.startsWith("material:battery");
         const actions = wrapper.actions || [];
         actionLabel = actions.length > 0 ? (actions[0].text || I18n.tr("Open", "island notification face: default action button")) : "";
         controller.notificationTimeout = wrapperTimeout(wrapper);

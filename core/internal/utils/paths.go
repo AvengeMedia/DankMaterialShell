@@ -8,6 +8,12 @@ import (
 	"github.com/AvengeMedia/dankgo/paths"
 )
 
+var app = paths.New("danklinux")
+
+func App() paths.App { return app }
+
+func RuntimeDir() string { return app.SocketDir() }
+
 func XDGStateHome() string { return paths.XDGStateHome() }
 
 func XDGDataHome() string { return paths.XDGDataHome() }

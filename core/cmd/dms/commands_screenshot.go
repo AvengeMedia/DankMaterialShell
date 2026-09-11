@@ -20,6 +20,7 @@ import (
 
 var (
 	ssOutputName  string
+	ssSeat        string
 	ssCursor      string
 	ssFormat      string
 	ssQuality     int
@@ -32,11 +33,16 @@ var (
 	ssReset       bool
 	ssStdout      bool
 	ssJSON        bool
+	ssGeometry    bool
+	ssAllowMulti  bool
+	ssHUD         string
 )
 
 type screenshotMetadata struct {
 	Status string  `json:"status"`
 	Path   string  `json:"path,omitempty"`
+	X      *int    `json:"x,omitempty"`
+	Y      *int    `json:"y,omitempty"`
 	Width  int     `json:"width,omitempty"`
 	Height int     `json:"height,omitempty"`
 	Scale  float64 `json:"scale,omitempty"`
@@ -54,7 +60,7 @@ Modes:
   full        - Capture the focused output
   all         - Capture all outputs combined
   output      - Capture a specific output by name
-  window      - Capture the focused window (Hyprland/Mango/niri)
+  window      - Capture the focused window (Hyprland/Mango/niri/Aqueous)
   last        - Capture the last selected region
   scroll      - Select a region, then scroll to capture a stitched tall image
 
@@ -68,7 +74,7 @@ Examples:
   dms screenshot full                # Full screen of focused output
   dms screenshot all                 # All screens combined
   dms screenshot output -o DP-1      # Specific output
-  dms screenshot window              # Focused window (Hyprland)
+  dms screenshot window              # Focused window
   dms screenshot last                # Last region (pre-selected)
   dms screenshot --reset             # Reset last region pre-selection
   dms screenshot --no-clipboard      # Save file only
@@ -77,6 +83,8 @@ Examples:
   dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85
   dms screenshot --json              # Print capture metadata as JSON
+  dms screenshot --allow-multiple    # Skip the one-selector-at-a-time guard
+  dms screenshot -g                  # Print selected region geometry (X,Y WxH) to stdout
   dms screenshot scroll              # Scroll capture, Enter finishes / Esc cancels
   dms screenshot scroll --interval 250`,
 }
@@ -116,7 +124,7 @@ If no previous region exists, falls back to interactive selection.`,
 var ssWindowCmd = &cobra.Command{
 	Use:   "window",
 	Short: "Capture the focused window",
-	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, and niri.`,
+	Long:  `Capture the currently focused window. Supported on Hyprland, Mango, niri, and Aqueous. Aqueous requires a running DMS shell and crops the output including borders and overlapping windows.`,
 	Run:   runScreenshotWindow,
 }
 
@@ -159,6 +167,7 @@ var notifyActionCmd = &cobra.Command{
 
 func init() {
 	screenshotCmd.PersistentFlags().StringVarP(&ssOutputName, "output", "o", "", "Output name for 'output' mode")
+	screenshotCmd.PersistentFlags().StringVar(&ssSeat, "seat", "", "Seat for Aqueous capture (required with multiple seats)")
 	screenshotCmd.PersistentFlags().StringVar(&ssCursor, "cursor", "off", "Include cursor in screenshot (on/off)")
 	screenshotCmd.PersistentFlags().StringVarP(&ssFormat, "format", "f", "png", "Output format (png, jpg, ppm)")
 	screenshotCmd.PersistentFlags().IntVarP(&ssQuality, "quality", "q", 90, "JPEG quality (1-100)")
@@ -171,6 +180,9 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssReset, "reset", false, "Reset saved last-region preselection before capturing")
 	screenshotCmd.PersistentFlags().BoolVar(&ssStdout, "stdout", false, "Output image to stdout (for piping to swappy, etc.)")
 	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
+	screenshotCmd.PersistentFlags().BoolVarP(&ssGeometry, "geometry", "g", false, "Print selected region geometry (X,Y WxH) to stdout without capturing an image")
+	screenshotCmd.PersistentFlags().BoolVar(&ssAllowMulti, "allow-multiple", false, "Open a selector even when another one is already open")
+	screenshotCmd.PersistentFlags().StringVar(&ssHUD, "hud", "auto", "HUD overlay scale in region selector (auto, off/0, or integer scale 1-4)")
 
 	ssScrollCmd.Flags().IntVar(&ssScrollInterval, "interval", 45, "Capture interval in milliseconds (30-1000)")
 
@@ -190,6 +202,7 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config := screenshot.DefaultConfig()
 	config.Mode = mode
 	config.OutputName = ssOutputName
+	config.Seat = ssSeat
 	if strings.EqualFold(ssCursor, "on") {
 		config.Cursor = screenshot.CursorOn
 	}
@@ -199,6 +212,15 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config.NoConfirm = ssNoConfirm
 	config.Reset = ssReset
 	config.Stdout = ssStdout
+	config.Geometry = ssGeometry
+	config.AllowMultiple = ssAllowMulti
+	config.HUD = ssHUD
+
+	if ssGeometry {
+		config.Clipboard = false
+		config.SaveFile = false
+		config.Notify = false
+	}
 
 	if ssOutputDir != "" {
 		config.OutputDir = ssOutputDir
@@ -279,6 +301,16 @@ func runScreenshot(config screenshot.Config) {
 		fmt.Fprintln(os.Stderr, "Error: --json cannot be combined with --stdout")
 		os.Exit(1)
 	}
+	if config.Geometry {
+		if config.Stdout {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with --stdout")
+			os.Exit(1)
+		}
+		if config.Mode == screenshot.ModeScroll {
+			fmt.Fprintln(os.Stderr, "Error: --geometry cannot be combined with scroll mode")
+			os.Exit(1)
+		}
+	}
 
 	// Short-lived process over a few tens of MB: let the heap grow instead of paying GC cycles mid-capture.
 	debug.SetGCPercent(-1)
@@ -295,13 +327,35 @@ func runScreenshot(config screenshot.Config) {
 		if ssJSON {
 			writeScreenshotJSON(screenshotMetadata{Status: "aborted", Error: "User cancelled selection"})
 		}
+		if config.Geometry {
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 
-	defer result.Buffer.Close()
+	if config.Geometry {
+		if ssJSON {
+			x := int(result.Region.X)
+			y := int(result.Region.Y)
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "success",
+				X:      &x,
+				Y:      &y,
+				Width:  int(result.Region.Width),
+				Height: int(result.Region.Height),
+			})
+		} else {
+			fmt.Println(result.Region.GeometryString())
+		}
+		os.Exit(0)
+	}
 
-	if result.YInverted {
-		result.Buffer.FlipVertical()
+	if result.Buffer != nil {
+		defer result.Buffer.Close()
+
+		if result.YInverted {
+			result.Buffer.FlipVertical()
+		}
 	}
 
 	if config.Stdout {
@@ -377,7 +431,7 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 	switch format {
 	case screenshot.FormatJPEG:
 		mimeType = "image/jpeg"
-		if err := screenshot.EncodeJPEG(&data, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality); err != nil {
+		if err := screenshot.EncodeBufferJPEG(&data, buf, pixelFormat, quality); err != nil {
 			return err
 		}
 	default:
@@ -393,7 +447,7 @@ func copyImageToClipboard(buf *screenshot.ShmBuffer, format screenshot.Format, q
 func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, quality int, pixelFormat uint32, cicp *screenshot.CICP) error {
 	switch format {
 	case screenshot.FormatJPEG:
-		return screenshot.EncodeJPEG(os.Stdout, screenshot.BufferToImageWithFormat(buf, pixelFormat), quality)
+		return screenshot.EncodeBufferJPEG(os.Stdout, buf, pixelFormat, quality)
 	default:
 		return screenshot.EncodeBufferPNG(os.Stdout, buf, pixelFormat, cicp)
 	}

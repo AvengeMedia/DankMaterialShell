@@ -72,8 +72,7 @@ Item {
     readonly property real effectiveBarThickness: {
         if (root.usesConnectedSurfaceChrome)
             return Math.max(0, storedBarThickness);
-        const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4;
-        return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing;
+        return Theme.barThickness(storedBarConfig?.innerPadding ?? 4, dpr) + storedBarSpacing;
     }
 
     readonly property var barBounds: {
@@ -113,30 +112,30 @@ Item {
         active: contentWindow.visible || root.shouldBeVisible
         presented: contentWindow.visible || root.shouldBeVisible
         renewTokenOnRecovery: false
-        isCurrentOwner: function(name) {
+        isCurrentOwner: function (name) {
             return PopoutManager.isCurrentPopout(root.popoutHandle, name);
         }
-        hasOwner: function(_name, ownerId) {
+        hasOwner: function (_name, ownerId) {
             return ConnectedModeState.hasPopoutOwner(ownerId);
         }
-        statePresent: function(name, ownerId) {
+        statePresent: function (name, ownerId) {
             return ConnectedModeState.hasPopoutOwner(ownerId) && ConnectedModeState.hasSurfaceDescriptor(name, "popout", ownerId);
         }
-        claimState: function(_name, state, ownerId) {
+        claimState: function (_name, state, ownerId) {
             return ConnectedModeState.claimPopout(ownerId, state);
         }
-        ensureState: function(_name, state, ownerId) {
+        ensureState: function (_name, state, ownerId) {
             if (!ConnectedModeState.hasPopoutOwner(ownerId))
                 return false;
             return ConnectedModeState.updatePopout(ownerId, state);
         }
-        releaseState: function(_name, ownerId) {
+        releaseState: function (_name, ownerId) {
             return ConnectedModeState.releasePopout(ownerId);
         }
-        updateAnimationState: function(_name, ownerId, animX, animY) {
+        updateAnimationState: function (_name, ownerId, animX, animY) {
             return ConnectedModeState.setPopoutAnim(ownerId, animX, animY);
         }
-        updateBodyState: function(_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
+        updateBodyState: function (_name, ownerId, bodyX, bodyY, bodyW, bodyH) {
             return ConnectedModeState.setPopoutBody(ownerId, bodyX, bodyY, bodyW, bodyH);
         }
         onClaimIdChanged: root._resetPublishedBody()
@@ -267,7 +266,7 @@ Item {
             "phase": phase,
             "visible": visible,
             "presented": presented,
-            "layer": root.triggerUsesOverlayLayer ? "overlay" : "top",
+            "layer": root.effectivePopoutLayer === WlrLayer.Overlay ? "overlay" : "top",
             "barSide": contentContainer.connectedBarSide,
             "bodyRect": bodyRect,
             "animationOffset": animationOffset,
@@ -424,8 +423,8 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: CompositorService.usesConnectedFrameChromeForScreen(root.screen)
-    readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect && !CompositorService.connectedFrameBlockedOnScreen(root.screen)
+    readonly property bool frameOwnsConnectedChrome: effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
+    readonly property bool usesConnectedSurfaceChrome: Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
     onFrameOwnsConnectedChromeChanged: _syncPopoutChromeState()
 
@@ -519,6 +518,21 @@ Item {
         _primeContent = false;
         PopoutManager.popoutChanged();
         closeTimer.restart();
+    }
+
+    function instantClose() {
+        closeTimer.stop();
+        _endMorphTravel();
+        _resetPublishedBody();
+        animationsEnabled = false;
+        isClosing = false;
+        shouldBeVisible = false;
+        _keyboardReady = false;
+        _primeContent = false;
+        contentWindow.visible = false;
+        PopoutManager.hidePopout(popoutHandle);
+        popoutClosed();
+        Qt.callLater(() => animationsEnabled = true);
     }
 
     function toggle() {
@@ -680,37 +694,31 @@ Item {
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
 
-    SpringMotion {
-        id: geometryYSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedY
-    }
-
-    SpringMotion {
-        id: geometryHSpring
-        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
-        reducedMotion: root.animationDuration <= 0
-        positionEpsilon: 0.05
-        velocityEpsilon: 0.05
-        stiffness: root._geometrySpringParams.stiffness
-        damping: root._geometrySpringParams.damping
-        value: root.alignedHeight
-    }
-
-    property real renderedAlignedY: geometryYSpring.value
-    property real renderedAlignedHeight: geometryHSpring.value
+    property real renderedAlignedY: alignedY
+    property real renderedAlignedHeight: alignedHeight
     readonly property bool renderedGeometryGrowing: alignedHeight >= renderedAlignedHeight
     readonly property bool _settlingToOpen: fullHeightSurface && shouldBeVisible && morph.running
 
-    onAlignedYChanged: {
-        geometryYSpring.retarget(root.alignedY)
-        _queueFullSync()
+    // content animates on these curves; springs here drift and overshoot it
+    Behavior on renderedAlignedY {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
     }
+
+    Behavior on renderedAlignedHeight {
+        enabled: root.animationsEnabled && contentWindow.visible && root.shouldBeVisible && !root._settlingToOpen
+        NumberAnimation {
+            duration: Theme.variantDuration(root.animationDuration, root.renderedGeometryGrowing)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.renderedGeometryGrowing ? root.animationEnterCurve : root.animationExitCurve
+        }
+    }
+
+    onAlignedYChanged: _queueFullSync()
 
     // Morph transition coordinates to animate travel between popouts during switch.
     property bool morphTravelEnabled: false
@@ -836,7 +844,6 @@ Item {
     }
 
     onAlignedHeightChanged: {
-        geometryHSpring.retarget(root.alignedHeight)
         _queueFullSync();
         if (!suspendShadowWhileResizing || !shouldBeVisible)
             return;

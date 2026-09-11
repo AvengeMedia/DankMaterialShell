@@ -166,6 +166,26 @@ Item {
                     }
                 }
 
+                SettingsDropdownRow {
+                    tab: "time"
+                    tags: ["calendar", "tasks", "list", "default", "caldav", "todo"]
+                    settingKey: "defaultTaskCalendarId"
+                    visible: CalendarService.isDankActive && _taskLists.length > 0
+                    text: I18n.tr("Default Task List")
+                    description: I18n.tr("Task list used when adding tasks from the dash calendar")
+                    readonly property var _taskLists: (CalendarService.calendars || []).filter(c => c.holdsTasks && !c.readOnly && !c.hidden)
+                    readonly property var _labels: [I18n.tr("Auto")].concat(_taskLists.map(c => c.name))
+                    options: _labels
+                    currentValue: {
+                        const idx = _taskLists.findIndex(c => c.id === SettingsData.defaultTaskCalendarId);
+                        return idx >= 0 ? _labels[idx + 1] : I18n.tr("Auto");
+                    }
+                    onValueChanged: value => {
+                        const idx = _labels.indexOf(value);
+                        SettingsData.set("defaultTaskCalendarId", idx > 0 ? _taskLists[idx - 1].id : "");
+                    }
+                }
+
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -729,42 +749,21 @@ Item {
                         width: parent.width
                         height: 70
 
-                        DankIcon {
+                        DankRefreshButton {
                             id: refreshButton
-                            name: "refresh"
-                            size: Theme.iconSize - 4
-                            color: Theme.onSurface_38
                             anchors.right: parent.right
                             anchors.top: parent.top
-                            smoothTransform: isRefreshing
-
-                            property bool isRefreshing: false
-                            enabled: !isRefreshing
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: parent.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
-                                onClicked: {
-                                    refreshButton.isRefreshing = true;
-                                    WeatherService.forceRefresh();
-                                    refreshTimer.restart();
-                                }
-                                enabled: parent.enabled
+                            iconSize: Theme.iconSize - 4
+                            iconColor: Theme.onSurface_38
+                            busy: refreshTimer.running
+                            onClicked: {
+                                WeatherService.forceRefresh();
+                                refreshTimer.restart();
                             }
 
                             Timer {
                                 id: refreshTimer
                                 interval: 2000
-                                onTriggered: refreshButton.isRefreshing = false
-                            }
-
-                            RotationAnimator on rotation {
-                                running: refreshButton.isRefreshing
-                                from: 0
-                                to: 360
-                                duration: 1000
-                                loops: Animation.Infinite
                             }
                         }
 
@@ -918,302 +917,130 @@ Item {
                     }
 
                     GridLayout {
+                        id: metricsGrid
+
+                        readonly property var metrics: [
+                            {
+                                "key": "feelsLike",
+                                "icon": "device_thermostat",
+                                "label": I18n.tr("Feels Like")
+                            },
+                            {
+                                "key": "humidity",
+                                "icon": "humidity_low",
+                                "label": I18n.tr("Humidity")
+                            },
+                            {
+                                "key": "wind",
+                                "icon": "air",
+                                "label": I18n.tr("Wind")
+                            },
+                            {
+                                "key": "pressure",
+                                "icon": "speed",
+                                "label": I18n.tr("Pressure")
+                            },
+                            {
+                                "key": "rain",
+                                "icon": "rainy",
+                                "label": I18n.tr("Rain Chance")
+                            },
+                            {
+                                "key": "visibility",
+                                "icon": "wb_sunny",
+                                "label": I18n.tr("Visibility")
+                            }
+                        ]
+
+                        function valueFor(key) {
+                            const weather = WeatherService.weather;
+                            switch (key) {
+                            case "feelsLike":
+                                return (SettingsData.useFahrenheit ? (weather.feelsLikeF || weather.tempF) : (weather.feelsLike || weather.temp)) + "°";
+                            case "humidity":
+                                return weather.humidity ? weather.humidity + "%" : "--";
+                            case "wind":
+                                SettingsData.windSpeedUnit;
+                                SettingsData.useFahrenheit;
+                                return WeatherService.formatSpeed(weather.wind) || "--";
+                            case "pressure":
+                                if (!weather.pressure)
+                                    return "--";
+                                return SettingsData.useFahrenheit ? (weather.pressure * 0.02953).toFixed(2) + " inHg" : weather.pressure + " hPa";
+                            case "rain":
+                                return weather.precipitationProbability ? weather.precipitationProbability + "%" : "0%";
+                            default:
+                                return I18n.tr("Good");
+                            }
+                        }
+
                         width: parent.width
-                        height: 95
-                        columns: 6
+                        height: implicitHeight
+                        columns: 3
                         columnSpacing: Theme.spacingS
-                        rowSpacing: 0
+                        rowSpacing: Theme.spacingS
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
+                        Repeater {
+                            model: metricsGrid.metrics
 
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
+                            Rectangle {
+                                id: tile
 
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "device_thermostat"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
+                                required property var modelData
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                implicitHeight: Math.max(95, tileContent.implicitHeight + Theme.spacingS * 2)
+                                radius: Theme.cornerRadius
+                                color: Theme.floatingWindowNestedSurface
+                                border.color: Theme.outlineMedium
+                                border.width: Theme.layerOutlineWidth
 
                                 Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Feels Like")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
+                                    id: tileContent
+                                    anchors.centerIn: parent
+                                    width: parent.width - Theme.spacingXXS * 2
+                                    spacing: Theme.spacingXS
+
+                                    Rectangle {
+                                        width: 32
+                                        height: 32
+                                        radius: 16
+                                        color: Theme.primaryHover
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        text: (SettingsData.useFahrenheit ? (WeatherService.weather.feelsLikeF || WeatherService.weather.tempF) : (WeatherService.weather.feelsLike || WeatherService.weather.temp)) + "°"
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "humidity_low"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
-
-                                Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Humidity")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        text: WeatherService.weather.humidity ? WeatherService.weather.humidity + "%" : "--"
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "air"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
-
-                                Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Wind")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        id: windText
-                                        text: {
-                                            SettingsData.windSpeedUnit;
-                                            SettingsData.useFahrenheit;
-                                            return WeatherService.formatSpeed(WeatherService.weather.wind) || "--";
-                                        }
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: SettingsData.useFahrenheit ? Qt.ArrowCursor : Qt.PointingHandCursor
-                                            enabled: !SettingsData.useFahrenheit
-                                            onClicked: SettingsData.set("windSpeedUnit", SettingsData.windSpeedUnit === "kmh" ? "ms" : "kmh")
+                                        DankIcon {
+                                            anchors.centerIn: parent
+                                            name: tile.modelData.icon
+                                            size: Theme.iconSize - 4
+                                            color: Theme.primary
                                         }
                                     }
-                                }
-                            }
-                        }
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "speed"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
-
-                                Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Pressure")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        text: {
-                                            if (!WeatherService.weather.pressure)
-                                                return "--";
-                                            if (SettingsData.useFahrenheit)
-                                                return (WeatherService.weather.pressure * 0.02953).toFixed(2) + " inHg";
-                                            return WeatherService.weather.pressure + " hPa";
+                                    Column {
+                                        width: parent.width
+                                        spacing: Theme.spacingXXS
+                                        StyledText {
+                                            text: tile.modelData.label
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceTextMedium
+                                            width: parent.width
+                                            horizontalAlignment: Text.AlignHCenter
                                         }
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                            }
-                        }
+                                        StyledText {
+                                            text: metricsGrid.valueFor(tile.modelData.key)
+                                            font.pixelSize: Theme.fontSizeSmall + 1
+                                            color: Theme.surfaceText
+                                            font.weight: Font.Medium
+                                            anchors.horizontalCenter: parent.horizontalCenter
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "rainy"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
-
-                                Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Rain Chance")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        text: WeatherService.weather.precipitationProbability ? WeatherService.weather.precipitationProbability + "%" : "0%"
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    color: Theme.primaryHover
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "wb_sunny"
-                                        size: Theme.iconSize - 4
-                                        color: Theme.primary
-                                    }
-                                }
-
-                                Column {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.spacingXXS
-                                    StyledText {
-                                        text: I18n.tr("Visibility")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    StyledText {
-                                        text: I18n.tr("Good")
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        anchors.horizontalCenter: parent.horizontalCenter
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                enabled: tile.modelData.key === "wind" && !SettingsData.useFahrenheit
+                                                hoverEnabled: enabled
+                                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                                onClicked: SettingsData.set("windSpeedUnit", SettingsData.windSpeedUnit === "kmh" ? "ms" : "kmh")
+                                            }
+                                        }
                                     }
                                 }
                             }

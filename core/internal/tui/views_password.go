@@ -17,39 +17,16 @@ func (m Model) viewAuthMethodChoice() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("Authentication Method")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("Authentication Method"))
+	b.WriteString("\n\n")
+	b.WriteString(m.styles.Normal.Render("Fingerprint authentication is available.\nHow would you like to authenticate?"))
 	b.WriteString("\n\n")
 
-	message := "Fingerprint authentication is available.\nHow would you like to authenticate?"
-	b.WriteString(m.styles.Normal.Render(message))
-	b.WriteString("\n\n")
+	m.renderOptionList(&b, []listOption{{label: "Use Fingerprint"}, {label: "Use Password"}}, m.selectedAuthMethod)
 
-	// Option 0: Fingerprint
-	if m.selectedConfig == 0 {
-		option := m.styles.SelectedOption.Render("▶ Use Fingerprint")
-		b.WriteString(option)
-	} else {
-		option := m.styles.Normal.Render("  Use Fingerprint")
-		b.WriteString(option)
-	}
-	b.WriteString("\n")
-
-	// Option 1: Password
-	if m.selectedConfig == 1 {
-		option := m.styles.SelectedOption.Render("▶ Use Password")
-		b.WriteString(option)
-	} else {
-		option := m.styles.Normal.Render("  Use Password")
-		b.WriteString(option)
-	}
-	b.WriteString("\n\n")
-
-	help := m.styles.Subtle.Render("↑/↓: Navigate, Enter: Select, Esc: Back")
-	b.WriteString(help)
-
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Subtle.Render("↑/↓: Navigate, Enter: Select, Esc: Back"))
 	return b.String()
 }
 
@@ -57,27 +34,20 @@ func (m Model) viewFingerprintAuth() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("Fingerprint Authentication")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("Fingerprint Authentication"))
 	b.WriteString("\n\n")
 
 	if m.fingerprintFailed {
-		errorMsg := m.styles.Error.Render("✗ Fingerprint authentication failed")
-		b.WriteString(errorMsg)
-		b.WriteString("\n")
-		retryMsg := m.styles.Subtle.Render("Returning to authentication menu...")
-		b.WriteString(retryMsg)
-	} else {
-		message := "Please place your finger on the fingerprint reader."
-		b.WriteString(m.styles.Normal.Render(message))
-		b.WriteString("\n\n")
-
-		spinner := m.spinner.View()
-		status := m.styles.Normal.Render("Waiting for fingerprint...")
-		fmt.Fprintf(&b, "%s %s", spinner, status)
+		b.WriteString(m.styles.Error.Render("✗ Fingerprint authentication failed"))
+		b.WriteByte('\n')
+		b.WriteString(m.styles.Subtle.Render("Returning to authentication menu..."))
+		return b.String()
 	}
+
+	b.WriteString(m.styles.Normal.Render("Please place your finger on the fingerprint reader."))
+	b.WriteString("\n\n")
+	fmt.Fprintf(&b, "%s %s", m.spinner.View(), m.styles.Normal.Render("Waiting for fingerprint..."))
 
 	return b.String()
 }
@@ -86,156 +56,102 @@ func (m Model) viewPasswordPrompt() string {
 	var b strings.Builder
 
 	b.WriteString(m.renderBanner())
-	b.WriteString("\n")
-
-	title := m.styles.Title.Render("Password Authentication")
-	b.WriteString(title)
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Title.Render("Password Authentication"))
 	b.WriteString("\n\n")
-
-	message := "Installation requires sudo privileges.\nPlease enter your password to continue:"
-	b.WriteString(m.styles.Normal.Render(message))
+	b.WriteString(m.styles.Normal.Render("Installation requires sudo privileges.\nPlease enter your password to continue:"))
 	b.WriteString("\n\n")
-
-	// Password input
 	b.WriteString(m.passwordInput.View())
-	b.WriteString("\n")
+	b.WriteByte('\n')
 
-	// Show validation status
-	if m.packageProgress.step == "Validating sudo password..." {
-		spinner := m.spinner.View()
-		status := m.styles.Normal.Render(m.packageProgress.step)
-		b.WriteString(spinner + " " + status)
-		b.WriteString("\n")
-	} else if m.packageProgress.error != nil {
-		errorMsg := m.styles.Error.Render("✗ " + m.packageProgress.error.Error() + ". Please try again.")
-		b.WriteString(errorMsg)
-		b.WriteString("\n")
-	} else if m.packageProgress.step == "Password validation failed" {
-		errorMsg := m.styles.Error.Render("✗ Incorrect password. Please try again.")
-		b.WriteString(errorMsg)
-		b.WriteString("\n")
+	switch {
+	case m.authValidating:
+		fmt.Fprintf(&b, "%s %s\n", m.spinner.View(), m.styles.Normal.Render("Validating sudo password..."))
+	case m.authFailed:
+		b.WriteString(m.styles.Error.Render("✗ Incorrect password. Please try again."))
+		b.WriteByte('\n')
 	}
 
-	b.WriteString("\n")
-	help := m.styles.Subtle.Render("Enter: Continue, Esc: Back, Ctrl+C: Cancel")
-	b.WriteString(help)
-
+	b.WriteByte('\n')
+	b.WriteString(m.styles.Subtle.Render("Enter: Continue, Esc: Back, Ctrl+C: Cancel"))
 	return b.String()
 }
 
 func (m Model) updateAuthMethodChoiceState(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.fingerprintFailed = false
 
-	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
-		case "up":
-			if m.selectedConfig > 0 {
-				m.selectedConfig--
-			}
-		case "down":
-			if m.selectedConfig < 1 {
-				m.selectedConfig++
-			}
-		case "enter":
-			if m.selectedConfig == 0 {
-				m.state = StateFingerprintAuth
-				m.isLoading = true
-				return m, tea.Batch(m.spinner.Tick, m.tryFingerprint())
-			} else {
-				m.state = StatePasswordPrompt
-				m.passwordInput.Focus()
-				return m, nil
-			}
-		case "esc":
-			m.state = StateDependencyReview
-			return m, nil
+	keyMsg, ok := msg.(tea.KeyMsg)
+	if !ok {
+		return m, nil
+	}
+
+	switch keyMsg.String() {
+	case "up":
+		m.selectedAuthMethod = moveIndex(m.selectedAuthMethod, -1, 1)
+	case "down":
+		m.selectedAuthMethod = moveIndex(m.selectedAuthMethod, 1, 1)
+	case "enter":
+		if m.selectedAuthMethod == 0 {
+			m.state = StateFingerprintAuth
+			m.isLoading = true
+			return m, tea.Batch(m.spinner.Tick, m.tryFingerprint())
 		}
+		return m.promptForPassword()
+	case "esc":
+		m.state = StateDependencyReview
 	}
 	return m, nil
 }
 
 func (m Model) updateFingerprintAuthState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if validMsg, ok := msg.(passwordValidMsg); ok {
-		if validMsg.valid {
-			m.sudoPassword = ""
-			m.packageProgress = packageInstallProgressMsg{}
-			m.state = StateInstallingPackages
-			m.isLoading = true
-			return m, tea.Batch(m.spinner.Tick, m.installPackages())
-		} else {
-			m.fingerprintFailed = true
-			return m, m.delayThenReturn()
+	switch msg := msg.(type) {
+	case passwordValidMsg:
+		if msg.valid {
+			return m.startInstallation("")
 		}
-	}
+		m.fingerprintFailed = true
+		return m, m.delayThenReturn()
 
-	if _, ok := msg.(delayCompleteMsg); ok {
+	case delayCompleteMsg:
 		m.fingerprintFailed = false
-		m.selectedConfig = 0
+		m.selectedAuthMethod = 0
 		m.state = StateAuthMethodChoice
 		return m, nil
 	}
-
 	return m, m.listenForLogs()
 }
 
 func (m Model) updatePasswordPromptState(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-
 	if validMsg, ok := msg.(passwordValidMsg); ok {
+		m.authValidating = false
 		if validMsg.valid {
-			// Password is valid, proceed with installation
-			m.sudoPassword = validMsg.password
-			m.passwordInput.SetValue("") // Clear password input
-			// Clear any error state
-			m.packageProgress = packageInstallProgressMsg{}
-			m.state = StateInstallingPackages
-			m.isLoading = true
-			return m, tea.Batch(m.spinner.Tick, m.installPackages())
-		} else {
-			// Password is invalid, show error and stay on password prompt
-			m.packageProgress = packageInstallProgressMsg{
-				progress:  0.0,
-				step:      "Password validation failed",
-				error:     fmt.Errorf("incorrect password"),
-				logOutput: "Authentication failed",
-			}
-			m.passwordInput.SetValue("")
-			m.passwordInput.Focus()
-			return m, nil
+			return m.startInstallation(validMsg.password)
 		}
+		m.authFailed = true
+		m.passwordInput.SetValue("")
+		m.passwordInput.Focus()
+		return m, nil
 	}
 
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {
 		switch keyMsg.String() {
 		case "enter":
-			// Don't allow multiple validation attempts while one is in progress
-			if m.packageProgress.step == "Validating sudo password..." {
+			if m.authValidating || m.passwordInput.Value() == "" {
 				return m, nil
 			}
-
-			// Validate password first
-			password := m.passwordInput.Value()
-			if password == "" {
-				return m, nil // Don't proceed with empty password
-			}
-
-			// Clear any previous error and show validation in progress
-			m.packageProgress = packageInstallProgressMsg{
-				progress:   0.01,
-				step:       "Validating sudo password...",
-				isComplete: false,
-				logOutput:  "Testing password with sudo -v",
-			}
-			return m, m.validatePassword(password)
+			m.authValidating = true
+			m.authFailed = false
+			return m, m.validatePassword(m.passwordInput.Value())
 		case "esc":
-			// Go back to dependency review
 			m.passwordInput.SetValue("")
-			m.packageProgress = packageInstallProgressMsg{} // Clear any validation state
+			m.authValidating = false
+			m.authFailed = false
 			m.state = StateDependencyReview
 			return m, nil
 		}
 	}
 
+	var cmd tea.Cmd
 	m.passwordInput, cmd = m.passwordInput.Update(msg)
 	return m, cmd
 }
@@ -244,25 +160,20 @@ func checkFingerprintEnabled() bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	// Check if pam_fprintd.so is in PAM config
-	cmd := exec.CommandContext(ctx, "grep", "-q", "pam_fprintd.so", "/etc/pam.d/system-auth")
-	if err := cmd.Run(); err != nil {
+	pamCheck := exec.CommandContext(ctx, "grep", "-q", "pam_fprintd.so", "/etc/pam.d/system-auth")
+	if err := pamCheck.Run(); err != nil {
 		return false
 	}
 
-	// Check if fprintd-list exists and user has enrolled fingerprints
 	user := os.Getenv("USER")
 	if user == "" {
 		return false
 	}
 
-	listCmd := exec.CommandContext(ctx, "fprintd-list", user)
-	output, err := listCmd.CombinedOutput()
+	output, err := exec.CommandContext(ctx, "fprintd-list", user).CombinedOutput()
 	if err != nil {
 		return false
 	}
-
-	// If output contains "finger:" or similar, fingerprints are enrolled
 	return strings.Contains(string(output), "finger")
 }
 
@@ -273,16 +184,15 @@ func (m Model) delayThenReturn() tea.Cmd {
 	}
 }
 
+// Validates cached credentials without a password by pointing sudo at an
+// askpass script that always fails, so only fingerprint/PAM auth can succeed.
 func (m Model) tryFingerprint() tea.Cmd {
 	return func() tea.Msg {
 		_ = privesc.ClearCache(context.Background())
 
-		tmpDir := os.TempDir()
-		askpassScript := filepath.Join(tmpDir, fmt.Sprintf("danklinux-fp-%d.sh", time.Now().UnixNano()))
-
-		scriptContent := "#!/bin/sh\nexit 1\n"
-		if err := os.WriteFile(askpassScript, []byte(scriptContent), 0o700); err != nil {
-			return passwordValidMsg{password: "", valid: false}
+		askpassScript := filepath.Join(os.TempDir(), fmt.Sprintf("danklinux-fp-%d.sh", time.Now().UnixNano()))
+		if err := os.WriteFile(askpassScript, []byte("#!/bin/sh\nexit 1\n"), 0o700); err != nil {
+			return passwordValidMsg{valid: false}
 		}
 		defer os.Remove(askpassScript)
 
@@ -290,9 +200,9 @@ func (m Model) tryFingerprint() tea.Cmd {
 		defer cancel()
 
 		if err := privesc.ValidateWithAskpass(ctx, askpassScript); err != nil {
-			return passwordValidMsg{password: "", valid: false}
+			return passwordValidMsg{valid: false}
 		}
-		return passwordValidMsg{password: "", valid: true}
+		return passwordValidMsg{valid: true}
 	}
 }
 
@@ -302,7 +212,7 @@ func (m Model) validatePassword(password string) tea.Cmd {
 		defer cancel()
 
 		if err := privesc.ValidatePassword(ctx, password); err != nil {
-			return passwordValidMsg{password: "", valid: false}
+			return passwordValidMsg{valid: false}
 		}
 		return passwordValidMsg{password: password, valid: true}
 	}

@@ -25,6 +25,13 @@ Item {
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
     property alias widgetLayoutLoader: layoutLoader
 
+    function refreshBlur() {
+        blurBarWindow?.refreshBlurRegion?.();
+    }
+
+    onXChanged: refreshBlur()
+    onYChanged: refreshBlur()
+
     implicitHeight: layoutLoader.item ? layoutLoader.item.implicitHeight : 0
     implicitWidth: layoutLoader.item ? layoutLoader.item.implicitWidth : 0
 
@@ -54,6 +61,7 @@ Item {
                     visible: widgetLoader.active && widgetLoader.widgetEnabled
                     width: widgetLoader.item ? widgetLoader.item.width : 0
                     height: widgetLoader.item ? widgetLoader.item.height : 0
+                    onXChanged: root.refreshBlur()
                     WidgetHost {
                         id: widgetLoader
                         anchors.verticalCenter: parent.verticalCenter
@@ -102,6 +110,7 @@ Item {
                     property var itemData: modelData
                     visible: widgetLoader.active && widgetLoader.widgetEnabled
                     height: widgetLoader.item ? widgetLoader.item.height : 0
+                    onYChanged: root.refreshBlur()
                     WidgetHost {
                         id: widgetLoader
                         anchors.horizontalCenter: parent.horizontalCenter

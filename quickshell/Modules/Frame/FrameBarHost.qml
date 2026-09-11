@@ -17,43 +17,19 @@ Item {
 
     readonly property string screenName: targetScreen ? targetScreen.name : ""
 
+    // Vertical edges first so horizontal bars paint over the corners; row 0 touches the screen edge.
     readonly property var barSlots: {
         SettingsData.barConfigs;
         const out = [];
-        const configs = SettingsData.barConfigs || [];
-        for (let i = 0; i < configs.length; i++) {
-            const bc = configs[i];
-            if (!bc.enabled || (bc.useOverlayLayer ?? false))
-                continue;
-            if (!SettingsData.barConfigCoversScreen(bc, host.targetScreen))
-                continue;
-            if (SettingsData.isIslandBarConfig(bc))
-                continue;
-            if (SettingsData.dankIslandOwnsEdge(host.targetScreen, SettingsData.positionToSide(bc.position ?? SettingsData.Position.Top)))
-                continue;
-            let edge = "top";
-            switch (bc.position ?? 0) {
-            case SettingsData.Position.Bottom:
-                edge = "bottom";
-                break;
-            case SettingsData.Position.Left:
-                edge = "left";
-                break;
-            case SettingsData.Position.Right:
-                edge = "right";
-                break;
-            }
-            out.push({
-                "barId": bc.id,
-                "edge": edge
-            });
+        for (const edge of ["left", "right", "top", "bottom"]) {
+            const configs = SettingsData.getFrameHostedBarConfigsForEdge(host.targetScreen, edge);
+            configs.forEach((bc, row) => out.push({
+                    "barId": bc.id,
+                    "edge": edge,
+                    "row": row,
+                    "rowCount": configs.length
+                }));
         }
-        // Horizontal bars own the corners, so render them last (on top) — their edge widget
-        // must receive the corner click over the vertical bar's hover area beneath it.
-        out.sort((a, b) => {
-            const rank = e => (e === "left" || e === "right") ? 0 : 1;
-            return rank(a.edge) - rank(b.edge);
-        });
         return out;
     }
 
@@ -66,34 +42,47 @@ Item {
             required property var modelData
 
             readonly property string edge: modelData.edge
+            readonly property string barId: modelData.barId
             readonly property var dankBarItem: BarWidgetService.dankBarItems[modelData.barId] ?? null
             readonly property var slotBarConfig: dankBarItem?.barConfig ?? SettingsData.getBarConfig(modelData.barId)
-
-            // Each bar spans its full edge (matching the standalone window extent) so
-            // DankBarContent's own adjacency margins inset it, rather than double-insetting
-            // against a pre-carved strip.
-            x: edge === "right" ? host.frameWindow._windowRegionWidth - host.frameWindow.cutoutRightInset : 0
-            y: edge === "bottom" ? host.frameWindow._windowRegionHeight - host.frameWindow.cutoutBottomInset : 0
-            width: {
+            readonly property int edgeInset: {
                 switch (edge) {
                 case "left":
                     return host.frameWindow.cutoutLeftInset;
                 case "right":
                     return host.frameWindow.cutoutRightInset;
-                default:
-                    return host.frameWindow._windowRegionWidth;
-                }
-            }
-            height: {
-                switch (edge) {
-                case "top":
-                    return host.frameWindow.cutoutTopInset;
                 case "bottom":
                     return host.frameWindow.cutoutBottomInset;
                 default:
-                    return host.frameWindow._windowRegionHeight;
+                    return host.frameWindow.cutoutTopInset;
                 }
             }
+            readonly property int rowThickness: Math.floor(edgeInset / Math.max(1, modelData.rowCount))
+            readonly property int rowOffset: modelData.row * rowThickness
+
+            // Slots span the full edge like standalone windows; DankBarContent applies the adjacency insets itself.
+            x: {
+                switch (edge) {
+                case "left":
+                    return rowOffset;
+                case "right":
+                    return host.frameWindow._windowRegionWidth - rowOffset - rowThickness;
+                default:
+                    return 0;
+                }
+            }
+            y: {
+                switch (edge) {
+                case "top":
+                    return rowOffset;
+                case "bottom":
+                    return host.frameWindow._windowRegionHeight - rowOffset - rowThickness;
+                default:
+                    return 0;
+                }
+            }
+            width: (edge === "left" || edge === "right") ? rowThickness : host.frameWindow._windowRegionWidth
+            height: (edge === "top" || edge === "bottom") ? rowThickness : host.frameWindow._windowRegionHeight
 
             Loader {
                 anchors.fill: parent
@@ -108,8 +97,8 @@ Item {
                     centerWidgetsModel: slot.dankBarItem?.centerWidgetsModel ?? null
                     rightWidgetsModel: slot.dankBarItem?.rightWidgetsModel ?? null
 
-                    Component.onCompleted: BarWidgetService.registerFrameBar(host.screenName, this)
-                    Component.onDestruction: BarWidgetService.unregisterFrameBar(host.screenName, this)
+                    Component.onCompleted: BarWidgetService.registerFrameBar(host.screenName, slot.barId, this)
+                    Component.onDestruction: BarWidgetService.unregisterFrameBar(host.screenName, slot.barId, this)
                 }
             }
         }

@@ -29,6 +29,7 @@ func handleMatugenQueue(conn *models.Conn, req models.Request) {
 		TerminalsAlwaysDark: models.GetOr(req, "terminalsAlwaysDark", false),
 		SkipTemplates:       models.GetOr(req, "skipTemplates", ""),
 		Contrast:            models.GetOr(req, "contrast", 0.0),
+		SourceMode:          models.GetOr(req, "sourceMode", ""),
 	}
 
 	wait := models.GetOr(req, "wait", true)
@@ -72,7 +73,8 @@ func handleMatugenQueue(conn *models.Conn, req models.Request) {
 func handleMatugenStatus(conn *models.Conn, req models.Request) {
 	queue := matugen.GetQueue()
 	models.Respond(conn, req.ID, map[string]bool{
-		"running": queue.IsRunning(),
-		"pending": queue.HasPending(),
+		"running":        queue.IsRunning(),
+		"pending":        queue.HasPending(),
+		"smartSupported": matugen.SupportsSmart(),
 	})
 }

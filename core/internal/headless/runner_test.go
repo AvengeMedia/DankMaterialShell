@@ -357,6 +357,8 @@ func TestBuildDisabledItems(t *testing.T) {
 		excludeDeps  []string
 		dankSearch   bool
 		dankCalendar bool
+		dmsGreeter   bool
+		allFeatures  bool
 		deps         []deps.Dependency // nil means use the shared fixture
 		wantErr      bool
 		errContains  string   // substring expected in error message
@@ -442,6 +444,31 @@ func TestBuildDisabledItems(t *testing.T) {
 			wantErr:      true,
 			errContains:  "--dankcalendar",
 		},
+		{
+			name:         "dms-greeter flag enables it",
+			dmsGreeter:   true,
+			wantEnabled:  []string{"dms-greeter"},
+			wantDisabled: []string{"danksearch", "dankcalendar"},
+		},
+		{
+			name:        "dms-greeter flag when unavailable errors",
+			dmsGreeter:  true,
+			deps:        []deps.Dependency{{Name: "niri", Status: deps.StatusInstalled, Required: true}},
+			wantErr:     true,
+			errContains: "--dms-greeter",
+		},
+		{
+			name:        "all-features enables every optional dep",
+			allFeatures: true,
+			wantEnabled: []string{"dms-greeter", "danksearch", "dankcalendar", "niri", "ghostty", "waybar"},
+		},
+		{
+			name:         "all-features with exclude still disables the excluded dep",
+			allFeatures:  true,
+			excludeDeps:  []string{"dankcalendar"},
+			wantEnabled:  []string{"dms-greeter", "danksearch"},
+			wantDisabled: []string{"dankcalendar"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -451,6 +478,8 @@ func TestBuildDisabledItems(t *testing.T) {
 				ExcludeDeps:  tt.excludeDeps,
 				DankSearch:   tt.dankSearch,
 				DankCalendar: tt.dankCalendar,
+				DmsGreeter:   tt.dmsGreeter,
+				AllFeatures:  tt.allFeatures,
 			})
 			d := tt.deps
 			if d == nil {
@@ -489,5 +518,154 @@ func TestBuildDisabledItems(t *testing.T) {
 				t.Errorf("expected empty disabledItems map, got %v", got)
 			}
 		})
+	}
+}
+
+func TestApplyGitVariants(t *testing.T) {
+	freshDeps := func() []deps.Dependency {
+		return []deps.Dependency{
+			{Name: "niri", Status: deps.StatusInstalled, Variant: deps.VariantStable, CanToggle: true},
+			{Name: "quickshell", Status: deps.StatusMissing, Variant: deps.VariantStable, CanToggle: true},
+			{Name: "hyprland", Status: deps.StatusInstalled, Variant: deps.VariantGit, CanToggle: true},
+			{Name: "dms (DankMaterialShell)", Status: deps.StatusMissing, Variant: deps.VariantStable, CanToggle: true},
+			{Name: "ghostty", Status: deps.StatusInstalled, Variant: deps.VariantStable, CanToggle: false},
+		}
+	}
+
+	tests := []struct {
+		name          string
+		gitAll        bool
+		gitDeps       []string
+		noGitVariant  []string // deps whose git and stable packages resolve identically
+		wantErr       bool
+		errContains   string
+		wantGit       []string
+		wantStable    []string
+		wantReinstall []string
+	}{
+		{
+			name:       "no git flags leaves variants untouched",
+			wantGit:    []string{"hyprland"},
+			wantStable: []string{"niri", "quickshell", "dms (DankMaterialShell)", "ghostty"},
+		},
+		{
+			name:          "git-deps flips only the named deps",
+			gitDeps:       []string{"niri", "quickshell"},
+			wantGit:       []string{"niri", "quickshell", "hyprland"},
+			wantStable:    []string{"dms (DankMaterialShell)", "ghostty"},
+			wantReinstall: []string{"niri"},
+		},
+		{
+			name:          "git-deps matches names case-insensitively and accepts the dms alias",
+			gitDeps:       []string{"NIRI", "dms"},
+			wantGit:       []string{"niri", "dms (DankMaterialShell)", "hyprland"},
+			wantStable:    []string{"quickshell", "ghostty"},
+			wantReinstall: []string{"niri"},
+		},
+		{
+			name:       "empty and whitespace entries are skipped",
+			gitDeps:    []string{"", "  "},
+			wantGit:    []string{"hyprland"},
+			wantStable: []string{"niri", "quickshell", "dms (DankMaterialShell)", "ghostty"},
+		},
+		{
+			name:        "unknown dep errors",
+			gitDeps:     []string{"nonexistent"},
+			wantErr:     true,
+			errContains: "--git-deps",
+		},
+		{
+			name:        "dep without git variant errors",
+			gitDeps:     []string{"ghostty"},
+			wantErr:     true,
+			errContains: "does not have a git variant",
+		},
+		{
+			name:          "git flips every toggleable dep",
+			gitAll:        true,
+			wantGit:       []string{"niri", "quickshell", "hyprland", "dms (DankMaterialShell)"},
+			wantStable:    []string{"ghostty"},
+			wantReinstall: []string{"niri"},
+		},
+		{
+			name:         "git-deps errors when the distro has no distinct git package",
+			gitDeps:      []string{"niri"},
+			noGitVariant: []string{"niri"},
+			wantErr:      true,
+			errContains:  "does not have a git variant",
+		},
+		{
+			name:          "git skips deps without a distinct git package",
+			gitAll:        true,
+			noGitVariant:  []string{"niri"},
+			wantGit:       []string{"quickshell", "hyprland", "dms (DankMaterialShell)"},
+			wantStable:    []string{"niri", "ghostty"},
+			wantReinstall: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewRunner(Config{GitAll: tt.gitAll, GitDeps: tt.gitDeps})
+			d := freshDeps()
+
+			hasGitVariant := func(name string) bool {
+				for _, n := range tt.noGitVariant {
+					if n == name {
+						return false
+					}
+				}
+				return true
+			}
+
+			reinstall, err := r.applyGitVariants(d, hasGitVariant)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("applyGitVariants() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
+					t.Errorf("error %q does not contain %q", err.Error(), tt.errContains)
+				}
+				return
+			}
+
+			variants := make(map[string]deps.PackageVariant)
+			for _, dep := range d {
+				variants[dep.Name] = dep.Variant
+			}
+			for _, name := range tt.wantGit {
+				if variants[name] != deps.VariantGit {
+					t.Errorf("expected %q to be VariantGit", name)
+				}
+			}
+			for _, name := range tt.wantStable {
+				if variants[name] != deps.VariantStable {
+					t.Errorf("expected %q to stay VariantStable", name)
+				}
+			}
+
+			if len(reinstall) != len(tt.wantReinstall) {
+				t.Errorf("reinstall = %v, want %v", reinstall, tt.wantReinstall)
+			}
+			for _, name := range tt.wantReinstall {
+				if !reinstall[name] {
+					t.Errorf("expected %q to be marked for reinstall", name)
+				}
+			}
+		})
+	}
+}
+
+func TestApplyPrivescTool(t *testing.T) {
+	if err := NewRunner(Config{}).applyPrivescTool(); err != nil {
+		t.Errorf("empty PrivescTool should be a no-op, got error: %v", err)
+	}
+
+	err := NewRunner(Config{PrivescTool: "pkexec"}).applyPrivescTool()
+	if err == nil {
+		t.Fatal("expected error for unsupported privesc tool, got nil")
+	}
+	if !strings.Contains(err.Error(), "--privesc") {
+		t.Errorf("error %q does not mention --privesc", err.Error())
 	}
 }

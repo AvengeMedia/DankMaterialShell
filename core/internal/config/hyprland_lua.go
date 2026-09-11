@@ -179,8 +179,8 @@ func CleanupStrayHyprlandConfFile(logFn func(format string, v ...any)) {
 		if err != nil {
 			rel = filepath.Base(src)
 		}
-		dst := filepath.Join(configDir, hyprlandBackupDirName, ts, rel)
-		if err := moveHyprlandConfigFile(src, dst); err != nil {
+		dst, err := moveHyprlandConfigFile(src, filepath.Join(configDir, hyprlandBackupDirName, ts, rel))
+		if err != nil {
 			if logFn != nil {
 				logFn("Could not move stray Hyprland conf file %s: %v", src, err)
 			}

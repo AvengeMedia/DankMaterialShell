@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Common
 import qs.Services
 
 Singleton {
@@ -109,7 +110,7 @@ Singleton {
     function applyConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected");
+                callback(false, I18n.tr("Not connected"));
             }
             return;
         }
@@ -122,11 +123,11 @@ Singleton {
         DMSService.sendRequest("wlroutput.applyConfiguration", {
             "heads": heads
         }, response => {
-            const success = !response.error;
+            const success = !response.error && response.result?.success === true;
             const message = response.error || response.result?.message || "";
 
-            if (response.error) {
-                log.warn("applyConfiguration error:", response.error);
+            if (!success) {
+                log.warn("applyConfiguration error:", message);
             } else {
                 log.debug("Configuration applied successfully");
             }
@@ -135,13 +136,13 @@ Singleton {
             if (callback) {
                 callback(success, message);
             }
-        });
+        }, 5000);
     }
 
     function testConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected");
+                callback(false, I18n.tr("Not connected"));
             }
             return;
         }
@@ -151,11 +152,11 @@ Singleton {
         DMSService.sendRequest("wlroutput.testConfiguration", {
             "heads": heads
         }, response => {
-            const success = !response.error;
+            const success = !response.error && response.result?.success === true;
             const message = response.error || response.result?.message || "";
 
-            if (response.error) {
-                log.warn("testConfiguration error:", response.error);
+            if (!success) {
+                log.warn("testConfiguration error:", message);
             } else {
                 log.debug("Configuration test passed");
             }
@@ -163,7 +164,7 @@ Singleton {
             if (callback) {
                 callback(success, message);
             }
-        });
+        }, 5000);
     }
 
     function setOutputEnabled(outputName, enabled, callback) {
@@ -282,9 +283,22 @@ Singleton {
     // NiriService, HyprlandService and MangoService.  Instead of writing a
     // config file, the changes are applied directly via the
     // wlr-output-management protocol.
-    function applyOutputsConfig(outputsData, connectedOutputs) {
-        if (!wlrOutputAvailable)
+    function applyOutputsConfig(outputsData, connectedOutputs, callback) {
+        if (!wlrOutputAvailable) {
+            if (callback)
+                callback(false, I18n.tr("Not connected"));
             return;
+        }
+        const heads = outputsConfigHeads(outputsData, connectedOutputs);
+        if (heads.length === 0) {
+            if (callback)
+                callback(false, I18n.tr("No monitors"));
+            return;
+        }
+        applyConfiguration(heads, callback);
+    }
+
+    function outputsConfigHeads(outputsData, connectedOutputs) {
         const heads = [];
         for (const name in outputsData) {
             if (!connectedOutputs[name])
@@ -319,8 +333,7 @@ Singleton {
             heads.push(head);
         }
 
-        if (heads.length > 0)
-            applyConfiguration(heads);
+        return heads;
     }
 
     function transformFromName(name) {

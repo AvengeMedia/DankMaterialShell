@@ -14,11 +14,12 @@ USER_HOME := $(if $(SUDO_USER),$(shell getent passwd $(SUDO_USER) | cut -d: -f6)
 SYSTEMD_USER_DIR=$(USER_HOME)/.config/systemd/user
 
 SHELL_DIR=quickshell
+QMLTESTRUNNER ?= qmltestrunner
 SHELL_INSTALL_DIR=$(DATA_DIR)/quickshell/dms
 ASSETS_DIR=assets
 APPLICATIONS_DIR=$(DATA_DIR)/applications
 
-.PHONY: all build dev run clean lint-qml install install-bin install-shell install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
+.PHONY: all build dev run clean lint-qml install install-bin install-completions install-systemd install-icon install-desktop uninstall uninstall-bin uninstall-shell uninstall-completions uninstall-systemd uninstall-icon uninstall-desktop help
 
 all: build
 
@@ -41,6 +42,10 @@ clean:
 lint-qml:
 	@./quickshell/scripts/qmllint-entrypoints.sh
 
+.PHONY: test-qml
+test-qml:
+	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -input quickshell/tests -o -,txt
+
 # Pull the latest dank-qml-common and pin it everywhere it is consumed
 # (submodule pointer + nix flake input). Commit both in one change.
 update-common:
@@ -52,14 +57,6 @@ install-bin:
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "Binary installed"
-
-install-shell:
-	@echo "Installing shell files to $(SHELL_INSTALL_DIR)..."
-	@test -e $(SHELL_DIR)/DankCommon/Widgets/DankIcon.qml || { echo "DankCommon missing: run git submodule update --init"; exit 1; }
-	@mkdir -p $(SHELL_INSTALL_DIR)
-	@cp -rL $(SHELL_DIR)/* $(SHELL_INSTALL_DIR)/
-	@rm -rf $(SHELL_INSTALL_DIR)/.git* $(SHELL_INSTALL_DIR)/.github
-	@echo "Shell files installed"
 
 install-completions:
 	@echo "Installing shell completions..."
@@ -98,7 +95,7 @@ install-desktop:
 	@update-desktop-database -q $(APPLICATIONS_DIR) 2>/dev/null || true
 	@echo "Desktop entries installed"
 
-install: install-bin install-shell install-completions install-systemd install-icon install-desktop
+install: install-bin install-completions install-systemd install-icon install-desktop
 	@echo ""
 	@echo "Installation complete!"
 	@echo ""
@@ -111,7 +108,7 @@ uninstall-bin:
 	@echo "Binary removed"
 
 uninstall-shell:
-	@echo "Removing shell files from $(SHELL_INSTALL_DIR)..."
+	@echo "Removing pre-1.6 shell files from $(SHELL_INSTALL_DIR)..."
 	@rm -rf $(SHELL_INSTALL_DIR)
 	@echo "Shell files removed"
 
@@ -155,11 +152,11 @@ help:
 	@echo "  build                - Same as 'all'"
 	@echo "  clean                - Clean build artifacts"
 	@echo "  lint-qml             - Run qmllint on shell entrypoints using the Quickshell tooling VFS"
+	@echo "  test-qml             - Run QML unit tests with Qt 6 qmltestrunner"
 	@echo ""
 	@echo "Install:"
 	@echo "  install              - Build and install everything (requires sudo)"
 	@echo "  install-bin          - Install only the binary"
-	@echo "  install-shell        - Install only shell files"
 	@echo "  install-completions  - Install only shell completions"
 	@echo "  install-systemd      - Install only systemd service"
 	@echo "  install-icon         - Install only icon"
@@ -168,7 +165,7 @@ help:
 	@echo "Uninstall:"
 	@echo "  uninstall            - Remove everything (requires sudo)"
 	@echo "  uninstall-bin        - Remove only the binary"
-	@echo "  uninstall-shell      - Remove only shell files"
+	@echo "  uninstall-shell      - Remove shell files left by pre-1.6 installs"
 	@echo "  uninstall-completions - Remove only shell completions"
 	@echo "  uninstall-systemd    - Remove only systemd service"
 	@echo "  uninstall-icon       - Remove only icon"

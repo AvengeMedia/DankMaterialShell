@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -20,17 +19,41 @@ type AppTheme struct {
 
 func TerminalTheme() AppTheme {
 	return AppTheme{
-		Primary:    "6",  // #625690 - purple
-		Secondary:  "5",  // #36247a - dark purple
-		Accent:     "12", // #7060ac - light purple
-		Text:       "7",  // #2e2e2e - dark gray
-		Subtle:     "8",  // #4a4a4a - medium gray
-		Error:      "1",  // #d83636 - red
-		Warning:    "3",  // #ffff89 - yellow
-		Success:    "2",  // #53e550 - green
-		Background: "15", // #1a1a1a - near black
-		Surface:    "8",  // #4a4a4a - medium gray
+		Primary:    "6",
+		Secondary:  "5",
+		Accent:     "12",
+		Text:       "7",
+		Subtle:     "8",
+		Error:      "1",
+		Warning:    "3",
+		Success:    "2",
+		Background: "15",
+		Surface:    "8",
 	}
+}
+
+type Styles struct {
+	Title           lipgloss.Style
+	Normal          lipgloss.Style
+	Bold            lipgloss.Style
+	Subtle          lipgloss.Style
+	SubtleItalic    lipgloss.Style
+	Warning         lipgloss.Style
+	Error           lipgloss.Style
+	StatusBar       lipgloss.Style
+	Key             lipgloss.Style
+	SpinnerStyle    lipgloss.Style
+	Success         lipgloss.Style
+	HighlightButton lipgloss.Style
+	SelectedOption  lipgloss.Style
+	CodeBlock       lipgloss.Style
+	Accent          lipgloss.Style
+	AccentItalic    lipgloss.Style
+	Highlight       lipgloss.Style
+	Banner          lipgloss.Style
+	TitleBox        lipgloss.Style
+	InfoBox         lipgloss.Style
+	ErrorBox        lipgloss.Style
 }
 
 func NewStyles(theme AppTheme) Styles {
@@ -50,6 +73,10 @@ func NewStyles(theme AppTheme) Styles {
 
 		Subtle: lipgloss.NewStyle().
 			Foreground(lipgloss.Color(theme.Subtle)),
+
+		SubtleItalic: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Subtle)).
+			Italic(true),
 
 		Error: lipgloss.NewStyle().
 			Foreground(lipgloss.Color(theme.Error)),
@@ -88,37 +115,39 @@ func NewStyles(theme AppTheme) Styles {
 			Foreground(lipgloss.Color(theme.Text)).
 			Padding(1, 2).
 			MarginLeft(2),
+
+		Accent: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Accent)),
+
+		AccentItalic: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Accent)).
+			Italic(true),
+
+		Highlight: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Primary)).
+			Bold(true),
+
+		Banner: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(theme.Primary)).
+			Bold(true).
+			MarginBottom(1),
+
+		TitleBox: lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color(theme.Primary)).
+			Padding(0, 2).
+			MarginBottom(1),
+
+		InfoBox: lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color(theme.Subtle)).
+			Padding(0, 1).
+			MarginBottom(1),
+
+		ErrorBox: lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color(theme.Error)).
+			Padding(1, 2).
+			MarginBottom(1),
 	}
-}
-
-type Styles struct {
-	Title           lipgloss.Style
-	Normal          lipgloss.Style
-	Bold            lipgloss.Style
-	Subtle          lipgloss.Style
-	Warning         lipgloss.Style
-	Error           lipgloss.Style
-	StatusBar       lipgloss.Style
-	Key             lipgloss.Style
-	SpinnerStyle    lipgloss.Style
-	Success         lipgloss.Style
-	HighlightButton lipgloss.Style
-	SelectedOption  lipgloss.Style
-	CodeBlock       lipgloss.Style
-}
-
-func (s Styles) NewThemedProgress(width int) progress.Model {
-	theme := TerminalTheme()
-	prog := progress.New(
-		progress.WithGradient(theme.Secondary, theme.Primary),
-	)
-
-	prog.Width = width
-	prog.ShowPercentage = true
-	prog.PercentFormat = "%.0f%%"
-	prog.PercentageStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(theme.Text)).
-		Bold(true)
-
-	return prog
 }

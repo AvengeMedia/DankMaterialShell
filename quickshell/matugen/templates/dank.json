@@ -17,6 +17,7 @@
         "color14": {"dark": "{{dank16.color14.dark.hex}}", "light": "{{dank16.color14.light.hex}}", "default": "{{dank16.color14.default.hex}}"},
         "color15": {"dark": "{{dank16.color15.dark.hex}}", "light": "{{dank16.color15.light.hex}}", "default": "{{dank16.color15.default.hex}}"}
     },
+    "mode": "{{mode}}",
     "colors": {
         "dark": {
             "background": "{{colors.background.dark.hex}}",

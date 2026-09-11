@@ -84,14 +84,17 @@ Item {
     function changeWallpaper(newPath) {
         if (!newPath)
             return;
-        if (newPath === currentWallpaper.source.toString())
-            return;
         if (transitioning) {
             transitionAnimation.stop();
             transitionProgress = 0;
             effectActive = false;
             currentWallpaper.source = nextWallpaper.source;
             nextWallpaper.source = "";
+        }
+        if (newPath === currentWallpaper.source.toString()) {
+            if (nextWallpaper.source.toString() || effectActive)
+                setWallpaperImmediate(newPath);
+            return;
         }
         if (!currentWallpaper.source.toString()) {
             setWallpaperImmediate(newPath);

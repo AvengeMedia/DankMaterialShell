@@ -33,12 +33,12 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/ipc"
-	"github.com/AvengeMedia/dankgo/paths"
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 30
+const APIVersion = 34
 
 var CLIVersion = "dev"
 
@@ -84,8 +84,9 @@ const dbusClientID = "dms-dbus-client"
 var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
 var cupsMu sync.Mutex
 var cupsSubscriberCount int
+var cupsEverAvailable bool
 
-var appPaths = paths.New("danklinux")
+var appPaths = utils.App()
 
 func GetSocketPath() string {
 	return appPaths.SocketPath()
@@ -176,6 +177,7 @@ func InitializeAppPickerManager() error {
 	return nil
 }
 
+// Reports whether the cups capability was newly gained, not whether a manager was created.
 func initializeCupsManagerLocked() (bool, error) {
 	if cupsManager != nil {
 		return false, nil
@@ -187,32 +189,37 @@ func initializeCupsManagerLocked() (bool, error) {
 	}
 	cupsManager = manager
 	log.Info("CUPS manager initialized")
-	return true, nil
+	gained := !cupsEverAvailable
+	cupsEverAvailable = true
+	return gained, nil
 }
 
 func ensureCupsManager() (*cups.Manager, error) {
 	cupsMu.Lock()
-	created, err := initializeCupsManagerLocked()
+	gained, err := initializeCupsManagerLocked()
 	mgr := cupsManager
 	cupsMu.Unlock()
 	if err != nil {
 		return nil, err
 	}
-	if created {
+	if gained {
 		notifyCapabilityChange()
 	}
 	return mgr, nil
 }
 
+// Sticky: the manager is torn down when nobody is subscribed, but CUPS itself stays available.
 func cupsAvailable() bool {
 	cupsMu.Lock()
 	defer cupsMu.Unlock()
-	return cupsManager != nil
+	return cupsEverAvailable
 }
 
 func releaseCupsSubscriber() {
 	cupsMu.Lock()
-	cupsSubscriberCount--
+	if cupsSubscriberCount > 0 {
+		cupsSubscriberCount--
+	}
 	var mgr *cups.Manager
 	if cupsSubscriberCount == 0 && cupsManager != nil {
 		mgr = cupsManager
@@ -224,7 +231,6 @@ func releaseCupsSubscriber() {
 	}
 	log.Info("Last CUPS subscriber disconnected, shutting down CUPS manager")
 	mgr.Close()
-	notifyCapabilityChange()
 }
 
 func InitializeBrightnessManager() error {
@@ -337,6 +343,7 @@ func InitializeTrayRecoveryManager() error {
 	}
 
 	trayRecoveryManager = manager
+	manager.WatchWatcherOwner()
 
 	log.Info("TrayRecovery manager initialized")
 	return nil
@@ -886,13 +893,13 @@ func handleSubscribe(conn *models.Conn, req models.Request) {
 	if shouldSubscribe("cups") {
 		cupsMu.Lock()
 		cupsSubscriberCount++
-		created, err := initializeCupsManagerLocked()
+		gained, err := initializeCupsManagerLocked()
 		mgr := cupsManager
 		cupsMu.Unlock()
 
 		if err != nil {
 			log.Warnf("Failed to initialize CUPS manager for subscription: %v", err)
-		} else if created {
+		} else if gained {
 			notifyCapabilityChange()
 		}
 
@@ -1377,6 +1384,12 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" network.ethernet.connect    - Connect Ethernet")
 		log.Info(" network.ethernet.connect.config - Connect Ethernet to a specific configuration")
 		log.Info(" network.ethernet.disconnect - Disconnect Ethernet")
+		log.Info(" network.cellular.connect    - Connect Cellular")
+		log.Info(" network.cellular.connect.config - Connect Cellular to a specific configuration (params: uuid)")
+		log.Info(" network.cellular.disconnect - Disconnect Cellular (params: device?)")
+		log.Info(" network.cellular.toggle     - Toggle Cellular radio")
+		log.Info(" network.cellular.enable     - Enable Cellular")
+		log.Info(" network.cellular.disable    - Disable Cellular")
 		log.Info(" network.vpn.profiles        - List VPN profiles")
 		log.Info(" network.vpn.active          - List active VPN connections")
 		log.Info(" network.vpn.connect         - Connect VPN (params: uuidOrName|name|uuid, singleActive?)")
@@ -1388,7 +1401,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" network.vpn.getConfig       - Get VPN configuration (params: uuid|name|uuidOrName)")
 		log.Info(" network.vpn.updateConfig    - Update VPN configuration (params: uuid, name?, autoconnect?, data?)")
 		log.Info(" network.vpn.delete          - Delete VPN connection (params: uuid|name|uuidOrName)")
-		log.Info(" network.preference.set      - Set preference (params: preference [auto|wifi|ethernet])")
+		log.Info(" network.preference.set      - Set preference (params: preference [auto|wifi|ethernet|cellular])")
 		log.Info(" network.info                - Get network info (params: ssid)")
 		log.Info(" network.credentials.submit  - Submit credentials for prompt (params: token, secrets, save?)")
 		log.Info(" network.credentials.cancel  - Cancel credential prompt (params: token)")
@@ -1418,8 +1431,8 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" wayland.gamma.getState                - Get current gamma control state")
 		log.Info(" wayland.gamma.setTemperature          - Set temperature range (params: low, high)")
 		log.Info(" wayland.gamma.setLocation             - Set location (params: latitude, longitude)")
-		log.Info(" wayland.gamma.setManualTimes          - Set manual times (params: sunrise, sunset)")
-		log.Info(" wayland.gamma.setGamma                - Set gamma value (params: gamma)")
+		log.Info(" wayland.gamma.setManualTimes          - Set manual times (params: sunrise, sunset, durationMinutes)")
+		log.Info(" wayland.gamma.setGamma                - Set gamma and contrast (params: gamma, contrast)")
 		log.Info(" wayland.gamma.setEnabled              - Enable/disable gamma control (params: enabled)")
 		log.Info(" wayland.gamma.subscribe               - Subscribe to gamma state changes (streaming)")
 		log.Info("Theme automation:")
@@ -1436,6 +1449,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" bluetooth.startDiscovery              - Start device discovery (params: adapter?)")
 		log.Info(" bluetooth.stopDiscovery               - Stop device discovery (params: adapter?)")
 		log.Info(" bluetooth.setPowered                  - Set adapter power state (params: powered, adapter?)")
+		log.Info(" bluetooth.togglePowered               - Toggle adapter power state from its live value (params: adapter?)")
 		log.Info(" bluetooth.pair                        - Pair with device (params: device)")
 		log.Info(" bluetooth.connect                     - Connect to device (params: device)")
 		log.Info(" bluetooth.disconnect                  - Disconnect from device (params: device)")
@@ -1484,6 +1498,7 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info(" clipboard.getHistory                  - Get clipboard history with previews")
 		log.Info(" clipboard.getEntry                    - Get full entry by ID (params: id)")
 		log.Info(" clipboard.deleteEntry                 - Delete entry by ID (params: id)")
+		log.Info(" clipboard.deleteEntries               - Delete entries by ID, skipping pinned ones (params: ids)")
 		log.Info(" clipboard.clearHistory                - Clear all clipboard history")
 		log.Info(" clipboard.copy                        - Copy text to clipboard (params: text)")
 		log.Info(" clipboard.paste                       - Get current clipboard text")

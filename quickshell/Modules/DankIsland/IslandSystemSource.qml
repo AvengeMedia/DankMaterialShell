@@ -27,6 +27,10 @@ QtObject {
     function show(activityKind) {
         if (SessionData.suppressOSD)
             return;
+        open(activityKind);
+    }
+
+    function open(activityKind) {
         if (controller.requestSystemActivity(activityKind))
             kind = activityKind;
     }

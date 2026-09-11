@@ -141,6 +141,7 @@ While the core colors above are required, you can also customize these optional 
   - `scheme-monochrome` - Monochromatic color schemes
   - `scheme-neutral` - Neutral, subdued color schemes
   - `scheme-rainbow` - Rainbow-like color schemes
+  - `scheme-smart` - Automatically picks the variant based on the wallpaper (requires matugen 4.2+)
   - `scheme-tonal-spot` - Tonal spot color schemes (default)
 
 ## Setting Custom Theme

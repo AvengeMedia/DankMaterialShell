@@ -34,8 +34,12 @@ var orderedConfigNames = []string{"niri", "hyprland", "ghostty", "kitty", "alacr
 
 // Config holds all CLI parameters for unattended installation.
 type Config struct {
-	Compositor        string // "niri" or "hyprland"
-	Terminal          string // "ghostty", "kitty", or "alacritty"
+	Compositor        string   // "niri", "hyprland", or "mango"
+	Terminal          string   // "ghostty", "kitty", or "alacritty"
+	PrivescTool       string   // "sudo", "doas", or "run0"; empty means autodetect
+	GitAll            bool     // git variant for every dep that supports it
+	GitDeps           []string // deps to force the git variant of
+	AllFeatures       bool     // enable all optional deps
 	IncludeDeps       []string
 	ExcludeDeps       []string
 	ReplaceConfigs    []string // specific configs to deploy (e.g. "niri", "ghostty")
@@ -43,6 +47,7 @@ type Config struct {
 	Yes               bool
 	DankSearch        bool // install danksearch and enable its user service
 	DankCalendar      bool // install dankcalendar
+	DmsGreeter        bool // install dms-greeter
 }
 
 // Runner orchestrates unattended (headless) installation.
@@ -67,6 +72,10 @@ func (r *Runner) GetLogChan() <-chan string {
 // Run executes the full unattended installation flow.
 func (r *Runner) Run() error {
 	r.log("Starting headless installation")
+
+	if err := r.applyPrivescTool(); err != nil {
+		return err
+	}
 
 	// 1. Parse compositor and terminal selections
 	wm, err := r.parseWindowManager()
@@ -112,14 +121,16 @@ func (r *Runner) Run() error {
 		return fmt.Errorf("dependency detection failed: %w", err)
 	}
 
+	reinstallItems, err := r.applyGitVariants(dependencies, gitVariantChecker(distro, wm, dependencies))
+	if err != nil {
+		return err
+	}
+
 	// 5. Apply include/exclude filters and build the disabled-items map.
-	// Headless mode does not currently collect any explicit reinstall selections,
-	// so keep reinstallItems nil instead of constructing an always-empty map.
 	disabledItems, err := r.buildDisabledItems(dependencies)
 	if err != nil {
 		return err
 	}
-	var reinstallItems map[string]bool
 
 	// Print dependency summary
 	fmt.Fprintln(os.Stdout, "\nDependencies:")
@@ -129,6 +140,9 @@ func (r *Runner) Run() error {
 		if disabledItems[dep.Name] {
 			marker = "  SKIP "
 			status = "(disabled)"
+		} else if reinstallItems[dep.Name] {
+			marker = "  RE   "
+			status = "(will reinstall)"
 		} else {
 			switch dep.Status {
 			case deps.StatusInstalled:
@@ -283,15 +297,96 @@ func (r *Runner) Run() error {
 	return nil
 }
 
+func (r *Runner) applyPrivescTool() error {
+	if r.cfg.PrivescTool == "" {
+		return nil
+	}
+	switch tool := privesc.Tool(strings.ToLower(r.cfg.PrivescTool)); tool {
+	case privesc.ToolSudo, privesc.ToolDoas, privesc.ToolRun0:
+		if err := privesc.SetTool(tool); err != nil {
+			return fmt.Errorf("--privesc: %w", err)
+		}
+		return nil
+	default:
+		return fmt.Errorf("invalid --privesc value %q: must be 'sudo', 'doas', or 'run0'", r.cfg.PrivescTool)
+	}
+}
+
+// CanToggle is not enough: some distros discard the variant (hyprland on Arch maps to stable either way)
+func gitVariantChecker(distro distros.Distribution, wm deps.WindowManager, dependencies []deps.Dependency) func(name string) bool {
+	stable := distro.GetPackageMappingWithVariants(wm, map[string]deps.PackageVariant{})
+	allGit := make(map[string]deps.PackageVariant, len(dependencies))
+	for _, dep := range dependencies {
+		allGit[dep.Name] = deps.VariantGit
+	}
+	git := distro.GetPackageMappingWithVariants(wm, allGit)
+	return func(name string) bool {
+		mapping, ok := git[name]
+		return ok && mapping != stable[name]
+	}
+}
+
+func (r *Runner) applyGitVariants(dependencies []deps.Dependency, hasGitVariant func(name string) bool) (map[string]bool, error) {
+	reinstallItems := make(map[string]bool)
+
+	// InstallPackages skips StatusInstalled deps unless marked for reinstall
+	markGit := func(dep *deps.Dependency) {
+		if dep.Variant == deps.VariantStable && dep.Status == deps.StatusInstalled {
+			reinstallItems[dep.Name] = true
+		}
+		dep.Variant = deps.VariantGit
+	}
+
+	for _, name := range r.cfg.GitDeps {
+		name = strings.ToLower(strings.TrimSpace(name))
+		if name == "" {
+			continue
+		}
+		dep := findDepFold(dependencies, name)
+		if dep == nil {
+			return nil, fmt.Errorf("--git-deps: unknown dependency %q", name)
+		}
+		if !dep.CanToggle || !hasGitVariant(dep.Name) {
+			return nil, fmt.Errorf("--git-deps: %q does not have a git variant on this distribution", dep.Name)
+		}
+		markGit(dep)
+	}
+
+	if !r.cfg.GitAll {
+		return reinstallItems, nil
+	}
+
+	for i := range dependencies {
+		if dependencies[i].CanToggle && hasGitVariant(dependencies[i].Name) {
+			markGit(&dependencies[i])
+		}
+	}
+	return reinstallItems, nil
+}
+
+func findDepFold(dependencies []deps.Dependency, lowerName string) *deps.Dependency {
+	if lowerName == "dms" {
+		lowerName = "dms (dankmaterialshell)"
+	}
+	for i := range dependencies {
+		if strings.ToLower(dependencies[i].Name) == lowerName {
+			return &dependencies[i]
+		}
+	}
+	return nil
+}
+
 // buildDisabledItems computes the set of dependencies that should be skipped
 // during installation. Optional components are opt-in (disabled by default),
-// then re-enabled by the dedicated flags and --include-deps.
+// then re-enabled by --all-features, the dedicated flags, and --include-deps.
 func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]bool, error) {
 	disabledItems := make(map[string]bool)
 
-	for i := range dependencies {
-		if !dependencies[i].Required {
-			disabledItems[dependencies[i].Name] = true
+	if !r.cfg.AllFeatures {
+		for i := range dependencies {
+			if !dependencies[i].Required {
+				disabledItems[dependencies[i].Name] = true
+			}
 		}
 	}
 
@@ -307,6 +402,12 @@ func (r *Runner) buildDisabledItems(dependencies []deps.Dependency) (map[string]
 			return nil, fmt.Errorf("--dankcalendar: not available on this distribution")
 		}
 		delete(disabledItems, "dankcalendar")
+	}
+	if r.cfg.DmsGreeter {
+		if !r.depExists(dependencies, "dms-greeter") {
+			return nil, fmt.Errorf("--dms-greeter: not available on this distribution")
+		}
+		delete(disabledItems, "dms-greeter")
 	}
 
 	// Process --include-deps (enable items that are disabled by default)

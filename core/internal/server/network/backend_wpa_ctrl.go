@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 const (
@@ -26,15 +28,8 @@ type wpaCtrlConn struct {
 	seq      int
 }
 
-func wpaCtrlLocalSocketBase() string {
-	if dir := os.Getenv("XDG_RUNTIME_DIR"); dir != "" {
-		return dir
-	}
-	return os.TempDir()
-}
-
 func newWpaCtrlConn(sockPath string) (*wpaCtrlConn, error) {
-	localDir, err := os.MkdirTemp(wpaCtrlLocalSocketBase(), "dms-wpa-")
+	localDir, err := os.MkdirTemp(utils.RuntimeDir(), "dms-wpa-")
 	if err != nil {
 		return nil, fmt.Errorf("create wpa_ctrl socket dir: %w", err)
 	}

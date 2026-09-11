@@ -74,6 +74,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "mediaWallpaper"
+                    tags: ["wallpaper", "art", "album", "backdrop", "background", "blur"]
+                    text: I18n.tr("Wallpaper")
+                    description: I18n.tr("Blur the album art behind the media player")
+                    checked: SettingsData.mediaWallpaperEnabled
+                    onToggled: checked => SettingsData.set("mediaWallpaperEnabled", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "mediaAlbumArtAccent"
                     tags: ["album", "art", "accent", "colors"]
                     text: I18n.tr("Use album art accent")

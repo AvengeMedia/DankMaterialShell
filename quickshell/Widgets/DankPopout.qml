@@ -137,8 +137,6 @@ Item {
         }
     }
 
-    // Backend re-resolution on toplevel activity is covered by CompositorService.frameBlockedByScreen.
-
     function _usesConnectedBackendForScreen(targetScreen) {
         return CompositorService.usesConnectedFrameChromeForScreen(targetScreen);
     }
@@ -171,11 +169,19 @@ Item {
     }
 
     function close() {
+        _close(false);
+    }
+
+    function instantClose() {
+        _close(true);
+    }
+
+    function _close(instant) {
         _pendingOpen = false;
         _pendingOpenTimer.stop();
         transientSurfaceTracker?.closeAll?.();
         if (impl.item) {
-            impl.item.close();
+            instant ? impl.item.instantClose() : impl.item.close();
             return;
         }
         PopoutManager.hidePopout(root);

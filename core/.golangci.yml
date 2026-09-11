@@ -96,6 +96,11 @@ linters:
       - linters:
           - ineffassign
         path: internal/proto/
+      # Exclude proto pkg SA4006 (generated protocol code has trailing dead offset increments)
+      - linters:
+          - staticcheck
+        text: "SA4006:"
+        path: internal/proto/
       # binary.Write/Read to bytes.Buffer can't fail
       - linters:
           - errcheck

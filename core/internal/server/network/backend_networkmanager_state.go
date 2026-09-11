@@ -1,6 +1,7 @@
 package network
 
 import (
+	"sort"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
@@ -57,10 +58,13 @@ func (b *NetworkManagerBackend) updatePrimaryConnection() error {
 
 	b.stateMutex.Lock()
 	switch connType {
-	case "802-3-ethernet":
+	// Link aggregates carry the default route while the member NIC has no IP (#1581).
+	case "802-3-ethernet", "bridge", "bond", "team", "vlan":
 		b.state.NetworkStatus = StatusEthernet
 	case "802-11-wireless":
 		b.state.NetworkStatus = StatusWiFi
+	case "gsm", "cdma":
+		b.state.NetworkStatus = StatusCellular
 	case "vpn", "wireguard":
 		b.state.NetworkStatus = StatusVPN
 	default:
@@ -100,6 +104,40 @@ func (b *NetworkManagerBackend) updateEthernetState() error {
 	b.state.EthernetDevice = connectedDevice
 	b.state.EthernetConnected = anyConnected
 	b.state.EthernetIP = connectedIP
+	b.stateMutex.Unlock()
+
+	return nil
+}
+
+func (b *NetworkManagerBackend) updateCellularState() error {
+	var connectedDevice string
+	var connectedIP string
+	var anyConnected bool
+
+	for name, info := range b.cellularDevicesSnapshot() {
+		state, err := info.device.GetPropertyState()
+		if err != nil {
+			continue
+		}
+
+		if state == gonetworkmanager.NmDeviceStateActivated {
+			anyConnected = true
+			connectedDevice = name
+			connectedIP = b.getDeviceIP(info.device)
+			break
+		}
+	}
+
+	if !anyConnected && b.cellularDevice != nil {
+		dev := b.cellularDevice.(gonetworkmanager.Device)
+		iface, _ := dev.GetPropertyInterface()
+		connectedDevice = iface
+	}
+
+	b.stateMutex.Lock()
+	b.state.CellularDevice = connectedDevice
+	b.state.CellularConnected = anyConnected
+	b.state.CellularIP = connectedIP
 	b.stateMutex.Unlock()
 
 	return nil
@@ -145,12 +183,57 @@ func (b *NetworkManagerBackend) classifyNMStateReason(reason uint32) string {
 	}
 }
 
-func (b *NetworkManagerBackend) updateWiFiState() error {
-	if b.wifiDevice == nil {
-		return nil
+// NM raises NO_SECRETS once auth retries run out on a saved profile too, not only
+// on a dismissed prompt (nm-device-wifi.c handle_8021x_or_psk_auth_fail, #3313).
+func forgetOnConnectFailure(reasonCode string, preExisting bool) bool {
+	return reasonCode == errdefs.ErrUserCanceled && !preExisting
+}
+
+// With several adapters, state must follow the associated device, not whichever
+// enumerated first (#2460).
+func (b *NetworkManagerBackend) wifiDeviceForState() (gonetworkmanager.Device, gonetworkmanager.DeviceWireless) {
+	var fallbackDev gonetworkmanager.Device
+	if b.wifiDevice != nil {
+		fallbackDev = b.wifiDevice.(gonetworkmanager.Device)
+	}
+	var fallbackWireless gonetworkmanager.DeviceWireless
+	if b.wifiDev != nil {
+		fallbackWireless = b.wifiDev.(gonetworkmanager.DeviceWireless)
 	}
 
-	dev := b.wifiDevice.(gonetworkmanager.Device)
+	snapshot := b.wifiDevicesSnapshot()
+	if len(snapshot) < 2 {
+		return fallbackDev, fallbackWireless
+	}
+
+	apMode := b.activeAPModeWiFiDevicePaths()
+	names := make([]string, 0, len(snapshot))
+	for name := range snapshot {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		info := snapshot[name]
+		if info.device == nil {
+			continue
+		}
+		state, err := info.device.GetPropertyState()
+		if err != nil || state != gonetworkmanager.NmDeviceStateActivated {
+			continue
+		}
+		if apMode[string(info.device.GetPath())] {
+			continue
+		}
+		return info.device, info.wireless
+	}
+	return fallbackDev, fallbackWireless
+}
+
+func (b *NetworkManagerBackend) updateWiFiState() error {
+	dev, wireless := b.wifiDeviceForState()
+	if dev == nil {
+		return nil
+	}
 
 	iface, err := dev.GetPropertyInterface()
 	if err != nil {
@@ -176,9 +259,13 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 	var signal uint8
 
 	if connected {
-		if err := b.ensureWiFiDevice(); err == nil && b.wifiDev != nil {
-			w := b.wifiDev.(gonetworkmanager.DeviceWireless)
-			activeAP, err := w.GetPropertyActiveAccessPoint()
+		if wireless == nil {
+			if err := b.ensureWiFiDevice(); err == nil && b.wifiDev != nil {
+				wireless = b.wifiDev.(gonetworkmanager.DeviceWireless)
+			}
+		}
+		if wireless != nil {
+			activeAP, err := wireless.GetPropertyActiveAccessPoint()
 			if err == nil && activeAP != nil && activeAP.GetPath() != "/" {
 				ssid, _ = activeAP.GetPropertySSID()
 				signal, _ = activeAP.GetPropertyStrength()
@@ -240,7 +327,7 @@ func (b *NetworkManagerBackend) updateWiFiState() error {
 			b.state.ConnectingSSID = ""
 			b.state.LastError = reasonCode
 
-			if reasonCode == errdefs.ErrUserCanceled {
+			if forgetOnConnectFailure(reasonCode, b.state.ConnectingPreExisting) {
 				forgetSSID = connectingSSID
 			}
 

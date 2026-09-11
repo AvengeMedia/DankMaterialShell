@@ -103,6 +103,35 @@ dms ipc call brightness increment 10 ""
 dms ipc call brightness decrement 5 "intel_backlight"
 ```
 
+## Target: `outputs`
+
+### `cycle`
+
+Cycles through connected outputs on Niri in stable name order, leaving one enabled after a successful switch.
+If the next output is disabled, DMS enables it and waits for confirmation before disabling the others.
+If it is already enabled, DMS disables the others immediately.
+
+The command returns immediately with one of these statuses:
+
+- `OUTPUT_CYCLE_ACCEPTED` — DMS started switching outputs; this does not confirm completion.
+- `OUTPUT_CYCLE_BUSY` — DMS is still waiting for the previously selected output to become enabled.
+- `OUTPUT_CYCLE_NOOP` — fewer than two outputs are connected, or DMS could not start switching outputs.
+- `OUTPUT_CYCLE_UNSUPPORTED` — the active compositor is not Niri, its IPC socket is unavailable, or DMS output-state notifications are unavailable.
+
+If the selected output disconnects and no connected output is enabled, DMS re-enables the previous output in the cycle, but only if a cycle command disabled it.
+Outputs that were already off, such as those disabled in display settings, are never enabled by this fallback.
+DMS keeps this cycle order and the list of outputs it disabled in memory until it restarts.
+
+### Niri keybinding example
+
+Add this binding to your Niri configuration:
+
+```kdl
+binds {
+    Super+P { spawn "dms" "ipc" "call" "outputs" "cycle"; }
+}
+```
+
 ## Target: `night`
 
 Night mode (gamma/color temperature) control.
@@ -124,6 +153,18 @@ Night mode (gamma/color temperature) control.
 **`status`**
 - Get current night mode status
 - Returns: Night mode enabled/disabled state
+
+**`gamma [value]`**
+- Get or set the display gamma correction, applied whether or not night mode is enabled
+- Parameters:
+  - `value` - Optional gamma multiplier (0.5-2.0, 1.0 is neutral)
+- Returns: Current or newly set gamma
+
+**`contrast [value]`**
+- Get or set the display contrast, pivoting around mid-gray, applied whether or not night mode is enabled
+- Parameters:
+  - `value` - Optional contrast multiplier (0.5-2.0, 1.0 is neutral)
+- Returns: Current or newly set contrast
 
 **`temperature [value]`**
 - Get or set night mode color temperature
@@ -154,6 +195,8 @@ Night mode (gamma/color temperature) control.
 ### Examples
 ```bash
 dms ipc call night toggle
+dms ipc call night gamma 1.2
+dms ipc call night contrast 1.1
 dms ipc call night temperature 4000
 dms ipc call night automation time
 dms ipc call night schedule 20:00 06:00
@@ -281,17 +324,27 @@ Idle inhibitor control to prevent automatic sleep/lock.
 - Returns: Current inhibit state message
 
 **`enable`**
-- Enable idle inhibit (prevent sleep/lock)
-- Returns: Confirmation message
+- Enable idle inhibit indefinitely (prevent sleep/lock)
+- Returns: Current inhibit state message
+
+**`enableFor <minutes>`**
+- Enable idle inhibit for a number of minutes
+- Returns: Current inhibit state message
 
 **`disable`**
 - Disable idle inhibit (allow sleep/lock)
 - Returns: Confirmation message
 
+**`status`**
+- Report whether idle inhibit is on, and remaining time when a timer is set
+- Returns: Current inhibit state message
+
 ### Examples
 ```bash
 dms ipc call inhibit toggle
 dms ipc call inhibit enable
+dms ipc call inhibit enableFor 60
+dms ipc call inhibit status
 ```
 
 ## Target: `powerprofile`

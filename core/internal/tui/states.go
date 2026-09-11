@@ -18,6 +18,5 @@ const (
 	StateConfigConfirmation
 	StateDeployingConfigs
 	StateInstallComplete
-	StateFinalComplete
 	StateError
 )

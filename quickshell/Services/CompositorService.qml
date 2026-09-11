@@ -21,8 +21,47 @@ Singleton {
     property bool isScroll: false
     property bool isMiracle: false
     property bool isLabwc: false
+    property bool isAqueous: false
     property string compositor: "unknown"
     property bool compositorDetected: false
+    property bool outputPowerAvailable: false
+    readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc
+    onGenericPowerBackendChanged: probeOutputPower()
+
+    function probeOutputPower() {
+        outputPowerAvailable = false;
+        if (!genericPowerBackend)
+            return;
+        const backend = compositor;
+        Proc.runCommand("output-power-probe", [Proc.dmsBin, "dpms", "list"], (output, code) => {
+            if (root.compositor === backend && root.genericPowerBackend)
+                root.outputPowerAvailable = code === 0;
+        }, 0, 5000);
+    }
+
+    function setOutputPower(on) {
+        Proc.runCommand("output-power-action", [Proc.dmsBin, "dpms", on ? "on" : "off"], (output, code) => {
+            if (code !== 0)
+                ToastService.showError(I18n.tr("Error"), I18n.tr("Failed to change display power", "Error shown when changing monitor power fails"));
+        }, 0, 12000);
+    }
+
+    Connections {
+        target: DMSService
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected)
+                root.probeOutputPower();
+            else
+                root.outputPowerAvailable = false;
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            root.probeOutputPower();
+        }
+    }
     readonly property bool frameCompositorLayoutReady: (!isNiri || NiriService.frameLayoutReady) && (!isHyprland || HyprlandService.frameLayoutReady)
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
 
@@ -45,9 +84,19 @@ Singleton {
 
     signal toplevelsChanged
 
-    readonly property bool supportsMinimize: DankCommon.Compositor.supportsMinimize
+    readonly property bool supportsMinimize: isAqueous && AqueousService.available ? AqueousService.capabilities.commands && !AqueousService.locked : DankCommon.Compositor.supportsMinimize
+
+    Connections {
+        target: AqueousService
+        function onStateChanged() {
+            if (root.isAqueous)
+                root.scheduleSort();
+        }
+    }
 
     function canMinimize(toplevel) {
+        if (isAqueous && toplevel?.aqueousWindowId)
+            return AqueousService.available && !AqueousService.locked && AqueousService.capabilities.commands && toplevel.canMinimize;
         return supportsMinimize && toplevel && toplevel.minimized !== undefined;
     }
 
@@ -59,6 +108,10 @@ Singleton {
     function activateToplevel(toplevel) {
         if (!toplevel)
             return;
+        if (isAqueous && toplevel.aqueousWindowId) {
+            toplevel.activate();
+            return;
+        }
         closeNiriOverviewOnWindowFocus();
         if (canMinimize(toplevel) && toplevel.minimized)
             toplevel.minimized = false;
@@ -147,7 +200,9 @@ Singleton {
 
     function getFocusedScreen() {
         let screenName = "";
-        if (isHyprland && Hyprland.focusedWorkspace?.monitor)
+        if (isAqueous && AqueousService.available)
+            screenName = AqueousService.focusedOutput;
+        else if (isHyprland && Hyprland.focusedWorkspace?.monitor)
             screenName = Hyprland.focusedWorkspace.monitor.name;
         else if (isNiri && NiriService.currentOutput)
             screenName = NiriService.currentOutput;
@@ -177,7 +232,6 @@ Singleton {
             // Avoid reassigning (and invalidating bindings) when contents are equivalent.
             if (!_toplevelListEquivalent(next, sortedToplevels))
                 sortedToplevels = next;
-            _recomputeFrameBlocked();
             toplevelsChanged();
         }
     }
@@ -231,10 +285,8 @@ Singleton {
                     if (event.name === "workspace" || event.name === "workspacev2" || event.name === "focusedmon" || event.name === "focusedmonv2" || event.name === "activespecial")
                         Hyprland.refreshMonitors();
                 } catch (e) {}
-                if (event.name === "activespecial") {
+                if (event.name === "activespecial")
                     root.updateHyprlandVisibleSpecialWorkspaces(event);
-                    root._recomputeFrameBlocked();
-                }
                 root.scheduleSort();
             }
         }
@@ -244,10 +296,6 @@ Singleton {
         function onWindowsChanged() {
             root.scheduleSort();
         }
-        // Workspace switches affect the fullscreen check's active workspace.
-        function onAllWorkspacesChanged() {
-            root._recomputeFrameBlocked();
-        }
     }
 
     Component.onCompleted: {
@@ -255,7 +303,6 @@ Singleton {
         detectCompositor();
         updateHyprlandVisibleSpecialWorkspaces(null);
         scheduleSort();
-        _recomputeFrameBlocked();
         Qt.callLater(() => {
             NiriService.generateNiriLayoutConfig();
             HyprlandService.generateLayoutConfig();
@@ -275,6 +322,8 @@ Singleton {
     }
 
     function computeSortedToplevels() {
+        if (isAqueous && AqueousService.available)
+            return AqueousService.toplevels;
         if (!ToplevelManager.toplevels || !ToplevelManager.toplevels.values)
             return [];
 
@@ -525,6 +574,10 @@ Singleton {
     }
 
     function filterCurrentWorkspace(toplevels, screen) {
+        if (isAqueous && AqueousService.available) {
+            const active = AqueousService.workspacesForOutput(_screenName(screen)).filter(w => w.active).map(w => w.id);
+            return toplevels.filter(t => active.includes(t.aqueousWorkspaceId));
+        }
         if (useNiriSorting)
             return NiriService.filterCurrentWorkspace(toplevels, screen);
         if (useMangoSorting)
@@ -532,6 +585,22 @@ Singleton {
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
+    }
+
+    function fullscreenToplevelOnScreen(screenOrName) {
+        const screenName = _screenName(screenOrName);
+        if (isAqueous && AqueousService.available)
+            return AqueousService.windows.some(w => w.output === AqueousService.outputId(screenName) && w.visible && w.fullscreen);
+        if (!screenName || !ToplevelManager.toplevels?.values)
+            return false;
+
+        const toplevels = ToplevelManager.toplevels.values;
+        for (let i = 0; i < toplevels.length; i++) {
+            const toplevel = toplevels[i];
+            if (toplevel?.fullscreen && toplevel.activated && _toplevelOnScreen(toplevel, screenName))
+                return true;
+        }
+        return false;
     }
 
     function filterCurrentDisplay(toplevels, screenName) {
@@ -608,92 +677,9 @@ Singleton {
         }
     }
 
-    function hyprlandSpecialWorkspaceBlocksConnectedFrame(screenOrName) {
-        const screenName = _screenName(screenOrName);
-        if (!isHyprland || !screenName || !Hyprland.toplevels?.values)
-            return false;
-        const visibleSpecialWorkspace = hyprlandVisibleSpecialWorkspaceOnScreen(screenName);
-        if (!visibleSpecialWorkspace)
-            return false;
-
-        try {
-            for (const t of Hyprland.toplevels.values) {
-                const monName = t.monitor?.name ?? t.lastIpcObject?.monitor ?? "";
-                if (monName !== screenName)
-                    continue;
-                const wsName = _normalizeSpecialWorkspaceName(t.workspace?.name ?? t.lastIpcObject?.workspace?.name ?? "");
-                if (!wsName || wsName !== visibleSpecialWorkspace)
-                    continue;
-                if (_hyprlandToplevelMapped(t))
-                    return true;
-            }
-        } catch (e) {
-            log.warn("hyprlandSpecialWorkspaceBlocksConnectedFrame failed:", e);
-        }
-        return false;
-    }
-
-    // Per-screen cache for connectedFrameBlockedOnScreen to avoid recomputing on every consumer binding.
-    property var frameBlockedByScreen: ({})
-
-    function _recomputeFrameBlocked() {
-        const screens = Quickshell.screens || [];
-        const next = {};
-        let changed = false;
-        for (let i = 0; i < screens.length; i++) {
-            const name = screens[i]?.name;
-            if (!name)
-                continue;
-            const blocked = hyprlandSpecialWorkspaceBlocksConnectedFrame(name);
-            next[name] = blocked;
-            if (frameBlockedByScreen[name] !== blocked)
-                changed = true;
-        }
-        if (!changed) {
-            for (const name in frameBlockedByScreen) {
-                if (!(name in next)) {
-                    changed = true;
-                    break;
-                }
-            }
-        }
-        if (changed)
-            frameBlockedByScreen = next;
-    }
-
-    function connectedFrameBlockedOnScreen(screenOrName) {
-        const screenName = _screenName(screenOrName);
-        if (!screenName)
-            return false;
-        const cached = frameBlockedByScreen[screenName];
-        if (cached !== undefined)
-            return cached;
-        return hyprlandSpecialWorkspaceBlocksConnectedFrame(screenName);
-    }
-
-    Connections {
-        target: ToplevelManager
-        function onActiveToplevelChanged() {
-            root._recomputeFrameBlocked();
-        }
-    }
-
-    // Track active toplevel's fullscreen/activated state directly (no per-property signals from ToplevelManager).
-    Connections {
-        target: ToplevelManager.activeToplevel
-        ignoreUnknownSignals: true
-        function onFullscreenChanged() {
-            root._recomputeFrameBlocked();
-        }
-        function onActivatedChanged() {
-            root._recomputeFrameBlocked();
-        }
-    }
-
     Connections {
         target: Quickshell
         function onScreensChanged() {
-            root._recomputeFrameBlocked();
             root.refreshHyprlandMonitorLayout();
         }
     }
@@ -731,18 +717,35 @@ Singleton {
     }
 
     function frameWindowVisibleForScreen(screenOrName) {
-        if (!frameConfiguredForScreen(screenOrName))
-            return false;
-        return !connectedFrameBlockedOnScreen(screenOrName);
+        return frameConfiguredForScreen(screenOrName);
+    }
+
+    function overviewActiveOnScreen(screenOrName) {
+        if (isAqueous && AqueousService.available)
+            return !!AqueousService.sessionState.overview_output && AqueousService.sessionState.overview_output === AqueousService.outputId(_screenName(screenOrName));
+        return isNiri && NiriService.inOverview;
     }
 
     function usesConnectedFrameChromeForScreen(screenOrName) {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameWindowVisibleForScreen(screenOrName);
     }
 
-    // Connected mode renders the bar inside the frame surface. True whenever connected
-    // chrome is configured for the screen, independent of the fullscreen block, so the
-    // standalone bar surface stays suppressed while the frame-hosted bar hides with the frame.
+    function canShareConnectedFrameChromeForScreen(screenOrName) {
+        if (!usesConnectedFrameChromeForScreen(screenOrName))
+            return false;
+        if (!isHyprland)
+            return true;
+
+        const screenName = _screenName(screenOrName);
+        const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
+        const specialWorkspace = monitor?.lastIpcObject?.specialWorkspace?.name;
+        const workspace = specialWorkspace ? Hyprland.workspaces.values.find(w => w.name === specialWorkspace) : monitor?.activeWorkspace;
+        if (!workspace)
+            return true;
+        return !workspace.toplevels.values.some(t => t.lastIpcObject?.fullscreen === 2);
+    }
+
+    // Connected mode renders the bar inside the frame surface.
     function frameHostsSurfacesForScreen(screenOrName) {
         return FrameTransitionState.effectiveConnectedFrameModeActive && frameConfiguredForScreen(screenOrName);
     }
@@ -1011,6 +1014,8 @@ Singleton {
             return "miracle";
         case "labwc":
             return "labwc";
+        case "aqueous":
+            return "aqueous";
         default:
             return "";
         }
@@ -1024,6 +1029,7 @@ Singleton {
         isScroll = name === "scroll";
         isMiracle = name === "miracle";
         isLabwc = name === "labwc";
+        isAqueous = name === "aqueous";
         compositor = name;
         compositorDetected = true;
         if (isNiri)
@@ -1075,7 +1081,14 @@ Singleton {
     // of winning on a stale env var.
     function _envDetectionCandidates() {
         const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "";
+        const aqueousSocket = Quickshell.env("AQUEOUS_SOCKET") || "";
         return [
+            {
+                name: "aqueous",
+                present: !!aqueousSocket,
+                test: ["test", "-S", aqueousSocket],
+                detail: "AQUEOUS_SOCKET " + aqueousSocket
+            },
             {
                 name: "mango",
                 present: !!mangoSignature,
@@ -1157,6 +1170,11 @@ Singleton {
         }
         if (isLabwc) {
             Quickshell.execDetached(["dms", "dpms", "off"]);
+            return;
+        }
+        if (outputPowerAvailable) {
+            setOutputPower(false);
+            return;
         }
         log.warn("Cannot power off monitors, unknown compositor");
     }
@@ -1176,6 +1194,11 @@ Singleton {
         }
         if (isLabwc) {
             Quickshell.execDetached(["dms", "dpms", "on"]);
+            return;
+        }
+        if (outputPowerAvailable) {
+            setOutputPower(true);
+            return;
         }
         log.warn("Cannot power on monitors, unknown compositor");
     }

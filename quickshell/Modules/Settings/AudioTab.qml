@@ -50,12 +50,12 @@ Item {
         };
 
         const outputs = allNodes.filter(node => {
-            return node.audio && node.isSink && !node.isStream;
+            return node.audio && node.isSink && (SettingsData.audioShowStreamDevices || !node.isStream);
         });
         outputDevices = outputs.sort(sortDevices);
 
         const inputs = allNodes.filter(node => {
-            return node.audio && !node.isSink && !node.isStream;
+            return node.audio && !node.isSink && (SettingsData.audioShowStreamDevices || !node.isStream);
         });
 
         const sortInputs = (a, b) => {
@@ -80,6 +80,13 @@ Item {
     Connections {
         target: Pipewire.nodes
         function onValuesChanged() {
+            root.updateDeviceList();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onAudioShowStreamDevicesChanged() {
             root.updateDeviceList();
         }
     }
@@ -132,6 +139,16 @@ Item {
                 Column {
                     width: parent.width
                     spacing: Theme.spacingM
+
+                    SettingsToggleRow {
+                        tab: "audio"
+                        tags: ["audio", "virtual", "stream", "obs", "loopback", "device"]
+                        settingKey: "audioShowStreamDevices"
+                        text: I18n.tr("Show Virtual Devices")
+                        description: I18n.tr("Include application streams and virtual sinks in the device lists")
+                        checked: SettingsData.audioShowStreamDevices
+                        onToggled: checked => SettingsData.set("audioShowStreamDevices", checked)
+                    }
 
                     StyledText {
                         width: parent.width

@@ -10,12 +10,8 @@ Item {
     required property var barContent
     required property var barWindow
     required property var barConfig
-    required property var hLeftSection
-    required property var hCenterSection
-    required property var hRightSection
-    required property var vLeftSection
-    required property var vCenterSection
-    required property var vRightSection
+    property var widgetOwner: null
+    property var sections: []
 
     property var leftWidgetsModel
     property var centerWidgetsModel
@@ -29,9 +25,11 @@ Item {
     property real _lastHoverGlobalY: 0
     property bool _hitTestPending: false
     property bool _barHovered: false
-    property bool _barExitPending: false
     property var _pendingHoverHit: null
     property string _pendingHoverTrigger: ""
+    property var _deferredReopenHit: null
+    property string _deferredReopenTrigger: ""
+    property string _hoverReopenSuppressedTrigger: ""
 
     property bool _candidateCacheValid: false
     property var _candidateCache: []
@@ -44,6 +42,7 @@ Item {
     onLeftWidgetsModelChanged: invalidateCandidateCache()
     onCenterWidgetsModelChanged: invalidateCandidateCache()
     onRightWidgetsModelChanged: invalidateCandidateCache()
+    onSectionsChanged: invalidateCandidateCache()
 
     onHoverPopoutsEnabledChanged: {
         if (hoverPopoutsEnabled)
@@ -54,12 +53,13 @@ Item {
         if (hasOpenHoverSurface() && !isActiveHoverSurfacePinned())
             closeHoverSurfaces();
         activeHoverTrigger = "";
+        _hoverReopenSuppressedTrigger = "";
     }
 
     Component.onDestruction: _disconnectCandidateWatchers()
 
     Connections {
-        target: root.barContent
+        target: root.widgetOwner || root.barContent
 
         function onWidthChanged() {
             root.invalidateCandidateCache();
@@ -75,6 +75,18 @@ Item {
 
         function onScreenChanged() {
             root.invalidateCandidateCache();
+        }
+    }
+
+    Connections {
+        target: PopoutManager
+
+        function onPopoutChanged() {
+            root._reconcileClosedHoverSurface();
+        }
+
+        function onPopoutToggledClosed(screenName) {
+            root._suppressReopenAfterToggleClose(screenName);
         }
     }
 
@@ -119,7 +131,6 @@ Item {
         _lastHoverGlobalX = gx;
         _lastHoverGlobalY = gy;
         _barHovered = true;
-        _barExitPending = false;
         PopoutManager.updateHoverCursor(gx, gy);
         if (hoverPopoutsEnabled)
             _hitTestPending = true;
@@ -128,16 +139,15 @@ Item {
     function updateBarHovered(hovered) {
         _barHovered = hovered;
         if (hovered) {
-            _barExitPending = false;
             _hoverCloseTimer.stop();
             return;
         }
 
         cancelQueuedHitTest();
         _cancelPendingHover();
+        _hoverReopenSuppressedTrigger = "";
         if (!hoverPopoutsEnabled || isActiveHoverSurfacePinned())
             return;
-        _barExitPending = true;
         _hoverCloseTimer.restart();
     }
 
@@ -154,6 +164,7 @@ Item {
         cancelQueuedHitTest();
         _cancelPendingHover();
         _hoverCloseTimer.stop();
+        _hoverReopenSuppressedTrigger = "";
         barContent._pendingPopoutOpenSpec = null;
 
         const activePopout = PopoutManager.getActivePopout(barWindow?.screen);
@@ -213,41 +224,12 @@ Item {
     }
 
     function _getBarSections() {
-        if (barWindow.isVertical) {
-            return [
-                {
-                    section: vLeftSection,
-                    name: "left"
-                },
-                {
-                    section: vCenterSection,
-                    name: "center"
-                },
-                {
-                    section: vRightSection,
-                    name: "right"
-                }
-            ];
-        }
-        return [
-            {
-                section: hLeftSection,
-                name: "left"
-            },
-            {
-                section: hCenterSection,
-                name: "center"
-            },
-            {
-                section: hRightSection,
-                name: "right"
-            }
-        ];
+        return root.sections || [];
     }
 
     // The widget registry is keyed by (widgetId, screenName)
     function _itemBelongsToThisBar(item) {
-        const owner = barContent;
+        const owner = root.widgetOwner || barContent;
         if (!owner || !item)
             return true;
         let node = item;
@@ -293,35 +275,94 @@ Item {
         return wrappers;
     }
 
+    readonly property var _hoverSpecs: ({
+            launcherButton: {
+                loader: "appDrawerLoader",
+                triggerSource: "appDrawer",
+                useVisualItem: true
+            },
+            clipboard: {
+                loader: "clipboardHistoryPopoutLoader",
+                triggerSource: "clipboard",
+                prepare: popout => popout.activeTab = "recents"
+            },
+            clock: {
+                loader: "dankDashPopoutLoader",
+                dashTab: "overview"
+            },
+            music: {
+                loader: "dankDashPopoutLoader",
+                dashTab: "media"
+            },
+            weather: {
+                loader: "dankDashPopoutLoader",
+                dashTab: "weather"
+            },
+            cpuUsage: {
+                loader: "processListPopoutLoader",
+                triggerSource: "cpu"
+            },
+            memUsage: {
+                loader: "processListPopoutLoader",
+                triggerSource: "memory"
+            },
+            cpuTemp: {
+                loader: "processListPopoutLoader",
+                triggerSource: "cpu_temp"
+            },
+            gpuTemp: {
+                loader: "processListPopoutLoader",
+                triggerSource: "gpu_temp"
+            },
+            notificationButton: {
+                loader: "notificationCenterLoader",
+                triggerSource: "notifications",
+                setTriggerScreen: true
+            },
+            battery: {
+                loader: "batteryPopoutLoader",
+                triggerSource: "battery"
+            },
+            layout: {
+                loader: "layoutPopoutLoader",
+                triggerSource: "layout"
+            },
+            vpn: {
+                loader: "vpnPopoutLoader",
+                triggerSource: "vpn"
+            },
+            powerMenuButton: {
+                loader: "powerMenuPopoutLoader",
+                triggerSource: "powerMenu"
+            },
+            colorPicker: {
+                loader: "colorPickerPopoutLoader",
+                triggerSource: "colorPicker"
+            },
+            controlCenterButton: {
+                loader: "controlCenterLoader",
+                triggerSource: "controlCenter",
+                setTriggerScreen: true,
+                afterOpen: loader => {
+                    if (loader.item?.shouldBeVisible && NetworkService.wifiEnabled)
+                        NetworkService.scanWifi();
+                }
+            },
+            systemUpdate: {
+                loader: "systemUpdateLoader",
+                triggerSource: "systemUpdate",
+                useVisualItem: true
+            }
+        })
+
     function _widgetSupportsHoverPopout(widgetId, widgetItem) {
         if (!widgetId || !widgetItem)
             return false;
         if (typeof widgetItem.triggerHoverPopout === "function")
             return true;
-        if (widgetId === "systemTray" && typeof widgetItem.openHoverAtGlobalPoint === "function")
-            return true;
-        switch (widgetId) {
-        case "launcherButton":
-        case "clipboard":
-        case "clock":
-        case "music":
-        case "weather":
-        case "cpuUsage":
-        case "memUsage":
-        case "cpuTemp":
-        case "gpuTemp":
-        case "notificationButton":
-        case "battery":
-        case "layout":
-        case "vpn":
-        case "controlCenterButton":
-        case "systemUpdate":
-        case "notepadButton":
-        case "systemTray":
-            return true;
-        default:
-            return false;
-        }
+        if (widgetId === "systemTray")
+            return typeof widgetItem.openHoverAtGlobalPoint === "function";
+        return widgetId === "notepadButton" || _hoverSpecs[widgetId] !== undefined;
     }
 
     function _enumerateWidgetHosts() {
@@ -416,17 +457,15 @@ Item {
     }
 
     function _globalItemBounds(item) {
-        try {
-            const topLeft = item.mapToItem(null, 0, 0);
-            return {
-                x: topLeft.x,
-                y: topLeft.y,
-                width: item.width,
-                height: item.height
-            };
-        } catch (e) {
+        const topLeft = barContent.mapItemToScreen(item, 0, 0);
+        if (!topLeft)
             return null;
-        }
+        return {
+            x: topLeft.x,
+            y: topLeft.y,
+            width: item.width,
+            height: item.height
+        };
     }
 
     function _hitBoundsForWidget(widgetItem, wrapper) {
@@ -541,8 +580,8 @@ Item {
         return hit;
     }
 
-    function dashTriggerSource(section, tabIndex) {
-        return (barConfig?.id ?? "default") + "-" + section + "-" + tabIndex;
+    function dashTriggerSource(section, tabId) {
+        return (barConfig?.id ?? "default") + "-" + section + "-" + tabId;
     }
 
     function _notepadWidgetForScreen() {
@@ -628,15 +667,67 @@ Item {
         return true;
     }
 
+    function _reconcileClosedHoverSurface() {
+        const hadStaleTrigger = activeHoverTrigger !== "" && !hasOpenHoverSurface();
+        if (hadStaleTrigger)
+            activeHoverTrigger = "";
+        if (_commitDeferredReopen())
+            return;
+        // A cursor resting on the trigger emits no further points; retest so the popout
+        // reopens without needing the cursor to leave and come back.
+        if (hadStaleTrigger && _barHovered && hoverPopoutsEnabled)
+            recheckLatestPoint();
+    }
+
+    function _commitDeferredReopen() {
+        const hit = _deferredReopenHit;
+        const triggerKey = _deferredReopenTrigger;
+        if (!hit)
+            return false;
+        _deferredReopenHit = null;
+        _deferredReopenTrigger = "";
+        if (!_barHovered || !hoverPopoutsEnabled || isActiveHoverSurfacePinned() || hasOpenHoverSurface())
+            return true;
+        const gx = _lastHoverGlobalX;
+        const gy = _lastHoverGlobalY;
+        const liveHit = findWidgetAtGlobalPoint(gx, gy);
+        if (!liveHit || _triggerKeyForHit(liveHit, gx, gy) !== triggerKey)
+            return true;
+        liveHit.globalX = gx;
+        liveHit.globalY = gy;
+        if (openHoverPopoutForHit(liveHit))
+            activeHoverTrigger = triggerKey;
+        return true;
+    }
+
+    function _suppressReopenAfterToggleClose(screenName) {
+        if (screenName !== barWindow?.screen?.name)
+            return;
+        activeHoverTrigger = "";
+        if (!hoverPopoutsEnabled)
+            return;
+        _cancelPendingHover();
+        const gx = PopoutManager.hoverCursorGlobalX;
+        const gy = PopoutManager.hoverCursorGlobalY;
+        const hit = findWidgetAtGlobalPoint(gx, gy);
+        _hoverReopenSuppressedTrigger = hit ? _triggerKeyForHit(hit, gx, gy) : "";
+    }
+
     function _syncHoverTriggerState() {
         if (activeHoverTrigger === "notepadButton") {
             const instance = _notepadWidgetForScreen()?.notepadInstance;
-            if (!instance?.isVisible)
+            if (!instance?.isVisible) {
+                _hoverReopenSuppressedTrigger = activeHoverTrigger;
                 activeHoverTrigger = "";
+            }
             return;
         }
-        if (activeHoverTrigger !== "" && !hasOpenHoverSurface())
+        if (activeHoverTrigger !== "" && !hasOpenHoverSurface()) {
+            // Tray menus close outside PopoutManager; popout closures reconcile via
+            // onPopoutChanged and must not leave a suppression that eats the next hover.
+            _hoverReopenSuppressedTrigger = activeHoverTrigger.startsWith("tray-") ? activeHoverTrigger : "";
             activeHoverTrigger = "";
+        }
     }
 
     function hasOpenHoverSurface() {
@@ -661,148 +752,56 @@ Item {
     }
 
     function _loaderForWidgetId(widgetId) {
-        switch (widgetId) {
-        case "launcherButton":
-            return PopoutService.appDrawerLoader;
-        case "clipboard":
-            return PopoutService.clipboardHistoryPopoutLoader;
-        case "clock":
-        case "music":
-        case "weather":
-            return PopoutService.dankDashPopoutLoader;
-        case "cpuUsage":
-        case "memUsage":
-        case "cpuTemp":
-        case "gpuTemp":
-            return PopoutService.processListPopoutLoader;
-        case "notificationButton":
-            return PopoutService.notificationCenterLoader;
-        case "battery":
-            return PopoutService.batteryPopoutLoader;
-        case "layout":
-            return PopoutService.layoutPopoutLoader;
-        case "vpn":
-            return PopoutService.vpnPopoutLoader;
-        case "controlCenterButton":
-            return PopoutService.controlCenterLoader;
-        case "systemUpdate":
-            return PopoutService.systemUpdateLoader;
-        default:
-            return null;
-        }
+        const loaderName = _hoverSpecs[widgetId]?.loader;
+        return loaderName ? PopoutService[loaderName] : null;
     }
 
     function openHoverPopoutForHit(hit) {
         if (!hit?.widgetItem)
             return false;
 
-        const widgetId = hit.widgetId;
         const widgetItem = hit.widgetItem;
-        const section = hit.section;
-        const base = {
-            widgetItem,
-            section,
-            mode: "hover"
-        };
-
-        if (widgetId === "systemTray") {
+        if (hit.widgetId === "systemTray") {
             if (typeof widgetItem.openHoverAtGlobalPoint !== "function")
                 return false;
             return !!widgetItem.openHoverAtGlobalPoint(hit.globalX, hit.globalY);
         }
-
         if (typeof widgetItem.triggerHoverPopout === "function") {
             widgetItem.triggerHoverPopout(hit.widgetId);
             return true;
         }
-
-        const loader = _loaderForWidgetId(widgetId);
-        switch (widgetId) {
-        case "launcherButton":
-            return barContent.openWidgetPopout(Object.assign({}, base, {
-                loader,
-                triggerSource: "appDrawer",
-                visualItem: widgetItem
-            }));
-        case "clipboard":
-            return barContent.openWidgetPopout(Object.assign({}, base, {
-                loader,
-                triggerSource: "clipboard",
-                prepare: popout => {
-                    popout.activeTab = "recents";
-                }
-            }));
-        case "clock":
-        case "music":
-        case "weather":
-            {
-                const tabId = widgetId === "clock" ? "overview" : (widgetId === "music" ? "media" : "weather");
-                return barContent.openWidgetPopout(Object.assign({}, base, {
-                    loader,
-                    triggerSource: dashTriggerSource(section, tabId),
-                    prepare: popout => popout.requestTab(tabId),
-                    useCenterSection: true,
-                    setTriggerScreen: true
-                }));
-            }
-        case "cpuUsage":
-        case "memUsage":
-        case "cpuTemp":
-        case "gpuTemp":
-            {
-                const triggerSources = {
-                    cpuUsage: "cpu",
-                    memUsage: "memory",
-                    cpuTemp: "cpu_temp",
-                    gpuTemp: "gpu_temp"
-                };
-                return barContent.openWidgetPopout(Object.assign({}, base, {
-                    loader,
-                    triggerSource: triggerSources[widgetId]
-                }));
-            }
-        case "notificationButton":
-            return barContent.openWidgetPopout(Object.assign({}, base, {
-                loader,
-                triggerSource: "notifications",
-                setTriggerScreen: true
-            }));
-        case "battery":
-        case "layout":
-        case "vpn":
-            {
-                const triggerSources = {
-                    battery: "battery",
-                    layout: "layout",
-                    vpn: "vpn"
-                };
-                return barContent.openWidgetPopout(Object.assign({}, base, {
-                    loader,
-                    triggerSource: triggerSources[widgetId]
-                }));
-            }
-        case "controlCenterButton":
-            if (barContent.openWidgetPopout(Object.assign({}, base, {
-                loader,
-                triggerSource: "controlCenter",
-                setTriggerScreen: true
-            }))) {
-                if (loader.item?.shouldBeVisible && NetworkService.wifiEnabled)
-                    NetworkService.scanWifi();
-                return true;
-            }
-            return false;
-        case "systemUpdate":
-            return barContent.openWidgetPopout(Object.assign({}, base, {
-                loader,
-                triggerSource: "systemUpdate",
-                visualItem: widgetItem
-            }));
-        case "notepadButton":
+        if (hit.widgetId === "notepadButton")
             return openNotepadHover(widgetItem);
-        default:
+
+        const spec = _hoverSpecs[hit.widgetId];
+        if (!spec)
             return false;
+
+        const loader = PopoutService[spec.loader];
+        const request = {
+            widgetItem,
+            section: hit.section,
+            mode: "hover",
+            loader,
+            triggerSource: spec.dashTab ? dashTriggerSource(hit.section, spec.dashTab) : spec.triggerSource
+        };
+        if (spec.dashTab) {
+            request.prepare = popout => popout.requestTab(spec.dashTab);
+            request.useCenterSection = true;
+            request.setTriggerScreen = true;
         }
+        if (spec.prepare)
+            request.prepare = spec.prepare;
+        if (spec.setTriggerScreen)
+            request.setTriggerScreen = true;
+        if (spec.useVisualItem)
+            request.visualItem = widgetItem;
+
+        if (!barContent.openWidgetPopout(request))
+            return false;
+        if (spec.afterOpen)
+            spec.afterOpen(loader);
+        return true;
     }
 
     function checkHoverPopout(gx, gy) {
@@ -819,6 +818,7 @@ Item {
 
         const hit = findWidgetAtGlobalPoint(gx, gy);
         if (!hit) {
+            _hoverReopenSuppressedTrigger = "";
             _cancelPendingHover();
             scheduleHoverClose(gx, gy);
             return;
@@ -827,21 +827,21 @@ Item {
         hit.globalX = gx;
         hit.globalY = gy;
 
-        let triggerKey = hit.widgetId;
-        if (hit.widgetId === "systemTray")
-            triggerKey = hit.widgetItem.hoverTriggerAtGlobalPoint?.(gx, gy) || "";
-        else if (hit.widgetId === "clock")
-            triggerKey = dashTriggerSource(hit.section, 0);
-        else if (hit.widgetId === "music")
-            triggerKey = dashTriggerSource(hit.section, 1);
-        else if (hit.widgetId === "weather")
-            triggerKey = dashTriggerSource(hit.section, 3);
+        const triggerKey = _triggerKeyForHit(hit, gx, gy);
 
         if (!triggerKey) {
             _cancelPendingHover();
             scheduleHoverClose(gx, gy);
             return;
         }
+
+        if (_hoverReopenSuppressedTrigger === triggerKey) {
+            _cancelPendingHover();
+            _hoverCloseTimer.stop();
+            return;
+        }
+        if (_hoverReopenSuppressedTrigger !== "")
+            _hoverReopenSuppressedTrigger = "";
 
         _hoverCloseTimer.stop();
 
@@ -864,6 +864,8 @@ Item {
         _hoverIntentTimer.stop();
         _pendingHoverHit = null;
         _pendingHoverTrigger = "";
+        _deferredReopenHit = null;
+        _deferredReopenTrigger = "";
     }
 
     function _hitTargetsActivePopout(hit) {
@@ -891,6 +893,15 @@ Item {
         const activePopout = PopoutManager.getActivePopout(barWindow?.screen);
         const targetLoader = _loaderForWidgetId(hit.widgetId);
         const targetPopout = barContent._resolvePopoutFromLoader(targetLoader);
+
+        // requestHoverPopout is ignored while the target's close animation runs;
+        // hold the hit and reopen the moment hidePopout lands.
+        if (targetPopout && targetPopout === activePopout && targetPopout.isClosing) {
+            _deferredReopenHit = hit;
+            _deferredReopenTrigger = triggerKey;
+            return;
+        }
+
         const managerOwnsTransition = !!(activePopout && targetPopout);
 
         if (triggerKey !== activeHoverTrigger && activeHoverTrigger !== "" && !_hitTargetsActivePopout(hit)) {
@@ -912,14 +923,31 @@ Item {
     function scheduleHoverClose(gx, gy) {
         cancelQueuedHitTest();
         _cancelPendingHover();
-        _barExitPending = false;
         if (!hoverPopoutsEnabled)
+            return;
+        if (!hasOpenHoverSurface())
             return;
         if (isActiveHoverSurfacePinned())
             return;
-        if (cursorOverHoverChain(gx, gy))
+        if (cursorOverHoverChain(gx, gy, barWindow?.hostWindow ?? null))
             return;
         _hoverCloseTimer.restart();
+    }
+
+    function _triggerKeyForHit(hit, gx, gy) {
+        if (hit.widgetId === "systemTray")
+            return hit.widgetItem.hoverTriggerAtGlobalPoint?.(gx, gy) || "";
+        const dashTab = _hoverSpecs[hit.widgetId]?.dashTab;
+        return dashTab ? dashTriggerSource(hit.section, dashTab) : hit.widgetId;
+    }
+
+    function _cursorRestsOnActiveTrigger(gx, gy) {
+        if (activeHoverTrigger === "")
+            return false;
+        const hit = findWidgetAtGlobalPoint(gx, gy);
+        if (!hit)
+            return false;
+        return _triggerKeyForHit(hit, gx, gy) === activeHoverTrigger;
     }
 
     function _commitHoverClose() {
@@ -927,13 +955,12 @@ Item {
         const gy = PopoutManager.hoverCursorGlobalY;
         if (isActiveHoverSurfacePinned())
             return;
-        if (_barHovered)
+        // A popout surface mapping can pull pointer focus off the bar on Hyprland; a leave
+        // with the cursor still resting on the trigger widget is not a real exit (#3248).
+        if (_cursorRestsOnActiveTrigger(gx, gy))
             return;
-        const excludedBar = _barExitPending ? barWindow : null;
-        const staleOverExitedBar = excludedBar?.containsGlobalPoint?.(gx, gy, 0) ?? false;
-        if (!staleOverExitedBar && cursorOverHoverChain(gx, gy, excludedBar))
+        if (cursorOverHoverChain(gx, gy, barWindow?.hostWindow ?? null))
             return;
-        _barExitPending = false;
         closeHoverSurfaces();
     }
 }

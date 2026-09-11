@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"path/filepath"
 	"time"
 	"unicode/utf16"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 const (
@@ -148,9 +149,5 @@ func readQString(r io.Reader) (string, error) {
 
 // SocketPathForPID returns the instance IPC socket used by qs --pid.
 func SocketPathForPID(pid int) string {
-	runtimeDir := os.Getenv("XDG_RUNTIME_DIR")
-	if runtimeDir == "" {
-		runtimeDir = fmt.Sprintf("/run/user/%d", os.Getuid())
-	}
-	return filepath.Join(runtimeDir, "quickshell", "by-pid", fmt.Sprint(pid), "ipc.sock")
+	return filepath.Join(utils.RuntimeDir(), "quickshell", "by-pid", fmt.Sprint(pid), "ipc.sock")
 }

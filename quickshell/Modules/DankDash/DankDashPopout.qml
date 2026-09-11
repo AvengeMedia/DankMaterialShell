@@ -144,24 +144,6 @@ DankPopout {
             onCloseRequested: root.__hideDropdowns()
             onPanelEntered: root.__stopCloseTimer()
             onPanelExited: root.__startCloseTimer()
-            onVolumeChanged: volume => {
-                const player = root.__dropdownPlayer;
-                const isChrome = player?.identity?.toLowerCase().includes("chrome") || player?.identity?.toLowerCase().includes("chromium");
-                const usePlayerVolume = player && player.volumeSupported && !isChrome;
-                if (usePlayerVolume) {
-                    player.volume = volume;
-                } else if (AudioService.sink?.audio) {
-                    AudioService.sink.audio.volume = volume;
-                }
-            }
-            onPlayerSelected: player => {
-                const currentPlayer = MprisController.activePlayer;
-                if (currentPlayer && currentPlayer !== player && currentPlayer.canPause) {
-                    currentPlayer.pause();
-                }
-                MprisController.setActivePlayer(player);
-                root.__hideDropdowns();
-            }
         }
     }
 

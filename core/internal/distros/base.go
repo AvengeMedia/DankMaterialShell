@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
@@ -616,24 +617,8 @@ func (b *BaseDistribution) WriteWindowManagerConfig(wm deps.WindowManager) error
 }
 
 func (b *BaseDistribution) WriteHyprlandSessionTarget() error {
-	homeDir, err := os.UserHomeDir()
+	targetPath, err := config.EnsureHyprlandSessionTarget()
 	if err != nil {
-		return fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	targetDir := filepath.Join(homeDir, ".config", "systemd", "user")
-	if err := os.MkdirAll(targetDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create systemd user directory: %w", err)
-	}
-
-	targetPath := filepath.Join(targetDir, "hyprland-session.target")
-	content := `[Unit]
-Description=Hyprland Session Target
-Requires=graphical-session.target
-After=graphical-session.target
-`
-
-	if err := os.WriteFile(targetPath, []byte(content), 0o644); err != nil {
 		return fmt.Errorf("failed to write hyprland-session.target: %w", err)
 	}
 

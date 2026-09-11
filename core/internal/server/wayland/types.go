@@ -32,6 +32,7 @@ type Config struct {
 	ManualSunset      *time.Time
 	ManualDuration    *time.Duration
 	Gamma             float64
+	Contrast          float64
 	Enabled           bool
 	ElevationTwilight float64
 	ElevationDaylight float64
@@ -116,6 +117,7 @@ type outputState struct {
 	lastFailTime time.Time
 	lastTemp     int
 	lastGamma    float64
+	lastContrast float64
 }
 
 func DefaultConfig() Config {
@@ -124,6 +126,7 @@ func DefaultConfig() Config {
 		LowTemp:           4000,
 		HighTemp:          6500,
 		Gamma:             1.0,
+		Contrast:          1.0,
 		Enabled:           false,
 		ElevationTwilight: -6.0,
 		ElevationDaylight: 3.0,
@@ -143,6 +146,9 @@ func (c *Config) Validate() error {
 	if c.Gamma <= 0 || c.Gamma > 10 {
 		return errdefs.ErrInvalidGamma
 	}
+	if c.Contrast < 0.5 || c.Contrast > 2 {
+		return errdefs.ErrInvalidContrast
+	}
 	if c.Latitude != nil && (math.Abs(*c.Latitude) > 90) {
 		return errdefs.ErrInvalidLocation
 	}
@@ -154,6 +160,9 @@ func (c *Config) Validate() error {
 	}
 	if (c.ManualSunrise != nil) != (c.ManualSunset != nil) {
 		return errdefs.ErrInvalidManualTimes
+	}
+	if c.ManualDuration != nil && (*c.ManualDuration < 0 || *c.ManualDuration > 6*time.Hour) {
+		return errdefs.ErrInvalidDuration
 	}
 	return nil
 }
@@ -206,6 +215,9 @@ func stateChanged(old, new *State) bool {
 		return true
 	}
 	if old.Config.Enabled != new.Config.Enabled {
+		return true
+	}
+	if old.Config.Gamma != new.Config.Gamma || old.Config.Contrast != new.Config.Contrast {
 		return true
 	}
 	if old.SunPosition != new.SunPosition {

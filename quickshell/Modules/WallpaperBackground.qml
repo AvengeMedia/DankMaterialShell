@@ -133,9 +133,13 @@ Variants {
             // settles, so the paused render loop wakes and drives the async load
             // and transition even when nothing else marks the window dirty.
             property bool changePending: false
-            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
+            // Image is released after srcCurrent grabs it, only the texture stays resident
+            property string currentSource: ""
+            property bool frozenValid: false
+            property int _freezeWaitFrames: 0
+            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentSource !== ""
             readonly property var backingWindow: Window.window
-            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
             property int _settleFrames: 3
 
             function invalidate() {
@@ -146,7 +150,50 @@ Variants {
             }
 
             onRenderActiveChanged: invalidate()
-            onBackingWindowChanged: invalidate()
+            onBackingWindowChanged: regenerate()
+            onTextureWidthChanged: regenerate()
+            onTextureHeightChanged: regenerate()
+
+            function scheduleFreeze() {
+                if (root.effectiveScrolling) {
+                    finishTransition();
+                    return;
+                }
+                root.frozenValid = true;
+                srcCurrent.scheduleUpdate();
+                root._freezeWaitFrames = 3;
+                invalidate();
+            }
+
+            function completeFreeze() {
+                if (currentWallpaper.status === Image.Ready && !root.effectiveScrolling)
+                    currentWallpaper.source = "";
+                finishTransition();
+                invalidate();
+            }
+
+            function regenerate() {
+                invalidate();
+                if (!root.currentSource || currentWallpaper.source.toString())
+                    return;
+                currentWallpaper.source = root.currentSource;
+            }
+
+            function finishTransition() {
+                if (root.transitioning)
+                    return;
+                root.useNextForEffect = false;
+                nextWallpaper.source = "";
+                root.transitionProgress = 0.0;
+                root.effectActive = false;
+                root.changePending = false;
+
+                if (!root.pendingWallpaper)
+                    return;
+                const pending = root.pendingWallpaper;
+                root.pendingWallpaper = "";
+                Qt.callLater(() => root.changeWallpaper(pending));
+            }
 
             // No swap after a requested frame: dropped frame callback left the window
             // unexposed (qtwayland mFrameCallbackTimedOut); only surface re-attach recovers.
@@ -172,6 +219,13 @@ Variants {
                         root._settleFrames--;
                     root._wedgeBounced = false;
                     wedgeWatchdog.stop();
+                    if (root._freezeWaitFrames === 0)
+                        return;
+                    if (--root._freezeWaitFrames === 0) {
+                        root.completeFreeze();
+                        return;
+                    }
+                    root.backingWindow?.update();
                 }
                 function onVisibleChanged() {
                     root.invalidate();
@@ -181,6 +235,14 @@ Variants {
                 }
                 function onHeightChanged() {
                     root.invalidate();
+                }
+            }
+
+            Connections {
+                target: wallpaperWindow
+                function onResourcesLost() {
+                    root.frozenValid = false;
+                    root.regenerate();
                 }
             }
 
@@ -195,7 +257,7 @@ Variants {
             Connections {
                 target: SettingsData
                 function onWallpaperFillModeChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
                 function onEffectiveWallpaperBackgroundColorChanged() {
                     root.invalidate();
@@ -205,10 +267,10 @@ Variants {
             Connections {
                 target: SessionData
                 function onMonitorWallpaperFillModesChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
                 function onPerMonitorWallpaperChanged() {
-                    root.invalidate();
+                    root.regenerate();
                 }
             }
 
@@ -318,7 +380,7 @@ Variants {
                     return;
                 const pending = root.pendingWallpaper;
                 root.pendingWallpaper = "";
-                Qt.callLater(() => root.changeWallpaper(pending, true));
+                Qt.callLater(() => root.changeWallpaper(pending));
             }
 
             function updateWorkspaceData() {
@@ -530,7 +592,7 @@ Variants {
 
                 const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
 
-                if (!isInitialized || !currentWallpaper.source) {
+                if (!isInitialized || !root.currentSource) {
                     if (!CompositorService.randrReady) {
                         _deferredSource = formattedSource;
                         return;
@@ -551,33 +613,40 @@ Variants {
                 root.transitionProgress = 0.0;
                 root.effectActive = false;
                 root.screenScale = CompositorService.getScreenScale(modelData);
-                // No status change coming to clear the flag
-                if (!newSource || currentWallpaper.source.toString() === newSource) {
+                nextWallpaper.source = "";
+                resetScrollState();
+                if (!newSource) {
+                    root.currentSource = "";
+                    root.frozenValid = false;
                     root.changePending = false;
                     root.contentReady = true;
+                    currentWallpaper.source = "";
+                    return;
+                }
+                if (root.currentSource === newSource && root.frozenValid) {
+                    root.changePending = false;
+                    root.contentReady = true;
+                    return;
                 }
                 currentWallpaper.source = newSource;
-                nextWallpaper.source = "";
+            }
 
-                // Reset scroll state for new image - will snap to correct position on first update
-                if (scrollingEnabled) {
-                    firstScrollUpdate = true;
-                    currentScrollX = 0.0;
-                    currentScrollY = 0.0;
-                    scrollAnim.startX = 0.0;
-                    scrollAnim.startY = 0.0;
-                    scrollAnim.targetX = 0.0;
-                    scrollAnim.targetY = 0.0;
-                }
+            function resetScrollState() {
+                if (!scrollingEnabled)
+                    return;
+                firstScrollUpdate = true;
+                currentScrollX = 0.0;
+                currentScrollY = 0.0;
+                scrollAnim.startX = 0.0;
+                scrollAnim.startY = 0.0;
+                scrollAnim.targetX = 0.0;
+                scrollAnim.targetY = 0.0;
             }
 
             function startTransition() {
                 root.useNextForEffect = true;
                 root.effectActive = true;
-                if (srcCurrent.scheduleUpdate)
-                    srcCurrent.scheduleUpdate();
-                if (srcNext.scheduleUpdate)
-                    srcNext.scheduleUpdate();
+                srcNext.scheduleUpdate();
                 transitionDelayTimer.start();
             }
 
@@ -588,11 +657,7 @@ Variants {
                 onTriggered: transitionAnimation.start()
             }
 
-            function changeWallpaper(newPath, force) {
-                if (!force && newPath === currentWallpaper.source.toString()) {
-                    root.changePending = false;
-                    return;
-                }
+            function changeWallpaper(newPath) {
                 if (!newPath || newPath.startsWith("#")) {
                     root.changePending = false;
                     return;
@@ -602,7 +667,15 @@ Variants {
                     root.pendingWallpaper = newPath;
                     return;
                 }
-                if (!currentWallpaper.source) {
+                if (newPath === root.currentSource) {
+                    if (nextWallpaper.source.toString()) {
+                        setWallpaperImmediate(newPath);
+                        return;
+                    }
+                    root.changePending = false;
+                    return;
+                }
+                if (!root.currentSource) {
                     setWallpaperImmediate(newPath);
                     return;
                 }
@@ -720,6 +793,8 @@ Variants {
                     }
                     if (status === Image.Ready) {
                         imageMetrics.capture(implicitWidth, implicitHeight);
+                        root.currentSource = source.toString();
+                        root.scheduleFreeze();
                     }
                     if (status === Image.Ready || status === Image.Error) {
                         root.changePending = false;
@@ -728,7 +803,8 @@ Variants {
                 }
 
                 onSourceChanged: {
-                    imageMetrics.reset();
+                    if (source.toString())
+                        imageMetrics.reset();
                 }
             }
 
@@ -764,9 +840,12 @@ Variants {
 
             ShaderEffectSource {
                 id: srcCurrent
-                sourceItem: root.effectActive ? currentWallpaper : null
-                hideSource: root.effectActive
-                live: root.effectActive
+                anchors.fill: parent
+                sourceItem: currentWallpaper
+                visible: root.frozenValid && !root.effectiveScrolling
+                hideSource: false
+                live: false
+                smooth: true
                 mipmap: false
                 recursive: false
                 textureSize: Qt.size(root.textureWidth, root.textureHeight)
@@ -805,7 +884,7 @@ Variants {
                 visible: false
                 width: imageMetrics.canvasWidth
                 height: imageMetrics.canvasHeight
-                source: root.effectiveScrolling ? currentWallpaper.source : ""
+                source: root.effectiveScrolling ? root.currentSource : ""
                 asynchronous: true
                 smooth: true
                 cache: true
@@ -1077,20 +1156,13 @@ Variants {
                 duration: root.actualTransitionType === "none" ? 0 : 1000
                 easing.type: Easing.InOutCubic
                 onFinished: {
-                    if (nextWallpaper.source && nextWallpaper.status === Image.Ready) {
-                        currentWallpaper.source = nextWallpaper.source;
-                    }
-                    root.useNextForEffect = false;
-                    nextWallpaper.source = "";
-                    root.transitionProgress = 0.0;
-                    root.effectActive = false;
-                    root.changePending = false;
-
-                    if (!root.pendingWallpaper)
+                    if (!nextWallpaper.source || nextWallpaper.status !== Image.Ready) {
+                        root.finishTransition();
                         return;
-                    var pending = root.pendingWallpaper;
-                    root.pendingWallpaper = "";
-                    Qt.callLater(() => root.changeWallpaper(pending, true));
+                    }
+                    currentWallpaper.source = nextWallpaper.source;
+                    if (root._freezeWaitFrames === 0 && currentWallpaper.status !== Image.Loading)
+                        root.finishTransition();
                 }
             }
 
@@ -1101,7 +1173,7 @@ Variants {
 
                 sourceComponent: MultiEffect {
                     anchors.fill: parent
-                    source: effectLoader.active ? effectLoader.item : (parallaxLoader.active ? parallaxLoader.item : currentWallpaper)
+                    source: effectLoader.active ? effectLoader.item : (parallaxLoader.active ? parallaxLoader.item : srcCurrent)
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75

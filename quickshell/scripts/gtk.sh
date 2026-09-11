@@ -4,15 +4,37 @@ CONFIG_DIR="$1"
 # apply: setup overrides and config dirs
 # patch: refresh overrides in adw-gtk3
 # remove: remove all overrides
-# assets: relink adw-gtk3 assets if DMS already manages gtk.css
 MODE="${2:-apply}"
 IS_LIGHT="${3:-light}"
-SHELL_DIR="$4"
 
 if [ -z "$CONFIG_DIR" ]; then
-	echo "Usage: $0 <config_dir> [apply|patch|remove|assets] [is_light] [shell_dir]" >&2
+	echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light]" >&2
 	exit 1
 fi
+
+USER_DATA_THEMES="${XDG_DATA_HOME:-$HOME/.local/share}/themes"
+
+# System theme roots come from XDG_DATA_DIRS so NixOS profiles and
+# /run/current-system are found, not just /usr/share.
+system_theme_roots() {
+	local IFS=':'
+	local dirs="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+	local d
+	for d in $dirs; do
+		[ -n "$d" ] && echo "${d%/}/themes"
+	done
+}
+
+# A theme is ours to patch only when it lives in a user dir and is writable;
+# prefix tests like ^/usr misclassify nix store paths as user copies.
+is_user_theme_dir() {
+	local dir="$1"
+	[ -n "$dir" ] && [ -w "$dir" ] || return 1
+	case "$dir" in
+		"$USER_DATA_THEMES"/*|"$HOME/.themes"/*) return 0 ;;
+	esac
+	return 1
+}
 
 get_adw_gtk3_dir() {
 	local variant="$1"
@@ -20,11 +42,14 @@ get_adw_gtk3_dir() {
 	[ "$variant" == "dark" ] && name="-$variant"
 
 	local candidates=(
-		"$HOME/.local/share/themes/adw-gtk3${name}/gtk-3.0"
+		"$USER_DATA_THEMES/adw-gtk3${name}/gtk-3.0"
 		"$HOME/.themes/adw-gtk3${name}/gtk-3.0"
-		"/usr/share/themes/adw-gtk3${name}/gtk-3.0"
-		"/usr/local/share/themes/adw-gtk3${name}/gtk-3.0"
 	)
+	local root
+	while IFS= read -r root; do
+		candidates+=("$root/adw-gtk3${name}/gtk-3.0")
+	done < <(system_theme_roots)
+
 	local target=""
 	for c in "${candidates[@]}"; do
 		if [ -d "$c" ]; then
@@ -35,40 +60,63 @@ get_adw_gtk3_dir() {
 	echo "$target"
 }
 
-# The light template references adw-gtk3 image assets relative to gtk.css
-# (check/radio glyphs, slider knobs); without them checked boxes render as
-# solid blocks.
-link_gtk3_assets() {
-	local gtk3_dir="$1"
-	local assets_link="$gtk3_dir/assets"
-
-	if [ -e "$assets_link" ] && [ ! -L "$assets_link" ]; then
-		echo "Leaving user-managed $assets_link in place"
-		return
-	fi
-
-	local candidates=(
-		"$HOME/.local/share/themes/adw-gtk3/gtk-3.0/assets"
-		"$HOME/.themes/adw-gtk3/gtk-3.0/assets"
-		"/usr/share/themes/adw-gtk3/gtk-3.0/assets"
-		"/usr/local/share/themes/adw-gtk3/gtk-3.0/assets"
-	)
-	local target=""
-	for c in "${candidates[@]}"; do
-		if [ -d "$c" ]; then
-			target="$c"
-			break
+get_system_adw_gtk3_root() {
+	local variant="$1"
+	local name=""
+	[ "$variant" == "dark" ] && name="-$variant"
+	local root
+	while IFS= read -r root; do
+		if [ -d "$root/adw-gtk3${name}/gtk-3.0" ]; then
+			echo "$root/adw-gtk3${name}"
+			return 0
 		fi
-	done
-	if [ -z "$target" ] && [ -n "$SHELL_DIR" ] && [ -d "$SHELL_DIR/matugen/gtk3-assets" ]; then
-		target="$SHELL_DIR/matugen/gtk3-assets"
-	fi
-	if [ -z "$target" ]; then
-		return
-	fi
+	done < <(system_theme_roots)
+	return 1
+}
 
-	ln -sfn "$target" "$assets_link"
-	echo "Linked GTK3 assets: $assets_link -> $target"
+theme_src_checksum() {
+	command -v sha256sum >/dev/null 2>&1 || return 1
+	sha256sum "$1/gtk-3.0/gtk.css" 2>/dev/null | cut -d' ' -f1
+}
+
+# DMS patches the theme css in place, which needs a user-writable copy;
+# package managers install to read-only system dirs (nix store included).
+ensure_user_adw_gtk3() {
+	local variant name src dest marker src_sum
+	for variant in light dark; do
+		name=""
+		[ "$variant" == "dark" ] && name="-$variant"
+		dest="$USER_DATA_THEMES/adw-gtk3${name}"
+		marker="$dest/.dms-copy"
+
+		if [ -d "$dest/gtk-3.0" ]; then
+			[ -f "$marker" ] || continue
+			src="$(get_system_adw_gtk3_root "$variant")" || continue
+			src_sum="$(theme_src_checksum "$src")" || continue
+			if [ "$src_sum" != "$(sed -n 's/^sha256=//p' "$marker")" ]; then
+				echo "System adw-gtk3${name} changed, refreshing DMS copy"
+				rm -rf "$dest"
+			else
+				continue
+			fi
+		fi
+		[ -d "$dest/gtk-3.0" ] && continue
+
+		src="$(get_system_adw_gtk3_root "$variant")" || continue
+		mkdir -p "$USER_DATA_THEMES"
+		# -L dereferences nix store symlink forests; store files arrive read-only.
+		if ! cp -RL "$src" "$dest"; then
+			echo "Warning: failed to copy adw-gtk3${name} from '$src'" >&2
+			rm -rf "$dest"
+			continue
+		fi
+		chmod -R u+w "$dest"
+		{
+			echo "src=$src"
+			echo "sha256=$(theme_src_checksum "$src")"
+		} >"$marker"
+		echo "Copied adw-gtk3${name} to '$dest' for dynamic theming"
+	done
 }
 
 DANK_IMPORT='@import url("dank-colors.css");'
@@ -158,7 +206,7 @@ remove_gtk3_colors() {
 	for variant in light dark; do
 		local adw_gtk3_dir && adw_gtk3_dir=$(get_adw_gtk3_dir "$variant")
 
-		if [ -z "$adw_gtk3_dir" ] || [[ "$adw_gtk3_dir" =~ ^/usr ]]; then
+		if ! is_user_theme_dir "$adw_gtk3_dir"; then
 			echo "No user version of adw-gtk3 ${variant} found, nothing to unpatch"
 			continue
 		fi
@@ -176,7 +224,7 @@ remove_gtk3_colors() {
 do_patch() {
 	local theme_dir="$1"
 	local variant="$2"
-	if [ -z "$theme_dir" ] || [[ "$theme_dir" =~ ^/usr ]]; then
+	if ! is_user_theme_dir "$theme_dir"; then
 		echo "Skipping '$variant' patch: no user copy of adw-gtk3 for this variant"
 		return 0
 	fi
@@ -203,7 +251,7 @@ patch_gtk3_colors() {
 	[ "$is_light" = "false" ] && variant="dark"
 	local adw_gtk3_dir && adw_gtk3_dir=$(get_adw_gtk3_dir "$variant")
 
-	if [ -z "$adw_gtk3_dir" ] || [[ "$adw_gtk3_dir" =~ ^/usr ]]; then
+	if ! is_user_theme_dir "$adw_gtk3_dir"; then
 		echo "No user version of adw-gtk3 ${variant} was found, skipping patch"
 		exit 2
 	fi
@@ -229,9 +277,11 @@ apply_gtk3_colors() {
 
 	local gtk3_dir="$config_dir/gtk-3.0"
 	local gtk3_override="$gtk3_dir/gtk.css"
-	# If no adw-gtk3 or only system wide, use global override
+	ensure_user_adw_gtk3
+
+	# If no adw-gtk3 anywhere, use the global override
 	local adw_gtk3 && adw_gtk3="$(get_adw_gtk3_dir)"
-	if [[ "$adw_gtk3" =~ ^/usr ]] || [[ -z "$adw_gtk3" ]]; then
+	if ! is_user_theme_dir "$adw_gtk3"; then
 		echo "Warning: No user version of adw-gtk3 found" >&2
 		echo "Falling back on global css override" >&2
 		local dank_colors="$gtk3_dir/dank-colors.css"
@@ -243,7 +293,6 @@ apply_gtk3_colors() {
 		fi
 
 		inject_dank_import "$gtk3_override" || exit 1
-		link_gtk3_assets "$gtk3_dir"
 
 		return
 	fi
@@ -318,14 +367,8 @@ case "$MODE" in
 
 		echo "GTK colors applied successfully"
 		;;
-	assets)
-		# Repair pass at startup; only acts when DMS already manages gtk.css
-		if dms_managed_css "$CONFIG_DIR/gtk-3.0/gtk.css"; then
-			link_gtk3_assets "$CONFIG_DIR/gtk-3.0"
-		fi
-		;;
 	*)
-		echo "Usage: $0 <config_dir> [apply|patch|remove|assets] [is_light] [shell_dir]" >&2
+		echo "Usage: $0 <config_dir> [apply|patch|remove] [is_light]" >&2
 		exit 1
 		;;
 esac

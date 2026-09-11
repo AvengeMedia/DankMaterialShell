@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import qs.Common
 import qs.Modals.Common
@@ -45,20 +44,90 @@ DankFloatingWindow {
         keyboardNavigationActive = false;
     }
 
+    function ensureSelectedVisible() {
+        if (selectedIndex >= 0)
+            themeGrid.positionViewAtIndex(selectedIndex, GridView.Contain);
+    }
+
     function selectNext() {
         if (filteredThemes.length === 0)
             return;
-        keyboardNavigationActive = true;
-        selectedIndex = Math.min(selectedIndex + 1, filteredThemes.length - 1);
+        if (!keyboardNavigationActive) {
+            keyboardNavigationActive = true;
+            selectedIndex = 0;
+            ensureSelectedVisible();
+            return;
+        }
+        selectedIndex = Math.min(selectedIndex + themeGrid.columns, filteredThemes.length - 1);
+        ensureSelectedVisible();
     }
 
     function selectPrevious() {
-        if (filteredThemes.length === 0)
+        if (filteredThemes.length === 0 || !keyboardNavigationActive)
             return;
-        keyboardNavigationActive = true;
-        selectedIndex = Math.max(selectedIndex - 1, -1);
-        if (selectedIndex === -1)
+        const next = selectedIndex - themeGrid.columns;
+        if (next < 0) {
+            selectedIndex = -1;
             keyboardNavigationActive = false;
+            return;
+        }
+        selectedIndex = next;
+        ensureSelectedVisible();
+    }
+
+    function selectStep(delta) {
+        if (filteredThemes.length === 0 || !keyboardNavigationActive)
+            return;
+        selectedIndex = Math.max(0, Math.min(selectedIndex + delta, filteredThemes.length - 1));
+        ensureSelectedVisible();
+    }
+
+    function themeBadges(theme) {
+        const badges = PluginService.badgeModel(theme);
+        const variants = theme.variants || null;
+        const variantCount = variants ? (variants.type === "multi" ? (variants.accents?.length ?? 0) : (variants.options?.length ?? 0)) : 0;
+        if (variantCount > 0)
+            badges.push({
+                label: I18n.tr("%1 variants").arg(variantCount),
+                icon: "",
+                tone: "secondary"
+            });
+        const wcag = wcagLabel(theme);
+        if (wcag)
+            badges.push({
+                label: wcag,
+                icon: "contrast",
+                tone: "info"
+            });
+        return badges;
+    }
+
+    function themePreviewUrl(theme) {
+        const base = "https://raw.githubusercontent.com/AvengeMedia/dms-plugin-registry/main/themes/" + (theme.sourceDir || theme.id) + "/";
+        const variants = theme.variants || null;
+        if (!variants)
+            return base + "preview.svg";
+        let variantId = "";
+        if (variants.type === "multi") {
+            const mode = Theme.isLightMode ? "light" : "dark";
+            const defaults = variants.defaults?.[mode] || variants.defaults?.dark || {};
+            variantId = (defaults.flavor || "") + (defaults.accent ? "-" + defaults.accent : "");
+        } else {
+            variantId = variants.default || (variants.options?.[0]?.id ?? "");
+        }
+        return variantId ? base + "preview-" + variantId + ".svg" : base + "preview.svg";
+    }
+
+    function wcagLabel(theme) {
+        const rows = (theme.wcag?.dark?.breakdown ?? []).concat(theme.wcag?.light?.breakdown ?? []);
+        let hasAAA = false;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].level === "AA")
+                return "WCAG AA";
+            if (rows[i].level === "AAA")
+                hasAAA = true;
+        }
+        return hasAAA ? "WCAG AAA" : "";
     }
 
     function installTheme(themeId, themeName, applyAfterInstall) {
@@ -127,7 +196,12 @@ DankFloatingWindow {
     function show() {
         if (parentModal)
             parentModal.shouldHaveFocus = false;
+        const wasVisible = visible;
         visible = true;
+        if (wasVisible && PopoutService.pendingThemeInstall) {
+            pendingInstallHandled = false;
+            checkPendingInstall();
+        }
         Qt.callLater(() => browserSearchField.forceActiveFocus());
     }
 
@@ -167,8 +241,10 @@ DankFloatingWindow {
         isLoading = false;
     }
 
-    ConfirmModal {
+    ConfirmDialogOverlay {
         id: urlInstallConfirm
+
+        onDialogClosed: Qt.callLater(() => browserSearchField.forceActiveFocus())
     }
 
     Connections {
@@ -207,6 +283,29 @@ DankFloatingWindow {
                 root.selectPrevious();
                 event.accepted = true;
                 return;
+            case Qt.Key_Left:
+                if (!root.keyboardNavigationActive)
+                    return;
+                root.selectStep(-1);
+                event.accepted = true;
+                return;
+            case Qt.Key_Right:
+                if (!root.keyboardNavigationActive)
+                    return;
+                root.selectStep(1);
+                event.accepted = true;
+                return;
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                {
+                    if (!root.keyboardNavigationActive || root.selectedIndex < 0)
+                        return;
+                    const theme = root.filteredThemes[root.selectedIndex];
+                    if (!theme.installed)
+                        root.installTheme(theme.id, theme.name, false);
+                    event.accepted = true;
+                    return;
+                }
             }
         }
 
@@ -253,12 +352,11 @@ DankFloatingWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXS
 
-                    DankActionButton {
+                    DankRefreshButton {
                         id: refreshButton
-                        iconName: "refresh"
                         iconSize: 18
                         iconColor: Theme.primary
-                        visible: !root.isLoading
+                        busy: root.isLoading
                         onClicked: root.refreshThemes()
                     }
 
@@ -335,464 +433,48 @@ DankFloatingWindow {
                     }
                 }
 
-                DankListView {
-                    id: themeBrowserList
+                DankGridView {
+                    id: themeGrid
+
+                    property int columns: Math.max(1, Math.floor(width / 300))
+                    readonly property real cardSpacing: Theme.spacingM
+                    readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * 0.52)
+                    readonly property int infoHeight: 100
 
                     anchors.fill: parent
-                    spacing: Theme.spacingS
-                    model: ScriptModel {
-                        values: root.filteredThemes
-                    }
+                    cellWidth: Math.floor(width / columns)
+                    cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
+                    model: root.filteredThemes
                     clip: true
                     visible: !root.isLoading
+                    cacheBuffer: cellHeight * 2
 
-                    ScrollBar.vertical: DankScrollbar {
-                        id: browserScrollbar
-                    }
+                    delegate: Item {
+                        id: cardCell
 
-                    delegate: Rectangle {
-                        id: themeDelegate
-                        width: themeBrowserList.width
-                        height: hasPreview ? 140 : themeDelegateContent.implicitHeight + Theme.spacingM * 2
-                        radius: Theme.cornerRadius
-                        property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-                        property bool isInstalled: modelData.installed || false
-                        property bool isFirstParty: modelData.firstParty || false
-                        property bool hasVariants: modelData.hasVariants || false
-                        property var variants: modelData.variants || null
-                        property string selectedVariantId: {
-                            if (!hasVariants || !variants)
-                                return "";
-                            if (variants.type === "multi") {
-                                const mode = Theme.isLightMode ? "light" : "dark";
-                                const defaults = variants.defaults?.[mode] || variants.defaults?.dark || {};
-                                return (defaults.flavor || "") + (defaults.accent ? "-" + defaults.accent : "");
-                            }
-                            return variants.default || (variants.options?.[0]?.id ?? "");
-                        }
-                        property string previewPath: {
-                            const baseDir = "/tmp/dankdots-plugin-registry/themes/" + (modelData.sourceDir || modelData.id);
-                            const mode = Theme.isLightMode ? "light" : "dark";
-                            if (hasVariants && selectedVariantId) {
-                                if (variants?.type === "multi")
-                                    return baseDir + "/preview-" + selectedVariantId + ".svg";
-                                return baseDir + "/preview-" + selectedVariantId + "-" + mode + ".svg";
-                            }
-                            return baseDir + "/preview-" + mode + ".svg";
-                        }
-                        property bool hasPreview: previewImage.status === Image.Ready
-                        color: isSelected ? Theme.primarySelected : Theme.withAlpha(Theme.surfaceVariant, 0.3)
-                        border.color: isSelected ? Theme.primary : Theme.outlineHeavy
-                        border.width: isSelected ? 2 : 1
+                        required property var modelData
+                        required property int index
 
-                        Row {
-                            id: themeDelegateContent
+                        width: themeGrid.cellWidth
+                        height: themeGrid.cellHeight
+
+                        PluginCard {
                             anchors.fill: parent
-                            anchors.margins: Theme.spacingM
-                            spacing: Theme.spacingM
-
-                            Rectangle {
-                                width: hasPreview ? 180 : 0
-                                height: parent.height
-                                radius: Theme.cornerRadius - 2
-                                color: Theme.floatingWindowNestedSurface
-                                visible: hasPreview
-
-                                Image {
-                                    id: previewImage
-                                    anchors.fill: parent
-                                    anchors.margins: 2
-                                    source: "file://" + previewPath
-                                    fillMode: Image.PreserveAspectFit
-                                    smooth: true
-                                    mipmap: true
-                                }
+                            anchors.margins: themeGrid.cardSpacing / 2
+                            plugin: cardCell.modelData
+                            fallbackIcon: "palette"
+                            previewSource: root.themePreviewUrl(cardCell.modelData)
+                            badges: root.themeBadges(cardCell.modelData)
+                            allowUninstall: true
+                            previewHeight: themeGrid.previewHeight
+                            installed: cardCell.modelData.installed || false
+                            selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
+                            onClicked: {
+                                root.selectedIndex = cardCell.index;
+                                root.keyboardNavigationActive = true;
                             }
-
-                            DankIcon {
-                                name: "palette"
-                                size: 48
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: !hasPreview
-                            }
-
-                            Column {
-                                width: parent.width - (hasPreview ? 180 : 48) - Theme.spacingM - installButton.width - Theme.spacingM
-                                spacing: Theme.spacingXS
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Row {
-                                    spacing: Theme.spacingXS
-                                    width: parent.width
-
-                                    StyledText {
-                                        text: modelData.name
-                                        font.pixelSize: Theme.fontSizeLarge
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        elide: Text.ElideRight
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Rectangle {
-                                        height: 18
-                                        width: versionText.implicitWidth + Theme.spacingS
-                                        radius: 9
-                                        color: Theme.outlineStrong
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        StyledText {
-                                            id: versionText
-                                            anchors.centerIn: parent
-                                            text: modelData.version || "1.0.0"
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.outline
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        height: 18
-                                        width: firstPartyText.implicitWidth + Theme.spacingS
-                                        radius: 9
-                                        color: Theme.primaryPressed
-                                        border.color: Theme.withAlpha(Theme.primary, 0.4)
-                                        border.width: 1
-                                        visible: isFirstParty
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        StyledText {
-                                            id: firstPartyText
-                                            anchors.centerIn: parent
-                                            text: I18n.tr("official")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.primary
-                                            font.weight: Font.Medium
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        height: 18
-                                        width: variantsText.implicitWidth + Theme.spacingS
-                                        radius: 9
-                                        color: Theme.withAlpha(Theme.secondary, 0.15)
-                                        border.color: Theme.withAlpha(Theme.secondary, 0.4)
-                                        border.width: 1
-                                        visible: themeDelegate.hasVariants
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        StyledText {
-                                            id: variantsText
-                                            anchors.centerIn: parent
-                                            text: {
-                                                if (themeDelegate.variants?.type === "multi")
-                                                    return I18n.tr("%1 variants").arg(themeDelegate.variants?.accents?.length ?? 0);
-                                                return I18n.tr("%1 variants").arg(themeDelegate.variants?.options?.length ?? 0);
-                                            }
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.secondary
-                                            font.weight: Font.Medium
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        id: wcagBadge
-
-                                        readonly property var modeReport: Theme.isLightMode ? modelData.wcag?.light : modelData.wcag?.dark
-                                        readonly property var rows: modeReport?.breakdown ?? []
-                                        readonly property var allRows: (modelData.wcag?.dark?.breakdown ?? []).concat(modelData.wcag?.light?.breakdown ?? [])
-                                        readonly property string level: wcagBadge.rollupLevel(wcagBadge.rows, "level")
-                                        readonly property string bodyLevel: wcagBadge.rollupLevel(wcagBadge.rows, "bodyLevel")
-                                        readonly property bool fullPass: level !== ""
-                                        readonly property bool bodyPass: bodyLevel !== ""
-                                        readonly property bool partial: wcagBadge.isPartial(wcagBadge.rows, fullPass ? "level" : "bodyLevel")
-
-                                        function rollupLevel(rows, key) {
-                                            let hasAAA = false;
-                                            for (let i = 0; i < rows.length; i++) {
-                                                const value = rows[i][key];
-                                                if (value === "AA")
-                                                    return "AA";
-                                                if (value === "AAA")
-                                                    hasAAA = true;
-                                            }
-                                            return hasAAA ? "AAA" : "";
-                                        }
-
-                                        function isPartial(rows, key) {
-                                            let total = 0;
-                                            let passing = 0;
-                                            for (let i = 0; i < rows.length; i++) {
-                                                const value = rows[i][key];
-                                                if (!value)
-                                                    continue;
-                                                total++;
-                                                if (value !== "fail")
-                                                    passing++;
-                                            }
-                                            return passing > 0 && passing < total;
-                                        }
-
-                                        height: 18
-                                        width: wcagRow.implicitWidth + Theme.spacingS
-                                        radius: 9
-                                        color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, wcagArea.containsMouse ? 0.25 : 0.15)
-                                        border.color: Theme.withAlpha(fullPass ? Theme.info : Theme.surfaceVariantText, 0.4)
-                                        border.width: 1
-                                        visible: fullPass || bodyPass
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        Row {
-                                            id: wcagRow
-                                            anchors.centerIn: parent
-                                            spacing: 2
-
-                                            StyledText {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                text: {
-                                                    let label = "WCAG " + (wcagBadge.fullPass ? wcagBadge.level : wcagBadge.bodyLevel);
-                                                    if (!wcagBadge.fullPass)
-                                                        label += " " + I18n.tr("Body", "notification rule match field option");
-                                                    if (wcagBadge.partial)
-                                                        label += " (" + I18n.tr("Partial", "contrast badge suffix: only some variants pass") + ")";
-                                                    return label;
-                                                }
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
-                                                font.weight: Font.Medium
-                                            }
-
-                                            DankIcon {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                name: "info"
-                                                size: 12
-                                                visible: wcagBadge.allRows.length > 1
-                                                color: wcagBadge.fullPass ? Theme.info : Theme.surfaceVariantText
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: wcagArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: wcagBadge.allRows.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            onClicked: {
-                                                if (wcagBadge.allRows.length <= 1)
-                                                    return;
-                                                wcagDetail.opened ? wcagDetail.close() : wcagDetail.open();
-                                            }
-                                        }
-
-                                        Popup {
-                                            id: wcagDetail
-                                            y: wcagBadge.height + Theme.spacingXS
-                                            padding: Theme.spacingS
-                                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-                                            background: Rectangle {
-                                                color: Theme.floatingWindowNestedSurface
-                                                radius: Theme.cornerRadius
-                                                border.width: 1
-                                                border.color: Theme.outlineMedium
-                                            }
-
-                                            contentItem: Column {
-                                                spacing: Theme.spacingXS
-
-                                                StyledText {
-                                                    text: I18n.tr("Contrast by variant", "WCAG breakdown popup heading")
-                                                    font.pixelSize: Theme.fontSizeSmall
-                                                    font.weight: Font.Medium
-                                                    color: Theme.surfaceText
-                                                }
-
-                                                Repeater {
-                                                    model: wcagBadge.allRows
-
-                                                    Row {
-                                                        spacing: Theme.spacingS
-
-                                                        Rectangle {
-                                                            width: 8
-                                                            height: 8
-                                                            radius: 4
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                            color: modelData.level === "fail" ? Theme.error : Theme.success
-                                                        }
-
-                                                        StyledText {
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                            text: modelData.name + " · " + modelData.mode
-                                                            font.pixelSize: Theme.fontSizeSmall
-                                                            color: Theme.surfaceVariantText
-                                                        }
-
-                                                        StyledText {
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                            text: modelData.level === "fail" ? I18n.tr("below AA", "contrast level below the AA threshold") : "WCAG " + modelData.level
-                                                            font.pixelSize: Theme.fontSizeSmall
-                                                            font.weight: Font.Medium
-                                                            color: modelData.level === "fail" ? Theme.error : Theme.surfaceText
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("by %1", "author attribution").arg(modelData.author || I18n.tr("Unknown", "unknown author"))
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.outline
-                                    elide: Text.ElideRight
-                                    width: parent.width
-                                }
-
-                                StyledText {
-                                    text: modelData.description || ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    width: parent.width
-                                    wrapMode: Text.WordWrap
-                                    maximumLineCount: themeDelegate.hasVariants ? 2 : 3
-                                    elide: Text.ElideRight
-                                    visible: modelData.description && modelData.description.length > 0
-                                }
-
-                                Flow {
-                                    width: parent.width
-                                    spacing: Theme.spacingXS
-                                    visible: themeDelegate.hasVariants && themeDelegate.variants?.type !== "multi"
-
-                                    Repeater {
-                                        model: themeDelegate.variants?.options ?? []
-
-                                        Rectangle {
-                                            property bool isActive: themeDelegate.selectedVariantId === modelData.id
-                                            height: 22
-                                            width: variantChipText.implicitWidth + Theme.spacingS * 2
-                                            radius: 11
-                                            color: isActive ? Theme.primary : Theme.floatingWindowFieldColor
-                                            border.color: isActive ? Theme.primary : Theme.outline
-                                            border.width: 1
-
-                                            StyledText {
-                                                id: variantChipText
-                                                anchors.centerIn: parent
-                                                text: modelData.name
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: isActive ? Theme.primaryText : Theme.surfaceText
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: themeDelegate.selectedVariantId = modelData.id
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Flow {
-                                    width: parent.width
-                                    spacing: Theme.spacingXS
-                                    visible: themeDelegate.hasVariants && themeDelegate.variants?.type === "multi"
-
-                                    Repeater {
-                                        model: themeDelegate.variants?.accents ?? []
-
-                                        Rectangle {
-                                            width: 18
-                                            height: 18
-                                            radius: 9
-                                            color: modelData.color || Theme.primary
-                                            border.color: Theme.outline
-                                            border.width: 1
-
-                                            DankTooltipV2 {
-                                                id: accentTooltip
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                onEntered: accentTooltip.show(modelData.name || modelData.id, parent, 0, 0, "top")
-                                                onExited: accentTooltip.hide()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                id: installButton
-                                width: 90
-                                height: 36
-                                radius: Theme.cornerRadius
-                                anchors.verticalCenter: parent.verticalCenter
-                                color: isInstalled ? (uninstallMouseArea.containsMouse ? Theme.error : Theme.surfaceVariant) : Theme.primary
-                                opacity: installMouseArea.containsMouse || uninstallMouseArea.containsMouse ? 0.9 : 1
-                                border.width: isInstalled ? 1 : 0
-                                border.color: isInstalled ? (uninstallMouseArea.containsMouse ? Theme.error : Theme.outline) : Theme.withAlpha(Theme.outline, 0)
-
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Theme.shortDuration
-                                        easing.type: Theme.standardEasing
-                                    }
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
-                                    }
-                                }
-
-                                Row {
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
-
-                                    DankIcon {
-                                        name: isInstalled ? (uninstallMouseArea.containsMouse ? "delete" : "check") : "download"
-                                        size: 16
-                                        color: isInstalled ? (uninstallMouseArea.containsMouse ? "white" : Theme.surfaceText) : Theme.surface
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        text: {
-                                            if (!isInstalled)
-                                                return I18n.tr("Install", "install action button");
-                                            if (uninstallMouseArea.containsMouse)
-                                                return I18n.tr("Uninstall", "uninstall action button");
-                                            return I18n.tr("Installed", "installed status");
-                                        }
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: isInstalled ? (uninstallMouseArea.containsMouse ? "white" : Theme.surfaceText) : Theme.surface
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: installMouseArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    visible: !isInstalled
-                                    onClicked: root.installTheme(modelData.id, modelData.name, false)
-                                }
-
-                                MouseArea {
-                                    id: uninstallMouseArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    visible: isInstalled
-                                    onClicked: root.uninstallTheme(modelData.id, modelData.name)
-                                }
-                            }
+                            onInstallRequested: root.installTheme(cardCell.modelData.id, cardCell.modelData.name, false)
+                            onUninstallRequested: root.uninstallTheme(cardCell.modelData.id, cardCell.modelData.name)
                         }
                     }
                 }

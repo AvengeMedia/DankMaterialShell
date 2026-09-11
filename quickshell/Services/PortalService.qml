@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/GSettings.js" as GSettings
 
 Singleton {
     id: root
@@ -19,7 +20,6 @@ Singleton {
     property bool colorSchemeInitialized: false
 
     property bool freedeskAvailable: false
-    property string colorSchemeCommand: ""
     property string pendingProfileImage: ""
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
@@ -50,6 +50,10 @@ Singleton {
 
     function getUserProfileImage(username) {
         if (!username) {
+            profileImage = "";
+            return;
+        }
+        if (Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true") {
             profileImage = "";
             return;
         }
@@ -90,6 +94,8 @@ Singleton {
         if (!settingsPortalAvailable)
             return false;
         if (typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled)
+            return false;
+        if (SettingsData.matugenSmartMode && typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
             return false;
         return typeof Theme !== "undefined";
     }
@@ -140,14 +146,7 @@ Singleton {
         const preferLight = isLightMode && systemColorScheme === 2;
         const targetScheme = isLightMode ? (preferLight ? "prefer-light" : "default") : "prefer-dark";
 
-        switch (colorSchemeCommand) {
-        case "gsettings":
-            Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", targetScheme]);
-            break;
-        case "dconf":
-            Quickshell.execDetached(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", `'${targetScheme}'`]);
-            break;
-        }
+        Quickshell.execDetached(["sh", "-c", GSettings.setCmd("org.gnome.desktop.interface", "color-scheme", targetScheme)]);
     }
 
     function setSystemIconTheme(themeName) {
@@ -201,7 +200,6 @@ Singleton {
         } else {
             log.info("DMS_SOCKET not set");
         }
-        colorSchemeDetector.running = true;
     }
 
     Connections {
@@ -296,19 +294,48 @@ Singleton {
         });
     }
 
+    property string pendingGreeterProfileUser: ""
+
+    function getGreeterUserProfileImage(username) {
+        if (!username) {
+            profileImage = "";
+            pendingGreeterProfileUser = "";
+            return;
+        }
+        if (typeof GreeterUsersService !== "undefined") {
+            const cachedPath = GreeterUsersService.profileImagePath(username);
+            if (cachedPath) {
+                profileImage = cachedPath;
+                pendingGreeterProfileUser = "";
+                return;
+            }
+        }
+        pendingGreeterProfileUser = username;
+        userProfileCheckProcess.command = ["bash", "-c", `uid=$(id -u ${username} 2>/dev/null) && [ -n "$uid" ] && dbus-send --system --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User$uid org.freedesktop.DBus.Properties.Get string:org.freedesktop.Accounts.User string:IconFile 2>/dev/null | grep -oP 'string "\\K[^"]+' || echo ""`];
+        userProfileCheckProcess.running = true;
+    }
+
     Process {
-        id: colorSchemeDetector
-        command: ["bash", "-c", "command -v gsettings || command -v dconf"]
+        id: userProfileCheckProcess
+        command: []
         running: false
 
         stdout: StdioCollector {
             onStreamFinished: {
-                const cmd = text.trim();
-                if (cmd.includes("gsettings")) {
-                    root.colorSchemeCommand = "gsettings";
-                } else if (cmd.includes("dconf")) {
-                    root.colorSchemeCommand = "dconf";
+                const trimmed = text.trim();
+                if (trimmed && trimmed !== "" && !trimmed.includes("Error") && trimmed !== "/var/lib/AccountsService/icons/") {
+                    root.profileImage = trimmed;
+                } else {
+                    root.profileImage = "";
                 }
+                root.pendingGreeterProfileUser = "";
+            }
+        }
+
+        onExited: exitCode => {
+            if (exitCode !== 0 && root.pendingGreeterProfileUser !== "") {
+                root.profileImage = "";
+                root.pendingGreeterProfileUser = "";
             }
         }
     }

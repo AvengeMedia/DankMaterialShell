@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -17,7 +16,7 @@ DankFloatingWindow {
     }
 
     objectName: "changelogModal"
-    title: i18n("What's New")
+    title: "What's New"
     minimumSize: Qt.size(modalWidth, modalHeight)
     maximumSize: Qt.size(modalWidth, modalHeight)
     visible: false
@@ -81,7 +80,7 @@ DankFloatingWindow {
                     onClicked: root.dismiss()
 
                     DankTooltip {
-                        text: i18n("Close")
+                        text: I18n.tr("Close")
                     }
                 }
             }
@@ -125,15 +124,15 @@ DankFloatingWindow {
                 spacing: Theme.spacingM
 
                 DankButton {
-                    text: i18n("Read Full Release Notes")
+                    text: I18n.tr("Open in Browser")
                     iconName: "open_in_new"
                     backgroundColor: Theme.surfaceContainerHighest
                     textColor: Theme.surfaceText
-                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-5-release")
+                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-6-release")
                 }
 
                 DankButton {
-                    text: i18n("Got It")
+                    text: I18n.tr("OK")
                     iconName: "check"
                     backgroundColor: Theme.primary
                     textColor: Theme.primaryText

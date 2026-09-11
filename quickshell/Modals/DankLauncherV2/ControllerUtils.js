@@ -134,6 +134,37 @@ function classifyAppSource(app) {
     return "system";
 }
 
+function extractFlatpakAppId(app) {
+    if (!app)
+        return "";
+
+    var execRaw = app.execString || app.exec || "";
+    if (app.command && app.command.length > 0) {
+        var isRun = false;
+        for (var i = 0; i < app.command.length; i++) {
+            var arg = String(app.command[i]);
+            if (arg === "run") {
+                isRun = true;
+                continue;
+            }
+            if (isRun && !arg.startsWith("-")) {
+                return arg;
+            }
+        }
+    }
+
+    if (execRaw) {
+        var match = execRaw.match(/\bflatpak\s+run\s+(?:--?[^\s]+\s+)*([a-zA-Z0-9_\-\.]+)/);
+        if (match && match[1])
+            return match[1];
+    }
+
+    var id = app.id || "";
+    if (id.endsWith(".desktop"))
+        return id.slice(0, -8);
+    return id;
+}
+
 function sortPluginIdsByOrder(pluginIds, order) {
     if (!order || order.length === 0)
         return pluginIds;

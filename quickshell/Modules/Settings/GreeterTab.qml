@@ -81,7 +81,8 @@ Item {
     property bool greeterTerminalFallbackFromPrecheck: false
     property bool greeterBinaryExists: false
     property bool greeterEnabled: false
-    readonly property bool greeterInstalled: greeterBinaryExists || greeterEnabled
+    property bool embeddedGreeterConfigured: false
+    readonly property bool embeddedGreeterOnly: embeddedGreeterConfigured && !greeterBinaryExists
     readonly property string greeterAction: greeterBinaryExists && !greeterEnabled ? "activate" : ""
     readonly property bool greeterActionAvailable: greeterAction !== ""
 
@@ -92,6 +93,7 @@ Item {
     function checkGreeterInstallState() {
         greetdEnabledCheckProcess.running = true;
         greeterBinaryCheckProcess.running = true;
+        embeddedGreeterCheckProcess.running = true;
     }
 
     function runGreeterStatus() {
@@ -124,6 +126,8 @@ Item {
     }
 
     function runGreeterSync() {
+        if (!greeterBinaryExists)
+            return;
         greeterSyncStdout = "";
         greeterSyncStderr = "";
         greeterSudoProbeStderr = "";
@@ -164,8 +168,17 @@ Item {
 
         onExited: exitCode => {
             root.greeterBinaryExists = (exitCode === 0);
-            if (exitCode !== 0 && root.greeterStatusText === "")
-                root.greeterStatusText = I18n.tr("Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.", "greeter status error");
+        }
+    }
+
+    Process {
+        id: embeddedGreeterCheckProcess
+        // archinstall's DMS profile points greetd at this launcher inside the packaged DMS tree
+        command: ["sh", "-c", "grep -q 'Modules/Greetd/assets/dms-greeter' /etc/greetd/config.toml 2>/dev/null"]
+        running: false
+
+        onExited: exitCode => {
+            root.embeddedGreeterConfigured = (exitCode === 0);
         }
     }
 
@@ -396,6 +409,10 @@ Item {
                                 return I18n.tr("Checking...", "greeter status loading");
                             if (root.greeterStatusText !== "")
                                 return root.greeterStatusText;
+                            if (root.embeddedGreeterOnly)
+                                return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
+                            if (!root.greeterBinaryExists && root.greeterEnabled)
+                                return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
                             return I18n.tr("Click Refresh to check status.", "greeter status placeholder");
                         }
                         font.pixelSize: Theme.fontSizeSmall
@@ -437,7 +454,7 @@ Item {
                         iconName: "sync"
                         horizontalPadding: Theme.spacingL
                         onClicked: root.runGreeterSync()
-                        enabled: root.greeterInstalled && !root.greeterSyncRunning && !root.greeterInstallActionRunning
+                        enabled: root.greeterBinaryExists && !root.greeterSyncRunning && !root.greeterInstallActionRunning
                     }
                 }
             }
@@ -512,6 +529,15 @@ Item {
                     description: I18n.tr("Font used on the login screen")
                     currentFont: SettingsData.greeterFontFamily || ""
                     onFontSelected: family => SettingsData.set("greeterFontFamily", family)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "greeterShowWeather"
+                    tags: ["greeter", "weather", "temperature", "login"]
+                    text: I18n.tr("Weather", "Enable weather display on the login screen")
+                    description: I18n.tr("Show weather on the login screen")
+                    checked: SettingsData.greeterShowWeather
+                    onToggled: checked => SettingsData.set("greeterShowWeather", checked)
                 }
 
                 StyledText {
@@ -661,7 +687,7 @@ Item {
     Rectangle {
         id: syncPendingPill
 
-        readonly property bool shown: SessionData.greeterSyncPending && root.greeterInstalled
+        readonly property bool shown: SessionData.greeterSyncPending && root.greeterBinaryExists
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom

@@ -52,7 +52,7 @@ StyledRect {
         isUpdating = true;
         currentUpdatingPlugin = plugin.name;
 
-        DMSService.update(plugin.name, response => {
+        DMSService.update(plugin.id, response => {
             isUpdating = false;
             currentUpdatingPlugin = "";
             if (response.error) {
@@ -89,7 +89,7 @@ StyledRect {
             var plugin = list[idx];
             currentUpdatingPlugin = plugin.name;
 
-            DMSService.update(plugin.name, response => {
+            DMSService.update(plugin.id, response => {
                 if (response.error) {
                     ToastService.showError(I18n.tr("Failed to update %1: %2").arg(plugin.name).arg(response.error));
                 } else {
@@ -162,6 +162,7 @@ StyledRect {
                 spacing: Theme.spacingM
 
                 DankSpinner {
+                    size: Theme.iconSize
                     running: root.isUpdating
                     anchors.verticalCenter: parent.verticalCenter
                 }

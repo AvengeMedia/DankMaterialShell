@@ -18,6 +18,7 @@ Singleton {
     property bool isElogind: false
     property bool loginctlCommandAvailable: false
     property bool systemctlCommandAvailable: false
+    property bool userManagerAvailable: false
     property bool hibernateSupported: false
     readonly property bool softRebootSupported: systemctlCommandAvailable
     property bool inhibitorAvailable: true
@@ -108,10 +109,11 @@ Singleton {
     Process {
         id: detectSystemctlProcess
         running: false
-        command: ["sh", "-c", "command -v systemctl"]
+        command: ["sh", "-c", "command -v systemctl > /dev/null || exit 1; systemctl --user show-environment > /dev/null 2>&1 || exit 2"]
 
         onExited: function (exitCode) {
-            systemctlCommandAvailable = (exitCode === 0);
+            systemctlCommandAvailable = (exitCode === 0 || exitCode === 2);
+            userManagerAvailable = (exitCode === 0);
         }
     }
 
@@ -174,20 +176,20 @@ Singleton {
 
     Process {
         id: uwsmLogout
+        property bool notRunning: false
         command: ["uwsm", "stop"]
         running: false
 
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                if (data.trim().toLowerCase().includes("not running")) {
-                    _logout();
-                }
+                if (data.trim().toLowerCase().includes("not running"))
+                    uwsmLogout.notRunning = true;
             }
         }
 
         onExited: function (exitCode) {
-            if (exitCode === 0) {
+            if (exitCode === 0 && !notRunning) {
                 return;
             }
             _logout();
@@ -278,6 +280,19 @@ Singleton {
         return args;
     }
 
+    // Restore pre-wrap Qt paths (Nix) so launched apps use their own.
+    function restoreWrapperEnv(env) {
+        const restore = (target, snapshot) => {
+            const orig = Quickshell.env(snapshot);
+            if (orig === null)
+                return;
+            env[target] = orig.length > 0 ? orig : null;
+        };
+        restore("NIXPKGS_QT6_QML_IMPORT_PATH", "DMS_ORIG_NIXPKGS_QT6_QML_IMPORT_PATH");
+        restore("QT_PLUGIN_PATH", "DMS_ORIG_QT_PLUGIN_PATH");
+        return env;
+    }
+
     function launchDesktopEntry(desktopEntry, useNvidia) {
         if (!desktopEntry || !desktopEntry.command)
             return;
@@ -302,7 +317,7 @@ Singleton {
         const cursorEnv = typeof SettingsData.getCursorEnvironment === "function" ? SettingsData.getCursorEnvironment() : {};
 
         const overrideEnv = override?.envVars ? parseEnvVars(override.envVars) : {};
-        const finalEnv = Object.assign({}, cursorEnv, overrideEnv);
+        const finalEnv = restoreWrapperEnv(Object.assign({}, cursorEnv, overrideEnv));
 
         if (desktopEntry.runInTerminal) {
             const terminal = SessionData.resolveTerminal() || "xterm";
@@ -353,13 +368,14 @@ Singleton {
         const prefix = userPrefix.length > 0 ? userPrefix : defaultPrefix;
         const workDir = desktopEntry.workingDirectory || Quickshell.env("HOME");
         const cursorEnv = typeof SettingsData.getCursorEnvironment === "function" ? SettingsData.getCursorEnvironment() : {};
+        const finalEnv = restoreWrapperEnv(Object.assign({}, cursorEnv));
 
         if (prefix.length > 0 && needsShellExecution(prefix)) {
             const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ");
             Quickshell.execDetached({
                 command: ["sh", "-c", `${prefix} ${escapedCmd}`],
                 workingDirectory: workDir,
-                environment: cursorEnv
+                environment: finalEnv
             });
             return;
         }
@@ -370,20 +386,28 @@ Singleton {
         Quickshell.execDetached({
             command: cmd,
             workingDirectory: workDir,
-            environment: cursorEnv
+            environment: finalEnv
         });
     }
 
     // * Session management
     function logout() {
         if (hasUwsm) {
+            if (uwsmLogout.running)
+                return;
+            uwsmLogout.notRunning = false;
             uwsmLogout.running = true;
+            return;
         }
         _logout();
     }
 
     function _logout() {
         if (SettingsData.customPowerActionLogout.length === 0) {
+            if (CompositorService.isAqueous) {
+                AqueousService.quit();
+                return;
+            }
             if (CompositorService.isNiri) {
                 NiriService.quit();
                 return;
@@ -408,8 +432,15 @@ Singleton {
 
             HyprlandService.exit();
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLogout]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionLogout));
         }
+    }
+
+    // systemd-run escapes the shell's cgroup so session teardown can't kill the command mid-run (#3250)
+    function customActionCommand(cmd) {
+        if (!userManagerAvailable)
+            return ["sh", "-c", cmd];
+        return ["systemd-run", "--user", "--scope", "--collect", "--quiet", "sh", "-c", cmd];
     }
 
     function powerManagerCommand(action) {
@@ -469,7 +500,7 @@ Singleton {
         if (SettingsData.customPowerActionReboot.length === 0) {
             Quickshell.execDetached(powerManagerCommand("reboot"));
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionReboot]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionReboot));
         }
     }
 
@@ -481,24 +512,172 @@ Singleton {
         if (SettingsData.customPowerActionPowerOff.length === 0) {
             Quickshell.execDetached(powerManagerCommand("poweroff"));
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionPowerOff]);
+            Quickshell.execDetached(customActionCommand(SettingsData.customPowerActionPowerOff));
+        }
+    }
+
+    function isPowerActionSupported(action) {
+        switch (action) {
+        case "hibernate":
+            return hibernateSupported;
+        case "softreboot":
+            return softRebootSupported;
+        default:
+            return true;
+        }
+    }
+
+    function executePowerAction(action) {
+        if (action.startsWith("custom:")) {
+            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+            if (!button?.command)
+                return false;
+            Quickshell.execDetached(customActionCommand(button.command));
+            return true;
+        }
+        switch (action) {
+        case "logout":
+            logout();
+            return true;
+        case "suspend":
+            suspend();
+            return true;
+        case "hibernate":
+            hibernate();
+            return true;
+        case "reboot":
+            reboot();
+            return true;
+        case "softreboot":
+            softReboot();
+            return true;
+        case "poweroff":
+            poweroff();
+            return true;
+        case "restart":
+            Quickshell.execDetached(["dms", "restart"]);
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    function getPowerActionData(action) {
+        if (action.startsWith("custom:")) {
+            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+            return {
+                "icon": button?.icon || "terminal",
+                "label": button?.label || button?.command || "",
+                "key": ""
+            };
+        }
+        switch (action) {
+        case "reboot":
+            return {
+                "icon": "restart_alt",
+                "label": I18n.tr("Reboot"),
+                "key": "R"
+            };
+        case "softreboot":
+            return {
+                "icon": "autorenew",
+                "label": I18n.tr("Soft Reboot"),
+                "key": "B"
+            };
+        case "logout":
+            return {
+                "icon": "logout",
+                "label": I18n.tr("Log Out"),
+                "key": "X"
+            };
+        case "poweroff":
+            return {
+                "icon": "power_settings_new",
+                "label": I18n.tr("Power Off"),
+                "key": "P"
+            };
+        case "lock":
+            return {
+                "icon": "lock",
+                "label": I18n.tr("Lock"),
+                "key": "L"
+            };
+        case "suspend":
+            return {
+                "icon": "bedtime",
+                "label": I18n.tr("Suspend"),
+                "key": "S"
+            };
+        case "hibernate":
+            return {
+                "icon": "ac_unit",
+                "label": I18n.tr("Hibernate"),
+                "key": "H"
+            };
+        case "restart":
+            return {
+                "icon": "refresh",
+                "label": I18n.tr("Restart DMS"),
+                "key": "D"
+            };
+        case "switchuser":
+            return {
+                "icon": "switch_account",
+                "label": I18n.tr("Switch User"),
+                "key": "U"
+            };
+        default:
+            return {
+                "icon": "help",
+                "label": action,
+                "key": "?"
+            };
         }
     }
 
     // * Idle Inhibitor
     signal inhibitorChanged
 
-    // The inhibitor is a state the user turns on explicitly, so it is persisted in the session
-    // like the other Control Center toggles (doNotDisturb, nightModeEnabled, ...). Without this
-    // it lived only in memory and every shell restart silently cleared it.
-    //
-    // Both entry points are needed because the two singletons are lazily created and the order is
-    // not fixed: onLoaded covers "service first, session file read later", the restore below
-    // covers "session already loaded by the time the service is instantiated". enableIdleInhibit
-    // is idempotent, so whichever runs second does nothing.
+    readonly property int _maxExpireInterval: 86400000
+
+    Timer {
+        id: inhibitExpireTimer
+        repeat: false
+        running: false
+        onTriggered: root._armExpireTimer()
+    }
+
+    // Timers use a monotonic clock that stops across suspend, so the deadline is
+    // re-checked against the wall clock on resume and after each chunk.
+    function _armExpireTimer() {
+        inhibitExpireTimer.stop();
+        if (!idleInhibited || SessionData.idleInhibitedUntil <= 0)
+            return;
+        const remaining = SessionData.idleInhibitedUntil - Date.now();
+        if (remaining <= 0) {
+            disableIdleInhibit();
+            return;
+        }
+        inhibitExpireTimer.interval = Math.min(remaining, _maxExpireInterval);
+        inhibitExpireTimer.start();
+    }
+
+    onSessionResumed: _armExpireTimer()
+
+    function _setIdleInhibited(enabled) {
+        if (idleInhibited === enabled)
+            return;
+        idleInhibited = enabled;
+        inhibitorChanged();
+    }
+
+    // Both entry points are deliberate: the singletons are created lazily in no fixed order, so
+    // whichever of these runs once the session is loaded does the restore; the other no-ops.
     function _restoreIdleInhibit() {
-        if (SessionData.idleInhibited && !idleInhibited)
-            enableIdleInhibit();
+        if (!SessionData._hasLoaded)
+            return;
+        _setIdleInhibited(SessionData.idleInhibited);
+        _armExpireTimer();
     }
 
     Connections {
@@ -511,20 +690,16 @@ Singleton {
 
     Component.onCompleted: _restoreIdleInhibit()
 
-    function enableIdleInhibit() {
-        if (idleInhibited)
-            return;
-        idleInhibited = true;
-        SessionData.setIdleInhibited(true);
-        inhibitorChanged();
+    function enableIdleInhibit(durationMinutes) {
+        SessionData.setIdleInhibited(true, durationMinutes);
+        _setIdleInhibited(true);
+        _armExpireTimer();
     }
 
     function disableIdleInhibit() {
-        if (!idleInhibited)
-            return;
-        idleInhibited = false;
         SessionData.setIdleInhibited(false);
-        inhibitorChanged();
+        _setIdleInhibited(false);
+        _armExpireTimer();
     }
 
     function toggleIdleInhibit() {

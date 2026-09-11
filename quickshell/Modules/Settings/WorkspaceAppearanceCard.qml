@@ -183,7 +183,7 @@ SettingsCard {
                 "label": I18n.tr("Custom", "workspace color option")
             })]
 
-    readonly property bool workspaceStateColorsVisible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+    readonly property bool workspaceStateColorsVisible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isAqueous
     readonly property bool urgentWorkspaceColorsVisible: workspaceStateColorsVisible || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
 
     function isFocusedAppearanceSection(section) {

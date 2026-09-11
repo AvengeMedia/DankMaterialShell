@@ -20,8 +20,8 @@ QtObject {
 
     property real currentWidth: 176
     property real currentHeight: 42
-    property real currentOffsetX: 0
-    property real currentOffsetY: 8
+    property real currentOffsetAlong: 0
+    property real currentOffsetCross: 8
     property real currentTopLeftRadius: 21
     property real currentTopRightRadius: 21
     property real currentBottomLeftRadius: 21
@@ -29,8 +29,8 @@ QtObject {
 
     property real targetWidth: currentWidth
     property real targetHeight: currentHeight
-    property real targetOffsetX: currentOffsetX
-    property real targetOffsetY: currentOffsetY
+    property real targetOffsetAlong: currentOffsetAlong
+    property real targetOffsetCross: currentOffsetCross
     property real targetTopLeftRadius: currentTopLeftRadius
     property real targetTopRightRadius: currentTopRightRadius
     property real targetBottomLeftRadius: currentBottomLeftRadius
@@ -38,15 +38,15 @@ QtObject {
 
     property real velocityWidth: 0
     property real velocityHeight: 0
-    property real velocityOffsetX: 0
-    property real velocityOffsetY: 0
+    property real velocityOffsetAlong: 0
+    property real velocityOffsetCross: 0
     property real velocityTopLeftRadius: 0
     property real velocityTopRightRadius: 0
     property real velocityBottomLeftRadius: 0
     property real velocityBottomRightRadius: 0
 
     function matchesTarget(target) {
-        return targetWidth === target.width && targetHeight === target.height && targetOffsetX === target.offsetX && targetOffsetY === target.offsetY && targetTopLeftRadius === target.topLeftRadius && targetTopRightRadius === target.topRightRadius && targetBottomLeftRadius === target.bottomLeftRadius && targetBottomRightRadius === target.bottomRightRadius;
+        return targetWidth === target.width && targetHeight === target.height && targetOffsetAlong === target.offsetAlong && targetOffsetCross === target.offsetCross && targetTopLeftRadius === target.topLeftRadius && targetTopRightRadius === target.topRightRadius && targetBottomLeftRadius === target.bottomLeftRadius && targetBottomRightRadius === target.bottomRightRadius;
     }
 
     function setTarget(target) {
@@ -54,8 +54,8 @@ QtObject {
             return;
         targetWidth = target.width;
         targetHeight = target.height;
-        targetOffsetX = target.offsetX;
-        targetOffsetY = target.offsetY;
+        targetOffsetAlong = target.offsetAlong;
+        targetOffsetCross = target.offsetCross;
         targetTopLeftRadius = target.topLeftRadius;
         targetTopRightRadius = target.topRightRadius;
         targetBottomLeftRadius = target.bottomLeftRadius;
@@ -73,8 +73,8 @@ QtObject {
     function snapTo(target) {
         targetWidth = target.width;
         targetHeight = target.height;
-        targetOffsetX = target.offsetX;
-        targetOffsetY = target.offsetY;
+        targetOffsetAlong = target.offsetAlong;
+        targetOffsetCross = target.offsetCross;
         targetTopLeftRadius = target.topLeftRadius;
         targetTopRightRadius = target.topRightRadius;
         targetBottomLeftRadius = target.bottomLeftRadius;
@@ -82,8 +82,8 @@ QtObject {
 
         currentWidth = target.width;
         currentHeight = target.height;
-        currentOffsetX = target.offsetX;
-        currentOffsetY = target.offsetY;
+        currentOffsetAlong = target.offsetAlong;
+        currentOffsetCross = target.offsetCross;
         currentTopLeftRadius = target.topLeftRadius;
         currentTopRightRadius = target.topRightRadius;
         currentBottomLeftRadius = target.bottomLeftRadius;
@@ -91,8 +91,8 @@ QtObject {
 
         velocityWidth = 0;
         velocityHeight = 0;
-        velocityOffsetX = 0;
-        velocityOffsetY = 0;
+        velocityOffsetAlong = 0;
+        velocityOffsetCross = 0;
         velocityTopLeftRadius = 0;
         velocityTopRightRadius = 0;
         velocityBottomLeftRadius = 0;
@@ -101,16 +101,16 @@ QtObject {
     }
 
     function isSettled() {
-        const positionSettled = Math.abs(targetWidth - currentWidth) <= positionEpsilon && Math.abs(targetHeight - currentHeight) <= positionEpsilon && Math.abs(targetOffsetX - currentOffsetX) <= positionEpsilon && Math.abs(targetOffsetY - currentOffsetY) <= positionEpsilon && Math.abs(targetTopLeftRadius - currentTopLeftRadius) <= positionEpsilon && Math.abs(targetTopRightRadius - currentTopRightRadius) <= positionEpsilon && Math.abs(targetBottomLeftRadius - currentBottomLeftRadius) <= positionEpsilon && Math.abs(targetBottomRightRadius - currentBottomRightRadius) <= positionEpsilon;
-        const velocitySettled = Math.abs(velocityWidth) <= velocityEpsilon && Math.abs(velocityHeight) <= velocityEpsilon && Math.abs(velocityOffsetX) <= velocityEpsilon && Math.abs(velocityOffsetY) <= velocityEpsilon && Math.abs(velocityTopLeftRadius) <= velocityEpsilon && Math.abs(velocityTopRightRadius) <= velocityEpsilon && Math.abs(velocityBottomLeftRadius) <= velocityEpsilon && Math.abs(velocityBottomRightRadius) <= velocityEpsilon;
+        const positionSettled = Math.abs(targetWidth - currentWidth) <= positionEpsilon && Math.abs(targetHeight - currentHeight) <= positionEpsilon && Math.abs(targetOffsetAlong - currentOffsetAlong) <= positionEpsilon && Math.abs(targetOffsetCross - currentOffsetCross) <= positionEpsilon && Math.abs(targetTopLeftRadius - currentTopLeftRadius) <= positionEpsilon && Math.abs(targetTopRightRadius - currentTopRightRadius) <= positionEpsilon && Math.abs(targetBottomLeftRadius - currentBottomLeftRadius) <= positionEpsilon && Math.abs(targetBottomRightRadius - currentBottomRightRadius) <= positionEpsilon;
+        const velocitySettled = Math.abs(velocityWidth) <= velocityEpsilon && Math.abs(velocityHeight) <= velocityEpsilon && Math.abs(velocityOffsetAlong) <= velocityEpsilon && Math.abs(velocityOffsetCross) <= velocityEpsilon && Math.abs(velocityTopLeftRadius) <= velocityEpsilon && Math.abs(velocityTopRightRadius) <= velocityEpsilon && Math.abs(velocityBottomLeftRadius) <= velocityEpsilon && Math.abs(velocityBottomRightRadius) <= velocityEpsilon;
         return positionSettled && velocitySettled;
     }
 
     function settle() {
         currentWidth = targetWidth;
         currentHeight = targetHeight;
-        currentOffsetX = targetOffsetX;
-        currentOffsetY = targetOffsetY;
+        currentOffsetAlong = targetOffsetAlong;
+        currentOffsetCross = targetOffsetCross;
         currentTopLeftRadius = targetTopLeftRadius;
         currentTopRightRadius = targetTopRightRadius;
         currentBottomLeftRadius = targetBottomLeftRadius;
@@ -118,8 +118,8 @@ QtObject {
 
         velocityWidth = 0;
         velocityHeight = 0;
-        velocityOffsetX = 0;
-        velocityOffsetY = 0;
+        velocityOffsetAlong = 0;
+        velocityOffsetCross = 0;
         velocityTopLeftRadius = 0;
         velocityTopRightRadius = 0;
         velocityBottomLeftRadius = 0;
@@ -142,8 +142,8 @@ QtObject {
         for (let i = 0; i < steps; i++) {
             velocityWidth += (stiffness * (targetWidth - currentWidth) - damping * velocityWidth) * inverseMass * step;
             velocityHeight += (stiffness * (targetHeight - currentHeight) - damping * velocityHeight) * inverseMass * step;
-            velocityOffsetX += (stiffness * (targetOffsetX - currentOffsetX) - damping * velocityOffsetX) * inverseMass * step;
-            velocityOffsetY += (stiffness * (targetOffsetY - currentOffsetY) - damping * velocityOffsetY) * inverseMass * step;
+            velocityOffsetAlong += (stiffness * (targetOffsetAlong - currentOffsetAlong) - damping * velocityOffsetAlong) * inverseMass * step;
+            velocityOffsetCross += (stiffness * (targetOffsetCross - currentOffsetCross) - damping * velocityOffsetCross) * inverseMass * step;
             velocityTopLeftRadius += (stiffness * (targetTopLeftRadius - currentTopLeftRadius) - damping * velocityTopLeftRadius) * inverseMass * step;
             velocityTopRightRadius += (stiffness * (targetTopRightRadius - currentTopRightRadius) - damping * velocityTopRightRadius) * inverseMass * step;
             velocityBottomLeftRadius += (stiffness * (targetBottomLeftRadius - currentBottomLeftRadius) - damping * velocityBottomLeftRadius) * inverseMass * step;
@@ -151,8 +151,8 @@ QtObject {
 
             currentWidth += velocityWidth * step;
             currentHeight += velocityHeight * step;
-            currentOffsetX += velocityOffsetX * step;
-            currentOffsetY += velocityOffsetY * step;
+            currentOffsetAlong += velocityOffsetAlong * step;
+            currentOffsetCross += velocityOffsetCross * step;
             currentTopLeftRadius += velocityTopLeftRadius * step;
             currentTopRightRadius += velocityTopRightRadius * step;
             currentBottomLeftRadius += velocityBottomLeftRadius * step;

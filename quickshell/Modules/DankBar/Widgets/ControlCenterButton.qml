@@ -123,8 +123,10 @@ BasePill {
         switch (NetworkService.networkStatus) {
         case "ethernet":
             return "lan";
+        case "cellular":
+            return "network_cell";
         case "vpn":
-            return NetworkService.ethernetConnected ? "lan" : NetworkService.wifiSignalIcon;
+            return NetworkService.ethernetConnected ? "lan" : (NetworkService.cellularConnected ? "network_cell" : NetworkService.wifiSignalIcon);
         default:
             return NetworkService.wifiSignalIcon;
         }
@@ -159,6 +161,12 @@ BasePill {
             return Theme.surfaceText;
         if (AudioService.source.audio.muted || AudioService.source.audio.volume === 0)
             return Theme.surfaceText;
+        return Theme.widgetIconColor;
+    }
+
+    function getAudioIconColor() {
+        if (AudioService.sinkSilent)
+            return Theme.widgetInactiveIconColor;
         return Theme.widgetIconColor;
     }
 
@@ -543,7 +551,7 @@ BasePill {
                             visible: verticalGroupItem.modelData.id === "audio"
                             name: AudioService.sinkVolumeIconName
                             size: root.vIconSize
-                            color: Theme.widgetIconColor
+                            color: root.getAudioIconColor()
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.top: parent.top
                         }
@@ -743,7 +751,7 @@ BasePill {
                                     id: audioIcon
                                     name: AudioService.sinkVolumeIconName
                                     size: root.getControlCenterIconSize()
-                                    color: Theme.widgetIconColor
+                                    color: root.getAudioIconColor()
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 

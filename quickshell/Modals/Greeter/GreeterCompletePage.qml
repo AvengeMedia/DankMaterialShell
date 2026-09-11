@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 
@@ -11,7 +12,6 @@ Item {
     readonly property real headerIconContainerSize: Math.round(Theme.iconSize * 2)
     readonly property real sectionIconSize: Theme.iconSizeSmall + 2
     readonly property real keybindRowHeight: Math.round(Theme.fontSizeMedium * 2)
-    readonly property real keyBadgeHeight: Math.round(Theme.fontSizeSmall * 1.83)
 
     readonly property var featureNames: ({
             "spotlight": "App Launcher",
@@ -97,23 +97,49 @@ Item {
                     }
                 }
 
-                Column {
+                StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingXXS
+                    text: I18n.tr("You're All Set!", "greeter completion page title")
+                    font.pixelSize: Theme.fontSizeXLarge
+                    font.weight: Font.Bold
+                    color: Theme.surfaceText
+                }
+            }
 
-                    StyledText {
-                        text: I18n.tr("You're All Set!", "greeter completion page title")
-                        font.pixelSize: Theme.fontSizeXLarge
-                        font.weight: Font.Bold
-                        color: Theme.surfaceText
+            Column {
+                width: parent.width
+                spacing: Theme.spacingS
+
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: "toolbar"
+                        size: root.sectionIconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     StyledText {
-                        text: I18n.tr("DankMaterialShell is ready to use", "greeter completion page subtitle")
+                        text: I18n.tr("Layout")
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
+
+                SettingsLayoutPicker {
+                    width: parent.width
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Theme.outlineMedium
+                opacity: 0.3
             }
 
             Column {
@@ -200,23 +226,8 @@ Item {
                                         Repeater {
                                             model: (modelData.key || "").split("+")
 
-                                            Rectangle {
-                                                width: singleKeyText.implicitWidth + Theme.spacingM
-                                                height: root.keyBadgeHeight
-                                                radius: Theme.spacingXS
-                                                color: Theme.surfaceContainerHighest
-                                                border.width: 1
-                                                border.color: Theme.outline
-
-                                                StyledText {
-                                                    id: singleKeyText
-                                                    anchors.centerIn: parent
-                                                    color: Theme.secondary
-                                                    text: modelData
-                                                    font.pixelSize: Theme.fontSizeSmall - 1
-                                                    font.weight: Font.Medium
-                                                    isMonospace: true
-                                                }
+                                            DankKeycap {
+                                                text: modelData
                                             }
                                         }
                                     }
@@ -463,7 +474,7 @@ Item {
                     spacing: Theme.spacingS
 
                     GreeterQuickLink {
-                        width: (parent.width - Theme.spacingS * 2) / 3
+                        width: (parent.width - Theme.spacingS) / 2
                         iconName: "menu_book"
                         title: I18n.tr("Docs", "greeter documentation link")
                         isExternal: true
@@ -471,15 +482,7 @@ Item {
                     }
 
                     GreeterQuickLink {
-                        width: (parent.width - Theme.spacingS * 2) / 3
-                        iconName: "extension"
-                        title: I18n.tr("Plugins", "greeter plugins link")
-                        isExternal: true
-                        onClicked: Qt.openUrlExternally("https://danklinux.com/plugins")
-                    }
-
-                    GreeterQuickLink {
-                        width: (parent.width - Theme.spacingS * 2) / 3
+                        width: (parent.width - Theme.spacingS) / 2
                         iconName: "palette"
                         title: I18n.tr("Themes", "greeter themes link")
                         isExternal: true

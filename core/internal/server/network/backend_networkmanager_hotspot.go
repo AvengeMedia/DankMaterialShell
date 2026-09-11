@@ -1,6 +1,7 @@
 package network
 
 import (
+	"encoding/hex"
 	"fmt"
 	"sort"
 
@@ -21,14 +22,12 @@ const (
 
 var _ HotspotBackend = (*NetworkManagerBackend)(nil)
 
-// ConfigureHotspot validates only DMS-owned constraints: SSID presence, band
-// names, device capability, and the not-active guard. SSID byte-length and
-// WPA-PSK password policy are deliberately left to NetworkManager, whose
-// AddConnection/Update errors are returned to the caller; duplicating its
-// evolving rules here would only let them drift.
 func (b *NetworkManagerBackend) ConfigureHotspot(req HotspotRequest) error {
 	if req.SSID == "" {
 		return fmt.Errorf("hotspot SSID cannot be empty")
+	}
+	if err := validateHotspotPassword(req.Password); err != nil {
+		return err
 	}
 	if err := validateHotspotBandName(req.Band); err != nil {
 		return err
@@ -493,6 +492,22 @@ func isAPCapableWiFiDevice(devInfo *wifiDeviceInfo) (bool, error) {
 	}
 
 	return caps&nmWiFiDeviceCapAP != 0, nil
+}
+
+// Mirrors NetworkManager's nm_utils_wpa_psk_valid: byte length, not rune count.
+func validateHotspotPassword(password string) error {
+	if password == "" {
+		return nil
+	}
+	if len(password) == 64 {
+		if _, err := hex.DecodeString(password); err == nil {
+			return nil
+		}
+	}
+	if len(password) < 8 || len(password) > 63 {
+		return fmt.Errorf("hotspot password must be 8 to 63 characters, or a 64-digit hex key")
+	}
+	return nil
 }
 
 func validateHotspotBandName(band string) error {

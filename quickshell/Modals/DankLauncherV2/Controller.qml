@@ -821,24 +821,15 @@ Item {
             }
 
             if (isCategoryFiltered) {
-                var categoryPluginId = AppSearchService.getPluginIdForCategory(appCategory);
-                if (categoryPluginId) {
-                    var pluginCategoryItems = getPluginItems(categoryPluginId, "");
-                    for (var i = 0; i < pluginCategoryItems.length; i++) {
-                        allItems.push(pluginCategoryItems[i]);
-                    }
-                } else {
-                    var rawApps = AppSearchService.getAppsInCategory(appCategory);
-                    for (var i = 0; i < rawApps.length; i++) {
-                        allItems.push(getOrTransformApp(rawApps[i]));
-                    }
-                    // Also include core apps (DMS Settings etc.) that match this category
-                    var allCoreApps = AppSearchService.getCoreApps("");
-                    for (var i = 0; i < allCoreApps.length; i++) {
-                        var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
-                        if (coreAppCats.indexOf(appCategory) !== -1)
-                            allItems.push(transformCoreApp(allCoreApps[i]));
-                    }
+                var rawApps = AppSearchService.getAppsInCategory(appCategory);
+                for (var i = 0; i < rawApps.length; i++) {
+                    allItems.push(getOrTransformApp(rawApps[i]));
+                }
+                var allCoreApps = AppSearchService.getCoreApps("");
+                for (var i = 0; i < allCoreApps.length; i++) {
+                    var coreAppCats = AppSearchService.getCategoriesForApp(allCoreApps[i]);
+                    if (coreAppCats.indexOf(appCategory) !== -1)
+                        allItems.push(transformCoreApp(allCoreApps[i]));
                 }
             } else {
                 var apps = searchApps(searchQuery);
@@ -1537,9 +1528,12 @@ Item {
             var meta = getPluginMetadata(pluginId);
             var viewPref = getPluginViewPref(pluginId);
             var orderIdx = orderMap[pluginId];
+            var defaultPriority = AppSearchService.builtInPlugins[pluginId]?.defaultSectionPriority;
             var priority;
             if (orderIdx !== undefined) {
                 priority = 2.6 + orderIdx * 0.01;
+            } else if (defaultPriority !== undefined) {
+                priority = defaultPriority;
             } else {
                 priority = unorderedPriority;
                 unorderedPriority += 0.01;
@@ -1685,18 +1679,60 @@ Item {
         return result;
     }
 
+    function _diskCacheSectionDef(sectionId) {
+        for (var i = 0; i < sectionDefinitions.length; i++) {
+            if (sectionDefinitions[i].id === sectionId)
+                return sectionDefinitions[i];
+        }
+        return null;
+    }
+
+    function _diskCacheSection(def, items) {
+        return {
+            id: def.id || "",
+            title: def.title || "",
+            icon: def.icon || "",
+            priority: def.priority || 0,
+            items: items,
+            collapsed: false,
+            flatStartIndex: 0
+        };
+    }
+
     function _loadDiskCache() {
         var cached = CacheData.loadLauncherCache();
         if (!cached || !Array.isArray(cached) || cached.length === 0)
             return null;
 
+        var browseItems = getPluginBrowseItems();
+        var liveCoreItems = {};
+        var liveCoreApps = AppSearchService.getCoreApps("");
+        for (var c = 0; c < liveCoreApps.length; c++) {
+            var coreItem = transformCoreApp(liveCoreApps[c]);
+            liveCoreItems[coreItem.id] = coreItem;
+        }
+
         var sectionsData = [];
+        var browseSectionSeen = false;
         for (var i = 0; i < cached.length; i++) {
             var s = cached[i];
+            if (s.id === "browse_plugins") {
+                browseSectionSeen = true;
+                if (browseItems.length > 0)
+                    sectionsData.push(_diskCacheSection(_diskCacheSectionDef(s.id) || s, browseItems));
+                continue;
+            }
             var items = [];
             var srcItems = s.items || [];
             for (var j = 0; j < srcItems.length; j++) {
                 var it = srcItems[j];
+                if (it.isCore) {
+                    if (liveCoreItems[it.id])
+                        items.push(liveCoreItems[it.id]);
+                    continue;
+                }
+                if (it.type === "plugin_browse" || it.isBuiltInLauncher || it.pluginId)
+                    continue;
                 items.push({
                     id: it.id || "",
                     type: it.type || "app",
@@ -1706,15 +1742,12 @@ Item {
                     iconType: it.iconType || "image",
                     iconFull: it.iconFull || "",
                     section: it.section || "",
-                    isCore: it.isCore || false,
-                    isBuiltInLauncher: it.isBuiltInLauncher || false,
-                    pluginId: it.pluginId || "",
                     source: it.source || "",
                     data: {
                         id: it.id
                     },
                     actions: _actionsFromDesktopEntry(it.id),
-                    primaryAction: it.type === "app" && !it.isCore ? {
+                    primaryAction: it.type === "app" ? {
                         name: I18n.tr("Launch"),
                         icon: "open_in_new",
                         action: "launch"
@@ -1726,16 +1759,22 @@ Item {
                     _preScored: undefined
                 });
             }
-            sectionsData.push({
-                id: s.id || "",
-                title: s.title || "",
-                icon: s.icon || "",
-                priority: s.priority || 0,
-                items: items,
-                collapsed: false,
-                flatStartIndex: 0
-            });
+            if (items.length > 0)
+                sectionsData.push(_diskCacheSection(s, items));
         }
+
+        if (!browseSectionSeen && browseItems.length > 0) {
+            var browseDef = _diskCacheSectionDef("browse_plugins");
+            if (browseDef)
+                sectionsData.push(_diskCacheSection(browseDef, browseItems));
+        }
+
+        if (sectionsData.length === 0)
+            return null;
+
+        sectionsData.sort(function (a, b) {
+            return a.priority - b.priority;
+        });
         return sectionsData;
     }
 

@@ -9,6 +9,8 @@ Column {
 
     readonly property real logoSize: Math.round(Theme.iconSize * 2.8)
     readonly property real badgeHeight: Math.round(Theme.fontSizeSmall * 1.7)
+    readonly property string releaseNotesUrl: "https://danklinux.com/blog/v1-6-release"
+    readonly property string screenshotDocsUrl: "https://danklinux.com/docs/dankmaterialshell/cli-screenshot"
 
     topPadding: Theme.spacingL
     spacing: Theme.spacingL
@@ -65,7 +67,7 @@ Column {
                         StyledText {
                             id: codenameText
                             anchors.centerIn: parent
-                            text: "The Wolverine"
+                            text: "Marble Tabby"
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Medium
                             color: Theme.primary
@@ -74,7 +76,7 @@ Column {
                 }
 
                 StyledText {
-                    text: "Frame Mode, DankCalendar, Spotlight, & more"
+                    text: "Dank Island, spring motion, performance & resource optimizations"
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceVariantText
                 }
@@ -108,98 +110,100 @@ Column {
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "border_outer"
-                title: "Frame Mode"
-                description: "Connected shell surfaces"
-                onClicked: PopoutService.openSettingsWithTab("frame")
+                iconName: "view_in_ar"
+                title: "Dank Island"
+                description: "A bar that reacts to you"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("dankIslandInstance");
+                    PopoutService.openSettingsWithTab("dank_island");
+                }
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "calendar_month"
-                title: "DankCalendar"
-                description: "Native calendar & events"
-                onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/dankcalendar")
+                iconName: "animation"
+                title: "Spring Motion"
+                description: "New motion physics"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("springBounce");
+                    PopoutService.openSettingsWithTab("typography");
+                }
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "search"
-                title: "Spotlight"
-                description: "Lightweight launcher"
-                onClicked: PopoutService.openSpotlightBar()
+                iconName: "speed"
+                title: "Performance"
+                description: "Big speedups, less memory"
+                onClicked: Qt.openUrlExternally(root.releaseNotesUrl)
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "window"
-                title: "Window Rules"
-                description: "Rules for many compositors"
-                onClicked: PopoutService.openSettingsWithTab("window_rules")
+                iconName: "wifi_tethering"
+                title: "Network"
+                description: "Hotspot, cellular, and OWE"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("networkHotspot");
+                    PopoutService.openSettingsWithTab("network_wifi");
+                }
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "display_settings"
-                title: "Display Profiles"
-                description: "Auto-switch monitor layouts"
-                onClicked: PopoutService.openSettingsWithTab("display_config")
+                iconName: "extension"
+                title: "Plugin Registries"
+                description: "Add your own sources"
+                onClicked: PopoutService.openSettingsWithTab("plugins")
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "dvr"
-                title: "Multiplexer Launcher"
-                description: "Attach to tmux sessions"
-                onClicked: PopoutService.openSettingsWithTab("multiplexers")
-            }
-
-            ChangelogFeatureCard {
-                width: (parent.width - Theme.spacingS) / 2
-                iconName: "edit_note"
-                title: "Notepad Rewrite"
-                description: "Popout & tiling support"
-                onClicked: PopoutService.openNotepad()
-            }
-
-            ChangelogFeatureCard {
-                width: (parent.width - Theme.spacingS) / 2
-                iconName: "gradient"
-                title: "M3 Shadows"
-                description: "Reworked elevation system"
-                onClicked: PopoutService.openSettingsWithTab("theme")
+                iconName: "photo_camera"
+                title: "Capture"
+                description: "Grab regions across outputs"
+                onClicked: Qt.openUrlExternally(root.screenshotDocsUrl)
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
                 iconName: "login"
-                title: "Greeter Enhancements"
-                description: "Settings GUI & multi-user"
-                onClicked: PopoutService.openSettingsWithTab("greeter")
+                title: "Standalone Greeter"
+                description: "Now its own app"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("greeterStatus");
+                    PopoutService.openSettingsWithTab("greeter");
+                }
+            }
+
+            ChangelogFeatureCard {
+                width: (parent.width - Theme.spacingS) / 2
+                iconName: "dock_to_bottom"
+                title: "Dock"
+                description: "Pinned apps, running apps"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("dockSeparatePinnedAndRunningApps");
+                    PopoutService.openSettingsWithTab("dock");
+                }
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
                 iconName: "content_paste"
-                title: "Clipboard Filtering"
-                description: "Text, image & pinned filters"
+                title: "Clipboard"
+                description: "Drop in anything to store it"
                 onClicked: PopoutService.openSettingsWithTab("clipboard")
             }
 
             ChangelogFeatureCard {
                 width: (parent.width - Theme.spacingS) / 2
-                iconName: "restart_alt"
-                title: "XDG Autostart"
-                description: "Manage apps at login"
-                onClicked: PopoutService.openSettingsWithTab("autostart")
-            }
-
-            ChangelogFeatureCard {
-                width: (parent.width - Theme.spacingS) / 2
-                iconName: "apps"
-                title: "Default Apps"
-                description: "Set preferred applications"
-                onClicked: PopoutService.openSettingsWithTab("default_apps")
+                iconName: "language"
+                title: "Translations"
+                description: "22 languages, plugin translations"
+                onClicked: {
+                    SettingsSearchService.navigateToSection("locale");
+                    PopoutService.openSettingsWithTab("locale");
+                }
             }
         }
     }
@@ -252,16 +256,19 @@ Column {
 
                 ChangelogUpgradeNote {
                     width: parent.width
-                    text: "App ID changed to com.danklinux.dms — update any compositor window rules targeting the old ID"
+                    text: "The shell is embedded in the dms binary. ~/.config/quickshell/dms is no longer auto-discovered, pass -c or set DMS_SHELL_DIR to override it"
+                }
+
+                ChangelogUpgradeNote {
+                    width: parent.width
+                    text: "The greeter is now a standalone application. dms greeter commands become dms-greeter"
+                }
+
+                ChangelogUpgradeNote {
+                    width: parent.width
+                    text: "settings.json only stores what differs from the defaults, and machine-specific state moved to session.json"
                 }
             }
         }
-
-        // StyledText {
-        //     text: "See full release notes for migration steps"
-        //     font.pixelSize: Theme.fontSizeSmall
-        //     color: Theme.surfaceVariantText
-        //     width: parent.width
-        // }
     }
 }

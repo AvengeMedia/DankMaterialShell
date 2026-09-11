@@ -18,6 +18,12 @@ Rectangle {
     implicitHeight: {
         if (height > 0)
             return height;
+        if (currentConnectionType === "cellular" && NetworkService.cellularToggling)
+            return headerRow.height + cellularToggleContent.height + Theme.spacingM;
+        if (currentConnectionType === "cellular" && NetworkService.cellularEnabled)
+            return headerRow.height + cellularContent.height + Theme.spacingM;
+        if (currentConnectionType === "cellular")
+            return headerRow.height + cellularOffContent.height + Theme.spacingM;
         if (NetworkService.wifiToggling)
             return headerRow.height + hotspotContentHeight + wifiToggleContent.height + Theme.spacingM;
         if (NetworkService.wifiEnabled)
@@ -39,12 +45,28 @@ Rectangle {
 
     property bool hasEthernetAvailable: (NetworkService.ethernetDevices?.length ?? 0) > 0
     property bool hasWifiAvailable: (NetworkService.wifiDevices?.length ?? 0) > 0
-    property bool hasBothConnectionTypes: hasEthernetAvailable && hasWifiAvailable
+    property bool hasCellularAvailable: (NetworkService.cellularDevices?.length ?? 0) > 0
+    property var connectionTypes: {
+        const types = [];
+        if (hasEthernetAvailable)
+            types.push("ethernet");
+        if (hasWifiAvailable)
+            types.push("wifi");
+        if (hasCellularAvailable)
+            types.push("cellular");
+        return types.length > 0 ? types : ["wifi"];
+    }
+    property string selectedType: ""
+    readonly property string currentConnectionType: {
+        if (selectedType && connectionTypes.includes(selectedType))
+            return selectedType;
+        return connectionTypes[Math.max(0, currentPreferenceIndex)] || "wifi";
+    }
     property int maxPinnedNetworks: 3
     // Hosting on the only wifi adapter with no ethernet uplink just drops connectivity,
     // so the hotspot row only shows where sharing can actually work (or is already on).
     readonly property bool hotspotRelevant: NetworkService.hotspotEnabled || NetworkService.hotspotActivating || NetworkService.hotspotBusy || NetworkService.ethernetConnected || (NetworkService.wifiDevices?.length ?? 0) > 1
-    readonly property bool showHotspotRow: currentPreferenceIndex === 1 && NetworkService.hotspotAvailable && hotspotRelevant
+    readonly property bool showHotspotRow: currentConnectionType === "wifi" && NetworkService.hotspotAvailable && hotspotRelevant
     readonly property int hotspotContentHeight: showHotspotRow ? 56 + Theme.spacingS : 0
 
     property var hotspotStartConfirm: ConfirmModal {}
@@ -81,20 +103,13 @@ Rectangle {
             return 1;
         if (NetworkService.backend !== "networkmanager" || DMSService.apiVersion <= 10)
             return 1;
-        if (!hasEthernetAvailable)
-            return 1;
-        if (!hasWifiAvailable)
-            return 0;
-
         const pref = NetworkService.userPreference;
-        switch (pref) {
-        case "ethernet":
-            return 0;
-        case "wifi":
-            return 1;
-        default:
-            return NetworkService.networkStatus === "ethernet" ? 0 : 1;
-        }
+        if (connectionTypes.indexOf(pref) !== -1)
+            return connectionTypes.indexOf(pref);
+        if (connectionTypes.indexOf(NetworkService.networkStatus) !== -1)
+            return connectionTypes.indexOf(NetworkService.networkStatus);
+        const wifiIndex = connectionTypes.indexOf("wifi");
+        return wifiIndex !== -1 ? wifiIndex : 0;
     }
 
     Row {
@@ -129,7 +144,7 @@ Rectangle {
             DankDropdown {
                 id: wifiDeviceDropdown
                 anchors.verticalCenter: parent.verticalCenter
-                visible: currentPreferenceIndex === 1 && (NetworkService.wifiDevices?.length ?? 0) > 1
+                visible: currentConnectionType === "wifi" && (NetworkService.wifiDevices?.length ?? 0) > 1
                 compactMode: true
                 dropdownWidth: 120
                 popupWidth: 160
@@ -150,21 +165,46 @@ Rectangle {
                 }
             }
 
+            DankRefreshButton {
+                anchors.verticalCenter: parent.verticalCenter
+                buttonSize: 28
+                iconSize: 16
+                iconColor: Theme.surfaceVariantText
+                visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling
+                busy: NetworkService.isScanning
+                onClicked: NetworkService.scanWifi()
+            }
+
             DankButtonGroup {
                 id: preferenceControls
                 anchors.verticalCenter: parent.verticalCenter
-                visible: hasBothConnectionTypes && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
                 buttonHeight: 28
                 textSize: Theme.fontSizeSmall
 
-                model: [I18n.tr("Ethernet"), I18n.tr("WiFi")]
-                currentIndex: currentPreferenceIndex
+                readonly property var labelsByType: ({
+                        "ethernet": I18n.tr("Ethernet"),
+                        "wifi": I18n.tr("WiFi"),
+                        "cellular": I18n.tr("Cellular")
+                    })
+
+                visible: connectionTypes.length > 1 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
+                model: connectionTypes.map(t => labelsByType[t] || t)
+                currentIndex: Math.max(0, connectionTypes.indexOf(currentConnectionType))
                 selectionMode: "single"
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
                         return;
-                    NetworkService.setNetworkPreference(index === 0 ? "ethernet" : "wifi");
+                    selectedType = connectionTypes[index] || "wifi";
+                    NetworkService.setNetworkPreference(selectedType);
                 }
+            }
+
+            DankToggle {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: currentConnectionType === "cellular" && NetworkService.backend === "networkmanager"
+                checked: NetworkService.cellularEnabled
+                enabled: NetworkService.cellularHardwareEnabled && !NetworkService.cellularToggling
+                onToggled: NetworkService.toggleCellularRadio()
             }
 
             DankActionButton {
@@ -175,7 +215,12 @@ Rectangle {
                 iconColor: Theme.surfaceVariantText
                 onClicked: {
                     PopoutService.closeControlCenter();
-                    PopoutService.openSettingsWithTab(currentPreferenceIndex === 0 ? "network_ethernet" : "network_wifi");
+                    if (currentConnectionType === "ethernet")
+                        PopoutService.openSettingsWithTab("network_ethernet");
+                    else if (currentConnectionType === "cellular")
+                        PopoutService.openSettingsWithTab("network_cellular");
+                    else
+                        PopoutService.openSettingsWithTab("network_wifi");
                 }
             }
         }
@@ -359,7 +404,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
-        visible: currentPreferenceIndex === 1 && NetworkService.wifiToggling
+        visible: currentConnectionType === "wifi" && NetworkService.wifiToggling
         height: visible ? wifiToggleColumn.implicitHeight + Theme.spacingM * 2 : 0
 
         Column {
@@ -400,7 +445,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
-        visible: currentPreferenceIndex === 1 && !NetworkService.wifiEnabled && !NetworkService.wifiToggling
+        visible: currentConnectionType === "wifi" && !NetworkService.wifiEnabled && !NetworkService.wifiToggling
         height: visible ? wifiOffColumn.implicitHeight + Theme.spacingM * 2 : 0
 
         Column {
@@ -455,6 +500,327 @@ Rectangle {
     }
 
     ScriptModel {
+        id: cellularConnectionsModel
+        objectProp: "uuid"
+        values: {
+            const networks = NetworkService.cellularConnections || [];
+            let sorted = [...networks];
+            sorted.sort((a, b) => {
+                if (a.isActive && !b.isActive)
+                    return -1;
+                if (!a.isActive && b.isActive)
+                    return 1;
+                return (a.id || "").localeCompare(b.id || "");
+            });
+            return sorted;
+        }
+    }
+
+    Item {
+        id: cellularToggleContent
+        anchors.top: headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: Theme.spacingM
+        anchors.topMargin: Theme.spacingM
+        visible: currentConnectionType === "cellular" && NetworkService.cellularToggling
+        height: visible ? cellularToggleColumn.implicitHeight + Theme.spacingM * 2 : 0
+
+        Column {
+            id: cellularToggleColumn
+            anchors.centerIn: parent
+            spacing: Theme.spacingM
+
+            DankIcon {
+                anchors.horizontalCenter: parent.horizontalCenter
+                name: "sync"
+                size: 32
+                color: Theme.primary
+                smoothTransform: NetworkService.cellularToggling
+
+                RotationAnimator on rotation {
+                    running: NetworkService.cellularToggling
+                    loops: Animation.Infinite
+                    from: 0
+                    to: 360
+                    duration: 1000
+                }
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: NetworkService.cellularEnabled ? I18n.tr("Disabling cellular...") : I18n.tr("Enabling cellular...")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+    }
+
+    Item {
+        id: cellularOffContent
+        anchors.top: headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: Theme.spacingM
+        anchors.topMargin: Theme.spacingM
+        visible: currentConnectionType === "cellular" && !NetworkService.cellularEnabled && !NetworkService.cellularToggling
+        height: visible ? cellularOffColumn.implicitHeight + Theme.spacingM * 2 : 0
+
+        Column {
+            id: cellularOffColumn
+            anchors.centerIn: parent
+            spacing: Theme.spacingL
+            width: parent.width
+
+            DankIcon {
+                anchors.horizontalCenter: parent.horizontalCenter
+                name: "network_cell"
+                size: 48
+                color: Theme.surfaceTextSecondary
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: NetworkService.cellularHardwareEnabled ? I18n.tr("Disabled") : I18n.tr("Unavailable")
+                font.pixelSize: Theme.fontSizeLarge
+                color: Theme.surfaceText
+                font.weight: Font.Medium
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: enableCellularLabel.implicitWidth + Theme.spacingL * 2
+                height: enableCellularLabel.implicitHeight + Theme.spacingM * 2
+                radius: height / 2
+                color: enableCellularButton.containsMouse ? Theme.primaryHover : Theme.primaryHoverLight
+                border.width: 0
+                visible: NetworkService.cellularHardwareEnabled
+
+                StyledText {
+                    id: enableCellularLabel
+                    anchors.centerIn: parent
+                    text: I18n.tr("Enable Cellular")
+                    color: Theme.primary
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                }
+
+                MouseArea {
+                    id: enableCellularButton
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: NetworkService.toggleCellularRadio()
+                }
+            }
+        }
+    }
+
+    DankFlickable {
+        id: cellularContent
+        anchors.top: headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: Theme.spacingM
+        anchors.topMargin: Theme.spacingM
+        visible: currentConnectionType === "cellular" && NetworkService.backend === "networkmanager" && NetworkService.cellularEnabled && !NetworkService.cellularToggling
+        enabled: visible
+        contentHeight: cellularColumn.height
+        clip: true
+
+        Column {
+            id: cellularColumn
+            width: parent.width
+            spacing: Theme.spacingS
+
+            Repeater {
+                model: (NetworkService.cellularConnections?.length ?? 0) > 0 ? [] : (NetworkService.cellularDevices || [])
+
+                delegate: Rectangle {
+                    id: cellularDeviceDelegate
+                    required property var modelData
+
+                    readonly property bool isActive: modelData.connected || false
+
+                    width: parent.width
+                    height: 56
+                    radius: Theme.cornerRadius
+                    color: cellularDeviceMouse.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: isActive ? Theme.primary : Theme.outlineLight
+                    border.width: isActive ? 2 : 1
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.right: cellularDeviceAction.left
+                        anchors.rightMargin: Theme.spacingS
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "network_cell"
+                            size: Theme.iconSize - 4
+                            color: cellularDeviceDelegate.isActive ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - Theme.iconSize - Theme.spacingS
+                            spacing: 2
+
+                            StyledText {
+                                text: modelData.description || modelData.name || I18n.tr("Unknown")
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: cellularDeviceDelegate.isActive ? Theme.primary : Theme.surfaceText
+                                font.weight: cellularDeviceDelegate.isActive ? Font.Medium : Font.Normal
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+
+                            StyledText {
+                                text: cellularDeviceDelegate.isActive ? I18n.tr("Connected") : (modelData.state || I18n.tr("Available"))
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+                        }
+                    }
+
+                    DankActionButton {
+                        id: cellularDeviceAction
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: cellularDeviceDelegate.isActive ? "link_off" : "link"
+                        buttonSize: 28
+                        iconSize: 18
+                        iconColor: cellularDeviceDelegate.isActive ? Theme.error : Theme.primary
+                        onClicked: NetworkService.toggleNetworkConnection("cellular")
+                    }
+
+                    MouseArea {
+                        id: cellularDeviceMouse
+                        anchors.fill: parent
+                        anchors.rightMargin: cellularDeviceAction.width + Theme.spacingS
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: NetworkService.toggleNetworkConnection("cellular")
+                    }
+                }
+            }
+
+            Repeater {
+                model: cellularConnectionsModel
+
+                delegate: Rectangle {
+                    id: cellularDelegate
+                    required property var modelData
+
+                    readonly property bool isActive: modelData.isActive
+                    readonly property string configName: modelData.id || I18n.tr("Unknown")
+
+                    width: parent.width
+                    height: cellularContentRow.implicitHeight + Theme.spacingM * 2
+                    radius: Theme.cornerRadius
+                    color: cellularMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                    border.color: cellularDelegate.isActive ? Theme.primary : Theme.outlineLight
+                    border.width: cellularDelegate.isActive ? 2 : 1
+
+                    Row {
+                        id: cellularContentRow
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.right: cellularActionButton.left
+                        anchors.rightMargin: Theme.spacingS
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "network_cell"
+                            size: Theme.iconSize - 4
+                            color: cellularDelegate.isActive ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - Theme.iconSize - Theme.spacingS
+                            spacing: 2
+
+                            StyledText {
+                                text: cellularDelegate.configName
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: cellularDelegate.isActive ? Theme.primary : Theme.surfaceText
+                                font.weight: cellularDelegate.isActive ? Font.Medium : Font.Normal
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+
+                            StyledText {
+                                text: cellularDelegate.isActive ? I18n.tr("Connected") : (modelData.type || I18n.tr("Available"))
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+                        }
+                    }
+
+                    DankActionButton {
+                        id: cellularActionButton
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: cellularDelegate.isActive ? "link_off" : "link"
+                        buttonSize: 28
+                        iconSize: 18
+                        iconColor: cellularDelegate.isActive ? Theme.error : Theme.primary
+                        onClicked: {
+                            if (cellularDelegate.isActive)
+                                NetworkService.toggleNetworkConnection("cellular");
+                            else
+                                NetworkService.connectToSpecificCellularConfig(modelData.uuid);
+                        }
+                    }
+
+                    DankRipple {
+                        id: cellularRipple
+                        cornerRadius: parent.radius
+                    }
+
+                    MouseArea {
+                        id: cellularMouseArea
+                        anchors.fill: parent
+                        anchors.rightMargin: cellularActionButton.width + Theme.spacingS
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => cellularRipple.trigger(mouse.x, mouse.y)
+                        onClicked: function (event) {
+                            if (!cellularDelegate.isActive)
+                                NetworkService.connectToSpecificCellularConfig(modelData.uuid);
+                            event.accepted = true;
+                        }
+                    }
+                }
+            }
+
+            StyledText {
+                width: parent.width
+                visible: (NetworkService.cellularDevices?.length ?? 0) === 0 && cellularConnectionsModel.values.length === 0
+                text: I18n.tr("No devices found")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceVariantText
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+    }
+
+    ScriptModel {
         id: wiredConnectionsModel
         objectProp: "uuid"
         values: {
@@ -481,7 +847,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
-        visible: currentPreferenceIndex === 0 && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
+        visible: currentConnectionType === "ethernet" && NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
         contentHeight: wiredColumn.height
         clip: true
 
@@ -682,7 +1048,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
-        visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling && NetworkService.wifiInterface && (NetworkService.wifiNetworks?.length ?? 0) < 1 && NetworkService.isScanning
+        visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling && NetworkService.wifiInterface && (NetworkService.wifiNetworks?.length ?? 0) < 1 && NetworkService.isScanning
 
         DankIcon {
             anchors.centerIn: parent
@@ -709,7 +1075,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: hotspotRow.visible ? Theme.spacingS : Theme.spacingM
-        visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !wifiScanningOverlay.visible
+        visible: currentConnectionType === "wifi" && NetworkService.wifiEnabled && !NetworkService.wifiToggling && !wifiScanningOverlay.visible
         clip: true
         spacing: Theme.spacingS
         model: wifiNetworksModel

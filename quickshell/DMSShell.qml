@@ -37,7 +37,7 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
-    readonly property var dankIslandScreens: SettingsData.getIslandScreens()
+    readonly property var dankIslandScreens: Quickshell.screens.filter(screen => SettingsData.dankIslandCoversScreen(screen))
     readonly property var notificationPopupScreens: {
         const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
         return root.withoutDankIslandScreens(screens);
@@ -378,6 +378,39 @@ Item {
                 confirmColor: Theme.error,
                 onConfirm: () => TrashService.emptyTrash()
             });
+        }
+    }
+
+    LazyLoader {
+        id: uninstallAppConfirmLoader
+        active: false
+        readonly property ConfirmModal loadedModal: item as ConfirmModal
+
+        ConfirmModal {
+            id: uninstallAppConfirm
+        }
+    }
+
+    Connections {
+        target: AppSearchService
+        function onUninstallAppConfirmRequested(appId, appName, flatpakId) {
+            uninstallAppConfirmLoader.active = true;
+            const showDialog = () => {
+                if (uninstallAppConfirmLoader.loadedModal) {
+                    uninstallAppConfirmLoader.loadedModal.showWithOptions({
+                        title: I18n.tr("Uninstall %1?", "modal title for app uninstallation").arg(appName),
+                        message: I18n.tr("%1 will be removed from your system.", "modal confirmation text for uninstalling an app").arg(appName),
+                        confirmText: I18n.tr("Uninstall", "confirm button label to proceed with uninstallation"),
+                        cancelText: I18n.tr("Cancel"),
+                        confirmColor: Theme.error,
+                        onConfirm: () => AppSearchService.uninstallFlatpak(appId, appName, flatpakId)
+                    });
+                }
+            };
+            if (uninstallAppConfirmLoader.loadedModal)
+                showDialog();
+            else
+                Qt.callLater(showDialog);
         }
     }
 
@@ -1065,45 +1098,53 @@ Item {
         PowerMenuModal {
             id: powerMenuModal
 
-            onPowerActionRequested: (action, title, message) => {
-                PopoutService.closeControlCenter();
-                switch (action) {
-                case "logout":
-                    SessionService.logout();
-                    break;
-                case "suspend":
-                    SessionService.suspend();
-                    break;
-                case "hibernate":
-                    SessionService.hibernate();
-                    break;
-                case "reboot":
-                    SessionService.reboot();
-                    break;
-                case "softreboot":
-                    SessionService.softReboot();
-                    break;
-                case "poweroff":
-                    SessionService.poweroff();
-                    break;
-                }
-            }
-
-            onLockRequested: {
-                PopoutService.closeControlCenter();
-                lock.activate();
-            }
-
-            onSwitchUserRequested: {
-                switchUserModalLoader.active = true;
-                Qt.callLater(() => {
-                    if (switchUserModalLoader.loadedModal)
-                        switchUserModalLoader.loadedModal.showFromPowerMenu();
-                });
-            }
+            onPowerActionRequested: (action, title, message) => root._executePowerAction(action)
+            onLockRequested: root._lockFromPowerMenu()
+            onSwitchUserRequested: root._switchUserFromPowerMenu()
 
             Component.onCompleted: {
                 PopoutService.powerMenuModal = powerMenuModal;
+            }
+        }
+    }
+
+    function _executePowerAction(action) {
+        PopoutService.closeControlCenter();
+        SessionService.executePowerAction(action);
+    }
+
+    function _lockFromPowerMenu() {
+        PopoutService.closeControlCenter();
+        lock.activate();
+    }
+
+    function _switchUserFromPowerMenu() {
+        switchUserModalLoader.active = true;
+        Qt.callLater(() => {
+            if (switchUserModalLoader.loadedModal)
+                switchUserModalLoader.loadedModal.showFromPowerMenu();
+        });
+    }
+
+    LazyLoader {
+        id: powerMenuPopoutLoader
+
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.powerMenuPopoutLoader = powerMenuPopoutLoader;
+        }
+
+        PowerMenuPopout {
+            id: powerMenuPopout
+
+            onPowerActionRequested: action => root._executePowerAction(action)
+            onLockRequested: root._lockFromPowerMenu()
+            onSwitchUserRequested: root._switchUserFromPowerMenu()
+            onPopoutClosed: PopoutService.unloadPowerMenuPopout()
+
+            Component.onCompleted: {
+                PopoutService.powerMenuPopout = powerMenuPopout;
             }
         }
     }
@@ -1232,6 +1273,12 @@ Item {
 
                     delegate: AudioOutputOSD {}
                 }
+
+                Variants {
+                    model: SettingsData.osdWorkspaceEnabled ? SettingsData.getFilteredScreens("osd") : []
+
+                    delegate: WorkspaceOSD {}
+                }
             }
         }
     }
@@ -1253,6 +1300,11 @@ Item {
             Component.onCompleted: show()
         }
 
+        Component.onCompleted: {
+            if (FirstLaunchService.shouldShowGreeter)
+                active = true;
+        }
+
         Connections {
             target: FirstLaunchService
             function onGreeterRequested() {
@@ -1272,6 +1324,11 @@ Item {
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
+        }
+
+        Component.onCompleted: {
+            if (ChangelogService.shouldShowChangelog)
+                active = true;
         }
 
         Connections {

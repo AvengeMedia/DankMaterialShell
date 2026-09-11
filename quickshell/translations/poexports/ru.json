@@ -77,6 +77,9 @@
   "%1 online": {
     "%1 online": "%1 в сети"
   },
+  "%1 position": {
+    "%1 position": ""
+  },
   "%1 tasks": {
     "%1 tasks": "%1 задач"
   },
@@ -104,6 +107,9 @@
   "%1 windows": {
     "%1 windows": "%1 окон"
   },
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "%1: %2": {
     "%1: %2": "%1: %2"
   },
@@ -127,6 +133,9 @@
   },
   "0 = square corners": {
     "0 = square corners": "0 = прямые углы"
+  },
+  "1 Connecting Line": {
+    "1 Connecting Line": ""
   },
   "1 day": {
     "1 day": "1 день"
@@ -187,6 +196,9 @@
   },
   "180°": {
     "180°": "180°"
+  },
+  "2 Connecting Lines": {
+    "2 Connecting Lines": ""
   },
   "2 hours": {
     "2 hours": "2 часа"
@@ -311,6 +323,9 @@
   "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": {
     "A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.": "Отдельное действие минималистичного лаунчера, работающее в автономном режиме, режиме отдельной рамки и режиме связанной рамки."
   },
+  "A slight natural settle, DMS default": {
+    "A slight natural settle, DMS default": ""
+  },
   "A user with that name already exists.": {
     "A user with that name already exists.": "Пользователь с таким именем уже существует."
   },
@@ -326,6 +341,9 @@
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
     "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "AUR-помощники интерактивны — следите за запросами в окне терминала. Это окно вернётся в режим ожидания после завершения обновления."
   },
+  "AUTO": {
+    "AUTO": ""
+  },
   "Aborted": {
     "Aborted": "Прервано"
   },
@@ -333,7 +351,7 @@
     "About": "О нас"
   },
   "Acceleration Profile": {
-    "Acceleration Profile": ""
+    "Acceleration Profile": "Профиль ускорения"
   },
   "Accent Color": {
     "Accent Color": "Акцентный цвет"
@@ -368,6 +386,9 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "Действие, выполняемое при вертикальной прокрутке на панели"
   },
+  "Action when Enter": {
+    "Action when Enter": ""
+  },
   "Activate": {
     "Activate": "Активировать"
   },
@@ -392,6 +413,9 @@
   "Active VPN": {
     "Active VPN": "Активный VPN"
   },
+  "Active Window": {
+    "Active Window": ""
+  },
   "Active in Column": {
     "Active in Column": "Активно в колонке"
   },
@@ -411,7 +435,10 @@
     "Adapters": "Адаптеры"
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "Адаптивный"
+  },
+  "Adaptive (DMS Theme)": {
+    "Adaptive (DMS Theme)": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Адаптивная ширина медиа"
@@ -421,9 +448,6 @@
   },
   "Add \"%1\" to the %2 group?": {
     "Add \"%1\" to the %2 group?": "Добавить «%1» в группу %2?"
-  },
-  "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": {
-    "Add \"%1\" to the %2 group? They must log out and back in, then run dms greeter sync --profile to publish their login-screen theme.": "Добавить «%1» в группу %2? Пользователю потребуется выйти из системы и войти снова, а затем выполнить команду dms greeter sync --profile, чтобы опубликовать свою тему экрана входа."
   },
   "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": {
     "Add \"%1\" to the %2 group? They must log out and back in, then run dms-greeter sync --profile to publish their login-screen theme.": "Добавить «%1» в группу %2? Пользователю нужно выйти и снова войти, затем выполнить dms-greeter sync --profile для публикации темы экрана входа."
@@ -439,6 +463,9 @@
   },
   "Add Printer": {
     "Add Printer": "Добавить принтер"
+  },
+  "Add Text Note": {
+    "Add Text Note": ""
   },
   "Add Title": {
     "Add Title": "Добавить заголовок"
@@ -476,9 +503,6 @@
   "Add notes": {
     "Add notes": "Добавить заметки"
   },
-  "Add the new user to the %1 group so they can run dms greeter sync --profile.": {
-    "Add the new user to the %1 group so they can run dms greeter sync --profile.": "Добавить нового пользователя в группу %1, чтобы он мог запустить dms greeter sync --profile."
-  },
   "Add the new user to the %1 group so they can run dms-greeter sync --profile.": {
     "Add the new user to the %1 group so they can run dms-greeter sync --profile.": "Добавить нового пользователя в группу %1, чтобы он мог выполнять dms-greeter sync --profile."
   },
@@ -488,11 +512,14 @@
   "Add to Autostart": {
     "Add to Autostart": "Добавить в автозапуск"
   },
+  "Additional settings are managed by the Island": {
+    "Additional settings are managed by the Island": ""
+  },
   "Adjust pointer sensitivity speed": {
-    "Adjust pointer sensitivity speed": ""
+    "Adjust pointer sensitivity speed": "Настройка чувствительности указателя"
   },
   "Adjust scrolling sensitivity multiplier": {
-    "Adjust scrolling sensitivity multiplier": ""
+    "Adjust scrolling sensitivity multiplier": "Настройка множителя чувствительности прокрутки"
   },
   "Adjust the bar height via inner padding": {
     "Adjust the bar height via inner padding": "Настройка высоты панели через внутренние отступы"
@@ -501,7 +528,7 @@
     "Adjust the number of columns in grid view mode.": "Настроить количество столбцов в режиме сетки."
   },
   "Adjust touchpad pointer speed": {
-    "Adjust touchpad pointer speed": ""
+    "Adjust touchpad pointer speed": "Настройка скорости указателя тачпада"
   },
   "Adjust volume per scroll indent": {
     "Adjust volume per scroll indent": "Регулировка громкости на шаг прокрутки"
@@ -519,7 +546,7 @@
     "Advanced": "Дополнительно"
   },
   "Advanced comma-separated libxkbcommon options.": {
-    "Advanced comma-separated libxkbcommon options.": ""
+    "Advanced comma-separated libxkbcommon options.": "Дополнительные параметры libxkbcommon, разделённые запятыми."
   },
   "Afternoon": {
     "Afternoon": "День"
@@ -529,6 +556,12 @@
   },
   "All": {
     "All": "Все"
+  },
+  "All Combined Outputs": {
+    "All Combined Outputs": ""
+  },
+  "All Outputs": {
+    "All Outputs": ""
   },
   "All checks passed": {
     "All checks passed": "Все проверки пройдены"
@@ -541,6 +574,9 @@
   },
   "Allow": {
     "Allow": "Разрешить"
+  },
+  "Allow %1 in Do Not Disturb": {
+    "Allow %1 in Do Not Disturb": ""
   },
   "Allow LAN access": {
     "Allow LAN access": "Разрешить доступ к локальной сети"
@@ -557,6 +593,9 @@
   "Allow greeter login access": {
     "Allow greeter login access": "Разрешить доступ экрану входа"
   },
+  "Allow in Do Not Disturb": {
+    "Allow in Do Not Disturb": ""
+  },
   "Already on that session": {
     "Already on that session": "Уже в этой сессии"
   },
@@ -564,7 +603,7 @@
     "Also group repeated application icons on the active workspace": "Также группировать повторяющиеся значки приложений на активном рабочем пространстве"
   },
   "Alt + Shift": {
-    "Alt + Shift": ""
+    "Alt + Shift": "Alt + Shift"
   },
   "Alternative (OR)": {
     "Alternative (OR)": "Альтернативный (ИЛИ)"
@@ -594,7 +633,7 @@
     "Always show when there's only one connected display": "Всегда показывать, если подключен только один дисплей"
   },
   "Always use the durations above, even if an app requests a shorter or longer one": {
-    "Always use the durations above, even if an app requests a shorter or longer one": ""
+    "Always use the durations above, even if an app requests a shorter or longer one": "Всегда использовать указанную выше длительность, даже если приложение запрашивает другую"
   },
   "Always use this app for %1": {
     "Always use this app for %1": "Всегда использовать это приложение для %1"
@@ -625,6 +664,15 @@
   },
   "Animation Style": {
     "Animation Style": "Стиль анимации"
+  },
+  "Annotating": {
+    "Annotating": ""
+  },
+  "Annotation Tools": {
+    "Annotation Tools": ""
+  },
+  "Anonymous Copy (stripped metadata)": {
+    "Anonymous Copy (stripped metadata)": ""
   },
   "Anonymous Identity": {
     "Anonymous Identity": "Анонимный идентификатор"
@@ -659,9 +707,6 @@
   "App Names": {
     "App Names": "Имена приложений"
   },
-  "App Theming": {
-    "App Theming": "Реестр тем"
-  },
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": "Имя или идентификатор приложения (например, firefox)"
   },
@@ -669,7 +714,7 @@
     "Appearance": "Внешний вид"
   },
   "Apple Music animated covers": {
-    "Apple Music animated covers": ""
+    "Apple Music animated covers": "Анимированные обложки Apple Music"
   },
   "Application": {
     "Application": "Приложение"
@@ -682,6 +727,9 @@
   },
   "Applications and commands to start automatically when you log in": {
     "Applications and commands to start automatically when you log in": "Приложения и команды для автоматического запуска при входе в систему"
+  },
+  "Applied independently of night mode": {
+    "Applied independently of night mode": ""
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Применится при следующей синхронизации экрана входа"
@@ -703,6 +751,9 @@
   },
   "Apply inverse concave corner cutouts to the bar": {
     "Apply inverse concave corner cutouts to the bar": "Применить обратные вогнутые вырезы по углам панели"
+  },
+  "Apply island geometry changes immediately without spring overshoot": {
+    "Apply island geometry changes immediately without spring overshoot": ""
   },
   "Apply to Hardware": {
     "Apply to Hardware": "Применить к оборудованию"
@@ -728,6 +779,9 @@
   "Apps Icon": {
     "Apps Icon": "Иконки приложений"
   },
+  "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
+    "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+  },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Приложения упорядочены по частоте использования, затем по последнему использованию, затем по алфавиту."
   },
@@ -749,6 +803,18 @@
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Расположить дисплеи и настроить разрешение, частоту обновления и VRR"
   },
+  "Arrow (3)": {
+    "Arrow (3)": ""
+  },
+  "Arrow Color": {
+    "Arrow Color": ""
+  },
+  "Arrow Thickness": {
+    "Arrow Thickness": ""
+  },
+  "Arrow Vector": {
+    "Arrow Vector": ""
+  },
   "At Startup": {
     "At Startup": "При запуске"
   },
@@ -763,6 +829,9 @@
   },
   "Audio": {
     "Audio": "Аудио"
+  },
+  "Audio & Overlay": {
+    "Audio & Overlay": ""
   },
   "Audio Codec": {
     "Audio Codec": "Аудио кодек"
@@ -803,9 +872,6 @@
   "Authenticate": {
     "Authenticate": "Аутентифицировать"
   },
-  "Authenticated!": {
-    "Authenticated!": "Аутентификация пройдена!"
-  },
   "Authentication": {
     "Authentication": "Аутентификация"
   },
@@ -839,11 +905,26 @@
   "Auto (Bar-aware)": {
     "Auto (Bar-aware)": "Авто (с учетом панели)"
   },
+  "Auto (Dark Mode)": {
+    "Auto (Dark Mode)": ""
+  },
+  "Auto (Light Mode)": {
+    "Auto (Light Mode)": ""
+  },
   "Auto (Wide)": {
     "Auto (Wide)": "Авто (широкий)"
   },
+  "Auto Balance": {
+    "Auto Balance": ""
+  },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "Автоматические отступы композитора"
+  },
+  "Auto Detect": {
+    "Auto Detect": ""
+  },
+  "Auto From Wallpaper": {
+    "Auto From Wallpaper": ""
   },
   "Auto Location": {
     "Auto Location": "Автоматическое определение местоположения"
@@ -875,11 +956,14 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Тайм-аут автоскрытия"
   },
-  "Auto-close Niri overview when DMS launches or focuses a window.": {
-    "Auto-close Niri overview when DMS launches or focuses a window.": ""
+  "Auto-apply background defaults": {
+    "Auto-apply background defaults": ""
   },
-  "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": "Автозакрытие обзора Niri при запуске приложений."
+  "Auto-close Niri overview when DMS launches or focuses a window.": {
+    "Auto-close Niri overview when DMS launches or focuses a window.": "Автоматически закрывать режим обзора Niri при запуске окна или переключении фокуса из DMS."
+  },
+  "Auto-close the loop when ending near the start point.": {
+    "Auto-close the loop when ending near the start point.": ""
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Сохранять уведомления обычного приоритета в историю"
@@ -902,8 +986,17 @@
   "Auto-login on startup": {
     "Auto-login on startup": "Автоматический вход при запуске"
   },
+  "Auto-minimize": {
+    "Auto-minimize": ""
+  },
   "Auto-save to disk": {
     "Auto-save to disk": "Автосохранение на диск"
+  },
+  "Auto-select a tool preset on hover, without releasing the mouse.": {
+    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+  },
+  "Auto-tiling": {
+    "Auto-tiling": ""
   },
   "Autoconnect": {
     "Autoconnect": "Автоподключение"
@@ -916,9 +1009,6 @@
   },
   "Autofill last remembered query when opened": {
     "Autofill last remembered query when opened": "Автоматически подставлять последний поисковый запрос при открытии"
-  },
-  "Automatic Color Mode": {
-    "Automatic Color Mode": "Автоматический Цветовой Режим"
   },
   "Automatic Control": {
     "Automatic Control": "Автоматическое Управление"
@@ -953,11 +1043,20 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "Автоматически блокировать экран при подготовке системы к приостановке"
   },
+  "Automatically minimize the float window after a delay": {
+    "Automatically minimize the float window after a delay": ""
+  },
+  "Automatically picks the scheme variant based on the wallpaper.": {
+    "Automatically picks the scheme variant based on the wallpaper.": ""
+  },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "Автоматически сохранять изменения в открытых файлах по мере ввода"
   },
+  "Automatically stack windows to avoid overlap": {
+    "Automatically stack windows to avoid overlap": ""
+  },
   "Automatically turn on Num Lock at startup": {
-    "Automatically turn on Num Lock at startup": ""
+    "Automatically turn on Num Lock at startup": "Автоматически включать Num Lock при запуске"
   },
   "Automatically turn on Power Saver profile when battery is low.": {
     "Automatically turn on Power Saver profile when battery is low.": "Автоматически включать режим энергосбережения при низком заряде батареи."
@@ -998,11 +1097,17 @@
   "Back": {
     "Back": "Назад"
   },
+  "Back to Annotation (B)": {
+    "Back to Annotation (B)": ""
+  },
   "Backend": {
     "Backend": "Бэкенд"
   },
   "Background": {
     "Background": "Фон"
+  },
+  "Background (B)": {
+    "Background (B)": ""
   },
   "Background Blur": {
     "Background Blur": "Размытие фона"
@@ -1010,11 +1115,23 @@
   "Background Color": {
     "Background Color": "Цвет фона"
   },
+  "Background Defaults": {
+    "Background Defaults": ""
+  },
   "Background Effect": {
     "Background Effect": "Эффект фона"
   },
+  "Background Image Folder": {
+    "Background Image Folder": ""
+  },
+  "Background Images": {
+    "Background Images": ""
+  },
   "Background Opacity": {
     "Background Opacity": "Непрозрачность фона"
+  },
+  "Background Presets": {
+    "Background Presets": ""
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": "Сбой синхронизации аутентификации в фоновом режиме. Запуск в режиме терминала."
@@ -1046,8 +1163,11 @@
   "Bar Inset Padding": {
     "Bar Inset Padding": "Внутренний отступ панели"
   },
+  "Bar Interactions": {
+    "Bar Interactions": ""
+  },
   "Bar Length Padding": {
-    "Bar Length Padding": ""
+    "Bar Length Padding": "Отступ длины панели"
   },
   "Bar Opacity": {
     "Bar Opacity": "Прозрачность панели"
@@ -1064,6 +1184,9 @@
   "Bar shadow, border, and corners": {
     "Bar shadow, border, and corners": "Тень, рамка и углы бара"
   },
+  "Bar visibility": {
+    "Bar visibility": ""
+  },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "Базовый цвет для теней (непрозрачность применяется автоматически)"
   },
@@ -1076,8 +1199,14 @@
   "Battery %1": {
     "Battery %1": "Батарея %1"
   },
+  "Battery / Control Center": {
+    "Battery / Control Center": ""
+  },
   "Battery Charge Limit": {
     "Battery Charge Limit": "Батарея Заряда Ограничение"
+  },
+  "Battery Colors": {
+    "Battery Colors": ""
   },
   "Battery Health": {
     "Battery Health": "Состояние аккумулятора"
@@ -1085,8 +1214,14 @@
   "Battery Power": {
     "Battery Power": "Питание от батареи"
   },
+  "Battery Style": {
+    "Battery Style": ""
+  },
   "Battery and power management": {
     "Battery and power management": "Батарея и управление питанием"
+  },
+  "Battery gauge opens Control Center": {
+    "Battery gauge opens Control Center": ""
   },
   "Battery has charged to your set limit of %1%": {
     "Battery has charged to your set limit of %1%": "Заряд аккумулятора достиг заданного лимита в %1%"
@@ -1121,6 +1256,12 @@
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": "Смешивать цвет Surface High с выбранным пользовательским цветом"
   },
+  "Blink Recording Dot": {
+    "Blink Recording Dot": ""
+  },
+  "Block %1 in Do Not Disturb": {
+    "Block %1 in Do Not Disturb": ""
+  },
   "Block Out": {
     "Block Out": "Блокировать с"
   },
@@ -1148,11 +1289,17 @@
   "Blur": {
     "Blur": "Размытие"
   },
+  "Blur Background Image": {
+    "Blur Background Image": ""
+  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Размытие Обоев слоя"
   },
   "Blur on Overview": {
     "Blur on Overview": "Размытие в режиме обзора"
+  },
+  "Blur the album art behind the media player": {
+    "Blur the album art behind the media player": ""
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Размывать фон за панелями, всплывающими, модальными окнами и уведомлениями. Требуется поддержка композитора. Настройте прозрачность соответствующим образом."
@@ -1165,6 +1312,9 @@
   },
   "Body": {
     "Body": "Заголовок"
+  },
+  "Body Click Runs Default Action": {
+    "Body Click Runs Default Action": ""
   },
   "Body Font Size": {
     "Body Font Size": "Размер шрифта текста"
@@ -1205,6 +1355,9 @@
   "Border with Background": {
     "Border with Background": "Рамка с фоном"
   },
+  "Both": {
+    "Both": ""
+  },
   "Bottom": {
     "Bottom": "Снизу"
   },
@@ -1223,11 +1376,17 @@
   "Bottom dock for pinned and running applications": {
     "Bottom dock for pinned and running applications": "Нижний док для закреплённых и запущенных приложений"
   },
+  "Bright": {
+    "Bright": ""
+  },
   "Brightness": {
     "Brightness": "Яркость"
   },
   "Brightness Slider": {
     "Brightness Slider": "Яркости Ползунок"
+  },
+  "Brightness Style": {
+    "Brightness Style": ""
   },
   "Brightness Value": {
     "Brightness Value": "Яркости Значение"
@@ -1289,11 +1448,26 @@
   "CUPS not available": {
     "CUPS not available": "CUPS недоступен"
   },
+  "CUST": {
+    "CUST": ""
+  },
   "Calendar": {
     "Calendar": "Календарь"
   },
   "Calendar Backend": {
     "Calendar Backend": "Провайдер календаря"
+  },
+  "Callout": {
+    "Callout": ""
+  },
+  "Callout (Z) | Hold G for Loupe": {
+    "Callout (Z) | Hold G for Loupe": ""
+  },
+  "Callout Zoom": {
+    "Callout Zoom": ""
+  },
+  "Callout, Background (Z, B)": {
+    "Callout, Background (Z, B)": ""
   },
   "Calls / Headset": {
     "Calls / Headset": "Вызовы / Гарнитура"
@@ -1340,11 +1514,44 @@
   "Caps Lock is on": {
     "Caps Lock is on": "Caps Lock включён"
   },
+  "Capture": {
+    "Capture": ""
+  },
+  "Capture Actions": {
+    "Capture Actions": ""
+  },
+  "Capture Options": {
+    "Capture Options": ""
+  },
+  "Capturing...": {
+    "Capturing...": ""
+  },
   "Cast Target": {
     "Cast Target": "Цель трансляции"
   },
   "Category": {
     "Category": "Категория"
+  },
+  "Catppuccin": {
+    "Catppuccin": ""
+  },
+  "Cellular": {
+    "Cellular": ""
+  },
+  "Cellular disabled": {
+    "Cellular disabled": ""
+  },
+  "Cellular enabled": {
+    "Cellular enabled": ""
+  },
+  "Center": {
+    "Center": ""
+  },
+  "Center Left": {
+    "Center Left": ""
+  },
+  "Center Right": {
+    "Center Right": ""
   },
   "Center Section": {
     "Center Section": "Центральная Секция"
@@ -1374,10 +1581,7 @@
     "Channel": "Канал"
   },
   "Characters per second while holding down key": {
-    "Characters per second while holding down key": ""
-  },
-  "Charge Level": {
-    "Charge Level": "Уровень заряда"
+    "Characters per second while holding down key": "Символов в секунду при удержании клавиши"
   },
   "Charge Limit Reached": {
     "Charge Limit Reached": "Достигнут лимит заряда"
@@ -1431,13 +1635,13 @@
     "Choose a power profile": "Выберите профиль питания"
   },
   "Choose a shortcut key to cycle between keyboard layouts": {
-    "Choose a shortcut key to cycle between keyboard layouts": ""
+    "Choose a shortcut key to cycle between keyboard layouts": "Выберите комбинацию клавиш для циклического переключения раскладок клавиатуры"
   },
   "Choose colors from palette": {
     "Choose colors from palette": "Выбрать цвета из палитры"
   },
   "Choose how the bar meets the screen edge": {
-    "Choose how the bar meets the screen edge": ""
+    "Choose how the bar meets the screen edge": "Выберите способ примыкания панели к краю экрана"
   },
   "Choose how the weather widget is displayed": {
     "Choose how the weather widget is displayed": "Выбрать способ отображения виджета погоды"
@@ -1460,6 +1664,12 @@
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": "Выберите нейтральный или акцентный цвет для текста виджетов"
   },
+  "Choose notifications shown after copy or save.": {
+    "Choose notifications shown after copy or save.": ""
+  },
+  "Choose the editor shape for portrait or landscape screens.": {
+    "Choose the editor shape for portrait or landscape screens.": ""
+  },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "Выбрать логотип, отображаемый на кнопке запуска приложений в DankBar"
   },
@@ -1467,13 +1677,16 @@
     "Choose wallpaper folder": "Выберите папку с обоями"
   },
   "Choose when to generate scrolling events": {
-    "Choose when to generate scrolling events": ""
+    "Choose when to generate scrolling events": "Выберите, когда создавать события прокрутки"
   },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Выбрать, где на экране будут отображаться всплывающие уведомления"
   },
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "Выбрать, где на экране появляются наэкранные дисплеи"
+  },
+  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
   },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": "Выберите, что запускать: приложение или команду"
@@ -1483,6 +1696,9 @@
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Выбрать, на каких дисплеях показывать этот виджет"
+  },
+  "Choose which monitor to capture during full screen recording.": {
+    "Choose which monitor to capture during full screen recording.": ""
   },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Выберите, какие мониторы отображают интерфейс экрана блокировки. Остальные мониторы будут показывать сплошной цвет для защиты OLED от выгорания."
@@ -1502,6 +1718,12 @@
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Regex класса (например, ^firefox$)"
   },
+  "Classic (Tailwind)": {
+    "Classic (Tailwind)": ""
+  },
+  "Clean Text Eraser": {
+    "Clean Text Eraser": ""
+  },
   "Clear": {
     "Clear": "Очистить"
   },
@@ -1510,6 +1732,12 @@
   },
   "Clear All Jobs": {
     "Clear All Jobs": "Очистить все задания"
+  },
+  "Clear Badge on Open": {
+    "Clear Badge on Open": ""
+  },
+  "Clear Filtered": {
+    "Clear Filtered": ""
   },
   "Clear History?": {
     "Clear History?": "Отчистить историю?"
@@ -1522,6 +1750,15 @@
   },
   "Clear at Startup": {
     "Clear at Startup": "Очистить при запуске"
+  },
+  "Clear saved region selection before each capture": {
+    "Clear saved region selection before each capture": ""
+  },
+  "Clears the badge on open but keeps notifications active": {
+    "Clears the badge on open but keeps notifications active": ""
+  },
+  "Click": {
+    "Click": ""
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
     "Click 'Setup' to create %1 and add include to your compositor config.": "Нажмите «Setup» для создания %1 и добавления include в конфиг композитора."
@@ -1541,6 +1778,12 @@
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Нажмите любую горячую клавишу для редактирования. Изменения сохраняются в %1"
   },
+  "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
+    "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
+  },
+  "Click the icon to mute": {
+    "Click the icon to mute": ""
+  },
   "Click to Paste": {
     "Click to Paste": "Нажмите для вставки"
   },
@@ -1549,6 +1792,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "Нажмите для выбора пользовательского JSON-файла темы"
+  },
+  "Clicking a popup runs its first action instead of expanding the body": {
+    "Clicking a popup runs its first action instead of expanding the body": ""
   },
   "Clip": {
     "Clip": "Обрезать"
@@ -1589,11 +1835,11 @@
   "Close All Windows": {
     "Close All Windows": "Закрыть все окна"
   },
-  "Close Niri Overview on Window Focus": {
-    "Close Niri Overview on Window Focus": ""
+  "Close Annotator": {
+    "Close Annotator": ""
   },
-  "Close Overview on Launch": {
-    "Close Overview on Launch": "Закрыть обзор при запуске"
+  "Close Niri Overview on Window Focus": {
+    "Close Niri Overview on Window Focus": "Закрывать обзор Niri при фокусе окна"
   },
   "Close Window": {
     "Close Window": "Закрыть окно"
@@ -1603,9 +1849,6 @@
   },
   "Codec switching is unavailable because WirePlumber was not found": {
     "Codec switching is unavailable because WirePlumber was not found": "Переключение кодеков недоступно, так как WirePlumber не найден"
-  },
-  "Codec switching is unavailable because pactl was not found": {
-    "Codec switching is unavailable because pactl was not found": "Переключение кодеков недоступно, так как pactl не найден"
   },
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": "Переключение кодеков недоступно. Утилита WirePlumber wpexec не найдена."
@@ -1628,11 +1871,23 @@
   "Color Override": {
     "Color Override": "Изменение Цвета"
   },
+  "Color Palette": {
+    "Color Palette": ""
+  },
   "Color Picker": {
     "Color Picker": "Выбор Цвета"
   },
+  "Color Picker (F for RGB | Eyedropper)": {
+    "Color Picker (F for RGB | Eyedropper)": ""
+  },
+  "Color Picker, Eraser (F, T)": {
+    "Color Picker, Eraser (F, T)": ""
+  },
   "Color Temperature": {
     "Color Temperature": "Цветовая температура"
+  },
+  "Color copied to clipboard: %1": {
+    "Color copied to clipboard: %1": ""
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "Цвет, отображаемый на мониторах без экрана блокировки"
@@ -1677,7 +1932,7 @@
     "Column Width": "Ширина столбца"
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
-    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
+    "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": "Список названий раскладок через запятую. Оставьте пустым для использования системных настроек."
   },
   "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": {
     "Comma-separated list of session names to hide. Wrap in slashes for regex (e.g., /^_.*/).": "Разделенный запятыми список имен сессий для скрытия. Заключите в косые черты для регулярных выражений (например, /^_.*/)."
@@ -1691,14 +1946,26 @@
   "Commands": {
     "Commands": "Команды"
   },
-  "Community themes": {
-    "Community themes": "Безопасность и конфиденциальность"
+  "Community favorites to get you started": {
+    "Community favorites to get you started": ""
   },
   "Compact": {
     "Compact": "Компактно"
   },
+  "Compact Island Height": {
+    "Compact Island Height": ""
+  },
+  "Compact Island Width": {
+    "Compact Island Width": ""
+  },
   "Compact Mode": {
     "Compact Mode": "Компактный Режим"
+  },
+  "Compact Pill": {
+    "Compact Pill": ""
+  },
+  "Compact home clock pill in both width and height": {
+    "Compact home clock pill in both width and height": ""
   },
   "Completed": {
     "Completed": "Завершено"
@@ -1710,7 +1977,7 @@
     "Compositor Settings": "Настройки композитора"
   },
   "Compositor actions (focus, move, etc.)": {
-    "Compositor actions (focus, move, etc.)": ""
+    "Compositor actions (focus, move, etc.)": "Действия композитора (фокус, перемещение и т. д.)"
   },
   "Config Format": {
     "Config Format": "Формат конфига"
@@ -1751,8 +2018,14 @@
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "Настройте этот параметр в Настройки → Док → Корзина."
   },
+  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
+  },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "%1 дисплей(ев)"
+  },
+  "Configure which displays show Dank Island as \"%1": {
+    "Configure which displays show Dank Island as \"%1\"": ""
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "Настроить мониторы для отображения компонентов оболочки"
@@ -1774,6 +2047,9 @@
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Конфликтует с: %1"
+  },
+  "Conic Gradient": {
+    "Conic Gradient": ""
   },
   "Connect": {
     "Connect": "Подключиться"
@@ -1817,6 +2093,9 @@
   "Connection failed": {
     "Connection failed": "Сбой подключения"
   },
+  "Container Format": {
+    "Container Format": ""
+  },
   "Contains": {
     "Contains": "Регулярное выражение"
   },
@@ -1829,11 +2108,11 @@
   "Contrast": {
     "Contrast": "Контраст"
   },
-  "Contrast by variant": {
-    "Contrast by variant": ""
-  },
   "Contributor": {
     "Contributor": "Автор"
+  },
+  "Contributors": {
+    "Contributors": ""
   },
   "Control Center": {
     "Control Center": "Центр Управления"
@@ -1877,14 +2156,29 @@
   "Controls the outline of popouts, modals, and other shell surfaces": {
     "Controls the outline of popouts, modals, and other shell surfaces": "Управляет контуром всплывающих, модальных окон и других поверхностей оболочки"
   },
+  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+  },
   "Convenience options for the login screen": {
     "Convenience options for the login screen": "Дополнительные опции для экрана входа"
   },
   "Convert to DMS": {
     "Convert to DMS": "Преобразовать в DMS"
   },
+  "Converting recording to GIF...": {
+    "Converting recording to GIF...": ""
+  },
   "Cooldown": {
     "Cooldown": "Перезарядка"
+  },
+  "Copied": {
+    "Copied": ""
+  },
+  "Copied & saved": {
+    "Copied & saved": ""
+  },
+  "Copied Anonymously": {
+    "Copied Anonymously": ""
   },
   "Copied GIF": {
     "Copied GIF": "GIF скопирован"
@@ -1901,11 +2195,26 @@
   "Copied!": {
     "Copied!": "Скопировано!"
   },
+  "Copied:": {
+    "Copied:": ""
+  },
   "Copy": {
     "Copy": "Копировать"
   },
+  "Copy & Save": {
+    "Copy & Save": ""
+  },
+  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
+  },
+  "Copy Color": {
+    "Copy Color": ""
+  },
   "Copy Content": {
     "Copy Content": "Копировать содержимое"
+  },
+  "Copy Current Palette": {
+    "Copy Current Palette": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "Скопировать полную команду"
@@ -1922,8 +2231,14 @@
   "Copy Text": {
     "Copy Text": "Копировать текст"
   },
+  "Copy and customize this preset": {
+    "Copy and customize this preset": ""
+  },
   "Copy target (%1)": {
-    "Copy target (%1)": ""
+    "Copy target (%1)": "Скопировать цель (%1)"
+  },
+  "Copy vector / Paste / Duplicate": {
+    "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
     "Corner Radius": "Радиус скругления углов"
@@ -1932,13 +2247,19 @@
     "Corner Radius Override": "Переопределение радиуса скругления"
   },
   "Corner Style": {
-    "Corner Style": ""
+    "Corner Style": "Стиль углов"
+  },
+  "Corner style applies to the bar surface": {
+    "Corner style applies to the bar surface": ""
   },
   "Corners & Background": {
     "Corners & Background": "Углы и фон"
   },
   "Couldn't load hotspot password": {
     "Couldn't load hotspot password": "Не удалось загрузить пароль точки доступа"
+  },
+  "Couldn't load plugins": {
+    "Couldn't load plugins": ""
   },
   "Count Only": {
     "Count Only": "Полное содержимое"
@@ -1994,11 +2315,17 @@
   "Critical Threshold": {
     "Critical Threshold": "Критический порог"
   },
+  "Crop / Resize": {
+    "Crop / Resize": ""
+  },
+  "Crop / Resize Area": {
+    "Crop / Resize Area": ""
+  },
   "Ctrl + Shift": {
-    "Ctrl + Shift": ""
+    "Ctrl + Shift": "Ctrl + Shift"
   },
   "Ctrl+%1 is used for password editing": {
-    "Ctrl+%1 is used for password editing": ""
+    "Ctrl+%1 is used for password editing": "Ctrl+%1 используется для редактирования пароля"
   },
   "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": {
     "Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close": "Ctrl+A: Выбрать все • Ctrl+P: Предпросмотр • Enter/Shift+Enter: Найти след./пред. • Esc: Закрыть"
@@ -2045,8 +2372,17 @@
   "Current Workspace": {
     "Current Workspace": "Текущее рабочее пространство"
   },
+  "Current display brightness on the home face": {
+    "Current display brightness on the home face": ""
+  },
+  "Current output volume on the home face": {
+    "Current output volume on the home face": ""
+  },
   "Current time and date display": {
     "Current time and date display": "Отображение текущих даты и времени"
+  },
+  "Current time and date pill": {
+    "Current time and date pill": ""
   },
   "Current weather conditions and temperature": {
     "Current weather conditions and temperature": "Текущие погодные условия и температура"
@@ -2063,20 +2399,23 @@
   "Curve": {
     "Curve": "Кривая"
   },
-  "Curve: curve rasterizer.": {
-    "Curve: curve rasterizer.": "Curve: растеризатор кривых."
+  "Curve rasterizer.": {
+    "Curve rasterizer.": ""
   },
   "Custom": {
     "Custom": "Свой"
   },
   "Custom / None": {
-    "Custom / None": ""
+    "Custom / None": "Пользовательское / Нет"
   },
   "Custom Blend": {
     "Custom Blend": "Пользовательское смешивание"
   },
   "Custom Color": {
     "Custom Color": "Пользовательский цвет"
+  },
+  "Custom Colors": {
+    "Custom Colors": ""
   },
   "Custom Duration": {
     "Custom Duration": "Пользовательская длительность"
@@ -2113,6 +2452,9 @@
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "Пользовательская команда приостановки"
+  },
+  "Custom Tool": {
+    "Custom Tool": ""
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Пользовательская команда и параметры терминала разделяются по пробелам; пути с пробелами приведут к сбою."
@@ -2166,7 +2508,7 @@
     "DMS Shortcuts": "Комбинации клавиш DMS"
   },
   "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": {
-    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": ""
+    "DMS is a highly customizable modern desktop shell with a %1 inspired design.<br/><br/>It is built with %2, a QT6 framework for building desktop shells, and %3, a statically typed, compiled programming language.": "DMS — это гибко настраиваемая современная оболочка рабочего стола с дизайном, вдохновлённым %1.<br/><br/>Она разработана на базе %2, фреймворка QT6 для создания оболочек рабочего стола, и %3, статически типизированного компилируемого языка программирования."
   },
   "DMS out of date": {
     "DMS out of date": "DMS устарел"
@@ -2192,6 +2534,9 @@
   "Daily at:": {
     "Daily at:": "Ежедневно в:"
   },
+  "Damped springs settle straight to their target with no overshoot": {
+    "Damped springs settle straight to their target with no overshoot": ""
+  },
   "Dank": {
     "Dank": "Dank"
   },
@@ -2203,6 +2548,15 @@
   },
   "Dank Dash": {
     "Dank Dash": "Dank Dash"
+  },
+  "Dank Island": {
+    "Dank Island": ""
+  },
+  "Dank Island instance": {
+    "Dank Island instance": ""
+  },
+  "Dank Violet": {
+    "Dank Violet": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2216,11 +2570,11 @@
   "DankCalendar isn't running": {
     "DankCalendar isn't running": "DankCalendar не запущен"
   },
-  "DankMaterialShell is ready to use": {
-    "DankMaterialShell is ready to use": "DankMaterialShell готов к использованию"
-  },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell и системные значки (требуется перезапуск)"
+  },
+  "Dark": {
+    "Dark": ""
   },
   "Dark Mode": {
     "Dark Mode": "Тёмный режим"
@@ -2234,11 +2588,29 @@
   "Dark mode harmony": {
     "Dark mode harmony": "Гармония темного режима"
   },
+  "Dark or light mode follows the wallpaper brightness": {
+    "Dark or light mode follows the wallpaper brightness": ""
+  },
   "Darken Modal Background": {
     "Darken Modal Background": "Затемнение фона модальных окон"
   },
+  "Darken the image to improve foreground contrast": {
+    "Darken the image to improve foreground contrast": ""
+  },
+  "Darkest": {
+    "Darkest": ""
+  },
+  "Dashboard": {
+    "Dashboard": ""
+  },
+  "Dashed Line": {
+    "Dashed Line": ""
+  },
+  "Date": {
+    "Date": ""
+  },
   "Date First": {
-    "Date First": ""
+    "Date First": "Сначала дата"
   },
   "Date Format": {
     "Date Format": "Формат даты"
@@ -2279,8 +2651,38 @@
   "Default (Global)": {
     "Default (Global)": "По умолчанию (глобально)"
   },
+  "Default Alignment": {
+    "Default Alignment": ""
+  },
   "Default Apps": {
     "Default Apps": "Приложения по умолчанию"
+  },
+  "Default Aspect Ratio": {
+    "Default Aspect Ratio": ""
+  },
+  "Default Background Image": {
+    "Default Background Image": ""
+  },
+  "Default Background Mode": {
+    "Default Background Mode": ""
+  },
+  "Default Bold Text": {
+    "Default Bold Text": ""
+  },
+  "Default Corner Radius": {
+    "Default Corner Radius": ""
+  },
+  "Default Gradient Angle": {
+    "Default Gradient Angle": ""
+  },
+  "Default Gradient End": {
+    "Default Gradient End": ""
+  },
+  "Default Gradient Start": {
+    "Default Gradient Start": ""
+  },
+  "Default Italic Text": {
+    "Default Italic Text": ""
   },
   "Default Launcher": {
     "Default Launcher": "Лаунчер по умолчанию"
@@ -2288,14 +2690,47 @@
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "Сочетание клавиш лаунчера по умолчанию"
   },
+  "Default Microphone": {
+    "Default Microphone": ""
+  },
   "Default Mode": {
     "Default Mode": "Режим по умолчанию"
   },
   "Default Opens": {
     "Default Opens": "Открытие по умолчанию"
   },
+  "Default Output": {
+    "Default Output": ""
+  },
+  "Default Padding": {
+    "Default Padding": ""
+  },
+  "Default Shadow Strength": {
+    "Default Shadow Strength": ""
+  },
+  "Default Solid Color": {
+    "Default Solid Color": ""
+  },
+  "Default Task List": {
+    "Default Task List": ""
+  },
+  "Default Text Background": {
+    "Default Text Background": ""
+  },
+  "Default Text Font Size": {
+    "Default Text Font Size": ""
+  },
+  "Default Underline Text": {
+    "Default Underline Text": ""
+  },
+  "Default Watermark": {
+    "Default Watermark": ""
+  },
   "Default Width (%)": {
     "Default Width (%)": "Ширина по умолчанию (%)"
+  },
+  "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": {
+    "Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.": ""
   },
   "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": {
     "Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.": "Сочетания клавиш лаунчера по умолчанию открывают полнофункциональный лаунчер с вкладками режимов, сеткой и панелью действий."
@@ -2316,7 +2751,7 @@
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Очистить • Shift+Del: Очистить Всё • 1-9: Действия • F10: Справка • Esc: Закрыть"
   },
   "Delay before characters start repeating": {
-    "Delay before characters start repeating": ""
+    "Delay before characters start repeating": "Задержка перед началом повтора символов"
   },
   "Delete": {
     "Delete": "Удалить"
@@ -2359,9 +2794,6 @@
   },
   "Depth": {
     "Depth": "Глубина"
-  },
-  "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": {
-    "Depth: Panels scale up from small as they slide in — a dramatic pop-forward depth effect.": "Глубина: панели увеличиваются в масштабе при выдвижении — выразительный эффект появления из глубины."
   },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Извлекает цвета, которые точно соответствуют исходному изображению."
@@ -2420,17 +2852,29 @@
   "Digital": {
     "Digital": "Цифровой"
   },
+  "Dim": {
+    "Dim": ""
+  },
+  "Dim Background Image": {
+    "Dim Background Image": ""
+  },
+  "Dim Intensity": {
+    "Dim Intensity": ""
+  },
+  "Dimming Opacity": {
+    "Dimming Opacity": ""
+  },
+  "Direct": {
+    "Direct": ""
+  },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
-    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": ""
+    "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Прямой путь к файлу раскладки .xkb. Переопределяет раскладки/варианты, указанные выше."
   },
   "Direction Source": {
     "Direction Source": "Источник направления"
   },
   "Directional": {
     "Directional": "Направленный"
-  },
-  "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": {
-    "Directional: Panels glide in from a larger distance at full size — no scale change, pure clean motion.": "Направленный: панели плавно заезжают с большего расстояния в полном размере — без изменения масштаба, чистое и чёткое движение."
   },
   "Disable Autoconnect": {
     "Disable Autoconnect": "Отключите Автоподключение"
@@ -2445,13 +2889,13 @@
     "Disable Output": "Отключите Выход"
   },
   "Disable While Typing": {
-    "Disable While Typing": ""
+    "Disable While Typing": "Отключать при вводе текста"
   },
   "Disable on External Mouse": {
-    "Disable on External Mouse": ""
+    "Disable on External Mouse": "Отключать при подключении внешней мыши"
   },
   "Disable touchpad when an external mouse is connected": {
-    "Disable touchpad when an external mouse is connected": ""
+    "Disable touchpad when an external mouse is connected": "Отключать тачпад при подключении внешней мыши"
   },
   "Disabled": {
     "Disabled": "Отключено"
@@ -2465,11 +2909,20 @@
   "Disabling auto-login on startup...": {
     "Disabling auto-login on startup...": "Отключение автоматического входа при запуске..."
   },
+  "Disabling cellular...": {
+    "Disabling cellular...": ""
+  },
   "Disc": {
     "Disc": "Диск"
   },
   "Discard": {
     "Discard": "Отменить"
+  },
+  "Discard & Close": {
+    "Discard & Close": ""
+  },
+  "Discard & Close (Esc)": {
+    "Discard & Close (Esc)": ""
   },
   "Discharging": {
     "Discharging": "Подключено"
@@ -2573,6 +3026,12 @@
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "Отображает активную раскладку клавиатуры и позволяет переключаться"
   },
+  "Distance between display edge and island": {
+    "Distance between display edge and island": ""
+  },
+  "Distance-field renderer.": {
+    "Distance-field renderer.": ""
+  },
   "Distribution": {
     "Distribution": "Имя хоста"
   },
@@ -2603,20 +3062,41 @@
   "Domain (optional)": {
     "Domain (optional)": "Домен (необязательно)"
   },
+  "Dominant": {
+    "Dominant": ""
+  },
   "Don't Change": {
     "Don't Change": "Не изменять"
   },
   "Don't Save": {
     "Don't Save": "Не сохранять"
   },
+  "Done": {
+    "Done": ""
+  },
+  "Done (Action based on settings)": {
+    "Done (Action based on settings)": ""
+  },
   "Door Open": {
     "Door Open": "Дверь открыта"
   },
+  "Dotted Line": {
+    "Dotted Line": ""
+  },
+  "Dracula": {
+    "Dracula": ""
+  },
+  "Drag Image": {
+    "Drag Image": ""
+  },
   "Drag Lock": {
-    "Drag Lock": ""
+    "Drag Lock": "Фиксация перетаскивания"
   },
   "Drag a widget by its handle here to reorder it or drop it into another group": {
     "Drag a widget by its handle here to reorder it or drop it into another group": "Перетащите виджет за маркер сюда, чтобы изменить порядок или перенести в другую группу"
+  },
+  "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": {
+    "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": ""
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Перетащите для изменения порядка"
@@ -2630,8 +3110,14 @@
   "Drag workspace indicators to reorder them": {
     "Drag workspace indicators to reorder them": "Перетащите индикаторы рабочих пространств для изменения порядка"
   },
-  "Draw a connected picture-frame border around the entire display": {
-    "Draw a connected picture-frame border around the entire display": "Отрисовывать сплошную рамку по всему периметру экрана"
+  "Draw an island-styled background behind satellite widgets": {
+    "Draw an island-styled background behind satellite widgets": ""
+  },
+  "Draw an outer ring using the stamp number color": {
+    "Draw an outer ring using the stamp number color": ""
+  },
+  "Draw an outline and use the highest-contrast surface tone": {
+    "Draw an outline and use the highest-contrast surface tone": ""
   },
   "Driver": {
     "Driver": "Драйвер"
@@ -2641,6 +3127,9 @@
   },
   "Drop here": {
     "Drop here": "Перетащите сюда"
+  },
+  "Drop image onto bar icon to annotate it": {
+    "Drop image onto bar icon to annotate it": ""
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "Сбросить переопределение для %1, чтобы снова применять действие DMS по умолчанию?"
@@ -2684,11 +3173,11 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Динамические цвета, предустановки"
   },
-  "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": {
-    "Dynamic: Spring bezier with overshoot — entry briefly exceeds its target then settles. Expressive and alive.": "Динамичный: упругая кривая Безье с проскоком — при появлении элемент ненадолго превышает конечную точку, а затем стабилизируется. Выразительно и живо."
+  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
   "Edge": {
-    "Edge": ""
+    "Edge": "По краю"
   },
   "Edge Hover Reveal": {
     "Edge Hover Reveal": "Появление при наведении на край"
@@ -2711,8 +3200,17 @@
   "Edit Clipboard": {
     "Edit Clipboard": "Редактировать буфер обмена"
   },
+  "Edit Color Palette": {
+    "Edit Color Palette": ""
+  },
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
+  },
   "Edit Rule": {
     "Edit Rule": "Редактировать правило"
+  },
+  "Edit Text Note": {
+    "Edit Text Note": ""
   },
   "Edit Window Rule": {
     "Edit Window Rule": "Изменить правило окна"
@@ -2726,8 +3224,41 @@
   "Editing changes on %1": {
     "Editing changes on %1": "Редактирование изменений на %1"
   },
+  "Editor": {
+    "Editor": ""
+  },
+  "Editor Aspect Ratio": {
+    "Editor Aspect Ratio": ""
+  },
+  "Editor Display Mode": {
+    "Editor Display Mode": ""
+  },
+  "Editor Display Screen": {
+    "Editor Display Screen": ""
+  },
+  "Editor Preview Quality": {
+    "Editor Preview Quality": ""
+  },
   "Education": {
     "Education": "Обучение"
+  },
+  "Ellipse": {
+    "Ellipse": ""
+  },
+  "Ellipse / Circle": {
+    "Ellipse / Circle": ""
+  },
+  "Ellipse / Circle (Q)": {
+    "Ellipse / Circle (Q)": ""
+  },
+  "Ellipse Color": {
+    "Ellipse Color": ""
+  },
+  "Ellipse Thickness": {
+    "Ellipse Thickness": ""
+  },
+  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
   },
   "Empty": {
     "Empty": "Пусто"
@@ -2739,7 +3270,7 @@
     "Empty Trash (%1)": "Очистить корзину (%1)"
   },
   "Emulate middle click by pressing left and right buttons": {
-    "Emulate middle click by pressing left and right buttons": ""
+    "Emulate middle click by pressing left and right buttons": "Эмулировать нажатие средней кнопки одновременным нажатием левой и правой"
   },
   "Enable 10-bit color depth for wider color gamut and HDR support": {
     "Enable 10-bit color depth for wider color gamut and HDR support": "Включить 10-битную глубину цвета для более широкой цветовой гаммы и поддержки HDR"
@@ -2750,17 +3281,20 @@
   "Enable Bar": {
     "Enable Bar": "Включить бар"
   },
+  "Enable Cellular": {
+    "Enable Cellular": ""
+  },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Включить режим 'Не беспокоить'"
-  },
-  "Enable Frame": {
-    "Enable Frame": "Включить рамку"
   },
   "Enable History": {
     "Enable History": "Включить историю"
   },
+  "Enable Island": {
+    "Enable Island": ""
+  },
   "Enable Num Lock": {
-    "Enable Num Lock": ""
+    "Enable Num Lock": "Включить Num Lock"
   },
   "Enable Overview Overlay": {
     "Enable Overview Overlay": "Включить наложение обзора"
@@ -2786,6 +3320,9 @@
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Включите пользовательское переопределение ниже, чтобы настроить интенсивность, непрозрачность и цвет тени для каждой панели."
   },
+  "Enable background automatically when opening the editor": {
+    "Enable background automatically when opening the editor": ""
+  },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Включить слой размытия, доступный для композитора (пространство имён: dms:blurwallpaper). Требуется ручная настройка niri."
   },
@@ -2807,11 +3344,17 @@
   "Enable security key authentication": {
     "Enable security key authentication": "Включить аутентификацию по ключу безопасности"
   },
+  "Enable weather in Time & Weather to show this shortcut": {
+    "Enable weather in Time & Weather to show this shortcut": ""
+  },
   "Enabled": {
     "Enabled": "Включено"
   },
   "Enabling WiFi...": {
     "Enabling WiFi...": "Включение Wi-Fi…"
+  },
+  "Enabling cellular...": {
+    "Enabling cellular...": ""
   },
   "End": {
     "End": "Конец"
@@ -2871,7 +3414,7 @@
     "Enter password for ": "Введите пароль для "
   },
   "Enter text to encode": {
-    "Enter text to encode": ""
+    "Enter text to encode": "Введите текст для кодирования"
   },
   "Enter this passkey on ": {
     "Enter this passkey on ": "Введите этот ключ доступа на "
@@ -2894,6 +3437,9 @@
   "Environment Variables": {
     "Environment Variables": "Переменные окружения"
   },
+  "Eraser": {
+    "Eraser": ""
+  },
   "Error": {
     "Error": "Ошибка"
   },
@@ -2908,6 +3454,9 @@
   },
   "Event title": {
     "Event title": "Название события"
+  },
+  "Everforest": {
+    "Everforest": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "Каждые 15 минут"
@@ -2935,6 +3484,15 @@
   },
   "Exit node": {
     "Exit node": "Выходной узел"
+  },
+  "Expand Notifications": {
+    "Expand Notifications": ""
+  },
+  "Expand notifications by default instead of click or hover": {
+    "Expand notifications by default instead of click or hover": ""
+  },
+  "Expansion Mode": {
+    "Expansion Mode": ""
   },
   "Experimental Feature": {
     "Experimental Feature": "Экспериментальная функция"
@@ -2970,7 +3528,7 @@
     "Extra Light": "Сверхсветлый"
   },
   "Extract theme to JSON": {
-    "Extract theme to JSON": ""
+    "Extract theme to JSON": "Экспортировать тему в JSON"
   },
   "Fade": {
     "Fade": "Затухание"
@@ -2989,9 +3547,6 @@
   },
   "Failed to add binds include": {
     "Failed to add binds include": "Не удалось добавить binds include"
-  },
-  "Failed to add printer to class": {
-    "Failed to add printer to class": "Не удалось добавить принтер в класс"
   },
   "Failed to apply %1 colors": {
     "Failed to apply %1 colors": "Не удалось применить цвета %1"
@@ -3023,8 +3578,14 @@
   "Failed to connect to %1": {
     "Failed to connect to %1": "Не удалось подключиться к %1"
   },
+  "Failed to convert recording to GIF.": {
+    "Failed to convert recording to GIF.": ""
+  },
   "Failed to copy entry": {
     "Failed to copy entry": "Не удалось скопировать запись"
+  },
+  "Failed to copy screenshot to clipboard.": {
+    "Failed to copy screenshot to clipboard.": ""
   },
   "Failed to create printer": {
     "Failed to create printer": "Не удалось создать принтер"
@@ -3072,13 +3633,16 @@
     "Failed to enable night mode": "Не удалось включить ночной режим"
   },
   "Failed to extract theme": {
-    "Failed to extract theme": ""
+    "Failed to extract theme": "Не удалось экспортировать тему"
   },
   "Failed to fetch network QR code: %1": {
     "Failed to fetch network QR code: %1": "Не удалось получить QR-код сети: %1"
   },
   "Failed to generate QR code: %1": {
-    "Failed to generate QR code: %1": ""
+    "Failed to generate QR code: %1": "Не удалось создать QR-код: %1"
+  },
+  "Failed to generate blurred background image": {
+    "Failed to generate blurred background image": ""
   },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Не удалось создать переопределение systemd"
@@ -3097,9 +3661,6 @@
   },
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Не удалось загрузить конфигурацию буфера обмена."
-  },
-  "Failed to move job": {
-    "Failed to move job": "Не удалось переместить задание"
   },
   "Failed to move to trash": {
     "Failed to move to trash": "Не удалось переместить в корзину"
@@ -3134,9 +3695,6 @@
   "Failed to remove keybind": {
     "Failed to remove keybind": "Не удалось удалить комбинацию клавиш"
   },
-  "Failed to remove printer from class": {
-    "Failed to remove printer from class": "Не удалось удалить принтер из класса"
-  },
   "Failed to restart audio system": {
     "Failed to restart audio system": "Не удалось перезапустить аудиосистему"
   },
@@ -3148,9 +3706,6 @@
   },
   "Failed to ring device": {
     "Failed to ring device": "Не удалось вызвать устройство"
-  },
-  "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": {
-    "Failed to run 'dms greeter status'. Ensure DMS is installed and dms is in PATH.": "Не удалось выполнить 'dms greeter status'. Убедитесь, что DMS установлен и dms находится в PATH."
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Не удалось выполнить 'dms-greeter status'. Убедитесь, что пакет dms-greeter установлен."
@@ -3164,11 +3719,23 @@
   "Failed to save clipboard setting": {
     "Failed to save clipboard setting": "Не удалось сохранить настройку буфера обмена"
   },
+  "Failed to save dropped file": {
+    "Failed to save dropped file": ""
+  },
+  "Failed to save dropped text": {
+    "Failed to save dropped text": ""
+  },
   "Failed to save keybind": {
     "Failed to save keybind": "Не удалось сохранить комбинацию клавиш"
   },
   "Failed to save profile": {
     "Failed to save profile": "Не удалось сохранить профиль"
+  },
+  "Failed to save screenshot": {
+    "Failed to save screenshot": ""
+  },
+  "Failed to save screenshot file.": {
+    "Failed to save screenshot file.": ""
   },
   "Failed to send SMS": {
     "Failed to send SMS": "Не удалось отправить SMS"
@@ -3218,6 +3785,15 @@
   "Failed to switch codec": {
     "Failed to switch codec": "Не удалось переключить кодек"
   },
+  "Failed to switch output": {
+    "Failed to switch output": ""
+  },
+  "Failed to switch port": {
+    "Failed to switch port": ""
+  },
+  "Failed to toggle cellular": {
+    "Failed to toggle cellular": ""
+  },
   "Failed to unpin entry": {
     "Failed to unpin entry": "Не удалось открепить запись"
   },
@@ -3232,15 +3808,6 @@
   },
   "Failed to update clipboard": {
     "Failed to update clipboard": "Не удалось обновить буфер обмена"
-  },
-  "Failed to update description": {
-    "Failed to update description": "Не удалось обновить описание"
-  },
-  "Failed to update location": {
-    "Failed to update location": "Не удалось обновить местоположение"
-  },
-  "Failed to update sharing": {
-    "Failed to update sharing": "Не удалось обновить общий доступ"
   },
   "Failed to write autostart entry": {
     "Failed to write autostart entry": "Не удалось записать запись автозапуска"
@@ -3351,13 +3918,19 @@
     "Flags": "Флаги"
   },
   "Flat": {
-    "Flat": ""
+    "Flat": "Линейный"
   },
   "Flat uses constant speed; Adaptive scales with movement speed": {
-    "Flat uses constant speed; Adaptive scales with movement speed": ""
+    "Flat uses constant speed; Adaptive scales with movement speed": "«Линейный» использует постоянную скорость; «Адаптивный» подстраивается под скорость движения"
   },
   "Flatpak": {
     "Flatpak": "Flatpak"
+  },
+  "Flip Horiz": {
+    "Flip Horiz": ""
+  },
+  "Flip Vert": {
+    "Flip Vert": ""
   },
   "Flipped": {
     "Flipped": "Отражённый"
@@ -3377,6 +3950,12 @@
   "Float Anchor": {
     "Float Anchor": "Привязка плавающего окна"
   },
+  "Float Image": {
+    "Float Image": ""
+  },
+  "Float Window": {
+    "Float Window": ""
+  },
   "Float X": {
     "Float X": "Плавающее X"
   },
@@ -3390,19 +3969,19 @@
     "Floating Position": "Положение плавающего окна"
   },
   "Floating Windows": {
-    "Floating Windows": ""
+    "Floating Windows": "Плавающие окна"
   },
   "Floating windows follow Surface Styling settings": {
-    "Floating windows follow Surface Styling settings": ""
+    "Floating windows follow Surface Styling settings": "Плавающие окна используют настройки стиля поверхностей"
+  },
+  "Floats above windows and other content": {
+    "Floats above windows and other content": ""
   },
   "Fluent": {
     "Fluent": "Fluent"
   },
-  "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": {
-    "Fluent: Smooth cubic deceleration in, quick snap out — clean, elegant curves.": "Fluent: плавное кубическое замедление при появлении, быстрое скрытие — чистые, элегантные кривые."
-  },
   "Flush": {
-    "Flush": ""
+    "Flush": "Встык"
   },
   "Focus": {
     "Focus": "Фокус"
@@ -3431,6 +4010,9 @@
   "Focused Monitor Only": {
     "Focused Monitor Only": "Только активный монитор"
   },
+  "Focused Screen": {
+    "Focused Screen": ""
+  },
   "Focused Window": {
     "Focused Window": "Используемое Окно"
   },
@@ -3452,6 +4034,9 @@
   "Follow focus": {
     "Follow focus": "Следовать за фокусом"
   },
+  "Follow the theme accent, or step from green to red as the battery drains.": {
+    "Follow the theme accent, or step from green to red as the battery drains.": ""
+  },
   "Follows the default launcher choice selected above.": {
     "Follows the default launcher choice selected above.": "Следует выбору лаунчера по умолчанию, сделанному выше."
   },
@@ -3469,6 +4054,9 @@
   },
   "Font Weight": {
     "Font Weight": "Толщина шрифта"
+  },
+  "Font family used for number stamp labels": {
+    "Font family used for number stamp labels": ""
   },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": "Шрифт для часов и даты на экране блокировки"
@@ -3494,6 +4082,12 @@
   "For editing plain text files": {
     "For editing plain text files": "Для редактирования текстовых файлов"
   },
+  "Force Copy & Save": {
+    "Force Copy & Save": ""
+  },
+  "Force Copy to Clipboard": {
+    "Force Copy to Clipboard": ""
+  },
   "Force HDR": {
     "Force HDR": "Принудительный HDR"
   },
@@ -3505,6 +4099,9 @@
   },
   "Force RGBX": {
     "Force RGBX": "Принудительный RGBX"
+  },
+  "Force Save to File": {
+    "Force Save to File": ""
   },
   "Force Wide Color": {
     "Force Wide Color": "Force Wide цвет"
@@ -3528,7 +4125,7 @@
     "Foreground Layers": "Слои переднего плана"
   },
   "Foreground Opacity": {
-    "Foreground Opacity": ""
+    "Foreground Opacity": "Непрозрачность переднего плана"
   },
   "Forever": {
     "Forever": "Навсегда"
@@ -3554,6 +4151,12 @@
   "Format the date on the login screen": {
     "Format the date on the login screen": "Формат даты на экране входа"
   },
+  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+  },
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  },
   "Forward 10s": {
     "Forward 10s": "Вперёд на 10 сек"
   },
@@ -3572,14 +4175,32 @@
   "Frame Xray": {
     "Frame Xray": "Frame Xray"
   },
+  "Framerate": {
+    "Framerate": ""
+  },
+  "Free": {
+    "Free": ""
+  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Освободить VRAM/память при закрытии лаунчера. Может вызвать небольшую задержку при повторном открытии."
+  },
+  "Freehand Pen": {
+    "Freehand Pen": ""
+  },
+  "Freehand Pen (1)": {
+    "Freehand Pen (1)": ""
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "Ледяная морось"
   },
   "Frequency": {
     "Frequency": "Частота"
+  },
+  "From Clipboard": {
+    "From Clipboard": ""
+  },
+  "From File": {
+    "From File": ""
   },
   "Fruit Salad": {
     "Fruit Salad": "Фруктовый салат"
@@ -3595,6 +4216,12 @@
   },
   "Full Day & Month": {
     "Full Day & Month": "Полное название дня и месяца"
+  },
+  "Full Screen": {
+    "Full Screen": ""
+  },
+  "Full Screen Target": {
+    "Full Screen Target": ""
   },
   "Full Size": {
     "Full Size": "Полный размер"
@@ -3614,8 +4241,8 @@
   "Fully Charged": {
     "Fully Charged": "Подключено"
   },
-  "G: grid • Z/X: size": {
-    "G: grid • Z/X: size": "G: сетка • Z/X: размер"
+  "GIF Framerate": {
+    "GIF Framerate": ""
   },
   "GPU": {
     "GPU": "ГП"
@@ -3632,11 +4259,11 @@
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "Цвета GTK успешно применены"
   },
-  "GTK, Qt, IDEs, more": {
-    "GTK, Qt, IDEs, more": "GTK, Qt, IDEs, и далее"
-  },
   "Games": {
     "Games": "Игры"
+  },
+  "Gamma": {
+    "Gamma": ""
   },
   "Gamma Control": {
     "Gamma Control": "Настройка гаммы"
@@ -3653,14 +4280,14 @@
   "General": {
     "General": "Общие"
   },
+  "General Shortcuts": {
+    "General Shortcuts": ""
+  },
   "Generate Override": {
     "Generate Override": "Создать переопределение"
   },
-  "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4 or QT5/QT6 (requires qt6ct-kde) configurations to follow DMS colors. Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
-  },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
-    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": ""
+    "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Создать базовые конфигурации GTK3/4, QT5/QT6 или qtengine в соответствии с цветами DMS (только для qt6ct требуется qt6ct-kde). Достаточно выполнить один раз.<br /><br />Рекомендуется настроить %1 перед применением тем GTK."
   },
   "Generic": {
     "Generic": "Общий"
@@ -3678,10 +4305,10 @@
     "Global fonts can be configured in Settings → Personalization": "Глобальные шрифты можно настроить в Настройки → Персонализация"
   },
   "Globally": {
-    "Globally": ""
+    "Globally": "Глобально"
   },
-  "Globally scale all animation durations": {
-    "Globally scale all animation durations": "Глобально масштабировать все длительности анимаций"
+  "Globally scale animation durations with geometric motion & spring based physics with bezier curves": {
+    "Globally scale animation durations with geometric motion & spring based physics with bezier curves": ""
   },
   "Golden Hour": {
     "Golden Hour": "Золотой час"
@@ -3728,9 +4355,6 @@
   "Greeter font": {
     "Greeter font": "Шрифт экрана приветствия"
   },
-  "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": {
-    "Greeter group members can sync their login-screen theme with dms greeter sync --profile after logging out and back in.": "Участники группы greeter могут синхронизировать тему экрана входа с помощью dms greeter sync --profile после выхода и повторного входа в систему."
-  },
   "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": {
     "Greeter group members can sync their login-screen theme with dms-greeter sync --profile after logging out and back in.": "Участники группы greeter могут синхронизировать тему экрана входа с помощью dms-greeter sync --profile после выхода и повторного входа."
   },
@@ -3775,6 +4399,9 @@
   },
   "Groups": {
     "Groups": "Группы"
+  },
+  "Gruvbox Material": {
+    "Gruvbox Material": ""
   },
   "H": {
     "H": "В"
@@ -3857,6 +4484,12 @@
   "Hide App": {
     "Hide App": "Скрыть приложение"
   },
+  "Hide Control Center": {
+    "Hide Control Center": ""
+  },
+  "Hide Control Center by Default": {
+    "Hide Control Center by Default": ""
+  },
   "Hide Delay": {
     "Hide Delay": "Задержка скрытия"
   },
@@ -3884,9 +4517,6 @@
   "Hide installed": {
     "Hide installed": "Скрывать установленные"
   },
-  "Hide notification content until expanded": {
-    "Hide notification content until expanded": "Скрывать содержимое уведомления до развёртывания"
-  },
   "Hide notification content until expanded; popups show collapsed by default": {
     "Hide notification content until expanded; popups show collapsed by default": "Скрывать содержимое уведомления до развёртывания; всплывающие окна показываются свёрнутыми по умолчанию"
   },
@@ -3905,14 +4535,38 @@
   "High": {
     "High": "Высокое"
   },
+  "High Contrast": {
+    "High Contrast": ""
+  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Высокоточная палитра, сохраняющая исходные оттенки."
+  },
+  "Higher percentages give island more inertia": {
+    "Higher percentages give island more inertia": ""
+  },
+  "Higher values pull island toward its target more strongly": {
+    "Higher values pull island toward its target more strongly": ""
+  },
+  "Higher values settle island with less bounce": {
+    "Higher values settle island with less bounce": ""
   },
   "Highlight Active Workspace App": {
     "Highlight Active Workspace App": "Подсвечивать приложение активного рабочего пространства"
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "Подсвечивать приложение в фокусе внутри индикаторов рабочих пространств"
+  },
+  "Highlighter": {
+    "Highlighter": ""
+  },
+  "Highlighter (S)": {
+    "Highlighter (S)": ""
+  },
+  "Highlighter Color": {
+    "Highlighter Color": ""
+  },
+  "Highlighter Thickness": {
+    "Highlighter Thickness": ""
   },
   "History": {
     "History": "История"
@@ -3931,6 +4585,15 @@
   },
   "Hold to Confirm Power Actions": {
     "Hold to Confirm Power Actions": "Удерживать для подтверждения действий питания"
+  },
+  "Home Compact": {
+    "Home Compact": ""
+  },
+  "Horizontal": {
+    "Horizontal": ""
+  },
+  "Horizontal Offset": {
+    "Horizontal Offset": ""
   },
   "Horizontal and vertical bar thickness": {
     "Horizontal and vertical bar thickness": "Горизонтальная и вертикальная толщина бара"
@@ -3977,8 +4640,11 @@
   "Hover Popouts": {
     "Hover Popouts": "Всплывающие окна при наведении"
   },
+  "Hover Trigger Delay": {
+    "Hover Trigger Delay": ""
+  },
   "How layout changes are remembered across apps": {
-    "How layout changes are remembered across apps": ""
+    "How layout changes are remembered across apps": "Как сохранять переключение раскладки между приложениями"
   },
   "How often the server polls for new updates.": {
     "How often the server polls for new updates.": "Как часто сервер проверяет наличие новых обновлений."
@@ -3994,6 +4660,12 @@
   },
   "Humidity": {
     "Humidity": "Влажность"
+  },
+  "Hybrid": {
+    "Hybrid": ""
+  },
+  "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": {
+    "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open": ""
   },
   "Hyprland Discord Server": {
     "Hyprland Discord Server": "Discord-сервер Hyprland"
@@ -4028,6 +4700,9 @@
   "IP sharing setup failed. Check that dnsmasq is installed.": {
     "IP sharing setup failed. Check that dnsmasq is installed.": "Ошибка настройки общего доступа к IP. Проверьте, установлен ли dnsmasq."
   },
+  "IPC Commands": {
+    "IPC Commands": ""
+  },
   "ISO Date": {
     "ISO Date": "Формат ISO"
   },
@@ -4042,6 +4717,9 @@
   },
   "Icon Size %": {
     "Icon Size %": "Размер значка %"
+  },
+  "Icon Spacing": {
+    "Icon Spacing": ""
   },
   "Icon Theme": {
     "Icon Theme": "Тема Значков"
@@ -4077,7 +4755,7 @@
     "If the field is hidden, it will appear as soon as a key is pressed.": "Если поле скрыто, оно появится сразу после нажатия клавиши."
   },
   "Ignore App-Requested Timeout": {
-    "Ignore App-Requested Timeout": ""
+    "Ignore App-Requested Timeout": "Игнорировать запрошенное приложением время показа"
   },
   "Ignore Completely": {
     "Ignore Completely": "Только всплывающее"
@@ -4103,11 +4781,26 @@
   "Image": {
     "Image": "Изображение"
   },
+  "Image + Text": {
+    "Image + Text": ""
+  },
+  "Image Background": {
+    "Image Background": ""
+  },
+  "Image Error": {
+    "Image Error": ""
+  },
+  "Image Size": {
+    "Image Size": ""
+  },
   "Image Viewer": {
     "Image Viewer": "Просмотр изображений"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Изображение скопировано в буфера обмена"
+  },
+  "Image selected automatically when using Image Background mode": {
+    "Image selected automatically when using Image Background mode": ""
   },
   "Import": {
     "Import": "Импорт"
@@ -4121,6 +4814,9 @@
   "Include AUR updates": {
     "Include AUR updates": "Включить обновления AUR"
   },
+  "Include Cursor": {
+    "Include Cursor": ""
+  },
   "Include Files in All Tab": {
     "Include Files in All Tab": "Включать файлы во вкладку «Все»"
   },
@@ -4132,6 +4828,9 @@
   },
   "Include Transitions": {
     "Include Transitions": "Включить переходы"
+  },
+  "Include application streams and virtual sinks in the device lists": {
+    "Include application streams and virtual sinks in the device lists": ""
   },
   "Include desktop actions (shortcuts) in search results.": {
     "Include desktop actions (shortcuts) in search results.": "Включить действия рабочего стола (ярлыки) в результаты поиска."
@@ -4147,6 +4846,9 @@
   },
   "Index Centering": {
     "Index Centering": "Центрирование по индексу"
+  },
+  "Indicator Colors": {
+    "Indicator Colors": ""
   },
   "Indicator Style": {
     "Indicator Style": "Индикатор Стиль"
@@ -4169,8 +4871,14 @@
   "Inhibitable": {
     "Inhibitable": "Блокируемый"
   },
+  "Initial Width": {
+    "Initial Width": ""
+  },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
     "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": "Начальное положение для плавающих окон. Укажите как X, так и Y; привязка определяет, относительно какого угла или края они располагаются."
+  },
+  "Initial state for the Control Center toggle.": {
+    "Initial state for the Control Center toggle.": ""
   },
   "Initialised": {
     "Initialised": "Инициализировано"
@@ -4178,14 +4886,23 @@
   "Inner Gaps": {
     "Inner Gaps": "Внутренние отступы"
   },
+  "Inner authentication": {
+    "Inner authentication": ""
+  },
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "Внутренний отступ, применяемый к каждому виджету"
   },
   "Input Devices": {
     "Input Devices": "Устройства Ввода"
   },
+  "Input Mode": {
+    "Input Mode": ""
+  },
   "Input Volume Slider": {
     "Input Volume Slider": "Вход Громкость Ползунок"
+  },
+  "Insert Image": {
+    "Insert Image": ""
   },
   "Insert your security key...": {
     "Insert your security key...": "Вставьте ключ безопасности..."
@@ -4196,9 +4913,6 @@
   "Install": {
     "Install": "Установить"
   },
-  "Install Greeter": {
-    "Install Greeter": "Установить экран приветствия"
-  },
   "Install Plugin": {
     "Install Plugin": "Установить дополнение"
   },
@@ -4207,9 +4921,6 @@
   },
   "Install color themes from the DMS theme registry": {
     "Install color themes from the DMS theme registry": "Установить цветовые темы из реестра тем DMS"
-  },
-  "Install complete. Greeter has been installed.": {
-    "Install complete. Greeter has been installed.": "Установка завершена. Экран приветствия был установлен."
   },
   "Install dsearch to search files.": {
     "Install dsearch to search files.": "Установите dsearch для поиска файлов."
@@ -4225,9 +4936,6 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Установить дополнения из репозитория DMS"
-  },
-  "Install the DMS greeter? A terminal will open for sudo authentication.": {
-    "Install the DMS greeter? A terminal will open for sudo authentication.": "Установить экран приветствия DMS? Откроется терминал для аутентификации через sudo."
   },
   "Install theme '%1' from the DMS registry?": {
     "Install theme '%1' from the DMS registry?": "Установить тему '%1' из реестра DMS?"
@@ -4256,6 +4964,12 @@
   "Intensity": {
     "Intensity": "Интенсивность"
   },
+  "Interaction / Result": {
+    "Interaction / Result": ""
+  },
+  "Interactive Region": {
+    "Interactive Region": ""
+  },
   "Interface:": {
     "Interface:": "Интерфейс:"
   },
@@ -4277,9 +4991,6 @@
   "Invalid package name — letters, digits and @._+:- only.": {
     "Invalid package name — letters, digits and @._+:- only.": "Недопустимое имя пакета — только буквы, цифры и @._+:-."
   },
-  "Invalid password for %1": {
-    "Invalid password for %1": "Неверный пароль для %1"
-  },
   "Invalid username": {
     "Invalid username": "Неверное имя пользователя"
   },
@@ -4292,8 +5003,23 @@
   "Iris Bloom": {
     "Iris Bloom": "Раскрытие диафрагмы"
   },
+  "Island": {
+    "Island": ""
+  },
+  "Island Gap": {
+    "Island Gap": ""
+  },
+  "Island Instance": {
+    "Island Instance": ""
+  },
+  "Island placement": {
+    "Island placement": ""
+  },
   "Isolate Displays": {
     "Isolate Displays": "Изолировать дисплеи"
+  },
+  "JPEG Quality": {
+    "JPEG Quality": ""
   },
   "Jobs": {
     "Jobs": "Задания"
@@ -4307,29 +5033,41 @@
   "Jump to page (1 - %1)": {
     "Jump to page (1 - %1)": "Перейти к странице (1 - %1)"
   },
+  "Kanagawa": {
+    "Kanagawa": ""
+  },
   "Keep Awake": {
     "Keep Awake": "Не спать"
   },
   "Keep Changes": {
     "Keep Changes": "Сохранить изменения"
   },
+  "Keep Clock with Media": {
+    "Keep Clock with Media": ""
+  },
   "Keep My Edits": {
     "Keep My Edits": "Оставить мои изменения"
   },
   "Keep dragging when finger is briefly lifted": {
-    "Keep dragging when finger is briefly lifted": ""
+    "Keep dragging when finger is briefly lifted": "Продолжать перетаскивание при кратковременном поднятии пальца"
   },
   "Keep in Bar": {
     "Keep in Bar": "Оставить на панели"
   },
   "Keep pinned apps as launchers and show running windows separately": {
-    "Keep pinned apps as launchers and show running windows separately": ""
+    "Keep pinned apps as launchers and show running windows separately": "Оставлять закреплённые приложения как значки запуска и показывать запущенные окна отдельно"
   },
   "Keep the clipboard type filter when reopening history": {
     "Keep the clipboard type filter when reopening history": "Сохранять фильтр типа буфера обмена при повторном открытии истории"
   },
+  "Keep the dock visible above fullscreen applications": {
+    "Keep the dock visible above fullscreen applications": ""
+  },
   "Keep typing": {
     "Keep typing": "Продолжайте ввод"
+  },
+  "Keep widgets beside the island or align them like a standalone bar": {
+    "Keep widgets beside the island or align them like a standalone bar": ""
   },
   "Keeping Awake": {
     "Keeping Awake": "Не спит"
@@ -4341,7 +5079,7 @@
     "Key": "Ключ"
   },
   "Key combination": {
-    "Key combination": ""
+    "Key combination": "Комбинация клавиш"
   },
   "Keybind Sources": {
     "Keybind Sources": "Источники комбинаций клавиш"
@@ -4356,31 +5094,31 @@
     "Keybinds shown alongside regular search results": "Комбинации клавиш показываются вместе с обычными результатами поиска"
   },
   "Keyboard": {
-    "Keyboard": ""
+    "Keyboard": "Клавиатура"
   },
   "Keyboard Behavior": {
-    "Keyboard Behavior": ""
+    "Keyboard Behavior": "Поведение клавиатуры"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Наименование Раскладки Клавиатуры"
   },
   "Keyboard Layouts": {
-    "Keyboard Layouts": ""
+    "Keyboard Layouts": "Раскладки клавиатуры"
   },
   "Keyboard Model": {
-    "Keyboard Model": ""
+    "Keyboard Model": "Модель клавиатуры"
   },
   "Keyboard Shortcuts": {
     "Keyboard Shortcuts": "Горячие клавиши"
   },
   "Keyboard Variant": {
-    "Keyboard Variant": ""
+    "Keyboard Variant": "Вариант раскладки"
   },
   "Keyboard shortcut to start security key unlock": {
-    "Keyboard shortcut to start security key unlock": ""
+    "Keyboard shortcut to start security key unlock": "Сочетание клавиш для разблокировки ключом безопасности"
   },
   "Keymap File Path": {
-    "Keymap File Path": ""
+    "Keymap File Path": "Путь к файлу раскладки"
   },
   "Keys": {
     "Keys": "Ключи"
@@ -4406,11 +5144,23 @@
   "LabWC Website": {
     "LabWC Website": "Сайт LabWC"
   },
+  "Landscape": {
+    "Landscape": ""
+  },
   "Large": {
     "Large": "Большой"
   },
   "Largest": {
     "Largest": "Крупнейший"
+  },
+  "Last Reg": {
+    "Last Reg": ""
+  },
+  "Last Region": {
+    "Last Region": ""
+  },
+  "Last Selected Region": {
+    "Last Selected Region": ""
   },
   "Last hour": {
     "Last hour": "Вчера"
@@ -4472,17 +5222,26 @@
   "Layout Overrides": {
     "Layout Overrides": "Переопределения макета"
   },
+  "Least Saturated": {
+    "Least Saturated": ""
+  },
   "Left": {
     "Left": "Слева"
   },
   "Left Center": {
     "Left Center": "Слева по центру"
   },
+  "Left Click": {
+    "Left Click": ""
+  },
   "Left Section": {
     "Left Section": "Левая секция"
   },
   "Left-Handed Mode": {
-    "Left-Handed Mode": ""
+    "Left-Handed Mode": "Режим для левшей"
+  },
+  "Level": {
+    "Level": ""
   },
   "Light": {
     "Light": "Светлый"
@@ -4511,6 +5270,9 @@
   "Light mode harmony": {
     "Light mode harmony": "Гармония светлого режима"
   },
+  "Lightest": {
+    "Lightest": ""
+  },
   "Limit set to %1%": {
     "Limit set to %1%": "Лимит установлен на %1%"
   },
@@ -4520,17 +5282,29 @@
   "Line": {
     "Line": "Линия"
   },
+  "Line Color": {
+    "Line Color": ""
+  },
+  "Line Thickness": {
+    "Line Thickness": ""
+  },
   "Line: %1": {
     "Line: %1": "Строка: %1"
   },
   "Linear": {
     "Linear": "Линейный"
   },
+  "Linear Gradient": {
+    "Linear Gradient": ""
+  },
   "Lines: %1": {
     "Lines: %1": "Строки: %1"
   },
   "List": {
     "List": "Список"
+  },
+  "Live Preview": {
+    "Live Preview": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Живая палитра с насыщенными акцентами."
@@ -4541,8 +5315,14 @@
   "Loading codecs...": {
     "Loading codecs...": "Загрузка кодеков..."
   },
+  "Loading contributors...": {
+    "Loading contributors...": ""
+  },
   "Loading keybinds...": {
     "Loading keybinds...": "Загрузка комбинаций клавиш..."
+  },
+  "Loading ports...": {
+    "Loading ports...": ""
   },
   "Loading trending...": {
     "Loading trending...": "Загрузка трендов..."
@@ -4626,10 +5406,13 @@
     "MAC": "MAC"
   },
   "MIT License": {
-    "MIT License": ""
+    "MIT License": "Лицензия MIT"
   },
   "MTU": {
     "MTU": "MTU"
+  },
+  "Magnifier Loupe": {
+    "Magnifier Loupe": ""
   },
   "Mail": {
     "Mail": "Почта"
@@ -4657,9 +5440,6 @@
   },
   "Managed by the primary PAM source": {
     "Managed by the primary PAM source": "Управляется основным источником PAM"
-  },
-  "Managed by the primary PAM source.": {
-    "Managed by the primary PAM source.": "Управляется основным источником PAM."
   },
   "Management": {
     "Management": "Управление"
@@ -4727,8 +5507,11 @@
   "Material": {
     "Material": "Material"
   },
-  "Material Battery Style": {
-    "Material Battery Style": "Стиль батареи Material"
+  "Material 3 Expressive bezier curves, default.": {
+    "Material 3 Expressive bezier curves, default.": ""
+  },
+  "Material 3 Expressive panels rise from below with a subtle scale, default.": {
+    "Material 3 Expressive panels rise from below with a subtle scale, default.": ""
   },
   "Material Colors": {
     "Material Colors": "Акцентные Цвета"
@@ -4741,9 +5524,6 @@
   },
   "Material inspired shadows and elevation on modals, popouts, and dialogs": {
     "Material inspired shadows and elevation on modals, popouts, and dialogs": "Тени и глубина в стиле Material на модальных, всплывающих и диалоговых окнах"
-  },
-  "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": {
-    "Material: Material Design 3 Expressive bezier curves. The DMS default feel.": "Material: выразительные кривые Безье из Material Design 3. Стандартный стиль DMS."
   },
   "Matugen Contrast": {
     "Matugen Contrast": "Контрастность Matugen"
@@ -4765,6 +5545,9 @@
   },
   "Max H": {
     "Max H": "Макс В"
+  },
+  "Max Height (0 = no limit)": {
+    "Max Height (0 = no limit)": ""
   },
   "Max Pinned Apps": {
     "Max Pinned Apps": "Макс закреплённых приложений"
@@ -4829,6 +5612,9 @@
   "Maximum pinned entries reached": {
     "Maximum pinned entries reached": "Достигнуто максимальное количество закреплённых записей"
   },
+  "Media / Launcher": {
+    "Media / Launcher": ""
+  },
   "Media Controls": {
     "Media Controls": "Управление Медиа"
   },
@@ -4871,11 +5657,17 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Индикатор Использования Памяти"
   },
+  "Menu Item Right Click": {
+    "Menu Item Right Click": ""
+  },
   "Merge indexed file results into the All tab (requires dsearch).": {
     "Merge indexed file results into the All tab (requires dsearch).": "Объединять результаты индексации файлов со вкладкой «Все» (требуется dsearch)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
     "Merge indexed folder results into the All tab (requires dsearch).": "Объединять результаты индексации папок со вкладкой «Все» (требуется dsearch)."
+  },
+  "Merging audio tracks...": {
+    "Merging audio tracks...": ""
   },
   "Message": {
     "Message": "Сообщение"
@@ -4885,6 +5677,9 @@
   },
   "Microphone": {
     "Microphone": "Микрофон"
+  },
+  "Microphone Device": {
+    "Microphone Device": ""
   },
   "Microphone Mute": {
     "Microphone Mute": "Микрофон отключён"
@@ -4898,8 +5693,14 @@
   "Microphone volume control": {
     "Microphone volume control": "Управление громкостью микрофона"
   },
+  "Middle Click": {
+    "Middle Click": ""
+  },
+  "Middle Click Action": {
+    "Middle Click Action": ""
+  },
   "Middle Click Emulation": {
-    "Middle Click Emulation": ""
+    "Middle Click Emulation": "Эмуляция средней кнопки мыши"
   },
   "Middle Section": {
     "Middle Section": "Средняя секция"
@@ -4914,7 +5715,10 @@
     "Minimal palette built around a single hue.": "Минимальная палитра, встроенная вокруг одного оттенка."
   },
   "Minimize": {
-    "Minimize": ""
+    "Minimize": "Свернуть"
+  },
+  "Minimize Delay": {
+    "Minimize Delay": ""
   },
   "Minute": {
     "Minute": "Минута"
@@ -4924,6 +5728,9 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "Отсутствующие переменные окружения"
+  },
+  "Modal": {
+    "Modal": ""
   },
   "Modal Background": {
     "Modal Background": "Фон модального окна"
@@ -4970,8 +5777,23 @@
   "Month Date": {
     "Month Date": "Месяц и дата"
   },
+  "More Tools": {
+    "More Tools": ""
+  },
   "Morning": {
     "Morning": "Утро"
+  },
+  "Most Saturated": {
+    "Most Saturated": ""
+  },
+  "Most Vivid": {
+    "Most Vivid": ""
+  },
+  "Motion": {
+    "Motion": ""
+  },
+  "Motion & Accessibility": {
+    "Motion & Accessibility": ""
   },
   "Motion Effects": {
     "Motion Effects": "Эффекты движения"
@@ -4980,10 +5802,10 @@
     "Mount Points": "Точки монтирования"
   },
   "Mouse & Touchpad": {
-    "Mouse & Touchpad": ""
+    "Mouse & Touchpad": "Мышь и тачпад"
   },
   "Mouse Settings": {
-    "Mouse Settings": ""
+    "Mouse Settings": "Настройки мыши"
   },
   "Mouse clicks pass through the bar to windows behind it": {
     "Mouse clicks pass through the bar to windows behind it": "Клики мыши проходят сквозь панель к окнам позади неё"
@@ -4996,6 +5818,12 @@
   },
   "Move Widget": {
     "Move Widget": "Переместить виджет"
+  },
+  "Move island and satellites left or right from display center": {
+    "Move island and satellites left or right from display center": ""
+  },
+  "Move island and satellites up or down from display center": {
+    "Move island and satellites up or down from display center": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "Перемещение в Paused"
@@ -5045,17 +5873,17 @@
   "Native": {
     "Native": "Нативный"
   },
-  "Native: platform renderer (FreeType).": {
-    "Native: platform renderer (FreeType).": "Native: системный рендерер (FreeType)."
-  },
   "Natural Scrolling": {
-    "Natural Scrolling": ""
+    "Natural Scrolling": "Естественная прокрутка"
   },
   "Natural Touchpad Scrolling": {
     "Natural Touchpad Scrolling": "Естественная прокрутка тачпада"
   },
   "Navigate": {
     "Navigate": "Навигация"
+  },
+  "Near Island": {
+    "Near Island": ""
   },
   "Network": {
     "Network": "Сеть"
@@ -5080,9 +5908,6 @@
   },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Отображение скорости скачивания и загрузки данных по сети"
-  },
-  "Network not found": {
-    "Network not found": "Сеть не найдена"
   },
   "Neutral": {
     "Neutral": "Нейтральный"
@@ -5144,11 +5969,11 @@
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "Сбой ночного режима: управление гаммой DMS недоступно"
   },
+  "Niri Binding Example": {
+    "Niri Binding Example": ""
+  },
   "Niri Integration": {
     "Niri Integration": "Интеграция Niri"
-  },
-  "Niri compositor actions (focus, move, etc.)": {
-    "Niri compositor actions (focus, move, etc.)": "Действия композитора Niri (фокус, перемещение и т.д.)"
   },
   "No": {
     "No": "Нет"
@@ -5189,6 +6014,9 @@
   "No History": {
     "No History": "Только всплывающее"
   },
+  "No Image Specified": {
+    "No Image Specified": ""
+  },
   "No Media": {
     "No Media": "Нет Медиа"
   },
@@ -5199,7 +6027,7 @@
     "No Rounding": "Без скругления"
   },
   "No Scroll": {
-    "No Scroll": ""
+    "No Scroll": "Без прокрутки"
   },
   "No Shadow": {
     "No Shadow": "Без тени"
@@ -5357,6 +6185,9 @@
   "No other active sessions on this seat": {
     "No other active sessions on this seat": "Нет других активных сессий на этом рабочем месте"
   },
+  "No output available": {
+    "No output available": ""
+  },
   "No output device": {
     "No output device": "Выбрать устройство"
   },
@@ -5374,6 +6205,9 @@
   },
   "No plugins found": {
     "No plugins found": "Дополнения не найдены"
+  },
+  "No ports found": {
+    "No ports found": ""
   },
   "No printer found": {
     "No printer found": "Принтер не найден"
@@ -5402,6 +6236,9 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "Сохранённые записи буфера обмена отсутствуют"
   },
+  "No saved images yet": {
+    "No saved images yet": ""
+  },
   "No screenshot provided": {
     "No screenshot provided": "Скриншот отсутствует"
   },
@@ -5413,6 +6250,9 @@
   },
   "No status output.": {
     "No status output.": "Нет вывода статуса."
+  },
+  "No supported images found": {
+    "No supported images found": ""
   },
   "No supported package manager found.": {
     "No supported package manager found.": "Поддерживаемый пакетный менеджер не найден."
@@ -5468,8 +6308,14 @@
   "None": {
     "None": "Нет"
   },
+  "None / Disabled": {
+    "None / Disabled": ""
+  },
   "None active": {
     "None active": "Нет активных"
+  },
+  "Nord": {
+    "Nord": ""
   },
   "Normal": {
     "Normal": "Нормальное"
@@ -5510,6 +6356,9 @@
   "Not set": {
     "Not set": "Не установлено"
   },
+  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+  },
   "Notepad": {
     "Notepad": "Блокнот"
   },
@@ -5543,9 +6392,6 @@
   "Notification Popups": {
     "Notification Popups": "Всплывающие уведомление"
   },
-  "Notification Settings": {
-    "Notification Settings": "Настройки Уведомлений"
-  },
   "Notification Type": {
     "Notification Type": "Тип уведомления"
   },
@@ -5561,11 +6407,23 @@
   "Now playing and media controls": {
     "Now playing and media controls": "Сейчас играет и управление медиа"
   },
+  "Number Stamp": {
+    "Number Stamp": ""
+  },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Числовой (Д/М)"
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "Числовой (М/Д)"
+  },
+  "OCR": {
+    "OCR": ""
+  },
+  "OCR Result": {
+    "OCR Result": ""
+  },
+  "OCR Text Recognition": {
+    "OCR Text Recognition": ""
   },
   "OK": {
     "OK": "ОК"
@@ -5598,7 +6456,7 @@
     "On": "Вкл"
   },
   "On Button Down": {
-    "On Button Down": ""
+    "On Button Down": "При зажатой кнопке"
   },
   "On indefinitely": {
     "On indefinitely": "Включено бессрочно"
@@ -5619,7 +6477,7 @@
     "Only adjust gamma based on time or location rules.": "Регулировать цветовую температуру только на основе правил времени или местоположения."
   },
   "Only continue if you recognize this server certificate fingerprint.": {
-    "Only continue if you recognize this server certificate fingerprint.": ""
+    "Only continue if you recognize this server certificate fingerprint.": "Продолжайте только в том случае, если вы уверены в подлинности отпечатка сертификата этого сервера."
   },
   "Only on Battery": {
     "Only on Battery": "Только при работе от батареи"
@@ -5634,13 +6492,13 @@
     "Opacity": "Непрозрачность"
   },
   "Opacity of cards and nested surfaces inside floating windows": {
-    "Opacity of cards and nested surfaces inside floating windows": ""
+    "Opacity of cards and nested surfaces inside floating windows": "Непрозрачность карточек и вложенных поверхностей внутри плавающих окон"
   },
   "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": {
-    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": ""
+    "Opacity of floating DMS windows like Settings, Notepad, and authentication prompts": "Непрозрачность плавающих окон DMS, таких как «Настройки», «Блокнот» и запросы аутентификации"
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
-    "Opacity of foreground cards and nested surfaces on shell panels": ""
+    "Opacity of foreground cards and nested surfaces on shell panels": "Непрозрачность карточек переднего плана и вложенных поверхностей на панелях оболочки"
   },
   "Opaque": {
     "Opaque": "Непрозрачный"
@@ -5652,7 +6510,7 @@
     "Open App": "Открыть приложение"
   },
   "Open DMS windows floating instead of tiled": {
-    "Open DMS windows floating instead of tiled": ""
+    "Open DMS windows floating instead of tiled": "Открывать окна DMS плавающими вместо мозаичных"
   },
   "Open Delay": {
     "Open Delay": "Задержка открытия"
@@ -5660,14 +6518,26 @@
   "Open Dir": {
     "Open Dir": "Открыть папку"
   },
+  "Open Folder": {
+    "Open Folder": ""
+  },
   "Open Frame": {
     "Open Frame": "Разомкнутая рамка"
   },
   "Open From": {
     "Open From": "Открыть из"
   },
+  "Open Island": {
+    "Open Island": ""
+  },
   "Open Notepad File": {
     "Open Notepad File": "Открыть Файл Блокнота"
+  },
+  "Open Quick Capture menu (Popout)": {
+    "Open Quick Capture menu (Popout)": ""
+  },
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Открыть корзину"
@@ -5676,7 +6546,7 @@
     "Open Trash With": "Открыть корзину с помощью"
   },
   "Open Windows Floating": {
-    "Open Windows Floating": ""
+    "Open Windows Floating": "Открывать окна плавающими"
   },
   "Open a new note": {
     "Open a new note": "Открыть новую заметку"
@@ -5759,6 +6629,9 @@
   "Outline": {
     "Outline": "Контур"
   },
+  "Outline Variant": {
+    "Outline Variant": ""
+  },
   "Outline around shell surfaces": {
     "Outline around shell surfaces": "Контур вокруг поверхностей оболочки"
   },
@@ -5774,8 +6647,20 @@
   "Output Devices": {
     "Output Devices": "Устройства вывода"
   },
+  "Output Format": {
+    "Output Format": ""
+  },
   "Output Tray Missing": {
     "Output Tray Missing": "Выходной лоток отсутствует"
+  },
+  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+  },
+  "Output switched": {
+    "Output switched": ""
+  },
+  "Outputs": {
+    "Outputs": ""
   },
   "Overcast": {
     "Overcast": "Пасмурно"
@@ -5785,6 +6670,9 @@
   },
   "Overlay": {
     "Overlay": "Оверлей"
+  },
+  "Overlay Opacity": {
+    "Overlay Opacity": ""
   },
   "Overridden by config": {
     "Overridden by config": "Переопределено конфигурацией"
@@ -5799,13 +6687,10 @@
     "Override Corner Radius": "Переопределить радиус углов"
   },
   "Override floating window transparency for Notepad": {
-    "Override floating window transparency for Notepad": ""
+    "Override floating window transparency for Notepad": "Переопределить прозрачность плавающего окна для «Блокнота»"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Переопределить глобальные настройки макета для этого выхода"
-  },
-  "Override global transparency for Notepad": {
-    "Override global transparency for Notepad": "Переопределить глобальную прозрачность для Блокнота"
   },
   "Override terminal with a custom command or script": {
     "Override terminal with a custom command or script": "Переопределить терминал пользовательской командой или скриптом"
@@ -5834,11 +6719,20 @@
   "PAM already provides security-key auth. Enable this to show it at login.": {
     "PAM already provides security-key auth. Enable this to show it at login.": "PAM уже обеспечивает аутентификацию по ключу безопасности. Включите эту опцию, чтобы отображать её при входе."
   },
+  "PAUSED": {
+    "PAUSED": ""
+  },
   "PDF Reader": {
     "PDF Reader": "Просмотр PDF"
   },
+  "PID": {
+    "PID": ""
+  },
   "PIN": {
     "PIN": "PIN"
+  },
+  "PRIMARY": {
+    "PRIMARY": ""
   },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "Имя пакета (например, docker)"
@@ -5876,8 +6770,17 @@
   "Pairing...": {
     "Pairing...": "Сопряжение..."
   },
-  "Partial": {
-    "Partial": ""
+  "Palette": {
+    "Palette": ""
+  },
+  "Palette Preset": {
+    "Palette Preset": ""
+  },
+  "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
+    "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
+  },
+  "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
+    "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": ""
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Переменная облачность"
@@ -5893,6 +6796,9 @@
   },
   "Password change failed (exit %1)": {
     "Password change failed (exit %1)": "Сбой смены пароля (код выхода %1)"
+  },
+  "Password must be 8 to 63 characters, or a 64-digit hex key.": {
+    "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
   },
   "Password set": {
     "Password set": "Пароль установлен"
@@ -5921,8 +6827,23 @@
   "Pause": {
     "Pause": "Пауза"
   },
+  "Pause / Resume": {
+    "Pause / Resume": ""
+  },
   "Paused": {
     "Paused": "На паузе"
+  },
+  "Pen Auto-Close": {
+    "Pen Auto-Close": ""
+  },
+  "Pen Color": {
+    "Pen Color": ""
+  },
+  "Pen Thickness": {
+    "Pen Thickness": ""
+  },
+  "Pen, Line, Arrow, Rect": {
+    "Pen, Line, Arrow, Rect": ""
   },
   "Pending": {
     "Pending": "Ожидание"
@@ -5934,7 +6855,7 @@
     "Pending Discharge": "Подключено"
   },
   "Per Window": {
-    "Per Window": ""
+    "Per Window": "Для каждого окна"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Обои для режима"
@@ -5966,11 +6887,17 @@
   "Phone number": {
     "Phone number": "Номер телефона"
   },
+  "Pick Color": {
+    "Pick Color": ""
+  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "Выберите другой файловый менеджер в Настройки → Док → Корзина."
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Каждый раз выбирать другое случайное видео из той же папки"
+  },
+  "Pick a palette preset or customize individual color slots.": {
+    "Pick a palette preset or customize individual color slots.": ""
   },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Выберите, на сколько приостановить уведомления"
@@ -5993,14 +6920,26 @@
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": "Закреплённые и запущенные приложения с перетаскиванием"
   },
+  "Pixel Intensity": {
+    "Pixel Intensity": ""
+  },
   "Pixelate": {
     "Pixelate": "Пикселизация"
+  },
+  "Pixelate (E)": {
+    "Pixelate (E)": ""
+  },
+  "Pixelate Intensity": {
+    "Pixelate Intensity": ""
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Разместить корзину в конце дока"
   },
   "Place clipboard history on the Wayland overlay layer": {
-    "Place clipboard history on the Wayland overlay layer": ""
+    "Place clipboard history on the Wayland overlay layer": "Размещать историю буфера обмена на оверлейном слое Wayland"
+  },
+  "Place independent widgets to left and right of island": {
+    "Place independent widgets to left and right of island": ""
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Поместите каталоги дополнений здесь. Каждое дополнение должно иметь файл plugin.json в качестве манифеста."
@@ -6013,6 +6952,9 @@
   },
   "Place the dock on the Wayland overlay layer": {
     "Place the dock on the Wayland overlay layer": "Разместить док на слое оверлея Wayland"
+  },
+  "Platform renderer (FreeType).": {
+    "Platform renderer (FreeType).": ""
   },
   "Play": {
     "Play": "Воспроизведение"
@@ -6037,6 +6979,9 @@
   },
   "Playback error: ": {
     "Playback error: ": "Ошибка воспроизведения: "
+  },
+  "Playful": {
+    "Playful": ""
   },
   "Plays audio files": {
     "Plays audio files": "Воспроизводит аудиофайлы"
@@ -6090,7 +7035,7 @@
     "Pointer": "Указатель"
   },
   "Pointer Speed": {
-    "Pointer Speed": ""
+    "Pointer Speed": "Скорость указателя"
   },
   "Polkit integration is disabled. User management requires Polkit to elevate privileges.": {
     "Polkit integration is disabled. User management requires Polkit to elevate privileges.": "Интеграция с Polkit отключена. Управление пользователями требует Polkit для повышения привилегий."
@@ -6106,6 +7051,12 @@
   },
   "Popouts and Modals follow global Animation Speed (disable to customize independently)": {
     "Popouts and Modals follow global Animation Speed (disable to customize independently)": "Всплывающие и модальные окна следуют глобальной скорости анимации (отключите для независимой настройки)"
+  },
+  "Popular Plugins": {
+    "Popular Plugins": ""
+  },
+  "Popup Input": {
+    "Popup Input": ""
   },
   "Popup Only": {
     "Popup Only": "Только всплывающее"
@@ -6125,8 +7076,17 @@
   "Port": {
     "Port": "Порт"
   },
+  "Port Selection": {
+    "Port Selection": ""
+  },
+  "Port switched": {
+    "Port switched": ""
+  },
   "Portal": {
     "Portal": "Портал"
+  },
+  "Portrait": {
+    "Portrait": ""
   },
   "Position": {
     "Position": "Позиция"
@@ -6136,6 +7096,9 @@
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "Возможные конфликты переопределения"
+  },
+  "Post-Capture Notification": {
+    "Post-Capture Notification": ""
   },
   "Power": {
     "Power": "Питание"
@@ -6194,6 +7157,42 @@
   "Preference": {
     "Preference": "Предпочтение"
   },
+  "Preset %1": {
+    "Preset %1": ""
+  },
+  "Preset 1": {
+    "Preset 1": ""
+  },
+  "Preset 2": {
+    "Preset 2": ""
+  },
+  "Preset 3": {
+    "Preset 3": ""
+  },
+  "Preset 4": {
+    "Preset 4": ""
+  },
+  "Preset 5": {
+    "Preset 5": ""
+  },
+  "Preset 6": {
+    "Preset 6": ""
+  },
+  "Preset 7": {
+    "Preset 7": ""
+  },
+  "Preset 8": {
+    "Preset 8": ""
+  },
+  "Preset Color": {
+    "Preset Color": ""
+  },
+  "Preset Thickness": {
+    "Preset Thickness": ""
+  },
+  "Preset Tool": {
+    "Preset Tool": ""
+  },
   "Preset Widths (%)": {
     "Preset Widths (%)": "Предустановленные ширины (%)"
   },
@@ -6201,7 +7200,7 @@
     "Press Ctrl+N or click 'New Session' to create one": "Нажмите Ctrl+N или «Новая сессия», чтобы создать её"
   },
   "Press Ctrl+key to set. Esc cancels.": {
-    "Press Ctrl+key to set. Esc cancels.": ""
+    "Press Ctrl+key to set. Esc cancels.": "Нажмите Ctrl + клавишу для назначения. Esc — отмена."
   },
   "Press Enter and the audio system will restart to apply the change": {
     "Press Enter and the audio system will restart to apply the change": "Нажмите Enter, и аудиосистема перезапустится для применения изменений"
@@ -6216,7 +7215,7 @@
     "Pressure": "Давление"
   },
   "Prevent accidental cursor jumps while typing": {
-    "Prevent accidental cursor jumps while typing": ""
+    "Prevent accidental cursor jumps while typing": "Предотвращать случайные перемещения курсора при вводе текста"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Предотвращение тайм-аута экрана"
@@ -6241,6 +7240,9 @@
   },
   "Primary Container": {
     "Primary Container": "Вариант поверхности"
+  },
+  "Primary Screen": {
+    "Primary Screen": ""
   },
   "Print Server Management": {
     "Print Server Management": "Управление Print Server"
@@ -6336,16 +7338,16 @@
     "Protocol": "Протокол"
   },
   "QR Generator": {
-    "QR Generator": ""
+    "QR Generator": "Генератор QR-кодов"
+  },
+  "QR Result": {
+    "QR Result": ""
   },
   "Qt": {
     "Qt": "Qt"
   },
   "Qt colors applied successfully": {
     "Qt colors applied successfully": "Цвета Qt успешно применены"
-  },
-  "Qt: distance-field renderer.": {
-    "Qt: distance-field renderer.": "Qt: рендерер distance-field."
   },
   "QtMultimedia is not available": {
     "QtMultimedia is not available": "QtMultimedia недоступно"
@@ -6355,6 +7357,12 @@
   },
   "Quality": {
     "Quality": "Качество"
+  },
+  "Quick Capture": {
+    "Quick Capture": ""
+  },
+  "Quick Capture Error": {
+    "Quick Capture Error": ""
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Быстрый доступ к меню запуска приложений"
@@ -6371,8 +7379,26 @@
   "Quick system toggles": {
     "Quick system toggles": "Безопасность и конфиденциальность"
   },
+  "RECORDING": {
+    "RECORDING": ""
+  },
   "RGB": {
     "RGB": "RGB"
+  },
+  "Radial Gradient": {
+    "Radial Gradient": ""
+  },
+  "Radial Menu": {
+    "Radial Menu": ""
+  },
+  "Radial Menu Opacity": {
+    "Radial Menu Opacity": ""
+  },
+  "Radial Menu Settings": {
+    "Radial Menu Settings": ""
+  },
+  "Radial Preset": {
+    "Radial Preset": ""
   },
   "Radius": {
     "Radius": "Радиус"
@@ -6390,10 +7416,13 @@
     "Random": "Случайный"
   },
   "Random Order": {
-    "Random Order": ""
+    "Random Order": "Случайный порядок"
   },
   "Rate": {
     "Rate": "Частота"
+  },
+  "Ratio": {
+    "Ratio": ""
   },
   "Re-enter password": {
     "Re-enter password": "Повторите пароль"
@@ -6422,6 +7451,9 @@
   "Recent Colors": {
     "Recent Colors": "Недавние Цвета"
   },
+  "Recent Edits": {
+    "Recent Edits": ""
+  },
   "Recent Images": {
     "Recent Images": "Недавние изображения"
   },
@@ -6431,8 +7463,65 @@
   "Recommended available": {
     "Recommended available": "Рекомендуемое доступно"
   },
+  "Record Microphone": {
+    "Record Microphone": ""
+  },
+  "Record Mouse Cursor": {
+    "Record Mouse Cursor": ""
+  },
+  "Record System Audio": {
+    "Record System Audio": ""
+  },
+  "Recording": {
+    "Recording": ""
+  },
+  "Recording Folder": {
+    "Recording Folder": ""
+  },
+  "Recording ended with error code %1.": {
+    "Recording ended with error code %1.": ""
+  },
+  "Recording...": {
+    "Recording...": ""
+  },
+  "Recordings Directory": {
+    "Recordings Directory": ""
+  },
+  "Rectangle": {
+    "Rectangle": ""
+  },
+  "Rectangle Color": {
+    "Rectangle Color": ""
+  },
+  "Rectangle Outline": {
+    "Rectangle Outline": ""
+  },
+  "Rectangle Outline (4)": {
+    "Rectangle Outline (4)": ""
+  },
+  "Rectangle Thickness": {
+    "Rectangle Thickness": ""
+  },
+  "Redact": {
+    "Redact": ""
+  },
+  "Redact (R)": {
+    "Redact (R)": ""
+  },
+  "Redact Thickness": {
+    "Redact Thickness": ""
+  },
+  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
+  },
+  "Redo last undone stroke": {
+    "Redo last undone stroke": ""
+  },
+  "Reduce Motion": {
+    "Reduce Motion": ""
+  },
   "Reduce the visible bar length from both ends": {
-    "Reduce the visible bar length from both ends": ""
+    "Reduce the visible bar length from both ends": "Уменьшить видимую длину панели с обоих концов"
   },
   "Refresh": {
     "Refresh": "Обновить"
@@ -6446,8 +7535,11 @@
   "Regex": {
     "Regex": "Регулярное выражение"
   },
+  "Region": {
+    "Region": ""
+  },
   "Registries": {
-    "Registries": ""
+    "Registries": "Реестры"
   },
   "Regular": {
     "Regular": "Обычный"
@@ -6486,7 +7578,7 @@
     "Remember Last Query": "Запоминать последний запрос"
   },
   "Remember Layout": {
-    "Remember Layout": ""
+    "Remember Layout": "Запоминать раскладку"
   },
   "Remember Type Filter": {
     "Remember Type Filter": "Запоминать фильтр типа"
@@ -6514,9 +7606,6 @@
   },
   "Remove admin": {
     "Remove admin": "Убрать права администратора"
-  },
-  "Remove corner rounding from the bar": {
-    "Remove corner rounding from the bar": "Убрать закругление углов панели"
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Убрать отступы и границу когда окна развёрнуты"
@@ -6554,6 +7643,9 @@
   "Rename Workspace": {
     "Rename Workspace": "Переименовать рабочую область"
   },
+  "Render Type": {
+    "Render Type": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": "Сортировка и группировка"
   },
@@ -6561,10 +7653,10 @@
     "Repeat": "Повторить"
   },
   "Repeat Delay": {
-    "Repeat Delay": ""
+    "Repeat Delay": "Задержка повтора"
   },
   "Repeat Rate": {
-    "Repeat Rate": ""
+    "Repeat Rate": "Частота повтора"
   },
   "Replacement": {
     "Replacement": "Замена"
@@ -6586,6 +7678,9 @@
   },
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "Требуется инструмент 'dgop'"
+  },
+  "Requires Bar Shadows to be enabled in Theme & Colors.": {
+    "Requires Bar Shadows to be enabled in Theme & Colors.": ""
   },
   "Requires DMS %1": {
     "Requires DMS %1": "Требуется DMS %1"
@@ -6609,10 +7704,19 @@
     "Requires remembering the last user and session. Enable those options first.": "Требуется запоминание последнего пользователя и сессии. Сначала включите эти опции."
   },
   "Requires the DMS Theme extension from the editor marketplace": {
-    "Requires the DMS Theme extension from the editor marketplace": ""
+    "Requires the DMS Theme extension from the editor marketplace": "Требуется расширение DMS Theme из каталога расширений редактора"
+  },
+  "Reserved Height": {
+    "Reserved Height": ""
+  },
+  "Reserved Width": {
+    "Reserved Width": ""
   },
   "Reset": {
     "Reset": "Сбросить"
+  },
+  "Reset Last Region": {
+    "Reset Last Region": ""
   },
   "Reset Position": {
     "Reset Position": "Сбросить позицию"
@@ -6632,6 +7736,9 @@
   "Resize on Border": {
     "Resize on Border": "Изменение размера за рамку"
   },
+  "Resize the resting island to align with nearby widgets": {
+    "Resize the resting island to align with nearby widgets": ""
+  },
   "Resize windows by dragging their edges with the mouse": {
     "Resize windows by dragging their edges with the mouse": "Изменять размер окон перетаскиванием их краев мышью"
   },
@@ -6648,13 +7755,13 @@
     "Restart the DankMaterialShell": "Перезагрузить DankMaterialShell"
   },
   "Restart userspace without rebooting the kernel, requires systemd": {
-    "Restart userspace without rebooting the kernel, requires systemd": ""
+    "Restart userspace without rebooting the kernel, requires systemd": "Перезапустить пространство пользователя без перезагрузки ядра (требуется systemd)"
   },
   "Restarting audio system...": {
     "Restarting audio system...": "Перезапуск аудиосистемы..."
   },
   "Restore": {
-    "Restore": ""
+    "Restore": "Восстановить"
   },
   "Restore Special Workspace Windows": {
     "Restore Special Workspace Windows": "Восстановить окна специального рабочего пространства"
@@ -6665,6 +7772,9 @@
   "Resume": {
     "Resume": "Продолжить"
   },
+  "Retry": {
+    "Retry": ""
+  },
   "Reveal the arcs where surfaces meet the frame": {
     "Reveal the arcs where surfaces meet the frame": "Показывать дуги в местах соприкосновения элементов с рамкой"
   },
@@ -6672,10 +7782,10 @@
     "Reverse Scrolling Direction": "Обратить направление прокрутки"
   },
   "Reverse mouse wheel scrolling direction": {
-    "Reverse mouse wheel scrolling direction": ""
+    "Reverse mouse wheel scrolling direction": "Инвертировать направление прокрутки колёсика мыши"
   },
   "Reverse two-finger scrolling direction": {
-    "Reverse two-finger scrolling direction": ""
+    "Reverse two-finger scrolling direction": "Инвертировать направление прокрутки двумя пальцами"
   },
   "Reverse workspace switch direction when scrolling over the bar": {
     "Reverse workspace switch direction when scrolling over the bar": "Обратить направление переключения рабочих пространств при прокрутке на панели"
@@ -6691,6 +7801,12 @@
   },
   "Right Center": {
     "Right Center": "Справа по центру"
+  },
+  "Right Click": {
+    "Right Click": ""
+  },
+  "Right Click Action": {
+    "Right Click Action": ""
   },
   "Right Section": {
     "Right Section": "Правая секция"
@@ -6719,8 +7835,26 @@
   "Root Filesystem": {
     "Root Filesystem": "Корневая файловая система"
   },
+  "Rosé Pine": {
+    "Rosé Pine": ""
+  },
+  "Rotate L": {
+    "Rotate L": ""
+  },
+  "Rotate R": {
+    "Rotate R": ""
+  },
+  "Round Highlighter Tips": {
+    "Round Highlighter Tips": ""
+  },
+  "Round Rectangle Corners": {
+    "Round Rectangle Corners": ""
+  },
   "Rounded": {
-    "Rounded": ""
+    "Rounded": "Скруглённые"
+  },
+  "Rounded Rectangle": {
+    "Rounded Rectangle": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Скруглённые углы для окон"
@@ -6791,20 +7925,38 @@
   "SSID": {
     "SSID": "SSID"
   },
+  "Satellite Widgets": {
+    "Satellite Widgets": ""
+  },
+  "Satellites widget to place left or right of the island": {
+    "Satellites widget to place left or right of the island": ""
+  },
   "Saturation": {
     "Saturation": "Насыщенность"
   },
   "Save & Start": {
     "Save & Start": "Сохранить и запустить"
   },
+  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
+  },
+  "Save Directory": {
+    "Save Directory": ""
+  },
   "Save Extracted Theme": {
-    "Save Extracted Theme": ""
+    "Save Extracted Theme": "Сохранить экспортированную тему"
+  },
+  "Save Filename Pattern": {
+    "Save Filename Pattern": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Сохранить Файл Блокнота"
   },
   "Save QR Code": {
     "Save QR Code": "Сохранить QR-код"
+  },
+  "Save Screenshot As": {
+    "Save Screenshot As": ""
   },
   "Save and close": {
     "Save and close": "Сохранить и закрыть"
@@ -6836,6 +7988,9 @@
   "Saved": {
     "Saved": "Сохранено"
   },
+  "Saved %1 (%2)": {
+    "Saved %1 (%2)": ""
+  },
   "Saved Configurations": {
     "Saved Configurations": "Saved Конфигурации"
   },
@@ -6847,6 +8002,9 @@
   },
   "Saved item deleted": {
     "Saved item deleted": "Сохранённый элемент удалён"
+  },
+  "Saving": {
+    "Saving": ""
   },
   "Saving...": {
     "Saving...": "Сохранение..."
@@ -6860,11 +8018,17 @@
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": "Масштабировать размеры значков DankBar независимо"
   },
+  "Scale Editor to Screenshot Size": {
+    "Scale Editor to Screenshot Size": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Масштабировать все размеры шрифтов во всей оболочке"
   },
   "Scan": {
     "Scan": "Сканировать"
+  },
+  "Scan QR": {
+    "Scan QR": ""
   },
   "Scanning...": {
     "Scanning...": "Сканирование..."
@@ -6875,8 +8039,71 @@
   "Score": {
     "Score": "Счёт"
   },
+  "Screen": {
+    "Screen": ""
+  },
+  "Screen Edges": {
+    "Screen Edges": ""
+  },
+  "Screen Recorder": {
+    "Screen Recorder": ""
+  },
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
+  },
+  "Screen Recording Error": {
+    "Screen Recording Error": ""
+  },
+  "Screen Recording Saved": {
+    "Screen Recording Saved": ""
+  },
+  "Screen recording timed out or was cancelled.": {
+    "Screen recording timed out or was cancelled.": ""
+  },
   "Screen sharing": {
     "Screen sharing": "Демонстрация экрана"
+  },
+  "Screen: %1 (%2x%3)": {
+    "Screen: %1 (%2x%3)": ""
+  },
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
+  },
+  "Screenshot Copied": {
+    "Screenshot Copied": ""
+  },
+  "Screenshot Folder": {
+    "Screenshot Folder": ""
+  },
+  "Screenshot Saved": {
+    "Screenshot Saved": ""
+  },
+  "Screenshot copied anonymously with randomized name and stripped metadata.": {
+    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+  },
+  "Screenshot copied to clipboard and saved to %1": {
+    "Screenshot copied to clipboard and saved to %1": ""
+  },
+  "Screenshot copied to clipboard but failed to save file: %1": {
+    "Screenshot copied to clipboard but failed to save file: %1": ""
+  },
+  "Screenshot copied to clipboard.": {
+    "Screenshot copied to clipboard.": ""
+  },
+  "Screenshot copied with randomized name.": {
+    "Screenshot copied with randomized name.": ""
+  },
+  "Screenshot failed (mode: %1).": {
+    "Screenshot failed (mode: %1).": ""
+  },
+  "Screenshot saved": {
+    "Screenshot saved": ""
+  },
+  "Screenshot saved to %1": {
+    "Screenshot saved to %1": ""
+  },
+  "Screenshot saved to %1/%2": {
+    "Screenshot saved to %1/%2": ""
   },
   "Screenshot unavailable": {
     "Screenshot unavailable": "Скриншот недоступен"
@@ -6890,11 +8117,17 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Прокрутка GitHub"
   },
+  "Scroll Interval": {
+    "Scroll Interval": ""
+  },
   "Scroll Method": {
-    "Scroll Method": ""
+    "Scroll Method": "Способ прокрутки"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Колесо прокрутки"
+  },
+  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scroll song title": {
     "Scroll song title": "Прокручивать название песни"
@@ -6908,8 +8141,11 @@
   "Scrolling": {
     "Scrolling": "Прокрутка"
   },
+  "Scrolling Capture": {
+    "Scrolling Capture": ""
+  },
   "Scrolling Speed": {
-    "Scrolling Speed": ""
+    "Scrolling Speed": "Скорость прокрутки"
   },
   "Search App Actions": {
     "Search App Actions": "Поиск действий приложений"
@@ -6947,6 +8183,9 @@
   "Search themes...": {
     "Search themes...": "Поиск тем..."
   },
+  "Search when idle, visualizer when media is playing": {
+    "Search when idle, visualizer when media is playing": ""
+  },
   "Search widgets...": {
     "Search widgets...": "Поиск виджетов..."
   },
@@ -6968,23 +8207,20 @@
   "Security": {
     "Security": "Безопасность"
   },
-  "Security & privacy": {
-    "Security & privacy": "Безопасность и конфиденциальность"
-  },
   "Security Key PAM Source": {
     "Security Key PAM Source": "Источник PAM ключа безопасности"
   },
   "Security key": {
-    "Security key": ""
+    "Security key": "Ключ безопасности"
   },
   "Security key (%1)": {
-    "Security key (%1)": ""
+    "Security key (%1)": "Ключ безопасности (%1)"
   },
   "Security key mode": {
     "Security key mode": "Режим ключа безопасности"
   },
   "Security key shortcut": {
-    "Security key shortcut": ""
+    "Security key shortcut": "Сочетание клавиш для ключа безопасности"
   },
   "Security-key availability could not be confirmed": {
     "Security-key availability could not be confirmed": "Не удалось подтвердить доступность ключа безопасности"
@@ -6995,20 +8231,38 @@
   "Select": {
     "Select": "Выбрать"
   },
+  "Select / Move stroke": {
+    "Select / Move stroke": ""
+  },
   "Select Application": {
     "Select Application": "Select Приложение"
   },
   "Select Bar": {
     "Select Bar": "Select Панели"
   },
+  "Select Color Slots 1 - 4": {
+    "Select Color Slots 1 - 4": ""
+  },
+  "Select Color Slots 5 - 8 (Q, W, E, R)": {
+    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
+  },
   "Select Custom Theme": {
     "Select Custom Theme": "Выберите пользовательскую тему"
+  },
+  "Select Directory": {
+    "Select Directory": ""
   },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "Выбрать логотип лаунчера дока"
   },
   "Select File to Send": {
     "Select File to Send": "Выбрать файл для отправки"
+  },
+  "Select Image File": {
+    "Select Image File": ""
+  },
+  "Select Image to Annotate": {
+    "Select Image to Annotate": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Выбрать лого лаунчера"
@@ -7032,7 +8286,7 @@
     "Select a desktop application": "Выберите приложение рабочего стола"
   },
   "Select a random wallpaper instead of cycling in alphabetical order": {
-    "Select a random wallpaper instead of cycling in alphabetical order": ""
+    "Select a random wallpaper instead of cycling in alphabetical order": "Выбирать случайные обои вместо перебора по алфавиту"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "Выбрать виджет для добавления на рабочий стол. Каждый виджет это отдельный экземпляр со своими настройками."
@@ -7085,6 +8339,9 @@
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Выбрать алгоритм палитры, используемый для цветов на основе обоев"
   },
+  "Select which color is extracted from the wallpaper to seed the palette": {
+    "Select which color is extracted from the wallpaper to seed the palette": ""
+  },
   "Select which keybind providers to include": {
     "Select which keybind providers to include": "Выбрать, какие источники комбинаций клавиш включать"
   },
@@ -7093,6 +8350,9 @@
   },
   "Select...": {
     "Select...": "Выбрать..."
+  },
+  "Selected Tool / Action": {
+    "Selected Tool / Action": ""
   },
   "Selected image file not found.": {
     "Selected image file not found.": "Выбранный файл изображения не найден."
@@ -7119,7 +8379,7 @@
     "Separate Light & Dark Themes": "Раздельные светлая и тёмная темы"
   },
   "Separate Pinned and Running Apps": {
-    "Separate Pinned and Running Apps": ""
+    "Separate Pinned and Running Apps": "Разделять закреплённые и запущенные приложения"
   },
   "Separate appearance for unfocused displays is not supported on this compositor.": {
     "Separate appearance for unfocused displays is not supported on this compositor.": "Раздельный внешний вид для неактивных мониторов не поддерживается этим композитором."
@@ -7220,6 +8480,9 @@
   "Shadows": {
     "Shadows": "Тени"
   },
+  "Shapes": {
+    "Shapes": ""
+  },
   "Share": {
     "Share": "Поделиться"
   },
@@ -7244,6 +8507,9 @@
   "Shortcut (%1)": {
     "Shortcut (%1)": "Сочетание клавиш (%1)"
   },
+  "Shortcut Action": {
+    "Shortcut Action": ""
+  },
   "Shortcut that opens this settings window": {
     "Shortcut that opens this settings window": "Сочетание клавиш, открывающее это окно настроек"
   },
@@ -7257,7 +8523,7 @@
     "Show": "Показать"
   },
   "Show \"config reloaded\" Toast": {
-    "Show \"config reloaded\" Toast": ""
+    "Show \"config reloaded\" Toast": "Показывать уведомление «Конфигурация перезагружена»"
   },
   "Show 3rd Party": {
     "Show 3rd Party": "Показать сторонние"
@@ -7280,14 +8546,26 @@
   "Show CPU Temp": {
     "Show CPU Temp": "Показать температуру CPU"
   },
+  "Show Charge Rate": {
+    "Show Charge Rate": ""
+  },
+  "Show Control Center": {
+    "Show Control Center": ""
+  },
   "Show Date": {
     "Show Date": "Показать дату"
+  },
+  "Show Discharge Rate": {
+    "Show Discharge Rate": ""
   },
   "Show Disk": {
     "Show Disk": "Показать диск"
   },
   "Show Dock": {
     "Show Dock": "Показывать Док"
+  },
+  "Show Dock Over Fullscreen": {
+    "Show Dock Over Fullscreen": ""
   },
   "Show Feels Like Temperature": {
     "Show Feels Like Temperature": "Показать ощущаемую температуру"
@@ -7321,6 +8599,9 @@
   },
   "Show Icon": {
     "Show Icon": "Показывать значок"
+  },
+  "Show Keyboard Shortcut Hints": {
+    "Show Keyboard Shortcut Hints": ""
   },
   "Show Launcher Button": {
     "Show Launcher Button": "Показать кнопку лаунчера"
@@ -7376,6 +8657,9 @@
   "Show Percentage": {
     "Show Percentage": "Показывать процент заряда"
   },
+  "Show Pill Border": {
+    "Show Pill Border": ""
+  },
   "Show Power Actions": {
     "Show Power Actions": "Показать действия питания"
   },
@@ -7394,20 +8678,32 @@
   "Show Reboot": {
     "Show Reboot": "Показать перезагрузку"
   },
+  "Show Recent Edits History": {
+    "Show Recent Edits History": ""
+  },
+  "Show Region Border": {
+    "Show Region Border": ""
+  },
   "Show Remaining Time": {
     "Show Remaining Time": "Показывать оставшееся время"
   },
   "Show Restart DMS": {
     "Show Restart DMS": "Показать перезапуск DMS"
   },
+  "Show Satellite Widgets": {
+    "Show Satellite Widgets": ""
+  },
   "Show Saved Items": {
     "Show Saved Items": "Показать сохранённые элементы"
+  },
+  "Show Screenshot Border": {
+    "Show Screenshot Border": ""
   },
   "Show Seconds": {
     "Show Seconds": "Показывать секунды"
   },
   "Show Soft Reboot": {
-    "Show Soft Reboot": ""
+    "Show Soft Reboot": "Показывать «Мягкую перезагрузку»"
   },
   "Show Sunrise/Sunset": {
     "Show Sunrise/Sunset": "Показать рассвет/закат"
@@ -7430,11 +8726,20 @@
   "Show System Time": {
     "Show System Time": "Показать системное время"
   },
+  "Show Toolbar": {
+    "Show Toolbar": ""
+  },
+  "Show Toolbar Border": {
+    "Show Toolbar Border": ""
+  },
   "Show Top Processes": {
     "Show Top Processes": "Показать топ процессов"
   },
   "Show Trash in Dock": {
     "Show Trash in Dock": "Показывать корзину в доке"
+  },
+  "Show Virtual Devices": {
+    "Show Virtual Devices": ""
   },
   "Show Weather Condition": {
     "Show Weather Condition": "Показать условие погоды"
@@ -7454,11 +8759,14 @@
   "Show a bar that drains as the popup's auto-dismiss timer runs": {
     "Show a bar that drains as the popup's auto-dismiss timer runs": "Показывать убывающую полосу по мере работы таймера автозакрытия всплывающего окна"
   },
+  "Show a clickable clock beside compact media details": {
+    "Show a clickable clock beside compact media details": ""
+  },
   "Show a notification when battery reaches the charge limit.": {
     "Show a notification when battery reaches the charge limit.": "Показывать уведомление при достижении лимита заряда."
   },
   "Show a toast when the compositor config is reloaded": {
-    "Show a toast when the compositor config is reloaded": ""
+    "Show a toast when the compositor config is reloaded": "Показывать уведомление при перезагрузке конфигурации композитора"
   },
   "Show a warning popup when battery is running low.": {
     "Show a warning popup when battery is running low.": "Показывать всплывающее предупреждение при низком заряде батареи."
@@ -7474,6 +8782,9 @@
   },
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "Показать аудиовизуализатор cava в медиа виджете"
+  },
+  "Show critical priority popups while Do Not Disturb is on": {
+    "Show critical priority popups while Do Not Disturb is on": ""
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "Показать затемнённое наложение за модальными диалогами"
@@ -7491,7 +8802,7 @@
     "Show during Niri overview": "Показывать в режиме обзора Niri"
   },
   "Show foreground surfaces on cards inside floating windows": {
-    "Show foreground surfaces on cards inside floating windows": ""
+    "Show foreground surfaces on cards inside floating windows": "Отображать поверхности переднего плана на карточках внутри плавающих окон"
   },
   "Show foreground surfaces on notification cards": {
     "Show foreground surfaces on notification cards": "Показывать поверхности переднего плана на карточках уведомлений"
@@ -7506,7 +8817,7 @@
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Показывать наложение лаунчера при вводе в обзоре Niri. Отключите для использования другого лаунчера."
   },
   "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": {
-    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": ""
+    "Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.": "Отображать зацикленные видеообложки альбомов из Apple Music при их наличии. Отправляет имя текущего исполнителя и название альбома в Apple."
   },
   "Show mode tabs and keyboard hints at the bottom.": {
     "Show mode tabs and keyboard hints at the bottom.": "Показывать вкладки режимов и подсказки клавиатуры внизу."
@@ -7529,6 +8840,9 @@
   "Show on screens:": {
     "Show on screens:": "Показать  на экранах:"
   },
+  "Show only the image on a transparent background": {
+    "Show only the image on a transparent background": ""
+  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": "Показывать панель только когда нет открытых окон"
   },
@@ -7537,6 +8851,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Показывать информацию о погоде в верхней панели и центре управления"
+  },
+  "Show weather on the login screen": {
+    "Show weather on the login screen": ""
   },
   "Show workspace index numbers in the top bar workspace switcher": {
     "Show workspace index numbers in the top bar workspace switcher": "Показывать номера индексов рабочих пространств в переключателе рабочих пространств верхней панели"
@@ -7595,6 +8912,9 @@
   "Skip": {
     "Skip": "Пропустить"
   },
+  "Skip Confirmation": {
+    "Skip Confirmation": ""
+  },
   "Skip confirmation": {
     "Skip confirmation": "Пропустить подтверждение"
   },
@@ -7607,23 +8927,80 @@
   "Slideout": {
     "Slideout": "Выдвижная панель"
   },
+  "Slot 1": {
+    "Slot 1": ""
+  },
+  "Slot 2": {
+    "Slot 2": ""
+  },
+  "Slot 3": {
+    "Slot 3": ""
+  },
+  "Slot 4": {
+    "Slot 4": ""
+  },
+  "Slot 5": {
+    "Slot 5": ""
+  },
+  "Slot 6": {
+    "Slot 6": ""
+  },
+  "Slot 7": {
+    "Slot 7": ""
+  },
+  "Slot 8": {
+    "Slot 8": ""
+  },
   "Small": {
     "Small": "Маленький"
+  },
+  "Smart": {
+    "Smart": ""
   },
   "Smartcard Authentication": {
     "Smartcard Authentication": "Аутентификация Smartcard"
   },
+  "Smooth": {
+    "Smooth": ""
+  },
+  "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": {
+    "Smooth cubic deceleration in, quick snap out, clean, elegant curves.": ""
+  },
   "Snap": {
     "Snap": "Прилипание"
+  },
+  "Snap spring-driven motion straight to its target without physics travel": {
+    "Snap spring-driven motion straight to its target without physics travel": ""
   },
   "Snow": {
     "Snow": "Снег"
   },
   "Soft Reboot": {
-    "Soft Reboot": ""
+    "Soft Reboot": "Мягкая перезагрузка"
+  },
+  "Soften image details so screenshot content stands out": {
+    "Soften image details so screenshot content stands out": ""
+  },
+  "Solid": {
+    "Solid": ""
+  },
+  "Solid Color": {
+    "Solid Color": ""
+  },
+  "Solid Fill": {
+    "Solid Fill": ""
+  },
+  "Solid Line": {
+    "Solid Line": ""
+  },
+  "Solid or outlined material meter, or a circular gauge": {
+    "Solid or outlined material meter, or a circular gauge": ""
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Некоторые плагины требуют более новую версию DMS:"
+  },
+  "Some settings are managed by the island": {
+    "Some settings are managed by the island": ""
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Сортировать по алфавиту"
@@ -7640,11 +9017,14 @@
   "Sounds": {
     "Sounds": "Звуки"
   },
+  "Source Color": {
+    "Source Color": ""
+  },
   "Source: %1": {
     "Source: %1": "Источник: %1"
   },
   "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": {
-    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": ""
+    "Sources for plugins and themes. Registries are git repositories with a plugins/ or themes/ directory.": "Источники плагинов и тем. Реестры представляют собой git-репозитории с каталогом plugins/ или themes/."
   },
   "Space between the bar and screen edges": {
     "Space between the bar and screen edges": "Расстояние между панелью и краями экрана"
@@ -7655,14 +9035,23 @@
   "Space between windows and screen edges": {
     "Space between windows and screen edges": "Расстояние между окнами и краями экрана"
   },
+  "Space kept clear for compact island and satellites": {
+    "Space kept clear for compact island and satellites": ""
+  },
   "Spacer": {
     "Spacer": "Разделитель"
   },
   "Spacing": {
     "Spacing": "Отступ"
   },
+  "Spawn Position": {
+    "Spawn Position": ""
+  },
   "Speaker settings": {
     "Speaker settings": "Настройки динамиков"
+  },
+  "Specific Output": {
+    "Specific Output": ""
   },
   "Speed": {
     "Speed": "Скорость"
@@ -7673,35 +9062,71 @@
   "Spotlight": {
     "Spotlight": "Spotlight"
   },
+  "Spotlight (D)": {
+    "Spotlight (D)": ""
+  },
   "Spotlight Bar": {
     "Spotlight Bar": "Панель Spotlight"
   },
   "Spotlight Bar Shortcut": {
     "Spotlight Bar Shortcut": "Сочетание клавиш для панели Spotlight"
   },
+  "Spotlight Opacity": {
+    "Spotlight Opacity": ""
+  },
   "Spotlight Search": {
     "Spotlight Search": "Поиск Spotlight"
   },
-  "Square": {
-    "Square": ""
+  "Spring Damping": {
+    "Spring Damping": ""
   },
-  "Square Corners": {
-    "Square Corners": "Прямые углы"
+  "Spring Mass": {
+    "Spring Mass": ""
+  },
+  "Spring Motion": {
+    "Spring Motion": ""
+  },
+  "Spring Stiffness": {
+    "Spring Stiffness": ""
+  },
+  "Spring bezier with overshoot, entry briefly exceeds its target then settles.": {
+    "Spring bezier with overshoot, entry briefly exceeds its target then settles.": ""
+  },
+  "Springs carry extra energy and visibly bounce before settling": {
+    "Springs carry extra energy and visibly bounce before settling": ""
+  },
+  "Square": {
+    "Square": "Прямые"
   },
   "Stacked": {
     "Stacked": "Стопкой"
   },
+  "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
+    "Stage the Wayland overlay layer to remain visible over fullscreen apps": ""
+  },
+  "Stamp (A)": {
+    "Stamp (A)": ""
+  },
+  "Stamp Color": {
+    "Stamp Color": ""
+  },
+  "Stamp Contrast Ring": {
+    "Stamp Contrast Ring": ""
+  },
+  "Stamp Number Font": {
+    "Stamp Number Font": ""
+  },
+  "Stamp Size": {
+    "Stamp Size": ""
+  },
+  "Stamp, Highlighter, Spotlight (A, S, D)": {
+    "Stamp, Highlighter, Spotlight (A, S, D)": ""
+  },
   "Standard": {
     "Standard": "Стандартный"
   },
-  "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": {
-    "Standard: Classic Material Design 3 — panels rise from below with a subtle scale. The DMS default.": "Стандартный: классический Material Design 3 — панели выдвигаются снизу с лёгким масштабированием. Стандартный стиль DMS."
-  },
   "Start": {
     "Start": "Старт"
-  },
-  "Start DankConnect, KDE Connect, or Valent to use this plugin": {
-    "Start DankConnect, KDE Connect, or Valent to use this plugin": ""
   },
   "Start Hotspot?": {
     "Start Hotspot?": "Запустить точку доступа?"
@@ -7711,6 +9136,15 @@
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Начните вводить заметки здесь..."
+  },
+  "Starting Preset": {
+    "Starting Preset": ""
+  },
+  "Starting Tool": {
+    "Starting Tool": ""
+  },
+  "Starting Tool Mode": {
+    "Starting Tool Mode": ""
   },
   "Starting hotspot...": {
     "Starting hotspot...": "Запуск точки доступа..."
@@ -7727,6 +9161,9 @@
   "Stop": {
     "Stop": "Остановить"
   },
+  "Stop & Save": {
+    "Stop & Save": ""
+  },
   "Stop ignoring %1": {
     "Stop ignoring %1": "Прекратить игнорирование %1"
   },
@@ -7738,6 +9175,12 @@
   },
   "Stopping": {
     "Stopping": "Останавливается"
+  },
+  "Straight Line": {
+    "Straight Line": ""
+  },
+  "Straight Line (2)": {
+    "Straight Line (2)": ""
   },
   "Stretch": {
     "Stretch": "Плитка вертикально"
@@ -7767,7 +9210,7 @@
     "Sunset": "Закат"
   },
   "Super + Space": {
-    "Super + Space": ""
+    "Super + Space": "Super + Пробел"
   },
   "Suppress Duplicate Notifications": {
     "Suppress Duplicate Notifications": "Подавлять дублирующиеся уведомления"
@@ -7793,6 +9236,9 @@
   "Surface Container": {
     "Surface Container": "Контейнер поверхности"
   },
+  "Surface Container Highest": {
+    "Surface Container Highest": ""
+  },
   "Surface High": {
     "Surface High": "Высокая поверхность"
   },
@@ -7803,7 +9249,7 @@
     "Surface Opacity": "Непрозрачность поверхностей"
   },
   "Surface Styling": {
-    "Surface Styling": ""
+    "Surface Styling": "Стиль поверхностей"
   },
   "Surface Text": {
     "Surface Text": "Текст поверхности"
@@ -7827,13 +9273,16 @@
     "Suspend then Hibernate": "Приостановить затем гибернация"
   },
   "Swap primary and secondary mouse buttons": {
-    "Swap primary and secondary mouse buttons": ""
+    "Swap primary and secondary mouse buttons": "Поменять местами основную и дополнительную кнопки мыши"
   },
   "Sway Website": {
     "Sway Website": "Сайт Sway"
   },
+  "Sweep the background into the screen edges": {
+    "Sweep the background into the screen edges": ""
+  },
   "Switch Layout Shortcut": {
-    "Switch Layout Shortcut": ""
+    "Switch Layout Shortcut": "Сочетание клавиш переключения раскладки"
   },
   "Switch between display configurations": {
     "Switch between display configurations": "Переключение между конфигурациями дисплеев"
@@ -7841,8 +9290,14 @@
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
     "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "Переключать экраны с поддержкой режима 60 Гц на 60 Гц при работе от батареи и восстанавливать прежний режим при питании от сети. Пропускает экраны с включенным VRR."
   },
+  "Switch to Select Tool": {
+    "Switch to Select Tool": ""
+  },
   "Switch to power profile": {
     "Switch to power profile": "Переключиться на профиль питания"
+  },
+  "Switch to your custom preset": {
+    "Switch to your custom preset": ""
   },
   "Sync": {
     "Sync": "Синхронизация"
@@ -7858,9 +9313,6 @@
   },
   "Sync Position Across Screens": {
     "Sync Position Across Screens": "Синхронизировать позицию на всех экранах"
-  },
-  "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": {
-    "Sync applies your theme and settings to the login screen. Shared users should run dms greeter sync --profile instead of a primary user sync.": "Синхронизация применяет вашу тему и настройки к экрану входа. Другим пользователям следует выполнять dms greeter sync --profile вместо синхронизации основного пользователя."
   },
   "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": {
     "Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.": "Синхронизация применяет вашу тему и настройки к экрану входа. Другим пользователям следует выполнять dms-greeter sync --profile вместо синхронизации основного пользователя."
@@ -7881,13 +9333,19 @@
     "Sync to apply": "Синхронизируйте для применения"
   },
   "Sync with Global Settings": {
-    "Sync with Global Settings": ""
+    "Sync with Global Settings": "Синхронизировать с глобальными настройками"
   },
   "Syncing...": {
     "Syncing...": "Синхронизация..."
   },
+  "Synthwave Electric": {
+    "Synthwave Electric": ""
+  },
   "System App Theming": {
     "System App Theming": "Темы системных приложений"
+  },
+  "System Audio Device": {
+    "System Audio Device": ""
   },
   "System Check": {
     "System Check": "Проверка системы"
@@ -7959,16 +9417,22 @@
     "Tailscale not available": "Tailscale недоступен"
   },
   "Tap and Drag": {
-    "Tap and Drag": ""
+    "Tap and Drag": "Касание и перетаскивание"
   },
   "Tap and drag on the touchpad to move items": {
-    "Tap and drag on the touchpad to move items": ""
+    "Tap and drag on the touchpad to move items": "Коснитесь тачпада и проведите пальцем для перемещения элементов"
   },
   "Tap the touchpad surface to trigger left click clicks": {
-    "Tap the touchpad surface to trigger left click clicks": ""
+    "Tap the touchpad surface to trigger left click clicks": "Касание поверхности тачпада срабатывает как нажатие левой кнопки"
   },
   "Tap to Click": {
-    "Tap to Click": ""
+    "Tap to Click": "Нажатие касанием"
+  },
+  "Target Output Name": {
+    "Target Output Name": ""
+  },
+  "Task list used when adding tasks from the dash calendar": {
+    "Task list used when adding tasks from the dash calendar": ""
   },
   "Terminal": {
     "Terminal": "Терминал"
@@ -7978,9 +9442,6 @@
   },
   "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": {
     "Terminal fallback failed. Install a supported terminal emulator or run 'dms auth sync' manually.": "Сбой запуска терминала. Установите один из поддерживаемых эмуляторов терминала или запустите 'dms auth sync' вручную."
-  },
-  "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": {
-    "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms greeter sync' manually.": "Сбой запуска терминала. Установите один из поддерживаемых эмуляторов терминала или запустите 'dms greeter sync' вручную."
   },
   "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": {
     "Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.": "Ошибка резервного терминала. Установите один из поддерживаемых эмуляторов терминала или запустите 'dms-greeter sync' вручную."
@@ -8015,32 +9476,53 @@
   "Text": {
     "Text": "Текст"
   },
+  "Text (W)": {
+    "Text (W)": ""
+  },
+  "Text Background Roundness": {
+    "Text Background Roundness": ""
+  },
   "Text Color": {
     "Text Color": "Цвет текста"
   },
   "Text Editor": {
     "Text Editor": "Текстовый редактор"
   },
+  "Text Font": {
+    "Text Font": ""
+  },
+  "Text Note": {
+    "Text Note": ""
+  },
   "Text Rendering": {
     "Text Rendering": "Отрисовка текста"
   },
-  "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.": "Инструмент 'dgop' требуется для системного мониторинга.\nУстановите dgop для использования этой функции."
+  "Text Size": {
+    "Text Size": ""
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "Переменная окружения DMS_SOCKET не установлена или сокет недоступен. Автоматизированное управление плагинами требует DMS_SOCKET."
   },
+  "The Island anchors to one screen edge": {
+    "The Island anchors to one screen edge": ""
+  },
+  "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
+    "The Island holds this edge on a display this bar covers, so the bar stays hidden there": ""
+  },
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": "Адаптер Wi-Fi не смог запустить режим точки доступа."
   },
-  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Приведённые ниже настройки изменят ваши настройки GTK и Qt. Если вы хотите сохранить текущие конфигурации, сделайте их резервную копию (qt5ct.conf|qt6ct.conf и ~/.config/gtk-3.0|gtk-4.0)."
-  },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
-    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Приведённые ниже параметры изменят ваши настройки GTK и Qt. Если вы хотите сохранить текущую конфигурацию, сделайте резервную копию файлов (qt5ct.conf|qt6ct.conf|qtengine/config.json и ~/.config/gtk-3.0|gtk-4.0)."
   },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "Пользовательская команда, используемая при подключении к сеансам (принимает имя сеанса в качестве первого аргумента)"
+  },
+  "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+  },
+  "The island draws its own surface": {
+    "The island draws its own surface": ""
   },
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "Очередь заданий этого принтера пуста"
@@ -8049,7 +9531,10 @@
     "The rule applies to any window matching one of these.": "Правило применяется к любому окну, соответствующему одному из этих условий."
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
-    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
+    "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "Сертификат сервера изменился с момента последнего подтверждения доверия. Продолжайте только в том случае, если вы уверены в подлинности нового отпечатка."
+  },
+  "Theme": {
+    "Theme": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "Темы и цвета"
@@ -8057,8 +9542,8 @@
   "Theme Color": {
     "Theme Color": "Цвет темы"
   },
-  "Theme Registry": {
-    "Theme Registry": "Реестр тем"
+  "Theme Primary Color": {
+    "Theme Primary Color": ""
   },
   "Theme color used for the border": {
     "Theme color used for the border": "Цвет темы, используемый для границы"
@@ -8067,7 +9552,7 @@
     "Theme color used for the widget outline": "Цвет темы, используемый для контура виджета"
   },
   "Theme extracted to: %1": {
-    "Theme extracted to: %1": ""
+    "Theme extracted to: %1": "Тема экспортирована в: %1"
   },
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "Сбой обработчика темы (%1)"
@@ -8077,6 +9562,9 @@
   },
   "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": {
     "These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)": "Они добавляют записи в каталог автозапуска XDG (~/.config/autostart/*.desktop)"
+  },
+  "These style the bar surface, which the Island replaces": {
+    "These style the bar surface, which the Island replaces": ""
   },
   "Thickness": {
     "Thickness": "Толщина"
@@ -8105,6 +9593,9 @@
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Этот выход отключён в текущем профиле"
   },
+  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
+  },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Этот плагин не имеет разрешения 'settings_write'.\n\nДобавьте \"permissions\": [\"settings_read\", \"settings_write\"] в plugin.json"
   },
@@ -8113,6 +9604,9 @@
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
     "This will delete all unpinned entries. %1 pinned entries will be kept.": "Это удалит все незакреплённые записи. %1 закреплённых записей будут сохранены."
+  },
+  "This will delete the %1 entries matching the current filter. Pinned entries are kept.": {
+    "This will delete the %1 entries matching the current filter. Pinned entries are kept.": ""
   },
   "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": {
     "This will disconnect WiFi from \"%1\" — the radio can't host a hotspot and stay connected at the same time. Internet sharing will need another connection, such as Ethernet.": "Это отключит Wi-Fi от «%1» — адаптер не может раздавать точку доступа и оставаться подключённым одновременно. Для раздачи интернета потребуется другое подключение, например Ethernet."
@@ -8157,7 +9651,7 @@
     "Time & Weather": "Время & Погода"
   },
   "Time First": {
-    "Time First": ""
+    "Time First": "Сначала время"
   },
   "Time Format": {
     "Time Format": "Формат времени"
@@ -8222,17 +9716,32 @@
   "Today": {
     "Today": "Сегодня"
   },
+  "Toggle Hide/Show Annotations": {
+    "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
+  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "Переключать видимость панели вручную через IPC"
   },
+  "Toggle between 2 latest presets": {
+    "Toggle between 2 latest presets": ""
+  },
   "Toggle fonts": {
     "Toggle fonts": "Переключить шрифты"
+  },
+  "Toggle the Island on this instance's displays": {
+    "Toggle the Island on this instance's displays": ""
   },
   "Toggle visibility of this bar configuration": {
     "Toggle visibility of this bar configuration": "Переключить видимость этой конфигурации панели"
   },
   "Toggling...": {
     "Toggling...": "Переключение..."
+  },
+  "Tokyo Night": {
+    "Tokyo Night": ""
   },
   "Tomorrow": {
     "Tomorrow": "Завтра"
@@ -8249,8 +9758,23 @@
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Слишком много попыток — вход заблокирован"
   },
+  "Tool Defaults": {
+    "Tool Defaults": ""
+  },
+  "Toolbar": {
+    "Toolbar": ""
+  },
+  "Toolbar Palette": {
+    "Toolbar Palette": ""
+  },
+  "Toolbar Position": {
+    "Toolbar Position": ""
+  },
   "Tools": {
     "Tools": "Инструменты"
+  },
+  "Tools icon opens Control Center": {
+    "Tools icon opens Control Center": ""
   },
   "Top": {
     "Top": "Сверху"
@@ -8286,19 +9810,28 @@
     "Touch your security key...": "Коснитесь ключа безопасности..."
   },
   "Touchpad Settings": {
-    "Touchpad Settings": ""
+    "Touchpad Settings": "Настройки тачпада"
   },
   "Touchpad Speed": {
-    "Touchpad Speed": ""
+    "Touchpad Speed": "Скорость тачпада"
   },
   "Transform": {
     "Transform": "Преобразовать"
+  },
+  "Transition Duration": {
+    "Transition Duration": ""
   },
   "Transition Effect": {
     "Transition Effect": "Эффект перехода"
   },
   "Transparency": {
     "Transparency": "Прозрачность"
+  },
+  "Transparent": {
+    "Transparent": ""
+  },
+  "Transparent Background": {
+    "Transparent Background": ""
   },
   "Trash": {
     "Trash": "Корзина"
@@ -8318,8 +9851,17 @@
   "Trigger": {
     "Trigger": "Триггер"
   },
+  "Trigger Middle-Click Action (Default: Interactive Region)": {
+    "Trigger Middle-Click Action (Default: Interactive Region)": ""
+  },
   "Trigger Prefix": {
     "Trigger Prefix": "Префикс триггера"
+  },
+  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
+  },
+  "Trigger on Hover": {
+    "Trigger on Hover": ""
   },
   "Trigger: %1": {
     "Trigger: %1": "Триггер: %1"
@@ -8352,13 +9894,16 @@
     "Turn off now": "Выключить сейчас"
   },
   "Two Finger": {
-    "Two Finger": ""
+    "Two Finger": "Двумя пальцами"
   },
   "Type at least 2 characters": {
     "Type at least 2 characters": "Введите не менее 2 символов"
   },
   "Type at least 2 characters to search files.": {
     "Type at least 2 characters to search files.": "Введите не менее 2 символов для поиска файлов."
+  },
+  "Type note...": {
+    "Type note...": ""
   },
   "Type this prefix to search keybinds": {
     "Type this prefix to search keybinds": "Введите этот префикс для поиска комбинацию клавишs"
@@ -8381,6 +9926,12 @@
   "Uncategorized": {
     "Uncategorized": "Без категории"
   },
+  "Undo (Ctrl+Z)": {
+    "Undo (Ctrl+Z)": ""
+  },
+  "Undo last stroke": {
+    "Undo last stroke": ""
+  },
   "Unfocused Color": {
     "Unfocused Color": "Цвет неактивного"
   },
@@ -8390,23 +9941,11 @@
   "Ungrouped": {
     "Ungrouped": "Негруппированный"
   },
-  "Uninstall": {
-    "Uninstall": "Удалить"
-  },
-  "Uninstall Greeter": {
-    "Uninstall Greeter": "Удалить экран входа"
-  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Удалить плагин"
   },
-  "Uninstall complete. Greeter has been removed.": {
-    "Uninstall complete. Greeter has been removed.": "Удаление завершено. Экран входа был удалён."
-  },
   "Uninstall failed: %1": {
     "Uninstall failed: %1": "Ошибка удаления: %1"
-  },
-  "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": {
-    "Uninstall the DMS greeter? This will remove configuration and restore your previous display manager. A terminal will open for sudo authentication.": "Удалить DMS greeter? Это приведёт к удалению конфигурации и восстановлению предыдущего дисплейного менеджера. Откроется терминал для подтверждения прав sudo."
   },
   "Uninstalled: %1": {
     "Uninstalled: %1": "Удалено: %1"
@@ -8471,6 +10010,9 @@
   "Unpin from Dock": {
     "Unpin from Dock": "Открепить от дока"
   },
+  "Unread notification count beside the clock": {
+    "Unread notification count beside the clock": ""
+  },
   "Unsaved changes": {
     "Unsaved changes": "Несохранённые изменения"
   },
@@ -8496,7 +10038,7 @@
     "Untrust": "Не доверять"
   },
   "Untrusted VPN certificate": {
-    "Untrusted VPN certificate": ""
+    "Untrusted VPN certificate": "Недоверенный сертификат VPN"
   },
   "Up to date": {
     "Up to date": "Обновлено"
@@ -8531,6 +10073,9 @@
   "Urgent Color": {
     "Urgent Color": "Цвет срочного"
   },
+  "Usage Guide": {
+    "Usage Guide": ""
+  },
   "Usage Tips": {
     "Usage Tips": "Советы по использованию"
   },
@@ -8539,6 +10084,12 @@
   },
   "Use Custom Command": {
     "Use Custom Command": "Использовать пользовательскую команду"
+  },
+  "Use Existing Custom": {
+    "Use Existing Custom": ""
+  },
+  "Use Floating Editor": {
+    "Use Floating Editor": ""
   },
   "Use Grid Layout": {
     "Use Grid Layout": "Использовать макет сетки"
@@ -8557,6 +10108,9 @@
   },
   "Use Inline Expansion": {
     "Use Inline Expansion": "Использовать встроенное раскрытие"
+  },
+  "Use Modal Editor": {
+    "Use Modal Editor": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Использовать моноширинный шрифт"
@@ -8750,11 +10304,17 @@
   "Version": {
     "Version": "Версия"
   },
+  "Vertical": {
+    "Vertical": ""
+  },
   "Vertical Deck": {
     "Vertical Deck": "Вертикальная дека"
   },
   "Vertical Grid": {
     "Vertical Grid": "Вертикальная сетка"
+  },
+  "Vertical Offset": {
+    "Vertical Offset": ""
   },
   "Vertical Scrolling": {
     "Vertical Scrolling": "Вертикальная прокрутка"
@@ -8771,14 +10331,23 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Яркая палитра с игривой насыщенностью."
   },
+  "Video Codec": {
+    "Video Codec": ""
+  },
   "Video Path": {
     "Video Path": "Путь к видео"
   },
   "Video Player": {
     "Video Player": "Видеоплеер"
   },
+  "Video Quality": {
+    "Video Quality": ""
+  },
   "Video Screensaver": {
     "Video Screensaver": "Видео-заставка"
+  },
+  "Video Settings": {
+    "Video Settings": ""
   },
   "View Mode": {
     "View Mode": "Режим просмотра"
@@ -8807,6 +10376,9 @@
   "Volume Slider": {
     "Volume Slider": "Громкость Ползунок"
   },
+  "Volume Style": {
+    "Volume Style": ""
+  },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Громкость, яркость и другие системные OSD"
   },
@@ -8815,9 +10387,6 @@
   },
   "W": {
     "W": "Ш"
-  },
-  "WCAG %1 body": {
-    "WCAG %1 body": "Текст WCAG %1"
   },
   "WPA/WPA2": {
     "WPA/WPA2": "WPA/WPA2"
@@ -8855,6 +10424,18 @@
   "Warnings": {
     "Warnings": "Предупреждения"
   },
+  "Watermark": {
+    "Watermark": ""
+  },
+  "Watermark Image": {
+    "Watermark Image": ""
+  },
+  "Watermark Text": {
+    "Watermark Text": ""
+  },
+  "Watermark Type": {
+    "Watermark Type": ""
+  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Волновые прогресс-бары"
   },
@@ -8864,8 +10445,14 @@
   "Weather Widget": {
     "Weather Widget": "Виджет погоды"
   },
+  "Weather icon and temperature open the weather activity": {
+    "Weather icon and temperature open the weather activity": ""
+  },
   "Web Browser": {
     "Web Browser": "Веб-браузер"
+  },
+  "WebP Quality": {
+    "WebP Quality": ""
   },
   "Welcome": {
     "Welcome": "Добро пожаловать"
@@ -8881,6 +10468,9 @@
   },
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
     "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "Если включено, проверка обновлений выполняется при запуске. Если отключено, проверка выполняется только согласно интервалу выше или при обновлении вручную."
+  },
+  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
   },
   "When locked": {
     "When locked": "Когда заблокировано"
@@ -8987,6 +10577,12 @@
   "Wind Speed in m/s": {
     "Wind Speed in m/s": "Скорость ветра в м/с"
   },
+  "Window": {
+    "Window": ""
+  },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
   "Window Corner Radius": {
     "Window Corner Radius": "Радиус углов окна"
   },
@@ -9000,7 +10596,7 @@
     "Window Height": "Высота окна"
   },
   "Window Opacity": {
-    "Window Opacity": ""
+    "Window Opacity": "Непрозрачность окон"
   },
   "Window Opening": {
     "Window Opening": "Открытие окна"
@@ -9014,6 +10610,12 @@
   "Working...": {
     "Working...": "Выполнение..."
   },
+  "Workspace %1": {
+    "Workspace %1": ""
+  },
+  "Workspace %1: %2": {
+    "Workspace %1: %2": ""
+  },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Номера индексов рабочих областей"
   },
@@ -9022,6 +10624,9 @@
   },
   "Workspace Padding": {
     "Workspace Padding": "Отступ рабочей области"
+  },
+  "Workspace Switch": {
+    "Workspace Switch": ""
   },
   "Workspace Switcher": {
     "Workspace Switcher": "Переключатель рабочих областей"
@@ -9048,7 +10653,7 @@
     "X-Ray": "X-Ray"
   },
   "XKB Options": {
-    "XKB Options": ""
+    "XKB Options": "Параметры XKB"
   },
   "XWayland": {
     "XWayland": "XWayland"
@@ -9077,11 +10682,8 @@
   "You have unsaved changes. Save before continuing?": {
     "You have unsaved changes. Save before continuing?": "У вас есть несохранённые изменения. Сохранить перед продолжением?"
   },
-  "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Необходимо установить одну из переменных окружения:\nQT_QPA_PLATFORMTHEME=gtk3 ИЛИ\nQT_QPA_PLATFORMTHEME=qt6ct\nа затем перезапустить оболочку.\n\nДля qt6ct требуется qt6ct-kde."
-  },
   "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": {
-    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": ""
+    "You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.": "Необходимо задать одну из следующих переменных окружения:\nQT_QPA_PLATFORMTHEME=gtk3 ИЛИ\nQT_QPA_PLATFORMTHEME=qt6ct ИЛИ\nQT_QPA_PLATFORMTHEME=qtengine\nа затем перезапустить оболочку.\n\nПакет qt6ct-kde требуется только для qt6ct."
   },
   "You'll enter your password at the greeter after the next reboot.": {
     "You'll enter your password at the greeter after the next reboot.": "Вам потребуется ввести пароль на экране приветствия после следующей перезагрузки."
@@ -9104,14 +10706,14 @@
   "Your system is up to date!": {
     "Your system is up to date!": "Ваша система обновлена!"
   },
+  "Zoom Level": {
+    "Zoom Level": ""
+  },
   "admin": {
     "admin": "admin"
   },
   "attached": {
     "attached": "Подключён"
-  },
-  "below AA": {
-    "below AA": ""
   },
   "brandon": {
     "brandon": "brandon"
@@ -9158,6 +10760,9 @@
   "display rotation option": {
     "Normal": "Обычная"
   },
+  "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": {
+    "dms-greeter is not installed. Install the dms-greeter package to manage the greeter.": ""
+  },
   "e.g. /usr/bin/my-script --flag": {
     "e.g. /usr/bin/my-script --flag": "напр. /usr/bin/my-script --flag"
   },
@@ -9187,6 +10792,9 @@
   },
   "featured": {
     "featured": "избранное"
+  },
+  "gpu-screen-recorder is not installed. Please install it first.": {
+    "gpu-screen-recorder is not installed. Please install it first.": ""
   },
   "khal": {
     "khal": "khal"

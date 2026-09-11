@@ -16,6 +16,7 @@ Singleton {
 
     signal popoutOpening
     signal popoutChanged
+    signal popoutToggledClosed(string screenName)
 
     property real hoverCursorGlobalX: 0
     property real hoverCursorGlobalY: 0
@@ -254,8 +255,7 @@ Singleton {
         if (!popout || !popout.screen)
             return;
 
-        // Clicking a transient popout pins it instead of toggling it closed.
-        const wasTransient = popout.hoverDismissEnabled === true;
+        // Clicks pin a popout, while clicking its active trigger toggles it closed below.
         if (!hoverRequest && popout.hoverDismissEnabled !== undefined)
             popout.hoverDismissEnabled = false;
 
@@ -310,14 +310,8 @@ Singleton {
                 return;
 
             if (!hoverRequest && (triggerId === undefined || sameDefinedTrigger)) {
-                if (!wasTransient) {
-                    _closePopout(popout);
-                    return;
-                }
-                if (popout.updateSurfacePosition)
-                    popout.updateSurfacePosition();
-                if (triggerId !== undefined)
-                    currentPopoutTriggers[screenName] = triggerId;
+                _closePopout(popout);
+                popoutToggledClosed(screenName);
                 return;
             }
 

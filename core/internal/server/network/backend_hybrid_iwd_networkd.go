@@ -164,6 +164,38 @@ func (b *HybridIwdNetworkdBackend) ActivateWiredConnection(uuid string) error {
 	return b.l3.ActivateWiredConnection(uuid)
 }
 
+func (b *HybridIwdNetworkdBackend) GetCellularDevices() []CellularDevice {
+	return []CellularDevice{}
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularEnabled() (bool, error) {
+	return false, fmt.Errorf("cellular radio control not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) SetCellularEnabled(enabled bool) error {
+	return fmt.Errorf("cellular radio control not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetCellularConnections() ([]WiredConnection, error) {
+	return nil, fmt.Errorf("cellular connections not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) ConnectCellular() error {
+	return fmt.Errorf("cellular connections not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectCellular() error {
+	return fmt.Errorf("cellular connections not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectCellularDevice(device string) error {
+	return fmt.Errorf("cellular connections not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) ActivateCellularConnection(uuid string) error {
+	return fmt.Errorf("cellular connections not supported in hybrid mode")
+}
+
 func (b *HybridIwdNetworkdBackend) ListVPNProfiles() ([]VPNProfile, error) {
 	return []VPNProfile{}, nil
 }

@@ -293,7 +293,7 @@ FocusScope {
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.error
             width: parent.width
-            visible: root.currentFlow?.failed ?? false
+            visible: PolkitService.authFailed
         }
 
         Item {

@@ -155,35 +155,33 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankActionButton {
+            DankRefreshButton {
                 id: refreshButtonTwo
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: isRefreshing ? "" : "refresh"
                 iconColor: Theme.withAlpha(Theme.surfaceText, 0.4)
                 tooltipText: I18n.tr("Refresh Weather")
                 tooltipSide: "left"
-                enabled: !isRefreshing
-
-                property bool isRefreshing: false
-
+                busy: refreshTimerTwo.running
                 onClicked: {
-                    isRefreshing = true;
                     WeatherService.forceRefresh();
                     refreshTimerTwo.restart();
-                }
-
-                DankSpinner {
-                    anchors.centerIn: parent
-                    size: refreshButtonTwo.iconSize
-                    visible: refreshButtonTwo.isRefreshing
                 }
 
                 Timer {
                     id: refreshTimerTwo
                     interval: 2000
-                    onTriggered: refreshButtonTwo.isRefreshing = false
                 }
             }
+        }
+
+        StyledText {
+            text: WeatherService.lastFetchError
+            visible: text.length > 0
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.withAlpha(Theme.surfaceText, 0.5)
+            width: Math.min(implicitWidth, 420)
+            elide: Text.ElideRight
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 
@@ -846,34 +844,22 @@ Item {
                 onClicked: SessionData.setWeatherHourlyDetailed(!SessionData.weatherHourlyDetailed)
             }
 
-            DankActionButton {
+            DankRefreshButton {
                 id: refreshButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: isRefreshing ? "" : "refresh"
                 iconColor: Theme.withAlpha(Theme.surfaceText, 0.4)
                 tooltipText: I18n.tr("Refresh Weather")
                 tooltipSide: "left"
-                enabled: !isRefreshing
-
-                property bool isRefreshing: false
-
+                busy: refreshTimer.running
                 onClicked: {
-                    isRefreshing = true;
                     WeatherService.forceRefresh();
                     refreshTimer.restart();
-                }
-
-                DankSpinner {
-                    anchors.centerIn: parent
-                    size: refreshButton.iconSize
-                    visible: refreshButton.isRefreshing
                 }
 
                 Timer {
                     id: refreshTimer
                     interval: 2000
-                    onTriggered: refreshButton.isRefreshing = false
                 }
             }
         }

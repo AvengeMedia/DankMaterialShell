@@ -47,23 +47,20 @@ Rectangle {
     Row {
         id: leftContent
         anchors.left: parent.left
-        anchors.leftMargin: Theme.spacingXS
+        anchors.leftMargin: hasAppCategories ? 0 : Theme.spacingXS
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingS
 
-        // Whether the apps category picker should replace the plain title
         readonly property bool hasAppCategories: root.section?.id === "apps" && (root.controller?.appCategories?.length ?? 0) > 0
 
         DankIcon {
             anchors.verticalCenter: parent.verticalCenter
-            // Hide section icon when the category chip already shows one
             visible: !leftContent.hasAppCategories
             name: root.section?.icon ?? "folder"
             size: 16
             color: Theme.surfaceVariantText
         }
 
-        // Plain title — hidden when the category chip is shown
         StyledText {
             anchors.verticalCenter: parent.verticalCenter
             visible: !leftContent.hasAppCategories
@@ -73,12 +70,10 @@ Rectangle {
             color: Theme.surfaceVariantText
         }
 
-        // Compact inline category chip — only visible on the apps section
         Item {
             id: categoryChip
             visible: leftContent.hasAppCategories
             anchors.verticalCenter: parent.verticalCenter
-            // Size to content with a fixed-min width so it doesn't jump around
             width: chipRow.implicitWidth + Theme.spacingM * 2
             height: 24
 
@@ -237,7 +232,6 @@ Rectangle {
                     }
                 }
 
-                // Size to list content, cap at 10 visible items
                 height: Math.min((root.controller?.appCategories?.length ?? 0) * 34, 10 * 34) + Theme.spacingS * 2 + 4
             }
         }

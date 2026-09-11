@@ -57,6 +57,7 @@ Item {
     property alias maximum: slider.maximum
     property alias step: slider.step
     property alias unit: slider.unit
+    property alias decimals: slider.decimals
     property alias wheelEnabled: slider.wheelEnabled
     property alias thumbOutlineColor: slider.thumbOutlineColor
     property int defaultValue: -1

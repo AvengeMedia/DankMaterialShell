@@ -12,15 +12,26 @@ Item {
 
     signal preferencesChanged(var preferences)
 
-    property bool localAllDisplays: true
+    property bool emptyMeansAll: true
 
-    onDisplayPreferencesChanged: {
-        if (!Array.isArray(displayPreferences) || displayPreferences.length === 0) {
-            localAllDisplays = true;
-            return;
-        }
-        localAllDisplays = displayPreferences.includes("all");
+    function coversAllDisplays(prefs) {
+        return !Array.isArray(prefs) || prefs.includes("all") || (emptyMeansAll && prefs.length === 0);
     }
+
+    function screenPref(screen) {
+        const pref = {
+            name: screen.name,
+            model: screen.model || ""
+        };
+        const modelIndex = SettingsData.getScreenModelIndex(screen);
+        if (modelIndex >= 0)
+            pref.modelIndex = modelIndex;
+        return pref;
+    }
+
+    property bool localAllDisplays: coversAllDisplays(displayPreferences)
+
+    onDisplayPreferencesChanged: localAllDisplays = coversAllDisplays(displayPreferences)
 
     width: parent?.width ?? 0
     height: displayColumn.height + Theme.spacingM * 2
@@ -48,15 +59,7 @@ Item {
                     root.preferencesChanged(["all"]);
                     return;
                 }
-                var screens = [];
-                for (var i = 0; i < Quickshell.screens.length; i++) {
-                    var s = Quickshell.screens[i];
-                    screens.push({
-                        name: s.name,
-                        model: s.model || ""
-                    });
-                }
-                root.preferencesChanged(screens);
+                root.preferencesChanged(Quickshell.screens.map(s => root.screenPref(s)));
             }
         }
 
@@ -87,12 +90,8 @@ Item {
                         if (!Array.isArray(prefs) || prefs.includes("all"))
                             prefs = [];
                         prefs = prefs.filter(p => p.name !== modelData.name);
-                        if (isChecked) {
-                            prefs.push({
-                                name: modelData.name,
-                                model: modelData.model || ""
-                            });
-                        }
+                        if (isChecked)
+                            prefs.push(root.screenPref(modelData));
                         if (prefs.length === 0) {
                             localChecked = true;
                             return;

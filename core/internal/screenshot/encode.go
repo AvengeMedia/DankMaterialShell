@@ -22,14 +22,14 @@ func tenBitSwapRB(format uint32) bool {
 	return format == uint32(FormatARGB2101010) || format == uint32(FormatXRGB2101010)
 }
 
-func tenBitToRGBA(buf *ShmBuffer, format uint32) *image.RGBA {
-	img := image.NewRGBA(image.Rect(0, 0, buf.Width, buf.Height))
+func tenBitRowsToRGBA(buf *ShmBuffer, format uint32, y0, y1 int) *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, buf.Width, y1-y0))
 	data := buf.Data()
 	swapRB := tenBitSwapRB(format)
 
-	for y := 0; y < buf.Height; y++ {
+	for y := y0; y < y1; y++ {
 		srcOff := y * buf.Stride
-		dstOff := y * img.Stride
+		dstOff := (y - y0) * img.Stride
 		for x := 0; x < buf.Width; x++ {
 			si := srcOff + x*4
 			di := dstOff + x*4
@@ -48,11 +48,15 @@ func tenBitToRGBA(buf *ShmBuffer, format uint32) *image.RGBA {
 }
 
 func BufferToImageWithFormat(buf *ShmBuffer, format uint32) *image.RGBA {
+	return bufferRowsToRGBA(buf, format, 0, buf.Height)
+}
+
+func bufferRowsToRGBA(buf *ShmBuffer, format uint32, y0, y1 int) *image.RGBA {
 	if PixelFormat(format).Is10Bit() {
-		return tenBitToRGBA(buf, format)
+		return tenBitRowsToRGBA(buf, format, y0, y1)
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, buf.Width, buf.Height))
+	img := image.NewRGBA(image.Rect(0, 0, buf.Width, y1-y0))
 	data := buf.Data()
 
 	var swapRB bool
@@ -63,9 +67,9 @@ func BufferToImageWithFormat(buf *ShmBuffer, format uint32) *image.RGBA {
 		swapRB = true
 	}
 
-	for y := 0; y < buf.Height; y++ {
+	for y := y0; y < y1; y++ {
 		srcOff := y * buf.Stride
-		dstOff := y * img.Stride
+		dstOff := (y - y0) * img.Stride
 		for x := 0; x < buf.Width; x++ {
 			si := srcOff + x*4
 			di := dstOff + x*4
@@ -210,7 +214,7 @@ func WriteToFileWithFormat(buf *ShmBuffer, path string, format Format, quality i
 
 	switch format {
 	case FormatJPEG:
-		return EncodeJPEG(f, BufferToImageWithFormat(buf, pixelFormat), quality)
+		return EncodeBufferJPEG(f, buf, pixelFormat, quality)
 	case FormatPPM:
 		return EncodePPM(f, BufferToImageWithFormat(buf, pixelFormat))
 	default:

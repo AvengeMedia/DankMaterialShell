@@ -12,10 +12,11 @@ Singleton {
     property string fullName: ""
     property string profilePicture: ""
     property string hostname: ""
+    property int uid: -1
     property bool profileAvailable: false
 
     function getUserInfo() {
-        Proc.runCommand("userInfo", ["sh", "-c", "echo \"$USER|$(getent passwd $USER | cut -d: -f5 | cut -d, -f1)|$(hostname)\""], (output, exitCode) => {
+        Proc.runCommand("userInfo", ["sh", "-c", "echo \"$USER|$(getent passwd $USER | cut -d: -f5 | cut -d, -f1)|$(hostname)|$(id -u)\""], (output, exitCode) => {
             if (exitCode !== 0) {
                 root.username = "User";
                 root.fullName = "User";
@@ -27,6 +28,10 @@ Singleton {
                 root.username = parts[0] || "";
                 root.fullName = parts[1] || parts[0] || "";
                 root.hostname = parts[2] || "";
+            }
+            if (parts.length >= 4) {
+                const parsedUid = parseInt(parts[3], 10);
+                root.uid = isNaN(parsedUid) ? -1 : parsedUid;
             }
         }, 0);
     }

@@ -63,7 +63,6 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 		subscribers:    make(map[string]chan State),
 		dirty:          make(chan struct{}, 1),
 		offerMimeTypes: make(map[any][]string),
-		offerRegistry:  make(map[uint32]any),
 		dbPath:         dbPath,
 	}
 
@@ -113,7 +112,68 @@ func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error)
 }
 
 func openDB(path string) (*bolt.DB, error) {
-	db, err := bolt.Open(path, 0o644, &bolt.Options{
+	db, err := tryOpenDB(path)
+	if err == nil {
+		return db, nil
+	}
+
+	log.Errorf("Clipboard db corrupted, salvaging readable entries: %v", err)
+
+	salvagePath := path + ".salvage"
+	os.Remove(salvagePath)
+	// chunked commits keep entries copied before the first unreadable page
+	if salvageErr := compactInto(path, salvagePath, 64<<10); salvageErr != nil {
+		log.Warnf("Clipboard db salvage stopped early: %v", salvageErr)
+	}
+
+	corruptPath := path + ".corrupt"
+	os.Remove(corruptPath)
+	if renameErr := os.Rename(path, corruptPath); renameErr != nil {
+		os.Remove(salvagePath)
+		return nil, err
+	}
+
+	os.Rename(salvagePath, path)
+
+	db, err = tryOpenDB(path)
+	if err == nil {
+		return db, nil
+	}
+
+	os.Remove(path)
+	return tryOpenDB(path)
+}
+
+// bbolt reports corrupted pages by panicking (internal/common/verify.go), not
+// by returning errors, so every db touchpoint recovers and converts to error.
+func recoverDBPanic(err *error) {
+	r := recover()
+	if r == nil {
+		return
+	}
+	*err = fmt.Errorf("clipboard db panic: %v", r)
+}
+
+// a pgid past the mmap end faults instead of panicking; only recoverable while armed
+func armDBFaultPanics() func() {
+	prev := debug.SetPanicOnFault(true)
+	return func() { debug.SetPanicOnFault(prev) }
+}
+
+func tryOpenDB(path string) (db *bolt.DB, err error) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			return
+		}
+		if db != nil {
+			db.Close()
+		}
+		db, err = nil, fmt.Errorf("clipboard db panic: %v", r)
+	}()
+	defer armDBFaultPanics()()
+
+	db, err = bolt.Open(path, 0o644, &bolt.Options{
 		Timeout: 1 * time.Second,
 	})
 	if err != nil {
@@ -129,7 +189,31 @@ func openDB(path string) (*bolt.DB, error) {
 		return nil, err
 	}
 
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
+		return b.ForEach(func(k, v []byte) error { return nil })
+	})
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+
 	return db, nil
+}
+
+func (m *Manager) dbUpdate(fn func(tx *bolt.Tx) error) (err error) {
+	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
+	return m.db.Update(fn)
+}
+
+func (m *Manager) dbView(fn func(tx *bolt.Tx) error) (err error) {
+	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
+	return m.db.View(fn)
 }
 
 func (m *Manager) post(fn func()) {
@@ -194,7 +278,11 @@ func (m *Manager) setupDataDeviceSync() {
 	ctx := m.display.Context()
 	dataMgr := m.dataControlMgr.(*ext_data_control.ExtDataControlManagerV1)
 
-	dataDevice := ext_data_control.NewExtDataControlDeviceV1(ctx)
+	dataDevice, err := dataMgr.GetDataDevice(m.seat)
+	if err != nil {
+		log.Errorf("Failed to send get_data_device request: %v", err)
+		return
+	}
 
 	dataDevice.SetDataOfferHandler(func(e ext_data_control.ExtDataControlDeviceV1DataOfferEvent) {
 		if e.Id == nil {
@@ -202,7 +290,6 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		m.offerMutex.Lock()
-		m.offerRegistry[e.Id.ID()] = e.Id
 		m.offerMimeTypes[e.Id] = make([]string, 0)
 		m.offerMutex.Unlock()
 
@@ -220,13 +307,8 @@ func (m *Manager) setupDataDeviceSync() {
 		}
 
 		var offer any
-		switch {
-		case e.Id != nil:
+		if e.Id != nil {
 			offer = e.Id
-		case e.OfferId != 0:
-			m.offerMutex.RLock()
-			offer = m.offerRegistry[e.OfferId]
-			m.offerMutex.RUnlock()
 		}
 
 		m.ownerLock.Lock()
@@ -306,11 +388,6 @@ func (m *Manager) setupDataDeviceSync() {
 		go m.readAndStore(r, preferredMime, altR, altMime)
 	})
 
-	if err := dataMgr.GetDataDeviceWithProxy(dataDevice, m.seat); err != nil {
-		log.Errorf("Failed to send get_data_device request: %v", err)
-		return
-	}
-
 	m.dataDevice = dataDevice
 
 	if err := ctx.Dispatch(); err != nil {
@@ -331,7 +408,6 @@ func (m *Manager) releaseOffer(offer any) {
 	}
 	m.offerMutex.Lock()
 	delete(m.offerMimeTypes, offer)
-	delete(m.offerRegistry, typedOffer.ID())
 	m.offerMutex.Unlock()
 	typedOffer.Destroy()
 }
@@ -444,8 +520,11 @@ func (m *Manager) storeEntry(entry Entry) error {
 
 	entry.Hash = computeHash(entry.Data)
 
-	return m.db.Update(func(tx *bolt.Tx) error {
+	return m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return fmt.Errorf("clipboard bucket missing")
+		}
 
 		if err := m.deduplicateInTx(b, entry.Hash); err != nil {
 			return err
@@ -908,8 +987,11 @@ func (m *Manager) GetHistory() []Entry {
 	var history []Entry
 	var stale []uint64
 
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
 		c := b.Cursor()
 
 		for k, v := c.Last(); k != nil; k, v = c.Prev() {
@@ -940,8 +1022,11 @@ func (m *Manager) deleteStaleEntries(ids []uint64) {
 		return
 	}
 
-	if err := m.db.Update(func(tx *bolt.Tx) error {
+	if err := m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
 		for _, id := range ids {
 			if err := b.Delete(itob(id)); err != nil {
 				log.Errorf("Failed to delete stale entry %d: %v", id, err)
@@ -961,8 +1046,11 @@ func (m *Manager) GetEntry(id uint64) (*Entry, error) {
 	var entry Entry
 	var found bool
 
-	err := m.db.View(func(tx *bolt.Tx) error {
+	err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
 		v := b.Get(itob(id))
 		if v == nil {
 			return nil
@@ -992,8 +1080,11 @@ func (m *Manager) DeleteEntry(id uint64) error {
 		return fmt.Errorf("database not available")
 	}
 
-	err := m.db.Update(func(tx *bolt.Tx) error {
+	err := m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
 		return b.Delete(itob(id))
 	})
 
@@ -1003,6 +1094,52 @@ func (m *Manager) DeleteEntry(id uint64) error {
 	}
 
 	return err
+}
+
+// DeleteEntries removes several entries in one transaction and reports how many
+// were actually deleted. Pinned entries are skipped: a bulk delete must never be
+// able to take out saved items.
+func (m *Manager) DeleteEntries(ids []uint64) (int, error) {
+	if m.db == nil {
+		return 0, fmt.Errorf("database not available")
+	}
+	if len(ids) == 0 {
+		return 0, nil
+	}
+
+	deleted := 0
+	err := m.dbUpdate(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
+		for _, id := range ids {
+			key := itob(id)
+			v := b.Get(key)
+			if v == nil {
+				continue
+			}
+			if entry, err := decodeEntryMeta(v); err == nil && entry.Pinned {
+				continue
+			}
+			if err := b.Delete(key); err != nil {
+				return err
+			}
+			deleted++
+		}
+		return nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	if deleted > 0 {
+		m.updateState()
+		m.notifySubscribers()
+	}
+
+	return deleted, nil
 }
 
 func (m *Manager) TouchEntry(id uint64) error {
@@ -1061,7 +1198,7 @@ func (m *Manager) ClearHistory() {
 	}
 
 	// Delete only non-pinned entries
-	if err := m.db.Update(func(tx *bolt.Tx) error {
+	if err := m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1088,7 +1225,7 @@ func (m *Manager) ClearHistory() {
 	}
 
 	pinnedCount := 0
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b != nil {
 			c := b.Cursor()
@@ -1120,40 +1257,54 @@ func (m *Manager) compactDB() error {
 	tmpPath := m.dbPath + ".compact"
 	defer os.Remove(tmpPath)
 
-	srcDB, err := bolt.Open(m.dbPath, 0o644, &bolt.Options{ReadOnly: true, Timeout: time.Second})
-	if err != nil {
-		m.db, _ = bolt.Open(m.dbPath, 0o644, &bolt.Options{Timeout: time.Second})
-		return fmt.Errorf("open source: %w", err)
+	if err := compactInto(m.dbPath, tmpPath, 0); err != nil {
+		m.reopenDB()
+		return err
 	}
-
-	dstDB, err := bolt.Open(tmpPath, 0o644, &bolt.Options{Timeout: time.Second})
-	if err != nil {
-		srcDB.Close()
-		m.db, _ = bolt.Open(m.dbPath, 0o644, &bolt.Options{Timeout: time.Second})
-		return fmt.Errorf("open destination: %w", err)
-	}
-
-	if err := bolt.Compact(dstDB, srcDB, 0); err != nil {
-		srcDB.Close()
-		dstDB.Close()
-		m.db, _ = bolt.Open(m.dbPath, 0o644, &bolt.Options{Timeout: time.Second})
-		return fmt.Errorf("compact: %w", err)
-	}
-
-	srcDB.Close()
-	dstDB.Close()
 
 	if err := os.Rename(tmpPath, m.dbPath); err != nil {
-		m.db, _ = bolt.Open(m.dbPath, 0o644, &bolt.Options{Timeout: time.Second})
+		m.reopenDB()
 		return fmt.Errorf("rename: %w", err)
 	}
 
-	m.db, err = bolt.Open(m.dbPath, 0o644, &bolt.Options{Timeout: time.Second})
-	if err != nil {
-		return fmt.Errorf("reopen: %w", err)
+	m.reopenDB()
+	if m.db == nil {
+		return fmt.Errorf("reopen failed")
 	}
 
 	return nil
+}
+
+func compactInto(srcPath, dstPath string, txMaxSize int64) (err error) {
+	defer recoverDBPanic(&err)
+	defer armDBFaultPanics()()
+
+	srcDB, err := bolt.Open(srcPath, 0o644, &bolt.Options{ReadOnly: true, Timeout: time.Second})
+	if err != nil {
+		return fmt.Errorf("open source: %w", err)
+	}
+	defer srcDB.Close()
+
+	dstDB, err := bolt.Open(dstPath, 0o644, &bolt.Options{Timeout: time.Second})
+	if err != nil {
+		return fmt.Errorf("open destination: %w", err)
+	}
+	defer dstDB.Close()
+
+	if err := bolt.Compact(dstDB, srcDB, txMaxSize); err != nil {
+		return fmt.Errorf("compact: %w", err)
+	}
+	return nil
+}
+
+func (m *Manager) reopenDB() {
+	db, err := openDB(m.dbPath)
+	if err != nil {
+		log.Errorf("Failed to reopen clipboard db: %v", err)
+		m.db = nil
+		return
+	}
+	m.db = db
 }
 
 func (m *Manager) SetClipboard(data []byte, mimeType string) error {
@@ -1339,7 +1490,7 @@ func (m *Manager) Close() {
 }
 
 func (m *Manager) clearHistoryInternal() error {
-	return m.db.Update(func(tx *bolt.Tx) error {
+	return m.dbUpdate(func(tx *bolt.Tx) error {
 		if err := tx.DeleteBucket([]byte("clipboard")); err != nil {
 			return err
 		}
@@ -1351,7 +1502,7 @@ func (m *Manager) clearHistoryInternal() error {
 func (m *Manager) clearOldEntries(days int) error {
 	cutoff := time.Now().AddDate(0, 0, -days)
 
-	return m.db.Update(func(tx *bolt.Tx) error {
+	return m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1387,7 +1538,7 @@ func (m *Manager) migrateHashes() error {
 	}
 
 	var needsMigration bool
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1410,7 +1561,7 @@ func (m *Manager) migrateHashes() error {
 
 	log.Info("Migrating clipboard entries to add hashes...")
 
-	return m.db.Update(func(tx *bolt.Tx) error {
+	return m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1470,7 +1621,7 @@ func (m *Manager) Search(params SearchParams) SearchResult {
 	mimeFilter := strings.ToLower(params.MimeType)
 
 	var all []Entry
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1664,7 +1815,7 @@ func (m *Manager) PinEntry(id uint64) error {
 	}
 
 	var hashExists bool
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1691,7 +1842,7 @@ func (m *Manager) PinEntry(id uint64) error {
 
 	cfg := m.getConfig()
 	pinnedCount := 0
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1712,8 +1863,11 @@ func (m *Manager) PinEntry(id uint64) error {
 		return fmt.Errorf("maximum pinned entries reached (%d)", cfg.MaxPinned)
 	}
 
-	err = m.db.Update(func(tx *bolt.Tx) error {
+	err = m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return fmt.Errorf("entry not found")
+		}
 		v := b.Get(itob(id))
 		if v == nil {
 			return fmt.Errorf("entry not found")
@@ -1746,8 +1900,11 @@ func (m *Manager) UnpinEntry(id uint64) error {
 		return fmt.Errorf("database not available")
 	}
 
-	err := m.db.Update(func(tx *bolt.Tx) error {
+	err := m.dbUpdate(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return fmt.Errorf("entry not found")
+		}
 		v := b.Get(itob(id))
 		if v == nil {
 			return fmt.Errorf("entry not found")
@@ -1812,7 +1969,7 @@ func (m *Manager) GetPinnedEntries() []Entry {
 	}
 
 	var pinned []Entry
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil
@@ -1842,7 +1999,7 @@ func (m *Manager) GetPinnedCount() int {
 	}
 
 	count := 0
-	if err := m.db.View(func(tx *bolt.Tx) error {
+	if err := m.dbView(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		if b == nil {
 			return nil

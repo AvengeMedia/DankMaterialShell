@@ -130,7 +130,7 @@ Item {
         return procs.slice(0, topProcessCount);
     }
 
-    Component.onCompleted: {
+    readonly property var requiredModules: {
         var modules = ["system"];
         if (showCpu || showCpuTemp || showCpuGraph)
             modules.push("cpu");
@@ -142,28 +142,35 @@ Item {
             modules.push("disk", "diskmounts");
         if (showTopProcesses)
             modules.push("processes");
-        activeModuleRefs = modules;
-        DgopService.addRef(modules);
+        return modules;
+    }
+
+    // Add before remove so a module shared by both sets never dips to zero refs, which would drop its cursors.
+    function syncModuleRefs() {
+        const prev = activeModuleRefs;
+        activeModuleRefs = requiredModules;
+        DgopService.addRef(activeModuleRefs);
+        if (prev.length === 0)
+            return;
+        DgopService.removeRef(prev);
+    }
+
+    onRequiredModulesChanged: syncModuleRefs()
+
+    Component.onCompleted: {
+        syncModuleRefs();
         updateGpuRef();
     }
 
     Component.onDestruction: {
-        DgopService.removeRef(activeModuleRefs);
+        if (activeModuleRefs.length > 0)
+            DgopService.removeRef(activeModuleRefs);
         if (currentGpuPciIdRef)
             DgopService.removeGpuPciId(currentGpuPciIdRef);
     }
 
     onShowGpuTempChanged: updateGpuRef()
     onSelectedGpuPciIdChanged: updateGpuRef()
-    onShowTopProcessesChanged: {
-        if (showTopProcesses) {
-            activeModuleRefs = activeModuleRefs.concat(["processes"]);
-            DgopService.addRef(["processes"]);
-        } else {
-            DgopService.removeRef(["processes"]);
-            activeModuleRefs = activeModuleRefs.filter(m => m !== "processes");
-        }
-    }
 
     function updateGpuRef() {
         if (currentGpuPciIdRef && currentGpuPciIdRef !== selectedGpuPciId) {

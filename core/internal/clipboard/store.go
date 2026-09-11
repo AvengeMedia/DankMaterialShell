@@ -47,7 +47,15 @@ func Store(data []byte, mimeType string) error {
 	return StoreWithConfig(data, mimeType, DefaultStoreConfig())
 }
 
-func StoreWithConfig(data []byte, mimeType string, cfg StoreConfig) error {
+func StoreWithConfig(data []byte, mimeType string, cfg StoreConfig) (err error) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			return
+		}
+		err = fmt.Errorf("clipboard db panic: %v", r)
+	}()
+
 	if len(data) == 0 {
 		return nil
 	}

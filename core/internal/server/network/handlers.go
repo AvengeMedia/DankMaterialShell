@@ -35,6 +35,18 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleConnectEthernet(conn, req, manager)
 	case "network.ethernet.disconnect":
 		handleDisconnectEthernet(conn, req, manager)
+	case "network.cellular.connect.config":
+		handleConnectCellularSpecificConfig(conn, req, manager)
+	case "network.cellular.connect":
+		handleConnectCellular(conn, req, manager)
+	case "network.cellular.disconnect":
+		handleDisconnectCellular(conn, req, manager)
+	case "network.cellular.toggle":
+		handleToggleCellular(conn, req, manager)
+	case "network.cellular.enable":
+		handleEnableCellular(conn, req, manager)
+	case "network.cellular.disable":
+		handleDisableCellular(conn, req, manager)
 	case "network.preference.set":
 		handleSetPreference(conn, req, manager)
 	case "network.info":
@@ -302,6 +314,68 @@ func handleDisconnectEthernet(conn *models.Conn, req models.Request, manager *Ma
 		return
 	}
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "disconnected"})
+}
+
+func handleConnectCellularSpecificConfig(conn *models.Conn, req models.Request, manager *Manager) {
+	uuid, err := params.String(req.Params, "uuid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	if err := manager.activateCellularConnection(uuid); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "connecting"})
+}
+
+func handleConnectCellular(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.ConnectCellular(); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "connecting"})
+}
+
+func handleDisconnectCellular(conn *models.Conn, req models.Request, manager *Manager) {
+	device := params.StringOpt(req.Params, "device", "")
+	var err error
+	if device != "" {
+		err = manager.DisconnectCellularDevice(device)
+	} else {
+		err = manager.DisconnectCellular()
+	}
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "disconnected"})
+}
+
+func handleToggleCellular(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.ToggleCellular(); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	state := manager.GetState()
+	models.Respond(conn, req.ID, map[string]bool{"enabled": state.CellularEnabled})
+}
+
+func handleEnableCellular(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.EnableCellular(); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, map[string]bool{"enabled": true})
+}
+
+func handleDisableCellular(conn *models.Conn, req models.Request, manager *Manager) {
+	if err := manager.DisableCellular(); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+	models.Respond(conn, req.ID, map[string]bool{"enabled": false})
 }
 
 func handleSetPreference(conn *models.Conn, req models.Request, manager *Manager) {

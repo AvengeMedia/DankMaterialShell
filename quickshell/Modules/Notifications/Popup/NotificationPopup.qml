@@ -1035,7 +1035,7 @@ PanelWindow {
                 iconSize: compactMode ? 14 : 16
                 buttonSize: compactMode ? 20 : 24
                 z: 15
-                visible: (SettingsData.notificationPopupPrivacyMode || win.bodyClickInvokesAction) && win.hasExpandableBody
+                visible: win.hasExpandableBody && (SettingsData.notificationPopupPrivacyMode || win.bodyClickInvokesAction || bodyText.hasMoreText || win.descriptionExpanded)
 
                 onClicked: {
                     if (win.hasExpandableBody)

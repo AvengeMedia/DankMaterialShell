@@ -96,6 +96,8 @@ in
       Service = {
         ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
+        RestartForceExitStatus = "TEMPFAIL";
+        SuccessExitStatus = "TEMPFAIL";
       };
 
       Install.WantedBy = [ cfg.systemd.target ];

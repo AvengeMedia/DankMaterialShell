@@ -344,7 +344,7 @@ func TestInterpolate_EdgeCases(t *testing.T) {
 }
 
 func TestGenerateGammaRamp_ZeroSize(t *testing.T) {
-	ramp := GenerateGammaRamp(0, 5000, 1.0)
+	ramp := GenerateGammaRamp(0, 5000, 1.0, 1.0)
 	assert.Empty(t, ramp.Red)
 	assert.Empty(t, ramp.Green)
 	assert.Empty(t, ramp.Blue)
@@ -358,7 +358,7 @@ func TestGenerateGammaRamp_ValidSizes(t *testing.T) {
 	for _, size := range sizes {
 		for _, temp := range temps {
 			for _, gamma := range gammas {
-				ramp := GenerateGammaRamp(size, temp, gamma)
+				ramp := GenerateGammaRamp(size, temp, gamma, 1.0)
 				assert.Len(t, ramp.Red, int(size))
 				assert.Len(t, ramp.Green, int(size))
 				assert.Len(t, ramp.Blue, int(size))
@@ -398,6 +398,7 @@ func TestNewManager_InvalidConfig(t *testing.T) {
 		LowTemp:  500,
 		HighTemp: 6500,
 		Gamma:    1.0,
+		Contrast: 1.0,
 	}
 
 	_, err := NewManager(mockDisplay, config)
@@ -432,11 +433,11 @@ func TestSetters_RejectedValuesLeaveConfigUntouched(t *testing.T) {
 		assert.Empty(t, m.updateTrigger)
 	})
 
-	t.Run("SetGamma", func(t *testing.T) {
+	t.Run("SetAdjustments", func(t *testing.T) {
 		m := newManager()
 		before := m.config
 
-		err := m.SetGamma(-1.0)
+		err := m.SetAdjustments(-1.0, 1.0)
 		assert.Error(t, err)
 		assert.Equal(t, before, m.config)
 		assert.Empty(t, m.updateTrigger)
@@ -474,4 +475,58 @@ func TestApplyGamma_SkipsUnchangedTempAndGamma(t *testing.T) {
 	assert.False(t, out.failed, "unchanged temp must not reach the compositor write path")
 	assert.Equal(t, 5000, out.lastTemp)
 	assert.Equal(t, uint32(256), out.rampSize)
+}
+
+func TestNeedsControls(t *testing.T) {
+	tests := []struct {
+		name     string
+		enabled  bool
+		gamma    float64
+		contrast float64
+		want     bool
+	}{
+		{"all_neutral_disabled", false, 1.0, 1.0, false},
+		{"enabled", true, 1.0, 1.0, true},
+		{"gamma_only", false, 1.2, 1.0, true},
+		{"contrast_only", false, 1.0, 1.3, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := DefaultConfig()
+			cfg.Enabled = tt.enabled
+			cfg.Gamma = tt.gamma
+			cfg.Contrast = tt.contrast
+			m := &Manager{config: cfg}
+			assert.Equal(t, tt.want, m.needsControls())
+		})
+	}
+}
+
+func TestSetAdjustments_UnchangedValuesDoNotTouchActor(t *testing.T) {
+	m := &Manager{config: DefaultConfig(), cmdq: make(chan cmd, 1)}
+
+	assert.NoError(t, m.SetAdjustments(1.0, 1.0))
+	assert.Empty(t, m.cmdq, "neutral defaults resent must not schedule any work")
+
+	assert.Error(t, m.SetAdjustments(1.0, 3.0))
+	assert.Equal(t, DefaultConfig(), m.config)
+	assert.Empty(t, m.cmdq)
+
+	assert.NoError(t, m.SetAdjustments(1.2, 1.5))
+	assert.Equal(t, 1.2, m.config.Gamma)
+	assert.Equal(t, 1.5, m.config.Contrast)
+	assert.Len(t, m.cmdq, 1, "one change must schedule exactly one sync")
+
+	assert.NoError(t, m.SetAdjustments(1.2, 1.5))
+	assert.Len(t, m.cmdq, 1, "resending the same values must not schedule more work")
+}
+
+func TestOutputState_RampCurrent(t *testing.T) {
+	out := &outputState{lastTemp: 5000, lastGamma: 1.0, lastContrast: 1.0}
+
+	assert.True(t, out.rampCurrent(5000, 1.0, 1.0))
+	assert.False(t, out.rampCurrent(4500, 1.0, 1.0))
+	assert.False(t, out.rampCurrent(5000, 1.2, 1.0))
+	assert.False(t, out.rampCurrent(5000, 1.0, 1.4))
 }

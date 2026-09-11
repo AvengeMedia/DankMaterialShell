@@ -20,12 +20,10 @@ Rectangle {
     border.color: Theme.outlineMedium
     border.width: Theme.layerOutlineWidth
 
-    Component.onCompleted: {
-        DgopService.addRef(["diskmounts"]);
-    }
-
-    Component.onDestruction: {
-        DgopService.removeRef(["diskmounts"]);
+    Ref {
+        service: DgopService
+        modules: ["diskmounts"]
+        active: root.visible && (root.Window.window?.visible ?? false)
     }
 
     DankFlickable {
