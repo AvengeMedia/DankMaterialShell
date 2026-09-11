@@ -35,6 +35,7 @@ var (
 	ssJSON        bool
 	ssGeometry    bool
 	ssAllowMulti  bool
+	ssHUD         string
 )
 
 type screenshotMetadata struct {
@@ -181,6 +182,7 @@ func init() {
 	screenshotCmd.PersistentFlags().BoolVar(&ssJSON, "json", false, "Print capture metadata as JSON")
 	screenshotCmd.PersistentFlags().BoolVarP(&ssGeometry, "geometry", "g", false, "Print selected region geometry (X,Y WxH) to stdout without capturing an image")
 	screenshotCmd.PersistentFlags().BoolVar(&ssAllowMulti, "allow-multiple", false, "Open a selector even when another one is already open")
+	screenshotCmd.PersistentFlags().StringVar(&ssHUD, "hud", "auto", "HUD overlay scale in region selector (auto, off/0, or custom scale factor like 1.5, 2)")
 
 	ssScrollCmd.Flags().IntVar(&ssScrollInterval, "interval", 45, "Capture interval in milliseconds (30-1000)")
 
@@ -212,6 +214,7 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config.Stdout = ssStdout
 	config.Geometry = ssGeometry
 	config.AllowMultiple = ssAllowMulti
+	config.HUD = ssHUD
 
 	if ssGeometry {
 		config.Clipboard = false

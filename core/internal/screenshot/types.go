@@ -73,6 +73,7 @@ type Config struct {
 	Geometry      bool
 	AllowMultiple bool
 	IntervalMs    int
+	HUD           string
 	// SelectorHook runs as the interactive selector starts (true) and ends (false).
 	SelectorHook func(begin bool)
 }
@@ -90,5 +91,6 @@ func DefaultConfig() Config {
 		Clipboard: true,
 		SaveFile:  true,
 		Notify:    true,
+		HUD:       "auto",
 	}
 }

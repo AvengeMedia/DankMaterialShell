@@ -238,6 +238,12 @@ func TestHUDDimensionsContainText(t *testing.T) {
 				},
 			}
 
+			// When scale <= 0, hudDimensions should return zero
+			hx, hy, hw, hh := r.hudDimensions(bufW, bufH, 0)
+			if hx != 0 || hy != 0 || hw != 0 || hh != 0 {
+				t.Fatalf("expected 0 dimensions for scale 0, got %d, %d, %d, %d", hx, hy, hw, hh)
+			}
+
 			for _, scale := range []int{1, 2} {
 				hudX, hudY, hudW, hudH := r.hudDimensions(bufW, bufH, scale)
 				data := make([]byte, bufH*stride)
@@ -256,6 +262,44 @@ func TestHUDDimensionsContainText(t *testing.T) {
 					}
 				}
 			}
+		}
+	}
+}
+
+func TestHUDScale(t *testing.T) {
+	tests := []struct {
+		hudOpt         string
+		effectiveScale float64
+		expectedScale  int
+	}{
+		{"auto", 1.0, 1},
+		{"auto", 1.8, 2},
+		{"auto", 2.4, 2},
+		{"", 1.0, 1},
+		{"", 2.0, 2},
+		{"off", 1.0, 0},
+		{"OFF", 2.0, 0},
+		{"none", 1.5, 0},
+		{"false", 1.0, 0},
+		{"0", 2.0, 0},
+		{"0.0", 1.0, 0},
+		{"-1", 1.0, 0},
+		{"1", 1.0, 1},
+		{"1.5", 1.0, 2},
+		{"2", 1.0, 2},
+		{"3", 1.0, 3},
+		{"invalid", 1.7, 2},
+	}
+
+	for _, tc := range tests {
+		r := &RegionSelector{
+			screenshoter: &Screenshoter{
+				config: Config{HUD: tc.hudOpt},
+			},
+		}
+		got := r.hudScale(tc.effectiveScale)
+		if got != tc.expectedScale {
+			t.Errorf("hudScale(%q, %v) = %d, expected %d", tc.hudOpt, tc.effectiveScale, got, tc.expectedScale)
 		}
 	}
 }
