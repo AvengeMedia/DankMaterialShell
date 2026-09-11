@@ -188,6 +188,15 @@ mockery
 
 `core/.mockery.yml` lists every mocked interface and where its mock goes (e.g. `network.Backend` -> `internal/mocks/network/mock_Backend.go`). To mock a new interface, add it there under its package and regenerate.
 
+## Generative AI
+
+Using an LLM to help write code, issues, or comments is fine. Submitting its output unread is not.
+
+- You are responsible for every line you submit. You have read it, tested it, and can explain it in review.
+- Say in the PR when a meaningful part of it was AI generated.
+- Do not file issues or leave comments you have not verified yourself. Reports that do not reproduce get closed.
+- PRs that read like unreviewed output, with narrating comments, invented APIs, or style that ignores the file they are in, get closed without review.
+
 ## Pull request
 
 Include screenshots/video if applicable in your pull request if applicable, to visualize what your change is affecting.
