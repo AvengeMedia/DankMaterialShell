@@ -150,7 +150,7 @@ func TestDetectVPNAuthAction_Fortinet(t *testing.T) {
 		"protocol": "fortinet",
 		"authtype": "password",
 	}))
-	assert.Equal(t, "", detectVPNAuthAction(service, map[string]string{
+	assert.Equal(t, "openconnect_helper", detectVPNAuthAction(service, map[string]string{
 		"protocol": "anyconnect",
 		"authtype": "password",
 	}))
@@ -205,6 +205,39 @@ func TestOpenConnectAuthCacheActivationLifecycle(t *testing.T) {
 			} else {
 				assert.Nil(t, backend.cachedOpenConnectAuth)
 			}
+		})
+	}
+}
+
+func TestDetectVPNAuthAction(t *testing.T) {
+	tests := []struct {
+		name        string
+		serviceType string
+		data        map[string]string
+		expected    string
+	}{
+		{name: "AnyConnect password", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "authtype": "password"}, expected: "openconnect_helper"},
+		{name: "AnyConnect absent auth type", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect"}, expected: "openconnect_helper"},
+		{name: "default protocol", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{}, expected: "openconnect_helper"},
+		{name: "Fortinet password preserved", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "fortinet", "authtype": "password"}, expected: "openconnect_password"},
+		{name: "Fortinet absent auth type remains unsupported", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "fortinet"}},
+		{name: "GlobalProtect browser preserved", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "gp", "saml-auth-method": "REDIRECT"}, expected: "gp_saml"},
+		{name: "AnyConnect detected browser does not fall through", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "saml-auth-method": "POST"}},
+		{name: "AnyConnect certificate auth", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "authtype": "cert"}},
+		{name: "AnyConnect user certificate", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "usercert": "/tmp/user.pem"}},
+		{name: "AnyConnect private key", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "userkey": "/tmp/user.key"}},
+		{name: "AnyConnect multi certificate", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "mcacert": "/tmp/machine.pem"}},
+		{name: "AnyConnect PKCS11", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "usercert": "pkcs11:token=test"}},
+		{name: "AnyConnect software token", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "stoken_source": "totp"}},
+		{name: "AnyConnect disabled token", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "anyconnect", "stoken_source": "disabled"}, expected: "openconnect_helper"},
+		{name: "unsupported OpenConnect protocol", serviceType: "org.freedesktop.NetworkManager.openconnect", data: map[string]string{"protocol": "pulse", "authtype": "password"}},
+		{name: "OpenVPN behavior preserved", serviceType: "org.freedesktop.NetworkManager.openvpn", data: map[string]string{"connection-type": "password"}, expected: "openvpn_username"},
+		{name: "nil data", serviceType: "org.freedesktop.NetworkManager.openconnect", data: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, detectVPNAuthAction(tt.serviceType, tt.data))
 		})
 	}
 }

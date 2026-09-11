@@ -337,6 +337,10 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 		if err := b.handleOpenVPNUsernameAuth(targetConn, connName, targetUUID, vpnServiceType); err != nil {
 			return err
 		}
+	case "openconnect_helper":
+		if err := b.ensureOpenConnectAgentFlags(targetConn, vpnData); err != nil {
+			return fmt.Errorf("failed to prepare OpenConnect connection: %w", err)
+		}
 	case "openconnect_password":
 		if err := b.ensureOpenConnectAgentFlags(targetConn, vpnData); err != nil {
 			return fmt.Errorf("failed to prepare OpenConnect connection: %w", err)
@@ -477,6 +481,9 @@ func detectVPNAuthAction(serviceType string, data map[string]string) string {
 				log.Infof("[VPN] External browser auth detected for protocol '%s' but only GlobalProtect (gp) and Fortinet are currently supported", protocol)
 			}
 			return ""
+		}
+		if isOpenConnectHelperEligible(serviceType, data) {
+			return "openconnect_helper"
 		}
 		if openConnectPasswordProtocol(data["protocol"]) == "fortinet" && supportsOpenConnectPasswordAuth(data) {
 			return "openconnect_password"
@@ -659,27 +666,6 @@ func (b *NetworkManagerBackend) readStoredOpenConnectSecrets(
 	// D-Bus cannot distinguish concurrent external reads of this same profile.
 	// Keep the marker limited to the synchronous lookup, with no lock held.
 	return conn.GetSecrets("vpn")
-}
-
-func (b *NetworkManagerBackend) beginOpenConnectSecretRead(uuid string, path dbus.ObjectPath) func() {
-	key := openConnectSecretRead{uuid: uuid, path: path}
-	if uuid == "" || !path.IsValid() || path == "/" {
-		return func() {}
-	}
-	b.openConnectSecretReadMu.Lock()
-	if b.openConnectSecretReads == nil {
-		b.openConnectSecretReads = make(map[openConnectSecretRead]uint)
-	}
-	b.openConnectSecretReads[key]++
-	b.openConnectSecretReadMu.Unlock()
-	return func() {
-		b.openConnectSecretReadMu.Lock()
-		defer b.openConnectSecretReadMu.Unlock()
-		b.openConnectSecretReads[key]--
-		if b.openConnectSecretReads[key] == 0 {
-			delete(b.openConnectSecretReads, key)
-		}
-	}
 }
 
 func (b *NetworkManagerBackend) isReadingOpenConnectSecrets(uuid string, path dbus.ObjectPath) bool {

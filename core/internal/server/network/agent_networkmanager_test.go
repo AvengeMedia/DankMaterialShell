@@ -180,21 +180,6 @@ func TestBuildOpenConnectSecretsResponse(t *testing.T) {
 	}
 }
 
-func helperAgentConnection(uuid string) map[string]nmVariantMap {
-	return map[string]nmVariantMap{
-		"connection": {
-			"type": dbus.MakeVariant("vpn"), "id": dbus.MakeVariant("AnyConnect"), "uuid": dbus.MakeVariant(uuid),
-		},
-		"vpn": {
-			"service-type": dbus.MakeVariant("org.freedesktop.NetworkManager.openconnect"),
-			"data": dbus.MakeVariant(map[string]string{
-				"protocol": "anyconnect", "cookie-flags": "2", "gateway-flags": "2", "gwcert-flags": "2", "resolve-flags": "2",
-			}),
-			"secrets": dbus.MakeVariant(map[string]string{"password": "old-password", "form:main:username": "alice"}),
-		},
-	}
-}
-
 func TestSecretAgentCachedOpenConnectFullHandoff(t *testing.T) {
 	for _, tt := range []struct {
 		name     string
