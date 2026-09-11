@@ -12620,6 +12620,25 @@
     "conditionKey": "islandEnabled"
   },
   {
+    "section": "islandHomeStatusContent",
+    "label": "Control Center",
+    "tabIndex": 46,
+    "category": "Island",
+    "keywords": [
+      "battery",
+      "bluetooth",
+      "center",
+      "compact",
+      "connectivity",
+      "control",
+      "home",
+      "island",
+      "status",
+      "wifi"
+    ],
+    "conditionKey": "islandEnabled"
+  },
+  {
     "section": "islandCornerRadius",
     "label": "Corner Radius",
     "tabIndex": 46,

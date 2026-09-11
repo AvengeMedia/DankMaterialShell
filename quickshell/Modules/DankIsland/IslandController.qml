@@ -281,6 +281,7 @@ QtObject {
 
     readonly property var homeLeftGroups: homeGroups("left")
     readonly property var homeRightGroups: homeGroups("right")
+    property string homeStatusContent: "battery"
     property string homeClockDisplay: "both"
     property string homeVolumeDisplay: "both"
     property string homeBrightnessDisplay: "both"

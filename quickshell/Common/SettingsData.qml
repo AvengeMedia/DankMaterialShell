@@ -1017,6 +1017,7 @@ Singleton {
             "islandHomeClockDisplay": "both",
             "islandHomeVolumeDisplay": "both",
             "islandHomeBrightnessDisplay": "both",
+            "islandHomeStatusContent": "battery",
             "islandBatteryStyle": "solid",
             "islandSatellitesEnabled": true,
             "islandSatellitePosition": "edges",
@@ -1044,6 +1045,11 @@ Singleton {
     function islandClockDisplay(bc) {
         const value = islandSetting(bc, "islandHomeClockDisplay");
         return value === "time" || value === "date" || value === "both" ? value : "both";
+    }
+
+    function islandHomeStatusContent(bc) {
+        const value = islandSetting(bc, "islandHomeStatusContent");
+        return value === "battery" || value === "connectivity" ? value : "battery";
     }
 
     function islandEdge(bc) {

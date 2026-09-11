@@ -35,9 +35,9 @@ Item {
                 "description": SettingsData.weatherEnabled ? I18n.tr("Weather icon and temperature open the weather activity", "island settings: weather slot description") : I18n.tr("Enable weather in Time & Weather to show this shortcut", "island settings: weather slot disabled hint")
             },
             "status": {
-                "icon": BatteryService.batteryAvailable ? "battery_full" : "tune",
-                "text": I18n.tr("Battery / Control Center", "island settings: battery or control center slot row"),
-                "description": BatteryService.batteryAvailable ? I18n.tr("Battery gauge opens Control Center", "island settings: status slot description with battery") : I18n.tr("Tools icon opens Control Center", "island settings: status slot description without battery")
+                "icon": "settings",
+                "text": I18n.tr("Control Center", "island settings: battery or control center slot row"),
+                "description": I18n.tr("Choose between battery gauge or connectivity icons", "island settings: control center slot description")
             },
             "volume": {
                 "icon": "volume_up",

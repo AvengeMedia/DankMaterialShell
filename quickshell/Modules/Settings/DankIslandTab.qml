@@ -55,6 +55,7 @@ Item {
     }
     readonly property var clockDisplayValues: ["time", "date", "both"]
     readonly property var systemLevelDisplayValues: ["icon", "percentage", "both"]
+    readonly property var statusContentValues: ["battery", "connectivity"]
     readonly property var paletteValues: ["default", "bright", "dim"]
     readonly property var batteryStyleValues: ["solid", "outline", "ring"]
     readonly property var satellitePositionValues: ["island", "edges"]
@@ -274,6 +275,19 @@ Item {
                     }
                 }
 
+                SettingsButtonGroupRow {
+                    settingKey: "islandHomeStatusContent"
+                    tags: ["island", "home", "compact", "status", "battery", "wifi", "bluetooth", "connectivity"]
+                    text: I18n.tr("Control Center", "island settings: status group content row")
+                    visible: SettingsData.islandHomeGroupEnabled(root.config, "status")
+                    model: [I18n.tr("Battery", "island settings: status group battery content"), I18n.tr("Wi-Fi & Bluetooth", "island settings: status group connectivity content")]
+                    currentIndex: root.valueIndex(root.statusContentValues, SettingsData.islandHomeStatusContent(root.config), "battery")
+                    onSelectionChanged: (index, selected) => {
+                        if (selected)
+                            root.apply("islandHomeStatusContent", root.statusContentValues[index] ?? "battery");
+                    }
+                }
+
                 SettingsToggleRow {
                     settingKey: "islandHomeCompactTight"
                     tags: ["island", "home", "compact", "narrow", "width", "height", "clock"]
@@ -379,7 +393,7 @@ Item {
                     tags: ["island", "battery", "gauge", "solid", "outline", "ring", "circle", "appearance"]
                     text: I18n.tr("Battery Style", "island settings: battery meter style row")
                     description: I18n.tr("Solid or outlined material meter, or a circular gauge", "island settings: battery style description")
-                    visible: BatteryService.batteryAvailable
+                    visible: SettingsData.islandHomeGroupEnabled(root.config, "status") && BatteryService.batteryAvailable && SettingsData.islandHomeStatusContent(root.config) === "battery"
                     model: [I18n.tr("Solid", "island settings: filled battery meter style"), I18n.tr("Outline", "island settings: outlined battery meter style"), I18n.tr("Circle", "island settings: circular battery meter style")]
                     currentIndex: root.valueIndex(root.batteryStyleValues, root.setting("islandBatteryStyle"), "solid")
                     onSelectionChanged: (index, selected) => {
