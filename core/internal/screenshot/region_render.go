@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -630,6 +632,32 @@ func (r *RegionSelector) drawScrollBar(data []byte, stride, bufW, bufH int, form
 		style.TextR, style.TextG, style.TextB, format)
 }
 
+const (
+	minHUDScale = 1
+	maxHUDScale = 4
+)
+
+func (r *RegionSelector) hudScale(effectiveScale float64) int {
+	hudOpt := "auto"
+	if r.screenshoter != nil && r.screenshoter.config.HUD != "" {
+		hudOpt = strings.ToLower(strings.TrimSpace(r.screenshoter.config.HUD))
+	}
+	switch hudOpt {
+	case "off", "none", "false", "0":
+		return 0
+	case "", "auto":
+		return min(scaleFactor(effectiveScale), maxHUDScale)
+	default:
+		if val, err := strconv.ParseFloat(hudOpt, 64); err == nil {
+			if val <= 0 {
+				return 0
+			}
+			return min(max(scaleFactor(val), minHUDScale), maxHUDScale)
+		}
+		return min(scaleFactor(effectiveScale), maxHUDScale)
+	}
+}
+
 type hudItem struct {
 	key, desc string
 }
@@ -657,6 +685,9 @@ func (r *RegionSelector) hudItems() []hudItem {
 }
 
 func (r *RegionSelector) hudDimensions(bufW, bufH, scale int) (hudX, hudY, hudW, hudH int) {
+	if scale <= 0 {
+		return 0, 0, 0, 0
+	}
 	scale = scaleFactor(float64(scale))
 	charH := fontCharH * scale
 	padding, itemSpacing := 12*scale, 24*scale
@@ -680,7 +711,7 @@ func (r *RegionSelector) hudDimensions(bufW, bufH, scale int) (hudX, hudY, hudW,
 }
 
 func (r *RegionSelector) drawHUD(data []byte, stride, bufW, bufH int, format uint32, scale int) {
-	if r.selection.dragging {
+	if r.selection.dragging || scale <= 0 {
 		return
 	}
 

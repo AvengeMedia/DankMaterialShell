@@ -973,11 +973,12 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase, handles, shift):
 			slot.shm.CopyFrom(srcBuf)
 			r.dimBackground(slot.shm)
-			scale := 1
+			effectiveScale := 1.0
 			if os.output != nil {
-				scale = scaleFactor(os.output.effectiveScale())
+				effectiveScale = os.output.effectiveScale()
 			}
-			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat, scale)
+			hudScale := r.hudScale(effectiveScale)
+			r.drawHUD(slot.shm.Data(), slot.shm.Stride, slot.shm.Width, slot.shm.Height, os.screenFormat, hudScale)
 			slot.backgroundInitialized = true
 			slot.backgroundSource = srcBuf
 			slot.backgroundDragging = r.selection.dragging
