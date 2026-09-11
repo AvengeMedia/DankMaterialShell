@@ -189,7 +189,7 @@ Item {
             return;
         }
         if (AudioService.sink?.audio)
-            AudioService.sink.audio.volume = clamped;
+            AudioService.setVolume(Math.round(clamped * 100));
     }
 
     function adjustVolume(step) {
