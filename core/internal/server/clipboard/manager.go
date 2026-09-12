@@ -2004,6 +2004,10 @@ func (m *Manager) EditEntry(id uint64, text string) error {
 			return errors.New("cannot edit image entry")
 		}
 
+		if existing.MimeType != "" && !strings.HasPrefix(existing.MimeType, "text/plain") {
+			return errors.New("cannot edit non-text entry")
+		}
+
 		wasPinned := existing.Pinned
 
 		if err := b.Delete(oldKey); err != nil {

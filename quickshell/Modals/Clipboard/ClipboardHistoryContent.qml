@@ -181,7 +181,7 @@ FocusScope {
     }
 
     function editEntry(entry) {
-        if (!entry || entry.isImage) {
+        if (!entry || entry.isImage || (entry.mimeType && !entry.mimeType.startsWith("text/plain"))) {
             return;
         }
         editorView.setEntry(entry);

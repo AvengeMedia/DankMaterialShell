@@ -22,7 +22,7 @@ Item {
         repeat: false
         onTriggered: {
             if (!root.textLoaded) {
-                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
             }
         }
     }
@@ -94,7 +94,7 @@ Item {
             }
         });
 
-        if (!newEntry || newEntry.isImage || !(newEntry.id > 0)) {
+        if (!newEntry || newEntry.isImage || (newEntry.mimeType && !newEntry.mimeType.startsWith("text/plain")) || !(newEntry.id > 0)) {
             loadTimeoutTimer.stop();
             return;
         }
@@ -109,7 +109,7 @@ Item {
                 return;
             }
             if (response.error || !response.result) {
-                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
                 if (!response.result) {
                     ClipboardService.refresh();
                 }
@@ -124,7 +124,7 @@ Item {
             }
 
             if (!fullText || fullText.length === 0) {
-                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
                 return;
             }
             root.textLoaded = true;
@@ -150,7 +150,7 @@ Item {
         const entryId = root.entry?.id ?? 0;
 
         if (entryId > 0 && !root.textLoaded) {
-            ToastService.showWarning(I18n.tr("Loading full text, please wait..."));
+            ToastService.showWarning(I18n.tr("Loading full text, please wait...", "clipboard editor: save blocked while the entry's full text is still being fetched"));
             return;
         }
 

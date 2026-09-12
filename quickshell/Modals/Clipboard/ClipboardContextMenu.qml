@@ -28,7 +28,7 @@ Item {
     readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     readonly property bool hasPinnedDuplicate: !!entry && !entry.pinned && ClipboardService.getPinnedEntryByHash(entry.hash) !== null
-    readonly property bool canEditEntry: !!entry && !(entry.isImage ?? false)
+    readonly property bool canEditEntry: !!entry && !(entry.isImage ?? false) && (!entry.mimeType || entry.mimeType.startsWith("text/plain"))
     readonly property bool hasTextAlternative: !!entry && (entry.altMimeType ?? "") !== ""
     readonly property string pinText: entry?.pinned || hasPinnedDuplicate ? I18n.tr("Unpin") : I18n.tr("Pin")
     readonly property string pinIcon: entry?.pinned || hasPinnedDuplicate ? "keep_off" : "push_pin"

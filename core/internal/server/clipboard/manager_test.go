@@ -655,6 +655,27 @@ func TestEditEntry_ImageReturnsError(t *testing.T) {
 	assert.Contains(t, err.Error(), "cannot edit image entry")
 }
 
+func TestEditEntry_NonTextReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	uriEntry := Entry{
+		Data:      []byte("file:///path/to/file\n"),
+		MimeType:  "text/uri-list",
+		Preview:   "file:///path/to/file",
+		Size:      21,
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	}
+	require.NoError(t, m.storeEntry(uriEntry))
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	id := history[0].ID
+
+	err := m.EditEntry(id, "replacement text")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot edit non-text entry")
+}
+
 func TestEditEntry_EmptyOrWhitespaceReturnsError(t *testing.T) {
 	m := newTestManagerWithDB(t)
 	id := storeTestEntry(t, m, "keep me")
