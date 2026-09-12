@@ -22,8 +22,7 @@ Item {
         repeat: false
         onTriggered: {
             if (!root.textLoaded) {
-                root.entry = null;
-                root.textLoaded = true;
+                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
             }
         }
     }
@@ -110,8 +109,7 @@ Item {
                 return;
             }
             if (response.error || !response.result) {
-                root.entry = null;
-                root.textLoaded = true;
+                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
                 if (!response.result) {
                     ClipboardService.refresh();
                 }
@@ -126,8 +124,7 @@ Item {
             }
 
             if (!fullText || fullText.length === 0) {
-                root.entry = null;
-                root.textLoaded = true;
+                ToastService.showError(I18n.tr("Failed to load clipboard entry"));
                 return;
             }
             root.textLoaded = true;
