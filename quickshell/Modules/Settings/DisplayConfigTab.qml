@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Modals
+import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.DisplayConfig
@@ -10,6 +11,9 @@ Item {
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
+
+    property var parentModal: null
+    property string pendingICCOutput: ""
 
     property string selectedProfileId: {
         const id = SessionData.activeDisplayProfile[CompositorService.compositor] || "";
@@ -613,6 +617,10 @@ Item {
                                 required property string modelData
                                 outputName: modelData
                                 outputData: DisplayConfigState.allOutputs[modelData]
+                                onRequestICCBrowse: name => {
+                                    pendingICCOutput = name;
+                                    iccFileBrowser.open();
+                                }
                             }
                         }
                     }
@@ -643,6 +651,21 @@ Item {
             NoBackendMessage {
                 width: parent.width
                 visible: !DisplayConfigState.hasOutputBackend
+            }
+        }
+    }
+
+    FileBrowserModal {
+        id: iccFileBrowser
+        parentModal: root.parentModal || null
+        browserTitle: I18n.tr("Select ICC Profile", "ICC profile file browser title")
+        browserIcon: "palette"
+        browserType: "icc"
+        showHiddenFiles: false
+        fileExtensions: ["*.icc", "*.icm"]
+        onFileSelected: path => {
+            if (pendingICCOutput) {
+                ICCService.applyICC(pendingICCOutput, path)
             }
         }
     }

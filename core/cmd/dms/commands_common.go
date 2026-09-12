@@ -773,6 +773,7 @@ func getCommonCommands() []*cobra.Command {
 		registryCmd,
 		dank16Cmd,
 		brightnessCmd,
+		iccCmd,
 		dpmsCmd,
 		keybindsCmd,
 		greeterCmd,

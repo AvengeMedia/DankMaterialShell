@@ -530,3 +530,31 @@ func TestOutputState_RampCurrent(t *testing.T) {
 	assert.False(t, out.rampCurrent(5000, 1.2, 1.0))
 	assert.False(t, out.rampCurrent(5000, 1.0, 1.4))
 }
+
+// needsControls decides whether gamma controls are created at all. ICC
+// profiles and per-output temperatures apply independently of the night light
+// schedule, so they have to keep the controls alive: otherwise turning the
+// night light off tears the controls down and drops the ICC ramps.
+func TestManager_NeedsControlsCoversICCAndOutputTemps(t *testing.T) {
+	base := Config{Enabled: false, Gamma: 1.0, Contrast: 1.0}
+
+	cases := []struct {
+		name string
+		cfg  Config
+		want bool
+	}{
+		{"idle", base, false},
+		{"night light on", Config{Enabled: true, Gamma: 1.0, Contrast: 1.0}, true},
+		{"gamma tweak", Config{Gamma: 1.2, Contrast: 1.0}, true},
+		{"contrast tweak", Config{Gamma: 1.0, Contrast: 1.2}, true},
+		{"icc profile only", Config{Gamma: 1.0, Contrast: 1.0, ICCProfiles: map[string]string{"DP-1": "/tmp/display.icc"}}, true},
+		{"output temp only", Config{Gamma: 1.0, Contrast: 1.0, OutputTemps: map[string]int{"DP-1": 7000}}, true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			m := &Manager{config: tc.cfg}
+			assert.Equal(t, tc.want, m.needsControls())
+		})
+	}
+}

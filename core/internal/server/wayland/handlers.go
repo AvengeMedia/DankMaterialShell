@@ -31,6 +31,18 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 		handleSetEnabled(conn, req, manager)
 	case "wayland.gamma.subscribe":
 		handleSubscribe(conn, req, manager)
+	case "wayland.icc.getStatus":
+		handleICCGetStatus(conn, req, manager)
+	case "wayland.icc.apply":
+		handleICCApply(conn, req, manager)
+	case "wayland.icc.remove":
+		handleICCRemove(conn, req, manager)
+	case "wayland.icc.listOutputs":
+		handleICCListOutputs(conn, req, manager)
+	case "wayland.icc.setTemp":
+		handleICCSetTemp(conn, req, manager)
+	case "wayland.icc.getTemps":
+		handleICCGetTemps(conn, req, manager)
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
@@ -188,4 +200,81 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 			return
 		}
 	}
+}
+
+func handleICCGetStatus(conn *models.Conn, req models.Request, manager *Manager) {
+	status := manager.GetICCStatus()
+	outputs := manager.ListOutputs()
+	result := map[string]any{
+		"outputs":  outputs,
+		"profiles": status,
+	}
+	models.Respond(conn, req.ID, result)
+}
+
+func handleICCApply(conn *models.Conn, req models.Request, manager *Manager) {
+	output, err := params.String(req.Params, "output")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	path, err := params.String(req.Params, "path")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.ApplyICC(output, path); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "ICC profile applied"})
+}
+
+func handleICCRemove(conn *models.Conn, req models.Request, manager *Manager) {
+	output, err := params.String(req.Params, "output")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.RemoveICC(output); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "ICC profile removed"})
+}
+
+func handleICCListOutputs(conn *models.Conn, req models.Request, manager *Manager) {
+	outputs := manager.ListOutputs()
+	models.Respond(conn, req.ID, outputs)
+}
+
+func handleICCSetTemp(conn *models.Conn, req models.Request, manager *Manager) {
+	output, err := params.String(req.Params, "output")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	temp, err := params.Int(req.Params, "temp")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := manager.SetOutputTemp(output, temp); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "Output temperature set"})
+}
+
+func handleICCGetTemps(conn *models.Conn, req models.Request, manager *Manager) {
+	temps := manager.GetOutputTemps()
+	models.Respond(conn, req.ID, temps)
 }
