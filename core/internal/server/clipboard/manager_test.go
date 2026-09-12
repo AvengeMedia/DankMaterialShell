@@ -45,9 +45,15 @@ func newTestManagerWithDB(t *testing.T) *Manager {
 		db.Close()
 	})
 
+	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
+	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
+		fn()
+	}).Maybe()
+
 	return &Manager{
 		config: DefaultConfig(),
 		db:     db,
+		wlCtx:  mockCtx,
 	}
 }
 

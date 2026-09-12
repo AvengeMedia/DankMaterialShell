@@ -130,7 +130,6 @@ Item {
     function saveEntry(action) {
         const saveAction = action ?? "history";
         const entryId = root.entry?.id ?? 0;
-        const wasPinned = root.entry?.pinned ?? false;
 
         const onComplete = function () {
             if (saveAction === "history") {
@@ -155,39 +154,11 @@ Item {
 
         if (entryId > 0) {
             ClipboardService.editEntry(root.entry, root.editorText, function (response) {
-                if (!response.error) {
-                    onComplete();
+                if (response.error) {
+                    ToastService.showError(I18n.tr("Failed to update clipboard"));
                     return;
                 }
-                // Fallback for older daemon versions that lack clipboard.editEntry
-                DMSService.sendRequest("clipboard.copy", {
-                    "text": root.editorText
-                }, function (copyResponse) {
-                    if (copyResponse.error) {
-                        ToastService.showError(I18n.tr("Failed to update clipboard"));
-                        return;
-                    }
-                    if (wasPinned) {
-                        DMSService.sendRequest("clipboard.unpinEntry", {
-                            "id": entryId
-                        }, function () {
-                            DMSService.sendRequest("clipboard.getHistory", null, function (histResponse) {
-                                const entries = histResponse.result || [];
-                                if (entries.length > 0) {
-                                    DMSService.sendRequest("clipboard.pinEntry", {
-                                        "id": entries[0].id
-                                    }, function () {
-                                        onComplete();
-                                    });
-                                } else {
-                                    onComplete();
-                                }
-                            });
-                        });
-                    } else {
-                        onComplete();
-                    }
-                });
+                onComplete();
             });
             return;
         }

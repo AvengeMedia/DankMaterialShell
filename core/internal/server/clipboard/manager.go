@@ -217,9 +217,6 @@ func (m *Manager) dbView(fn func(tx *bolt.Tx) error) (err error) {
 }
 
 func (m *Manager) post(fn func()) {
-	if m.wlCtx == nil {
-		return
-	}
 	m.wlCtx.Post(fn)
 }
 
@@ -1974,10 +1971,6 @@ func (m *Manager) EditEntry(id uint64, text string) error {
 	data := []byte(text)
 	mimeType := "text/plain;charset=utf-8"
 
-	if err := m.SetClipboard(data, mimeType); err != nil {
-		return err
-	}
-
 	newHash := computeHash(data)
 	preview := m.textPreview(data)
 
@@ -2054,6 +2047,9 @@ func (m *Manager) EditEntry(id uint64, text string) error {
 	})
 
 	if err == nil {
+		if clipErr := m.SetClipboard(data, mimeType); clipErr != nil {
+			log.Errorf("Failed to set clipboard selection: %v", clipErr)
+		}
 		m.updateState()
 		m.notifySubscribers()
 	}
