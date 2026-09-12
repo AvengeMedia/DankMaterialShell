@@ -1114,6 +1114,13 @@ Singleton {
     }
 
     Connections {
+        target: HyprlandService
+        function onMonitorLayoutChanged() {
+            root.outputs = root.buildOutputsMap();
+        }
+    }
+
+    Connections {
         target: CompositorService
         function onCompositorChanged() {
             root.checkIncludeStatus();
@@ -1806,6 +1813,13 @@ Singleton {
                     "transform": mapWlrTransform(output.transform)
                 }
             };
+            const live = HyprlandService.liveMonitor(output.name);
+            if (!live)
+                continue;
+            map[output.name].logical.x = live.x;
+            map[output.name].logical.y = live.y;
+            map[output.name].logical.scale = live.scale || 1.0;
+            map[output.name].logical.transform = hyprlandToTransform(live.lastIpcObject?.transform ?? 0);
         }
         return map;
     }
