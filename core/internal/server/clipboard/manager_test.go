@@ -45,9 +45,15 @@ func newTestManagerWithDB(t *testing.T) *Manager {
 		db.Close()
 	})
 
+	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
+	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
+		fn()
+	}).Maybe()
+
 	return &Manager{
 		config: DefaultConfig(),
 		db:     db,
+		wlCtx:  mockCtx,
 	}
 }
 
@@ -576,6 +582,175 @@ func TestCreateHistoryEntryFromPinned_KeepsLatestUnpinnedDuplicate(t *testing.T)
 	assert.Equal(t, pinnedID, history[1].ID)
 	assert.True(t, history[1].Pinned)
 	assert.NotEqual(t, firstDuplicate.ID, latestDuplicate.ID)
+}
+
+func TestEditEntry_UnpinnedEntry(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	id := storeTestEntry(t, m, "original unpinned")
+	require.NoError(t, m.EditEntry(id, "edited unpinned"))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "edited unpinned", history[0].Preview)
+	assert.False(t, history[0].Pinned)
+	assert.NotEqual(t, id, history[0].ID)
+
+	// Old entry should not exist
+	oldEntry, err := m.GetEntry(id)
+	assert.ErrorIs(t, err, errEntryNotFound)
+	assert.Nil(t, oldEntry)
+}
+
+func TestEditEntry_PinnedEntryRemainsPinned(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	id := storeTestEntry(t, m, "original pinned")
+	require.NoError(t, m.PinEntry(id))
+	assert.Equal(t, 1, m.GetPinnedCount())
+
+	require.NoError(t, m.EditEntry(id, "edited pinned"))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "edited pinned", history[0].Preview)
+	assert.True(t, history[0].Pinned)
+
+	pinnedEntries := m.GetPinnedEntries()
+	require.Len(t, pinnedEntries, 1)
+	assert.Equal(t, "edited pinned", pinnedEntries[0].Preview)
+	assert.Equal(t, 1, m.GetPinnedCount())
+
+	// Old pinned entry should be deleted
+	oldEntry, err := m.GetEntry(id)
+	assert.ErrorIs(t, err, errEntryNotFound)
+	assert.Nil(t, oldEntry)
+}
+
+func TestEditEntry_NotFound(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	err := m.EditEntry(99999, "new text")
+	assert.ErrorIs(t, err, errEntryNotFound)
+}
+
+func TestEditEntry_ImageReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	imgEntry := Entry{
+		Data:      []byte{0x89, 0x50, 0x4E, 0x47},
+		MimeType:  "image/png",
+		Preview:   "[[ image ]]",
+		Size:      4,
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   true,
+	}
+	require.NoError(t, m.storeEntry(imgEntry))
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	id := history[0].ID
+
+	err := m.EditEntry(id, "replacement text")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot edit image entry")
+}
+
+func TestEditEntry_NonTextReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	uriEntry := Entry{
+		Data:      []byte("file:///path/to/file\n"),
+		MimeType:  "text/uri-list",
+		Preview:   "file:///path/to/file",
+		Size:      21,
+		Timestamp: time.Now().Truncate(time.Second),
+		IsImage:   false,
+	}
+	require.NoError(t, m.storeEntry(uriEntry))
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	id := history[0].ID
+
+	err := m.EditEntry(id, "replacement text")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot edit non-text entry")
+}
+
+func TestEditEntry_AltTextMimeTypesAllowed(t *testing.T) {
+	for _, mime := range []string{"UTF8_STRING", "STRING", "TEXT", "text/plain;charset=utf-8", "text/plain"} {
+		t.Run(mime, func(t *testing.T) {
+			m := newTestManagerWithDB(t)
+			entry := Entry{
+				Data:      []byte("old text"),
+				MimeType:  mime,
+				Preview:   "old text",
+				Size:      8,
+				Timestamp: time.Now().Truncate(time.Second),
+				IsImage:   false,
+			}
+			require.NoError(t, m.storeEntry(entry))
+			history := m.GetHistory()
+			require.Len(t, history, 1)
+			id := history[0].ID
+
+			err := m.EditEntry(id, "replacement text")
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestEditEntry_EmptyOrWhitespaceReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	id := storeTestEntry(t, m, "keep me")
+
+	for _, badText := range []string{"", "   ", "\t\n\r"} {
+		err := m.EditEntry(id, badText)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "cannot save empty entry")
+	}
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "keep me", history[0].Preview)
+}
+
+func TestEditEntry_DataTooLargeReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	m.config.MaxEntrySize = 10
+	id := storeTestEntry(t, m, "small")
+
+	err := m.EditEntry(id, "this text exceeds the 10-byte limit")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "data too large")
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "small", history[0].Preview)
+}
+
+func TestHandleEditEntry_SuccessAndValidation(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	id := storeTestEntry(t, m, "before edit")
+
+	mc := newClipboardTestConn()
+	conn := models.NewConn(mc)
+	handleEditEntry(conn, models.Request{
+		ID: 1,
+		Params: map[string]any{
+			"id":   float64(id),
+			"text": "after edit",
+		},
+	}, m)
+
+	var resp models.Response[models.SuccessResult]
+	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.True(t, resp.Result.Success)
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "after edit", history[0].Preview)
 }
 
 func TestManager_ConcurrentSubscriberAccess(t *testing.T) {

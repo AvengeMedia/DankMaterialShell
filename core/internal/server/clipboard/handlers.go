@@ -49,6 +49,8 @@ func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
 		handlePinEntry(conn, req, m)
 	case "clipboard.unpinEntry":
 		handleUnpinEntry(conn, req, m)
+	case "clipboard.editEntry":
+		handleEditEntry(conn, req, m)
 	case "clipboard.getPinnedEntries":
 		handleGetPinnedEntries(conn, req, m)
 	case "clipboard.getPinnedCount":
@@ -421,4 +423,25 @@ func handleCopyFile(conn *models.Conn, req models.Request, m *Manager) {
 	}
 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "copied"})
+}
+
+func handleEditEntry(conn *models.Conn, req models.Request, m *Manager) {
+	id, err := params.Int(req.Params, "id")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	text, err := params.String(req.Params, "text")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if err := m.EditEntry(uint64(id), text); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "entry updated"})
 }
