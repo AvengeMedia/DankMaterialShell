@@ -822,6 +822,10 @@ Singleton {
     property string batteryStyle: "icon"
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
+    property string screensaverType: "auto"
+    property string screensaverText: "DankMaterialShell"
+    property string screensaverSpeed: "normal"
+    property bool screensaverShowShapes: true
     property bool fadeToLockEnabled: true
     property int fadeToLockGracePeriod: 5
     property bool fadeToDpmsEnabled: true

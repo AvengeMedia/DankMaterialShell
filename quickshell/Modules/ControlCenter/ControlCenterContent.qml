@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
@@ -87,6 +88,10 @@ Rectangle {
                 onLockRequested: {
                     root.host.close();
                     root.host.lockRequested();
+                }
+                onScreensaverRequested: {
+                    root.host.close();
+                    IdleService.screensaverRequested();
                 }
                 onSettingsButtonClicked: root.host.close()
             }

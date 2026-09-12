@@ -8342,6 +8342,34 @@
     "description": "Open a terminal and run a custom command instead of the in-shell upgrade flow."
   },
   {
+    "section": "screensaverSpeed",
+    "label": "Animation Speed",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "calm",
+      "effects",
+      "energy",
+      "immediately",
+      "lively",
+      "motion",
+      "power",
+      "repeating",
+      "rotate",
+      "screensaver",
+      "shutdown",
+      "sleep",
+      "speed",
+      "suspend",
+      "transition",
+      "without"
+    ],
+    "description": "Effects rotate without immediately repeating"
+  },
+  {
     "section": "lockTimeout",
     "label": "Automatically lock after",
     "tabIndex": 21,
@@ -8359,6 +8387,24 @@
       "sleep",
       "suspend",
       "timeout"
+    ]
+  },
+  {
+    "section": "screensaverType",
+    "label": "Content Type",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "ascii",
+      "content",
+      "energy",
+      "power",
+      "screensaver",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "text",
+      "type"
     ]
   },
   {
@@ -8405,6 +8451,29 @@
       "sleep",
       "suspend"
     ]
+  },
+  {
+    "section": "screensaverShowShapes",
+    "label": "Expressive Shapes",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "around",
+      "energy",
+      "expressive",
+      "large",
+      "material",
+      "power",
+      "screensaver",
+      "shapes",
+      "show",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "text",
+      "tonal"
+    ],
+    "description": "Show a few large tonal shapes around text"
   },
   {
     "section": "fadeToLockEnabled",
@@ -8680,6 +8749,30 @@
     ],
     "icon": "tune",
     "description": "Display power menu actions in a grid instead of a list"
+  },
+  {
+    "section": "screensaver",
+    "label": "Screensaver",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "ascii",
+      "content",
+      "effects",
+      "energy",
+      "immediately",
+      "power",
+      "repeating",
+      "rotate",
+      "screensaver",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "text",
+      "without"
+    ],
+    "icon": "animation",
+    "description": "Effects rotate without immediately repeating"
   },
   {
     "section": "suspendTimeout",

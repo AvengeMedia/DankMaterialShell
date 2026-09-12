@@ -267,6 +267,56 @@ dms ipc call lock lock
 dms ipc call lock isLocked
 ```
 
+## Target: `screensaver`
+
+Standalone manual screensaver control. This does not lock or unlock the session.
+The theme-aware Material renderer automatically selects dedicated text or ASCII
+effects and respects the reduced-motion setting. It has no external dependencies.
+
+### Functions
+
+**`open`**
+- Show the screensaver immediately
+- Returns: Open result message
+
+**`close`**
+- Dismiss the screensaver
+- Returns: Close result message
+
+**`toggle`**
+- Show or dismiss the screensaver
+- Returns: Toggle result message
+
+**`start`**
+- Backwards-compatible alias for opening the screensaver
+- Returns: Start result message
+
+**`stop`**
+- Backwards-compatible alias for closing the screensaver
+- Returns: Stop result message
+
+**`status`**
+- Check whether the screensaver is visible
+- Returns: JSON containing visibility, detected content mode, and current effect
+
+**`effects`**
+- List the available text and ASCII effects
+- Returns: JSON arrays grouped by content mode
+
+**`openEffect effectName`**
+- Open a specific effect supported by the current content mode
+- Returns: Open result message
+
+### Examples
+```bash
+dms ipc call screensaver open
+dms ipc call screensaver close
+dms ipc call screensaver toggle
+dms ipc call screensaver status
+dms ipc call screensaver effects
+dms ipc call screensaver openEffect asciiRings
+```
+
 ## Target: `sessions`
 
 Logind session enumeration and seat-local session switching. Wraps `loginctl list-sessions` and `loginctl activate`. Only switches between sessions that are *already running* on the current seat — creating a fresh login as another user requires a multi-session greeter setup (greetd-flexiserver / GDM / LightDM) and is out of scope.

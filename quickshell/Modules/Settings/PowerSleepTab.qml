@@ -361,6 +361,87 @@ Item {
 
             SettingsCard {
                 width: parent.width
+                iconName: "animation"
+                title: I18n.tr("Screensaver", "Settings card title under Power & Sleep")
+                settingKey: "screensaver"
+
+                SettingsDropdownRow {
+                    id: screensaverTypeDropdown
+                    settingKey: "screensaverType"
+                    tags: ["screensaver", "content", "text", "ascii"]
+                    property var typeLabels: [I18n.tr("Auto", "Screensaver content type"), I18n.tr("Text", "Screensaver content type"), I18n.tr("ASCII Art", "Screensaver content type")]
+                    property var typeValues: ["auto", "text", "ascii"]
+
+                    text: I18n.tr("Content Type", "Screensaver content setting title")
+                    options: typeLabels
+                    currentValue: typeLabels[Math.max(0, typeValues.indexOf(SettingsData.screensaverType))]
+                    onValueChanged: value => {
+                        const index = typeLabels.indexOf(value);
+                        if (index >= 0)
+                            SettingsData.set("screensaverType", typeValues[index]);
+                    }
+                }
+
+                SettingsDropdownRow {
+                    id: screensaverSpeedDropdown
+                    settingKey: "screensaverSpeed"
+                    tags: ["screensaver", "animation", "speed", "calm", "lively"]
+                    property var speedLabels: [I18n.tr("Calm", "Screensaver animation speed"), I18n.tr("Normal", "Screensaver animation speed"), I18n.tr("Lively", "Screensaver animation speed")]
+                    property var speedValues: ["calm", "normal", "lively"]
+
+                    text: I18n.tr("Animation Speed", "Screensaver animation setting title")
+                    description: I18n.tr("Effects rotate without immediately repeating", "Description for the screensaver animation speed")
+                    options: speedLabels
+                    currentValue: speedLabels[Math.max(0, speedValues.indexOf(SettingsData.screensaverSpeed))]
+                    onValueChanged: value => {
+                        const index = speedLabels.indexOf(value);
+                        if (index >= 0)
+                            SettingsData.set("screensaverSpeed", speedValues[index]);
+                    }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "screensaverShowShapes"
+                    tags: ["screensaver", "expressive", "shapes", "material"]
+                    text: I18n.tr("Expressive Shapes", "Screensaver shapes setting title")
+                    description: I18n.tr("Show a few large tonal shapes around text", "Description for screensaver shapes setting")
+                    checked: SettingsData.screensaverShowShapes
+                    onToggled: checked => SettingsData.set("screensaverShowShapes", checked)
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+                    visible: ["auto", "text", "ascii"].includes(SettingsData.screensaverType)
+
+                    StyledText {
+                        text: SettingsData.screensaverType === "ascii" ? I18n.tr("ASCII Art", "Screensaver content field label") : I18n.tr("Custom Content", "Screensaver content field label")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    DankTextEdit {
+                        width: parent.width
+                        height: SettingsData.screensaverType === "text" ? 100 : 180
+                        placeholderText: SettingsData.screensaverType === "text" ? I18n.tr("Enter screensaver text", "Placeholder for screensaver text content") : I18n.tr("Enter text or paste ASCII art", "Placeholder for screensaver content")
+                        text: SettingsData.screensaverText
+                        font.family: SettingsData.screensaverType === "ascii" ? Theme.monoFontFamily : Theme.fontFamily
+                        backgroundColor: Theme.floatingWindowFieldColor
+                        onTextEdited: {
+                            if (text !== SettingsData.screensaverText)
+                                SettingsData.set("screensaverText", text);
+                        }
+                    }
+                }
+
+                DankButton {
+                    text: I18n.tr("Start Screensaver", "Button to start the screensaver")
+                    onClicked: IdleService.screensaverRequested()
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
                 iconName: "tune"
                 title: I18n.tr("Power Menu Customization")
                 settingKey: "powerMenu"
