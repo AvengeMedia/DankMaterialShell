@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -30,7 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 )
 
-func RouteRequest(conn *models.Conn, req models.Request) {
+func RouteRequest(ctx context.Context, conn *models.Conn, req models.Request) {
 	if strings.HasPrefix(req.Method, "network.") {
 		if networkManager == nil {
 			models.RespondError(conn, req.ID, "network manager not initialized")
@@ -235,7 +236,7 @@ func RouteRequest(conn *models.Conn, req models.Request) {
 		info := getServerInfo()
 		models.Respond(conn, req.ID, info)
 	case "subscribe":
-		handleSubscribe(conn, req)
+		handleSubscribe(ctx, conn, req)
 	case "matugen.queue":
 		handleMatugenQueue(conn, req)
 	case "matugen.status":

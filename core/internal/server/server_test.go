@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -8,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/stretchr/testify/assert"
@@ -155,4 +157,90 @@ func TestResponse_JSON(t *testing.T) {
 		assert.Equal(t, "test error", decoded.Error)
 		assert.Nil(t, decoded.Result)
 	})
+}
+
+func TestExclusiveServiceRequiresExplicitSubscription(t *testing.T) {
+	tests := []struct {
+		name       string
+		services   []string
+		includeAll bool
+		want       bool
+	}{
+		{name: "explicit", services: []string{"mpris.command"}, want: true},
+		{name: "all excluded", services: []string{"all"}, want: false},
+		{name: "omitted excluded", services: nil, want: false},
+		{name: "regular service via all", services: []string{"all"}, includeAll: true, want: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			service := "mpris.command"
+			if tt.includeAll {
+				service = "bluetooth"
+			}
+			assert.Equal(t, tt.want, serviceSubscribed(tt.services, service, tt.includeAll))
+		})
+	}
+}
+
+func TestSubscriptionCancellationPromotesMPRISWaiter(t *testing.T) {
+	originalBluezManager := bluezManager
+	manager := &bluez.Manager{}
+	bluezManager = manager
+	defer func() { bluezManager = originalBluezManager }()
+
+	serverConn, clientConn := net.Pipe()
+	defer clientConn.Close()
+	defer serverConn.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		handleSubscribe(ctx, models.NewConn(serverConn), models.Request{
+			ID:     42,
+			Method: "subscribe",
+			Params: map[string]any{"services": []any{"mpris.command"}},
+		})
+	}()
+
+	require.NoError(t, clientConn.SetReadDeadline(time.Now().Add(2*time.Second)))
+	decoder := json.NewDecoder(clientConn)
+	var ownerLease string
+	for ownerLease == "" {
+		var response models.Response[ServiceEvent]
+		require.NoError(t, decoder.Decode(&response))
+		if response.Result == nil || response.Result.Service != "mpris.command" {
+			continue
+		}
+		data, ok := response.Result.Data.(map[string]any)
+		require.True(t, ok)
+		ownerLease, _ = data["lease"].(string)
+	}
+	require.NotEmpty(t, ownerLease)
+
+	waiter, err := manager.SubscribePlayerCommands("waiter")
+	require.NoError(t, err)
+	select {
+	case event := <-waiter:
+		t.Fatalf("waiting subscriber received unexpected event: %#v", event)
+	default:
+	}
+
+	cancel()
+
+	select {
+	case event := <-waiter:
+		require.NotEmpty(t, event.Lease)
+		assert.NotEqual(t, ownerLease, event.Lease)
+	case <-time.After(2 * time.Second):
+		t.Fatal("waiting MPRIS subscriber was not promoted after connection cancellation")
+	}
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("subscription handler did not stop after connection cancellation")
+	}
+
+	manager.UnsubscribePlayerCommands("waiter")
 }

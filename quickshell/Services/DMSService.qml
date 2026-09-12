@@ -24,6 +24,7 @@ Singleton {
     property bool isConnected: false
     readonly property bool isConnecting: requestSocket.connected && !requestSocket.linkUp
     property bool subscribeConnected: false
+    property string mprisCommandLease: ""
     property bool matugenSmartSupported: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
@@ -51,6 +52,7 @@ Singleton {
     signal capabilitiesReceived
     signal credentialsRequest(var data)
     signal bluetoothPairingRequest(var data)
+    signal mprisCommandReceived(string command)
     signal brightnessStateUpdate(var data)
     signal brightnessDeviceUpdate(var device)
     signal wlrOutputStateUpdate(var data)
@@ -191,6 +193,7 @@ Singleton {
 
         onConnectionStateChanged: {
             root.subscribeConnected = linkUp;
+            root.mprisCommandLease = "";
             if (!linkUp) {
                 root.connectionCapabilities = null;
                 return;
@@ -281,16 +284,15 @@ Singleton {
     }
 
     function addSubscription(service) {
-        if (activeSubscriptions.includes("all"))
+        if (activeSubscriptions.includes(service))
             return;
-        if (!activeSubscriptions.includes(service)) {
-            const newSubs = [...activeSubscriptions, service];
-            subscribe(newSubs);
-        }
+        if (activeSubscriptions.includes("all") && service !== "mpris.command")
+            return;
+        subscribe([...activeSubscriptions, service]);
     }
 
     function removeSubscription(service) {
-        if (activeSubscriptions.includes("all")) {
+        if (activeSubscriptions.includes("all") && service !== "mpris.command") {
             const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "brightness", "browser", "location"];
             const filtered = allServices.filter(s => s !== service);
             subscribe(filtered);
@@ -352,6 +354,11 @@ Singleton {
             loginctlStateUpdate(data);
         } else if (service === "bluetooth.pairing") {
             bluetoothPairingRequest(data);
+        } else if (service === "mpris.command") {
+            if (data && typeof data.lease === "string")
+                mprisCommandLease = data.lease;
+            else if (data && typeof data.command === "string")
+                mprisCommandReceived(data.command);
         } else if (service === "cups") {
             cupsStateUpdate(data);
         } else if (service === "brightness") {
