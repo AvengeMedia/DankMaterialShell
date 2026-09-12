@@ -2,6 +2,7 @@ package wayland
 
 import (
 	"errors"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -557,4 +558,50 @@ func TestManager_NeedsControlsCoversICCAndOutputTemps(t *testing.T) {
 			assert.Equal(t, tc.want, m.needsControls())
 		})
 	}
+}
+
+// The registry handler can establish the gamma controls before the startup post
+// runs, so loading the configured ICC profiles and temperatures must not depend
+// on the controls still being uninitialized.
+func TestManager_LoadConfiguredICCWhenControlsAlreadyExist(t *testing.T) {
+	dir := t.TempDir()
+	m := &Manager{config: Config{
+		ICCProfiles: map[string]string{"DP-2": filepath.Join(dir, "missing.icm")},
+		OutputTemps: map[string]int{"DP-1": 7000},
+	}}
+	m.controlsInitialized = true
+
+	dp1 := &outputState{id: 1}
+	m.outputs.Store(1, dp1)
+	m.outputNames.Store(1, "DP-1")
+
+	dp2 := &outputState{id: 2}
+	m.outputs.Store(2, dp2)
+	m.outputNames.Store(2, "DP-2")
+
+	if !m.loadConfiguredICC() {
+		t.Fatal("loadConfiguredICC() = false, want true")
+	}
+	assert.Equal(t, 7000, dp1.outputTemp, "configured temperature should attach")
+
+	// An unreadable profile must be skipped without aborting the rest.
+	assert.Empty(t, dp2.iccPath, "unparsable profile should not attach")
+}
+
+// A hotplugged output gets its configured profile and temperature attached as
+// soon as its name is known.
+func TestManager_AttachConfiguredICCForNamedOutput(t *testing.T) {
+	m := &Manager{config: Config{OutputTemps: map[string]int{"DP-3": 6500}}}
+
+	configured := &outputState{id: 3}
+	m.outputs.Store(3, configured)
+	m.outputNames.Store(3, "DP-3")
+
+	m.attachConfiguredICC(3, "DP-3")
+	assert.Equal(t, 6500, configured.outputTemp)
+
+	plain := &outputState{id: 4}
+	m.outputs.Store(4, plain)
+	m.attachConfiguredICC(4, "HDMI-A-1")
+	assert.Zero(t, plain.outputTemp, "outputs without configuration are left alone")
 }

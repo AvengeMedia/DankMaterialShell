@@ -85,59 +85,26 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 	// temperatures, so controls are set up whenever any of them is configured.
 	if m.needsControls() {
 		m.post(func() {
-			if m.controlsInitialized {
-				return
-			}
-			log.Info("Gamma control enabled at startup")
-			m.createControls()
+			// Profiles and temperatures are configured state, not control state:
+			// the registry handler may already have established the controls, and
+			// the configuration still has to be attached.
+			loaded := m.loadConfiguredICC()
 
-			// Load ICC profiles from config (always, regardless of gamma enabled)
-			m.configMutex.RLock()
-			iccProfiles := m.config.ICCProfiles
-			outputTemps := m.config.OutputTemps
-			m.configMutex.RUnlock()
-
-			if len(iccProfiles) > 0 {
-				for outputName, iccPath := range iccProfiles {
-					profile, err := icc.ParseFile(iccPath)
-					if err != nil {
-						log.Warnf("icc: failed to load profile for output %q: %v", outputName, err)
-						continue
-					}
-					m.outputs.Range(func(_ uint32, out *outputState) bool {
-						if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
-							out.iccPath = iccPath
-							out.iccProfile = profile
-							return false
-						}
-						return true
-					})
-				}
-				log.Infof("icc: loaded %d ICC profiles from config", len(iccProfiles))
+			if !m.controlsInitialized {
+				log.Info("Gamma control enabled at startup")
+				m.createControls()
 			}
 
-			// Load per-output temperatures from config
-			if len(outputTemps) > 0 {
-				for outputName, temp := range outputTemps {
-					m.outputs.Range(func(_ uint32, out *outputState) bool {
-						if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
-							out.outputTemp = temp
-							return false
-						}
-						return true
-					})
-				}
-				log.Infof("icc: loaded %d output temperatures from config", len(outputTemps))
+			if loaded {
+				// The attached configuration is invisible to the per-output
+				// dedup, which only compares the schedule-derived
+				// temp/gamma/contrast, so clear that state before applying.
+				m.outputs.Range(func(_ uint32, out *outputState) bool {
+					out.lastTemp = 0
+					return true
+				})
+				m.applyCurrentTemp("startup")
 			}
-
-			// The profiles and temperatures loaded above are invisible to the
-			// per-output dedup, which only compares the schedule-derived
-			// temp/gamma/contrast, so clear that state before applying.
-			m.outputs.Range(func(_ uint32, out *outputState) bool {
-				out.lastTemp = 0
-				return true
-			})
-			m.applyCurrentTemp("startup")
 		})
 	}
 
@@ -222,6 +189,9 @@ func (m *Manager) setupRegistry() error {
 			output.SetNameHandler(func(ev wlclient.OutputNameEvent) {
 				outputNames[outputID] = ev.Name
 				m.outputNames.Store(outputID, ev.Name)
+				m.post(func() {
+					m.attachConfiguredICC(outputID, ev.Name)
+				})
 			})
 			if gammaMgr != nil {
 				outputs = append(outputs, output)
@@ -468,6 +438,12 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 	}
 	m.setupControlHandlers(outState, control)
 	m.outputs.Store(outputID, outState)
+
+	// The name may already be known (hotplug after the output was announced),
+	// in which case the configured profile/temperature attaches right away.
+	if name, ok := m.outputNames.Load(outputID); ok {
+		m.attachConfiguredICC(outputID, name)
+	}
 	return nil
 }
 
@@ -1362,6 +1338,91 @@ func (m *Manager) destroyControls() {
 		return true
 	})
 	m.controlsInitialized = false
+}
+
+// loadConfiguredICC attaches the configured ICC profiles and per-output
+// temperatures to the outputs that are already known, and reports whether
+// anything was attached.
+func (m *Manager) loadConfiguredICC() bool {
+	m.configMutex.RLock()
+	iccProfiles := m.config.ICCProfiles
+	outputTemps := m.config.OutputTemps
+	m.configMutex.RUnlock()
+
+	if len(iccProfiles) == 0 && len(outputTemps) == 0 {
+		return false
+	}
+
+	attached := 0
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		name, ok := m.outputNames.Load(out.id)
+		if !ok {
+			return true
+		}
+		if m.applyConfiguredICCForOutput(out, name, iccProfiles, outputTemps) {
+			attached++
+		}
+		return true
+	})
+
+	log.Infof("icc: config has %d profile(s) and %d temperature override(s), attached to %d output(s)",
+		len(iccProfiles), len(outputTemps), attached)
+	return attached > 0
+}
+
+// attachConfiguredICC attaches the configured profile and temperature to an
+// output whose name just became known, so a hotplugged output comes up
+// corrected without an explicit re-apply.
+func (m *Manager) attachConfiguredICC(outputID uint32, outputName string) {
+	m.configMutex.RLock()
+	iccProfiles := m.config.ICCProfiles
+	outputTemps := m.config.OutputTemps
+	m.configMutex.RUnlock()
+
+	if len(iccProfiles) == 0 && len(outputTemps) == 0 {
+		return
+	}
+
+	changed := false
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		if out.id != outputID {
+			return true
+		}
+		changed = m.applyConfiguredICCForOutput(out, outputName, iccProfiles, outputTemps)
+		if changed {
+			log.Infof("icc: attached configured profile/temperature to output %s", outputName)
+			out.lastTemp = 0
+		}
+		return false
+	})
+
+	if changed {
+		m.applyCurrentTemp("output-name")
+	}
+}
+
+// applyConfiguredICCForOutput applies the configured profile and temperature of
+// one output and reports whether anything changed.
+func (m *Manager) applyConfiguredICCForOutput(out *outputState, outputName string, iccProfiles map[string]string, outputTemps map[string]int) bool {
+	changed := false
+
+	if temp, ok := outputTemps[outputName]; ok {
+		out.outputTemp = temp
+		changed = true
+	}
+
+	if iccPath, ok := iccProfiles[outputName]; ok {
+		profile, err := icc.ParseFile(iccPath)
+		if err != nil {
+			log.Warnf("icc: failed to load profile for output %q: %v", outputName, err)
+		} else {
+			out.iccPath = iccPath
+			out.iccProfile = profile
+			changed = true
+		}
+	}
+
+	return changed
 }
 
 // ApplyICC loads and applies an ICC profile to a specific output.
