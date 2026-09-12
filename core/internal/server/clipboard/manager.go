@@ -1971,6 +1971,15 @@ func (m *Manager) EditEntry(id uint64, text string) error {
 	data := []byte(text)
 	mimeType := "text/plain;charset=utf-8"
 
+	if len(bytes.TrimSpace(data)) == 0 {
+		return fmt.Errorf("cannot save empty entry")
+	}
+
+	cfg := m.getConfig()
+	if int64(len(data)) > cfg.MaxEntrySize {
+		return fmt.Errorf("data too large")
+	}
+
 	newHash := computeHash(data)
 	preview := m.textPreview(data)
 

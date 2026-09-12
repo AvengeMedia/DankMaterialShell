@@ -655,6 +655,35 @@ func TestEditEntry_ImageReturnsError(t *testing.T) {
 	assert.Contains(t, err.Error(), "cannot edit image entry")
 }
 
+func TestEditEntry_EmptyOrWhitespaceReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	id := storeTestEntry(t, m, "keep me")
+
+	for _, badText := range []string{"", "   ", "\t\n\r"} {
+		err := m.EditEntry(id, badText)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "cannot save empty entry")
+	}
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "keep me", history[0].Preview)
+}
+
+func TestEditEntry_DataTooLargeReturnsError(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	m.config.MaxEntrySize = 10
+	id := storeTestEntry(t, m, "small")
+
+	err := m.EditEntry(id, "this text exceeds the 10-byte limit")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "data too large")
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	assert.Equal(t, "small", history[0].Preview)
+}
+
 func TestHandleEditEntry_SuccessAndValidation(t *testing.T) {
 	m := newTestManagerWithDB(t)
 	id := storeTestEntry(t, m, "before edit")
