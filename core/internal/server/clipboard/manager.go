@@ -217,6 +217,9 @@ func (m *Manager) dbView(fn func(tx *bolt.Tx) error) (err error) {
 }
 
 func (m *Manager) post(fn func()) {
+	if m.wlCtx == nil {
+		return
+	}
 	m.wlCtx.Post(fn)
 }
 
@@ -1953,6 +1956,101 @@ func (m *Manager) UnpinEntry(id uint64) error {
 		}
 
 		return b.Put(itob(id), encoded)
+	})
+
+	if err == nil {
+		m.updateState()
+		m.notifySubscribers()
+	}
+
+	return err
+}
+
+func (m *Manager) EditEntry(id uint64, text string) error {
+	if m.db == nil {
+		return fmt.Errorf("database not available")
+	}
+
+	data := []byte(text)
+	mimeType := "text/plain;charset=utf-8"
+
+	if err := m.SetClipboard(data, mimeType); err != nil {
+		return err
+	}
+
+	newHash := computeHash(data)
+	preview := m.textPreview(data)
+
+	err := m.dbUpdate(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return fmt.Errorf("clipboard bucket missing")
+		}
+
+		oldKey := itob(id)
+		v := b.Get(oldKey)
+		if v == nil {
+			return errEntryNotFound
+		}
+
+		existing, err := decodeEntry(v)
+		if err != nil {
+			return err
+		}
+
+		if existing.IsImage {
+			return errors.New("cannot edit image entry")
+		}
+
+		wasPinned := existing.Pinned
+
+		if err := b.Delete(oldKey); err != nil {
+			return err
+		}
+
+		if err := m.deduplicateInTx(b, newHash); err != nil {
+			return err
+		}
+
+		if wasPinned {
+			c := b.Cursor()
+			for k, val := c.First(); k != nil; k, val = c.Next() {
+				if extractHash(val) == newHash {
+					meta, err := decodeEntryMeta(val)
+					if err == nil && meta.Pinned {
+						return nil
+					}
+				}
+			}
+		}
+
+		newID, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+
+		newEntry := Entry{
+			ID:        newID,
+			Data:      data,
+			MimeType:  mimeType,
+			Preview:   preview,
+			Size:      len(data),
+			Timestamp: time.Now(),
+			IsImage:   false,
+			Hash:      newHash,
+			Pinned:    wasPinned,
+		}
+
+		encoded, err := encodeEntry(newEntry)
+		if err != nil {
+			return err
+		}
+
+		if err := b.Put(itob(newID), encoded); err != nil {
+			return err
+		}
+
+		return m.trimLengthInTx(b)
 	})
 
 	if err == nil {

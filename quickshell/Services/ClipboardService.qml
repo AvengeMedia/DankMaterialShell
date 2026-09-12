@@ -200,6 +200,7 @@ Singleton {
         internalEntries = [];
         clipboardEntries = [];
         unpinnedEntries = [];
+        pinnedEntries = [];
     }
 
     function copyEntry(entry, closeCallback, textOnly) {
@@ -331,6 +332,33 @@ Singleton {
             }
             ToastService.showInfo(I18n.tr("Entry unpinned"));
             refresh();
+        });
+    }
+
+    function editEntry(entry, text, callback) {
+        if (!entry || typeof entry.id !== "number") {
+            if (callback) {
+                callback({
+                    "error": "Invalid entry"
+                });
+            }
+            return;
+        }
+        DMSService.sendRequest("clipboard.editEntry", {
+            "id": entry.id,
+            "text": text
+        }, function (response) {
+            if (response.error) {
+                log.warn("Failed to edit entry:", response.error);
+                if (callback) {
+                    callback(response);
+                }
+                return;
+            }
+            refresh();
+            if (callback) {
+                callback(response);
+            }
         });
     }
 
