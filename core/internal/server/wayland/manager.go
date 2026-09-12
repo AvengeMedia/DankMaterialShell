@@ -845,6 +845,20 @@ func (m *Manager) applyCurrentTemp(_ string) {
 	m.updateStateFromSchedule()
 }
 
+// effectiveTempTarget returns the temperature to render an output at: a
+// per-output override wins over the night light schedule, so each display can
+// keep its own temperature (0 = no override). Without either, the output keeps
+// whatever its profile describes.
+func effectiveTempTarget(out *outputState, scheduleTemp int) int {
+	if out.outputTemp != 0 {
+		return out.outputTemp
+	}
+	if scheduleTemp > 0 {
+		return scheduleTemp
+	}
+	return noTempTarget
+}
+
 func (m *Manager) applyGamma(temp int) {
 	m.configMutex.RLock()
 	gamma, contrast := m.config.Gamma, m.config.Contrast
@@ -885,36 +899,29 @@ func (m *Manager) applyGamma(temp int) {
 		case !m.outputStillValid(out):
 			continue
 		}
-		// Per-output temperature doubles as the white point the profile was
-		// produced at; without one, the profile is assumed to be at neutral.
-		outBaseTemp := out.outputTemp
-		if outBaseTemp == 0 {
-			outBaseTemp = neutralTemp
-		}
+		targetTemp := effectiveTempTarget(out, temp)
 
 		var ramp GammaRamp
 		if out.iccPath != "" && out.iccProfile != nil {
-			profileRamp, err := ProfileRampWithTemp(out.rampSize, out.iccProfile, outBaseTemp, temp, gamma, contrast)
+			// The profile describes the display at the white point display
+			// profiles are produced at (D65); a target temperature is composed
+			// on top of it.
+			profileRamp, err := ProfileRampWithTemp(out.rampSize, out.iccProfile, neutralTemp, targetTemp, gamma, contrast)
 			if err != nil {
 				log.Warnf("icc: failed to generate ramp for output %d: %v, falling back to temperature", out.id, err)
-				fallbackTemp := temp
+				fallbackTemp := targetTemp
 				if fallbackTemp <= 0 {
-					fallbackTemp = outBaseTemp
+					fallbackTemp = neutralTemp
 				}
 				ramp = GenerateGammaRamp(out.rampSize, fallbackTemp, gamma, contrast)
 			} else {
 				ramp = profileRamp
-				log.Infof("icc: applied ICC ramp to output %d (size=%d, ref=%dK, target=%dK)", out.id, out.rampSize, outBaseTemp, temp)
+				log.Infof("icc: applied ICC ramp to output %d (size=%d, ref=%dK, target=%dK)", out.id, out.rampSize, neutralTemp, targetTemp)
 			}
 		} else {
-			// No ICC profile — use per-output temp if set, otherwise the night
-			// light temperature, otherwise neutral.
-			outTemp := temp
+			outTemp := targetTemp
 			if outTemp <= 0 {
 				outTemp = neutralTemp
-			}
-			if out.outputTemp != 0 {
-				outTemp = out.outputTemp
 			}
 			ramp = GenerateGammaRamp(out.rampSize, outTemp, gamma, contrast)
 		}

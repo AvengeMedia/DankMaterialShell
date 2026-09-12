@@ -60,13 +60,13 @@ var iccSetTempCmd = &cobra.Command{
 	Use:     "set-temp <output> <kelvin>",
 	Aliases: []string{"setTemp"},
 	Short:   "Set the color temperature for a specific output",
-	Long: "Set the reference white point of an output, in kelvin.\n\n" +
-		"For outputs with an ICC profile this is the white point the profile was\n" +
-		"produced at: the profile is applied as measured, and the night light\n" +
-		"shifts from that reference instead of assuming 6500K. Outputs without a\n" +
-		"profile use it as their color temperature directly.\n\n" +
+	Long: "Set the color temperature for a specific output, independently of the\n" +
+		"night light schedule: every display keeps its own value, which also makes\n" +
+		"the range wider than the night light's.\n\n" +
+		"For an output with an ICC profile the temperature is composed on top of\n" +
+		"it, treating the profile as measured at 6500K.\n\n" +
 		"Accepts 1000-10000K; 0 removes the override, so the output follows the\n" +
-		"night light schedule with a 6500K reference.",
+		"night light schedule again (6500K while it is disabled).",
 	Args: cobra.ExactArgs(2),
 	Run:  runICCSetTemp,
 }
@@ -351,10 +351,10 @@ func runICCSetTemp(cmd *cobra.Command, args []string) {
 	}
 
 	if temp == 0 {
-		fmt.Printf("Output '%s' uses a 6500K reference white point again\n", outputName)
+		fmt.Printf("Output '%s' follows the night light schedule again\n", outputName)
 		return
 	}
-	fmt.Printf("Set output '%s' reference white point to %dK\n", outputName, temp)
+	fmt.Printf("Set output '%s' color temperature to %dK\n", outputName, temp)
 }
 
 // fetchICCOutputTemps asks the running server for the per-output overrides.

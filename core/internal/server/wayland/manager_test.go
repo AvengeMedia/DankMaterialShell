@@ -605,3 +605,26 @@ func TestManager_AttachConfiguredICCForNamedOutput(t *testing.T) {
 	m.attachConfiguredICC(4, "HDMI-A-1")
 	assert.Zero(t, plain.outputTemp, "outputs without configuration are left alone")
 }
+
+// Each display can keep its own temperature: a per-output override wins over the
+// night light schedule, and 0 means "no override" rather than 0K.
+func TestEffectiveTempTarget(t *testing.T) {
+	cases := []struct {
+		name         string
+		outputTemp   int
+		scheduleTemp int
+		want         int
+	}{
+		{"override wins over the schedule", 7000, 5000, 7000},
+		{"override applies without a schedule", 7000, noTempTarget, 7000},
+		{"schedule applies without an override", 0, 5000, 5000},
+		{"neither configured", 0, noTempTarget, noTempTarget},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := &outputState{outputTemp: tc.outputTemp}
+			assert.Equal(t, tc.want, effectiveTempTarget(out, tc.scheduleTemp))
+		})
+	}
+}
