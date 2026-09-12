@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
@@ -55,8 +56,20 @@ var iccStatusCmd = &cobra.Command{
 	Run:   runICCStatus,
 }
 
+var iccSetTempCmd = &cobra.Command{
+	Use:     "set-temp <output> <kelvin>",
+	Aliases: []string{"setTemp"},
+	Short:   "Set the color temperature for a specific output",
+	Long: "Set the color temperature for a specific output, overriding the\n" +
+		"night light temperature for that output only.\n\n" +
+		"Accepts 1000-10000K; 0 removes the override so the output follows the\n" +
+		"night light schedule again.",
+	Args: cobra.ExactArgs(2),
+	Run:  runICCSetTemp,
+}
+
 func init() {
-	iccCmd.AddCommand(iccListCmd, iccInfoCmd, iccApplyCmd, iccRemoveCmd, iccStatusCmd)
+	iccCmd.AddCommand(iccListCmd, iccInfoCmd, iccApplyCmd, iccRemoveCmd, iccStatusCmd, iccSetTempCmd)
 }
 
 func getICCConfigDir() string {
@@ -308,6 +321,73 @@ func runICCRemove(cmd *cobra.Command, args []string) {
 	fmt.Printf("Removed ICC profile from output '%s'\n", outputName)
 }
 
+func runICCSetTemp(cmd *cobra.Command, args []string) {
+	outputName := args[0]
+
+	temp, err := strconv.Atoi(args[1])
+	if err != nil {
+		log.Fatalf("Invalid temperature %q: expected a number in kelvin", args[1])
+	}
+	if temp != 0 && (temp < 1000 || temp > 10000) {
+		log.Fatalf("Temperature %d out of range (1000-10000, or 0 to follow the schedule)", temp)
+	}
+
+	req := models.Request{
+		Method: "wayland.icc.setTemp",
+		Params: map[string]any{
+			"output": outputName,
+			"temp":   temp,
+		},
+	}
+	resp, err := sendServerRequest(req)
+	if err != nil {
+		log.Fatalf("Failed to set output temperature: %v", err)
+	}
+	if resp.Error != "" {
+		log.Fatalf("Server error: %s", resp.Error)
+	}
+
+	if temp == 0 {
+		fmt.Printf("Output '%s' follows the night light temperature again\n", outputName)
+		return
+	}
+	fmt.Printf("Set output '%s' color temperature to %dK\n", outputName, temp)
+}
+
+// fetchICCOutputTemps asks the running server for the per-output overrides.
+// Outputs without an override report 0.
+func fetchICCOutputTemps() map[string]int {
+	temps := make(map[string]int)
+
+	resp, err := sendServerRequest(models.Request{Method: "wayland.icc.getTemps"})
+	if err != nil || resp.Result == nil {
+		return temps
+	}
+	resultBytes, err := json.Marshal(*resp.Result)
+	if err != nil {
+		return temps
+	}
+	var raw map[string]any
+	if err := json.Unmarshal(resultBytes, &raw); err != nil {
+		return temps
+	}
+	for output, value := range raw {
+		if f, ok := value.(float64); ok {
+			temps[output] = int(f)
+		}
+	}
+	return temps
+}
+
+// formatOutputTemp renders a per-output override, or the schedule marker.
+func formatOutputTemp(temps map[string]int, output string) string {
+	temp, ok := temps[output]
+	if !ok || temp == 0 {
+		return "schedule"
+	}
+	return strconv.Itoa(temp) + "K"
+}
+
 func runICCStatus(cmd *cobra.Command, args []string) {
 	req := models.Request{
 		Method: "wayland.icc.getStatus",
@@ -342,10 +422,12 @@ func runICCStatus(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	temps := fetchICCOutputTemps()
+
 	fmt.Println("ICC Profile Status:")
-	fmt.Println(strings.Repeat("─", 90))
-	fmt.Printf("  %-20s %-20s %-10s %-10s %-7s\n", "Output", "Profile", "Version", "ColorSpace", "Active")
-	fmt.Println("  " + strings.Repeat("─", 86))
+	fmt.Println(strings.Repeat("─", 100))
+	fmt.Printf("  %-20s %-20s %-10s %-10s %-7s %-9s\n", "Output", "Profile", "Version", "ColorSpace", "Active", "Temp")
+	fmt.Println("  " + strings.Repeat("─", 96))
 
 	shown := make(map[string]bool)
 	for _, output := range outputs {
@@ -371,9 +453,9 @@ func runICCStatus(cmd *cobra.Command, args []string) {
 			if active {
 				activeStr = "yes"
 			}
-			fmt.Printf("  %-20s %-20s %-10s %-10s %-7s\n", output, desc, version, colorSpace, activeStr)
+			fmt.Printf("  %-20s %-20s %-10s %-10s %-7s %-9s\n", output, desc, version, colorSpace, activeStr, formatOutputTemp(temps, output))
 		} else {
-			fmt.Printf("  %-20s %-20s %-10s %-10s %-7s\n", output, "(none)", "", "", "no")
+			fmt.Printf("  %-20s %-20s %-10s %-10s %-7s %-9s\n", output, "(none)", "", "", "no", formatOutputTemp(temps, output))
 		}
 	}
 
@@ -402,6 +484,6 @@ func runICCStatus(cmd *cobra.Command, args []string) {
 		if active {
 			activeStr = "yes"
 		}
-		fmt.Printf("  %-20s %-20s %-10s %-10s %-7s\n", output, desc, version, colorSpace, activeStr)
+		fmt.Printf("  %-20s %-20s %-10s %-10s %-7s %-9s\n", output, desc, version, colorSpace, activeStr, formatOutputTemp(temps, output))
 	}
 }
