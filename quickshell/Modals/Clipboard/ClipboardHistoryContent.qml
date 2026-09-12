@@ -184,8 +184,41 @@ FocusScope {
         if (!ClipboardService.canEditEntry(entry)) {
             return;
         }
-        editorView.setEntry(entry);
-        mode = "editor";
+
+        const requestedId = entry.id;
+        if (!requestedId) {
+            editorView.setEntry(entry);
+            mode = "editor";
+            return;
+        }
+
+        DMSService.sendRequest("clipboard.getEntry", {
+            "id": requestedId
+        }, function (response) {
+            if (response.error || !response.result) {
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
+                if (!response.result) {
+                    ClipboardService.refresh();
+                }
+                return;
+            }
+            const result = response.result;
+            let fullText = "";
+            if (result?.data) {
+                fullText = editorView.decodeEntryData(result.data);
+            } else {
+                fullText = result?.preview ?? "";
+            }
+
+            if (!fullText && (entry.preview ?? "").length > 0) {
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
+                return;
+            }
+
+            const entryWithText = Object.assign({}, entry, { "text": fullText });
+            editorView.setEntry(entryWithText);
+            mode = "editor";
+        });
     }
 
     function resetState() {

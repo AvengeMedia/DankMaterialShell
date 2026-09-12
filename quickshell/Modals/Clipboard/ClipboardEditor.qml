@@ -15,6 +15,7 @@ Item {
     property var entry: null
     property string editorText: ""
     property bool textLoaded: false
+    property bool loadFailed: false
 
     Timer {
         id: loadTimeoutTimer
@@ -22,6 +23,7 @@ Item {
         repeat: false
         onTriggered: {
             if (!root.textLoaded) {
+                root.loadFailed = true;
                 ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
             }
         }
@@ -80,26 +82,8 @@ Item {
         }
     }
 
-    function setEntry(newEntry) {
-        entry = newEntry;
-        textLoaded = !newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0);
-        editorText = newEntry?.text ?? newEntry?.preview ?? "";
-        if (editField) {
-            editField.text = editorText;
-        }
-        Qt.callLater(function () {
-            if (editField) {
-                editField.forceActiveFocus();
-                editField.cursorPosition = editField.text.length;
-            }
-        });
-
-        if (!newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0)) {
-            loadTimeoutTimer.stop();
-            return;
-        }
-
-        const requestedId = newEntry.id;
+    function fetchEntry(requestedId) {
+        loadFailed = false;
         loadTimeoutTimer.restart();
         DMSService.sendRequest("clipboard.getEntry", {
             "id": requestedId
@@ -109,6 +93,7 @@ Item {
                 return;
             }
             if (response.error || !response.result) {
+                root.loadFailed = true;
                 ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
                 if (!response.result) {
                     ClipboardService.refresh();
@@ -124,9 +109,11 @@ Item {
             }
 
             if (!fullText || fullText.length === 0) {
+                root.loadFailed = true;
                 ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
                 return;
             }
+            root.loadFailed = false;
             root.textLoaded = true;
             root.editorText = fullText;
             if (editField) {
@@ -145,12 +132,41 @@ Item {
         });
     }
 
+    function setEntry(newEntry) {
+        entry = newEntry;
+        loadFailed = false;
+        const hasFullText = typeof newEntry?.text === "string";
+        textLoaded = !newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0) || hasFullText;
+        editorText = newEntry?.text ?? newEntry?.preview ?? "";
+        if (editField) {
+            editField.text = editorText;
+        }
+        Qt.callLater(function () {
+            if (editField) {
+                editField.forceActiveFocus();
+                editField.cursorPosition = editField.text.length;
+            }
+        });
+
+        if (hasFullText || !newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0)) {
+            loadTimeoutTimer.stop();
+            return;
+        }
+
+        fetchEntry(newEntry.id);
+    }
+
     function saveEntry(action) {
         const saveAction = action ?? "history";
         const entryId = root.entry?.id ?? 0;
 
         if (entryId > 0 && !root.textLoaded) {
-            ToastService.showWarning(I18n.tr("Loading full text, please wait...", "clipboard editor: save blocked while the entry's full text is still being fetched"));
+            if (root.loadFailed) {
+                ToastService.showError(I18n.tr("Failed to load clipboard entry", "clipboard editor: fetching the entry's full text failed"));
+                root.fetchEntry(entryId);
+            } else {
+                ToastService.showWarning(I18n.tr("Loading full text, please wait...", "clipboard editor: save blocked while the entry's full text is still being fetched"));
+            }
             return;
         }
 
