@@ -795,6 +795,13 @@ func selectAltTextMimeType(mimes []string) string {
 	return ""
 }
 
+func isTextMimeType(mime string) bool {
+	if mime == "" || strings.HasPrefix(mime, "text/plain") {
+		return true
+	}
+	return slices.Contains(altTextMimeTypes, mime)
+}
+
 func (m *Manager) isImageMimeType(mime string) bool {
 	return strings.HasPrefix(mime, "image/")
 }
@@ -2004,7 +2011,7 @@ func (m *Manager) EditEntry(id uint64, text string) error {
 			return errors.New("cannot edit image entry")
 		}
 
-		if existing.MimeType != "" && !strings.HasPrefix(existing.MimeType, "text/plain") {
+		if !isTextMimeType(existing.MimeType) {
 			return errors.New("cannot edit non-text entry")
 		}
 

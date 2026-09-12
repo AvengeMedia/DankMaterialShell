@@ -181,7 +181,7 @@ FocusScope {
     }
 
     function editEntry(entry) {
-        if (!entry || entry.isImage || (entry.mimeType && !entry.mimeType.startsWith("text/plain"))) {
+        if (!ClipboardService.canEditEntry(entry)) {
             return;
         }
         editorView.setEntry(entry);

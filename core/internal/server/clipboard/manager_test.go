@@ -676,6 +676,29 @@ func TestEditEntry_NonTextReturnsError(t *testing.T) {
 	assert.Contains(t, err.Error(), "cannot edit non-text entry")
 }
 
+func TestEditEntry_AltTextMimeTypesAllowed(t *testing.T) {
+	for _, mime := range []string{"UTF8_STRING", "STRING", "TEXT", "text/plain;charset=utf-8", "text/plain"} {
+		t.Run(mime, func(t *testing.T) {
+			m := newTestManagerWithDB(t)
+			entry := Entry{
+				Data:      []byte("old text"),
+				MimeType:  mime,
+				Preview:   "old text",
+				Size:      8,
+				Timestamp: time.Now().Truncate(time.Second),
+				IsImage:   false,
+			}
+			require.NoError(t, m.storeEntry(entry))
+			history := m.GetHistory()
+			require.Len(t, history, 1)
+			id := history[0].ID
+
+			err := m.EditEntry(id, "replacement text")
+			assert.NoError(t, err)
+		})
+	}
+}
+
 func TestEditEntry_EmptyOrWhitespaceReturnsError(t *testing.T) {
 	m := newTestManagerWithDB(t)
 	id := storeTestEntry(t, m, "keep me")

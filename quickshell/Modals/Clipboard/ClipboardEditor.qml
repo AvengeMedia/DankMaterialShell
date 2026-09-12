@@ -82,7 +82,7 @@ Item {
 
     function setEntry(newEntry) {
         entry = newEntry;
-        textLoaded = !newEntry || Boolean(newEntry.isImage) || !(newEntry.id > 0);
+        textLoaded = !newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0);
         editorText = newEntry?.text ?? newEntry?.preview ?? "";
         if (editField) {
             editField.text = editorText;
@@ -94,7 +94,7 @@ Item {
             }
         });
 
-        if (!newEntry || newEntry.isImage || (newEntry.mimeType && !newEntry.mimeType.startsWith("text/plain")) || !(newEntry.id > 0)) {
+        if (!newEntry || !ClipboardService.canEditEntry(newEntry) || !(newEntry.id > 0)) {
             loadTimeoutTimer.stop();
             return;
         }

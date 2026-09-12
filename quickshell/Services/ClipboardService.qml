@@ -399,6 +399,17 @@ Singleton {
         return entry.preview || "";
     }
 
+    function isTextMimeType(mimeType) {
+        if (!mimeType || mimeType.startsWith("text/plain")) {
+            return true;
+        }
+        return mimeType === "UTF8_STRING" || mimeType === "STRING" || mimeType === "TEXT";
+    }
+
+    function canEditEntry(entry) {
+        return !!entry && !(entry.isImage ?? false) && isTextMimeType(entry.mimeType);
+    }
+
     function getEntryType(entry) {
         if (entry.isImage) {
             return "image";
