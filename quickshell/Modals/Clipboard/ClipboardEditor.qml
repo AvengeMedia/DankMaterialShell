@@ -16,6 +16,18 @@ Item {
     property string editorText: ""
     property bool textLoaded: false
 
+    Timer {
+        id: loadTimeoutTimer
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            if (!root.textLoaded) {
+                root.entry = null;
+                root.textLoaded = true;
+            }
+        }
+    }
+
     function releaseTextInputFocus() {
         if (editField) {
             editField.setFocus(false);
@@ -83,22 +95,26 @@ Item {
             }
         });
 
-        if (!newEntry || newEntry.isImage) {
+        if (!newEntry || newEntry.isImage || !(newEntry.id > 0)) {
+            loadTimeoutTimer.stop();
             return;
         }
 
         const requestedId = newEntry.id;
+        loadTimeoutTimer.restart();
         DMSService.sendRequest("clipboard.getEntry", {
             "id": requestedId
         }, function (response) {
-            if (response.error) {
-                return;
-            }
+            loadTimeoutTimer.stop();
             if (!root.entry || root.entry.id !== requestedId) {
                 return;
             }
-            if (!response.result) {
-                ClipboardService.refresh();
+            if (response.error || !response.result) {
+                root.entry = null;
+                root.textLoaded = true;
+                if (!response.result) {
+                    ClipboardService.refresh();
+                }
                 return;
             }
             const result = response.result;
@@ -110,6 +126,8 @@ Item {
             }
 
             if (!fullText || fullText.length === 0) {
+                root.entry = null;
+                root.textLoaded = true;
                 return;
             }
             root.textLoaded = true;
@@ -135,8 +153,11 @@ Item {
         const entryId = root.entry?.id ?? 0;
 
         if (entryId > 0 && !root.textLoaded) {
+            ToastService.showWarning(I18n.tr("Loading full text, please wait..."));
             return;
         }
+
+        loadTimeoutTimer.stop();
 
         const onComplete = function () {
             if (saveAction === "history") {
@@ -316,6 +337,7 @@ Item {
 
                 width: cancelButton.width
                 height: buttonHeight
+                opacity: root.textLoaded ? 1 : 0.6
 
                 Rectangle {
                     anchors.fill: parent
