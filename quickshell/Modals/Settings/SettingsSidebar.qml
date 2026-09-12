@@ -121,8 +121,6 @@ Rectangle {
             return false;
         if (item.greeterOnly && !GreeterService.available)
             return false;
-        if (item.autostartOnly && !DesktopService.autostartAvailable)
-            return false;
         if (item.frameOnly && !SettingsData.frameEnabled)
             return false;
         if (item.islandOnly && SettingsData.islandBarConfigs.length === 0)

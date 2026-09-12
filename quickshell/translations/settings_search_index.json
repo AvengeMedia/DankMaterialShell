@@ -10416,18 +10416,21 @@
   },
   {
     "section": "autostartAddEntry",
-    "label": "Add Entry",
+    "label": "Add Startup App",
     "tabIndex": 36,
-    "category": "Autostart Apps",
+    "category": "Startup Apps",
     "keywords": [
       "add",
+      "app",
+      "application",
       "apps",
       "autostart",
       "choose",
       "command",
       "desktop",
-      "entry",
       "launch",
+      "login",
+      "programs",
       "startup",
       "whether"
     ],
@@ -10435,39 +10438,36 @@
     "description": "Choose whether to launch a desktop app or a command"
   },
   {
-    "section": "_tab_36",
-    "label": "Autostart Apps",
-    "tabIndex": 36,
-    "category": "Autostart Apps",
-    "keywords": [
-      "apps",
-      "autostart"
-    ],
-    "icon": "line_start"
-  },
-  {
     "section": "autostartEntries",
-    "label": "Autostart Entries",
+    "label": "Startup Apps",
     "tabIndex": 36,
-    "category": "Autostart Apps",
+    "category": "Startup Apps",
     "keywords": [
+      "applications",
       "apps",
       "autostart",
-      "entries"
+      "launch",
+      "login",
+      "programs",
+      "startup"
     ],
-    "icon": "line_start"
+    "icon": "rocket_launch"
   },
   {
     "section": "autostartTrayIconFix",
     "label": "Tray Icon Fix",
     "tabIndex": 36,
-    "category": "Autostart Apps",
+    "category": "Startup Apps",
     "keywords": [
       "apps",
       "autostart",
       "fix",
       "icon",
       "icons",
+      "launch",
+      "login",
+      "programs",
+      "startup",
       "systemd",
       "tray"
     ],
