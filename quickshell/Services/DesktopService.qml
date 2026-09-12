@@ -14,9 +14,6 @@ Singleton {
     property var _cache: ({})
 
     property bool isSystemd: false
-    property bool systemdAutostartTargetActive: false
-    property bool systemdAutostartTargetChecked: false
-    readonly property bool autostartAvailable: root.systemdAutostartTargetChecked && (!root.isSystemd || root.systemdAutostartTargetActive)
 
     Component.onCompleted: {
         Paths.desktopIconResolver = name => resolveIconPath(name);
@@ -28,25 +25,7 @@ Singleton {
         command: ["sh", "-c", "cat /proc/1/comm 2>/dev/null | tr -d '\\n'"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: {
-                root.isSystemd = (text || "").trim() === "systemd";
-                if (!root.isSystemd)
-                    root.systemdAutostartTargetChecked = true;
-                else
-                    systemdAutostartTargetCheck.running = true;
-            }
-        }
-    }
-
-    Process {
-        id: systemdAutostartTargetCheck
-        command: ["systemctl", "--user", "is-active", "xdg-desktop-autostart.target"]
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.systemdAutostartTargetActive = (text || "").trim() === "active";
-                root.systemdAutostartTargetChecked = true;
-            }
+            onStreamFinished: root.isSystemd = (text || "").trim() === "systemd"
         }
     }
 

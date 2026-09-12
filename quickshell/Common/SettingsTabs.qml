@@ -248,10 +248,9 @@ Singleton {
                 },
                 {
                     "id": "autostart",
-                    "text": I18n.tr("Autostart Apps"),
-                    "icon": "line_start",
-                    "tabIndex": 36,
-                    "autostartOnly": true
+                    "text": I18n.tr("Startup Apps"),
+                    "icon": "rocket_launch",
+                    "tabIndex": 36
                 },
                 {
                     "id": "window_rules",
