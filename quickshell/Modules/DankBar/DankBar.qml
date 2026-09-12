@@ -16,6 +16,7 @@ Item {
     Component.onDestruction: BarWidgetService.unregisterDankBarItem(root.barConfig?.id, root)
 
     property alias barVariants: barVariants
+    readonly property bool fullscreenAutoHide: barVariants.instances.some(bar => bar.fullscreenAutoHide)
     property var hyprlandOverviewLoader: null
     property bool systemTrayMenuOpen: false
 

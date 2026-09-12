@@ -432,7 +432,7 @@ Singleton {
         for (const ws of data.workspaces) {
             const oldWs = root.workspaces[ws.id];
             newWorkspaces[ws.id] = ws;
-            if (oldWs && oldWs.active_window_id !== undefined) {
+            if (ws.active_window_id === undefined && oldWs && oldWs.active_window_id !== undefined) {
                 newWorkspaces[ws.id].active_window_id = oldWs.active_window_id;
             }
         }
@@ -533,10 +533,8 @@ Singleton {
                 }
                 updatedWs.active_window_id = focusedWindowId;
 
-                const updatedWorkspaces = {};
-                for (const id in root.workspaces) {
-                    updatedWorkspaces[id] = id === focusedWindow.workspace_id ? updatedWs : root.workspaces[id];
-                }
+                const updatedWorkspaces = Object.assign({}, root.workspaces);
+                updatedWorkspaces[focusedWindow.workspace_id] = updatedWs;
                 setWorkspaces(updatedWorkspaces);
             }
         }
@@ -550,15 +548,16 @@ Singleton {
                 updatedWs[prop] = ws[prop];
             }
             updatedWs.active_window_id = data.active_window_id;
-            if (data.active_window_id !== null && data.active_window_id !== undefined)
+            if (ws.is_focused && data.active_window_id !== null && data.active_window_id !== undefined)
                 lastFocusedWindowId = data.active_window_id;
 
-            const updatedWorkspaces = {};
-            for (const id in root.workspaces) {
-                updatedWorkspaces[id] = id === data.workspace_id ? updatedWs : root.workspaces[id];
-            }
+            const updatedWorkspaces = Object.assign({}, root.workspaces);
+            updatedWorkspaces[data.workspace_id] = updatedWs;
             setWorkspaces(updatedWorkspaces);
         }
+
+        if (!ws?.is_focused)
+            return;
 
         let changed = false;
         const updatedWindows = new Array(windows.length);

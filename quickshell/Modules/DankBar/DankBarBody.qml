@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import qs.Common
 import qs.Services
 
@@ -19,6 +20,11 @@ Item {
     property var rightWidgetsModel
 
     readonly property bool barRevealed: inputMask.showing
+    readonly property bool fullscreenAutoHide: (barConfig?.hideOnFullscreen ?? false)
+        && hostWindow?.dBarLayer === WlrLayer.Overlay
+        && CompositorService.isNiri && !NiriService.inOverview
+        && CompositorService.visibleNiriFullscreenToplevelOnScreen(barWindow.screen)
+
 
     property var controlCenterButtonRef: null
     property var clockButtonRef: null
@@ -804,7 +810,7 @@ Item {
 
     readonly property bool reserveExclusiveWhenAutoHidden: FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
-    readonly property real surfaceExclusiveZone: (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
+    readonly property real surfaceExclusiveZone: (!(barConfig?.visible ?? true) || ((barConfig?.autoHide ?? false) && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
     readonly property alias inputMaskItem: inputMask
 
@@ -911,7 +917,8 @@ Item {
         anchors.fill: parent
         layer.enabled: false
 
-        property bool autoHide: barConfig?.autoHide ?? false
+        readonly property bool autoHide: (barConfig?.autoHide ?? false) || barWindow.fullscreenAutoHide
+        onAutoHideChanged: evaluateReveal()
         property bool revealSticky: false
         // In click-through mode the hidden bar's input mask covers the full
         // band while the revealed bar's mask covers only the widget sections,
@@ -1009,6 +1016,9 @@ Item {
             if (inOverviewWithShow)
                 return true;
 
+            if (barWindow.fullscreenAutoHide)
+                return hoverReveal || popoutPinsReveal || revealSticky || ipcReveal;
+
             const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango)) {
                 if (barWindow.shouldHideForWindows)
@@ -1024,7 +1034,6 @@ Item {
 
         Connections {
             function onBarConfigChanged() {
-                topBarCore.autoHide = barConfig?.autoHide ?? false;
                 topBarCore.evaluateReveal();
             }
 

@@ -9,6 +9,7 @@ import Quickshell.Hyprland
 import qs.Common
 import qs.DankCommon.Common as DankCommon
 import qs.Services
+import "NiriFullscreen.js" as NiriFullscreen
 
 Singleton {
     id: root
@@ -601,6 +602,12 @@ Singleton {
                 return true;
         }
         return false;
+    }
+
+    function visibleNiriFullscreenToplevelOnScreen(screenOrName) {
+        if (!isNiri || !NiriService.hasInitialConnection)
+            return false;
+        return NiriFullscreen.isFullscreenOnScreen(_screenName(screenOrName), NiriService.allWorkspaces, NiriService.windows, ToplevelManager.toplevels?.values);
     }
 
     function filterCurrentDisplay(toplevels, screenName) {

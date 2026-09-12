@@ -19,6 +19,7 @@ PanelWindow {
     readonly property bool isVertical: body.isVertical
     readonly property int barPos: body.barPos
     readonly property bool barRevealed: body.barRevealed
+    readonly property bool fullscreenAutoHide: body.fullscreenAutoHide
 
     property alias controlCenterButtonRef: body.controlCenterButtonRef
     property alias clockButtonRef: body.clockButtonRef
