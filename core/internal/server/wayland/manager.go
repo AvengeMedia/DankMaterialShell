@@ -27,6 +27,11 @@ const animKelvinStep = 25
 
 const neutralTemp = 6500
 
+// noTempTarget marks "the night light has no temperature target". Plain outputs
+// then get the neutral ramp, while outputs with an ICC profile stay at the
+// white point their profile was produced at.
+const noTempTarget = -1
+
 func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
@@ -837,11 +842,10 @@ func (m *Manager) applyCurrentTemp(_ string) {
 	low, high := m.config.LowTemp, m.config.HighTemp
 	m.configMutex.RUnlock()
 
-	// With the night light disabled the outputs still need their ICC ramp, so
-	// push a neutral temperature: outputs with a profile get their measured
-	// ramp, the rest stay at identity.
+	// With the night light disabled, outputs with an ICC profile keep the ramp
+	// their profile describes and the rest stay at identity (noTempTarget).
 	if !enabled {
-		m.applyGamma(neutralTemp)
+		m.applyGamma(noTempTarget)
 		m.updateStateFromSchedule()
 		return
 	}
@@ -905,24 +909,34 @@ func (m *Manager) applyGamma(temp int) {
 		case !m.outputStillValid(out):
 			continue
 		}
+		// Per-output temperature doubles as the white point the profile was
+		// produced at; without one, the profile is assumed to be at neutral.
+		outBaseTemp := out.outputTemp
+		if outBaseTemp == 0 {
+			outBaseTemp = neutralTemp
+		}
+
 		var ramp GammaRamp
 		if out.iccPath != "" && out.iccProfile != nil {
-			// ICC profile is active for this output — use ICC ramp
-			iccRamp, err := icc.GenerateGammaRamp(out.rampSize, out.iccProfile)
+			profileRamp, err := ProfileRampWithTemp(out.rampSize, out.iccProfile, outBaseTemp, temp, gamma, contrast)
 			if err != nil {
 				log.Warnf("icc: failed to generate ramp for output %d: %v, falling back to temperature", out.id, err)
-				outTemp := temp
-				if out.outputTemp != 0 {
-					outTemp = out.outputTemp
+				fallbackTemp := temp
+				if fallbackTemp <= 0 {
+					fallbackTemp = outBaseTemp
 				}
-				ramp = GenerateGammaRamp(out.rampSize, outTemp, gamma, contrast)
+				ramp = GenerateGammaRamp(out.rampSize, fallbackTemp, gamma, contrast)
 			} else {
-				ramp = GammaRamp{Red: iccRamp.Red, Green: iccRamp.Green, Blue: iccRamp.Blue}
-				log.Infof("icc: applied ICC ramp to output %d (size=%d)", out.id, out.rampSize)
+				ramp = profileRamp
+				log.Infof("icc: applied ICC ramp to output %d (size=%d, ref=%dK, target=%dK)", out.id, out.rampSize, outBaseTemp, temp)
 			}
 		} else {
-			// No ICC profile — use per-output temp if set, otherwise global temp
+			// No ICC profile — use per-output temp if set, otherwise the night
+			// light temperature, otherwise neutral.
 			outTemp := temp
+			if outTemp <= 0 {
+				outTemp = neutralTemp
+			}
 			if out.outputTemp != 0 {
 				outTemp = out.outputTemp
 			}
