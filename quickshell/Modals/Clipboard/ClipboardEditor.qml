@@ -14,6 +14,7 @@ Item {
 
     property var entry: null
     property string editorText: ""
+    property bool textLoaded: false
 
     function releaseTextInputFocus() {
         if (editField) {
@@ -70,6 +71,7 @@ Item {
 
     function setEntry(newEntry) {
         entry = newEntry;
+        textLoaded = !newEntry || Boolean(newEntry.isImage) || !(newEntry.id > 0);
         editorText = newEntry?.text ?? newEntry?.preview ?? "";
         if (editField) {
             editField.text = editorText;
@@ -110,6 +112,7 @@ Item {
             if (!fullText || fullText.length === 0) {
                 return;
             }
+            root.textLoaded = true;
             root.editorText = fullText;
             if (editField) {
                 if (fullText.length > 50000) {
@@ -130,6 +133,10 @@ Item {
     function saveEntry(action) {
         const saveAction = action ?? "history";
         const entryId = root.entry?.id ?? 0;
+
+        if (entryId > 0 && !root.textLoaded) {
+            return;
+        }
 
         const onComplete = function () {
             if (saveAction === "history") {
