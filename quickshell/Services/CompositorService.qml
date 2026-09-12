@@ -275,7 +275,7 @@ Singleton {
         enabled: isHyprland
 
         function onRawEvent(event) {
-            if (event.name === "monitoraddedv2" || event.name === "monitorremoved") {
+            if (event.name === "monitoraddedv2" || event.name === "monitorremoved" || event.name === "configreloaded") {
                 root.refreshHyprlandMonitorLayout();
                 return;
             }
