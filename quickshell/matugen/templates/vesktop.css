@@ -94,7 +94,7 @@
     --text-brand: {{colors.primary.default.hex}} !important;
     --control-brand-foreground: {{colors.primary.default.hex}} !important;
     --control-brand-foreground-new: {{colors.primary.default.hex}} !important;
-    --badge-text-brand: {{colors.primary.default.hex}} !important;
+    --badge-text-brand: {{colors.surface.default.hex}} !important;
 
     --text-danger: {{colors.error.default.hex}} !important;
     --text-feedback-critical: {{colors.error.default.hex}} !important;
