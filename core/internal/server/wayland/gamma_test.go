@@ -2,8 +2,10 @@ package wayland
 
 import (
 	"math"
+	"slices"
 	"testing"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
@@ -155,4 +157,68 @@ func TestGenerateGammaRamp_ContrastPivotsAtMidGray(t *testing.T) {
 	if low.Red[0] != 16383 || low.Red[size-1] != 49151 {
 		t.Errorf("contrast 0.5 should compress endpoints to quarter points, got %d and %d", low.Red[0], low.Red[size-1])
 	}
+}
+
+// Profile ramps are composed with a target temperature relative to the white
+// point display profiles are produced at (D65): no target keeps the profile as
+// measured, a target shifts it.
+func TestProfileRampWithTemp(t *testing.T) {
+	const size = uint32(256)
+	mid := int(size) / 2
+
+	// An empty profile yields the identity ramp.
+	profile := &icc.Profile{}
+	identity := GenerateIdentityRamp(size)
+
+	t.Run("no target keeps the profile as measured", func(t *testing.T) {
+		ramp, err := ProfileRampWithTemp(size, profile, neutralTemp, noTempTarget, 1, 1)
+		if err != nil {
+			t.Fatalf("ProfileRampWithTemp: %v", err)
+		}
+		if !slices.Equal(identity.Red, ramp.Red) || !slices.Equal(identity.Blue, ramp.Blue) {
+			t.Fatal("profile ramp should be unchanged without a temperature target")
+		}
+	})
+
+	t.Run("target equal to the reference leaves the profile alone", func(t *testing.T) {
+		ramp, err := ProfileRampWithTemp(size, profile, neutralTemp, neutralTemp, 1, 1)
+		if err != nil {
+			t.Fatalf("ProfileRampWithTemp: %v", err)
+		}
+		if !slices.Equal(identity.Red, ramp.Red) {
+			t.Fatal("profile ramp should be unchanged at its reference white point")
+		}
+	})
+
+	t.Run("cooler target cools the output", func(t *testing.T) {
+		ramp, err := ProfileRampWithTemp(size, profile, neutralTemp, 7000, 1, 1)
+		if err != nil {
+			t.Fatalf("ProfileRampWithTemp: %v", err)
+		}
+		if ramp.Red[mid] >= identity.Red[mid] {
+			t.Errorf("red should be pulled down: got %d, want < %d", ramp.Red[mid], identity.Red[mid])
+		}
+		if ramp.Green[mid] >= identity.Green[mid] {
+			t.Errorf("green should be pulled down: got %d, want < %d", ramp.Green[mid], identity.Green[mid])
+		}
+		if ramp.Blue[mid] != identity.Blue[mid] {
+			t.Errorf("blue is the reference channel and should be unchanged: got %d, want %d", ramp.Blue[mid], identity.Blue[mid])
+		}
+	})
+
+	t.Run("warmer target warms the output", func(t *testing.T) {
+		ramp, err := ProfileRampWithTemp(size, profile, neutralTemp, 5000, 1, 1)
+		if err != nil {
+			t.Fatalf("ProfileRampWithTemp: %v", err)
+		}
+		if ramp.Red[mid] != identity.Red[mid] {
+			t.Errorf("red is the reference channel and should be unchanged: got %d, want %d", ramp.Red[mid], identity.Red[mid])
+		}
+		if ramp.Green[mid] >= identity.Green[mid] {
+			t.Errorf("green should be pulled down: got %d, want < %d", ramp.Green[mid], identity.Green[mid])
+		}
+		if ramp.Blue[mid] >= identity.Blue[mid] {
+			t.Errorf("blue should be pulled down: got %d, want < %d", ramp.Blue[mid], identity.Blue[mid])
+		}
+	})
 }

@@ -2,12 +2,15 @@ package wayland
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	mocks_wlclient "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlclient"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
 )
@@ -529,4 +532,145 @@ func TestOutputState_RampCurrent(t *testing.T) {
 	assert.False(t, out.rampCurrent(4500, 1.0, 1.0))
 	assert.False(t, out.rampCurrent(5000, 1.2, 1.0))
 	assert.False(t, out.rampCurrent(5000, 1.0, 1.4))
+}
+
+// needsControls decides whether gamma controls are created at all. ICC
+// profiles and per-output temperatures apply independently of the night light
+// schedule, so they have to keep the controls alive: otherwise turning the
+// night light off tears the controls down and drops the ICC ramps.
+func TestManager_NeedsControlsCoversICCAndOutputTemps(t *testing.T) {
+	base := Config{Enabled: false, Gamma: 1.0, Contrast: 1.0}
+
+	cases := []struct {
+		name string
+		cfg  Config
+		want bool
+	}{
+		{"idle", base, false},
+		{"night light on", Config{Enabled: true, Gamma: 1.0, Contrast: 1.0}, true},
+		{"gamma tweak", Config{Gamma: 1.2, Contrast: 1.0}, true},
+		{"contrast tweak", Config{Gamma: 1.0, Contrast: 1.2}, true},
+		{"icc profile only", Config{Gamma: 1.0, Contrast: 1.0, ICCProfiles: map[string]string{"DP-1": "/tmp/display.icc"}}, true},
+		{"output temp only", Config{Gamma: 1.0, Contrast: 1.0, OutputTemps: map[string]int{"DP-1": 7000}}, true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			m := &Manager{config: tc.cfg}
+			assert.Equal(t, tc.want, m.needsControls())
+		})
+	}
+}
+
+// The registry handler can establish the gamma controls before the startup post
+// runs, so loading the configured ICC profiles and temperatures must not depend
+// on the controls still being uninitialized.
+func TestManager_LoadConfiguredICCWhenControlsAlreadyExist(t *testing.T) {
+	dir := t.TempDir()
+	m := &Manager{config: Config{
+		ICCProfiles: map[string]string{"DP-2": filepath.Join(dir, "missing.icm")},
+		OutputTemps: map[string]int{"DP-1": 7000},
+	}}
+	m.controlsInitialized = true
+
+	dp1 := &outputState{id: 1}
+	m.outputs.Store(1, dp1)
+	m.outputNames.Store(1, "DP-1")
+
+	dp2 := &outputState{id: 2}
+	m.outputs.Store(2, dp2)
+	m.outputNames.Store(2, "DP-2")
+
+	if !m.loadConfiguredICC() {
+		t.Fatal("loadConfiguredICC() = false, want true")
+	}
+	assert.Equal(t, 7000, dp1.outputTemp, "configured temperature should attach")
+
+	// An unreadable profile must be skipped without aborting the rest.
+	assert.Empty(t, dp2.iccPath, "unparsable profile should not attach")
+}
+
+// A hotplugged output gets its configured profile and temperature attached as
+// soon as its name is known.
+func TestManager_AttachConfiguredICCForNamedOutput(t *testing.T) {
+	m := &Manager{config: Config{OutputTemps: map[string]int{"DP-3": 6500}}}
+
+	configured := &outputState{id: 3}
+	m.outputs.Store(3, configured)
+	m.outputNames.Store(3, "DP-3")
+
+	m.attachConfiguredICC(3, "DP-3")
+	assert.Equal(t, 6500, configured.outputTemp)
+
+	plain := &outputState{id: 4}
+	m.outputs.Store(4, plain)
+	m.attachConfiguredICC(4, "HDMI-A-1")
+	assert.Zero(t, plain.outputTemp, "outputs without configuration are left alone")
+}
+
+// Each display can keep its own temperature: a per-output override wins over the
+// night light schedule, and 0 means "no override" rather than 0K.
+func TestEffectiveTempTarget(t *testing.T) {
+	cases := []struct {
+		name         string
+		outputTemp   int
+		scheduleTemp int
+		want         int
+	}{
+		{"override wins over the schedule", 7000, 5000, 7000},
+		{"override applies without a schedule", 7000, noTempTarget, 7000},
+		{"schedule applies without an override", 0, 5000, 5000},
+		{"neither configured", 0, noTempTarget, noTempTarget},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := &outputState{outputTemp: tc.outputTemp}
+			assert.Equal(t, tc.want, effectiveTempTarget(out, tc.scheduleTemp))
+		})
+	}
+}
+
+// The status payload is what the settings UI shows for a profile, so the
+// descriptive metadata has to be carried through.
+func TestManager_GetICCStatusDescribesProfile(t *testing.T) {
+	dir := t.TempDir()
+	profilePath := filepath.Join(dir, "display.icm")
+	if err := os.WriteFile(profilePath, []byte("stub"), 0o644); err != nil {
+		t.Fatalf("write stub profile: %v", err)
+	}
+
+	gamma := icc.Curve{Type: icc.CurveParametric, Gamma: 2.2}
+	m := &Manager{}
+	m.outputs.Store(1, &outputState{
+		id:      1,
+		iccPath: profilePath,
+		iccProfile: &icc.Profile{
+			Description: "Test Display",
+			Version:     "2.1.0",
+			Class:       "mntr",
+			ColorSpace:  "RGB",
+			HasTRC:      true,
+			TRC:         [3]icc.Curve{gamma, gamma, gamma},
+			HasVCGT:     true,
+			VCGT:        &icc.VCGT{Channels: 3, Entries: 1024},
+			WhitePoint:  [3]float64{0.9505, 1.0, 1.0890},
+		},
+	})
+	m.outputNames.Store(1, "DP-2")
+
+	status := m.GetICCStatus()["DP-2"]
+	if status == nil {
+		t.Fatal("no status for DP-2")
+	}
+
+	assert.True(t, status.Active)
+	assert.Equal(t, "mntr", status.Class)
+	assert.Equal(t, "gamma", status.TRCKind)
+	assert.Equal(t, 2.2, status.TRCGamma)
+	assert.Equal(t, 3, status.VCGTChannels)
+	assert.Equal(t, 1024, status.VCGTEntries)
+	assert.Equal(t, "D65", status.WhitePointName)
+	assert.Equal(t, int64(4), status.Size)
+	assert.NotZero(t, status.Modified)
 }

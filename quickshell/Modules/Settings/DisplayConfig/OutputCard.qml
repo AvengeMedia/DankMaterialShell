@@ -9,6 +9,9 @@ StyledRect {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    signal requestICCBrowse(string outputName)
+    signal requestICCInfo(string outputName)
+
     required property string outputName
     required property var outputData
     property bool isConnected: outputData?.connected ?? false
@@ -400,6 +403,192 @@ StyledRect {
             onLoaded: {
                 item.outputName = root.outputName;
                 item.outputData = root.outputData;
+            }
+        }
+
+        // ICC Color Profile row
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: Theme.withAlpha(Theme.outline, 0.15)
+            visible: iccProfileRow.visible
+        }
+
+        Row {
+            id: iccProfileRow
+            width: parent.width
+            spacing: Theme.spacingS
+            visible: root.isConnected && !root.isDisabled && ICCService.outputNames.indexOf(root.outputName) !== -1
+
+            property var iccInfo: ICCService.status[root.outputName]
+
+            DankIcon {
+                name: "palette"
+                size: 18
+                color: iccProfileRow.iccInfo ? Theme.primary : Theme.surfaceVariantText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Column {
+                width: parent.width - 18 - Theme.spacingS - iccBrowseButton.width - Theme.spacingS - (iccInfoButton.visible ? iccInfoButton.width + Theme.spacingS : 0) - (iccRemoveButton.visible ? iccRemoveButton.width + Theme.spacingS : 0)
+                spacing: 1
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    text: I18n.tr("Color Profile", "Display Config output card label for the per-monitor ICC profile row")
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    width: parent.width
+                    elide: Text.ElideRight
+                }
+
+                Row {
+                    spacing: Theme.spacingXS
+                    width: parent.width
+
+                    Rectangle {
+                        width: 6
+                        height: 6
+                        radius: 3
+                        color: iccProfileRow.iccInfo ? Theme.success : Theme.withAlpha(Theme.outline, 0.5)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: {
+                            if (!iccProfileRow.iccInfo)
+                                return I18n.tr("No profile", "Display Config output card ICC row when the output has no profile applied");
+                            const info = iccProfileRow.iccInfo;
+                            return info.description || info.path || I18n.tr("Active", "Active");
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: iccProfileRow.iccInfo ? Theme.success : Theme.surfaceVariantText
+                        width: parent.width - 6 - Theme.spacingXS
+                        elide: Text.ElideMiddle
+                    }
+                }
+            }
+
+            DankButton {
+                id: iccBrowseButton
+                text: I18n.tr("Browse", "Browse")
+                iconName: "folder_open"
+                buttonHeight: 30
+                horizontalPadding: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: root.requestICCBrowse(root.outputName)
+            }
+
+            DankButton {
+                id: iccInfoButton
+                text: ""
+                iconName: "info"
+                buttonHeight: 30
+                horizontalPadding: Theme.spacingXS
+                backgroundColor: "transparent"
+                textColor: Theme.surfaceText
+                visible: iccProfileRow.iccInfo !== undefined
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: root.requestICCInfo(root.outputName)
+            }
+
+            DankButton {
+                id: iccRemoveButton
+                text: ""
+                iconName: "close"
+                buttonHeight: 30
+                horizontalPadding: Theme.spacingXS
+                backgroundColor: "transparent"
+                textColor: Theme.error
+                visible: iccProfileRow.iccInfo !== undefined
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: ICCService.removeICC(root.outputName)
+            }
+        }
+
+        // Per-output color temperature slider
+        Row {
+            id: colorTempRow
+            width: parent.width
+            spacing: Theme.spacingS
+            visible: root.isConnected && !root.isDisabled && ICCService.outputNames.indexOf(root.outputName) !== -1
+            leftPadding: 0
+            topPadding: Theme.spacingS
+
+            property int currentTemp: ICCService.outputTemps[root.outputName] !== undefined ? ICCService.outputTemps[root.outputName] : 7000
+            property bool editing: false
+
+            DankIcon {
+                name: "thermostat"
+                size: 18
+                color: colorTempRow.currentTemp !== 7000 ? Theme.primary : Theme.surfaceVariantText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Column {
+                width: parent.width - 18 - Theme.spacingS - tempLabel.width - Theme.spacingS
+                spacing: 1
+                anchors.verticalCenter: parent.verticalCenter
+
+                StyledText {
+                    text: I18n.tr("Color Temperature", "Color Temperature")
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                }
+
+                StyledText {
+                    text: colorTempRow.currentTemp === 0 ? I18n.tr("Default", "Default") : (colorTempRow.currentTemp + "K")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+            }
+
+            StyledText {
+                id: tempLabel
+                text: colorTempRow.editing ? (Math.round(tempSlider.value) + "K") : (colorTempRow.currentTemp === 0 ? I18n.tr("Default", "Default") : (colorTempRow.currentTemp + "K"))
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: colorTempRow.currentTemp !== 7000 && colorTempRow.currentTemp !== 0 ? Theme.primary : Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Item {
+                width: 1
+                height: 1
+            }
+        }
+
+        // Slider row (appears below the temp label when visible)
+        Item {
+            id: tempSliderRow
+            width: parent.width - (18 + Theme.spacingS) - Theme.spacingS
+            height: 48
+            visible: colorTempRow.visible
+            x: 18 + Theme.spacingS
+
+            DankSlider {
+                id: tempSlider
+                width: parent.width
+                anchors.verticalCenter: parent.verticalCenter
+                minimum: 3000
+                maximum: 10000
+                step: 100
+                value: colorTempRow.currentTemp === 0 ? 7000 : colorTempRow.currentTemp
+                showValue: true
+                unit: "K"
+
+                onSliderValueChanged: function (newValue) {
+                    // Keep the label binding (line above) intact: assigning
+                    // tempLabel.text here would freeze it after the first drag.
+                    colorTempRow.editing = true
+                }
+
+                onSliderDragFinished: function (finalValue) {
+                    ICCService.setOutputTemp(root.outputName, finalValue)
+                    colorTempRow.editing = false
+                }
             }
         }
     }

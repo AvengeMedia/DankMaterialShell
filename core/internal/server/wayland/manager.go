@@ -17,6 +17,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/shm"
@@ -25,6 +26,11 @@ import (
 const animKelvinStep = 25
 
 const neutralTemp = 6500
+
+// noTempTarget marks "the night light has no temperature target". Plain outputs
+// then get the neutral ramp, while outputs with an ICC profile stay at the
+// white point their profile was produced at.
+const noTempTarget = -1
 
 func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
@@ -75,13 +81,30 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 	m.wg.Add(1)
 	go m.waylandActor()
 
+	// needsControls() also accounts for ICC profiles and per-output
+	// temperatures, so controls are set up whenever any of them is configured.
 	if m.needsControls() {
 		m.post(func() {
-			if m.controlsInitialized {
-				return
+			// Profiles and temperatures are configured state, not control state:
+			// the registry handler may already have established the controls, and
+			// the configuration still has to be attached.
+			loaded := m.loadConfiguredICC()
+
+			if !m.controlsInitialized {
+				log.Info("Gamma control enabled at startup")
+				m.createControls()
 			}
-			log.Info("Gamma control enabled at startup")
-			m.createControls()
+
+			if loaded {
+				// The attached configuration is invisible to the per-output
+				// dedup, which only compares the schedule-derived
+				// temp/gamma/contrast, so clear that state before applying.
+				m.outputs.Range(func(_ uint32, out *outputState) bool {
+					out.lastTemp = 0
+					return true
+				})
+				m.applyCurrentTemp("startup")
+			}
 		})
 	}
 
@@ -165,6 +188,10 @@ func (m *Manager) setupRegistry() error {
 			outputID := output.ID()
 			output.SetNameHandler(func(ev wlclient.OutputNameEvent) {
 				outputNames[outputID] = ev.Name
+				m.outputNames.Store(outputID, ev.Name)
+				m.post(func() {
+					m.attachConfiguredICC(outputID, ev.Name)
+				})
 			})
 			if gammaMgr != nil {
 				outputs = append(outputs, output)
@@ -411,6 +438,12 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 	}
 	m.setupControlHandlers(outState, control)
 	m.outputs.Store(outputID, outState)
+
+	// The name may already be known (hotplug after the output was announced),
+	// in which case the configured profile/temperature attaches right away.
+	if name, ok := m.outputNames.Load(outputID); ok {
+		m.attachConfiguredICC(outputID, name)
+	}
 	return nil
 }
 
@@ -785,8 +818,10 @@ func (m *Manager) applyCurrentTemp(_ string) {
 	low, high := m.config.LowTemp, m.config.HighTemp
 	m.configMutex.RUnlock()
 
+	// With the night light disabled, outputs with an ICC profile keep the ramp
+	// their profile describes and the rest stay at identity (noTempTarget).
 	if !enabled {
-		m.applyGamma(neutralTemp)
+		m.applyGamma(noTempTarget)
 		m.updateStateFromSchedule()
 		return
 	}
@@ -808,6 +843,20 @@ func (m *Manager) applyCurrentTemp(_ string) {
 
 	m.applyGamma(temp)
 	m.updateStateFromSchedule()
+}
+
+// effectiveTempTarget returns the temperature to render an output at: a
+// per-output override wins over the night light schedule, so each display can
+// keep its own temperature (0 = no override). Without either, the output keeps
+// whatever its profile describes.
+func effectiveTempTarget(out *outputState, scheduleTemp int) int {
+	if out.outputTemp != 0 {
+		return out.outputTemp
+	}
+	if scheduleTemp > 0 {
+		return scheduleTemp
+	}
+	return noTempTarget
 }
 
 func (m *Manager) applyGamma(temp int) {
@@ -850,7 +899,32 @@ func (m *Manager) applyGamma(temp int) {
 		case !m.outputStillValid(out):
 			continue
 		}
-		ramp := GenerateGammaRamp(out.rampSize, temp, gamma, contrast)
+		targetTemp := effectiveTempTarget(out, temp)
+
+		var ramp GammaRamp
+		if out.iccPath != "" && out.iccProfile != nil {
+			// The profile describes the display at the white point display
+			// profiles are produced at (D65); a target temperature is composed
+			// on top of it.
+			profileRamp, err := ProfileRampWithTemp(out.rampSize, out.iccProfile, neutralTemp, targetTemp, gamma, contrast)
+			if err != nil {
+				log.Warnf("icc: failed to generate ramp for output %d: %v, falling back to temperature", out.id, err)
+				fallbackTemp := targetTemp
+				if fallbackTemp <= 0 {
+					fallbackTemp = neutralTemp
+				}
+				ramp = GenerateGammaRamp(out.rampSize, fallbackTemp, gamma, contrast)
+			} else {
+				ramp = profileRamp
+				log.Infof("icc: applied ICC ramp to output %d (size=%d, ref=%dK, target=%dK)", out.id, out.rampSize, neutralTemp, targetTemp)
+			}
+		} else {
+			outTemp := targetTemp
+			if outTemp <= 0 {
+				outTemp = neutralTemp
+			}
+			ramp = GenerateGammaRamp(out.rampSize, outTemp, gamma, contrast)
+		}
 		buf := bytes.NewBuffer(make([]byte, 0, int(out.rampSize)*6))
 		for _, v := range ramp.Red {
 			binary.Write(buf, binary.LittleEndian, v)
@@ -960,6 +1034,8 @@ func (m *Manager) updateStateFromSchedule() {
 		NightTime:      times.Night,
 		IsDay:          isDay,
 		SunPosition:    pos,
+		ICCProfiles:    m.GetICCStatus(),
+		OutputTemps:    m.GetOutputTemps(),
 	}
 
 	m.stateMutex.Lock()
@@ -1224,7 +1300,11 @@ func (m *Manager) SetEnabled(enabled bool) {
 func (m *Manager) needsControls() bool {
 	m.configMutex.RLock()
 	defer m.configMutex.RUnlock()
-	return m.config.Enabled || m.config.Gamma != 1.0 || m.config.Contrast != 1.0
+	return m.config.Enabled ||
+		m.config.Gamma != 1.0 ||
+		m.config.Contrast != 1.0 ||
+		len(m.config.ICCProfiles) > 0 ||
+		len(m.config.OutputTemps) > 0
 }
 
 func (m *Manager) syncControls() {
@@ -1265,6 +1345,303 @@ func (m *Manager) destroyControls() {
 		return true
 	})
 	m.controlsInitialized = false
+}
+
+// loadConfiguredICC attaches the configured ICC profiles and per-output
+// temperatures to the outputs that are already known, and reports whether
+// anything was attached.
+func (m *Manager) loadConfiguredICC() bool {
+	m.configMutex.RLock()
+	iccProfiles := m.config.ICCProfiles
+	outputTemps := m.config.OutputTemps
+	m.configMutex.RUnlock()
+
+	if len(iccProfiles) == 0 && len(outputTemps) == 0 {
+		return false
+	}
+
+	attached := 0
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		name, ok := m.outputNames.Load(out.id)
+		if !ok {
+			return true
+		}
+		if m.applyConfiguredICCForOutput(out, name, iccProfiles, outputTemps) {
+			attached++
+		}
+		return true
+	})
+
+	log.Infof("icc: config has %d profile(s) and %d temperature override(s), attached to %d output(s)",
+		len(iccProfiles), len(outputTemps), attached)
+	return attached > 0
+}
+
+// attachConfiguredICC attaches the configured profile and temperature to an
+// output whose name just became known, so a hotplugged output comes up
+// corrected without an explicit re-apply.
+func (m *Manager) attachConfiguredICC(outputID uint32, outputName string) {
+	m.configMutex.RLock()
+	iccProfiles := m.config.ICCProfiles
+	outputTemps := m.config.OutputTemps
+	m.configMutex.RUnlock()
+
+	if len(iccProfiles) == 0 && len(outputTemps) == 0 {
+		return
+	}
+
+	changed := false
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		if out.id != outputID {
+			return true
+		}
+		changed = m.applyConfiguredICCForOutput(out, outputName, iccProfiles, outputTemps)
+		if changed {
+			log.Infof("icc: attached configured profile/temperature to output %s", outputName)
+			out.lastTemp = 0
+		}
+		return false
+	})
+
+	if changed {
+		m.applyCurrentTemp("output-name")
+	}
+}
+
+// applyConfiguredICCForOutput applies the configured profile and temperature of
+// one output and reports whether anything changed.
+func (m *Manager) applyConfiguredICCForOutput(out *outputState, outputName string, iccProfiles map[string]string, outputTemps map[string]int) bool {
+	changed := false
+
+	if temp, ok := outputTemps[outputName]; ok {
+		out.outputTemp = temp
+		changed = true
+	}
+
+	if iccPath, ok := iccProfiles[outputName]; ok {
+		profile, err := icc.ParseFile(iccPath)
+		if err != nil {
+			log.Warnf("icc: failed to load profile for output %q: %v", outputName, err)
+		} else {
+			out.iccPath = iccPath
+			out.iccProfile = profile
+			changed = true
+		}
+	}
+
+	return changed
+}
+
+// ApplyICC loads and applies an ICC profile to a specific output.
+// outputName is the wl_output name (e.g., "DP-1").
+// iccPath is the path to the .icm/.icc profile file.
+func (m *Manager) ApplyICC(outputName, iccPath string) error {
+	// 1. Parse and validate the ICC profile
+	profile, err := icc.ParseFile(iccPath)
+	if err != nil {
+		return fmt.Errorf("icc: failed to parse %s: %w", iccPath, err)
+	}
+	if profile.ColorSpace != "RGB" {
+		return fmt.Errorf("icc: unsupported color space %q, only RGB supported", profile.ColorSpace)
+	}
+	if !profile.HasVCGT && !profile.HasTRC {
+		return fmt.Errorf("icc: profile has neither vcgt nor TRC curves, cannot generate gamma ramp")
+	}
+
+	// 2. Post to wayland actor thread to apply
+	m.post(func() {
+		// If output controls aren't initialized (gamma/night-light disabled),
+		// initialize them now so ICC can work independently.
+		if !m.controlsInitialized {
+			gammaMgr, ok := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
+			if !ok {
+				log.Warnf("icc: gamma control manager not available")
+				return
+			}
+			m.availOutputsMu.RLock()
+			outs := slices.Clone(m.availableOutputs)
+			m.availOutputsMu.RUnlock()
+			if err := m.setupOutputControls(outs, gammaMgr); err != nil {
+				log.Errorf("icc: failed to initialize output controls: %v", err)
+				return
+			}
+			m.controlsInitialized = true
+			log.Info("icc: output controls initialized (gamma was disabled)")
+		}
+
+		// Find the output by name
+		var targetOutput *outputState
+		m.outputs.Range(func(_ uint32, out *outputState) bool {
+			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				targetOutput = out
+				return false // stop
+			}
+			return true
+		})
+		if targetOutput == nil {
+			log.Warnf("icc: output %q not found", outputName)
+			return
+		}
+
+		targetOutput.iccPath = iccPath
+		targetOutput.iccProfile = profile
+
+		// The new profile is invisible to the per-output dedup, so clear this
+		// output's state to force a fresh ramp.
+		targetOutput.lastTemp = 0
+		m.applyCurrentTemp("icc-apply")
+	})
+
+	// 3. Persist to config
+	m.configMutex.Lock()
+	if m.config.ICCProfiles == nil {
+		m.config.ICCProfiles = make(map[string]string)
+	}
+	m.config.ICCProfiles[outputName] = iccPath
+	savedConfig := m.config
+	m.configMutex.Unlock()
+
+	// Save to disk
+	if err := SaveConfig(savedConfig); err != nil {
+		log.Warnf("icc: failed to save config: %v", err)
+	}
+
+	// 4. Notify subscribers
+	m.updateStateFromSchedule()
+
+	return nil
+}
+
+// RemoveICC removes the ICC profile from a specific output, reverting to temperature-based gamma.
+func (m *Manager) RemoveICC(outputName string) error {
+	m.post(func() {
+		m.outputs.Range(func(_ uint32, out *outputState) bool {
+			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				out.iccPath = ""
+				out.iccProfile = nil
+				out.lastTemp = 0
+				m.applyCurrentTemp("icc-remove")
+				return false
+			}
+			return true
+		})
+	})
+
+	m.configMutex.Lock()
+	delete(m.config.ICCProfiles, outputName)
+	savedConfig := m.config
+	m.configMutex.Unlock()
+
+	if err := SaveConfig(savedConfig); err != nil {
+		log.Warnf("icc: failed to save config: %v", err)
+	}
+
+	m.updateStateFromSchedule()
+	return nil
+}
+
+// GetICCStatus returns current ICC profile status for all outputs.
+func (m *Manager) GetICCStatus() map[string]*ICCStatus {
+	result := make(map[string]*ICCStatus)
+
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		name, nameOK := m.outputNames.Load(out.id)
+		if !nameOK || out.iccPath == "" {
+			return true
+		}
+		status := &ICCStatus{
+			Path:   out.iccPath,
+			Active: out.iccProfile != nil,
+		}
+		if profile := out.iccProfile; profile != nil {
+			status.Description = profile.Description
+			status.Version = profile.Version
+			status.ColorSpace = profile.ColorSpace
+			status.Class = profile.Class
+			status.HasVCGT = profile.HasVCGT
+			status.TRCKind, status.TRCGamma, status.TRCEntries = profile.TRCKind()
+			if profile.VCGT != nil {
+				status.VCGTChannels = profile.VCGT.Channels
+				status.VCGTEntries = profile.VCGT.Entries
+			}
+			if x, y, ok := profile.WhitePointXY(); ok {
+				status.WhitePointX = x
+				status.WhitePointY = y
+				status.WhitePointCCT = profile.WhitePointCCT()
+				status.WhitePointName = profile.WhitePointName()
+			}
+		}
+		if info, err := os.Stat(out.iccPath); err == nil {
+			status.Size = info.Size()
+			status.Modified = info.ModTime().Unix()
+		}
+		result[name] = status
+		return true
+	})
+
+	return result
+}
+
+// ListOutputs returns a list of all output names for ICC assignment.
+func (m *Manager) ListOutputs() []string {
+	var names []string
+	m.outputNames.Range(func(_ uint32, name string) bool {
+		names = append(names, name)
+		return true
+	})
+	return names
+}
+
+// SetOutputTemp sets a per-output color temperature (1000K-10000K).
+// A value of 0 resets to the global default.
+func (m *Manager) SetOutputTemp(outputName string, temp int) error {
+	if temp != 0 && (temp < 1000 || temp > 10000) {
+		return fmt.Errorf("temperature %d out of range (1000-10000)", temp)
+	}
+
+	m.post(func() {
+		m.outputs.Range(func(_ uint32, out *outputState) bool {
+			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				out.outputTemp = temp
+				out.lastTemp = 0
+				m.applyCurrentTemp("output-temp-change")
+				return false
+			}
+			return true
+		})
+	})
+
+	// Persist to config
+	m.configMutex.Lock()
+	if m.config.OutputTemps == nil {
+		m.config.OutputTemps = make(map[string]int)
+	}
+	if temp == 0 {
+		delete(m.config.OutputTemps, outputName)
+	} else {
+		m.config.OutputTemps[outputName] = temp
+	}
+	savedConfig := m.config
+	m.configMutex.Unlock()
+
+	if err := SaveConfig(savedConfig); err != nil {
+		log.Warnf("icc: failed to save config: %v", err)
+	}
+
+	m.updateStateFromSchedule()
+	return nil
+}
+
+// GetOutputTemps returns current per-output temperatures.
+func (m *Manager) GetOutputTemps() map[string]int {
+	result := make(map[string]int)
+	m.outputs.Range(func(_ uint32, out *outputState) bool {
+		if name, ok := m.outputNames.Load(out.id); ok {
+			result[name] = out.outputTemp
+		}
+		return true
+	})
+	return result
 }
 
 func (m *Manager) Close() {
