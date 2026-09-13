@@ -95,7 +95,7 @@ func newManager(client tailscaleClient) *Manager {
 func (m *Manager) watchLoop(ctx context.Context) {
 	defer m.watchWG.Done()
 
-	mask := ipn.NotifyInitialState | ipn.NotifyInitialNetMap | ipn.NotifyRateLimit
+	mask := ipn.NotifyInitialState | ipn.NotifyInitialPrefs | ipn.NotifyInitialNetMap | ipn.NotifyRateLimit
 	backoff := time.Second
 	unreachableSent := false
 
@@ -122,8 +122,13 @@ func (m *Manager) watchLoop(ctx context.Context) {
 		log.Info("[Tailscale] Connected to IPN bus")
 		m.markAvailable()
 
+		select {
+		case m.dirty <- struct{}{}:
+		default:
+		}
+
 		for {
-			notify, err := watcher.Next()
+			_, err := watcher.Next()
 			if err != nil {
 				log.Warnf("[Tailscale] IPN bus error: %v", err)
 				break
@@ -131,9 +136,6 @@ func (m *Manager) watchLoop(ctx context.Context) {
 
 			backoff = time.Second
 
-			if notify.State == nil && notify.NetMap == nil { //nolint:staticcheck // NetMap is deprecated upstream but still the only activity signal on some platforms
-				continue
-			}
 			select {
 			case m.dirty <- struct{}{}:
 			default:

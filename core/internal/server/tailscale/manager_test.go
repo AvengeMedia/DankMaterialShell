@@ -418,3 +418,26 @@ func TestManager_Actions_PropagateError(t *testing.T) {
 	assert.Error(t, m.SetExitNode("nABC123"))
 	assert.Error(t, m.SetAllowLANAccess(true))
 }
+
+func TestWatchLoop_NotifyWithoutStateOrNetMap(t *testing.T) {
+	var statusCalls atomic.Int32
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			return newMockWatcher(ctx,
+				[]ipn.Notify{{Engine: &ipn.EngineStatus{}}},
+				fmt.Errorf("done"),
+			), nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
+			statusCalls.Add(1)
+			return runningStatus(), nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	require.Eventually(t, func() bool {
+		return statusCalls.Load() >= 1
+	}, 2*time.Second, 10*time.Millisecond)
+}
