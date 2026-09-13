@@ -33,9 +33,7 @@ func convertStatus(status *ipnstate.Status) *TailscaleState {
 
 	if status.Self != nil {
 		state.Self = convertPeerStatus(status.Self, users)
-		if connected {
-			state.Self.Online = true
-		}
+		state.Self.Online = true
 	}
 
 	if len(status.Peer) > 0 {
