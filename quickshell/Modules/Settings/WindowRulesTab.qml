@@ -740,18 +740,18 @@ Item {
 
                                             DankActionButton {
                                                 id: deleteBtn
-                                                property bool hovered: false
+                                                property bool _hov: false
                                                 buttonSize: 28
                                                 iconName: "delete"
                                                 iconSize: 16
                                                 backgroundColor: "transparent"
-                                                iconColor: hovered ? Theme.error : Theme.surfaceVariantText
+                                                iconColor: _hov ? Theme.error : Theme.surfaceVariantText
                                                 enabled: !root.readOnly
                                                 opacity: enabled ? 1 : 0.5
                                                 tooltipText: I18n.tr("Delete Rule")
                                                 tooltipSide: "top"
-                                                onEntered: hovered = true
-                                                onExited: hovered = false
+                                                onEntered: _hov = true
+                                                onExited: _hov = false
                                                 onClicked: root.removeRule(ruleDelegateItem.ruleIdRef)
                                             }
                                         }
