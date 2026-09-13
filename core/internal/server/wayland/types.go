@@ -69,6 +69,21 @@ type ICCStatus struct {
 	ColorSpace  string `json:"colorSpace"`  // e.g., "RGB"
 	HasVCGT     bool   `json:"hasVCGT"`     // has video card gamma table
 	Active      bool   `json:"active"`      // currently applied
+
+	// Descriptive profile metadata, surfaced in the UI so a profile can be
+	// identified without leaving the settings page.
+	Class          string  `json:"class,omitempty"`          // "mntr", "scnr", "prtr"
+	TRCKind        string  `json:"trcKind,omitempty"`        // "identity", "gamma", "table", "mixed"
+	TRCGamma       float64 `json:"trcGamma,omitempty"`       // when TRCKind is "gamma"
+	TRCEntries     int     `json:"trcEntries,omitempty"`     // when TRCKind is "table"
+	VCGTChannels   int     `json:"vcgtChannels,omitempty"`   // channels in the video card gamma table
+	VCGTEntries    int     `json:"vcgtEntries,omitempty"`    // entries per channel
+	WhitePointX    float64 `json:"whitePointX,omitempty"`    // chromaticity x
+	WhitePointY    float64 `json:"whitePointY,omitempty"`    // chromaticity y
+	WhitePointCCT  int     `json:"whitePointCCT,omitempty"`  // correlated color temperature (K)
+	WhitePointName string  `json:"whitePointName,omitempty"` // "D50", "D65", ...
+	Size           int64   `json:"size,omitempty"`           // profile file size in bytes
+	Modified       int64   `json:"modified,omitempty"`       // profile file mtime, unix seconds
 }
 
 type cmd struct {

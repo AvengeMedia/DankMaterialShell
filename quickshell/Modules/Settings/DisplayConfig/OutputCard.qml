@@ -10,6 +10,7 @@ StyledRect {
     LayoutMirroring.childrenInherit: true
 
     signal requestICCBrowse(string outputName)
+    signal requestICCInfo(string outputName)
 
     required property string outputName
     required property var outputData
@@ -429,7 +430,7 @@ StyledRect {
             }
 
             Column {
-                width: parent.width - 18 - Theme.spacingS - iccBrowseButton.width - Theme.spacingS - (iccRemoveButton.visible ? iccRemoveButton.width + Theme.spacingS : 0)
+                width: parent.width - 18 - Theme.spacingS - iccBrowseButton.width - Theme.spacingS - (iccInfoButton.visible ? iccInfoButton.width + Theme.spacingS : 0) - (iccRemoveButton.visible ? iccRemoveButton.width + Theme.spacingS : 0)
                 spacing: 1
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -477,6 +478,19 @@ StyledRect {
                 horizontalPadding: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: root.requestICCBrowse(root.outputName)
+            }
+
+            DankButton {
+                id: iccInfoButton
+                text: ""
+                iconName: "info"
+                buttonHeight: 30
+                horizontalPadding: Theme.spacingXS
+                backgroundColor: "transparent"
+                textColor: Theme.surfaceText
+                visible: iccProfileRow.iccInfo !== undefined
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: root.requestICCInfo(root.outputName)
             }
 
             DankButton {

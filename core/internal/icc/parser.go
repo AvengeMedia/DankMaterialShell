@@ -618,3 +618,93 @@ func uint16Clamp(v float64) uint16 {
 	}
 	return uint16(v + 0.5) // round to nearest
 }
+
+// WhitePointXY returns the chromaticity coordinates of the profile white point.
+func (p *Profile) WhitePointXY() (float64, float64, bool) {
+	sum := p.WhitePoint[0] + p.WhitePoint[1] + p.WhitePoint[2]
+	if sum <= 0 {
+		return 0, 0, false
+	}
+	return p.WhitePoint[0] / sum, p.WhitePoint[1] / sum, true
+}
+
+// WhitePointCCT estimates the correlated color temperature of the profile white
+// point in kelvin using McCamy's approximation. It returns 0 when the white
+// point is missing or the estimate is out of range.
+func (p *Profile) WhitePointCCT() int {
+	x, y, ok := p.WhitePointXY()
+	if !ok {
+		return 0
+	}
+	denominator := 0.1858 - y
+	if math.Abs(denominator) < 1e-9 {
+		return 0
+	}
+	n := (x - 0.3320) / denominator
+	cct := 449.0*n*n*n + 3525.0*n*n + 6823.3*n + 5520.33
+	if cct < 1000 || cct > 40000 {
+		return 0
+	}
+	return int(math.Round(cct))
+}
+
+// WhitePointName names the white point when it is close to a standard
+// illuminant ("D50", "D65"), or returns an empty string.
+func (p *Profile) WhitePointName() string {
+	cct := p.WhitePointCCT()
+	switch {
+	case cct == 0:
+		return ""
+	case math.Abs(float64(cct)-6504) <= 150:
+		return "D65"
+	case math.Abs(float64(cct)-5003) <= 150:
+		return "D50"
+	default:
+		return ""
+	}
+}
+
+// TRCKind describes how the tone reproduction curves are stored: "identity",
+// "gamma", "table" or "mixed". gamma and entries are only set when all three
+// channels agree.
+func (p *Profile) TRCKind() (kind string, gamma float64, entries int) {
+	if !p.HasTRC {
+		return "", 0, 0
+	}
+
+	identity, parametric, tables := 0, 0, 0
+	sameGamma := true
+	sameEntries := true
+	for i, curve := range p.TRC {
+		switch curve.Type {
+		case CurveIdentity:
+			identity++
+		case CurveParametric:
+			parametric++
+		case CurveTable:
+			tables++
+		}
+		if i == 0 {
+			gamma = curve.Gamma
+			entries = len(curve.Entries)
+			continue
+		}
+		if curve.Gamma != gamma {
+			sameGamma = false
+		}
+		if len(curve.Entries) != entries {
+			sameEntries = false
+		}
+	}
+
+	switch {
+	case identity == len(p.TRC):
+		return "identity", 0, 0
+	case parametric == len(p.TRC) && sameGamma:
+		return "gamma", gamma, 0
+	case tables == len(p.TRC) && sameEntries:
+		return "table", 0, entries
+	default:
+		return "mixed", 0, 0
+	}
+}

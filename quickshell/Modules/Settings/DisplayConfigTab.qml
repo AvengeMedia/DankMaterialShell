@@ -621,6 +621,7 @@ Item {
                                     pendingICCOutput = name;
                                     iccFileBrowser.open();
                                 }
+                                onRequestICCInfo: name => iccInfoModal.showProfile(name)
                             }
                         }
                     }
@@ -653,6 +654,10 @@ Item {
                 visible: !DisplayConfigState.hasOutputBackend
             }
         }
+    }
+
+    ICCProfileInfoModal {
+        id: iccInfoModal
     }
 
     FileBrowserModal {

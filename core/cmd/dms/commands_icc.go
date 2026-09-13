@@ -241,8 +241,21 @@ func runICCInfo(cmd *cobra.Command, args []string) {
 		fmt.Println()
 	}
 
-	fmt.Printf("White Point: %.4f %.4f %.4f\n",
-		profile.WhitePoint[0], profile.WhitePoint[1], profile.WhitePoint[2])
+	if x, y, ok := profile.WhitePointXY(); ok {
+		cct := profile.WhitePointCCT()
+		name := profile.WhitePointName()
+		switch {
+		case name != "" && cct > 0:
+			fmt.Printf("White Point: %s (%.4f, %.4f, %dK)\n", name, x, y, cct)
+		case cct > 0:
+			fmt.Printf("White Point: (%.4f, %.4f, %dK)\n", x, y, cct)
+		default:
+			fmt.Printf("White Point: (%.4f, %.4f)\n", x, y)
+		}
+	} else {
+		fmt.Printf("White Point: %.4f %.4f %.4f\n",
+			profile.WhitePoint[0], profile.WhitePoint[1], profile.WhitePoint[2])
+	}
 }
 
 func runICCApply(cmd *cobra.Command, args []string) {

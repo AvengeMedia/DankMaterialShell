@@ -2,6 +2,7 @@ package wayland
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	mocks_wlclient "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlclient"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
 )
@@ -627,4 +629,48 @@ func TestEffectiveTempTarget(t *testing.T) {
 			assert.Equal(t, tc.want, effectiveTempTarget(out, tc.scheduleTemp))
 		})
 	}
+}
+
+// The status payload is what the settings UI shows for a profile, so the
+// descriptive metadata has to be carried through.
+func TestManager_GetICCStatusDescribesProfile(t *testing.T) {
+	dir := t.TempDir()
+	profilePath := filepath.Join(dir, "display.icm")
+	if err := os.WriteFile(profilePath, []byte("stub"), 0o644); err != nil {
+		t.Fatalf("write stub profile: %v", err)
+	}
+
+	gamma := icc.Curve{Type: icc.CurveParametric, Gamma: 2.2}
+	m := &Manager{}
+	m.outputs.Store(1, &outputState{
+		id:      1,
+		iccPath: profilePath,
+		iccProfile: &icc.Profile{
+			Description: "Test Display",
+			Version:     "2.1.0",
+			Class:       "mntr",
+			ColorSpace:  "RGB",
+			HasTRC:      true,
+			TRC:         [3]icc.Curve{gamma, gamma, gamma},
+			HasVCGT:     true,
+			VCGT:        &icc.VCGT{Channels: 3, Entries: 1024},
+			WhitePoint:  [3]float64{0.9505, 1.0, 1.0890},
+		},
+	})
+	m.outputNames.Store(1, "DP-2")
+
+	status := m.GetICCStatus()["DP-2"]
+	if status == nil {
+		t.Fatal("no status for DP-2")
+	}
+
+	assert.True(t, status.Active)
+	assert.Equal(t, "mntr", status.Class)
+	assert.Equal(t, "gamma", status.TRCKind)
+	assert.Equal(t, 2.2, status.TRCGamma)
+	assert.Equal(t, 3, status.VCGTChannels)
+	assert.Equal(t, 1024, status.VCGTEntries)
+	assert.Equal(t, "D65", status.WhitePointName)
+	assert.Equal(t, int64(4), status.Size)
+	assert.NotZero(t, status.Modified)
 }

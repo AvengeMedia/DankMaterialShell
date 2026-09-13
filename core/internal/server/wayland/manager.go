@@ -1553,11 +1553,27 @@ func (m *Manager) GetICCStatus() map[string]*ICCStatus {
 			Path:   out.iccPath,
 			Active: out.iccProfile != nil,
 		}
-		if out.iccProfile != nil {
-			status.Description = out.iccProfile.Description
-			status.Version = out.iccProfile.Version
-			status.ColorSpace = out.iccProfile.ColorSpace
-			status.HasVCGT = out.iccProfile.HasVCGT
+		if profile := out.iccProfile; profile != nil {
+			status.Description = profile.Description
+			status.Version = profile.Version
+			status.ColorSpace = profile.ColorSpace
+			status.Class = profile.Class
+			status.HasVCGT = profile.HasVCGT
+			status.TRCKind, status.TRCGamma, status.TRCEntries = profile.TRCKind()
+			if profile.VCGT != nil {
+				status.VCGTChannels = profile.VCGT.Channels
+				status.VCGTEntries = profile.VCGT.Entries
+			}
+			if x, y, ok := profile.WhitePointXY(); ok {
+				status.WhitePointX = x
+				status.WhitePointY = y
+				status.WhitePointCCT = profile.WhitePointCCT()
+				status.WhitePointName = profile.WhitePointName()
+			}
+		}
+		if info, err := os.Stat(out.iccPath); err == nil {
+			status.Size = info.Size()
+			status.Modified = info.ModTime().Unix()
 		}
 		result[name] = status
 		return true
