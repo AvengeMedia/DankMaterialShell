@@ -631,6 +631,44 @@ func TestEffectiveTempTarget(t *testing.T) {
 	}
 }
 
+// A re-created gamma control (night light toggled, outputs re-enumerated) must
+// not drop the configured ICC state of the output it belongs to.
+func TestManager_ControlStateReuseKeepsAttachedICC(t *testing.T) {
+	m := &Manager{}
+	existing := &outputState{
+		id:           1,
+		registryName: 10,
+		iccPath:      "/tmp/display.icm",
+		iccProfile:   &icc.Profile{Description: "Test Display"},
+		outputTemp:   7000,
+		rampSize:     256,
+		failed:       true,
+		retryCount:   3,
+		lastFailTime: time.Now(),
+		lastTemp:     7000,
+		lastGamma:    1.1,
+		lastContrast: 0.9,
+	}
+	m.outputs.Store(1, existing)
+
+	got := m.controlStateFor(1, 10, nil, "control-2")
+
+	assert.Same(t, existing, got, "the output keeps its state across control re-creation")
+	assert.Equal(t, "/tmp/display.icm", got.iccPath, "the attached profile survives")
+	assert.Equal(t, 7000, got.outputTemp, "the per-output temperature survives")
+	assert.Equal(t, "control-2", got.gammaControl, "the new control is attached")
+
+	assert.Zero(t, got.rampSize, "the new control has not reported gamma_size yet")
+	assert.False(t, got.failed)
+	assert.Zero(t, got.retryCount)
+	assert.Zero(t, got.lastTemp, "the ramp has to be written again")
+
+	fresh := m.controlStateFor(2, 20, nil, "control-3")
+	assert.NotSame(t, existing, fresh)
+	assert.Empty(t, fresh.iccPath, "an output seen for the first time starts clean")
+	assert.Zero(t, fresh.outputTemp)
+}
+
 // The status payload is what the settings UI shows for a profile, so the
 // descriptive metadata has to be carried through.
 func TestManager_GetICCStatusDescribesProfile(t *testing.T) {

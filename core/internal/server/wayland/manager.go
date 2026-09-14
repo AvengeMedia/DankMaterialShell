@@ -267,16 +267,40 @@ func (m *Manager) setupOutputControls(outputs []*wlclient.Output, manager *wlr_g
 		}
 		outputID := output.ID()
 		registryName, _ := m.outputRegNames.Load(outputID)
-		outState := &outputState{
+		outState := m.controlStateFor(outputID, registryName, output, control)
+		m.setupControlHandlers(outState, control)
+		m.outputs.Store(outputID, outState)
+	}
+	return nil
+}
+
+// controlStateFor returns the state a (re)created gamma control is attached to.
+// A re-created control must not drop what belongs to the output rather than to
+// the control: the attached ICC profile and the per-output temperature survive,
+// while the ramp bookkeeping and the failure budget start over so the new
+// control receives a fresh ramp once it reports gamma_size.
+func (m *Manager) controlStateFor(outputID, registryName uint32, output *wlclient.Output, control any) *outputState {
+	existing, ok := m.outputs.Load(outputID)
+	if !ok {
+		return &outputState{
 			id:           outputID,
 			registryName: registryName,
 			output:       output,
 			gammaControl: control,
 		}
-		m.setupControlHandlers(outState, control)
-		m.outputs.Store(outputID, outState)
 	}
-	return nil
+
+	existing.registryName = registryName
+	existing.output = output
+	existing.gammaControl = control
+	existing.rampSize = 0
+	existing.failed = false
+	existing.retryCount = 0
+	existing.lastFailTime = time.Time{}
+	existing.lastTemp = 0
+	existing.lastGamma = 0
+	existing.lastContrast = 0
+	return existing
 }
 
 func (m *Manager) setupControlHandlers(state *outputState, control *wlr_gamma_control.ZwlrGammaControlV1) {
