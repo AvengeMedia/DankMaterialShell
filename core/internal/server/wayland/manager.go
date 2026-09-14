@@ -398,34 +398,49 @@ func (m *Manager) removeAvailableOutput(o *wlclient.Output) {
 // removeOutputByRegistryName tears down the state of an output that left the
 // compositor (unplugged or asleep). Only the wayland actor goroutine calls it.
 func (m *Manager) removeOutputByRegistryName(registryName uint32) {
-	var foundID uint32
+	// Resolve the object ID from the registry name map: both name maps are
+	// populated for every wl_output, whether or not a gamma control exists for
+	// it, while m.outputs only has entries once the controls exist. On a default
+	// install (night light off, no profile, no override) no control is ever
+	// created, and the name entries still have to go with the output.
+	foundID, found := m.outputIDForRegistryName(registryName)
+
 	var foundOut *outputState
-	m.outputs.Range(func(id uint32, out *outputState) bool {
-		if out.registryName == registryName {
-			foundID = id
+	if found {
+		if out, ok := m.outputs.Load(foundID); ok {
 			foundOut = out
-			return false
 		}
-		return true
-	})
-	if foundOut == nil {
+	} else {
+		// An output whose name never arrived is only known through its state.
+		m.outputs.Range(func(id uint32, out *outputState) bool {
+			if out.registryName == registryName {
+				foundID, foundOut, found = id, out, true
+				return false
+			}
+			return true
+		})
+	}
+	if !found {
 		return
 	}
-	if foundOut.gammaControl != nil {
-		foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
-		foundOut.gammaControl = nil
-	}
-	m.removeAvailableOutput(foundOut.output)
-	if foundOut.output != nil && !foundOut.output.IsZombie() {
-		_ = foundOut.output.Release()
-	}
-	m.outputs.Delete(foundID)
-	// The name entries have to go with the output: they are what
-	// `dms icc status`/`listOutputs` report, and a rebound wl_output reusing a
-	// released object ID would otherwise attach the previous monitor's profile
-	// from the stale name.
+
+	// The name entries go first: they are what `dms icc status`/`listOutputs`
+	// report, and a rebound wl_output reusing a released object ID would
+	// otherwise attach the previous monitor's profile from the stale name.
 	m.outputNames.Delete(foundID)
 	m.outputRegNames.Delete(foundID)
+
+	if foundOut != nil {
+		if foundOut.gammaControl != nil {
+			foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
+			foundOut.gammaControl = nil
+		}
+		m.removeAvailableOutput(foundOut.output)
+		if foundOut.output != nil && !foundOut.output.IsZombie() {
+			_ = foundOut.output.Release()
+		}
+		m.outputs.Delete(foundID)
+	}
 	m.publishICCState()
 
 	hasOutputs := false
@@ -436,6 +451,21 @@ func (m *Manager) removeOutputByRegistryName(registryName uint32) {
 	if !hasOutputs {
 		m.controlsInitialized = false
 	}
+}
+
+// outputIDForRegistryName maps a wl_output registry name back to the object ID
+// it was announced with.
+func (m *Manager) outputIDForRegistryName(registryName uint32) (uint32, bool) {
+	var foundID uint32
+	var found bool
+	m.outputRegNames.Range(func(id, name uint32) bool {
+		if name == registryName {
+			foundID, found = id, true
+			return false
+		}
+		return true
+	})
+	return foundID, found
 }
 
 func (m *Manager) outputStillValid(out *outputState) bool {
@@ -1583,8 +1613,9 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 	savedConfig := cloneConfig(m.config)
 	m.configMutex.Unlock()
 
-	// Save to disk
-	if err := SaveConfig(savedConfig); err != nil {
+	// Save to disk. Only the ICC fields are written: the night light fields in
+	// this config belong to the shell, not to the daemon.
+	if err := SaveICCConfig(savedConfig.ICCProfiles, savedConfig.OutputTemps); err != nil {
 		log.Warnf("icc: failed to save config: %v", err)
 	}
 
@@ -1614,7 +1645,7 @@ func (m *Manager) RemoveICC(outputName string) error {
 	savedConfig := cloneConfig(m.config)
 	m.configMutex.Unlock()
 
-	if err := SaveConfig(savedConfig); err != nil {
+	if err := SaveICCConfig(savedConfig.ICCProfiles, savedConfig.OutputTemps); err != nil {
 		log.Warnf("icc: failed to save config: %v", err)
 	}
 
@@ -1733,7 +1764,7 @@ func (m *Manager) SetOutputTemp(outputName string, temp int) error {
 	savedConfig := cloneConfig(m.config)
 	m.configMutex.Unlock()
 
-	if err := SaveConfig(savedConfig); err != nil {
+	if err := SaveICCConfig(savedConfig.ICCProfiles, savedConfig.OutputTemps); err != nil {
 		log.Warnf("icc: failed to save config: %v", err)
 	}
 

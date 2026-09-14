@@ -516,13 +516,16 @@ StyledRect {
             leftPadding: 0
             topPadding: Theme.spacingS
 
-            property int currentTemp: ICCService.outputTemps[root.outputName] !== undefined ? ICCService.outputTemps[root.outputName] : 7000
+            // 0 is "no override": the daemon only publishes an entry for an
+            // output that has one, and the night light temperature is not this
+            // value, so a fallback of 7000K would claim a setting nobody made.
+            property int currentTemp: ICCService.outputTemps[root.outputName] !== undefined ? ICCService.outputTemps[root.outputName] : 0
             property bool editing: false
 
             DankIcon {
                 name: "thermostat"
                 size: 18
-                color: colorTempRow.currentTemp !== 7000 ? Theme.primary : Theme.surfaceVariantText
+                color: colorTempRow.currentTemp !== 0 ? Theme.primary : Theme.surfaceVariantText
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -550,7 +553,7 @@ StyledRect {
                 text: colorTempRow.editing ? (Math.round(tempSlider.value) + "K") : (colorTempRow.currentTemp === 0 ? I18n.tr("Default", "Default") : (colorTempRow.currentTemp + "K"))
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
-                color: colorTempRow.currentTemp !== 7000 && colorTempRow.currentTemp !== 0 ? Theme.primary : Theme.surfaceText
+                color: colorTempRow.currentTemp !== 0 ? Theme.primary : Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
             }
 

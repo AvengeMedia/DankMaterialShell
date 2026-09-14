@@ -3,6 +3,8 @@ package wayland
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -409,4 +411,37 @@ func TestStateChanged(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The night light fields in wayland.json belong to the shell: the daemon reads
+// them at boot and the shell pushes changes through IPC, so an ICC change must
+// not write the daemon's copy of them back to disk. Otherwise applying a profile
+// while the night light happens to be on persists "Enabled": true, and the mode
+// comes back after a session restart with no way to resync from the UI.
+func TestSaveICCConfigKeepsNightLightFields(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	onDisk := Config{
+		Enabled:  true,
+		LowTemp:  3000,
+		HighTemp: 6000,
+		Gamma:    1.1,
+		Contrast: 1.0,
+		Outputs:  []string{},
+	}
+	if err := SaveConfig(onDisk); err != nil {
+		t.Fatalf("SaveConfig: %v", err)
+	}
+
+	if err := SaveICCConfig(map[string]string{"DP-1": "/tmp/dp1.icc"}, map[string]int{"DP-1": 7000}); err != nil {
+		t.Fatalf("SaveICCConfig: %v", err)
+	}
+
+	got := LoadConfig()
+	assert.True(t, got.Enabled, "the night light state on disk must survive an ICC write")
+	assert.Equal(t, 3000, got.LowTemp)
+	assert.Equal(t, 6000, got.HighTemp)
+	assert.Equal(t, 1.1, got.Gamma)
+	assert.Equal(t, map[string]string{"DP-1": "/tmp/dp1.icc"}, got.ICCProfiles)
+	assert.Equal(t, map[string]int{"DP-1": 7000}, got.OutputTemps)
 }

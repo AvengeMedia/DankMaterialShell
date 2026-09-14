@@ -671,6 +671,26 @@ func TestManager_ControlStateReuseKeepsAttachedICC(t *testing.T) {
 	assert.Zero(t, fresh.outputTemp)
 }
 
+// A wl_output that has no gamma control (the default install: night light off,
+// no profile, no override) exists only in the name maps. It still has to
+// disappear from listOutputs/status once it is gone, or every dock/undock cycle
+// leaves another monitor in maps that live as long as the daemon.
+func TestManager_RemoveOutputByRegistryNameWithoutControl(t *testing.T) {
+	m := &Manager{}
+	m.outputNames.Store(9, "HDMI-A-1")
+	m.outputRegNames.Store(9, 77)
+
+	assert.Equal(t, []string{"HDMI-A-1"}, m.ListOutputs())
+
+	m.removeOutputByRegistryName(77)
+
+	assert.Empty(t, m.ListOutputs(), "a monitor with no control must not stay listed")
+	_, nameStored := m.outputNames.Load(9)
+	assert.False(t, nameStored, "the name entry should be gone")
+	_, regStored := m.outputRegNames.Load(9)
+	assert.False(t, regStored, "the registry name entry should be gone")
+}
+
 // The status payload is what the settings UI shows for a profile, so the
 // descriptive metadata has to be carried through.
 func TestManager_GetICCStatusDescribesProfile(t *testing.T) {

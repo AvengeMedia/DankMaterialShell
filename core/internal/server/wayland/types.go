@@ -276,6 +276,22 @@ func SaveConfig(cfg Config) error {
 	return os.WriteFile(path, data, 0o644)
 }
 
+// SaveICCConfig stores the ICC profiles and the per-output temperatures, leaving
+// every other field of the file as it is on disk.
+//
+// The night light fields are owned by the shell: the daemon only reads them at
+// boot and writes them in memory when the shell calls setEnabled/setTemperature,
+// so writing its copy back would persist whatever the night light happened to be
+// doing when an ICC change was made (for example `"Enabled": true` while the
+// user had since turned it off), and the shell only sends setEnabled when the
+// mode is on, so the state would silently come back after a session restart.
+func SaveICCConfig(iccProfiles map[string]string, outputTemps map[string]int) error {
+	cfg := LoadConfig()
+	cfg.ICCProfiles = iccProfiles
+	cfg.OutputTemps = outputTemps
+	return SaveConfig(cfg)
+}
+
 func (c *Config) Validate() error {
 	if c.LowTemp < 1000 || c.LowTemp > 10000 {
 		return errdefs.ErrInvalidTemperature
