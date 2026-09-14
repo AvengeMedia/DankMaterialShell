@@ -57,8 +57,8 @@ type State struct {
 	NightTime      time.Time             `json:"nightTime"`
 	IsDay          bool                  `json:"isDay"`
 	SunPosition    float64               `json:"sunPosition"`
-	ICCProfiles    map[string]*ICCStatus `json:"iccProfiles,omitempty"` // outputName -> status
-	OutputTemps    map[string]int        `json:"outputTemps,omitempty"` // outputName -> current temp
+	ICCProfiles    map[string]*ICCStatus `json:"iccProfiles"` // outputName -> status
+	OutputTemps    map[string]int        `json:"outputTemps"` // outputName -> current temp
 }
 
 // ICCStatus represents the ICC profile status for a single output.
@@ -115,6 +115,14 @@ type Manager struct {
 	outputs             syncmap.Map[uint32, *outputState]
 	controlsInitialized bool
 	connectionDead      atomic.Bool
+
+	// The per-output ICC fields (iccPath, iccProfile, outputTemp) are only
+	// touched by the wayland actor goroutine. The published snapshot below is
+	// what the IPC handlers, the CLI and the scheduler read, so they never
+	// reach into outputState from another goroutine.
+	iccStateMutex sync.RWMutex
+	iccStatus     map[string]*ICCStatus // outputName -> status
+	iccTemps      map[string]int        // outputName -> per-output temperature (K)
 
 	cmdq  chan cmd
 	alive bool

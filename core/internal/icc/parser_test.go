@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -540,6 +541,49 @@ func TestParseDescriptionMalformed(t *testing.T) {
 
 		if _, err := parseDescription(data, tagEntry{sig: mlucSig, offset: 0, size: 32}); err == nil {
 			t.Fatal("expected error for out-of-bounds mluc string")
+		}
+	})
+}
+
+// TestParseBytesTagTableBounds feeds tag counts that do not fit in the file.
+// The count sizes a slice before any entry is read, so a wrapping count has to
+// be rejected up front: with tagCount*12 wrapping in uint32, a 140-byte profile
+// passed the old bounds check, allocated a ~4 GB tag slice and then panicked
+// with slice bounds out of range. ParseFile runs on the wayland actor goroutine,
+// which has no recover(), so that panic took the dms daemon down at startup.
+func TestParseBytesTagTableBounds(t *testing.T) {
+	t.Run("count wraps in uint32 arithmetic", func(t *testing.T) {
+		data := buildSyntheticProfile("Wrapping tag count", 2.2)
+		binary.BigEndian.PutUint32(data[128:132], 0x15555556) // *12 == 8
+
+		_, err := ParseBytes(data)
+		if err == nil {
+			t.Fatal("expected error for a tag count that does not fit in the profile")
+		}
+		if !strings.Contains(err.Error(), "tag entries") {
+			t.Fatalf("ParseBytes() error = %v, want a tag entry count error", err)
+		}
+	})
+
+	t.Run("count exceeds remaining bytes", func(t *testing.T) {
+		data := buildSyntheticProfile("Too many tags", 2.2)
+		binary.BigEndian.PutUint32(data[128:132], uint32((len(data)-132)/12+1))
+
+		_, err := ParseBytes(data)
+		if err == nil {
+			t.Fatal("expected error for more tag entries than the profile can hold")
+		}
+		if !strings.Contains(err.Error(), "tag entries") {
+			t.Fatalf("ParseBytes() error = %v, want a tag entry count error", err)
+		}
+	})
+
+	t.Run("count filling the file exactly still parses", func(t *testing.T) {
+		data := buildSyntheticProfile("Exact fit", 2.2)
+		binary.BigEndian.PutUint32(data[128:132], uint32((len(data)-132)/12))
+
+		if _, err := ParseBytes(data); err != nil {
+			t.Fatalf("ParseBytes() = %v, want the boundary count accepted", err)
 		}
 	})
 }

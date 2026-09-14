@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"slices"
 	"syscall"
@@ -64,6 +65,9 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 	}
 
 	m.alive = true
+	// Publish before the first state push so the snapshot is never nil, and
+	// before the actor starts so no other goroutine touches the fields yet.
+	m.publishICCState()
 	m.recalcSchedule(time.Now())
 	m.updateStateFromSchedule()
 
@@ -89,6 +93,7 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 			// the registry handler may already have established the controls, and
 			// the configuration still has to be attached.
 			loaded := m.loadConfiguredICC()
+			m.publishICCState()
 
 			if !m.controlsInitialized {
 				log.Info("Gamma control enabled at startup")
@@ -223,39 +228,7 @@ func (m *Manager) setupRegistry() error {
 	})
 
 	registry.SetGlobalRemoveHandler(func(e wlclient.RegistryGlobalRemoveEvent) {
-		m.post(func() {
-			var foundID uint32
-			var foundOut *outputState
-			m.outputs.Range(func(id uint32, out *outputState) bool {
-				if out.registryName == e.Name {
-					foundID = id
-					foundOut = out
-					return false
-				}
-				return true
-			})
-			if foundOut == nil {
-				return
-			}
-			if foundOut.gammaControl != nil {
-				foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
-				foundOut.gammaControl = nil
-			}
-			m.removeAvailableOutput(foundOut.output)
-			if foundOut.output != nil && !foundOut.output.IsZombie() {
-				_ = foundOut.output.Release()
-			}
-			m.outputs.Delete(foundID)
-
-			hasOutputs := false
-			m.outputs.Range(func(_ uint32, _ *outputState) bool {
-				hasOutputs = true
-				return false
-			})
-			if !hasOutputs {
-				m.controlsInitialized = false
-			}
-		})
+		m.post(func() { m.removeOutputByRegistryName(e.Name) })
 	})
 
 	if err := m.display.Roundtrip(); err != nil {
@@ -380,6 +353,49 @@ func (m *Manager) removeAvailableOutput(o *wlclient.Output) {
 	})
 }
 
+// removeOutputByRegistryName tears down the state of an output that left the
+// compositor (unplugged or asleep). Only the wayland actor goroutine calls it.
+func (m *Manager) removeOutputByRegistryName(registryName uint32) {
+	var foundID uint32
+	var foundOut *outputState
+	m.outputs.Range(func(id uint32, out *outputState) bool {
+		if out.registryName == registryName {
+			foundID = id
+			foundOut = out
+			return false
+		}
+		return true
+	})
+	if foundOut == nil {
+		return
+	}
+	if foundOut.gammaControl != nil {
+		foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1).Destroy()
+		foundOut.gammaControl = nil
+	}
+	m.removeAvailableOutput(foundOut.output)
+	if foundOut.output != nil && !foundOut.output.IsZombie() {
+		_ = foundOut.output.Release()
+	}
+	m.outputs.Delete(foundID)
+	// The name entries have to go with the output: they are what
+	// `dms icc status`/`listOutputs` report, and a rebound wl_output reusing a
+	// released object ID would otherwise attach the previous monitor's profile
+	// from the stale name.
+	m.outputNames.Delete(foundID)
+	m.outputRegNames.Delete(foundID)
+	m.publishICCState()
+
+	hasOutputs := false
+	m.outputs.Range(func(_ uint32, _ *outputState) bool {
+		hasOutputs = true
+		return false
+	})
+	if !hasOutputs {
+		m.controlsInitialized = false
+	}
+}
+
 func (m *Manager) outputStillValid(out *outputState) bool {
 	switch {
 	case out == nil:
@@ -444,6 +460,7 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 	if name, ok := m.outputNames.Load(outputID); ok {
 		m.attachConfiguredICC(outputID, name)
 	}
+	m.publishICCState()
 	return nil
 }
 
@@ -1330,6 +1347,9 @@ func (m *Manager) createControls() {
 		return
 	}
 	m.controlsInitialized = true
+	// Recreated controls carry fresh output state, so the snapshot has to
+	// follow it rather than keep reporting what the old state held.
+	m.publishICCState()
 	m.triggerUpdate()
 }
 
@@ -1345,6 +1365,7 @@ func (m *Manager) destroyControls() {
 		return true
 	})
 	m.controlsInitialized = false
+	m.publishICCState()
 }
 
 // loadConfiguredICC attaches the configured ICC profiles and per-output
@@ -1374,6 +1395,7 @@ func (m *Manager) loadConfiguredICC() bool {
 
 	log.Infof("icc: config has %d profile(s) and %d temperature override(s), attached to %d output(s)",
 		len(iccProfiles), len(outputTemps), attached)
+	m.publishICCState()
 	return attached > 0
 }
 
@@ -1387,6 +1409,7 @@ func (m *Manager) attachConfiguredICC(outputID uint32, outputName string) {
 	m.configMutex.RUnlock()
 
 	if len(iccProfiles) == 0 && len(outputTemps) == 0 {
+		m.publishICCState()
 		return
 	}
 
@@ -1402,6 +1425,10 @@ func (m *Manager) attachConfiguredICC(outputID uint32, outputName string) {
 		}
 		return false
 	})
+
+	// Publish either way: a hotplugged output is new to the snapshot even when
+	// it has no configured profile or temperature.
+	m.publishICCState()
 
 	if changed {
 		m.applyCurrentTemp("output-name")
@@ -1485,6 +1512,7 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 
 		targetOutput.iccPath = iccPath
 		targetOutput.iccProfile = profile
+		m.publishICCState()
 
 		// The new profile is invisible to the per-output dedup, so clear this
 		// output's state to force a fresh ramp.
@@ -1520,6 +1548,7 @@ func (m *Manager) RemoveICC(outputName string) error {
 				out.iccPath = ""
 				out.iccProfile = nil
 				out.lastTemp = 0
+				m.publishICCState()
 				m.applyCurrentTemp("icc-remove")
 				return false
 			}
@@ -1540,46 +1569,71 @@ func (m *Manager) RemoveICC(outputName string) error {
 	return nil
 }
 
-// GetICCStatus returns current ICC profile status for all outputs.
-func (m *Manager) GetICCStatus() map[string]*ICCStatus {
-	result := make(map[string]*ICCStatus)
+// publishICCState republishes the ICC snapshot the getters serve. The
+// per-output ICC fields are written on the wayland actor goroutine only, so
+// this must run there; the getters are called from the IPC handlers, the CLI
+// and the scheduler goroutine, which is why they never touch those fields.
+// Publishing on ICC changes rather than on every state push also keeps the
+// per-profile stat below out of the night light animation path.
+func (m *Manager) publishICCState() {
+	status := make(map[string]*ICCStatus)
+	temps := make(map[string]int)
 
 	m.outputs.Range(func(_ uint32, out *outputState) bool {
-		name, nameOK := m.outputNames.Load(out.id)
-		if !nameOK || out.iccPath == "" {
+		name, ok := m.outputNames.Load(out.id)
+		if !ok {
 			return true
 		}
-		status := &ICCStatus{
-			Path:   out.iccPath,
-			Active: out.iccProfile != nil,
+		temps[name] = out.outputTemp
+		if out.iccPath != "" {
+			status[name] = describeICCProfile(out.iccPath, out.iccProfile)
 		}
-		if profile := out.iccProfile; profile != nil {
-			status.Description = profile.Description
-			status.Version = profile.Version
-			status.ColorSpace = profile.ColorSpace
-			status.Class = profile.Class
-			status.HasVCGT = profile.HasVCGT
-			status.TRCKind, status.TRCGamma, status.TRCEntries = profile.TRCKind()
-			if profile.VCGT != nil {
-				status.VCGTChannels = profile.VCGT.Channels
-				status.VCGTEntries = profile.VCGT.Entries
-			}
-			if x, y, ok := profile.WhitePointXY(); ok {
-				status.WhitePointX = x
-				status.WhitePointY = y
-				status.WhitePointCCT = profile.WhitePointCCT()
-				status.WhitePointName = profile.WhitePointName()
-			}
-		}
-		if info, err := os.Stat(out.iccPath); err == nil {
-			status.Size = info.Size()
-			status.Modified = info.ModTime().Unix()
-		}
-		result[name] = status
 		return true
 	})
 
-	return result
+	m.iccStateMutex.Lock()
+	m.iccStatus = status
+	m.iccTemps = temps
+	m.iccStateMutex.Unlock()
+}
+
+// describeICCProfile builds the record served to the CLI and the settings UI.
+// It is the only place that stats the profile file.
+func describeICCProfile(path string, profile *icc.Profile) *ICCStatus {
+	status := &ICCStatus{
+		Path:   path,
+		Active: profile != nil,
+	}
+	if profile != nil {
+		status.Description = profile.Description
+		status.Version = profile.Version
+		status.ColorSpace = profile.ColorSpace
+		status.Class = profile.Class
+		status.HasVCGT = profile.HasVCGT
+		status.TRCKind, status.TRCGamma, status.TRCEntries = profile.TRCKind()
+		if profile.VCGT != nil {
+			status.VCGTChannels = profile.VCGT.Channels
+			status.VCGTEntries = profile.VCGT.Entries
+		}
+		if x, y, ok := profile.WhitePointXY(); ok {
+			status.WhitePointX = x
+			status.WhitePointY = y
+			status.WhitePointCCT = profile.WhitePointCCT()
+			status.WhitePointName = profile.WhitePointName()
+		}
+	}
+	if info, err := os.Stat(path); err == nil {
+		status.Size = info.Size()
+		status.Modified = info.ModTime().Unix()
+	}
+	return status
+}
+
+// GetICCStatus returns the published ICC status for all outputs.
+func (m *Manager) GetICCStatus() map[string]*ICCStatus {
+	m.iccStateMutex.RLock()
+	defer m.iccStateMutex.RUnlock()
+	return maps.Clone(m.iccStatus)
 }
 
 // ListOutputs returns a list of all output names for ICC assignment.
@@ -1604,6 +1658,7 @@ func (m *Manager) SetOutputTemp(outputName string, temp int) error {
 			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
 				out.outputTemp = temp
 				out.lastTemp = 0
+				m.publishICCState()
 				m.applyCurrentTemp("output-temp-change")
 				return false
 			}
@@ -1632,16 +1687,11 @@ func (m *Manager) SetOutputTemp(outputName string, temp int) error {
 	return nil
 }
 
-// GetOutputTemps returns current per-output temperatures.
+// GetOutputTemps returns the published per-output temperatures.
 func (m *Manager) GetOutputTemps() map[string]int {
-	result := make(map[string]int)
-	m.outputs.Range(func(_ uint32, out *outputState) bool {
-		if name, ok := m.outputNames.Load(out.id); ok {
-			result[name] = out.outputTemp
-		}
-		return true
-	})
-	return result
+	m.iccStateMutex.RLock()
+	defer m.iccStateMutex.RUnlock()
+	return maps.Clone(m.iccTemps)
 }
 
 func (m *Manager) Close() {

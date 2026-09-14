@@ -578,6 +578,10 @@ StyledRect {
                 value: colorTempRow.currentTemp === 0 ? 7000 : colorTempRow.currentTemp
                 showValue: true
                 unit: "K"
+                // Scroll-to-change assigns value and emits sliderValueChanged
+                // without sliderDragFinished, so a wheel change would never be
+                // sent and would freeze the label on the scrolled value.
+                wheelEnabled: false
 
                 onSliderValueChanged: function (newValue) {
                     // Keep the label binding (line above) intact: assigning

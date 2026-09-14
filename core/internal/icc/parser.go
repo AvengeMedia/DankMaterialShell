@@ -129,8 +129,11 @@ func ParseBytes(data []byte) (*Profile, error) {
 	}
 
 	tagCount := binary.BigEndian.Uint32(data[128:132])
-	tagTableEnd := uint32(132) + tagCount*12
-	if uint32(len(data)) < tagTableEnd {
+	// tagCount comes straight from the file, so compare it against the space
+	// that is actually left before sizing anything with it: tagCount*12 wraps
+	// in uint32 (0x15555556*12 == 8) and would otherwise let a 140-byte profile
+	// through the bounds check and request a ~4 GB tag table.
+	if uint64(tagCount) > uint64((len(data)-132)/12) {
 		return nil, fmt.Errorf("icc: profile data too short for %d tag entries", tagCount)
 	}
 

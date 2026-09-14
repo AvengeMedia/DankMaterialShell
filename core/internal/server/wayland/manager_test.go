@@ -658,6 +658,7 @@ func TestManager_GetICCStatusDescribesProfile(t *testing.T) {
 		},
 	})
 	m.outputNames.Store(1, "DP-2")
+	m.publishICCState()
 
 	status := m.GetICCStatus()["DP-2"]
 	if status == nil {
@@ -673,4 +674,89 @@ func TestManager_GetICCStatusDescribesProfile(t *testing.T) {
 	assert.Equal(t, "D65", status.WhitePointName)
 	assert.Equal(t, int64(4), status.Size)
 	assert.NotZero(t, status.Modified)
+}
+
+// The exported getters serve the published snapshot, so callers on other
+// goroutines (IPC handlers, the scheduler) never read the per-output fields the
+// actor mutates. A profile therefore appears in the status only once the actor
+// has published it, and an empty snapshot has to clear the previous one.
+func TestManager_ICCStatusServesPublishedSnapshot(t *testing.T) {
+	m := &Manager{}
+	out := &outputState{id: 1, iccPath: "/tmp/display.icm", outputTemp: 7000}
+	m.outputs.Store(1, out)
+	m.outputNames.Store(1, "DP-1")
+
+	assert.Empty(t, m.GetICCStatus(), "nothing is published before the first publish")
+	assert.Empty(t, m.GetOutputTemps())
+
+	m.publishICCState()
+	assert.Contains(t, m.GetICCStatus(), "DP-1")
+	assert.Equal(t, 7000, m.GetOutputTemps()["DP-1"])
+
+	// A mutation the actor has not published yet is invisible to callers.
+	out.outputTemp = 5000
+	out.iccPath = ""
+	assert.Equal(t, 7000, m.GetOutputTemps()["DP-1"])
+
+	m.publishICCState()
+	assert.Equal(t, 5000, m.GetOutputTemps()["DP-1"])
+	assert.Empty(t, m.GetICCStatus(), "the removed profile is gone from the snapshot")
+}
+
+// Outputs that go away (unplugged, monitor sleep) must not stay in the name
+// maps: they are what `dms icc listOutputs` and `status` enumerate, and a
+// rebound wl_output reusing the object ID would attach the previous monitor's
+// profile from the stale name.
+func TestManager_RemoveOutputByRegistryNamePrunesNames(t *testing.T) {
+	m := &Manager{}
+	out := &outputState{id: 7, registryName: 42, iccPath: "/tmp/display.icm", outputTemp: 6500}
+	m.outputs.Store(7, out)
+	m.outputNames.Store(7, "DP-1")
+	m.outputRegNames.Store(7, 42)
+	m.controlsInitialized = true
+	m.publishICCState()
+
+	m.removeOutputByRegistryName(42)
+
+	_, stillStored := m.outputs.Load(7)
+	assert.False(t, stillStored, "the output state should be gone")
+	_, nameStored := m.outputNames.Load(7)
+	assert.False(t, nameStored, "the output name should be gone")
+	_, regNameStored := m.outputRegNames.Load(7)
+	assert.False(t, regNameStored, "the registry name should be gone")
+	assert.Empty(t, m.ListOutputs(), "a disconnected monitor must not be listed")
+	assert.Empty(t, m.GetICCStatus(), "nor reported as a profiled output")
+	assert.Empty(t, m.GetOutputTemps())
+	assert.False(t, m.controlsInitialized, "the last output going away clears the controls")
+
+	// A registry name that no output uses is a no-op.
+	m.removeOutputByRegistryName(99)
+}
+
+// The getters are called from the scheduler and the IPC handlers while the
+// actor publishes, so they must not share unsynchronised state with it (run
+// with -race).
+func TestManager_ICCStatusConcurrentPublishAndRead(t *testing.T) {
+	m := &Manager{}
+	out := &outputState{id: 1, iccPath: "/tmp/display.icm"}
+	m.outputs.Store(1, out)
+	m.outputNames.Store(1, "DP-1")
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := range 500 {
+			out.outputTemp = 6000 + i
+			out.iccProfile = nil
+			m.publishICCState()
+		}
+	}()
+
+	for range 500 {
+		_ = m.GetICCStatus()
+		_ = m.GetOutputTemps()
+		_ = m.ListOutputs()
+	}
+	wg.Wait()
 }
