@@ -3,6 +3,7 @@ package qmlchecks
 import (
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -31,5 +32,53 @@ func TestLockScreenPasswordFieldBypassesTextInputIME(t *testing.T) {
 	}
 	if !strings.Contains(content, "Qt.ImhSensitiveData") {
 		t.Fatalf("imeCommitSink must advertise hidden-text hints so IMEs treat it as a password field")
+	}
+}
+
+func TestLockScreenFprintProfileMatchesPamQml(t *testing.T) {
+	profile, err := os.ReadFile("../../../quickshell/assets/pam/fprint")
+	if err != nil {
+		t.Fatalf("read fprint PAM profile: %v", err)
+	}
+
+	qml, err := os.ReadFile("../../../quickshell/Modules/Lock/Pam.qml")
+	if err != nil {
+		t.Fatalf("read lock screen PAM QML: %v", err)
+	}
+
+	// Pam.qml tells a pam_fprintd timeout expiry apart from a device fault by
+	// how long the session ran, so a profile change that is not mirrored in
+	// sessionTimeoutMs makes real faults look like planned renewals.
+	profileTimeout := regexp.MustCompile(`pam_fprintd\.so[^\n]*\btimeout=(\d+)`).FindSubmatch(profile)
+	if profileTimeout == nil {
+		t.Fatalf("fprint profile must set an explicit pam_fprintd timeout")
+	}
+	qmlTimeout := regexp.MustCompile(`sessionTimeoutMs:\s*(\d+)`).FindSubmatch(qml)
+	if qmlTimeout == nil {
+		t.Fatalf("Pam.qml must declare sessionTimeoutMs")
+	}
+
+	seconds, err := strconv.Atoi(string(profileTimeout[1]))
+	if err != nil {
+		t.Fatalf("parse profile timeout: %v", err)
+	}
+	millis, err := strconv.Atoi(string(qmlTimeout[1]))
+	if err != nil {
+		t.Fatalf("parse sessionTimeoutMs: %v", err)
+	}
+	if seconds*1000 != millis {
+		t.Fatalf("sessionTimeoutMs is %dms but the fprint profile sets timeout=%d", millis, seconds)
+	}
+
+	// fprintd 1.94.0 and older ignore this option when it is longer than two
+	// digits and silently fall back to 30 seconds.
+	if len(profileTimeout[1]) > 2 {
+		t.Fatalf("pam_fprintd timeout=%s is too long for fprintd <= 1.94.0, which would ignore it", profileTimeout[1])
+	}
+
+	// One finished session must equal one wrong finger, otherwise
+	// SettingsData.maxFprintTries silently means a multiple of the scans it names.
+	if !regexp.MustCompile(`pam_fprintd\.so[^\n]*\bmax-tries=1\b`).Match(profile) {
+		t.Fatalf("fprint profile must use max-tries=1 so the shell counts wrong scans one for one")
 	}
 }

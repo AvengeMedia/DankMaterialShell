@@ -32,19 +32,21 @@ def run(name, command):
 def main():
     parser = argparse.ArgumentParser(description="Run shell logic, Qt unit tests and QML widget regressions")
     parser.add_argument("--jobs", type=int, default=max(1, min(4, len(os.sched_getaffinity(0)) // 4)))
-    parser.add_argument("suites", nargs="*", choices=["widgets", "media", "qt", "logic"])
+    parser.add_argument("suites", nargs="*", choices=["widgets", "media", "qt", "lock", "logic"])
     args = parser.parse_args()
     if args.jobs < 1:
         parser.error("--jobs must be positive")
-    selected = args.suites or ["widgets", "media", "qt", "logic"]
+    selected = args.suites or ["widgets", "media", "qt", "lock", "logic"]
     fixtures = sorted(str(path.relative_to(repo)) for path in (repo / "quickshell/tests/qml").glob("*.qml"))
     commands = {
         "widgets": [sys.executable, "quickshell/tests/run-surface-fixture.py", *(path for path in fixtures if not path.startswith("quickshell/tests/qml/media-"))],
         "media": [sys.executable, "quickshell/tests/run-surface-fixture.py", "--mpris", "--artwork", *(path for path in fixtures if path.startswith("quickshell/tests/qml/media-"))],
         "logic": ["node", "--test", *sorted(str(path.relative_to(repo)) for path in (repo / "quickshell/tests").glob("*.test.mjs"))],
     }
-    if "qt" in selected:
-        commands["qt"] = [qml_test_runner(), "-input", "quickshell/tests", "-o", "-,txt"]
+    if {"qt", "lock"} & set(selected):
+        runner = qml_test_runner()
+        commands["qt"] = [runner, "-input", "quickshell/tests/unit", "-o", "-,txt"]
+        commands["lock"] = [runner, "-import", "quickshell/tests/lock/mocks", "-input", "quickshell/tests/lock", "-o", "-,txt"]
     started = time.monotonic()
     failed = False
     with ThreadPoolExecutor(max_workers=min(args.jobs, len(selected))) as pool:

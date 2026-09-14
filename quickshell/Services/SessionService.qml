@@ -42,11 +42,14 @@ Singleton {
     signal sessionLocked
     signal sessionUnlocked
     signal sessionResumed
+    signal lidOpened
     signal loginctlStateChanged
 
     property bool stateInitialized: false
     property string prepareForSleepSubscriptionId: ""
     property bool prepareForSleepSubscriptionPending: false
+    property string lidSubscriptionId: ""
+    property bool lidSubscriptionPending: false
     property double lastResumeSignalTimestamp: 0
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
@@ -756,7 +759,7 @@ Singleton {
             if (DMSService.isConnected) {
                 checkDMSCapabilities();
             } else {
-                clearPrepareForSleepSubscriptionState();
+                clearPowerSubscriptionState();
             }
         }
 
@@ -774,10 +777,11 @@ Singleton {
         }
 
         function onDbusSignalReceived(subscriptionId, data) {
-            if (subscriptionId !== prepareForSleepSubscriptionId) {
-                return;
+            if (subscriptionId === prepareForSleepSubscriptionId) {
+                handlePrepareForSleepSignal(data);
+            } else if (subscriptionId === lidSubscriptionId) {
+                handleLidPropertiesChanged(data);
             }
-            handlePrepareForSleepSignal(data);
         }
     }
 
@@ -839,14 +843,41 @@ Singleton {
 
         if (DMSService.capabilities.includes("dbus")) {
             ensurePrepareForSleepSubscription();
+            ensureLidSubscription();
         } else {
-            clearPrepareForSleepSubscriptionState();
+            clearPowerSubscriptionState();
         }
     }
 
-    function clearPrepareForSleepSubscriptionState() {
+    function clearPowerSubscriptionState() {
         prepareForSleepSubscriptionId = "";
         prepareForSleepSubscriptionPending = false;
+        lidSubscriptionId = "";
+        lidSubscriptionPending = false;
+    }
+
+    function ensureLidSubscription() {
+        if (!DMSService.isConnected || !DMSService.capabilities.includes("dbus"))
+            return;
+        if (lidSubscriptionId || lidSubscriptionPending)
+            return;
+
+        lidSubscriptionPending = true;
+        DMSService.dbusSubscribe("system", "org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.DBus.Properties", "PropertiesChanged", response => {
+            lidSubscriptionPending = false;
+            if (response.error) {
+                log.warn("Failed to subscribe to lid changes:", response.error);
+                return;
+            }
+            lidSubscriptionId = response.result?.subscriptionId || "";
+        });
+    }
+
+    function handleLidPropertiesChanged(data) {
+        if (data?.path !== "/org/freedesktop/UPower" || data.body?.[0] !== "org.freedesktop.UPower")
+            return;
+        if (data.body?.[1]?.LidIsClosed === false)
+            lidOpened();
     }
 
     function ensurePrepareForSleepSubscription() {

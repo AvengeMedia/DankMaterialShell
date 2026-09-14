@@ -16,7 +16,20 @@ FocusScope {
     signal passwordChanged(string newPassword)
     signal unlockRequested
 
+    HoverHandler {
+        enabled: root.pam.awaitingActivityRetry
+        onPointChanged: root.pam.retryFprintOnActivity()
+    }
+
+    PointHandler {
+        onActiveChanged: {
+            if (active)
+                root.pam.retryFprintOnActivity();
+        }
+    }
+
     Keys.onPressed: event => {
+        root.pam.retryFprintOnActivity();
         if (videoScreensaver.active && videoScreensaver.inputEnabled) {
             videoScreensaver.dismiss();
             event.accepted = true;

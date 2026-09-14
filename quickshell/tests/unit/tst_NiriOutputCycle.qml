@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../Services"
+import "../../Services"
 
 TestCase {
     id: testCase

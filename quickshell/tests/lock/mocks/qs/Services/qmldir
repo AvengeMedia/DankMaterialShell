@@ -1,0 +1,3 @@
+module qs.Services
+singleton SessionService 1.0 SessionService.qml
+singleton IdleService 1.0 IdleService.qml

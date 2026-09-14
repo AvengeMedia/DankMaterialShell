@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../Services/OutputCycleState.js" as OutputCycleState
+import "../../Services/OutputCycleState.js" as OutputCycleState
 
 TestCase {
     name: "OutputCycleState"
