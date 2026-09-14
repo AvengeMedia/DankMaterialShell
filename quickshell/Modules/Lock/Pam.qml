@@ -32,9 +32,8 @@ Scope {
 
     function resetAuthFlows(): void {
         passwd.abort();
-        fprint.abort();
+        fprint.stop();
         u2f.abort();
-        errorRetry.running = false;
         u2fErrorRetry.running = false;
         u2fPendingTimeout.running = false;
         passwdActiveTimeout.running = false;
@@ -58,9 +57,8 @@ Scope {
         if (!root.unlockInProgress) {
             root.unlockInProgress = true;
             passwd.abort();
-            fprint.abort();
+            fprint.stop();
             u2f.abort();
-            errorRetry.running = false;
             u2fErrorRetry.running = false;
             u2fPendingTimeout.running = false;
             root.u2fPending = false;
@@ -217,7 +215,7 @@ Scope {
 
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
-                    fprint.abort();
+                    fprint.stop();
                     root.proceedAfterPrimaryAuth();
                 }
                 return;
@@ -260,69 +258,138 @@ Scope {
     PamContext {
         id: fprint
 
-        property bool available: SettingsData.lockFingerprintReady
-        property int tries
-        property int errorTries
-        property bool retrying: false
+        readonly property bool available: SettingsData.lockFingerprintReady
+        property int tries: 0
+        property int errorTries: 0
+        property double attemptStartedAt: 0
+        property bool completedDuringStart: false
+        readonly property int maxErrorTries: 200
+        readonly property int daemonIdleExitMs: 30000
+        // sessionTimeoutMs mirrors `timeout=` in assets/pam/fprint
+        readonly property int sessionTimeoutMs: 90000
+        readonly property bool retrying: errorRetry.running
+        readonly property int retryInterval: errorRetry.interval
+        readonly property bool allowed: available && SettingsData.enableFprint && root.lockSecured && !root.fprintSuppressedByPrimaryPam && !root.unlockInProgress && !root.u2fPending && !SessionService.preparingForSleep && !IdleService.monitorsOff && tries < SettingsData.maxFprintTries
+        readonly property string status: {
+            if (!available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam)
+                return "disabled";
+            if (tries >= SettingsData.maxFprintTries)
+                return "max";
+            if (!allowed)
+                return "paused";
+            if (active)
+                return "active";
+            if (retrying)
+                return "retrying";
+            return errorTries >= maxErrorTries ? "stopped" : "idle";
+        }
+
+        function stop(): void {
+            errorRetry.stop();
+            attemptStartedAt = 0;
+            abort();
+        }
+
+        // pam_fprintd reports an expired timeout as PAM_AUTHINFO_UNAVAIL with no
+        // message, exactly like a device fault, so age is the only signal left.
+        // Its own clock only starts after the claim and stops before the release,
+        // so a real expiry always measures longer than the timeout here; anything
+        // shorter is treated as a fault.
+        function attemptSettled(): bool {
+            return attemptStartedAt > 0 && Date.now() - attemptStartedAt >= sessionTimeoutMs;
+        }
 
         function checkAvail(): void {
-            if (!available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam) {
-                retrying = false;
-                abort();
+            if (!allowed) {
+                stop();
+                return;
+            }
+            if (!active && !retrying)
+                startAttempt();
+        }
+
+        function startAttempt(): void {
+            if (!allowed || errorTries >= maxErrorTries) {
+                stop();
                 return;
             }
             if (active)
                 return;
+            errorRetry.stop();
+            if (root.fprintState === "error")
+                root.fprintState = "";
+            attemptStartedAt = 0;
+            completedDuringStart = false;
+            if (start()) {
+                attemptStartedAt = Date.now();
+                return;
+            }
+            if (!completedDuringStart)
+                scheduleErrorRetry();
+        }
 
-            tries = 0;
+        function scheduleErrorRetry(): void {
+            stop();
+            if (!allowed)
+                return;
+            errorTries++;
+            root.fprintState = "error";
+            if (errorTries === 1)
+                root.flashMsg();
+            fprintStateReset.restart();
+            if (errorTries < maxErrorTries)
+                errorRetry.restart();
+        }
+
+        function recover(): void {
+            if (!allowed)
+                return;
             errorTries = 0;
-            retrying = false;
-            start();
+            if (!active)
+                startAttempt();
+        }
+
+        onAllowedChanged: {
+            if (!allowed)
+                stop();
+            else
+                Qt.callLater(checkAvail);
         }
 
         config: "fprint"
         configDirectory: Quickshell.shellDir + "/assets/pam"
 
         onCompleted: res => {
-            if (!available)
+            completedDuringStart = true;
+            if (!allowed)
                 return;
 
             switch (res) {
             case PamResult.Success:
-                retrying = false;
-                if (!root.unlockInProgress) {
-                    passwd.abort();
-                    root.proceedAfterPrimaryAuth();
-                }
+                stop();
+                passwd.abort();
+                root.proceedAfterPrimaryAuth();
                 return;
             case PamResult.Error:
-                errorTries++;
-                if (errorTries < 200) {
-                    retrying = true;
-                    abort();
-                    errorRetry.restart();
+                if (attemptSettled()) {
+                    stop();
+                    errorTries = 0;
+                    startAttempt();
                     return;
                 }
-                retrying = false;
-                abort();
+                scheduleErrorRetry();
                 return;
+            case PamResult.Failed:
             case PamResult.MaxTries:
-                retrying = false;
+                stop();
                 tries++;
-                if (tries < SettingsData.maxFprintTries) {
-                    root.fprintState = "fail";
-                    start();
-                } else {
-                    root.fprintState = "max";
-                    abort();
-                }
-                break;
-            default:
+                errorTries = 0;
+                root.fprintState = tries < SettingsData.maxFprintTries ? "fail" : "max";
+                root.flashMsg();
+                fprintStateReset.restart();
+                startAttempt();
                 return;
             }
-
-            root.flashMsg();
-            fprintStateReset.start();
         }
     }
 
@@ -426,20 +493,35 @@ Scope {
     Timer {
         id: errorRetry
 
-        interval: Math.min(1500 * Math.pow(2, Math.max(0, fprint.errorTries - 1)), 30000)
-        onTriggered: fprint.start()
+        // A device wedged by a suspend mid-verify only comes back when fprintd
+        // restarts, and fprintd only exits after its idle timeout with no client
+        // attached, so the second retry outlasts that instead of climbing to it.
+        interval: {
+            if (fprint.errorTries <= 1)
+                return 1500;
+            if (fprint.errorTries === 2)
+                return fprint.daemonIdleExitMs + 5000;
+            return 60000;
+        }
+        onTriggered: fprint.startAttempt()
+    }
+
+    readonly property bool awaitingActivityRetry: fprint.errorTries > 0 && !fprint.retrying && !fprint.active
+
+    function retryFprintOnActivity(): void {
+        if (root.awaitingActivityRetry)
+            fprint.recover();
     }
 
     Connections {
         target: SessionService
 
-        // timers run on monotonic time, so suspend leaves the backoff remainder to burn after wake (#3171)
         function onSessionResumed() {
-            if (!fprint.available || !SettingsData.enableFprint || !root.lockSecured || root.fprintSuppressedByPrimaryPam)
-                return;
-            fprint.errorTries = 0;
-            if (errorRetry.running)
-                errorRetry.restart();
+            fprint.recover();
+        }
+
+        function onLidOpened() {
+            fprint.recover();
         }
     }
 
@@ -491,7 +573,10 @@ Scope {
         id: fprintStateReset
 
         interval: 4000
-        onTriggered: root.fprintState = ""
+        onTriggered: {
+            if (root.fprintState !== "max")
+                root.fprintState = "";
+        }
     }
 
     onLockSecuredChanged: {
@@ -508,6 +593,8 @@ Scope {
         root.attemptInfoMessages = [];
         root.lockoutAnnouncedThisAttempt = false;
         root.resetAuthFlows();
+        fprint.tries = 0;
+        fprint.errorTries = 0;
         if (!SettingsData.lockPamExternallyManaged && !dankshellConfigWatcher.loaded && !userPamWatcher.loaded)
             ensureUserPamConfig();
         // FileView cannot watch a path that does not exist yet; re-read so a
@@ -521,11 +608,17 @@ Scope {
         target: SettingsData
 
         function onEnableFprintChanged(): void {
-            fprint.checkAvail();
+            if (SettingsData.enableFprint)
+                fprint.recover();
+            else
+                fprint.checkAvail();
         }
 
         function onLockFingerprintReadyChanged(): void {
-            fprint.checkAvail();
+            if (SettingsData.lockFingerprintReady)
+                fprint.recover();
+            else
+                fprint.checkAvail();
         }
 
         function onEnableU2fChanged(): void {
