@@ -325,6 +325,80 @@ func TestStateChanged(t *testing.T) {
 			},
 			wantChanged: true,
 		},
+		{
+			// Applying or removing a profile changes nothing else, so the push
+			// that carries it to the settings page must not be suppressed.
+			name: "profile_applied",
+			old:  baseState,
+			new: &State{
+				CurrentTemp:    baseState.CurrentTemp,
+				NextTransition: baseState.NextTransition,
+				SunriseTime:    baseState.SunriseTime,
+				SunsetTime:     baseState.SunsetTime,
+				IsDay:          baseState.IsDay,
+				Config:         baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{
+					"DP-1": {Path: "/tmp/dp1.icc", Active: true},
+				},
+			},
+			wantChanged: true,
+		},
+		{
+			name: "profile_removed",
+			old: &State{
+				CurrentTemp:    baseState.CurrentTemp,
+				NextTransition: baseState.NextTransition,
+				SunriseTime:    baseState.SunriseTime,
+				SunsetTime:     baseState.SunsetTime,
+				IsDay:          baseState.IsDay,
+				Config:         baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{
+					"DP-1": {Path: "/tmp/dp1.icc", Active: true},
+				},
+			},
+			new:         baseState,
+			wantChanged: true,
+		},
+		{
+			name: "profile_description_changed",
+			old: &State{
+				Config:      baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{"DP-1": {Path: "/tmp/dp1.icc", Description: "Old"}},
+			},
+			new: &State{
+				Config:      baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{"DP-1": {Path: "/tmp/dp1.icc", Description: "New"}},
+			},
+			wantChanged: true,
+		},
+		{
+			name: "output_temp_changed",
+			old:  baseState,
+			new: &State{
+				CurrentTemp:    baseState.CurrentTemp,
+				NextTransition: baseState.NextTransition,
+				SunriseTime:    baseState.SunriseTime,
+				SunsetTime:     baseState.SunsetTime,
+				IsDay:          baseState.IsDay,
+				Config:         baseState.Config,
+				OutputTemps:    map[string]int{"DP-1": 7000},
+			},
+			wantChanged: true,
+		},
+		{
+			name: "same_icc_state",
+			old: &State{
+				Config:      baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{"DP-1": {Path: "/tmp/dp1.icc", Active: true}},
+				OutputTemps: map[string]int{"DP-1": 7000},
+			},
+			new: &State{
+				Config:      baseState.Config,
+				ICCProfiles: map[string]*ICCStatus{"DP-1": {Path: "/tmp/dp1.icc", Active: true}},
+				OutputTemps: map[string]int{"DP-1": 7000},
+			},
+			wantChanged: false,
+		},
 	}
 
 	for _, tt := range tests {

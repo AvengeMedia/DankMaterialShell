@@ -366,5 +366,33 @@ func stateChanged(old, new *State) bool {
 	if old.SunPosition != new.SunPosition {
 		return true
 	}
+	return iccStateChanged(old, new)
+}
+
+// iccStateChanged reports whether the ICC part of the state (what the Display
+// Config card renders) differs. Without it, applying or removing a profile and
+// setting a per-output temperature are the only things that changed, and the
+// notifier would treat the state as unchanged and never push it.
+func iccStateChanged(old, new *State) bool {
+	if len(old.ICCProfiles) != len(new.ICCProfiles) || len(old.OutputTemps) != len(new.OutputTemps) {
+		return true
+	}
+	for name, temp := range new.OutputTemps {
+		if oldTemp, ok := old.OutputTemps[name]; !ok || oldTemp != temp {
+			return true
+		}
+	}
+	for name, status := range new.ICCProfiles {
+		prev, ok := old.ICCProfiles[name]
+		if !ok || prev == nil || status == nil {
+			if prev != status {
+				return true
+			}
+			continue
+		}
+		if *prev != *status {
+			return true
+		}
+	}
 	return false
 }
