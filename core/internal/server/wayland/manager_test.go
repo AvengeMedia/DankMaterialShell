@@ -1,7 +1,9 @@
 package wayland
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -797,4 +799,99 @@ func TestManager_ICCStatusConcurrentPublishAndRead(t *testing.T) {
 		_ = m.ListOutputs()
 	}
 	wg.Wait()
+}
+
+// The config is copied by value all over the manager, so a copy has to be a real
+// snapshot: the maps must not alias the ones the manager writes under its lock,
+// or a state push marshalled on another goroutine becomes a fatal
+// "concurrent map iteration and map write".
+func TestManager_ConfigSnapshotOwnsItsMaps(t *testing.T) {
+	m := &Manager{config: DefaultConfig()}
+	m.config.ICCProfiles = map[string]string{"DP-1": "/tmp/dp1.icc"}
+	m.config.OutputTemps = map[string]int{"DP-1": 7000}
+
+	snapshot := m.configSnapshot()
+
+	m.configMutex.Lock()
+	m.config.ICCProfiles["DP-2"] = "/tmp/dp2.icc"
+	m.config.OutputTemps["DP-1"] = 4000
+	m.config.OutputTemps["DP-2"] = 5000
+	m.configMutex.Unlock()
+
+	assert.Equal(t, map[string]string{"DP-1": "/tmp/dp1.icc"}, snapshot.ICCProfiles)
+	assert.Equal(t, map[string]int{"DP-1": 7000}, snapshot.OutputTemps)
+}
+
+// Marshalling the copied config happens on the connection writer goroutine
+// while the IPC goroutine stores a profile, so the copy has to be taken under
+// the lock and own its maps (run with -race).
+func TestManager_ConfigSnapshotConcurrentMarshal(t *testing.T) {
+	m := &Manager{config: DefaultConfig()}
+	m.config.ICCProfiles = make(map[string]string)
+	m.config.OutputTemps = make(map[string]int)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := range 500 {
+			name := fmt.Sprintf("DP-%d", i)
+			m.configMutex.Lock()
+			m.config.ICCProfiles[name] = "/tmp/profile.icc"
+			m.config.OutputTemps[name] = 6000 + i
+			m.configMutex.Unlock()
+		}
+	}()
+
+	for range 500 {
+		if _, err := json.Marshal(m.configSnapshot()); err != nil {
+			t.Fatalf("marshal config snapshot: %v", err)
+		}
+	}
+	wg.Wait()
+}
+
+// On a default install (night light off, no profile) no gamma control exists,
+// so a per-output temperature used to be written to wayland.json without ever
+// being applied or reported: the settings slider snapped back to "Default" and
+// the value only took effect after a daemon restart.
+func TestManager_SetOutputTempWithoutControlsPublishesValue(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	m := &Manager{
+		config:   DefaultConfig(),
+		cmdq:     make(chan cmd, 8),
+		stopChan: make(chan struct{}),
+	}
+	m.wg.Add(1)
+	go m.waylandActor()
+	defer func() {
+		close(m.stopChan)
+		m.wg.Wait()
+	}()
+
+	if err := m.SetOutputTemp("DP-1", 7000); err != nil {
+		t.Fatalf("SetOutputTemp() = %v", err)
+	}
+
+	// Wait for the posted body, so the assertions below are ordered after it.
+	done := make(chan struct{})
+	m.post(func() { close(done) })
+	<-done
+
+	assert.Equal(t, 7000, m.GetOutputTemps()["DP-1"], "the value is reported even without gamma controls")
+
+	path, err := getConfigPath()
+	if err != nil {
+		t.Fatalf("config path: %v", err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read %s: %v", path, err)
+	}
+	var saved Config
+	if err := json.Unmarshal(data, &saved); err != nil {
+		t.Fatalf("unmarshal %s: %v", path, err)
+	}
+	assert.Equal(t, 7000, saved.OutputTemps["DP-1"], "and persisted to the config file")
 }

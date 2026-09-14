@@ -535,16 +535,20 @@ func SampleCurve(curve Curve, t float64) float64 {
 	}
 }
 
-// GenerateGammaRamp creates a wlr-gamma-control compatible ramp from an ICC profile.
-// size is the ramp size (typically 256 or 4096).
+// GenerateGammaRamp creates a wlr-gamma-control compatible ramp from an ICC
+// profile.
 //
-// Strategy:
-// 1. If vcgt exists: resample vcgt entries to `size` entries (linear interpolation)
-// 2. If no vcgt but TRC exists: use TRC curves (composite all three channels)
-// 3. If neither: return identity ramp
+// Only vcgt carries a video card gamma table, which is what the GPU LUT takes.
+// rTRC/gTRC/bTRC describe the device-to-PCS transfer function of the display
+// itself (roughly t^2.2 for a normal monitor), not a correction to write into
+// the ramp, so treating them as one would wash the display out instead of
+// calibrating it. A profile without a vcgt table therefore has no ramp.
 func GenerateGammaRamp(size uint32, profile *Profile) (GammaRamp, error) {
-	if size == 0 {
-		return GammaRamp{}, errors.New("icc: ramp size must be > 0")
+	if size < 2 {
+		return GammaRamp{}, errors.New("icc: ramp size must be at least 2")
+	}
+	if !profile.HasVCGT || profile.VCGT == nil {
+		return GammaRamp{}, errors.New("icc: profile has no vcgt table, so it has no video card gamma ramp")
 	}
 
 	ramp := GammaRamp{
@@ -553,38 +557,12 @@ func GenerateGammaRamp(size uint32, profile *Profile) (GammaRamp, error) {
 		Blue:  make([]uint16, size),
 	}
 
-	// Strategy 1: VCGT exists - resample
-	if profile.HasVCGT && profile.VCGT != nil {
-		vcgt := profile.VCGT
-		for i := uint32(0); i < size; i++ {
-			t := float64(i) / float64(size-1)
-			ramp.Red[i] = resampleVCGT(vcgt.Red, t)
-			ramp.Green[i] = resampleVCGT(vcgt.Green, t)
-			ramp.Blue[i] = resampleVCGT(vcgt.Blue, t)
-		}
-		return ramp, nil
-	}
-
-	// Strategy 2: TRC exists - use curves
-	if profile.HasTRC {
-		for i := uint32(0); i < size; i++ {
-			t := float64(i) / float64(size-1)
-			r := SampleCurve(profile.TRC[0], t)
-			g := SampleCurve(profile.TRC[1], t)
-			b := SampleCurve(profile.TRC[2], t)
-			ramp.Red[i] = uint16Clamp(r * 65535.0)
-			ramp.Green[i] = uint16Clamp(g * 65535.0)
-			ramp.Blue[i] = uint16Clamp(b * 65535.0)
-		}
-		return ramp, nil
-	}
-
-	// Strategy 3: Identity ramp
+	vcgt := profile.VCGT
 	for i := uint32(0); i < size; i++ {
-		v := uint16(float64(i) / float64(size-1) * 65535.0)
-		ramp.Red[i] = v
-		ramp.Green[i] = v
-		ramp.Blue[i] = v
+		t := float64(i) / float64(size-1)
+		ramp.Red[i] = resampleVCGT(vcgt.Red, t)
+		ramp.Green[i] = resampleVCGT(vcgt.Green, t)
+		ramp.Blue[i] = resampleVCGT(vcgt.Blue, t)
 	}
 	return ramp, nil
 }

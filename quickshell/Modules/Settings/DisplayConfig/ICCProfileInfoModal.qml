@@ -198,7 +198,7 @@ DankModal {
 
                             StyledText {
                                 visible: root.details.length === 0
-                                text: I18n.tr("No information available")
+                                text: I18n.tr("No information available", "No information available")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceTextMedium
                             }

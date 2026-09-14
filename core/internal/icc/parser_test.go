@@ -152,6 +152,12 @@ func TestGenerateGammaRamp(t *testing.T) {
 			if err != nil {
 				t.Fatalf("ParseFile failed: %v", err)
 			}
+			if !p.HasVCGT {
+				if _, err := GenerateGammaRamp(256, p); err == nil {
+					t.Error("expected an error for a profile without a vcgt table")
+				}
+				t.Skip("profile carries no vcgt table, so it has no ramp")
+			}
 
 			for _, rampSize := range []uint32{256, 4096} {
 				t.Run("size="+itoa(rampSize), func(t *testing.T) {
@@ -295,21 +301,6 @@ func TestParseBytes(t *testing.T) {
 		_, err := ParseBytes([]byte{0, 1, 2})
 		if err == nil {
 			t.Error("expected error for short data")
-		}
-	})
-
-	t.Run("IdentityRamp", func(t *testing.T) {
-		// Generate identity ramp from a profile with no vcgt and no TRC
-		p := &Profile{}
-		ramp, err := GenerateGammaRamp(256, p)
-		if err != nil {
-			t.Fatalf("GenerateGammaRamp failed: %v", err)
-		}
-		if ramp.Red[0] != 0 {
-			t.Errorf("identity ramp Red[0] = %d, want 0", ramp.Red[0])
-		}
-		if ramp.Red[255] < 65530 {
-			t.Errorf("identity ramp Red[255] = %d, want ~65535", ramp.Red[255])
 		}
 	})
 }
@@ -483,6 +474,35 @@ func TestGenerateGammaRampSynthetic(t *testing.T) {
 	}
 	if ramp.Red[size-1] <= ramp.Red[0] {
 		t.Errorf("ramp not increasing: first=%d last=%d", ramp.Red[0], ramp.Red[size-1])
+	}
+}
+
+// A profile without a vcgt table has no video card gamma ramp: the TRC tags
+// describe the display's own transfer function, so writing them into the GPU
+// LUT washes the output out instead of calibrating it.
+func TestGenerateGammaRampRequiresVCGT(t *testing.T) {
+	trcOnly := &Profile{
+		HasTRC:  true,
+		HasVCGT: false,
+		TRC: [3]Curve{
+			{Type: CurveParametric, Gamma: 2.2},
+			{Type: CurveParametric, Gamma: 2.2},
+			{Type: CurveParametric, Gamma: 2.2},
+		},
+	}
+	if _, err := GenerateGammaRamp(256, trcOnly); err == nil {
+		t.Fatal("expected an error for a profile without a vcgt table")
+	}
+
+	// A vcgt tag with no channel data is unusable in the same way.
+	emptyVCGT := &Profile{HasVCGT: true}
+	if _, err := GenerateGammaRamp(256, emptyVCGT); err == nil {
+		t.Fatal("expected an error for a profile without a vcgt table")
+	}
+
+	// The ramp size has to be at least 2: the values are spread over size-1.
+	if _, err := GenerateGammaRamp(1, &Profile{HasVCGT: true, VCGT: &VCGT{Channels: 3, Entries: 4}}); err == nil {
+		t.Fatal("expected an error for a ramp size below 2")
 	}
 }
 

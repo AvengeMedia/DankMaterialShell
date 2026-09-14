@@ -166,8 +166,26 @@ func TestProfileRampWithTemp(t *testing.T) {
 	const size = uint32(256)
 	mid := int(size) / 2
 
-	// An empty profile yields the identity ramp.
-	profile := &icc.Profile{}
+	// Only vcgt carries a video card gamma table, so the fixture is a profile
+	// whose table is the identity ramp: that keeps the expectations below about
+	// the temperature composition readable.
+	identityTable := func(entries int) []uint16 {
+		out := make([]uint16, entries)
+		for i := range out {
+			out[i] = uint16(float64(i) / float64(entries-1) * 65535.0)
+		}
+		return out
+	}
+	profile := &icc.Profile{
+		HasVCGT: true,
+		VCGT: &icc.VCGT{
+			Channels: 3,
+			Entries:  256,
+			Red:      identityTable(256),
+			Green:    identityTable(256),
+			Blue:     identityTable(256),
+		},
+	}
 	identity := GenerateIdentityRamp(size)
 
 	t.Run("no target keeps the profile as measured", func(t *testing.T) {
