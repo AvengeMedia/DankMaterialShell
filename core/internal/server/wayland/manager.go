@@ -8,7 +8,9 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 	"syscall"
 	"time"
 
@@ -1551,10 +1553,43 @@ func (m *Manager) applyConfiguredICCForOutput(out *outputState, outputName strin
 	return changed
 }
 
+// validateOutputName rejects names no wl_output can report, so a typo or an
+// empty argument cannot persist an entry in wayland.json that nothing will ever
+// match.
+func validateOutputName(name string) error {
+	switch {
+	case name == "":
+		return errors.New("icc: output name is required")
+	case strings.TrimSpace(name) != name:
+		return fmt.Errorf("icc: output name %q has surrounding whitespace", name)
+	}
+	return nil
+}
+
+// validateICCProfilePath rejects paths that cannot be resolved later: the path
+// is persisted and read again on the next start, when the daemon no longer has
+// the working directory the caller had.
+func validateICCProfilePath(path string) error {
+	switch {
+	case path == "":
+		return errors.New("icc: profile path is required")
+	case !filepath.IsAbs(path):
+		return fmt.Errorf("icc: profile path %q must be absolute", path)
+	}
+	return nil
+}
+
 // ApplyICC loads and applies an ICC profile to a specific output.
 // outputName is the wl_output name (e.g., "DP-1").
 // iccPath is the path to the .icm/.icc profile file.
 func (m *Manager) ApplyICC(outputName, iccPath string) error {
+	if err := validateOutputName(outputName); err != nil {
+		return err
+	}
+	if err := validateICCProfilePath(iccPath); err != nil {
+		return err
+	}
+
 	// 1. Parse and validate the ICC profile
 	profile, err := icc.ParseFile(iccPath)
 	if err != nil {
@@ -1624,6 +1659,10 @@ func (m *Manager) ApplyICC(outputName, iccPath string) error {
 
 // RemoveICC removes the ICC profile from a specific output, reverting to temperature-based gamma.
 func (m *Manager) RemoveICC(outputName string) error {
+	if err := validateOutputName(outputName); err != nil {
+		return err
+	}
+
 	m.post(func() {
 		defer m.updateStateFromSchedule()
 
@@ -1745,6 +1784,9 @@ func (m *Manager) ListOutputs() []string {
 // SetOutputTemp sets a per-output color temperature (1000K-10000K).
 // A value of 0 resets to the global default.
 func (m *Manager) SetOutputTemp(outputName string, temp int) error {
+	if err := validateOutputName(outputName); err != nil {
+		return err
+	}
 	if temp != 0 && (temp < 1000 || temp > 10000) {
 		return fmt.Errorf("temperature %d out of range (1000-10000)", temp)
 	}

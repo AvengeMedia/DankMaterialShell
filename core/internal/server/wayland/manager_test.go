@@ -915,3 +915,30 @@ func TestManager_SetOutputTempWithoutControlsPublishesValue(t *testing.T) {
 	}
 	assert.Equal(t, 7000, saved.OutputTemps["DP-1"], "and persisted to the config file")
 }
+
+// Arguments that no wl_output or file can satisfy are rejected before anything is
+// written: an empty name would persist an entry in wayland.json that nothing can
+// match, and a relative profile path cannot be resolved by the next start, when
+// the daemon no longer has the caller's working directory.
+func TestManager_RejectsInvalidICCArguments(t *testing.T) {
+	m := &Manager{config: DefaultConfig()}
+
+	t.Run("empty output name", func(t *testing.T) {
+		assert.Error(t, m.ApplyICC("", "/tmp/profile.icc"))
+		assert.Error(t, m.RemoveICC(""))
+		assert.Error(t, m.SetOutputTemp("", 7000))
+		assert.Empty(t, m.config.ICCProfiles, "nothing may be stored for a name that cannot exist")
+		assert.Empty(t, m.config.OutputTemps)
+	})
+
+	t.Run("output name with whitespace", func(t *testing.T) {
+		assert.Error(t, m.SetOutputTemp(" DP-1", 7000))
+		assert.Empty(t, m.config.OutputTemps)
+	})
+
+	t.Run("relative profile path", func(t *testing.T) {
+		assert.Error(t, m.ApplyICC("DP-1", "profile.icc"))
+		assert.Error(t, m.ApplyICC("DP-1", ""))
+		assert.Empty(t, m.config.ICCProfiles)
+	})
+}

@@ -189,7 +189,14 @@ func runICCList(cmd *cobra.Command, args []string) {
 				fmt.Printf("  %-40s (parse error: %v)\n", filepath.Base(path), err)
 				continue
 			}
-			fmt.Printf("  %-40s %s\n", filepath.Base(path), profile.Description)
+			// A profile without a vcgt table has no video card gamma ramp, so the
+			// daemon refuses to apply it: say so here instead of letting the user
+			// find out from a rejected `dms icc apply`.
+			note := ""
+			if !profile.HasVCGT {
+				note = "  (no vcgt table: cannot be applied)"
+			}
+			fmt.Printf("  %-40s %s%s\n", filepath.Base(path), profile.Description, note)
 		}
 	}
 }
@@ -271,10 +278,19 @@ func runICCApply(cmd *cobra.Command, args []string) {
 		filePath = abs
 	}
 
-	// Validate file exists and is a valid ICC profile
+	// Validate file exists and is a valid ICC profile. The rules the daemon
+	// enforces are checked here too: a profile it would refuse must not be copied
+	// into the profile directory first, or `dms icc list` keeps offering a file
+	// that can never be applied.
 	profile, err := icc.ParseFile(filePath)
 	if err != nil {
 		log.Fatalf("Invalid ICC profile: %v", err)
+	}
+	if profile.ColorSpace != "RGB" {
+		log.Fatalf("Unsupported color space %q, only RGB profiles can be applied", profile.ColorSpace)
+	}
+	if !profile.HasVCGT {
+		log.Fatalf("%s has no vcgt table, so it has no gamma ramp to apply", filepath.Base(filePath))
 	}
 
 	// Copy the ICC file to config dir for persistence
@@ -284,7 +300,11 @@ func runICCApply(cmd *cobra.Command, args []string) {
 	}
 
 	destPath := filepath.Join(configDir, filepath.Base(filePath))
+	copied := false
 	if filepath.Clean(filePath) != filepath.Clean(destPath) {
+		if _, err := os.Stat(destPath); err != nil {
+			copied = true
+		}
 		data, err := os.ReadFile(filePath)
 		if err != nil {
 			log.Fatalf("Failed to read ICC file: %v", err)
@@ -302,17 +322,29 @@ func runICCApply(cmd *cobra.Command, args []string) {
 			"path":   destPath,
 		},
 	}
-
 	resp, err := sendServerRequest(req)
 	if err != nil {
+		dropCopiedProfile(destPath, copied)
 		log.Fatalf("Failed to apply ICC profile: %v", err)
 	}
-
 	if resp.Error != "" {
+		dropCopiedProfile(destPath, copied)
 		log.Fatalf("Server error: %s", resp.Error)
 	}
 
 	fmt.Printf("Applied ICC profile '%s' to output '%s'\n", profile.Description, outputName)
+}
+
+// dropCopiedProfile removes the copy this command just made, so a rejected apply
+// does not leave a profile in the config directory that was never applied (a
+// file that was already there is left alone).
+func dropCopiedProfile(path string, copied bool) {
+	if !copied {
+		return
+	}
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		log.Errorf("Failed to remove %s: %v", path, err)
+	}
 }
 
 func runICCRemove(cmd *cobra.Command, args []string) {
