@@ -207,6 +207,10 @@ Singleton {
     }
 
     function isMine(peer) {
+        if (!peer)
+            return false;
+        if (selfNode && (peer === selfNode || peer.id === selfNode.id))
+            return true;
         const myOwner = selfNode ? (selfNode.owner || "") : "";
         if (peer.owner === myOwner && myOwner !== "")
             return true;
