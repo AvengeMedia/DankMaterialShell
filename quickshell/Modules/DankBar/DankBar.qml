@@ -103,8 +103,8 @@ Item {
 
     function triggerControlCenterOnFocusedScreen() {
         let focusedScreenName = "";
-        if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
-            focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
+        if (CompositorService.isHyprland && Hyprland.focusedMonitor) {
+            focusedScreenName = Hyprland.focusedMonitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
             focusedScreenName = NiriService.currentOutput;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
@@ -132,8 +132,8 @@ Item {
 
     function triggerWallpaperBrowserOnFocusedScreen() {
         let focusedScreenName = "";
-        if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
-            focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
+        if (CompositorService.isHyprland && Hyprland.focusedMonitor) {
+            focusedScreenName = Hyprland.focusedMonitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
             focusedScreenName = NiriService.currentOutput;
         } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
