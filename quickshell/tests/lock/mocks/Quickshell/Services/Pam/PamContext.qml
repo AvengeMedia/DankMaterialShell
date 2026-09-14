@@ -10,6 +10,7 @@ Item {
     property bool startSucceeds: true
     property bool startFailsSynchronously: false
     signal completed(int res)
+    signal pamMessage
     function start() {
         if (active)
             return false;
@@ -27,6 +28,10 @@ Item {
         active = false;
     }
     function respond(value) {
+    }
+    function deliverMessage() {
+        if (active)
+            pamMessage();
     }
     function finish(result) {
         active = false;

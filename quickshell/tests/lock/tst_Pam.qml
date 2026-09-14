@@ -197,6 +197,7 @@ TestCase {
         const pam = lockedPam();
         pam.fprint.finish(PamResult.MaxTries);
         compare(pam.fprint.tries, 1);
+        pam.fprint.deliverMessage();
         pam.fprint.attemptStartedAt = Date.now() - (pam.fprint.sessionTimeoutMs + 1000);
         pam.fprint.finish(PamResult.Error);
         compare(pam.fprint.errorTries, 0);
@@ -381,8 +382,28 @@ TestCase {
         compare(pam.fprint.starts, 1);
     }
 
+    // pam_fprintd's timeout runs from the verify, so a claim that drags on must
+    // not age a fault into looking like an expiry.
+    function test_sessionAgeIsMeasuredFromTheVerifyNotTheClaim() {
+        const pam = lockedPam();
+        compare(pam.fprint.attemptStartedAt, 0);
+        verify(!pam.fprint.attemptSettled());
+        pam.fprint.deliverMessage();
+        verify(pam.fprint.attemptStartedAt > 0);
+    }
+
+    function test_errorBeforeAnyVerifyIsAlwaysAFault() {
+        const pam = lockedPam();
+        pam.fprint.finish(PamResult.Error);
+        compare(pam.fprint.errorTries, 1);
+        compare(pam.fprintState, "error");
+        verify(pam.fprint.retrying);
+        compare(pam.fprint.starts, 1);
+    }
+
     function test_faultBeforeTimeoutStillSpendsErrorBudget() {
         const pam = lockedPam();
+        pam.fprint.deliverMessage();
         // halfway to the PAM timeout is a device fault, not an expiry
         pam.fprint.attemptStartedAt = Date.now() - pam.fprint.sessionTimeoutMs / 2;
         pam.fprint.finish(PamResult.Error);
@@ -392,9 +413,23 @@ TestCase {
         compare(pam.fprint.starts, 1);
     }
 
+    // VerifyStart is asynchronous: pam_fprintd arms its deadline before the call
+    // and the message lands afterwards, so an ordinary expiry reads a little short
+    // of the timeout here and must still renew rather than back off.
+    function test_expiryShortenedByVerifyStartStillRenews() {
+        const pam = lockedPam();
+        pam.fprint.deliverMessage();
+        pam.fprint.attemptStartedAt = Date.now() - (pam.fprint.sessionTimeoutMs - 900);
+        pam.fprint.finish(PamResult.Error);
+        compare(pam.fprint.errorTries, 0);
+        compare(pam.fprint.starts, 2);
+        compare(pam.fprintState, "");
+    }
+
     function test_faultJustBeforeTimeoutStillSpendsErrorBudget() {
         const pam = lockedPam();
-        pam.fprint.attemptStartedAt = Date.now() - (pam.fprint.sessionTimeoutMs - 9000);
+        pam.fprint.deliverMessage();
+        pam.fprint.attemptStartedAt = Date.now() - (pam.fprint.sessionTimeoutMs - pam.fprint.verifyStartSlackMs - 1000);
         pam.fprint.finish(PamResult.Error);
         compare(pam.fprint.errorTries, 1);
         verify(pam.fprint.retrying);

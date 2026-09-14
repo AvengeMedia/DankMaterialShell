@@ -267,6 +267,7 @@ Scope {
         readonly property int daemonIdleExitMs: 30000
         // sessionTimeoutMs mirrors `timeout=` in assets/pam/fprint
         readonly property int sessionTimeoutMs: 90000
+        readonly property int verifyStartSlackMs: 10000
         readonly property bool retrying: errorRetry.running
         readonly property int retryInterval: errorRetry.interval
         readonly property bool allowed: available && SettingsData.enableFprint && root.lockSecured && !root.fprintSuppressedByPrimaryPam && !root.unlockInProgress && !root.u2fPending && !SessionService.preparingForSleep && !IdleService.monitorsOff && tries < SettingsData.maxFprintTries
@@ -290,13 +291,18 @@ Scope {
             abort();
         }
 
-        // pam_fprintd reports an expired timeout as PAM_AUTHINFO_UNAVAIL with no
-        // message, exactly like a device fault, so age is the only signal left.
-        // Its own clock only starts after the claim and stops before the release,
-        // so a real expiry always measures longer than the timeout here; anything
-        // shorter is treated as a fault.
+        // pam_fprintd reports an expired timeout as PAM_AUTHINFO_UNAVAIL, the same
+        // result a device fault gives, and its "Verification timed out" message is
+        // translated, so age is the signal we can rely on. Its timeout runs from the
+        // verify rather than from the claim, which is why the age is measured from
+        // the message announcing the verify: a slow claim then cannot make a fault
+        // look old enough, and a session that never reached a verify never qualifies.
+        // That message lands after pam_fprintd has already armed its deadline, so the
+        // age read here runs short of the real timeout and the slack makes it up. The
+        // bias is deliberate: a timeout misread as a fault parks the reader behind the
+        // backoff, while a fault misread as a timeout costs one extra retry.
         function attemptSettled(): bool {
-            return attemptStartedAt > 0 && Date.now() - attemptStartedAt >= sessionTimeoutMs;
+            return attemptStartedAt > 0 && Date.now() - attemptStartedAt >= sessionTimeoutMs - verifyStartSlackMs;
         }
 
         function checkAvail(): void {
@@ -320,10 +326,8 @@ Scope {
                 root.fprintState = "";
             attemptStartedAt = 0;
             completedDuringStart = false;
-            if (start()) {
-                attemptStartedAt = Date.now();
+            if (start())
                 return;
-            }
             if (!completedDuringStart)
                 scheduleErrorRetry();
         }
@@ -358,6 +362,11 @@ Scope {
 
         config: "fprint"
         configDirectory: Quickshell.shellDir + "/assets/pam"
+
+        onPamMessage: {
+            if (attemptStartedAt === 0)
+                attemptStartedAt = Date.now();
+        }
 
         onCompleted: res => {
             completedDuringStart = true;
