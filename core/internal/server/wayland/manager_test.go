@@ -12,6 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
+
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	mocks_wlclient "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlclient"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
@@ -941,4 +943,67 @@ func TestManager_RejectsInvalidICCArguments(t *testing.T) {
 		assert.Error(t, m.ApplyICC("DP-1", ""))
 		assert.Empty(t, m.config.ICCProfiles)
 	})
+}
+
+// A gamma control that the compositor dropped on an output with an ICC profile
+// (or a per-output temperature) has to be recreated even while the night light
+// is off, because the controls exist for the profile in that case. Gating on
+// config.Enabled left out.failed set for the life of the daemon, and applyGamma
+// skips those outputs.
+func TestManager_RecreateOutputControlFollowsNeedsControls(t *testing.T) {
+	output := &wlclient.Output{}
+	out := &outputState{id: 1, registryName: 10, output: output, rampSize: 256, failed: true}
+
+	m := &Manager{config: DefaultConfig()}
+	m.outputs.Store(out.id, out)
+	m.availOutputsMu.Lock()
+	m.availableOutputs = []*wlclient.Output{output}
+	m.availOutputsMu.Unlock()
+	m.controlsInitialized = true
+
+	// Night light off and nothing configured: there is nothing to recreate.
+	assert.NoError(t, m.recreateOutputControl(out))
+
+	// Still no night light, but the output has a profile: the control has to be
+	// recreated (the missing gamma manager is what stops it in this test).
+	m.config.ICCProfiles = map[string]string{"DP-1": "/tmp/dp1.icc"}
+	assert.Error(t, m.recreateOutputControl(out), "a profiled output needs its control back with the night light off")
+
+	// A per-output temperature counts as well.
+	m.config.ICCProfiles = nil
+	m.config.OutputTemps = map[string]int{"DP-1": 7000}
+	assert.Error(t, m.recreateOutputControl(out), "so does an output with a temperature override")
+}
+
+// Clearing an override is what the reset button in Display Config does: it has to
+// drop the stored value and the published entry, so the row goes back to
+// "Default" and the output follows the schedule again.
+func TestManager_SetOutputTempZeroClearsTheOverride(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	m := &Manager{
+		config:   DefaultConfig(),
+		cmdq:     make(chan cmd, 8),
+		stopChan: make(chan struct{}),
+	}
+	m.wg.Add(1)
+	go m.waylandActor()
+	defer func() {
+		close(m.stopChan)
+		m.wg.Wait()
+	}()
+
+	if err := m.SetOutputTemp("DP-1", 7000); err != nil {
+		t.Fatalf("SetOutputTemp(7000) = %v", err)
+	}
+	if err := m.SetOutputTemp("DP-1", 0); err != nil {
+		t.Fatalf("SetOutputTemp(0) = %v", err)
+	}
+
+	done := make(chan struct{})
+	m.post(func() { close(done) })
+	<-done
+
+	assert.NotContains(t, m.GetOutputTemps(), "DP-1", "the published override has to disappear")
+	assert.NotContains(t, m.config.OutputTemps, "DP-1", "and so has the stored one")
 }

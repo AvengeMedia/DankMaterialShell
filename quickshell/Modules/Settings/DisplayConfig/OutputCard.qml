@@ -530,7 +530,7 @@ StyledRect {
             }
 
             Column {
-                width: parent.width - 18 - Theme.spacingS - tempLabel.width - Theme.spacingS - (tempResetButton.visible ? tempResetButton.width + Theme.spacingS : 0)
+                width: parent.width - 18 - Theme.spacingS - tempLabel.width - Theme.spacingS - tempResetButton.width - Theme.spacingS
                 spacing: 1
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -557,6 +557,11 @@ StyledRect {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
+            // The slider cannot produce the "no override" value (its range starts
+            // at 3000K), so this is the only way back to "Default" from the UI.
+            // It keeps its slot instead of appearing on demand: the row sits in
+            // the same column as the slider below it, so a height change while
+            // the value is dragged would move the slider under the pointer.
             DankButton {
                 id: tempResetButton
                 text: ""
@@ -565,7 +570,8 @@ StyledRect {
                 horizontalPadding: Theme.spacingXS
                 backgroundColor: "transparent"
                 textColor: Theme.error
-                visible: colorTempRow.currentTemp !== 0
+                enabled: colorTempRow.currentTemp !== 0
+                opacity: colorTempRow.currentTemp !== 0 ? 1 : 0
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: ICCService.setOutputTemp(root.outputName, 0)
             }
