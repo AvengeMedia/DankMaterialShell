@@ -530,7 +530,7 @@ StyledRect {
             }
 
             Column {
-                width: parent.width - 18 - Theme.spacingS - tempLabel.width - Theme.spacingS
+                width: parent.width - 18 - Theme.spacingS - tempLabel.width - Theme.spacingS - (tempResetButton.visible ? tempResetButton.width + Theme.spacingS : 0)
                 spacing: 1
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -557,9 +557,17 @@ StyledRect {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Item {
-                width: 1
-                height: 1
+            DankButton {
+                id: tempResetButton
+                text: ""
+                iconName: "close"
+                buttonHeight: 30
+                horizontalPadding: Theme.spacingXS
+                backgroundColor: "transparent"
+                textColor: Theme.error
+                visible: colorTempRow.currentTemp !== 0
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: ICCService.setOutputTemp(root.outputName, 0)
             }
         }
 

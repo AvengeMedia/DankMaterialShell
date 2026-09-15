@@ -539,14 +539,10 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 }
 
 func (m *Manager) recreateOutputControl(out *outputState) error {
-	m.configMutex.RLock()
-	enabled := m.config.Enabled
-	m.configMutex.RUnlock()
-
 	switch {
 	case m.connectionDead.Load():
 		return nil
-	case !enabled || !m.controlsInitialized:
+	case !m.needsControls() || !m.controlsInitialized:
 		return nil
 	case out.isVirtual:
 		return nil
