@@ -169,38 +169,51 @@ func GenerateIdentityRamp(size uint32) GammaRamp {
 	return ramp
 }
 
-// ProfileRampWithTemp builds the gamma ramp for an output that has an ICC
-// profile. The profile describes the display at its reference white point
-// (baseTemp), so a temperature target is composed as the ratio between the
-// target ramp and the base ramp. targetTemp <= 0 means "no target", which
-// leaves the profile as measured.
+// ProfileRampWithTemp builds the ramp for an output with an ICC profile: the
+// vcgt table is sampled at the contrast-adjusted input, the user gamma is
+// applied to the result, and a temperature target (targetTemp > 0) is composed
+// as the white point ratio against baseTemp, the profile's reference white.
 func ProfileRampWithTemp(size uint32, profile *icc.Profile, baseTemp, targetTemp int, gamma, contrast float64) (GammaRamp, error) {
-	iccRamp, err := icc.GenerateGammaRamp(size, profile)
+	iccRamp, err := icc.GenerateGammaRampAt(size, profile, func(t float64) float64 { return applyContrast(t, contrast) })
 	if err != nil {
 		return GammaRamp{}, err
 	}
-	ramp := GammaRamp{Red: iccRamp.Red, Green: iccRamp.Green, Blue: iccRamp.Blue}
-	if targetTemp <= 0 || targetTemp == baseTemp {
-		return ramp, nil
+
+	tint := whitepointRatio(baseTemp, targetTemp)
+	ramp := GammaRamp{
+		Red:   make([]uint16, size),
+		Green: make([]uint16, size),
+		Blue:  make([]uint16, size),
 	}
-
-	base := GenerateGammaRamp(size, baseTemp, gamma, contrast)
-	target := GenerateGammaRamp(size, targetTemp, gamma, contrast)
-
-	for i := range ramp.Red {
-		ramp.Red[i] = scaleRampValue(ramp.Red[i], base.Red[i], target.Red[i])
-		ramp.Green[i] = scaleRampValue(ramp.Green[i], base.Green[i], target.Green[i])
-		ramp.Blue[i] = scaleRampValue(ramp.Blue[i], base.Blue[i], target.Blue[i])
+	for i := range size {
+		ramp.Red[i] = adjustRampValue(iccRamp.Red[i], tint.r, gamma)
+		ramp.Green[i] = adjustRampValue(iccRamp.Green[i], tint.g, gamma)
+		ramp.Blue[i] = adjustRampValue(iccRamp.Blue[i], tint.b, gamma)
 	}
-
 	return ramp, nil
 }
 
-// scaleRampValue rescales a profile ramp value by the ratio of the target and
-// base temperature ramps at the same index.
-func scaleRampValue(value, base, target uint16) uint16 {
-	if base == 0 {
-		return value
+func whitepointRatio(baseTemp, targetTemp int) rgb {
+	if targetTemp <= 0 || targetTemp == baseTemp {
+		return rgb{r: 1, g: 1, b: 1}
 	}
-	return uint16(clamp01(float64(value)*float64(target)/float64(base)/65535.0) * 65535.0)
+	base := calcWhitepoint(baseTemp)
+	target := calcWhitepoint(targetTemp)
+	return rgb{
+		r: channelRatio(target.r, base.r),
+		g: channelRatio(target.g, base.g),
+		b: channelRatio(target.b, base.b),
+	}
+}
+
+func channelRatio(target, base float64) float64 {
+	if base <= 0 {
+		return 1
+	}
+	return target / base
+}
+
+func adjustRampValue(value uint16, tint, gamma float64) uint16 {
+	linear := clamp01(float64(value) / 65535.0 * tint)
+	return uint16(math.Round(clamp01(math.Pow(linear, 1.0/gamma)) * 65535.0))
 }

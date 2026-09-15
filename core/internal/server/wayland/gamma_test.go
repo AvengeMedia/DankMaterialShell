@@ -240,3 +240,85 @@ func TestProfileRampWithTemp(t *testing.T) {
 		}
 	})
 }
+
+func identityVCGTProfile(entries int) *icc.Profile {
+	table := func() []uint16 {
+		out := make([]uint16, entries)
+		for i := range out {
+			out[i] = uint16(float64(i) / float64(entries-1) * 65535.0)
+		}
+		return out
+	}
+	return &icc.Profile{
+		HasVCGT: true,
+		VCGT:    &icc.VCGT{Channels: 3, Entries: entries, Red: table(), Green: table(), Blue: table()},
+	}
+}
+
+func TestProfileRampWithTempAppliesGammaAndContrast(t *testing.T) {
+	const size = uint32(256)
+	const tolerance = 2
+	profile := identityVCGTProfile(256)
+
+	closeTo := func(t *testing.T, name string, got, want []uint16) {
+		t.Helper()
+		for i := range want {
+			diff := int(got[i]) - int(want[i])
+			if diff < -tolerance || diff > tolerance {
+				t.Fatalf("%s[%d] = %d, want %d (±%d)", name, i, got[i], want[i], tolerance)
+			}
+		}
+	}
+
+	cases := []struct {
+		name     string
+		target   int
+		gamma    float64
+		contrast float64
+	}{
+		{"no target, gamma only", noTempTarget, 1.8, 1.0},
+		{"no target, contrast only", noTempTarget, 1.0, 1.4},
+		{"reference target, both", neutralTemp, 0.8, 0.7},
+		{"warm target, both", 4000, 1.5, 1.3},
+		{"cool target, both", 8000, 0.9, 0.6},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ramp, err := ProfileRampWithTemp(size, profile, neutralTemp, tc.target, tc.gamma, tc.contrast)
+			if err != nil {
+				t.Fatalf("ProfileRampWithTemp: %v", err)
+			}
+			plainTemp := tc.target
+			if plainTemp <= 0 {
+				plainTemp = neutralTemp
+			}
+			want := GenerateGammaRamp(size, plainTemp, tc.gamma, tc.contrast)
+			closeTo(t, "red", ramp.Red, want.Red)
+			closeTo(t, "green", ramp.Green, want.Green)
+			closeTo(t, "blue", ramp.Blue, want.Blue)
+		})
+	}
+
+	t.Run("gamma changes the profile ramp without a target", func(t *testing.T) {
+		flat, _ := ProfileRampWithTemp(size, profile, neutralTemp, noTempTarget, 1.0, 1.0)
+		raised, _ := ProfileRampWithTemp(size, profile, neutralTemp, noTempTarget, 2.0, 1.0)
+		mid := int(size) / 2
+		if raised.Red[mid] <= flat.Red[mid] {
+			t.Fatalf("gamma 2.0 should lift mid gray: got %d, flat %d", raised.Red[mid], flat.Red[mid])
+		}
+	})
+
+	t.Run("contrast pivots the profile ramp at mid gray", func(t *testing.T) {
+		const oddSize = uint32(257)
+		flat, _ := ProfileRampWithTemp(oddSize, profile, neutralTemp, noTempTarget, 1.0, 1.0)
+		high, _ := ProfileRampWithTemp(oddSize, profile, neutralTemp, noTempTarget, 1.0, 2.0)
+		mid := int(oddSize) / 2
+		quarter := int(oddSize) / 4
+		if diff := int(high.Green[mid]) - int(flat.Green[mid]); diff < -tolerance || diff > tolerance {
+			t.Fatalf("mid gray should hold under contrast: got %d, flat %d", high.Green[mid], flat.Green[mid])
+		}
+		if high.Green[quarter] >= flat.Green[quarter] {
+			t.Fatalf("quarter gray should drop under contrast 2.0: got %d, flat %d", high.Green[quarter], flat.Green[quarter])
+		}
+	})
+}

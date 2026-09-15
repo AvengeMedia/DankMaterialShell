@@ -544,6 +544,13 @@ func SampleCurve(curve Curve, t float64) float64 {
 // the ramp, so treating them as one would wash the display out instead of
 // calibrating it. A profile without a vcgt table therefore has no ramp.
 func GenerateGammaRamp(size uint32, profile *Profile) (GammaRamp, error) {
+	return GenerateGammaRampAt(size, profile, func(t float64) float64 { return t })
+}
+
+// GenerateGammaRampAt samples the vcgt table at input(t) for each ramp
+// position t in [0, 1], so a caller can reshape the ramp input (contrast)
+// before the table is applied.
+func GenerateGammaRampAt(size uint32, profile *Profile, input func(float64) float64) (GammaRamp, error) {
 	if size < 2 {
 		return GammaRamp{}, errors.New("icc: ramp size must be at least 2")
 	}
@@ -559,7 +566,7 @@ func GenerateGammaRamp(size uint32, profile *Profile) (GammaRamp, error) {
 
 	vcgt := profile.VCGT
 	for i := uint32(0); i < size; i++ {
-		t := float64(i) / float64(size-1)
+		t := input(float64(i) / float64(size-1))
 		ramp.Red[i] = resampleVCGT(vcgt.Red, t)
 		ramp.Green[i] = resampleVCGT(vcgt.Green, t)
 		ramp.Blue[i] = resampleVCGT(vcgt.Blue, t)
