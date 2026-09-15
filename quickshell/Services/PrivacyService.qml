@@ -45,7 +45,7 @@ Singleton {
 
         for (let i = 0; i < Pipewire.nodes.values.length; i++) {
             const node = Pipewire.nodes.values[i]
-            if (!node || !node.ready) {
+            if (!node || !node.ready || node.properties?.["media.role"] === "Screen") {
                 continue
             }
 
