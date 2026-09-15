@@ -356,7 +356,7 @@ Singleton {
         }).filter(a => a.name);
     }
 
-    function getBuiltInLauncherItems(pluginId, query) {
+    function getBuiltInLauncherItems(pluginId, query, allowEmptyQuery) {
         if (pluginId === "dms_power") {
             const q = (query || "").toString().trim().toLowerCase();
             return getPowerLauncherActions().filter(a => {
@@ -393,7 +393,7 @@ Singleton {
             if (!DMSNetworkService.vpnAvailable)
                 return [];
             const q = (query || "").toString().trim().toLowerCase();
-            if (!q && !getBuiltInPluginTrigger(pluginId))
+            if (!q && !allowEmptyQuery && !getBuiltInPluginTrigger(pluginId))
                 return [];
             return (DMSNetworkService.profiles || []).map(profile => {
                 const id = profile.uuid || profile.name || "";
