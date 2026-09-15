@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -299,19 +300,9 @@ func runICCApply(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to create config directory: %v", err)
 	}
 
-	destPath := filepath.Join(configDir, filepath.Base(filePath))
-	copied := false
-	if filepath.Clean(filePath) != filepath.Clean(destPath) {
-		if _, err := os.Stat(destPath); err != nil {
-			copied = true
-		}
-		data, err := os.ReadFile(filePath)
-		if err != nil {
-			log.Fatalf("Failed to read ICC file: %v", err)
-		}
-		if err := os.WriteFile(destPath, data, 0644); err != nil {
-			log.Fatalf("Failed to copy ICC file: %v", err)
-		}
+	destPath, copied, err := stageProfile(configDir, filePath)
+	if err != nil {
+		log.Fatalf("Failed to copy ICC file: %v", err)
 	}
 
 	// Send IPC request to running server
@@ -333,6 +324,44 @@ func runICCApply(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("Applied ICC profile '%s' to output '%s'\n", profile.Description, outputName)
+}
+
+// stageProfile places filePath in configDir and reports the path the daemon
+// should load and whether a new file was written. A file already in configDir
+// is used as it is. An existing file with the same name keeps its content: an
+// identical copy is reused, a different one gets a numbered sibling, so two
+// displays never end up sharing one file by name.
+func stageProfile(configDir, filePath string) (string, bool, error) {
+	if filepath.Dir(filepath.Clean(filePath)) == filepath.Clean(configDir) {
+		return filePath, false, nil
+	}
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", false, err
+	}
+
+	base := filepath.Base(filePath)
+	ext := filepath.Ext(base)
+	stem := strings.TrimSuffix(base, ext)
+	for n := 0; ; n++ {
+		name := base
+		if n > 0 {
+			name = fmt.Sprintf("%s-%d%s", stem, n, ext)
+		}
+		destPath := filepath.Join(configDir, name)
+		existing, err := os.ReadFile(destPath)
+		switch {
+		case os.IsNotExist(err):
+			if err := os.WriteFile(destPath, data, 0644); err != nil {
+				return "", false, err
+			}
+			return destPath, true, nil
+		case err != nil:
+			return "", false, err
+		case bytes.Equal(existing, data):
+			return destPath, false, nil
+		}
+	}
 }
 
 // dropCopiedProfile removes the copy this command just made, so a rejected apply
