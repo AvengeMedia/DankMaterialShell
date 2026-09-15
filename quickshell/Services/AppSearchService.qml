@@ -393,6 +393,8 @@ Singleton {
             if (!DMSNetworkService.vpnAvailable)
                 return [];
             const q = (query || "").toString().trim().toLowerCase();
+            if (!q && !getBuiltInPluginTrigger(pluginId))
+                return [];
             return (DMSNetworkService.profiles || []).map(profile => {
                 const id = profile.uuid || profile.name || "";
                 const active = DMSNetworkService.isActiveVpnUuid(id);
