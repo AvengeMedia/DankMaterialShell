@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -59,6 +60,7 @@ type State struct {
 	SunPosition    float64               `json:"sunPosition"`
 	ICCProfiles    map[string]*ICCStatus `json:"iccProfiles"` // outputName -> status
 	OutputTemps    map[string]int        `json:"outputTemps"` // outputName -> current temp
+	Outputs        []string              `json:"outputs"`     // connected output names, sorted
 }
 
 // ICCStatus represents the ICC profile status for a single output.
@@ -391,6 +393,9 @@ func stateChanged(old, new *State) bool {
 // notifier would treat the state as unchanged and never push it.
 func iccStateChanged(old, new *State) bool {
 	if len(old.ICCProfiles) != len(new.ICCProfiles) || len(old.OutputTemps) != len(new.OutputTemps) {
+		return true
+	}
+	if !slices.Equal(old.Outputs, new.Outputs) {
 		return true
 	}
 	for name, temp := range new.OutputTemps {

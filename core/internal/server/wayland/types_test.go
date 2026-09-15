@@ -271,6 +271,12 @@ func TestStateChanged(t *testing.T) {
 			wantChanged: true,
 		},
 		{
+			name:        "output list changed",
+			old:         baseState,
+			new:         func() *State { st := *baseState; st.Outputs = []string{"DP-1"}; return &st }(),
+			wantChanged: true,
+		},
+		{
 			name:        "nil_new",
 			old:         baseState,
 			new:         nil,

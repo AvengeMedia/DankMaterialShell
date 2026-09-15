@@ -1007,3 +1007,105 @@ func TestManager_SetOutputTempZeroClearsTheOverride(t *testing.T) {
 	assert.NotContains(t, m.GetOutputTemps(), "DP-1", "the published override has to disappear")
 	assert.NotContains(t, m.config.OutputTemps, "DP-1", "and so has the stored one")
 }
+
+func startTestActor(t *testing.T, m *Manager) func() {
+	t.Helper()
+	m.cmdq = make(chan cmd, 8)
+	m.stopChan = make(chan struct{})
+	m.wg.Add(1)
+	go m.waylandActor()
+	t.Cleanup(func() {
+		close(m.stopChan)
+		m.wg.Wait()
+	})
+	return func() {
+		done := make(chan struct{})
+		m.post(func() { close(done) })
+		<-done
+	}
+}
+
+func TestManager_ClearingLastOverrideReleasesControls(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	cfg := DefaultConfig()
+	cfg.OutputTemps = map[string]int{"DP-1": 7000}
+	m := &Manager{config: cfg, controlsInitialized: true}
+	m.outputs.Store(1, &outputState{id: 1, outputTemp: 7000})
+	m.outputNames.Store(1, "DP-1")
+	drain := startTestActor(t, m)
+
+	if err := m.SetOutputTemp("DP-1", 0); err != nil {
+		t.Fatalf("SetOutputTemp() = %v", err)
+	}
+	drain()
+
+	assert.False(t, m.controlsInitialized, "nothing needs the controls once the last override is gone")
+	_, kept := m.outputs.Load(1)
+	assert.False(t, kept, "the output state goes with the controls")
+	assert.Empty(t, m.GetOutputTemps())
+}
+
+func TestManager_ClearingOverrideWithoutControlsCreatesNone(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	m := &Manager{config: DefaultConfig()}
+	drain := startTestActor(t, m)
+
+	if err := m.SetOutputTemp("DP-1", 0); err != nil {
+		t.Fatalf("SetOutputTemp() = %v", err)
+	}
+	drain()
+
+	assert.False(t, m.controlsInitialized, "clearing a value nothing holds must not create controls")
+}
+
+func TestManager_RemovingLastProfileReleasesControls(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	cfg := DefaultConfig()
+	cfg.ICCProfiles = map[string]string{"DP-1": "/tmp/display.icc"}
+	m := &Manager{config: cfg, controlsInitialized: true}
+	m.outputs.Store(1, &outputState{id: 1, iccPath: "/tmp/display.icc"})
+	m.outputNames.Store(1, "DP-1")
+	drain := startTestActor(t, m)
+
+	if err := m.RemoveICC("DP-1"); err != nil {
+		t.Fatalf("RemoveICC() = %v", err)
+	}
+	drain()
+
+	assert.False(t, m.controlsInitialized, "nothing needs the controls once the last profile is gone")
+	assert.Empty(t, m.GetICCStatus())
+}
+
+func TestManager_RemovingProfileKeepsControlsForNightLight(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.ICCProfiles = map[string]string{"DP-1": "/tmp/display.icc"}
+	m := &Manager{config: cfg, controlsInitialized: true}
+	m.outputs.Store(1, &outputState{id: 1, iccPath: "/tmp/display.icc"})
+	m.outputNames.Store(1, "DP-1")
+	drain := startTestActor(t, m)
+
+	if err := m.RemoveICC("DP-1"); err != nil {
+		t.Fatalf("RemoveICC() = %v", err)
+	}
+	drain()
+
+	assert.True(t, m.controlsInitialized, "the night light still needs the controls")
+	_, kept := m.outputs.Load(1)
+	assert.True(t, kept)
+}
+
+func TestManager_StateCarriesSortedOutputs(t *testing.T) {
+	m := &Manager{config: DefaultConfig()}
+	m.outputNames.Store(2, "HDMI-A-1")
+	m.outputNames.Store(1, "DP-1")
+
+	m.updateStateFromSchedule()
+
+	assert.Equal(t, []string{"DP-1", "HDMI-A-1"}, m.GetState().Outputs)
+}

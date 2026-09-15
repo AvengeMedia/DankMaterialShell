@@ -38,6 +38,8 @@ Singleton {
                 status = data.iccProfiles
             if (data.outputTemps)
                 outputTemps = data.outputTemps
+            if (data.outputs)
+                outputNames = data.outputs
         }
     }
 

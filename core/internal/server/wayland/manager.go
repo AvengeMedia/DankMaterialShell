@@ -216,6 +216,7 @@ func (m *Manager) setupRegistry() error {
 				m.outputNames.Store(outputID, ev.Name)
 				m.post(func() {
 					m.attachConfiguredICC(outputID, ev.Name)
+					m.updateStateFromSchedule()
 				})
 			})
 			if gammaMgr != nil {
@@ -248,7 +249,10 @@ func (m *Manager) setupRegistry() error {
 	})
 
 	registry.SetGlobalRemoveHandler(func(e wlclient.RegistryGlobalRemoveEvent) {
-		m.post(func() { m.removeOutputByRegistryName(e.Name) })
+		m.post(func() {
+			m.removeOutputByRegistryName(e.Name)
+			m.updateStateFromSchedule()
+		})
 	})
 
 	if err := m.display.Roundtrip(); err != nil {
@@ -1115,6 +1119,7 @@ func (m *Manager) updateStateFromSchedule() {
 		SunPosition:    pos,
 		ICCProfiles:    m.GetICCStatus(),
 		OutputTemps:    m.GetOutputTemps(),
+		Outputs:        m.ListOutputs(),
 	}
 
 	m.stateMutex.Lock()
@@ -1659,22 +1664,6 @@ func (m *Manager) RemoveICC(outputName string) error {
 		return err
 	}
 
-	m.post(func() {
-		defer m.updateStateFromSchedule()
-
-		m.outputs.Range(func(_ uint32, out *outputState) bool {
-			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
-				out.iccPath = ""
-				out.iccProfile = nil
-				out.lastTemp = 0
-				m.publishICCState()
-				m.applyCurrentTemp("icc-remove")
-				return false
-			}
-			return true
-		})
-	})
-
 	m.configMutex.Lock()
 	delete(m.config.ICCProfiles, outputName)
 	savedConfig := cloneConfig(m.config)
@@ -1684,7 +1673,36 @@ func (m *Manager) RemoveICC(outputName string) error {
 		log.Warnf("icc: failed to save config: %v", err)
 	}
 
+	m.post(func() {
+		defer m.updateStateFromSchedule()
+
+		m.outputs.Range(func(_ uint32, out *outputState) bool {
+			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				out.iccPath = ""
+				out.iccProfile = nil
+				out.lastTemp = 0
+				return false
+			}
+			return true
+		})
+		if m.releaseIdleControls() {
+			return
+		}
+		m.publishICCState()
+		m.applyCurrentTemp("icc-remove")
+	})
+
 	return nil
+}
+
+// releaseIdleControls tears the gamma controls down once nothing needs them,
+// so another gamma client can take over. Called on the wayland actor goroutine.
+func (m *Manager) releaseIdleControls() bool {
+	if m.needsControls() || !m.controlsInitialized {
+		return false
+	}
+	m.destroyControls()
+	return true
 }
 
 // publishICCState republishes the ICC snapshot the getters serve. The
@@ -1774,6 +1792,7 @@ func (m *Manager) ListOutputs() []string {
 		names = append(names, name)
 		return true
 	})
+	slices.Sort(names)
 	return names
 }
 
@@ -1808,6 +1827,14 @@ func (m *Manager) SetOutputTemp(outputName string, temp int) error {
 
 	m.post(func() {
 		defer m.updateStateFromSchedule()
+
+		if m.releaseIdleControls() {
+			return
+		}
+		if !m.needsControls() {
+			m.publishICCState()
+			return
+		}
 
 		// Without controls there are no outputs to write a ramp for, which is
 		// why the slider and `dms icc set-temp` used to do nothing until a
