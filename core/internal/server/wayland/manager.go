@@ -966,12 +966,14 @@ func (m *Manager) applyGamma(temp int) {
 	}
 
 	type job struct {
-		out  *outputState
-		data []byte
+		out        *outputState
+		targetTemp int
+		data       []byte
 	}
 	var jobs []job
 
 	for _, out := range outs {
+		targetTemp := effectiveTempTarget(out, temp)
 		switch {
 		case out.failed:
 			continue
@@ -979,12 +981,11 @@ func (m *Manager) applyGamma(temp int) {
 			continue
 		case out.gammaControl == nil:
 			continue
-		case out.rampCurrent(temp, gamma, contrast):
+		case out.rampCurrent(targetTemp, gamma, contrast):
 			continue
 		case !m.outputStillValid(out):
 			continue
 		}
-		targetTemp := effectiveTempTarget(out, temp)
 
 		var ramp GammaRamp
 		if out.iccPath != "" && out.iccProfile != nil {
@@ -1020,13 +1021,13 @@ func (m *Manager) applyGamma(temp int) {
 		for _, v := range ramp.Blue {
 			binary.Write(buf, binary.LittleEndian, v)
 		}
-		jobs = append(jobs, job{out: out, data: buf.Bytes()})
+		jobs = append(jobs, job{out: out, targetTemp: targetTemp, data: buf.Bytes()})
 	}
 
 	for _, j := range jobs {
 		err := m.setGammaBytes(j.out, j.data)
 		if err == nil {
-			j.out.lastTemp = temp
+			j.out.lastTemp = j.targetTemp
 			j.out.lastGamma = gamma
 			j.out.lastContrast = contrast
 			continue
@@ -1042,8 +1043,11 @@ func (m *Manager) applyGamma(temp int) {
 	}
 }
 
-func (out *outputState) rampCurrent(temp int, gamma, contrast float64) bool {
-	return out.lastTemp == temp && out.lastGamma == gamma && out.lastContrast == contrast
+// rampCurrent compares against the output's effective target, not the schedule
+// temperature, so an overridden output is not resent on every schedule step.
+// lastTemp 0 never matches a target and marks a forced resend.
+func (out *outputState) rampCurrent(targetTemp int, gamma, contrast float64) bool {
+	return out.lastTemp == targetTemp && out.lastGamma == gamma && out.lastContrast == contrast
 }
 
 func (m *Manager) setGammaBytes(out *outputState, data []byte) error {
@@ -1678,6 +1682,9 @@ func (m *Manager) RemoveICC(outputName string) error {
 
 		m.outputs.Range(func(_ uint32, out *outputState) bool {
 			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				if out.iccPath == "" {
+					return false
+				}
 				out.iccPath = ""
 				out.iccProfile = nil
 				out.lastTemp = 0
@@ -1843,6 +1850,9 @@ func (m *Manager) SetOutputTemp(outputName string, temp int) error {
 
 		m.outputs.Range(func(_ uint32, out *outputState) bool {
 			if name, ok := m.outputNames.Load(out.id); ok && name == outputName {
+				if out.outputTemp == temp {
+					return false
+				}
 				out.outputTemp = temp
 				out.lastTemp = 0
 				m.publishICCState()

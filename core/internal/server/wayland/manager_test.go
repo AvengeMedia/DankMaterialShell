@@ -1109,3 +1109,56 @@ func TestManager_StateCarriesSortedOutputs(t *testing.T) {
 
 	assert.Equal(t, []string{"DP-1", "HDMI-A-1"}, m.GetState().Outputs)
 }
+
+func TestRampCurrentUsesEffectiveTarget(t *testing.T) {
+	overridden := &outputState{outputTemp: 7000, lastTemp: 7000, lastGamma: 1.0, lastContrast: 1.0}
+	for _, scheduleTemp := range []int{noTempTarget, 4000, 4025, 6500} {
+		assert.True(t, overridden.rampCurrent(effectiveTempTarget(overridden, scheduleTemp), 1.0, 1.0),
+			"an overridden output must not be resent when the schedule moves to %d", scheduleTemp)
+	}
+
+	scheduled := &outputState{lastTemp: 4000, lastGamma: 1.0, lastContrast: 1.0}
+	assert.True(t, scheduled.rampCurrent(effectiveTempTarget(scheduled, 4000), 1.0, 1.0))
+	assert.False(t, scheduled.rampCurrent(effectiveTempTarget(scheduled, 4025), 1.0, 1.0))
+
+	forced := &outputState{outputTemp: 7000, lastTemp: 0, lastGamma: 1.0, lastContrast: 1.0}
+	assert.False(t, forced.rampCurrent(effectiveTempTarget(forced, 7000), 1.0, 1.0), "lastTemp 0 always resends")
+}
+
+func TestManager_SameOverrideValueDoesNotForceResend(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	cfg := DefaultConfig()
+	cfg.OutputTemps = map[string]int{"DP-1": 7000}
+	m := &Manager{config: cfg, controlsInitialized: true}
+	out := &outputState{id: 1, outputTemp: 7000, lastTemp: 7000, lastGamma: 1.0, lastContrast: 1.0}
+	m.outputs.Store(1, out)
+	m.outputNames.Store(1, "DP-1")
+	drain := startTestActor(t, m)
+
+	if err := m.SetOutputTemp("DP-1", 7000); err != nil {
+		t.Fatalf("SetOutputTemp() = %v", err)
+	}
+	drain()
+
+	assert.Equal(t, 7000, out.lastTemp, "an unchanged override must not clear the dedupe state")
+}
+
+func TestManager_RemovingAbsentProfileDoesNotForceResend(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	m := &Manager{config: cfg, controlsInitialized: true}
+	out := &outputState{id: 1, lastTemp: 4000, lastGamma: 1.0, lastContrast: 1.0}
+	m.outputs.Store(1, out)
+	m.outputNames.Store(1, "DP-1")
+	drain := startTestActor(t, m)
+
+	if err := m.RemoveICC("DP-1"); err != nil {
+		t.Fatalf("RemoveICC() = %v", err)
+	}
+	drain()
+
+	assert.Equal(t, 4000, out.lastTemp, "removing a profile that was never attached must not clear the dedupe state")
+}
