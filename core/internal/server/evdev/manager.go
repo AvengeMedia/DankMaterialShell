@@ -126,7 +126,7 @@ func findKeyboards() ([]EvdevDevice, error) {
 
 	var keyboards []EvdevDevice
 	for _, path := range matches {
-		device, err := evdev.Open(path)
+		device, err := evdev.OpenWithFlags(path, os.O_RDONLY)
 		if err != nil {
 			continue
 		}
@@ -207,7 +207,7 @@ func (m *Manager) watchForNewKeyboards() {
 					continue
 				}
 
-				device, err := evdev.Open(event.Name)
+				device, err := evdev.OpenWithFlags(event.Name, os.O_RDONLY)
 				if err != nil {
 					m.devicesMutex.Unlock()
 					continue
