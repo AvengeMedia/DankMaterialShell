@@ -532,7 +532,7 @@ jobs:
           - dgop
           - dankgo
 #          - dank-qml-common
-          - dankcalendar
+#          - dankcalendar
           - danksearch
           - dank-greeter
     steps:
