@@ -405,7 +405,7 @@ Singleton {
                     icon: active ? "material:vpn_lock" : "material:vpn_key_off",
                     comment: typeLabel,
                     action: "vpn:" + id,
-                    keywords: ["vpn", typeLabel, active ? "disconnect" : "connect"],
+                    keywords: ["vpn", typeLabel],
                     badgeLabel: connecting ? I18n.tr("Connecting...") : (active ? I18n.tr("Connected") : I18n.tr("Disconnected")),
                     isBuiltInLauncher: true,
                     builtInPluginId: pluginId
