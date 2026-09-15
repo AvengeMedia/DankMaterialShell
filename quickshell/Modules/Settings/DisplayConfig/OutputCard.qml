@@ -522,6 +522,12 @@ StyledRect {
             property int currentTemp: ICCService.outputTemps[root.outputName] !== undefined ? ICCService.outputTemps[root.outputName] : 0
             property bool editing: false
 
+            onCurrentTempChanged: {
+                if (editing)
+                    return
+                tempSlider.value = currentTemp === 0 ? 7000 : currentTemp
+            }
+
             DankIcon {
                 name: "thermostat"
                 size: 18

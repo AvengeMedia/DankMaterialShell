@@ -433,8 +433,11 @@ func parseVCGT(data []byte, entry tagEntry) (*VCGT, error) {
 		count := int(binary.BigEndian.Uint16(data[entry.offset+14 : entry.offset+16]))
 		entrySize := int(binary.BigEndian.Uint16(data[entry.offset+16 : entry.offset+18]))
 
-		if channels < 1 || count < 1 || entrySize < 1 {
+		if count < 1 || entrySize < 1 {
 			return nil, fmt.Errorf("icc: vcgt invalid dimensions: channels=%d, count=%d, entrySize=%d", channels, count, entrySize)
+		}
+		if channels != 1 && channels != 3 {
+			return nil, fmt.Errorf("icc: vcgt has %d channels, want 1 or 3", channels)
 		}
 
 		dataStart := int(entry.offset) + 18
@@ -453,7 +456,7 @@ func parseVCGT(data []byte, entry tagEntry) (*VCGT, error) {
 
 		channels_arr := [3][]uint16{vcgt.Red, vcgt.Green, vcgt.Blue}
 
-		for ch := 0; ch < channels && ch < 3; ch++ {
+		for ch := 0; ch < channels; ch++ {
 			for i := 0; i < count; i++ {
 				byteOff := dataStart + (ch*count+i)*entrySize
 				var val uint16
@@ -468,6 +471,10 @@ func parseVCGT(data []byte, entry tagEntry) (*VCGT, error) {
 				}
 				channels_arr[ch][i] = val
 			}
+		}
+		if channels == 1 {
+			copy(vcgt.Green, vcgt.Red)
+			copy(vcgt.Blue, vcgt.Red)
 		}
 
 		return vcgt, nil

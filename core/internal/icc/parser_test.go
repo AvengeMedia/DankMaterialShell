@@ -2,9 +2,11 @@ package icc
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -606,4 +608,56 @@ func TestParseBytesTagTableBounds(t *testing.T) {
 			t.Fatalf("ParseBytes() = %v, want the boundary count accepted", err)
 		}
 	})
+}
+
+func vcgtTableTag(channels int, entries []uint16) []byte {
+	tag := make([]byte, 18+channels*len(entries)*2)
+	copy(tag[0:], "vcgt")
+	binary.BigEndian.PutUint16(tag[12:], uint16(channels))
+	binary.BigEndian.PutUint16(tag[14:], uint16(len(entries)))
+	binary.BigEndian.PutUint16(tag[16:], 2)
+	for ch := 0; ch < channels; ch++ {
+		for i, v := range entries {
+			binary.BigEndian.PutUint16(tag[18+(ch*len(entries)+i)*2:], v)
+		}
+	}
+	return tag
+}
+
+func TestParseVCGTChannelCount(t *testing.T) {
+	entries := []uint16{0, 21845, 43690, 65535}
+
+	t.Run("one channel is replicated to all three", func(t *testing.T) {
+		tag := vcgtTableTag(1, entries)
+		vcgt, err := parseVCGT(tag, tagEntry{offset: 0, size: uint32(len(tag))})
+		if err != nil {
+			t.Fatalf("parseVCGT: %v", err)
+		}
+		if !slices.Equal(vcgt.Red, entries) {
+			t.Fatalf("red = %v, want %v", vcgt.Red, entries)
+		}
+		if !slices.Equal(vcgt.Green, entries) || !slices.Equal(vcgt.Blue, entries) {
+			t.Fatalf("green/blue must copy the single curve: green=%v blue=%v", vcgt.Green, vcgt.Blue)
+		}
+	})
+
+	t.Run("three channels are read independently", func(t *testing.T) {
+		tag := vcgtTableTag(3, entries)
+		vcgt, err := parseVCGT(tag, tagEntry{offset: 0, size: uint32(len(tag))})
+		if err != nil {
+			t.Fatalf("parseVCGT: %v", err)
+		}
+		if !slices.Equal(vcgt.Blue, entries) {
+			t.Fatalf("blue = %v, want %v", vcgt.Blue, entries)
+		}
+	})
+
+	for _, channels := range []int{0, 2, 4} {
+		t.Run(fmt.Sprintf("%d channels are rejected", channels), func(t *testing.T) {
+			tag := vcgtTableTag(channels, entries)
+			if _, err := parseVCGT(tag, tagEntry{offset: 0, size: uint32(len(tag))}); err == nil {
+				t.Fatalf("expected an error for a %d-channel vcgt", channels)
+			}
+		})
+	}
 }
