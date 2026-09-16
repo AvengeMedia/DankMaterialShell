@@ -3549,7 +3549,7 @@ Singleton {
                     const fileName = filePath?.split("/").pop() || "unknown";
                     log.warn(`Aborting ${fileName} reload, there are unsaved changes which would've been lost`)
                     isLoading = false;
-                    _loading = _settingsFilesPaths.some(path => _settingsFiles.get(path).isLoading);
+                    _loading = _someSettingsFile(file => file.isLoading);
                     settingsSaveFailRecovery.start();
                     return;
                 }
@@ -3574,12 +3574,11 @@ Singleton {
                     Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg(fileName), msg));
                 } finally {
                     isLoading = false;
-                    const files = Array.from(_settingsFiles.values());
                     if (hasLoaded) {
-                        _checkIfAllSettingsFilesLoaded()
+                        _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
                     }
                     if (hadParseFailed && !hasParseFailed) {
-                        _parseError = files.some(file => file.hasParseFailed);
+                        _parseError = _someSettingsFile(file => file.hasParseFailed);
                     }
                     _loadSettingsOrStartIfReady();
                 }
@@ -3589,22 +3588,21 @@ Singleton {
                     return;
                 }
                 isLoading = false;
-                _loading = _settingsFilesPaths.some(path => _settingsFiles.get(path).isLoading);
+                _loading = _someSettingsFile(file => file.isLoading);
                 if (error === FileViewError.FileNotFound) {
                     // fake that file has been loaded so that it gets written after a change.
                     hasLoaded = true;
                 }
                 applyStoredTheme();
                 if (hasLoaded) {
-                    _checkIfAllSettingsFilesLoaded();
+                    _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
                 }
                 _loadSettingsOrStartIfReady();
             }
             onSaved: {
-                const filesArray = Array.from(_settingsFiles.values());
                 hasUnsavedChanges = false;
                 isFileReadOnly = false;
-                isReadOnly = filesArray.some(file => file.isFileReadOnly)
+                isReadOnly = _someSettingsFile(file => file.isFileReadOnly);
 
                 const fileName = filePath?.split("/").pop() || "unknown";
                 if (_failedSaveSettingsFiles.has(settingsFile)) {
@@ -3625,7 +3623,7 @@ Singleton {
         }
     }
 
-    property bool _allFilesRegistered: false
+    property bool _allSettingsFilesRegistered: false
     property var _settingsFiles: new Map()
     property var _settingsFilesPaths: ([])
     property var _failedSaveSettingsFiles: new Set()
@@ -3648,14 +3646,14 @@ Singleton {
         } else {
             _settingsFilesPaths.push(filePath);
         }
-        _checkIfAllSettingsFilesFound();
+        _tryCompleteRegistration();
     }
     function _unregisterSettingsFile(file) {
         _settingsFiles.delete(file.filePath);
         _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
     }
-    function _checkIfAllSettingsFilesFound() {
-        if (_allFilesRegistered || !configDirExists.checked) {
+    function _tryCompleteRegistration() {
+        if (_allSettingsFilesRegistered || !configDirExists.checked) {
             return;
         }
         let expectedCount = 1;
@@ -3666,8 +3664,8 @@ Singleton {
             expectedCount += settingsFolderModel.count;
         }
         if (_settingsFilesPaths.length == expectedCount) {
-            _allFilesRegistered = true;
-            _checkIfAllSettingsFilesLoaded()
+            _allSettingsFilesRegistered = true;
+            _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
             _loadSettingsOrStartIfReady();
         }
     }
@@ -3694,18 +3692,30 @@ Singleton {
         }
         _loading = false;
     }
-    function _checkIfAllSettingsFilesLoaded() {
-        if (_allSettingsFilesLoaded || !_allFilesRegistered) {
-            return;
-        }
-        _allSettingsFilesLoaded = true;
-        for (const path of _settingsFilesPaths) {
-            const file = _settingsFiles.get(path);
-            if (!file.hasLoaded) {
-                _allSettingsFilesLoaded = false;
-                return;
+    function _anySettingsFile(predicate) {
+        for (const file of _settingsFiles.values()) {
+            if (predicate(file)) {
+                return true;
             }
         }
+        return false;
+    }
+    function _everySettingsFile(predicate) {
+        for (const file of _settingsFiles.values()) {
+            if (!predicate(file)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function _areAllSettingsFilesLoaded() {
+        if (_allSettingsFilesLoaded) {
+            return true;
+        }
+        if (!_allSettingsFilesRegistered) {
+            return false;
+        }
+        return _everySettingsFile(file => file.hasLoaded);
     }
 
     SettingsFile {
@@ -3791,7 +3801,7 @@ Singleton {
             if (exists) {
                 _syncSettingsFilesModels();
             }
-            _checkIfAllSettingsFilesFound();
+            _tryCompleteRegistration();
         }
     }
 
