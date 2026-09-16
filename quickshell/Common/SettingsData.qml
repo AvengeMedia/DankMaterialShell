@@ -1986,24 +1986,31 @@ Singleton {
     }
 
     function _splitSettingsByFile(settings) {
+        const savedSettings = new Set();
         const splitSettings = {};
 
-        const filePaths = _settingsFilesPaths.slice()
-        // Reverse order ensures only the effective value gets overwritten.
-        filePaths.reverse();
-        for (const path of filePaths) {
+        for (let i = _settingsFilesPaths.length - 1; i >= 0; i--) {
+            const path = _settingsFilesPaths[i];
             const file = _settingsFiles.get(path);
-            const fileSettings = {};
-            for (const setting in file.settings) {
-                if (!(setting in settings)) continue;
+            const fileSettings = file.getSettings();
+            for (const setting in fileSettings) {
+                if (!(setting in settings)) {
+                    delete fileSettings[setting];
+                    continue;
+                }
+                if (savedSettings.has(setting)) {
+                    continue;
+                }
                 fileSettings[setting] = settings[setting];
-                delete settings[setting];
+                savedSettings.add(setting);
             }
             splitSettings[path] = fileSettings;
         }
 
         for (const setting in settings) {
-            splitSettings[defaultSettingsFile.filePath][setting] = settings[setting];
+            if (!savedSettings.has(setting)) {
+                splitSettings[defaultSettingsFile.filePath][setting] = settings[setting];
+            }
         }
         return splitSettings;
     }
@@ -3496,7 +3503,7 @@ Singleton {
             }
         }
         function getSettings() {
-            return settings;
+            return Object.assign({}, settings);
         }
         function retrySaving() {
             if (!hasUnsavedChanges) {
