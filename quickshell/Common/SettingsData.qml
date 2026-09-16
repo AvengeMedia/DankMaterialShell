@@ -3547,7 +3547,7 @@ Singleton {
                     const fileName = filePath?.split("/").pop() || "unknown";
                     log.warn(`Aborting ${fileName} reload, there are unsaved changes which would've been lost`)
                     isLoading = false;
-                    _loading = _someSettingsFile(file => file.isLoading);
+                    _loading = _anySettingsFile(file => file.isLoading);
                     settingsSaveFailRecovery.start();
                     return;
                 }
@@ -3576,7 +3576,7 @@ Singleton {
                         _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
                     }
                     if (hadParseFailed && !hasParseFailed) {
-                        _parseError = _someSettingsFile(file => file.hasParseFailed);
+                        _parseError = _anySettingsFile(file => file.hasParseFailed);
                     }
                     _loadSettingsOrStartIfReady();
                 }
@@ -3586,7 +3586,7 @@ Singleton {
                     return;
                 }
                 isLoading = false;
-                _loading = _someSettingsFile(file => file.isLoading);
+                _loading = _anySettingsFile(file => file.isLoading);
                 if (error === FileViewError.FileNotFound) {
                     // fake that file has been loaded so that it gets written after a change.
                     hasLoaded = true;
@@ -3600,7 +3600,7 @@ Singleton {
             onSaved: {
                 hasUnsavedChanges = false;
                 isFileReadOnly = false;
-                isReadOnly = _someSettingsFile(file => file.isFileReadOnly);
+                isReadOnly = _anySettingsFile(file => file.isFileReadOnly);
 
                 const fileName = filePath?.split("/").pop() || "unknown";
                 if (_failedSaveSettingsFiles.has(settingsFile)) {
