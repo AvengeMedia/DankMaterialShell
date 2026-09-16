@@ -3483,6 +3483,8 @@ Singleton {
     component SettingsFile : QtObject {
         id: settingsFile
 
+        property bool blockLoading: false
+
         required property string filePath
         property var settings: ({})
         property bool isLoading: false
@@ -3526,7 +3528,7 @@ Singleton {
             id: settingsFileView
 
             path: isGreeterMode ? "" : filePath
-            blockLoading: false
+            blockLoading: settingsFile.blockLoading
             blockWrites: true
             atomicWrites: true
             watchChanges: !isGreeterMode
@@ -3710,6 +3712,7 @@ Singleton {
         id: defaultSettingsFile
 
         filePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
+        blockLoading: true
 
         Component.onCompleted: {
             _registerSettingsFile(defaultSettingsFile);
