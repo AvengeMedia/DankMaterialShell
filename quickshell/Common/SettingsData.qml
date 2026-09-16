@@ -3535,6 +3535,7 @@ Singleton {
                     selfWrite = false;
                 } else {
                     isLoading = true;
+                    _loading = true;
                     settingsFileReloadDebounce.restart();
                 }
             }
@@ -3545,8 +3546,10 @@ Singleton {
                 if (hasUnsavedChanges) {
                     const fileName = filePath?.split("/").pop() || "unknown";
                     log.warn(`Aborting ${fileName} reload, there are unsaved changes which would've been lost`)
+                    isLoading = false;
+                    _loading = _settingsFilesPaths.some(path => _settingsFiles.get(path).isLoading);
                     settingsSaveFailRecovery.start();
-                    return
+                    return;
                 }
                 isLoading = true;
                 _loading = true;
