@@ -202,8 +202,8 @@ Singleton {
         let screenName = "";
         if (isAqueous && AqueousService.available)
             screenName = AqueousService.focusedOutput;
-        else if (isHyprland && Hyprland.focusedWorkspace?.monitor)
-            screenName = Hyprland.focusedWorkspace.monitor.name;
+        else if (isHyprland && Hyprland.focusedMonitor)
+            screenName = Hyprland.focusedMonitor.name;
         else if (isNiri && NiriService.currentOutput)
             screenName = NiriService.currentOutput;
         else if (isSway || isScroll || isMiracle) {
@@ -275,7 +275,7 @@ Singleton {
         enabled: isHyprland
 
         function onRawEvent(event) {
-            if (event.name === "monitoraddedv2" || event.name === "monitorremoved") {
+            if (event.name === "monitoraddedv2" || event.name === "monitorremoved" || event.name === "configreloaded") {
                 root.refreshHyprlandMonitorLayout();
                 return;
             }

@@ -607,7 +607,9 @@ File names match what DMS ships in its own catalog (`es.json`, `pt.json`, `zh_CN
 
 ### Central Translation via POEditor
 
-Plugins in the [plugin registry](https://github.com/AvengeMedia/dms-plugin-registry) can apply to join the central DMS POEditor project — the same one community translators use for DMS itself. Approved plugins get their strings translated alongside the shell, and finished translations come back to the plugin repo as PRs. See the registry's CONTRIBUTING guide for the application process.
+Plugins in the [plugin registry](https://github.com/AvengeMedia/dms-plugin-registry) can apply to join the DankPlugins POEditor project, translated by the same community that translates DMS itself. Approved plugins get every `I18n.trFor()` string uploaded under a `<pluginId>:` context, so your "Auto" and another plugin's "Auto" are separate terms with separate translations. Finished translations come back to the plugin repo as PRs to `translations/`, in the file format above. See the registry's CONTRIBUTING guide for the application process.
+
+Strings you wrap in plain `I18n.tr()` are not uploaded. They resolve from the shell catalog only, which is the right choice for terms DMS already has ("Cancel", "Settings"). A term DMS does not have stays English, and the sync warns about it.
 
 ## PluginService API
 

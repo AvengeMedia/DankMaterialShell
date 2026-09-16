@@ -874,7 +874,7 @@ Item {
                 for (var k = 0; k < filterItems.length; k++)
                     allItems.push(filterItems[k]);
 
-                var builtInItems = AppSearchService.getBuiltInLauncherItems(pluginFilter, searchQuery);
+                var builtInItems = AppSearchService.getBuiltInLauncherItems(pluginFilter, searchQuery, true);
                 for (var j = 0; j < builtInItems.length; j++) {
                     allItems.push(transformBuiltInSearchItem(builtInItems[j], pluginFilter));
                 }

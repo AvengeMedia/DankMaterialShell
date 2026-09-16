@@ -881,6 +881,7 @@ EOFCONFIG
                     [ $found -eq 1 ] && break
                 done
             done
+            exit 0
         `;
 
         Proc.runCommand("discoverSoundFiles", ["sh", "-c", script], (output, exitCode) => {

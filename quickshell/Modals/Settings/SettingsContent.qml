@@ -207,7 +207,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: DisplayConfigTab {}
+            sourceComponent: DisplayConfigTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)

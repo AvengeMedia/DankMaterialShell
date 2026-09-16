@@ -795,6 +795,13 @@ func selectAltTextMimeType(mimes []string) string {
 	return ""
 }
 
+func isTextMimeType(mime string) bool {
+	if mime == "" || strings.HasPrefix(mime, "text/plain") {
+		return true
+	}
+	return slices.Contains(altTextMimeTypes, mime)
+}
+
 func (m *Manager) isImageMimeType(mime string) bool {
 	return strings.HasPrefix(mime, "image/")
 }
@@ -1956,6 +1963,113 @@ func (m *Manager) UnpinEntry(id uint64) error {
 	})
 
 	if err == nil {
+		m.updateState()
+		m.notifySubscribers()
+	}
+
+	return err
+}
+
+func (m *Manager) EditEntry(id uint64, text string) error {
+	if m.db == nil {
+		return fmt.Errorf("database not available")
+	}
+
+	data := []byte(text)
+	mimeType := "text/plain;charset=utf-8"
+
+	if len(bytes.TrimSpace(data)) == 0 {
+		return fmt.Errorf("cannot save empty entry")
+	}
+
+	cfg := m.getConfig()
+	if int64(len(data)) > cfg.MaxEntrySize {
+		return fmt.Errorf("data too large")
+	}
+
+	newHash := computeHash(data)
+	preview := m.textPreview(data)
+
+	err := m.dbUpdate(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return fmt.Errorf("clipboard bucket missing")
+		}
+
+		oldKey := itob(id)
+		v := b.Get(oldKey)
+		if v == nil {
+			return errEntryNotFound
+		}
+
+		existing, err := decodeEntry(v)
+		if err != nil {
+			return err
+		}
+
+		if existing.IsImage {
+			return errors.New("cannot edit image entry")
+		}
+
+		if !isTextMimeType(existing.MimeType) {
+			return errors.New("cannot edit non-text entry")
+		}
+
+		wasPinned := existing.Pinned
+
+		if err := b.Delete(oldKey); err != nil {
+			return err
+		}
+
+		if err := m.deduplicateInTx(b, newHash); err != nil {
+			return err
+		}
+
+		if wasPinned {
+			c := b.Cursor()
+			for k, val := c.First(); k != nil; k, val = c.Next() {
+				if extractHash(val) == newHash {
+					meta, err := decodeEntryMeta(val)
+					if err == nil && meta.Pinned {
+						return nil
+					}
+				}
+			}
+		}
+
+		newID, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+
+		newEntry := Entry{
+			ID:        newID,
+			Data:      data,
+			MimeType:  mimeType,
+			Preview:   preview,
+			Size:      len(data),
+			Timestamp: time.Now(),
+			IsImage:   false,
+			Hash:      newHash,
+			Pinned:    wasPinned,
+		}
+
+		encoded, err := encodeEntry(newEntry)
+		if err != nil {
+			return err
+		}
+
+		if err := b.Put(itob(newID), encoded); err != nil {
+			return err
+		}
+
+		return m.trimLengthInTx(b)
+	})
+
+	if err == nil {
+		if clipErr := m.SetClipboard(data, mimeType); clipErr != nil {
+			log.Errorf("Failed to set clipboard selection: %v", clipErr)
+		}
 		m.updateState()
 		m.notifySubscribers()
 	}

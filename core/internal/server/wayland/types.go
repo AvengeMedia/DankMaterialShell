@@ -1,13 +1,21 @@
 package wayland
 
 import (
+	"encoding/json"
+	"fmt"
 	"math"
+	"os"
+	"path/filepath"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/screenshot"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/syncmap"
 	wlclient "github.com/AvengeMedia/dankgo/wayland/client"
 	"github.com/godbus/dbus/v5"
@@ -36,18 +44,48 @@ type Config struct {
 	Enabled           bool
 	ElevationTwilight float64
 	ElevationDaylight float64
+	ICCProfiles       map[string]string `json:"iccProfiles,omitempty"` // outputName -> ICC file path
+	OutputTemps       map[string]int    `json:"outputTemps,omitempty"` // outputName -> per-output color temperature (K)
 }
 
 type State struct {
-	Config         Config    `json:"config"`
-	CurrentTemp    int       `json:"currentTemp"`
-	NextTransition time.Time `json:"nextTransition"`
-	SunriseTime    time.Time `json:"sunriseTime"`
-	SunsetTime     time.Time `json:"sunsetTime"`
-	DawnTime       time.Time `json:"dawnTime"`
-	NightTime      time.Time `json:"nightTime"`
-	IsDay          bool      `json:"isDay"`
-	SunPosition    float64   `json:"sunPosition"`
+	Config         Config                `json:"config"`
+	CurrentTemp    int                   `json:"currentTemp"`
+	NextTransition time.Time             `json:"nextTransition"`
+	SunriseTime    time.Time             `json:"sunriseTime"`
+	SunsetTime     time.Time             `json:"sunsetTime"`
+	DawnTime       time.Time             `json:"dawnTime"`
+	NightTime      time.Time             `json:"nightTime"`
+	IsDay          bool                  `json:"isDay"`
+	SunPosition    float64               `json:"sunPosition"`
+	ICCProfiles    map[string]*ICCStatus `json:"iccProfiles"` // outputName -> status
+	OutputTemps    map[string]int        `json:"outputTemps"` // outputName -> current temp
+	Outputs        []string              `json:"outputs"`     // connected output names, sorted
+}
+
+// ICCStatus represents the ICC profile status for a single output.
+type ICCStatus struct {
+	Path        string `json:"path"`        // ICC file path
+	Description string `json:"description"` // ICC profile description
+	Version     string `json:"version"`     // ICC version
+	ColorSpace  string `json:"colorSpace"`  // e.g., "RGB"
+	HasVCGT     bool   `json:"hasVCGT"`     // has video card gamma table
+	Active      bool   `json:"active"`      // currently applied
+
+	// Descriptive profile metadata, surfaced in the UI so a profile can be
+	// identified without leaving the settings page.
+	Class          string  `json:"class,omitempty"`          // "mntr", "scnr", "prtr"
+	TRCKind        string  `json:"trcKind,omitempty"`        // "identity", "gamma", "table", "mixed"
+	TRCGamma       float64 `json:"trcGamma,omitempty"`       // when TRCKind is "gamma"
+	TRCEntries     int     `json:"trcEntries,omitempty"`     // when TRCKind is "table"
+	VCGTChannels   int     `json:"vcgtChannels,omitempty"`   // channels in the video card gamma table
+	VCGTEntries    int     `json:"vcgtEntries,omitempty"`    // entries per channel
+	WhitePointX    float64 `json:"whitePointX,omitempty"`    // chromaticity x
+	WhitePointY    float64 `json:"whitePointY,omitempty"`    // chromaticity y
+	WhitePointCCT  int     `json:"whitePointCCT,omitempty"`  // correlated color temperature (K)
+	WhitePointName string  `json:"whitePointName,omitempty"` // "D50", "D65", ...
+	Size           int64   `json:"size,omitempty"`           // profile file size in bytes
+	Modified       int64   `json:"modified,omitempty"`       // profile file mtime, unix seconds
 }
 
 type cmd struct {
@@ -75,9 +113,18 @@ type Manager struct {
 	availableOutputs    []*wlclient.Output
 	availOutputsMu      sync.RWMutex
 	outputRegNames      syncmap.Map[uint32, uint32]
+	outputNames         syncmap.Map[uint32, string] // outputID -> wl_output name string (e.g., "DP-1")
 	outputs             syncmap.Map[uint32, *outputState]
 	controlsInitialized bool
 	connectionDead      atomic.Bool
+
+	// The per-output ICC fields (iccPath, iccProfile, outputTemp) are only
+	// touched by the wayland actor goroutine. The published snapshot below is
+	// what the IPC handlers, the CLI and the scheduler read, so they never
+	// reach into outputState from another goroutine.
+	iccStateMutex sync.RWMutex
+	iccStatus     map[string]*ICCStatus // outputName -> status
+	iccTemps      map[string]int        // outputName -> per-output temperature (K)
 
 	cmdq  chan cmd
 	alive bool
@@ -118,6 +165,9 @@ type outputState struct {
 	lastTemp     int
 	lastGamma    float64
 	lastContrast float64
+	iccPath      string       // path to ICC profile file, empty if not set
+	iccProfile   *icc.Profile // cached parsed ICC profile (nil if not loaded)
+	outputTemp   int          // per-output color temperature (K), 0 = use global temp
 }
 
 func DefaultConfig() Config {
@@ -131,6 +181,117 @@ func DefaultConfig() Config {
 		ElevationTwilight: -6.0,
 		ElevationDaylight: 3.0,
 	}
+}
+
+// DMSConfigDir returns the compositor-specific DMS config directory, matching
+// the layout used by the shell and `dms setup` (niri/dms, hypr/dms, mango/dms).
+func DMSConfigDir() string {
+	return filepath.Join(utils.XDGConfigHome(), compositorConfigDirName(), "dms")
+}
+
+// ICCProfilesDir returns the directory scanned for ICC profile files.
+func ICCProfilesDir() string {
+	return filepath.Join(DMSConfigDir(), "icc")
+}
+
+// compositorConfigDirName maps the running compositor to its DMS config
+// directory name. Compositors without a DMS config layout fall back to niri.
+func compositorConfigDirName() string {
+	switch screenshot.DetectCompositor() {
+	case screenshot.CompositorHyprland:
+		return "hypr"
+	case screenshot.CompositorMango:
+		return "mango"
+	default:
+		return "niri"
+	}
+}
+
+// getConfigPath returns the path to the wayland config file.
+func getConfigPath() (string, error) {
+	dir := DMSConfigDir()
+	if !filepath.IsAbs(dir) {
+		return "", fmt.Errorf("could not determine DMS config directory")
+	}
+	return filepath.Join(dir, "wayland.json"), nil
+}
+
+// LoadConfig reads the wayland config from disk, falling back to DefaultConfig.
+func LoadConfig() Config {
+	path, err := getConfigPath()
+	if err != nil {
+		return DefaultConfig()
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return DefaultConfig()
+	}
+	var cfg Config
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return DefaultConfig()
+	}
+	// Ensure defaults are set for missing fields (keep in sync with DefaultConfig)
+	def := DefaultConfig()
+	if cfg.HighTemp == 0 {
+		cfg.HighTemp = def.HighTemp
+	}
+	if cfg.LowTemp == 0 {
+		cfg.LowTemp = def.LowTemp
+	}
+	if cfg.Gamma == 0 {
+		cfg.Gamma = def.Gamma
+	}
+	if cfg.Contrast == 0 {
+		cfg.Contrast = def.Contrast
+	}
+	if cfg.ElevationTwilight == 0 {
+		cfg.ElevationTwilight = def.ElevationTwilight
+	}
+	if cfg.ElevationDaylight == 0 {
+		cfg.ElevationDaylight = def.ElevationDaylight
+	}
+	if cfg.Outputs == nil {
+		cfg.Outputs = []string{}
+	}
+	if cfg.ICCProfiles == nil {
+		cfg.ICCProfiles = make(map[string]string)
+	}
+	if cfg.OutputTemps == nil {
+		cfg.OutputTemps = make(map[string]int)
+	}
+	return cfg
+}
+
+// SaveConfig writes the wayland config to disk.
+func SaveConfig(cfg Config) error {
+	path, err := getConfigPath()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0o644)
+}
+
+// SaveICCConfig stores the ICC profiles and the per-output temperatures, leaving
+// every other field of the file as it is on disk.
+//
+// The night light fields are owned by the shell: the daemon only reads them at
+// boot and writes them in memory when the shell calls setEnabled/setTemperature,
+// so writing its copy back would persist whatever the night light happened to be
+// doing when an ICC change was made (for example `"Enabled": true` while the
+// user had since turned it off), and the shell only sends setEnabled when the
+// mode is on, so the state would silently come back after a session restart.
+func SaveICCConfig(iccProfiles map[string]string, outputTemps map[string]int) error {
+	cfg := LoadConfig()
+	cfg.ICCProfiles = iccProfiles
+	cfg.OutputTemps = outputTemps
+	return SaveConfig(cfg)
 }
 
 func (c *Config) Validate() error {
@@ -222,6 +383,37 @@ func stateChanged(old, new *State) bool {
 	}
 	if old.SunPosition != new.SunPosition {
 		return true
+	}
+	return iccStateChanged(old, new)
+}
+
+// iccStateChanged reports whether the ICC part of the state (what the Display
+// Config card renders) differs. Without it, applying or removing a profile and
+// setting a per-output temperature are the only things that changed, and the
+// notifier would treat the state as unchanged and never push it.
+func iccStateChanged(old, new *State) bool {
+	if len(old.ICCProfiles) != len(new.ICCProfiles) || len(old.OutputTemps) != len(new.OutputTemps) {
+		return true
+	}
+	if !slices.Equal(old.Outputs, new.Outputs) {
+		return true
+	}
+	for name, temp := range new.OutputTemps {
+		if oldTemp, ok := old.OutputTemps[name]; !ok || oldTemp != temp {
+			return true
+		}
+	}
+	for name, status := range new.ICCProfiles {
+		prev, ok := old.ICCProfiles[name]
+		if !ok || prev == nil || status == nil {
+			if prev != status {
+				return true
+			}
+			continue
+		}
+		if *prev != *status {
+			return true
+		}
 	}
 	return false
 }

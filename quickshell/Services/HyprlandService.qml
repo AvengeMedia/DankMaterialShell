@@ -21,6 +21,8 @@ Singleton {
     readonly property bool luaConfigActive: CompositorService.isHyprland && (Hyprland.usingLua === true || luaConfigDetected)
 
     property int _lastGapValue: -1
+    property string _monitorLayoutSignature: ""
+    signal monitorLayoutChanged
     property bool luaConfigDetected: false
     property bool luaConfigStatusReady: false
     property bool luaConfigStatusLoading: false
@@ -296,9 +298,36 @@ Singleton {
         Proc.runCommand("hyprctl-reload", ["hyprctl", "reload"], (output, exitCode) => {
             if (exitCode !== 0)
                 log.warn("hyprctl reload failed:", output);
+            else
+                Hyprland.refreshMonitors();
             if (callback)
                 callback(exitCode === 0);
         });
+    }
+
+    function liveMonitor(name) {
+        if (!CompositorService.isHyprland)
+            return null;
+        return Hyprland.monitors.values.find(m => m.name === name) ?? null;
+    }
+
+    function _syncMonitorLayout() {
+        const signature = Hyprland.monitors.values.map(m => `${m.name}:${m.x},${m.y},${m.scale},${m.lastIpcObject?.transform ?? 0}`).join("|");
+        if (signature === _monitorLayoutSignature)
+            return;
+        _monitorLayoutSignature = signature;
+        monitorLayoutChanged();
+    }
+
+    Instantiator {
+        model: CompositorService.isHyprland ? Hyprland.monitors : null
+        delegate: Connections {
+            required property HyprlandMonitor modelData
+            target: modelData
+            function onLastIpcObjectChanged() {
+                root._syncMonitorLayout();
+            }
+        }
     }
 
     function setLayoutXray(enabled) {

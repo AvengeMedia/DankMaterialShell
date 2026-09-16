@@ -45,7 +45,7 @@ Singleton {
 
         for (let i = 0; i < Pipewire.nodes.values.length; i++) {
             const node = Pipewire.nodes.values[i]
-            if (!node || !node.ready) {
+            if (!node || !node.ready || node.properties?.["media.role"] === "Screen") {
                 continue
             }
 
@@ -124,6 +124,37 @@ Singleton {
         const mediaName = (node.properties && node.properties["media.name"] || "").toLowerCase()
         const combined = appName + " " + nodeName + " " + mediaName
         return /xdg-desktop-portal|xdpw|screencast|screen-cast|screen|gnome shell|kwin|obs|niri/.test(combined)
+    }
+
+    function screencastSourceIds() {
+        const ids = []
+
+        if (CompositorService.isNiri) {
+            for (const cast of NiriService.casts) {
+                if (cast && cast.is_active) {
+                    ids.push("niri:" + cast.stream_id)
+                }
+            }
+        }
+
+        if (!Pipewire.ready || !Pipewire.nodes?.values) {
+            return ids
+        }
+
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            const node = Pipewire.nodes.values[i]
+            if (!node || !node.ready) {
+                continue
+            }
+
+            const isVideoSource = (node.type & PwNodeType.VideoSource) === PwNodeType.VideoSource
+            const isVideoStream = node.properties && node.properties["media.class"] === "Stream/Output/Video"
+            if ((isVideoSource || isVideoStream) && looksLikeScreencast(node)) {
+                ids.push("pw:" + node.id)
+            }
+        }
+
+        return ids.sort()
     }
 
     function getMicrophoneStatus() {
