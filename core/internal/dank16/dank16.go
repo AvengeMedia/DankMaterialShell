@@ -455,6 +455,7 @@ func EnsureContrastDPSBidirectional(hexColor, hexBg string, minLc float64, isLig
 type PaletteOptions struct {
 	IsLight    bool
 	Background string
+	Container  string
 	UseDPS     bool
 }
 
@@ -520,8 +521,18 @@ func DeriveContainer(primary string, isLight bool) string {
 	return RGBToHex(HSVToRGB(HSV{H: hsv.H, S: containerS, V: containerV}))
 }
 
+// DeriveContainer only approximates the Material tone pairing, so a caller that
+// has the real primary_container should pass it: color5 and color6 are the
+// primary/container pair and their contrast with each other is the invariant.
+func resolveContainer(primaryColor string, opts PaletteOptions) string {
+	if opts.Container != "" {
+		return opts.Container
+	}
+	return DeriveContainer(primaryColor, opts.IsLight)
+}
+
 func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
-	baseColor := DeriveContainer(primaryColor, opts.IsLight)
+	baseColor := resolveContainer(primaryColor, opts)
 
 	rgb := HexToRGB(baseColor)
 	hsv := RGBToHSV(rgb)
@@ -531,13 +542,20 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 
 	var palette Palette
 
-	var normalTextTarget, secondaryTarget float64
-	if opts.UseDPS {
+	// Delta Phi Star is not symmetric across polarity: on a light background the
+	// same Lc buys far less real contrast, so the light targets are the numbers
+	// that land on the same measured WCAG ratios the dark ones already deliver.
+	var normalTextTarget, accentTarget float64
+	switch {
+	case opts.UseDPS && opts.IsLight:
+		normalTextTarget = 70.0
+		accentTarget = 58.0
+	case opts.UseDPS:
 		normalTextTarget = 40.0
-		secondaryTarget = 35.0
-	} else {
+		accentTarget = 24.5
+	default:
 		normalTextTarget = 4.5
-		secondaryTarget = 3.0
+		accentTarget = 2.1
 	}
 
 	var bgColor string
@@ -557,8 +575,6 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 	greenH := blendHue(0.33, ph.H, 0.10)
 	yellowH := blendHue(0.14, ph.H, 0.04)
 
-	accentTarget := secondaryTarget * 0.7
-
 	if opts.IsLight {
 		redS := math.Min(baseSat*1.2, 1.0)
 		redV := baseVal * 0.95
@@ -570,15 +586,13 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 
 		yellowS := math.Min(baseSat*1.5, 1.0)
 		yellowV := math.Min(baseVal*1.2, 1.0)
-		palette.Color3 = NewColorInfo(ensureContrastBidirectional(RGBToHex(HSVToRGB(HSV{H: yellowH, S: yellowS, V: yellowV})), bgColor, accentTarget, opts))
+		palette.Color3 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: yellowH, S: yellowS, V: yellowV})), bgColor, normalTextTarget, opts))
 
 		blueS := math.Min(ph.S*1.05, 1.0)
 		blueV := math.Min(ph.V*1.05, 1.0)
 		palette.Color4 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: ph.H, S: blueS, V: blueV})), bgColor, normalTextTarget, opts))
 
-		// Color5 matches primary_container exactly (light container in light mode)
-		container5 := DeriveContainer(primaryColor, true)
-		palette.Color5 = NewColorInfo(container5)
+		palette.Color5 = NewColorInfo(baseColor)
 
 		palette.Color6 = NewColorInfo(primaryColor)
 
@@ -604,8 +618,9 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 		brightBlueV := math.Min(ph.V*1.15, 1.0)
 		palette.Color12 = NewColorInfo(ensureContrastBidirectional(RGBToHex(HSVToRGB(HSV{H: ph.H, S: brightBlueS, V: brightBlueV})), bgColor, accentTarget, opts))
 
-		lightContainer := DeriveContainer(primaryColor, true)
-		palette.Color13 = NewColorInfo(lightContainer)
+		color13S := ph.S * 0.7
+		color13V := math.Min(ph.V*1.3, 1.0)
+		palette.Color13 = NewColorInfo(ensureContrastBidirectional(RGBToHex(HSVToRGB(HSV{H: ph.H, S: color13S, V: color13V})), bgColor, accentTarget, opts))
 
 		brightCyanS := ph.S * 0.5
 		brightCyanV := math.Min(ph.V*1.3, 1.0)
@@ -632,9 +647,7 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 		blueV := ph.V * 0.95
 		palette.Color4 = NewColorInfo(ensureContrastAuto(RGBToHex(HSVToRGB(HSV{H: ph.H, S: blueS, V: blueV})), bgColor, normalTextTarget, opts))
 
-		// Color5 matches primary_container exactly (dark container in dark mode)
-		darkContainer := DeriveContainer(primaryColor, false)
-		palette.Color5 = NewColorInfo(darkContainer)
+		palette.Color5 = NewColorInfo(baseColor)
 
 		palette.Color6 = NewColorInfo(primaryColor)
 
@@ -681,11 +694,14 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 }
 
 type VariantOptions struct {
-	PrimaryDark  string
-	PrimaryLight string
-	Background   string
-	UseDPS       bool
-	IsLightMode  bool
+	PrimaryDark     string
+	PrimaryLight    string
+	BackgroundDark  string
+	BackgroundLight string
+	ContainerDark   string
+	ContainerLight  string
+	UseDPS          bool
+	IsLightMode     bool
 }
 
 func mergeColorInfo(dark, light ColorInfo, isLightMode bool) VariantColorInfo {
@@ -702,8 +718,8 @@ func mergeColorInfo(dark, light ColorInfo, isLightMode bool) VariantColorInfo {
 }
 
 func GenerateVariantPalette(opts VariantOptions) VariantPalette {
-	darkOpts := PaletteOptions{IsLight: false, Background: opts.Background, UseDPS: opts.UseDPS}
-	lightOpts := PaletteOptions{IsLight: true, Background: opts.Background, UseDPS: opts.UseDPS}
+	darkOpts := PaletteOptions{IsLight: false, Background: opts.BackgroundDark, Container: opts.ContainerDark, UseDPS: opts.UseDPS}
+	lightOpts := PaletteOptions{IsLight: true, Background: opts.BackgroundLight, Container: opts.ContainerLight, UseDPS: opts.UseDPS}
 
 	dark := GeneratePalette(opts.PrimaryDark, darkOpts)
 	light := GeneratePalette(opts.PrimaryLight, lightOpts)

@@ -701,7 +701,8 @@ func TestGeneratePaletteWithDPS(t *testing.T) {
 
 			bgColor := result.Color0.Hex
 			for i := 1; i < 8; i++ {
-				// Skip Color5 (container) and Color6 (exact primary) - intentionally not contrast-adjusted
+				// Color5 is the container and Color6 the exact primary: they pair
+				// with each other, not with the background
 				if i == 5 || i == 6 {
 					continue
 				}
@@ -860,5 +861,114 @@ func TestGeneratePaletteLightColor8StaysLight(t *testing.T) {
 	if bgRatio > 3.0 {
 		t.Errorf("light mode Color8 %s vs bg %s ratio %.2f, expected <= 3.0",
 			palette.Color8.Hex, palette.Color0.Hex, bgRatio)
+	}
+}
+
+func TestGeneratePaletteLightYellowMeetsNormalTextContrast(t *testing.T) {
+	primaries := []string{"#63568f", "#7d5800", "#116d2b", "#1c5070", "#8b3f68"}
+
+	for _, primary := range primaries {
+		t.Run(primary, func(t *testing.T) {
+			palette := GeneratePalette(primary, PaletteOptions{IsLight: true, Background: "#f5fafc", UseDPS: true})
+
+			ratio := ContrastRatio(palette.Color3.Hex, palette.Color0.Hex)
+			if ratio < 4.5 {
+				t.Errorf("light Color3 %s vs bg %s ratio %.2f, expected >= 4.5 (yellow must clear the normal-text target)",
+					palette.Color3.Hex, palette.Color0.Hex, ratio)
+			}
+		})
+	}
+}
+
+func TestGenerateVariantPaletteUsesPerVariantBackground(t *testing.T) {
+	const darkBg = "#0f1417"
+	const lightBg = "#f5fafc"
+
+	variants := GenerateVariantPalette(VariantOptions{
+		PrimaryDark:     "#8ecff2",
+		PrimaryLight:    "#1c5070",
+		BackgroundDark:  darkBg,
+		BackgroundLight: lightBg,
+		UseDPS:          true,
+	})
+
+	if variants.Color0.Dark.Hex != darkBg {
+		t.Errorf("dark Color0 = %s, expected the dark background %s", variants.Color0.Dark.Hex, darkBg)
+	}
+	if variants.Color0.Light.Hex != lightBg {
+		t.Errorf("light Color0 = %s, expected the light background %s", variants.Color0.Light.Hex, lightBg)
+	}
+
+	lightDim := variants.Color8.Light.Hex
+	if lstar := getLstar(lightDim); lstar < 60.0 {
+		t.Errorf("light Color8 %s has L* %.2f, expected >= 60 (derived from the dark surface it collapses to near-black)",
+			lightDim, lstar)
+	}
+	if ratio := ContrastRatio(lightDim, lightBg); ratio > 3.0 {
+		t.Errorf("light Color8 %s vs bg %s ratio %.2f, expected <= 3.0 (bright black stays dim)", lightDim, lightBg, ratio)
+	}
+
+	darkDim := variants.Color8.Dark.Hex
+	if ratio := ContrastRatio(darkDim, darkBg); ratio > 3.0 {
+		t.Errorf("dark Color8 %s vs bg %s ratio %.2f, expected <= 3.0", darkDim, darkBg, ratio)
+	}
+}
+
+func TestGeneratePaletteColor5PairsWithColor6(t *testing.T) {
+	tests := []struct {
+		name      string
+		primary   string
+		container string
+		bg        string
+		isLight   bool
+	}{
+		{"violet dark", "#cdbdff", "#4b3e76", "#141318", false},
+		{"violet light", "#63568f", "#e8deff", "#fdf7ff", true},
+		{"green dark", "#9ed49d", "#1f5027", "#101510", false},
+		{"green light", "#38693c", "#b9f0b8", "#f7fbf2", true},
+		{"amber light", "#805610", "#ffddb3", "#fff8f4", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			palette := GeneratePalette(tt.primary, PaletteOptions{
+				IsLight:    tt.isLight,
+				Background: tt.bg,
+				Container:  tt.container,
+				UseDPS:     true,
+			})
+
+			if palette.Color5.Hex != tt.container {
+				t.Errorf("Color5 = %s, expected the supplied container %s", palette.Color5.Hex, tt.container)
+			}
+			if palette.Color6.Hex != tt.primary {
+				t.Errorf("Color6 = %s, expected the primary %s", palette.Color6.Hex, tt.primary)
+			}
+
+			pair := ContrastRatio(palette.Color5.Hex, palette.Color6.Hex)
+			if pair < 4.5 {
+				t.Errorf("Color5 %s vs Color6 %s ratio %.2f, expected >= 4.5 (the container/primary pair carries the prompt themes that use ANSI 5 on 6)",
+					palette.Color5.Hex, palette.Color6.Hex, pair)
+			}
+
+			if palette.Color5.Hex == palette.Color13.Hex {
+				t.Errorf("Color5 and Color13 are both %s, expected a distinct bright variant", palette.Color5.Hex)
+			}
+			if sep := ContrastRatio(palette.Color5.Hex, palette.Color13.Hex); sep < 2.0 {
+				t.Errorf("Color5 %s vs Color13 %s ratio %.2f, expected >= 2.0 (normal and bright must be tellable apart)",
+					palette.Color5.Hex, palette.Color13.Hex, sep)
+			}
+		})
+	}
+}
+
+func TestGeneratePaletteFallsBackToDerivedContainer(t *testing.T) {
+	const primary = "#cdbdff"
+
+	palette := GeneratePalette(primary, PaletteOptions{Background: "#141318", UseDPS: true})
+
+	want := DeriveContainer(primary, false)
+	if palette.Color5.Hex != want {
+		t.Errorf("Color5 = %s with no container supplied, expected the derived %s", palette.Color5.Hex, want)
 	}
 }
