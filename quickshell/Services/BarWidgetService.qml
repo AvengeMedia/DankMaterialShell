@@ -140,8 +140,8 @@ Singleton {
     function getFocusedScreenName() {
         if (CompositorService.isAqueous && AqueousService.available)
             return AqueousService.focusedOutput;
-        if (CompositorService.isHyprland && Hyprland.focusedWorkspace?.monitor)
-            return Hyprland.focusedWorkspace.monitor.name;
+        if (CompositorService.isHyprland && Hyprland.focusedMonitor)
+            return Hyprland.focusedMonitor.name;
         if (CompositorService.isNiri && NiriService.currentOutput)
             return NiriService.currentOutput;
         if (CompositorService.isMango && MangoService.activeOutput)

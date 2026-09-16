@@ -2,6 +2,8 @@ package wayland
 
 import (
 	"math"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 )
 
 type GammaRamp struct {
@@ -165,4 +167,53 @@ func GenerateIdentityRamp(size uint32) GammaRamp {
 	}
 
 	return ramp
+}
+
+// ProfileRampWithTemp builds the ramp for an output with an ICC profile: the
+// vcgt table is sampled at the contrast-adjusted input, the user gamma is
+// applied to the result, and a temperature target (targetTemp > 0) is composed
+// as the white point ratio against baseTemp, the profile's reference white.
+func ProfileRampWithTemp(size uint32, profile *icc.Profile, baseTemp, targetTemp int, gamma, contrast float64) (GammaRamp, error) {
+	iccRamp, err := icc.GenerateGammaRampAt(size, profile, func(t float64) float64 { return applyContrast(t, contrast) })
+	if err != nil {
+		return GammaRamp{}, err
+	}
+
+	tint := whitepointRatio(baseTemp, targetTemp)
+	ramp := GammaRamp{
+		Red:   make([]uint16, size),
+		Green: make([]uint16, size),
+		Blue:  make([]uint16, size),
+	}
+	for i := range size {
+		ramp.Red[i] = adjustRampValue(iccRamp.Red[i], tint.r, gamma)
+		ramp.Green[i] = adjustRampValue(iccRamp.Green[i], tint.g, gamma)
+		ramp.Blue[i] = adjustRampValue(iccRamp.Blue[i], tint.b, gamma)
+	}
+	return ramp, nil
+}
+
+func whitepointRatio(baseTemp, targetTemp int) rgb {
+	if targetTemp <= 0 || targetTemp == baseTemp {
+		return rgb{r: 1, g: 1, b: 1}
+	}
+	base := calcWhitepoint(baseTemp)
+	target := calcWhitepoint(targetTemp)
+	return rgb{
+		r: channelRatio(target.r, base.r),
+		g: channelRatio(target.g, base.g),
+		b: channelRatio(target.b, base.b),
+	}
+}
+
+func channelRatio(target, base float64) float64 {
+	if base <= 0 {
+		return 1
+	}
+	return target / base
+}
+
+func adjustRampValue(value uint16, tint, gamma float64) uint16 {
+	linear := clamp01(float64(value) / 65535.0 * tint)
+	return uint16(math.Round(clamp01(math.Pow(linear, 1.0/gamma)) * 65535.0))
 }

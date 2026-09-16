@@ -200,6 +200,7 @@ Singleton {
         internalEntries = [];
         clipboardEntries = [];
         unpinnedEntries = [];
+        pinnedEntries = [];
     }
 
     function copyEntry(entry, closeCallback, textOnly) {
@@ -334,6 +335,33 @@ Singleton {
         });
     }
 
+    function editEntry(entry, text, callback) {
+        if (!entry || typeof entry.id !== "number") {
+            if (callback) {
+                callback({
+                    "error": "Invalid entry"
+                });
+            }
+            return;
+        }
+        DMSService.sendRequest("clipboard.editEntry", {
+            "id": entry.id,
+            "text": text
+        }, function (response) {
+            if (response.error) {
+                log.warn("Failed to edit entry:", response.error);
+                if (callback) {
+                    callback(response);
+                }
+                return;
+            }
+            refresh();
+            if (callback) {
+                callback(response);
+            }
+        });
+    }
+
     function clearAll() {
         const hasPinned = pinnedCount > 0;
         const savedCount = pinnedCount;
@@ -369,6 +397,17 @@ Singleton {
 
     function getEntryPreview(entry) {
         return entry.preview || "";
+    }
+
+    function isTextMimeType(mimeType) {
+        if (!mimeType || mimeType.startsWith("text/plain")) {
+            return true;
+        }
+        return mimeType === "UTF8_STRING" || mimeType === "STRING" || mimeType === "TEXT";
+    }
+
+    function canEditEntry(entry) {
+        return !!entry && !(entry.isImage ?? false) && isTextMimeType(entry.mimeType);
     }
 
     function getEntryType(entry) {

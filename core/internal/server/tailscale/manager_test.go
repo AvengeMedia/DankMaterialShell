@@ -418,3 +418,55 @@ func TestManager_Actions_PropagateError(t *testing.T) {
 	assert.Error(t, m.SetExitNode("nABC123"))
 	assert.Error(t, m.SetAllowLANAccess(true))
 }
+
+type dynamicWatcher struct {
+	ctx context.Context
+	ch  chan ipn.Notify
+}
+
+func (w *dynamicWatcher) Next() (ipn.Notify, error) {
+	select {
+	case n, ok := <-w.ch:
+		if !ok {
+			return ipn.Notify{}, fmt.Errorf("watcher closed")
+		}
+		return n, nil
+	case <-w.ctx.Done():
+		return ipn.Notify{}, w.ctx.Err()
+	}
+}
+
+func (w *dynamicWatcher) Close() error {
+	return nil
+}
+
+func TestWatchLoop_NotifyWithoutStateOrNetMap(t *testing.T) {
+	var statusCalls atomic.Int32
+	notifyCh := make(chan ipn.Notify, 1)
+
+	client := &mockClient{
+		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
+			return &dynamicWatcher{ctx: ctx, ch: notifyCh}, nil
+		},
+		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
+			statusCalls.Add(1)
+			return runningStatus(), nil
+		},
+	}
+
+	m := newManager(client)
+	defer m.Close()
+
+	// Wait for the initial connect-time status call to complete.
+	require.Eventually(t, func() bool {
+		return statusCalls.Load() == 1
+	}, 2*time.Second, 10*time.Millisecond)
+
+	// Send an event with State == nil and NetMap == nil.
+	notifyCh <- ipn.Notify{Engine: &ipn.EngineStatus{}}
+
+	// Verify that the notification without State or NetMap triggers a second status call.
+	require.Eventually(t, func() bool {
+		return statusCalls.Load() >= 2
+	}, 2*time.Second, 10*time.Millisecond)
+}

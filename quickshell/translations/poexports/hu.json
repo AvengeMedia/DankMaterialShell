@@ -101,14 +101,14 @@
   "%1 widgets": {
     "%1 widgets": "%1 widget"
   },
+  "%1 will be removed from your system.": {
+    "%1 will be removed from your system.": ""
+  },
   "%1 window": {
     "%1 window": "%1 ablak"
   },
   "%1 windows": {
     "%1 windows": "%1 ablak"
-  },
-  "%1 — %2": {
-    "%1 — %2": ""
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
@@ -133,9 +133,6 @@
   },
   "0 = square corners": {
     "0 = square corners": "0 = szögletes sarkok"
-  },
-  "1 Connecting Line": {
-    "1 Connecting Line": ""
   },
   "1 day": {
     "1 day": "1 nap"
@@ -196,9 +193,6 @@
   },
   "180°": {
     "180°": "180 fok"
-  },
-  "2 Connecting Lines": {
-    "2 Connecting Lines": ""
   },
   "2 hours": {
     "2 hours": "2 óra"
@@ -341,9 +335,6 @@
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
     "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "Az AUR-segédprogramok interaktívak – a kérésekért nézd meg a terminálablakot. Ez a felugró ablak visszatér üresjáratba, amikor a frissítés befejeződik."
   },
-  "AUTO": {
-    "AUTO": ""
-  },
   "Aborted": {
     "Aborted": "Megszakítva"
   },
@@ -353,14 +344,11 @@
   "Acceleration Profile": {
     "Acceleration Profile": "Gyorsítási profil"
   },
-  "Accent Color": {
-    "Accent Color": "Hangsúlyszín"
-  },
-  "Accept": {
-    "Accept": "Elfogadás"
-  },
   "Accept Jobs": {
     "Accept Jobs": "Feladatok elfogadása"
+  },
+  "Accept reviewed changes": {
+    "Accept reviewed changes": ""
   },
   "Accepting": {
     "Accepting": "Elfogadva"
@@ -386,9 +374,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "A sávon történő függőleges görgetéskor végrehajtandó művelet"
   },
-  "Action when Enter": {
-    "Action when Enter": ""
-  },
   "Activate": {
     "Activate": "Aktiválás"
   },
@@ -401,9 +386,6 @@
   "Activates immediately": {
     "Activates immediately": "Azonnal aktiválódik"
   },
-  "Activation": {
-    "Activation": "Aktiválás"
-  },
   "Active": {
     "Active": "Aktív"
   },
@@ -412,9 +394,6 @@
   },
   "Active VPN": {
     "Active VPN": "Aktív VPN"
-  },
-  "Active Window": {
-    "Active Window": ""
   },
   "Active in Column": {
     "Active in Column": "Aktív az oszlopban"
@@ -436,9 +415,6 @@
   },
   "Adaptive": {
     "Adaptive": "Adaptív"
-  },
-  "Adaptive (DMS Theme)": {
-    "Adaptive (DMS Theme)": ""
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "Adaptív médiaszélesség"
@@ -463,9 +439,6 @@
   },
   "Add Printer": {
     "Add Printer": "Nyomtató hozzáadása"
-  },
-  "Add Text Note": {
-    "Add Text Note": ""
   },
   "Add Title": {
     "Add Title": "Cím hozzáadása"
@@ -557,12 +530,6 @@
   "All": {
     "All": "Összes"
   },
-  "All Combined Outputs": {
-    "All Combined Outputs": ""
-  },
-  "All Outputs": {
-    "All Outputs": ""
-  },
   "All checks passed": {
     "All checks passed": "Minden ellenőrzés sikeres"
   },
@@ -608,9 +575,6 @@
   "Alternative (OR)": {
     "Alternative (OR)": "Alternatív (VAGY)"
   },
-  "Always Active": {
-    "Always Active": "Mindig aktív"
-  },
   "Always Show Percentage": {
     "Always Show Percentage": "Mindig mutassa a százalékot"
   },
@@ -641,6 +605,9 @@
   "Amount": {
     "Amount": "Mennyiség"
   },
+  "An uninstallation is already in progress": {
+    "An uninstallation is already in progress": ""
+  },
   "An xray rule at %1 may conflict with the Xray settings below": {
     "An xray rule at %1 may conflict with the Xray settings below": "Egy röntgen szabály itt: %1 ütközhet az alábbi Röntgen beállításokkal"
   },
@@ -665,20 +632,14 @@
   "Animation Style": {
     "Animation Style": "Animációs stílus"
   },
-  "Annotating": {
-    "Annotating": ""
-  },
-  "Annotation Tools": {
-    "Annotation Tools": ""
-  },
-  "Anonymous Copy (stripped metadata)": {
-    "Anonymous Copy (stripped metadata)": ""
-  },
   "Anonymous Identity": {
     "Anonymous Identity": "Névtelen azonosító"
   },
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "Névtelen azonosító (nem kötelező)"
+  },
+  "Another Aqueous operation is in progress.": {
+    "Another Aqueous operation is in progress.": ""
   },
   "Any window": {
     "Any window": "Bármely ablak"
@@ -733,6 +694,9 @@
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "A következő üdvözlőképernyő-szinkronizáláskor lép életbe"
+  },
+  "Apply AUR updates alongside system updates when running 'Update All'.": {
+    "Apply AUR updates alongside system updates when running 'Update All'.": ""
   },
   "Apply Changes": {
     "Apply Changes": "Változtatások alkalmazása"
@@ -791,6 +755,12 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "Alkalmazások elnémított értesítési felugrókkal. A visszakapcsoláshoz hangosíts vissza vagy töröld őket."
   },
+  "Aqueous cursor": {
+    "Aqueous cursor": ""
+  },
+  "Aqueous typography": {
+    "Aqueous typography": ""
+  },
   "Arc Extender": {
     "Arc Extender": "Ív kiterjesztő"
   },
@@ -802,18 +772,6 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Képernyő-elrendezés és a felbontás, frissítési frekvencia, valamint VRR beállítása"
-  },
-  "Arrow (3)": {
-    "Arrow (3)": ""
-  },
-  "Arrow Color": {
-    "Arrow Color": ""
-  },
-  "Arrow Thickness": {
-    "Arrow Thickness": ""
-  },
-  "Arrow Vector": {
-    "Arrow Vector": ""
   },
   "At Startup": {
     "At Startup": "Indításkor"
@@ -829,9 +787,6 @@
   },
   "Audio": {
     "Audio": "Hang"
-  },
-  "Audio & Overlay": {
-    "Audio & Overlay": ""
   },
   "Audio Codec": {
     "Audio Codec": "Hangkodek"
@@ -914,14 +869,8 @@
   "Auto (Wide)": {
     "Auto (Wide)": "Automatikus (széles)"
   },
-  "Auto Balance": {
-    "Auto Balance": ""
-  },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "Automatikus kompozitor rések"
-  },
-  "Auto Detect": {
-    "Auto Detect": ""
   },
   "Auto From Wallpaper": {
     "Auto From Wallpaper": "Automatikus háttérkép alapján"
@@ -956,14 +905,8 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "Automatikus elrejtés időtúllépése"
   },
-  "Auto-apply background defaults": {
-    "Auto-apply background defaults": ""
-  },
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": "Niri-áttekintés automatikus bezárása, ha a DMS elindul vagy fókuszba helyez egy ablakot."
-  },
-  "Auto-close the loop when ending near the start point.": {
-    "Auto-close the loop when ending near the start point.": ""
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "Ennél régebbi értesítések automatikus törlése"
@@ -986,17 +929,8 @@
   "Auto-login on startup": {
     "Auto-login on startup": "Automatikus bejelentkezés indításkor"
   },
-  "Auto-minimize": {
-    "Auto-minimize": ""
-  },
   "Auto-save to disk": {
     "Auto-save to disk": "Automatikus mentés a lemezre"
-  },
-  "Auto-select a tool preset on hover, without releasing the mouse.": {
-    "Auto-select a tool preset on hover, without releasing the mouse.": ""
-  },
-  "Auto-tiling": {
-    "Auto-tiling": ""
   },
   "Autoconnect": {
     "Autoconnect": "Automatikus csatlakozás"
@@ -1043,17 +977,11 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "A képernyő automatikus zárolása, amikor a rendszer felfüggesztésre készül"
   },
-  "Automatically minimize the float window after a delay": {
-    "Automatically minimize the float window after a delay": ""
-  },
   "Automatically picks the scheme variant based on the wallpaper.": {
     "Automatically picks the scheme variant based on the wallpaper.": "Automatikusan kiválasztja a sémát a háttérkép alapján."
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "A megnyitott fájlok módosításainak automatikus mentése gépelés közben"
-  },
-  "Automatically stack windows to avoid overlap": {
-    "Automatically stack windows to avoid overlap": ""
   },
   "Automatically turn on Num Lock at startup": {
     "Automatically turn on Num Lock at startup": "Num Lock automatikus bekapcsolása indításkor"
@@ -1088,17 +1016,11 @@
   "Available Updates (%1)": {
     "Available Updates (%1)": "Elérhető frissítések (%1)"
   },
-  "Available in Detailed and Forecast view modes": {
-    "Available in Detailed and Forecast view modes": "Részletes és Előrejelzés nézetmódokban érhető el"
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "Vissza"
-  },
-  "Back to Annotation (B)": {
-    "Back to Annotation (B)": ""
   },
   "Backend": {
     "Backend": "Háttérrendszer"
@@ -1106,32 +1028,14 @@
   "Background": {
     "Background": "Háttér"
   },
-  "Background (B)": {
-    "Background (B)": ""
-  },
   "Background Blur": {
     "Background Blur": "Háttér elmosása"
   },
   "Background Color": {
     "Background Color": "Háttérszín"
   },
-  "Background Defaults": {
-    "Background Defaults": ""
-  },
   "Background Effect": {
     "Background Effect": "Háttéreffektus"
-  },
-  "Background Image Folder": {
-    "Background Image Folder": ""
-  },
-  "Background Images": {
-    "Background Images": ""
-  },
-  "Background Opacity": {
-    "Background Opacity": "Háttér átlátszatlansága"
-  },
-  "Background Presets": {
-    "Background Presets": ""
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": "A háttérbeli hitelesítési szinkronizálás sikertelen. Próbálkozás terminál módban."
@@ -1162,9 +1066,6 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "Sáv belső margója"
-  },
-  "Bar Interactions": {
-    "Bar Interactions": ""
   },
   "Bar Length Padding": {
     "Bar Length Padding": "Sávhossz kitöltése"
@@ -1206,7 +1107,7 @@
     "Battery Charge Limit": "Akkumulátor töltési korlát"
   },
   "Battery Colors": {
-    "Battery Colors": ""
+    "Battery Colors": "Akkumulátor színei"
   },
   "Battery Health": {
     "Battery Health": "Akkumulátor állapota (egészség)"
@@ -1215,7 +1116,7 @@
     "Battery Power": "Akkumulátoros tápellátás"
   },
   "Battery Style": {
-    "Battery Style": ""
+    "Battery Style": "Akkumulátor stílusa"
   },
   "Battery and power management": {
     "Battery and power management": "Akkumulátor- és energiakezelés"
@@ -1256,9 +1157,6 @@
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": "Átmenet a Surface High és a kiválasztott egyéni szín között"
   },
-  "Blink Recording Dot": {
-    "Blink Recording Dot": ""
-  },
   "Block %1 in Do Not Disturb": {
     "Block %1 in Do Not Disturb": "%1 tiltása Ne zavarjanak módban"
   },
@@ -1289,9 +1187,6 @@
   "Blur": {
     "Blur": "Elmosás"
   },
-  "Blur Background Image": {
-    "Blur Background Image": ""
-  },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "Háttérkép elmosási réteg"
   },
@@ -1299,7 +1194,7 @@
     "Blur on Overview": "Elmosás az áttekintésben"
   },
   "Blur the album art behind the media player": {
-    "Blur the album art behind the media player": ""
+    "Blur the album art behind the media player": "Elmosott albumborító a médialejátszó mögött"
   },
   "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": {
     "Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.": "Háttér elmosása a sávok, felugrók, modális ablakok és értesítések mögött. Kompozitor támogatás szükséges hozzá. Állítsd be az átlátszatlanságot ennek megfelelően."
@@ -1397,9 +1292,6 @@
   "Browse": {
     "Browse": "Böngészés"
   },
-  "Browse Files": {
-    "Browse Files": "Fájlok böngészése"
-  },
   "Browse Plugins": {
     "Browse Plugins": "Bővítmények böngészése"
   },
@@ -1414,6 +1306,12 @@
   },
   "Button Color": {
     "Button Color": "Gomb színe"
+  },
+  "Button areas": {
+    "Button areas": ""
+  },
+  "Button areas determines click type by finger position; Clickfinger by finger count": {
+    "Button areas determines click type by finger position; Clickfinger by finger count": ""
   },
   "CPU": {
     "CPU": "CPU"
@@ -1448,26 +1346,11 @@
   "CUPS not available": {
     "CUPS not available": "A CUPS nem érhető el"
   },
-  "CUST": {
-    "CUST": ""
-  },
   "Calendar": {
     "Calendar": "Naptár"
   },
   "Calendar Backend": {
     "Calendar Backend": "Naptár háttérprogram"
-  },
-  "Callout": {
-    "Callout": ""
-  },
-  "Callout (Z) | Hold G for Loupe": {
-    "Callout (Z) | Hold G for Loupe": ""
-  },
-  "Callout Zoom": {
-    "Callout Zoom": ""
-  },
-  "Callout, Background (Z, B)": {
-    "Callout, Background (Z, B)": ""
   },
   "Calls / Headset": {
     "Calls / Headset": "Hívások / Fejhallgató"
@@ -1514,26 +1397,11 @@
   "Caps Lock is on": {
     "Caps Lock is on": "A Caps Lock be van kapcsolva"
   },
-  "Capture": {
-    "Capture": ""
-  },
-  "Capture Actions": {
-    "Capture Actions": ""
-  },
-  "Capture Options": {
-    "Capture Options": ""
-  },
-  "Capturing...": {
-    "Capturing...": ""
-  },
   "Cast Target": {
     "Cast Target": "Kivetítés célpontja"
   },
   "Category": {
     "Category": "Kategória"
-  },
-  "Catppuccin": {
-    "Catppuccin": ""
   },
   "Cellular": {
     "Cellular": "Mobilhálózat"
@@ -1543,15 +1411,6 @@
   },
   "Cellular enabled": {
     "Cellular enabled": "Mobilhálózat engedélyezve"
-  },
-  "Center": {
-    "Center": ""
-  },
-  "Center Left": {
-    "Center Left": ""
-  },
-  "Center Right": {
-    "Center Right": ""
   },
   "Center Section": {
     "Center Section": "Középső rész"
@@ -1588,6 +1447,9 @@
   },
   "Charge limit applied successfully": {
     "Charge limit applied successfully": "Töltési korlát sikeresen alkalmazva"
+  },
+  "Charge limit not supported on this hardware": {
+    "Charge limit not supported on this hardware": ""
   },
   "Charging": {
     "Charging": "Töltés"
@@ -1637,14 +1499,14 @@
   "Choose a shortcut key to cycle between keyboard layouts": {
     "Choose a shortcut key to cycle between keyboard layouts": "Válassz egy billentyűparancsot a billentyűzetkiosztások közötti váltáshoz"
   },
+  "Choose between battery gauge or connectivity icons": {
+    "Choose between battery gauge or connectivity icons": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "Színek választása a palettáról"
   },
   "Choose how the bar meets the screen edge": {
     "Choose how the bar meets the screen edge": "Hogyan érintkezzen a sáv a képernyő szélével"
-  },
-  "Choose how the weather widget is displayed": {
-    "Choose how the weather widget is displayed": "Az időjárási widget megjelenítési módjának kiválasztása"
   },
   "Choose how this bar resolves shadow direction": {
     "Choose how this bar resolves shadow direction": "Árnyék irányának meghatározása ezen a sávon"
@@ -1664,12 +1526,6 @@
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": "Semleges vagy kiemelt színű widget szöveg választása"
   },
-  "Choose notifications shown after copy or save.": {
-    "Choose notifications shown after copy or save.": ""
-  },
-  "Choose the editor shape for portrait or landscape screens.": {
-    "Choose the editor shape for portrait or landscape screens.": ""
-  },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "A DankBar indítógombján megjelenő logó kiválasztása"
   },
@@ -1685,9 +1541,6 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "A képernyőkijelzés megjelenítési helye"
   },
-  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
-    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
-  },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": "Válaszd ki, hogy asztali alkalmazást vagy parancsot indítasz"
   },
@@ -1697,14 +1550,8 @@
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "Mely kijelzők mutassák ezt a widgetet"
   },
-  "Choose which monitor to capture during full screen recording.": {
-    "Choose which monitor to capture during full screen recording.": ""
-  },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Mely monitorok jelenítsék meg a lezárási képernyő felületét. A többi monitor egyszínű képet jelenít meg az OLED beégés elleni védelem érdekében."
-  },
-  "Chroma Style": {
-    "Chroma Style": "Chroma stílus"
   },
   "Cipher": {
     "Cipher": "Titkosítás"
@@ -1717,12 +1564,6 @@
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "Osztály (Class) regex (például ^firefox$)"
-  },
-  "Classic (Tailwind)": {
-    "Classic (Tailwind)": ""
-  },
-  "Clean Text Eraser": {
-    "Clean Text Eraser": ""
   },
   "Clear": {
     "Clear": "Törlés"
@@ -1751,9 +1592,6 @@
   "Clear at Startup": {
     "Clear at Startup": "Törlés indításkor"
   },
-  "Clear saved region selection before each capture": {
-    "Clear saved region selection before each capture": ""
-  },
   "Clears the badge on open but keeps notifications active": {
     "Clears the badge on open but keeps notifications active": "Törli a jelvényt a megnyitáskor, de aktívan tartja az értesítéseket"
   },
@@ -1766,6 +1604,9 @@
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Kattints az importálás gombra .ovpn vagy .conf fájl hozzáadásához"
   },
+  "Click Method": {
+    "Click Method": ""
+  },
   "Click Refresh to check status.": {
     "Click Refresh to check status.": "Kattints a Frissítés gombra az állapot ellenőrzéséhez."
   },
@@ -1774,6 +1615,9 @@
   },
   "Click an entry to paste directly instead of copying": {
     "Click an entry to paste directly instead of copying": "Kattints egy elemre a közvetlen beillesztéshez másolás helyett"
+  },
+  "Click any shortcut to edit Aqueous configuration": {
+    "Click any shortcut to edit Aqueous configuration": ""
   },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Kattints bármelyik gyorsbillentyűre a szerkesztéshez. A módosítások a(z) %1 fájlba lesznek mentve."
@@ -1792,6 +1636,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "Kattints egy egyéni téma JSON fájl kiválasztásához"
+  },
+  "Clickfinger": {
+    "Clickfinger": ""
   },
   "Clicking a popup runs its first action instead of expanding the body": {
     "Clicking a popup runs its first action instead of expanding the body": "A felugró ablakra való kattintás az első műveletét futtatja a törzs kibontása helyett"
@@ -1814,9 +1661,6 @@
   "Clipboard Saved": {
     "Clipboard Saved": "Vágólapra mentve"
   },
-  "Clipboard sent": {
-    "Clipboard sent": "Vágólap elküldve"
-  },
   "Clipboard works but nothing saved to disk": {
     "Clipboard works but nothing saved to disk": "A vágólap működni fog, de nem lesz a lemezre mentve semmi"
   },
@@ -1834,9 +1678,6 @@
   },
   "Close All Windows": {
     "Close All Windows": "Összes ablak bezárása"
-  },
-  "Close Annotator": {
-    "Close Annotator": ""
   },
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": "Niri áttekintés bezárása ablak fókuszba kerülésekor"
@@ -1871,23 +1712,11 @@
   "Color Override": {
     "Color Override": "Színfelülírás"
   },
-  "Color Palette": {
-    "Color Palette": ""
-  },
   "Color Picker": {
     "Color Picker": "Színválasztó"
   },
-  "Color Picker (F for RGB | Eyedropper)": {
-    "Color Picker (F for RGB | Eyedropper)": ""
-  },
-  "Color Picker, Eraser (F, T)": {
-    "Color Picker, Eraser (F, T)": ""
-  },
   "Color Temperature": {
     "Color Temperature": "Színhőmérséklet"
-  },
-  "Color copied to clipboard: %1": {
-    "Color copied to clipboard: %1": ""
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "Szín, amely a zárolási képernyő nélküli monitorokon jelenik meg"
@@ -1900,12 +1729,6 @@
   },
   "Color temperature for night mode": {
     "Color temperature for night mode": "Színhőmérséklet az éjszakai módhoz"
-  },
-  "Color theme for syntax highlighting.": {
-    "Color theme for syntax highlighting.": "Színtéma a szintaxiskiemeléshez."
-  },
-  "Color theme for syntax highlighting. %1 themes available.": {
-    "Color theme for syntax highlighting. %1 themes available.": "Színtéma a szintaxiskiemeléshez. %1 téma érhető el."
   },
   "Color theme from DMS registry": {
     "Color theme from DMS registry": "Színtéma a DMS-regiszterből"
@@ -1956,13 +1779,13 @@
     "Compact Island Height": "Kompakt szigetmagasság"
   },
   "Compact Island Width": {
-    "Compact Island Width": ""
+    "Compact Island Width": "Kompakt szigetszélesség"
   },
   "Compact Mode": {
     "Compact Mode": "Kompakt mód"
   },
   "Compact Pill": {
-    "Compact Pill": ""
+    "Compact Pill": "Kompakt kapszula"
   },
   "Compact home clock pill in both width and height": {
     "Compact home clock pill in both width and height": "Kompakt otthoni óra kapszula szélességben és magasságban is"
@@ -1994,6 +1817,9 @@
   "Configuration activated": {
     "Configuration activated": "Konfiguráció aktiválva"
   },
+  "Configuration changed. Refresh to continue.": {
+    "Configuration changed. Refresh to continue.": ""
+  },
   "Configuration will be preserved when this display reconnects": {
     "Configuration will be preserved when this display reconnects": "A konfiguráció megmarad, amikor ez a kijelző újra csatlakozik"
   },
@@ -2017,9 +1843,6 @@
   },
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "Állíts be egyet a Beállítások → Dokk → Kuka útvonalon."
-  },
-  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
-    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "Mely kijelzők mutassák ezt: „%1”"
@@ -2047,9 +1870,6 @@
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "Ütközik ezzel: %1"
-  },
-  "Conic Gradient": {
-    "Conic Gradient": ""
   },
   "Connect": {
     "Connect": "Csatlakozás"
@@ -2093,26 +1913,17 @@
   "Connection failed": {
     "Connection failed": "Kapcsolódás sikertelen"
   },
-  "Container Format": {
-    "Container Format": ""
-  },
   "Contains": {
     "Contains": "Tartalmazza"
   },
   "Content": {
     "Content": "Tartalom"
   },
-  "Content copied": {
-    "Content copied": "Tartalom másolva"
-  },
   "Contrast": {
     "Contrast": "Kontraszt"
   },
   "Contributor": {
     "Contributor": "Közreműködő"
-  },
-  "Contributors": {
-    "Contributors": ""
   },
   "Control Center": {
     "Control Center": "Vezérlőközpont"
@@ -2156,38 +1967,14 @@
   "Controls the outline of popouts, modals, and other shell surfaces": {
     "Controls the outline of popouts, modals, and other shell surfaces": "Szabályozza a felugró ablakok, modális ablakok és egyéb felületek körvonalát"
   },
-  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
-    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
-  },
   "Convenience options for the login screen": {
     "Convenience options for the login screen": "Kényelmi beállítások a bejelentkezési képernyőhöz"
   },
   "Convert to DMS": {
     "Convert to DMS": "Konvertálás DMS-formátumba"
   },
-  "Converting recording to GIF...": {
-    "Converting recording to GIF...": ""
-  },
   "Cooldown": {
     "Cooldown": "Várakozási idő"
-  },
-  "Copied": {
-    "Copied": ""
-  },
-  "Copied & saved": {
-    "Copied & saved": ""
-  },
-  "Copied Anonymously": {
-    "Copied Anonymously": ""
-  },
-  "Copied GIF": {
-    "Copied GIF": "GIF másolva"
-  },
-  "Copied MP4": {
-    "Copied MP4": "MP4 másolva"
-  },
-  "Copied WebP": {
-    "Copied WebP": "WebP másolva"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "Másolva a vágólapra"
@@ -2195,26 +1982,8 @@
   "Copied!": {
     "Copied!": "Másolva!"
   },
-  "Copied:": {
-    "Copied:": ""
-  },
   "Copy": {
     "Copy": "Másolás"
-  },
-  "Copy & Save": {
-    "Copy & Save": ""
-  },
-  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
-    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
-  },
-  "Copy Color": {
-    "Copy Color": ""
-  },
-  "Copy Content": {
-    "Copy Content": "Tartalom másolása"
-  },
-  "Copy Current Palette": {
-    "Copy Current Palette": ""
   },
   "Copy Full Command": {
     "Copy Full Command": "Teljes parancs másolása"
@@ -2231,14 +2000,8 @@
   "Copy Text": {
     "Copy Text": "Szöveg másolása"
   },
-  "Copy and customize this preset": {
-    "Copy and customize this preset": ""
-  },
   "Copy target (%1)": {
     "Copy target (%1)": "Cél másolása (%1)"
-  },
-  "Copy vector / Paste / Duplicate": {
-    "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
     "Corner Radius": "Sarokkerekítés"
@@ -2315,12 +2078,6 @@
   "Critical Threshold": {
     "Critical Threshold": "Kritikus küszöbérték"
   },
-  "Crop / Resize": {
-    "Crop / Resize": ""
-  },
-  "Crop / Resize Area": {
-    "Crop / Resize Area": ""
-  },
   "Ctrl + Shift": {
     "Ctrl + Shift": "Ctrl + Shift"
   },
@@ -2382,7 +2139,7 @@
     "Current time and date display": "Jelenlegi idő- és dátumkijelzés"
   },
   "Current time and date pill": {
-    "Current time and date pill": ""
+    "Current time and date pill": "Aktuális idő és dátum kapszula"
   },
   "Current weather conditions and temperature": {
     "Current weather conditions and temperature": "Jelenlegi időjárási viszonyok és hőmérséklet"
@@ -2413,9 +2170,6 @@
   },
   "Custom Color": {
     "Custom Color": "Egyéni szín"
-  },
-  "Custom Colors": {
-    "Custom Colors": ""
   },
   "Custom Duration": {
     "Custom Duration": "Egyéni időtartam"
@@ -2452,9 +2206,6 @@
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "Egyéni felfüggesztési parancs"
-  },
-  "Custom Tool": {
-    "Custom Tool": ""
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "Az egyéni parancs és a terminál paraméterei szóközök mentén válnak el; a szóközöket tartalmazó útvonalak hibát okoznak."
@@ -2525,6 +2276,9 @@
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "DMS-héjműveletek (indító, vágólap, stb.)"
   },
+  "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
+    "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": ""
+  },
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "A DMS_SOCKET nem érhető el"
   },
@@ -2550,13 +2304,10 @@
     "Dank Dash": "Dank Dash"
   },
   "Dank Island": {
-    "Dank Island": ""
+    "Dank Island": "Dank Island"
   },
   "Dank Island instance": {
     "Dank Island instance": "Dank Island példány"
-  },
-  "Dank Violet": {
-    "Dank Violet": ""
   },
   "DankBar": {
     "DankBar": "DankBar"
@@ -2572,9 +2323,6 @@
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell és Rendszerikonok (újraindítást igényel)"
-  },
-  "Dark": {
-    "Dark": ""
   },
   "Dark Mode": {
     "Dark Mode": "Sötét mód"
@@ -2594,20 +2342,14 @@
   "Darken Modal Background": {
     "Darken Modal Background": "Kizárólagos ablak hátterének sötétítése"
   },
-  "Darken the image to improve foreground contrast": {
-    "Darken the image to improve foreground contrast": ""
-  },
   "Darkest": {
-    "Darkest": ""
+    "Darkest": "Legsötétebb"
   },
   "Dashboard": {
     "Dashboard": "Irányítópult"
   },
-  "Dashed Line": {
-    "Dashed Line": ""
-  },
   "Date": {
-    "Date": ""
+    "Date": "Dátum"
   },
   "Date First": {
     "Date First": "Dátum előre"
@@ -2651,38 +2393,8 @@
   "Default (Global)": {
     "Default (Global)": "Alapértelmezett (globális)"
   },
-  "Default Alignment": {
-    "Default Alignment": ""
-  },
   "Default Apps": {
     "Default Apps": "Alapértelmezett alkalmazások"
-  },
-  "Default Aspect Ratio": {
-    "Default Aspect Ratio": ""
-  },
-  "Default Background Image": {
-    "Default Background Image": ""
-  },
-  "Default Background Mode": {
-    "Default Background Mode": ""
-  },
-  "Default Bold Text": {
-    "Default Bold Text": ""
-  },
-  "Default Corner Radius": {
-    "Default Corner Radius": ""
-  },
-  "Default Gradient Angle": {
-    "Default Gradient Angle": ""
-  },
-  "Default Gradient End": {
-    "Default Gradient End": ""
-  },
-  "Default Gradient Start": {
-    "Default Gradient Start": ""
-  },
-  "Default Italic Text": {
-    "Default Italic Text": ""
   },
   "Default Launcher": {
     "Default Launcher": "Alapértelmezett indító"
@@ -2690,41 +2402,14 @@
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "Alapértelmezett indító gyorsbillentyű"
   },
-  "Default Microphone": {
-    "Default Microphone": ""
-  },
   "Default Mode": {
     "Default Mode": "Alapértelmezett mód"
   },
   "Default Opens": {
     "Default Opens": "Alapértelmezetten megnyitja"
   },
-  "Default Output": {
-    "Default Output": ""
-  },
-  "Default Padding": {
-    "Default Padding": ""
-  },
-  "Default Shadow Strength": {
-    "Default Shadow Strength": ""
-  },
-  "Default Solid Color": {
-    "Default Solid Color": ""
-  },
   "Default Task List": {
     "Default Task List": "Alapértelmezett feladatlista"
-  },
-  "Default Text Background": {
-    "Default Text Background": ""
-  },
-  "Default Text Font Size": {
-    "Default Text Font Size": ""
-  },
-  "Default Underline Text": {
-    "Default Underline Text": ""
-  },
-  "Default Watermark": {
-    "Default Watermark": ""
   },
   "Default Width (%)": {
     "Default Width (%)": "Alapértelmezett szélesség (%)"
@@ -2819,9 +2504,6 @@
   "Desktop background images": {
     "Desktop background images": "Asztali háttérképek"
   },
-  "Detailed": {
-    "Detailed": "Részletes"
-  },
   "Details for \"%1": {
     "Details for \"%1\"": "„%1” részletei"
   },
@@ -2843,9 +2525,6 @@
   "Device paired": {
     "Device paired": "Eszköz párosítva"
   },
-  "Device unpaired": {
-    "Device unpaired": "Eszköz párosítása megszüntetve"
-  },
   "Diff": {
     "Diff": "Különbség"
   },
@@ -2854,18 +2533,6 @@
   },
   "Dim": {
     "Dim": "Halvány"
-  },
-  "Dim Background Image": {
-    "Dim Background Image": ""
-  },
-  "Dim Intensity": {
-    "Dim Intensity": ""
-  },
-  "Dimming Opacity": {
-    "Dimming Opacity": ""
-  },
-  "Direct": {
-    "Direct": ""
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "Közvetlen elérési út egy .xkb billentyűkiosztás-fájlhoz. Felülírja a fenti kiosztásokat/változatokat."
@@ -2918,11 +2585,8 @@
   "Discard": {
     "Discard": "Elvetés"
   },
-  "Discard & Close": {
-    "Discard & Close": ""
-  },
-  "Discard & Close (Esc)": {
-    "Discard & Close (Esc)": ""
+  "Discard draft and reload": {
+    "Discard draft and reload": ""
   },
   "Discharging": {
     "Discharging": "Merülés"
@@ -2996,9 +2660,6 @@
   "Display currently focused application title": {
     "Display currently focused application title": "Jelenleg fókuszban lévő alkalmazás címének megjelenítése"
   },
-  "Display hourly weather predictions": {
-    "Display hourly weather predictions": "Óránkénti időjárás-előrejelzés megjelenítése"
-  },
   "Display line numbers in editor": {
     "Display line numbers in editor": "Sorszámok megjelenítése a szerkesztőben"
   },
@@ -3063,7 +2724,7 @@
     "Domain (optional)": "Tartomány (nem kötelező)"
   },
   "Dominant": {
-    "Dominant": ""
+    "Dominant": "Domináns"
   },
   "Don't Change": {
     "Don't Change": "Ne módosítsa"
@@ -3071,23 +2732,8 @@
   "Don't Save": {
     "Don't Save": "Ne mentse"
   },
-  "Done": {
-    "Done": ""
-  },
-  "Done (Action based on settings)": {
-    "Done (Action based on settings)": ""
-  },
   "Door Open": {
     "Door Open": "Ajtó nyitva"
-  },
-  "Dotted Line": {
-    "Dotted Line": ""
-  },
-  "Dracula": {
-    "Dracula": ""
-  },
-  "Drag Image": {
-    "Drag Image": ""
   },
   "Drag Lock": {
     "Drag Lock": "Húzási zár"
@@ -3096,7 +2742,7 @@
     "Drag a widget by its handle here to reorder it or drop it into another group": "Húzz ide egy widgetet a fogantyújánál fogva az újrarendezéshez, vagy dobd be egy másik csoportba"
   },
   "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": {
-    "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": ""
+    "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": "Húzd a csoportokat az óra fölé, hogy balra essenek, vagy alá, hogy jobbra. Kattints a szemre a csoport elrejtéséhez."
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Húzd az átrendezéshez"
@@ -3113,9 +2759,6 @@
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": "Sziget-stílusú háttér rajzolása a műholdas widgetek mögé"
   },
-  "Draw an outer ring using the stamp number color": {
-    "Draw an outer ring using the stamp number color": ""
-  },
   "Draw an outline and use the highest-contrast surface tone": {
     "Draw an outline and use the highest-contrast surface tone": "Körvonal rajzolása és a legmagasabb kontrasztú felületi tónus használata"
   },
@@ -3127,9 +2770,6 @@
   },
   "Drop here": {
     "Drop here": "Dobd ide"
-  },
-  "Drop image onto bar icon to annotate it": {
-    "Drop image onto bar icon to annotate it": ""
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "Elveted a(z) %1 felülbírálását, hogy a DMS alapértelmezett művelete újra érvénybe lépjen?"
@@ -3173,9 +2813,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "Dinamikus színek, előbeállítások"
   },
-  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
-    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
-  },
   "Edge": {
     "Edge": "Szél"
   },
@@ -3200,17 +2837,8 @@
   "Edit Clipboard": {
     "Edit Clipboard": "Vágólap szerkesztése"
   },
-  "Edit Color Palette": {
-    "Edit Color Palette": ""
-  },
-  "Edit Image from Clipboard": {
-    "Edit Image from Clipboard": ""
-  },
   "Edit Rule": {
     "Edit Rule": "Szabály szerkesztése"
-  },
-  "Edit Text Note": {
-    "Edit Text Note": ""
   },
   "Edit Window Rule": {
     "Edit Window Rule": "Ablakszabály szerkesztése"
@@ -3224,41 +2852,8 @@
   "Editing changes on %1": {
     "Editing changes on %1": "Módosítások szerkesztése ezen: %1"
   },
-  "Editor": {
-    "Editor": ""
-  },
-  "Editor Aspect Ratio": {
-    "Editor Aspect Ratio": ""
-  },
-  "Editor Display Mode": {
-    "Editor Display Mode": ""
-  },
-  "Editor Display Screen": {
-    "Editor Display Screen": ""
-  },
-  "Editor Preview Quality": {
-    "Editor Preview Quality": ""
-  },
   "Education": {
     "Education": "Oktatás"
-  },
-  "Ellipse": {
-    "Ellipse": ""
-  },
-  "Ellipse / Circle": {
-    "Ellipse / Circle": ""
-  },
-  "Ellipse / Circle (Q)": {
-    "Ellipse / Circle (Q)": ""
-  },
-  "Ellipse Color": {
-    "Ellipse Color": ""
-  },
-  "Ellipse Thickness": {
-    "Ellipse Thickness": ""
-  },
-  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
-    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
   },
   "Empty": {
     "Empty": "Üres"
@@ -3320,9 +2915,6 @@
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "Engedélyezd az egyéni felülbírálást alább a sávonkénti árnyékintenzitás, átlátszatlanság és szín beállításához."
   },
-  "Enable background automatically when opening the editor": {
-    "Enable background automatically when opening the editor": ""
-  },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Kompozitor által célozható elmosási réteg engedélyezése (névtér: dms:blurwallpaper). Kézi niri konfigurációt igényel."
   },
@@ -3376,9 +2968,6 @@
   },
   "Enter PIN for ": {
     "Enter PIN for ": "PIN-kód megadása ehhez: "
-  },
-  "Enter URI or text to share": {
-    "Enter URI or text to share": "Add meg a megosztani kívánt URI-t vagy szöveget"
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "Add meg a(z) „%1” munkamenet új nevét"
@@ -3437,9 +3026,6 @@
   "Environment Variables": {
     "Environment Variables": "Környezeti változók"
   },
-  "Eraser": {
-    "Eraser": ""
-  },
   "Error": {
     "Error": "Hiba"
   },
@@ -3454,9 +3040,6 @@
   },
   "Event title": {
     "Event title": "Esemény címe"
-  },
-  "Everforest": {
-    "Everforest": ""
   },
   "Every 15 minutes": {
     "Every 15 minutes": "15 percenként"
@@ -3539,9 +3122,6 @@
   "Fade to monitor off": {
     "Fade to monitor off": "Elhalványítás a monitor kikapcsolásáig"
   },
-  "Failed to accept pairing": {
-    "Failed to accept pairing": "Nem sikerült a párosítás elfogadása"
-  },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Nem sikerült aktiválni a konfigurációt"
   },
@@ -3557,14 +3137,14 @@
   "Failed to apply profile": {
     "Failed to apply profile": "A profil alkalmazása sikertelen"
   },
-  "Failed to browse device": {
-    "Failed to browse device": "Nem sikerült az eszköz tallózása"
-  },
   "Failed to cancel all jobs": {
     "Failed to cancel all jobs": "Nem sikerült az összes feladatot törölni"
   },
   "Failed to cancel selected job": {
     "Failed to cancel selected job": "Nem sikerült a kiválasztott feladatot törölni"
+  },
+  "Failed to change display power": {
+    "Failed to change display power": ""
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "Nem sikerült a rögzítési korlát ellenőrzése"
@@ -3578,14 +3158,8 @@
   "Failed to connect to %1": {
     "Failed to connect to %1": "Nem sikerült csatlakozni ehhez: %1"
   },
-  "Failed to convert recording to GIF.": {
-    "Failed to convert recording to GIF.": ""
-  },
   "Failed to copy entry": {
     "Failed to copy entry": "Nem sikerült másolni a bejegyzést"
-  },
-  "Failed to copy screenshot to clipboard.": {
-    "Failed to copy screenshot to clipboard.": ""
   },
   "Failed to create printer": {
     "Failed to create printer": "Nem sikerült létrehozni a nyomtatót"
@@ -3641,9 +3215,6 @@
   "Failed to generate QR code: %1": {
     "Failed to generate QR code: %1": "Nem sikerült a QR-kód előállítása: %1"
   },
-  "Failed to generate blurred background image": {
-    "Failed to generate blurred background image": ""
-  },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "Sikertelen a systemd felülbírálás létrehozása"
   },
@@ -3653,14 +3224,17 @@
   "Failed to import VPN": {
     "Failed to import VPN": "Nem sikerült importálni a VPN-konfigurációt"
   },
-  "Failed to launch SMS app": {
-    "Failed to launch SMS app": "Nem sikerült az SMS-alkalmazás indítása"
-  },
   "Failed to load VPN config": {
     "Failed to load VPN config": "Nem sikerült betölteni a VPN-konfigurációt"
   },
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "Nem sikerült betölteni a vágólap-beállításokat."
+  },
+  "Failed to load clipboard entry": {
+    "Failed to load clipboard entry": ""
+  },
+  "Failed to load keybinds": {
+    "Failed to load keybinds": ""
   },
   "Failed to move to trash": {
     "Failed to move to trash": "Nem sikerült a kukába helyezés"
@@ -3679,9 +3253,6 @@
   },
   "Failed to read theme file: %1": {
     "Failed to read theme file: %1": "Nem sikerült olvasni a témafájlt: %1"
-  },
-  "Failed to reject pairing": {
-    "Failed to reject pairing": "Nem sikerült a párosítás elutasítása"
   },
   "Failed to reload plugin: %1": {
     "Failed to reload plugin: %1": "Nem sikerült újratölteni a bővítményt: %1"
@@ -3703,9 +3274,6 @@
   },
   "Failed to resume printer": {
     "Failed to resume printer": "Nem sikerült folytatni a nyomtatót"
-  },
-  "Failed to ring device": {
-    "Failed to ring device": "Nem sikerült az eszköz megcsöngetése"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "Nem sikerült futtatni a 'dms-greeter status' parancsot. Győződj meg arról, hogy a dms-greeter csomag telepítve van."
@@ -3731,24 +3299,6 @@
   "Failed to save profile": {
     "Failed to save profile": "A profil mentése sikertelen"
   },
-  "Failed to save screenshot": {
-    "Failed to save screenshot": ""
-  },
-  "Failed to save screenshot file.": {
-    "Failed to save screenshot file.": ""
-  },
-  "Failed to send SMS": {
-    "Failed to send SMS": "Nem sikerült az SMS elküldése"
-  },
-  "Failed to send clipboard": {
-    "Failed to send clipboard": "Nem sikerült a vágólap elküldése"
-  },
-  "Failed to send file": {
-    "Failed to send file": "Nem sikerült elküldeni a fájlt"
-  },
-  "Failed to send ping": {
-    "Failed to send ping": "Nem sikerült a ping küldése"
-  },
   "Failed to set brightness": {
     "Failed to set brightness": "Nem sikerült beállítani a fényerőt"
   },
@@ -3770,9 +3320,6 @@
   "Failed to set profile image: %1": {
     "Failed to set profile image: %1": "Nem sikerült beállítani a profilképet: %1"
   },
-  "Failed to share": {
-    "Failed to share": "Nem sikerült a megosztás"
-  },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "Nem sikerült elindítani a csatlakozást ehhez: %1"
   },
@@ -3786,7 +3333,7 @@
     "Failed to switch codec": "Nem sikerült a kodekváltás"
   },
   "Failed to switch output": {
-    "Failed to switch output": ""
+    "Failed to switch output": "Nem sikerült átváltani a kimenetet"
   },
   "Failed to switch port": {
     "Failed to switch port": "Nem sikerült portot váltani"
@@ -3824,9 +3371,6 @@
   "Features": {
     "Features": "Funkciók"
   },
-  "Feels": {
-    "Feels": "Hőérzet"
-  },
   "Feels Like": {
     "Feels Like": "Hőérzet"
   },
@@ -3850,9 +3394,6 @@
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "A kuka megnyitásához használt fájlkezelő. Válaszd az „egyéni” lehetőséget saját parancs megadásához."
-  },
-  "File received from %1": {
-    "File received from %1": "Fájl érkezett innen: %1"
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "A fájlkereséshez dsearch szükséges\nTelepítsd innen: github.com/AvengeMedia/danksearch"
@@ -3926,12 +3467,6 @@
   "Flatpak": {
     "Flatpak": "Flatpak"
   },
-  "Flip Horiz": {
-    "Flip Horiz": ""
-  },
-  "Flip Vert": {
-    "Flip Vert": ""
-  },
   "Flipped": {
     "Flipped": "Tükrözött"
   },
@@ -3949,12 +3484,6 @@
   },
   "Float Anchor": {
     "Float Anchor": "Lebegő horgony"
-  },
-  "Float Image": {
-    "Float Image": ""
-  },
-  "Float Window": {
-    "Float Window": ""
   },
   "Float X": {
     "Float X": "Lebegő X"
@@ -4010,9 +3539,6 @@
   "Focused Monitor Only": {
     "Focused Monitor Only": "Csak a fókuszált monitor"
   },
-  "Focused Screen": {
-    "Focused Screen": ""
-  },
   "Focused Window": {
     "Focused Window": "Fókuszált ablak"
   },
@@ -4035,7 +3561,7 @@
     "Follow focus": "Fókusz követése"
   },
   "Follow the theme accent, or step from green to red as the battery drains.": {
-    "Follow the theme accent, or step from green to red as the battery drains.": ""
+    "Follow the theme accent, or step from green to red as the battery drains.": "Téma kiemelésének követése, vagy zöldből pirosra váltás az akkumulátor merülésével."
   },
   "Follows the default launcher choice selected above.": {
     "Follows the default launcher choice selected above.": "A fent kiválasztott alapértelmezett indítóbeállítást követi."
@@ -4044,7 +3570,7 @@
     "Font": "Betűtípus"
   },
   "Font Family": {
-    "Font Family": "Betűtípus-család"
+    "Font Family": "Betűtípuscsalád"
   },
   "Font Scale": {
     "Font Scale": "Betűméret-skála"
@@ -4054,9 +3580,6 @@
   },
   "Font Weight": {
     "Font Weight": "Betűvastagság"
-  },
-  "Font family used for number stamp labels": {
-    "Font family used for number stamp labels": ""
   },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": "A lezárási képernyőn az órához és a dátumhoz használt betűtípus"
@@ -4070,23 +3593,23 @@
   "For 15 minutes": {
     "For 15 minutes": "15 percre"
   },
+  "For 2 hours": {
+    "For 2 hours": ""
+  },
   "For 3 hours": {
     "For 3 hours": "3 órára"
   },
   "For 30 minutes": {
     "For 30 minutes": "30 percre"
   },
+  "For 4 hours": {
+    "For 4 hours": ""
+  },
   "For 8 hours": {
     "For 8 hours": "8 órára"
   },
   "For editing plain text files": {
     "For editing plain text files": "Egyszerű szövegfájlok szerkesztéséhez"
-  },
-  "Force Copy & Save": {
-    "Force Copy & Save": ""
-  },
-  "Force Copy to Clipboard": {
-    "Force Copy to Clipboard": ""
   },
   "Force HDR": {
     "Force HDR": "HDR kényszerítése"
@@ -4100,20 +3623,11 @@
   "Force RGBX": {
     "Force RGBX": "RGBX kényszerítése"
   },
-  "Force Save to File": {
-    "Force Save to File": ""
-  },
   "Force Wide Color": {
     "Force Wide Color": "Széles színskála kényszerítése"
   },
   "Force terminal applications to always use dark color schemes": {
     "Force terminal applications to always use dark color schemes": "Terminálalkalmazások kényszerítése sötét színsémák használatára"
-  },
-  "Forecast": {
-    "Forecast": "Előrejelzés"
-  },
-  "Forecast Days": {
-    "Forecast Days": "Előrejelzési napok"
   },
   "Forecast Not Available": {
     "Forecast Not Available": "Előrejelzés nem érhető el"
@@ -4151,15 +3665,6 @@
   "Format the date on the login screen": {
     "Format the date on the login screen": "A dátum formázása a bejelentkezési képernyőn"
   },
-  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
-    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
-  },
-  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
-  },
-  "Forward 10s": {
-    "Forward 10s": "Előretekerés 10 mp-cel"
-  },
   "Frame": {
     "Frame": "Keret"
   },
@@ -4175,32 +3680,14 @@
   "Frame Xray": {
     "Frame Xray": "Keret-röntgen"
   },
-  "Framerate": {
-    "Framerate": ""
-  },
-  "Free": {
-    "Free": ""
-  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/memória felszabadítása az indító bezárásakor. Újranyitáskor némi késést okozhat."
-  },
-  "Freehand Pen": {
-    "Freehand Pen": ""
-  },
-  "Freehand Pen (1)": {
-    "Freehand Pen (1)": ""
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "Ónos szitálás"
   },
   "Frequency": {
     "Frequency": "Frekvencia"
-  },
-  "From Clipboard": {
-    "From Clipboard": ""
-  },
-  "From File": {
-    "From File": ""
   },
   "Fruit Salad": {
     "Fruit Salad": "Gyümölcssaláta"
@@ -4216,12 +3703,6 @@
   },
   "Full Day & Month": {
     "Full Day & Month": "Teljes nap és hónap"
-  },
-  "Full Screen": {
-    "Full Screen": ""
-  },
-  "Full Screen Target": {
-    "Full Screen Target": ""
   },
   "Full Size": {
     "Full Size": "Teljes méret"
@@ -4240,9 +3721,6 @@
   },
   "Fully Charged": {
     "Fully Charged": "Teljesen feltöltve"
-  },
-  "GIF Framerate": {
-    "GIF Framerate": ""
   },
   "GPU": {
     "GPU": "GPU"
@@ -4279,9 +3757,6 @@
   },
   "General": {
     "General": "Általános"
-  },
-  "General Shortcuts": {
-    "General Shortcuts": ""
   },
   "Generate Override": {
     "Generate Override": "Felülbírálás létrehozása"
@@ -4400,9 +3875,6 @@
   "Groups": {
     "Groups": "Csoportok"
   },
-  "Gruvbox Material": {
-    "Gruvbox Material": ""
-  },
   "H": {
     "H": "Ó"
   },
@@ -4484,12 +3956,6 @@
   "Hide App": {
     "Hide App": "Alkalmazás elrejtése"
   },
-  "Hide Control Center": {
-    "Hide Control Center": ""
-  },
-  "Hide Control Center by Default": {
-    "Hide Control Center by Default": ""
-  },
   "Hide Delay": {
     "Hide Delay": "Elrejtési késleltetés"
   },
@@ -4555,18 +4021,6 @@
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "A fókuszált alkalmazás kiemelése a munkaterület-jelzőkben"
-  },
-  "Highlighter": {
-    "Highlighter": ""
-  },
-  "Highlighter (S)": {
-    "Highlighter (S)": ""
-  },
-  "Highlighter Color": {
-    "Highlighter Color": ""
-  },
-  "Highlighter Thickness": {
-    "Highlighter Thickness": ""
   },
   "History": {
     "History": "Előzmények"
@@ -4634,14 +4088,8 @@
   "Hourly": {
     "Hourly": "Óránkénti"
   },
-  "Hourly Forecast Count": {
-    "Hourly Forecast Count": "Óránkénti előrejelzések száma"
-  },
   "Hover Popouts": {
     "Hover Popouts": "Lebegő felugró ablakok"
-  },
-  "Hover Trigger Delay": {
-    "Hover Trigger Delay": ""
   },
   "How layout changes are remembered across apps": {
     "How layout changes are remembered across apps": "Hogyan jegyezze meg a kiosztásváltozásokat az alkalmazások között"
@@ -4699,9 +4147,6 @@
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
     "IP sharing setup failed. Check that dnsmasq is installed.": "Az IP-megosztás beállítása sikertelen. Ellenőrizd, hogy a dnsmasq telepítve van-e."
-  },
-  "IPC Commands": {
-    "IPC Commands": ""
   },
   "ISO Date": {
     "ISO Date": "ISO dátum"
@@ -4781,26 +4226,11 @@
   "Image": {
     "Image": "Kép"
   },
-  "Image + Text": {
-    "Image + Text": ""
-  },
-  "Image Background": {
-    "Image Background": ""
-  },
-  "Image Error": {
-    "Image Error": ""
-  },
-  "Image Size": {
-    "Image Size": ""
-  },
   "Image Viewer": {
     "Image Viewer": "Képmegjelenítő"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "Kép másolva a vágólapra"
-  },
-  "Image selected automatically when using Image Background mode": {
-    "Image selected automatically when using Image Background mode": ""
   },
   "Import": {
     "Import": "Importálás"
@@ -4813,9 +4243,6 @@
   },
   "Include AUR updates": {
     "Include AUR updates": "AUR-frissítések belevétele"
-  },
-  "Include Cursor": {
-    "Include Cursor": ""
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": "Fájlok megjelenítése az Összes lapon"
@@ -4848,7 +4275,7 @@
     "Index Centering": "Index alapú középre igazítás"
   },
   "Indicator Colors": {
-    "Indicator Colors": ""
+    "Indicator Colors": "Indikátor színek"
   },
   "Indicator Style": {
     "Indicator Style": "Jelzőstílus"
@@ -4871,14 +4298,8 @@
   "Inhibitable": {
     "Inhibitable": "Gátolható"
   },
-  "Initial Width": {
-    "Initial Width": ""
-  },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
     "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": "Lebegő ablakok kezdeti pozíciója. Állítsa be az X és Y értéket is; a horgony határozza meg, hogy melyik sarokhoz/élhez képest jelenjenek meg."
-  },
-  "Initial state for the Control Center toggle.": {
-    "Initial state for the Control Center toggle.": ""
   },
   "Initialised": {
     "Initialised": "Inicializálva"
@@ -4895,14 +4316,8 @@
   "Input Devices": {
     "Input Devices": "Bemeneti eszközök"
   },
-  "Input Mode": {
-    "Input Mode": ""
-  },
   "Input Volume Slider": {
     "Input Volume Slider": "Bemeneti hangerő csúszka"
-  },
-  "Insert Image": {
-    "Insert Image": ""
   },
   "Insert your security key...": {
     "Insert your security key...": "Helyezd be a biztonsági kulcsodat…"
@@ -4964,12 +4379,6 @@
   "Intensity": {
     "Intensity": "Intenzitás"
   },
-  "Interaction / Result": {
-    "Interaction / Result": ""
-  },
-  "Interactive Region": {
-    "Interactive Region": ""
-  },
   "Interface:": {
     "Interface:": "Csatoló:"
   },
@@ -5018,9 +4427,6 @@
   "Isolate Displays": {
     "Isolate Displays": "Kijelzők elszigetelése"
   },
-  "JPEG Quality": {
-    "JPEG Quality": ""
-  },
   "Jobs": {
     "Jobs": "Feladatok"
   },
@@ -5032,9 +4438,6 @@
   },
   "Jump to page (1 - %1)": {
     "Jump to page (1 - %1)": "Ugrás az oldalra (1 - %1)"
-  },
-  "Kanagawa": {
-    "Kanagawa": ""
   },
   "Keep Awake": {
     "Keep Awake": "Ébren tartás"
@@ -5081,17 +4484,11 @@
   "Key combination": {
     "Key combination": "Billentyűkombináció"
   },
-  "Keybind Sources": {
-    "Keybind Sources": "Gyorsbillentyű-források"
+  "Keybindings changed. Refresh and review your edit before saving.": {
+    "Keybindings changed. Refresh and review your edit before saving.": ""
   },
   "Keybinds": {
     "Keybinds": "Billentyűkombinációk"
-  },
-  "Keybinds Search Settings": {
-    "Keybinds Search Settings": "Gyorsbillentyű-keresési beállítások"
-  },
-  "Keybinds shown alongside regular search results": {
-    "Keybinds shown alongside regular search results": "Gyorsbillentyűk megjelenítése a normál keresési eredmények mellett"
   },
   "Keyboard": {
     "Keyboard": "Billentyűzet"
@@ -5144,23 +4541,11 @@
   "LabWC Website": {
     "LabWC Website": "LabWC weboldala"
   },
-  "Landscape": {
-    "Landscape": ""
-  },
   "Large": {
     "Large": "Nagy"
   },
   "Largest": {
     "Largest": "Legnagyobb"
-  },
-  "Last Reg": {
-    "Last Reg": ""
-  },
-  "Last Region": {
-    "Last Region": ""
-  },
-  "Last Selected Region": {
-    "Last Selected Region": ""
   },
   "Last hour": {
     "Last hour": "Utolsó óra"
@@ -5223,16 +4608,13 @@
     "Layout Overrides": "Elrendezés felülbírálása"
   },
   "Least Saturated": {
-    "Least Saturated": ""
+    "Least Saturated": "Legkevésbé telített"
   },
   "Left": {
     "Left": "Bal"
   },
   "Left Center": {
     "Left Center": "Bal középen"
-  },
-  "Left Click": {
-    "Left Click": ""
   },
   "Left Section": {
     "Left Section": "Bal oldali szakasz"
@@ -5241,7 +4623,7 @@
     "Left-Handed Mode": "Balkezes mód"
   },
   "Level": {
-    "Level": ""
+    "Level": "Szint"
   },
   "Light": {
     "Light": "Vékony"
@@ -5271,7 +4653,7 @@
     "Light mode harmony": "Világos mód (harmónia)"
   },
   "Lightest": {
-    "Lightest": ""
+    "Lightest": "Legvilágosabb"
   },
   "Limit set to %1%": {
     "Limit set to %1%": "Korlát beállítva: %1%"
@@ -5282,29 +4664,17 @@
   "Line": {
     "Line": "Vonal"
   },
-  "Line Color": {
-    "Line Color": ""
-  },
-  "Line Thickness": {
-    "Line Thickness": ""
-  },
   "Line: %1": {
     "Line: %1": "Sor: %1"
   },
   "Linear": {
     "Linear": "Lineáris"
   },
-  "Linear Gradient": {
-    "Linear Gradient": ""
-  },
   "Lines: %1": {
     "Lines: %1": "%1 sor"
   },
   "List": {
     "List": "Lista"
-  },
-  "Live Preview": {
-    "Live Preview": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Élénk paletta telített kiemelésekkel."
@@ -5315,17 +4685,14 @@
   "Loading codecs...": {
     "Loading codecs...": "Kodekek betöltése…"
   },
-  "Loading contributors...": {
-    "Loading contributors...": ""
+  "Loading full text, please wait...": {
+    "Loading full text, please wait...": ""
   },
   "Loading keybinds...": {
     "Loading keybinds...": "Gyorsbillentyűk betöltése…"
   },
   "Loading ports...": {
     "Loading ports...": "Portok betöltése…"
-  },
-  "Loading trending...": {
-    "Loading trending...": "Trendek betöltése…"
   },
   "Loading...": {
     "Loading...": "Betöltés…"
@@ -5411,17 +4778,11 @@
   "MTU": {
     "MTU": "MTU"
   },
-  "Magnifier Loupe": {
-    "Magnifier Loupe": ""
-  },
   "Mail": {
     "Mail": "Levelezés"
   },
   "Make admin": {
     "Make admin": "Legyen rendszergazda"
-  },
-  "Make sure KDE Connect or Valent is running on your other devices": {
-    "Make sure KDE Connect or Valent is running on your other devices": "Győződj meg róla, hogy a KDE Connect vagy a Valent fut a többi eszközön"
   },
   "Make the bar background fully transparent": {
     "Make the bar background fully transparent": "A sáv hátterének teljesen átlátszóvá tétele"
@@ -5546,9 +4907,6 @@
   "Max H": {
     "Max H": "Max. mag."
   },
-  "Max Height (0 = no limit)": {
-    "Max Height (0 = no limit)": ""
-  },
   "Max Pinned Apps": {
     "Max Pinned Apps": "Max. rögzített alk."
   },
@@ -5657,29 +5015,17 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Memóriahasználat-jelző"
   },
-  "Menu Item Right Click": {
-    "Menu Item Right Click": ""
-  },
   "Merge indexed file results into the All tab (requires dsearch).": {
     "Merge indexed file results into the All tab (requires dsearch).": "Az indexelt fájleredmények egyesítése az Összes lappal (dsearch szükséges)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
     "Merge indexed folder results into the All tab (requires dsearch).": "Az indexelt mapparedmények egyesítése az Összes lappal (dsearch szükséges)."
   },
-  "Merging audio tracks...": {
-    "Merging audio tracks...": ""
-  },
-  "Message": {
-    "Message": "Üzenet"
-  },
   "Message Content": {
     "Message Content": "Üzenet tartalma"
   },
   "Microphone": {
     "Microphone": "Mikrofon"
-  },
-  "Microphone Device": {
-    "Microphone Device": ""
   },
   "Microphone Mute": {
     "Microphone Mute": "Mikrofon némítás"
@@ -5692,12 +5038,6 @@
   },
   "Microphone volume control": {
     "Microphone volume control": "Mikrofon hangerőszabályozó"
-  },
-  "Middle Click": {
-    "Middle Click": ""
-  },
-  "Middle Click Action": {
-    "Middle Click Action": ""
   },
   "Middle Click Emulation": {
     "Middle Click Emulation": "Középső kattintás emulációja"
@@ -5717,9 +5057,6 @@
   "Minimize": {
     "Minimize": "Minimalizálás"
   },
-  "Minimize Delay": {
-    "Minimize Delay": ""
-  },
   "Minute": {
     "Minute": "Perc"
   },
@@ -5728,9 +5065,6 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "Hiányzó környezeti változók"
-  },
-  "Modal": {
-    "Modal": ""
   },
   "Modal Background": {
     "Modal Background": "Kizárólagos párbeszédablakok háttere"
@@ -5777,17 +5111,14 @@
   "Month Date": {
     "Month Date": "Hónap, dátum"
   },
-  "More Tools": {
-    "More Tools": ""
-  },
   "Morning": {
     "Morning": "Reggel"
   },
   "Most Saturated": {
-    "Most Saturated": ""
+    "Most Saturated": "Legtelítettebb"
   },
   "Most Vivid": {
-    "Most Vivid": ""
+    "Most Vivid": "Legélénkebb"
   },
   "Motion": {
     "Motion": "Mozgás"
@@ -5823,7 +5154,7 @@
     "Move island and satellites left or right from display center": "Sziget és műholdak mozgatása balra vagy jobbra a kijelző közepétől"
   },
   "Move island and satellites up or down from display center": {
-    "Move island and satellites up or down from display center": ""
+    "Move island and satellites up or down from display center": "A sziget és a szatellitek mozgatása fel vagy le a kijelző közepétől"
   },
   "Moving to Paused": {
     "Moving to Paused": "Szüneteltetésre váltás"
@@ -5833,6 +5164,9 @@
   },
   "Multimedia": {
     "Multimedia": "Multimédia"
+  },
+  "Multiple bindings use the original shortcut. Resolve the duplicate bindings first.": {
+    "Multiple bindings use the original shortcut. Resolve the duplicate bindings first.": ""
   },
   "Multiplexer Type": {
     "Multiplexer Type": "Multiplexer típusa"
@@ -5903,9 +5237,6 @@
   "Network Speed Monitor": {
     "Network Speed Monitor": "Hálózati sebességfigyelő"
   },
-  "Network Type": {
-    "Network Type": "Hálózati típus"
-  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Hálózati le- és feltöltési sebesség kijelzése"
   },
@@ -5969,9 +5300,6 @@
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "Az éjszakai mód nem sikerült: a DMS gammavezérlése nem érhető el"
   },
-  "Niri Binding Example": {
-    "Niri Binding Example": ""
-  },
   "Niri Integration": {
     "Niri Integration": "Niri integráció"
   },
@@ -6014,9 +5342,6 @@
   "No History": {
     "No History": "Nincs előzmény"
   },
-  "No Image Specified": {
-    "No Image Specified": ""
-  },
   "No Media": {
     "No Media": "Nincs média"
   },
@@ -6037,9 +5362,6 @@
   },
   "No Weather": {
     "No Weather": "Nincs időjárás"
-  },
-  "No Weather Data": {
-    "No Weather Data": "Nincsenek időjárási adatok"
   },
   "No Weather Data Available": {
     "No Weather Data Available": "Nincs elérhető időjárási adat"
@@ -6140,9 +5462,6 @@
   "No human user accounts found.": {
     "No human user accounts found.": "Nem találhatók emberi felhasználói fiókok."
   },
-  "No images found": {
-    "No images found": "Nem találhatók képek"
-  },
   "No info items": {
     "No info items": "Nincsenek információs elemek"
   },
@@ -6184,9 +5503,6 @@
   },
   "No other active sessions on this seat": {
     "No other active sessions on this seat": "Nincs más aktív munkamenet ezen az állomáson"
-  },
-  "No output available": {
-    "No output available": ""
   },
   "No output device": {
     "No output device": "Nincs kimeneti eszköz"
@@ -6236,9 +5552,6 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "Nincsenek mentett vágólap-bejegyzések"
   },
-  "No saved images yet": {
-    "No saved images yet": ""
-  },
   "No screenshot provided": {
     "No screenshot provided": "Nincs képernyőkép mellékelve"
   },
@@ -6250,9 +5563,6 @@
   },
   "No status output.": {
     "No status output.": "Nincs állapotkimenet."
-  },
-  "No supported images found": {
-    "No supported images found": ""
   },
   "No supported package manager found.": {
     "No supported package manager found.": "Nem található támogatott csomagkezelő."
@@ -6302,20 +5612,17 @@
   "No writable calendar available": {
     "No writable calendar available": "Nem érhető el írható naptár"
   },
+  "No writable charge threshold file was found under /sys/class/power_supply.": {
+    "No writable charge threshold file was found under /sys/class/power_supply.": ""
+  },
   "Noise": {
     "Noise": "Zaj"
   },
   "None": {
     "None": "Nincs"
   },
-  "None / Disabled": {
-    "None / Disabled": ""
-  },
   "None active": {
     "None active": "Nincs aktív"
-  },
-  "Nord": {
-    "Nord": ""
   },
   "Normal": {
     "Normal": "Normál"
@@ -6350,14 +5657,11 @@
   "Not detected": {
     "Not detected": "Nem észlelhető"
   },
-  "Not paired": {
-    "Not paired": "Nincs párosítva"
-  },
   "Not set": {
     "Not set": "Nincs beállítva"
   },
-  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
-    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+  "Not synchronized": {
+    "Not synchronized": ""
   },
   "Notepad": {
     "Notepad": "Jegyzettömb"
@@ -6407,23 +5711,11 @@
   "Now playing and media controls": {
     "Now playing and media controls": "Most játszott és médiavezérlők"
   },
-  "Number Stamp": {
-    "Number Stamp": ""
-  },
   "Numeric (D/M)": {
     "Numeric (D/M)": "Numerikus (N/H)"
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "Numerikus (H/N)"
-  },
-  "OCR": {
-    "OCR": ""
-  },
-  "OCR Result": {
-    "OCR Result": ""
-  },
-  "OCR Text Recognition": {
-    "OCR Text Recognition": ""
   },
   "OK": {
     "OK": "OK"
@@ -6442,9 +5734,6 @@
   },
   "Office": {
     "Office": "Iroda"
-  },
-  "Offline": {
-    "Offline": "Offline"
   },
   "Offline Report": {
     "Offline Report": "Offline jelentés"
@@ -6506,9 +5795,6 @@
   "Open": {
     "Open": "Megnyitás"
   },
-  "Open App": {
-    "Open App": "Alkalmazás megnyitása"
-  },
   "Open DMS windows floating instead of tiled": {
     "Open DMS windows floating instead of tiled": "DMS-ablakok megnyitása lebegőként a csempézett helyett"
   },
@@ -6517,9 +5803,6 @@
   },
   "Open Dir": {
     "Open Dir": "Mappa megnyitása"
-  },
-  "Open Folder": {
-    "Open Folder": ""
   },
   "Open Frame": {
     "Open Frame": "Nyitott keret"
@@ -6532,12 +5815,6 @@
   },
   "Open Notepad File": {
     "Open Notepad File": "Jegyzettömb-fájl megnyitása"
-  },
-  "Open Quick Capture menu (Popout)": {
-    "Open Quick Capture menu (Popout)": ""
-  },
-  "Open Specific Image Path": {
-    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "Kuka megnyitása"
@@ -6581,12 +5858,6 @@
   "Open with...": {
     "Open with...": "Megnyitás ezzel…"
   },
-  "Opening SMS app": {
-    "Opening SMS app": "SMS-alkalmazás megnyitása"
-  },
-  "Opening file browser": {
-    "Opening file browser": "Fájlkezelő megnyitása"
-  },
   "Opening terminal: ": {
     "Opening terminal: ": "Terminál megnyitása: "
   },
@@ -6620,6 +5891,9 @@
   "Original: %1": {
     "Original: %1": "Eredeti: %1"
   },
+  "Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4": {
+    "Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4": ""
+  },
   "Other": {
     "Other": "Egyéb"
   },
@@ -6628,9 +5902,6 @@
   },
   "Outline": {
     "Outline": "Körvonal"
-  },
-  "Outline Variant": {
-    "Outline Variant": ""
   },
   "Outline around shell surfaces": {
     "Outline around shell surfaces": "Körvonal a felületek körül"
@@ -6647,20 +5918,11 @@
   "Output Devices": {
     "Output Devices": "Kimeneti eszközök"
   },
-  "Output Format": {
-    "Output Format": ""
-  },
   "Output Tray Missing": {
     "Output Tray Missing": "Kimeneti tálca hiányzik"
   },
-  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
-    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
-  },
   "Output switched": {
-    "Output switched": ""
-  },
-  "Outputs": {
-    "Outputs": ""
+    "Output switched": "Kimenet átváltva"
   },
   "Overcast": {
     "Overcast": "Borult"
@@ -6670,9 +5932,6 @@
   },
   "Overlay": {
     "Overlay": "Átfedés"
-  },
-  "Overlay Opacity": {
-    "Overlay Opacity": ""
   },
   "Overridden by config": {
     "Overridden by config": "Felülírta a konfiguráció"
@@ -6719,9 +5978,6 @@
   "PAM already provides security-key auth. Enable this to show it at login.": {
     "PAM already provides security-key auth. Enable this to show it at login.": "A PAM már biztosítja a biztonsági kulcsos hitelesítést. Engedélyezd ezt a bejelentkezéskori megjelenítéshez."
   },
-  "PAUSED": {
-    "PAUSED": ""
-  },
   "PDF Reader": {
     "PDF Reader": "PDF-olvasó"
   },
@@ -6730,9 +5986,6 @@
   },
   "PIN": {
     "PIN": "PIN"
-  },
-  "PRIMARY": {
-    "PRIMARY": ""
   },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "Csomagnév (pl. docker)"
@@ -6758,29 +6011,20 @@
   "Pairing failed": {
     "Pairing failed": "A párosítás sikertelen"
   },
-  "Pairing request from %1": {
-    "Pairing request from %1": "Párosítási kérelmet küldött: %1"
-  },
-  "Pairing request sent": {
-    "Pairing request sent": "Párosítási kérelem elküldve"
-  },
-  "Pairing requested": {
-    "Pairing requested": "Párosítás kérve"
-  },
   "Pairing...": {
     "Pairing...": "Párosítás…"
   },
   "Palette": {
     "Palette": "Paletta"
   },
-  "Palette Preset": {
-    "Palette Preset": ""
-  },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
     "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "A panelek nagyobb távolságból csúsznak be teljes méretben, méretváltozás nélkül, tiszta mozgással."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "A panelek kicsiből felskálázódnak beúszás közben, drámai, előreugró mélységhatást keltve."
+  },
+  "Partially synchronized": {
+    "Partially synchronized": ""
   },
   "Partly Cloudy": {
     "Partly Cloudy": "Részben felhős"
@@ -6798,7 +6042,7 @@
     "Password change failed (exit %1)": "A jelszó módosítása sikertelen (kilépési kód: %1)"
   },
   "Password must be 8 to 63 characters, or a 64-digit hex key.": {
-    "Password must be 8 to 63 characters, or a 64-digit hex key.": ""
+    "Password must be 8 to 63 characters, or a 64-digit hex key.": "A jelszónak 8-63 karakternek, vagy 64 számjegyű hexadecimális kulcsnak kell lennie."
   },
   "Password set": {
     "Password set": "Jelszó beállítva"
@@ -6827,23 +6071,8 @@
   "Pause": {
     "Pause": "Szüneteltetés"
   },
-  "Pause / Resume": {
-    "Pause / Resume": ""
-  },
   "Paused": {
     "Paused": "Szüneteltetve"
-  },
-  "Pen Auto-Close": {
-    "Pen Auto-Close": ""
-  },
-  "Pen Color": {
-    "Pen Color": ""
-  },
-  "Pen Thickness": {
-    "Pen Thickness": ""
-  },
-  "Pen, Line, Arrow, Rect": {
-    "Pen, Line, Arrow, Rect": ""
   },
   "Pending": {
     "Pending": "Függőben"
@@ -6881,26 +6110,17 @@
   "Personalization": {
     "Personalization": "Személyre szabás"
   },
-  "Phone Connect Not Available": {
-    "Phone Connect Not Available": "A telefonos kapcsolat nem érhető el"
-  },
-  "Phone number": {
-    "Phone number": "Telefonszám"
-  },
-  "Pick Color": {
-    "Pick Color": ""
-  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "Válassz egy másik fájlkezelőt a Beállítások → Dokk → Kuka útvonalon."
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "Minden alkalommal válasszon más véletlenszerű videót ugyanabból a mappából"
   },
-  "Pick a palette preset or customize individual color slots.": {
-    "Pick a palette preset or customize individual color slots.": ""
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "Mennyi ideig legyenek szüneteltetve az értesítések"
+  },
+  "Pick how long to stay awake": {
+    "Pick how long to stay awake": ""
   },
   "Pin": {
     "Pin": "Rögzítés"
@@ -6908,29 +6128,14 @@
   "Pin to Dock": {
     "Pin to Dock": "Rögzítés a dokkra"
   },
-  "Ping": {
-    "Ping": "Ping"
-  },
-  "Ping sent to %1": {
-    "Ping sent to %1": "Ping elküldve a következőnek: %1"
-  },
   "Pinned": {
     "Pinned": "Rögzítve"
   },
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": "Kitűzött és futó alkalmazások átrendezése húzással"
   },
-  "Pixel Intensity": {
-    "Pixel Intensity": ""
-  },
   "Pixelate": {
     "Pixelate": "Képpontosítás"
-  },
-  "Pixelate (E)": {
-    "Pixelate (E)": ""
-  },
-  "Pixelate Intensity": {
-    "Pixelate Intensity": ""
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "Kuka elhelyezése a dokk végén"
@@ -6955,9 +6160,6 @@
   },
   "Platform renderer (FreeType).": {
     "Platform renderer (FreeType).": "Platform renderelő (FreeType)."
-  },
-  "Play": {
-    "Play": "Lejátszás"
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "Videó lejátszása a képernyő zárolásakor."
@@ -7055,9 +6257,6 @@
   "Popular Plugins": {
     "Popular Plugins": "Népszerű bővítmények"
   },
-  "Popup Input": {
-    "Popup Input": ""
-  },
   "Popup Only": {
     "Popup Only": "Csak felugró"
   },
@@ -7085,9 +6284,6 @@
   "Portal": {
     "Portal": "Portál"
   },
-  "Portrait": {
-    "Portrait": ""
-  },
   "Position": {
     "Position": "Pozíció"
   },
@@ -7096,9 +6292,6 @@
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "Lehetséges felülírási konfliktusok"
-  },
-  "Post-Capture Notification": {
-    "Post-Capture Notification": ""
   },
   "Power": {
     "Power": "Energia"
@@ -7145,9 +6338,6 @@
   "Pre-select the last used session on the greeter": {
     "Pre-select the last used session on the greeter": "Az utolsó használt munkamenet előre kijelölése az üdvözlőképernyőn"
   },
-  "Precip": {
-    "Precip": "Csapadék"
-  },
   "Precipitation": {
     "Precipitation": "Csapadék"
   },
@@ -7156,42 +6346,6 @@
   },
   "Preference": {
     "Preference": "Beállítás"
-  },
-  "Preset %1": {
-    "Preset %1": ""
-  },
-  "Preset 1": {
-    "Preset 1": ""
-  },
-  "Preset 2": {
-    "Preset 2": ""
-  },
-  "Preset 3": {
-    "Preset 3": ""
-  },
-  "Preset 4": {
-    "Preset 4": ""
-  },
-  "Preset 5": {
-    "Preset 5": ""
-  },
-  "Preset 6": {
-    "Preset 6": ""
-  },
-  "Preset 7": {
-    "Preset 7": ""
-  },
-  "Preset 8": {
-    "Preset 8": ""
-  },
-  "Preset Color": {
-    "Preset Color": ""
-  },
-  "Preset Thickness": {
-    "Preset Thickness": ""
-  },
-  "Preset Tool": {
-    "Preset Tool": ""
   },
   "Preset Widths (%)": {
     "Preset Widths (%)": "Előre beállított szélességek (%)"
@@ -7229,20 +6383,17 @@
   "Preview: %1": {
     "Preview: %1": "Előnézet: %1"
   },
-  "Previous": {
-    "Previous": "Előző"
-  },
   "Previous page": {
     "Previous page": "Előző oldal"
+  },
+  "Previous: %1\nCurrent: %2": {
+    "Previous: %1\nCurrent: %2": ""
   },
   "Primary": {
     "Primary": "Elsődleges"
   },
   "Primary Container": {
     "Primary Container": "Elsődleges tároló"
-  },
-  "Primary Screen": {
-    "Primary Screen": ""
   },
   "Print Server Management": {
     "Print Server Management": "Nyomtatókiszolgáló-kezelés"
@@ -7340,9 +6491,6 @@
   "QR Generator": {
     "QR Generator": "QR-generátor"
   },
-  "QR Result": {
-    "QR Result": ""
-  },
   "Qt": {
     "Qt": "Qt"
   },
@@ -7357,12 +6505,6 @@
   },
   "Quality": {
     "Quality": "Minőség"
-  },
-  "Quick Capture": {
-    "Quick Capture": ""
-  },
-  "Quick Capture Error": {
-    "Quick Capture Error": ""
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Gyors hozzáférés az alkalmazásindítóhoz"
@@ -7379,26 +6521,8 @@
   "Quick system toggles": {
     "Quick system toggles": "Gyors rendszerkapcsolók"
   },
-  "RECORDING": {
-    "RECORDING": ""
-  },
   "RGB": {
     "RGB": "RGB"
-  },
-  "Radial Gradient": {
-    "Radial Gradient": ""
-  },
-  "Radial Menu": {
-    "Radial Menu": ""
-  },
-  "Radial Menu Opacity": {
-    "Radial Menu Opacity": ""
-  },
-  "Radial Menu Settings": {
-    "Radial Menu Settings": ""
-  },
-  "Radial Preset": {
-    "Radial Preset": ""
   },
   "Radius": {
     "Radius": "Sugár"
@@ -7420,9 +6544,6 @@
   },
   "Rate": {
     "Rate": "Sebesség"
-  },
-  "Ratio": {
-    "Ratio": ""
   },
   "Re-enter password": {
     "Re-enter password": "Jelszó újbóli megadása"
@@ -7451,71 +6572,11 @@
   "Recent Colors": {
     "Recent Colors": "Legutóbbi színek"
   },
-  "Recent Edits": {
-    "Recent Edits": ""
-  },
-  "Recent Images": {
-    "Recent Images": "Legutóbbi képek"
-  },
   "Recently Used Apps": {
     "Recently Used Apps": "Legutóbb használt alkalmazások"
   },
   "Recommended available": {
     "Recommended available": "Ajánlott, elérhető"
-  },
-  "Record Microphone": {
-    "Record Microphone": ""
-  },
-  "Record Mouse Cursor": {
-    "Record Mouse Cursor": ""
-  },
-  "Record System Audio": {
-    "Record System Audio": ""
-  },
-  "Recording": {
-    "Recording": ""
-  },
-  "Recording Folder": {
-    "Recording Folder": ""
-  },
-  "Recording ended with error code %1.": {
-    "Recording ended with error code %1.": ""
-  },
-  "Recording...": {
-    "Recording...": ""
-  },
-  "Recordings Directory": {
-    "Recordings Directory": ""
-  },
-  "Rectangle": {
-    "Rectangle": ""
-  },
-  "Rectangle Color": {
-    "Rectangle Color": ""
-  },
-  "Rectangle Outline": {
-    "Rectangle Outline": ""
-  },
-  "Rectangle Outline (4)": {
-    "Rectangle Outline (4)": ""
-  },
-  "Rectangle Thickness": {
-    "Rectangle Thickness": ""
-  },
-  "Redact": {
-    "Redact": ""
-  },
-  "Redact (R)": {
-    "Redact (R)": ""
-  },
-  "Redact Thickness": {
-    "Redact Thickness": ""
-  },
-  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
-    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
-  },
-  "Redo last undone stroke": {
-    "Redo last undone stroke": ""
   },
   "Reduce Motion": {
     "Reduce Motion": "Mozgás csökkentése"
@@ -7535,17 +6596,11 @@
   "Regex": {
     "Regex": "Regex"
   },
-  "Region": {
-    "Region": ""
-  },
   "Registries": {
     "Registries": "Regiszterek"
   },
   "Regular": {
     "Regular": "Normál"
-  },
-  "Reject": {
-    "Reject": "Elutasítás"
   },
   "Reject Jobs": {
     "Reject Jobs": "Feladatok elutasítása"
@@ -7646,6 +6701,12 @@
   "Render Type": {
     "Render Type": "Renderelési típus"
   },
+  "Reopen panel after update": {
+    "Reopen panel after update": ""
+  },
+  "Reopen the update panel once the terminal window closes after running updates.": {
+    "Reopen the update panel once the terminal window closes after running updates.": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": "Újrarendezés és csoportosítás"
   },
@@ -7664,9 +6725,6 @@
   "Report": {
     "Report": "Jelentés"
   },
-  "Request Pairing": {
-    "Request Pairing": "Párosítás kérése"
-  },
   "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Megköveteli a gomb/billentyű nyomva tartását a kikapcsolás, újraindítás, felfüggesztés, hibernálás és kijelentkezés megerősítéséhez"
   },
@@ -7680,7 +6738,7 @@
     "Requires 'dgop' tool": "Szükséges a „dgop” eszköz"
   },
   "Requires Bar Shadows to be enabled in Theme & Colors.": {
-    "Requires Bar Shadows to be enabled in Theme & Colors.": ""
+    "Requires Bar Shadows to be enabled in Theme & Colors.": "Ehhez engedélyezni kell a Sávárnyékokat a Téma és színek menüpontban."
   },
   "Requires DMS %1": {
     "Requires DMS %1": "DMS %1 szükséges"
@@ -7710,13 +6768,10 @@
     "Reserved Height": "Fenntartott magasság"
   },
   "Reserved Width": {
-    "Reserved Width": ""
+    "Reserved Width": "Fenntartott szélesség"
   },
   "Reset": {
     "Reset": "Visszaállítás"
-  },
-  "Reset Last Region": {
-    "Reset Last Region": ""
   },
   "Reset Position": {
     "Reset Position": "Pozíció visszaállítása"
@@ -7793,20 +6848,14 @@
   "Revert": {
     "Revert": "Visszaállítás"
   },
-  "Rewind 10s": {
-    "Rewind 10s": "Visszatekerés 10 mp-cel"
+  "Review the current bindings before saving this edit.": {
+    "Review the current bindings before saving this edit.": ""
   },
   "Right": {
     "Right": "Jobb"
   },
   "Right Center": {
     "Right Center": "Jobb közép"
-  },
-  "Right Click": {
-    "Right Click": ""
-  },
-  "Right Click Action": {
-    "Right Click Action": ""
   },
   "Right Section": {
     "Right Section": "Jobb oldali szakasz"
@@ -7823,38 +6872,14 @@
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "Kattints jobb gombbal a sáv widgetre a váltáshoz"
   },
-  "Ring": {
-    "Ring": "Megcsörgetés"
-  },
-  "Ringing %1...": {
-    "Ringing %1...": "%1 hívása…"
-  },
   "Ripple Effects": {
     "Ripple Effects": "Hullám effektusok"
   },
   "Root Filesystem": {
     "Root Filesystem": "Gyökérkönyvtár fájlrendszer"
   },
-  "Rosé Pine": {
-    "Rosé Pine": ""
-  },
-  "Rotate L": {
-    "Rotate L": ""
-  },
-  "Rotate R": {
-    "Rotate R": ""
-  },
-  "Round Highlighter Tips": {
-    "Round Highlighter Tips": ""
-  },
-  "Round Rectangle Corners": {
-    "Round Rectangle Corners": ""
-  },
   "Rounded": {
     "Rounded": "Lekerekített"
-  },
-  "Rounded Rectangle": {
-    "Rounded Rectangle": ""
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "Lekerekített sarkok az ablakoknál"
@@ -7916,12 +6941,6 @@
   "SDR Saturation": {
     "SDR Saturation": "SDR-színtelítettség"
   },
-  "SMS": {
-    "SMS": "SMS"
-  },
-  "SMS sent successfully": {
-    "SMS sent successfully": "SMS sikeresen elküldve"
-  },
   "SSID": {
     "SSID": "SSID"
   },
@@ -7937,26 +6956,14 @@
   "Save & Start": {
     "Save & Start": "Mentés és indítás"
   },
-  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
-    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
-  },
-  "Save Directory": {
-    "Save Directory": ""
-  },
   "Save Extracted Theme": {
     "Save Extracted Theme": "Exportált téma mentése"
-  },
-  "Save Filename Pattern": {
-    "Save Filename Pattern": ""
   },
   "Save Notepad File": {
     "Save Notepad File": "Jegyzettömb-fájl mentése"
   },
   "Save QR Code": {
     "Save QR Code": "QR-kód mentése"
-  },
-  "Save Screenshot As": {
-    "Save Screenshot As": ""
   },
   "Save and close": {
     "Save and close": "Mentés és bezárás"
@@ -7982,14 +6989,14 @@
   "Save normal priority notifications to history": {
     "Save normal priority notifications to history": "Normál prioritású értesítések mentése az előzményekbe"
   },
+  "Save or discard the current edit before editing another shortcut.": {
+    "Save or discard the current edit before editing another shortcut.": ""
+  },
   "Save password": {
     "Save password": "Jelszó mentése"
   },
   "Saved": {
     "Saved": "Mentve"
-  },
-  "Saved %1 (%2)": {
-    "Saved %1 (%2)": ""
   },
   "Saved Configurations": {
     "Saved Configurations": "Mentett konfigurációk"
@@ -8003,9 +7010,6 @@
   "Saved item deleted": {
     "Saved item deleted": "Mentett elem törölve"
   },
-  "Saving": {
-    "Saving": ""
-  },
   "Saving...": {
     "Saving...": "Mentés…"
   },
@@ -8018,17 +7022,11 @@
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": "DankBar ikonméretek független skálázása"
   },
-  "Scale Editor to Screenshot Size": {
-    "Scale Editor to Screenshot Size": ""
-  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Betűméret skálázása a felületen"
   },
   "Scan": {
     "Scan": "Szkennelés"
-  },
-  "Scan QR": {
-    "Scan QR": ""
   },
   "Scanning...": {
     "Scanning...": "Keresés…"
@@ -8039,71 +7037,11 @@
   "Score": {
     "Score": "Pontszám"
   },
-  "Screen": {
-    "Screen": ""
-  },
   "Screen Edges": {
     "Screen Edges": "Képernyőszélek"
   },
-  "Screen Recorder": {
-    "Screen Recorder": ""
-  },
-  "Screen Recording (%1)": {
-    "Screen Recording (%1)": ""
-  },
-  "Screen Recording Error": {
-    "Screen Recording Error": ""
-  },
-  "Screen Recording Saved": {
-    "Screen Recording Saved": ""
-  },
-  "Screen recording timed out or was cancelled.": {
-    "Screen recording timed out or was cancelled.": ""
-  },
   "Screen sharing": {
     "Screen sharing": "Képernyőmegosztás"
-  },
-  "Screen: %1 (%2x%3)": {
-    "Screen: %1 (%2x%3)": ""
-  },
-  "Screenshot (%1) — %2": {
-    "Screenshot (%1) — %2": ""
-  },
-  "Screenshot Copied": {
-    "Screenshot Copied": ""
-  },
-  "Screenshot Folder": {
-    "Screenshot Folder": ""
-  },
-  "Screenshot Saved": {
-    "Screenshot Saved": ""
-  },
-  "Screenshot copied anonymously with randomized name and stripped metadata.": {
-    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
-  },
-  "Screenshot copied to clipboard and saved to %1": {
-    "Screenshot copied to clipboard and saved to %1": ""
-  },
-  "Screenshot copied to clipboard but failed to save file: %1": {
-    "Screenshot copied to clipboard but failed to save file: %1": ""
-  },
-  "Screenshot copied to clipboard.": {
-    "Screenshot copied to clipboard.": ""
-  },
-  "Screenshot copied with randomized name.": {
-    "Screenshot copied with randomized name.": ""
-  },
-  "Screenshot failed (mode: %1).": {
-    "Screenshot failed (mode: %1).": ""
-  },
-  "Screenshot saved": {
-    "Screenshot saved": ""
-  },
-  "Screenshot saved to %1": {
-    "Screenshot saved to %1": ""
-  },
-  "Screenshot saved to %1/%2": {
-    "Screenshot saved to %1/%2": ""
   },
   "Screenshot unavailable": {
     "Screenshot unavailable": "A képernyőkép nem érhető el"
@@ -8117,17 +7055,11 @@
   "Scroll GitHub": {
     "Scroll GitHub": "Scroll GitHub"
   },
-  "Scroll Interval": {
-    "Scroll Interval": ""
-  },
   "Scroll Method": {
     "Scroll Method": "Görgetési módszer"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Egérgörgő"
-  },
-  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
-    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scroll song title": {
     "Scroll song title": "Zeneszám címének görgetése"
@@ -8141,9 +7073,6 @@
   "Scrolling": {
     "Scrolling": "Görgetés"
   },
-  "Scrolling Capture": {
-    "Scrolling Capture": ""
-  },
   "Scrolling Speed": {
     "Scrolling Speed": "Görgetési sebesség"
   },
@@ -8156,9 +7085,6 @@
   "Search applications...": {
     "Search applications...": "Alkalmazások keresése…"
   },
-  "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "Keresés billentyűkombináció, leírás vagy műveletnév alapján.\n\nAz alapértelmezett művelet a vágólapra másolja a gyorsbillentyűt.\nKattints jobb gombbal vagy nyomd meg a jobb nyilat a gyakran használt gyorsbillentyűk rögzítéséhez – ezek a keresésen kívül felül jelennek meg."
-  },
   "Search devices...": {
     "Search devices...": "Eszközök keresése…"
   },
@@ -8167,9 +7093,6 @@
   },
   "Search keybinds...": {
     "Search keybinds...": "Billentyűk keresése…"
-  },
-  "Search keyboard shortcuts from your compositor and applications": {
-    "Search keyboard shortcuts from your compositor and applications": "Gyorsbillentyűk keresése a kompozitortól és az alkalmazásoktól"
   },
   "Search plugins...": {
     "Search plugins...": "Bővítmények keresése…"
@@ -8231,38 +7154,17 @@
   "Select": {
     "Select": "Kiválasztás"
   },
-  "Select / Move stroke": {
-    "Select / Move stroke": ""
-  },
   "Select Application": {
     "Select Application": "Alkalmazás kiválasztása"
   },
   "Select Bar": {
     "Select Bar": "Sáv kiválasztása"
   },
-  "Select Color Slots 1 - 4": {
-    "Select Color Slots 1 - 4": ""
-  },
-  "Select Color Slots 5 - 8 (Q, W, E, R)": {
-    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
-  },
   "Select Custom Theme": {
     "Select Custom Theme": "Egyéni téma kiválasztása"
   },
-  "Select Directory": {
-    "Select Directory": ""
-  },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "Dokkindító logó kiválasztása"
-  },
-  "Select File to Send": {
-    "Select File to Send": "Küldendő fájl kiválasztása"
-  },
-  "Select Image File": {
-    "Select Image File": ""
-  },
-  "Select Image to Annotate": {
-    "Select Image to Annotate": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Indító logó kiválasztása"
@@ -8303,9 +7205,6 @@
   "Select an image file...": {
     "Select an image file...": "Képfájl kiválasztása…"
   },
-  "Select at least one provider": {
-    "Select at least one provider": "Válassz ki legalább egy szolgáltatót"
-  },
   "Select background image": {
     "Select background image": "Háttérkép kiválasztása"
   },
@@ -8334,16 +7233,13 @@
     "Select network": "Hálózat kiválasztása"
   },
   "Select the font family for UI text": {
-    "Select the font family for UI text": "Betűtípus-család a felületen lévő szövegekhez"
+    "Select the font family for UI text": "Betűtípuscsalád a felületen lévő szövegekhez"
   },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Válaszd ki a háttérkép alapú színekhez használt paletta algoritmust"
   },
   "Select which color is extracted from the wallpaper to seed the palette": {
-    "Select which color is extracted from the wallpaper to seed the palette": ""
-  },
-  "Select which keybind providers to include": {
-    "Select which keybind providers to include": "Válaszd ki a befoglalni kívánt gyorsbillentyű-szolgáltatókat"
+    "Select which color is extracted from the wallpaper to seed the palette": "Válassza ki, melyik szín legyen kinyerve a háttérképből a paletta alapjául"
   },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "Mely átmenetek legyenek a véletlenszerűsítésben"
@@ -8351,23 +7247,8 @@
   "Select...": {
     "Select...": "Kiválasztás…"
   },
-  "Selected Tool / Action": {
-    "Selected Tool / Action": ""
-  },
   "Selected image file not found.": {
     "Selected image file not found.": "A kiválasztott képfájl nem található."
-  },
-  "Send": {
-    "Send": "Küldés"
-  },
-  "Send Clipboard": {
-    "Send Clipboard": "Vágólap küldése"
-  },
-  "Send SMS": {
-    "Send SMS": "SMS küldése"
-  },
-  "Sending %1...": {
-    "Sending %1...": "%1 küldése…"
   },
   "Separate": {
     "Separate": "Különálló"
@@ -8480,17 +7361,8 @@
   "Shadows": {
     "Shadows": "Árnyékok"
   },
-  "Shapes": {
-    "Shapes": ""
-  },
-  "Share": {
-    "Share": "Megosztás"
-  },
   "Share Gamma Control Settings": {
     "Share Gamma Control Settings": "Gammavezérlési beállítások megosztása"
-  },
-  "Shared": {
-    "Shared": "Megosztva"
   },
   "Shell": {
     "Shell": "Héj"
@@ -8506,9 +7378,6 @@
   },
   "Shortcut (%1)": {
     "Shortcut (%1)": "Gyorsbillentyű (%1)"
-  },
-  "Shortcut Action": {
-    "Shortcut Action": ""
   },
   "Shortcut that opens this settings window": {
     "Shortcut that opens this settings window": "Gyorsbillentyű, amely megnyitja ezt a beállítási ablakot"
@@ -8549,9 +7418,6 @@
   "Show Charge Rate": {
     "Show Charge Rate": "Töltési sebesség megjelenítése"
   },
-  "Show Control Center": {
-    "Show Control Center": ""
-  },
   "Show Date": {
     "Show Date": "Dátum megjelenítése"
   },
@@ -8567,17 +7433,11 @@
   "Show Dock Over Fullscreen": {
     "Show Dock Over Fullscreen": "Dokk megjelenítése teljes képernyő felett"
   },
-  "Show Feels Like Temperature": {
-    "Show Feels Like Temperature": "Hőérzet megjelenítése"
-  },
   "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
     "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": "Flatpak, Snap, AppImage vagy Nix jelvényikonok megjelenítése az indítóelemeken."
   },
   "Show Footer": {
     "Show Footer": "Élőláb megjelenítése"
-  },
-  "Show Forecast": {
-    "Show Forecast": "Előrejelzés megjelenítése"
   },
   "Show GPU Temperature": {
     "Show GPU Temperature": "GPU-hőmérséklet megjelenítése"
@@ -8591,26 +7451,14 @@
   "Show Hour Numbers": {
     "Show Hour Numbers": "Óraszámok megjelenítése"
   },
-  "Show Hourly Forecast": {
-    "Show Hourly Forecast": "Óránkénti előrejelzés megjelenítése"
-  },
-  "Show Humidity": {
-    "Show Humidity": "Páratartalom megjelenítése"
-  },
   "Show Icon": {
     "Show Icon": "Ikon megjelenítése"
-  },
-  "Show Keyboard Shortcut Hints": {
-    "Show Keyboard Shortcut Hints": ""
   },
   "Show Launcher Button": {
     "Show Launcher Button": "Indítógomb megjelenítése"
   },
   "Show Line Numbers": {
     "Show Line Numbers": "Sorok számának megjelenítése"
-  },
-  "Show Location": {
-    "Show Location": "Hely megjelenítése"
   },
   "Show Lock": {
     "Show Lock": "Zárolás megjelenítése"
@@ -8657,32 +7505,17 @@
   "Show Percentage": {
     "Show Percentage": "Százalék megjelenítése"
   },
-  "Show Pill Border": {
-    "Show Pill Border": ""
-  },
   "Show Power Actions": {
     "Show Power Actions": "Főkapcsoló-műveletek megjelenítése"
   },
   "Show Power Off": {
     "Show Power Off": "Leállítás megjelenítése"
   },
-  "Show Precipitation Probability": {
-    "Show Precipitation Probability": "Csapadékvalószínűség megjelenítése"
-  },
-  "Show Pressure": {
-    "Show Pressure": "Légnyomás megjelenítése"
-  },
   "Show Profile Image": {
     "Show Profile Image": "Profilkép megjelenítése"
   },
   "Show Reboot": {
     "Show Reboot": "Újraindítás megjelenítése"
-  },
-  "Show Recent Edits History": {
-    "Show Recent Edits History": ""
-  },
-  "Show Region Border": {
-    "Show Region Border": ""
   },
   "Show Remaining Time": {
     "Show Remaining Time": "Hátralévő idő megjelenítése"
@@ -8696,17 +7529,11 @@
   "Show Saved Items": {
     "Show Saved Items": "Mentett elemek megjelenítése"
   },
-  "Show Screenshot Border": {
-    "Show Screenshot Border": ""
-  },
   "Show Seconds": {
     "Show Seconds": "Másodpercek megjelenítése"
   },
   "Show Soft Reboot": {
     "Show Soft Reboot": "Szoftveres újraindítás mutatása"
-  },
-  "Show Sunrise/Sunset": {
-    "Show Sunrise/Sunset": "Napkelte/Napnyugta megjelenítése"
   },
   "Show Suspend": {
     "Show Suspend": "Felfüggesztés megjelenítése"
@@ -8726,12 +7553,6 @@
   "Show System Time": {
     "Show System Time": "Rendszeridő megjelenítése"
   },
-  "Show Toolbar": {
-    "Show Toolbar": ""
-  },
-  "Show Toolbar Border": {
-    "Show Toolbar Border": ""
-  },
   "Show Top Processes": {
     "Show Top Processes": "Top folyamatok megjelenítése"
   },
@@ -8741,17 +7562,11 @@
   "Show Virtual Devices": {
     "Show Virtual Devices": "Virtuális eszközök megjelenítése"
   },
-  "Show Weather Condition": {
-    "Show Weather Condition": "Időjárási körülmények megjelenítése"
-  },
   "Show Week Number": {
     "Show Week Number": "Hétszám megjelenítése"
   },
   "Show Welcome": {
     "Show Welcome": "Üdvözlőképernyő megjelenítése"
-  },
-  "Show Wind Speed": {
-    "Show Wind Speed": "Szélsebesség megjelenítése"
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "Munkaterület-alkalmazások megjelenítése"
@@ -8840,9 +7655,6 @@
   "Show on screens:": {
     "Show on screens:": "Megjelenítés képernyőkön:"
   },
-  "Show only the image on a transparent background": {
-    "Show only the image on a transparent background": ""
-  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": "A sáv megjelenítése csak akkor, ha nincs nyitva ablak"
   },
@@ -8885,9 +7697,6 @@
   "Signal": {
     "Signal": "Jel"
   },
-  "Signal Strength": {
-    "Signal Strength": "Jelerősség"
-  },
   "Silence for a while": {
     "Silence for a while": "Némítás egy időre"
   },
@@ -8912,9 +7721,6 @@
   "Skip": {
     "Skip": "Kihagyás"
   },
-  "Skip Confirmation": {
-    "Skip Confirmation": ""
-  },
   "Skip confirmation": {
     "Skip confirmation": "Megerősítés kihagyása"
   },
@@ -8926,30 +7732,6 @@
   },
   "Slideout": {
     "Slideout": "Kicsúszó panel"
-  },
-  "Slot 1": {
-    "Slot 1": ""
-  },
-  "Slot 2": {
-    "Slot 2": ""
-  },
-  "Slot 3": {
-    "Slot 3": ""
-  },
-  "Slot 4": {
-    "Slot 4": ""
-  },
-  "Slot 5": {
-    "Slot 5": ""
-  },
-  "Slot 6": {
-    "Slot 6": ""
-  },
-  "Slot 7": {
-    "Slot 7": ""
-  },
-  "Slot 8": {
-    "Slot 8": ""
   },
   "Small": {
     "Small": "Kicsi"
@@ -8978,23 +7760,11 @@
   "Soft Reboot": {
     "Soft Reboot": "Szoftveres újraindítás"
   },
-  "Soften image details so screenshot content stands out": {
-    "Soften image details so screenshot content stands out": ""
-  },
   "Solid": {
     "Solid": "Szilárd"
   },
-  "Solid Color": {
-    "Solid Color": ""
-  },
-  "Solid Fill": {
-    "Solid Fill": ""
-  },
-  "Solid Line": {
-    "Solid Line": ""
-  },
   "Solid or outlined material meter, or a circular gauge": {
-    "Solid or outlined material meter, or a circular gauge": ""
+    "Solid or outlined material meter, or a circular gauge": "Tömör vagy körvonalas mérő, vagy kör alakú műszer"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Néhány bővítmény a DMS újabb verzióját igényli:"
@@ -9018,7 +7788,7 @@
     "Sounds": "Hangok"
   },
   "Source Color": {
-    "Source Color": ""
+    "Source Color": "Forrásszín"
   },
   "Source: %1": {
     "Source: %1": "Forrás: %1"
@@ -9044,14 +7814,8 @@
   "Spacing": {
     "Spacing": "Távolság"
   },
-  "Spawn Position": {
-    "Spawn Position": ""
-  },
   "Speaker settings": {
     "Speaker settings": "Hangszóró-beállítások"
-  },
-  "Specific Output": {
-    "Specific Output": ""
   },
   "Speed": {
     "Speed": "Sebesség"
@@ -9062,17 +7826,11 @@
   "Spotlight": {
     "Spotlight": "Spotlight"
   },
-  "Spotlight (D)": {
-    "Spotlight (D)": ""
-  },
   "Spotlight Bar": {
     "Spotlight Bar": "Spotlight-sáv"
   },
   "Spotlight Bar Shortcut": {
     "Spotlight Bar Shortcut": "Spotlight-sáv gyorsbillentyűje"
-  },
-  "Spotlight Opacity": {
-    "Spotlight Opacity": ""
   },
   "Spotlight Search": {
     "Spotlight Search": "Spotlight-keresés"
@@ -9104,24 +7862,6 @@
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
     "Stage the Wayland overlay layer to remain visible over fullscreen apps": "A Wayland átfedő réteg előkészítése, hogy látható maradjon a teljes képernyős alkalmazások felett"
   },
-  "Stamp (A)": {
-    "Stamp (A)": ""
-  },
-  "Stamp Color": {
-    "Stamp Color": ""
-  },
-  "Stamp Contrast Ring": {
-    "Stamp Contrast Ring": ""
-  },
-  "Stamp Number Font": {
-    "Stamp Number Font": ""
-  },
-  "Stamp Size": {
-    "Stamp Size": ""
-  },
-  "Stamp, Highlighter, Spotlight (A, S, D)": {
-    "Stamp, Highlighter, Spotlight (A, S, D)": ""
-  },
   "Standard": {
     "Standard": "Standard"
   },
@@ -9131,20 +7871,8 @@
   "Start Hotspot?": {
     "Start Hotspot?": "Elindítod a hotspotot?"
   },
-  "Start KDE Connect or Valent to use this plugin": {
-    "Start KDE Connect or Valent to use this plugin": "Indítsd el a KDE Connectet vagy a Valentet a bővítmény használatához"
-  },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Írd ide a jegyzeteidet…"
-  },
-  "Starting Preset": {
-    "Starting Preset": ""
-  },
-  "Starting Tool": {
-    "Starting Tool": ""
-  },
-  "Starting Tool Mode": {
-    "Starting Tool Mode": ""
   },
   "Starting hotspot...": {
     "Starting hotspot...": "Hotspot indítása…"
@@ -9161,9 +7889,6 @@
   "Stop": {
     "Stop": "Leállítás"
   },
-  "Stop & Save": {
-    "Stop & Save": ""
-  },
   "Stop ignoring %1": {
     "Stop ignoring %1": "%1 mellőzésének leállítása"
   },
@@ -9175,12 +7900,6 @@
   },
   "Stopping": {
     "Stopping": "Megállítás"
-  },
-  "Straight Line": {
-    "Straight Line": ""
-  },
-  "Straight Line (2)": {
-    "Straight Line (2)": ""
   },
   "Stretch": {
     "Stretch": "Nyújtás"
@@ -9236,9 +7955,6 @@
   "Surface Container": {
     "Surface Container": "Felszíni tároló"
   },
-  "Surface Container Highest": {
-    "Surface Container Highest": ""
-  },
   "Surface High": {
     "Surface High": "Magas felszín"
   },
@@ -9290,14 +8006,8 @@
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
     "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "A 60 Hz-es móddal rendelkező kijelzők átváltása 60 Hz-re akkumulátoros használat esetén, és az előző mód visszaállítása hálózati tápellátásnál. Kihagyja a bekapcsolt VRR-rel rendelkező kijelzőket."
   },
-  "Switch to Select Tool": {
-    "Switch to Select Tool": ""
-  },
   "Switch to power profile": {
     "Switch to power profile": "Váltás energiaprofilra"
-  },
-  "Switch to your custom preset": {
-    "Switch to your custom preset": ""
   },
   "Sync": {
     "Sync": "Szinkronizálás"
@@ -9323,6 +8033,9 @@
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "Sötét mód szinkronizálása a beállítási portálokkal a rendszer egészére vonatkozó témajavaslatokhoz"
   },
+  "Sync failed": {
+    "Sync failed": ""
+  },
   "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
     "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "A szinkronizálás sikertelen lett háttér módban. Terminál mód megkísérlése az interaktív hitelesítéshez."
   },
@@ -9335,17 +8048,14 @@
   "Sync with Global Settings": {
     "Sync with Global Settings": "Szinkronizálás a globális beállításokkal"
   },
+  "Synchronized": {
+    "Synchronized": ""
+  },
   "Syncing...": {
     "Syncing...": "Szinkronizálás…"
   },
-  "Synthwave Electric": {
-    "Synthwave Electric": ""
-  },
   "System App Theming": {
     "System App Theming": "Rendszeralkalmazások témája"
-  },
-  "System Audio Device": {
-    "System Audio Device": ""
   },
   "System Check": {
     "System Check": "Rendszerellenőrzés"
@@ -9428,9 +8138,6 @@
   "Tap to Click": {
     "Tap to Click": "Koppintás a kattintáshoz"
   },
-  "Target Output Name": {
-    "Target Output Name": ""
-  },
   "Task list used when adding tasks from the dash calendar": {
     "Task list used when adding tasks from the dash calendar": "A feladatlista, amelyet a dash naptárból történő feladatok hozzáadásakor használnak"
   },
@@ -9476,35 +8183,23 @@
   "Text": {
     "Text": "Szöveg"
   },
-  "Text (W)": {
-    "Text (W)": ""
-  },
-  "Text Background Roundness": {
-    "Text Background Roundness": ""
-  },
   "Text Color": {
     "Text Color": "Szövegszín"
   },
   "Text Editor": {
     "Text Editor": "Szövegszerkesztő"
   },
-  "Text Font": {
-    "Text Font": ""
-  },
-  "Text Note": {
-    "Text Note": ""
-  },
   "Text Rendering": {
     "Text Rendering": "Szövegmegjelenítés"
   },
-  "Text Size": {
-    "Text Size": ""
+  "The Aqueous operation failed.": {
+    "The Aqueous operation failed.": ""
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem érhető el. Az automatizált bővítménykezeléshez DMS_SOCKET szükséges."
   },
   "The Island anchors to one screen edge": {
-    "The Island anchors to one screen edge": ""
+    "The Island anchors to one screen edge": "Az Island az egyik képernyőszélhez rögzül"
   },
   "The Island holds this edge on a display this bar covers, so the bar stays hidden there": {
     "The Island holds this edge on a display this bar covers, so the bar stays hidden there": "A sziget megtartja ezt a szélt a sáv által lefedett kijelzőn, így a sáv ott rejtve marad"
@@ -9515,11 +8210,14 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "Az alábbi beállítások módosítják a GTK és Qt beállításokat. Ha meg szeretnéd őrizni jelenlegi konfigurációidat, készíts róluk biztonsági mentést (qt5ct.conf|qt6ct.conf|qtengine/config.json és ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The compositor session changed. Discard this edit before starting a new one.": {
+    "The compositor session changed. Discard this edit before starting a new one.": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "A munkamenetekhez való csatlakozáskor használt egyéni parancs (első argumentumként a munkamenet nevét kapja)"
   },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
-    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "A DMS-hez mellékelt bejelentkező felület aktív (archinstall beállítás). Továbbra is működik így, de a téma és a beállítások szinkronizálásához az önálló bejelentkező felület szükséges. Telepítsd a greetd-dms-greeter-bin csomagot az AUR-ból, majd futtasd a Szinkronizálást az üdvözlőképernyő migrálásához."
+    "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": "A DMS-hez mellékelt bejelentkező felület aktív (archinstall-beállítás). Továbbra is működik így, de a téma és a beállítások szinkronizálásához az önálló bejelentkező felület szükséges. Telepítsd a greetd-dms-greeter-bin csomagot az AUR-ból, majd futtasd a Szinkronizálást az üdvözlőképernyő migrálásához."
   },
   "The island draws its own surface": {
     "The island draws its own surface": "A sziget saját felületet rajzol"
@@ -9527,23 +8225,38 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "A nyomtató feladatlistája üres"
   },
+  "The new shortcut is already in use. Choose another shortcut.": {
+    "The new shortcut is already in use. Choose another shortcut.": ""
+  },
+  "The original shortcut changed. Refresh and review your edit.": {
+    "The original shortcut changed. Refresh and review your edit.": ""
+  },
+  "The original shortcut was removed. Discard this edit or add a new shortcut.": {
+    "The original shortcut was removed. Discard this edit or add a new shortcut.": ""
+  },
+  "The result is unknown. Refresh before trying again.": {
+    "The result is unknown. Refresh before trying again.": ""
+  },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "A szabály minden olyan ablakra vonatkozik, amely megegyezik ezek valamelyikével."
+  },
+  "The save result is unknown. Refresh and check the current bindings.": {
+    "The save result is unknown. Refresh and check the current bindings.": ""
+  },
+  "The selected action is no longer available.": {
+    "The selected action is no longer available.": ""
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "A szervertanúsítvány megváltozott a legutóbbi megbízás óta. Csak akkor folytasd, ha felismered az új ujjlenyomatot."
   },
   "Theme": {
-    "Theme": ""
+    "Theme": "Téma"
   },
   "Theme & Colors": {
     "Theme & Colors": "Téma és színek"
   },
   "Theme Color": {
     "Theme Color": "Témaszín"
-  },
-  "Theme Primary Color": {
-    "Theme Primary Color": ""
   },
   "Theme color used for the border": {
     "Theme color used for the border": "A kerethez használt témaszín"
@@ -9590,11 +8303,11 @@
   "This may take a few seconds": {
     "This may take a few seconds": "Ez eltarthat néhány másodpercig"
   },
+  "This operation is not supported by the installed Aqueous version.": {
+    "This operation is not supported by the installed Aqueous version.": ""
+  },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "Ez a kimenet le van tiltva a jelenlegi profilban"
-  },
-  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
-    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "Ez a bővítmény nem rendelkezik „settings_write” engedéllyel.\n\nAdd hozzá a \"permissions\": [\"settings_read\", \"settings_write\"] sort a plugin.json fájlhoz"
@@ -9716,17 +8429,8 @@
   "Today": {
     "Today": "Ma"
   },
-  "Toggle Hide/Show Annotations": {
-    "Toggle Hide/Show Annotations": ""
-  },
-  "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
-  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "A sáv láthatóságának kézi váltása IPC-n keresztül"
-  },
-  "Toggle between 2 latest presets": {
-    "Toggle between 2 latest presets": ""
   },
   "Toggle fonts": {
     "Toggle fonts": "Betűtípusok átváltása"
@@ -9739,9 +8443,6 @@
   },
   "Toggling...": {
     "Toggling...": "Váltás…"
-  },
-  "Tokyo Night": {
-    "Tokyo Night": ""
   },
   "Tomorrow": {
     "Tomorrow": "Holnap"
@@ -9757,18 +8458,6 @@
   },
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "Túl sok kísérlet - kizárva"
-  },
-  "Tool Defaults": {
-    "Tool Defaults": ""
-  },
-  "Toolbar": {
-    "Toolbar": ""
-  },
-  "Toolbar Palette": {
-    "Toolbar Palette": ""
-  },
-  "Toolbar Position": {
-    "Toolbar Position": ""
   },
   "Tools": {
     "Tools": "Eszközök"
@@ -9827,12 +8516,6 @@
   "Transparency": {
     "Transparency": "Átlátszóság"
   },
-  "Transparent": {
-    "Transparent": ""
-  },
-  "Transparent Background": {
-    "Transparent Background": ""
-  },
   "Trash": {
     "Trash": "Kuka"
   },
@@ -9842,26 +8525,8 @@
   "Tray Icon Fix": {
     "Tray Icon Fix": "Tálcaikon javítás"
   },
-  "Trending GIFs": {
-    "Trending GIFs": "Népszerű GIF-ek"
-  },
-  "Trending Stickers": {
-    "Trending Stickers": "Népszerű matricák"
-  },
   "Trigger": {
     "Trigger": "Indító"
-  },
-  "Trigger Middle-Click Action (Default: Interactive Region)": {
-    "Trigger Middle-Click Action (Default: Interactive Region)": ""
-  },
-  "Trigger Prefix": {
-    "Trigger Prefix": "Indító előtag"
-  },
-  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
-    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
-  },
-  "Trigger on Hover": {
-    "Trigger on Hover": ""
   },
   "Trigger: %1": {
     "Trigger: %1": "Indító: %1"
@@ -9902,12 +8567,6 @@
   "Type at least 2 characters to search files.": {
     "Type at least 2 characters to search files.": "Gépelj be legalább 2 karaktert a fájlok kereséséhez."
   },
-  "Type note...": {
-    "Type note...": ""
-  },
-  "Type this prefix to search keybinds": {
-    "Type this prefix to search keybinds": "Írd be ezt az előtagot a gyorsbillentyűk kereséséhez"
-  },
   "Type to search files": {
     "Type to search files": "Írj a fájlok kereséséhez"
   },
@@ -9917,20 +8576,11 @@
   "Typography & Motion": {
     "Typography & Motion": "Tipográfia és animáció"
   },
-  "URI": {
-    "URI": "URI"
-  },
   "Unavailable": {
     "Unavailable": "Nem érhető el"
   },
   "Uncategorized": {
     "Uncategorized": "Besorolatlan"
-  },
-  "Undo (Ctrl+Z)": {
-    "Undo (Ctrl+Z)": ""
-  },
-  "Undo last stroke": {
-    "Undo last stroke": ""
   },
   "Unfocused Color": {
     "Unfocused Color": "Nem fókuszált szín"
@@ -9940,6 +8590,12 @@
   },
   "Ungrouped": {
     "Ungrouped": "Csoportosítatlan"
+  },
+  "Uninstall": {
+    "Uninstall": ""
+  },
+  "Uninstall %1?": {
+    "Uninstall %1?": ""
   },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Bővítmény eltávolítása"
@@ -9952,6 +8608,9 @@
   },
   "Uninstalling: %1": {
     "Uninstalling: %1": "Eltávolítás: %1"
+  },
+  "Uninstall…": {
+    "Uninstall…": ""
   },
   "Unknown": {
     "Unknown": "Ismeretlen"
@@ -9997,12 +8656,6 @@
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Névtelen szabály"
-  },
-  "Unpair": {
-    "Unpair": "Párosítás megszüntetése"
-  },
-  "Unpair failed": {
-    "Unpair failed": "A párosítás megszüntetése sikertelen"
   },
   "Unpin": {
     "Unpin": "Rögzítés feloldása"
@@ -10073,23 +8726,11 @@
   "Urgent Color": {
     "Urgent Color": "Sürgős szín"
   },
-  "Usage Guide": {
-    "Usage Guide": ""
-  },
-  "Usage Tips": {
-    "Usage Tips": "Használati tippek"
-  },
   "Use 24-hour time format instead of 12-hour AM/PM": {
     "Use 24-hour time format instead of 12-hour AM/PM": "24 órás időformátum használata a 12 órás AM/PM formátum helyett"
   },
   "Use Custom Command": {
     "Use Custom Command": "Egyéni parancs használata"
-  },
-  "Use Existing Custom": {
-    "Use Existing Custom": ""
-  },
-  "Use Floating Editor": {
-    "Use Floating Editor": ""
   },
   "Use Grid Layout": {
     "Use Grid Layout": "Rács elrendezés használata"
@@ -10108,9 +8749,6 @@
   },
   "Use Inline Expansion": {
     "Use Inline Expansion": "Beágyazott kibontás használata"
-  },
-  "Use Modal Editor": {
-    "Use Modal Editor": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Rögzített szélességű betűtípus használata"
@@ -10193,14 +8831,8 @@
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "Azonos pozíció és méret használata minden kijelzőn"
   },
-  "Use trigger prefix to activate": {
-    "Use trigger prefix to activate": "Indító előtag használata az aktiváláshoz"
-  },
   "Used for xdg-terminal-exec": {
     "Used for xdg-terminal-exec": "Az xdg-terminal-exec-hez használatos"
-  },
-  "Used when accent color is set to Custom": {
-    "Used when accent color is set to Custom": "Akkor használatos, ha a kiemelőszín Egyéni-re van állítva"
   },
   "User": {
     "User": "Felhasználó"
@@ -10298,9 +8930,6 @@
   "Variable Refresh Rate": {
     "Variable Refresh Rate": "Változó frissítési gyakoriság"
   },
-  "Verification": {
-    "Verification": "Ellenőrzés"
-  },
   "Version": {
     "Version": "Verzió"
   },
@@ -10314,7 +8943,7 @@
     "Vertical Grid": "Függőleges rács"
   },
   "Vertical Offset": {
-    "Vertical Offset": ""
+    "Vertical Offset": "Függőleges eltolás"
   },
   "Vertical Scrolling": {
     "Vertical Scrolling": "Függőleges görgetés"
@@ -10331,26 +8960,14 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Élénk paletta játékos telítettséggel."
   },
-  "Video Codec": {
-    "Video Codec": ""
-  },
   "Video Path": {
     "Video Path": "Videó útvonala"
   },
   "Video Player": {
     "Video Player": "Videolejátszó"
   },
-  "Video Quality": {
-    "Video Quality": ""
-  },
   "Video Screensaver": {
     "Video Screensaver": "Videós képernyővédő"
-  },
-  "Video Settings": {
-    "Video Settings": ""
-  },
-  "View Mode": {
-    "View Mode": "Nézetmód"
   },
   "Visibility": {
     "Visibility": "Láthatóság"
@@ -10424,18 +9041,6 @@
   "Warnings": {
     "Warnings": "Figyelmeztetések"
   },
-  "Watermark": {
-    "Watermark": ""
-  },
-  "Watermark Image": {
-    "Watermark Image": ""
-  },
-  "Watermark Text": {
-    "Watermark Text": ""
-  },
-  "Watermark Type": {
-    "Watermark Type": ""
-  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Hullámzó folyamatjelzők"
   },
@@ -10450,9 +9055,6 @@
   },
   "Web Browser": {
     "Web Browser": "Böngésző"
-  },
-  "WebP Quality": {
-    "WebP Quality": ""
   },
   "Welcome": {
     "Welcome": "Üdvözlünk"
@@ -10469,9 +9071,6 @@
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
     "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "Ha engedélyezve van, indításkor ellenőrzi a frissítéseket. Ha le van tiltva, csak a fenti időközönként vagy kézi frissítéskor fut az ellenőrzés."
   },
-  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
-    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
-  },
   "When locked": {
     "When locked": "Zároláskor"
   },
@@ -10480,6 +9079,9 @@
   },
   "White": {
     "White": "Fehér"
+  },
+  "Wi-Fi & Bluetooth": {
+    "Wi-Fi & Bluetooth": ""
   },
   "Wi-Fi and Ethernet connection": {
     "Wi-Fi and Ethernet connection": "Wi-Fi- és Ethernet-kapcsolatok"
@@ -10577,12 +9179,6 @@
   "Wind Speed in m/s": {
     "Wind Speed in m/s": "Szélsebesség m/s-ban"
   },
-  "Window": {
-    "Window": ""
-  },
-  "Window / Portal": {
-    "Window / Portal": ""
-  },
   "Window Corner Radius": {
     "Window Corner Radius": "Ablaksarok sugara"
   },
@@ -10607,14 +9203,17 @@
   "Wipe": {
     "Wipe": "Törlés"
   },
+  "With Shelly, only Flatpak packages in the current update list can be ignored.": {
+    "With Shelly, only Flatpak packages in the current update list can be ignored.": ""
+  },
   "Working...": {
     "Working...": "Folyamatban…"
   },
   "Workspace %1": {
-    "Workspace %1": ""
+    "Workspace %1": "%1. munkaterület"
   },
   "Workspace %1: %2": {
-    "Workspace %1: %2": ""
+    "Workspace %1: %2": "%1. munkaterület: %2"
   },
   "Workspace Index Numbers": {
     "Workspace Index Numbers": "Munkaterület-indexszámok"
@@ -10626,7 +9225,7 @@
     "Workspace Padding": "Munkaterület-margó"
   },
   "Workspace Switch": {
-    "Workspace Switch": ""
+    "Workspace Switch": "Munkaterület-váltó"
   },
   "Workspace Switcher": {
     "Workspace Switcher": "Munkaterület-váltó"
@@ -10706,9 +9305,6 @@
   "Your system is up to date!": {
     "Your system is up to date!": "A rendszer naprakész!"
   },
-  "Zoom Level": {
-    "Zoom Level": ""
-  },
   "admin": {
     "admin": "rendszergazda"
   },
@@ -10744,9 +9340,6 @@
   },
   "detached": {
     "detached": "leválasztva"
-  },
-  "device": {
-    "device": "eszköz"
   },
   "dgop not available": {
     "dgop not available": "A dgop nem érhető el"
@@ -10792,9 +9385,6 @@
   },
   "featured": {
     "featured": "kiemelt"
-  },
-  "gpu-screen-recorder is not installed. Please install it first.": {
-    "gpu-screen-recorder is not installed. Please install it first.": ""
   },
   "khal": {
     "khal": "khal"
@@ -10891,6 +9481,12 @@
   },
   "procs": {
     "procs": "folyamat"
+  },
+  "pt": {
+    "pt": ""
+  },
+  "px": {
+    "px": ""
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": "r/niri subreddit"

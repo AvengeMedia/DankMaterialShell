@@ -34,6 +34,10 @@ PluginComponent {
             TailscaleService.connectTailscale(null);
     }
 
+    onCcWidgetExpanded: {
+        TailscaleService.refresh(null);
+    }
+
     ccDetailContent: Component {
         Rectangle {
             id: detailRoot

@@ -101,14 +101,14 @@
   "%1 widgets": {
     "%1 widgets": "أدوات %1"
   },
+  "%1 will be removed from your system.": {
+    "%1 will be removed from your system.": ""
+  },
   "%1 window": {
     "%1 window": "%1 نافذة"
   },
   "%1 windows": {
     "%1 windows": "%1 نوافذ"
-  },
-  "%1 — %2": {
-    "%1 — %2": ""
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
@@ -133,9 +133,6 @@
   },
   "0 = square corners": {
     "0 = square corners": "0 = زوايا مربعة"
-  },
-  "1 Connecting Line": {
-    "1 Connecting Line": "خط اتصال واحد"
   },
   "1 day": {
     "1 day": "يوم واحد"
@@ -196,9 +193,6 @@
   },
   "180°": {
     "180°": "180 درجة"
-  },
-  "2 Connecting Lines": {
-    "2 Connecting Lines": "خطا اتصال"
   },
   "2 hours": {
     "2 hours": "ساعتان"
@@ -341,9 +335,6 @@
   "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": {
     "AUR helpers are interactive — see the terminal window for prompts. This popout will return to idle when the upgrade exits.": "مساعدو AUR تفاعليون - انظر نافذة المحطة الطرفية للمطالبات. ستعود هذه النافذة المنبثقة إلى وضع الخمول عند خروج الترقية."
   },
-  "AUTO": {
-    "AUTO": "تلقائي"
-  },
   "Aborted": {
     "Aborted": "تم الإلغاء"
   },
@@ -353,14 +344,11 @@
   "Acceleration Profile": {
     "Acceleration Profile": "ملف تعريف التسارع"
   },
-  "Accent Color": {
-    "Accent Color": "لون التمييز"
-  },
-  "Accept": {
-    "Accept": "قبول"
-  },
   "Accept Jobs": {
     "Accept Jobs": "قبول المهام"
+  },
+  "Accept reviewed changes": {
+    "Accept reviewed changes": ""
   },
   "Accepting": {
     "Accepting": "قيد القبول"
@@ -386,9 +374,6 @@
   "Action performed when scrolling vertically on the bar": {
     "Action performed when scrolling vertically on the bar": "الإجراء المنفذ عند التمرير عموديًا على الشريط"
   },
-  "Action when Enter": {
-    "Action when Enter": "الإجراء عند الضغط على Enter"
-  },
   "Activate": {
     "Activate": "تفعيل"
   },
@@ -401,9 +386,6 @@
   "Activates immediately": {
     "Activates immediately": "يتفعل فوراً"
   },
-  "Activation": {
-    "Activation": "التنشيط"
-  },
   "Active": {
     "Active": "نشط"
   },
@@ -412,9 +394,6 @@
   },
   "Active VPN": {
     "Active VPN": "VPN نشط"
-  },
-  "Active Window": {
-    "Active Window": "النافذة النشطة"
   },
   "Active in Column": {
     "Active in Column": "نشط في العمود"
@@ -436,9 +415,6 @@
   },
   "Adaptive": {
     "Adaptive": "تكيفي"
-  },
-  "Adaptive (DMS Theme)": {
-    "Adaptive (DMS Theme)": "تكييفي (سمة DMS)"
   },
   "Adaptive Media Width": {
     "Adaptive Media Width": "عرض الوسائط التكيفي"
@@ -463,9 +439,6 @@
   },
   "Add Printer": {
     "Add Printer": "إضافة طابعة"
-  },
-  "Add Text Note": {
-    "Add Text Note": "إضافة ملاحظة نصية"
   },
   "Add Title": {
     "Add Title": "إضافة عنوان"
@@ -557,12 +530,6 @@
   "All": {
     "All": "الكل"
   },
-  "All Combined Outputs": {
-    "All Combined Outputs": "جميع المخرجات مجتمعة"
-  },
-  "All Outputs": {
-    "All Outputs": "جميع المخرجات"
-  },
   "All checks passed": {
     "All checks passed": "تم اجتياز جميع الفحوصات"
   },
@@ -608,9 +575,6 @@
   "Alternative (OR)": {
     "Alternative (OR)": "بديل (أو)"
   },
-  "Always Active": {
-    "Always Active": "نشط دائماً"
-  },
   "Always Show Percentage": {
     "Always Show Percentage": "إظهار النسبة المئوية دائماً"
   },
@@ -641,6 +605,9 @@
   "Amount": {
     "Amount": "الكمية"
   },
+  "An uninstallation is already in progress": {
+    "An uninstallation is already in progress": ""
+  },
   "An xray rule at %1 may conflict with the Xray settings below": {
     "An xray rule at %1 may conflict with the Xray settings below": "قد تتعارض قاعدة Xray في %1 مع إعدادات Xray أدناه"
   },
@@ -665,20 +632,14 @@
   "Animation Style": {
     "Animation Style": "نمط التحريك"
   },
-  "Annotating": {
-    "Annotating": "التعليق التوضيحي"
-  },
-  "Annotation Tools": {
-    "Annotation Tools": "أدوات التعليق التوضيحي"
-  },
-  "Anonymous Copy (stripped metadata)": {
-    "Anonymous Copy (stripped metadata)": "نسخ مجهول (تم إزالة البيانات الوصفية)"
-  },
   "Anonymous Identity": {
     "Anonymous Identity": "هوية مجهولة"
   },
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "الهوية المجهولة (اختياري)"
+  },
+  "Another Aqueous operation is in progress.": {
+    "Another Aqueous operation is in progress.": ""
   },
   "Any window": {
     "Any window": "أي نافذة"
@@ -733,6 +694,9 @@
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "يُطبق عند مزامنة الgreeter التالية"
+  },
+  "Apply AUR updates alongside system updates when running 'Update All'.": {
+    "Apply AUR updates alongside system updates when running 'Update All'.": ""
   },
   "Apply Changes": {
     "Apply Changes": "تطبيق التغييرات"
@@ -791,6 +755,12 @@
   "Apps with notification popups muted. Unmute or delete to remove.": {
     "Apps with notification popups muted. Unmute or delete to remove.": "التطبيقات ذات النوافذ المنبثقة للإشعارات المكتومة. قم بإلغاء الكتم أو الحذف لإزالتها."
   },
+  "Aqueous cursor": {
+    "Aqueous cursor": ""
+  },
+  "Aqueous typography": {
+    "Aqueous typography": ""
+  },
   "Arc Extender": {
     "Arc Extender": "موسع القوس (Arc Extender)"
   },
@@ -802,18 +772,6 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "ترتيب الشاشات وضبط الدقة ومعدل التحديث ومعدل التحديث المتغير"
-  },
-  "Arrow (3)": {
-    "Arrow (3)": "سهم (3)"
-  },
-  "Arrow Color": {
-    "Arrow Color": "لون السهم"
-  },
-  "Arrow Thickness": {
-    "Arrow Thickness": "سمك السهم"
-  },
-  "Arrow Vector": {
-    "Arrow Vector": "سهم متجه"
   },
   "At Startup": {
     "At Startup": "عند بدء التشغيل"
@@ -829,9 +787,6 @@
   },
   "Audio": {
     "Audio": "الصوت"
-  },
-  "Audio & Overlay": {
-    "Audio & Overlay": "الصوت والتراكب"
   },
   "Audio Codec": {
     "Audio Codec": "برنامج ترميز الصوت"
@@ -914,14 +869,8 @@
   "Auto (Wide)": {
     "Auto (Wide)": "تلقائي (عريض)"
   },
-  "Auto Balance": {
-    "Auto Balance": "موازنة تلقائية"
-  },
   "Auto Compositor Gaps": {
     "Auto Compositor Gaps": "فجوات مدير النوافذ التلقائية"
-  },
-  "Auto Detect": {
-    "Auto Detect": "كشف تلقائي"
   },
   "Auto From Wallpaper": {
     "Auto From Wallpaper": "تلقائي من الخلفية"
@@ -956,14 +905,8 @@
   "Auto-Hide Timeout": {
     "Auto-Hide Timeout": "مهلة الإخفاء التلقائي"
   },
-  "Auto-apply background defaults": {
-    "Auto-apply background defaults": "تطبيق إعدادات الخلفية الافتراضية تلقائياً"
-  },
   "Auto-close Niri overview when DMS launches or focuses a window.": {
     "Auto-close Niri overview when DMS launches or focuses a window.": "إغلاق نظرة عامة لـ Niri تلقائياً عند تشغيل DMS أو التركيز على نافذة."
-  },
-  "Auto-close the loop when ending near the start point.": {
-    "Auto-close the loop when ending near the start point.": "إغلاق الحلقة تلقائياً عند الانتهاء بالقرب من نقطة البداية."
   },
   "Auto-delete notifications older than this": {
     "Auto-delete notifications older than this": "حذف الإشعارات القديمة تلقائيًا قبل هذا الوقت"
@@ -986,17 +929,8 @@
   "Auto-login on startup": {
     "Auto-login on startup": "تسجيل الدخول التلقائي عند بدء التشغيل"
   },
-  "Auto-minimize": {
-    "Auto-minimize": "تصغير تلقائي"
-  },
   "Auto-save to disk": {
     "Auto-save to disk": "حفظ تلقائي على القرص"
-  },
-  "Auto-select a tool preset on hover, without releasing the mouse.": {
-    "Auto-select a tool preset on hover, without releasing the mouse.": "تحديد مسبق للأداة تلقائياً عند التمرير، دون تحرير الماوس."
-  },
-  "Auto-tiling": {
-    "Auto-tiling": "تجانب تلقائي"
   },
   "Autoconnect": {
     "Autoconnect": "اتصال تلقائي"
@@ -1043,17 +977,11 @@
   "Automatically lock the screen when the system prepares to suspend": {
     "Automatically lock the screen when the system prepares to suspend": "قفل الشاشة تلقائياً عندما يستعد النظام لدخول وضع السكون"
   },
-  "Automatically minimize the float window after a delay": {
-    "Automatically minimize the float window after a delay": "تصغير النافذة العائمة تلقائياً بعد تأخير"
-  },
   "Automatically picks the scheme variant based on the wallpaper.": {
     "Automatically picks the scheme variant based on the wallpaper.": "يختار تلقائياً نوع المخطط بناءً على الخلفية."
   },
   "Automatically save changes to opened files as you type": {
     "Automatically save changes to opened files as you type": "حفظ التغييرات تلقائيًا في الملفات المفتوحة أثناء الكتابة"
-  },
-  "Automatically stack windows to avoid overlap": {
-    "Automatically stack windows to avoid overlap": "ترتيب النوافذ تلقائياً لتجنب التداخل"
   },
   "Automatically turn on Num Lock at startup": {
     "Automatically turn on Num Lock at startup": "تشغيل Num Lock تلقائيًا عند بدء التشغيل"
@@ -1088,17 +1016,11 @@
   "Available Updates (%1)": {
     "Available Updates (%1)": "التحديثات المتاحة (%1)"
   },
-  "Available in Detailed and Forecast view modes": {
-    "Available in Detailed and Forecast view modes": "متاح في أوضاع العرض التفصيلي والتوقعات"
-  },
   "BSSID": {
     "BSSID": "BSSID"
   },
   "Back": {
     "Back": "رجوع"
-  },
-  "Back to Annotation (B)": {
-    "Back to Annotation (B)": "العودة إلى التعليق التوضيحي (B)"
   },
   "Backend": {
     "Backend": "النظام الخلفي"
@@ -1106,32 +1028,14 @@
   "Background": {
     "Background": "الخلفية"
   },
-  "Background (B)": {
-    "Background (B)": "الخلفية (B)"
-  },
   "Background Blur": {
     "Background Blur": "تخبيش الخلفية"
   },
   "Background Color": {
     "Background Color": "لون الخلفية"
   },
-  "Background Defaults": {
-    "Background Defaults": "إعدادات الخلفية الافتراضية"
-  },
   "Background Effect": {
     "Background Effect": "تأثير الخلفية"
-  },
-  "Background Image Folder": {
-    "Background Image Folder": "مجلد صور الخلفية"
-  },
-  "Background Images": {
-    "Background Images": "صور الخلفية"
-  },
-  "Background Opacity": {
-    "Background Opacity": "عتامة الخلفية"
-  },
-  "Background Presets": {
-    "Background Presets": "إعدادات الخلفية المسبقة"
   },
   "Background authentication sync failed. Trying terminal mode.": {
     "Background authentication sync failed. Trying terminal mode.": "فشل مزامنة مصادقة الخلفية. جاري محاولة وضع المحطة الطرفية."
@@ -1162,9 +1066,6 @@
   },
   "Bar Inset Padding": {
     "Bar Inset Padding": "حاشية الشريط"
-  },
-  "Bar Interactions": {
-    "Bar Interactions": "تفاعلات الشريط"
   },
   "Bar Length Padding": {
     "Bar Length Padding": "حشوة طول الشريط"
@@ -1256,9 +1157,6 @@
   "Blend between Surface High and the selected custom color": {
     "Blend between Surface High and the selected custom color": "مزج بين السطح العالي واللون المخصص المحدد"
   },
-  "Blink Recording Dot": {
-    "Blink Recording Dot": "وميض نقطة التسجيل"
-  },
   "Block %1 in Do Not Disturb": {
     "Block %1 in Do Not Disturb": "حظر %1 في وضع عدم الإزعاج"
   },
@@ -1288,9 +1186,6 @@
   },
   "Blur": {
     "Blur": "تخبيش"
-  },
-  "Blur Background Image": {
-    "Blur Background Image": "تمويه صورة الخلفية"
   },
   "Blur Wallpaper Layer": {
     "Blur Wallpaper Layer": "تخبيش طبقة الخلفية"
@@ -1397,9 +1292,6 @@
   "Browse": {
     "Browse": "تصفح"
   },
-  "Browse Files": {
-    "Browse Files": "تصفح الملفات"
-  },
   "Browse Plugins": {
     "Browse Plugins": "تصفح الملحقات"
   },
@@ -1414,6 +1306,12 @@
   },
   "Button Color": {
     "Button Color": "لون الزر"
+  },
+  "Button areas": {
+    "Button areas": ""
+  },
+  "Button areas determines click type by finger position; Clickfinger by finger count": {
+    "Button areas determines click type by finger position; Clickfinger by finger count": ""
   },
   "CPU": {
     "CPU": "المعالج"
@@ -1448,26 +1346,11 @@
   "CUPS not available": {
     "CUPS not available": "خدمة CUPS غير متاحة"
   },
-  "CUST": {
-    "CUST": "مخصص"
-  },
   "Calendar": {
     "Calendar": "التقويم"
   },
   "Calendar Backend": {
     "Calendar Backend": "الخلفية التقويمية"
-  },
-  "Callout": {
-    "Callout": "وسيلة إيضاح"
-  },
-  "Callout (Z) | Hold G for Loupe": {
-    "Callout (Z) | Hold G for Loupe": "وسيلة إيضاح (Z) | اضغط باستمرار على G للعدسة المكبرة"
-  },
-  "Callout Zoom": {
-    "Callout Zoom": "تكبير وسيلة الإيضاح"
-  },
-  "Callout, Background (Z, B)": {
-    "Callout, Background (Z, B)": "وسيلة إيضاح، خلفية (Z, B)"
   },
   "Calls / Headset": {
     "Calls / Headset": "المكالمات / سماعة الرأس"
@@ -1514,26 +1397,11 @@
   "Caps Lock is on": {
     "Caps Lock is on": "Caps Lock مفعل"
   },
-  "Capture": {
-    "Capture": "التقاط"
-  },
-  "Capture Actions": {
-    "Capture Actions": "إجراءات الالتقاط"
-  },
-  "Capture Options": {
-    "Capture Options": "خيارات الالتقاط"
-  },
-  "Capturing...": {
-    "Capturing...": "جاري الالتقاط..."
-  },
   "Cast Target": {
     "Cast Target": "هدف البث"
   },
   "Category": {
     "Category": "الفئة"
-  },
-  "Catppuccin": {
-    "Catppuccin": "Catppuccin"
   },
   "Cellular": {
     "Cellular": "خلوي"
@@ -1543,15 +1411,6 @@
   },
   "Cellular enabled": {
     "Cellular enabled": "تم تمكين الشبكة الخلوية"
-  },
-  "Center": {
-    "Center": "المنتصف"
-  },
-  "Center Left": {
-    "Center Left": "منتصف اليسار"
-  },
-  "Center Right": {
-    "Center Right": "منتصف اليمين"
   },
   "Center Section": {
     "Center Section": "القسم الأوسط"
@@ -1588,6 +1447,9 @@
   },
   "Charge limit applied successfully": {
     "Charge limit applied successfully": "تم تطبيق حد الشحن بنجاح"
+  },
+  "Charge limit not supported on this hardware": {
+    "Charge limit not supported on this hardware": ""
   },
   "Charging": {
     "Charging": "جاري الشحن"
@@ -1637,14 +1499,14 @@
   "Choose a shortcut key to cycle between keyboard layouts": {
     "Choose a shortcut key to cycle between keyboard layouts": "اختر مفتاح اختصار للتبديل بين تخطيطات لوحة المفاتيح"
   },
+  "Choose between battery gauge or connectivity icons": {
+    "Choose between battery gauge or connectivity icons": ""
+  },
   "Choose colors from palette": {
     "Choose colors from palette": "اختر ألواناً من اللوحة"
   },
   "Choose how the bar meets the screen edge": {
     "Choose how the bar meets the screen edge": "اختر كيفية ملاقاة الشريط لحافة الشاشة"
-  },
-  "Choose how the weather widget is displayed": {
-    "Choose how the weather widget is displayed": "اختر كيفية عرض أداة الطقس"
   },
   "Choose how this bar resolves shadow direction": {
     "Choose how this bar resolves shadow direction": "اختر كيفية تحديد هذا الشريط لاتجاه الظل"
@@ -1664,12 +1526,6 @@
   "Choose neutral or accent-colored widget text": {
     "Choose neutral or accent-colored widget text": "اختر نص عنصر واجهة المستخدم بلون محايد أو بلون التمييز"
   },
-  "Choose notifications shown after copy or save.": {
-    "Choose notifications shown after copy or save.": "اختر الإشعارات التي تظهر بعد النسخ أو الحفظ."
-  },
-  "Choose the editor shape for portrait or landscape screens.": {
-    "Choose the editor shape for portrait or landscape screens.": "اختر شكل المحرر للشاشات العمودية أو الأفقية."
-  },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "اختر الايقونة المعروضة على زر مُشغِّل التطبيقات في شريط دانك"
   },
@@ -1685,9 +1541,6 @@
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "اختر مكان ظهور مبيّنات الشاشة"
   },
-  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
-    "Choose whether the editor opens as a modal overlay or a movable floating window.": "اختر ما إذا كان المحرر يفتح كطبقة تراكب مشروطة أو نافذة عائمة قابلة للتحريك."
-  },
   "Choose whether to launch a desktop app or a command": {
     "Choose whether to launch a desktop app or a command": "اختر ما إذا كنت تريد تشغيل تطبيق سطح مكتب أو أمر"
   },
@@ -1697,14 +1550,8 @@
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "اختر الشاشات التي تعرض هذه الأداة"
   },
-  "Choose which monitor to capture during full screen recording.": {
-    "Choose which monitor to capture during full screen recording.": "اختر الشاشة المراد التقاطها أثناء تسجيل ملء الشاشة."
-  },
   "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
     "Choose which monitors show the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "اختر الشاشات التي تعرض واجهة شاشة القفل. ستعرض الشاشات الأخرى لوناً مصمتاً للحماية من احتراق شاشات OLED."
-  },
-  "Chroma Style": {
-    "Chroma Style": "نمط كروما"
   },
   "Cipher": {
     "Cipher": "شفرة التعمية"
@@ -1717,12 +1564,6 @@
   },
   "Class regex (e.g. ^firefox$)": {
     "Class regex (e.g. ^firefox$)": "تعبير نمطي للفئة (مثال: ^firefox$)"
-  },
-  "Classic (Tailwind)": {
-    "Classic (Tailwind)": "كلاسيكي (Tailwind)"
-  },
-  "Clean Text Eraser": {
-    "Clean Text Eraser": "ممساحة النصوص النظيفة"
   },
   "Clear": {
     "Clear": "مسح"
@@ -1751,9 +1592,6 @@
   "Clear at Startup": {
     "Clear at Startup": "المسح عند بدء التشغيل"
   },
-  "Clear saved region selection before each capture": {
-    "Clear saved region selection before each capture": "مسح تحديد المنطقة المحفوظة قبل كل التقاط"
-  },
   "Clears the badge on open but keeps notifications active": {
     "Clears the badge on open but keeps notifications active": "مسح الشارة عند الفتح مع إبقاء الإشعارات نشطة"
   },
@@ -1766,6 +1604,9 @@
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "اضغط استيراد لإضافة ملف .ovpn أو .conf"
   },
+  "Click Method": {
+    "Click Method": ""
+  },
   "Click Refresh to check status.": {
     "Click Refresh to check status.": "انقر على 'تحديث' للتحقق من الحالة."
   },
@@ -1774,6 +1615,9 @@
   },
   "Click an entry to paste directly instead of copying": {
     "Click an entry to paste directly instead of copying": "انقر على إدخال للصق مباشرة بدلاً من النسخ"
+  },
+  "Click any shortcut to edit Aqueous configuration": {
+    "Click any shortcut to edit Aqueous configuration": ""
   },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "انقر على أي اختصار للتعديل. سيتم حفظ التغييرات في %1"
@@ -1792,6 +1636,9 @@
   },
   "Click to select a custom theme JSON file": {
     "Click to select a custom theme JSON file": "انقر لتحديد ملف JSON لسمة مخصصة"
+  },
+  "Clickfinger": {
+    "Clickfinger": ""
   },
   "Clicking a popup runs its first action instead of expanding the body": {
     "Clicking a popup runs its first action instead of expanding the body": "النقر على النافذة المنبثقة يشغل إجراءها الأول بدلاً من توسيع الجسم"
@@ -1814,9 +1661,6 @@
   "Clipboard Saved": {
     "Clipboard Saved": "تم حفظ الحافظة"
   },
-  "Clipboard sent": {
-    "Clipboard sent": "تم إرسال الحافظة"
-  },
   "Clipboard works but nothing saved to disk": {
     "Clipboard works but nothing saved to disk": "الحافظة تعمل ولكن لا يتم حفظ أي شيء على القرص"
   },
@@ -1834,9 +1678,6 @@
   },
   "Close All Windows": {
     "Close All Windows": "إغلاق كل النوافذ"
-  },
-  "Close Annotator": {
-    "Close Annotator": "إغلاق أداة التعليقات التوضيحية"
   },
   "Close Niri Overview on Window Focus": {
     "Close Niri Overview on Window Focus": "إغلاق نظرة عامة لـ Niri عند التركيز على النافذة"
@@ -1871,23 +1712,11 @@
   "Color Override": {
     "Color Override": "تجاوز الالوان"
   },
-  "Color Palette": {
-    "Color Palette": "لوحة الألوان"
-  },
   "Color Picker": {
     "Color Picker": "اداة اختيار الالوان"
   },
-  "Color Picker (F for RGB | Eyedropper)": {
-    "Color Picker (F for RGB | Eyedropper)": "منتقي الألوان (F للـ RGB | القطارة)"
-  },
-  "Color Picker, Eraser (F, T)": {
-    "Color Picker, Eraser (F, T)": "منتقي الألوان، ممساحة (F, T)"
-  },
   "Color Temperature": {
     "Color Temperature": "درجة حرارة اللون"
-  },
-  "Color copied to clipboard: %1": {
-    "Color copied to clipboard: %1": "تم نسخ اللون إلى الحافظة: %1"
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "اللون المعروض على الشاشات التي لا تحتوي على قفل الشاشة"
@@ -1900,12 +1729,6 @@
   },
   "Color temperature for night mode": {
     "Color temperature for night mode": "درجة حرارة اللون للوضع الليلي"
-  },
-  "Color theme for syntax highlighting.": {
-    "Color theme for syntax highlighting.": "نسق الألوان لتمييز الصيغة."
-  },
-  "Color theme for syntax highlighting. %1 themes available.": {
-    "Color theme for syntax highlighting. %1 themes available.": "نسق الألوان لتمييز الصيغة. %1 سمة متاحة."
   },
   "Color theme from DMS registry": {
     "Color theme from DMS registry": "سمة لونية من سجل DMS"
@@ -1994,6 +1817,9 @@
   "Configuration activated": {
     "Configuration activated": "تم تفعيل الإعدادات"
   },
+  "Configuration changed. Refresh to continue.": {
+    "Configuration changed. Refresh to continue.": ""
+  },
   "Configuration will be preserved when this display reconnects": {
     "Configuration will be preserved when this display reconnects": "سيتم حفظ التكوين عند إعادة اتصال هذه الشاشة"
   },
@@ -2017,9 +1843,6 @@
   },
   "Configure one in Settings → Dock → Trash.": {
     "Configure one in Settings → Dock → Trash.": "قم بتهيئة واحدة في الإعدادات ← شريط المهام ← المهملات."
-  },
-  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
-    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": "قم بتهيئة ما يصل إلى 8 إعدادات مسبقة لأدوات الوصول السريع. انقر بزر الماوس الأيمن أثناء الالتقاط لفتح القائمة الشعاعية."
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "تكوين الشاشات التي تعرض \"%1\""
@@ -2047,9 +1870,6 @@
   },
   "Conflicts with: %1": {
     "Conflicts with: %1": "يتعارض مع: %1"
-  },
-  "Conic Gradient": {
-    "Conic Gradient": "تدرج مخروطي"
   },
   "Connect": {
     "Connect": "اتصال"
@@ -2093,26 +1913,17 @@
   "Connection failed": {
     "Connection failed": "فشل الاتصال"
   },
-  "Container Format": {
-    "Container Format": "تنسيق الحاوية"
-  },
   "Contains": {
     "Contains": "يحتوي على"
   },
   "Content": {
     "Content": "المحتوى"
   },
-  "Content copied": {
-    "Content copied": "تم نسخ المحتوى"
-  },
   "Contrast": {
     "Contrast": "التباين"
   },
   "Contributor": {
     "Contributor": "مساهم"
-  },
-  "Contributors": {
-    "Contributors": "المساهمون"
   },
   "Control Center": {
     "Control Center": "مركز التحكم"
@@ -2156,38 +1967,14 @@
   "Controls the outline of popouts, modals, and other shell surfaces": {
     "Controls the outline of popouts, modals, and other shell surfaces": "يتحكم في مخطط النوافذ المنبثقة، والنوافذ الحوارية، وأسطح الصدفة الأخرى"
   },
-  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
-    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "يتحكم في ميزانية بكسل المعاينة أثناء التحرير. قللها إذا واجهت بطئًا. لا يؤثر ذلك على جودة الصورة النهائية المحفوظة."
-  },
   "Convenience options for the login screen": {
     "Convenience options for the login screen": "خيارات الملاءمة لشاشة تسجيل الدخول"
   },
   "Convert to DMS": {
     "Convert to DMS": "تحويل إلى DMS"
   },
-  "Converting recording to GIF...": {
-    "Converting recording to GIF...": "جاري تحويل التسجيل إلى GIF..."
-  },
   "Cooldown": {
     "Cooldown": "فترة التهدئة"
-  },
-  "Copied": {
-    "Copied": "تم النسخ"
-  },
-  "Copied & saved": {
-    "Copied & saved": "تم النسخ والحفظ"
-  },
-  "Copied Anonymously": {
-    "Copied Anonymously": "تم النسخ بشكل مجهول"
-  },
-  "Copied GIF": {
-    "Copied GIF": "تم نسخ GIF"
-  },
-  "Copied MP4": {
-    "Copied MP4": "تم نسخ MP4"
-  },
-  "Copied WebP": {
-    "Copied WebP": "تم نسخ WebP"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "تم النسخ إلى الحافظة"
@@ -2195,26 +1982,8 @@
   "Copied!": {
     "Copied!": "تم النسخ!"
   },
-  "Copied:": {
-    "Copied:": "تم النسخ:"
-  },
   "Copy": {
     "Copy": "نسخ"
-  },
-  "Copy & Save": {
-    "Copy & Save": "نسخ وحفظ"
-  },
-  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
-    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": "نسخ (Ctrl+C) | نسخ مجهول (Ctrl+Shift+C)"
-  },
-  "Copy Color": {
-    "Copy Color": "نسخ اللون"
-  },
-  "Copy Content": {
-    "Copy Content": "نسخ المحتوى"
-  },
-  "Copy Current Palette": {
-    "Copy Current Palette": "نسخ اللوحة الحالية"
   },
   "Copy Full Command": {
     "Copy Full Command": "نسخ الأمر الكامل"
@@ -2231,14 +2000,8 @@
   "Copy Text": {
     "Copy Text": "نسخ النص"
   },
-  "Copy and customize this preset": {
-    "Copy and customize this preset": "نسخ وتخصيص هذا الإعداد المسبق"
-  },
   "Copy target (%1)": {
     "Copy target (%1)": "نسخ الهدف (%1)"
-  },
-  "Copy vector / Paste / Duplicate": {
-    "Copy vector / Paste / Duplicate": "نسخ المتجه / لصق / تكرار"
   },
   "Corner Radius": {
     "Corner Radius": "نصف قطر الزاوية"
@@ -2314,12 +2077,6 @@
   },
   "Critical Threshold": {
     "Critical Threshold": "عتبة المستوى الحرج"
-  },
-  "Crop / Resize": {
-    "Crop / Resize": "قص / تغيير الحجم"
-  },
-  "Crop / Resize Area": {
-    "Crop / Resize Area": "منطقة القص / تغيير الحجم"
   },
   "Ctrl + Shift": {
     "Ctrl + Shift": "Ctrl + Shift"
@@ -2414,9 +2171,6 @@
   "Custom Color": {
     "Custom Color": "لون مخصص"
   },
-  "Custom Colors": {
-    "Custom Colors": "ألوان مخصصة"
-  },
   "Custom Duration": {
     "Custom Duration": "مدة مخصصة"
   },
@@ -2452,9 +2206,6 @@
   },
   "Custom Suspend Command": {
     "Custom Suspend Command": "أمر التعليق المخصص"
-  },
-  "Custom Tool": {
-    "Custom Tool": "أداة مخصصة"
   },
   "Custom command and terminal params are split on whitespace; paths with spaces will break.": {
     "Custom command and terminal params are split on whitespace; paths with spaces will break.": "يتم فصل الأمر المخصص ومعلمات الجهاز على المسافات البيضاء؛ المسارات التي تحتوي على مسافات ستتسبب في خطأ."
@@ -2525,6 +2276,9 @@
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "إجراءات غلاف DMS (المشغل، الحافظة، غيرها)"
   },
+  "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
+    "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": ""
+  },
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "DMS_SOCKET غير متوفر"
   },
@@ -2555,9 +2309,6 @@
   "Dank Island instance": {
     "Dank Island instance": "مثيل Dank Island"
   },
-  "Dank Violet": {
-    "Dank Violet": "Dank Violet"
-  },
   "DankBar": {
     "DankBar": "DankBar"
   },
@@ -2572,9 +2323,6 @@
   },
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "أيقونات DankShell والنظام (تتطلب إعادة تشغيل)"
-  },
-  "Dark": {
-    "Dark": "داكن"
   },
   "Dark Mode": {
     "Dark Mode": "الوضع الداكن"
@@ -2594,17 +2342,11 @@
   "Darken Modal Background": {
     "Darken Modal Background": "عتيم خلفية النافذة المنبثقة"
   },
-  "Darken the image to improve foreground contrast": {
-    "Darken the image to improve foreground contrast": "تغميق الصورة لتحسين تباين المقدمة"
-  },
   "Darkest": {
     "Darkest": "الأكثر قتامة"
   },
   "Dashboard": {
     "Dashboard": "لوحة التحكم"
-  },
-  "Dashed Line": {
-    "Dashed Line": "خط متقطع"
   },
   "Date": {
     "Date": "التاريخ"
@@ -2651,38 +2393,8 @@
   "Default (Global)": {
     "Default (Global)": "الافتراضي (عام)"
   },
-  "Default Alignment": {
-    "Default Alignment": "المحاذاة الافتراضية"
-  },
   "Default Apps": {
     "Default Apps": "التطبيقات الافتراضية"
-  },
-  "Default Aspect Ratio": {
-    "Default Aspect Ratio": "نسبة العرض إلى الارتفاع الافتراضية"
-  },
-  "Default Background Image": {
-    "Default Background Image": "صورة الخلفية الافتراضية"
-  },
-  "Default Background Mode": {
-    "Default Background Mode": "وضع الخلفية الافتراضي"
-  },
-  "Default Bold Text": {
-    "Default Bold Text": "نص عريض افتراضي"
-  },
-  "Default Corner Radius": {
-    "Default Corner Radius": "نصف قطر الزاوية الافتراضي"
-  },
-  "Default Gradient Angle": {
-    "Default Gradient Angle": "زاوية التدرج الافتراضية"
-  },
-  "Default Gradient End": {
-    "Default Gradient End": "نهاية التدرج الافتراضية"
-  },
-  "Default Gradient Start": {
-    "Default Gradient Start": "بداية التدرج الافتراضية"
-  },
-  "Default Italic Text": {
-    "Default Italic Text": "نص مائل افتراضي"
   },
   "Default Launcher": {
     "Default Launcher": "المشغل الافتراضي"
@@ -2690,41 +2402,14 @@
   "Default Launcher Shortcut": {
     "Default Launcher Shortcut": "اختصار المشغل الافتراضي"
   },
-  "Default Microphone": {
-    "Default Microphone": "الميكروفون الافتراضي"
-  },
   "Default Mode": {
     "Default Mode": "الوضع الافتراضي"
   },
   "Default Opens": {
     "Default Opens": "يفتح افتراضيًا"
   },
-  "Default Output": {
-    "Default Output": "المخرج الافتراضي"
-  },
-  "Default Padding": {
-    "Default Padding": "الهامش الافتراضي"
-  },
-  "Default Shadow Strength": {
-    "Default Shadow Strength": "قوة الظل الافتراضية"
-  },
-  "Default Solid Color": {
-    "Default Solid Color": "لون صلب افتراضي"
-  },
   "Default Task List": {
     "Default Task List": "قائمة المهام الافتراضية"
-  },
-  "Default Text Background": {
-    "Default Text Background": "خلفية النص الافتراضية"
-  },
-  "Default Text Font Size": {
-    "Default Text Font Size": "حجم خط النص الافتراضي"
-  },
-  "Default Underline Text": {
-    "Default Underline Text": "نص مسطر افتراضي"
-  },
-  "Default Watermark": {
-    "Default Watermark": "العلامة المائية الافتراضية"
   },
   "Default Width (%)": {
     "Default Width (%)": "العرض الافتراضي (%)"
@@ -2819,9 +2504,6 @@
   "Desktop background images": {
     "Desktop background images": "صور خلفية سطح المكتب"
   },
-  "Detailed": {
-    "Detailed": "مفصل"
-  },
   "Details for \"%1": {
     "Details for \"%1\"": "تفاصيل لـ \"%1\""
   },
@@ -2843,9 +2525,6 @@
   "Device paired": {
     "Device paired": "تم اقتران الجهاز"
   },
-  "Device unpaired": {
-    "Device unpaired": "تم إلغاء اقتران الجهاز"
-  },
   "Diff": {
     "Diff": "اختلاف (Diff)"
   },
@@ -2854,18 +2533,6 @@
   },
   "Dim": {
     "Dim": "خافت"
-  },
-  "Dim Background Image": {
-    "Dim Background Image": "تعتيم صورة الخلفية"
-  },
-  "Dim Intensity": {
-    "Dim Intensity": "شدة التعتيم"
-  },
-  "Dimming Opacity": {
-    "Dimming Opacity": "عتامة التعتيم"
-  },
-  "Direct": {
-    "Direct": "مباشر"
   },
   "Direct path to a .xkb keymap file. Overrides layouts/variants above.": {
     "Direct path to a .xkb keymap file. Overrides layouts/variants above.": "المسار المباشر لملف خريطة المفاتيح .xkb. يتجاوز التخطيطات/المتغيرات أعلاه."
@@ -2918,11 +2585,8 @@
   "Discard": {
     "Discard": "تجاهل"
   },
-  "Discard & Close": {
-    "Discard & Close": "تجاهل وإغلاق"
-  },
-  "Discard & Close (Esc)": {
-    "Discard & Close (Esc)": "تجاهل وإغلاق (Esc)"
+  "Discard draft and reload": {
+    "Discard draft and reload": ""
   },
   "Discharging": {
     "Discharging": "قيد التفريغ"
@@ -2996,9 +2660,6 @@
   "Display currently focused application title": {
     "Display currently focused application title": "عرض عنوان التطبيق النشط حاليًا"
   },
-  "Display hourly weather predictions": {
-    "Display hourly weather predictions": "عرض توقعات الطقس بالساعة"
-  },
   "Display line numbers in editor": {
     "Display line numbers in editor": "عرض أرقام الأسطر في المحرر"
   },
@@ -3071,23 +2732,8 @@
   "Don't Save": {
     "Don't Save": "لا تحفظ"
   },
-  "Done": {
-    "Done": "تم"
-  },
-  "Done (Action based on settings)": {
-    "Done (Action based on settings)": "تم (إجراء يعتمد على الإعدادات)"
-  },
   "Door Open": {
     "Door Open": "الباب مفتوح"
-  },
-  "Dotted Line": {
-    "Dotted Line": "خط منقط"
-  },
-  "Dracula": {
-    "Dracula": "Dracula"
-  },
-  "Drag Image": {
-    "Drag Image": "سحب الصورة"
   },
   "Drag Lock": {
     "Drag Lock": "قفل السحب"
@@ -3113,9 +2759,6 @@
   "Draw an island-styled background behind satellite widgets": {
     "Draw an island-styled background behind satellite widgets": "رسم خلفية بنمط الجزيرة خلف عناصر واجهة المستخدم الثانوية"
   },
-  "Draw an outer ring using the stamp number color": {
-    "Draw an outer ring using the stamp number color": "ارسم حلقة خارجية باستخدام لون رقم الطابع"
-  },
   "Draw an outline and use the highest-contrast surface tone": {
     "Draw an outline and use the highest-contrast surface tone": "رسم مخطط تفصيلي واستخدام نغمة السطح ذات التباين العالي"
   },
@@ -3127,9 +2770,6 @@
   },
   "Drop here": {
     "Drop here": "أسقط هنا"
-  },
-  "Drop image onto bar icon to annotate it": {
-    "Drop image onto bar icon to annotate it": "أفلت الصورة على أيقونة الشريط للتعليق عليها"
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "هل تريد إسقاط التجاوز الخاص بك لـ %1 حتى يتم إعادة تطبيق إجراء DMS الافتراضي؟"
@@ -3173,9 +2813,6 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "ألوان ديناميكية، إعدادات مسبقة"
   },
-  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
-    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": "يقبل كل أمر إجراء: <b>edit</b> (فتح المحرر) أو <b>float</b> (نافذة تبقى في المقدمة دائماً)."
-  },
   "Edge": {
     "Edge": "الحافة"
   },
@@ -3200,17 +2837,8 @@
   "Edit Clipboard": {
     "Edit Clipboard": "تعديل الحافظة"
   },
-  "Edit Color Palette": {
-    "Edit Color Palette": "تعديل لوحة الألوان"
-  },
-  "Edit Image from Clipboard": {
-    "Edit Image from Clipboard": ""
-  },
   "Edit Rule": {
     "Edit Rule": "تحرير القاعدة"
-  },
-  "Edit Text Note": {
-    "Edit Text Note": "تعديل ملاحظة نصية"
   },
   "Edit Window Rule": {
     "Edit Window Rule": "تعديل قاعدة النافذة"
@@ -3224,41 +2852,8 @@
   "Editing changes on %1": {
     "Editing changes on %1": "تحرير التغييرات على %1"
   },
-  "Editor": {
-    "Editor": "المحرر"
-  },
-  "Editor Aspect Ratio": {
-    "Editor Aspect Ratio": "نسبة عرض المحرر"
-  },
-  "Editor Display Mode": {
-    "Editor Display Mode": "وضع عرض المحرر"
-  },
-  "Editor Display Screen": {
-    "Editor Display Screen": "شاشة عرض المحرر"
-  },
-  "Editor Preview Quality": {
-    "Editor Preview Quality": "جودة معاينة المحرر"
-  },
   "Education": {
     "Education": "تعليم"
-  },
-  "Ellipse": {
-    "Ellipse": "شكل بيضاوي"
-  },
-  "Ellipse / Circle": {
-    "Ellipse / Circle": "شكل بيضاوي / دائرة"
-  },
-  "Ellipse / Circle (Q)": {
-    "Ellipse / Circle (Q)": "شكل بيضاوي / دائرة (Q)"
-  },
-  "Ellipse Color": {
-    "Ellipse Color": "لون الشكل البيضاوي"
-  },
-  "Ellipse Thickness": {
-    "Ellipse Thickness": "سُمك الشكل البيضاوي"
-  },
-  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
-    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": "شكل بيضاوي، نص، بكسلة، حجب (Q, W, E, R)"
   },
   "Empty": {
     "Empty": "فارغ"
@@ -3320,9 +2915,6 @@
   "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": {
     "Enable a custom override below to set per-bar shadow intensity, opacity, and color.": "قم بتفعيل تجاوز مخصص أدناه لضبط شدة الظل، والشفافية، واللون لكل شريط."
   },
-  "Enable background automatically when opening the editor": {
-    "Enable background automatically when opening the editor": "تمكين الخلفية تلقائياً عند فتح المحرر"
-  },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "تفعيل طبقة التغبيش القابلة للاستهداف من مدير النوافذ (المجال: dms:blurwallpaper). يتطلب إعدادًا يدويًا لـ"
   },
@@ -3376,9 +2968,6 @@
   },
   "Enter PIN for ": {
     "Enter PIN for ": "أدخل رمز PIN لـ "
-  },
-  "Enter URI or text to share": {
-    "Enter URI or text to share": "أدخل الرابط أو النص للمشاركة"
   },
   "Enter a new name for session \"%1": {
     "Enter a new name for session \"%1\"": "أدخل اسمًا جديدًا للجلسة \"%1\""
@@ -3437,9 +3026,6 @@
   "Environment Variables": {
     "Environment Variables": "متغيرات البيئة"
   },
-  "Eraser": {
-    "Eraser": "الممحاة"
-  },
   "Error": {
     "Error": "خطأ"
   },
@@ -3454,9 +3040,6 @@
   },
   "Event title": {
     "Event title": "عنوان الحدث"
-  },
-  "Everforest": {
-    "Everforest": "Everforest"
   },
   "Every 15 minutes": {
     "Every 15 minutes": "كل 15 دقيقة"
@@ -3539,9 +3122,6 @@
   "Fade to monitor off": {
     "Fade to monitor off": "التلاشي عند إيقاف تشغيل الشاشة"
   },
-  "Failed to accept pairing": {
-    "Failed to accept pairing": "فشل قبول الاقتران"
-  },
   "Failed to activate configuration": {
     "Failed to activate configuration": "فشل تفعيل الإعدادات"
   },
@@ -3557,14 +3137,14 @@
   "Failed to apply profile": {
     "Failed to apply profile": "فشل تطبيق الملف الشخصي"
   },
-  "Failed to browse device": {
-    "Failed to browse device": "فشل تصفح الجهاز"
-  },
   "Failed to cancel all jobs": {
     "Failed to cancel all jobs": "تعذر إلغاء جميع المهام"
   },
   "Failed to cancel selected job": {
     "Failed to cancel selected job": "تعذر إلغاء المهمة المحددة"
+  },
+  "Failed to change display power": {
+    "Failed to change display power": ""
   },
   "Failed to check pin limit": {
     "Failed to check pin limit": "فشل التحقق من حد التثبيت"
@@ -3578,14 +3158,8 @@
   "Failed to connect to %1": {
     "Failed to connect to %1": "فشل الاتصال بـ %1"
   },
-  "Failed to convert recording to GIF.": {
-    "Failed to convert recording to GIF.": "فشل تحويل التسجيل إلى GIF."
-  },
   "Failed to copy entry": {
     "Failed to copy entry": "فشل في نسخ الإدخال"
-  },
-  "Failed to copy screenshot to clipboard.": {
-    "Failed to copy screenshot to clipboard.": "فشل نسخ لقطة الشاشة إلى الحافظة."
   },
   "Failed to create printer": {
     "Failed to create printer": "فشل إنشاء الطابعة"
@@ -3641,9 +3215,6 @@
   "Failed to generate QR code: %1": {
     "Failed to generate QR code: %1": "فشل في إنشاء رمز الاستجابة السريعة: %1"
   },
-  "Failed to generate blurred background image": {
-    "Failed to generate blurred background image": "فشل توليد صورة الخلفية الضبابية"
-  },
   "Failed to generate systemd override": {
     "Failed to generate systemd override": "فشل في إنشاء تجاوز systemd"
   },
@@ -3653,14 +3224,17 @@
   "Failed to import VPN": {
     "Failed to import VPN": "فشل استيراد الـ VPN"
   },
-  "Failed to launch SMS app": {
-    "Failed to launch SMS app": "فشل تشغيل تطبيق الرسائل القصيرة"
-  },
   "Failed to load VPN config": {
     "Failed to load VPN config": "فشل تحميل إعدادات الـ VPN"
   },
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "فشل في تحميل تكوين الحافظة."
+  },
+  "Failed to load clipboard entry": {
+    "Failed to load clipboard entry": ""
+  },
+  "Failed to load keybinds": {
+    "Failed to load keybinds": ""
   },
   "Failed to move to trash": {
     "Failed to move to trash": "فشل في النقل إلى المهملات"
@@ -3679,9 +3253,6 @@
   },
   "Failed to read theme file: %1": {
     "Failed to read theme file: %1": "فشل قراءة ملف السمة: %1"
-  },
-  "Failed to reject pairing": {
-    "Failed to reject pairing": "فشل في رفض الاقتران"
   },
   "Failed to reload plugin: %1": {
     "Failed to reload plugin: %1": "فشل إعادة تحميل الملحق: %1"
@@ -3703,9 +3274,6 @@
   },
   "Failed to resume printer": {
     "Failed to resume printer": "تعذر استئناف تشغيل الطابعة"
-  },
-  "Failed to ring device": {
-    "Failed to ring device": "فشل في رنين الجهاز"
   },
   "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": {
     "Failed to run 'dms-greeter status'. Ensure the dms-greeter package is installed.": "فشل تشغيل 'dms-greeter status'. تأكد من تثبيت حزمة dms-greeter."
@@ -3731,24 +3299,6 @@
   "Failed to save profile": {
     "Failed to save profile": "فشل حفظ الملف الشخصي"
   },
-  "Failed to save screenshot": {
-    "Failed to save screenshot": "فشل حفظ لقطة الشاشة"
-  },
-  "Failed to save screenshot file.": {
-    "Failed to save screenshot file.": "فشل حفظ ملف لقطة الشاشة."
-  },
-  "Failed to send SMS": {
-    "Failed to send SMS": "فشل إرسال الرسالة القصيرة"
-  },
-  "Failed to send clipboard": {
-    "Failed to send clipboard": "فشل في إرسال الحافظة"
-  },
-  "Failed to send file": {
-    "Failed to send file": "فشل إرسال الملف"
-  },
-  "Failed to send ping": {
-    "Failed to send ping": "فشل في إرسال اختبار الاتصال (Ping)"
-  },
   "Failed to set brightness": {
     "Failed to set brightness": "فشل في ضبط السطوع"
   },
@@ -3769,9 +3319,6 @@
   },
   "Failed to set profile image: %1": {
     "Failed to set profile image: %1": "فشل تعيين صورة الملف الشخصي: %1"
-  },
-  "Failed to share": {
-    "Failed to share": "فشل في المشاركة"
   },
   "Failed to start connection to %1": {
     "Failed to start connection to %1": "فشل بدء الاتصال بـ %1"
@@ -3824,9 +3371,6 @@
   "Features": {
     "Features": "الميزات"
   },
-  "Feels": {
-    "Feels": "درجة الحرارة المحسوسة"
-  },
   "Feels Like": {
     "Feels Like": "الحرارة المحسوسة"
   },
@@ -3850,9 +3394,6 @@
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "مدير الملفات المستخدم لفتح المهملات. اختر \"مخصص\" لإدخال أمرك الخاص."
-  },
-  "File received from %1": {
-    "File received from %1": "تم استلام الملف من %1"
   },
   "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": {
     "File search requires dsearch\nInstall from github.com/AvengeMedia/danksearch": "يتطلب البحث عن الملفات dsearch\nقم بالتثبيت من github.com/AvengeMedia/danksearch"
@@ -3926,12 +3467,6 @@
   "Flatpak": {
     "Flatpak": "Flatpak"
   },
-  "Flip Horiz": {
-    "Flip Horiz": "انعكاس أفقي"
-  },
-  "Flip Vert": {
-    "Flip Vert": "انعكاس عمودي"
-  },
   "Flipped": {
     "Flipped": "معكوس"
   },
@@ -3949,12 +3484,6 @@
   },
   "Float Anchor": {
     "Float Anchor": "مرساة عائمة"
-  },
-  "Float Image": {
-    "Float Image": "صورة عائمة"
-  },
-  "Float Window": {
-    "Float Window": "نافذة عائمة"
   },
   "Float X": {
     "Float X": "إحداثي X العائم"
@@ -4010,9 +3539,6 @@
   "Focused Monitor Only": {
     "Focused Monitor Only": "الشاشة المركّز عليها فقط"
   },
-  "Focused Screen": {
-    "Focused Screen": "الشاشة المركزة"
-  },
   "Focused Window": {
     "Focused Window": "النافذة النشطة"
   },
@@ -4055,9 +3581,6 @@
   "Font Weight": {
     "Font Weight": "سمك الخط"
   },
-  "Font family used for number stamp labels": {
-    "Font family used for number stamp labels": "عائلة الخط المستخدمة لملصقات أرقام الطوابع"
-  },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": "الخط المستخدم للساعة والتاريخ على شاشة القفل"
   },
@@ -4070,23 +3593,23 @@
   "For 15 minutes": {
     "For 15 minutes": "لمدة 15 دقيقة"
   },
+  "For 2 hours": {
+    "For 2 hours": ""
+  },
   "For 3 hours": {
     "For 3 hours": "لمدة 3 ساعات"
   },
   "For 30 minutes": {
     "For 30 minutes": "لمدة 30 دقيقة"
   },
+  "For 4 hours": {
+    "For 4 hours": ""
+  },
   "For 8 hours": {
     "For 8 hours": "لمدة 8 ساعات"
   },
   "For editing plain text files": {
     "For editing plain text files": "لتحرير ملفات النصوص العادية"
-  },
-  "Force Copy & Save": {
-    "Force Copy & Save": "فرض النسخ والحفظ"
-  },
-  "Force Copy to Clipboard": {
-    "Force Copy to Clipboard": "فرض النسخ إلى الحافظة"
   },
   "Force HDR": {
     "Force HDR": "فرض HDR"
@@ -4100,20 +3623,11 @@
   "Force RGBX": {
     "Force RGBX": "فرض RGBX"
   },
-  "Force Save to File": {
-    "Force Save to File": "فرض الحفظ إلى ملف"
-  },
   "Force Wide Color": {
     "Force Wide Color": "فرض الألوان الواسعة"
   },
   "Force terminal applications to always use dark color schemes": {
     "Force terminal applications to always use dark color schemes": "إجبار تطبيقات الطرفية على استخدام المظاهر الداكنة دائمًا"
-  },
-  "Forecast": {
-    "Forecast": "توقعات الطقس"
-  },
-  "Forecast Days": {
-    "Forecast Days": "أيام التوقعات"
   },
   "Forecast Not Available": {
     "Forecast Not Available": "التوقعات غير متاحة"
@@ -4151,15 +3665,6 @@
   "Format the date on the login screen": {
     "Format the date on the login screen": "نسق التاريخ على شاشة تسجيل الدخول"
   },
-  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
-    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "رموز التنسيق: %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)، {zzz} (جزء من الثانية)"
-  },
-  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "رموز التنسيق: {user} (اسم المستخدم)، \\n (سطر جديد)، %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)"
-  },
-  "Forward 10s": {
-    "Forward 10s": "تقديم 10 ثوانٍ"
-  },
   "Frame": {
     "Frame": "إطار"
   },
@@ -4175,32 +3680,14 @@
   "Frame Xray": {
     "Frame Xray": "Xray للإطار"
   },
-  "Framerate": {
-    "Framerate": "معدل الإطارات"
-  },
-  "Free": {
-    "Free": "حر"
-  },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "تحرير ذاكرة الوصول العشوائي للفيديو (VRAM)/الذاكرة عند إغلاق المشغل. قد يسبب تأخيرًا بسيطًا عند إعادة الفتح."
-  },
-  "Freehand Pen": {
-    "Freehand Pen": "قلم رسم حر"
-  },
-  "Freehand Pen (1)": {
-    "Freehand Pen (1)": "قلم رسم حر (1)"
   },
   "Freezing Drizzle": {
     "Freezing Drizzle": "رذاذ متجمد"
   },
   "Frequency": {
     "Frequency": "التردد"
-  },
-  "From Clipboard": {
-    "From Clipboard": "من الحافظة"
-  },
-  "From File": {
-    "From File": "من ملف"
   },
   "Fruit Salad": {
     "Fruit Salad": "سلطة فواكه"
@@ -4216,12 +3703,6 @@
   },
   "Full Day & Month": {
     "Full Day & Month": "اليوم والشهر بالكامل"
-  },
-  "Full Screen": {
-    "Full Screen": "ملء الشاشة"
-  },
-  "Full Screen Target": {
-    "Full Screen Target": "هدف ملء الشاشة"
   },
   "Full Size": {
     "Full Size": "الحجم الكامل"
@@ -4240,9 +3721,6 @@
   },
   "Fully Charged": {
     "Fully Charged": "مشحون بالكامل"
-  },
-  "GIF Framerate": {
-    "GIF Framerate": "معدل إطارات GIF"
   },
   "GPU": {
     "GPU": "معالج الرسوميات"
@@ -4279,9 +3757,6 @@
   },
   "General": {
     "General": "عام"
-  },
-  "General Shortcuts": {
-    "General Shortcuts": "اختصارات عامة"
   },
   "Generate Override": {
     "Generate Override": "إنشاء تجاوز"
@@ -4400,9 +3875,6 @@
   "Groups": {
     "Groups": "المجموعات"
   },
-  "Gruvbox Material": {
-    "Gruvbox Material": "Gruvbox Material"
-  },
   "H": {
     "H": "H"
   },
@@ -4484,12 +3956,6 @@
   "Hide App": {
     "Hide App": "إخفاء التطبيق"
   },
-  "Hide Control Center": {
-    "Hide Control Center": "إخفاء مركز التحكم"
-  },
-  "Hide Control Center by Default": {
-    "Hide Control Center by Default": "إخفاء مركز التحكم افتراضياً"
-  },
   "Hide Delay": {
     "Hide Delay": "تأخير الإخفاء"
   },
@@ -4555,18 +4021,6 @@
   },
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "إبراز التطبيق النشط داخل شارات سطح المكتب"
-  },
-  "Highlighter": {
-    "Highlighter": "أداة التمييز"
-  },
-  "Highlighter (S)": {
-    "Highlighter (S)": "أداة التمييز (S)"
-  },
-  "Highlighter Color": {
-    "Highlighter Color": "لون أداة التمييز"
-  },
-  "Highlighter Thickness": {
-    "Highlighter Thickness": "سُمك أداة التمييز"
   },
   "History": {
     "History": "السجل"
@@ -4634,14 +4088,8 @@
   "Hourly": {
     "Hourly": "كل ساعة"
   },
-  "Hourly Forecast Count": {
-    "Hourly Forecast Count": "عدد توقعات الطقس بالساعة"
-  },
   "Hover Popouts": {
     "Hover Popouts": "النوافذ المنبثقة عند التمرير"
-  },
-  "Hover Trigger Delay": {
-    "Hover Trigger Delay": "تأخير تفعيل التحويم"
   },
   "How layout changes are remembered across apps": {
     "How layout changes are remembered across apps": "كيف يتم تذكر تغييرات التخطيط عبر التطبيقات"
@@ -4699,9 +4147,6 @@
   },
   "IP sharing setup failed. Check that dnsmasq is installed.": {
     "IP sharing setup failed. Check that dnsmasq is installed.": "فشل إعداد مشاركة بروتوكول الإنترنت (IP). تأكد من تثبيت dnsmasq."
-  },
-  "IPC Commands": {
-    "IPC Commands": "أوامر IPC"
   },
   "ISO Date": {
     "ISO Date": "تاريخ ISO"
@@ -4781,26 +4226,11 @@
   "Image": {
     "Image": "صورة"
   },
-  "Image + Text": {
-    "Image + Text": "صورة + نص"
-  },
-  "Image Background": {
-    "Image Background": "خلفية الصورة"
-  },
-  "Image Error": {
-    "Image Error": "خطأ في الصورة"
-  },
-  "Image Size": {
-    "Image Size": "حجم الصورة"
-  },
   "Image Viewer": {
     "Image Viewer": "عارض الصور"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "تم نسخ الصورة إلى الحافظة"
-  },
-  "Image selected automatically when using Image Background mode": {
-    "Image selected automatically when using Image Background mode": "يتم اختيار الصورة تلقائياً عند استخدام وضع خلفية الصورة"
   },
   "Import": {
     "Import": "استيراد"
@@ -4813,9 +4243,6 @@
   },
   "Include AUR updates": {
     "Include AUR updates": "تضمين تحديثات AUR"
-  },
-  "Include Cursor": {
-    "Include Cursor": "تضمين المؤشر"
   },
   "Include Files in All Tab": {
     "Include Files in All Tab": "تضمين الملفات في علامة التبويب الكل"
@@ -4871,14 +4298,8 @@
   "Inhibitable": {
     "Inhibitable": "قابل للتثبيط"
   },
-  "Initial Width": {
-    "Initial Width": "العرض الأولي"
-  },
   "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": {
     "Initial position for floating windows. Set both X and Y; anchor controls which corner/edge they're relative to.": "الموضع الأولي للنوافذ العائمة. اضبط كلاً من X و Y؛ تتحكم المرساة في الزاوية/الحافة التي ترتبط بها."
-  },
-  "Initial state for the Control Center toggle.": {
-    "Initial state for the Control Center toggle.": "الحالة الأولية لتبديل مركز التحكم."
   },
   "Initialised": {
     "Initialised": "تم التهيئة"
@@ -4895,14 +4316,8 @@
   "Input Devices": {
     "Input Devices": "أجهزة الإدخال"
   },
-  "Input Mode": {
-    "Input Mode": "وضع الإدخال"
-  },
   "Input Volume Slider": {
     "Input Volume Slider": "شريط تمرير مستوى صوت المدخلات"
-  },
-  "Insert Image": {
-    "Insert Image": "إدراج صورة"
   },
   "Insert your security key...": {
     "Insert your security key...": "أدخل مفتاح الأمان الخاص بك..."
@@ -4964,12 +4379,6 @@
   "Intensity": {
     "Intensity": "الشدة"
   },
-  "Interaction / Result": {
-    "Interaction / Result": "التفاعل / النتيجة"
-  },
-  "Interactive Region": {
-    "Interactive Region": "المنطقة التفاعلية"
-  },
   "Interface:": {
     "Interface:": "الواجهة:"
   },
@@ -5018,9 +4427,6 @@
   "Isolate Displays": {
     "Isolate Displays": "عزل الشاشات"
   },
-  "JPEG Quality": {
-    "JPEG Quality": "جودة JPEG"
-  },
   "Jobs": {
     "Jobs": "المهام"
   },
@@ -5032,9 +4438,6 @@
   },
   "Jump to page (1 - %1)": {
     "Jump to page (1 - %1)": "انتقل إلى الصفحة (1 - %1)"
-  },
-  "Kanagawa": {
-    "Kanagawa": "Kanagawa"
   },
   "Keep Awake": {
     "Keep Awake": "منع الخمول"
@@ -5081,17 +4484,11 @@
   "Key combination": {
     "Key combination": "مجموعة المفاتيح"
   },
-  "Keybind Sources": {
-    "Keybind Sources": "مصادر اختصارات المفاتيح"
+  "Keybindings changed. Refresh and review your edit before saving.": {
+    "Keybindings changed. Refresh and review your edit before saving.": ""
   },
   "Keybinds": {
     "Keybinds": "اختصارات لوحة المفاتيح"
-  },
-  "Keybinds Search Settings": {
-    "Keybinds Search Settings": "إعدادات بحث اختصارات المفاتيح"
-  },
-  "Keybinds shown alongside regular search results": {
-    "Keybinds shown alongside regular search results": "اختصارات المفاتيح تظهر بجانب نتائج البحث العادية"
   },
   "Keyboard": {
     "Keyboard": "لوحة المفاتيح"
@@ -5144,23 +4541,11 @@
   "LabWC Website": {
     "LabWC Website": "موقع LabWC"
   },
-  "Landscape": {
-    "Landscape": "أفقي (عرضي)"
-  },
   "Large": {
     "Large": "كبير"
   },
   "Largest": {
     "Largest": "الأكبر"
-  },
-  "Last Reg": {
-    "Last Reg": "آخر منطقة"
-  },
-  "Last Region": {
-    "Last Region": "آخر منطقة"
-  },
-  "Last Selected Region": {
-    "Last Selected Region": "آخر منطقة محددة"
   },
   "Last hour": {
     "Last hour": "الساعة الماضية"
@@ -5231,9 +4616,6 @@
   "Left Center": {
     "Left Center": "يسار المنتصف"
   },
-  "Left Click": {
-    "Left Click": "النقر الأيسر"
-  },
   "Left Section": {
     "Left Section": "القسم الأيسر"
   },
@@ -5282,29 +4664,17 @@
   "Line": {
     "Line": "خط"
   },
-  "Line Color": {
-    "Line Color": "لون الخط"
-  },
-  "Line Thickness": {
-    "Line Thickness": "سُمك الخط"
-  },
   "Line: %1": {
     "Line: %1": "السطر: %1"
   },
   "Linear": {
     "Linear": "خطي"
   },
-  "Linear Gradient": {
-    "Linear Gradient": "تدرج خطي"
-  },
   "Lines: %1": {
     "Lines: %1": "الأسطر: %1"
   },
   "List": {
     "List": "قائمة"
-  },
-  "Live Preview": {
-    "Live Preview": "معاينة مباشرة"
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "لوحة ألوان حيوية مع عناصر بارزة مشبعة."
@@ -5315,17 +4685,14 @@
   "Loading codecs...": {
     "Loading codecs...": "جاري تحميل برامج الترميز..."
   },
-  "Loading contributors...": {
-    "Loading contributors...": "جاري تحميل المساهمين..."
+  "Loading full text, please wait...": {
+    "Loading full text, please wait...": ""
   },
   "Loading keybinds...": {
     "Loading keybinds...": "تحميل اختصارات لوحة المفاتيح..."
   },
   "Loading ports...": {
     "Loading ports...": "جاري تحميل المنافذ..."
-  },
-  "Loading trending...": {
-    "Loading trending...": "جارٍ تحميل الرائج..."
   },
   "Loading...": {
     "Loading...": "جاري التحميل..."
@@ -5411,17 +4778,11 @@
   "MTU": {
     "MTU": "MTU"
   },
-  "Magnifier Loupe": {
-    "Magnifier Loupe": "عدسة مكبرة"
-  },
   "Mail": {
     "Mail": "البريد"
   },
   "Make admin": {
     "Make admin": "اجعل مسؤولًا"
-  },
-  "Make sure KDE Connect or Valent is running on your other devices": {
-    "Make sure KDE Connect or Valent is running on your other devices": "تأكد من تشغيل KDE Connect أو Valent على أجهزتك الأخرى"
   },
   "Make the bar background fully transparent": {
     "Make the bar background fully transparent": "جعل خلفية الشريط شفافة تمامًا"
@@ -5546,9 +4907,6 @@
   "Max H": {
     "Max H": "أقصى ارتفاع"
   },
-  "Max Height (0 = no limit)": {
-    "Max Height (0 = no limit)": "الحد الأقصى للارتفاع (0 = بلا حد)"
-  },
   "Max Pinned Apps": {
     "Max Pinned Apps": "أقصى التطبيقات المثبتة"
   },
@@ -5657,29 +5015,17 @@
   "Memory usage indicator": {
     "Memory usage indicator": "مؤشر استهلاك الذاكرة"
   },
-  "Menu Item Right Click": {
-    "Menu Item Right Click": "النقر بزر الفأرة الأيمن على عنصر القائمة"
-  },
   "Merge indexed file results into the All tab (requires dsearch).": {
     "Merge indexed file results into the All tab (requires dsearch).": "دمج نتائج الملفات المفهرسة في علامة التبويب الكل (يتطلب dsearch)."
   },
   "Merge indexed folder results into the All tab (requires dsearch).": {
     "Merge indexed folder results into the All tab (requires dsearch).": "دمج نتائج المجلدات المفهرسة في علامة التبويب الكل (يتطلب dsearch)."
   },
-  "Merging audio tracks...": {
-    "Merging audio tracks...": "جاري دمج المسارات الصوتية..."
-  },
-  "Message": {
-    "Message": "رسالة"
-  },
   "Message Content": {
     "Message Content": "محتوى الرسالة"
   },
   "Microphone": {
     "Microphone": "الميكروفون"
-  },
-  "Microphone Device": {
-    "Microphone Device": "جهاز الميكروفون"
   },
   "Microphone Mute": {
     "Microphone Mute": "كتم الميكروفون"
@@ -5692,12 +5038,6 @@
   },
   "Microphone volume control": {
     "Microphone volume control": "التحكم في مستوى صوت الميكروفون"
-  },
-  "Middle Click": {
-    "Middle Click": "النقر بزر الفأرة الأوسط"
-  },
-  "Middle Click Action": {
-    "Middle Click Action": "إجراء النقر بزر الفأرة الأوسط"
   },
   "Middle Click Emulation": {
     "Middle Click Emulation": "محاكاة النقر الأوسط"
@@ -5717,9 +5057,6 @@
   "Minimize": {
     "Minimize": "تصغير"
   },
-  "Minimize Delay": {
-    "Minimize Delay": "تقليل التأخير"
-  },
   "Minute": {
     "Minute": "الدقيقة"
   },
@@ -5728,9 +5065,6 @@
   },
   "Missing Environment Variables": {
     "Missing Environment Variables": "متغيرات البيئة مفقودة"
-  },
-  "Modal": {
-    "Modal": "مشروط (Modal)"
   },
   "Modal Background": {
     "Modal Background": "خلفية مشروطة"
@@ -5776,9 +5110,6 @@
   },
   "Month Date": {
     "Month Date": "الشهر والتاريخ"
-  },
-  "More Tools": {
-    "More Tools": "المزيد من الأدوات"
   },
   "Morning": {
     "Morning": "الصباح"
@@ -5833,6 +5164,9 @@
   },
   "Multimedia": {
     "Multimedia": "الوسائط المتعددة"
+  },
+  "Multiple bindings use the original shortcut. Resolve the duplicate bindings first.": {
+    "Multiple bindings use the original shortcut. Resolve the duplicate bindings first.": ""
   },
   "Multiplexer Type": {
     "Multiplexer Type": "نوع المضاعف"
@@ -5903,9 +5237,6 @@
   "Network Speed Monitor": {
     "Network Speed Monitor": "مراقب سرعة الشبكة"
   },
-  "Network Type": {
-    "Network Type": "نوع الشبكة"
-  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "عرض سرعة التحميل والإرسال للشبكة"
   },
@@ -5969,9 +5300,6 @@
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "فشل الوضع الليلي: التحكم في حرارة الوان DMS غير متاح"
   },
-  "Niri Binding Example": {
-    "Niri Binding Example": "مثال ربط Niri"
-  },
   "Niri Integration": {
     "Niri Integration": "تكامل Niri"
   },
@@ -6014,9 +5342,6 @@
   "No History": {
     "No History": "بدون سجل"
   },
-  "No Image Specified": {
-    "No Image Specified": "لم يتم تحديد صورة"
-  },
   "No Media": {
     "No Media": "لا توجد وسائط"
   },
@@ -6037,9 +5362,6 @@
   },
   "No Weather": {
     "No Weather": "لا يوجد طقس"
-  },
-  "No Weather Data": {
-    "No Weather Data": "لا توجد بيانات طقس"
   },
   "No Weather Data Available": {
     "No Weather Data Available": "لا تتوفر بيانات عن الطقس"
@@ -6140,9 +5462,6 @@
   "No human user accounts found.": {
     "No human user accounts found.": "لم يتم العثور على حسابات مستخدمين بشرية."
   },
-  "No images found": {
-    "No images found": "لم يتم العثور على صور"
-  },
   "No info items": {
     "No info items": "لا توجد عناصر معلومات"
   },
@@ -6184,9 +5503,6 @@
   },
   "No other active sessions on this seat": {
     "No other active sessions on this seat": "لا توجد جلسات نشطة أخرى في هذا المقعد"
-  },
-  "No output available": {
-    "No output available": "لا يوجد مخرج متاح"
   },
   "No output device": {
     "No output device": "لا يوجد جهاز إخراج"
@@ -6236,9 +5552,6 @@
   "No saved clipboard entries": {
     "No saved clipboard entries": "لا توجد إدخالات حافظة محفوظة"
   },
-  "No saved images yet": {
-    "No saved images yet": "لا توجد صور محفوظة بعد"
-  },
   "No screenshot provided": {
     "No screenshot provided": "لم يتم توفير لقطة شاشة"
   },
@@ -6250,9 +5563,6 @@
   },
   "No status output.": {
     "No status output.": "لا يوجد مخرج للحالة."
-  },
-  "No supported images found": {
-    "No supported images found": "لم يتم العثور على صور مدعومة"
   },
   "No supported package manager found.": {
     "No supported package manager found.": "لم يتم العثور على مدير برنامج مدعوم."
@@ -6302,20 +5612,17 @@
   "No writable calendar available": {
     "No writable calendar available": "لا يوجد تقويم قابل للكتابة متاح"
   },
+  "No writable charge threshold file was found under /sys/class/power_supply.": {
+    "No writable charge threshold file was found under /sys/class/power_supply.": ""
+  },
   "Noise": {
     "Noise": "ضجيج"
   },
   "None": {
     "None": "لا شيء"
   },
-  "None / Disabled": {
-    "None / Disabled": "لا شيء / معطل"
-  },
   "None active": {
     "None active": "لا شيء نشط"
-  },
-  "Nord": {
-    "Nord": "نورد (Nord)"
   },
   "Normal": {
     "Normal": "عادي"
@@ -6350,14 +5657,11 @@
   "Not detected": {
     "Not detected": "لم يتم الكشف عنه"
   },
-  "Not paired": {
-    "Not paired": "غير مقترن"
-  },
   "Not set": {
     "Not set": "غير محدد"
   },
-  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
-    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": "ملاحظة: يؤدي بدء وضع الأداة إلى تجاوز إعدادات سمك الأداة واللون الافتراضية إذا كانت الأداة الأولية تطابقها."
+  "Not synchronized": {
+    "Not synchronized": ""
   },
   "Notepad": {
     "Notepad": "الملاحظات"
@@ -6407,23 +5711,11 @@
   "Now playing and media controls": {
     "Now playing and media controls": "قيد التشغيل الآن وعناصر التحكم في الوسائط"
   },
-  "Number Stamp": {
-    "Number Stamp": "ختم رقمي"
-  },
   "Numeric (D/M)": {
     "Numeric (D/M)": "رقمي (ي/ش)"
   },
   "Numeric (M/D)": {
     "Numeric (M/D)": "رقمي (ش/ي)"
-  },
-  "OCR": {
-    "OCR": "التعرف الضوئي على الحروف (OCR)"
-  },
-  "OCR Result": {
-    "OCR Result": "نتيجة التعرف الضوئي على الحروف"
-  },
-  "OCR Text Recognition": {
-    "OCR Text Recognition": "التعرف على نصوص OCR"
   },
   "OK": {
     "OK": "موافق"
@@ -6442,9 +5734,6 @@
   },
   "Office": {
     "Office": "المكتب"
-  },
-  "Offline": {
-    "Offline": "غير متصل"
   },
   "Offline Report": {
     "Offline Report": "تقرير عدم الاتصال"
@@ -6506,9 +5795,6 @@
   "Open": {
     "Open": "فتح"
   },
-  "Open App": {
-    "Open App": "فتح التطبيق"
-  },
   "Open DMS windows floating instead of tiled": {
     "Open DMS windows floating instead of tiled": "فتح نوافذ DMS عائمة بدلاً من متجانبة"
   },
@@ -6517,9 +5803,6 @@
   },
   "Open Dir": {
     "Open Dir": "فتح المجلد"
-  },
-  "Open Folder": {
-    "Open Folder": "فتح المجلد"
   },
   "Open Frame": {
     "Open Frame": "فتح الإطار"
@@ -6532,12 +5815,6 @@
   },
   "Open Notepad File": {
     "Open Notepad File": "فتح ملف ملاحظات"
-  },
-  "Open Quick Capture menu (Popout)": {
-    "Open Quick Capture menu (Popout)": "فتح قائمة الالتقاط السريع (منبثقة)"
-  },
-  "Open Specific Image Path": {
-    "Open Specific Image Path": ""
   },
   "Open Trash": {
     "Open Trash": "فتح المهملات"
@@ -6581,12 +5858,6 @@
   "Open with...": {
     "Open with...": "فتح باستخدام..."
   },
-  "Opening SMS app": {
-    "Opening SMS app": "فتح تطبيق الرسائل القصيرة"
-  },
-  "Opening file browser": {
-    "Opening file browser": "فتح متصفح الملفات"
-  },
   "Opening terminal: ": {
     "Opening terminal: ": "فتح الطرفيّة: "
   },
@@ -6620,6 +5891,9 @@
   "Original: %1": {
     "Original: %1": "الأصلي: %1"
   },
+  "Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4": {
+    "Original: %1\nCurrent: %2\nProposed: %3\nCurrent destination: %4": ""
+  },
   "Other": {
     "Other": "أخرى"
   },
@@ -6628,9 +5902,6 @@
   },
   "Outline": {
     "Outline": "مخطط تفصيلي"
-  },
-  "Outline Variant": {
-    "Outline Variant": "تباين المخطط التفصيلي"
   },
   "Outline around shell surfaces": {
     "Outline around shell surfaces": "تحديد محيط أسطح الغلاف"
@@ -6647,20 +5918,11 @@
   "Output Devices": {
     "Output Devices": "أجهزة الإخراج"
   },
-  "Output Format": {
-    "Output Format": "تنسيق الإخراج"
-  },
   "Output Tray Missing": {
     "Output Tray Missing": "صينية الإخراج مفقودة"
   },
-  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
-    "Output format applies only to disk saves. Clipboard copies are always PNG.": "ينطبق تنسيق الإخراج على الحفظ على القرص فقط. نسخ الحافظة تكون دائماً بتنسيق PNG."
-  },
   "Output switched": {
     "Output switched": "تم تبديل المخرج"
-  },
-  "Outputs": {
-    "Outputs": "المخرجات"
   },
   "Overcast": {
     "Overcast": "غائم كلياً"
@@ -6670,9 +5932,6 @@
   },
   "Overlay": {
     "Overlay": "تراكب (Overlay)"
-  },
-  "Overlay Opacity": {
-    "Overlay Opacity": "عتامة التراكب"
   },
   "Overridden by config": {
     "Overridden by config": "تم التجاوز بواسطة الإعدادات المحددة"
@@ -6719,9 +5978,6 @@
   "PAM already provides security-key auth. Enable this to show it at login.": {
     "PAM already provides security-key auth. Enable this to show it at login.": "نظام PAM يوفر بالفعل المصادقة بمفتاح الأمان. فعل هذا لإظهاره عند تسجيل الدخول."
   },
-  "PAUSED": {
-    "PAUSED": "مُتوقف مؤقتاً"
-  },
   "PDF Reader": {
     "PDF Reader": "قارئ PDF"
   },
@@ -6730,9 +5986,6 @@
   },
   "PIN": {
     "PIN": "PIN"
-  },
-  "PRIMARY": {
-    "PRIMARY": "أساسي"
   },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": "اسم التطبيق (مثال: docker)"
@@ -6758,29 +6011,20 @@
   "Pairing failed": {
     "Pairing failed": "فشل الاقتران"
   },
-  "Pairing request from %1": {
-    "Pairing request from %1": "طلب اقتران من %1"
-  },
-  "Pairing request sent": {
-    "Pairing request sent": "تم إرسال طلب الاقتران"
-  },
-  "Pairing requested": {
-    "Pairing requested": "تم طلب الاقتران"
-  },
   "Pairing...": {
     "Pairing...": "جاري الاقتران..."
   },
   "Palette": {
     "Palette": "لوحة الألوان"
   },
-  "Palette Preset": {
-    "Palette Preset": "إعدادات اللوحة المسبقة"
-  },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
     "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": "تنزلق اللوحات من مسافة أكبر بحجمها الكامل، بدون تغيير في الحجم، حركة نقية ونظيفة."
   },
   "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": {
     "Panels scale up from small as they slide in, a dramatic pop-forward depth effect.": "تتوسع اللوحات من حجم صغير أثناء انزلاقها للداخل، تأثير عمق درامي يبرز للأمام."
+  },
+  "Partially synchronized": {
+    "Partially synchronized": ""
   },
   "Partly Cloudy": {
     "Partly Cloudy": "غائم جزئياً"
@@ -6827,23 +6071,8 @@
   "Pause": {
     "Pause": "إيقاف مؤقت"
   },
-  "Pause / Resume": {
-    "Pause / Resume": ""
-  },
   "Paused": {
     "Paused": "متوقف"
-  },
-  "Pen Auto-Close": {
-    "Pen Auto-Close": "إغلاق القلم تلقائياً"
-  },
-  "Pen Color": {
-    "Pen Color": "لون القلم"
-  },
-  "Pen Thickness": {
-    "Pen Thickness": "سُمك القلم"
-  },
-  "Pen, Line, Arrow, Rect": {
-    "Pen, Line, Arrow, Rect": "قلم، خط، سهم، مستطيل"
   },
   "Pending": {
     "Pending": "قيد الانتظار"
@@ -6881,26 +6110,17 @@
   "Personalization": {
     "Personalization": "التخصيص"
   },
-  "Phone Connect Not Available": {
-    "Phone Connect Not Available": "اتصال الهاتف غير متاح"
-  },
-  "Phone number": {
-    "Phone number": "رقم الهاتف"
-  },
-  "Pick Color": {
-    "Pick Color": "اختيار اللون"
-  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "اختر مدير ملفات مختلف في الإعدادات ← شريط المهام ← المهملات."
   },
   "Pick a different random video each time from the same folder": {
     "Pick a different random video each time from the same folder": "اختر فيديو عشوائياً مختلفاً في كل مرة من نفس المجلد"
   },
-  "Pick a palette preset or customize individual color slots.": {
-    "Pick a palette preset or customize individual color slots.": "اختر إعداداً مسبقاً للوحة أو قم بتخصيص فتحات الألوان الفردية."
-  },
   "Pick how long to pause notifications": {
     "Pick how long to pause notifications": "اختر مدة إيقاف الإشعارات مؤقتاً"
+  },
+  "Pick how long to stay awake": {
+    "Pick how long to stay awake": ""
   },
   "Pin": {
     "Pin": "تثبيت"
@@ -6908,29 +6128,14 @@
   "Pin to Dock": {
     "Pin to Dock": "اضافة الى الشريط"
   },
-  "Ping": {
-    "Ping": "اختبار الاتصال (Ping)"
-  },
-  "Ping sent to %1": {
-    "Ping sent to %1": "تم إرسال إشارة إلى %1"
-  },
   "Pinned": {
     "Pinned": "مثبت"
   },
   "Pinned and running apps with drag-and-drop": {
     "Pinned and running apps with drag-and-drop": "التطبيقات المثبتة والتي تعمل مع خاصية السحب والإفلات"
   },
-  "Pixel Intensity": {
-    "Pixel Intensity": "كثافة البكسل"
-  },
   "Pixelate": {
     "Pixelate": "بكسلة"
-  },
-  "Pixelate (E)": {
-    "Pixelate (E)": "تنميط (Pixelate) (E)"
-  },
-  "Pixelate Intensity": {
-    "Pixelate Intensity": "كثافة التنميط"
   },
   "Place a trash bin at the end of the dock": {
     "Place a trash bin at the end of the dock": "ضع سلة مهملات في نهاية شريط التطبيقات"
@@ -6955,9 +6160,6 @@
   },
   "Platform renderer (FreeType).": {
     "Platform renderer (FreeType).": "عارض المنصة (FreeType)."
-  },
-  "Play": {
-    "Play": "تشغيل"
   },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "شغل فيديو عند قفل الشاشة."
@@ -7055,9 +6257,6 @@
   "Popular Plugins": {
     "Popular Plugins": "الملحقات الشائعة"
   },
-  "Popup Input": {
-    "Popup Input": "إدخال منبثق"
-  },
   "Popup Only": {
     "Popup Only": "نافذة منبثقة فقط"
   },
@@ -7085,9 +6284,6 @@
   "Portal": {
     "Portal": "بوابة"
   },
-  "Portrait": {
-    "Portrait": "عمودي"
-  },
   "Position": {
     "Position": "الموقع"
   },
@@ -7096,9 +6292,6 @@
   },
   "Possible Override Conflicts": {
     "Possible Override Conflicts": "تعارضات التجاوز المحتملة"
-  },
-  "Post-Capture Notification": {
-    "Post-Capture Notification": "إشعار ما بعد الالتقاط"
   },
   "Power": {
     "Power": "الطاقة"
@@ -7145,9 +6338,6 @@
   "Pre-select the last used session on the greeter": {
     "Pre-select the last used session on the greeter": "تحديد مسبق لآخر جلسة مستخدمة في شاشة الترحيب"
   },
-  "Precip": {
-    "Precip": "هطول الأمطار"
-  },
   "Precipitation": {
     "Precipitation": "هطول الأمطار"
   },
@@ -7156,42 +6346,6 @@
   },
   "Preference": {
     "Preference": "التفضيلات"
-  },
-  "Preset %1": {
-    "Preset %1": "إعداد مسبق %1"
-  },
-  "Preset 1": {
-    "Preset 1": "إعداد مسبق 1"
-  },
-  "Preset 2": {
-    "Preset 2": "إعداد مسبق 2"
-  },
-  "Preset 3": {
-    "Preset 3": "إعداد مسبق 3"
-  },
-  "Preset 4": {
-    "Preset 4": "إعداد مسبق 4"
-  },
-  "Preset 5": {
-    "Preset 5": "إعداد مسبق 5"
-  },
-  "Preset 6": {
-    "Preset 6": "إعداد مسبق 6"
-  },
-  "Preset 7": {
-    "Preset 7": "إعداد مسبق 7"
-  },
-  "Preset 8": {
-    "Preset 8": "إعداد مسبق 8"
-  },
-  "Preset Color": {
-    "Preset Color": "لون الإعداد المسبق"
-  },
-  "Preset Thickness": {
-    "Preset Thickness": "سُمك الإعداد المسبق"
-  },
-  "Preset Tool": {
-    "Preset Tool": "أداة الإعداد المسبق"
   },
   "Preset Widths (%)": {
     "Preset Widths (%)": "أعراض محددة مسبقًا (%)"
@@ -7229,20 +6383,17 @@
   "Preview: %1": {
     "Preview: %1": "معاينة: %1"
   },
-  "Previous": {
-    "Previous": "السابق"
-  },
   "Previous page": {
     "Previous page": "الصفحة السابقة"
+  },
+  "Previous: %1\nCurrent: %2": {
+    "Previous: %1\nCurrent: %2": ""
   },
   "Primary": {
     "Primary": "رئيسي"
   },
   "Primary Container": {
     "Primary Container": "حاوية أساسية"
-  },
-  "Primary Screen": {
-    "Primary Screen": "الشاشة الأساسية"
   },
   "Print Server Management": {
     "Print Server Management": "إدارة خادم الطباعة"
@@ -7340,9 +6491,6 @@
   "QR Generator": {
     "QR Generator": "مولد رمز الاستجابة السريعة"
   },
-  "QR Result": {
-    "QR Result": "نتيجة رمز الاستجابة السريعة (QR)"
-  },
   "Qt": {
     "Qt": "Qt"
   },
@@ -7357,12 +6505,6 @@
   },
   "Quality": {
     "Quality": "الجودة"
-  },
-  "Quick Capture": {
-    "Quick Capture": "التقاط سريع"
-  },
-  "Quick Capture Error": {
-    "Quick Capture Error": "خطأ في الالتقاط السريع"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "وصول سريع إلى مشغل التطبيقات"
@@ -7379,26 +6521,8 @@
   "Quick system toggles": {
     "Quick system toggles": "تبديلات النظام السريعة"
   },
-  "RECORDING": {
-    "RECORDING": "جاري التسجيل"
-  },
   "RGB": {
     "RGB": "RGB"
-  },
-  "Radial Gradient": {
-    "Radial Gradient": "تدرج شعاعي"
-  },
-  "Radial Menu": {
-    "Radial Menu": "قائمة شعاعية"
-  },
-  "Radial Menu Opacity": {
-    "Radial Menu Opacity": "عتامة القائمة الشعاعية"
-  },
-  "Radial Menu Settings": {
-    "Radial Menu Settings": "إعدادات القائمة الشعاعية"
-  },
-  "Radial Preset": {
-    "Radial Preset": "إعداد شعاعي مسبق"
   },
   "Radius": {
     "Radius": "نصف القطر"
@@ -7420,9 +6544,6 @@
   },
   "Rate": {
     "Rate": "المعدل"
-  },
-  "Ratio": {
-    "Ratio": "نسبة"
   },
   "Re-enter password": {
     "Re-enter password": "أعد إدخال كلمة المرور"
@@ -7451,71 +6572,11 @@
   "Recent Colors": {
     "Recent Colors": "أحدث الألوان"
   },
-  "Recent Edits": {
-    "Recent Edits": "التعديلات الأخيرة"
-  },
-  "Recent Images": {
-    "Recent Images": "الصور الأخيرة"
-  },
   "Recently Used Apps": {
     "Recently Used Apps": "التطبيقات المستخدمة مؤخراً"
   },
   "Recommended available": {
     "Recommended available": "متوفر وموصى به"
-  },
-  "Record Microphone": {
-    "Record Microphone": "تسجيل الميكروفون"
-  },
-  "Record Mouse Cursor": {
-    "Record Mouse Cursor": "تسجيل مؤشر الفأرة"
-  },
-  "Record System Audio": {
-    "Record System Audio": "تسجيل صوت النظام"
-  },
-  "Recording": {
-    "Recording": "تسجيل"
-  },
-  "Recording Folder": {
-    "Recording Folder": "مجلد التسجيل"
-  },
-  "Recording ended with error code %1.": {
-    "Recording ended with error code %1.": "انتهى التسجيل برمز خطأ %1."
-  },
-  "Recording...": {
-    "Recording...": "جارٍ التسجيل..."
-  },
-  "Recordings Directory": {
-    "Recordings Directory": "دليل التسجيلات"
-  },
-  "Rectangle": {
-    "Rectangle": "مستطيل"
-  },
-  "Rectangle Color": {
-    "Rectangle Color": "لون المستطيل"
-  },
-  "Rectangle Outline": {
-    "Rectangle Outline": "مخطط المستطيل"
-  },
-  "Rectangle Outline (4)": {
-    "Rectangle Outline (4)": "مخطط المستطيل (4)"
-  },
-  "Rectangle Thickness": {
-    "Rectangle Thickness": "سُمك المستطيل"
-  },
-  "Redact": {
-    "Redact": "تنقيح"
-  },
-  "Redact (R)": {
-    "Redact (R)": "تنقيح (R)"
-  },
-  "Redact Thickness": {
-    "Redact Thickness": "سُمك التنقيح"
-  },
-  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
-    "Redo (Ctrl+Y / Ctrl+Shift+Z)": "إعادة (Ctrl+Y / Ctrl+Shift+Z)"
-  },
-  "Redo last undone stroke": {
-    "Redo last undone stroke": "إعادة آخر إجراء تم التراجع عنه"
   },
   "Reduce Motion": {
     "Reduce Motion": "تقليل الحركة"
@@ -7535,17 +6596,11 @@
   "Regex": {
     "Regex": "تعبير نمطي (Regex)"
   },
-  "Region": {
-    "Region": "منطقة"
-  },
   "Registries": {
     "Registries": "السجلات"
   },
   "Regular": {
     "Regular": "عادي"
-  },
-  "Reject": {
-    "Reject": "رفض"
   },
   "Reject Jobs": {
     "Reject Jobs": "رفض المهام"
@@ -7646,6 +6701,12 @@
   "Render Type": {
     "Render Type": "نوع العرض"
   },
+  "Reopen panel after update": {
+    "Reopen panel after update": ""
+  },
+  "Reopen the update panel once the terminal window closes after running updates.": {
+    "Reopen the update panel once the terminal window closes after running updates.": ""
+  },
   "Reorder & Group": {
     "Reorder & Group": "إعادة الترتيب والتجميع"
   },
@@ -7663,9 +6724,6 @@
   },
   "Report": {
     "Report": "تقرير"
-  },
-  "Request Pairing": {
-    "Request Pairing": "طلب الاقتران"
   },
   "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "يتطلب الاستمرار في الضغط على الزر/المفتاح لتأكيد إيقاف التشغيل، وإعادة التشغيل، والتعليق، والإسبات، وتسجيل الخروج"
@@ -7714,9 +6772,6 @@
   },
   "Reset": {
     "Reset": "إعادة تعيين"
-  },
-  "Reset Last Region": {
-    "Reset Last Region": "إعادة ضبط آخر منطقة"
   },
   "Reset Position": {
     "Reset Position": "إعادة تعيين الموضع"
@@ -7793,20 +6848,14 @@
   "Revert": {
     "Revert": "تراجع"
   },
-  "Rewind 10s": {
-    "Rewind 10s": "ترجيع 10 ثوانٍ"
+  "Review the current bindings before saving this edit.": {
+    "Review the current bindings before saving this edit.": ""
   },
   "Right": {
     "Right": "يمين"
   },
   "Right Center": {
     "Right Center": "يمين المنتصف"
-  },
-  "Right Click": {
-    "Right Click": "نقرة يمين"
-  },
-  "Right Click Action": {
-    "Right Click Action": "إجراء النقر بالزر الأيمن"
   },
   "Right Section": {
     "Right Section": "القسم الأيمن"
@@ -7823,38 +6872,14 @@
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "اضغط بيمين الفأرة للتنقل بين الأنماط"
   },
-  "Ring": {
-    "Ring": "رنين"
-  },
-  "Ringing %1...": {
-    "Ringing %1...": "يتم الاتصال بـ %1..."
-  },
   "Ripple Effects": {
     "Ripple Effects": "تأثيرات التموج"
   },
   "Root Filesystem": {
     "Root Filesystem": "نظام ملفات الجذر"
   },
-  "Rosé Pine": {
-    "Rosé Pine": "روز باين"
-  },
-  "Rotate L": {
-    "Rotate L": "تدوير لليسار"
-  },
-  "Rotate R": {
-    "Rotate R": "تدوير لليمين"
-  },
-  "Round Highlighter Tips": {
-    "Round Highlighter Tips": "رؤوس تمييز مستديرة"
-  },
-  "Round Rectangle Corners": {
-    "Round Rectangle Corners": "زوايا مستطيل مستديرة"
-  },
   "Rounded": {
     "Rounded": "مستدير"
-  },
-  "Rounded Rectangle": {
-    "Rounded Rectangle": "مستطيل مستدير الزوايا"
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "زوايا دائرية للنوافذ"
@@ -7916,12 +6941,6 @@
   "SDR Saturation": {
     "SDR Saturation": "تشبع SDR"
   },
-  "SMS": {
-    "SMS": "رسائل قصيرة"
-  },
-  "SMS sent successfully": {
-    "SMS sent successfully": "تم إرسال الرسالة القصيرة بنجاح"
-  },
   "SSID": {
     "SSID": "SSID"
   },
@@ -7937,26 +6956,14 @@
   "Save & Start": {
     "Save & Start": "حفظ وابدأ"
   },
-  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
-    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": "حفظ (Ctrl+S) | حفظ باسم (Ctrl+Shift+S)"
-  },
-  "Save Directory": {
-    "Save Directory": "دليل الحفظ"
-  },
   "Save Extracted Theme": {
     "Save Extracted Theme": "حفظ السمة المستخرجة"
-  },
-  "Save Filename Pattern": {
-    "Save Filename Pattern": "نمط اسم ملف الحفظ"
   },
   "Save Notepad File": {
     "Save Notepad File": "حفظ ملف الملاحظة"
   },
   "Save QR Code": {
     "Save QR Code": "حفظ رمز QR"
-  },
-  "Save Screenshot As": {
-    "Save Screenshot As": "حفظ لقطة الشاشة باسم"
   },
   "Save and close": {
     "Save and close": "حفظ وإغلاق"
@@ -7982,14 +6989,14 @@
   "Save normal priority notifications to history": {
     "Save normal priority notifications to history": "حفظ الإشعارات ذات الأولوية العادية في السجل"
   },
+  "Save or discard the current edit before editing another shortcut.": {
+    "Save or discard the current edit before editing another shortcut.": ""
+  },
   "Save password": {
     "Save password": "حفظ كلمة المرور"
   },
   "Saved": {
     "Saved": "تم الحفظ"
-  },
-  "Saved %1 (%2)": {
-    "Saved %1 (%2)": "تم الحفظ %1 (%2)"
   },
   "Saved Configurations": {
     "Saved Configurations": "الإعدادات المحفوظة"
@@ -8003,9 +7010,6 @@
   "Saved item deleted": {
     "Saved item deleted": "تم حذف العنصر المحفوظ"
   },
-  "Saving": {
-    "Saving": "جارٍ الحفظ"
-  },
   "Saving...": {
     "Saving...": "جارٍ الحفظ..."
   },
@@ -8018,17 +7022,11 @@
   "Scale DankBar icon sizes independently": {
     "Scale DankBar icon sizes independently": "ضبط أحجام أيقونات شريط دانك بشكل مستقل"
   },
-  "Scale Editor to Screenshot Size": {
-    "Scale Editor to Screenshot Size": "ملاءمة المحرر لحجم لقطة الشاشة"
-  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "قياس جميع أحجام الخطوط في جميع أنحاء الغلاف (shell)"
   },
   "Scan": {
     "Scan": "فحص"
-  },
-  "Scan QR": {
-    "Scan QR": "مسح رمز الاستجابة السريعة"
   },
   "Scanning...": {
     "Scanning...": "جاري الفحص..."
@@ -8039,71 +7037,11 @@
   "Score": {
     "Score": "النتيجة"
   },
-  "Screen": {
-    "Screen": "شاشة"
-  },
   "Screen Edges": {
     "Screen Edges": "حواف الشاشة"
   },
-  "Screen Recorder": {
-    "Screen Recorder": "مسجل الشاشة"
-  },
-  "Screen Recording (%1)": {
-    "Screen Recording (%1)": ""
-  },
-  "Screen Recording Error": {
-    "Screen Recording Error": "خطأ في تسجيل الشاشة"
-  },
-  "Screen Recording Saved": {
-    "Screen Recording Saved": "تم حفظ تسجيل الشاشة"
-  },
-  "Screen recording timed out or was cancelled.": {
-    "Screen recording timed out or was cancelled.": "انتهت مهلة تسجيل الشاشة أو تم إلغاؤه."
-  },
   "Screen sharing": {
     "Screen sharing": "مشاركة الشاشة"
-  },
-  "Screen: %1 (%2x%3)": {
-    "Screen: %1 (%2x%3)": "الشاشة: %1 (%2x%3)"
-  },
-  "Screenshot (%1) — %2": {
-    "Screenshot (%1) — %2": ""
-  },
-  "Screenshot Copied": {
-    "Screenshot Copied": "تم نسخ لقطة الشاشة"
-  },
-  "Screenshot Folder": {
-    "Screenshot Folder": "مجلد لقطات الشاشة"
-  },
-  "Screenshot Saved": {
-    "Screenshot Saved": "تم حفظ لقطة الشاشة"
-  },
-  "Screenshot copied anonymously with randomized name and stripped metadata.": {
-    "Screenshot copied anonymously with randomized name and stripped metadata.": "تم نسخ لقطة الشاشة بشكل مجهول مع اسم عشوائي وإزالة البيانات الوصفية."
-  },
-  "Screenshot copied to clipboard and saved to %1": {
-    "Screenshot copied to clipboard and saved to %1": "تم نسخ لقطة الشاشة إلى الحافظة وحفظها في %1"
-  },
-  "Screenshot copied to clipboard but failed to save file: %1": {
-    "Screenshot copied to clipboard but failed to save file: %1": "تم نسخ لقطة الشاشة إلى الحافظة ولكن فشل حفظ الملف: %1"
-  },
-  "Screenshot copied to clipboard.": {
-    "Screenshot copied to clipboard.": "تم نسخ لقطة الشاشة إلى الحافظة."
-  },
-  "Screenshot copied with randomized name.": {
-    "Screenshot copied with randomized name.": "تم نسخ لقطة الشاشة باسم عشوائي."
-  },
-  "Screenshot failed (mode: %1).": {
-    "Screenshot failed (mode: %1).": "فشلت لقطة الشاشة (الوضع: %1)."
-  },
-  "Screenshot saved": {
-    "Screenshot saved": "تم حفظ لقطة الشاشة"
-  },
-  "Screenshot saved to %1": {
-    "Screenshot saved to %1": "تم حفظ لقطة الشاشة في %1"
-  },
-  "Screenshot saved to %1/%2": {
-    "Screenshot saved to %1/%2": "تم حفظ لقطة الشاشة في %1/%2"
   },
   "Screenshot unavailable": {
     "Screenshot unavailable": "لقطة الشاشة غير متاحة"
@@ -8117,17 +7055,11 @@
   "Scroll GitHub": {
     "Scroll GitHub": "تمرير GitHub"
   },
-  "Scroll Interval": {
-    "Scroll Interval": "فاصل التمرير"
-  },
   "Scroll Method": {
     "Scroll Method": "طريقة التمرير"
   },
   "Scroll Wheel": {
     "Scroll Wheel": "عجلة التمرير"
-  },
-  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
-    "Scroll capture: select a region, scroll content, then press Enter to finish.": "التقاط التمرير: حدد منطقة، وقم بتمرير المحتوى، ثم اضغط Enter للإنهاء."
   },
   "Scroll song title": {
     "Scroll song title": "تمرير عنوان الأغنية"
@@ -8141,9 +7073,6 @@
   "Scrolling": {
     "Scrolling": "شريطي"
   },
-  "Scrolling Capture": {
-    "Scrolling Capture": "التقاط التمرير"
-  },
   "Scrolling Speed": {
     "Scrolling Speed": "سرعة التمرير"
   },
@@ -8156,9 +7085,6 @@
   "Search applications...": {
     "Search applications...": "البحث عن التطبيقات..."
   },
-  "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "البحث عن طريق اختصار المفاتيح، أو الوصف، أو اسم الإجراء. الإجراء الافتراضي ينسخ اختصار المفاتيح إلى الحافظة. اضغط بزر الفأرة الأيمن أو اضغط على السهم الأيمن لتثبيت اختصارات المفاتيح المستخدمة بشكل متكرر - ستظهر في الأعلى عند عدم البحث."
-  },
   "Search devices...": {
     "Search devices...": "البحث عن الأجهزة..."
   },
@@ -8167,9 +7093,6 @@
   },
   "Search keybinds...": {
     "Search keybinds...": "البحث في اختصارات لوحة المفاتيح..."
-  },
-  "Search keyboard shortcuts from your compositor and applications": {
-    "Search keyboard shortcuts from your compositor and applications": "البحث عن اختصارات لوحة المفاتيح من مدير النوافذ والتطبيقات الخاصة بك"
   },
   "Search plugins...": {
     "Search plugins...": "ابحث عن ملحقات..."
@@ -8231,38 +7154,17 @@
   "Select": {
     "Select": "تحديد"
   },
-  "Select / Move stroke": {
-    "Select / Move stroke": "تحديد / تحريك الخط"
-  },
   "Select Application": {
     "Select Application": "اختر التطبيق"
   },
   "Select Bar": {
     "Select Bar": "اختر الشريط"
   },
-  "Select Color Slots 1 - 4": {
-    "Select Color Slots 1 - 4": "تحديد خانات الألوان 1 - 4"
-  },
-  "Select Color Slots 5 - 8 (Q, W, E, R)": {
-    "Select Color Slots 5 - 8 (Q, W, E, R)": "تحديد خانات الألوان 5 - 8 (Q, W, E, R)"
-  },
   "Select Custom Theme": {
     "Select Custom Theme": "اختيار مظهر مخصص"
   },
-  "Select Directory": {
-    "Select Directory": "تحديد المجلد"
-  },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "اختيار شعار مشغل التطبيقات في شريط التطبيقات"
-  },
-  "Select File to Send": {
-    "Select File to Send": "حدد ملفاً لإرساله"
-  },
-  "Select Image File": {
-    "Select Image File": ""
-  },
-  "Select Image to Annotate": {
-    "Select Image to Annotate": "تحديد صورة للتعليق عليها"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "اختر أيقونة المشغل"
@@ -8303,9 +7205,6 @@
   "Select an image file...": {
     "Select an image file...": "اختر ملف صورة..."
   },
-  "Select at least one provider": {
-    "Select at least one provider": "اختر مزوداً واحداً على الأقل"
-  },
   "Select background image": {
     "Select background image": "اختر صورة الخلفية"
   },
@@ -8342,32 +7241,14 @@
   "Select which color is extracted from the wallpaper to seed the palette": {
     "Select which color is extracted from the wallpaper to seed the palette": "اختر اللون الذي يتم استخراجه من الخلفية لتغذية اللوحة"
   },
-  "Select which keybind providers to include": {
-    "Select which keybind providers to include": "اختر مزودي اختصارات المفاتيح المراد تضمينهم"
-  },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "اختر الانتقالات التي ترغب في تضمينها في الاختيار العشوائي"
   },
   "Select...": {
     "Select...": "اختيار..."
   },
-  "Selected Tool / Action": {
-    "Selected Tool / Action": "الأداة / الإجراء المحدد"
-  },
   "Selected image file not found.": {
     "Selected image file not found.": "ملف الصورة المحدد غير موجود."
-  },
-  "Send": {
-    "Send": "إرسال"
-  },
-  "Send Clipboard": {
-    "Send Clipboard": "إرسال الحافظة"
-  },
-  "Send SMS": {
-    "Send SMS": "إرسال رسالة قصيرة"
-  },
-  "Sending %1...": {
-    "Sending %1...": "جاري الإرسال %1..."
   },
   "Separate": {
     "Separate": "منفصل"
@@ -8480,17 +7361,8 @@
   "Shadows": {
     "Shadows": "الظلال"
   },
-  "Shapes": {
-    "Shapes": "الأشكال"
-  },
-  "Share": {
-    "Share": "مشاركة"
-  },
   "Share Gamma Control Settings": {
     "Share Gamma Control Settings": "مشاركة إعدادات التحكم في حرارة الالوان"
-  },
-  "Shared": {
-    "Shared": "تمت المشاركة"
   },
   "Shell": {
     "Shell": "الغلاف"
@@ -8506,9 +7378,6 @@
   },
   "Shortcut (%1)": {
     "Shortcut (%1)": "اختصار (%1)"
-  },
-  "Shortcut Action": {
-    "Shortcut Action": "إجراء الاختصار"
   },
   "Shortcut that opens this settings window": {
     "Shortcut that opens this settings window": "اختصار يفتح نافذة الإعدادات هذه"
@@ -8549,9 +7418,6 @@
   "Show Charge Rate": {
     "Show Charge Rate": "إظهار معدل الشحن"
   },
-  "Show Control Center": {
-    "Show Control Center": "إظهار مركز التحكم"
-  },
   "Show Date": {
     "Show Date": "إظهار التاريخ"
   },
@@ -8567,17 +7433,11 @@
   "Show Dock Over Fullscreen": {
     "Show Dock Over Fullscreen": "إظهار الشريط فوق ملء الشاشة"
   },
-  "Show Feels Like Temperature": {
-    "Show Feels Like Temperature": "عرض درجة الحرارة المحسوسة"
-  },
   "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": {
     "Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.": "إظهار أيقونات شارة Flatpak أو Snap أو AppImage أو Nix على عناصر المشغل."
   },
   "Show Footer": {
     "Show Footer": "إظهار التذييل"
-  },
-  "Show Forecast": {
-    "Show Forecast": "عرض توقعات الطقس"
   },
   "Show GPU Temperature": {
     "Show GPU Temperature": "إظهار درجة حرارة وحدة معالجة الرسومات"
@@ -8591,26 +7451,14 @@
   "Show Hour Numbers": {
     "Show Hour Numbers": "إظهار أرقام الساعة"
   },
-  "Show Hourly Forecast": {
-    "Show Hourly Forecast": "عرض التوقعات بالساعة"
-  },
-  "Show Humidity": {
-    "Show Humidity": "عرض الرطوبة"
-  },
   "Show Icon": {
     "Show Icon": "إظهار الأيقونة"
-  },
-  "Show Keyboard Shortcut Hints": {
-    "Show Keyboard Shortcut Hints": "إظهار تلميحات اختصارات لوحة المفاتيح"
   },
   "Show Launcher Button": {
     "Show Launcher Button": "إظهار زر المشغل"
   },
   "Show Line Numbers": {
     "Show Line Numbers": "إظهار أرقام الأسطر"
-  },
-  "Show Location": {
-    "Show Location": "عرض الموقع"
   },
   "Show Lock": {
     "Show Lock": "تفعيل خيار القفل"
@@ -8657,32 +7505,17 @@
   "Show Percentage": {
     "Show Percentage": "إظهار النسبة المئوية"
   },
-  "Show Pill Border": {
-    "Show Pill Border": "إظهار حدود الحبة"
-  },
   "Show Power Actions": {
     "Show Power Actions": "إظهار إجراءات الطاقة"
   },
   "Show Power Off": {
     "Show Power Off": "تفعيل خيار إيقاف التشغيل"
   },
-  "Show Precipitation Probability": {
-    "Show Precipitation Probability": "عرض احتمالية هطول الأمطار"
-  },
-  "Show Pressure": {
-    "Show Pressure": "عرض الضغط الجوي"
-  },
   "Show Profile Image": {
     "Show Profile Image": "إظهار صورة الملف الشخصي"
   },
   "Show Reboot": {
     "Show Reboot": "تفعيل خيار إعادة التشغيل"
-  },
-  "Show Recent Edits History": {
-    "Show Recent Edits History": "إظهار سجل التعديلات الأخيرة"
-  },
-  "Show Region Border": {
-    "Show Region Border": "إظهار حدود المنطقة"
   },
   "Show Remaining Time": {
     "Show Remaining Time": "إظهار الوقت المتبقي"
@@ -8696,17 +7529,11 @@
   "Show Saved Items": {
     "Show Saved Items": "إظهار العناصر المحفوظة"
   },
-  "Show Screenshot Border": {
-    "Show Screenshot Border": "إظهار حدود لقطة الشاشة"
-  },
   "Show Seconds": {
     "Show Seconds": "إظهار الثواني"
   },
   "Show Soft Reboot": {
     "Show Soft Reboot": "إظهار إعادة التشغيل البرمجية"
-  },
-  "Show Sunrise/Sunset": {
-    "Show Sunrise/Sunset": "عرض شروق/غروب الشمس"
   },
   "Show Suspend": {
     "Show Suspend": "تفعيل خيار السكون"
@@ -8726,12 +7553,6 @@
   "Show System Time": {
     "Show System Time": "إظهار وقت النظام"
   },
-  "Show Toolbar": {
-    "Show Toolbar": "إظهار شريط الأدوات"
-  },
-  "Show Toolbar Border": {
-    "Show Toolbar Border": "إظهار حدود شريط الأدوات"
-  },
   "Show Top Processes": {
     "Show Top Processes": "إظهار أهم العمليات"
   },
@@ -8741,17 +7562,11 @@
   "Show Virtual Devices": {
     "Show Virtual Devices": "إظهار الأجهزة الافتراضية"
   },
-  "Show Weather Condition": {
-    "Show Weather Condition": "عرض حالة الطقس"
-  },
   "Show Week Number": {
     "Show Week Number": "إظهار رقم الأسبوع"
   },
   "Show Welcome": {
     "Show Welcome": "عرض شاشة الترحيب"
-  },
-  "Show Wind Speed": {
-    "Show Wind Speed": "عرض سرعة الرياح"
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "إظهار تطبيقات سطح المكتب"
@@ -8840,9 +7655,6 @@
   "Show on screens:": {
     "Show on screens:": "العرض على الشاشات:"
   },
-  "Show only the image on a transparent background": {
-    "Show only the image on a transparent background": "إظهار الصورة فقط على خلفية شفافة"
-  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": "إظهار الشريط فقط عند عدم وجود نوافذ مفتوحة"
   },
@@ -8885,9 +7697,6 @@
   "Signal": {
     "Signal": "الإشارة"
   },
-  "Signal Strength": {
-    "Signal Strength": "قوة الإشارة"
-  },
   "Silence for a while": {
     "Silence for a while": "إسكات لفترة"
   },
@@ -8912,9 +7721,6 @@
   "Skip": {
     "Skip": "تخطّي"
   },
-  "Skip Confirmation": {
-    "Skip Confirmation": "تخطي التأكيد"
-  },
   "Skip confirmation": {
     "Skip confirmation": "تخطي التأكيد"
   },
@@ -8926,30 +7732,6 @@
   },
   "Slideout": {
     "Slideout": "نافذة منزلقة"
-  },
-  "Slot 1": {
-    "Slot 1": "الخانة 1"
-  },
-  "Slot 2": {
-    "Slot 2": "الخانة 2"
-  },
-  "Slot 3": {
-    "Slot 3": "الخانة 3"
-  },
-  "Slot 4": {
-    "Slot 4": "الخانة 4"
-  },
-  "Slot 5": {
-    "Slot 5": "الخانة 5"
-  },
-  "Slot 6": {
-    "Slot 6": "الخانة 6"
-  },
-  "Slot 7": {
-    "Slot 7": "الخانة 7"
-  },
-  "Slot 8": {
-    "Slot 8": "الخانة 8"
   },
   "Small": {
     "Small": "صغير"
@@ -8978,20 +7760,8 @@
   "Soft Reboot": {
     "Soft Reboot": "إعادة تشغيل برمجية"
   },
-  "Soften image details so screenshot content stands out": {
-    "Soften image details so screenshot content stands out": "تنعيم تفاصيل الصورة ليبرز محتوى لقطة الشاشة"
-  },
   "Solid": {
     "Solid": "صلب"
-  },
-  "Solid Color": {
-    "Solid Color": "لون مصمت"
-  },
-  "Solid Fill": {
-    "Solid Fill": "تعبئة مصمتة"
-  },
-  "Solid Line": {
-    "Solid Line": "خط مستقيم"
   },
   "Solid or outlined material meter, or a circular gauge": {
     "Solid or outlined material meter, or a circular gauge": "مقياس مادي صلب أو محدد، أو عداد دائري"
@@ -9044,14 +7814,8 @@
   "Spacing": {
     "Spacing": "التباعد"
   },
-  "Spawn Position": {
-    "Spawn Position": "موقع الظهور"
-  },
   "Speaker settings": {
     "Speaker settings": "إعدادات السماعات"
-  },
-  "Specific Output": {
-    "Specific Output": "مخرج محدد"
   },
   "Speed": {
     "Speed": "السرعة"
@@ -9062,17 +7826,11 @@
   "Spotlight": {
     "Spotlight": "Spotlight"
   },
-  "Spotlight (D)": {
-    "Spotlight (D)": "تسليط الضوء (Spotlight) (D)"
-  },
   "Spotlight Bar": {
     "Spotlight Bar": "شريط Spotlight"
   },
   "Spotlight Bar Shortcut": {
     "Spotlight Bar Shortcut": "اختصار شريط Spotlight"
-  },
-  "Spotlight Opacity": {
-    "Spotlight Opacity": "عتامة تسليط الضوء"
   },
   "Spotlight Search": {
     "Spotlight Search": "بحث Spotlight"
@@ -9104,24 +7862,6 @@
   "Stage the Wayland overlay layer to remain visible over fullscreen apps": {
     "Stage the Wayland overlay layer to remain visible over fullscreen apps": "تهيئة طبقة تراكب Wayland لتظل مرئية فوق التطبيقات بملء الشاشة"
   },
-  "Stamp (A)": {
-    "Stamp (A)": "الختم (Stamp) (A)"
-  },
-  "Stamp Color": {
-    "Stamp Color": "لون الختم"
-  },
-  "Stamp Contrast Ring": {
-    "Stamp Contrast Ring": "حلقة تباين الختم"
-  },
-  "Stamp Number Font": {
-    "Stamp Number Font": "خط رقم الختم"
-  },
-  "Stamp Size": {
-    "Stamp Size": "حجم الختم"
-  },
-  "Stamp, Highlighter, Spotlight (A, S, D)": {
-    "Stamp, Highlighter, Spotlight (A, S, D)": "الختم، قلم التمييز، تسليط الضوء (A, S, D)"
-  },
   "Standard": {
     "Standard": "قياسي"
   },
@@ -9131,20 +7871,8 @@
   "Start Hotspot?": {
     "Start Hotspot?": "بدء نقطة الاتصال؟"
   },
-  "Start KDE Connect or Valent to use this plugin": {
-    "Start KDE Connect or Valent to use this plugin": "ابدأ KDE Connect أو Valent لاستخدام هذه الملحق"
-  },
   "Start typing your notes here...": {
     "Start typing your notes here...": "ابدأ بكتابة ملاحظاتك هنا..."
-  },
-  "Starting Preset": {
-    "Starting Preset": "الإعداد المسبق للبدء"
-  },
-  "Starting Tool": {
-    "Starting Tool": "أداة البدء"
-  },
-  "Starting Tool Mode": {
-    "Starting Tool Mode": "وضع أداة البدء"
   },
   "Starting hotspot...": {
     "Starting hotspot...": "جاري بدء نقطة الاتصال..."
@@ -9161,9 +7889,6 @@
   "Stop": {
     "Stop": "قف"
   },
-  "Stop & Save": {
-    "Stop & Save": "إيقاف وحفظ"
-  },
   "Stop ignoring %1": {
     "Stop ignoring %1": "إلغاء تجاهل %1"
   },
@@ -9175,12 +7900,6 @@
   },
   "Stopping": {
     "Stopping": "جاري الإيقاف"
-  },
-  "Straight Line": {
-    "Straight Line": "خط مستقيم"
-  },
-  "Straight Line (2)": {
-    "Straight Line (2)": "خط مستقيم (2)"
   },
   "Stretch": {
     "Stretch": "تمديد"
@@ -9236,9 +7955,6 @@
   "Surface Container": {
     "Surface Container": "حاوية السطح"
   },
-  "Surface Container Highest": {
-    "Surface Container Highest": "حاوية السطح الأعلى"
-  },
   "Surface High": {
     "Surface High": "سطح مرتفع"
   },
@@ -9290,14 +8006,8 @@
   "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": {
     "Switch displays with an available 60 Hz mode to 60 Hz on battery and restore the previous mode on AC. Skips displays with VRR enabled.": "قم بتبديل الشاشات التي يتوفر بها وضع 60 هرتز إلى 60 هرتز عند العمل بالبطارية، واستعد الوضع السابق عند توصيل التيار المتردد. يتخطى الشاشات التي تم تمكين معدل التحديث المتغير (VRR) فيها."
   },
-  "Switch to Select Tool": {
-    "Switch to Select Tool": "التبديل إلى أداة التحديد"
-  },
   "Switch to power profile": {
     "Switch to power profile": "التبديل إلى ملف تعريف الطاقة"
-  },
-  "Switch to your custom preset": {
-    "Switch to your custom preset": "التبديل إلى إعدادك المسبق المخصص"
   },
   "Sync": {
     "Sync": "مزامنة"
@@ -9323,6 +8033,9 @@
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "مزامنة الوضع الداكن مع اعدادات portal لتلميحات السمات على مستوى النظام"
   },
+  "Sync failed": {
+    "Sync failed": ""
+  },
   "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": {
     "Sync failed in background mode. Trying terminal mode so you can authenticate interactively.": "فشلت المزامنة في وضع الخلفية. تجربة وضع الطرفية حتى تتمكن من المصادقة بشكل تفاعلي."
   },
@@ -9335,17 +8048,14 @@
   "Sync with Global Settings": {
     "Sync with Global Settings": "المزامنة مع الإعدادات العامة"
   },
+  "Synchronized": {
+    "Synchronized": ""
+  },
   "Syncing...": {
     "Syncing...": "جارٍ المزامنة..."
   },
-  "Synthwave Electric": {
-    "Synthwave Electric": "Synthwave Electric"
-  },
   "System App Theming": {
     "System App Theming": "مظهر تطبيقات النظام"
-  },
-  "System Audio Device": {
-    "System Audio Device": "جهاز صوت النظام"
   },
   "System Check": {
     "System Check": "فحص النظام"
@@ -9428,9 +8138,6 @@
   "Tap to Click": {
     "Tap to Click": "النقر للنقر"
   },
-  "Target Output Name": {
-    "Target Output Name": "اسم المخرج المستهدف"
-  },
   "Task list used when adding tasks from the dash calendar": {
     "Task list used when adding tasks from the dash calendar": "قائمة المهام المستخدمة عند إضافة مهام من تقويم لوحة التحكم"
   },
@@ -9476,29 +8183,17 @@
   "Text": {
     "Text": "نص"
   },
-  "Text (W)": {
-    "Text (W)": "النص (W)"
-  },
-  "Text Background Roundness": {
-    "Text Background Roundness": "استدارة خلفية النص"
-  },
   "Text Color": {
     "Text Color": "لون النص"
   },
   "Text Editor": {
     "Text Editor": "محرر النصوص"
   },
-  "Text Font": {
-    "Text Font": "خط النص"
-  },
-  "Text Note": {
-    "Text Note": "ملاحظة نصية"
-  },
   "Text Rendering": {
     "Text Rendering": "عرض النص"
   },
-  "Text Size": {
-    "Text Size": "حجم النص"
+  "The Aqueous operation failed.": {
+    "The Aqueous operation failed.": ""
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "متغير البيئة DMS_SOCKET غير معين أو أن المقبس غير متاح. تتطلب الإدارة التلقائية للملحقات وجود DMS_SOCKET."
@@ -9515,6 +8210,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": "الإعدادات أدناه ستعدل إعدادات GTK و Qt الخاصة بك. إذا كنت ترغب في الاحتفاظ بتكويناتك الحالية، يرجى نسخها احتياطياً (qt5ct.conf|qt6ct.conf|qtengine/config.json و ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The compositor session changed. Discard this edit before starting a new one.": {
+    "The compositor session changed. Discard this edit before starting a new one.": ""
+  },
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "الأمر المخصص المستخدم عند الاتصال بالجلسات (يستقبل اسم الجلسة كأول وسيط)"
   },
@@ -9527,8 +8225,26 @@
   "The job queue of this printer is empty": {
     "The job queue of this printer is empty": "قائمة مهام هذه الطابعة فارغة"
   },
+  "The new shortcut is already in use. Choose another shortcut.": {
+    "The new shortcut is already in use. Choose another shortcut.": ""
+  },
+  "The original shortcut changed. Refresh and review your edit.": {
+    "The original shortcut changed. Refresh and review your edit.": ""
+  },
+  "The original shortcut was removed. Discard this edit or add a new shortcut.": {
+    "The original shortcut was removed. Discard this edit or add a new shortcut.": ""
+  },
+  "The result is unknown. Refresh before trying again.": {
+    "The result is unknown. Refresh before trying again.": ""
+  },
   "The rule applies to any window matching one of these.": {
     "The rule applies to any window matching one of these.": "تنطبق القاعدة على أي نافذة تطابق واحدة من هذه."
+  },
+  "The save result is unknown. Refresh and check the current bindings.": {
+    "The save result is unknown. Refresh and check the current bindings.": ""
+  },
+  "The selected action is no longer available.": {
+    "The selected action is no longer available.": ""
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": "تغيرت شهادة الخادم منذ آخر مرة تم الوثوق بها. تابع فقط إذا كنت تتعرف على البصمة الجديدة."
@@ -9541,9 +8257,6 @@
   },
   "Theme Color": {
     "Theme Color": "لون المظهر"
-  },
-  "Theme Primary Color": {
-    "Theme Primary Color": "اللون الأساسي للسمة"
   },
   "Theme color used for the border": {
     "Theme color used for the border": "لون السمة المستخدم للحدود"
@@ -9590,11 +8303,11 @@
   "This may take a few seconds": {
     "This may take a few seconds": "قد يستغرق هذا بضع ثوانٍ"
   },
+  "This operation is not supported by the installed Aqueous version.": {
+    "This operation is not supported by the installed Aqueous version.": ""
+  },
   "This output is disabled in the current profile": {
     "This output is disabled in the current profile": "هذا المخرج معطل في الملف الشخصي الحالي"
-  },
-  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
-    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "إعداد اللوحة المسبق هذا للقراءة فقط. اختر أحد الخيارات أدناه للتبديل إلى اللوحة المخصصة وتحرير الألوان:"
   },
   "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": {
     "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json": "هذه الإضافة لا تملك إذن 'settings_write'. أضف \"permissions\": [\"settings_read\", \"settings_write\"] إلى ملف plugin.json"
@@ -9716,17 +8429,8 @@
   "Today": {
     "Today": "اليوم"
   },
-  "Toggle Hide/Show Annotations": {
-    "Toggle Hide/Show Annotations": "تبديل إخفاء/إظهار التعليقات التوضيحية"
-  },
-  "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
-  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "تبديل رؤية الشريط يدوياً عبر IPC"
-  },
-  "Toggle between 2 latest presets": {
-    "Toggle between 2 latest presets": "التبديل بين آخر إعدادين مسبقين"
   },
   "Toggle fonts": {
     "Toggle fonts": "تبديل الخطوط"
@@ -9739,9 +8443,6 @@
   },
   "Toggling...": {
     "Toggling...": "جاري التبديل..."
-  },
-  "Tokyo Night": {
-    "Tokyo Night": "Tokyo Night"
   },
   "Tomorrow": {
     "Tomorrow": "غداً"
@@ -9757,18 +8458,6 @@
   },
   "Too many attempts - locked out": {
     "Too many attempts - locked out": "الكثير من المحاولات - تم القفل"
-  },
-  "Tool Defaults": {
-    "Tool Defaults": "إعدادات الأداة الافتراضية"
-  },
-  "Toolbar": {
-    "Toolbar": "شريط الأدوات"
-  },
-  "Toolbar Palette": {
-    "Toolbar Palette": "لوحة شريط الأدوات"
-  },
-  "Toolbar Position": {
-    "Toolbar Position": "موقع شريط الأدوات"
   },
   "Tools": {
     "Tools": "الأدوات"
@@ -9827,12 +8516,6 @@
   "Transparency": {
     "Transparency": "الشفافية"
   },
-  "Transparent": {
-    "Transparent": "شفاف"
-  },
-  "Transparent Background": {
-    "Transparent Background": "خلفية شفافة"
-  },
   "Trash": {
     "Trash": "المهملات"
   },
@@ -9842,26 +8525,8 @@
   "Tray Icon Fix": {
     "Tray Icon Fix": "إصلاح أيقونة علبة النظام"
   },
-  "Trending GIFs": {
-    "Trending GIFs": "صور GIF الرائجة"
-  },
-  "Trending Stickers": {
-    "Trending Stickers": "ملصقات رائجة"
-  },
   "Trigger": {
     "Trigger": "المشغل"
-  },
-  "Trigger Middle-Click Action (Default: Interactive Region)": {
-    "Trigger Middle-Click Action (Default: Interactive Region)": "تشغيل إجراء النقر الأوسط (الافتراضي: منطقة تفاعلية)"
-  },
-  "Trigger Prefix": {
-    "Trigger Prefix": "بادئة المشغل"
-  },
-  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
-    "Trigger Right-Click Action (Default: Clipboard Annotate)": "تشغيل إجراء النقر الأيمن (الافتراضي: تعليق الحافظة)"
-  },
-  "Trigger on Hover": {
-    "Trigger on Hover": "التشغيل عند التحويم"
   },
   "Trigger: %1": {
     "Trigger: %1": "المشغل: %1"
@@ -9902,12 +8567,6 @@
   "Type at least 2 characters to search files.": {
     "Type at least 2 characters to search files.": "اكتب حرفين على الأقل للبحث عن الملفات."
   },
-  "Type note...": {
-    "Type note...": "اكتب ملاحظة..."
-  },
-  "Type this prefix to search keybinds": {
-    "Type this prefix to search keybinds": "اكتب هذه البادئة للبحث عن اختصارات المفاتيح"
-  },
   "Type to search files": {
     "Type to search files": "اكتب للبحث عن الملفات"
   },
@@ -9917,20 +8576,11 @@
   "Typography & Motion": {
     "Typography & Motion": "الطباعة والحركة"
   },
-  "URI": {
-    "URI": "رابط"
-  },
   "Unavailable": {
     "Unavailable": "غير متاح"
   },
   "Uncategorized": {
     "Uncategorized": "غير مصنف"
-  },
-  "Undo (Ctrl+Z)": {
-    "Undo (Ctrl+Z)": "تراجع (Ctrl+Z)"
-  },
-  "Undo last stroke": {
-    "Undo last stroke": "تراجع عن آخر ضربة"
   },
   "Unfocused Color": {
     "Unfocused Color": "لون غير المركز"
@@ -9940,6 +8590,12 @@
   },
   "Ungrouped": {
     "Ungrouped": "غير مجمعة"
+  },
+  "Uninstall": {
+    "Uninstall": ""
+  },
+  "Uninstall %1?": {
+    "Uninstall %1?": ""
   },
   "Uninstall Plugin": {
     "Uninstall Plugin": "إزالة الملحق"
@@ -9952,6 +8608,9 @@
   },
   "Uninstalling: %1": {
     "Uninstalling: %1": "جاري إلغاء التثبيت: %1"
+  },
+  "Uninstall…": {
+    "Uninstall…": ""
   },
   "Unknown": {
     "Unknown": "غير معروف"
@@ -9997,12 +8656,6 @@
   },
   "Unnamed Rule": {
     "Unnamed Rule": "قاعدة بدون اسم"
-  },
-  "Unpair": {
-    "Unpair": "إلغاء الاقتران"
-  },
-  "Unpair failed": {
-    "Unpair failed": "فشل إلغاء الاقتران"
   },
   "Unpin": {
     "Unpin": "إلغاء التثبيت"
@@ -10073,23 +8726,11 @@
   "Urgent Color": {
     "Urgent Color": "لون التنبيه"
   },
-  "Usage Guide": {
-    "Usage Guide": "دليل الاستخدام"
-  },
-  "Usage Tips": {
-    "Usage Tips": "نصائح الاستخدام"
-  },
   "Use 24-hour time format instead of 12-hour AM/PM": {
     "Use 24-hour time format instead of 12-hour AM/PM": "استخدام تنسيق الوقت 24 ساعة بدلاً من 12 ساعة ص/م"
   },
   "Use Custom Command": {
     "Use Custom Command": "استخدام أمر مخصص"
-  },
-  "Use Existing Custom": {
-    "Use Existing Custom": "استخدم مخصص موجود"
-  },
-  "Use Floating Editor": {
-    "Use Floating Editor": "استخدام المحرر العائم"
   },
   "Use Grid Layout": {
     "Use Grid Layout": "استخدام تخطيط الشبكة"
@@ -10108,9 +8749,6 @@
   },
   "Use Inline Expansion": {
     "Use Inline Expansion": "استخدام التوسيع المضمن"
-  },
-  "Use Modal Editor": {
-    "Use Modal Editor": "استخدام المحرر النمطي"
   },
   "Use Monospace Font": {
     "Use Monospace Font": "استخدام خط أحادي المسافة"
@@ -10193,14 +8831,8 @@
   "Use the same position and size on all displays": {
     "Use the same position and size on all displays": "استخدام نفس الموقع والحجم على جميع الشاشات"
   },
-  "Use trigger prefix to activate": {
-    "Use trigger prefix to activate": "استخدم بادئة المشغل للتفعيل"
-  },
   "Used for xdg-terminal-exec": {
     "Used for xdg-terminal-exec": "يُستخدم لـ xdg-terminal-exec"
-  },
-  "Used when accent color is set to Custom": {
-    "Used when accent color is set to Custom": "يُستخدم عند ضبط لون التمييز على مخصص"
   },
   "User": {
     "User": "مستخدم"
@@ -10298,9 +8930,6 @@
   "Variable Refresh Rate": {
     "Variable Refresh Rate": "معدل التحديث المتغير (VRR)"
   },
-  "Verification": {
-    "Verification": "التحقق"
-  },
   "Version": {
     "Version": "الإصدار"
   },
@@ -10331,26 +8960,14 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "لوحة ألوان مفعمة بالحيوية مع تشبع مبهج."
   },
-  "Video Codec": {
-    "Video Codec": "ترميز الفيديو"
-  },
   "Video Path": {
     "Video Path": "مسار الفيديو"
   },
   "Video Player": {
     "Video Player": "مشغل الفيديو"
   },
-  "Video Quality": {
-    "Video Quality": "جودة الفيديو"
-  },
   "Video Screensaver": {
     "Video Screensaver": "شاشة توقف الفيديو"
-  },
-  "Video Settings": {
-    "Video Settings": "إعدادات الفيديو"
-  },
-  "View Mode": {
-    "View Mode": "وضع العرض"
   },
   "Visibility": {
     "Visibility": "الظهور"
@@ -10424,18 +9041,6 @@
   "Warnings": {
     "Warnings": "تحذيرات"
   },
-  "Watermark": {
-    "Watermark": "علامة مائية"
-  },
-  "Watermark Image": {
-    "Watermark Image": "صورة العلامة المائية"
-  },
-  "Watermark Text": {
-    "Watermark Text": "نص العلامة المائية"
-  },
-  "Watermark Type": {
-    "Watermark Type": "نوع العلامة المائية"
-  },
   "Wave Progress Bars": {
     "Wave Progress Bars": "أشرطة التقدم الموجية"
   },
@@ -10450,9 +9055,6 @@
   },
   "Web Browser": {
     "Web Browser": "متصفح الويب"
-  },
-  "WebP Quality": {
-    "WebP Quality": "جودة WebP"
   },
   "Welcome": {
     "Welcome": "أهلاً بك"
@@ -10469,9 +9071,6 @@
   "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": {
     "When enabled, checks updates on startup. When disabled, only the interval above or a manual refresh runs a check.": "عند التفعيل، يتم التحقق من التحديثات عند بدء التشغيل. عند التعطيل، يتم التحقق فقط بناءً على الفاصل الزمني أعلاه أو التحديث اليدوي."
   },
-  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
-    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": "عند التفعيل، يتقلص المحرر ليتناسب مع المنطقة الملتقطة بدلاً من ملء 90% من الشاشة."
-  },
   "When locked": {
     "When locked": "عند القفل"
   },
@@ -10480,6 +9079,9 @@
   },
   "White": {
     "White": "أبيض"
+  },
+  "Wi-Fi & Bluetooth": {
+    "Wi-Fi & Bluetooth": ""
   },
   "Wi-Fi and Ethernet connection": {
     "Wi-Fi and Ethernet connection": "اتصال Wi-Fi و Ethernet"
@@ -10577,12 +9179,6 @@
   "Wind Speed in m/s": {
     "Wind Speed in m/s": "سرعة الرياح بالمتر/ثانية"
   },
-  "Window": {
-    "Window": "نافذة"
-  },
-  "Window / Portal": {
-    "Window / Portal": ""
-  },
   "Window Corner Radius": {
     "Window Corner Radius": "نصف قطر زاوية النافذة"
   },
@@ -10606,6 +9202,9 @@
   },
   "Wipe": {
     "Wipe": "مسح"
+  },
+  "With Shelly, only Flatpak packages in the current update list can be ignored.": {
+    "With Shelly, only Flatpak packages in the current update list can be ignored.": ""
   },
   "Working...": {
     "Working...": "جاري العمل..."
@@ -10706,9 +9305,6 @@
   "Your system is up to date!": {
     "Your system is up to date!": "نظامك محدث!"
   },
-  "Zoom Level": {
-    "Zoom Level": "مستوى التكبير"
-  },
   "admin": {
     "admin": "مسؤول"
   },
@@ -10744,9 +9340,6 @@
   },
   "detached": {
     "detached": "غير متصل"
-  },
-  "device": {
-    "device": "جهاز"
   },
   "dgop not available": {
     "dgop not available": "dgop غير متاح"
@@ -10792,9 +9385,6 @@
   },
   "featured": {
     "featured": "مميز"
-  },
-  "gpu-screen-recorder is not installed. Please install it first.": {
-    "gpu-screen-recorder is not installed. Please install it first.": "gpu-screen-recorder غير مثبت. يرجى تثبيته أولاً."
   },
   "khal": {
     "khal": "khal"
@@ -10891,6 +9481,12 @@
   },
   "procs": {
     "procs": "عمليات"
+  },
+  "pt": {
+    "pt": ""
+  },
+  "px": {
+    "px": ""
   },
   "r/niri Subreddit": {
     "r/niri Subreddit": "صب‌ريديت r/niri"
