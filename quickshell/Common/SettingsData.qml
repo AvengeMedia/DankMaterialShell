@@ -3557,9 +3557,9 @@ Singleton {
                 hasParseFailed = false;
                 const fileName = filePath?.split("/").pop();
                 try {
-                    const txt = settingsFileView.text();
+                    let txt = settingsFileView.text();
                     if (!txt || !txt.trim()) {
-                        throw new Error(`File ${fileName} is empty`)
+                        txt = "{}";
                     }
                     settings = JSON.parse(txt);
                     hasLoaded = true;
