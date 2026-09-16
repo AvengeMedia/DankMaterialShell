@@ -3588,7 +3588,6 @@ Singleton {
                 }
                 isLoading = false;
                 _loading = _settingsFilesPaths.some(path => _settingsFiles.get(path).isLoading);
-                const name = filePath.split("/").pop() || "unknown";
                 if (error === FileViewError.FileNotFound) {
                     // fake that file has been loaded so that it gets written after a change.
                     hasLoaded = true;
