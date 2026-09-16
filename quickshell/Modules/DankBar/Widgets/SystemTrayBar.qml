@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
@@ -1612,7 +1613,7 @@ BasePill {
                                 }
                             }
 
-                            Row {
+                            RowLayout {
                                 anchors.left: parent.left
                                 anchors.leftMargin: Theme.spacingS
                                 anchors.right: parent.right
@@ -1622,9 +1623,9 @@ BasePill {
                                 visible: !menuEntry?.isSeparator
 
                                 Rectangle {
-                                    width: Theme.iconSizeSmall
-                                    height: Theme.iconSizeSmall
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    Layout.preferredWidth: Theme.iconSizeSmall
+                                    Layout.preferredHeight: Theme.iconSizeSmall
+                                    Layout.alignment: Qt.AlignVCenter
                                     visible: menuEntry?.buttonType !== undefined && menuEntry.buttonType !== 0
                                     radius: menuEntry?.buttonType === 2 ? width / 2 : 2
                                     border.width: 1
@@ -1650,9 +1651,9 @@ BasePill {
                                 }
 
                                 Item {
-                                    width: Theme.iconSizeSmall
-                                    height: Theme.iconSizeSmall
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    Layout.preferredWidth: Theme.iconSizeSmall
+                                    Layout.preferredHeight: Theme.iconSizeSmall
+                                    Layout.alignment: Qt.AlignVCenter
                                     visible: (menuEntry?.icon ?? "") !== ""
 
                                     Image {
@@ -1670,22 +1671,23 @@ BasePill {
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: (menuEntry?.enabled !== false) ? Theme.surfaceText : Theme.surfaceTextMedium
                                     elide: Text.ElideRight
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: Math.max(150, parent.width - 64)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
                                     wrapMode: Text.NoWrap
                                 }
 
                                 Item {
-                                    width: Theme.iconSizeSmall
-                                    height: Theme.iconSizeSmall
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    Layout.preferredWidth: Theme.iconSizeSmall
+                                    Layout.preferredHeight: Theme.iconSizeSmall
+                                    Layout.alignment: Qt.AlignVCenter
+                                    visible: menuEntry?.hasChildren ?? false
 
                                     DankIcon {
                                         anchors.centerIn: parent
                                         name: "chevron_right"
                                         size: Theme.iconSizeSmall - 2
                                         color: Theme.widgetTextColor
-                                        visible: menuEntry?.hasChildren ?? false
                                     }
                                 }
                             }
