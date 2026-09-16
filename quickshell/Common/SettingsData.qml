@@ -3711,7 +3711,6 @@ Singleton {
         id: defaultSettingsFile
 
         filePath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
-        property int index: 0
 
         Component.onCompleted: {
             _registerSettingsFile(defaultSettingsFile);
