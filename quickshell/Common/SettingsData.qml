@@ -3719,43 +3719,44 @@ Singleton {
         }
     }
 
+    function _syncSettingsFilesModels() {
+        if (!configDirExists.checked) {
+            settingsFilesModelSyncDebounce.restart();
+            return;
+        }
+        if (!configDirExists.exists) {
+            return;
+        }
+        const folderModel = settingsFolderModel;
+        const listModel = settingsFilesListModel;
+
+        if (folderModel.status === FolderListModel.Ready) {
+            const folderPaths = (new Array(folderModel.count)).fill(1).map((_, index) => {
+                return folderModel.get(index, "filePath")
+            });
+
+            for (const filePath of folderPaths) {
+                if (!_settingsFiles.has(filePath)) {
+                    listModel.append({ filePath });
+                }
+            }
+            const folderPathsSet = new Set(folderPaths);
+            for (let i = listModel.count - 1; i >= 0; i--) {
+                const filePath = listModel.get(i).filePath;
+                if (!folderPathsSet.has(filePath)) {
+                    listModel.remove(i);
+                }
+            }
+        } else {
+            settingsFilesModelSyncDebounce.restart();
+        }
+    }
     Timer {
         id: settingsFilesModelSyncDebounce
         interval: 50
         repeat: false
         running: false
-        onTriggered: {
-            if (!configDirExists.checked) {
-                restart();
-                return;
-            }
-            if (!configDirExists.exists) {
-                return;
-            }
-            const folderModel = settingsFolderModel;
-            const listModel = settingsFilesListModel;
-
-            if (folderModel.status === FolderListModel.Ready) {
-                const folderPaths = (new Array(folderModel.count)).fill(1).map((_, index) => {
-                    return folderModel.get(index, "filePath")
-                });
-
-                for (const filePath of folderPaths) {
-                    if (!_settingsFiles.has(filePath)) {
-                        listModel.append({ filePath });
-                    }
-                }
-                const folderPathsSet = new Set(folderPaths);
-                for (let i = listModel.count - 1; i >= 0; i--) {
-                    const filePath = listModel.get(i).filePath;
-                    if (!folderPathsSet.has(filePath)) {
-                        listModel.remove(i);
-                    }
-                }
-            } else {
-                restart();
-            }
-        }
+        onTriggered: _syncSettingsFilesModels()
     }
     ListModel {
         id: settingsFilesListModel
@@ -3769,7 +3770,11 @@ Singleton {
         showDirs: false
         nameFilters: ["*.json"]
         onStatusChanged: {
-            settingsFilesModelSyncDebounce.restart();
+            if (_hasLoaded) {
+                settingsFilesModelSyncDebounce.restart();
+            } else {
+                _syncSettingsFilesModels();
+            }
         }
     }
     Process {
@@ -3781,12 +3786,12 @@ Singleton {
         property bool exists: false
         // qmllint disable signal-handler-parameters
         onExited: (code) => {
+            checked = true;
             exists = code === 0;
             if (exists) {
-                settingsFilesModelSyncDebounce.restart();
+                _syncSettingsFilesModels();
             }
-            checked = true;
-            _checkIfAllSettingsFilesFound()
+            _checkIfAllSettingsFilesFound();
         }
     }
 
