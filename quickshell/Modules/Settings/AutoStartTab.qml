@@ -166,7 +166,7 @@ Item {
         onExited: exitCode => {
             if (exitCode !== 0) {
                 const title = operation === "add" ? I18n.tr("Failed to add startup application") : (operation === "remove" ? I18n.tr("Failed to remove startup application") : I18n.tr("Failed to update startup application"));
-                ToastService.showError(title, "", errorText.split("\n")[0]);
+                ToastService.showError(title, errorText.split("\n")[0]);
                 root.log.warn(title + ": " + errorText);
             } else if (operation === "add") {
                 root.resetNewEntry();
