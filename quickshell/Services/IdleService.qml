@@ -32,7 +32,11 @@ Singleton {
     onLockTimeoutChanged: _rearmIdleMonitors()
     onSuspendTimeoutChanged: _rearmIdleMonitors()
     onPostLockMonitorTimeoutChanged: _rearmIdleMonitors()
-    onIsShellLockedChanged: _rearmIdleMonitors()
+    onIsShellLockedChanged: {
+        if (isShellLocked)
+            dismissScreensaver();
+        _rearmIdleMonitors();
+    }
 
     function _applyMonitorEnableds() {
         // Gate on the shell's own inhibit state rather than relying on the
@@ -55,6 +59,8 @@ Singleton {
     }
 
     signal lockRequested
+    signal screensaverRequested
+    signal dismissScreensaver
     signal fadeToLockRequested
     signal cancelFadeToLock
     signal dismissFadeToLock
@@ -83,6 +89,7 @@ Singleton {
             if (!enabled)
                 return;
             if (isIdle) {
+                root.dismissScreensaver();
                 if (SettingsData.fadeToDpmsEnabled) {
                     root.fadeToDpmsRequested();
                 } else {
@@ -122,6 +129,7 @@ Singleton {
             if (!enabled)
                 return;
             if (isIdle) {
+                root.dismissScreensaver();
                 if (SettingsData.fadeToLockEnabled) {
                     root.fadeToLockRequested();
                 } else {
@@ -191,6 +199,7 @@ Singleton {
 
     onExternalInhibitActiveChanged: {
         if (externalInhibitActive) {
+            dismissScreensaver();
             const apps = DMSService.screensaverInhibitors.map(i => i.appName).join(", ");
             log.info("External idle inhibit active from:", apps || "unknown");
         } else {

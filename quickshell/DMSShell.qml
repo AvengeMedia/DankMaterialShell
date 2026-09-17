@@ -22,6 +22,7 @@ import qs.Widgets
 import qs.Modules.Notifications.Popup
 import qs.Modules.OSD
 import qs.Modules.ProcessList
+import qs.Modules.Screensaver
 import qs.Modules.DankBar.Popouts
 import qs.Modules.WorkspaceOverlays
 import qs.Modules.Settings.DisplayConfig
@@ -57,6 +58,8 @@ Item {
     }
 
     DesktopWidgetLayer {}
+
+    Screensaver {}
 
     Lock {
         id: lock
