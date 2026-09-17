@@ -1786,98 +1786,90 @@ Singleton {
         const isInitial = !_hasLoaded;
         let unsavedChanges;
 
-        try {
-            let obj = _getSettingsObjectFromFiles();
-            let loadedSettings = JSON.stringify(obj);
+        let obj = _getSettingsObjectFromFiles();
+        let loadedSettings = JSON.stringify(obj);
 
-            if (isInitial) {
-                const oldVersion = obj?.configVersion ?? 0;
-                const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
-                const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
-                const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
-                if (oldVersion < settingsConfigVersion) {
-                    const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
-                    if (migrated) {
-                        obj = migrated;
+        if (isInitial) {
+            const oldVersion = obj?.configVersion ?? 0;
+            const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
+            const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
+            const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
+            if (oldVersion < settingsConfigVersion) {
+                const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
+                if (migrated) {
+                    obj = migrated;
+                }
+            }
+
+            if (legacyPins) {
+                Qt.callLater(() => CacheData.migratePins(legacyPins));
+            }
+            if (cachePayload) {
+                Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
+            } if (sessionPayload) {
+                Qt.callLater(() => {
+                    SessionData.importFromSettings(sessionPayload);
+                    _mergeSessionState();
+                });
+            }
+
+            if (obj?.lockScreenActiveMonitor !== undefined) {
+                var oldVal = obj.lockScreenActiveMonitor;
+                if (oldVal && oldVal !== "all") {
+                    if (!obj.screenPreferences) {
+                        obj.screenPreferences = {};
+                    }
+                    if (obj.screenPreferences.lockScreen === undefined) {
+                        obj.screenPreferences.lockScreen = [oldVal];
                     }
                 }
-
-                if (legacyPins) {
-                    Qt.callLater(() => CacheData.migratePins(legacyPins));
-                }
-                if (cachePayload) {
-                    Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
-                } if (sessionPayload) {
-                    Qt.callLater(() => {
-                        SessionData.importFromSettings(sessionPayload);
-                        _mergeSessionState();
-                    });
-                }
-
-                if (obj?.lockScreenActiveMonitor !== undefined) {
-                    var oldVal = obj.lockScreenActiveMonitor;
-                    if (oldVal && oldVal !== "all") {
-                        if (!obj.screenPreferences) {
-                            obj.screenPreferences = {};
-                        }
-                        if (obj.screenPreferences.lockScreen === undefined) {
-                            obj.screenPreferences.lockScreen = [oldVal];
-                        }
-                    }
-                    delete obj.lockScreenActiveMonitor;
-                }
-
-                if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
-                    obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
-                    delete obj.use24HourClock;
-                }
+                delete obj.lockScreenActiveMonitor;
             }
 
-            const prevFrameEnabled = frameEnabled;
-            const prevFrameMode = frameMode;
-            unsavedChanges = loadedSettings !== JSON.stringify(obj);
-            Store.parse(root, obj);
-
-            // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
-            if (frameEnabled && islandBarConfigs.length > 0)
-                clearIslandBars();
-
-            if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
-                frameMode = "connected";
-
-            if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
-                iconThemeDark = obj.iconTheme;
-
-            if (obj?.weatherLocation !== undefined)
-                _legacyWeatherLocation = obj.weatherLocation;
-
-            if (obj.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
-                _legacyVpnLastConnected = obj.vpnLastConnected;
-                SessionData.vpnLastConnected = _legacyVpnLastConnected;
-                SessionData.saveSettings();
+            if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
+                obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
+                delete obj.use24HourClock;
             }
+        }
 
-            _hasLoaded = true;
+        const prevFrameEnabled = frameEnabled;
+        const prevFrameMode = frameMode;
+        unsavedChanges = loadedSettings !== JSON.stringify(obj);
+        Store.parse(root, obj);
 
-            if (isInitial) {
-                _mergeSessionState();
-                Qt.callLater(checkIconThemeDrift);
+        // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
+        if (frameEnabled && islandBarConfigs.length > 0)
+        clearIslandBars();
+
+        if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
+        frameMode = "connected";
+
+        if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
+        iconThemeDark = obj.iconTheme;
+
+        if (obj?.weatherLocation !== undefined)
+        _legacyWeatherLocation = obj.weatherLocation;
+
+        if (obj.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
+            _legacyVpnLastConnected = obj.vpnLastConnected;
+            SessionData.vpnLastConnected = _legacyVpnLastConnected;
+            SessionData.saveSettings();
+        }
+
+        _hasLoaded = true;
+
+        if (isInitial) {
+            _mergeSessionState();
+            Qt.callLater(checkIconThemeDrift);
+        }
+        applyStoredTheme();
+        updateCompositorCursor();
+        if (!isInitial) {
+            // External edits reload under _loading, which skips the per-property transition triggers
+            const frameChanged = (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode));
+            if (!_parseError && frameChanged) {
+                updateFrameCompositorLayout();
             }
-            applyStoredTheme();
-            updateCompositorCursor();
-            if (!isInitial) {
-                // External edits reload under _loading, which skips the per-property transition triggers
-                const frameChanged = (frameEnabled !== prevFrameEnabled || (frameEnabled && frameMode !== prevFrameMode));
-                if (!_parseError && frameChanged) {
-                    updateFrameCompositorLayout();
-                }
-            }
-
-        } catch (e) {
-            const msg = e.message;
-            log.error("Failed to load settings. Error:", msg);
-            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to load settings"), msg));
-            applyStoredTheme();
         }
 
         if (isInitial) {
