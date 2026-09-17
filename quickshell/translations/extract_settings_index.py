@@ -90,7 +90,7 @@ CATEGORY_KEYWORDS = {
     "Dank Island": ["island", "activities", "dynamic island"],
     "Default Apps": ["browser", "terminal", "handlers", "mime"],
     "Users": ["accounts", "user", "profile"],
-    "Autostart": ["startup", "launch", "boot"],
+    "Startup Apps": ["autostart", "launch", "login", "programs"],
 }
 
 TAB_INDEX_MAP = {
@@ -189,7 +189,7 @@ TAB_CATEGORY_MAP = {
     33: "Frame",
     34: "Default Apps",
     35: "Users",
-    36: "Autostart Apps",
+    36: "Startup Apps",
     37: "Personalization",
     38: "Applications",
     39: "Network",
