@@ -43,7 +43,7 @@ Variants {
                 if (launcherOpen || _openedForCurrentHover)
                     return;
                 _openedForCurrentHover = true;
-                PopoutService.openDankLauncherV2(CompositorService.framePeerSurfacesUseOverlayForScreen(zoneLoader.modelData), true);
+                PopoutService.openDankLauncherV2(false, true);
             }
 
             screen: zoneLoader.modelData
