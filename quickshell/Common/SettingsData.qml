@@ -1734,8 +1734,11 @@ Singleton {
     function saveSettings() {
         if (isGreeterMode || _loading || _parseError || !_hasLoaded)
             return;
+        const json = JSON.stringify(Store.toJson(root), null, 2);
+        if (json === settingsFile.text())
+            return;
         _selfWrite = true;
-        settingsFile.setText(JSON.stringify(Store.toJson(root), null, 2));
+        settingsFile.setText(json);
         if (_isReadOnly)
             _checkSettingsWritable();
     }
