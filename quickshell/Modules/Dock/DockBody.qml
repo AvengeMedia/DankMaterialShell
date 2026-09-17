@@ -351,7 +351,7 @@ Item {
         onTriggered: dock.startupRevealDone = true
     }
 
-    readonly property bool overviewReveal: CompositorService.overviewActiveOnScreen(screenName) && SettingsData.dockOpenOnOverview
+    readonly property bool overviewReveal: CompositorService.overviewActiveOnScreen(dock._dockScreenName) && SettingsData.dockOpenOnOverview
     readonly property bool hoverOrActive: dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky
 
     onOverviewRevealChanged: {
