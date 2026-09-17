@@ -67,6 +67,17 @@ Singleton {
         root.allWorkspaces = Object.values(newMap).sort((a, b) => a.idx - b.idx);
     }
 
+    function updateWorkspace(workspaceId, changes) {
+        const ws = root.workspaces[workspaceId];
+        if (!ws)
+            return;
+        if (Object.keys(changes).every(key => ws[key] === changes[key]))
+            return;
+        const updatedWorkspaces = Object.assign({}, root.workspaces);
+        updatedWorkspaces[workspaceId] = Object.assign({}, ws, changes);
+        setWorkspaces(updatedWorkspaces);
+    }
+
     function validate() {
         validateProcess.running = true;
     }
@@ -512,40 +523,20 @@ Singleton {
         if (changed)
             windows = updatedWindows;
 
-        if (focusedWindow) {
-            const ws = root.workspaces[focusedWindow.workspace_id];
-            if (ws && ws.active_window_id !== focusedWindowId) {
-                const updatedWs = {};
-                for (let prop in ws) {
-                    updatedWs[prop] = ws[prop];
-                }
-                updatedWs.active_window_id = focusedWindowId;
-
-                const updatedWorkspaces = {};
-                for (const id in root.workspaces) {
-                    updatedWorkspaces[id] = id === focusedWindow.workspace_id ? updatedWs : root.workspaces[id];
-                }
-                setWorkspaces(updatedWorkspaces);
-            }
-        }
+        if (!focusedWindow)
+            return;
+        updateWorkspace(focusedWindow.workspace_id, {
+            "active_window_id": focusedWindowId
+        });
     }
 
     function handleWorkspaceActiveWindowChanged(data) {
-        const ws = root.workspaces[data.workspace_id];
-        if (ws) {
-            const updatedWs = {};
-            for (let prop in ws) {
-                updatedWs[prop] = ws[prop];
-            }
-            updatedWs.active_window_id = data.active_window_id;
+        if (root.workspaces[data.workspace_id]) {
             if (data.active_window_id !== null && data.active_window_id !== undefined)
                 lastFocusedWindowId = data.active_window_id;
-
-            const updatedWorkspaces = {};
-            for (const id in root.workspaces) {
-                updatedWorkspaces[id] = id === data.workspace_id ? updatedWs : root.workspaces[id];
-            }
-            setWorkspaces(updatedWorkspaces);
+            updateWorkspace(data.workspace_id, {
+                "active_window_id": data.active_window_id
+            });
         }
 
         let changed = false;
@@ -682,20 +673,11 @@ Singleton {
     }
 
     function handleWorkspaceUrgencyChanged(data) {
-        const ws = root.workspaces[data.id];
-        if (!ws)
+        if (!root.workspaces[data.id])
             return;
-        const updatedWs = {};
-        for (let prop in ws) {
-            updatedWs[prop] = ws[prop];
-        }
-        updatedWs.is_urgent = data.urgent;
-
-        const updatedWorkspaces = {};
-        for (const id in root.workspaces) {
-            updatedWorkspaces[id] = id === data.id ? updatedWs : root.workspaces[id];
-        }
-        setWorkspaces(updatedWorkspaces);
+        updateWorkspace(data.id, {
+            "is_urgent": data.urgent
+        });
 
         windowUrgentChanged();
     }
