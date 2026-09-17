@@ -1494,10 +1494,11 @@ Singleton {
 
     function _runStartSequence() {
         Processes.settingsRoot = root;
-        _loadSettings();
+        const unsaved = _loadSettings();
         initializeListModels();
         refreshAuthAvailability();
         Processes.checkPluginSettings();
+        return unsaved;
     }
 
     function applyStoredTheme() {
@@ -1783,6 +1784,7 @@ Singleton {
 
     function _loadSettings() {
         const isInitial = !_hasLoaded;
+        let unsavedChanges;
 
         try {
             let obj = _getSettingsObjectFromFiles();
@@ -1833,7 +1835,7 @@ Singleton {
 
             const prevFrameEnabled = frameEnabled;
             const prevFrameMode = frameMode;
-            const unsavedChanges = loadedSettings !== JSON.stringify(obj);
+            unsavedChanges = loadedSettings !== JSON.stringify(obj);
             Store.parse(root, obj);
 
             // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
@@ -1870,9 +1872,6 @@ Singleton {
                     updateFrameCompositorLayout();
                 }
             }
-            if (unsavedChanges) {
-                saveSettings();
-            }
 
         } catch (e) {
             const msg = e.message;
@@ -1885,6 +1884,7 @@ Singleton {
             loadPluginSettings();
             Qt.callLater(() => _reconcileConnectedFrameBarStyles());
         }
+        return unsavedChanges;
     }
 
     function _mergeSessionState() {
@@ -3692,13 +3692,17 @@ Singleton {
         if (_settingsStage !== SettingsData.Stage.Ready || _anySettingsFile(file => file.isLoading)) {
             return;
         }
+        let unsaved;
         _loading = true;
         if (!_hasLoaded) {
-            _runStartSequence();
+            unsaved = _runStartSequence();
         } else {
-            _loadSettings();
+            unsaved = _loadSettings();
         }
         _loading = false;
+        if (unsaved) {
+            _saveSettings();
+        }
     }
     function _getSettingsObjectFromFiles() {
         const settingsObject = {};
