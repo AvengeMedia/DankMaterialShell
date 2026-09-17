@@ -244,18 +244,33 @@ StyledRect {
                         width: parent.width
                         dropdownWidth: parent.width
                         visible: !scaleContainer.customMode
-                        currentValue: scaleContainer.currentScale
                         options: scaleContainer.scaleOptionsData.labels
                         onValueChanged: value => {
                             if (value === I18n.tr("Custom...")) {
-                                scaleContainer.customMode = true;
+                                currentValue = scaleContainer.currentScale;
                                 scaleInput.text = scaleContainer.currentScale;
-                                scaleInput.forceActiveFocus();
-                                scaleInput.selectAll();
+                                scaleContainer.customMode = true;
+                                customFocusTimer.restart();
                                 return;
                             }
                             const mapped = scaleContainer.scaleOptionsData.valueByLabel[value];
                             DisplayConfigState.setPendingChange(root.outputName, "scale", mapped !== undefined ? mapped : parseFloat(value));
+                        }
+                    }
+
+                    Binding {
+                        target: scaleDropdown
+                        property: "currentValue"
+                        value: scaleContainer.currentScale
+                    }
+
+                    // the dropdown takes focus back when its menu finishes closing
+                    Timer {
+                        id: customFocusTimer
+                        interval: Theme.shortDuration + 100
+                        onTriggered: {
+                            scaleInput.forceActiveFocus();
+                            scaleInput.selectAll();
                         }
                     }
 
