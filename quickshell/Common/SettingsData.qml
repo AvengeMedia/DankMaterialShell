@@ -88,7 +88,6 @@ Singleton {
     property bool _parseError: false
     property bool _pluginParseError: false
     property bool _hasLoaded: false
-    property bool _allSettingsFilesLoaded: false
     property bool isReadOnly: false
     property var pluginSettings: ({})
     property var builtInPluginSettings: ({})
@@ -3573,7 +3572,7 @@ Singleton {
                 } finally {
                     isLoading = false;
                     if (hasLoaded) {
-                        _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
+                        _tryCompleteLoading();
                     }
                     if (hadParseFailed && !hasParseFailed) {
                         _parseError = _anySettingsFile(file => file.hasParseFailed);
@@ -3588,12 +3587,12 @@ Singleton {
                 isLoading = false;
                 _loading = _anySettingsFile(file => file.isLoading);
                 if (error === FileViewError.FileNotFound) {
-                    // fake that file has been loaded so that it gets written after a change.
+                    // Fake that the file has been loaded so that it gets created after a save.
                     hasLoaded = true;
                 }
                 applyStoredTheme();
                 if (hasLoaded) {
-                    _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
+                    _tryCompleteLoading();
                 }
                 _loadSettingsOrStartIfReady();
             }
@@ -3621,7 +3620,9 @@ Singleton {
         }
     }
 
-    property bool _allSettingsFilesRegistered: false
+    enum Stage { Discovering = 0, Loading = 1, Ready = 2 }
+    property int _settingsState: State.Discovering
+
     property var _settingsFiles: new Map()
     property var _settingsFilesPaths: ([])
     property var _failedSaveSettingsFiles: new Set()
@@ -3644,14 +3645,14 @@ Singleton {
         } else {
             _settingsFilesPaths.push(filePath);
         }
-        _tryCompleteRegistration();
+        _tryCompleteDiscovery();
     }
     function _unregisterSettingsFile(file) {
         _settingsFiles.delete(file.filePath);
         _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
     }
-    function _tryCompleteRegistration() {
-        if (_allSettingsFilesRegistered || !configDirExists.checked) {
+    function _tryCompleteDiscovery() {
+        if (_settingsState > SettingsData.Stage.Discovering || !configDirExists.checked) {
             return;
         }
         let expectedCount = 1;
@@ -3662,10 +3663,30 @@ Singleton {
             expectedCount += settingsFolderModel.count;
         }
         if (_settingsFilesPaths.length == expectedCount) {
-            _allSettingsFilesRegistered = true;
-            _allSettingsFilesLoaded = _areAllSettingsFilesLoaded();
+            _settingsState = SettingsData.Stage.Loading;
+            _tryCompleteLoading();
             _loadSettingsOrStartIfReady();
         }
+    }
+    function _tryCompleteLoading() {
+        if (_settingsState !== SettingsData.Stage.Loading) {
+            return;
+        }
+        if (_everySettingsFile(file => file.hasLoaded)) {
+            _settingsState = SettingsData.Stage.Ready;
+        }
+    }
+    function _loadSettingsOrStartIfReady() {
+        if (_settingsState !== SettingsData.Stage.Ready || _anySettingsFile(file => file.isLoading)) {
+            return;
+        }
+        _loading = true;
+        if (!_hasLoaded) {
+            _runStartSequence();
+        } else {
+            _loadSettings();
+        }
+        _loading = false;
     }
     function _getSettingsObjectFromFiles() {
         const settingsObject = {};
@@ -3676,20 +3697,6 @@ Singleton {
         return settingsObject;
     }
 
-    function _loadSettingsOrStartIfReady() {
-        const files = Array.from(_settingsFiles.values());
-        if (!_allSettingsFilesLoaded || files.some(file => file.isLoading)) {
-            return;
-        }
-        // Already true when ran from onLoaded, but false otherwise.
-        _loading = true;
-        if (!_hasLoaded) {
-            _runStartSequence();
-        } else {
-            _loadSettings();
-        }
-        _loading = false;
-    }
     function _anySettingsFile(predicate) {
         for (const file of _settingsFiles.values()) {
             if (predicate(file)) {
@@ -3705,15 +3712,6 @@ Singleton {
             }
         }
         return true;
-    }
-    function _areAllSettingsFilesLoaded() {
-        if (_allSettingsFilesLoaded) {
-            return true;
-        }
-        if (!_allSettingsFilesRegistered) {
-            return false;
-        }
-        return _everySettingsFile(file => file.hasLoaded);
     }
 
     SettingsFile {
@@ -3798,7 +3796,7 @@ Singleton {
             if (exists) {
                 _syncSettingsFilesModels();
             }
-            _tryCompleteRegistration();
+            _tryCompleteDiscovery();
         }
     }
 
