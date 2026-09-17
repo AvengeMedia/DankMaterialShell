@@ -75,8 +75,8 @@ Item {
     function entryDescription(entry) {
         if (entry.description)
             return entry.description;
-        const source = entry.source === "systemd" ? I18n.tr("systemd user service") : I18n.tr("XDG Autostart");
-        return I18n.tr("Startup source: %1").arg(source);
+        const source = entry.source === "systemd" ? I18n.tr("systemd user service", "Startup application source type shown in Settings") : I18n.tr("XDG Autostart", "Startup application source type shown in Settings");
+        return I18n.tr("Startup source: %1", "%1 is the startup source shown for a startup application").arg(source);
     }
 
     function addEntry() {
@@ -138,11 +138,11 @@ Item {
                     root.entries = parsed.filter(entry => entry.category === "application" && entry.mutable === true);
                     root.lastError = "";
                 } catch (error) {
-                    root.lastError = I18n.tr("Failed to read startup applications");
+                    root.lastError = I18n.tr("Failed to read startup applications", "Error shown when startup applications cannot be loaded");
                     root.log.warn("Failed to parse startup application list: " + error);
                 }
             } else {
-                root.lastError = errorText || I18n.tr("Failed to read startup applications");
+                root.lastError = errorText || I18n.tr("Failed to read startup applications", "Error shown when startup applications cannot be loaded");
                 root.log.warn("Failed to load startup applications: " + root.lastError);
             }
             if (root.refreshPending) {
@@ -165,7 +165,7 @@ Item {
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                const title = operation === "add" ? I18n.tr("Failed to add startup application") : (operation === "remove" ? I18n.tr("Failed to remove startup application") : I18n.tr("Failed to update startup application"));
+                const title = operation === "add" ? I18n.tr("Failed to add startup application", "Error shown when a startup application cannot be added") : (operation === "remove" ? I18n.tr("Failed to remove startup application", "Error shown when a startup application cannot be removed") : I18n.tr("Failed to update startup application", "Error shown when a startup application cannot be updated"));
                 ToastService.showError(title, errorText.split("\n")[0]);
                 root.log.warn(title + ": " + errorText);
             } else if (operation === "add") {
@@ -179,7 +179,7 @@ Item {
     Timer {
         interval: 30000
         repeat: true
-        running: root.visible
+        running: root.visible && (root.parentModal ? root.parentModal.visible : true)
         onTriggered: root.refresh()
     }
 
@@ -274,27 +274,27 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "rocket_launch"
-                title: I18n.tr("Startup Apps")
+                title: I18n.tr("Startup Apps", "Title for the list of applications that launch at sign-in")
                 settingKey: "autostartEntries"
                 tags: ["startup", "autostart", "applications", "login"]
 
                 headerActions: [
                     DankRefreshButton {
                         busy: root.loading
-                        tooltipText: I18n.tr("Refresh")
+                        tooltipText: I18n.tr("Refresh", "Tooltip for refreshing the startup application list")
                         onClicked: root.refresh()
                     },
                     DankActionButton {
                         iconName: root.showAddForm ? "close" : "add"
                         iconColor: Theme.primary
-                        tooltipText: root.showAddForm ? I18n.tr("Close") : I18n.tr("Add Startup App")
+                        tooltipText: root.showAddForm ? I18n.tr("Close", "Tooltip for closing the add startup application form") : I18n.tr("Add Startup App", "Label for adding an application that launches at sign-in")
                         onClicked: root.showAddForm = !root.showAddForm
                     }
                 ]
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("Applications that automatically start when you sign in.")
+                    text: I18n.tr("Applications that automatically start when you sign in.", "Description of applications that launch at sign-in")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
@@ -391,7 +391,7 @@ Item {
                                 iconSize: 18
                                 buttonSize: 32
                                 iconColor: Theme.error
-                                tooltipText: I18n.tr("Remove")
+                                tooltipText: I18n.tr("Remove", "Tooltip for removing a startup application")
                                 visible: entryRow.modelData.removable === true
                                 enabled: !operationProcess.running
                                 onClicked: root.removeEntry(entryRow.modelData)
@@ -418,7 +418,7 @@ Item {
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("No startup applications found")
+                    text: I18n.tr("No startup applications found", "Empty state shown when no startup applications are configured")
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceVariantText
                     horizontalAlignment: Text.AlignHCenter
@@ -429,7 +429,7 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "add_circle"
-                title: I18n.tr("Add Startup App")
+                title: I18n.tr("Add Startup App", "Label for adding an application that launches at sign-in")
                 settingKey: "autostartAddEntry"
                 tags: ["startup", "autostart", "add", "application", "command"]
                 visible: root.showAddForm
@@ -450,7 +450,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: I18n.tr("Select an application")
+                        text: I18n.tr("Select a desktop application")
                         font.pixelSize: Theme.fontSizeMedium
                         font.weight: Font.Medium
                         color: Theme.surfaceText
@@ -555,7 +555,7 @@ Item {
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("This creates an XDG startup entry for your user.")
+                    text: I18n.tr("This creates an XDG startup entry for your user.", "Description of what the add startup application form creates")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
@@ -564,7 +564,7 @@ Item {
 
                 DankButton {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: I18n.tr("Add Startup App")
+                    text: I18n.tr("Add Startup App", "Label for adding an application that launches at sign-in")
                     iconName: "add"
                     enabled: !operationProcess.running && (root.newEntryType === "desktop" ? root.newEntryDesktopId !== "" : root.newEntryName.trim() !== "" && root.newEntryExec.trim() !== "")
                     onClicked: root.addEntry()
