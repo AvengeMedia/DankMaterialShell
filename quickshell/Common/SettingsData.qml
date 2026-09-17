@@ -2014,10 +2014,22 @@ Singleton {
         return splitSettings;
     }
     function saveSettings() {
-        if (_loading || _parseError || !_hasLoaded) return;
+        if (_loading || !_hasLoaded) {
+            return;
+        }
         settingsSaveDebounce.restart();
     }
     function _saveSettings() {
+        let reason = null;
+        if (_loading) {
+            reason = "some files are being loaded";
+        } else if (_parseError) {
+            reason = "failed to parse settings.";
+        }
+        if (reason !== null) {
+            log.warn("Refusing to save settings, recent changes may be lost: " + reason);
+            return;
+        }
         const settings = _getCurrentSettings();
         const splitSettings = _splitSettingsByFile(settings);
         for (const path in splitSettings) {
@@ -3544,7 +3556,7 @@ Singleton {
                 }
                 if (hasUnsavedChanges) {
                     const fileName = filePath?.split("/").pop() || "unknown";
-                    log.warn(`Aborting ${fileName} reload, there are unsaved changes which would've been lost`)
+                    log.warn(`Aborting ${fileName} reload: there are unsaved changes which would've been lost.`)
                     isLoading = false;
                     _loading = _anySettingsFile(file => file.isLoading);
                     settingsSaveFailRecovery.start();
@@ -3621,7 +3633,7 @@ Singleton {
     }
 
     enum Stage { Discovering = 0, Loading = 1, Ready = 2 }
-    property int _settingsState: State.Discovering
+    property int _settingsStage: SettingsData.Stage.Discovering
 
     property var _settingsFiles: new Map()
     property var _settingsFilesPaths: ([])
@@ -3652,7 +3664,7 @@ Singleton {
         _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
     }
     function _tryCompleteDiscovery() {
-        if (_settingsState > SettingsData.Stage.Discovering || !configDirExists.checked) {
+        if (_settingsStage > SettingsData.Stage.Discovering || !configDirExists.checked) {
             return;
         }
         let expectedCount = 1;
@@ -3663,21 +3675,21 @@ Singleton {
             expectedCount += settingsFolderModel.count;
         }
         if (_settingsFilesPaths.length == expectedCount) {
-            _settingsState = SettingsData.Stage.Loading;
+            _settingsStage = SettingsData.Stage.Loading;
             _tryCompleteLoading();
             _loadSettingsOrStartIfReady();
         }
     }
     function _tryCompleteLoading() {
-        if (_settingsState !== SettingsData.Stage.Loading) {
+        if (_settingsStage !== SettingsData.Stage.Loading) {
             return;
         }
         if (_everySettingsFile(file => file.hasLoaded)) {
-            _settingsState = SettingsData.Stage.Ready;
+            _settingsStage = SettingsData.Stage.Ready;
         }
     }
     function _loadSettingsOrStartIfReady() {
-        if (_settingsState !== SettingsData.Stage.Ready || _anySettingsFile(file => file.isLoading)) {
+        if (_settingsStage !== SettingsData.Stage.Ready || _anySettingsFile(file => file.isLoading)) {
             return;
         }
         _loading = true;
