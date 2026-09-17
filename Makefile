@@ -44,7 +44,8 @@ lint-qml:
 
 .PHONY: test-qml
 test-qml:
-	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -input quickshell/tests -o -,txt
+	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -input quickshell/tests/unit -o -,txt
+	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -import quickshell/tests/lock/mocks -input quickshell/tests/lock -o -,txt
 
 # Pull the latest dank-qml-common and pin it everywhere it is consumed
 # (submodule pointer + nix flake input). Commit both in one change.

@@ -1,0 +1,3 @@
+module Quickshell.Services.Pam
+PamContext 1.0 PamContext.qml
+PamResult 1.0 PamResult.qml
