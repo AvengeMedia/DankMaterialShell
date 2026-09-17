@@ -998,6 +998,37 @@
     "description": "Apply inverse concave corner cutouts to the bar"
   },
   {
+    "section": "barHideOnFullscreen",
+    "label": "Hide Bar on Fullscreen",
+    "tabIndex": 3,
+    "category": "Bar",
+    "keywords": [
+      "app",
+      "applications",
+      "apps",
+      "away",
+      "bar",
+      "edge",
+      "fullscreen",
+      "hide",
+      "move",
+      "over",
+      "panel",
+      "pointer",
+      "program",
+      "programs",
+      "reveal",
+      "screen",
+      "slide",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "visibility"
+    ],
+    "description": "Slide the bar away over fullscreen applications. Move the pointer to the screen edge to reveal it.",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "barHideWhenWindowsOpen",
     "label": "Hide When Windows Open",
     "tabIndex": 3,

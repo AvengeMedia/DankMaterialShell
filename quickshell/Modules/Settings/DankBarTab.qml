@@ -234,6 +234,7 @@ Item {
             popupGapsManual: defaultBar.popupGapsManual ?? 4,
             maximizeDetection: defaultBar.maximizeDetection ?? true,
             useOverlayLayer: defaultBar.useOverlayLayer ?? false,
+            hideOnFullscreen: defaultBar.hideOnFullscreen ?? false,
             scrollEnabled: defaultBar.scrollEnabled ?? true,
             scrollXBehavior: defaultBar.scrollXBehavior ?? "column",
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
@@ -916,6 +917,16 @@ Item {
                         });
                         notifyHorizontalBarChange();
                     }
+                }
+
+                SettingsToggleRow {
+                    settingKey: "barHideOnFullscreen"
+                    tags: ["bar", "fullscreen", "hide", "visibility"]
+                    visible: CompositorService.isNiri && !dankBarTab.islandOwnsSelectedBarTop && (selectedBarConfig?.useOverlayLayer ?? false)
+                    text: I18n.tr("Hide Bar on Fullscreen", "bar visibility toggle")
+                    description: I18n.tr("Slide the bar away over fullscreen applications. Move the pointer to the screen edge to reveal it.", "bar fullscreen auto-hide description")
+                    checked: selectedBarConfig?.hideOnFullscreen ?? false
+                    onToggled: toggled => SettingsData.updateBarConfig(selectedBarId, { hideOnFullscreen: toggled })
                 }
             }
 
