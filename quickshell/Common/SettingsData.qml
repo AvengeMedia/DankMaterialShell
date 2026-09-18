@@ -3225,14 +3225,12 @@ Singleton {
         _settingsFilesPaths = _settingsFilesPaths.filter(path => path != file.filePath);
     }
     function _tryCompleteDiscovery() {
-        if (_settingsStage > SettingsData.Stage.Discovering || !configDirExists.checked) {
+        const folderModel = settingsFolderModel;
+        if (_settingsStage !== SettingsData.Stage.Discovering || !folderModel.checked) {
             return;
         }
         let expectedCount = 1;
-        if (configDirExists.exists) {
-            if (!(settingsFolderModel.status === FolderListModel.Ready)) {
-                return;
-            }
+        if (folderModel.exists) {
             expectedCount += settingsFolderModel.count;
         }
         if (_settingsFilesPaths.length == expectedCount) {
@@ -3302,35 +3300,31 @@ Singleton {
     }
 
     function _syncSettingsFilesModels() {
-        if (!configDirExists.checked) {
-            settingsFilesModelSyncDebounce.restart();
-            return;
-        }
-        if (!configDirExists.exists) {
-            return;
-        }
-        const folderModel = settingsFolderModel;
         const listModel = settingsFilesListModel;
-
-        if (folderModel.status === FolderListModel.Ready) {
-            const folderPaths = (new Array(folderModel.count)).fill(1).map((_, index) => {
-                return folderModel.get(index, "filePath")
-            });
-
-            for (const filePath of folderPaths) {
-                if (!_settingsFiles.has(filePath)) {
-                    listModel.append({ filePath });
-                }
-            }
-            const folderPathsSet = new Set(folderPaths);
-            for (let i = listModel.count - 1; i >= 0; i--) {
-                const filePath = listModel.get(i).filePath;
-                if (!folderPathsSet.has(filePath)) {
-                    listModel.remove(i);
-                }
-            }
-        } else {
+        const folderModel = settingsFolderModel;
+        if (!folderModel.checked) {
             settingsFilesModelSyncDebounce.restart();
+            return;
+        }
+        if (!folderModel.exists) {
+            return;
+        }
+
+        const folderPaths = Array.from({length: folderModel.count}, (index) => {
+            return folderModel.get(index, "filePath");
+        });
+
+        for (const filePath of folderPaths) {
+            if (!_settingsFiles.has(filePath)) {
+                listModel.append({ filePath });
+            }
+        }
+        const folderPathsSet = new Set(folderPaths);
+        for (let i = listModel.count - 1; i >= 0; i--) {
+            const filePath = listModel.get(i).filePath;
+            if (!folderPathsSet.has(filePath)) {
+                listModel.remove(i);
+            }
         }
     }
     Timer {
@@ -3348,32 +3342,22 @@ Singleton {
 
         // Folder seems to be reset to the CWD if the directory doesn't exist.
         property url dir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/config.d"
+        property bool checked: false
+        property bool exists: folder === dir
+
         folder: dir
         showDirs: false
         nameFilters: ["*.json"]
         onStatusChanged: {
+            if (status === FolderListModel.Ready) {
+                checked = true;
+                _tryCompleteDiscovery();
+            }
             if (_hasLoaded) {
                 settingsFilesModelSyncDebounce.restart();
             } else {
                 _syncSettingsFilesModels();
             }
-        }
-    }
-    Process {
-        id: configDirExists
-
-        command: ["test", "-d", Paths.strip(settingsFolderModel.dir)]
-        running: true
-        property bool checked: false
-        property bool exists: false
-        // qmllint disable signal-handler-parameters
-        onExited: (code) => {
-            checked = true;
-            exists = code === 0;
-            if (exists) {
-                _syncSettingsFilesModels();
-            }
-            _tryCompleteDiscovery();
         }
     }
 
