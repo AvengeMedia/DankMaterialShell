@@ -683,7 +683,7 @@ Singleton {
     readonly property color buttonText: {
         switch (SettingsData.buttonColorMode) {
         case "primaryContainer":
-            return primary;
+            return onPrimaryContainer;
         case "secondary":
             return surfaceText;
         case "surfaceVariant":
