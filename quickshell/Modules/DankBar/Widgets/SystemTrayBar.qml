@@ -79,7 +79,10 @@ BasePill {
         const id = key.includes("::") ? key.split("::")[0] : key;
         if (root.trayItemCountForId(id) > 1)
             return null;
-        return list.filter(saved => saved === id || saved.startsWith(id + "::"))[0] || null;
+        const matches = list.filter(saved => saved === id || saved.startsWith(id + "::"));
+        if (matches.length !== 1)
+            return null;
+        return matches[0];
     }
 
     function isTrayIdHidden(key) {
