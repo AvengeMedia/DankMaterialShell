@@ -3310,16 +3310,14 @@ Singleton {
             return;
         }
 
-        const folderPaths = Array.from({length: folderModel.count}, (index) => {
-            return folderModel.get(index, "filePath");
-        });
-
-        for (const filePath of folderPaths) {
+        const folderPathsSet = new Set();
+        for (let i = 0; i < folderModel.count; i++) {
+            const filePath = folderModel.get(i, "filePath");
+            folderPathsSet.add(filePath);
             if (!_settingsFiles.has(filePath)) {
                 listModel.append({ filePath });
             }
         }
-        const folderPathsSet = new Set(folderPaths);
         for (let i = listModel.count - 1; i >= 0; i--) {
             const filePath = listModel.get(i).filePath;
             if (!folderPathsSet.has(filePath)) {
@@ -3349,15 +3347,16 @@ Singleton {
         showDirs: false
         nameFilters: ["*.json"]
         onStatusChanged: {
-            if (status === FolderListModel.Ready) {
-                checked = true;
-                _tryCompleteDiscovery();
+            if (status !== FolderListModel.Ready) {
+                return;
             }
+            checked = true;
             if (_hasLoaded) {
                 settingsFilesModelSyncDebounce.restart();
             } else {
                 _syncSettingsFilesModels();
             }
+            _tryCompleteDiscovery();
         }
     }
 
