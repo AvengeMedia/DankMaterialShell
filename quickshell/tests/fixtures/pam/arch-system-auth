@@ -1,0 +1,16 @@
+#%PAM-1.0
+
+auth       required                    pam_faillock.so      preauth deny=5 unlock_time=600
+# Optionally use requisite above if you do not want to prompt for the password
+# on locked accounts.
+-auth      [success=2 default=ignore]  pam_systemd_home.so
+auth       [success=1 default=bad]     pam_unix.so          try_first_pass nullok
+auth       [default=die]               pam_faillock.so      authfail deny=5 unlock_time=600
+auth       optional                    pam_permit.so
+auth       required                    pam_env.so
+auth       required                    pam_faillock.so      authsucc
+auth       include                     system-login
+
+account    required                    pam_unix.so
+password   required                    pam_unix.so          try_first_pass nullok shadow
+session    required                    pam_unix.so

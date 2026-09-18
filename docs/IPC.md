@@ -574,6 +574,62 @@ dms ipc call bar status
 
 One bar instance may be designated as Dank Island (Settings → Island → Island instance)
 
+## Target: `dock`
+
+Dock visibility and auto-hide control.
+
+A dock is one of possibly several configurations, each holding one screen edge. Functions without a
+`selector` act on the dock of the focused screen; the `*For` variants take a `selector` naming a dock
+by its id or its display name (as shown in Settings → Dock → Configuration). Every function returns
+`DOCK_NOT_FOUND` when no dock matches.
+
+### Functions
+
+**`reveal`** / **`revealFor <selector>`**
+- Enable the dock
+- Returns: `DOCK_SHOW_SUCCESS`
+
+**`hide`** / **`hideFor <selector>`**
+- Disable the dock
+- Returns: `DOCK_HIDE_SUCCESS`
+
+**`toggle`** / **`toggleFor <selector>`**
+- Toggle the dock
+- Returns: `DOCK_SHOW_SUCCESS` or `DOCK_HIDE_SUCCESS`
+
+**`status`** / **`statusFor <selector>`**
+- Get current dock visibility
+- Returns: "visible" or "hidden"
+
+**`edit`** / **`editFor <selector>`**
+- Open the dock's widget edit mode
+- Returns: `DOCK_EDIT_SUCCESS`, or `DOCK_HIDDEN` when the dock is disabled
+
+**`autoHide`** / **`manualHide`**
+- Turn auto-hide on or off for the focused screen's dock. Both clear smart auto-hide
+- Returns: `BAR_AUTO_HIDE_SUCCESS` or `BAR_MANUAL_HIDE_SUCCESS`
+
+**`toggleAutoHide`**
+- Toggle auto-hide for the focused screen's dock
+- Returns: `BAR_AUTO_HIDE_SUCCESS` or `BAR_MANUAL_HIDE_SUCCESS`
+
+**`autoHideFor <selector> <enabled>`**
+- Set auto-hide on a named dock
+- Parameters: `enabled` - `true` or `false`
+- Returns: `BAR_AUTO_HIDE_SUCCESS` or `BAR_MANUAL_HIDE_SUCCESS`
+
+### Examples
+```bash
+dms ipc call dock toggle
+dms ipc call dock status
+dms ipc call dock revealFor Dock
+dms ipc call dock hideFor dock_1757371200000
+dms ipc call dock toggleAutoHide
+dms ipc call dock autoHideFor Dock true
+dms ipc call dock edit
+dms ipc call dock editFor Dock
+```
+
 ## Target: `island`
 
 Dank Island activity surface. Requires a bar instance designated as the island in Settings (Island → Island instance) and enabled. Commands target the focused screen.
@@ -610,7 +666,7 @@ Dank Island activity surface. Requires a bar instance designated as the island i
 - Returns: `DANK_ISLAND_CLOSED: <screen>` or `DANK_ISLAND_UNAVAILABLE`
 
 **`cycle`**
-- Cycle island activities (`home` → `media` when available → `launcher` when Launcher → Default Opens is Island → `controlcenter` → `notificationcenter`)
+- Cycle island activities (`home` → `media` when available → `launcher` when Launcher → Default Opens is Island → `controlcenter` → `wallpaper` → `weather` when enabled → `notificationcenter`)
 - Returns: `DANK_ISLAND_ACTIVITY: <activity>\t<screen>` or `DANK_ISLAND_UNAVAILABLE`
 
 **`status`**
@@ -770,8 +826,25 @@ Settings modal control.
 
 **Functions:**
 - `open` - Show settings modal
+- `openWith <page>` - Show settings modal on a page
 - `close` - Hide settings modal
 - `toggle` - Toggle settings modal visibility
+- `toggleWith <page>` - Toggle settings modal, landing on a page when it opens
+- `focusOrToggle` - Focus the settings window if it is open but not active, otherwise toggle it
+- `focusOrToggleWith <page>` - Same as above, landing on a page
+- `tabs` - List valid page ids, one per line
+- `get <key>` - Read a settings value as JSON
+- `set <key> <value>` - Set a boolean, number or string settings value
+- `dump` - Print settings.json
+- `dumpSession` - Print session.json
+
+Page ids are the category ids (`personalization`, `dankbar`, `dashboards_osd`, `sound_media`, `displays`, `network`, `applications`, `input`, `power_battery`, `security_accounts`, `date_time_region`, `system`, `plugins`), the top-level page ids (`theme_surfaces`, `typography`, `dankbar_widgets`, `dock`, `launcher`, `notifications`, `about`), the page ids inside them (`wallpaper`, `theme`, `dock`, `network_wifi`, `keybinds`, ...) and `plugin:<pluginId>` for an installed plugin's settings page. A category id opens its hub page, or its only page when just one is available. Ids are case-insensitive and ignore `_`, `-` and spaces.
+
+```bash
+dms ipc call settings tabs
+dms ipc call settings openWith dock
+dms ipc call settings openWith plugin:dankKDEConnect
+```
 
 ### Target: `processlist`
 System process list and performance modal control.
@@ -834,17 +907,19 @@ Notepad/scratchpad modal control for quick note-taking.
 - `toggleExpand` - Toggle the active notepad width between collapsed and expanded
 
 ### Target: `dash`
-Dashboard popup control with tab selection for overview, media, and weather information.
+Dashboard popup control with tab selection.
 
 **Functions:**
 - `open [tab]` - Show dashboard popup with optional tab selection
-  - Parameters: `tab` - Tab to open: "", "overview", "media", or "weather"
+  - Parameters: `tab` - Tab id: "", "overview", "media", "wallpaper", "weather", or `plugin_<pluginId>` for a plugin tab. A number selects the nth visible tab. Unknown ids and tabs hidden in Settings open the overview.
   - Returns: Success/failure message
 - `close` - Hide dashboard popup
   - Returns: Success/failure message
 - `toggle [tab]` - Toggle dashboard popup visibility with optional tab selection
-  - Parameters: `tab` - Tab to open when showing: "", "overview", "media", or "weather"
+  - Parameters: `tab` - Same values as `open`
   - Returns: Success/failure message
+- `openAt <tab> <position>` / `toggleAt <tab> <position>` - Same, anchored to the `left`, `center` or `right` bar section
+- `resolveTabIndex <tab>` - Index of the tab in the visible tab bar
 
 On displays where Dank Island is the sole top chrome, `open`/`toggle` with `overview` (or no tab), `media`, `wallpaper`, or `weather` route to the matching island activity. `close` collapses those island activities when they are open.
 
@@ -973,6 +1048,7 @@ dms ipc call notepad toggleExpand
 dms ipc call dash open overview
 dms ipc call dash toggle media
 dms ipc call dash open weather
+dms ipc call dash open plugin_dashTabExample
 
 # Open wallpaper browser
 dms ipc call dankdash wallpaper

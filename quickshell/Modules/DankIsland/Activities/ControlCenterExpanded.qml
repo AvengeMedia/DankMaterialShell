@@ -14,24 +14,28 @@ FocusScope {
     property real alignedY: 0
     property real alignedWidth: 0
     property real alignedHeight: 0
+    property QtObject resizeGeometry: null
+    readonly property real sideInset: Theme.spacingXS
     property real bottomInset: Theme.spacingM
     property bool _heightReportPending: false
+    signal windowRequested(string windowName)
 
     clip: true
 
     function resetState() {
         hostContract.editMode = false;
         hostContract.expandedSection = "";
-        hostContract.expandedWidgetIndex = -1;
-        hostContract.expandedWidgetData = null;
     }
 
     function beginSession() {
         hostContract.editMode = false;
         hostContract.expandedSection = root.controller.controlCenterPendingSection || "";
-        hostContract.expandedWidgetIndex = -1;
-        hostContract.expandedWidgetData = null;
         root.queueHeightReport();
+    }
+
+    function focusFace() {
+        content.forceActiveFocus();
+        return true;
     }
 
     function queueHeightReport() {
@@ -49,9 +53,12 @@ FocusScope {
 
         property bool editMode: false
         property string expandedSection: ""
-        property int expandedWidgetIndex: -1
-        property var expandedWidgetData: null
 
+        onEditModeChanged: root.controller.setEditing("controlcenter", editMode)
+
+        readonly property real sheetContentWidth: CcMetrics.sheetWidth + root.controller.controlCenterSheetInset - root.sideInset * 2
+        readonly property real renderedAlignedX: (root.resizeGeometry?.renderedX ?? 0) + root.sideInset
+        readonly property real renderedAlignedY: root.resizeGeometry?.renderedY ?? 0
         readonly property bool shouldBeVisible: root.controller.activeActivity === "controlcenter" && root.controller.expanded
         readonly property bool headerTogglesClose: true
         readonly property bool powerMenuOpen: PopoutService.powerMenuModalLoader?.item?.shouldBeVisible ?? false
@@ -72,19 +79,22 @@ FocusScope {
             root.controller.requestCollapse();
         }
 
-        function collapseAll() {
-            hostContract.expandedSection = "";
-            hostContract.expandedWidgetIndex = -1;
-            hostContract.expandedWidgetData = null;
+        function openSettings() {
+            root.windowRequested("settings");
         }
 
-        function toggleSection(section) {
-            if (hostContract.expandedSection === section) {
-                hostContract.expandedSection = "";
-                hostContract.expandedWidgetIndex = -1;
+        function openColorPicker() {
+            if (!PopoutService.colorPickerModal)
                 return;
-            }
-            hostContract.expandedSection = section;
+            root.windowRequested("colorPicker");
+        }
+
+        function collapseAll() {
+            hostContract.expandedSection = "";
+        }
+
+        function alignedXFor(width) {
+            return (root.resizeGeometry?.screenXFor(width + root.sideInset * 2) ?? 0) + root.sideInset;
         }
     }
 
@@ -105,6 +115,7 @@ FocusScope {
     }
 
     Component.onDestruction: {
+        root.controller.setEditing("controlcenter", false);
         if (hostContract.shouldBeVisible)
             root.releaseScanState();
     }
@@ -135,8 +146,8 @@ FocusScope {
 
         anchors {
             fill: parent
-            leftMargin: Theme.spacingXS
-            rightMargin: Theme.spacingXS
+            leftMargin: root.sideInset
+            rightMargin: root.sideInset
             topMargin: Theme.spacingXS
             bottomMargin: root.bottomInset
         }

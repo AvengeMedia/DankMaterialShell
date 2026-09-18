@@ -102,21 +102,3 @@ a5431dd02dc23d9ef1680e67777fed00fe5f7cda	refs/tags/v1.2.2
 		})
 	}
 }
-
-func TestManualPackageInstaller_parseLatestTagFromGitOutput_EmptyInstaller(t *testing.T) {
-	// Test that parsing works even with a minimal installer setup
-	logChan := make(chan string, 10)
-	defer close(logChan)
-
-	base := NewBaseDistribution(logChan)
-	installer := &ManualPackageInstaller{BaseDistribution: base}
-
-	input := `abc123	refs/tags/v1.0.0
-def456	refs/tags/v0.9.0`
-
-	result := installer.parseLatestTagFromGitOutput(input)
-
-	if result != "v1.0.0" {
-		t.Errorf("Expected v1.0.0, got %s", result)
-	}
-}

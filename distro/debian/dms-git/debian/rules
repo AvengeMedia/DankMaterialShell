@@ -72,7 +72,7 @@ override_dh_auto_install:
 	install -Dm644 assets/dms-open.desktop debian/dms-git/usr/share/applications/dms-open.desktop
 	install -Dm644 assets/com.danklinux.dms.desktop debian/dms-git/usr/share/applications/com.danklinux.dms.desktop
 	install -Dm644 assets/com.danklinux.dms.notepad.desktop debian/dms-git/usr/share/applications/com.danklinux.dms.notepad.desktop
-	install -Dm644 assets/danklogo.svg debian/dms-git/usr/share/icons/hicolor/scalable/apps/danklogo.svg
+	install -Dm644 assets/com.danklinux.dms.svg debian/dms-git/usr/share/icons/hicolor/scalable/apps/com.danklinux.dms.svg
 
 override_dh_auto_clean:
 	# Clean up build artifacts

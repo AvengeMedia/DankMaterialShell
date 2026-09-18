@@ -7,6 +7,7 @@ Column {
 
     property string headerText: ""
     property string detailsText: ""
+    // !TODO: plugin API only, popouts no longer draw a close button; drop once plugins stop setting it
     property bool showCloseButton: false
     property var closePopout: null
     property var parentPopout: null
@@ -29,47 +30,13 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             text: root.headerText
             font.pixelSize: Theme.fontSizeLarge + 4
-            font.weight: Font.Bold
             color: Theme.surfaceText
         }
 
-        Row {
+        Loader {
+            id: headerActionsLoader
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingXS
-
-            Loader {
-                id: headerActionsLoader
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Rectangle {
-                id: closeButton
-                width: 32
-                height: 32
-                radius: 16
-                color: closeArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-                visible: root.showCloseButton
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "close"
-                    size: Theme.iconSize - 4
-                    color: closeArea.containsMouse ? Theme.error : Theme.surfaceText
-                }
-
-                MouseArea {
-                    id: closeArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onPressed: {
-                        if (root.closePopout) {
-                            root.closePopout();
-                        }
-                    }
-                }
-            }
         }
     }
 

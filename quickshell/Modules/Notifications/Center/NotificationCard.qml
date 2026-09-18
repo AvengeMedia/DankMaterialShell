@@ -1,1141 +1,284 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
-import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Notifications
+import qs.Modules.Notifications as Notifications
 
-Rectangle {
+Item {
     id: root
 
     property var notificationGroup
-    property bool expanded: (NotificationService.expandedGroups[notificationGroup && notificationGroup.key] || false)
-    property bool descriptionExpanded: (NotificationService.expandedMessages[(notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : ""] || false)
-    property bool userInitiatedExpansion: false
-    property bool isAnimating: false
+    property bool expanded: NotificationService.expandedGroups[notificationGroup?.key] || false
     property bool animateExpansion: true
-    property bool lightweight: false
-    property bool isDescriptionToggleAnimation: false
-    property bool _retainedExpandedContent: false
-    property bool _clipAnimatedContent: false
-    property real expandedContentOpacity: expanded ? 1 : 0
-    property real collapsedContentOpacity: expanded ? 0 : 1
-    readonly property bool renderExpandedContent: expanded || _retainedExpandedContent
-    readonly property bool renderCollapsedContent: !expanded
-
     property bool isGroupSelected: false
     property int selectedNotificationIndex: -1
     property bool keyboardNavigationActive: false
-    property int swipingNotificationIndex: -1
-    property real swipingNotificationOffset: 0
-    property real listLevelAdjacentScaleInfluence: 1.0
-    property bool listLevelScaleAnimationsEnabled: true
     property var transientSurfaceTracker: null
+    property bool firstInList: true
+    property bool lastInList: true
+    readonly property real expandedTargetHeight: {
+        let total = groupHeader.height;
+        for (const child of expandedContent.children) {
+            if (child.targetHeight === undefined)
+                continue;
+            total += Theme.groupedListGap + child.targetHeight;
+        }
+        return total;
+    }
+    readonly property real targetHeight: expanded ? expandedTargetHeight : collapsedCard.targetHeight
+    readonly property bool isAnimating: heightAnimation.running
 
-    readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
-    readonly property real iconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
-    readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
-    readonly property real collapsedDismissOffset: 5
-    readonly property real badgeSize: compactMode ? 16 : 18
-    readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
-    readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
-    readonly property bool connectedFrameMode: FrameTransitionState.effectiveConnectedFrameModeActive
+    width: parent ? parent.width : NotificationMetrics.popupWidth
+    height: targetHeight
+    clip: true
 
-    width: parent ? parent.width : 400
-    height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
-    readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
-    radius: connectedFrameMode ? Theme.connectedSurfaceRadius : Theme.cornerRadius
-    scale: lightweight ? 1 : (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
-    readonly property bool shadowsAllowed: !lightweight && Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-    readonly property var shadowElevation: Theme.elevationLevel1
-    readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
-    readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
-    property real shadowBlurPx: shadowsAllowed ? (baseShadowBlurPx + hoverShadowBlurBoost) : 0
-    property real shadowOffsetXPx: shadowsAllowed ? Theme.elevationOffsetX(shadowElevation) : 0
-    property real shadowOffsetYPx: shadowsAllowed ? (Theme.elevationOffsetY(shadowElevation, 1) + (cardHoverHandler.hovered ? 0.35 : 0)) : 0
-    property bool __initialized: false
-
-    Component.onCompleted: {
-        Qt.callLater(() => {
-            if (root)
-                root.__initialized = true;
-        });
+    function toggleGroup() {
+        NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
     }
 
-    Component.onDestruction: {
-        transientSurfaceTracker?.unregister(root);
-        notificationCardContextMenu.close();
+    function invokeAction(action) {
+        if (!action?.invoke)
+            return;
+        action.invoke();
+        PopoutService.closeNotificationCenter();
     }
+
+    function openContextMenu(item, x, y) {
+        notificationCardContextMenu.popupAnchorItem = item;
+        notificationCardContextMenu.showDropdownMenu();
+    }
+
+    Component.onDestruction: transientSurfaceTracker?.unregister(root)
 
     Connections {
         target: root.transientSurfaceTracker
         ignoreUnknownSignals: true
-
         function onCloseRequested() {
-            notificationCardContextMenu.close();
+            notificationCardContextMenu.closeDropdownMenu();
         }
     }
 
-    function expansionMotionDuration() {
-        if (isDescriptionToggleAnimation)
-            return descriptionExpanded ? Theme.notificationInlineExpandDuration : Theme.notificationInlineCollapseDuration;
-        return Theme.variantDuration(Theme.popoutAnimationDuration, root.expanded);
-    }
-
-    function expansionMotionCurve() {
-        return root.expanded ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve;
-    }
-
-    Behavior on scale {
-        enabled: !root.lightweight && listLevelScaleAnimationsEnabled
+    Behavior on height {
+        enabled: root.animateExpansion && NotificationMetrics.animationsEnabled
         NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on shadowBlurPx {
-        enabled: !root.lightweight && !root.connectedFrameMode
-        NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on shadowOffsetXPx {
-        enabled: !root.lightweight && !root.connectedFrameMode
-        NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on shadowOffsetYPx {
-        enabled: !root.lightweight && !root.connectedFrameMode
-        NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on border.color {
-        enabled: root.__initialized
-        ColorAnimation {
-            duration: root.__initialized ? Theme.shortDuration : 0
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on expandedContentOpacity {
-        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
-        NumberAnimation {
-            duration: root.expansionMotionDuration()
+            id: heightAnimation
+            duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.expansionMotionCurve()
+            easing.bezierCurve: NotificationMetrics.expandCurve
         }
     }
 
-    Behavior on collapsedContentOpacity {
-        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
-        NumberAnimation {
-            duration: root.expansionMotionDuration()
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.expansionMotionCurve()
-        }
-    }
-
-    color: {
-        if (isGroupSelected && keyboardNavigationActive) {
-            return Theme.primaryPressed;
-        }
-        if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
-            return Theme.primaryHoverLight;
-        }
-        return Theme.notificationFloatingSurfaceHigh;
-    }
-    border.color: {
-        if (isGroupSelected && keyboardNavigationActive) {
-            return Theme.withAlpha(Theme.primary, 0.5);
-        }
-        if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
-            return Theme.primaryPressed;
-        }
-        if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
-            return Theme.primarySelected;
-        }
-        return Theme.outlineMedium;
-    }
-    border.width: {
-        if (isGroupSelected && keyboardNavigationActive) {
-            return 1.5;
-        }
-        if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
-            return 1;
-        }
-        if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
-            return 2;
-        }
-        return Theme.layerOutlineWidth;
-    }
-    clip: _clipAnimatedContent
-
-    onExpandedChanged: {
-        if (__initialized && userInitiatedExpansion && animateExpansion)
-            _clipAnimatedContent = true;
-        if (expanded) {
-            _retainedExpandedContent = false;
-            return;
-        }
-        if (__initialized && userInitiatedExpansion && animateExpansion)
-            _retainedExpandedContent = true;
-    }
-
-    onHeightChanged: {
-        if (Math.abs(height - targetHeight) > 0.5)
-            return;
-        _clipAnimatedContent = false;
-        if (!expanded && _retainedExpandedContent)
-            _retainedExpandedContent = false;
-    }
-
-    onExpandedContentOpacityChanged: {
-        if (!expanded && _retainedExpandedContent && expandedContentOpacity <= 0.01)
-            _retainedExpandedContent = false;
-    }
-
-    HoverHandler {
-        id: cardHoverHandler
-    }
-
-    ElevationShadow {
-        id: shadowLayer
-        anchors.fill: parent
-        z: -1
-        level: root.shadowElevation
-        targetRadius: root.radius
-        targetColor: root.color
-        borderColor: root.border.color
-        borderWidth: root.border.width
-        shadowBlurPx: root.shadowBlurPx
-        shadowSpreadPx: 0
-        shadowOffsetX: root.shadowOffsetXPx
-        shadowOffsetY: root.shadowOffsetYPx
-        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : Theme.withAlpha(Theme.elevationShadowColor(root.shadowElevation), 0)
-        shadowEnabled: root.shadowsAllowed && !root.connectedFrameMode
-        visible: !root.lightweight
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: parent.radius
-        visible: notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0.0
-                color: Theme.primary
+    Notifications.NotificationCard {
+        id: collapsedCard
+        width: parent.width
+        visible: !root.expanded
+        notificationData: root.notificationGroup?.latestNotification ?? null
+        groupCount: root.notificationGroup?.count || 0
+        descriptionExpanded: NotificationService.expandedMessages[(notificationData?.notification?.id || "") + "_desc"] || false
+        firstInGroup: root.firstInList
+        lastInGroup: root.lastInList
+        keyboardSelected: root.keyboardNavigationActive && root.isGroupSelected
+        keyboardHints: keyboardSelected
+        animateHeight: false
+        onExpandRequested: NotificationService.toggleMessageExpansion((notificationData?.notification?.id || "") + "_desc")
+        onGroupToggleRequested: root.toggleGroup()
+        onDismissRequested: NotificationService.dismissGroup(root.notificationGroup?.key || "")
+        onActionRequested: action => root.invokeAction(action)
+        onBodyClicked: {
+            if (groupCount > 1) {
+                root.toggleGroup();
+                return;
             }
-            GradientStop {
-                position: 0.02
-                color: Theme.primary
-            }
-            GradientStop {
-                position: 0.021
-                color: "transparent"
-            }
+            root.invokeAction(contextActions.defaultAction(notificationData));
         }
-        opacity: 1.0
-    }
-
-    Item {
-        id: collapsedContent
-
-        readonly property real expandedTextHeight: descriptionText.contentHeight
-        readonly property real collapsedLineCount: compactMode ? 1 : 2
-        readonly property real collapsedLineHeight: Theme.fontSizeSmall * 1.2 * collapsedLineCount
-        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedLineHeight + 2) ? (expandedTextHeight - collapsedLineHeight) : 0
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.topMargin: cardPadding
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
-        height: collapsedContentHeight + extraHeight
-        visible: renderCollapsedContent
-        opacity: root.collapsedContentOpacity
-
-        DankCircularImage {
-            id: iconContainer
-            cacheImages: root.lightweight
-
-            width: iconSize
-            height: iconSize
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - iconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - iconSize / 2)
-
-            imageSource: notificationGroup?.latestNotification?.displayImage ?? ""
-            hasImage: notificationGroup?.latestNotification?.hasDisplayImage ?? false
-            fallbackIcon: notificationGroup?.latestNotification?.fallbackIconName ?? ""
-            fallbackText: {
-                const appName = notificationGroup?.appName || "?";
-                return appName.charAt(0).toUpperCase();
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -2
-                radius: width / 2
-                color: "transparent"
-                border.color: root.color
-                border.width: 5
-                visible: parent.hasImage
-                antialiasing: true
-            }
-
-            Rectangle {
-                width: badgeSize
-                height: badgeSize
-                radius: badgeSize / 2
-                color: Theme.primary
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.topMargin: -2
-                anchors.rightMargin: -2
-                visible: (notificationGroup?.count || 0) > 1
-
-                StyledText {
-                    anchors.centerIn: parent
-                    text: (notificationGroup?.count || 0) > 99 ? "99+" : (notificationGroup?.count || 0).toString()
-                    color: Theme.primaryText
-                    font.pixelSize: compactMode ? 8 : 9
-                    font.weight: Font.Bold
-                }
-            }
-        }
-
-        Rectangle {
-            id: textContainer
-
-            anchors.left: iconContainer.right
-            anchors.leftMargin: Theme.spacingM
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: contentSpacing
-            color: "transparent"
-
-            Column {
-                width: parent.width
-                anchors.top: parent.top
-                spacing: Theme.notificationContentSpacing
-
-                Row {
-                    id: collapsedHeaderRow
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    visible: (collapsedHeaderAppNameText.text.length > 0 || collapsedHeaderTimeText.text.length > 0)
-
-                    StyledText {
-                        id: collapsedHeaderAppNameText
-                        text: notificationGroup?.appName || ""
-                        color: Theme.surfaceTextMedium
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Normal
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                        width: Math.min(implicitWidth, parent.width - collapsedHeaderSeparator.implicitWidth - collapsedHeaderTimeText.implicitWidth - parent.spacing * 2)
-                    }
-
-                    StyledText {
-                        id: collapsedHeaderSeparator
-                        text: (collapsedHeaderAppNameText.text.length > 0 && collapsedHeaderTimeText.text.length > 0) ? " • " : ""
-                        color: Theme.surfaceTextMedium
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Normal
-                    }
-
-                    StyledText {
-                        id: collapsedHeaderTimeText
-                        text: notificationGroup?.latestNotification?.timeStr || ""
-                        color: Theme.surfaceTextMedium
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Normal
-                    }
-                }
-
-                StyledText {
-                    id: collapsedTitleText
-                    width: parent.width
-                    text: notificationGroup?.latestNotification?.summary || ""
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    visible: text.length > 0
-                }
-
-                StyledText {
-                    id: descriptionText
-                    property string fullText: (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.htmlBody) || ""
-                    property bool hasMoreText: truncated
-
-                    text: fullText
-                    textFormat: Text.StyledText
-                    color: Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
-                    width: parent.width
-                    elide: Text.ElideRight
-                    maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
-                    wrapMode: Text.WordWrap
-                    visible: text.length > 0
-                    linkColor: Theme.primary
-                    onLinkActivated: link => Qt.openUrlExternally(link)
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : (parent.hasMoreText || descriptionExpanded) ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-                        onClicked: mouse => {
-                            if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
-                                root.userInitiatedExpansion = true;
-                                root.isDescriptionToggleAnimation = true;
-                                const messageId = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : "";
-                                NotificationService.toggleMessageExpansion(messageId);
-                                Qt.callLater(() => {
-                                    if (root && !root.isAnimating)
-                                        root.userInitiatedExpansion = false;
-                                });
-                            }
-                        }
-
-                        propagateComposedEvents: false
-                        onPressed: mouse => {
-                            if (parent.hoveredLink)
-                                mouse.accepted = false;
-                        }
-                        onReleased: mouse => {
-                            if (parent.hoveredLink)
-                                mouse.accepted = false;
-                        }
-                    }
-                }
-            }
-        }
+        onContextMenuRequested: (x, y) => root.openContextMenu(collapsedCard, x, y)
     }
 
     Column {
         id: expandedContent
         objectName: "expandedContent"
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.topMargin: cardPadding
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        spacing: compactMode ? Theme.spacingXS : Theme.spacingS
-        visible: renderExpandedContent
-        opacity: root.expandedContentOpacity
+        property int swipingIndex: -1
+        property real swipingOffset: 0
+        width: parent.width
+        visible: root.expanded
+        spacing: Theme.groupedListGap
 
-        Item {
+        Rectangle {
+            id: groupHeader
             width: parent.width
-            height: compactMode ? 32 : 40
-
-            Row {
+            height: NotificationMetrics.cardPadding * 2 + NotificationMetrics.controlSize
+            radius: Theme.groupedListOuterRadius
+            color: "transparent"
+            border.width: root.keyboardNavigationActive && root.isGroupSelected ? Theme.focusRingWidth : 0
+            border.color: Theme.focusRingColor
+            StyledText {
                 anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
+                anchors.leftMargin: NotificationMetrics.cardPadding
+                anchors.right: groupControls.left
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingS
-
-                StyledText {
-                    text: notificationGroup?.appName || ""
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Bold
+                text: root.notificationGroup?.appName || ""
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
+                color: Theme.primary
+                elide: Text.ElideRight
+            }
+            Row {
+                id: groupControls
+                anchors.right: parent.right
+                anchors.rightMargin: NotificationMetrics.cardPadding
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingXS
+                DankButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
+                    text: I18n.tr("Dismiss")
+                    buttonHeight: NotificationMetrics.controlSize
+                    horizontalPadding: NotificationMetrics.actionPadding
+                    backgroundColor: "transparent"
+                    textColor: Theme.primary
+                    onClicked: NotificationService.dismissGroup(root.notificationGroup?.key || "")
                 }
-
-                Rectangle {
-                    width: badgeSize
-                    height: badgeSize
-                    radius: badgeSize / 2
-                    color: Theme.primary
-                    visible: (notificationGroup?.count || 0) > 1
+                DankButton {
                     anchors.verticalCenter: parent.verticalCenter
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        text: (notificationGroup?.count || 0) > 99 ? "99+" : (notificationGroup?.count || 0).toString()
-                        color: Theme.primaryText
-                        font.pixelSize: compactMode ? 8 : 9
-                        font.weight: Font.Bold
-                    }
+                    text: (root.notificationGroup?.count || 0).toString()
+                    iconName: "expand_less"
+                    buttonHeight: NotificationMetrics.controlSize
+                    horizontalPadding: Theme.spacingS
+                    backgroundColor: Theme.surfaceContainerHighest
+                    textColor: Theme.onSurfaceVariant
+                    Accessible.name: I18n.tr("Collapse")
+                    onClicked: root.toggleGroup()
                 }
             }
         }
-
-        Column {
-            width: parent.width
-            spacing: compactMode ? Theme.spacingS : Theme.spacingL
-
-            Repeater {
-                id: notificationRepeater
-                objectName: "notificationRepeater"
-                model: notificationGroup?.notifications?.slice(0, 10) || []
-
-                delegate: Item {
-                    id: expandedDelegateWrapper
-                    required property var modelData
-                    required property int index
-                    readonly property bool messageExpanded: NotificationService.expandedMessages[modelData?.notification?.id] || false
-                    readonly property bool isSelected: root.selectedNotificationIndex === index
-                    readonly property bool actionsVisible: true
-                    readonly property real expandedIconSize: compactMode ? Theme.notificationExpandedIconSizeCompact : Theme.notificationExpandedIconSizeNormal
-
-                    HoverHandler {
-                        id: expandedDelegateHoverHandler
-                    }
-                    readonly property real expandedItemPadding: compactMode ? Theme.spacingS : Theme.spacingM
-                    readonly property real expandedBaseHeight: expandedItemPadding * 2 + Math.max(expandedIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * 2) + actionButtonHeight + contentSpacing * 2
-                    property bool __delegateInitialized: false
-                    property real swipeOffset: 0
-                    property bool isDismissing: false
-                    readonly property real dismissThreshold: width * 0.35
-
-                    Component.onCompleted: {
-                        Qt.callLater(() => {
-                            if (expandedDelegateWrapper)
-                                expandedDelegateWrapper.__delegateInitialized = true;
-                        });
-                    }
-
-                    width: parent.width
-                    height: delegateRect.height
-                    clip: true
-
-                    Rectangle {
-                        id: delegateRect
-                        width: parent.width
-
-                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 && (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 || expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
-                        readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? root.swipingNotificationOffset * 0.10 : 0
-                        readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(root.swipingNotificationOffset) / width * 0.02 : 1.0
-
-                        x: expandedDelegateWrapper.swipeOffset + adjacentSwipeInfluence
-                        scale: adjacentScaleInfluence
-                        transformOrigin: Item.Center
-
-                        Behavior on x {
-                            enabled: !expandedSwipeHandler.active && !expandedDelegateWrapper.isDismissing
-                            NumberAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        Behavior on scale {
-                            enabled: !expandedSwipeHandler.active
-                            NumberAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        height: {
-                            if (!messageExpanded)
-                                return expandedBaseHeight;
-                            const collapsedBodyHeight = bodyText.collapsedLineHeight;
-                            if (bodyText.implicitHeight > collapsedBodyHeight + 2)
-                                return expandedBaseHeight + bodyText.implicitHeight - collapsedBodyHeight;
-                            return expandedBaseHeight;
-                        }
-                        radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primaryPressed : Theme.notificationNestedSurface
-                        border.color: isSelected ? Theme.withAlpha(Theme.primary, 0.4) : Theme.outlineMedium
-                        border.width: 1
-
-                        Behavior on border.color {
-                            enabled: __delegateInitialized
-                            ColorAnimation {
-                                duration: __delegateInitialized ? Theme.shortDuration : 0
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        Behavior on height {
-                            enabled: expandedDelegateWrapper.__delegateInitialized && root.animateExpansion && root.userInitiatedExpansion
-                            NumberAnimation {
-                                duration: root.expansionMotionDuration()
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: root.expansionMotionCurve()
-                            }
-                        }
-
-                        Item {
-                            anchors.fill: parent
-                            anchors.margins: compactMode ? Theme.spacingS : Theme.spacingM
-                            anchors.bottomMargin: contentSpacing
-
-                            DankCircularImage {
-                                id: messageIcon
-                                cacheImages: root.lightweight
-
-                                width: expandedIconSize
-                                height: expandedIconSize
-                                anchors.left: parent.left
-                                anchors.top: parent.top
-                                anchors.topMargin: Theme.fontSizeSmall * 1.2 + (compactMode ? Theme.spacingXS : Theme.spacingS)
-
-                                imageSource: modelData?.displayImage ?? ""
-                                fallbackIcon: modelData?.fallbackIconName ?? ""
-
-                                fallbackText: {
-                                    const appName = modelData?.appName || "?";
-                                    return appName.charAt(0).toUpperCase();
-                                }
-                            }
-
-                            Item {
-                                anchors.left: messageIcon.right
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingM
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-
-                                Column {
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.top: parent.top
-                                    anchors.bottom: buttonArea.top
-                                    anchors.bottomMargin: contentSpacing
-                                    spacing: Theme.notificationContentSpacing
-
-                                    Row {
-                                        id: expandedDelegateHeaderRow
-                                        width: parent.width
-                                        spacing: Theme.spacingXS
-                                        visible: (expandedDelegateHeaderAppNameText.text.length > 0 || expandedDelegateHeaderTimeText.text.length > 0)
-
-                                        StyledText {
-                                            id: expandedDelegateHeaderAppNameText
-                                            text: modelData?.appName || ""
-                                            color: Theme.surfaceTextMedium
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.Normal
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 1
-                                            width: Math.min(implicitWidth, parent.width - expandedDelegateHeaderSeparator.implicitWidth - expandedDelegateHeaderTimeText.implicitWidth - parent.spacing * 2)
-                                        }
-
-                                        StyledText {
-                                            id: expandedDelegateHeaderSeparator
-                                            text: (expandedDelegateHeaderAppNameText.text.length > 0 && expandedDelegateHeaderTimeText.text.length > 0) ? " • " : ""
-                                            color: Theme.surfaceTextMedium
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.Normal
-                                        }
-
-                                        StyledText {
-                                            id: expandedDelegateHeaderTimeText
-                                            text: modelData?.timeStr || ""
-                                            color: Theme.surfaceTextMedium
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.Normal
-                                        }
-                                    }
-
-                                    StyledText {
-                                        id: expandedDelegateTitleText
-                                        width: parent.width
-                                        text: modelData?.summary || ""
-                                        color: Theme.surfaceText
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        elide: Text.ElideRight
-                                        maximumLineCount: 1
-                                        visible: text.length > 0
-                                    }
-
-                                    StyledText {
-                                        id: bodyText
-                                        readonly property real collapsedLineCount: compactMode ? 1 : 2
-                                        readonly property real collapsedLineHeight: font.pixelSize * 1.2 * collapsedLineCount
-                                        property bool hasMoreText: truncated
-
-                                        text: modelData?.htmlBody || ""
-                                        textFormat: Text.StyledText
-                                        color: Theme.surfaceVariantText
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        width: parent.width
-                                        elide: messageExpanded ? Text.ElideNone : Text.ElideRight
-                                        maximumLineCount: messageExpanded ? -1 : collapsedLineCount
-                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                        visible: text.length > 0
-                                        linkColor: Theme.primary
-                                        onLinkActivated: link => Qt.openUrlExternally(link)
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : (bodyText.hasMoreText || messageExpanded) ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-                                            onClicked: mouse => {
-                                                if (!parent.hoveredLink && (bodyText.hasMoreText || messageExpanded)) {
-                                                    root.userInitiatedExpansion = true;
-                                                    root.isDescriptionToggleAnimation = true;
-                                                    NotificationService.toggleMessageExpansion(modelData?.notification?.id || "");
-                                                    Qt.callLater(() => {
-                                                        if (root && !root.isAnimating)
-                                                            root.userInitiatedExpansion = false;
-                                                    });
-                                                }
-                                            }
-
-                                            propagateComposedEvents: false
-                                            onPressed: mouse => {
-                                                if (parent.hoveredLink) {
-                                                    mouse.accepted = false;
-                                                }
-                                            }
-                                            onReleased: mouse => {
-                                                if (parent.hoveredLink) {
-                                                    mouse.accepted = false;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Item {
-                                    id: buttonArea
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.bottom: parent.bottom
-                                    height: actionButtonHeight + contentSpacing
-
-                                    Row {
-                                        visible: expandedDelegateWrapper.actionsVisible
-                                        opacity: visible ? 1 : 0
-                                        anchors.right: parent.right
-                                        anchors.bottom: parent.bottom
-                                        spacing: contentSpacing
-
-                                        Behavior on opacity {
-                                            NumberAnimation {
-                                                duration: Theme.shortDuration
-                                                easing.type: Theme.standardEasing
-                                            }
-                                        }
-
-                                        Repeater {
-                                            model: modelData?.actions || []
-
-                                            Rectangle {
-                                                property bool isHovered: false
-
-                                                width: Math.max(expandedActionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
-                                                height: actionButtonHeight
-                                                radius: Theme.notificationButtonCornerRadius
-                                                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
-
-                                                StyledText {
-                                                    id: expandedActionText
-                                                    text: {
-                                                        const baseText = modelData.text || I18n.tr("Open");
-                                                        if (keyboardNavigationActive && (isGroupSelected || selectedNotificationIndex >= 0))
-                                                            return `${baseText} (${index + 1})`;
-                                                        return baseText;
-                                                    }
-                                                    color: parent.isHovered ? Theme.primary : Theme.surfaceVariantText
-                                                    font.pixelSize: Theme.fontSizeSmall
-                                                    font.weight: Font.Medium
-                                                    anchors.centerIn: parent
-                                                    elide: Text.ElideRight
-                                                }
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    cursorShape: Qt.PointingHandCursor
-                                                    onEntered: parent.isHovered = true
-                                                    onExited: parent.isHovered = false
-                                                    onClicked: {
-                                                        if (modelData && modelData.invoke) {
-                                                            modelData.invoke();
-                                                            PopoutService.closeNotificationCenter();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        Rectangle {
-                                            id: expandedDelegateDismissBtn
-                                            property bool isHovered: false
-
-                                            visible: expandedDelegateWrapper.actionsVisible
-                                            opacity: visible ? 1 : 0
-                                            width: Math.max(expandedClearText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
-                                            height: actionButtonHeight
-                                            radius: Theme.notificationButtonCornerRadius
-                                            color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
-
-                                            Behavior on opacity {
-                                                NumberAnimation {
-                                                    duration: Theme.shortDuration
-                                                    easing.type: Theme.standardEasing
-                                                }
-                                            }
-
-                                            StyledText {
-                                                id: expandedClearText
-                                                text: I18n.tr("Dismiss")
-                                                color: parent.isHovered ? Theme.primary : Theme.surfaceVariantText
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                font.weight: Font.Medium
-                                                anchors.centerIn: parent
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onEntered: parent.isHovered = true
-                                                onExited: parent.isHovered = false
-                                                onClicked: NotificationService.dismissNotification(modelData)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    DragHandler {
-                        id: expandedSwipeHandler
-                        target: null
-                        xAxis.enabled: true
-                        yAxis.enabled: false
-                        grabPermissions: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType
-
-                        onActiveChanged: {
-                            if (active) {
-                                root.swipingNotificationIndex = expandedDelegateWrapper.index;
-                            } else {
-                                root.swipingNotificationIndex = -1;
-                                root.swipingNotificationOffset = 0;
-                            }
-                            if (active || expandedDelegateWrapper.isDismissing)
-                                return;
-                            if (Math.abs(expandedDelegateWrapper.swipeOffset) > expandedDelegateWrapper.dismissThreshold) {
-                                expandedDelegateWrapper.isDismissing = true;
-                                expandedSwipeDismissAnim.start();
-                            } else {
-                                expandedDelegateWrapper.swipeOffset = 0;
-                            }
-                        }
-
-                        onTranslationChanged: {
-                            if (expandedDelegateWrapper.isDismissing)
-                                return;
-                            expandedDelegateWrapper.swipeOffset = translation.x;
-                            root.swipingNotificationOffset = translation.x;
-                        }
-                    }
-
-                    NumberAnimation {
-                        id: expandedSwipeDismissAnim
-                        target: expandedDelegateWrapper
-                        property: "swipeOffset"
-                        to: expandedDelegateWrapper.swipeOffset > 0 ? expandedDelegateWrapper.width : -expandedDelegateWrapper.width
-                        duration: Theme.notificationExitDuration
-                        easing.type: Easing.OutCubic
-                        onStopped: NotificationService.dismissNotification(modelData)
-                    }
-                }
-            }
-        }
-    }
-
-    Row {
-        visible: renderCollapsedContent
-        opacity: root.collapsedContentOpacity
-        anchors.right: clearButton.visible ? clearButton.left : parent.right
-        anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
-        anchors.top: collapsedContent.bottom
-        anchors.topMargin: contentSpacing + collapsedDismissOffset
-        spacing: contentSpacing
 
         Repeater {
-            model: notificationGroup?.latestNotification?.actions || []
+            id: notificationRepeater
+            objectName: "notificationRepeater"
+            model: ScriptModel {
+                values: root.expanded ? (root.notificationGroup?.notifications?.slice(0, NotificationMetrics.expandedLimit) || []) : []
+            }
 
-            Rectangle {
-                property bool isHovered: false
+            Item {
+                id: row
+                required property var modelData
+                required property int index
+                property real swipeOffset: 0
+                property bool dismissing: false
+                property bool collapsing: false
+                property var notificationToDismiss: null
+                readonly property real targetHeight: collapsing ? 0 : message.targetHeight
+                readonly property bool adjacentToSwipe: expandedContent.swipingIndex !== -1 && Math.abs(index - expandedContent.swipingIndex) === 1
+                readonly property real adjacentSwipeInfluence: adjacentToSwipe ? expandedContent.swipingOffset * NotificationMetrics.adjacentSwipeInfluence : 0
+                width: expandedContent.width
+                height: message.height
+                clip: true
 
-                width: Math.max(collapsedActionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
-                height: actionButtonHeight
-                radius: Theme.notificationButtonCornerRadius
-                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
-
-                StyledText {
-                    id: collapsedActionText
-                    text: {
-                        const baseText = modelData.text || I18n.tr("Open");
-                        if (keyboardNavigationActive && isGroupSelected) {
-                            return `${baseText} (${index + 1})`;
+                Notifications.NotificationCard {
+                    id: message
+                    x: row.swipeOffset + row.adjacentSwipeInfluence
+                    width: parent.width
+                    notificationData: row.modelData
+                    firstInGroup: row.index === 0
+                    lastInGroup: row.index === notificationRepeater.count - 1
+                    keyboardSelected: root.keyboardNavigationActive && root.selectedNotificationIndex === row.index
+                    keyboardHints: keyboardSelected
+                    descriptionExpanded: NotificationService.expandedMessages[(notificationData?.notification?.id || "") + "_desc"] || false
+                    onExpandRequested: NotificationService.toggleMessageExpansion((notificationData?.notification?.id || "") + "_desc")
+                    onDismissRequested: NotificationService.dismissNotification(row.modelData)
+                    onActionRequested: action => root.invokeAction(action)
+                    onBodyClicked: root.invokeAction(contextActions.defaultAction(notificationData))
+                    onContextMenuRequested: (x, y) => root.openContextMenu(message, x, y)
+                    Behavior on x {
+                        enabled: !swipe.active && !row.dismissing && !row.adjacentToSwipe && NotificationMetrics.animationsEnabled
+                        NumberAnimation {
+                            duration: Theme.notificationExitDuration
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: NotificationMetrics.dismissCurve
                         }
-                        return baseText;
                     }
-                    color: parent.isHovered ? Theme.primary : Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    anchors.centerIn: parent
-                    elide: Text.ElideRight
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: parent.isHovered = true
-                    onExited: parent.isHovered = false
-                    onClicked: {
-                        if (modelData && modelData.invoke) {
-                            modelData.invoke();
-                            PopoutService.closeNotificationCenter();
+                DragHandler {
+                    id: swipe
+                    target: null
+                    yAxis.enabled: false
+                    grabPermissions: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType
+                    onTranslationChanged: {
+                        if (row.dismissing)
+                            return;
+                        row.swipeOffset = translation.x;
+                        expandedContent.swipingOffset = translation.x;
+                    }
+                    onActiveChanged: {
+                        if (active) {
+                            expandedContent.swipingIndex = row.index;
+                            return;
                         }
+                        expandedContent.swipingIndex = -1;
+                        expandedContent.swipingOffset = 0;
+                        if (row.dismissing)
+                            return;
+                        if (Math.abs(row.swipeOffset) <= row.width * NotificationMetrics.swipeThreshold) {
+                            row.swipeOffset = 0;
+                            return;
+                        }
+                        row.notificationToDismiss = row.modelData;
+                        row.dismissing = true;
+                        dismissAnimation.start();
+                    }
+                }
+                SequentialAnimation {
+                    id: dismissAnimation
+
+                    NumberAnimation {
+                        target: row
+                        property: "swipeOffset"
+                        to: row.swipeOffset > 0 ? row.width : -row.width
+                        duration: NotificationMetrics.animationsEnabled ? Theme.notificationExitDuration : 0
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: NotificationMetrics.dismissCurve
+                    }
+                    PropertyAction {
+                        target: row
+                        property: "collapsing"
+                        value: true
+                    }
+                    NumberAnimation {
+                        target: row
+                        property: "height"
+                        to: 0
+                        duration: NotificationMetrics.animationsEnabled ? Theme.notificationExpandDuration : 0
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: NotificationMetrics.expandCurve
+                    }
+                    ScriptAction {
+                        script: NotificationService.dismissNotification(row.notificationToDismiss)
                     }
                 }
             }
         }
     }
 
-    Rectangle {
-        id: clearButton
-
-        property bool isHovered: false
-        readonly property int actionCount: (notificationGroup?.latestNotification?.actions || []).length
-
-        visible: renderCollapsedContent && actionCount < 3
-        opacity: root.collapsedContentOpacity
-        anchors.right: parent.right
-        anchors.rightMargin: Theme.spacingL
-        anchors.top: collapsedContent.bottom
-        anchors.topMargin: contentSpacing + collapsedDismissOffset
-        width: Math.max(collapsedClearText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
-        height: actionButtonHeight
-        radius: Theme.notificationButtonCornerRadius
-        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : Theme.withAlpha(Theme.primary, 0)
-
-        StyledText {
-            id: collapsedClearText
-            text: I18n.tr("Dismiss")
-            color: clearButton.isHovered ? Theme.primary : Theme.surfaceVariantText
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Medium
-            anchors.centerIn: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onEntered: clearButton.isHovered = true
-            onExited: clearButton.isHovered = false
-            onClicked: NotificationService.dismissGroup(notificationGroup?.key || "")
-        }
+    NotificationActions {
+        id: contextActions
+        appName: root.notificationGroup?.appName || ""
+        desktopEntry: root.notificationGroup?.latestNotification?.desktopEntry || ""
+        onDismissRequested: NotificationService.dismissGroup(root.notificationGroup?.key || "")
+        onAppMuted: NotificationService.dismissGroup(root.notificationGroup?.key || "")
     }
 
-    MouseArea {
-        anchors.fill: parent
-        visible: renderCollapsedContent && (notificationGroup?.count || 0) > 1 && !descriptionExpanded
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            root.userInitiatedExpansion = true;
-            root.isDescriptionToggleAnimation = false;
-            NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
-        }
-        z: -1
-    }
-
-    Item {
-        id: fixedControls
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: cardPadding
-        anchors.rightMargin: Theme.spacingL
-        width: compactMode ? 52 : 60
-        height: compactMode ? 24 : 28
-
-        DankActionButton {
-            anchors.left: parent.left
-            anchors.top: parent.top
-            visible: (notificationGroup?.count || 0) > 1
-            iconName: expanded ? "expand_less" : "expand_more"
-            iconSize: compactMode ? 16 : 18
-            buttonSize: compactMode ? 24 : 28
-            onClicked: {
-                root.userInitiatedExpansion = true;
-                root.isDescriptionToggleAnimation = false;
-                NotificationService.toggleGroupExpansion(notificationGroup?.key || "");
-            }
-        }
-
-        DankActionButton {
-            anchors.right: parent.right
-            anchors.top: parent.top
-            iconName: "close"
-            iconSize: compactMode ? 16 : 18
-            buttonSize: compactMode ? 24 : 28
-            onClicked: NotificationService.dismissGroup(notificationGroup?.key || "")
-        }
-    }
-
-    Behavior on height {
-        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
-        NumberAnimation {
-            duration: root.expansionMotionDuration()
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.expansionMotionCurve()
-            onRunningChanged: {
-                if (running) {
-                    root.isAnimating = true;
-                } else {
-                    root.isAnimating = false;
-                    root.userInitiatedExpansion = false;
-                    root.isDescriptionToggleAnimation = false;
-                    root._retainedExpandedContent = false;
-                    root._clipAnimatedContent = false;
-                }
-            }
-        }
-    }
-
-    Menu {
+    DankDropdown {
         id: notificationCardContextMenu
-        width: 220
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        onVisibleChanged: root.transientSurfaceTracker?.setActive(root, visible, null)
-
-        background: Rectangle {
-            color: BlurService.enabled ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.width: 0
-            border.color: Theme.outlineStrong
-        }
-
-        MenuItem {
-            id: setNotificationRulesItem
-            text: I18n.tr("Set notification rules")
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                const appName = notificationGroup?.appName || "";
-                const desktopEntry = notificationGroup?.latestNotification?.desktopEntry || "";
-                SettingsData.addNotificationRuleForNotification(appName, desktopEntry);
-                PopoutService.openSettingsWithTab("notifications");
-            }
-        }
-
-        MenuItem {
-            id: muteUnmuteItem
-            readonly property bool isMuted: SettingsData.isAppMuted(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "")
-            text: isMuted ? I18n.tr("Unmute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app")) : I18n.tr("Mute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app"))
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                const appName = notificationGroup?.appName || "";
-                const desktopEntry = notificationGroup?.latestNotification?.desktopEntry || "";
-                if (isMuted) {
-                    SettingsData.removeMuteRuleForApp(appName, desktopEntry);
-                } else {
-                    SettingsData.addMuteRuleForApp(appName, desktopEntry);
-                    NotificationService.dismissGroup(notificationGroup?.key || "");
-                }
-            }
-        }
-
-        MenuItem {
-            id: dndBypassItem
-            readonly property bool isDndBypassed: SettingsData.isAppDndBypassed(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "")
-            text: isDndBypassed ? I18n.tr("Block %1 in Do Not Disturb").arg(notificationGroup?.appName || I18n.tr("this app")) : I18n.tr("Allow %1 in Do Not Disturb").arg(notificationGroup?.appName || I18n.tr("this app"))
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: SettingsData.setAppDndBypass(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "", !isDndBypassed)
-        }
-
-        MenuItem {
-            text: I18n.tr("Dismiss")
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: NotificationService.dismissGroup(notificationGroup?.key || "")
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        z: -2
-        onClicked: mouse => {
-            if (mouse.button === Qt.RightButton && notificationGroup) {
-                notificationCardContextMenu.popup();
-            }
+        showTrigger: false
+        popupWidth: NotificationMetrics.menuWidth
+        transientSurfaceTracker: root.transientSurfaceTracker
+        options: contextActions.items.map(item => item.label)
+        onValueChanged: value => {
+            const item = contextActions.items.find(item => item.label === value);
+            if (item)
+                contextActions.trigger(item.action);
         }
     }
 }

@@ -4,20 +4,19 @@ import qs.Common
 import qs.Modals.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+RegistryBrowserWindow {
     id: root
 
     property var allThemes: []
-    property string searchQuery: ""
     property var filteredThemes: []
-    property int selectedIndex: -1
-    property bool keyboardNavigationActive: false
-    property bool isLoading: false
-    property var parentModal: null
-    parentWindow: parentModal
-    property bool pendingInstallHandled: false
     property string pendingApplyThemeId: ""
+    property string loadError: ""
+    property string operationMessage: ""
+    property bool operationFailed: false
+    property var pendingThemes: ({})
+    property int filterIndex: 0
 
     function updateFilteredThemes() {
         var filtered = [];
@@ -25,6 +24,10 @@ DankFloatingWindow {
 
         for (var i = 0; i < allThemes.length; i++) {
             var theme = allThemes[i];
+            if (filterIndex === 1 && !theme.installed)
+                continue;
+            if (filterIndex === 2 && theme.installed)
+                continue;
 
             if (query.length === 0) {
                 filtered.push(theme);
@@ -88,7 +91,7 @@ DankFloatingWindow {
         const variantCount = variants ? (variants.type === "multi" ? (variants.accents?.length ?? 0) : (variants.options?.length ?? 0)) : 0;
         if (variantCount > 0)
             badges.push({
-                label: I18n.tr("%1 variants").arg(variantCount),
+                label: I18n.tr("%1 variants", "theme browser badge, plural, %1 is a count of theme variants").arg(variantCount),
                 icon: "",
                 tone: "secondary"
             });
@@ -130,14 +133,28 @@ DankFloatingWindow {
         return hasAAA ? "WCAG AAA" : "";
     }
 
+    function finishOperation(themeId, message, failed) {
+        const pending = Object.assign({}, pendingThemes);
+        delete pending[themeId];
+        pendingThemes = pending;
+        operationMessage = message;
+        operationFailed = failed;
+    }
+
     function installTheme(themeId, themeName, applyAfterInstall) {
-        ToastService.showInfo(I18n.tr("Installing: %1", "installation progress").arg(themeName));
+        if (pendingThemes[themeId])
+            return;
+        pendingThemes = Object.assign({}, pendingThemes, {
+            [themeId]: true
+        });
+        operationFailed = false;
+        operationMessage = I18n.tr("Installing: %1", "installation progress").arg(themeName);
         DMSService.installTheme(themeId, response => {
             if (response.error) {
-                ToastService.showError(I18n.tr("Install failed: %1", "installation error").arg(response.error));
+                finishOperation(themeId, I18n.tr("Install failed: %1", "installation error").arg(response.error), true);
                 return;
             }
-            ToastService.showInfo(I18n.tr("Installed: %1", "installation success").arg(themeName));
+            finishOperation(themeId, I18n.tr("Installed: %1", "installation success").arg(themeName), false);
             if (applyAfterInstall)
                 pendingApplyThemeId = themeId;
             refreshThemes();
@@ -160,21 +177,44 @@ DankFloatingWindow {
     }
 
     function uninstallTheme(themeId, themeName) {
-        ToastService.showInfo(I18n.tr("Uninstalling: %1", "uninstallation progress").arg(themeName));
+        if (pendingThemes[themeId])
+            return;
+        pendingThemes = Object.assign({}, pendingThemes, {
+            [themeId]: true
+        });
+        operationFailed = false;
+        operationMessage = I18n.tr("Uninstalling: %1", "uninstallation progress").arg(themeName);
         DMSService.uninstallTheme(themeId, response => {
             if (response.error) {
-                ToastService.showError(I18n.tr("Uninstall failed: %1", "uninstallation error").arg(response.error));
+                finishOperation(themeId, I18n.tr("Uninstall failed: %1", "uninstallation error").arg(response.error), true);
                 return;
             }
-            ToastService.showInfo(I18n.tr("Uninstalled: %1", "uninstallation success").arg(themeName));
+            finishOperation(themeId, I18n.tr("Uninstalled: %1", "uninstallation success").arg(themeName), false);
             refreshThemes();
         });
     }
 
     function refreshThemes() {
         isLoading = true;
-        DMSService.listThemes();
-        DMSService.listInstalledThemes();
+        loadError = "";
+        DMSService.listThemes(response => {
+            isLoading = false;
+            if (!visible)
+                return;
+            if (response.error) {
+                loadError = response.error;
+                return;
+            }
+            allThemes = response.result || [];
+            updateFilteredThemes();
+        });
+        DMSService.listInstalledThemes(response => {
+            if (!response.error)
+                return;
+            pendingApplyThemeId = "";
+            operationFailed = true;
+            operationMessage = response.error;
+        });
     }
 
     function checkPendingInstall() {
@@ -183,7 +223,7 @@ DankFloatingWindow {
         pendingInstallHandled = true;
         var themeId = PopoutService.pendingThemeInstall;
         PopoutService.pendingThemeInstall = "";
-        urlInstallConfirm.showWithOptions({
+        installConfirm.showWithOptions({
             "title": I18n.tr("Install Theme", "theme installation dialog title"),
             "message": I18n.tr("Install theme '%1' from the DMS registry?", "theme installation confirmation").arg(themeId),
             "confirmText": I18n.tr("Install", "install action button"),
@@ -193,63 +233,42 @@ DankFloatingWindow {
         });
     }
 
-    function show() {
-        if (parentModal)
-            parentModal.shouldHaveFocus = false;
-        const wasVisible = visible;
-        visible = true;
-        if (wasVisible && PopoutService.pendingThemeInstall) {
-            pendingInstallHandled = false;
-            checkPendingInstall();
-        }
-        Qt.callLater(() => browserSearchField.forceActiveFocus());
-    }
-
-    function hide() {
-        visible = false;
-        if (!parentModal)
-            return;
-        parentModal.shouldHaveFocus = Qt.binding(() => parentModal.shouldBeVisible);
-        Qt.callLater(() => {
-            if (parentModal.modalFocusScope)
-                parentModal.modalFocusScope.forceActiveFocus();
-        });
-    }
-
     objectName: "themeBrowser"
     title: I18n.tr("Browse Themes", "theme browser window title")
-    minimumSize: Qt.size(550, 450)
-    implicitWidth: 700
-    implicitHeight: 700
-    visible: false
+    headerTitle: I18n.tr("Browse Themes")
+    searchPlaceholder: I18n.tr("Search themes...", "theme search placeholder")
 
-    onVisibleChanged: {
-        if (visible) {
-            pendingInstallHandled = false;
-            refreshThemes();
-            Qt.callLater(() => {
-                browserSearchField.forceActiveFocus();
-                checkPendingInstall();
-            });
-            return;
-        }
-        allThemes = [];
-        searchQuery = "";
-        filteredThemes = [];
-        selectedIndex = -1;
-        keyboardNavigationActive = false;
-        isLoading = false;
+    function pendingInstallId() {
+        return PopoutService.pendingThemeInstall || "";
     }
 
-    ConfirmDialogOverlay {
-        id: urlInstallConfirm
+    function refresh() {
+        refreshThemes();
+    }
 
-        onDialogClosed: Qt.callLater(() => browserSearchField.forceActiveFocus())
+    function applySearch() {
+        updateFilteredThemes();
+    }
+
+    function resetContent() {
+        allThemes = [];
+        filteredThemes = [];
+    }
+
+    function activateSelected() {
+        if (!keyboardNavigationActive || selectedIndex < 0)
+            return false;
+        const theme = filteredThemes[selectedIndex];
+        if (!theme.installed)
+            installTheme(theme.id, theme.name, false);
+        return true;
     }
 
     Connections {
         target: DMSService
         function onThemesListReceived(themes) {
+            if (!root.visible)
+                return;
             isLoading = false;
             allThemes = themes;
             updateFilteredThemes();
@@ -263,235 +282,113 @@ DankFloatingWindow {
         }
     }
 
-    FocusScope {
-        id: browserKeyHandler
-
-        anchors.fill: parent
-        focus: true
-
-        Keys.onPressed: event => {
-            switch (event.key) {
-            case Qt.Key_Escape:
-                root.hide();
-                event.accepted = true;
-                return;
-            case Qt.Key_Down:
-                root.selectNext();
-                event.accepted = true;
-                return;
-            case Qt.Key_Up:
-                root.selectPrevious();
-                event.accepted = true;
-                return;
-            case Qt.Key_Left:
-                if (!root.keyboardNavigationActive)
-                    return;
-                root.selectStep(-1);
-                event.accepted = true;
-                return;
-            case Qt.Key_Right:
-                if (!root.keyboardNavigationActive)
-                    return;
-                root.selectStep(1);
-                event.accepted = true;
-                return;
-            case Qt.Key_Return:
-            case Qt.Key_Enter:
-                {
-                    if (!root.keyboardNavigationActive || root.selectedIndex < 0)
-                        return;
-                    const theme = root.filteredThemes[root.selectedIndex];
-                    if (!theme.installed)
-                        root.installTheme(theme.id, theme.name, false);
-                    event.accepted = true;
-                    return;
-                }
-            }
+    aboveSearch: [
+        StyledText {
+            id: descriptionText
+            topPadding: Theme.spacingM
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: I18n.tr("Install color themes from the DMS theme registry", "theme browser description")
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.onSurfaceVariant
+            wrapMode: Text.WordWrap
         }
+    ]
 
-        Item {
-            id: browserContent
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
+    belowSearch: [
+        Column {
+            id: themeFilters
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Theme.spacingS
 
-            Item {
-                id: headerArea
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                height: Math.max(headerIcon.height, headerText.height, refreshButton.height, closeButton.height)
-
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: windowControls.tryStartMove()
-                    onDoubleClicked: windowControls.tryToggleMaximize()
-                }
-
-                DankIcon {
-                    id: headerIcon
-                    name: "palette"
-                    size: Theme.iconSize
-                    color: Theme.primary
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    id: headerText
-                    text: I18n.tr("Browse Themes", "theme browser header")
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.left: headerIcon.right
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingXS
-
-                    DankRefreshButton {
-                        id: refreshButton
-                        iconSize: 18
-                        iconColor: Theme.primary
-                        busy: root.isLoading
-                        onClicked: root.refreshThemes()
-                    }
-
-                    DankActionButton {
-                        visible: windowControls.canMaximize
-                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.outline
-                        onClicked: windowControls.tryToggleMaximize()
-                    }
-
-                    DankActionButton {
-                        id: closeButton
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.outline
-                        onClicked: root.hide()
-                    }
-                }
-            }
-
-            StyledText {
-                id: descriptionText
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: headerArea.bottom
-                anchors.topMargin: Theme.spacingM
-                text: I18n.tr("Install color themes from the DMS theme registry", "theme browser description")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.outline
-                wrapMode: Text.WordWrap
-            }
-
-            DankTextField {
-                id: browserSearchField
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: descriptionText.bottom
-                anchors.topMargin: Theme.spacingM
-                height: 48
-                leftIconName: "search"
-                leftIconSize: Theme.iconSize
-                leftIconColor: Theme.surfaceVariantText
-                leftIconFocusedColor: Theme.primary
-                showClearButton: true
-                textColor: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeMedium
-                placeholderText: I18n.tr("Search themes...", "theme search placeholder")
-                text: root.searchQuery
-                focus: true
-                ignoreLeftRightKeys: true
-                keyForwardTargets: [browserKeyHandler]
-                onTextEdited: {
-                    root.searchQuery = text;
+            DankFilterChips {
+                width: parent.width
+                model: [I18n.tr("All"), I18n.tr("Installed"), I18n.tr("Available")]
+                currentIndex: root.filterIndex
+                onSelectionChanged: index => {
+                    root.filterIndex = index;
                     root.updateFilteredThemes();
                 }
             }
-
-            Item {
-                id: listArea
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: browserSearchField.bottom
-                anchors.topMargin: Theme.spacingM
-                anchors.bottom: parent.bottom
-
-                Item {
-                    anchors.fill: parent
-                    visible: root.isLoading
-
-                    DankSpinner {
-                        anchors.centerIn: parent
-                        running: root.isLoading
-                    }
-                }
-
-                DankGridView {
-                    id: themeGrid
-
-                    property int columns: Math.max(1, Math.floor(width / 300))
-                    readonly property real cardSpacing: Theme.spacingM
-                    readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * 0.52)
-                    readonly property int infoHeight: 100
-
-                    anchors.fill: parent
-                    cellWidth: Math.floor(width / columns)
-                    cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
-                    model: root.filteredThemes
-                    clip: true
-                    visible: !root.isLoading
-                    cacheBuffer: cellHeight * 2
-
-                    delegate: Item {
-                        id: cardCell
-
-                        required property var modelData
-                        required property int index
-
-                        width: themeGrid.cellWidth
-                        height: themeGrid.cellHeight
-
-                        PluginCard {
-                            anchors.fill: parent
-                            anchors.margins: themeGrid.cardSpacing / 2
-                            plugin: cardCell.modelData
-                            fallbackIcon: "palette"
-                            previewSource: root.themePreviewUrl(cardCell.modelData)
-                            badges: root.themeBadges(cardCell.modelData)
-                            allowUninstall: true
-                            previewHeight: themeGrid.previewHeight
-                            installed: cardCell.modelData.installed || false
-                            selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
-                            onClicked: {
-                                root.selectedIndex = cardCell.index;
-                                root.keyboardNavigationActive = true;
-                            }
-                            onInstallRequested: root.installTheme(cardCell.modelData.id, cardCell.modelData.name, false)
-                            onUninstallRequested: root.uninstallTheme(cardCell.modelData.id, cardCell.modelData.name)
-                        }
-                    }
-                }
-
-                StyledText {
-                    anchors.centerIn: listArea
-                    text: I18n.tr("No themes found", "empty theme list")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceVariantText
-                    visible: !root.isLoading && root.filteredThemes.length === 0
-                }
+            StyledText {
+                width: parent.width
+                visible: root.operationMessage !== ""
+                text: root.operationMessage
+                color: root.operationFailed ? Theme.error : Theme.onSurfaceVariant
+                wrapMode: Text.Wrap
+            }
+            StyledText {
+                width: parent.width
+                visible: root.loadError !== ""
+                text: root.loadError
+                color: Theme.error
+                wrapMode: Text.Wrap
+            }
+            DankButton {
+                visible: root.loadError !== ""
+                text: I18n.tr("Retry", "retry failed action button")
+                iconName: "refresh"
+                onClicked: root.refreshThemes()
             }
         }
-    }
+    ]
 
-    FloatingWindowControls {
-        id: windowControls
-        targetWindow: root
-    }
+    listContent: [
+        DankGridView {
+            id: themeGrid
+
+            property int columns: Math.max(1, Math.floor(width / (Theme.smallBreakpoint / 2 + Theme.spacingXL * 2)))
+            readonly property real cardSpacing: Theme.spacingM
+            readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * SettingsMetrics.choiceCardPreviewRatio)
+            readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
+
+            anchors.fill: parent
+            cellWidth: Math.floor(width / columns)
+            cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
+            model: root.filteredThemes
+            clip: true
+            visible: !root.isLoading
+            cacheBuffer: cellHeight * 2
+
+            delegate: Item {
+                id: cardCell
+
+                required property var modelData
+                required property int index
+
+                width: themeGrid.cellWidth
+                height: themeGrid.cellHeight
+
+                PluginCard {
+                    anchors.fill: parent
+                    anchors.margins: themeGrid.cardSpacing / 2
+                    plugin: cardCell.modelData
+                    busy: !!root.pendingThemes[cardCell.modelData.id]
+                    fallbackIcon: "palette"
+                    previewSource: root.themePreviewUrl(cardCell.modelData)
+                    badges: root.themeBadges(cardCell.modelData)
+                    allowUninstall: true
+                    previewHeight: themeGrid.previewHeight
+                    installed: cardCell.modelData.installed || false
+                    selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
+                    onClicked: {
+                        root.selectedIndex = cardCell.index;
+                        root.keyboardNavigationActive = true;
+                        if (!cardCell.modelData.installed)
+                            root.installTheme(cardCell.modelData.id, cardCell.modelData.name, false);
+                    }
+                    onInstallRequested: root.installTheme(cardCell.modelData.id, cardCell.modelData.name, false)
+                    onUninstallRequested: root.uninstallTheme(cardCell.modelData.id, cardCell.modelData.name)
+                }
+            }
+        },
+        StyledText {
+            anchors.centerIn: parent
+            text: I18n.tr("No themes found", "empty theme list")
+            font.pixelSize: Theme.fontSizeMedium
+            color: Theme.surfaceVariantText
+            visible: !root.isLoading && root.loadError === "" && root.filteredThemes.length === 0
+        }
+    ]
 }

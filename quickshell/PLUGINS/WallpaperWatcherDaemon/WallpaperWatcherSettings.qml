@@ -10,7 +10,7 @@ PluginSettings {
     StyledText {
         text: "Wallpaper Change Hook"
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 

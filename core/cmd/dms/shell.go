@@ -231,7 +231,6 @@ func printIPCHelpFailure(err error) {
 	fmt.Println("  Try:        dms ipc call <target> <function>")
 }
 
-// ensureFontCache rebuilds the fontconfig cache if user-configured fonts are missing while skipping defaults
 func ensureFontCache() {
 	if _, err := exec.LookPath("fc-list"); err != nil {
 		return
@@ -246,15 +245,16 @@ func ensureFontCache() {
 		settingsPath := filepath.Join(configDir, "DankMaterialShell", "settings.json")
 		if data, err := os.ReadFile(settingsPath); err == nil {
 			var settings struct {
-				FontFamily     string `json:"fontFamily"`
-				MonoFontFamily string `json:"monoFontFamily"`
+				FontFamily        string `json:"fontFamily"`
+				MonoFontFamily    string `json:"monoFontFamily"`
+				DisplayFontFamily string `json:"displayFontFamily"`
 			}
 			if err := json.Unmarshal(data, &settings); err == nil {
-				if settings.FontFamily != "" && settings.FontFamily != "Inter Variable" {
-					fontsToCheck = append(fontsToCheck, settings.FontFamily)
-				}
-				if settings.MonoFontFamily != "" && settings.MonoFontFamily != "Fira Code" {
-					fontsToCheck = append(fontsToCheck, settings.MonoFontFamily)
+				for _, family := range []string{settings.FontFamily, settings.MonoFontFamily, settings.DisplayFontFamily} {
+					if family == "" || isBundledDefaultFont(family) {
+						continue
+					}
+					fontsToCheck = append(fontsToCheck, family)
 				}
 			}
 		}

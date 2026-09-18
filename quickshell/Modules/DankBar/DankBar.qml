@@ -1,9 +1,8 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.I3
 import qs.Common
 import qs.Services
+import "WidgetModel.js" as WidgetModel
 
 Item {
     id: root
@@ -12,8 +11,18 @@ Item {
 
     signal barReady(var barConfig)
 
-    Component.onCompleted: BarWidgetService.registerDankBarItem(root.barConfig?.id, root)
-    Component.onDestruction: BarWidgetService.unregisterDankBarItem(root.barConfig?.id, root)
+    property string _registeredBarId: ""
+    function registerBar() {
+        const id = barConfig?.id ?? "";
+        if (id === _registeredBarId)
+            return;
+        BarWidgetService.unregisterDankBarItem(_registeredBarId, root);
+        _registeredBarId = id;
+        BarWidgetService.registerDankBarItem(id, root);
+    }
+    onBarConfigChanged: registerBar()
+    Component.onCompleted: registerBar()
+    Component.onDestruction: BarWidgetService.unregisterDankBarItem(_registeredBarId, root)
 
     property alias barVariants: barVariants
     property var hyprlandOverviewLoader: null
@@ -23,157 +32,54 @@ Item {
     property alias centerWidgetsModel: centerWidgetsModel
     property alias rightWidgetsModel: rightWidgetsModel
 
-    property string _leftWidgetsJson: {
-        root.barConfig;
-        const leftWidgets = root.barConfig?.leftWidgets || [];
-        const mapped = leftWidgets.map((w, index) => {
-            if (typeof w === "string") {
-                return {
-                    widgetId: w,
-                    id: w + "_" + index,
-                    enabled: true
-                };
-            } else {
-                const obj = Object.assign({}, w);
-                obj.widgetId = w.id || w.widgetId;
-                obj.id = (w.id || w.widgetId) + "_" + index;
-                obj.enabled = w.enabled !== false;
-                return obj;
-            }
-        });
-        return JSON.stringify(mapped);
-    }
-
-    property string _centerWidgetsJson: {
-        root.barConfig;
-        const centerWidgets = root.barConfig?.centerWidgets || [];
-        const mapped = centerWidgets.map((w, index) => {
-            if (typeof w === "string") {
-                return {
-                    widgetId: w,
-                    id: w + "_" + index,
-                    enabled: true
-                };
-            } else {
-                const obj = Object.assign({}, w);
-                obj.widgetId = w.id || w.widgetId;
-                obj.id = (w.id || w.widgetId) + "_" + index;
-                obj.enabled = w.enabled !== false;
-                return obj;
-            }
-        });
-        return JSON.stringify(mapped);
-    }
-
-    property string _rightWidgetsJson: {
-        root.barConfig;
-        const rightWidgets = root.barConfig?.rightWidgets || [];
-        const mapped = rightWidgets.map((w, index) => {
-            if (typeof w === "string") {
-                return {
-                    widgetId: w,
-                    id: w + "_" + index,
-                    enabled: true
-                };
-            } else {
-                const obj = Object.assign({}, w);
-                obj.widgetId = w.id || w.widgetId;
-                obj.id = (w.id || w.widgetId) + "_" + index;
-                obj.enabled = w.enabled !== false;
-                return obj;
-            }
-        });
-        return JSON.stringify(mapped);
-    }
+    property string _leftWidgetsJson: JSON.stringify(WidgetModel.normalize(root.barConfig?.leftWidgets))
+    property string _centerWidgetsJson: JSON.stringify(WidgetModel.normalize(root.barConfig?.centerWidgets))
+    property string _rightWidgetsJson: JSON.stringify(WidgetModel.normalize(root.barConfig?.rightWidgets))
 
     ScriptModel {
         id: leftWidgetsModel
+        objectProp: "id"
         values: JSON.parse(root._leftWidgetsJson)
     }
 
     ScriptModel {
         id: centerWidgetsModel
+        objectProp: "id"
         values: JSON.parse(root._centerWidgetsJson)
     }
 
     ScriptModel {
         id: rightWidgetsModel
+        objectProp: "id"
         values: JSON.parse(root._rightWidgetsJson)
     }
 
+    function focusedBarInstance() {
+        const screenName = CompositorService.getFocusedScreenName();
+        if (!screenName)
+            return barVariants.instances[0] || null;
+        return barVariants.instances.find(instance => instance.modelData?.name === screenName) || null;
+    }
+
     function triggerControlCenterOnFocusedScreen() {
-        let focusedScreenName = "";
-        if (CompositorService.isHyprland && Hyprland.focusedMonitor) {
-            focusedScreenName = Hyprland.focusedMonitor.name;
-        } else if (CompositorService.isNiri && NiriService.currentOutput) {
-            focusedScreenName = NiriService.currentOutput;
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            focusedScreenName = focusedWs?.monitor?.name || "";
-        } else if (CompositorService.isMango && MangoService.activeOutput) {
-            focusedScreenName = MangoService.activeOutput;
-        }
-
-        if (!focusedScreenName && barVariants.instances.length > 0) {
-            const firstBar = barVariants.instances[0];
-            firstBar.triggerControlCenter();
-            return true;
-        }
-
-        for (var i = 0; i < barVariants.instances.length; i++) {
-            const barInstance = barVariants.instances[i];
-            if (barInstance.modelData && barInstance.modelData.name === focusedScreenName) {
-                barInstance.triggerControlCenter();
-                return true;
-            }
-        }
-        return false;
+        const instance = focusedBarInstance();
+        if (!instance)
+            return false;
+        instance.triggerControlCenter();
+        return true;
     }
 
     function triggerWallpaperBrowserOnFocusedScreen() {
-        let focusedScreenName = "";
-        if (CompositorService.isHyprland && Hyprland.focusedMonitor) {
-            focusedScreenName = Hyprland.focusedMonitor.name;
-        } else if (CompositorService.isNiri && NiriService.currentOutput) {
-            focusedScreenName = NiriService.currentOutput;
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            focusedScreenName = focusedWs?.monitor?.name || "";
-        } else if (CompositorService.isMango && MangoService.activeOutput) {
-            focusedScreenName = MangoService.activeOutput;
-        }
-
-        if (!focusedScreenName && barVariants.instances.length > 0) {
-            const firstBar = barVariants.instances[0];
-            firstBar.triggerWallpaperBrowser();
-            return true;
-        }
-
-        for (var i = 0; i < barVariants.instances.length; i++) {
-            const barInstance = barVariants.instances[i];
-            if (barInstance.modelData && barInstance.modelData.name === focusedScreenName) {
-                barInstance.triggerWallpaperBrowser();
-                return true;
-            }
-        }
-        return false;
+        const instance = focusedBarInstance();
+        if (!instance)
+            return false;
+        instance.triggerWallpaperBrowser();
+        return true;
     }
 
     Variants {
         id: barVariants
-        model: {
-            const base = Quickshell.screens.filter(screen => SettingsData.barConfigCoversScreen(root.barConfig, screen));
-            // Connected frame mode renders the bar inside the frame surface; skip the standalone window there
-            // unless this bar wants the overlay layer, which the frame surface cannot provide.
-            return base.filter(screen => {
-                if (CompositorService.frameHostsBarForConfig(screen, root.barConfig))
-                    return false;
-                if (SettingsData.isIslandBarConfig(root.barConfig))
-                    return false;
-                const edge = SettingsData.positionToSide(root.barConfig?.position ?? SettingsData.Position.Top);
-                return !SettingsData.dankIslandOwnsEdge(screen, edge);
-            });
-        }
+        model: ShellLayout.hostedScreens(root.barConfig?.id)
 
         delegate: DankBarWindow {
             rootWindow: root

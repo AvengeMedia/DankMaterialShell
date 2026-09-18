@@ -130,10 +130,10 @@ Singleton {
         const parts = [];
         switch (device.class) {
         case "direct":
-            parts.push(I18n.tr("Local"));
+            parts.push(I18n.tr("Local", "adjective, directly attached printer device class"));
             break;
         case "network":
-            parts.push(I18n.tr("Network"));
+            parts.push(I18n.tr("Network", "printer device class, a network printer"));
             break;
         case "file":
             parts.push(I18n.tr("File"));
@@ -640,33 +640,33 @@ Singleton {
     function getJobStateTranslation(state) {
         switch (state) {
         case "pending":
-            return I18n.tr("Pending");
+            return I18n.tr("Pending", "printer job state");
         case "pending-held":
-            return I18n.tr("Held");
+            return I18n.tr("Held", "printer job state, job is on hold");
         case "processing":
-            return I18n.tr("Processing");
+            return I18n.tr("Processing", "printer job state, also printer state");
         case "processing-stopped":
-            return I18n.tr("Stopped");
+            return I18n.tr("Stopped", "printer job state, also printer state");
         case "canceled":
-            return I18n.tr("Canceled");
+            return I18n.tr("Canceled", "printer job state");
         case "aborted":
-            return I18n.tr("Aborted");
+            return I18n.tr("Aborted", "printer job state");
         case "completed":
-            return I18n.tr("Completed");
+            return I18n.tr("Completed", "printer job state");
         default:
             return state;
         }
     }
 
     readonly property var states: ({
-            "idle": I18n.tr("Idle"),
+            "idle": I18n.tr("Idle", "adjective, printer state", true),
             "processing": I18n.tr("Processing"),
             "stopped": I18n.tr("Stopped")
         })
 
     readonly property var reasonsGeneral: ({
             "none": I18n.tr("None"),
-            "other": I18n.tr("Other")
+            "other": I18n.tr("Other", "printer state reason")
         })
 
     readonly property var reasonsSupplies: ({
@@ -695,11 +695,11 @@ Singleton {
         })
 
     readonly property var reasonsErrors: ({
-            "paused": I18n.tr("Paused"),
-            "shutdown": I18n.tr("Shutdown"),
+            "paused": I18n.tr("Paused", "printer state reason"),
+            "shutdown": I18n.tr("Shutdown", "printer state reason, the printer has shut down"),
             "connecting-to-device": I18n.tr("Connecting to Device"),
             "timed-out": I18n.tr("Timed Out"),
-            "stopping": I18n.tr("Stopping"),
+            "stopping": I18n.tr("Stopping", "printer state reason"),
             "stopped-partly": I18n.tr("Stopped Partly")
         })
 
@@ -716,8 +716,8 @@ Singleton {
 
     readonly property var severitySuffixes: ({
             "-error": I18n.tr("Error"),
-            "-warning": I18n.tr("Warning"),
-            "-report": I18n.tr("Report")
+            "-warning": I18n.tr("Warning", "noun, printer state reason severity"),
+            "-report": I18n.tr("Report", "noun, printer state reason severity")
         })
 
     function getPrinterStateTranslation(state) {

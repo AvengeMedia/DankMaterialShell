@@ -15,30 +15,18 @@ Item {
     Component.onCompleted: NetworkService.addRef()
     Component.onDestruction: NetworkService.removeRef()
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
+        SettingsCard {
+            id: root
 
-            topPadding: 4
-            width: Math.min(600, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingL
+            settingKey: "networkCellular"
+            tags: ["cellular", "mobile", "modem", "wwan", "lte", "gsm", "cdma", "network"]
+            width: parent.width
 
-            SettingsCard {
-                id: root
-
-                title: I18n.tr("Cellular")
-                iconName: "network_cell"
-                settingKey: "networkCellular"
-                tags: ["cellular", "mobile", "modem", "wwan", "lte", "gsm", "cdma", "network"]
-                width: parent.width
-
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width
                     spacing: Theme.spacingM
 
@@ -82,21 +70,15 @@ Item {
                         }
                     }
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
-
                     Column {
                         width: parent.width
-                        spacing: 4
+                        spacing: Theme.spacingXS
                         visible: NetworkService.cellularEnabled && (NetworkService.cellularDevices?.length ?? 0) > 0
 
                         StyledText {
                             text: I18n.tr("Adapters")
                             font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             width: parent.width
                             horizontalAlignment: Text.AlignLeft
@@ -115,7 +97,7 @@ Item {
                                 height: 56
                                 radius: Theme.cornerRadius
                                 color: modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-                                border.width: isConnected ? 2 : 0
+                                border.width: isConnected ? Theme.outlineWidthFocused : 0
                                 border.color: Theme.primary
 
                                 Row {
@@ -135,14 +117,14 @@ Item {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
+                                        spacing: Theme.spacingXXS
                                         width: parent.width - 20 - Theme.spacingS
 
                                         StyledText {
                                             text: modelData.name || I18n.tr("Unknown")
                                             font.pixelSize: Theme.fontSizeMedium
                                             color: modemDelegate.isConnected ? Theme.primary : Theme.surfaceText
-                                            font.weight: modemDelegate.isConnected ? Font.Medium : Font.Normal
+                                            font.weight: Theme.fontWeightMedium
                                             elide: Text.ElideRight
                                             width: parent.width
                                             horizontalAlignment: Text.AlignLeft
@@ -173,7 +155,7 @@ Item {
                                     Rectangle {
                                         width: 28
                                         height: 28
-                                        radius: 14
+                                        radius: Theme.cornerRadiusL
                                         color: modemActionBtn.containsMouse ? (modemDelegate.isConnected ? Theme.errorHover : Theme.primaryHover) : "transparent"
 
                                         DankIcon {
@@ -194,6 +176,12 @@ Item {
                                                 else
                                                     NetworkService.connectCellular();
                                             }
+                                        }
+
+                                        DankTooltipHost {
+                                            text: modemDelegate.isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                            target: parent
+                                            hoverArea: modemActionBtn
                                         }
                                     }
                                 }
@@ -216,18 +204,20 @@ Item {
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                title: I18n.tr("Saved Configurations")
-                iconName: "sim_card"
-                settingKey: "networkCellularProfiles"
-                tags: ["cellular", "mobile", "profile", "apn", "sim"]
-                width: parent.width
-                visible: NetworkService.cellularEnabled && (NetworkService.cellularConnections?.length ?? 0) > 0
+        SettingsCard {
+            title: I18n.tr("Saved configurations")
+            iconName: "sim_card"
+            settingKey: "networkCellularProfiles"
+            tags: ["cellular", "mobile", "profile", "apn", "sim"]
+            width: parent.width
+            visible: NetworkService.cellularEnabled && (NetworkService.cellularConnections?.length ?? 0) > 0
 
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width
-                    spacing: 4
+                    spacing: Theme.spacingXS
 
                     Repeater {
                         model: NetworkService.cellularConnections || []
@@ -243,7 +233,7 @@ Item {
                             radius: Theme.cornerRadius
                             color: profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
                             border.color: isActive ? Theme.primary : Theme.outlineLight
-                            border.width: isActive ? 2 : 1
+                            border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
 
                             Row {
                                 anchors.left: parent.left
@@ -263,13 +253,13 @@ Item {
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: parent.width - 20 - Theme.spacingS
-                                    spacing: 2
+                                    spacing: Theme.spacingXXS
 
                                     StyledText {
                                         text: modelData.id || I18n.tr("Unknown")
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: profileDelegate.isActive ? Theme.primary : Theme.surfaceText
-                                        font.weight: profileDelegate.isActive ? Font.Medium : Font.Normal
+                                        font.weight: Theme.fontWeightMedium
                                         elide: Text.ElideRight
                                         width: parent.width
                                         horizontalAlignment: Text.AlignLeft
@@ -291,6 +281,7 @@ Item {
                                 anchors.rightMargin: Theme.spacingS
                                 anchors.verticalCenter: parent.verticalCenter
                                 iconName: profileDelegate.isActive ? "link_off" : "link"
+                                tooltipText: profileDelegate.isActive ? I18n.tr("Disconnect") : I18n.tr("Connect")
                                 buttonSize: 28
                                 iconSize: 18
                                 iconColor: profileDelegate.isActive ? Theme.error : Theme.primary

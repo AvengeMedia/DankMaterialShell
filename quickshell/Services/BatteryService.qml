@@ -238,7 +238,7 @@ Singleton {
         if (isCharging && batteryLevel >= SettingsData.batteryChargeLimit) {
             if (!_hasNotifiedChargeLimit && SettingsData.batteryNotifyChargeLimit) {
                 _hasNotifiedChargeLimit = true;
-                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%").arg(SettingsData.batteryChargeLimit), "info", "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
+                sendAlert(I18n.tr("Charge Limit Reached"), I18n.tr("Battery has charged to your set limit of %1%", "charge limit notification body, %1 is the limit percentage").arg(SettingsData.batteryChargeLimit), "info", "material:battery_profile", SettingsData.batteryChargeLimitNotificationType);
             }
         } else if (!isCharging || batteryLevel < SettingsData.batteryChargeLimit - 2) {
             _hasNotifiedChargeLimit = false;
@@ -254,7 +254,7 @@ Singleton {
         if (isCriticalBattery) {
             if (!_hasNotifiedCriticalBattery && SettingsData.batteryNotifyCritical) {
                 _hasNotifiedCriticalBattery = true;
-                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!").arg(batteryLevel), "critical", "material:battery_alert", SettingsData.batteryCriticalNotificationType);
+                sendAlert(I18n.tr("Critical Battery"), I18n.tr("Battery is at %1% - Connect charger immediately!", "critical battery notification body, %1 is the battery percentage").arg(batteryLevel), "critical", "material:battery_alert", SettingsData.batteryCriticalNotificationType);
             }
             return;
         }
@@ -267,7 +267,7 @@ Singleton {
         if (isLowBattery) {
             if (!_hasNotifiedLowBattery && SettingsData.batteryNotifyLow) {
                 _hasNotifiedLowBattery = true;
-                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon").arg(batteryLevel), "warning", "material:battery_0_bar", SettingsData.batteryLowNotificationType);
+                sendAlert(I18n.tr("Low Battery"), I18n.tr("Battery is at %1% - Consider charging soon", "low battery notification body, %1 is the battery percentage").arg(batteryLevel), "warning", "material:battery_0_bar", SettingsData.batteryLowNotificationType);
             }
 
             if (SettingsData.batteryAutoPowerSaver && PowerProfileWatcher.available) {
@@ -473,33 +473,65 @@ Singleton {
         if (stateKnownBatteries.length === 0) {
             if (isCharging)
                 return I18n.tr("Charging", "battery status");
-            return isPluggedIn ? I18n.tr("Plugged In", "battery status") : I18n.tr("Discharging", "battery status");
+            return isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status");
         }
 
         if (isCharging && !stateKnownBatteries.some(b => b.changeRate > 0))
-            return I18n.tr("Plugged In", "battery status");
+            return I18n.tr("Plugged in", "battery status");
 
         const states = stateKnownBatteries.map(b => b.state);
         if (states.every(s => s === states[0]))
             return translateBatteryState(states[0]);
 
-        return isCharging ? I18n.tr("Charging", "battery status") : (isPluggedIn ? I18n.tr("Plugged In", "battery status") : I18n.tr("Discharging", "battery status"));
+        return isCharging ? I18n.tr("Charging", "battery status") : (isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status"));
     }
 
     readonly property bool suggestPowerSaver: false
 
-    readonly property var bluetoothDevices: {
-        const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
-
-        const btDevices = UPower.devices.values.filter(dev => dev && dev.ready && bluetoothTypes.includes(dev.type)).map(dev => {
-            return {
+    readonly property var peripheralDevices: UPower.devices.values.filter(dev => dev && dev.ready && !dev.isLaptopBattery && peripheralIcon(dev.type) !== "").map(dev => ({
                 "name": dev.model || UPowerDeviceType.toString(dev.type),
                 "percentage": Math.round(dev.percentage * 100),
-                "type": dev.type
-            };
-        });
+                "type": dev.type,
+                "icon": peripheralIcon(dev.type),
+                "charging": dev.state === UPowerDeviceState.Charging
+            }))
 
-        return btDevices;
+    readonly property var bluetoothDevices: {
+        const bluetoothTypes = [UPowerDeviceType.BluetoothGeneric, UPowerDeviceType.Headphones, UPowerDeviceType.Headset, UPowerDeviceType.Keyboard, UPowerDeviceType.Mouse, UPowerDeviceType.Speakers];
+        return peripheralDevices.filter(dev => bluetoothTypes.includes(dev.type));
+    }
+
+    function peripheralIcon(type) {
+        switch (type) {
+        case UPowerDeviceType.BluetoothGeneric:
+            return "bluetooth";
+        case UPowerDeviceType.Headphones:
+            return "headphones";
+        case UPowerDeviceType.Headset:
+            return "headset_mic";
+        case UPowerDeviceType.Speakers:
+            return "speaker";
+        case UPowerDeviceType.Keyboard:
+            return "keyboard";
+        case UPowerDeviceType.Mouse:
+            return "mouse";
+        case UPowerDeviceType.Touchpad:
+            return "touchpad_mouse";
+        case UPowerDeviceType.Pen:
+            return "stylus";
+        case UPowerDeviceType.GamingInput:
+            return "sports_esports";
+        case UPowerDeviceType.Phone:
+            return "smartphone";
+        case UPowerDeviceType.Tablet:
+            return "tablet";
+        case UPowerDeviceType.MediaPlayer:
+            return "media_output";
+        case UPowerDeviceType.Wearable:
+            return "watch";
+        default:
+            return "";
+        }
     }
 
     function estimatedSeconds() {
@@ -514,15 +546,17 @@ Singleton {
         return seconds;
     }
 
-    // Format time remaining for charge/discharge
+    function formatDuration(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return hours > 0 ? I18n.tr("%1h %2m", "battery time remaining").arg(hours).arg(minutes) : I18n.tr("%1m", "battery time remaining").arg(minutes);
+    }
+
     function formatTimeRemaining() {
         const seconds = estimatedSeconds();
         if (!seconds)
             return "Unknown";
-
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+        return formatDuration(seconds);
     }
 
     function formatEstimatedTime() {

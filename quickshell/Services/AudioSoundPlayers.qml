@@ -1,16 +1,9 @@
 import QtQuick
 import QtMultimedia
+import qs.Services
 
 Item {
     id: root
-
-    property real volume: 1.0
-    property url volumeChangeSource
-    property url powerPlugSource
-    property url powerUnplugSource
-    property url normalNotificationSource
-    property url criticalNotificationSource
-    property url loginSource
 
     readonly property alias mediaDevices: devices
     readonly property alias volumeChangeSound: volumeChangePlayer
@@ -20,61 +13,46 @@ Item {
     readonly property alias criticalNotificationSound: criticalNotificationPlayer
     readonly property alias loginSound: loginPlayer
 
+    component SoundPlayer: MediaPlayer {
+        required property string soundEvent
+        source: AudioService.getSoundPath(soundEvent)
+        audioOutput: AudioOutput {
+            device: devices.defaultAudioOutput
+            volume: AudioService.notificationsVolume
+        }
+    }
+
     MediaDevices {
         id: devices
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: volumeChangePlayer
-        source: root.volumeChangeSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "audio-volume-change"
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: powerPlugPlayer
-        source: root.powerPlugSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "power-plug"
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: powerUnplugPlayer
-        source: root.powerUnplugSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "power-unplug"
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: normalNotificationPlayer
-        source: root.normalNotificationSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "message"
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: criticalNotificationPlayer
-        source: root.criticalNotificationSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "message-new-instant"
     }
 
-    MediaPlayer {
+    SoundPlayer {
         id: loginPlayer
-        source: root.loginSource
-        audioOutput: AudioOutput {
-            device: devices.defaultAudioOutput
-            volume: root.volume
-        }
+        soundEvent: "desktop-login"
     }
 }

@@ -46,7 +46,7 @@ Item {
                     text: root.notificationModel.appName
                     color: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.DemiBold
+                    font.weight: Theme.fontWeightMedium
                     elide: Text.ElideRight
                 }
 
@@ -64,6 +64,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "close"
+                Accessible.name: I18n.tr("Dismiss")
                 iconSize: 21
                 buttonSize: 38
                 onClicked: root.notificationModel.dismiss()
@@ -86,7 +87,7 @@ Item {
                 text: root.notificationModel.summary
                 color: Theme.surfaceText
                 font.pixelSize: Theme.fontSizeLarge
-                font.weight: Font.DemiBold
+                font.weight: Theme.fontWeightMedium
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 maximumLineCount: 2
                 elide: Text.ElideRight
@@ -116,7 +117,7 @@ Item {
 
             DankButton {
                 height: parent.height
-                radius: height / 2
+                radius: Theme.fullRadius(width, height)
                 text: I18n.tr("Dismiss", "island notification face: dismiss button")
                 backgroundColor: "transparent"
                 textColor: Theme.surfaceText
@@ -130,7 +131,7 @@ Item {
             DankButton {
                 visible: root.notificationModel.hasAction
                 height: parent.height
-                radius: height / 2
+                radius: Theme.fullRadius(width, height)
                 text: root.notificationModel.actionLabel
                 backgroundColor: Theme.primary
                 textColor: Theme.onPrimary

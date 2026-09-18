@@ -116,228 +116,197 @@ Item {
         }
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            tab: "audio"
+            tags: ["audio", "device", "output", "speaker"]
+            title: I18n.tr("Output devices")
+            settingKey: "audioOutputDevices"
+            iconName: "volume_up"
 
-            SettingsCard {
+            SettingsToggleRow {
                 tab: "audio"
-                tags: ["audio", "device", "output", "speaker"]
-                title: I18n.tr("Output Devices", "Audio settings: speaker/headphone devices")
-                settingKey: "audioOutputDevices"
-                iconName: "volume_up"
+                tags: ["audio", "virtual", "stream", "obs", "loopback", "device", "sink"]
+                settingKey: "audioShowStreamDevices"
+                text: I18n.tr("Show virtual devices")
+                checked: SettingsData.audioShowStreamDevices
+                onToggled: checked => SettingsData.set("audioShowStreamDevices", checked)
+            }
 
-                Column {
+            SettingsRow {
+                body: StyledText {
                     width: parent.width
-                    spacing: Theme.spacingM
+                    text: I18n.tr("Set custom names for your audio output devices", "Audio settings description")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignLeft
+                }
+            }
 
-                    SettingsToggleRow {
-                        tab: "audio"
-                        tags: ["audio", "virtual", "stream", "obs", "loopback", "device"]
-                        settingKey: "audioShowStreamDevices"
-                        text: I18n.tr("Show Virtual Devices")
-                        description: I18n.tr("Include application streams and virtual sinks in the device lists")
-                        checked: SettingsData.audioShowStreamDevices
-                        onToggled: checked => SettingsData.set("audioShowStreamDevices", checked)
-                    }
+            Repeater {
+                model: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name))
 
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("Set custom names for your audio output devices", "Audio settings description")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        horizontalAlignment: Text.AlignLeft
-                    }
+                delegate: Column {
+                    required property var modelData
+                    width: parent?.width ?? 0
+                    spacing: 0
 
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                    }
+                    DeviceAliasRow {
+                        deviceNode: modelData
+                        deviceType: "output"
+                        showHideButton: true
 
-                    Repeater {
-                        model: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name))
+                        onEditRequested: device => {
+                            root.editingDevice = device;
+                            root.editingDeviceType = "output";
+                            root.newDeviceName = AudioService.displayName(device);
+                            root.showEditDialog = true;
+                        }
 
-                        delegate: Column {
-                            required property var modelData
-                            width: parent?.width ?? 0
-                            spacing: 0
-
-                            DeviceAliasRow {
-                                deviceNode: modelData
-                                deviceType: "output"
-                                showHideButton: true
-
-                                onEditRequested: device => {
-                                    root.editingDevice = device;
-                                    root.editingDeviceType = "output";
-                                    root.newDeviceName = AudioService.displayName(device);
-                                    root.showEditDialog = true;
-                                }
-
-                                onResetRequested: device => {
-                                    AudioService.removeDeviceAlias(device.name);
-                                }
-
-                                onHideRequested: device => {
-                                    root.persistHiddenOutputDeviceNames([...root.hiddenOutputDeviceNames, device.name]);
-                                }
-                            }
-
-                            Item {
-                                width: parent.width
-                                height: 36
-
-                                StyledText {
-                                    id: maxVolLabel
-                                    text: I18n.tr("Max Volume", "Audio settings: maximum volume limit per device") + " · " + maxVolSlider.value + "%"
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: Theme.spacingM + Theme.iconSize + Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-
-                                DankSlider {
-                                    id: maxVolSlider
-                                    anchors.left: maxVolLabel.right
-                                    anchors.leftMargin: Theme.spacingS
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    height: 36
-                                    minimum: 100
-                                    maximum: 200
-                                    step: 5
-                                    showValue: true
-                                    wheelEnabled: false
-                                    centerMinimum: true
-                                    unit: "%"
-                                    onSliderValueChanged: newValue => {
-                                        SessionData.setDeviceMaxVolume(modelData.name, newValue);
-                                    }
-                                }
-
-                                Binding {
-                                    target: maxVolSlider
-                                    property: "value"
-                                    value: SessionData.deviceMaxVolumes[modelData.name] ?? 100
-                                    when: !maxVolSlider.isDragging
-                                }
-                            }
+                        onHideRequested: device => {
+                            root.persistHiddenOutputDeviceNames([...root.hiddenOutputDeviceNames, device.name]);
                         }
                     }
 
-                    StyledText {
+                    Item {
                         width: parent.width
-                        text: I18n.tr("No output devices found", "Audio settings empty state")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        horizontalAlignment: Text.AlignHCenter
-                        visible: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name)).length === 0 && root.hiddenOutputDeviceNames.length === 0
-                        topPadding: Theme.spacingM
+                        height: 36
+
+                        StyledText {
+                            id: maxVolLabel
+                            text: I18n.tr("Max volume") + " · " + maxVolSlider.value + "%"
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM + Theme.iconSize + Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            horizontalAlignment: Text.AlignLeft
+                        }
+
+                        DankSlider {
+                            id: maxVolSlider
+                            anchors.left: maxVolLabel.right
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            height: 36
+                            minimum: 100
+                            maximum: 200
+                            step: 5
+                            showValue: true
+                            wheelEnabled: false
+                            centerMinimum: true
+                            unit: "%"
+                            onSliderValueChanged: newValue => {
+                                SessionData.setDeviceMaxVolume(modelData.name, newValue);
+                            }
+                        }
+
+                        Binding {
+                            target: maxVolSlider
+                            property: "value"
+                            value: SessionData.deviceMaxVolumes[modelData.name] ?? 100
+                            when: !maxVolSlider.isDragging
+                        }
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name)).length === 0 && root.hiddenOutputDeviceNames.length === 0
+                body: StyledText {
+                    width: parent.width
+                    text: I18n.tr("No output devices found", "Audio settings empty state")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    horizontalAlignment: Text.AlignHCenter
+                    topPadding: Theme.spacingM
+                }
+            }
+
+            SettingsRow {
+                visible: root.hiddenOutputDeviceNames.length > 0
+                body: Column {
+                    width: parent.width
+                    spacing: 0
+
+                    Item {
+                        width: parent.width
+                        height: 36
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: "visibility_off"
+                                size: Theme.iconSizeMedium
+                                color: Theme.surfaceVariantText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Hidden (%1)", "count of hidden audio devices").arg(root.hiddenOutputDeviceNames.length)
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        DankIcon {
+                            name: root.showHiddenOutputDevices ? "expand_less" : "expand_more"
+                            size: Theme.iconSizeMedium
+                            color: Theme.surfaceVariantText
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.showHiddenOutputDevices = !root.showHiddenOutputDevices
+                        }
                     }
 
                     Column {
                         width: parent.width
                         spacing: 0
-                        visible: root.hiddenOutputDeviceNames.length > 0
+                        visible: root.showHiddenOutputDevices
 
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: Theme.outline
-                            opacity: 0.15
-                        }
+                        Repeater {
+                            model: root.outputDevices.filter(d => root.hiddenOutputDeviceNames.includes(d.name))
 
-                        Item {
-                            width: parent.width
-                            height: 36
+                            delegate: DeviceAliasRow {
+                                required property var modelData
+                                deviceNode: modelData
+                                deviceType: "output"
+                                isHidden: true
+                                showHideButton: true
 
-                            Row {
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
-
-                                DankIcon {
-                                    name: "visibility_off"
-                                    size: Theme.iconSize - 4
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Hidden (%1)", "count of hidden audio devices").arg(root.hiddenOutputDeviceNames.length)
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            DankIcon {
-                                name: root.showHiddenOutputDevices ? "expand_less" : "expand_more"
-                                size: Theme.iconSize - 4
-                                color: Theme.surfaceVariantText
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.showHiddenOutputDevices = !root.showHiddenOutputDevices
-                            }
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: 0
-                            visible: root.showHiddenOutputDevices
-
-                            Repeater {
-                                model: root.outputDevices.filter(d => root.hiddenOutputDeviceNames.includes(d.name))
-
-                                delegate: DeviceAliasRow {
-                                    required property var modelData
-                                    deviceNode: modelData
-                                    deviceType: "output"
-                                    isHidden: true
-                                    showHideButton: true
-
-                                    onHideRequested: device => {
-                                        root.persistHiddenOutputDeviceNames(root.hiddenOutputDeviceNames.filter(n => n !== device.name));
-                                    }
-
-                                    onResetRequested: device => {
-                                        AudioService.removeDeviceAlias(device.name);
-                                    }
+                                onHideRequested: device => {
+                                    root.persistHiddenOutputDeviceNames(root.hiddenOutputDeviceNames.filter(n => n !== device.name));
                                 }
                             }
                         }
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                tab: "audio"
-                tags: ["audio", "device", "input", "microphone"]
-                title: I18n.tr("Input Devices")
-                settingKey: "audioInputDevices"
-                iconName: "mic"
+        SettingsCard {
+            tab: "audio"
+            tags: ["audio", "device", "input", "microphone"]
+            title: I18n.tr("Input devices")
+            settingKey: "audioInputDevices"
+            iconName: "mic"
 
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width
                     spacing: Theme.spacingM
 
@@ -348,13 +317,6 @@ Item {
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignLeft
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
                     }
 
                     Repeater {
@@ -372,10 +334,6 @@ Item {
                                 root.editingDeviceType = "input";
                                 root.newDeviceName = AudioService.displayName(device);
                                 root.showEditDialog = true;
-                            }
-
-                            onResetRequested: device => {
-                                AudioService.removeDeviceAlias(device.name);
                             }
 
                             onHideRequested: device => {
@@ -399,13 +357,6 @@ Item {
                         spacing: 0
                         visible: root.hiddenInputDeviceNames.length > 0
 
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: Theme.outline
-                            opacity: 0.15
-                        }
-
                         Item {
                             width: parent.width
                             height: 36
@@ -417,7 +368,7 @@ Item {
 
                                 DankIcon {
                                     name: "visibility_off"
-                                    size: Theme.iconSize - 4
+                                    size: Theme.iconSizeMedium
                                     color: Theme.surfaceVariantText
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -432,7 +383,7 @@ Item {
 
                             DankIcon {
                                 name: root.showHiddenInputDevices ? "expand_less" : "expand_more"
-                                size: Theme.iconSize - 4
+                                size: Theme.iconSizeMedium
                                 color: Theme.surfaceVariantText
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
@@ -463,10 +414,6 @@ Item {
                                     onHideRequested: device => {
                                         root.persistHiddenInputDeviceNames(root.hiddenInputDeviceNames.filter(n => n !== device.name));
                                     }
-
-                                    onResetRequested: device => {
-                                        AudioService.removeDeviceAlias(device.name);
-                                    }
                                 }
                             }
                         }
@@ -490,7 +437,7 @@ Item {
             Rectangle {
                 width: 80
                 height: 80
-                radius: 40
+                radius: Theme.fullRadius(width, height)
                 color: Theme.primaryContainer
                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -498,7 +445,7 @@ Item {
                     id: spinningIcon
                     name: "refresh"
                     size: 40
-                    color: Theme.primary
+                    color: Theme.accentOnPrimaryContainer
                     anchors.centerIn: parent
                     smoothTransform: loadingOverlay.visible
 
@@ -520,7 +467,7 @@ Item {
                 StyledText {
                     text: I18n.tr("Restarting audio system...", "Loading overlay while WirePlumber restarts")
                     font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                     color: Theme.surfaceText
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -585,7 +532,7 @@ Item {
 
                     DankIcon {
                         name: root.editingDeviceType === "input" ? "mic" : "speaker"
-                        size: Theme.iconSize + 8
+                        size: Theme.iconSizeLarge
                         color: Theme.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -595,9 +542,9 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Set Custom Device Name", "Audio device rename dialog title")
+                            text: I18n.tr("Set custom device name")
                             font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Bold
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             width: parent.width
                             wrapMode: Text.Wrap
@@ -630,22 +577,13 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    StyledText {
-                        text: I18n.tr("Custom Name", "Audio device rename dialog field label")
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                    }
-
                     DankTextField {
                         id: nameInput
+                        outlined: true
+                        leftIconName: "edit"
+                        labelText: I18n.tr("Custom name")
                         width: parent.width
-                        placeholderText: I18n.tr("Enter device name...", "Audio device rename dialog placeholder")
                         text: root.newDeviceName
-                        normalBorderColor: Theme.outlineMedium
-                        focusedBorderColor: Theme.primary
                         showClearButton: true
 
                         onTextChanged: {
@@ -689,9 +627,9 @@ Item {
                     Rectangle {
                         id: saveButton
                         width: saveButtonContent.width + Theme.spacingL * 2
-                        height: Theme.buttonHeight
+                        height: Theme.iconButtonSize
                         radius: Theme.cornerRadius
-                        color: saveButtonMouseArea.containsMouse ? Theme.primaryContainer : Theme.primary
+                        color: saveButtonMouseArea.containsMouse ? Theme.blend(Theme.primary, Theme.onPrimary, Theme.stateLayerHover) : Theme.primary
                         enabled: root.newDeviceName.trim() !== ""
                         opacity: enabled ? 1.0 : 0.5
 
@@ -702,7 +640,7 @@ Item {
 
                             DankIcon {
                                 name: "check"
-                                size: Theme.iconSize - 4
+                                size: Theme.iconSizeMedium
                                 color: Theme.onPrimary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -710,7 +648,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("Save")
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.onPrimary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -733,17 +671,17 @@ Item {
 
                     Rectangle {
                         width: cancelButtonText.width + Theme.spacingL * 2
-                        height: Theme.buttonHeight
+                        height: Theme.iconButtonSize
                         radius: Theme.cornerRadius
                         color: cancelButtonMouseArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
-                        border.width: 1
+                        border.width: Theme.outlineWidth
                         border.color: Theme.outline
 
                         StyledText {
                             id: cancelButtonText
                             text: I18n.tr("Cancel")
                             font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             anchors.centerIn: parent
                         }

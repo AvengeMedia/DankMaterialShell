@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -7,15 +6,26 @@ import qs.Widgets
 DankFloatingWindow {
     id: root
 
+    property var currentFlow: null
+
     function show() {
+        currentFlow = PolkitService.agent?.flow ?? null;
         if (contentLoader.item)
             contentLoader.item.reset();
         visible = true;
-        Qt.callLater(focusContent);
     }
 
     function hide() {
         visible = false;
+    }
+
+    function cancelAuth() {
+        const flow = currentFlow;
+        currentFlow = null;
+        hide();
+        if (!flow || flow.isCompleted)
+            return;
+        flow.cancelAuthenticationRequest();
     }
 
     function focusContent() {
@@ -24,20 +34,26 @@ DankFloatingWindow {
     }
 
     objectName: "polkitAuthModal"
-    title: I18n.tr("Authentication")
-    minimumSize: Qt.size(460, 220)
-    maximumSize: Qt.size(460, 220)
+    title: I18n.tr("Authentication", "noun, polkit dialog title and settings section title")
+    minimumSize: Qt.size(Theme.dialogMaxWidth, Math.min((screen?.height ?? 1080) - Theme.spacingXL * 2, Math.max(220, contentLoader.item?.implicitHeight ?? 0)))
+    maximumSize: minimumSize
     visible: false
 
-    onClosed: hide()
+    onClosed: cancelAuth()
 
     onVisibleChanged: {
         if (visible) {
-            Qt.callLater(focusContent);
+            focusTimer.restart();
             return;
         }
         if (contentLoader.item)
             contentLoader.item.reset();
+    }
+
+    Timer {
+        id: focusTimer
+        interval: 0
+        onTriggered: root.focusContent()
     }
 
     Connections {
@@ -55,13 +71,15 @@ DankFloatingWindow {
         anchors.fill: parent
         active: root.visible
         sourceComponent: PolkitAuthContent {
-            windowControls: windowControls
+            currentFlow: root.currentFlow
+            windowControls: authWindowControls
+            onCancelRequested: root.cancelAuth()
             onCloseRequested: root.hide()
         }
     }
 
     FloatingWindowControls {
-        id: windowControls
+        id: authWindowControls
         targetWindow: root
     }
 }

@@ -9,7 +9,7 @@ import qs.Widgets
 import qs.Modules.Settings.Widgets
 import qs.Modules.Settings.DesktopWidgetSettings as DWS
 
-SettingsCard {
+SettingsReorderRow {
     id: root
 
     required property var instanceData
@@ -21,6 +21,7 @@ SettingsCard {
     readonly property var widgetDef: DesktopWidgetRegistry.getWidget(widgetType)
     readonly property string widgetName: instanceData?.name ?? widgetDef?.name ?? widgetType
 
+    signal expandedToggled(bool expanded)
     signal deleteRequested
     signal duplicateRequested
 
@@ -44,17 +45,15 @@ SettingsCard {
     width: parent?.width ?? 400
     iconName: widgetDef?.icon ?? "widgets"
     title: widgetName
-    collapsible: true
-    expanded: isExpanded
+    clickable: true
+    onClicked: expandedToggled(!isExpanded)
 
-    onExpandedChanged: isExpanded = expanded
-
-    headerActions: [
+    trailing: [
         DankToggle {
+            anchors.verticalCenter: parent.verticalCenter
+            hideText: true
             checked: instanceData?.enabled ?? true
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 SettingsData.updateDesktopWidgetInstance(root.instanceId, {
                     enabled: isChecked
                 });
@@ -62,9 +61,11 @@ SettingsCard {
         },
         DankActionButton {
             id: menuButton
+            anchors.verticalCenter: parent.verticalCenter
             iconName: "more_vert"
+            Accessible.name: I18n.tr("Options")
             onClicked: {
-                if (actionsMenu.opened) {
+                if (actionsMenu.visible) {
                     actionsMenu.close();
                     return;
                 }
@@ -79,13 +80,13 @@ SettingsCard {
                 padding: Theme.spacingXS
                 modal: false
                 focus: true
-                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                 onClosed: root.confirmingDelete = false
 
                 background: Rectangle {
                     color: Theme.floatingWindowSurface
-                    radius: Theme.cornerRadius
+                    radius: Theme.windowRadius
                     border.color: Theme.outlineMedium
                     border.width: Theme.layerOutlineWidth
                 }
@@ -112,7 +113,7 @@ SettingsCard {
                             }
 
                             StyledText {
-                                text: I18n.tr("Duplicate")
+                                text: I18n.tr("Duplicate", "verb, desktop widget menu action")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                             }
@@ -172,119 +173,56 @@ SettingsCard {
                     }
                 }
             }
+        },
+        DankIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            name: root.isExpanded ? "expand_less" : "expand_more"
+            size: Theme.iconSize
+            color: Theme.onSurfaceVariant
         }
     ]
 
-    Column {
+    body: Column {
         width: parent.width
-        spacing: 0
         visible: root.isExpanded
-        opacity: visible ? 1 : 0
+        height: root.isExpanded ? implicitHeight : 0
+        spacing: 0
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
-
-        Item {
-            width: parent.width
-            height: nameRow.height + Theme.spacingM * 2
-
-            Row {
-                id: nameRow
-                x: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-                width: parent.width - Theme.spacingM * 2
-
-                StyledText {
-                    text: I18n.tr("Name")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 80
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                DankTextField {
-                    width: parent.width - 80 - Theme.spacingM
-                    text: root.widgetName
-                    onEditingFinished: {
-                        if (!root.instanceId)
-                            return;
-                        SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                            name: text
-                        });
-                    }
-                }
-            }
+        SettingsTextFieldRow {
+            leftIconName: "badge"
+            text: I18n.tr("Name")
+            value: root.widgetName
+            onEditingFinished: value => SettingsData.updateDesktopWidgetInstance(root.instanceId, {
+                    name: value
+                })
         }
 
         SettingsDivider {}
 
-        Item {
-            width: parent.width
-            height: groupRow.height + Theme.spacingM * 2
-            visible: (SettingsData.desktopWidgetGroups || []).length > 0
-
-            Row {
-                id: groupRow
-                x: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-                width: parent.width - Theme.spacingM * 2
-
-                StyledText {
-                    text: I18n.tr("Group")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 80
-                    horizontalAlignment: Text.AlignLeft
+        SettingsDropdownRow {
+            readonly property var groupsData: {
+                const items = [
+                    {
+                        value: "",
+                        label: I18n.tr("None")
+                    }
+                ];
+                for (const g of SettingsData.desktopWidgetGroups || []) {
+                    items.push({
+                        value: g.id,
+                        label: g.name
+                    });
                 }
-
-                DankDropdown {
-                    id: groupDropdown
-                    width: parent.width - 80 - Theme.spacingM
-                    compactMode: true
-
-                    property var groupsData: {
-                        const groups = SettingsData.desktopWidgetGroups || [];
-                        const items = [
-                            {
-                                value: "",
-                                label: I18n.tr("None")
-                            }
-                        ];
-                        for (const g of groups) {
-                            items.push({
-                                value: g.id,
-                                label: g.name
-                            });
-                        }
-                        return items;
-                    }
-
-                    options: groupsData.map(g => g.label)
-                    currentValue: {
-                        const currentGroup = root.instanceData?.group ?? "";
-                        const item = groupsData.find(g => g.value === currentGroup);
-                        return item?.label ?? I18n.tr("None");
-                    }
-
-                    onValueChanged: value => {
-                        if (!root.instanceId)
-                            return;
-                        const item = groupsData.find(g => g.label === value);
-                        const groupId = item?.value ?? "";
-                        SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                            group: groupId || null
-                        });
-                    }
-                }
+                return items;
             }
+
+            visible: (SettingsData.desktopWidgetGroups || []).length > 0
+            text: I18n.tr("Group", "noun, dropdown label for a desktop widget group")
+            options: groupsData.map(g => g.label)
+            currentValue: groupsData.find(g => g.value === (root.instanceData?.group ?? ""))?.label ?? I18n.tr("None")
+            onValueChanged: value => SettingsData.updateDesktopWidgetInstance(root.instanceId, {
+                    group: groupsData.find(g => g.label === value)?.value || null
+                })
         }
 
         SettingsDivider {
@@ -292,11 +230,9 @@ SettingsCard {
         }
 
         SettingsToggleRow {
-            text: I18n.tr("Show on Overlay")
+            text: I18n.tr("Show on overlay")
             checked: instanceData?.config?.showOnOverlay ?? false
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
                     showOnOverlay: isChecked
                 });
@@ -309,11 +245,9 @@ SettingsCard {
 
         SettingsToggleRow {
             visible: CompositorService.isNiri
-            text: I18n.tr("Show on Overview")
+            text: I18n.tr("Show on overview")
             checked: instanceData?.config?.showOnOverview ?? false
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
                     showOnOverview: isChecked
                 });
@@ -326,11 +260,9 @@ SettingsCard {
 
         SettingsToggleRow {
             visible: CompositorService.isNiri
-            text: I18n.tr("Show on Overview Only")
+            text: I18n.tr("Show on overview only")
             checked: instanceData?.config?.showOnOverviewOnly ?? false
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
                     showOnOverviewOnly: isChecked
                 });
@@ -340,12 +272,9 @@ SettingsCard {
         SettingsDivider {}
 
         SettingsToggleRow {
-            text: I18n.tr("Click Through")
-            description: I18n.tr("Allow clicks to pass through the widget")
+            text: I18n.tr("Click through")
             checked: instanceData?.config?.clickThrough ?? false
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
                     clickThrough: isChecked
                 });
@@ -355,12 +284,9 @@ SettingsCard {
         SettingsDivider {}
 
         SettingsToggleRow {
-            text: I18n.tr("Sync Position Across Screens")
-            description: I18n.tr("Use the same position and size on all displays")
+            text: I18n.tr("Sync position across displays")
             checked: instanceData?.config?.syncPositionAcrossScreens ?? false
             onToggled: isChecked => {
-                if (!root.instanceId)
-                    return;
                 if (isChecked)
                     SessionData.syncDesktopWidgetPositionToAllScreens(root.instanceId);
                 SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, {
@@ -393,7 +319,7 @@ SettingsCard {
                 Rectangle {
                     width: parent.width
                     height: ipcText.height + Theme.spacingS * 2
-                    radius: Theme.cornerRadius / 2
+                    radius: Theme.cornerRadiusS
                     color: Theme.surfaceHover
 
                     Row {
@@ -416,6 +342,7 @@ SettingsCard {
                         DankButton {
                             id: copyBtn
                             iconName: "content_copy"
+                            Accessible.name: I18n.tr("Copy")
                             backgroundColor: "transparent"
                             textColor: Theme.surfaceText
                             buttonHeight: 28

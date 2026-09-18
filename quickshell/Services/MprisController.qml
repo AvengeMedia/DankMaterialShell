@@ -9,8 +9,11 @@ import qs.Common
 Singleton {
     id: root
 
+    // playerctld mirrors whichever player is active and advertises shuffle/loop the real player may lack
+    readonly property string _playerctldBusName: "org.mpris.MediaPlayer2.playerctld"
+
     readonly property list<MprisPlayer> availablePlayers: {
-        const players = Mpris.players.values;
+        const players = Mpris.players.values.filter(p => p.dbusName !== _playerctldBusName);
         const excluded = SettingsData.mediaExcludePlayers || [];
         if (excluded.length === 0)
             return players;
@@ -49,6 +52,9 @@ Singleton {
     property string stableTitle: ""
     property string stableArtist: ""
     property string stableAlbum: ""
+    property bool _mprisRequestInFlight: false
+    property bool _mprisPublishDirty: false
+    property int _mprisConnectionEpoch: 0
 
     Connections {
         target: root.activePlayer
@@ -68,10 +74,63 @@ Singleton {
             if (root.activePlayer && root.activePlayer.lengthSupported && root.activePlayer.length > 1) {
                 root.activePlayerStableLength = root.activePlayer.length;
             }
+            root._scheduleMPRISPublish();
+        }
+        function onMetadataChanged() {
+            root._scheduleMPRISPublish();
         }
         function onPlaybackStateChanged() {
             root._syncStableMeta();
             root._checkIdle();
+            root._scheduleMPRISPublish();
+        }
+        function onCanControlChanged() {
+            root._scheduleMPRISPublish();
+        }
+        function onCanPlayChanged() {
+            root._scheduleMPRISPublish();
+        }
+        function onCanPauseChanged() {
+            root._scheduleMPRISPublish();
+        }
+        function onCanGoNextChanged() {
+            root._scheduleMPRISPublish();
+        }
+        function onCanGoPreviousChanged() {
+            root._scheduleMPRISPublish();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onBluetoothMprisEnabledChanged() {
+            if (SettingsData.bluetoothMprisEnabled)
+                DMSService.addSubscription("mpris.command");
+            root._scheduleMPRISPublish();
+        }
+    }
+
+    Connections {
+        target: DMSService
+        function onConnectionStateChanged() {
+            root._invalidateMPRISPublishRequests();
+            root._scheduleMPRISPublish();
+        }
+        function onCapabilitiesReceived() {
+            if (!DMSService.capabilities.includes("bluetooth"))
+                root._invalidateMPRISPublishRequests();
+            root._scheduleMPRISPublish();
+        }
+        function onSubscribeConnectedChanged() {
+            root._invalidateMPRISPublishRequests();
+            root._scheduleMPRISPublish();
+        }
+        function onMprisCommandLeaseChanged() {
+            root._invalidateMPRISPublishRequests();
+            root._scheduleMPRISPublish();
+        }
+        function onMprisCommandReceived(command) {
+            root._dispatchMPRISCommand(command);
         }
     }
 
@@ -82,7 +141,12 @@ Singleton {
         stableAlbum = "";
         _syncStableMeta();
         _checkIdle();
+        _scheduleMPRISPublish();
     }
+    onActivePlayerStableLengthChanged: _scheduleMPRISPublish()
+    onStableTitleChanged: _scheduleMPRISPublish()
+    onStableArtistChanged: _scheduleMPRISPublish()
+    onStableAlbumChanged: _scheduleMPRISPublish()
 
     function _syncStableMeta(): void {
         const p = activePlayer;
@@ -112,7 +176,7 @@ Singleton {
     // Chromium reports stopped media w/blank metadata, resolve by checking idle status
     Timer {
         id: _idleGraceTimer
-        interval: 1223
+        interval: 3000
         onTriggered: {
             if (!root.isIdle(root.activePlayer))
                 return;
@@ -133,38 +197,36 @@ Singleton {
     }
 
     onAvailablePlayersChanged: _resolveActivePlayer()
-    Component.onCompleted: _resolveActivePlayer()
+    Component.onCompleted: {
+        _resolveActivePlayer();
+        if (SettingsData.bluetoothMprisEnabled)
+            DMSService.addSubscription("mpris.command");
+        _scheduleMPRISPublish();
+    }
 
     Instantiator {
         model: root.availablePlayers
-        delegate: Connections {
+        delegate: QtObject {
             required property MprisPlayer modelData
-            target: modelData
-            ignoreUnknownSignals: true
-            function onIsPlayingChanged() {
+            readonly property bool playerIsPlaying: modelData.isPlaying
+            readonly property string playerTrackTitle: modelData.trackTitle
+            readonly property string playerTrackArtist: modelData.trackArtist
+            readonly property string playerTrackAlbum: modelData.trackAlbum
+            readonly property var playerMetadata: modelData.metadata
+            function syncMeta() {
+                if (playerIsPlaying)
+                    root._resolveActivePlayer();
+                root._syncStableMeta();
+            }
+            onPlayerIsPlayingChanged: {
+                root._checkIdle();
                 root._resolveActivePlayer();
                 root._syncStableMeta();
             }
-            function onTrackTitleChanged() {
-                if (modelData.isPlaying)
-                    root._resolveActivePlayer();
-                root._syncStableMeta();
-            }
-            function onTrackArtistChanged() {
-                if (modelData.isPlaying)
-                    root._resolveActivePlayer();
-                root._syncStableMeta();
-            }
-            function onTrackAlbumChanged() {
-                if (modelData.isPlaying)
-                    root._resolveActivePlayer();
-                root._syncStableMeta();
-            }
-            function onMetadataChanged() {
-                if (modelData.isPlaying)
-                    root._resolveActivePlayer();
-                root._syncStableMeta();
-            }
+            onPlayerTrackTitleChanged: syncMeta()
+            onPlayerTrackArtistChanged: syncMeta()
+            onPlayerTrackAlbumChanged: syncMeta()
+            onPlayerMetadataChanged: syncMeta()
         }
     }
 
@@ -330,10 +392,175 @@ Singleton {
     }
 
     Timer {
+        id: _mprisPublishTimer
+        interval: 25
+        repeat: false
+        onTriggered: root._publishMPRISSnapshot()
+    }
+
+    Timer {
+        id: _mprisRetryTimer
+        interval: 2000
+        repeat: false
+        onTriggered: root._scheduleMPRISPublish()
+    }
+
+    Timer {
         interval: 1000
         running: root.activePlayer?.playbackState === MprisPlaybackState.Playing
         repeat: true
         onTriggered: root.activePlayer?.positionChanged()
+    }
+
+    function _hasMPRISSubscription(): bool {
+        return DMSService.activeSubscriptions.includes("mpris.command");
+    }
+
+    function _canPublishMPRIS(): bool {
+        return DMSService.isConnected && DMSService.subscribeConnected && DMSService.mprisCommandLease && DMSService.capabilities.includes("bluetooth");
+    }
+
+    function _scheduleMPRISPublish(): void {
+        const enabled = SettingsData.bluetoothMprisEnabled;
+        const subscribed = _hasMPRISSubscription();
+
+        if (!enabled && !subscribed && !_mprisRequestInFlight) {
+            _mprisPublishDirty = false;
+            return;
+        }
+        if (!enabled && subscribed && !DMSService.mprisCommandLease && !_mprisRequestInFlight) {
+            _mprisPublishDirty = false;
+            DMSService.removeSubscription("mpris.command");
+            return;
+        }
+
+        _mprisPublishDirty = true;
+        if (enabled && !subscribed) {
+            DMSService.addSubscription("mpris.command");
+            return;
+        }
+        if (_mprisRequestInFlight || !_canPublishMPRIS())
+            return;
+        if (!_mprisPublishTimer.running)
+            _mprisPublishTimer.start();
+    }
+
+    function _scheduleMPRISRetry(): void {
+        if (!SettingsData.bluetoothMprisEnabled && !_hasMPRISSubscription())
+            return;
+        if (!_mprisRetryTimer.running)
+            _mprisRetryTimer.start();
+    }
+
+    function _invalidateMPRISPublishRequests(): void {
+        _mprisConnectionEpoch++;
+    }
+
+    function _publishMPRISSnapshot(): void {
+        if (_mprisRequestInFlight || !_mprisPublishDirty)
+            return;
+        if (!SettingsData.bluetoothMprisEnabled && !_hasMPRISSubscription()) {
+            _mprisPublishDirty = false;
+            return;
+        }
+        if (!_canPublishMPRIS())
+            return;
+
+        const enabled = SettingsData.bluetoothMprisEnabled;
+        const requestLease = DMSService.mprisCommandLease;
+        const requestEpoch = _mprisConnectionEpoch;
+        const snapshot = _mprisSnapshot(enabled, requestLease);
+        _mprisPublishDirty = false;
+        _mprisRequestInFlight = true;
+        _mprisRetryTimer.stop();
+
+        DMSService.sendRequest("bluetooth.mpris.publish", snapshot, response => {
+            const changedWhileInFlight = root._mprisPublishDirty;
+            const currentConnection = requestEpoch === root._mprisConnectionEpoch && requestLease === DMSService.mprisCommandLease && DMSService.isConnected && DMSService.subscribeConnected;
+            root._mprisRequestInFlight = false;
+
+            if (!currentConnection) {
+                root._mprisPublishDirty = true;
+                root._scheduleMPRISPublish();
+                return;
+            }
+            if (response?.error) {
+                root._mprisPublishDirty = true;
+                root._scheduleMPRISRetry();
+                return;
+            }
+
+            _mprisRetryTimer.stop();
+
+            if (!enabled && !SettingsData.bluetoothMprisEnabled) {
+                root._mprisPublishDirty = false;
+                DMSService.removeSubscription("mpris.command");
+                return;
+            }
+            if (changedWhileInFlight || enabled !== SettingsData.bluetoothMprisEnabled)
+                root._scheduleMPRISPublish();
+        });
+    }
+
+    function _mprisSnapshot(enabled: bool, lease: string): var {
+        const player = enabled ? activePlayer : null;
+        return {
+            "lease": lease,
+            "enabled": enabled,
+            "identity": "DankMaterialShell",
+            "playbackStatus": _mprisPlaybackStatus(player),
+            "title": player ? stableTitle : "",
+            "artist": player ? stableArtist : "",
+            "album": player ? stableAlbum : "",
+            "length": player ? _secondsToMicroseconds(activePlayerStableLength) : 0,
+            "position": player && player.positionSupported ? _secondsToMicroseconds(player.position) : 0,
+            "canControl": player ? player.canControl : false,
+            "canPlay": player ? player.canPlay : false,
+            "canPause": player ? player.canPause : false,
+            "canGoNext": player ? player.canGoNext : false,
+            "canGoPrevious": player ? player.canGoPrevious : false
+        };
+    }
+
+    function _mprisPlaybackStatus(player: MprisPlayer): string {
+        if (!player)
+            return "Stopped";
+        if (player.playbackState === MprisPlaybackState.Playing)
+            return "Playing";
+        if (player.playbackState === MprisPlaybackState.Paused)
+            return "Paused";
+        return "Stopped";
+    }
+
+    function _secondsToMicroseconds(seconds: real): real {
+        if (!Number.isFinite(seconds) || seconds <= 0)
+            return 0;
+        return Math.round(seconds * 1000000);
+    }
+
+    function _dispatchMPRISCommand(command: string): void {
+        if (!SettingsData.bluetoothMprisEnabled || !DMSService.mprisCommandLease)
+            return;
+        switch (command) {
+        case "play":
+            play();
+            break;
+        case "pause":
+            pause();
+            break;
+        case "playPause":
+            playPause();
+            break;
+        case "stop":
+            stop();
+            break;
+        case "next":
+            next();
+            break;
+        case "previous":
+            previous();
+            break;
+        }
     }
 
     function isFirefoxYoutubeHoverPreview(player: MprisPlayer): bool {
@@ -346,6 +573,33 @@ Singleton {
         return /^https?:\/\/(www\.)?youtube\.com\/?($|\?|#)/i.test(url);
     }
 
+    function play(): void {
+        const player = activePlayer;
+        if (!player?.canPlay)
+            return;
+        player.play();
+    }
+
+    function pause(): void {
+        const player = activePlayer;
+        if (!player?.canPause)
+            return;
+        player.pause();
+    }
+
+    function playPause(): void {
+        const player = activePlayer;
+        if (!player?.canTogglePlaying)
+            return;
+        player.togglePlaying();
+    }
+
+    function stop(): void {
+        const player = activePlayer;
+        if (player)
+            player.stop();
+    }
+
     function previousOrRewind(): void {
         if (!activePlayer)
             return;
@@ -353,6 +607,12 @@ Singleton {
             activePlayer.position = 0.1;
         else if (activePlayer.canGoPrevious)
             activePlayer.previous();
+    }
+
+    function previous(): void {
+        const player = activePlayer;
+        if (player?.canGoPrevious)
+            player.previous();
     }
 
     function next(): void {

@@ -12,22 +12,31 @@ Column {
     property var defaultValue: []
     property var items: defaultValue
     property Component delegate: null
+    property alias inputs: inputSlot.data
+    property bool isLoading: false
+    property bool _loaded: false
 
     width: parent.width
     spacing: Theme.spacingM
 
-    Component.onCompleted: {
+    Component.onCompleted: loadValue()
+
+    function loadValue() {
         const settings = QmlUtils.findSettings(root.parent);
         if (settings) {
+            isLoading = true;
             items = settings.loadValue(settingKey, defaultValue);
+            isLoading = false;
         }
+        _loaded = true;
     }
 
     onItemsChanged: {
+        if (isLoading || !_loaded)
+            return;
         const settings = QmlUtils.findSettings(root.parent);
-        if (settings) {
+        if (settings)
             settings.saveValue(settingKey, items);
-        }
     }
 
     function addItem(item) {
@@ -43,7 +52,7 @@ Column {
     StyledText {
         text: root.label
         font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 
@@ -54,6 +63,13 @@ Column {
         width: parent.width
         wrapMode: Text.WordWrap
         visible: root.description !== ""
+    }
+
+    Column {
+        id: inputSlot
+        width: parent.width
+        spacing: Theme.spacingM
+        visible: children.length > 0
     }
 
     Column {
@@ -90,32 +106,8 @@ Column {
                 color: Theme.surfaceText
             }
 
-            Rectangle {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                width: 60
-                height: 28
-                color: removeArea.containsMouse ? Theme.errorHover : Theme.error
-                radius: Theme.cornerRadius
-
-                StyledText {
-                    anchors.centerIn: parent
-                    text: I18n.tr("Remove")
-                    color: Theme.errorText
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                }
-
-                MouseArea {
-                    id: removeArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.removeItem(index);
-                    }
-                }
+            ListSettingRemoveButton {
+                onClicked: root.removeItem(index)
             }
         }
     }

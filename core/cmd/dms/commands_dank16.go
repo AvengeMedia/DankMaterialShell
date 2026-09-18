@@ -79,11 +79,11 @@ func runDank16(cmd *cobra.Command, args []string) {
 			primaryLight = primaryColor
 		}
 		variantOpts := dank16.VariantOptions{
-			PrimaryDark:  primaryDark,
-			PrimaryLight: primaryLight,
-			Background:   background,
-			UseDPS:       contrastAlgo == "dps",
-			IsLightMode:  isLight,
+			PrimaryDark:    primaryDark,
+			PrimaryLight:   primaryLight,
+			BackgroundDark: background,
+			UseDPS:         contrastAlgo == "dps",
+			IsLightMode:    isLight,
 		}
 		variantColors := dank16.GenerateVariantPalette(variantOpts)
 		fmt.Print(dank16.GenerateVariantJSON(variantColors))

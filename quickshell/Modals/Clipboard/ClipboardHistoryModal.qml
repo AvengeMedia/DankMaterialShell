@@ -74,14 +74,13 @@ DankModal {
     visible: false
     keepContentLoaded: true
     useOverlayLayer: SettingsData.clipboardUseOverlayLayer
-    modalWidth: ClipboardConstants.modalWidth
-    modalHeight: ClipboardConstants.modalHeight
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    cornerRadius: Theme.cornerRadius
-    borderColor: Theme.outlineMedium
-    borderWidth: 1
+    modalWidth: Math.min(ClipboardConstants.sizeWidth(SettingsData.clipboardSize), screenWidth - Theme.spacingXL * 2)
+    modalHeight: Math.min(ClipboardConstants.sizeHeight(SettingsData.clipboardSize), screenHeight - Theme.spacingXL * 2)
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowTransparency)
+    borderColor: Theme.outlineVariant
+    borderWidth: Theme.outlineWidth
     enableShadow: true
-    closeOnEscapeKey: (contentLoader.item?.mode ?? "history") !== "editor"
+    closeOnEscapeKey: (contentLoader.item?.mode ?? "history") === "history"
     onBackgroundClicked: hide()
     onShouldBeVisibleChanged: {
         if (!shouldBeVisible) {

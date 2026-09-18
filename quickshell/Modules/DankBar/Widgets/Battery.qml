@@ -11,18 +11,18 @@ BasePill {
     property bool batteryPopupVisible: false
     property var popoutTarget: null
     property var widgetData: null
-    readonly property bool showPercentOnlyOnBattery: widgetData?.showBatteryPercentOnlyOnBattery !== undefined ? widgetData.showBatteryPercentOnlyOnBattery : SettingsData.showBatteryPercentOnlyOnBattery
+    readonly property bool showPercentOnlyOnBattery: SettingsData.widgetOption("battery", widgetData, "showBatteryPercentOnlyOnBattery")
     readonly property bool showPercent: {
-        const base = widgetData?.showBatteryPercent !== undefined ? widgetData.showBatteryPercent : SettingsData.showBatteryPercent;
+        const base = SettingsData.widgetOption("battery", widgetData, "showBatteryPercent");
         return base && !(showPercentOnlyOnBattery && BatteryService.isPluggedIn);
     }
-    readonly property bool showTime: widgetData?.showBatteryTime !== undefined ? widgetData.showBatteryTime : SettingsData.showBatteryTime
-    readonly property bool showTimeOnlyOnBattery: widgetData?.showBatteryTimeOnlyOnBattery !== undefined ? widgetData.showBatteryTimeOnlyOnBattery : SettingsData.showBatteryTimeOnlyOnBattery
-    readonly property string batteryStyle: widgetData?.batteryStyle !== undefined ? widgetData.batteryStyle : SettingsData.batteryStyle
+    readonly property bool showTime: SettingsData.widgetOption("battery", widgetData, "showBatteryTime")
+    readonly property bool showTimeOnlyOnBattery: SettingsData.widgetOption("battery", widgetData, "showBatteryTimeOnlyOnBattery")
+    readonly property string batteryStyle: SettingsData.widgetOption("battery", widgetData, "batteryStyle")
     readonly property bool pillStyle: battery.batteryStyle !== "icon"
     readonly property bool levelColors: (barConfig?.batteryColorMode ?? "theme") === "level"
-    readonly property bool showPowerCharging: widgetData?.showBatteryPowerCharging !== undefined ? widgetData.showBatteryPowerCharging : SettingsData.showBatteryPowerCharging
-    readonly property bool showPowerDischarging: widgetData?.showBatteryPowerDischarging !== undefined ? widgetData.showBatteryPowerDischarging : SettingsData.showBatteryPowerDischarging
+    readonly property bool showPowerCharging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerCharging")
+    readonly property bool showPowerDischarging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerDischarging")
     readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
 
     // Signed charge/discharge rate, e.g. "+45W" while charging, "-8.4W" while
@@ -140,7 +140,7 @@ BasePill {
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
                     visible: !battery.pillStyle
-                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -170,14 +170,14 @@ BasePill {
                     meterStyle: battery.batteryStyle
                     levelColors: battery.levelColors
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
-                    thickness: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    thickness: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 StyledText {
                     text: battery.verticalDisplayText
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
+                    color: battery.contentColor
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: BatteryService.batteryAvailable && battery.verticalDisplayText !== ""
@@ -193,7 +193,7 @@ BasePill {
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
                     visible: !battery.pillStyle
-                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -222,7 +222,7 @@ BasePill {
                     meterStyle: battery.batteryStyle
                     levelColors: battery.levelColors
                     maxDiameter: battery.widgetThickness - Theme.spacingXS
-                    thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                    thickness: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, battery.barConfig?.iconScale)
                     fontSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -234,7 +234,7 @@ BasePill {
                     width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
+                    color: battery.contentColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: BatteryService.batteryAvailable && battery.horizontalSideText !== ""
                 }
@@ -275,14 +275,14 @@ BasePill {
                 touchpadAccumulator = 0;
             }
 
-            if (!DisplayService.brightnessAvailable) {
+            if (!BrightnessService.brightnessAvailable) {
                 return;
             }
 
             const step = 5;
             const change = delta > 0 ? step : -step;
-            const newBrightness = Math.max(0, Math.min(100, DisplayService.brightnessLevel + change));
-            DisplayService.setBrightness(newBrightness, "", false);
+            const newBrightness = Math.max(0, Math.min(100, BrightnessService.brightnessLevel + change));
+            BrightnessService.setBrightness(newBrightness, "", false);
         }
     }
 }

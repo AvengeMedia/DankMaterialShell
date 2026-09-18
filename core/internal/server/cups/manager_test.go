@@ -11,20 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewManager(t *testing.T) {
-	m := &Manager{
-		state: &CUPSState{
-			Printers: make(map[string]*Printer),
-		},
-		client:   nil,
-		stopChan: make(chan struct{}),
-		dirty:    make(chan struct{}, 1),
-	}
-
-	assert.NotNil(t, m)
-	assert.NotNil(t, m.state)
-}
-
 func TestManager_GetState(t *testing.T) {
 	mockClient := mocks_cups.NewMockCUPSClientInterface(t)
 

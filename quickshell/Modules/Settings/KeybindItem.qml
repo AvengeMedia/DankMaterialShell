@@ -329,7 +329,7 @@ Item {
             topRightRadius: Theme.cornerRadius
             color: Theme.floatingWindowNestedSurface
             border.color: root.hasOverride ? Theme.outlineVariant : Theme.outlineMedium
-            border.width: root.hasOverride ? 1 : Theme.layerOutlineWidth
+            border.width: root.hasOverride ? Theme.outlineWidth : Theme.layerOutlineWidth
 
             RowLayout {
                 id: collapsedContent
@@ -367,7 +367,7 @@ Item {
                             StyledText {
                                 text: modelData.key
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: parent.isSelected ? Font.Medium : Font.Normal
+                                font.weight: Theme.fontWeightMedium
                                 isMonospace: true
                                 color: parent.isSelected ? Theme.primaryText : Theme.surfaceVariantText
                                 anchors.centerIn: parent
@@ -419,13 +419,13 @@ Item {
                         Rectangle {
                             width: 4
                             height: 4
-                            radius: 2
+                            radius: Theme.fullRadius(width, height)
                             color: Theme.surfaceVariantText
                             visible: root.hasOverride && (root.bindData.category ?? "")
                         }
 
                         StyledText {
-                            text: I18n.tr("Override")
+                            text: I18n.tr("Override", "noun, badge on a keybind that overrides the default", true)
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.primary
                             visible: root.hasOverride && !root.hasConfigConflict
@@ -453,7 +453,7 @@ Item {
 
                 DankIcon {
                     name: root.isExpanded ? "expand_less" : "expand_more"
-                    size: Theme.iconSize - 4
+                    size: Theme.iconSizeMedium
                     color: Theme.surfaceVariantText
                     Layout.alignment: Qt.AlignVCenter
                 }
@@ -486,7 +486,7 @@ Item {
             height: expandedContent.implicitHeight + Theme.spacingL * 2
             color: Theme.floatingWindowNestedSurface
             border.color: root.hasOverride ? Theme.outlineVariant : Theme.outlineMedium
-            border.width: root.hasOverride ? 1 : Theme.layerOutlineWidth
+            border.width: root.hasOverride ? Theme.outlineWidth : Theme.layerOutlineWidth
             bottomLeftRadius: Theme.cornerRadius
             bottomRightRadius: Theme.cornerRadius
 
@@ -507,7 +507,7 @@ Item {
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.primary, 0.15)
                     border.color: Theme.withAlpha(Theme.primary, 0.3)
-                    border.width: 1
+                    border.width: Theme.outlineWidth
                     visible: root.hasConfigConflict
 
                     Column {
@@ -529,7 +529,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("This bind is overridden by config.kdl")
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.primary
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignLeft
@@ -537,7 +537,7 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("Config action: %1").arg(root.configConflict?.action ?? "")
+                            text: I18n.tr("Config action: %1", "keybind conflict notice, %1 is the action from the compositor config").arg(root.configConflict?.action ?? "")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             width: parent.width
@@ -560,9 +560,9 @@ Item {
                     visible: root.keys.length > 1 || root.addingNewKey
 
                     StyledText {
-                        text: I18n.tr("Keys")
+                        text: I18n.tr("Keys", "noun plural, keybind editor row label for key combinations")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -595,7 +595,7 @@ Item {
                                     id: editKeyChipText
                                     text: modelData.key
                                     font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: parent.isSelected ? Font.Medium : Font.Normal
+                                    font.weight: Theme.fontWeightMedium
                                     isMonospace: true
                                     color: parent.isSelected ? Theme.primaryText : Theme.surfaceVariantText
                                     anchors.centerIn: parent
@@ -612,6 +612,8 @@ Item {
                         }
 
                         Rectangle {
+                            Accessible.role: Accessible.Button
+                            Accessible.name: I18n.tr("New key")
                             width: root._chipHeight
                             height: root._chipHeight
                             radius: root._chipHeight / 4
@@ -647,9 +649,9 @@ Item {
                     spacing: Theme.spacingM
 
                     StyledText {
-                        text: root.addingNewKey ? I18n.tr("New Key") : I18n.tr("Key")
+                        text: root.addingNewKey ? I18n.tr("New key") : I18n.tr("Key", "noun, keybind editor row label for the key combination")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -660,25 +662,24 @@ Item {
                         Layout.preferredHeight: root._inputHeight
                         focus: root.recording
 
+                        readonly property bool rootRecording: root.recording
+
                         Component.onCompleted: {
                             if (root.recording)
                                 forceActiveFocus();
                         }
 
-                        Connections {
-                            target: root
-                            function onRecordingChanged() {
-                                if (root.recording)
-                                    captureScope.forceActiveFocus();
-                            }
+                        onRootRecordingChanged: {
+                            if (rootRecording)
+                                forceActiveFocus();
                         }
 
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.cornerRadius
-                            color: root.recording ? Theme.primaryContainer : Theme.floatingWindowFieldColor
+                            color: root.recording ? Theme.selectedContainer : Theme.floatingWindowFieldColor
                             border.color: root.recording ? Theme.primary : Theme.outlineHeavy
-                            border.width: root.recording ? 2 : 1
+                            border.width: root.recording ? Theme.outlineWidthFocused : Theme.outlineWidth
 
                             Row {
                                 anchors.left: parent.left
@@ -704,6 +705,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     circular: false
                                     iconName: root.recording ? "close" : "radio_button_checked"
+                                    tooltipText: root.recording ? I18n.tr("Stop") : I18n.tr("Record", "verb, tooltip on button that captures a key combination")
                                     iconSize: Theme.iconSizeSmall
                                     iconColor: root.recording ? Theme.error : Theme.primary
                                     enabled: !root.readOnly
@@ -816,6 +818,8 @@ Item {
                     }
 
                     Rectangle {
+                        Accessible.role: Accessible.Button
+                        Accessible.name: I18n.tr("New key")
                         Layout.preferredWidth: root._inputHeight
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
@@ -858,7 +862,7 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr("Conflicts with: %1").arg(root._conflicts.map(c => c.desc).join(", "))
+                        text: I18n.tr("Conflicts with: %1", "keybind warning, %1 is a list of conflicting bind descriptions").arg(root._conflicts.map(c => c.desc).join(", "))
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.primary
                         Layout.fillWidth: true
@@ -874,7 +878,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Type")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -903,7 +907,7 @@ Item {
                                 radius: Theme.cornerRadius
                                 color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.floatingWindowFieldColor
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : Theme.withAlpha(Theme.outlineVariant, 0))
-                                border.width: 1
+                                border.width: Theme.outlineWidth
                                 clip: true
 
                                 RowLayout {
@@ -922,6 +926,7 @@ Item {
                                         Layout.fillWidth: true
                                         text: typeDelegate.modelData.label
                                         font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Theme.fontWeightMedium
                                         color: root._actionType === typeDelegate.modelData.id ? Theme.surfaceText : Theme.surfaceVariantText
                                         visible: typeDelegate.width > 100
                                         elide: Text.ElideRight
@@ -964,20 +969,15 @@ Item {
                                             break;
                                         }
                                     }
-                                    onContainsMouseChanged: {
-                                        if (containsMouse) {
-                                            typeTooltip.show(typeDelegate.tooltipTexts[typeDelegate.modelData.id], typeDelegate, 0, 0, "bottom");
-                                        } else {
-                                            typeTooltip.hide();
-                                        }
-                                    }
+                                }
+
+                                DankTooltipHost {
+                                    text: typeDelegate.tooltipTexts[typeDelegate.modelData.id]
+                                    target: typeDelegate
+                                    hoverArea: typeArea
                                 }
                             }
                         }
-                    }
-
-                    DankTooltipV2 {
-                        id: typeTooltip
                     }
                 }
 
@@ -989,7 +989,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Action")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -997,7 +997,7 @@ Item {
                     DankDropdown {
                         Layout.fillWidth: true
                         compactMode: true
-                        currentValue: KeybindsService.getActionLabel(root.editAction) || I18n.tr("Select...")
+                        currentValue: KeybindsService.getActionLabel(root.editAction) || I18n.tr("Select", "verb, dropdown placeholder or option that opens a picker") + "…"
                         options: KeybindsService.getDmsActions().map(a => a.label)
                         enableFuzzySearch: true
                         maxPopupHeight: 300
@@ -1046,29 +1046,22 @@ Item {
 
                     visible: root._actionType === "dms" && argConfig?.type === "dms"
 
-                    StyledText {
-                        text: I18n.tr("Amount")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                        visible: dmsArgsRow.hasAmountArg
-                    }
-
                     DankTextField {
                         id: dmsAmountField
-                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 5.5)
-                        Layout.preferredHeight: root._inputHeight
+                        outlined: true
+                        leftIconName: "tune"
+                        labelText: I18n.tr("Amount", "keybind editor field, numeric amount argument of a dms action")
+                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 5.5) + Theme.iconButtonSize
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: "5"
                         visible: dmsArgsRow.hasAmountArg
 
-                        Connections {
-                            target: dmsArgsRow
-                            function onParsedArgsChanged() {
-                                const newText = dmsArgsRow.parsedArgs?.args?.amount || "";
-                                if (dmsAmountField.text !== newText)
-                                    dmsAmountField.text = newText;
-                            }
+                        readonly property var argsRowParsedArgs: dmsArgsRow.parsedArgs
+
+                        onArgsRowParsedArgsChanged: {
+                            const newText = argsRowParsedArgs?.args?.amount || "";
+                            if (text !== newText)
+                                text = newText;
                         }
 
                         Component.onCompleted: {
@@ -1098,30 +1091,22 @@ Item {
                         visible: dmsArgsRow.hasAmountArg
                     }
 
-                    StyledText {
-                        text: I18n.tr("Device")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.leftMargin: dmsArgsRow.hasAmountArg ? Theme.spacingM : 0
-                        Layout.preferredWidth: dmsArgsRow.hasAmountArg ? -1 : root._labelWidth
-                        visible: dmsArgsRow.hasDeviceArg
-                    }
-
                     DankTextField {
                         id: dmsDeviceField
+                        outlined: true
+                        leftIconName: "devices"
+                        labelText: I18n.tr("Device")
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root._inputHeight
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: I18n.tr("leave empty for default")
                         visible: dmsArgsRow.hasDeviceArg
 
-                        Connections {
-                            target: dmsArgsRow
-                            function onParsedArgsChanged() {
-                                const newText = dmsArgsRow.parsedArgs?.args?.device || "";
-                                if (dmsDeviceField.text !== newText)
-                                    dmsDeviceField.text = newText;
-                            }
+                        readonly property var argsRowParsedArgs: dmsArgsRow.parsedArgs
+
+                        onArgsRowParsedArgsChanged: {
+                            const newText = argsRowParsedArgs?.args?.device || "";
+                            if (text !== newText)
+                                text = newText;
                         }
 
                         Component.onCompleted: {
@@ -1145,9 +1130,9 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr("Tab")
+                        text: I18n.tr("Tab", "noun, keybind argument label for a dashboard tab")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                         visible: dmsArgsRow.hasTabArg
@@ -1199,7 +1184,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Options")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                         visible: dmsArgsRow.flagArgs.length > 0
@@ -1251,7 +1236,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Action")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -1278,7 +1263,7 @@ Item {
                     DankDropdown {
                         Layout.fillWidth: true
                         compactMode: true
-                        currentValue: KeybindsService.getActionLabel(root.editAction) || I18n.tr("Select...")
+                        currentValue: KeybindsService.getActionLabel(root.editAction) || I18n.tr("Select", "verb, dropdown placeholder or option that opens a picker") + "…"
                         options: KeybindsService.getCompositorActions(compositorCatDropdown.currentValue).map(a => a.label)
                         enableFuzzySearch: true
                         maxPopupHeight: 300
@@ -1325,6 +1310,12 @@ Item {
                                     return;
                                 root.useCustomCompositor = true;
                             }
+                        }
+
+                        DankTooltipHost {
+                            text: I18n.tr("Custom")
+                            target: parent
+                            hoverArea: customToggleArea
                         }
                     }
                 }
@@ -1397,7 +1388,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Options")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -1421,24 +1412,19 @@ Item {
                                 spacing: Theme.spacingXS
                                 visible: editorVisible
 
-                                StyledText {
-                                    text: I18n.tr(argEditor.argDef?.label || "", "keybind option label")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    Layout.fillWidth: true
-                                    Layout.leftMargin: 6
-                                    horizontalAlignment: Text.AlignLeft
-                                    visible: optionsRow.argEditorCount > 1
-                                }
-
                                 DankTextField {
                                     id: argField
+                                    outlined: true
+                                    leftIconName: "tune"
+                                    labelText: I18n.tr(argEditor.argDef?.label || "", "keybind option label")
 
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: root._inputHeight
+                                    Layout.preferredHeight: implicitHeight
                                     placeholderText: I18n.tr(argEditor.argDef?.placeholder || "", "keybind option placeholder")
 
                                     property bool _syncing: false
+                                    readonly property var optionsRowParsedArgs: optionsRow.parsedArgs
+                                    readonly property var editorArgDef: argEditor.argDef
 
                                     function syncFromAction() {
                                         const newText = optionsRow.displayArgValue(argEditor.argDef);
@@ -1451,21 +1437,8 @@ Item {
                                         _syncing = false;
                                     }
 
-                                    Connections {
-                                        target: optionsRow
-
-                                        function onParsedArgsChanged() {
-                                            argField.syncFromAction();
-                                        }
-                                    }
-
-                                    Connections {
-                                        target: argEditor
-
-                                        function onArgDefChanged() {
-                                            argField.syncFromAction();
-                                        }
-                                    }
+                                    onOptionsRowParsedArgsChanged: syncFromAction()
+                                    onEditorArgDefChanged: syncFromAction()
 
                                     Component.onCompleted: {
                                         syncFromAction();
@@ -1542,7 +1515,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: I18n.tr("Pointer")
+                                    text: I18n.tr("Pointer", "noun, mouse cursor, keybind screenshot option to include it")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                 }
@@ -1604,18 +1577,13 @@ Item {
                     spacing: Theme.spacingM
                     visible: root._actionType === "compositor" && root.useCustomCompositor
 
-                    StyledText {
-                        text: I18n.tr("Custom")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                    }
-
                     DankTextField {
                         id: customCompositorField
+                        outlined: true
+                        leftIconName: "terminal"
+                        labelText: I18n.tr("Custom")
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root._inputHeight
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: KeybindsService.currentProvider === "hyprland" ? I18n.tr("e.g., hl.dsp.focus({ workspace = \"3\" })") : I18n.tr("e.g., focus-workspace 3, resize-column -10")
                         text: root._actionType === "compositor" ? root.editAction : ""
                         onTextChanged: {
@@ -1661,6 +1629,12 @@ Item {
                                 });
                             }
                         }
+
+                        DankTooltipHost {
+                            text: I18n.tr("Presets", "noun plural, keybind editor tooltip, switch from custom to preset compositor actions")
+                            target: parent
+                            hoverArea: presetToggleArea
+                        }
                     }
                 }
 
@@ -1669,18 +1643,13 @@ Item {
                     spacing: Theme.spacingM
                     visible: root._actionType === "spawn"
 
-                    StyledText {
-                        text: I18n.tr("Command")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                    }
-
                     DankTextField {
                         id: spawnTextField
+                        outlined: true
+                        leftIconName: "terminal"
+                        labelText: I18n.tr("Command")
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root._inputHeight
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: I18n.tr("e.g., firefox, kitty --title foo")
                         readonly property var _parsed: root._actionType === "spawn" ? Actions.parseSpawnCommand(root.editAction) : null
                         text: _parsed ? (_parsed.command + " " + _parsed.args.join(" ")).trim() : ""
@@ -1701,18 +1670,13 @@ Item {
                     spacing: Theme.spacingM
                     visible: root._actionType === "shell"
 
-                    StyledText {
-                        text: I18n.tr("Shell")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                    }
-
                     DankTextField {
                         id: shellTextField
+                        outlined: true
+                        leftIconName: "terminal"
+                        labelText: I18n.tr("Shell", "noun, keybind editor field label for a shell command")
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root._inputHeight
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: I18n.tr("e.g., notify-send 'Hello' && sleep 1")
                         text: root._actionType === "shell" ? Actions.parseShellCommand(root.editAction) : ""
                         onTextChanged: {
@@ -1731,18 +1695,13 @@ Item {
                     spacing: Theme.spacingM
                     visible: KeybindsService.currentProvider !== "aqueous"
 
-                    StyledText {
-                        text: I18n.tr("Title")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                    }
-
                     DankTextField {
                         id: titleField
+                        outlined: true
+                        leftIconName: "title"
+                        labelText: I18n.tr("Title")
                         Layout.fillWidth: true
-                        Layout.preferredHeight: root._inputHeight
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: I18n.tr("Hotkey overlay title (optional)")
                         text: root.editDesc
                         onTextChanged: root.updateEdit({
@@ -1757,9 +1716,9 @@ Item {
                     visible: KeybindsService.currentProvider === "hyprland"
 
                     StyledText {
-                        text: I18n.tr("Flags")
+                        text: I18n.tr("Flags", "noun plural, keybind editor row label for hyprland bind flags")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -1784,7 +1743,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Repeat")
+                                text: I18n.tr("Repeat", "noun, keybind option, action repeats while key is held")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                             }
@@ -1806,7 +1765,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Locked")
+                                text: I18n.tr("Locked", "adjective, hyprland bind flag toggle, bind works on lock screen")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                             }
@@ -1828,7 +1787,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Release")
+                                text: I18n.tr("Release", "noun, hyprland bind flag toggle, trigger on key release")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                             }
@@ -1863,27 +1822,21 @@ Item {
                     spacing: Theme.spacingM
                     visible: KeybindsService.currentProvider === "niri"
 
-                    StyledText {
-                        text: I18n.tr("Cooldown")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
-                        Layout.preferredWidth: root._labelWidth
-                    }
-
                     DankTextField {
                         id: cooldownField
-                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 7)
-                        Layout.preferredHeight: root._inputHeight
+                        outlined: true
+                        leftIconName: "timer"
+                        labelText: I18n.tr("Cooldown", "noun, niri keybind cooldown time field label")
+                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 7) + Theme.iconButtonSize
+                        Layout.preferredHeight: implicitHeight
                         placeholderText: "0"
 
-                        Connections {
-                            target: root
-                            function onEditCooldownMsChanged() {
-                                const newText = root.editCooldownMs > 0 ? String(root.editCooldownMs) : "";
-                                if (cooldownField.text !== newText)
-                                    cooldownField.text = newText;
-                            }
+                        readonly property int rootEditCooldownMs: root.editCooldownMs
+
+                        onRootEditCooldownMsChanged: {
+                            const newText = rootEditCooldownMs > 0 ? String(rootEditCooldownMs) : "";
+                            if (text !== newText)
+                                text = newText;
                         }
 
                         Component.onCompleted: {
@@ -1900,7 +1853,7 @@ Item {
                     }
 
                     StyledText {
-                        text: I18n.tr("ms")
+                        text: I18n.tr("ms", "milliseconds unit suffix after a number field")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                     }
@@ -1918,7 +1871,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Options")
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceVariantText
                         Layout.preferredWidth: root._labelWidth
                     }
@@ -1978,7 +1931,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("Inhibitable")
+                                text: I18n.tr("Inhibitable", "adjective, niri keybind option, apps may inhibit this shortcut")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                             }
@@ -2001,7 +1954,8 @@ Item {
                         Layout.preferredHeight: root._buttonHeight
                         circular: false
                         iconName: "delete"
-                        iconSize: Theme.iconSize - 4
+                        Accessible.name: I18n.tr("Delete")
+                        iconSize: Theme.iconSizeMedium
                         iconColor: Theme.error
                         visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && (root.keys[root.editingKeyIndex].isDMSManaged || root.keys[root.editingKeyIndex].isOverride) && !root.isNew && !root.readOnly
                         onClicked: root.removeBind(root._originalKey)
@@ -2010,7 +1964,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Reset to default")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.floatingWindowFieldColor
+                        backgroundColor: Theme.surfaceContainerHigh
                         textColor: Theme.primary
                         visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew && !root.readOnly
                         onClicked: root.resetBind(root._originalKey)
@@ -2030,7 +1984,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Cancel")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.floatingWindowFieldColor
+                        backgroundColor: Theme.surfaceContainerHigh
                         textColor: Theme.surfaceText
                         visible: root.hasChanges || root.isNew || root.retainEdits
                         onClicked: {

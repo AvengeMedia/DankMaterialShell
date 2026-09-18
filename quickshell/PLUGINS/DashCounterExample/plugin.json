@@ -1,0 +1,28 @@
+{
+    "id": "dashCounterExample",
+    "name": "Counter Example",
+    "description": "One counter shared by a dash tab, an overview card and a bar or dock widget",
+    "version": "1.0.0",
+    "author": "DankMaterialShell",
+    "type": "composite",
+    "capabilities": ["dash-tab", "dash-card", "dankbar-widget"],
+    "icon": "counter_1",
+    "components": {
+        "dash": "./CounterTab.qml",
+        "dashCard": "./CounterCard.qml",
+        "widget": "./CounterWidget.qml"
+    },
+    "dash": {
+        "title": "Counter",
+        "card": {
+            "w": 2,
+            "h": 1,
+            "minW": 1,
+            "minH": 1,
+            "maxW": 3,
+            "maxH": 2
+        }
+    },
+    "requires_dms": ">=1.7.0",
+    "permissions": ["settings_read", "settings_write"]
+}

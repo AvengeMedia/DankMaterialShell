@@ -1,0 +1,28 @@
+{
+    "twoScreens": {
+        "workspaces": [
+            { "num": 1, "name": "1", "focused": false, "active": false, "urgent": false, "monitor": "DP-1" },
+            { "num": 3, "name": "3:code", "focused": true, "active": true, "urgent": false, "monitor": "DP-1" },
+            { "num": -1, "name": "notes", "focused": false, "active": false, "urgent": false, "monitor": "HDMI-A-1" },
+            { "num": 2, "name": "2", "focused": false, "active": true, "urgent": true, "monitor": "HDMI-A-1" },
+            { "num": -1, "name": "chat", "focused": false, "active": false, "urgent": false, "monitor": "HDMI-A-1" }
+        ],
+        "windows": [
+            { "appId": "foot" },
+            { "appId": "mpv", "workspace": { "num": 2 } },
+            { "appId": "zathura", "workspace": { "num": -1 } }
+        ]
+    },
+    "namedActive": {
+        "workspaces": [
+            { "num": 1, "name": "1", "focused": true, "active": true, "urgent": false, "monitor": "DP-1" },
+            { "num": -1, "name": "notes", "focused": false, "active": true, "urgent": false, "monitor": "HDMI-A-1" },
+            { "num": 2, "name": "2", "focused": false, "active": false, "urgent": false, "monitor": "HDMI-A-1" }
+        ],
+        "windows": []
+    },
+    "empty": {
+        "workspaces": [],
+        "windows": []
+    }
+}

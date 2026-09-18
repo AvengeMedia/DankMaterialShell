@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Services
+import qs.Modules.Notifications
 
 QtObject {
     id: controller
@@ -41,7 +42,7 @@ QtObject {
 
             if (isExpanded) {
                 const notifications = group.notifications || [];
-                const maxNotifications = Math.min(notifications.length, 10);
+                const maxNotifications = Math.min(notifications.length, NotificationMetrics.expandedLimit);
                 for (var j = 0; j < maxNotifications; j++) {
                     const notifId = String(notifications[j] && notifications[j].notification && notifications[j].notification.id ? notifications[j].notification.id : "");
                     nav.push({
@@ -70,16 +71,14 @@ QtObject {
 
             if (selectedItemType === "group" && item.type === "group" && item.groupKey === selectedGroupKey) {
                 selectedFlatIndex = i;
-                selectionVersion++; // Trigger UI update
+                selectionVersion++;
                 return;
             } else if (selectedItemType === "notification" && item.type === "notification" && String(item.notificationId) === String(selectedNotificationId)) {
                 selectedFlatIndex = i;
-                selectionVersion++; // Trigger UI update
+                selectionVersion++;
                 return;
             }
         }
-
-        // If not found, try to find the same group but select the group header instead
         if (selectedItemType === "notification") {
             for (var j = 0; j < flatNavigation.length; j++) {
                 const groupItem = flatNavigation[j];
@@ -87,18 +86,16 @@ QtObject {
                     selectedFlatIndex = j;
                     selectedItemType = "group";
                     selectedNotificationId = "";
-                    selectionVersion++; // Trigger UI update
+                    selectionVersion++;
                     return;
                 }
             }
         }
-
-        // If still not found, clamp to valid range and update
         if (flatNavigation.length > 0) {
             selectedFlatIndex = Math.min(selectedFlatIndex, flatNavigation.length - 1);
             selectedFlatIndex = Math.max(selectedFlatIndex, 0);
             updateSelectedIdFromIndex();
-            selectionVersion++; // Trigger UI update
+            selectionVersion++;
         }
     }
 
@@ -115,7 +112,6 @@ QtObject {
         selectedFlatIndex = 0;
         keyboardNavigationActive = false;
         showKeyboardHints = false;
-        // Reset keyboardActive when modal is reset
         if (listView) {
             listView.keyboardActive = false;
         }
@@ -126,8 +122,6 @@ QtObject {
         keyboardNavigationActive = true;
         if (flatNavigation.length === 0)
             return;
-
-        // Re-enable auto-scrolling when arrow keys are used
         if (listView && listView.enableAutoScroll) {
             listView.enableAutoScroll();
         }
@@ -142,8 +136,6 @@ QtObject {
         keyboardNavigationActive = true;
         if (flatNavigation.length === 0)
             return;
-
-        // Re-enable auto-scrolling when arrow keys are used
         if (listView && listView.enableAutoScroll) {
             listView.enableAutoScroll();
         }
@@ -158,8 +150,6 @@ QtObject {
         keyboardNavigationActive = true;
         if (flatNavigation.length === 0)
             return;
-
-        // Re-enable auto-scrolling when arrow keys are used
         if (listView && listView.enableAutoScroll) {
             listView.enableAutoScroll();
         }
@@ -178,8 +168,6 @@ QtObject {
         const group = groups[currentItem.groupIndex];
         if (!group)
             return;
-
-        // Prevent expanding groups with < 2 notifications
         const notificationCount = group.notifications ? group.notifications.length : 0;
         if (notificationCount < 2)
             return;
@@ -189,47 +177,26 @@ QtObject {
         isTogglingGroup = true;
         NotificationService.toggleGroupExpansion(group.key);
         rebuildFlatNavigation();
-
-        // Smart selection after toggle
-        if (!wasExpanded) {
-            // Just expanded - move to first notification in the group
-            for (var i = 0; i < flatNavigation.length; i++) {
-                if (flatNavigation[i].type === "notification" && flatNavigation[i].groupIndex === groupIndex) {
-                    selectedFlatIndex = i;
-                    break;
-                }
-            }
-        } else {
-            // Just collapsed - stay on the group header
-            for (var i = 0; i < flatNavigation.length; i++) {
-                if (flatNavigation[i].type === "group" && flatNavigation[i].groupIndex === groupIndex) {
-                    selectedFlatIndex = i;
-                    break;
-                }
-            }
-        }
+        const type = wasExpanded ? "group" : "notification";
+        const index = flatNavigation.findIndex(item => item.type === type && item.groupIndex === groupIndex);
+        if (index >= 0)
+            selectedFlatIndex = index;
+        updateSelectedIdFromIndex();
+        selectionVersion++;
+        ensureVisible();
 
         isTogglingGroup = false;
     }
 
     function handleEnterKey() {
-        if (flatNavigation.length === 0 || selectedFlatIndex >= flatNavigation.length)
-            return;
-        const currentItem = flatNavigation[selectedFlatIndex];
-        const groups = NotificationService.groupedNotifications;
-        const group = groups[currentItem.groupIndex];
+        const selection = getCurrentSelection();
+        const group = NotificationService.groupedNotifications[selection.groupIndex];
         if (!group)
             return;
-        if (currentItem.type === "group") {
-            const notificationCount = group.notifications ? group.notifications.length : 0;
-            if (notificationCount >= 2) {
-                toggleGroupExpanded();
-            } else {
-                executeAction(0);
-            }
-        } else if (currentItem.type === "notification") {
-            executeAction(0);
-        }
+        const notification = selection.type === "notification" ? group.notifications[selection.notificationIndex] : group.latestNotification;
+        const actions = notification?.actions || [];
+        const index = actions.findIndex(action => action.identifier === "default");
+        executeAction(index < 0 ? 0 : index);
     }
 
     function toggleTextExpanded() {
@@ -348,9 +315,9 @@ QtObject {
                             const viewportBottom = listView.contentY + listView.height;
 
                             if (itemY < viewportTop) {
-                                listView.contentY = itemY - 20;
+                                listView.contentY = itemY - NotificationMetrics.cardPadding;
                             } else if (itemY + itemHeight > viewportBottom) {
-                                listView.contentY = itemY + itemHeight - listView.height + 20;
+                                listView.contentY = itemY + itemHeight - listView.height + NotificationMetrics.cardPadding;
                             }
                         }
                     }
@@ -393,10 +360,9 @@ QtObject {
         } else if (event.key === Qt.Key_Down || event.key === 16777237) {
             if (!keyboardNavigationActive) {
                 keyboardNavigationActive = true;
-                rebuildFlatNavigation(); // Ensure we have fresh navigation data
+                rebuildFlatNavigation();
                 selectedFlatIndex = 0;
                 updateSelectedIdFromIndex();
-                // Set keyboardActive on listView to show highlight
                 if (listView) {
                     listView.keyboardActive = true;
                 }
@@ -410,10 +376,9 @@ QtObject {
         } else if (event.key === Qt.Key_Up || event.key === 16777235) {
             if (!keyboardNavigationActive) {
                 keyboardNavigationActive = true;
-                rebuildFlatNavigation(); // Ensure we have fresh navigation data
+                rebuildFlatNavigation();
                 selectedFlatIndex = 0;
                 updateSelectedIdFromIndex();
-                // Set keyboardActive on listView to show highlight
                 if (listView) {
                     listView.keyboardActive = true;
                 }
@@ -422,7 +387,6 @@ QtObject {
                 event.accepted = true;
             } else if (selectedFlatIndex === 0) {
                 keyboardNavigationActive = false;
-                // Reset keyboardActive when navigation is disabled
                 if (listView) {
                     listView.keyboardActive = false;
                 }
@@ -536,8 +500,6 @@ QtObject {
             event.accepted = true;
         }
     }
-
-    // Get current selection info for UI
     function getCurrentSelection() {
         if (!keyboardNavigationActive || selectedFlatIndex < 0 || selectedFlatIndex >= flatNavigation.length) {
             return {

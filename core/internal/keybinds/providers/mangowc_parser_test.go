@@ -353,27 +353,6 @@ func TestMangoWCReadContentMultipleFiles(t *testing.T) {
 	}
 }
 
-func TestMangoWCReadContentSingleFile(t *testing.T) {
-	tmpDir := t.TempDir()
-	configFile := filepath.Join(tmpDir, "config.conf")
-
-	content := "bind=ALT,q,killclient,\n"
-
-	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
-		t.Fatalf("Failed to write config: %v", err)
-	}
-
-	parser := NewMangoWCParser("")
-	if err := parser.ReadContent(configFile); err != nil {
-		t.Fatalf("ReadContent failed: %v", err)
-	}
-
-	keybinds := parser.ParseKeys()
-	if len(keybinds) != 1 {
-		t.Errorf("Expected 1 keybind, got %d", len(keybinds))
-	}
-}
-
 func TestMangoWCReadContentErrors(t *testing.T) {
 	tests := []struct {
 		name string

@@ -76,9 +76,9 @@ hl.bind("SUPER + V", hl.dsp.togglefloating(), { description = "float toggle" })`
 		t.Errorf("SUPER+T should be untouched, got keys: %v", bindKeys(binds))
 	}
 	// An unbind makes this an override rather than two live binds on one key.
-	if result.DMSStatus.BindsAfterDMS != 0 {
-		t.Errorf("BindsAfterDMS = %d, want 0 for an unbind+rebind override",
-			result.DMSStatus.BindsAfterDMS)
+	if result.DMSStatus.EntriesAfterDMS != 0 {
+		t.Errorf("EntriesAfterDMS = %d, want 0 for an unbind+rebind override",
+			result.DMSStatus.EntriesAfterDMS)
 	}
 }
 
@@ -108,9 +108,9 @@ require("mybinds")
 	if got.Comment != "Clipboard history" {
 		t.Errorf("SUPER+V shows %q, want the DMS bind to be kept as before", got.Comment)
 	}
-	if result.DMSStatus.BindsAfterDMS != 1 {
-		t.Errorf("BindsAfterDMS = %d, want 1 for a config bind without unbind",
-			result.DMSStatus.BindsAfterDMS)
+	if result.DMSStatus.EntriesAfterDMS != 1 {
+		t.Errorf("EntriesAfterDMS = %d, want 1 for a config bind without unbind",
+			result.DMSStatus.EntriesAfterDMS)
 	}
 }
 

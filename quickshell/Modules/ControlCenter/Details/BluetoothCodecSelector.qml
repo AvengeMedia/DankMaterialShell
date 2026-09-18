@@ -1,17 +1,15 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
+import qs.Modules.ControlCenter.Widgets
+import qs.Modules.Settings.Widgets
 import qs.Services
-import qs.Widgets
 
-Item {
+CcSheetDialog {
     id: root
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
-
     property var device: null
-    property bool modalVisible: false
-    property var parentItem
     property var availableCodecs: []
     property string currentCodec: ""
     property bool isLoading: false
@@ -21,13 +19,24 @@ Item {
     readonly property var mediaCodecs: availableCodecs.filter(c => (c.category || "media") !== "call")
     readonly property var callCodecs: availableCodecs.filter(c => c.category === "call")
     readonly property bool deviceValid: device !== null && device.connected && BluetoothService.isAudioDevice(device)
+    readonly property bool splitSections: mediaCodecs.length > 0 && callCodecs.length > 0
 
     signal codecSelected(string deviceAddress, string codecName)
 
+    iconName: device ? BluetoothService.getDeviceIcon(device) : "headset"
+    title: device ? (device.name || device.deviceName) : ""
+    subtitle: I18n.tr("Audio Codec Selection")
+    statusText: {
+        if (isLoading)
+            return I18n.tr("Loading codecs...");
+        if (statusMessage.length > 0)
+            return statusMessage;
+        return I18n.tr("Current: %1").arg(currentCodec);
+    }
+    statusColor: statusIsError ? Theme.error : (isLoading ? Theme.primary : Theme.surfaceVariantText)
+
     function show(bluetoothDevice) {
-        if (!bluetoothDevice?.connected)
-            return;
-        if (!BluetoothService.isAudioDevice(bluetoothDevice))
+        if (!bluetoothDevice?.connected || !BluetoothService.isAudioDevice(bluetoothDevice))
             return;
         device = bluetoothDevice;
         isLoading = true;
@@ -35,356 +44,109 @@ Item {
         currentCodec = "";
         statusMessage = "";
         statusIsError = false;
-        visible = true;
-        modalVisible = true;
         queryCodecs();
-        Qt.callLater(() => {
-            focusScope.forceActiveFocus();
-        });
-    }
-
-    function hide() {
-        modalVisible = false;
-        Qt.callLater(() => {
-            visible = false;
-            device = null;
-        });
+        present();
     }
 
     function queryCodecs() {
         if (!deviceValid) {
-            hide();
+            dismiss();
             return;
         }
-
         const capturedDevice = device;
         const capturedAddress = device.address;
-
-        BluetoothService.getAvailableCodecs(capturedDevice, function (codecs, current) {
+        BluetoothService.getAvailableCodecs(capturedDevice, (codecs, current) => {
             if (!root.deviceValid || root.device?.address !== capturedAddress)
                 return;
             availableCodecs = codecs;
             currentCodec = current;
             isLoading = false;
             if (BluetoothService.wpexecChecked && !BluetoothService.wpexecAvailable && !BluetoothService.dbusBridgeAvailable) {
-                statusMessage = I18n.tr("Codec switching is unavailable because WirePlumber was not found");
+                statusMessage = I18n.tr("Codec switching is unavailable. WirePlumber wpexec was not found.", "bluetooth codec selector error, wpexec is a program name");
                 statusIsError = true;
-            } else if (codecs.length === 0) {
-                statusMessage = I18n.tr("No codecs found");
-                statusIsError = false;
-            } else {
-                statusMessage = "";
-                statusIsError = false;
+                return;
             }
+            statusMessage = codecs.length === 0 ? I18n.tr("No codecs found") : "";
+            statusIsError = false;
         });
     }
 
     function selectCodec(profileName) {
         if (!deviceValid || isLoading)
             return;
-
         const capturedDevice = device;
         const capturedAddress = device.address;
-
         const selectedCodec = availableCodecs.find(c => c.profile === profileName);
         if (!selectedCodec)
             return;
-
         BluetoothService.updateDeviceCodec(capturedAddress, selectedCodec.name);
         codecSelected(capturedAddress, selectedCodec.name);
-
         isLoading = true;
-        BluetoothService.switchCodec(capturedDevice, profileName, function (success, message) {
+        BluetoothService.switchCodec(capturedDevice, profileName, (success, message) => {
             if (!root.device || root.device.address !== capturedAddress)
                 return;
-
             isLoading = false;
-            if (success) {
-                BluetoothService.updateDeviceCodec(capturedAddress, selectedCodec.name);
-                codecSelected(capturedAddress, selectedCodec.name);
-                ToastService.showToast(message, ToastService.levelInfo);
-                Qt.callLater(root.hide);
+            if (!success) {
+                ToastService.showToast(message, ToastService.levelError);
                 return;
             }
-            ToastService.showToast(message, ToastService.levelError);
+            BluetoothService.updateDeviceCodec(capturedAddress, selectedCodec.name);
+            codecSelected(capturedAddress, selectedCodec.name);
+            ToastService.showToast(message, ToastService.levelInfo);
+            root.dismiss();
         }, selectedCodec.name);
     }
 
     onDeviceValidChanged: {
-        if (modalVisible && !deviceValid) {
-            hide();
+        if (shown && !deviceValid)
+            dismiss();
+    }
+
+    onDismissed: device = null
+
+    component CodecRow: CcListRow {
+        required property var modelData
+
+        title: modelData.name
+        subtitle: modelData.description
+        active: modelData.name === root.currentCodec
+        showActiveCheck: true
+        enabled: !root.isLoading
+        clickable: !active
+        onClicked: root.selectCodec(modelData.profile)
+
+        leading: CcStatusDot {
+            color: modelData.qualityColor
         }
     }
 
-    visible: false
-    anchors.fill: parent
-    z: 2000
+    SettingsSectionLabel {
+        text: I18n.tr("Media")
+        visible: root.splitSections && !root.isLoading
+    }
 
-    MouseArea {
-        id: modalBlocker
-        anchors.fill: parent
-        visible: modalVisible
-        enabled: modalVisible
-        hoverEnabled: true
-        preventStealing: true
-        propagateComposedEvents: false
+    CcGroup {
+        visible: !root.isLoading && root.mediaCodecs.length > 0
 
-        onClicked: root.hide()
-        onWheel: wheel => {
-            wheel.accepted = true;
-        }
-        onPositionChanged: mouse => {
-            mouse.accepted = true;
+        Repeater {
+            model: root.mediaCodecs
+
+            CodecRow {}
         }
     }
 
-    Rectangle {
-        id: modalBackground
-        anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, BlurService.enabled ? 0.72 : 0.5)
-        opacity: modalVisible ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
+    SettingsSectionLabel {
+        text: I18n.tr("Calls / Headset")
+        visible: root.callCodecs.length > 0 && !root.isLoading
     }
 
-    FocusScope {
-        id: focusScope
+    CcGroup {
+        visible: !root.isLoading && root.callCodecs.length > 0
 
-        anchors.fill: parent
-        focus: root.visible
-        enabled: root.visible
+        Repeater {
+            model: root.callCodecs
 
-        Keys.onEscapePressed: event => {
-            root.hide();
-            event.accepted = true;
-        }
-    }
-
-    Rectangle {
-        id: modalContent
-        anchors.centerIn: parent
-        width: 320
-        height: contentColumn.implicitHeight + Theme.spacingL * 2
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, BlurService.enabled ? 0.96 : Theme.popupTransparency)
-        border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineMedium
-        border.width: BlurService.enabled ? BlurService.borderWidth : Theme.layerOutlineWidth
-        opacity: modalVisible ? 1 : 0
-        scale: modalVisible ? 1 : 0.9
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            preventStealing: true
-            propagateComposedEvents: false
-            onClicked: mouse => {
-                mouse.accepted = true;
-            }
-            onWheel: wheel => {
-                wheel.accepted = true;
-            }
-            onPositionChanged: mouse => {
-                mouse.accepted = true;
-            }
-        }
-
-        Column {
-            id: contentColumn
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingM
-
-            Row {
-                width: parent.width
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: device ? BluetoothService.getDeviceIcon(device) : "headset"
-                    size: Theme.iconSize + 4
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Column {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingXXS
-
-                    StyledText {
-                        text: device ? (device.name || device.deviceName) : ""
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Audio Codec Selection")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextMedium
-                    }
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outlineLight
-            }
-
-            StyledText {
-                text: {
-                    if (isLoading)
-                        return I18n.tr("Loading codecs...");
-                    if (statusMessage.length > 0)
-                        return statusMessage;
-                    return I18n.tr("Current: %1").arg(currentCodec);
-                }
-                font.pixelSize: Theme.fontSizeSmall
-                color: statusIsError ? Theme.error : (isLoading ? Theme.primary : Theme.surfaceTextMedium)
-                font.weight: Font.Medium
-                wrapMode: Text.WordWrap
-                width: parent.width
-            }
-
-            Column {
-                width: parent.width
-                spacing: Theme.spacingXS
-                visible: !isLoading && availableCodecs.length > 0
-
-                StyledText {
-                    text: I18n.tr("Media")
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    color: Theme.surfaceTextMedium
-                    visible: root.mediaCodecs.length > 0 && root.callCodecs.length > 0
-                    width: parent.width
-                }
-
-                Repeater {
-                    model: root.mediaCodecs
-                    delegate: codecRow
-                }
-
-                Item {
-                    width: 1
-                    height: Theme.spacingS
-                    visible: root.mediaCodecs.length > 0 && root.callCodecs.length > 0
-                }
-
-                StyledText {
-                    text: I18n.tr("Calls / Headset")
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    color: Theme.surfaceTextMedium
-                    visible: root.callCodecs.length > 0
-                    width: parent.width
-                }
-
-                Repeater {
-                    model: root.callCodecs
-                    delegate: codecRow
-                }
-            }
-        }
-
-        Component {
-            id: codecRow
-
-            Rectangle {
-                required property var modelData
-                width: parent ? parent.width : 280
-                height: 48
-                radius: Theme.cornerRadius
-                color: {
-                    if (modelData.name === root.currentCodec)
-                        return Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency);
-                    if (codecMouseArea.containsMouse)
-                        return Theme.surfaceHover;
-                    return "transparent";
-                }
-                border.color: "transparent"
-                border.width: 0
-
-                Row {
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingS
-
-                    Rectangle {
-                        width: 6
-                        height: 6
-                        radius: 3
-                        color: modelData.qualityColor
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Column {
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingXXS
-
-                        StyledText {
-                            text: modelData.name
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: modelData.name === root.currentCodec ? Theme.primary : Theme.surfaceText
-                            font.weight: modelData.name === root.currentCodec ? Font.Medium : Font.Normal
-                        }
-
-                        StyledText {
-                            text: modelData.description
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceTextMedium
-                        }
-                    }
-                }
-
-                DankIcon {
-                    name: "check"
-                    size: Theme.iconSize - 4
-                    color: Theme.primary
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: modelData.name === root.currentCodec
-                }
-
-                DankRipple {
-                    id: codecRipple
-                    cornerRadius: parent.radius
-                }
-
-                MouseArea {
-                    id: codecMouseArea
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    enabled: modelData.name !== root.currentCodec && !root.isLoading
-                    onPressed: mouse => codecRipple.trigger(mouse.x, mouse.y)
-                    onClicked: root.selectCodec(modelData.profile)
-                }
-            }
-        }
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
-
-        Behavior on scale {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
+            CodecRow {}
         }
     }
 }

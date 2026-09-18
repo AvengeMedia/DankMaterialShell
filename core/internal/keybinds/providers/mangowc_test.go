@@ -9,13 +9,6 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 )
 
-func TestMangoWCProviderName(t *testing.T) {
-	provider := NewMangoWCProvider("")
-	if provider.Name() != "mangowc" {
-		t.Errorf("Name() = %q, want %q", provider.Name(), "mangowc")
-	}
-}
-
 func TestMangoWCProviderDefaultPath(t *testing.T) {
 	provider := NewMangoWCProvider("")
 	configDir, err := os.UserConfigDir()
@@ -29,14 +22,6 @@ func TestMangoWCProviderDefaultPath(t *testing.T) {
 	expected := filepath.Join(configDir, "mango")
 	if provider.configPath != expected {
 		t.Errorf("configPath = %q, want %q", provider.configPath, expected)
-	}
-}
-
-func TestMangoWCProviderCustomPath(t *testing.T) {
-	customPath := "/custom/path"
-	provider := NewMangoWCProvider(customPath)
-	if provider.configPath != customPath {
-		t.Errorf("configPath = %q, want %q", provider.configPath, customPath)
 	}
 }
 

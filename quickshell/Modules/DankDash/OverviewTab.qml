@@ -1,99 +1,191 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
-import qs.Modules.DankDash.Overview
+import qs.Services
 import qs.Widgets
+import qs.Modules.DankDash.Overview
+import qs.Modules.ControlCenter.Widgets
+import "utils/cards.js" as CardUtils
 
-Item {
+FocusScope {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-    implicitHeight: 410
     property bool live: Window.window?.visible ?? false
+    property bool editMode: false
+    property int rowBudget: DashMetrics.minimumTabRows
+    property int columnCap: DashMetrics.maximumGridColumns
+    property string preferredFocusId: "calendar"
 
-    signal switchToWeatherTab
-    signal switchToMediaTab
-    signal closeDash
-    signal navFocusRequested
+    signal cardFocusChanged(string id)
+    readonly property Item focusTarget: grid
+    readonly property Item previousFocusTarget: grid.lastFocusTarget
+    readonly property var addable: grid.addableEntries
+    readonly property bool cardResizing: grid.sizePreview !== null
+    readonly property bool blocksTabNavigation: grid.blocksTabNavigation || detailSheet.shown || editorSheet.shown || optionsSheet.shown || addMenu.open
 
-    function handleKeyEvent(event) {
-        return calendarLoader.item ? calendarLoader.item.handleKeyEvent(event) : false;
+    implicitWidth: DashMetrics.contentWidthFor(SettingsData.showWeekNumber)
+    implicitHeight: grid.implicitHeight
+
+    signal tabRequested(string id)
+    signal navFocusRequested(bool backwards)
+
+    onEditModeChanged: {
+        if (!editMode)
+            optionsSheet.dismiss();
     }
 
-    Item {
-        anchors.fill: parent
-        // Clock - top left (narrower and shorter)
-        ClockCard {
-            x: 0
-            y: 0
-            width: parent.width * 0.2 - Theme.spacingM * 2
-            height: 180
-            live: root.live
+    function handleKeyEvent(event) {
+        if (detailSheet.shown || editorSheet.shown || optionsSheet.shown) {
+            if (event.key !== Qt.Key_Escape)
+                return false;
+            detailSheet.dismiss();
+            editorSheet.dismiss();
+            optionsSheet.dismiss();
+            return true;
+        }
+        if (addMenu.open) {
+            if (event.key !== Qt.Key_Escape)
+                return false;
+            addMenu.close();
+            return true;
+        }
+        return grid.handleKeyEvent(event);
+    }
+
+    function restoreFocus() {
+        return grid.restoreFocus();
+    }
+
+    function cycleFocus(backwards) {
+        return grid.cycleFocus(backwards);
+    }
+
+    function moveCardFocus(direction) {
+        return grid.moveCardFocus(direction);
+    }
+
+    function cycleCardFocus(backwards) {
+        return grid.cycleCardFocus(backwards);
+    }
+
+    function openAddMenu(anchor) {
+        addMenu.openAt(anchor);
+    }
+
+    DashCardGrid {
+        id: grid
+
+        width: parent.width
+        editMode: root.editMode
+        rowBudget: root.rowBudget
+        columnCap: root.columnCap
+        live: root.live
+        preferredFocusId: root.preferredFocusId
+        onCardFocusChanged: id => root.cardFocusChanged(id)
+
+        onCardClicked: cardId => {
+            if (DashRegistry.hasTab(cardId))
+                root.tabRequested(cardId);
+        }
+        onNavFocusRequested: backwards => root.navFocusRequested(backwards)
+        onOptionsRequested: cardId => optionsSheet.presentFor(cardId)
+        onDetailRequested: eventData => {
+            detailSheet.eventData = eventData;
+            detailSheet.present();
+        }
+        onEditorRequested: (eventData, initialDate) => {
+            editorSheet.eventData = eventData;
+            editorSheet.initialDate = initialDate;
+            editorSheet.present();
+        }
+    }
+
+    CcMenu {
+        id: addMenu
+
+        items: root.addable.map(candidate => ({
+                    "label": candidate.entry.card.text,
+                    "iconName": candidate.entry.card.icon,
+                    "action": () => CardUtils.addCard(candidate.entry.id, candidate.size.w, candidate.size.h)
+                }))
+    }
+
+    DashOptionsSheet {
+        id: optionsSheet
+        onDismissed: root.navFocusRequested(false)
+    }
+
+    CcSheetDialog {
+        id: detailSheet
+
+        property var eventData: null
+
+        readonly property bool canEdit: CalendarService.canCreateEvents && !!eventData && !eventData.readOnly && !(eventData.id && eventData.id.startsWith("task_"))
+
+        panelWidth: DashMetrics.sheetWidth
+        iconName: "event"
+        title: eventData?.title ?? ""
+        subtitle: detailLoader.item?.timeText ?? ""
+
+        onDismissed: {
+            eventData = null;
+            root.navFocusRequested(false);
         }
 
-        // Weather - top middle-left (narrower)
-        WeatherOverviewCard {
-            x: SettingsData.weatherEnabled ? parent.width * 0.2 - Theme.spacingM : 0
-            y: 0
-            width: SettingsData.weatherEnabled ? parent.width * 0.3 : 0
-            height: 100
-            visible: SettingsData.weatherEnabled
-            live: root.live
-
-            onClicked: root.switchToWeatherTab()
-        }
-
-        // UserInfo - top middle-right (extend when weather disabled)
-        UserInfoCard {
-            x: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.2 - Theme.spacingM
-            y: 0
-            width: SettingsData.weatherEnabled ? parent.width * 0.5 : parent.width * 0.8 + Theme.spacingM
-            height: 100
-            live: root.live
-        }
-
-        // SystemMonitor - middle left (narrow and shorter)
-        SystemMonitorCard {
-            x: 0
-            y: 180 + Theme.spacingM
-            width: parent.width * 0.2 - Theme.spacingM * 2
-            height: 220
-            live: root.live
-        }
-
-        // Calendar - bottom middle; deferred so the grid stays off the emerge frame.
         Loader {
-            id: calendarLoader
-            x: parent.width * 0.2 - Theme.spacingM
-            y: 100 + Theme.spacingM
-            width: parent.width * 0.6
-            height: 300
-            asynchronous: true
-            sourceComponent: Component {
-                CalendarOverviewCard {
-                    onCloseDash: root.closeDash()
-                    onNavFocusRequested: root.navFocusRequested()
+            id: detailLoader
+
+            width: parent.width
+            active: detailSheet.visible
+
+            sourceComponent: CalendarEventDetail {
+                eventData: detailSheet.eventData
+                canEdit: detailSheet.canEdit
+                onCloseRequested: detailSheet.dismiss()
+                onEditRequested: {
+                    editorSheet.eventData = detailSheet.eventData;
+                    editorSheet.initialDate = detailSheet.eventData?.start ?? new Date();
+                    detailSheet.dismiss();
+                    editorSheet.present();
+                }
+                onDeleteRequested: {
+                    if (detailSheet.eventData?.id)
+                        CalendarService.deleteEvent(detailSheet.eventData.id, null);
+                    detailSheet.dismiss();
                 }
             }
+        }
+    }
 
-            DankSpinner {
-                anchors.centerIn: parent
-                size: 32
-                visible: calendarLoader.status === Loader.Loading
-            }
+    CcSheetDialog {
+        id: editorSheet
+
+        property var eventData: null
+        property date initialDate: new Date()
+
+        panelWidth: DashMetrics.sheetWidth
+        iconName: "edit_calendar"
+        title: eventData ? I18n.tr("Edit event") : I18n.tr("New event")
+
+        onDismissed: {
+            eventData = null;
+            root.navFocusRequested(false);
         }
 
-        // Media - bottom right (narrow and taller)
-        MediaOverviewCard {
-            x: parent.width * 0.8
-            y: 100 + Theme.spacingM
-            width: parent.width * 0.2
-            height: 300
-            live: root.live
+        Loader {
+            width: parent.width
+            active: editorSheet.visible
 
-            onClicked: root.switchToMediaTab()
+            sourceComponent: CalendarEventEditor {
+                eventData: editorSheet.eventData
+                initialDate: editorSheet.initialDate
+                onSaved: editorSheet.dismiss()
+                onCloseRequested: editorSheet.dismiss()
+            }
         }
     }
 }

@@ -6,157 +6,148 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            width: parent.width
+            settingKey: "osd"
 
-            SettingsCard {
-                width: parent.width
-                iconName: "tune"
-                title: I18n.tr("On-screen Displays")
-                settingKey: "osd"
-
-                SettingsDropdownRow {
-                    settingKey: "osdPosition"
-                    text: I18n.tr("OSD Position")
-                    description: I18n.tr("Choose where on-screen displays appear on screen")
-                    currentValue: {
-                        switch (SettingsData.osdPosition) {
-                        case SettingsData.Position.Top:
-                            return I18n.tr("Top Right", "screen position option");
-                        case SettingsData.Position.Left:
-                            return I18n.tr("Top Left", "screen position option");
-                        case SettingsData.Position.TopCenter:
-                            return I18n.tr("Top Center", "screen position option");
-                        case SettingsData.Position.Right:
-                            return I18n.tr("Bottom Right", "screen position option");
-                        case SettingsData.Position.Bottom:
-                            return I18n.tr("Bottom Left", "screen position option");
-                        case SettingsData.Position.BottomCenter:
-                            return I18n.tr("Bottom Center", "screen position option");
-                        case SettingsData.Position.LeftCenter:
-                            return I18n.tr("Left Center", "screen position option");
-                        case SettingsData.Position.RightCenter:
-                            return I18n.tr("Right Center", "screen position option");
-                        default:
-                            return I18n.tr("Bottom Center", "screen position option");
-                        }
-                    }
-                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Left Center", "screen position option"), I18n.tr("Right Center", "screen position option")]
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Top Right", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.Top);
-                        } else if (value === I18n.tr("Top Left", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.Left);
-                        } else if (value === I18n.tr("Top Center", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.TopCenter);
-                        } else if (value === I18n.tr("Bottom Right", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.Right);
-                        } else if (value === I18n.tr("Bottom Left", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.Bottom);
-                        } else if (value === I18n.tr("Bottom Center", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.BottomCenter);
-                        } else if (value === I18n.tr("Left Center", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.LeftCenter);
-                        } else if (value === I18n.tr("Right Center", "screen position option")) {
-                            SettingsData.set("osdPosition", SettingsData.Position.RightCenter);
-                        }
+            SettingsDropdownRow {
+                settingKey: "osdPosition"
+                text: I18n.tr("Position")
+                currentValue: {
+                    switch (SettingsData.osdPosition) {
+                    case SettingsData.Position.Top:
+                        return I18n.tr("Top Right", "screen position option");
+                    case SettingsData.Position.Left:
+                        return I18n.tr("Top Left", "screen position option");
+                    case SettingsData.Position.TopCenter:
+                        return I18n.tr("Top Center", "screen position option");
+                    case SettingsData.Position.Right:
+                        return I18n.tr("Bottom Right", "screen position option");
+                    case SettingsData.Position.Bottom:
+                        return I18n.tr("Bottom Left", "screen position option");
+                    case SettingsData.Position.BottomCenter:
+                        return I18n.tr("Bottom Center", "screen position option");
+                    case SettingsData.Position.LeftCenter:
+                        return I18n.tr("Left Center", "screen position option");
+                    case SettingsData.Position.RightCenter:
+                        return I18n.tr("Right Center", "screen position option");
+                    default:
+                        return I18n.tr("Bottom Center", "screen position option");
                     }
                 }
-
-                SettingsToggleRow {
-                    settingKey: "osdAlwaysShowValue"
-                    text: I18n.tr("Always Show Percentage")
-                    description: I18n.tr("Display volume and brightness percentage values in OSD popups")
-                    checked: SettingsData.osdAlwaysShowValue
-                    onToggled: checked => SettingsData.set("osdAlwaysShowValue", checked)
+                options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Left Center", "screen position option"), I18n.tr("Right Center", "screen position option")]
+                onValueChanged: value => {
+                    if (value === I18n.tr("Top Right", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.Top);
+                    } else if (value === I18n.tr("Top Left", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.Left);
+                    } else if (value === I18n.tr("Top Center", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.TopCenter);
+                    } else if (value === I18n.tr("Bottom Right", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.Right);
+                    } else if (value === I18n.tr("Bottom Left", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.Bottom);
+                    } else if (value === I18n.tr("Bottom Center", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.BottomCenter);
+                    } else if (value === I18n.tr("Left Center", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.LeftCenter);
+                    } else if (value === I18n.tr("Right Center", "screen position option")) {
+                        SettingsData.set("osdPosition", SettingsData.Position.RightCenter);
+                    }
                 }
+            }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
+            SettingsToggleRow {
+                settingKey: "osdAlwaysShowValue"
+                text: I18n.tr("Always show percentage")
+                checked: SettingsData.osdAlwaysShowValue
+                onToggled: checked => SettingsData.set("osdAlwaysShowValue", checked)
+            }
+        }
 
-                SettingsToggleRow {
-                    settingKey: "osdVolumeEnabled"
-                    text: I18n.tr("Volume")
-                    checked: SettingsData.osdVolumeEnabled
-                    onToggled: checked => SettingsData.set("osdVolumeEnabled", checked)
-                }
+        SettingsCard {
+            width: parent.width
+            title: I18n.tr("Show for")
+            settingKey: "osdEvents"
 
-                SettingsToggleRow {
-                    settingKey: "osdMediaVolumeEnabled"
-                    text: I18n.tr("Media Volume")
-                    checked: SettingsData.osdMediaVolumeEnabled
-                    onToggled: checked => SettingsData.set("osdMediaVolumeEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdVolumeEnabled"
+                text: I18n.tr("Volume")
+                checked: SettingsData.osdVolumeEnabled
+                onToggled: checked => SettingsData.set("osdVolumeEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdMediaPlaybackEnabled"
-                    text: I18n.tr("Media Playback")
-                    checked: SettingsData.osdMediaPlaybackEnabled
-                    onToggled: checked => SettingsData.set("osdMediaPlaybackEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdMediaVolumeEnabled"
+                text: I18n.tr("Media volume")
+                checked: SettingsData.osdMediaVolumeEnabled
+                onToggled: checked => SettingsData.set("osdMediaVolumeEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdBrightnessEnabled"
-                    text: I18n.tr("Brightness")
-                    checked: SettingsData.osdBrightnessEnabled
-                    onToggled: checked => SettingsData.set("osdBrightnessEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdMediaPlaybackEnabled"
+                text: I18n.tr("Media playback")
+                checked: SettingsData.osdMediaPlaybackEnabled
+                onToggled: checked => SettingsData.set("osdMediaPlaybackEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdIdleInhibitorEnabled"
-                    text: I18n.tr("Idle Inhibitor")
-                    checked: SettingsData.osdIdleInhibitorEnabled
-                    onToggled: checked => SettingsData.set("osdIdleInhibitorEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdBrightnessEnabled"
+                text: I18n.tr("Brightness")
+                checked: SettingsData.osdBrightnessEnabled
+                onToggled: checked => SettingsData.set("osdBrightnessEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdMicMuteEnabled"
-                    text: I18n.tr("Microphone Mute")
-                    checked: SettingsData.osdMicMuteEnabled
-                    onToggled: checked => SettingsData.set("osdMicMuteEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdIdleInhibitorEnabled"
+                text: I18n.tr("Idle inhibitor", "feature that keeps the session from going idle")
+                checked: SettingsData.osdIdleInhibitorEnabled
+                onToggled: checked => SettingsData.set("osdIdleInhibitorEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdCapsLockEnabled"
-                    text: I18n.tr("Caps Lock")
-                    checked: SettingsData.osdCapsLockEnabled
-                    onToggled: checked => SettingsData.set("osdCapsLockEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdMicMuteEnabled"
+                text: I18n.tr("Microphone mute")
+                checked: SettingsData.osdMicMuteEnabled
+                onToggled: checked => SettingsData.set("osdMicMuteEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdPowerProfileEnabled"
-                    text: I18n.tr("Power Profile")
-                    checked: SettingsData.osdPowerProfileEnabled
-                    onToggled: checked => SettingsData.set("osdPowerProfileEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdMicVolumeEnabled"
+                text: I18n.tr("Microphone volume")
+                checked: SettingsData.osdMicVolumeEnabled
+                onToggled: checked => SettingsData.set("osdMicVolumeEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdAudioOutputEnabled"
-                    text: I18n.tr("Audio Output Switch")
-                    checked: SettingsData.osdAudioOutputEnabled
-                    onToggled: checked => SettingsData.set("osdAudioOutputEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdCapsLockEnabled"
+                text: I18n.tr("Caps lock")
+                checked: SettingsData.osdCapsLockEnabled
+                onToggled: checked => SettingsData.set("osdCapsLockEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "osdWorkspaceEnabled"
-                    text: I18n.tr("Workspace Switch", "toggle label for workspace change OSD")
-                    checked: SettingsData.osdWorkspaceEnabled
-                    onToggled: checked => SettingsData.set("osdWorkspaceEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "osdPowerProfileEnabled"
+                text: I18n.tr("Power profile")
+                checked: SettingsData.osdPowerProfileEnabled
+                onToggled: checked => SettingsData.set("osdPowerProfileEnabled", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "osdAudioOutputEnabled"
+                text: I18n.tr("Audio output switch")
+                checked: SettingsData.osdAudioOutputEnabled
+                onToggled: checked => SettingsData.set("osdAudioOutputEnabled", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "osdWorkspaceEnabled"
+                text: I18n.tr("Workspace Switch", "toggle label for workspace change OSD")
+                checked: SettingsData.osdWorkspaceEnabled
+                onToggled: checked => SettingsData.set("osdWorkspaceEnabled", checked)
             }
         }
     }

@@ -8,6 +8,8 @@ SettingsDropdownRow {
 
     text: I18n.tr("Terminal")
     settingKey: "terminalOverride"
+    resetStore: SessionData
+    resetKeys: ["terminalOverride"]
 
     options: {
         const opts = [autoLabel];

@@ -23,56 +23,43 @@ Item {
         NetworkService.removeRef();
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
+        SettingsCard {
+            id: root
 
-            topPadding: 4
-            width: Math.min(600, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingL
+            property string expandedVpnUuid: ""
 
-            SettingsCard {
-                id: root
+            settingKey: "networkVpn"
+            tags: ["vpn", "network", "profiles", "import", "openvpn", "wireguard"]
 
-                property string expandedVpnUuid: ""
+            function openVpnFileBrowser() {
+                vpnFileBrowserLoader.active = true;
+                if (vpnFileBrowserLoader.item)
+                    vpnFileBrowserLoader.item.open();
+            }
 
-                title: I18n.tr("VPN")
-                iconName: "vpn_key"
-                settingKey: "networkVpn"
-                tags: ["vpn", "network", "profiles", "import", "openvpn", "wireguard"]
+            property var vpnFileBrowserLoader: LazyLoader {
+                active: false
 
-                function openVpnFileBrowser() {
-                    vpnFileBrowserLoader.active = true;
-                    if (vpnFileBrowserLoader.item)
-                        vpnFileBrowserLoader.item.open();
-                }
+                FileBrowserModal {
+                    browserTitle: I18n.tr("Import VPN")
+                    browserType: "vpn"
+                    fileExtensions: VPNService.getFileFilter()
 
-                property var vpnFileBrowserLoader: LazyLoader {
-                    active: false
-
-                    FileBrowserModal {
-                        browserTitle: I18n.tr("Import VPN")
-                        browserIcon: "vpn_key"
-                        browserType: "vpn"
-                        fileExtensions: VPNService.getFileFilter()
-
-                        onFileSelected: path => {
-                            VPNService.importVpn(path.replace("file://", ""));
-                        }
+                    onFileSelected: path => {
+                        VPNService.importVpn(path.replace("file://", ""));
                     }
                 }
+            }
 
-                property var deleteVpnConfirm: ConfirmModal {}
+            property var deleteVpnConfirm: ConfirmModal {}
 
-                width: parent.width
+            width: parent.width
 
-                Column {
+            SettingsRow {
+                body: Column {
                     id: vpnSection
 
                     width: parent.width
@@ -115,7 +102,7 @@ Item {
 
                             Rectangle {
                                 height: 28
-                                radius: 14
+                                radius: Theme.cornerRadiusL
                                 width: importVpnRow.width + Theme.spacingM * 2
                                 color: importVpnArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
                                 opacity: VPNService.importing ? 0.5 : 1.0
@@ -135,7 +122,7 @@ Item {
                                         text: I18n.tr("Import")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.primary
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                     }
                                 }
 
@@ -151,7 +138,7 @@ Item {
 
                             Rectangle {
                                 height: 28
-                                radius: 14
+                                radius: Theme.cornerRadiusL
                                 width: disconnectAllRow.width + Theme.spacingM * 2
                                 color: disconnectAllArea.containsMouse ? Theme.errorHover : Theme.surfaceLight
                                 visible: DMSNetworkService.connected
@@ -172,7 +159,7 @@ Item {
                                         text: I18n.tr("Disconnect")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceText
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                     }
                                 }
 
@@ -186,13 +173,6 @@ Item {
                                 }
                             }
                         }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                        visible: DMSNetworkService.vpnAvailable
                     }
 
                     Item {
@@ -251,7 +231,7 @@ Item {
                                 height: isExpanded ? 56 + vpnExpandedContent.height : 56
                                 radius: Theme.cornerRadius
                                 color: vpnRowArea.containsMouse ? Theme.primaryHoverLight : (isActive ? Theme.primaryPressed : Theme.surfaceLight)
-                                border.width: isActive ? 2 : 0
+                                border.width: isActive ? Theme.outlineWidthFocused : 0
                                 border.color: Theme.primary
                                 opacity: DMSNetworkService.isBusy ? 0.6 : 1.0
                                 clip: true
@@ -297,6 +277,7 @@ Item {
                                             StyledText {
                                                 text: modelData.name
                                                 font.pixelSize: Theme.fontSizeMedium
+                                                font.weight: Theme.fontWeightMedium
                                                 color: isActive ? Theme.primary : Theme.surfaceText
                                                 elide: Text.ElideRight
                                                 width: parent.width
@@ -317,9 +298,11 @@ Item {
                                         }
 
                                         Rectangle {
+                                            Accessible.role: Accessible.Button
+                                            Accessible.name: isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                                             width: 28
                                             height: 28
-                                            radius: 14
+                                            radius: Theme.cornerRadiusL
                                             color: vpnExpandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canExpand
@@ -348,9 +331,11 @@ Item {
                                         }
 
                                         Rectangle {
+                                            Accessible.role: Accessible.Button
+                                            Accessible.name: I18n.tr("Delete")
                                             width: 28
                                             height: 28
-                                            radius: 14
+                                            radius: Theme.cornerRadiusL
                                             color: vpnDeleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: canDelete
@@ -370,7 +355,7 @@ Item {
                                                 onClicked: {
                                                     root.deleteVpnConfirm.showWithOptions({
                                                         title: I18n.tr("Delete VPN"),
-                                                        message: I18n.tr("Delete \"%1\"?").arg(modelData.name),
+                                                        message: I18n.tr("Delete \"%1\"?", "delete confirmation, %1 is a vpn profile or printer name").arg(modelData.name),
                                                         confirmText: I18n.tr("Delete"),
                                                         confirmColor: Theme.error,
                                                         onConfirm: () => VPNService.deleteVpn(modelData.uuid)
@@ -385,12 +370,6 @@ Item {
                                         width: parent.width
                                         spacing: Theme.spacingXS
                                         visible: !isTransient && isExpanded
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 1
-                                            color: Theme.outlineLight
-                                        }
 
                                         Item {
                                             width: parent.width
@@ -417,7 +396,7 @@ Item {
 
                                                     if (data.remote)
                                                         fields.push({
-                                                            label: I18n.tr("Server"),
+                                                            label: I18n.tr("Server", "noun, vpn profile detail label, remote server address"),
                                                             value: data.remote
                                                         });
                                                     if (configData.username || data.username)
@@ -427,12 +406,12 @@ Item {
                                                         });
                                                     if (data.cipher)
                                                         fields.push({
-                                                            label: I18n.tr("Cipher"),
+                                                            label: I18n.tr("Cipher", "noun, vpn profile detail label, encryption cipher"),
                                                             value: data.cipher
                                                         });
                                                     if (data.auth)
                                                         fields.push({
-                                                            label: I18n.tr("Auth"),
+                                                            label: I18n.tr("Auth", "abbreviation of authentication, vpn profile detail label"),
                                                             value: data.auth
                                                         });
                                                     if (data["proto-tcp"] === "yes" || data["proto-tcp"] === "no")
@@ -442,12 +421,12 @@ Item {
                                                         });
                                                     if (data["tunnel-mtu"])
                                                         fields.push({
-                                                            label: I18n.tr("MTU"),
+                                                            label: "MTU",
                                                             value: data["tunnel-mtu"]
                                                         });
                                                     if (data["connection-type"])
                                                         fields.push({
-                                                            label: I18n.tr("Auth Type"),
+                                                            label: I18n.tr("Auth type"),
                                                             value: data["connection-type"]
                                                         });
                                                     return fields;
@@ -459,9 +438,9 @@ Item {
 
                                                     width: vpnFieldContent.width + Theme.spacingM * 2
                                                     height: 32
-                                                    radius: Theme.cornerRadius - 2
+                                                    radius: Theme.cornerRadius - Theme.outlineWidthFocused
                                                     color: Theme.floatingWindowFieldColor
-                                                    border.width: 1
+                                                    border.width: Theme.outlineWidth
                                                     border.color: Theme.floatingWindowFieldBorderColor
 
                                                     Row {
@@ -480,7 +459,7 @@ Item {
                                                             text: modelData.value
                                                             font.pixelSize: Theme.fontSizeSmall
                                                             color: Theme.surfaceText
-                                                            font.weight: Font.Medium
+                                                            font.weight: Theme.fontWeightMedium
                                                             anchors.verticalCenter: parent.verticalCenter
                                                         }
                                                     }

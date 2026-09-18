@@ -10,7 +10,7 @@ AppPickerModal {
 
     property string url: ""
 
-    title: I18n.tr("Open with...")
+    title: I18n.tr("Open with", "app picker title, followed by a list of apps") + "…"
     targetData: url
     targetDataLabel: ""
     categoryFilter: ["WebBrowser", "X-WebBrowser"]

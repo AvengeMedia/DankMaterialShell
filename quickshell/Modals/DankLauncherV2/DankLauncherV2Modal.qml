@@ -13,11 +13,11 @@ Item {
     readonly property var spotlightContent: impl.item ? impl.item.spotlightContent : null
     readonly property bool openedFromOverview: impl.item ? impl.item.openedFromOverview : false
     readonly property var effectiveScreen: impl.item ? impl.item.effectiveScreen : null
-    readonly property real screenWidth: impl.item ? impl.item.screenWidth : 1920
-    readonly property real screenHeight: impl.item ? impl.item.screenHeight : 1080
+    readonly property real screenWidth: impl.item ? impl.item.screenWidth : Theme.mediumBreakpoint * 2
+    readonly property real screenHeight: impl.item ? impl.item.screenHeight : Theme.mediumBreakpoint
     readonly property real dpr: impl.item ? impl.item.dpr : 1
-    readonly property int modalWidth: impl.item ? impl.item.modalWidth : 620
-    readonly property int modalHeight: impl.item ? impl.item.modalHeight : 600
+    readonly property int modalWidth: impl.item ? impl.item.modalWidth : Theme.launcherWidthDefault
+    readonly property int modalHeight: impl.item ? impl.item.modalHeight : Theme.launcherHeightDefault
     readonly property real modalX: impl.item ? impl.item.modalX : 0
     readonly property real modalY: impl.item ? impl.item.modalY : 0
     readonly property bool frameOwnsConnectedChrome: impl.item ? (impl.item.frameOwnsConnectedChrome ?? false) : false
@@ -63,74 +63,62 @@ Item {
             impl.item.toggleWithMode(mode);
     }
 
-    readonly property bool useSpotlightBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "spotlight"
-    readonly property bool useIslandBackend: !FrameTransitionState.effectiveConnectedFrameModeActive && SettingsData.launcherStyle === "island"
-    readonly property var _desiredBackend: FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : useIslandBackend ? islandComp : useSpotlightBackend ? spotlightComp : standaloneComp
-    property var _resolvedBackend: null
+    readonly property bool _desiredConnected: FrameTransitionState.effectiveConnectedFrameModeActive
+    readonly property bool useSpotlightBackend: !_desiredConnected && SettingsData.launcherStyle === "spotlight"
+    readonly property bool useIslandBackend: !_desiredConnected && SettingsData.launcherStyle === "island"
+    readonly property var _desiredBackend: useIslandBackend ? islandComp : hostComp
+    property bool _resolvedConnected: false
+    property bool _resolvedSpotlight: false
 
-    Component.onCompleted: _resolvedBackend = _desiredBackend
+    Component.onCompleted: _loadHost()
 
-    Connections {
-        target: SettingsData
-        function onConnectedFrameModeActiveChanged() {
-            root._maybeResolveBackend();
-        }
-        function onLauncherStyleChanged() {
-            root._maybeResolveBackend();
-        }
-    }
+    readonly property bool settingsConnectedFrameModeActive: SettingsData.connectedFrameModeActive
+    readonly property string settingsLauncherStyle: SettingsData.launcherStyle
 
-    // Defer Loader source-component swap until impl is fully closed; avoids
-    // tearing down the launcher mid-animation when frame mode is toggled.
+    onSettingsConnectedFrameModeActiveChanged: _maybeResolveBackend()
+    onSettingsLauncherStyleChanged: _maybeResolveBackend()
+
     function _maybeResolveBackend() {
-        if (_resolvedBackend === _desiredBackend)
+        if (impl.sourceComponent === _desiredBackend && _resolvedConnected === _desiredConnected && _resolvedSpotlight === useSpotlightBackend)
             return;
         if (impl.item && (impl.item.spotlightOpen || impl.item.isClosing))
             return;
-        _resolvedBackend = _desiredBackend;
+        _loadHost();
+    }
+
+    function _hostDialogClosed() {
+        dialogClosed();
+        _maybeResolveBackend();
+    }
+
+    function _loadHost() {
+        impl.sourceComponent = null;
+        _resolvedConnected = _desiredConnected;
+        _resolvedSpotlight = useSpotlightBackend;
+        impl.sourceComponent = _desiredBackend;
     }
 
     Loader {
         id: impl
-        sourceComponent: root._resolvedBackend
-        onItemChanged: if (item)
-            root._wireBackend(item)
     }
 
     Component {
-        id: standaloneComp
-        DankLauncherV2ModalStandalone {}
-    }
-
-    Component {
-        id: connectedComp
-        DankLauncherV2ModalConnected {}
-    }
-
-    Component {
-        id: spotlightComp
-        DankLauncherV2ModalSpotlight {}
+        id: hostComp
+        DankLauncherV2ModalHost {
+            modalHandle: root
+            triggerUsesOverlayLayer: root.triggerUsesOverlayLayer
+            connected: root._resolvedConnected
+            spotlight: root._resolvedSpotlight
+            onDialogClosed: root._hostDialogClosed()
+        }
     }
 
     Component {
         id: islandComp
-        DankLauncherV2ModalIsland {}
-    }
-
-    function _wireBackend(it) {
-        if (!it)
-            return;
-        it.modalHandle = root;
-        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
-    }
-
-    Connections {
-        target: impl.item
-        ignoreUnknownSignals: true
-
-        function onDialogClosed() {
-            root.dialogClosed();
-            root._maybeResolveBackend();
+        DankLauncherV2ModalIsland {
+            modalHandle: root
+            triggerUsesOverlayLayer: root.triggerUsesOverlayLayer
+            onDialogClosed: root._hostDialogClosed()
         }
     }
 }

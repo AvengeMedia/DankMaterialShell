@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	switch req.Method {
 	case "freedesktop.getState":
 		handleGetState(conn, req, manager)
@@ -32,11 +33,11 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleSetIconFile(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetIconFile(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	iconPath, err := params.String(req.Params, "path")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -51,7 +52,7 @@ func handleSetIconFile(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "icon file set"})
 }
 
-func handleSetRealName(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetRealName(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	name, err := params.String(req.Params, "name")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -66,7 +67,7 @@ func handleSetRealName(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "real name set"})
 }
 
-func handleSetEmail(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetEmail(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	email, err := params.String(req.Params, "email")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -81,7 +82,7 @@ func handleSetEmail(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "email set"})
 }
 
-func handleSetLanguage(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetLanguage(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	language, err := params.String(req.Params, "language")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -96,7 +97,7 @@ func handleSetLanguage(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "language set"})
 }
 
-func handleSetLocation(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetLocation(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	location, err := params.String(req.Params, "location")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -111,7 +112,7 @@ func handleSetLocation(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "location set"})
 }
 
-func handleGetUserIconFile(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetUserIconFile(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	username, err := params.String(req.Params, "username")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -127,7 +128,7 @@ func handleGetUserIconFile(conn *models.Conn, req models.Request, manager *Manag
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Value: iconFile})
 }
 
-func handleGetColorScheme(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetColorScheme(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.updateSettingsState(); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -137,7 +138,7 @@ func handleGetColorScheme(conn *models.Conn, req models.Request, manager *Manage
 	models.Respond(conn, req.ID, map[string]uint32{"colorScheme": state.Settings.ColorScheme})
 }
 
-func handleSetIconTheme(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetIconTheme(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	iconTheme, err := params.String(req.Params, "iconTheme")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())

@@ -19,7 +19,7 @@ PluginSettings {
         width: parent.width
         text: "Variant Manager"
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 
@@ -46,7 +46,7 @@ PluginSettings {
             StyledText {
                 text: "Add New Variant"
                 font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
             }
 
@@ -146,7 +146,7 @@ PluginSettings {
             StyledText {
                 text: "Existing Variants"
                 font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
             }
 
@@ -212,6 +212,8 @@ PluginSettings {
                         }
 
                         Rectangle {
+                            Accessible.role: Accessible.Button
+                            Accessible.name: I18n.tr("Delete")
                             id: deleteButton
                             width: 32
                             height: 32
@@ -283,7 +285,7 @@ PluginSettings {
                 StyledText {
                     text: "How to Use Variants"
                     font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }

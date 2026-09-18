@@ -59,7 +59,7 @@ Rectangle {
             StyledText {
                 text: root.count.toString()
                 font.pixelSize: Theme.fontSizeXLarge
-                font.weight: Font.Bold
+                font.weight: Theme.fontWeightMedium
                 color: root.iconColor
                 anchors.verticalCenter: parent.verticalCenter
             }

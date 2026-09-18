@@ -52,7 +52,7 @@ Item {
             text: root.label
             color: Theme.surfaceText
             font.pixelSize: Theme.fontSizeMedium
-            font.weight: Font.DemiBold
+            font.weight: Theme.fontWeightMedium
         }
     }
 

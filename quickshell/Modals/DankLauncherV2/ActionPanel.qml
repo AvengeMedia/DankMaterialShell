@@ -8,10 +8,26 @@ import qs.Widgets
 Rectangle {
     id: root
 
+    LayoutMirroring.enabled: I18n.isRtl
+    LayoutMirroring.childrenInherit: true
+
     property var selectedItem: null
     property var controller: null
     property bool expanded: false
     property int selectedActionIndex: 0
+
+    onSelectedActionIndexChanged: revealTimer.restart()
+    onActionsChanged: revealTimer.restart()
+    onExpandedChanged: {
+        if (expanded)
+            revealTimer.restart();
+    }
+
+    Timer {
+        id: revealTimer
+        interval: 0
+        onTriggered: root.ensureSelectedVisible()
+    }
 
     function getPluginContextMenuActions() {
         if (selectedItem?.type !== "plugin" || !selectedItem?.pluginId)
@@ -102,9 +118,9 @@ Rectangle {
         }
     }
 
-    width: parent?.width ?? 200
-    height: expanded && hasActions ? 52 : 0
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    width: parent?.width ?? Theme.fieldDefaultWidth
+    height: expanded && hasActions ? Theme.listItemHeight : 0
+    color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
     radius: Theme.cornerRadius
 
     clip: true
@@ -119,7 +135,7 @@ Rectangle {
     Rectangle {
         anchors.top: parent.top
         width: parent.width
-        height: 1
+        height: Theme.outlineWidth
         color: Theme.outlineMedium
     }
 
@@ -127,7 +143,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: Theme.spacingS
 
-        Flickable {
+        DankFlickable {
             id: actionsFlickable
             anchors.left: parent.left
             anchors.right: tabHint.left
@@ -146,65 +162,40 @@ Rectangle {
                 spacing: Theme.spacingS
 
                 Repeater {
+                    id: actionRepeater
                     model: root.actions
 
-                    Rectangle {
+                    DankButton {
                         id: actionButton
-
                         required property var modelData
                         required property int index
-
-                        width: actionContent.implicitWidth + Theme.spacingM * 2
-                        height: actionsRow.height
-                        radius: Theme.cornerRadius
-                        color: index === root.selectedActionIndex ? Theme.primaryHover : actionArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
-
-                        Row {
-                            id: actionContent
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-
-                            DankIcon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: actionButton.modelData?.icon ?? "play_arrow"
-                                size: 16
-                                color: actionButton.index === root.selectedActionIndex ? Theme.primary : Theme.surfaceText
-                            }
-
-                            StyledText {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: actionButton.modelData?.name ?? ""
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: actionButton.index === root.selectedActionIndex ? Theme.primary : Theme.surfaceText
-                            }
+                        anchors.verticalCenter: actionsRow.verticalCenter
+                        text: modelData?.name ?? ""
+                        iconName: modelData?.icon ?? "play_arrow"
+                        buttonHeight: Theme.buttonHeightXS
+                        backgroundColor: index === root.selectedActionIndex ? Theme.secondaryContainer : "transparent"
+                        textColor: index === root.selectedActionIndex ? Theme.onSecondaryContainer : Theme.onSurfaceVariant
+                        onHoveredChanged: {
+                            if (hovered)
+                                root.selectedActionIndex = index;
                         }
-
-                        MouseArea {
-                            id: actionArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (root.controller && root.selectedItem) {
-                                    root.controller.executeAction(root.selectedItem, actionButton.modelData);
-                                }
-                            }
-                            onEntered: root.selectedActionIndex = actionButton.index
+                        onClicked: {
+                            if (!root.controller || !root.selectedItem)
+                                return;
+                            root.controller.executeAction(root.selectedItem, modelData);
                         }
                     }
                 }
             }
         }
 
-        StyledText {
+        DankKeycap {
             id: tabHint
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             visible: root.hasActions
-            text: "Tab"
-            font.pixelSize: Theme.fontSizeSmall - 2
-            color: Theme.outlineButton
+            text: I18n.tr("Tab", "keyboard tab key name", true)
+            textColor: Theme.onSurfaceVariant
         }
     }
 
@@ -225,35 +216,25 @@ Rectangle {
 
     function cycleAction(reverse = false) {
         if (actions.length > 0) {
-            selectedActionIndex = reverse
-                ? (selectedActionIndex - 1 + actions.length) % actions.length
-                : (selectedActionIndex + 1) % actions.length;
-            ensureSelectedVisible();
+            selectedActionIndex = reverse ? (selectedActionIndex - 1 + actions.length) % actions.length : (selectedActionIndex + 1) % actions.length;
         }
     }
 
     function ensureSelectedVisible() {
-        if (selectedActionIndex < 0 || !actionsRow.children || selectedActionIndex >= actionsRow.children.length)
-            return;
-        var buttonX = 0;
-        for (var i = 0; i < selectedActionIndex; i++) {
-            var child = actionsRow.children[i];
-            if (child)
-                buttonX += child.width + actionsRow.spacing;
-        }
-
-        var button = actionsRow.children[selectedActionIndex];
+        var button = actionRepeater.itemAt(selectedActionIndex);
         if (!button)
             return;
+        var buttonX = button.x;
         var buttonRight = buttonX + button.width;
         var viewLeft = actionsFlickable.contentX;
         var viewRight = viewLeft + actionsFlickable.width;
 
         if (buttonX < viewLeft) {
             actionsFlickable.contentX = Math.max(0, buttonX - Theme.spacingS);
-        } else if (buttonRight > viewRight) {
-            actionsFlickable.contentX = Math.min(actionsFlickable.contentWidth - actionsFlickable.width, buttonRight - actionsFlickable.width + Theme.spacingS);
+            return;
         }
+        if (buttonRight > viewRight)
+            actionsFlickable.contentX = Math.max(0, Math.min(actionsFlickable.contentWidth - actionsFlickable.width, buttonRight - actionsFlickable.width + Theme.spacingS));
     }
 
     function executeSelectedAction() {

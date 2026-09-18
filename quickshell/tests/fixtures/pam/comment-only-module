@@ -1,0 +1,4 @@
+#%PAM-1.0
+# auth       sufficient   pam_fprintd.so
+auth       required     pam_unix.so   # pam_u2f.so disabled
+account    required     pam_unix.so

@@ -11,8 +11,8 @@ DankModal {
     keepPopoutsOpen: true
     allowStacking: true
     shouldBeVisible: false
-    modalWidth: 420
-    modalHeight: calculatedHeight
+    modalWidth: Math.min(Theme.dialogMaxWidth, screenWidth - Theme.spacingXL * 2)
+    modalHeight: Math.min(contentFocusScope.implicitHeight, screenHeight - Theme.spacingXL * 2)
     enableShadow: true
     onBackgroundClicked: clearAndClose()
     directContent: contentFocusScope
@@ -54,34 +54,7 @@ DankModal {
     readonly property bool showDomainField: showAnonField
     readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11" && !isCertificatePrompt
 
-    readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
-    readonly property int inputFieldWithSpacing: inputFieldHeight + Theme.spacingM
-    readonly property int checkboxRowHeight: Theme.fontSizeMedium + Theme.spacingS
-    readonly property int headerHeight: Theme.fontSizeLarge + Theme.fontSizeMedium + Theme.spacingM * 2
-    readonly property int buttonRowHeight: 36 + Theme.spacingM
     readonly property int certificateWarningHeight: certificateWarningColumn.implicitHeight + Theme.spacingM * 2
-
-    property int calculatedHeight: {
-        let h = headerHeight + buttonRowHeight + Theme.spacingL * 2;
-        h += fieldsInfo.length * inputFieldWithSpacing;
-        if (isHiddenNetwork)
-            h += inputFieldWithSpacing;
-        if (showEapFields)
-            h += eapSelectorRow.implicitHeight + Theme.spacingM;
-        if (showUsernameField)
-            h += inputFieldWithSpacing;
-        if (showPasswordField)
-            h += inputFieldWithSpacing;
-        if (showAnonField)
-            h += inputFieldWithSpacing;
-        if (showDomainField)
-            h += inputFieldWithSpacing;
-        if (showSavePasswordCheckbox)
-            h += checkboxRowHeight;
-        if (isCertificatePrompt)
-            h += certificateWarningHeight + Theme.spacingM;
-        return h;
-    }
 
     function focusFirstField() {
         if (isCertificatePrompt) {
@@ -92,7 +65,7 @@ DankModal {
             if (dynamicFieldsRepeater.count > 0) {
                 const firstItem = dynamicFieldsRepeater.itemAt(0);
                 if (firstItem)
-                    firstItem.children[0].forceActiveFocus();
+                    firstItem.forceActiveFocus();
             }
             return;
         }
@@ -216,7 +189,7 @@ DankModal {
             return I18n.tr("Private Key Password");
         case "pin":
         case "key_pass":
-            return I18n.tr("PIN");
+            return I18n.tr("PIN", "noun, numeric personal identification number for a smart card");
         case "psk":
             return I18n.tr("Password");
         case "anonymous-identity":
@@ -227,6 +200,8 @@ DankModal {
     }
 
     function submitCredentialsAndClose() {
+        if (!connectButton.enabled)
+            return;
         if (fieldsInfo.length > 0) {
             NetworkService.submitCredentials(promptToken, secretValues, savePasswordCheckbox.checked);
             hide();
@@ -300,8 +275,8 @@ DankModal {
         ssidInput.text = "";
         for (var i = 0; i < dynamicFieldsRepeater.count; i++) {
             const item = dynamicFieldsRepeater.itemAt(i);
-            if (item?.children[0])
-                item.children[0].text = "";
+            if (item)
+                item.text = "";
         }
     }
 
@@ -318,578 +293,313 @@ DankModal {
         }
     }
 
-    FocusScope {
+    DankDialog {
         id: contentFocusScope
 
         anchors.fill: parent
         focus: root.shouldBeVisible
-
-        Keys.onEscapePressed: event => {
-            clearAndClose();
-            event.accepted = true;
+        acceptEnabled: connectButton.enabled
+        onAccepted: submitCredentialsAndClose()
+        onRejected: clearAndClose()
+        title: {
+            if (promptReason === "pkcs11")
+                return I18n.tr("Smartcard Authentication");
+            if (isCertificatePrompt)
+                return I18n.tr("Untrusted VPN certificate", "Title for VPN server certificate trust confirmation");
+            if (isVpnPrompt)
+                return I18n.tr("Connect to VPN");
+            if (isHiddenNetwork)
+                return I18n.tr("Connect to Hidden Network");
+            return I18n.tr("Connect to Wi-Fi");
+        }
+        supportingText: {
+            if (promptReason === "pkcs11")
+                return I18n.tr("Enter PIN for ") + wifiPasswordSSID;
+            if (isCertificatePrompt)
+                return wifiPasswordSSID;
+            if (fieldsInfo.length > 0)
+                return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
+            if (isVpnPrompt)
+                return I18n.tr("Enter password for ") + wifiPasswordSSID;
+            if (isHiddenNetwork)
+                return I18n.tr("Enter network name and password");
+            return (requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ")) + wifiPasswordSSID;
         }
 
-        Column {
-            id: contentCol
-            anchors.centerIn: parent
-            width: parent.width - Theme.spacingL * 2
-            spacing: Theme.spacingM
+        Rectangle {
+            id: certificateWarningBox
 
-            Item {
-                width: contentCol.width
-                height: Math.max(headerCol.height, buttonRow.height)
+            readonly property color warningTone: isCertificateChangedPrompt ? Theme.error : Theme.warning
 
-                MouseArea {
-                    anchors.left: parent.left
-                    anchors.right: buttonRow.left
-                    anchors.rightMargin: Theme.spacingM
-                    height: headerCol.height
+            width: parent.width
+            height: certificateWarningHeight
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(warningTone, 0.12)
+            border.color: Theme.withAlpha(warningTone, 0.5)
+            border.width: 1
+            visible: isCertificatePrompt
 
-                    Column {
-                        id: headerCol
-                        width: parent.width
-                        spacing: Theme.spacingXS
+            Column {
+                id: certificateWarningColumn
 
-                        StyledText {
-                            text: {
-                                if (promptReason === "pkcs11")
-                                    return I18n.tr("Smartcard Authentication");
-                                if (isCertificatePrompt)
-                                    return I18n.tr("Untrusted VPN certificate", "Title for VPN server certificate trust confirmation");
-                                if (isVpnPrompt)
-                                    return I18n.tr("Connect to VPN");
-                                if (isHiddenNetwork)
-                                    return I18n.tr("Connect to Hidden Network");
-                                return I18n.tr("Connect to Wi-Fi");
-                            }
-                            font.pixelSize: Theme.fontSizeLarge
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: {
-                                    if (promptReason === "pkcs11")
-                                        return I18n.tr("Enter PIN for ") + wifiPasswordSSID;
-                                    if (isCertificatePrompt)
-                                        return wifiPasswordSSID;
-                                    if (fieldsInfo.length > 0)
-                                        return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
-                                    if (isVpnPrompt)
-                                        return I18n.tr("Enter password for ") + wifiPasswordSSID;
-                                    if (isHiddenNetwork)
-                                        return I18n.tr("Enter network name and password");
-                                    const prefix = requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ");
-                                    return prefix + wifiPasswordSSID;
-                                }
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceTextMedium
-                                width: parent.width
-                                elide: Text.ElideRight
-                            }
-
-                            StyledText {
-                                visible: isPromptMode && promptReason === "wrong-password"
-                                text: I18n.tr("Incorrect password")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.error
-                                width: parent.width
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    id: buttonRow
-                    anchors.right: parent.right
-                    spacing: Theme.spacingXS
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: clearAndClose()
-                    }
-                }
-            }
-
-            Rectangle {
-                id: certificateWarningBox
-
-                readonly property color warningTone: isCertificateChangedPrompt ? Theme.error : Theme.warning
-
-                width: parent.width
-                height: certificateWarningHeight
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(warningTone, 0.12)
-                border.color: Theme.withAlpha(warningTone, 0.5)
-                border.width: 1
-                visible: isCertificatePrompt
-
-                Column {
-                    id: certificateWarningColumn
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingM
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        width: parent.width
-                        text: isCertificateChangedPrompt ? I18n.tr("The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.", "Warning shown when a trusted VPN server certificate no longer matches") : I18n.tr("Only continue if you recognize this server certificate fingerprint.", "Warning shown before trusting an unverified VPN server certificate")
-                        wrapMode: Text.Wrap
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                    }
-
-                    StyledText {
-                        width: parent.width
-                        text: serverCertificateFingerprint
-                        wrapMode: Text.WrapAnywhere
-                        font.family: SettingsData.monoFontFamily
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: certificateWarningBox.warningTone
-                    }
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: ssidInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: ssidInput.activeFocus ? 2 : 1
-                visible: isHiddenNetwork
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: ssidInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: ssidInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    placeholderText: I18n.tr("Network Name (SSID)")
-                    backgroundColor: "transparent"
-                    enabled: root.shouldBeVisible
-                    keyNavigationTab: passwordInput
-                    onAccepted: passwordInput.forceActiveFocus()
-                }
-            }
-
-            Repeater {
-                id: dynamicFieldsRepeater
-                model: fieldsInfo
-
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
-
-                    width: contentCol.width
-                    height: inputFieldHeight
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
-                    border.color: fieldInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: fieldInput.activeFocus ? 2 : 1
-
-                    DankTextField {
-                        id: fieldInput
-                        anchors.fill: parent
-                        font.pixelSize: Theme.fontSizeMedium
-                        textColor: Theme.surfaceText
-                        showPasswordToggle: modelData.isSecret
-                        echoMode: modelData.isSecret && !passwordVisible ? TextInput.Password : TextInput.Normal
-                        placeholderText: getFieldLabel(modelData.name)
-                        backgroundColor: "transparent"
-                        enabled: root.shouldBeVisible
-
-                        Keys.onTabPressed: event => {
-                            if (index < fieldsInfo.length - 1) {
-                                const nextItem = dynamicFieldsRepeater.itemAt(index + 1);
-                                if (nextItem)
-                                    nextItem.children[0].forceActiveFocus();
-                            } else {
-                                const firstItem = dynamicFieldsRepeater.itemAt(0);
-                                if (firstItem)
-                                    firstItem.children[0].forceActiveFocus();
-                            }
-                            event.accepted = true;
-                        }
-
-                        Keys.onBacktabPressed: event => {
-                            if (index > 0) {
-                                const prevItem = dynamicFieldsRepeater.itemAt(index - 1);
-                                if (prevItem)
-                                    prevItem.children[0].forceActiveFocus();
-                            } else {
-                                const lastItem = dynamicFieldsRepeater.itemAt(fieldsInfo.length - 1);
-                                if (lastItem)
-                                    lastItem.children[0].forceActiveFocus();
-                            }
-                            event.accepted = true;
-                        }
-
-                        onTextEdited: {
-                            let updated = Object.assign({}, root.secretValues);
-                            updated[modelData.name] = text;
-                            root.secretValues = updated;
-                        }
-
-                        onAccepted: {
-                            if (index < fieldsInfo.length - 1) {
-                                const nextItem = dynamicFieldsRepeater.itemAt(index + 1);
-                                if (nextItem)
-                                    nextItem.children[0].forceActiveFocus();
-                                return;
-                            }
-                            submitCredentialsAndClose();
-                        }
-                    }
-                }
-            }
-
-            Row {
-                id: eapSelectorRow
-
-                visible: showEapFields
-                width: parent.width
-                spacing: Theme.spacingM
-
-                Column {
-                    width: showPhase2Dropdown ? (parent.width - Theme.spacingM) / 2 : parent.width
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Authentication")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                    }
-
-                    DankDropdown {
-                        width: parent.width
-                        dropdownWidth: parent.width
-                        compactMode: true
-                        options: ["PEAP", "TTLS", "PWD"]
-                        currentValue: eapMethodValue.toUpperCase()
-                        onValueChanged: value => {
-                            eapMethodValue = value.toLowerCase();
-                            phase2AuthValue = eapMethodValue === "ttls" ? "pap" : "mschapv2";
-                        }
-                    }
-                }
-
-                Column {
-                    visible: showPhase2Dropdown
-                    width: (parent.width - Theme.spacingM) / 2
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                    }
-
-                    DankDropdown {
-                        width: parent.width
-                        dropdownWidth: parent.width
-                        compactMode: true
-                        options: eapMethodValue === "ttls" ? ["PAP", "MSCHAPv2", "MSCHAP", "CHAP", "GTC", "MD5"] : ["MSCHAPv2", "GTC", "MD5"]
-                        currentValue: phase2AuthValue === "mschapv2" ? "MSCHAPv2" : phase2AuthValue.toUpperCase()
-                        onValueChanged: value => phase2AuthValue = value.toLowerCase()
-                    }
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: usernameInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: usernameInput.activeFocus ? 2 : 1
-                visible: showUsernameField
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: usernameInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: usernameInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    text: wifiUsernameInput
-                    placeholderText: I18n.tr("Username")
-                    backgroundColor: "transparent"
-                    enabled: root.shouldBeVisible
-                    keyNavigationTab: passwordInput
-                    keyNavigationBacktab: showDomainField ? domainMatchInput : passwordInput
-                    onTextEdited: wifiUsernameInput = text
-                    onAccepted: passwordInput.forceActiveFocus()
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: passwordInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: passwordInput.activeFocus ? 2 : 1
-                visible: showPasswordField
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: passwordInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: passwordInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    text: wifiPasswordInput
-                    showPasswordToggle: true
-                    echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
-                    placeholderText: (requiresEnterprise && !isVpnPrompt) ? I18n.tr("Password") : ""
-                    backgroundColor: "transparent"
-                    enabled: root.shouldBeVisible
-                    keyNavigationTab: showAnonField ? anonInput : (showUsernameField ? usernameInput : null)
-                    keyNavigationBacktab: showUsernameField ? usernameInput : null
-                    onTextEdited: wifiPasswordInput = text
-                    onAccepted: {
-                        if (showAnonField) {
-                            anonInput.forceActiveFocus();
-                            return;
-                        }
-                        submitCredentialsAndClose();
-                    }
-                }
-            }
-
-            Rectangle {
-                visible: showAnonField
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: anonInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: anonInput.activeFocus ? 2 : 1
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: anonInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: anonInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    text: wifiAnonymousIdentityInput
-                    placeholderText: I18n.tr("Anonymous Identity (optional)")
-                    backgroundColor: "transparent"
-                    enabled: root.shouldBeVisible
-                    keyNavigationTab: domainMatchInput
-                    keyNavigationBacktab: passwordInput
-                    onTextEdited: wifiAnonymousIdentityInput = text
-                    onAccepted: domainMatchInput.forceActiveFocus()
-                }
-            }
-
-            Rectangle {
-                visible: showDomainField
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: domainMatchInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: domainMatchInput.activeFocus ? 2 : 1
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: domainMatchInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: domainMatchInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    text: wifiDomainInput
-                    placeholderText: I18n.tr("Domain (optional)")
-                    backgroundColor: "transparent"
-                    enabled: root.shouldBeVisible
-                    keyNavigationTab: usernameInput
-                    keyNavigationBacktab: anonInput
-                    onTextEdited: wifiDomainInput = text
-                    onAccepted: submitCredentialsAndClose()
-                }
-            }
-
-            Row {
+                anchors.fill: parent
+                anchors.margins: Theme.spacingM
                 spacing: Theme.spacingS
-                visible: showSavePasswordCheckbox
 
-                Rectangle {
-                    id: savePasswordCheckbox
-
-                    property bool checked: !isVpnPrompt
-
-                    width: 20
-                    height: 20
-                    radius: 4
-                    color: checked ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                    border.color: checked ? Theme.primary : Theme.outlineButton
-                    border.width: 2
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "check"
-                        size: 12
-                        color: Theme.background
-                        visible: parent.checked
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: savePasswordCheckbox.checked = !savePasswordCheckbox.checked
-                    }
+                StyledText {
+                    width: parent.width
+                    text: isCertificateChangedPrompt ? I18n.tr("The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.", "Warning shown when a trusted VPN server certificate no longer matches") : I18n.tr("Only continue if you recognize this server certificate fingerprint.", "Warning shown before trusting an unverified VPN server certificate")
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                 }
 
                 StyledText {
-                    text: I18n.tr("Save password")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            Item {
-                width: parent.width
-                height: 40
-
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingM
-
-                    Rectangle {
-                        width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
-                        height: 36
-                        radius: Theme.cornerRadius
-                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
-                        border.color: Theme.surfaceVariantAlpha
-                        border.width: 1
-
-                        StyledText {
-                            id: cancelText
-                            anchors.centerIn: parent
-                            text: I18n.tr("Cancel")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        MouseArea {
-                            id: cancelArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: clearAndClose()
-                        }
-                    }
-
-                    Rectangle {
-                        id: connectButton
-
-                        width: Math.max(80, connectText.contentWidth + Theme.spacingM * 2)
-                        height: 36
-                        radius: Theme.cornerRadius
-                        color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                        border.color: activeFocus ? Theme.surfaceText : "transparent"
-                        border.width: activeFocus ? 2 : 0
-                        activeFocusOnTab: true
-                        enabled: {
-                            if (fieldsInfo.length > 0) {
-                                for (var i = 0; i < fieldsInfo.length; i++) {
-                                    if (!fieldsInfo[i].isSecret)
-                                        continue;
-                                    const fieldName = fieldsInfo[i].name;
-                                    if (!secretValues[fieldName] || secretValues[fieldName].length === 0)
-                                        return false;
-                                }
-                                return true;
-                            }
-                            if (isCertificatePrompt)
-                                return serverCertificateFingerprint.length > 0;
-                            if (isVpnPrompt)
-                                return passwordInput.text.length > 0;
-                            if (isHiddenNetwork)
-                                return ssidInput.text.length > 0;
-                            return requiresEnterprise ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
-                        }
-                        opacity: enabled ? 1 : 0.5
-
-                        StyledText {
-                            id: connectText
-                            anchors.centerIn: parent
-                            text: isCertificatePrompt ? I18n.tr("Trust", "Button that approves a VPN server certificate fingerprint") : I18n.tr("Connect")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.background
-                            font.weight: Font.Medium
-                        }
-
-                        MouseArea {
-                            id: connectArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            enabled: parent.enabled
-                            onClicked: submitCredentialsAndClose()
-                        }
-
-                        Keys.onReturnPressed: event => {
-                            if (enabled)
-                                submitCredentialsAndClose();
-                            event.accepted = true;
-                        }
-                        Keys.onEnterPressed: event => {
-                            if (enabled)
-                                submitCredentialsAndClose();
-                            event.accepted = true;
-                        }
-                        Keys.onSpacePressed: event => {
-                            if (enabled)
-                                submitCredentialsAndClose();
-                            event.accepted = true;
-                        }
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-                    }
+                    width: parent.width
+                    text: serverCertificateFingerprint
+                    wrapMode: Text.WrapAnywhere
+                    font.family: SettingsData.monoFontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: certificateWarningBox.warningTone
                 }
             }
         }
-    }
 
-    onOpened: Qt.callLater(() => contentFocusScope.forceActiveFocus())
+        DankTextField {
+            id: ssidInput
+            visible: isHiddenNetwork
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            leftIconName: "wifi"
+
+            width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
+            labelText: I18n.tr("Network Name (SSID)")
+            enabled: root.shouldBeVisible
+
+            onAccepted: passwordInput.forceActiveFocus()
+        }
+
+        Repeater {
+            id: dynamicFieldsRepeater
+            model: fieldsInfo
+
+            delegate: DankTextField {
+                id: fieldInput
+                required property var modelData
+                required property int index
+                outlined: true
+                controlHeight: Theme.fieldHeightLarge
+                leftIconName: modelData.isSecret ? "lock" : "person"
+                width: contentFocusScope.contentItem.width
+                font.pixelSize: Theme.fontSizeMedium
+                textColor: Theme.surfaceText
+                showPasswordToggle: modelData.isSecret
+                isError: modelData.isSecret && isPromptMode && promptReason === "wrong-password" && text.length === 0
+                supportingText: isError ? I18n.tr("Incorrect password") : ""
+                echoMode: modelData.isSecret && !passwordVisible ? TextInput.Password : TextInput.Normal
+                labelText: getFieldLabel(modelData.name)
+                enabled: root.shouldBeVisible
+
+                onTextEdited: {
+                    let updated = Object.assign({}, root.secretValues);
+                    updated[modelData.name] = text;
+                    root.secretValues = updated;
+                }
+
+                onAccepted: {
+                    if (index < fieldsInfo.length - 1) {
+                        const nextItem = dynamicFieldsRepeater.itemAt(index + 1);
+                        if (nextItem)
+                            nextItem.forceActiveFocus();
+                        return;
+                    }
+                    submitCredentialsAndClose();
+                }
+            }
+        }
+
+        Row {
+            id: eapSelectorRow
+
+            visible: showEapFields
+            width: parent.width
+            spacing: Theme.spacingM
+
+            Column {
+                width: showPhase2Dropdown ? (parent.width - Theme.spacingM) / 2 : parent.width
+                spacing: Theme.spacingXS
+
+                StyledText {
+                    text: I18n.tr("Authentication")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+
+                DankDropdown {
+                    width: parent.width
+                    dropdownWidth: parent.width
+                    compactMode: true
+                    options: ["PEAP", "TTLS", "PWD"]
+                    currentValue: eapMethodValue.toUpperCase()
+                    onValueChanged: value => {
+                        eapMethodValue = value.toLowerCase();
+                        phase2AuthValue = eapMethodValue === "ttls" ? "pap" : "mschapv2";
+                    }
+                }
+            }
+
+            Column {
+                visible: showPhase2Dropdown
+                width: (parent.width - Theme.spacingM) / 2
+                spacing: Theme.spacingXS
+
+                StyledText {
+                    text: I18n.tr("Inner authentication", "802.1X phase 2 authentication method")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+
+                DankDropdown {
+                    width: parent.width
+                    dropdownWidth: parent.width
+                    compactMode: true
+                    options: eapMethodValue === "ttls" ? ["PAP", "MSCHAPv2", "MSCHAP", "CHAP", "GTC", "MD5"] : ["MSCHAPv2", "GTC", "MD5"]
+                    currentValue: phase2AuthValue === "mschapv2" ? "MSCHAPv2" : phase2AuthValue.toUpperCase()
+                    onValueChanged: value => phase2AuthValue = value.toLowerCase()
+                }
+            }
+        }
+
+        DankTextField {
+            id: usernameInput
+            visible: showUsernameField
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            leftIconName: "person"
+
+            width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
+            text: wifiUsernameInput
+            labelText: I18n.tr("Username", "text field label for network, vpn and account forms")
+            enabled: root.shouldBeVisible
+
+            onTextEdited: wifiUsernameInput = text
+            onAccepted: passwordInput.forceActiveFocus()
+        }
+
+        DankTextField {
+            id: passwordInput
+            visible: showPasswordField
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            leftIconName: "lock"
+
+            width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
+            text: wifiPasswordInput
+            showPasswordToggle: true
+            isError: isPromptMode && promptReason === "wrong-password" && text.length === 0
+            supportingText: isError ? I18n.tr("Incorrect password") : ""
+            echoMode: passwordVisible ? TextInput.Normal : TextInput.Password
+            labelText: promptReason === "pkcs11" ? I18n.tr("PIN", "noun, numeric personal identification number for a smart card") : I18n.tr("Password")
+            enabled: root.shouldBeVisible
+
+            onTextEdited: wifiPasswordInput = text
+            onAccepted: {
+                if (showAnonField) {
+                    anonInput.forceActiveFocus();
+                    return;
+                }
+                submitCredentialsAndClose();
+            }
+        }
+
+        DankTextField {
+            id: anonInput
+            visible: showAnonField
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            leftIconName: "person_off"
+
+            width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
+            text: wifiAnonymousIdentityInput
+            labelText: I18n.tr("Anonymous Identity (optional)")
+            enabled: root.shouldBeVisible
+
+            onTextEdited: wifiAnonymousIdentityInput = text
+            onAccepted: domainMatchInput.forceActiveFocus()
+        }
+
+        DankTextField {
+            id: domainMatchInput
+            visible: showDomainField
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            leftIconName: "domain"
+
+            width: parent.width
+            font.pixelSize: Theme.fontSizeMedium
+            textColor: Theme.surfaceText
+            text: wifiDomainInput
+            labelText: I18n.tr("Domain (optional)")
+            enabled: root.shouldBeVisible
+
+            onTextEdited: wifiDomainInput = text
+            onAccepted: submitCredentialsAndClose()
+        }
+
+        DankToggle {
+            id: savePasswordCheckbox
+
+            width: parent.width
+            text: I18n.tr("Save password")
+            visible: showSavePasswordCheckbox
+            checked: !isVpnPrompt
+            onToggled: checked => savePasswordCheckbox.checked = checked
+        }
+
+        actions: [
+            DankButton {
+                maximumWidth: contentFocusScope.actionWidth
+                wrapText: true
+                text: I18n.tr("Cancel")
+                backgroundColor: "transparent"
+                textColor: Theme.primary
+                onClicked: clearAndClose()
+            },
+            DankButton {
+                id: connectButton
+                maximumWidth: contentFocusScope.actionWidth
+                wrapText: true
+
+                text: isCertificatePrompt ? I18n.tr("Trust", "Button that approves a VPN server certificate fingerprint") : I18n.tr("Connect", "verb, connect to a network or device")
+                enabled: {
+                    if (fieldsInfo.length > 0) {
+                        for (var i = 0; i < fieldsInfo.length; i++) {
+                            if (!fieldsInfo[i].isSecret)
+                                continue;
+                            const fieldName = fieldsInfo[i].name;
+                            if (!secretValues[fieldName] || secretValues[fieldName].length === 0)
+                                return false;
+                        }
+                        return true;
+                    }
+                    if (isCertificatePrompt)
+                        return serverCertificateFingerprint.length > 0;
+                    if (isVpnPrompt)
+                        return passwordInput.text.length > 0;
+                    if (isHiddenNetwork)
+                        return ssidInput.text.length > 0;
+                    return requiresEnterprise ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
+                }
+                onClicked: submitCredentialsAndClose()
+            }
+        ]
+    }
 }

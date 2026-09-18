@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -43,65 +42,15 @@ DankFloatingWindow {
     Item {
         anchors.fill: parent
 
-        Item {
+        DankWindowHeader {
             id: titleBar
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 44
             z: 10
-
-            MouseArea {
-                anchors.fill: parent
-                onPressed: windowControls.tryStartMove()
-                onDoubleClicked: windowControls.tryToggleMaximize()
-            }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingS
-
-                DankIcon {
-                    name: "edit_note"
-                    size: Theme.iconSize - 2
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: I18n.tr("Notepad")
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                DankActionButton {
-                    visible: windowControls.canMaximize
-                    circular: false
-                    iconName: win.maximized ? "fullscreen_exit" : "fullscreen"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: windowControls.tryToggleMaximize()
-                }
-
-                DankActionButton {
-                    circular: false
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: win.hide()
-                }
-            }
+            controls: windowControls
+            title: I18n.tr("Notepad")
+            onCloseRequested: win.hide()
         }
 
         Notepad {

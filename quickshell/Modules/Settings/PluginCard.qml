@@ -1,63 +1,36 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.Common
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+DankCard {
     id: root
 
     property var plugin: ({})
+    property bool busy: false
     property bool installed: false
     property bool selected: false
     property string fallbackIcon: "extension"
     property string previewSource: PluginService.previewUrl(plugin)
     property var badges: PluginService.badgeModel(plugin)
     property bool allowUninstall: false
-    property real previewHeight: Math.round((width - Theme.spacingS * 2) * 0.52)
-    readonly property int infoHeight: 100
+    property real previewHeight: Math.round((width - Theme.spacingS * 2) * SettingsMetrics.choiceCardPreviewRatio)
+    readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
     readonly property bool compatible: PluginService.checkPluginCompatibility(plugin.requires_dms)
 
-    signal clicked
     signal installRequested
     signal uninstallRequested
 
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
-    radius: Theme.cornerRadius
-    color: cardMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceVariant, 0.5) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
-    border.color: selected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
-    border.width: selected ? 2 : 1
-    scale: cardMouseArea.containsMouse ? 1.012 : 1
-
-    Behavior on color {
-        ColorAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on scale {
-        NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    MouseArea {
-        id: cardMouseArea
-        z: 0
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onPressed: mouse => cardRipple.trigger(mouse.x, mouse.y)
-        onClicked: root.clicked()
-    }
-
-    DankRipple {
-        id: cardRipple
-        cornerRadius: root.radius
-        rippleColor: Theme.surfaceVariantText
-    }
+    radius: Theme.cornerRadiusM
+    color: Theme.surfaceContainerHighest
+    border.color: Theme.focusRingColor
+    border.width: selected ? Theme.focusRingWidth : 0
+    pad: 0
+    clickable: true
+    Accessible.name: plugin.name || ""
 
     Item {
         id: previewArea
@@ -70,8 +43,8 @@ Rectangle {
 
         ClippingRectangle {
             anchors.fill: parent
-            radius: Theme.cornerRadius - 2
-            color: Theme.floatingWindowNestedSurface
+            radius: Theme.cornerRadiusS
+            color: Theme.surfaceContainerLow
 
             CachingImage {
                 id: cardPreview
@@ -86,8 +59,8 @@ Rectangle {
             DankIcon {
                 anchors.centerIn: parent
                 name: root.plugin.icon || root.fallbackIcon
-                size: Theme.iconSize + 12
-                color: Theme.withAlpha(Theme.outline, 0.6)
+                size: Theme.avatarSize
+                color: Theme.onSurfaceVariant
                 visible: cardPreview.status !== Image.Ready
             }
 
@@ -146,7 +119,7 @@ Rectangle {
             DankIcon {
                 id: cardIcon
                 name: root.plugin.icon || root.fallbackIcon
-                size: Theme.iconSize - 4
+                size: Theme.iconSizeMedium
                 color: Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -155,83 +128,21 @@ Rectangle {
                 width: parent.width - cardIcon.width - installAction.width - Theme.spacingS * 2
                 text: root.plugin.name || ""
                 font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
                 elide: Text.ElideRight
                 maximumLineCount: 1
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Rectangle {
+            DankActionButton {
                 id: installAction
-
-                property string buttonState: {
-                    if (root.installed)
-                        return "installed";
-                    if (!root.compatible)
-                        return "incompatible";
-                    return "available";
-                }
-
-                width: 28
-                height: 28
-                radius: 14
                 anchors.verticalCenter: parent.verticalCenter
-                color: {
-                    switch (buttonState) {
-                    case "installed":
-                        return root.allowUninstall && installMouseArea.containsMouse ? Theme.withAlpha(Theme.error, 0.15) : Theme.surfaceVariant;
-                    case "incompatible":
-                        return Theme.withAlpha(Theme.warning, 0.15);
-                    default:
-                        return Theme.primary;
-                    }
-                }
-                opacity: buttonState === "available" && installMouseArea.containsMouse ? 0.85 : 1
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    size: 15
-                    name: {
-                        switch (installAction.buttonState) {
-                        case "installed":
-                            return root.allowUninstall && installMouseArea.containsMouse ? "delete" : "check";
-                        case "incompatible":
-                            return "warning";
-                        default:
-                            return "download";
-                        }
-                    }
-                    color: {
-                        switch (installAction.buttonState) {
-                        case "installed":
-                            return root.allowUninstall && installMouseArea.containsMouse ? Theme.error : Theme.surfaceText;
-                        case "incompatible":
-                            return Theme.warning;
-                        default:
-                            return Theme.surface;
-                        }
-                    }
-                }
-
-                MouseArea {
-                    id: installMouseArea
-
-                    readonly property bool canUninstall: installAction.buttonState === "installed" && root.allowUninstall
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: installAction.buttonState === "available" || canUninstall
-                    onClicked: canUninstall ? root.uninstallRequested() : root.installRequested()
-                }
+                enabled: !root.busy && (root.installed ? root.allowUninstall : root.compatible)
+                iconName: root.busy ? "hourglass_empty" : root.installed ? (root.allowUninstall ? "delete" : "check") : root.compatible ? "download" : "warning"
+                iconColor: root.installed && root.allowUninstall ? Theme.error : Theme.primary
+                tooltipText: root.installed ? (root.allowUninstall ? I18n.tr("Uninstall") : I18n.tr("Installed")) : root.compatible ? I18n.tr("Install") : I18n.tr("Requires %1", "version requirement").arg(root.plugin.requires_dms || "")
+                onClicked: root.installed ? root.uninstallRequested() : root.installRequested()
             }
         }
 
@@ -239,7 +150,7 @@ Rectangle {
             width: parent.width
             text: I18n.tr("by %1", "author attribution").arg(root.plugin.author || I18n.tr("Unknown", "unknown author"))
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.outline
+            color: Theme.onSurfaceVariant
             elide: Text.ElideRight
             maximumLineCount: 1
         }

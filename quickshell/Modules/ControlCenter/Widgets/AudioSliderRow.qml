@@ -1,89 +1,56 @@
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 
-Row {
+CcSliderRow {
     id: root
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
+    property var node: AudioService.sink
+    property bool isInput: false
+    property real maxVolume: 100
+    property bool playFeedback: false
 
-    property var defaultSink: AudioService.sink
-    property color sliderTrackColor: "transparent"
-    property real sliderTrackOpacity: Theme.ccSliderTrackOpacity
+    readonly property var audio: node?.audio ?? null
+    readonly property real volumePercent: audio ? Math.round(audio.volume * 100) : 0
+    readonly property bool audible: !!audio && !audio.muted && audio.volume > 0
 
-    height: 40
-    spacing: 0
+    iconName: {
+        if (!isInput)
+            return AudioService.volumeIconName(node);
+        return audible ? "mic" : "mic_off";
+    }
+    sliderLabel: isInput ? I18n.tr("Input Volume") : I18n.tr("Volume")
+    insetIconClickable: audio !== null && interactive
+    insetIconLabel: audio?.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
+    sliderEnabled: audio !== null
+    minimum: 0
+    maximum: maxVolume
+    unit: "%"
+    valueOverride: volumePercent
 
-    Rectangle {
-        width: Theme.iconSize + Theme.spacingS * 2
-        height: Theme.iconSize + Theme.spacingS * 2
-        anchors.verticalCenter: parent.verticalCenter
-        radius: (Theme.iconSize + Theme.spacingS * 2) / 2
-        color: iconArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primary, 0)
-
-        DankRipple {
-            id: iconRipple
-            cornerRadius: parent.radius
-        }
-
-        MouseArea {
-            id: iconArea
-            anchors.fill: parent
-            visible: defaultSink !== null
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onPressed: mouse => iconRipple.trigger(mouse.x, mouse.y)
-            onClicked: {
-                if (defaultSink?.audio) {
-                    SessionData.suppressOSDTemporarily();
-                    defaultSink.audio.muted = !defaultSink.audio.muted;
-                }
-            }
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            name: AudioService.volumeIconName(defaultSink)
-            size: Theme.iconSize
-            color: defaultSink?.audio && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
-        }
+    onInsetIconClicked: {
+        if (!audio)
+            return;
+        SessionData.suppressOSDTemporarily();
+        audio.muted = !audio.muted;
     }
 
-    DankSlider {
-        id: volumeSlider
-
-        readonly property real actualVolumePercent: defaultSink?.audio ? Math.round(defaultSink.audio.volume * 100) : 0
-
-        anchors.verticalCenter: parent.verticalCenter
-        width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
-        enabled: defaultSink?.audio != null
-        minimum: 0
-        maximum: AudioService.sinkMaxVolume
-        showValue: true
-        unit: "%"
-        valueOverride: actualVolumePercent
-        thumbOutlineColor: Theme.surfaceContainer
-        trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.ccSliderTrackColor
-        trackOpacity: root.sliderTrackOpacity
-
-        onSliderValueChanged: function (newValue) {
-            if (defaultSink?.audio) {
-                SessionData.suppressOSDTemporarily();
-                defaultSink.audio.volume = newValue / 100.0;
-                if (newValue > 0 && defaultSink.audio.muted) {
-                    defaultSink.audio.muted = false;
-                }
-                AudioService.playVolumeChangeSoundIfEnabled();
-            }
-        }
+    onSliderValueChanged: newValue => {
+        if (!audio)
+            return;
+        SessionData.suppressOSDTemporarily();
+        audio.volume = newValue / 100;
+        if (newValue > 0 && audio.muted)
+            audio.muted = false;
+        if (playFeedback)
+            AudioService.playVolumeChangeSoundIfEnabled();
     }
 
     Binding {
-        target: volumeSlider
+        target: root.slider
         property: "value"
-        value: defaultSink?.audio ? Math.min(AudioService.sinkMaxVolume, Math.round(defaultSink.audio.volume * 100)) : 0
-        when: !volumeSlider.isDragging
+        value: Math.min(root.maxVolume, root.volumePercent)
+        restoreMode: Binding.RestoreNone
+        when: !root.isDragging
     }
 }

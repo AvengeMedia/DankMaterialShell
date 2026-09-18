@@ -3,16 +3,16 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../Common/PamStack.js" as PamStack
 
-FocusScope {
+DankDialog {
     id: root
 
     property var currentFlow: PolkitService.agent?.flow
     property string passwordInput: ""
     property bool isLoading: false
     property bool awaitingFprintForPassword: false
-    property var windowControls: null
-    readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
+    readonly property string inputPromptLabel: (root.currentFlow?.inputPrompt ?? "").replace(/[\s:]+$/, "")
 
     property string polkitEtcPamText: ""
     property string polkitLibPamText: ""
@@ -23,42 +23,21 @@ FocusScope {
         const polkitText = polkitEtcPamText !== "" ? polkitEtcPamText : polkitLibPamText;
         if (!polkitText)
             return false;
-        return pamModuleEnabled(polkitText, "pam_fprintd") || (polkitText.includes("system-auth") && pamModuleEnabled(systemAuthPamText, "pam_fprintd")) || (polkitText.includes("common-auth") && pamModuleEnabled(commonAuthPamText, "pam_fprintd")) || (polkitText.includes("password-auth") && pamModuleEnabled(passwordAuthPamText, "pam_fprintd"));
+        return PamStack.moduleEnabled(polkitText, "pam_fprintd") || (polkitText.includes("system-auth") && PamStack.moduleEnabled(systemAuthPamText, "pam_fprintd")) || (polkitText.includes("common-auth") && PamStack.moduleEnabled(commonAuthPamText, "pam_fprintd")) || (polkitText.includes("password-auth") && PamStack.moduleEnabled(passwordAuthPamText, "pam_fprintd"));
     }
 
+    signal cancelRequested
     signal closeRequested
     signal authenticationSucceeded
 
     focus: true
 
-    Keys.onEscapePressed: event => {
-        cancelAuth();
-        event.accepted = true;
-    }
-
-    function stripPamComment(line) {
-        if (!line)
-            return "";
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith("#"))
-            return "";
-        const hashIdx = trimmed.indexOf("#");
-        if (hashIdx >= 0)
-            return trimmed.substring(0, hashIdx).trim();
-        return trimmed;
-    }
-
-    function pamModuleEnabled(pamText, moduleName) {
-        if (!pamText || !moduleName)
-            return false;
-        const lines = pamText.split(/\r?\n/);
-        for (let i = 0; i < lines.length; i++) {
-            const line = stripPamComment(lines[i]);
-            if (line && line.includes(moduleName))
-                return true;
-        }
-        return false;
-    }
+    title: I18n.tr("Authentication Required")
+    supportingText: root.currentFlow?.message ?? ""
+    iconName: "lock"
+    acceptEnabled: !root.isLoading
+    onRejected: cancelAuth()
+    onAccepted: submitAuth()
 
     function focusPasswordField() {
         passwordField.forceActiveFocus();
@@ -88,14 +67,8 @@ FocusScope {
     }
 
     function cancelAuth() {
-        if (isLoading)
-            return;
         awaitingFprintForPassword = false;
-        if (currentFlow) {
-            currentFlow.cancelAuthenticationRequest();
-            return;
-        }
-        closeRequested();
+        cancelRequested();
     }
 
     Connections {
@@ -164,210 +137,55 @@ FocusScope {
         onLoadFailed: root.passwordAuthPamText = ""
     }
 
-    Item {
-        id: headerSection
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: Theme.spacingM
-        height: Math.max(titleColumn.implicitHeight, windowButtonRow.implicitHeight)
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.windowControls !== null
-            onPressed: {
-                if (root.windowControls)
-                    root.windowControls.tryStartMove();
-            }
-            onDoubleClicked: {
-                if (root.windowControls)
-                    root.windowControls.tryToggleMaximize();
-            }
-        }
-
-        Column {
-            id: titleColumn
-            anchors.left: parent.left
-            anchors.right: windowButtonRow.left
-            anchors.rightMargin: Theme.spacingM
-            spacing: Theme.spacingXS
-
-            StyledText {
-                text: I18n.tr("Authentication Required")
-                font.pixelSize: Theme.fontSizeLarge
-                color: Theme.surfaceText
-                font.weight: Font.Medium
-            }
-
-            StyledText {
-                text: root.currentFlow?.message ?? ""
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-                width: parent.width
-                wrapMode: Text.Wrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
-                visible: text !== ""
-            }
-
-            StyledText {
-                text: root.currentFlow?.supplementaryMessage ?? ""
-                font.pixelSize: Theme.fontSizeSmall
-                color: (root.currentFlow?.supplementaryIsError ?? false) ? Theme.error : Theme.surfaceTextMedium
-                width: parent.width
-                wrapMode: Text.Wrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
-                opacity: (root.currentFlow?.supplementaryIsError ?? false) ? 1 : 0.8
-                visible: text !== ""
-            }
-        }
-
-        Row {
-            id: windowButtonRow
-            anchors.right: parent.right
-            anchors.top: parent.top
-            spacing: Theme.spacingXS
-
-            DankActionButton {
-                visible: root.windowControls?.supported === true && root.windowControls?.canMaximize === true
-                iconName: (root.windowControls?.targetWindow?.maximized ?? false) ? "fullscreen_exit" : "fullscreen"
-                iconSize: Theme.iconSize - 4
-                iconColor: Theme.surfaceText
-                onClicked: {
-                    if (root.windowControls)
-                        root.windowControls.tryToggleMaximize();
-                }
-            }
-
-            DankActionButton {
-                iconName: "close"
-                iconSize: Theme.iconSize - 4
-                iconColor: Theme.surfaceText
-                enabled: !root.isLoading
-                opacity: enabled ? 1 : 0.5
-                onClicked: root.cancelAuth()
-            }
-        }
+    StyledText {
+        text: root.currentFlow?.supplementaryMessage ?? ""
+        font.pixelSize: Theme.fontSizeSmall
+        color: (root.currentFlow?.supplementaryIsError ?? false) ? Theme.error : Theme.onSurfaceVariant
+        width: parent.width
+        wrapMode: Text.Wrap
+        visible: text !== ""
     }
 
-    Column {
-        id: bottomSection
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: Theme.spacingM
-        spacing: Theme.spacingS
+    DankTextField {
+        id: passwordField
 
-        StyledText {
-            text: root.currentFlow?.inputPrompt ?? ""
-            font.pixelSize: Theme.fontSizeMedium
-            color: Theme.surfaceText
-            width: parent.width
-            visible: text !== ""
-        }
+        width: parent.width
+        outlined: true
+        controlHeight: Theme.fieldHeightLarge
+        labelText: root.inputPromptLabel || I18n.tr("Password")
+        isError: PolkitService.authFailed
+        supportingText: isError ? I18n.tr("Authentication failed - try again") : ""
+        leftIconName: root.polkitPamHasFprint ? "fingerprint" : "lock"
+        leftIconSize: Theme.iconSizeSmall
+        leftIconColor: Theme.primary
+        leftIconFocusedColor: Theme.primary
+        font.pixelSize: Theme.fontSizeMedium
+        textColor: Theme.surfaceText
+        text: root.passwordInput
+        showPasswordToggle: !(root.currentFlow?.responseVisible ?? false)
+        echoMode: (root.currentFlow?.responseVisible ?? false) || passwordVisible ? TextInput.Normal : TextInput.Password
+        placeholderText: ""
+        enabled: !root.isLoading
+        onTextEdited: root.passwordInput = text
+        onAccepted: root.submitAuth()
+    }
 
-        DankTextField {
-            id: passwordField
-
-            width: parent.width
-            height: root.inputFieldHeight
-            leftIconName: root.polkitPamHasFprint ? "fingerprint" : ""
-            leftIconSize: 20
-            leftIconColor: Theme.primary
-            leftIconFocusedColor: Theme.primary
-            opacity: root.isLoading ? 0.5 : 1
-            font.pixelSize: Theme.fontSizeMedium
-            textColor: Theme.surfaceText
-            text: root.passwordInput
-            showPasswordToggle: !(root.currentFlow?.responseVisible ?? false)
-            echoMode: (root.currentFlow?.responseVisible ?? false) || passwordVisible ? TextInput.Normal : TextInput.Password
-            placeholderText: ""
+    actions: [
+        DankButton {
+            maximumWidth: root.actionWidth
+            wrapText: true
+            text: I18n.tr("Cancel")
+            backgroundColor: "transparent"
+            textColor: Theme.primary
+            onClicked: root.cancelAuth()
+        },
+        DankButton {
+            maximumWidth: root.actionWidth
+            wrapText: true
+            text: I18n.tr("Authenticate", "verb, polkit password dialog submit button")
             enabled: !root.isLoading
-            onTextEdited: root.passwordInput = text
-            onAccepted: root.submitAuth()
+            busy: root.isLoading
+            onClicked: root.submitAuth()
         }
-
-        StyledText {
-            text: I18n.tr("Authentication failed - try again")
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.error
-            width: parent.width
-            visible: PolkitService.authFailed
-        }
-
-        Item {
-            width: parent.width
-            height: 36
-
-            Row {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                Rectangle {
-                    width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
-                    height: 36
-                    radius: Theme.cornerRadius
-                    color: cancelArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
-                    border.color: Theme.surfaceVariantAlpha
-                    border.width: 1
-                    enabled: !root.isLoading
-                    opacity: enabled ? 1 : 0.5
-
-                    StyledText {
-                        id: cancelText
-                        anchors.centerIn: parent
-                        text: I18n.tr("Cancel")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
-
-                    MouseArea {
-                        id: cancelArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        enabled: parent.enabled
-                        onClicked: root.cancelAuth()
-                    }
-                }
-
-                Rectangle {
-                    width: Math.max(80, authText.contentWidth + Theme.spacingM * 2)
-                    height: 36
-                    radius: Theme.cornerRadius
-                    color: authArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                    enabled: !root.isLoading
-                    opacity: enabled ? 1 : 0.5
-
-                    StyledText {
-                        id: authText
-                        anchors.centerIn: parent
-                        text: I18n.tr("Authenticate")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.primaryText
-                        font.weight: Font.Medium
-                    }
-
-                    MouseArea {
-                        id: authArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        enabled: parent.enabled
-                        onClicked: root.submitAuth()
-                    }
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
-                        }
-                    }
-                }
-            }
-        }
-    }
+    ]
 }

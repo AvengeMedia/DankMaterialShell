@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -35,9 +36,7 @@ type MangoWCParser struct {
 	configDir          string
 	currentSource      string
 	dmsBindsExists     bool
-	dmsBindsIncluded   bool
-	includeCount       int
-	dmsIncludePos      int
+	walker             *configfrag.Walker
 	bindsAfterDMS      int
 	dmsBindKeys        map[string]bool
 	configBindKeys     map[string]bool
@@ -53,7 +52,7 @@ func NewMangoWCParser(configDir string) *MangoWCParser {
 		contentLines:       []string{},
 		readingLine:        0,
 		configDir:          configDir,
-		dmsIncludePos:      -1,
+		walker:             configfrag.NewWalker(isDMSMangoBindsSourcePath),
 		dmsBindKeys:        make(map[string]bool),
 		configBindKeys:     make(map[string]bool),
 		conflictingConfigs: make(map[string]*MangoWCKeyBinding),
@@ -271,47 +270,20 @@ func ParseMangoWCKeys(path string) ([]MangoWCKeyBinding, error) {
 type MangoWCParseResult struct {
 	Keybinds           []MangoWCKeyBinding
 	DMSBindsIncluded   bool
-	DMSStatus          *MangoWCDMSStatus
+	DMSStatus          *configfrag.Status
 	ConflictingConfigs map[string]*MangoWCKeyBinding
 }
 
-type MangoWCDMSStatus struct {
-	Exists          bool
-	Included        bool
-	IncludePosition int
-	TotalIncludes   int
-	BindsAfterDMS   int
-	Effective       bool
-	OverriddenBy    int
-	StatusMessage   string
+var mangowcBindsMessages = configfrag.Messages{
+	Missing:     "dms/binds.conf does not exist",
+	NotIncluded: "dms/binds.conf is not sourced in config",
+	Overridden:  "Some DMS binds may be overridden by config binds",
+	Active:      "DMS binds are active",
 }
 
-func (p *MangoWCParser) buildDMSStatus() *MangoWCDMSStatus {
-	status := &MangoWCDMSStatus{
-		Exists:          p.dmsBindsExists,
-		Included:        p.dmsBindsIncluded,
-		IncludePosition: p.dmsIncludePos,
-		TotalIncludes:   p.includeCount,
-		BindsAfterDMS:   p.bindsAfterDMS,
-	}
-
-	switch {
-	case !p.dmsBindsExists:
-		status.Effective = false
-		status.StatusMessage = "dms/binds.conf does not exist"
-	case !p.dmsBindsIncluded:
-		status.Effective = false
-		status.StatusMessage = "dms/binds.conf is not sourced in config"
-	case p.bindsAfterDMS > 0:
-		status.Effective = true
-		status.OverriddenBy = p.bindsAfterDMS
-		status.StatusMessage = "Some DMS binds may be overridden by config binds"
-	default:
-		status.Effective = true
-		status.StatusMessage = "DMS binds are active"
-	}
-
-	return status
+func (p *MangoWCParser) buildDMSStatus() *configfrag.Status {
+	status := configfrag.BuildStatus(p.walker.Scan(), p.dmsBindsExists, p.bindsAfterDMS, "", false, mangowcBindsMessages)
+	return &status
 }
 
 func (p *MangoWCParser) formatBindKey(kb *MangoWCKeyBinding) string {
@@ -447,38 +419,22 @@ func (p *MangoWCParser) parseFileWithSource(filePath string) ([]MangoWCKeyBindin
 	return keybinds, nil
 }
 
+func isDMSMangoBindsSourcePath(sourcePath string) bool {
+	return sourcePath == "dms/binds.conf" || sourcePath == "./dms/binds.conf" || strings.HasSuffix(sourcePath, "/dms/binds.conf")
+}
+
 func (p *MangoWCParser) handleSource(line, baseDir string, keybinds *[]MangoWCKeyBinding) {
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) < 2 {
-		return
-	}
-
-	sourcePath := strings.TrimSpace(parts[1])
-	isDMSSource := sourcePath == "dms/binds.conf" || sourcePath == "./dms/binds.conf" || strings.HasSuffix(sourcePath, "/dms/binds.conf")
-
-	p.includeCount++
-	if isDMSSource {
-		p.dmsBindsIncluded = true
-		p.dmsIncludePos = p.includeCount
+	matched := p.walker.IncludeAssignment(baseDir, line, func(absPath string) error {
+		includedBinds, err := p.parseFileWithSource(absPath)
+		if err != nil {
+			return err
+		}
+		*keybinds = append(*keybinds, includedBinds...)
+		return nil
+	})
+	if matched {
 		p.dmsProcessed = true
 	}
-
-	expanded, err := utils.ExpandPath(sourcePath)
-	if err != nil {
-		return
-	}
-
-	fullPath := expanded
-	if !filepath.IsAbs(expanded) {
-		fullPath = filepath.Join(baseDir, expanded)
-	}
-
-	includedBinds, err := p.parseFileWithSource(fullPath)
-	if err != nil {
-		return
-	}
-
-	*keybinds = append(*keybinds, includedBinds...)
 }
 
 func (p *MangoWCParser) parseDMSBindsDirectly(dmsBindsPath string) []MangoWCKeyBinding {
@@ -576,7 +532,7 @@ func ParseMangoWCKeysWithDMS(path string) (*MangoWCParseResult, error) {
 
 	return &MangoWCParseResult{
 		Keybinds:           keybinds,
-		DMSBindsIncluded:   parser.dmsBindsIncluded,
+		DMSBindsIncluded:   parser.walker.Included(),
 		DMSStatus:          parser.buildDMSStatus(),
 		ConflictingConfigs: parser.conflictingConfigs,
 	}, nil

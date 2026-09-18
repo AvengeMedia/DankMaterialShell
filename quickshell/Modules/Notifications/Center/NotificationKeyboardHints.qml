@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.Notifications
 import qs.Widgets
 
 Rectangle {
@@ -7,11 +8,11 @@ Rectangle {
 
     property bool showHints: false
 
-    height: 80
-    radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
+    height: Theme.listItemTwoLineHeight + Theme.spacingS
+    radius: NotificationMetrics.menuRadius
+    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     border.color: Theme.primary
-    border.width: 2
+    border.width: Theme.outlineWidthFocused
     opacity: showHints ? 1 : 0
     z: 100
 

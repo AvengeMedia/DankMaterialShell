@@ -1,7 +1,9 @@
 import QtQuick
+import Quickshell.Io
 import qs.Common
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import qs.Modules.DankDash
 import qs.Services
 
 Item {
@@ -9,298 +11,226 @@ Item {
 
     property var desktopApps: []
     property var parentModal: null
+    property bool mprisProxyRunning: false
+    readonly property bool bluetoothMprisEnabled: SettingsData.bluetoothMprisEnabled
 
-    Component.onCompleted: {
-        desktopApps = AppSearchService.getVisibleApplications() || [];
+    function addExcludedPlayer() {
+        const name = excludeEditor.value.trim();
+        if (!name)
+            return;
+        SettingsData.addMediaExcludePlayer(name);
+        excludeEditor.value = "";
+    }
+
+    function checkMprisProxy(): void {
+        if (!root.visible || !root.bluetoothMprisEnabled) {
+            mprisProxyRunning = false;
+            return;
+        }
+        if (!mprisProxyCheck.running)
+            mprisProxyCheck.running = true;
+    }
+
+    Component.onCompleted: desktopApps = AppSearchService.getVisibleApplications() || []
+    onVisibleChanged: checkMprisProxy()
+    onBluetoothMprisEnabledChanged: checkMprisProxy()
+
+    Process {
+        id: mprisProxyCheck
+        command: ["sh", "-c", "systemctl --user --quiet is-active mpris-proxy.service 2>/dev/null || pgrep -U \"$(id -u)\" -x mpris-proxy >/dev/null"]
+        running: false
+        onExited: exitCode => root.mprisProxyRunning = root.visible && root.bluetoothMprisEnabled && exitCode === 0
     }
 
     Component.onDestruction: {
         desktopApps = [];
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            width: parent.width
+            iconName: "music_note"
+            title: I18n.tr("General")
+            settingKey: "mediaPlayer"
 
-            SettingsCard {
-                width: parent.width
-                iconName: "music_note"
-                title: I18n.tr("General")
-                settingKey: "mediaPlayer"
+            SettingsToggleRow {
+                settingKey: "mediaScrollTitle"
+                tags: ["scroll", "title", "marquee"]
+                resetKeys: ["scrollTitleEnabled"]
+                text: I18n.tr("Scroll song title")
+                checked: SettingsData.scrollTitleEnabled
+                onToggled: checked => SettingsData.set("scrollTitleEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "mediaWaveProgress"
-                    tags: ["wave", "progress", "animated"]
-                    text: I18n.tr("Wave Progress Bars")
-                    description: I18n.tr("Use animated wave progress bars for media playback")
-                    checked: SettingsData.waveProgressEnabled
-                    onToggled: checked => SettingsData.set("waveProgressEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "mediaVisualizer"
+                tags: ["visualizer", "cava", "spectrum"]
+                resetKeys: ["audioVisualizerEnabled"]
+                text: I18n.tr("Audio visualizer")
+                checked: SettingsData.audioVisualizerEnabled
+                onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "mediaScrollTitle"
-                    tags: ["scroll", "title", "marquee"]
-                    text: I18n.tr("Scroll song title")
-                    description: I18n.tr("Scroll title if it doesn't fit in widget")
-                    checked: SettingsData.scrollTitleEnabled
-                    onToggled: checked => SettingsData.set("scrollTitleEnabled", checked)
-                }
+            SettingsToggleRow {
+                settingKey: "bluetoothMpris"
+                tags: ["bluetooth", "headphones", "media", "mpris", "avrcp"]
+                resetKeys: ["bluetoothMprisEnabled"]
+                text: I18n.tr("Bluetooth media controls", "Title for the setting that routes Bluetooth headset media buttons through DMS")
+                description: root.mprisProxyRunning ? I18n.tr("mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service", "Warning shown when the legacy BlueZ MPRIS proxy conflicts with DMS Bluetooth media controls") : I18n.tr("Route Bluetooth headset controls to the active DMS media player", "Description of how Bluetooth headset media buttons select a player")
+                descriptionColor: root.mprisProxyRunning ? Theme.error : Theme.surfaceVariantText
+                checked: SettingsData.bluetoothMprisEnabled
+                onToggled: checked => SettingsData.set("bluetoothMprisEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    settingKey: "mediaVisualizer"
-                    tags: ["visualizer", "cava", "spectrum"]
-                    text: I18n.tr("Audio Visualizer")
-                    description: I18n.tr("Show cava audio visualizer in media widget")
-                    checked: SettingsData.audioVisualizerEnabled
-                    onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "mediaAdaptiveWidth"
-                    tags: ["adaptive", "width", "shrink"]
-                    text: I18n.tr("Adaptive Media Width")
-                    description: I18n.tr("Shrink the media widget to fit shorter song titles while still respecting the configured maximum size")
-                    checked: SettingsData.mediaAdaptiveWidthEnabled
-                    onToggled: checked => SettingsData.set("mediaAdaptiveWidthEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "mediaWallpaper"
-                    tags: ["wallpaper", "art", "album", "backdrop", "background", "blur"]
-                    text: I18n.tr("Wallpaper")
-                    description: I18n.tr("Blur the album art behind the media player")
-                    checked: SettingsData.mediaWallpaperEnabled
-                    onToggled: checked => SettingsData.set("mediaWallpaperEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "mediaAlbumArtAccent"
-                    tags: ["album", "art", "accent", "colors"]
-                    text: I18n.tr("Use album art accent")
-                    description: I18n.tr("Use colors extracted from album art instead of system theme colors")
-                    checked: SettingsData.mediaUseAlbumArtAccent
-                    onToggled: checked => SettingsData.set("mediaUseAlbumArtAccent", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "appleMusicAnimatedArtEnabled"
-                    tags: ["apple", "animated", "video", "artwork", "cover"]
-                    text: I18n.tr("Apple Music animated covers")
-                    description: I18n.tr("Show looping video album artwork from Apple Music when available. Sends the playing artist and album name to Apple.")
-                    checked: SettingsData.appleMusicAnimatedArtEnabled
-                    onToggled: checked => SettingsData.set("appleMusicAnimatedArtEnabled", checked)
-                }
-
-                SettingsDropdownRow {
-                    property var scrollOptsInternal: ["volume", "song", "nothing"]
-                    property var scrollOptsDisplay: [I18n.tr("Change Volume", "media scroll wheel option"), I18n.tr("Change Song", "media scroll wheel option"), I18n.tr("Nothing", "media scroll wheel option")]
-
-                    text: I18n.tr("Scroll Wheel")
-                    description: I18n.tr("Scroll wheel behavior on media widget")
-                    settingKey: "audioScrollMode"
-                    tags: ["media", "music", "scroll"]
-                    options: scrollOptsDisplay
-                    currentValue: {
-                        const idx = scrollOptsInternal.indexOf(SettingsData.audioScrollMode);
-                        return idx >= 0 ? scrollOptsDisplay[idx] : scrollOptsDisplay[0];
-                    }
-                    onValueChanged: value => {
-                        const idx = scrollOptsDisplay.indexOf(value);
-                        if (idx >= 0)
-                            SettingsData.set("audioScrollMode", scrollOptsInternal[idx]);
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: audioWheelScrollAmountColumn.height
-                    visible: SettingsData.audioScrollMode == "volume"
-                    opacity: visible ? 1 : 0
-
-                    Column {
-                        id: audioWheelScrollAmountColumn
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingL
-                        spacing: Theme.spacingS
-
-                        StyledText {
-                            anchors.left: parent.left
-                            text: I18n.tr("Adjust volume per scroll indent")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            font.weight: Font.Medium
-                            horizontalAlignment: Text.AlignLeft
-                        }
-
-                        DankTextField {
-                            anchors.left: parent.left
-                            width: 100
-                            height: 28
-                            placeholderText: "5"
-                            text: SettingsData.audioWheelScrollAmount
-                            maximumLength: 2
-                            font.pixelSize: Theme.fontSizeSmall
-                            topPadding: Theme.spacingXS
-                            bottomPadding: Theme.spacingXS
-                            onEditingFinished: SettingsData.set("audioWheelScrollAmount", parseInt(text, 10))
-                        }
-                    }
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
-                        }
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "mediaDeviceScrollVolume"
-                    tags: ["device", "scroll", "volume"]
-                    text: I18n.tr("Device list scroll volume")
-                    description: I18n.tr("Allow adjusting device volume by scrolling on the right half of items in the device list")
-                    checked: SettingsData.audioDeviceScrollVolumeEnabled
-                    onToggled: checked => SettingsData.set("audioDeviceScrollVolumeEnabled", checked)
+            SettingsNavRow {
+                title: I18n.tr("Dashboard")
+                hint: I18n.tr("Media")
+                iconName: "dashboard"
+                onClicked: {
+                    root.parentModal?.navigateTo("dank_dash");
+                    SettingsSearchService.navigateToSection("dashOptions:media");
                 }
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "do_not_disturb_on"
-                title: I18n.tr("Excluded Players")
-                settingKey: "mediaExcludePlayers"
-                tags: ["media", "music", "exclude", "ignore", "player", "mpris"]
+            SettingsRow {
+                id: volumeStepRow
+                resetKeys: ["audioWheelScrollAmount"]
+                title: I18n.tr("Volume step")
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    StyledText {
-                        text: I18n.tr("Prevent specific applications from displaying in the media controllers (e.g., browser audio streams, background tools). Matches player identity or desktop file name case-insensitively.")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
+                DankTextField {
+                    outlined: true
+                    leftIconName: "volume_up"
+                    width: Theme.fieldHeight * 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    Accessible.name: volumeStepRow.title
+                    text: SettingsData.audioWheelScrollAmount.toString()
+                    maximumLength: 2
+                    validator: IntValidator {
+                        bottom: 0
+                        top: 99
                     }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        DankTextField {
-                            id: newExcludePlayerField
-                            width: parent.width - addBtn.width - selectAppBtn.width - Theme.spacingS * 2
-                            height: 36
-                            placeholderText: I18n.tr("App name or identity (e.g., firefox)")
-                            font.pixelSize: Theme.fontSizeSmall
-                            onAccepted: {
-                                if (text.trim() !== "") {
-                                    SettingsData.addMediaExcludePlayer(text.trim());
-                                    text = "";
-                                }
-                            }
-                        }
-
-                        DankActionButton {
-                            id: addBtn
-                            buttonSize: 36
-                            iconName: "add"
-                            iconSize: 20
-                            backgroundColor: Theme.primary
-                            iconColor: Theme.onPrimary
-                            onClicked: {
-                                if (newExcludePlayerField.text.trim() !== "") {
-                                    SettingsData.addMediaExcludePlayer(newExcludePlayerField.text.trim());
-                                    newExcludePlayerField.text = "";
-                                }
-                            }
-                        }
-
-                        DankActionButton {
-                            id: selectAppBtn
-                            buttonSize: 36
-                            iconName: "apps"
-                            iconSize: 20
-                            backgroundColor: Theme.floatingWindowFieldColor
-                            iconColor: Theme.primary
-                            onClicked: appBrowserPopup.show()
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        Repeater {
-                            model: SettingsData.mediaExcludePlayers
-
-                            delegate: Rectangle {
-                                width: parent.width
-                                height: 48
-                                radius: Theme.cornerRadius
-                                color: Theme.floatingWindowFieldColor
-
-                                Row {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: Theme.spacingM
-                                    anchors.rightMargin: Theme.spacingS
-                                    spacing: Theme.spacingM
-
-                                    Row {
-                                        width: parent.width - deleteBtn.width - Theme.spacingS
-                                        height: parent.height
-                                        spacing: Theme.spacingS
-
-                                        DankIcon {
-                                            name: "music_off"
-                                            size: 20
-                                            color: Theme.surfaceVariantText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
-                                        StyledText {
-                                            text: modelData
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-                                    }
-
-                                    DankActionButton {
-                                        id: deleteBtn
-                                        buttonSize: 32
-                                        iconName: "delete"
-                                        iconSize: 18
-                                        iconColor: Theme.error
-                                        backgroundColor: "transparent"
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        onClicked: SettingsData.removeMediaExcludePlayer(index)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    StyledText {
-                        visible: !SettingsData.mediaExcludePlayers || SettingsData.mediaExcludePlayers.length === 0
-                        text: I18n.tr("No excluded players configured")
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.italic: true
-                        color: Theme.surfaceVariantText
-                        horizontalAlignment: Text.AlignHCenter
-                        width: parent.width
-                        topPadding: Theme.spacingS
+                    onEditingFinished: {
+                        const value = parseInt(text, 10);
+                        if (!isNaN(value))
+                            SettingsData.set("audioWheelScrollAmount", value);
                     }
                 }
+            }
+        }
+
+        SettingsCard {
+            title: I18n.tr("Lyrics", "Media player lyrics button")
+            settingKey: "mediaLyrics"
+            tags: ["lyrics", "music", "karaoke", "synced", "word", "timing"]
+
+            SettingsToggleRow {
+                settingKey: "mediaLyricsEnabled"
+                text: I18n.tr("Lyrics", "Media player lyrics button")
+                description: I18n.tr("Sends the playing track, artist and album name to enabled lyrics providers")
+                checked: DashRegistry.option("media", "lyrics") === true
+                modified: checked !== MediaOptions.defaults.lyrics
+                onToggled: checked => DashRegistry.setOption("media", "lyrics", checked)
+            }
+        }
+
+        SettingsCard {
+            title: I18n.tr("Lyrics providers", "Lyrics source priority settings")
+            settingKey: "mediaLyricsProviders"
+            tags: ["lyrics", "provider", "priority", "order", "source", "lrclib", "better lyrics", "unison", "lyricsplus"]
+
+            headerActions: DankActionButton {
+                iconName: "restart_alt"
+                tooltipText: I18n.tr("Reset to default")
+                enabled: !SettingsData.isDefault(["mediaLyricsProviders"])
+                onClicked: SettingsData.resetToDefault(["mediaLyricsProviders"])
+            }
+
+            SettingsRow {
+                title: I18n.tr("Drag to reorder")
+                subtitle: I18n.tr("Higher providers take priority. Turn all off to use local lyrics only.")
+            }
+
+            SettingsReorderList {
+                id: lyricsProviderList
+                model: MediaOptions.lyricsProviderOrder.split(",")
+                onReordered: indices => MediaOptions.reorderLyricsProviders(indices)
+
+                delegate: SettingsReorderRow {
+                    id: providerRow
+                    required property string modelData
+                    readonly property var provider: MediaOptions.lyricsProviders.find(provider => provider.id === modelData)
+                    reorderList: lyricsProviderList
+                    title: provider?.text ?? ""
+                    clickable: true
+                    onClicked: MediaOptions.setLyricsProviderEnabled(modelData, !provider?.enabled)
+
+                    DankToggle {
+                        hideText: true
+                        Accessible.name: providerRow.title
+                        checked: providerRow.provider?.enabled ?? false
+                        onToggled: checked => MediaOptions.setLyricsProviderEnabled(providerRow.modelData, checked)
+                    }
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "do_not_disturb_on"
+            title: I18n.tr("Excluded players")
+            settingKey: "mediaExcludePlayers"
+            tags: ["media", "music", "exclude", "ignore", "player", "mpris"]
+
+            SettingsTextFieldRow {
+                id: excludeEditor
+                leftIconName: "apps"
+                text: I18n.tr("Name")
+                description: I18n.tr("Matches player identity or desktop file name, case-insensitive")
+                placeholderText: I18n.tr("App name or identity (e.g., firefox)")
+                onAccepted: root.addExcludedPlayer()
+
+                actions: [
+                    DankIconButton {
+                        variant: "filled"
+                        iconName: "add"
+                        Accessible.name: I18n.tr("Add")
+                        enabled: excludeEditor.value.trim() !== ""
+                        onClicked: root.addExcludedPlayer()
+                    },
+                    DankIconButton {
+                        iconName: "apps"
+                        tooltipText: I18n.tr("Browse")
+                        onClicked: appBrowserPopup.show()
+                    }
+                ]
+            }
+
+            Repeater {
+                model: SettingsData.mediaExcludePlayers
+
+                delegate: SettingsRow {
+                    required property string modelData
+                    required property int index
+
+                    title: modelData
+                    iconName: "music_off"
+
+                    DankActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "delete"
+                        iconColor: Theme.error
+                        Accessible.name: I18n.tr("Remove")
+                        onClicked: SettingsData.removeMediaExcludePlayer(index)
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: !SettingsData.mediaExcludePlayers?.length
+                title: I18n.tr("No excluded players configured")
+                titleColor: Theme.surfaceVariantText
             }
         }
     }

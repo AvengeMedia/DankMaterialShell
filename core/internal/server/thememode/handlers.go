@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if manager == nil {
 		models.RespondError(conn, req.ID, "theme mode manager not initialized")
 		return
@@ -35,11 +36,11 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleSetEnabled(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetEnabled(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	enabled, err := params.Bool(req.Params, "enabled")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -50,7 +51,7 @@ func handleSetEnabled(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "theme auto enabled set"})
 }
 
-func handleSetMode(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetMode(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	mode, err := params.String(req.Params, "mode")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -66,7 +67,7 @@ func handleSetMode(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "theme auto mode set"})
 }
 
-func handleSetSchedule(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetSchedule(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	startHour, err := params.Int(req.Params, "startHour")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -97,7 +98,7 @@ func handleSetSchedule(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleSetLocation(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetLocation(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	lat, err := params.Float(req.Params, "latitude")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -113,7 +114,7 @@ func handleSetLocation(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "theme auto location set"})
 }
 
-func handleSetUseIPLocation(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetUseIPLocation(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	use, err := params.Bool(req.Params, "use")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -124,18 +125,18 @@ func handleSetUseIPLocation(conn *models.Conn, req models.Request, manager *Mana
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "theme auto IP location set"})
 }
 
-func handleTrigger(conn *models.Conn, req models.Request, manager *Manager) {
+func handleTrigger(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	manager.TriggerUpdate()
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "theme auto update triggered"})
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	clientID := fmt.Sprintf("client-%p", conn)
 	stateChan := manager.Subscribe(clientID)
 	defer manager.Unsubscribe(clientID)
 
 	initialState := manager.GetState()
-	if err := conn.WriteResponse(models.Response[State]{
+	if err := conn.WriteResponse(ipc.Response[State]{
 		ID:     req.ID,
 		Result: &initialState,
 	}); err != nil {
@@ -143,7 +144,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 
 	for state := range stateChan {
-		if err := conn.WriteResponse(models.Response[State]{
+		if err := conn.WriteResponse(ipc.Response[State]{
 			Result: &state,
 		}); err != nil {
 			return

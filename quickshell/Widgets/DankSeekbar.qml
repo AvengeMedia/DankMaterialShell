@@ -6,8 +6,66 @@ import qs.Widgets
 Item {
     id: root
 
+    LayoutMirroring.enabled: false
+    LayoutMirroring.childrenInherit: true
+
     property MprisPlayer activePlayer
     property real stableLength: 0
+    readonly property bool canSeek: enabled && (activePlayer?.canSeek ?? false) && stableLength > 0
+    readonly property real minimumValue: 0
+    readonly property real maximumValue: 1
+    readonly property real stepSize: stableLength > 0 ? 5 / stableLength : 0
+    activeFocusOnTab: canSeek
+    Accessible.role: Accessible.Slider
+    Accessible.name: I18n.tr("Playback position", "media seekbar accessible name")
+    Accessible.focusable: canSeek
+    Accessible.onIncreaseAction: seekBy(5)
+    Accessible.onDecreaseAction: seekBy(-5)
+
+    function seekTo(position) {
+        if (!canSeek)
+            return;
+        const clamped = Math.max(0.1, Math.min(position, stableLength * 0.99));
+        activePlayer.position = clamped;
+        beginCommittedSeekPreview(clamped);
+    }
+
+    function seekBy(seconds) {
+        seekTo(value * stableLength + seconds);
+    }
+
+    Keys.onPressed: event => {
+        if (!canSeek)
+            return;
+        switch (event.key) {
+        case Qt.Key_Left:
+            seekBy(-5);
+            break;
+        case Qt.Key_Right:
+            seekBy(5);
+            break;
+        case Qt.Key_PageUp:
+            seekBy(stableLength / 10);
+            break;
+        case Qt.Key_PageDown:
+            seekBy(-stableLength / 10);
+            break;
+        case Qt.Key_Home:
+            seekTo(0);
+            break;
+        case Qt.Key_End:
+            seekTo(stableLength);
+            break;
+        default:
+            return;
+        }
+        event.accepted = true;
+    }
+
+    FocusRing {
+        radius: Theme.cornerRadiusXS + Theme.focusRingOffset
+        visible: root.activeFocus
+    }
     property color accentColor: Theme.primary
     property color accentTrackColor: Theme.withAlpha(accentColor, 0.28)
     property color accentSubtleColor: Theme.withAlpha(accentColor, 0.55)
@@ -16,7 +74,7 @@ Item {
     readonly property real playerValue: {
         if (!activePlayer || stableLength <= 0)
             return 0;
-        const pos = (activePlayer.position || 0) % Math.max(1, stableLength);
+        const pos = activePlayer.position || 0;
         const calculatedRatio = pos / stableLength;
         return Math.max(0, Math.min(1, calculatedRatio));
     }
@@ -134,7 +192,7 @@ Item {
     Loader {
         anchors.fill: parent
         visible: activePlayer && stableLength > 0
-        sourceComponent: SettingsData.waveProgressEnabled ? waveProgressComponent : flatProgressComponent
+        sourceComponent: MediaOptions.waveProgress ? waveProgressComponent : flatProgressComponent
         z: 1
 
         Component {
@@ -198,7 +256,7 @@ Item {
                     height: parent.lineWidth
                     anchors.verticalCenter: parent.verticalCenter
                     color: parent.trackColor
-                    radius: height / 2
+                    radius: Theme.fullRadius(width, height)
                 }
 
                 Rectangle {
@@ -207,19 +265,14 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     color: parent.fillColor
-                    radius: height / 2
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: 80
-                        }
-                    }
+                    radius: Theme.fullRadius(width, height)
                 }
 
                 Rectangle {
                     visible: root.isDraggingSeek
                     width: 2
                     height: Math.max(parent.lineWidth + 4, 10)
-                    radius: width / 2
+                    radius: Theme.fullRadius(width, height)
                     color: parent.actualProgressColor
                     x: Math.max(0, Math.min(parent.width, parent.width * root.playerValue)) - width / 2
                     y: parent.midY - height / 2
@@ -230,16 +283,11 @@ Item {
                     id: playhead
                     width: 3
                     height: Math.max(parent.lineWidth + 8, 14)
-                    radius: width / 2
+                    radius: Theme.fullRadius(width, height)
                     color: parent.playheadColor
                     x: Math.max(0, Math.min(parent.width, parent.width * root.value)) - width / 2
                     y: parent.midY - height / 2
                     z: 3
-                    Behavior on x {
-                        NumberAnimation {
-                            duration: 80
-                        }
-                    }
                 }
 
                 MouseArea {

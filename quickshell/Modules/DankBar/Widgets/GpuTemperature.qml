@@ -1,33 +1,31 @@
 import QtQuick
 import qs.Common
-import qs.Modules.Plugins
 import qs.Services
-import qs.Widgets
 
-BasePill {
+MonitorPill {
     id: root
-
-    property bool showPercentage: true
-    property bool showIcon: true
-    property var toggleProcessList
-    property var popoutTarget: null
-    property var widgetData: null
-    property int selectedGpuIndex: (widgetData && widgetData.selectedGpuIndex !== undefined) ? widgetData.selectedGpuIndex : 0
-    property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
 
     signal gpuTempClicked
 
-    property real displayTemp: {
-        if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
+    readonly property int selectedGpuIndex: SettingsData.widgetOption("gpuTemp", widgetData, "selectedGpuIndex")
+    readonly property real displayTemp: {
+        const gpus = DgopService.availableGpus;
+        if (!gpus || selectedGpuIndex < 0 || selectedGpuIndex >= gpus.length)
             return 0;
-        }
-
-        if (selectedGpuIndex >= 0 && selectedGpuIndex < DgopService.availableGpus.length) {
-            return DgopService.availableGpus[selectedGpuIndex].temperature || 0;
-        }
-
-        return 0;
+        return gpus[selectedGpuIndex].temperature || 0;
     }
+
+    widgetType: "gpuTemp"
+    dgopModules: ["gpu"]
+    iconName: "auto_awesome_mosaic"
+    level: displayTemp
+    warnLevel: 65
+    dangerLevel: 80
+    verticalText: displayTemp ? Math.round(displayTemp).toString() : "--"
+    horizontalText: displayTemp ? Math.round(displayTemp) + "°" : "--°"
+    reserveText: "88°"
+    sortKey: "cpu"
+    onActivated: gpuTempClicked()
 
     function updateWidgetPciId(pciId) {
         const sections = ["left", "center", "right"];
@@ -67,7 +65,6 @@ BasePill {
     }
 
     Component.onCompleted: {
-        DgopService.addRef(["gpu"]);
         if (widgetData && widgetData.pciId) {
             DgopService.addGpuPciId(widgetData.pciId);
         } else {
@@ -75,120 +72,8 @@ BasePill {
         }
     }
     Component.onDestruction: {
-        DgopService.removeRef(["gpu"]);
         if (widgetData && widgetData.pciId) {
             DgopService.removeGpuPciId(widgetData.pciId);
-        }
-    }
-
-    Connections {
-        function onWidgetDataChanged() {
-            root.selectedGpuIndex = Qt.binding(() => {
-                return (root.widgetData && root.widgetData.selectedGpuIndex !== undefined) ? root.widgetData.selectedGpuIndex : 0;
-            });
-        }
-
-        target: SettingsData
-    }
-
-    content: Component {
-        Item {
-            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : gpuTempRow.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? gpuTempColumn.implicitHeight : gpuTempRow.implicitHeight
-
-            Column {
-                id: gpuTempColumn
-                visible: root.isVerticalOrientation
-                anchors.centerIn: parent
-                spacing: 1
-
-                DankIcon {
-                    name: "auto_awesome_mosaic"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: {
-                        if (root.displayTemp > 80) {
-                            return Theme.tempDanger;
-                        }
-
-                        if (root.displayTemp > 65) {
-                            return Theme.tempWarning;
-                        }
-
-                        return Theme.widgetIconColor;
-                    }
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                NumericText {
-                    isMonospace: false
-                    text: {
-                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                            return "--";
-                        }
-
-                        return Math.round(root.displayTemp).toString();
-                    }
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
-
-            Row {
-                id: gpuTempRow
-                visible: !root.isVerticalOrientation
-                anchors.centerIn: parent
-                spacing: Theme.spacingXS
-
-                DankIcon {
-                    id: gpuTempIcon
-                    name: "auto_awesome_mosaic"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: {
-                        if (root.displayTemp > 80) {
-                            return Theme.tempDanger;
-                        }
-
-                        if (root.displayTemp > 65) {
-                            return Theme.tempWarning;
-                        }
-
-                        return Theme.widgetIconColor;
-                    }
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                NumericText {
-                    isMonospace: false
-                    text: {
-                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                            return "--°";
-                        }
-
-                        return Math.round(root.displayTemp) + "°";
-                    }
-                    reserveText: root.minimumWidth ? "88°" : ""
-                    width: Math.ceil(Math.max(implicitWidth, reservedWidth))
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        }
-    }
-
-    MouseArea {
-        x: -root.leftMargin
-        y: -root.topMargin
-        width: root.width + root.leftMargin + root.rightMargin
-        height: root.height + root.topMargin + root.bottomMargin
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
-        onPressed: mouse => {
-            root.triggerRipple(this, mouse.x, mouse.y);
-            DgopService.setSortBy("cpu");
-            gpuTempClicked();
         }
     }
 

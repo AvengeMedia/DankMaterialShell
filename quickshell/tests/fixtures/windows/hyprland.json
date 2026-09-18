@@ -1,0 +1,11 @@
+{
+    "focusedWorkspace": { "id": 1, "name": "1" },
+    "toplevels": [
+        { "wayland": "w1", "workspace": { "id": 1, "name": "1" }, "lastIpcObject": { "pid": 501, "workspace": { "id": 1, "name": "1" } } },
+        { "wayland": "w2", "workspace": { "id": -98, "name": "special:scratch" }, "lastIpcObject": { "pid": 502, "workspace": { "id": -98, "name": "special:scratch" } } },
+        { "wayland": "w3", "workspace": { "id": 2, "name": "2" }, "lastIpcObject": { "pid": 503, "workspace": { "id": 2, "name": "2" } } },
+        { "wayland": "w4", "workspace": { "id": -99, "name": "special:notes" }, "lastIpcObject": null },
+        { "wayland": "w5", "workspace": null, "lastIpcObject": { "workspace": { "name": "1" } } },
+        { "wayland": null, "workspace": { "id": 1, "name": "1" }, "lastIpcObject": { "pid": 506 } }
+    ]
+}

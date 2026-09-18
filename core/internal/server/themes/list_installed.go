@@ -5,6 +5,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/themes"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 func addVariantsInfo(info *ThemeInfo, variants *themes.ThemeVariants) {
@@ -78,7 +79,7 @@ func addVariantsInfo(info *ThemeInfo, variants *themes.ThemeVariants) {
 	}
 }
 
-func HandleListInstalled(conn *models.Conn, req models.Request) {
+func HandleListInstalled(conn *ipc.ConnWriter, req ipc.Request) {
 	manager, err := themes.NewManager()
 	if err != nil {
 		models.RespondError(conn, req.ID, fmt.Sprintf("failed to create manager: %v", err))

@@ -71,7 +71,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignLeft
                 text: KeybindsService.cheatsheet.title || I18n.tr("Keybinds")
                 font.pixelSize: Theme.fontSizeLarge
-                font.weight: Font.Bold
+                font.weight: Theme.fontWeightMedium
                 color: Theme.primary
             }
 
@@ -86,10 +86,9 @@ FocusScope {
                 onClicked: content.floatingToggleRequested()
             }
 
-            DankTextField {
+            DankSearchField {
                 id: searchField
                 Layout.alignment: Qt.AlignRight
-                leftIconName: "search"
                 keyForwardTargets: [content]
                 onTextEdited: searchDebounce.restart()
                 Keys.onEscapePressed: event => {
@@ -239,7 +238,7 @@ FocusScope {
                                 StyledText {
                                     text: categoryColumn.catName
                                     font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Bold
+                                    font.weight: Theme.fontWeightMedium
                                     color: Theme.primary
                                 }
 
@@ -273,7 +272,7 @@ FocusScope {
                                                 visible: parent.subcatName !== "_root"
                                                 text: parent.subcatName
                                                 font.pixelSize: Theme.fontSizeSmall
-                                                font.weight: Font.DemiBold
+                                                font.weight: Theme.fontWeightMedium
                                                 color: Theme.primary
                                                 opacity: 0.7
                                             }
@@ -293,7 +292,7 @@ FocusScope {
                                                             id: keyBadge
                                                             width: Math.min(keyText.implicitWidth + 12, 160)
                                                             height: 22
-                                                            radius: 4
+                                                            radius: Theme.cornerRadiusXS
                                                             anchors.verticalCenter: parent.verticalCenter
 
                                                             StyledText {
@@ -302,7 +301,7 @@ FocusScope {
                                                                 color: Theme.secondary
                                                                 text: (modelData.key || "").replace(/\+/g, " + ")
                                                                 font.pixelSize: Theme.fontSizeSmall
-                                                                font.weight: Font.Medium
+                                                                font.weight: Theme.fontWeightMedium
                                                                 isMonospace: true
                                                                 elide: Text.ElideRight
                                                                 width: Math.min(implicitWidth, 148)

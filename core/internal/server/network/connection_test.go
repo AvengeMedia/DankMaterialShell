@@ -9,41 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConnectionRequest_Validation(t *testing.T) {
-	t.Run("basic WiFi connection", func(t *testing.T) {
-		req := network.ConnectionRequest{
-			SSID:     "TestNetwork",
-			Password: "testpass123",
-		}
-
-		assert.NotEmpty(t, req.SSID)
-		assert.NotEmpty(t, req.Password)
-		assert.Empty(t, req.Username)
-	})
-
-	t.Run("enterprise WiFi connection", func(t *testing.T) {
-		req := network.ConnectionRequest{
-			SSID:     "EnterpriseNetwork",
-			Password: "testpass123",
-			Username: "testuser",
-		}
-
-		assert.NotEmpty(t, req.SSID)
-		assert.NotEmpty(t, req.Password)
-		assert.NotEmpty(t, req.Username)
-	})
-
-	t.Run("open WiFi connection", func(t *testing.T) {
-		req := network.ConnectionRequest{
-			SSID: "OpenNetwork",
-		}
-
-		assert.NotEmpty(t, req.SSID)
-		assert.Empty(t, req.Password)
-		assert.Empty(t, req.Username)
-	})
-}
-
 func TestManager_ConnectWiFi_NoDevice(t *testing.T) {
 	backend := mocks_network.NewMockBackend(t)
 	req := network.ConnectionRequest{

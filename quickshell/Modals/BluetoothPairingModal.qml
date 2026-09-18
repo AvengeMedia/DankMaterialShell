@@ -116,7 +116,7 @@ DankModal {
                         text: I18n.tr("Pair Bluetooth Device")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     StyledText {
@@ -219,7 +219,7 @@ DankModal {
                     width: parent.width
                     height: 56
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+                    color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
                     visible: requestType === "confirm" || requestType === "display-passkey"
 
                     Column {
@@ -227,7 +227,7 @@ DankModal {
                         spacing: Theme.spacingXXS
 
                         StyledText {
-                            text: I18n.tr("Passkey:")
+                            text: I18n.tr("Passkey:", "bluetooth pairing dialog label before the passkey")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceTextMedium
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -237,7 +237,7 @@ DankModal {
                             text: String(passkey).padStart(6, "0")
                             font.pixelSize: Theme.fontSizeXLarge
                             color: Theme.surfaceText
-                            font.weight: Font.Bold
+                            font.weight: Theme.fontWeightMedium
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
@@ -267,7 +267,7 @@ DankModal {
                                 text: I18n.tr("Cancel")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                             }
 
                             MouseArea {
@@ -312,16 +312,16 @@ DankModal {
                                     case "display-passkey":
                                         return I18n.tr("Confirm");
                                     case "authorize":
-                                        return I18n.tr("Authorize");
+                                        return I18n.tr("Authorize", "verb, bluetooth pairing dialog confirm button");
                                     default:
                                         if (requestType.startsWith("authorize-service"))
                                             return I18n.tr("Authorize");
-                                        return I18n.tr("Pair");
+                                        return I18n.tr("Pair", "verb, bluetooth device pairing button");
                                     }
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.background
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                             }
 
                             MouseArea {
@@ -353,6 +353,7 @@ DankModal {
                 anchors.topMargin: Theme.spacingM
                 anchors.rightMargin: Theme.spacingM
                 iconName: "close"
+                Accessible.name: I18n.tr("Cancel")
                 iconSize: Theme.iconSize - 4
                 iconColor: Theme.surfaceText
                 onClicked: () => {

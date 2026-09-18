@@ -44,175 +44,132 @@ Item {
         }
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
+        SettingsCard {
+            tab: "sounds"
+            tags: ["sound", "audio", "notification", "volume"]
+            settingKey: "systemSounds"
+            visible: AudioService.soundsAvailable
 
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
-
-            SettingsCard {
+            SettingsToggleRow {
                 tab: "sounds"
-                tags: ["sound", "audio", "notification", "volume"]
-                title: I18n.tr("System Sounds")
-                settingKey: "systemSounds"
-                iconName: SettingsData.soundsEnabled ? "volume_up" : "volume_off"
-                visible: AudioService.soundsAvailable
+                tags: ["sound", "enable", "system"]
+                settingKey: "soundsEnabled"
+                text: I18n.tr("System sounds")
+                checked: SettingsData.soundsEnabled
+                onToggled: checked => SettingsData.set("soundsEnabled", checked)
+            }
 
-                SettingsToggleRow {
-                    tab: "sounds"
-                    tags: ["sound", "enable", "system"]
-                    settingKey: "soundsEnabled"
-                    text: I18n.tr("Enable System Sounds")
-                    checked: SettingsData.soundsEnabled
-                    onToggled: checked => SettingsData.set("soundsEnabled", checked)
+            SettingsToggleRow {
+                enabled: (SettingsData.soundsEnabled) && (AudioService.soundThemeSupported)
+                tab: "sounds"
+                tags: ["sound", "theme", "system", "gsettings"]
+                settingKey: "useSystemSoundTheme"
+                visible: AudioService.soundThemeSupported
+                text: I18n.tr("Use system theme")
+                checked: SettingsData.useSystemSoundTheme
+                onToggled: checked => SettingsData.set("useSystemSoundTheme", checked)
+            }
+
+            SettingsDropdownRow {
+                tab: "sounds"
+                tags: ["sound", "theme", "select"]
+                settingKey: "soundTheme"
+                enabled: ((SettingsData.soundsEnabled) && (SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0)) && (SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0)
+                text: I18n.tr("Theme")
+                options: AudioService.availableSoundThemes
+                currentValue: {
+                    const theme = AudioService.currentSoundTheme;
+                    if (theme && AudioService.availableSoundThemes.includes(theme))
+                        return theme;
+                    return AudioService.availableSoundThemes.length > 0 ? AudioService.availableSoundThemes[0] : "";
                 }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    visible: SettingsData.soundsEnabled
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "theme", "system"]
-                        settingKey: "useSystemSoundTheme"
-                        visible: AudioService.soundThemeSupported
-                        text: I18n.tr("Use System Theme")
-                        description: I18n.tr("Use sound theme from system settings")
-                        checked: SettingsData.useSystemSoundTheme
-                        onToggled: checked => SettingsData.set("useSystemSoundTheme", checked)
-                    }
-
-                    SettingsDropdownRow {
-                        tab: "sounds"
-                        tags: ["sound", "theme", "select"]
-                        settingKey: "soundTheme"
-                        visible: SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0
-                        enabled: SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0
-                        text: I18n.tr("Sound Theme")
-                        options: AudioService.availableSoundThemes
-                        currentValue: {
-                            const theme = AudioService.currentSoundTheme;
-                            if (theme && AudioService.availableSoundThemes.includes(theme))
-                                return theme;
-                            return AudioService.availableSoundThemes.length > 0 ? AudioService.availableSoundThemes[0] : "";
-                        }
-                        onValueChanged: value => {
-                            if (value && value !== AudioService.currentSoundTheme)
-                                AudioService.setSoundTheme(value);
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                        visible: AudioService.soundThemeSupported
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "login", "startup", "boot"]
-                        settingKey: "soundLogin"
-                        text: I18n.tr("Login")
-                        description: I18n.tr("Play sound after logging in")
-                        checked: SettingsData.soundLogin
-                        onToggled: checked => SettingsData.set("soundLogin", checked)
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "notification", "new"]
-                        settingKey: "soundNewNotification"
-                        text: I18n.tr("New Notification")
-                        description: I18n.tr("Play sound when new notification arrives")
-                        checked: SettingsData.soundNewNotification
-                        onToggled: checked => SettingsData.set("soundNewNotification", checked)
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "volume", "changed"]
-                        settingKey: "soundVolumeChanged"
-                        text: I18n.tr("Volume Changed")
-                        description: I18n.tr("Play sound when volume is adjusted")
-                        checked: SettingsData.soundVolumeChanged
-                        onToggled: checked => SettingsData.set("soundVolumeChanged", checked)
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "power", "plugged"]
-                        settingKey: "soundPluggedIn"
-                        visible: BatteryService.batteryAvailable
-                        text: I18n.tr("Plugged In")
-                        description: I18n.tr("Play sound when power cable is connected")
-                        checked: SettingsData.soundPluggedIn
-                        onToggled: checked => SettingsData.set("soundPluggedIn", checked)
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                    }
-
-                    SettingsToggleRow {
-                        tab: "sounds"
-                        tags: ["sound", "media", "playback", "mute", "mpris", "music"]
-                        settingKey: "muteSoundsWhenMediaPlaying"
-                        text: I18n.tr("Mute During Playback")
-                        description: I18n.tr("Silence system sounds while media is playing")
-                        checked: SettingsData.muteSoundsWhenMediaPlaying
-                        onToggled: checked => SettingsData.set("muteSoundsWhenMediaPlaying", checked)
-                    }
+                onValueChanged: value => {
+                    if (value && value !== AudioService.currentSoundTheme)
+                        AudioService.setSoundTheme(value);
                 }
             }
 
-            Rectangle {
-                width: parent.width
-                height: notAvailableText.implicitHeight + Theme.spacingM * 2
-                radius: Theme.cornerRadius
-                color: Theme.warningHover
-                visible: !AudioService.soundsAvailable
+            SettingsToggleRow {
+                enabled: SettingsData.soundsEnabled
+                tab: "sounds"
+                tags: ["sound", "login", "startup", "boot"]
+                settingKey: "soundLogin"
+                text: I18n.tr("Login", "noun, system sounds toggle, sound played on login")
+                checked: SettingsData.soundLogin
+                onToggled: checked => SettingsData.set("soundLogin", checked)
+            }
 
-                Row {
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingM
-                    spacing: Theme.spacingM
+            SettingsToggleRow {
+                enabled: SettingsData.soundsEnabled
+                tab: "sounds"
+                tags: ["sound", "notification", "new"]
+                settingKey: "soundNewNotification"
+                text: I18n.tr("New notification")
+                checked: SettingsData.soundNewNotification
+                onToggled: checked => SettingsData.set("soundNewNotification", checked)
+            }
 
-                    DankIcon {
-                        name: "info"
-                        size: Theme.iconSizeSmall
-                        color: Theme.warning
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+            SettingsToggleRow {
+                enabled: SettingsData.soundsEnabled
+                tab: "sounds"
+                tags: ["sound", "volume", "changed"]
+                settingKey: "soundVolumeChanged"
+                text: I18n.tr("Volume changed")
+                checked: SettingsData.soundVolumeChanged
+                onToggled: checked => SettingsData.set("soundVolumeChanged", checked)
+            }
 
-                    StyledText {
-                        id: notAvailableText
-                        font.pixelSize: Theme.fontSizeSmall
-                        text: I18n.tr("System sounds are not available. Install %1 for sound support.").arg(root.multimediaPackage)
-                        wrapMode: Text.WordWrap
-                        width: parent.width - Theme.iconSizeSmall - Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+            SettingsToggleRow {
+                enabled: (SettingsData.soundsEnabled) && (BatteryService.batteryAvailable)
+                tab: "sounds"
+                tags: ["sound", "power", "plugged", "cable", "charger"]
+                settingKey: "soundPluggedIn"
+                visible: BatteryService.batteryAvailable
+                text: I18n.tr("Plugged in")
+                checked: SettingsData.soundPluggedIn
+                onToggled: checked => SettingsData.set("soundPluggedIn", checked)
+            }
+
+            SettingsToggleRow {
+                enabled: SettingsData.soundsEnabled
+                tab: "sounds"
+                tags: ["sound", "media", "playback", "mute", "mpris", "music"]
+                settingKey: "muteSoundsWhenMediaPlaying"
+                text: I18n.tr("Mute during media playback")
+                checked: SettingsData.muteSoundsWhenMediaPlaying
+                onToggled: checked => SettingsData.set("muteSoundsWhenMediaPlaying", checked)
+            }
+        }
+
+        Rectangle {
+            width: parent.width
+            height: notAvailableText.implicitHeight + Theme.spacingM * 2
+            radius: Theme.cornerRadius
+            color: Theme.warningHover
+            visible: !AudioService.soundsAvailable
+
+            Row {
+                anchors.fill: parent
+                anchors.margins: Theme.spacingM
+                spacing: Theme.spacingM
+
+                DankIcon {
+                    name: "info"
+                    size: Theme.iconSizeSmall
+                    color: Theme.warning
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    id: notAvailableText
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: I18n.tr("System sounds are not available. Install %1 for sound support.", "sounds settings warning, %1 is a package name").arg(root.multimediaPackage)
+                    wrapMode: Text.WordWrap
+                    width: parent.width - Theme.iconSizeSmall - Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

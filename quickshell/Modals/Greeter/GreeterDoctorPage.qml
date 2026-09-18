@@ -121,7 +121,7 @@ Item {
                         anchors.centerIn: parent
                         name: "vital_signs"
                         size: Theme.iconSizeLarge
-                        color: Theme.primary
+                        color: Theme.accentOnPrimaryContainer
                     }
 
                     SequentialAnimation on scale {
@@ -148,9 +148,8 @@ Item {
                 spacing: Theme.spacingS
 
                 StyledText {
-                    text: I18n.tr("System Check", "greeter doctor page title")
+                    text: I18n.tr("System check", "greeter doctor page title")
                     font.pixelSize: Theme.fontSizeXLarge
-                    font.weight: Font.Bold
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -203,7 +202,7 @@ Item {
                         anchors.centerIn: parent
                         name: root.errorCount > 0 ? "warning" : "check_circle"
                         size: Theme.iconSize + 4
-                        color: root.errorCount > 0 ? Theme.error : Theme.primary
+                        color: root.errorCount > 0 ? Theme.onErrorContainer : Theme.accentOnPrimaryContainer
                     }
                 }
 
@@ -212,9 +211,8 @@ Item {
                     spacing: Theme.spacingXXS
 
                     StyledText {
-                        text: I18n.tr("System Check", "greeter doctor page title")
+                        text: I18n.tr("System check", "greeter doctor page title")
                         font.pixelSize: Theme.fontSizeXLarge
-                        font.weight: Font.Bold
                         color: Theme.surfaceText
                     }
 

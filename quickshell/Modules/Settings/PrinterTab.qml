@@ -1,11 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import qs.Common
 import qs.Modals.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Item {
     id: printerTab
@@ -126,1576 +126,656 @@ Item {
         id: deleteClassConfirm
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
+        SettingsCard {
+            width: parent.width
+            iconName: "print"
+            title: I18n.tr("CUPS Print Server")
 
-            width: Math.min(600, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingL
+            SettingsRow {
+                title: I18n.tr("Status", "noun, settings row or section title showing current state")
+                trailingBadge: CupsService.cupsAvailable ? I18n.tr("Available") : I18n.tr("Unavailable")
 
-            StyledRect {
-                width: parent.width
-                height: overviewSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
+                DankBadge {
+                    color: CupsService.cupsAvailable ? Theme.success : Theme.error
+                }
+            }
 
-                Column {
-                    id: overviewSection
+            SettingsRow {
+                title: I18n.tr("Printers")
+                trailingBadge: CupsService.printerNames.length.toString()
+            }
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
+            SettingsRow {
+                title: I18n.tr("Total jobs")
+                trailingBadge: CupsService.getTotalJobsNum().toString()
+            }
+        }
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
+        SettingsCard {
+            width: parent.width
+            iconName: "add_circle"
+            title: I18n.tr("Add printer")
+            visible: CupsService.cupsAvailable
 
-                        DankIcon {
-                            name: "print"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+            SettingsRow {
+                iconName: "add_circle"
+                title: I18n.tr("Configure a new printer")
 
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("CUPS Print Server")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
+                DankActionButton {
+                    iconName: printerTab.showAddPrinter ? "expand_less" : "expand_more"
+                    Accessible.name: printerTab.showAddPrinter ? I18n.tr("Cancel") : I18n.tr("Add printer")
+                    onClicked: {
+                        printerTab.showAddPrinter = !printerTab.showAddPrinter;
+                        if (printerTab.showAddPrinter) {
+                            if (CupsService.devices.length === 0) {
+                                CupsService.getDevices();
+                                CupsService.getPPDs();
                             }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
-
-                    Grid {
-                        columns: 2
-                        columnSpacing: Theme.spacingL
-                        rowSpacing: Theme.spacingS
-                        width: parent.width
-
-                        StyledText {
-                            text: I18n.tr("Status")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                        }
-                        Row {
-                            spacing: Theme.spacingS
-
-                            Rectangle {
-                                width: 8
-                                height: 8
-                                radius: 4
-                                anchors.verticalCenter: parent.verticalCenter
-                                color: CupsService.cupsAvailable ? Theme.success : Theme.error
-                            }
-
-                            StyledText {
-                                text: CupsService.cupsAvailable ? I18n.tr("Available") : I18n.tr("Unavailable")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Printers")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                        }
-                        StyledText {
-                            text: CupsService.printerNames.length.toString()
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Total Jobs")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-                        }
-                        StyledText {
-                            text: CupsService.getTotalJobsNum().toString()
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
+                        } else {
+                            printerTab.resetAddPrinterForm();
                         }
                     }
                 }
             }
 
-            StyledRect {
-                width: parent.width
-                height: addPrinterSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-                visible: CupsService.cupsAvailable
+            SettingsButtonGroupRow {
+                visible: printerTab.showAddPrinter
+                model: [I18n.tr("Discover devices", "Toggle button to scan for printers via mDNS/Avahi"), I18n.tr("Add by address", "Toggle button to manually add a printer by IP or hostname")]
+                currentIndex: printerTab.manualEntryMode ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    switch (index) {
+                    case 0:
+                        printerTab.manualEntryMode = false;
+                        printerTab.testConnectionResult = null;
+                        printerTab.testingConnection = false;
+                        return;
+                    case 1:
+                        printerTab.manualEntryMode = true;
+                        printerTab.selectedDevice = null;
+                        printerTab.selectedDeviceUri = "";
+                        if (CupsService.ppds.length === 0)
+                            CupsService.getPPDs();
+                        return;
+                    }
+                }
+            }
 
-                Column {
-                    id: addPrinterSection
+            SettingsDropdownRow {
+                visible: printerTab.showAddPrinter && !printerTab.manualEntryMode
+                text: I18n.tr("Device")
+                description: printerTab.selectedDevice !== null ? CupsService.getDeviceSubtitle(printerTab.selectedDevice) : ""
+                dropdownWidth: width / 2
+                popupWidth: width / 2
+                enableFuzzySearch: true
+                emptyText: I18n.tr("No devices found")
+                currentValue: {
+                    if (CupsService.loadingDevices)
+                        return I18n.tr("Scanning...", "status while searching for printers, wifi networks or bluetooth devices");
+                    if (printerTab.selectedDevice)
+                        return CupsService.getDeviceDisplayName(printerTab.selectedDevice);
+                    return I18n.tr("Select device", "printer device dropdown placeholder") + "…";
+                }
+                options: CupsService.filteredDevices.map(d => CupsService.getDeviceDisplayName(d))
+                onValueChanged: value => {
+                    const filtered = CupsService.filteredDevices;
+                    const device = filtered.find(d => CupsService.getDeviceDisplayName(d) === value);
+                    if (device)
+                        printerTab.selectDevice(device);
+                }
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
+                DankRefreshButton {
+                    buttonSize: 32
+                    anchors.verticalCenter: parent.verticalCenter
+                    busy: CupsService.loadingDevices
+                    onClicked: CupsService.getDevices()
+                }
+            }
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
+            SettingsTextFieldRow {
+                visible: printerTab.showAddPrinter && printerTab.manualEntryMode
+                leftIconName: "dns"
+                text: I18n.tr("Host", "Label for printer IP address or hostname input field")
+                placeholderText: I18n.tr("IP address or hostname", "Placeholder text for manual printer address input")
+                value: printerTab.manualHost
+                onValueEdited: value => {
+                    printerTab.manualHost = value;
+                    printerTab.selectedDeviceUri = "";
+                    printerTab.testConnectionResult = null;
+                }
+            }
 
-                        DankIcon {
-                            name: "add_circle"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+            SettingsTextFieldRow {
+                visible: printerTab.showAddPrinter && printerTab.manualEntryMode
+                leftIconName: "settings_ethernet"
+                text: I18n.tr("Port", "Label for printer port number input field")
+                placeholderText: "631"
+                value: printerTab.manualPort
+                onValueEdited: value => {
+                    printerTab.manualPort = value;
+                    printerTab.selectedDeviceUri = "";
+                    printerTab.testConnectionResult = null;
+                }
+            }
 
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - addPrinterToggleBtn.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
+            SettingsDropdownRow {
+                visible: printerTab.showAddPrinter && printerTab.manualEntryMode
+                text: I18n.tr("Protocol", "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket")
+                dropdownWidth: 120
+                popupWidth: 120
+                currentValue: printerTab.manualProtocol
+                options: ["ipp", "ipps", "lpd", "socket"]
+                onValueChanged: value => {
+                    printerTab.manualProtocol = value;
+                    printerTab.selectedDeviceUri = "";
+                    printerTab.testConnectionResult = null;
+                }
+            }
 
-                            StyledText {
-                                text: I18n.tr("Add Printer")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
+            SettingsRow {
+                readonly property var result: printerTab.testConnectionResult
+                readonly property bool reachable: !!result?.success
 
-                            StyledText {
-                                text: I18n.tr("Configure a new printer")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
+                visible: printerTab.showAddPrinter && printerTab.manualEntryMode
+                title: result !== null ? (reachable ? I18n.tr("Printer reachable", "Status message when test connection to printer succeeds") : I18n.tr("Connection failed", "Status message when test connection to printer fails")) : ""
+                titleColor: reachable ? Theme.success : Theme.error
+                subtitle: {
+                    const details = reachable ? (result?.data?.makeModel || result?.data?.info || "") : "";
+                    const error = result?.data?.error || result?.error || "";
+                    return [details, error].filter(line => line !== "").join("\n");
+                }
+                leading: DankBadge {
+                    visible: printerTab.testConnectionResult !== null
+                    color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
+                }
 
-                        Rectangle {
-                            id: addPrinterToggleBtn
-                            width: 28
-                            height: 28
-                            radius: 14
-                            color: addPrinterToggleArea.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            DankIcon {
-                                anchors.centerIn: parent
-                                name: printerTab.showAddPrinter ? "expand_less" : "expand_more"
-                                size: 18
-                                color: Theme.surfaceText
-                            }
-
-                            MouseArea {
-                                id: addPrinterToggleArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    printerTab.showAddPrinter = !printerTab.showAddPrinter;
-                                    if (printerTab.showAddPrinter) {
-                                        if (CupsService.devices.length === 0) {
-                                            CupsService.getDevices();
-                                            CupsService.getPPDs();
-                                        }
-                                    } else {
-                                        printerTab.resetAddPrinterForm();
+                DankButton {
+                    text: printerTab.testingConnection ? I18n.tr("Testing...", "Button state while testing printer connection") : I18n.tr("Test connection", "Button to test connection to a printer by IP address")
+                    iconName: printerTab.testingConnection ? "sync" : "lan"
+                    buttonHeight: 36
+                    enabled: printerTab.manualHost.length > 0 && !printerTab.testingConnection
+                    onClicked: {
+                        printerTab.testingConnection = true;
+                        printerTab.testConnectionResult = null;
+                        const port = parseInt(printerTab.manualPort) || 631;
+                        CupsService.testConnection(printerTab.manualHost, port, printerTab.manualProtocol, response => {
+                            printerTab.testingConnection = false;
+                            if (response.error) {
+                                printerTab.testConnectionResult = {
+                                    "success": false,
+                                    "error": response.error
+                                };
+                            } else if (response.result) {
+                                printerTab.testConnectionResult = {
+                                    "success": response.result.reachable === true,
+                                    "data": response.result
+                                };
+                                if (response.result.reachable) {
+                                    if (response.result.uri)
+                                        printerTab.selectedDeviceUri = response.result.uri;
+                                    if (response.result.name && !printerTab.newPrinterName)
+                                        printerTab.newPrinterName = response.result.name.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").substring(0, 32) || "Printer";
+                                    if (CupsService.ppds.length === 0) {
+                                        CupsService.getPPDs();
                                     }
+                                    selectDriverlessPPD();
                                 }
+                            }
+                        });
+                    }
+                }
+            }
+
+            SettingsDropdownRow {
+                visible: printerTab.showAddPrinter
+                text: I18n.tr("Driver", "noun, printer driver dropdown label and network device driver detail label")
+                dropdownWidth: width / 2
+                popupWidth: width / 2
+                enableFuzzySearch: true
+                emptyText: I18n.tr("No drivers found")
+                currentValue: {
+                    if (CupsService.loadingPPDs)
+                        return I18n.tr("Loading...");
+                    if (printerTab.selectedPpd) {
+                        const ppd = CupsService.ppds.find(p => p.name === printerTab.selectedPpd);
+                        if (ppd) {
+                            const isSuggested = printerTab.suggestedPPDs.some(s => s.name === ppd.name);
+                            return (isSuggested ? "★ " : "") + (ppd.makeModel || ppd.name);
+                        }
+                        return printerTab.selectedPpd;
+                    }
+                    return printerTab.suggestedPPDs.length > 0 ? I18n.tr("Recommended available") : I18n.tr("Select driver...");
+                }
+                options: {
+                    const suggested = printerTab.suggestedPPDs.map(p => "★ " + (p.makeModel || p.name));
+                    const others = CupsService.ppds.filter(p => !printerTab.suggestedPPDs.some(s => s.name === p.name)).map(p => p.makeModel || p.name);
+                    return suggested.concat(others);
+                }
+                onValueChanged: value => {
+                    const cleanValue = value.replace(/^★ /, "");
+                    const ppd = CupsService.ppds.find(p => (p.makeModel || p.name) === cleanValue);
+                    if (ppd)
+                        printerTab.selectedPpd = ppd.name;
+                }
+
+                DankRefreshButton {
+                    buttonSize: 32
+                    anchors.verticalCenter: parent.verticalCenter
+                    busy: CupsService.loadingPPDs
+                    onClicked: CupsService.getPPDs()
+                }
+            }
+
+            SettingsTextFieldRow {
+                visible: printerTab.showAddPrinter
+                leftIconName: "print"
+                text: I18n.tr("Name")
+                placeholderText: I18n.tr("Printer name (no spaces)")
+                value: printerTab.newPrinterName
+                onValueEdited: value => printerTab.newPrinterName = value.replace(/\s/g, "-")
+            }
+
+            SettingsTextFieldRow {
+                visible: printerTab.showAddPrinter
+                leftIconName: "location_on"
+                text: I18n.tr("Location", "noun, physical place of a printer, text field label")
+                placeholderText: I18n.tr("Optional location")
+                value: printerTab.newPrinterLocation
+                onValueEdited: value => printerTab.newPrinterLocation = value
+            }
+
+            SettingsTextFieldRow {
+                visible: printerTab.showAddPrinter
+                leftIconName: "description"
+                text: I18n.tr("Description")
+                placeholderText: I18n.tr("Optional description")
+                value: printerTab.newPrinterInfo
+                onValueEdited: value => printerTab.newPrinterInfo = value
+            }
+
+            SettingsRow {
+                visible: printerTab.showAddPrinter
+                body: Row {
+                    LayoutMirroring.enabled: false
+                    width: parent.width
+                    layoutDirection: Qt.RightToLeft
+
+                    DankButton {
+                        text: CupsService.creatingPrinter ? I18n.tr("Creating...", "create printer button label while the printer is being added") : I18n.tr("Create printer")
+                        iconName: CupsService.creatingPrinter ? "sync" : "add"
+                        buttonHeight: 36
+                        enabled: printerTab.newPrinterName.length > 0 && printerTab.effectiveDeviceUri.length > 0 && printerTab.selectedPpd.length > 0 && !CupsService.creatingPrinter
+                        onClicked: {
+                            CupsService.createPrinter(printerTab.newPrinterName, printerTab.effectiveDeviceUri, printerTab.selectedPpd, {
+                                location: printerTab.newPrinterLocation,
+                                information: printerTab.newPrinterInfo
+                            });
+                            printerTab.resetAddPrinterForm();
+                            printerTab.showAddPrinter = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "print"
+            title: I18n.tr("Printers")
+            visible: CupsService.cupsAvailable
+
+            headerActions: [
+                StyledText {
+                    text: {
+                        const count = CupsService.printerNames.length;
+                        if (count === 0)
+                            return I18n.tr("No printers configured");
+                        return (count === 1 ? I18n.tr("%1 printer", "singular, %1 is 1, printer count") : I18n.tr("%1 printers", "plural, %1 is a count of printers")).arg(count);
+                    }
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    anchors.verticalCenter: parent.verticalCenter
+                },
+                DankActionButton {
+                    iconName: "refresh"
+                    Accessible.name: I18n.tr("Refresh")
+                    buttonSize: 32
+                    onClicked: CupsService.getState()
+                }
+            ]
+
+            SettingsRow {
+                visible: CupsService.printerNames.length === 0
+                body: Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    DankIcon {
+                        name: "print_disabled"
+                        size: 32
+                        color: Theme.surfaceVariantText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("No printer found", "empty state in printer list")
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceVariantText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+
+            Repeater {
+                model: CupsService.printerNames
+
+                delegate: Column {
+                    id: printerDelegate
+                    required property string modelData
+                    required property int index
+
+                    readonly property var printerData: CupsService.getPrinterData(modelData)
+                    readonly property bool isExpanded: CupsService.expandedPrinter === modelData || hasJobs
+                    readonly property bool hasJobs: (printerData?.jobs?.length ?? 0) > 0
+                    readonly property bool isIdle: printerData?.state === "idle"
+                    readonly property bool isStopped: printerData?.state === "stopped"
+
+                    width: parent?.width ?? 0
+                    spacing: Theme.groupedListGap
+
+                    SettingsRow {
+                        iconName: printerDelegate.isStopped ? "print_disabled" : "print"
+                        iconColor: printerDelegate.isStopped ? Theme.error : (printerDelegate.isIdle ? Theme.primary : Theme.warning)
+                        title: printerDelegate.modelData
+                        titleColor: CupsService.selectedPrinter === printerDelegate.modelData ? Theme.primary : Theme.surfaceText
+                        subtitle: CupsService.getPrinterStateTranslation(printerDelegate.printerData?.state || "")
+                        subtitleColor: {
+                            switch (printerDelegate.printerData?.state) {
+                            case "idle":
+                                return Theme.primary;
+                            case "stopped":
+                                return Theme.error;
+                            case "processing":
+                                return Theme.warning;
+                            default:
+                                return Theme.surfaceVariantText;
+                            }
+                        }
+                        trailingBadge: printerDelegate.hasJobs ? ((printerDelegate.printerData?.jobs?.length ?? 0) === 1 ? I18n.tr("%1 job", "singular, %1 is 1, print job count badge") : I18n.tr("%1 jobs", "plural, %1 is a count of print jobs")).arg(printerDelegate.printerData?.jobs?.length ?? 0) : ""
+                        clickable: true
+                        onClicked: CupsService.setSelectedPrinter(printerDelegate.modelData)
+
+                        DankActionButton {
+                            iconName: printerDelegate.isExpanded ? "expand_less" : "expand_more"
+                            Accessible.name: printerDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
+                            onClicked: {
+                                CupsService.expandedPrinter = printerDelegate.isExpanded ? "" : printerDelegate.modelData;
+                            }
+                        }
+
+                        DankActionButton {
+                            iconName: "delete"
+                            Accessible.name: I18n.tr("Delete")
+                            onClicked: {
+                                deletePrinterConfirm.showWithOptions({
+                                    title: I18n.tr("Delete printer"),
+                                    message: I18n.tr("Delete \"%1\"?").arg(printerDelegate.modelData),
+                                    confirmText: I18n.tr("Delete"),
+                                    confirmColor: Theme.error,
+                                    onConfirm: () => CupsService.deletePrinter(printerDelegate.modelData)
+                                });
                             }
                         }
                     }
 
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: printerTab.showAddPrinter
-
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: Theme.outlineStrong
-                        }
-
-                        Row {
+                    SettingsRow {
+                        visible: printerDelegate.isExpanded
+                        body: Column {
                             width: parent.width
                             spacing: Theme.spacingS
 
-                            Rectangle {
-                                width: discoverRow.width + Theme.spacingM * 2
-                                height: 32
-                                radius: Theme.cornerRadius
-                                color: !printerTab.manualEntryMode ? Theme.primary : (discoverArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
+                            Flow {
+                                width: parent.width
+                                spacing: Theme.spacingXS
 
-                                Row {
-                                    id: discoverRow
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
+                                Repeater {
+                                    model: {
+                                        const fields = [];
+                                        const p = printerDelegate.printerData;
+                                        if (!p)
+                                            return fields;
 
-                                    DankIcon {
-                                        name: "search"
-                                        size: 16
-                                        color: !printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
+                                        fields.push({
+                                            label: I18n.tr("State", "noun, detail label for printer or network device status"),
+                                            value: CupsService.getPrinterStateTranslation(p.state)
+                                        });
+                                        if (p.stateReason && p.stateReason !== "none")
+                                            fields.push({
+                                                label: I18n.tr("Reason", "printer detail label, reason for the current printer state"),
+                                                value: CupsService.getPrinterStateReasonTranslation(p.stateReason)
+                                            });
+                                        if (p.makeModel)
+                                            fields.push({
+                                                label: I18n.tr("Model"),
+                                                value: p.makeModel
+                                            });
+                                        if (p.location)
+                                            fields.push({
+                                                label: I18n.tr("Location"),
+                                                value: p.location
+                                            });
+                                        fields.push({
+                                            label: I18n.tr("Accepting", "printer detail label, whether the printer accepts jobs, value is yes or no"),
+                                            value: p.accepting ? I18n.tr("Yes") : I18n.tr("No")
+                                        });
+
+                                        return fields;
                                     }
 
-                                    StyledText {
-                                        text: I18n.tr("Discover Devices", "Toggle button to scan for printers via mDNS/Avahi")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: !printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
-                                        font.weight: Font.Medium
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        required property int index
+
+                                        width: fieldContent.width + Theme.spacingM * 2
+                                        height: 32
+                                        radius: Theme.cornerRadius - Theme.outlineWidthFocused
+                                        color: Theme.floatingWindowFieldColor
+                                        border.width: Theme.outlineWidth
+                                        border.color: Theme.floatingWindowFieldBorderColor
+
+                                        Row {
+                                            id: fieldContent
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacingXS
+
+                                            StyledText {
+                                                text: modelData.label + ":"
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            StyledText {
+                                                text: modelData.value
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                font.weight: Theme.fontWeightMedium
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
                                     }
                                 }
+                            }
 
-                                MouseArea {
-                                    id: discoverArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                DankButton {
+                                    text: printerDelegate.isStopped ? I18n.tr("Resume", "verb, button that resumes a paused printer") : I18n.tr("Pause")
+                                    iconName: printerDelegate.isStopped ? "play_arrow" : "pause"
+                                    buttonHeight: Theme.buttonHeightXS
+                                    backgroundColor: Theme.surfaceLight
+                                    textColor: Theme.surfaceText
                                     onClicked: {
-                                        printerTab.manualEntryMode = false;
-                                        printerTab.testConnectionResult = null;
-                                        printerTab.testingConnection = false;
+                                        if (printerDelegate.isStopped) {
+                                            CupsService.resumePrinter(printerDelegate.modelData);
+                                        } else {
+                                            CupsService.pausePrinter(printerDelegate.modelData);
+                                        }
                                     }
-                                }
-                            }
-
-                            Rectangle {
-                                width: manualRow.width + Theme.spacingM * 2
-                                height: 32
-                                radius: Theme.cornerRadius
-                                color: printerTab.manualEntryMode ? Theme.primary : (manualArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight)
-
-                                Row {
-                                    id: manualRow
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
-
-                                    DankIcon {
-                                        name: "edit"
-                                        size: 16
-                                        color: printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
-                                    }
-
-                                    StyledText {
-                                        text: I18n.tr("Add by Address", "Toggle button to manually add a printer by IP or hostname")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: printerTab.manualEntryMode ? Theme.onPrimary : Theme.surfaceText
-                                        font.weight: Font.Medium
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: manualArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        printerTab.manualEntryMode = true;
-                                        printerTab.selectedDevice = null;
-                                        printerTab.selectedDeviceUri = "";
-                                        if (CupsService.ppds.length === 0)
-                                            CupsService.getPPDs();
-                                    }
-                                }
-                            }
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: !printerTab.manualEntryMode
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Device")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankDropdown {
-                                    id: deviceDropdown
-                                    dropdownWidth: parent.width - 80 - scanDevicesBtn.width - Theme.spacingS * 2
-                                    popupWidth: parent.width - 80 - scanDevicesBtn.width - Theme.spacingS * 2
-                                    enableFuzzySearch: true
-                                    emptyText: I18n.tr("No devices found")
-                                    currentValue: {
-                                        if (CupsService.loadingDevices)
-                                            return I18n.tr("Scanning...");
-                                        if (printerTab.selectedDevice)
-                                            return CupsService.getDeviceDisplayName(printerTab.selectedDevice);
-                                        return I18n.tr("Select device...");
-                                    }
-                                    options: CupsService.filteredDevices.map(d => CupsService.getDeviceDisplayName(d))
-                                    onValueChanged: value => {
-                                        const filtered = CupsService.filteredDevices;
-                                        const device = filtered.find(d => CupsService.getDeviceDisplayName(d) === value);
-                                        if (device)
-                                            printerTab.selectDevice(device);
-                                    }
-                                }
-
-                                DankRefreshButton {
-                                    id: scanDevicesBtn
-                                    buttonSize: 32
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    busy: CupsService.loadingDevices
-                                    onClicked: CupsService.getDevices()
-                                }
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-                                visible: printerTab.selectedDevice !== null
-
-                                Item {
-                                    width: 80
-                                    height: 1
-                                }
-
-                                StyledText {
-                                    text: CupsService.getDeviceSubtitle(printerTab.selectedDevice)
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    width: parent.width - 80 - Theme.spacingS
-                                    elide: Text.ElideRight
-                                }
-                            }
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: printerTab.manualEntryMode
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Host", "Label for printer IP address or hostname input field")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankTextField {
-                                    width: parent.width - 80 - Theme.spacingS
-                                    placeholderText: I18n.tr("IP address or hostname", "Placeholder text for manual printer address input")
-                                    text: printerTab.manualHost
-                                    onTextEdited: {
-                                        printerTab.manualHost = text;
-                                        printerTab.selectedDeviceUri = "";
-                                        printerTab.testConnectionResult = null;
-                                    }
-                                }
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Port", "Label for printer port number input field")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankTextField {
-                                    width: 80
-                                    placeholderText: "631"
-                                    text: printerTab.manualPort
-                                    onTextEdited: {
-                                        printerTab.manualPort = text;
-                                        printerTab.selectedDeviceUri = "";
-                                        printerTab.testConnectionResult = null;
-                                    }
-                                }
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Protocol", "Label for printer protocol selector, e.g. ipp, ipps, lpd, socket")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankDropdown {
-                                    id: protocolDropdown
-                                    dropdownWidth: 120
-                                    popupWidth: 120
-                                    currentValue: printerTab.manualProtocol
-                                    options: ["ipp", "ipps", "lpd", "socket"]
-                                    onValueChanged: value => {
-                                        printerTab.manualProtocol = value;
-                                        printerTab.selectedDeviceUri = "";
-                                        printerTab.testConnectionResult = null;
-                                    }
-                                }
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                Item {
-                                    width: 80
-                                    height: 1
                                 }
 
                                 DankButton {
-                                    text: printerTab.testingConnection ? I18n.tr("Testing...", "Button state while testing printer connection") : I18n.tr("Test Connection", "Button to test connection to a printer by IP address")
-                                    iconName: printerTab.testingConnection ? "sync" : "lan"
-                                    buttonHeight: 36
-                                    enabled: printerTab.manualHost.length > 0 && !printerTab.testingConnection
+                                    text: I18n.tr("Test page")
+                                    iconName: "description"
+                                    buttonHeight: Theme.buttonHeightXS
+                                    backgroundColor: Theme.surfaceLight
+                                    textColor: Theme.surfaceText
+                                    onClicked: CupsService.printTestPage(printerDelegate.modelData)
+                                }
+
+                                DankButton {
+                                    text: printerDelegate.printerData?.accepting ? I18n.tr("Reject jobs") : I18n.tr("Accept jobs")
+                                    iconName: printerDelegate.printerData?.accepting ? "block" : "check_circle"
+                                    buttonHeight: Theme.buttonHeightXS
+                                    backgroundColor: Theme.surfaceLight
+                                    textColor: Theme.surfaceText
                                     onClicked: {
-                                        printerTab.testingConnection = true;
-                                        printerTab.testConnectionResult = null;
-                                        const port = parseInt(printerTab.manualPort) || 631;
-                                        CupsService.testConnection(printerTab.manualHost, port, printerTab.manualProtocol, response => {
-                                            printerTab.testingConnection = false;
-                                            if (response.error) {
-                                                printerTab.testConnectionResult = {
-                                                    "success": false,
-                                                    "error": response.error
-                                                };
-                                            } else if (response.result) {
-                                                printerTab.testConnectionResult = {
-                                                    "success": response.result.reachable === true,
-                                                    "data": response.result
-                                                };
-                                                if (response.result.reachable) {
-                                                    if (response.result.uri)
-                                                        printerTab.selectedDeviceUri = response.result.uri;
-                                                    if (response.result.name && !printerTab.newPrinterName)
-                                                        printerTab.newPrinterName = response.result.name.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").substring(0, 32) || "Printer";
-                                                    // Load PPDs if not loaded yet, then select driverless
-                                                    if (CupsService.ppds.length === 0) {
-                                                        CupsService.getPPDs();
-                                                    }
-                                                    selectDriverlessPPD();
-                                                }
-                                            }
+                                        if (printerDelegate.printerData?.accepting) {
+                                            CupsService.rejectJobs(printerDelegate.modelData);
+                                        } else {
+                                            CupsService.acceptJobs(printerDelegate.modelData);
+                                        }
+                                    }
+                                }
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                visible: (printerDelegate.printerData?.jobs?.length ?? 0) > 0
+
+                                StyledText {
+                                    text: I18n.tr("Jobs", "noun, print jobs section label")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Theme.fontWeightMedium
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                DankButton {
+                                    text: I18n.tr("Clear All")
+                                    iconName: "delete_sweep"
+                                    buttonHeight: Theme.buttonHeightXS
+                                    backgroundColor: Theme.surfaceLight
+                                    textColor: Theme.surfaceText
+                                    onClicked: {
+                                        purgeJobsConfirm.showWithOptions({
+                                            title: I18n.tr("Clear all jobs"),
+                                            message: I18n.tr("Cancel all jobs for \"%1\"?", "confirm dialog message, %1 is the printer name").arg(printerDelegate.modelData),
+                                            confirmText: I18n.tr("Clear"),
+                                            confirmColor: Theme.error,
+                                            onConfirm: () => CupsService.purgeJobs(printerDelegate.modelData)
                                         });
                                     }
                                 }
                             }
-
-                            Column {
-                                width: parent.width
-                                spacing: Theme.spacingXS
-                                visible: printerTab.testConnectionResult !== null
-
-                                Row {
-                                    spacing: Theme.spacingS
-
-                                    Item {
-                                        width: 80
-                                        height: 1
-                                    }
-
-                                    Rectangle {
-                                        width: 8
-                                        height: 8
-                                        radius: 4
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
-                                    }
-
-                                    StyledText {
-                                        text: printerTab.testConnectionResult?.success ? I18n.tr("Printer reachable", "Status message when test connection to printer succeeds") : I18n.tr("Connection failed", "Status message when test connection to printer fails")
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: printerTab.testConnectionResult?.success ? Theme.success : Theme.error
-                                    }
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingS
-                                    visible: printerTab.testConnectionResult?.success && (printerTab.testConnectionResult?.data?.makeModel || printerTab.testConnectionResult?.data?.info)
-
-                                    Item {
-                                        width: 80
-                                        height: 1
-                                    }
-
-                                    StyledText {
-                                        text: printerTab.testConnectionResult?.data?.makeModel || printerTab.testConnectionResult?.data?.info || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                    }
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingS
-                                    visible: !!(printerTab.testConnectionResult?.data?.error || printerTab.testConnectionResult?.error)
-
-                                    Item {
-                                        width: 80
-                                        height: 1
-                                    }
-
-                                    StyledText {
-                                        text: printerTab.testConnectionResult?.data?.error || printerTab.testConnectionResult?.error || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        width: parent.parent.width - 80 - Theme.spacingS
-                                        wrapMode: Text.WordWrap
-                                    }
-                                }
-                            }
                         }
+                    }
 
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingS
+                    Repeater {
+                        model: printerDelegate.printerData?.jobs ?? []
 
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
+                        delegate: SettingsRow {
+                            id: jobRow
+                            required property var modelData
+                            required property int index
 
-                                StyledText {
-                                    text: I18n.tr("Driver")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankDropdown {
-                                    id: ppdDropdown
-                                    dropdownWidth: parent.width - 80 - refreshPpdsBtn.width - Theme.spacingS * 2
-                                    popupWidth: parent.width - 80 - refreshPpdsBtn.width - Theme.spacingS * 2
-                                    enableFuzzySearch: true
-                                    emptyText: I18n.tr("No drivers found")
-                                    currentValue: {
-                                        if (CupsService.loadingPPDs)
-                                            return I18n.tr("Loading...");
-                                        if (printerTab.selectedPpd) {
-                                            const ppd = CupsService.ppds.find(p => p.name === printerTab.selectedPpd);
-                                            if (ppd) {
-                                                const isSuggested = printerTab.suggestedPPDs.some(s => s.name === ppd.name);
-                                                return (isSuggested ? "★ " : "") + (ppd.makeModel || ppd.name);
-                                            }
-                                            return printerTab.selectedPpd;
-                                        }
-                                        return printerTab.suggestedPPDs.length > 0 ? I18n.tr("Recommended available") : I18n.tr("Select driver...");
-                                    }
-                                    options: {
-                                        const suggested = printerTab.suggestedPPDs.map(p => "★ " + (p.makeModel || p.name));
-                                        const others = CupsService.ppds.filter(p => !printerTab.suggestedPPDs.some(s => s.name === p.name)).map(p => p.makeModel || p.name);
-                                        return suggested.concat(others);
-                                    }
-                                    onValueChanged: value => {
-                                        const cleanValue = value.replace(/^★ /, "");
-                                        const ppd = CupsService.ppds.find(p => (p.makeModel || p.name) === cleanValue);
-                                        if (ppd)
-                                            printerTab.selectedPpd = ppd.name;
-                                    }
-                                }
-
-                                DankRefreshButton {
-                                    id: refreshPpdsBtn
-                                    buttonSize: 32
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    busy: CupsService.loadingPPDs
-                                    onClicked: CupsService.getPPDs()
-                                }
+                            visible: printerDelegate.isExpanded
+                            iconName: "description"
+                            iconColor: Theme.surfaceVariantText
+                            title: "[" + modelData.id + "] " + CupsService.getJobStateTranslation(modelData.state)
+                            subtitle: {
+                                const size = Math.round((modelData.size || 0) / 1024);
+                                const date = new Date(modelData.timeCreated);
+                                return size + " KB • " + date.toLocaleString(Qt.locale(), Locale.ShortFormat);
                             }
 
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Name")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankTextField {
-                                    width: parent.width - 80 - Theme.spacingS
-                                    placeholderText: I18n.tr("Printer name (no spaces)")
-                                    text: printerTab.newPrinterName
-                                    onTextEdited: printerTab.newPrinterName = text.replace(/\s/g, "-")
-                                }
+                            DankActionButton {
+                                visible: jobRow.modelData.state === "pending"
+                                iconName: "pause"
+                                Accessible.name: I18n.tr("Pause")
+                                onClicked: CupsService.holdJob(jobRow.modelData.id)
                             }
 
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Location")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankTextField {
-                                    width: parent.width - 80 - Theme.spacingS
-                                    placeholderText: I18n.tr("Optional location")
-                                    text: printerTab.newPrinterLocation
-                                    onTextEdited: printerTab.newPrinterLocation = text
-                                }
+                            DankActionButton {
+                                visible: jobRow.modelData.state === "pending-held" || jobRow.modelData.state === "completed" || jobRow.modelData.state === "aborted"
+                                iconName: "replay"
+                                tooltipText: I18n.tr("Retry")
+                                onClicked: CupsService.restartJob(jobRow.modelData.id)
                             }
 
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacingS
-
-                                StyledText {
-                                    text: I18n.tr("Description")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    width: 80
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                DankTextField {
-                                    width: parent.width - 80 - Theme.spacingS
-                                    placeholderText: I18n.tr("Optional description")
-                                    text: printerTab.newPrinterInfo
-                                    onTextEdited: printerTab.newPrinterInfo = text
-                                }
-                            }
-                        }
-
-                        Row {
-                            LayoutMirroring.enabled: false
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            layoutDirection: Qt.RightToLeft
-
-                            DankButton {
-                                text: CupsService.creatingPrinter ? I18n.tr("Creating...") : I18n.tr("Create Printer")
-                                iconName: CupsService.creatingPrinter ? "sync" : "add"
-                                buttonHeight: 36
-                                enabled: printerTab.newPrinterName.length > 0 && printerTab.effectiveDeviceUri.length > 0 && printerTab.selectedPpd.length > 0 && !CupsService.creatingPrinter
-                                onClicked: {
-                                    CupsService.createPrinter(printerTab.newPrinterName, printerTab.effectiveDeviceUri, printerTab.selectedPpd, {
-                                        location: printerTab.newPrinterLocation,
-                                        information: printerTab.newPrinterInfo
-                                    });
-                                    printerTab.resetAddPrinterForm();
-                                    printerTab.showAddPrinter = false;
-                                }
+                            DankActionButton {
+                                iconName: "close"
+                                Accessible.name: I18n.tr("Cancel")
+                                onClicked: CupsService.cancelJob(printerDelegate.modelData, jobRow.modelData.id)
                             }
                         }
                     }
                 }
             }
-
-            StyledRect {
-                width: parent.width
-                height: printersSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-                visible: CupsService.cupsAvailable
-
-                Column {
-                    id: printersSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "print"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - refreshBtn.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("Printers")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            StyledText {
-                                text: {
-                                    const count = CupsService.printerNames.length;
-                                    if (count === 0)
-                                        return I18n.tr("No printers configured");
-                                    return I18n.ntr("%1 printer", "%1 printers", count).arg(count);
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
-
-                        DankActionButton {
-                            id: refreshBtn
-                            iconName: "refresh"
-                            buttonSize: 32
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: CupsService.getState()
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: 80
-                        visible: CupsService.printerNames.length === 0
-
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "print_disabled"
-                                size: 32
-                                color: Theme.surfaceVariantText
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("No printers found")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-                        visible: CupsService.printerNames.length > 0
-
-                        Repeater {
-                            model: CupsService.printerNames
-
-                            delegate: Rectangle {
-                                id: printerDelegate
-                                required property string modelData
-                                required property int index
-
-                                readonly property var printerData: CupsService.getPrinterData(modelData)
-                                readonly property bool isExpanded: CupsService.expandedPrinter === modelData || hasJobs
-                                readonly property bool hasJobs: (printerData?.jobs?.length ?? 0) > 0
-                                readonly property bool isIdle: printerData?.state === "idle"
-                                readonly property bool isStopped: printerData?.state === "stopped"
-
-                                width: parent.width
-                                height: isExpanded ? 56 + expandedContent.height : 56
-                                radius: Theme.cornerRadius
-                                color: printerMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-                                border.width: CupsService.selectedPrinter === modelData ? 2 : 0
-                                border.color: Theme.primary
-                                clip: true
-
-                                Behavior on height {
-                                    NumberAnimation {
-                                        duration: 150
-                                        easing.type: Easing.OutQuad
-                                    }
-                                }
-
-                                Column {
-                                    anchors.fill: parent
-                                    spacing: 0
-
-                                    Item {
-                                        width: parent.width
-                                        height: 56
-
-                                        Row {
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: Theme.spacingM
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: printerActions.left
-                                            anchors.rightMargin: Theme.spacingS
-                                            spacing: Theme.spacingS
-
-                                            DankIcon {
-                                                name: isStopped ? "print_disabled" : "print"
-                                                size: 20
-                                                color: isStopped ? Theme.error : (isIdle ? Theme.primary : Theme.warning)
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-
-                                            Column {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                spacing: Theme.spacingXXS
-                                                width: parent.width - 20 - Theme.spacingS
-
-                                                StyledText {
-                                                    text: modelData
-                                                    font.pixelSize: Theme.fontSizeMedium
-                                                    color: Theme.surfaceText
-                                                    font.weight: CupsService.selectedPrinter === modelData ? Font.Medium : Font.Normal
-                                                    elide: Text.ElideRight
-                                                    width: parent.width
-                                                    horizontalAlignment: Text.AlignLeft
-                                                }
-
-                                                Row {
-                                                    anchors.left: parent.left
-                                                    spacing: Theme.spacingXS
-
-                                                    StyledText {
-                                                        text: CupsService.getPrinterStateTranslation(printerData?.state || "")
-                                                        font.pixelSize: Theme.fontSizeSmall
-                                                        color: {
-                                                            switch (printerData?.state) {
-                                                            case "idle":
-                                                                return Theme.primary;
-                                                            case "stopped":
-                                                                return Theme.error;
-                                                            case "processing":
-                                                                return Theme.warning;
-                                                            default:
-                                                                return Theme.surfaceVariantText;
-                                                            }
-                                                        }
-                                                    }
-
-                                                    StyledText {
-                                                        text: "•"
-                                                        font.pixelSize: Theme.fontSizeSmall
-                                                        color: Theme.surfaceVariantText
-                                                        visible: (printerData?.jobs?.length ?? 0) > 0
-                                                    }
-
-                                                    StyledText {
-                                                        text: I18n.ntr("%1 job", "%1 jobs", printerData?.jobs?.length ?? 0).arg(printerData?.jobs?.length ?? 0)
-                                                        font.pixelSize: Theme.fontSizeSmall
-                                                        color: Theme.surfaceVariantText
-                                                        visible: (printerData?.jobs?.length ?? 0) > 0
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        Row {
-                                            id: printerActions
-                                            anchors.right: parent.right
-                                            anchors.rightMargin: Theme.spacingS
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            spacing: Theme.spacingXS
-
-                                            Rectangle {
-                                                width: 28
-                                                height: 28
-                                                radius: 14
-                                                color: expandBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
-
-                                                DankIcon {
-                                                    anchors.centerIn: parent
-                                                    name: isExpanded ? "expand_less" : "expand_more"
-                                                    size: 18
-                                                    color: Theme.surfaceText
-                                                }
-
-                                                MouseArea {
-                                                    id: expandBtn
-                                                    anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    cursorShape: Qt.PointingHandCursor
-                                                    onClicked: {
-                                                        CupsService.expandedPrinter = isExpanded ? "" : modelData;
-                                                    }
-                                                }
-                                            }
-
-                                            Rectangle {
-                                                width: 28
-                                                height: 28
-                                                radius: 14
-                                                color: deleteBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-
-                                                DankIcon {
-                                                    anchors.centerIn: parent
-                                                    name: "delete"
-                                                    size: 18
-                                                    color: deleteBtn.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                                }
-
-                                                MouseArea {
-                                                    id: deleteBtn
-                                                    anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    cursorShape: Qt.PointingHandCursor
-                                                    onClicked: {
-                                                        deletePrinterConfirm.showWithOptions({
-                                                            title: I18n.tr("Delete Printer"),
-                                                            message: I18n.tr("Delete \"%1\"?").arg(modelData),
-                                                            confirmText: I18n.tr("Delete"),
-                                                            confirmColor: Theme.error,
-                                                            onConfirm: () => CupsService.deletePrinter(modelData)
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: printerMouseArea
-                                            anchors.fill: parent
-                                            anchors.rightMargin: printerActions.width + Theme.spacingM
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                CupsService.setSelectedPrinter(modelData);
-                                            }
-                                        }
-                                    }
-
-                                    Column {
-                                        id: expandedContent
-                                        width: parent.width
-                                        visible: isExpanded
-
-                                        Rectangle {
-                                            width: parent.width - Theme.spacingM * 2
-                                            height: 1
-                                            x: Theme.spacingM
-                                            color: Theme.outlineLight
-                                        }
-
-                                        Item {
-                                            width: parent.width
-                                            height: detailsColumn.implicitHeight + Theme.spacingM * 2
-
-                                            Column {
-                                                id: detailsColumn
-                                                anchors.fill: parent
-                                                anchors.margins: Theme.spacingM
-                                                spacing: Theme.spacingS
-
-                                                Flow {
-                                                    width: parent.width
-                                                    spacing: Theme.spacingXS
-
-                                                    Repeater {
-                                                        model: {
-                                                            const fields = [];
-                                                            const p = printerData;
-                                                            if (!p)
-                                                                return fields;
-
-                                                            fields.push({
-                                                                label: I18n.tr("State"),
-                                                                value: CupsService.getPrinterStateTranslation(p.state)
-                                                            });
-                                                            if (p.stateReason && p.stateReason !== "none")
-                                                                fields.push({
-                                                                    label: I18n.tr("Reason"),
-                                                                    value: CupsService.getPrinterStateReasonTranslation(p.stateReason)
-                                                                });
-                                                            if (p.makeModel)
-                                                                fields.push({
-                                                                    label: I18n.tr("Model"),
-                                                                    value: p.makeModel
-                                                                });
-                                                            if (p.location)
-                                                                fields.push({
-                                                                    label: I18n.tr("Location"),
-                                                                    value: p.location
-                                                                });
-                                                            fields.push({
-                                                                label: I18n.tr("Accepting"),
-                                                                value: p.accepting ? I18n.tr("Yes") : I18n.tr("No")
-                                                            });
-
-                                                            return fields;
-                                                        }
-
-                                                        delegate: Rectangle {
-                                                            required property var modelData
-                                                            required property int index
-
-                                                            width: fieldContent.width + Theme.spacingM * 2
-                                                            height: 32
-                                                            radius: Theme.cornerRadius - 2
-                                                            color: Theme.floatingWindowFieldColor
-                                                            border.width: 1
-                                                            border.color: Theme.floatingWindowFieldBorderColor
-
-                                                            Row {
-                                                                id: fieldContent
-                                                                anchors.centerIn: parent
-                                                                spacing: Theme.spacingXS
-
-                                                                StyledText {
-                                                                    text: modelData.label + ":"
-                                                                    font.pixelSize: Theme.fontSizeSmall
-                                                                    color: Theme.surfaceVariantText
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                }
-
-                                                                StyledText {
-                                                                    text: modelData.value
-                                                                    font.pixelSize: Theme.fontSizeSmall
-                                                                    color: Theme.surfaceText
-                                                                    font.weight: Font.Medium
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                Row {
-                                                    width: parent.width
-                                                    spacing: Theme.spacingS
-
-                                                    Rectangle {
-                                                        height: 28
-                                                        width: pauseResumeRow.width + Theme.spacingM * 2
-                                                        radius: 14
-                                                        color: pauseResumeArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-
-                                                        Row {
-                                                            id: pauseResumeRow
-                                                            anchors.centerIn: parent
-                                                            spacing: Theme.spacingXS
-
-                                                            DankIcon {
-                                                                name: isStopped ? "play_arrow" : "pause"
-                                                                size: 16
-                                                                color: Theme.surfaceText
-                                                            }
-
-                                                            StyledText {
-                                                                text: isStopped ? I18n.tr("Resume") : I18n.tr("Pause")
-                                                                font.pixelSize: Theme.fontSizeSmall
-                                                                color: Theme.surfaceText
-                                                                font.weight: Font.Medium
-                                                            }
-                                                        }
-
-                                                        MouseArea {
-                                                            id: pauseResumeArea
-                                                            anchors.fill: parent
-                                                            hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            onClicked: {
-                                                                if (isStopped) {
-                                                                    CupsService.resumePrinter(modelData);
-                                                                } else {
-                                                                    CupsService.pausePrinter(modelData);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    Rectangle {
-                                                        height: 28
-                                                        width: testPageRow.width + Theme.spacingM * 2
-                                                        radius: 14
-                                                        color: testPageArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-
-                                                        Row {
-                                                            id: testPageRow
-                                                            anchors.centerIn: parent
-                                                            spacing: Theme.spacingXS
-
-                                                            DankIcon {
-                                                                name: "description"
-                                                                size: 16
-                                                                color: Theme.surfaceText
-                                                            }
-
-                                                            StyledText {
-                                                                text: I18n.tr("Test Page")
-                                                                font.pixelSize: Theme.fontSizeSmall
-                                                                color: Theme.surfaceText
-                                                                font.weight: Font.Medium
-                                                            }
-                                                        }
-
-                                                        MouseArea {
-                                                            id: testPageArea
-                                                            anchors.fill: parent
-                                                            hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            onClicked: CupsService.printTestPage(modelData)
-                                                        }
-                                                    }
-
-                                                    Rectangle {
-                                                        height: 28
-                                                        width: acceptRejectRow.width + Theme.spacingM * 2
-                                                        radius: 14
-                                                        color: acceptRejectArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-
-                                                        Row {
-                                                            id: acceptRejectRow
-                                                            anchors.centerIn: parent
-                                                            spacing: Theme.spacingXS
-
-                                                            DankIcon {
-                                                                name: printerData?.accepting ? "block" : "check_circle"
-                                                                size: 16
-                                                                color: Theme.surfaceText
-                                                            }
-
-                                                            StyledText {
-                                                                text: printerData?.accepting ? I18n.tr("Reject Jobs") : I18n.tr("Accept Jobs")
-                                                                font.pixelSize: Theme.fontSizeSmall
-                                                                color: Theme.surfaceText
-                                                                font.weight: Font.Medium
-                                                            }
-                                                        }
-
-                                                        MouseArea {
-                                                            id: acceptRejectArea
-                                                            anchors.fill: parent
-                                                            hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            onClicked: {
-                                                                if (printerData?.accepting) {
-                                                                    CupsService.rejectJobs(modelData);
-                                                                } else {
-                                                                    CupsService.acceptJobs(modelData);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                Column {
-                                                    width: parent.width
-                                                    spacing: Theme.spacingXS
-                                                    visible: (printerData?.jobs?.length ?? 0) > 0
-
-                                                    Row {
-                                                        width: parent.width
-                                                        spacing: Theme.spacingS
-
-                                                        StyledText {
-                                                            text: I18n.tr("Jobs")
-                                                            font.pixelSize: Theme.fontSizeSmall
-                                                            font.weight: Font.Medium
-                                                            color: Theme.surfaceText
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                        }
-
-                                                        Item {
-                                                            width: 1
-                                                            height: 1
-                                                            Layout.fillWidth: true
-                                                        }
-
-                                                        Rectangle {
-                                                            height: 24
-                                                            width: purgeRow.width + Theme.spacingM * 2
-                                                            radius: 12
-                                                            color: purgeArea.containsMouse ? Theme.errorHover : Theme.surfaceLight
-
-                                                            Row {
-                                                                id: purgeRow
-                                                                anchors.centerIn: parent
-                                                                spacing: Theme.spacingXS
-
-                                                                DankIcon {
-                                                                    name: "delete_sweep"
-                                                                    size: 14
-                                                                    color: purgeArea.containsMouse ? Theme.error : Theme.surfaceText
-                                                                }
-
-                                                                StyledText {
-                                                                    text: I18n.tr("Clear All")
-                                                                    font.pixelSize: Theme.fontSizeSmall - 1
-                                                                    color: purgeArea.containsMouse ? Theme.error : Theme.surfaceText
-                                                                    font.weight: Font.Medium
-                                                                }
-                                                            }
-
-                                                            MouseArea {
-                                                                id: purgeArea
-                                                                anchors.fill: parent
-                                                                hoverEnabled: true
-                                                                cursorShape: Qt.PointingHandCursor
-                                                                onClicked: {
-                                                                    purgeJobsConfirm.showWithOptions({
-                                                                        title: I18n.tr("Clear All Jobs"),
-                                                                        message: I18n.tr("Cancel all jobs for \"%1\"?").arg(modelData),
-                                                                        confirmText: I18n.tr("Clear"),
-                                                                        confirmColor: Theme.error,
-                                                                        onConfirm: () => CupsService.purgeJobs(modelData)
-                                                                    });
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    Repeater {
-                                                        model: printerData?.jobs ?? []
-
-                                                        delegate: Rectangle {
-                                                            required property var modelData
-                                                            required property int index
-
-                                                            width: parent.width
-                                                            height: 44
-                                                            radius: Theme.cornerRadius - 2
-                                                            color: Theme.floatingWindowFieldColor
-                                                            border.width: 1
-                                                            border.color: Theme.floatingWindowFieldBorderColor
-
-                                                            Row {
-                                                                anchors.left: parent.left
-                                                                anchors.leftMargin: Theme.spacingS
-                                                                anchors.right: jobActions.left
-                                                                anchors.rightMargin: Theme.spacingS
-                                                                anchors.verticalCenter: parent.verticalCenter
-                                                                spacing: Theme.spacingS
-
-                                                                DankIcon {
-                                                                    name: "description"
-                                                                    size: 18
-                                                                    color: Theme.surfaceVariantText
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                }
-
-                                                                Column {
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                    spacing: 1
-                                                                    width: parent.width - 18 - Theme.spacingS
-
-                                                                    StyledText {
-                                                                        text: "[" + modelData.id + "] " + CupsService.getJobStateTranslation(modelData.state)
-                                                                        font.pixelSize: Theme.fontSizeSmall
-                                                                        color: Theme.surfaceText
-                                                                        elide: Text.ElideRight
-                                                                        width: parent.width
-                                                                        horizontalAlignment: Text.AlignLeft
-                                                                    }
-
-                                                                    StyledText {
-                                                                        text: {
-                                                                            const size = Math.round((modelData.size || 0) / 1024);
-                                                                            const date = new Date(modelData.timeCreated);
-                                                                            return size + " KB • " + date.toLocaleString(Qt.locale(), Locale.ShortFormat);
-                                                                        }
-                                                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                                                        color: Theme.surfaceVariantText
-                                                                        anchors.left: parent.left
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            Row {
-                                                                id: jobActions
-                                                                anchors.right: parent.right
-                                                                anchors.rightMargin: Theme.spacingS
-                                                                anchors.verticalCenter: parent.verticalCenter
-                                                                spacing: Theme.spacingXS
-
-                                                                Rectangle {
-                                                                    width: 24
-                                                                    height: 24
-                                                                    radius: 12
-                                                                    color: holdJobBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
-                                                                    visible: modelData.state === "pending"
-
-                                                                    DankIcon {
-                                                                        anchors.centerIn: parent
-                                                                        name: "pause"
-                                                                        size: 14
-                                                                        color: Theme.surfaceVariantText
-                                                                    }
-
-                                                                    MouseArea {
-                                                                        id: holdJobBtn
-                                                                        anchors.fill: parent
-                                                                        hoverEnabled: true
-                                                                        cursorShape: Qt.PointingHandCursor
-                                                                        onClicked: CupsService.holdJob(modelData.id)
-                                                                    }
-                                                                }
-
-                                                                Rectangle {
-                                                                    width: 24
-                                                                    height: 24
-                                                                    radius: 12
-                                                                    color: restartJobBtn.containsMouse ? Theme.surfacePressed : Theme.withAlpha(Theme.surfacePressed, 0)
-                                                                    visible: modelData.state === "pending-held" || modelData.state === "completed" || modelData.state === "aborted"
-
-                                                                    DankIcon {
-                                                                        anchors.centerIn: parent
-                                                                        name: "replay"
-                                                                        size: 14
-                                                                        color: Theme.surfaceVariantText
-                                                                    }
-
-                                                                    MouseArea {
-                                                                        id: restartJobBtn
-                                                                        anchors.fill: parent
-                                                                        hoverEnabled: true
-                                                                        cursorShape: Qt.PointingHandCursor
-                                                                        onClicked: CupsService.restartJob(modelData.id)
-                                                                    }
-                                                                }
-
-                                                                Rectangle {
-                                                                    width: 24
-                                                                    height: 24
-                                                                    radius: 12
-                                                                    color: cancelJobBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-
-                                                                    DankIcon {
-                                                                        anchors.centerIn: parent
-                                                                        name: "close"
-                                                                        size: 14
-                                                                        color: cancelJobBtn.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                                                    }
-
-                                                                    MouseArea {
-                                                                        id: cancelJobBtn
-                                                                        anchors.fill: parent
-                                                                        hoverEnabled: true
-                                                                        cursorShape: Qt.PointingHandCursor
-                                                                        onClicked: CupsService.cancelJob(printerDelegate.modelData, modelData.id)
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "workspaces"
+            title: I18n.tr("Classes", "printer settings card title, cups printer classes")
+            visible: CupsService.cupsAvailable && CupsService.printerClasses.length > 0
+
+            headerActions: [
+                StyledText {
+                    text: (CupsService.printerClasses.length === 1 ? I18n.tr("%1 class", "singular, %1 is 1, printer class count") : I18n.tr("%1 classes", "plural, %1 is a count of printer classes")).arg(CupsService.printerClasses.length)
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    anchors.verticalCenter: parent.verticalCenter
+                },
+                DankActionButton {
+                    iconName: "refresh"
+                    Accessible.name: I18n.tr("Refresh")
+                    buttonSize: 32
+                    onClicked: CupsService.getClasses()
                 }
-            }
+            ]
 
-            StyledRect {
-                width: parent.width
-                height: classesSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-                visible: CupsService.cupsAvailable && CupsService.printerClasses.length > 0
+            Repeater {
+                model: CupsService.printerClasses
 
-                Column {
-                    id: classesSection
+                delegate: SettingsRow {
+                    id: classRow
+                    required property var modelData
+                    required property int index
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
+                    iconName: "workspaces"
+                    iconColor: Theme.surfaceText
+                    title: modelData.name || I18n.tr("Unknown")
+                    subtitle: ((modelData.members?.length ?? 0) === 1 ? I18n.tr("%1 printer") : I18n.tr("%1 printers")).arg(modelData.members?.length ?? 0)
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "workspaces"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - refreshClassesBtn.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("Printer Classes")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            StyledText {
-                                text: I18n.ntr("%1 class", "%1 classes", CupsService.printerClasses.length).arg(CupsService.printerClasses.length)
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
-
-                        DankActionButton {
-                            id: refreshClassesBtn
-                            iconName: "refresh"
-                            buttonSize: 32
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: CupsService.getClasses()
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-
-                        Repeater {
-                            model: CupsService.printerClasses
-
-                            delegate: Rectangle {
-                                required property var modelData
-                                required property int index
-
-                                width: parent.width
-                                height: 48
-                                radius: Theme.cornerRadius
-                                color: classMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-
-                                Row {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: Theme.spacingM
-                                    anchors.right: classActions.left
-                                    anchors.rightMargin: Theme.spacingS
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingS
-
-                                    DankIcon {
-                                        name: "workspaces"
-                                        size: 20
-                                        color: Theme.surfaceText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Column {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: modelData.name || I18n.tr("Unknown")
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            color: Theme.surfaceText
-                                        }
-
-                                        StyledText {
-                                            text: I18n.ntr("%1 printer", "%1 printers", modelData.members?.length ?? 0).arg(modelData.members?.length ?? 0)
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    id: classActions
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: Theme.spacingS
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingXS
-
-                                    Rectangle {
-                                        width: 28
-                                        height: 28
-                                        radius: 14
-                                        color: deleteClassBtn.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: "delete"
-                                            size: 18
-                                            color: deleteClassBtn.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: deleteClassBtn
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                deleteClassConfirm.showWithOptions({
-                                                    title: I18n.tr("Delete Class"),
-                                                    message: I18n.tr("Delete class \"%1\"?").arg(modelData.name),
-                                                    confirmText: I18n.tr("Delete"),
-                                                    confirmColor: Theme.error,
-                                                    onConfirm: () => CupsService.deleteClass(modelData.name)
-                                                });
-                                            }
-                                        }
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: classMouseArea
-                                    anchors.fill: parent
-                                    anchors.rightMargin: classActions.width + Theme.spacingM
-                                    hoverEnabled: true
-                                }
-                            }
+                    DankActionButton {
+                        iconName: "delete"
+                        Accessible.name: I18n.tr("Delete")
+                        onClicked: {
+                            deleteClassConfirm.showWithOptions({
+                                title: I18n.tr("Delete class"),
+                                message: I18n.tr("Delete class \"%1\"?", "confirm dialog message, %1 is the printer class name").arg(classRow.modelData.name),
+                                confirmText: I18n.tr("Delete"),
+                                confirmColor: Theme.error,
+                                onConfirm: () => CupsService.deleteClass(classRow.modelData.name)
+                            });
                         }
                     }
                 }

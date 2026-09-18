@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Modals.DankLauncherV2.Components
 
 Item {
     id: root
@@ -17,7 +18,7 @@ Item {
     signal itemRightClicked(int flatIndex, var item, real mouseX, real mouseY)
 
     height: headerItem.height + (section?.collapsed ? 0 : contentLoader.height + Theme.spacingXS)
-    width: parent?.width ?? 200
+    width: parent?.width ?? Theme.fieldDefaultWidth
 
     SectionHeader {
         id: headerItem
@@ -50,7 +51,7 @@ Item {
             id: listComponent
 
             Column {
-                spacing: Theme.spacingXS
+                spacing: LauncherMetrics.rowGap
                 width: contentLoader.width
 
                 Repeater {
@@ -59,12 +60,14 @@ Item {
                         objectProp: "id"
                     }
 
-                    ResultItem {
+                    LauncherRow {
                         required property var modelData
                         required property int index
 
-                        width: parent?.width ?? 200
+                        width: parent?.width ?? Theme.fieldDefaultWidth
                         item: modelData
+                        firstInGroup: index === 0
+                        lastInGroup: index === (root.section?.items?.length ?? 0) - 1
                         isSelected: (root.startIndex + index) === root.controller?.selectedFlatIndex
                         controller: root.controller
                         flatIndex: root.startIndex + index
@@ -83,7 +86,7 @@ Item {
 
             Flow {
                 width: contentLoader.width
-                spacing: Theme.spacingXS
+                spacing: LauncherMetrics.rowGap
 
                 Repeater {
                     model: ScriptModel {
@@ -91,12 +94,12 @@ Item {
                         objectProp: "id"
                     }
 
-                    GridItem {
+                    LauncherTile {
                         required property var modelData
                         required property int index
 
                         width: Math.floor(contentLoader.width / root.gridColumns)
-                        height: width + 24
+                        height: width + LauncherMetrics.tileLabelHeight
                         item: modelData
                         isSelected: (root.startIndex + index) === root.controller?.selectedFlatIndex
                         controller: root.controller

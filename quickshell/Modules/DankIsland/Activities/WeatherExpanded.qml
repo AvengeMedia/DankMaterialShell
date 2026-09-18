@@ -10,6 +10,7 @@ DashTabFace {
     tabComponent: Component {
         WeatherTab {
             live: root.live
+            editMode: root.editMode
         }
     }
 

@@ -1,6 +1,6 @@
 # Widget Plugin Guide
 
-Widgets are bar plugins that display pills in DankBar, optionally open popouts, and can integrate with the Control Center.
+Widgets display pills in DankBar and in docks (same component, no extra code), optionally open popouts, and can integrate with the Control Center.
 
 ## Base Component
 
@@ -37,6 +37,8 @@ These are automatically set by the plugin host:
 | `pluginId` | string | This plugin's ID |
 | `pluginService` | object | PluginService reference |
 | `pluginData` | object | Reactive plugin settings data |
+| `surfaceContext` | object | The host surface: `kind` (`"bar"` or `"dock"`), `id`, `screen`, `isVertical`, `thickness`, `live`, `editMode`, `inlineExpansion` |
+| `widgetInstanceId` | string | This occurrence; the same widget can appear on several bars and docks |
 
 ## Bar Pills
 
@@ -115,7 +117,6 @@ PluginComponent {
         PopoutComponent {
             headerText: "My Plugin"
             detailsText: "Optional subtitle"
-            showCloseButton: true
 
             Column {
                 width: parent.width
@@ -138,7 +139,6 @@ PluginComponent {
 |----------|------|---------|-------------|
 | `headerText` | string | `""` | Main header (bold, large). Hidden if empty. |
 | `detailsText` | string | `""` | Subtitle below header. Hidden if empty. |
-| `showCloseButton` | bool | `false` | Show X button in top-right corner. |
 | `closePopout` | function | (injected) | Call to close the popout programmatically. |
 | `headerHeight` | int | (readonly) | Height of header area (0 if hidden). |
 | `detailsHeight` | int | (readonly) | Height of details area (0 if hidden). |
@@ -241,15 +241,48 @@ PluginComponent {
 
 **Bar reveal optimization:** The visibility timer automatically pauses while the bar is hidden (auto-hide mode) and resumes checks when the bar is revealed. This is handled via the internal `_barRevealed` property - no plugin code needed. Plugins using `visibilityCommand` with `visibilityInterval` benefit from this automatically.
 
+## Docks
+
+Users add any loaded widget plugin to a dock from the dock's edit mode or Settings > Dock > Apps & widgets. Nothing in the manifest is needed.
+
+- Define both `horizontalBarPill` and `verticalBarPill`; docks sit on any edge.
+- Size icons with `root.iconSize` and text with `Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)`. The dock hands its own thickness and scale in those properties.
+- Gate timers and animations on `surfaceLive` (host visible and `visibilityCommand` passing). Docks auto-hide.
+- Don't assume one instance. Use `widgetInstanceId` if an instance needs its own state.
+
+Optional attached panel: set `attachedContent: Component { ... }`. When the dock's "Open widgets" setting is Inline (`surfaceContext.inlineExpansion`), a click grows the dock and shows the panel next to the apps. With Popout (the default) the normal `popoutContent` opens instead; a widget with no popout still expands inline. Bars always use `popoutContent`. A `pillClickAction` always wins over both.
+
+```qml
+PluginComponent {
+    id: root
+
+    attachedContent: Component {
+        Column {
+            padding: Theme.spacingM
+            spacing: Theme.spacingM
+
+            DankButton {
+                text: I18n.trFor("myPlugin", "Close")
+                onClicked: root.surfaceContext.dismissExpansion()
+            }
+        }
+    }
+}
+```
+
+The panel spans the dock's length and grows up to 320 px away from the edge (at most half the screen). The plugin cannot size it. `attachedActive` is true while this widget owns the panel. Escape closes it. See `quickshell/PLUGINS/AttachedPanelExample` and `quickshell/PLUGINS/SURFACE_WIDGETS.md`.
+
 ## Popout Namespace
 
 For plugins with multiple popout instances, use `layerNamespacePlugin` to isolate popout state:
 
 ```qml
 PluginComponent {
-    layerNamespacePlugin: true
+    layerNamespacePlugin: "my-plugin"
 }
 ```
+
+The shell prefixes it, so the popout's namespace becomes `dms:plugins:my-plugin`.
 
 ## Reading Plugin Data
 
@@ -333,7 +366,6 @@ PluginComponent {
     popoutContent: Component {
         PopoutComponent {
             headerText: "Emoji Picker"
-            showCloseButton: true
 
             DankGridView {
                 width: parent.width

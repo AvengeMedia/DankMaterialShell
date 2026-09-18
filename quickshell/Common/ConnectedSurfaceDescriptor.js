@@ -96,6 +96,7 @@ function normalize(input, defaults) {
         "barSide": _barSide(source.barSide, _barSide(base.barSide, defaultSide)),
         "bodyRect": bodyRect,
         "animationOffset": animationOffset,
+        "surfaceRadius": Math.max(-1, _number(source.surfaceRadius, _number(base.surfaceRadius, -1))),
         "scale": Math.max(0, _number(source.scale, _number(base.scale, 1))),
         "opacity": opacity,
         "omitStartConnector": _bool(source.omitStartConnector, _bool(base.omitStartConnector, false)),
@@ -139,6 +140,7 @@ function same(a, b, threshold) {
         && Math.abs(a.bodyRect.height - b.bodyRect.height) < epsilon
         && Math.abs(a.animationOffset.x - b.animationOffset.x) < epsilon
         && Math.abs(a.animationOffset.y - b.animationOffset.y) < epsilon
+        && Math.abs(a.surfaceRadius - b.surfaceRadius) < epsilon
         && Math.abs(a.scale - b.scale) < 0.0001
         && Math.abs(a.opacity - b.opacity) < 0.0001
         && a.omitStartConnector === b.omitStartConnector

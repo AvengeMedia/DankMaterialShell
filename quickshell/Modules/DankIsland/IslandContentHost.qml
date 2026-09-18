@@ -86,14 +86,29 @@ Item {
             "launcher": launcherExpandedLoader,
             "wallpaper": wallpaperExpandedLoader,
             "weather": weatherExpandedLoader,
-            "notificationcenter": notificationCenterExpandedLoader
+            "notificationcenter": notificationCenterExpandedLoader,
+            "controlcenter": controlCenterExpandedLoader
         })
 
     function requestActivityFocus() {
+        if (root.activityId === "launcher" && launcherExpandedLoader.active) {
+            // Reserve focus until the launcher is ready.
+            root.refocusLauncher();
+            return true;
+        }
         const face = root.focusableFaces[root.activityId]?.item;
         if (!face || typeof face.focusFace !== "function")
             return false;
         return face.focusFace() === true;
+    }
+
+    function refocusLauncher() {
+        if (root.activityId !== "launcher" || !root.controller.keyboardDismissRequested || !launcherExpandedLoader.enabled)
+            return;
+        const face = launcherExpandedLoader.item;
+        if (!face || face.activeFocus)
+            return;
+        face.focusFace();
     }
 
     function latchHomeExpanded() {
@@ -216,6 +231,14 @@ Item {
         asynchronous: true
         sourceComponent: root.launcherExpandedComponent
         opacity: root.expandedOpacity("launcher")
+        onEnabledChanged: {
+            if (enabled)
+                root.refocusLauncher();
+        }
+        onItemChanged: {
+            if (item)
+                root.refocusLauncher();
+        }
     }
 
     CompactFace {
@@ -226,6 +249,7 @@ Item {
     }
 
     ExpandedFace {
+        id: controlCenterExpandedLoader
         activity: "controlcenter"
         active: root.controller.visualsRequested("controlcenter")
         asynchronous: false

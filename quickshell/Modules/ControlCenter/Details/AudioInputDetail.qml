@@ -1,354 +1,105 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 import qs.Common
+import qs.Modules.ControlCenter
+import qs.Modules.ControlCenter.Widgets
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
-Rectangle {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property bool hasInputVolumeSliderInCC: {
-        const widgets = SettingsData.controlCenterWidgets || [];
-        return widgets.some(widget => widget.id === "inputVolumeSlider");
+    readonly property string title: I18n.tr("Audio Input")
+    readonly property var pinnedInputs: QmlUtils.normalizePinList((CacheData.audioInputDevicePins || {})["preferredInput"])
+
+    readonly property Item headerActions: CcSettingsButton {
+        settingsTab: "audio"
     }
 
-    implicitHeight: headerRow.height + (hasInputVolumeSliderInCC ? 0 : volumeSlider.height) + audioContent.height + Theme.spacingM
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
-
-    Row {
-        id: headerRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.topMargin: Theme.spacingS
-        height: 40
-
-        StyledText {
-            id: headerText
-            text: I18n.tr("Input Devices")
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.surfaceText
-            font.weight: Font.Medium
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Item {
-            height: 1
-            width: parent.width - headerText.width - settingsButton.width
-        }
-
-        DankActionButton {
-            id: settingsButton
-            anchors.verticalCenter: parent.verticalCenter
-            iconName: "settings"
-            buttonSize: 28
-            iconSize: 16
-            iconColor: Theme.surfaceVariantText
-            onClicked: {
-                PopoutService.closeControlCenter();
-                PopoutService.openSettingsWithTab("audio");
-            }
-        }
+    function togglePin(name) {
+        CacheData.set("audioInputDevicePins", QmlUtils.togglePinEntry(CacheData.audioInputDevicePins, "preferredInput", name, CcMetrics.maxPins));
     }
 
-    Row {
-        id: volumeSlider
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: headerRow.bottom
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.topMargin: Theme.spacingXS
-        height: 35
-        spacing: 0
-        visible: !hasInputVolumeSliderInCC
-
-        Rectangle {
-            width: Theme.iconSize + Theme.spacingS * 2
-            height: Theme.iconSize + Theme.spacingS * 2
-            anchors.verticalCenter: parent.verticalCenter
-            radius: (Theme.iconSize + Theme.spacingS * 2) / 2
-            color: iconArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
-
-            DankRipple {
-                id: iconRipple
-                cornerRadius: parent.radius
-            }
-
-            MouseArea {
-                id: iconArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onPressed: mouse => iconRipple.trigger(mouse.x, mouse.y)
-                onClicked: {
-                    if (AudioService.source && AudioService.source.audio) {
-                        AudioService.source.audio.muted = !AudioService.source.audio.muted;
-                    }
-                }
-            }
-
-            DankIcon {
-                anchors.centerIn: parent
-                name: {
-                    if (!AudioService.source || !AudioService.source.audio)
-                        return "mic_off";
-                    let muted = AudioService.source.audio.muted;
-                    return muted ? "mic_off" : "mic";
-                }
-                size: Theme.iconSize
-                color: AudioService.source && AudioService.source.audio && !AudioService.source.audio.muted && AudioService.source.audio.volume > 0 ? Theme.primary : Theme.surfaceText
-            }
-        }
-
-        DankSlider {
-            readonly property real actualVolumePercent: AudioService.source && AudioService.source.audio ? Math.round(AudioService.source.audio.volume * 100) : 0
-
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
-            enabled: AudioService.source && AudioService.source.audio
-            minimum: 0
-            maximum: 100
-            value: AudioService.source && AudioService.source.audio ? Math.min(100, Math.round(AudioService.source.audio.volume * 100)) : 0
-            showValue: true
-            unit: "%"
-            valueOverride: actualVolumePercent
-            thumbOutlineColor: Theme.surfaceVariant
-            trackColor: Theme.ccSliderTrackColor
-            trackOpacity: Theme.ccSliderTrackOpacity
-
-            onSliderValueChanged: function (newValue) {
-                if (AudioService.source && AudioService.source.audio) {
-                    AudioService.source.audio.volume = newValue / 100;
-                    if (newValue > 0 && AudioService.source.audio.muted) {
-                        AudioService.source.audio.muted = false;
-                    }
-                }
-            }
-        }
+    function deviceIcon(node) {
+        const name = node?.name ?? "";
+        return name.includes("bluez") || name.includes("usb") ? "headset" : "mic";
     }
 
     DankFlickable {
-        id: audioContent
-        anchors.top: hasInputVolumeSliderInCC ? headerRow.bottom : volumeSlider.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: Theme.spacingM
-        anchors.topMargin: hasInputVolumeSliderInCC ? Theme.spacingM : Theme.spacingS
-        contentHeight: audioColumn.height
+        anchors.fill: parent
+        contentHeight: column.height
         clip: true
 
-        property int maxPinnedInputs: 3
-
-        function getPinnedInputs() {
-            const pins = CacheData.audioInputDevicePins || {};
-            return QmlUtils.normalizePinList(pins["preferredInput"]);
-        }
-
         Column {
-            id: audioColumn
+            id: column
             width: parent.width
-            spacing: Theme.spacingS
+            spacing: Theme.spacingM
 
-            Repeater {
-                model: ScriptModel {
-                    values: {
-                        const hidden = SessionData.hiddenInputDeviceNames ?? [];
-                        const nodes = Pipewire.nodes.values.filter(node => {
-                            if (!node.audio || node.isSink || node.isStream)
-                                return false;
-                            return !hidden.includes(node.name);
-                        });
-                        const pinnedList = audioContent.getPinnedInputs();
-
-                        let sorted = [...nodes];
-                        sorted.sort((a, b) => {
-                            // Pinned device first
-                            const aPinnedIndex = pinnedList.indexOf(a.name);
-                            const bPinnedIndex = pinnedList.indexOf(b.name);
-                            if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
-                                if (aPinnedIndex === -1)
-                                    return 1;
-                                if (bPinnedIndex === -1)
-                                    return -1;
-                                return aPinnedIndex - bPinnedIndex;
-                            }
-                            // Then active device
-                            if (a === AudioService.source && b !== AudioService.source)
-                                return -1;
-                            if (b === AudioService.source && a !== AudioService.source)
-                                return 1;
-                            return 0;
-                        });
-                        return sorted;
-                    }
+            CcGroup {
+                AudioSliderRow {
+                    node: AudioService.source
+                    isInput: true
                 }
+            }
 
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
+            SettingsSectionLabel {
+                text: I18n.tr("Input devices")
+            }
 
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: deviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
-                    border.color: modelData === AudioService.source ? Theme.primary : Theme.outlineLight
-                    border.width: modelData === AudioService.source ? 2 : 1
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: {
-                                if (modelData.name.includes("bluez"))
-                                    return "headset";
-                                else if (modelData.name.includes("usb"))
-                                    return "headset";
-                                else
-                                    return "mic";
-                            }
-                            size: Theme.iconSize - 4
-                            color: modelData === AudioService.source ? Theme.primary : Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: {
-                                const iconWidth = Theme.iconSize;
-                                const pinButtonWidth = pinInputRow.width + Theme.spacingS * 4 + Theme.spacingM;
-                                return parent.parent.width - iconWidth - parent.spacing - pinButtonWidth - Theme.spacingM * 2;
-                            }
-
-                            StyledText {
-                                text: AudioService.displayName(modelData)
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: modelData === AudioService.source ? Font.Medium : Font.Normal
-                                elide: Text.ElideRight
-                                width: parent.width
-                                wrapMode: Text.NoWrap
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            StyledText {
-                                text: modelData === AudioService.source ? I18n.tr("Active") : I18n.tr("Available")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                elide: Text.ElideRight
-                                width: parent.width
-                                wrapMode: Text.NoWrap
-                                horizontalAlignment: Text.AlignLeft
-                            }
+            CcGroup {
+                Repeater {
+                    model: ScriptModel {
+                        values: {
+                            const hidden = SessionData.hiddenInputDeviceNames ?? [];
+                            const nodes = Pipewire.nodes.values.filter(node => node.audio && !node.isSink && !node.isStream && !hidden.includes(node.name));
+                            const pinnedList = root.pinnedInputs;
+                            return nodes.sort((a, b) => {
+                                const aPinned = pinnedList.indexOf(a.name);
+                                const bPinned = pinnedList.indexOf(b.name);
+                                if (aPinned !== -1 || bPinned !== -1) {
+                                    if (aPinned === -1)
+                                        return 1;
+                                    if (bPinned === -1)
+                                        return -1;
+                                    return aPinned - bPinned;
+                                }
+                                if (a === AudioService.source && b !== AudioService.source)
+                                    return -1;
+                                if (b === AudioService.source && a !== AudioService.source)
+                                    return 1;
+                                return 0;
+                            });
                         }
                     }
 
-                    Rectangle {
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: pinInputRow.width + Theme.spacingS * 2
-                        height: 28
-                        radius: height / 2
-                        color: {
-                            const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
-                            return isThisDevicePinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05);
-                        }
+                    CcListRow {
+                        id: deviceRow
 
-                        Row {
-                            id: pinInputRow
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
+                        required property var modelData
 
-                            DankIcon {
-                                name: "push_pin"
-                                size: 16
-                                color: {
-                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
-                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
-                                }
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: {
-                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
-                                    return isThisDevicePinned ? I18n.tr("Pinned") : I18n.tr("Pin");
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: {
-                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
-                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
-                                }
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DankRipple {
-                            id: pinRipple
-                            cornerRadius: parent.radius
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
-                            onClicked: {
-                                const pins = JSON.parse(JSON.stringify(CacheData.audioInputDevicePins || {}));
-                                let pinnedList = QmlUtils.normalizePinList(pins["preferredInput"]);
-                                const pinIndex = pinnedList.indexOf(modelData.name);
-
-                                if (pinIndex !== -1) {
-                                    pinnedList.splice(pinIndex, 1);
-                                } else {
-                                    pinnedList.unshift(modelData.name);
-                                    if (pinnedList.length > audioContent.maxPinnedInputs)
-                                        pinnedList = pinnedList.slice(0, audioContent.maxPinnedInputs);
-                                }
-
-                                if (pinnedList.length > 0)
-                                    pins["preferredInput"] = pinnedList;
-                                else
-                                    delete pins["preferredInput"];
-
-                                CacheData.set("audioInputDevicePins", pins);
-                            }
-                        }
-                    }
-
-                    DankRipple {
-                        id: deviceRipple
-                        cornerRadius: parent.radius
-                    }
-
-                    MouseArea {
-                        id: deviceMouseArea
-                        anchors.fill: parent
-                        anchors.rightMargin: pinInputRow.width + Theme.spacingS * 4
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: mouse => {
-                            let mapped = mapToItem(parent, mouse.x, mouse.y);
-                            deviceRipple.trigger(mapped.x, mapped.y);
-                        }
+                        iconName: root.deviceIcon(modelData)
+                        title: AudioService.displayName(modelData)
+                        subtitle: active ? I18n.tr("Active") : I18n.tr("Available")
+                        active: modelData === AudioService.source
+                        showActiveCheck: true
+                        clickable: true
                         onClicked: {
-                            if (modelData && modelData.name) {
+                            if (modelData?.name)
                                 AudioService.setDefaultSourceByName(modelData.name);
-                            }
+                        }
+
+                        CcPinChip {
+                            anchors.verticalCenter: parent.verticalCenter
+                            pinned: root.pinnedInputs.includes(deviceRow.modelData.name)
+                            onToggled: root.togglePin(deviceRow.modelData.name)
                         }
                     }
                 }

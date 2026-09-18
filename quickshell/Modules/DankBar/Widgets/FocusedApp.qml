@@ -3,7 +3,6 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
-import Quickshell.Hyprland
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -13,10 +12,10 @@ BasePill {
     id: root
 
     property var widgetData: null
-    property bool compactMode: widgetData?.focusedWindowCompactMode !== undefined ? widgetData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode
-    property bool showIcon: widgetData?.focusedWindowShowIcon !== undefined ? widgetData.focusedWindowShowIcon : SettingsData.focusedWindowShowIcon
+    property bool compactMode: SettingsData.widgetOption("focusedWindow", widgetData, "focusedWindowCompactMode")
+    property bool showIcon: SettingsData.widgetOption("focusedWindow", widgetData, "focusedWindowShowIcon")
     readonly property int maxWidth: {
-        const size = widgetData?.focusedWindowSize !== undefined ? widgetData.focusedWindowSize : SettingsData.focusedWindowSize;
+        const size = SettingsData.widgetOption("focusedWindow", widgetData, "focusedWindowSize");
         switch (size) {
         case 0:
             return 288;
@@ -34,108 +33,12 @@ BasePill {
     property var activeWindow: null
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
-    property bool isAutoHideBar: false
 
-    function resolveSortedWindow() {
-        const sortedWindows = CompositorService.sortedToplevels || [];
-        const exactMatch = sortedWindows.find(window => window === activeWindow || window.wayland === activeWindow || window.sourceToplevel === activeWindow);
-        if (exactMatch)
-            return exactMatch;
-
-        const titleMatches = sortedWindows.filter(window => window.appId === activeWindow.appId && window.title === activeWindow.title);
-        return titleMatches.length === 1 ? titleMatches[0] : null;
-    }
-
-    function resolveActiveWindowPid() {
-        if (!activeWindow)
-            return 0;
-        if (CompositorService.isNiri) {
-            const sortedWindow = resolveSortedWindow();
-            return sortedWindow?.niriWindowId !== undefined ? NiriService.windows.find(w => w.id === sortedWindow.niriWindowId)?.pid || 0 : 0;
-        }
-        if (CompositorService.isHyprland) {
-            const hyprWindow = Array.from(Hyprland.toplevels?.values || []).find(t => t.wayland === activeWindow);
-            return hyprWindow?.lastIpcObject?.pid || 0;
-        }
-        if (CompositorService.isMango) {
-            const sortedWindow = resolveSortedWindow();
-            return sortedWindow?.mangoWindowId !== undefined ? MangoService.windows.find(w => w.id === sortedWindow.mangoWindowId)?.pid || 0 : 0;
-        }
-        return activeWindow.pid || 0;
-    }
-
-    readonly property real minTooltipY: {
-        if (!parentScreen || !isVerticalOrientation) {
-            return 0;
-        }
-
-        if (isAutoHideBar) {
-            return 0;
-        }
-
-        if (parentScreen.y > 0) {
-            return barThickness + (barSpacing || 4);
-        }
-
-        return 0;
-    }
-
-    function isWindowAlive(win) {
-        if (!win)
-            return false;
-        const alive = ToplevelManager.toplevels?.values;
-        return !!alive && Array.from(alive).some(t => t === win);
-    }
-
-    function getNiriFocusedWindow() {
-        if (!CompositorService.isNiri)
-            return null;
-        const focused = NiriService.windows.find(w => w.is_focused);
-        if (focused)
-            return focused;
-        if (!focusedWindowPopoutLoader.item?.shouldBeVisible || NiriService.lastFocusedWindowId === null)
-            return null;
-        return NiriService.windows.find(w => w.id === NiriService.lastFocusedWindowId) || null;
-    }
+    readonly property string screenName: parentScreen?.name ?? ""
+    readonly property bool popoutVisible: focusedWindowPopoutLoader.item?.shouldBeVisible ?? false
 
     function updateActiveWindow() {
-        if (CompositorService.isAqueous && AqueousService.available) {
-            const focused = AqueousService.focusedWindow;
-            activeWindow = focused && (!parentScreen || focused.screens.some(s => s.name === parentScreen.name)) ? focused : null;
-            return;
-        }
-        let active = ToplevelManager.activeToplevel;
-
-        if (!active && CompositorService.isNiri) {
-            const focusedWin = getNiriFocusedWindow();
-            if (focusedWin) {
-                const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
-                if (screenWsIds.has(focusedWin.workspace_id)) {
-                    const sortedMatch = (CompositorService.sortedToplevels || []).find(st => st.niriWindowId === focusedWin.id);
-                    active = sortedMatch?.sourceToplevel || (Array.from(ToplevelManager.toplevels?.values || []).find(t => t.appId === focusedWin.app_id && (!focusedWin.title || t.title === focusedWin.title)) || null);
-                }
-            }
-        }
-
-        if (!active) {
-            if (activeWindow) {
-                if (CompositorService.isNiri) {
-                    const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
-                    const wsWindows = currentWs ? NiriService.windows.filter(w => w.workspace_id === currentWs.id) : [];
-                    if (!isWindowAlive(activeWindow) || wsWindows.length === 0)
-                        activeWindow = null;
-                } else if (!isWindowAlive(activeWindow)) {
-                    activeWindow = null;
-                }
-            }
-            return;
-        }
-
-        if (!parentScreen || CompositorService.filterCurrentDisplay([active], parentScreen?.name)?.length > 0) {
-            activeWindow = active;
-        } else if (!isWindowAlive(activeWindow)) {
-            activeWindow = null;
-        }
+        activeWindow = CompositorService.activeWindowForScreen(parentScreen ? parentScreen.name : null, activeWindow, popoutVisible);
     }
 
     Component.onCompleted: {
@@ -143,29 +46,16 @@ BasePill {
         updateDesktopEntry();
     }
 
-    Connections {
-        target: ToplevelManager
-        function onActiveToplevelChanged() {
-            root.updateActiveWindow();
-        }
-    }
+    readonly property Toplevel managerActiveToplevel: ToplevelManager.activeToplevel
+
+    onManagerActiveToplevelChanged: updateActiveWindow()
 
     Connections {
         target: CompositorService
         function onToplevelsChanged() {
             root.updateActiveWindow();
         }
-    }
-
-    Connections {
-        target: CompositorService.isNiri ? NiriService : null
-        function onWindowsChanged() {
-            root.updateActiveWindow();
-        }
-        function onCurrentOutputChanged() {
-            root.updateActiveWindow();
-        }
-        function onAllWorkspacesChanged() {
+        function onWorkspaceStateChanged() {
             root.updateActiveWindow();
         }
     }
@@ -182,34 +72,28 @@ BasePill {
         if (!popout || !activeWindow || !root.parentScreen)
             return;
         popout.currentWindow = activeWindow;
-        popout.processId = root.resolveActiveWindowPid();
+        popout.processId = CompositorService.windowPid(activeWindow);
         const globalPos = root.visualContent.mapToItem(null, 0, 0);
         const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
         const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
         popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
     }
 
-    Connections {
-        target: root
-        function onActiveWindowChanged() {
-            root.updateDesktopEntry();
-            if (focusedWindowPopoutLoader.item?.shouldBeVisible) {
-                if (root.activeWindow) {
-                    root.syncPopoutState();
-                    Qt.callLater(() => root.syncPopoutState());
-                } else {
-                    focusedWindowPopoutLoader.item.close();
-                }
+    onActiveWindowChanged: {
+        updateDesktopEntry();
+        if (focusedWindowPopoutLoader.item?.shouldBeVisible) {
+            if (activeWindow) {
+                syncPopoutState();
+                Qt.callLater(() => root.syncPopoutState());
+            } else {
+                focusedWindowPopoutLoader.item.close();
             }
         }
     }
 
-    Connections {
-        target: SettingsData
-        function onAppIdSubstitutionsChanged() {
-            root.updateDesktopEntry();
-        }
-    }
+    readonly property var settingsAppIdSubstitutions: SettingsData.appIdSubstitutions
+
+    onSettingsAppIdSubstitutionsChanged: updateDesktopEntry()
 
     function updateDesktopEntry() {
         if (activeWindow && activeWindow.appId) {
@@ -220,42 +104,10 @@ BasePill {
         }
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
-        if (CompositorService.isNiri) {
-            if (!activeWindow || !(activeWindow.title || activeWindow.appId))
-                return false;
-            if (NiriService.currentOutput !== (parentScreen?.name ?? ""))
-                return true;
-            const focusedWin = getNiriFocusedWindow();
-            if (!focusedWin) {
-                const currentWs = NiriService.allWorkspaces.find(ws => ws.output === (parentScreen?.name ?? "") && ws.is_active);
-                return !!currentWs && NiriService.windows.some(w => w.workspace_id === currentWs.id);
-            }
-            const screenWsIds = new Set(NiriService.allWorkspaces.filter(ws => ws.output === (parentScreen?.name ?? "")).map(ws => ws.id));
-            return screenWsIds.has(focusedWin.workspace_id);
-        }
-
-        if (CompositorService.isHyprland) {
-            if (!Hyprland.focusedWorkspace || !activeWindow || !(activeWindow.title || activeWindow.appId)) {
-                return false;
-            }
-
-            try {
-                if (!Hyprland.toplevels)
-                    return false;
-                const hyprlandToplevels = Array.from(Hyprland.toplevels.values);
-                const activeHyprToplevel = hyprlandToplevels.find(t => t?.wayland === activeWindow);
-
-                if (!activeHyprToplevel || !activeHyprToplevel.workspace) {
-                    return false;
-                }
-
-                return activeHyprToplevel.workspace.id === Hyprland.focusedWorkspace.id;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        return activeWindow && (activeWindow.title || activeWindow.appId);
+        CompositorService.windowStateRevision;
+        if (!activeWindow || !(activeWindow.title || activeWindow.appId))
+            return false;
+        return CompositorService.windowOnActiveWorkspace(screenName, activeWindow, popoutVisible);
     }
 
     width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : (effectiveHorizontalInnerWidth > 0 ? visualWidth : 0)) : 0
@@ -268,11 +120,11 @@ BasePill {
                 if (!root.hasWindowsOnCurrentWorkspace)
                     return 0;
                 if (root.isVerticalOrientation)
-                    return root.widgetThickness - root.horizontalPadding * 2;
+                    return root.contentThickness;
                 return Math.min(contentRow.implicitWidth, root.effectiveHorizontalInnerWidth);
             }
-            width: root.isVerticalOrientation ? root.widgetThickness - root.horizontalPadding * 2 : Math.min(implicitWidth, root.effectiveHorizontalInnerWidth)
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            width: root.isVerticalOrientation ? root.contentThickness : Math.min(implicitWidth, root.effectiveHorizontalInnerWidth)
+            implicitHeight: root.contentThickness
             clip: false
 
             IconImage {
@@ -303,7 +155,7 @@ BasePill {
                 anchors.centerIn: parent
                 size: 18
                 name: "sports_esports"
-                color: Theme.widgetTextColor
+                color: root.contentColor
                 visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
             }
 
@@ -317,7 +169,7 @@ BasePill {
                     return appName.charAt(0).toUpperCase();
                 }
                 font.pixelSize: 10
-                color: Theme.widgetTextColor
+                color: root.contentColor
             }
 
             Item {
@@ -365,7 +217,7 @@ BasePill {
                         size: contentRow.iconSize
                         anchors.verticalCenter: parent.verticalCenter
                         name: "sports_esports"
-                        color: Theme.widgetTextColor
+                        color: root.contentColor
                         visible: root.showIcon && activeWindow && activeWindow.appId && horizontalAppIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
                     }
 
@@ -377,7 +229,7 @@ BasePill {
                             return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
                         }
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
+                        color: root.contentColor
                         anchors.verticalCenter: parent.verticalCenter
                         wrapMode: Text.NoWrap
                         elide: Text.ElideRight
@@ -427,7 +279,7 @@ BasePill {
                             return title;
                         }
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
+                        color: root.contentColor
                         anchors.verticalCenter: parent.verticalCenter
                         wrapMode: Text.NoWrap
                         elide: Text.ElideRight
@@ -512,17 +364,13 @@ BasePill {
     Loader {
         id: focusedWindowPopoutLoader
         active: false
-        sourceComponent: FocusedWindowContextMenu {}
+        sourceComponent: FocusedWindowContextMenu {
+            onPopoutClosed: root.updateActiveWindow()
+        }
     }
 
-    Connections {
-        target: focusedWindowPopoutLoader.item
-        function onShouldBeVisibleChanged() {
-            if (!focusedWindowPopoutLoader.item?.shouldBeVisible)
-                root.updateActiveWindow();
-        }
-        function onPopoutClosed() {
-            root.updateActiveWindow();
-        }
+    onPopoutVisibleChanged: {
+        if (!popoutVisible)
+            updateActiveWindow();
     }
 }

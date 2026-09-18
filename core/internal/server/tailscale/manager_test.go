@@ -237,51 +237,6 @@ func TestWatchLoop_BacksOffOnPersistentBusError(t *testing.T) {
 		"a persistent bus read error should back off, not reconnect in a hot loop; got %d attempts in 300ms", calls)
 }
 
-func TestManager_Subscribe(t *testing.T) {
-	client := &mockClient{
-		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
-			<-ctx.Done()
-			return nil, ctx.Err()
-		},
-		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
-			return runningStatus(), nil
-		},
-	}
-
-	m := newManager(client)
-	defer m.Close()
-
-	ch := m.Subscribe("test-1")
-	assert.NotNil(t, ch)
-
-	ch2 := m.Subscribe("test-2")
-	assert.NotNil(t, ch2)
-
-	m.Unsubscribe("test-1")
-	m.Unsubscribe("test-2")
-}
-
-func TestManager_Close(t *testing.T) {
-	client := &mockClient{
-		watchFn: func(ctx context.Context, mask ipn.NotifyWatchOpt) (ipnBusWatcher, error) {
-			<-ctx.Done()
-			return nil, ctx.Err()
-		},
-		statusFn: func(ctx context.Context) (*ipnstate.Status, error) {
-			return runningStatus(), nil
-		},
-	}
-
-	m := newManager(client)
-
-	ch := m.Subscribe("test")
-	assert.NotNil(t, ch)
-
-	assert.NotPanics(t, func() {
-		m.Close()
-	})
-}
-
 func TestManager_Availability(t *testing.T) {
 	var watchAttempts atomic.Int32
 

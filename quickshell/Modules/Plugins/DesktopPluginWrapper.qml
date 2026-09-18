@@ -17,6 +17,7 @@ Item {
     property var pluginService: null
     property string instanceId: ""
     property var instanceData: null
+    onInstanceDataChanged: contentLoader.updateInstanceData()
     property bool widgetEnabled: true
 
     readonly property bool isBuiltin: pluginId === "desktopClock" || pluginId === "systemMonitor"
@@ -68,7 +69,6 @@ Item {
 
     readonly property string settingsKey: instanceId ? instanceId : pluginId
     readonly property bool isInstance: instanceId !== "" && instanceData !== null
-    readonly property bool usePluginService: pluginService !== null && !isInstance
 
     QtObject {
         id: instanceScopedPluginService
@@ -120,94 +120,26 @@ Item {
     property real previewWidth: widgetWidth
     property real previewHeight: widgetHeight
 
-    readonly property bool hasSavedPosition: {
-        if (isInstance)
-            return storedPositions?.[positionKey]?.x !== undefined;
-        if (usePluginService)
-            return pluginService.loadPluginData(pluginId, "desktopX_" + positionKey, null) !== null;
-        return SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "x", null) !== null;
+    function storedGeometry(key) {
+        if (!isInstance)
+            return undefined;
+        return storedPositions?.[positionKey]?.[key];
     }
 
-    readonly property bool hasSavedSize: {
-        if (isInstance)
-            return storedPositions?.[positionKey]?.width !== undefined;
-        if (usePluginService)
-            return pluginService.loadPluginData(pluginId, "desktopWidth_" + positionKey, null) !== null;
-        return SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "width", null) !== null;
+    function storedCoordinate(key, extent, fallback) {
+        const val = storedGeometry(key);
+        if (val === undefined)
+            return fallback;
+        return syncPositionAcrossScreens ? val * extent : val;
     }
 
-    property real savedX: {
-        if (isInstance) {
-            const val = storedPositions?.[positionKey]?.x;
-            if (val === undefined)
-                return screenWidth / 2 - savedWidth / 2;
-            return syncPositionAcrossScreens ? val * screenWidth : val;
-        }
-        if (usePluginService) {
-            const val = pluginService.loadPluginData(pluginId, "desktopX_" + positionKey, null);
-            if (val === null)
-                return screenWidth / 2 - savedWidth / 2;
-            return syncPositionAcrossScreens ? val * screenWidth : val;
-        }
-        const val = SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "x", null);
-        if (val === null)
-            return screenWidth / 2 - savedWidth / 2;
-        return syncPositionAcrossScreens ? val * screenWidth : val;
-    }
-    property real savedY: {
-        if (isInstance) {
-            const val = storedPositions?.[positionKey]?.y;
-            if (val === undefined)
-                return screenHeight / 2 - savedHeight / 2;
-            return syncPositionAcrossScreens ? val * screenHeight : val;
-        }
-        if (usePluginService) {
-            const val = pluginService.loadPluginData(pluginId, "desktopY_" + positionKey, null);
-            if (val === null)
-                return screenHeight / 2 - savedHeight / 2;
-            return syncPositionAcrossScreens ? val * screenHeight : val;
-        }
-        const val = SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "y", null);
-        if (val === null)
-            return screenHeight / 2 - savedHeight / 2;
-        return syncPositionAcrossScreens ? val * screenHeight : val;
-    }
-    property real savedWidth: {
-        if (isInstance) {
-            const val = storedPositions?.[positionKey]?.width;
-            if (val === undefined)
-                return 280;
-            return val;
-        }
-        if (usePluginService) {
-            const val = pluginService.loadPluginData(pluginId, "desktopWidth_" + positionKey, null);
-            if (val === null)
-                return 200;
-            return val;
-        }
-        const val = SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "width", null);
-        if (val === null)
-            return 280;
-        return val;
-    }
-    property real savedHeight: {
-        if (isInstance) {
-            const val = storedPositions?.[positionKey]?.height;
-            if (val === undefined)
-                return forceSquare ? savedWidth : 180;
-            return forceSquare ? savedWidth : val;
-        }
-        if (usePluginService) {
-            const val = pluginService.loadPluginData(pluginId, "desktopHeight_" + positionKey, null);
-            if (val === null)
-                return forceSquare ? savedWidth : 200;
-            return forceSquare ? savedWidth : val;
-        }
-        const val = SettingsData.getDesktopWidgetPosition(pluginId, positionKey, "height", null);
-        if (val === null)
-            return forceSquare ? savedWidth : 180;
-        return forceSquare ? savedWidth : val;
-    }
+    readonly property bool hasSavedPosition: storedGeometry("x") !== undefined
+    readonly property bool hasSavedSize: storedGeometry("width") !== undefined
+
+    property real savedX: storedCoordinate("x", screenWidth, screenWidth / 2 - savedWidth / 2)
+    property real savedY: storedCoordinate("y", screenHeight, screenHeight / 2 - savedHeight / 2)
+    property real savedWidth: storedGeometry("width") ?? 280
+    property real savedHeight: forceSquare ? savedWidth : (storedGeometry("height") ?? 180)
 
     property real dragOverrideX: -1
     property real dragOverrideY: -1
@@ -265,45 +197,24 @@ Item {
         return Math.round(value / gridSize) * gridSize;
     }
 
+    function saveGeometry(updates) {
+        if (!isInstance)
+            return;
+        SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, updates);
+    }
+
     function savePosition(finalX, finalY) {
-        const xVal = syncPositionAcrossScreens ? finalX / screenWidth : finalX;
-        const yVal = syncPositionAcrossScreens ? finalY / screenHeight : finalY;
-        if (isInstance && instanceData) {
-            SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
-                x: xVal,
-                y: yVal
-            });
-            return;
-        }
-        if (usePluginService) {
-            pluginService.savePluginData(pluginId, "desktopX_" + positionKey, xVal);
-            pluginService.savePluginData(pluginId, "desktopY_" + positionKey, yVal);
-            return;
-        }
-        SettingsData.updateDesktopWidgetPosition(pluginId, positionKey, {
-            x: xVal,
-            y: yVal
+        saveGeometry({
+            x: syncPositionAcrossScreens ? finalX / screenWidth : finalX,
+            y: syncPositionAcrossScreens ? finalY / screenHeight : finalY
         });
     }
 
     function saveSize(finalW, finalH) {
         const sizeVal = forceSquare ? Math.max(finalW, finalH) : finalW;
-        const heightVal = forceSquare ? sizeVal : finalH;
-        if (isInstance && instanceData) {
-            SessionData.updateDesktopWidgetInstancePosition(instanceId, positionKey, {
-                width: sizeVal,
-                height: heightVal
-            });
-            return;
-        }
-        if (usePluginService) {
-            pluginService.savePluginData(pluginId, "desktopWidth_" + positionKey, sizeVal);
-            pluginService.savePluginData(pluginId, "desktopHeight_" + positionKey, heightVal);
-            return;
-        }
-        SettingsData.updateDesktopWidgetPosition(pluginId, positionKey, {
+        saveGeometry({
             width: sizeVal,
-            height: heightVal
+            height: forceSquare ? sizeVal : finalH
         });
     }
 
@@ -412,15 +323,6 @@ Item {
                 if (!item || item.instanceData === undefined)
                     return;
                 item.instanceData = root.instanceData;
-            }
-
-            Connections {
-                target: root
-                enabled: contentLoader.item !== null
-
-                function onInstanceDataChanged() {
-                    contentLoader.updateInstanceData();
-                }
             }
 
             onLoaded: {

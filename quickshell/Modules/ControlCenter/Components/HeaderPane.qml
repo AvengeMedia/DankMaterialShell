@@ -1,17 +1,18 @@
 import QtQuick
 import qs.Common
+import qs.Modules.ControlCenter
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
     property bool editMode: false
-    // Hosts that morph in place reuse the header's dead space as their close target.
     property bool tapToClose: false
+    property bool live: true
 
     signal powerButtonClicked
     signal lockRequested
@@ -22,14 +23,11 @@ Rectangle {
     Ref {
         service: DgopService
         modules: "system"
-        active: root.visible && (root.Window.window?.visible ?? false)
+        active: root.live && root.visible && (root.Window.window?.visible ?? false)
     }
 
-    implicitHeight: 70
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
+    implicitHeight: CcMetrics.headerHeight
+    height: implicitHeight
 
     MouseArea {
         anchors.fill: parent
@@ -38,93 +36,103 @@ Rectangle {
         onClicked: root.headerTapped()
     }
 
-    Row {
+    Item {
         anchors.left: parent.left
+        anchors.right: actionButtonsRow.left
+        anchors.rightMargin: Theme.spacingM
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        spacing: Theme.spacingM
+        anchors.leftMargin: Theme.spacingS
+        height: CcMetrics.headerAvatarSize
 
         DankCircularImage {
-            id: avatarContainer
-
-            width: 60
-            height: 60
+            id: avatar
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: CcMetrics.headerAvatarSize
+            height: CcMetrics.headerAvatarSize
             imageSource: {
                 if (PortalService.profileImage === "")
                     return "";
-
                 if (PortalService.profileImage.startsWith("/"))
                     return "file://" + PortalService.profileImage;
-
                 return PortalService.profileImage;
             }
             fallbackIcon: "person"
         }
 
-        Column {
+        Item {
+            anchors.left: avatar.right
+            anchors.leftMargin: Theme.spacingM
+            anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingXXS
+            implicitHeight: userLabel.implicitHeight + Theme.spacingXXS + uptimeLabel.implicitHeight
 
-            Typography {
+            StyledText {
+                id: userLabel
+                width: parent.width
                 text: UserInfoService.fullName || UserInfoService.username || I18n.tr("User")
-                style: Typography.Style.Subtitle
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignLeft
             }
 
-            Typography {
+            StyledText {
+                id: uptimeLabel
+                y: userLabel.implicitHeight + Theme.spacingXXS
+                width: parent.width
                 text: DgopService.uptime ? I18n.tr("up", "uptime prefix, e.g. 'up 4h 2m'") + " " + DgopService.uptime.slice(3) : I18n.tr("Unknown")
-                style: Typography.Style.Caption
+                font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignLeft
             }
         }
     }
 
     Row {
         id: actionButtonsRow
+        width: Theme.iconButtonSize * 4 + spacing * 3
+        height: Theme.iconButtonSize
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: Theme.spacingXS
         spacing: Theme.spacingXS
 
         DankActionButton {
-            buttonSize: 36
+            buttonSize: Theme.iconButtonSize
+            iconSize: Theme.iconSize
             iconName: "lock"
-            iconSize: Theme.iconSize - 4
             iconColor: Theme.surfaceText
-            backgroundColor: "transparent"
-            onClicked: {
-                root.lockRequested();
-            }
+            Accessible.name: I18n.tr("Lock")
+            onClicked: root.lockRequested()
         }
 
         DankActionButton {
-            buttonSize: 36
+            buttonSize: Theme.iconButtonSize
+            iconSize: Theme.iconSize
             iconName: "power_settings_new"
-            iconSize: Theme.iconSize - 4
             iconColor: Theme.surfaceText
-            backgroundColor: "transparent"
+            Accessible.name: I18n.tr("Power")
             onClicked: root.powerButtonClicked()
         }
 
         DankActionButton {
-            buttonSize: 36
+            buttonSize: Theme.iconButtonSize
+            iconSize: Theme.iconSize
             iconName: "settings"
-            iconSize: Theme.iconSize - 4
             iconColor: Theme.surfaceText
-            backgroundColor: "transparent"
-            onClicked: {
-                root.settingsButtonClicked();
-                PopoutService.focusOrToggleSettings();
-            }
+            Accessible.name: I18n.tr("Settings")
+            onClicked: root.settingsButtonClicked()
         }
 
         DankActionButton {
-            buttonSize: 36
-            iconName: editMode ? "done" : "edit"
-            iconSize: Theme.iconSize - 4
-            iconColor: editMode ? Theme.primary : Theme.surfaceText
-            backgroundColor: "transparent"
+            buttonSize: Theme.iconButtonSize
+            iconSize: Theme.iconSize
+            iconName: root.editMode ? "done" : "edit"
+            iconColor: root.editMode ? Theme.onSecondaryContainer : Theme.surfaceText
+            backgroundColor: root.editMode ? Theme.secondaryContainer : "transparent"
+            Accessible.name: root.editMode ? I18n.tr("Finish") : I18n.tr("Edit")
             onClicked: root.editModeToggled()
         }
     }

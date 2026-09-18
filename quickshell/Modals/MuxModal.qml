@@ -80,7 +80,7 @@ DankModal {
     function renameSession(name) {
         inputModal.showWithOptions({
             title: I18n.tr("Rename Session"),
-            message: I18n.tr("Enter a new name for session \"%1\"").arg(name),
+            message: I18n.tr("Enter a new name for session \"%1\"", "rename session dialog, %1 is the current session name").arg(name),
             initialText: name,
             onConfirm: function (newName) {
                 MuxService.renameSession(name, newName);
@@ -91,8 +91,8 @@ DankModal {
     function killSession(name) {
         confirmModal.showWithOptions({
             title: I18n.tr("Kill Session"),
-            message: I18n.tr("Are you sure you want to kill session \"%1\"?").arg(name),
-            confirmText: I18n.tr("Kill"),
+            message: I18n.tr("Are you sure you want to kill session \"%1\"?", "kill session confirmation, %1 is the session name").arg(name),
+            confirmText: I18n.tr("Kill", "verb, terminate a multiplexer session"),
             confirmColor: Theme.primary,
             onConfirm: function () {
                 MuxService.killSession(name);
@@ -103,7 +103,7 @@ DankModal {
     function createNewSession() {
         inputModal.showWithOptions({
             title: I18n.tr("New Session"),
-            message: I18n.tr("Please write a name for your new %1 session").arg(MuxService.displayName),
+            message: I18n.tr("Please write a name for your new %1 session", "new session dialog, %1 is the terminal multiplexer name").arg(MuxService.displayName),
             onConfirm: function (name) {
                 MuxService.createSession(name);
                 hide();
@@ -130,8 +130,7 @@ DankModal {
     visible: false
     modalWidth: 600
     modalHeight: 600
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    cornerRadius: Theme.cornerRadius
+    backgroundColor: Theme.floatingWindowSurface
     borderColor: Theme.outlineMedium
     borderWidth: 1
     enableShadow: true
@@ -285,9 +284,8 @@ DankModal {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: I18n.tr("%1 Sessions").arg(MuxService.displayName)
+                    text: I18n.tr("%1 Sessions", "session manager title, %1 is the terminal multiplexer name").arg(MuxService.displayName)
                     font.pixelSize: Theme.fontSizeLarge + 4
-                    font.weight: Font.Bold
                     color: Theme.surfaceText
                 }
 
@@ -298,8 +296,8 @@ DankModal {
                     text: {
                         const total = MuxService.sessions.length;
                         const filtered = muxModal.filteredSessions.length;
-                        const activePart = total === 1 ? I18n.tr("%1 active session").arg(total) : I18n.tr("%1 active sessions").arg(total);
-                        const filteredPart = filtered === 1 ? I18n.tr("%1 filtered").arg(filtered) : I18n.tr("%1 filtered").arg(filtered);
+                        const activePart = total === 1 ? I18n.tr("%1 active session", "singular, %1 is 1, multiplexer session count").arg(total) : I18n.tr("%1 active sessions", "plural, %1 is a count of multiplexer sessions").arg(total);
+                        const filteredPart = filtered === 1 ? I18n.tr("%1 filtered", "%1 is a count of sessions matching the search").arg(filtered) : I18n.tr("%1 filtered").arg(filtered);
                         return activePart + ", " + filteredPart;
                     }
                     font.pixelSize: Theme.fontSizeMedium
@@ -308,16 +306,11 @@ DankModal {
             }
 
             // Search field
-            DankTextField {
+            DankSearchField {
                 id: searchField
 
                 width: parent.width
                 height: 48
-                leftIconName: "search"
-                leftIconSize: Theme.iconSize
-                leftIconColor: Theme.surfaceVariantText
-                leftIconFocusedColor: Theme.primary
-                showClearButton: true
                 font.pixelSize: Theme.fontSizeMedium
                 placeholderText: I18n.tr("Search sessions...")
                 keyForwardTargets: [muxPanel]
@@ -333,7 +326,7 @@ DankModal {
                 width: parent.width
                 height: 56
                 radius: Theme.cornerRadius
-                color: muxModal.selectedIndex === -1 ? Theme.primaryContainer : (newMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.surfaceContainer)
+                color: muxModal.selectedIndex === -1 ? Theme.selectedContainer : (newMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.surfaceContainer)
 
                 RowLayout {
                     anchors.fill: parent
@@ -344,14 +337,14 @@ DankModal {
                     Rectangle {
                         Layout.preferredWidth: 40
                         Layout.preferredHeight: 40
-                        radius: 20
+                        radius: Theme.fullRadius(width, height)
                         color: Theme.primaryContainer
 
                         DankIcon {
                             anchors.centerIn: parent
                             name: "add"
                             size: Theme.iconSize
-                            color: Theme.primary
+                            color: Theme.accentOnPrimaryContainer
                         }
                     }
 
@@ -362,12 +355,12 @@ DankModal {
                         StyledText {
                             text: I18n.tr("New Session")
                             font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                         }
 
                         StyledText {
-                            text: I18n.tr("Create a new %1 session (^N)").arg(MuxService.displayName)
+                            text: I18n.tr("Create a new %1 session (^N)", "button label, %1 is the terminal multiplexer name").arg(MuxService.displayName)
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
@@ -410,7 +403,7 @@ DankModal {
                                 width: parent.width
                                 height: 64
                                 radius: Theme.cornerRadius
-                                color: muxModal.selectedIndex === index ? Theme.primaryContainer : (sessionMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0))
+                                color: muxModal.selectedIndex === index ? Theme.selectedContainer : (sessionMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0))
 
                                 MouseArea {
                                     id: sessionMouse
@@ -430,15 +423,15 @@ DankModal {
                                     Rectangle {
                                         Layout.preferredWidth: 40
                                         Layout.preferredHeight: 40
-                                        radius: 20
+                                        radius: Theme.fullRadius(width, height)
                                         color: modelData.attached ? Theme.primaryContainer : Theme.surfaceContainerHigh
 
                                         StyledText {
                                             anchors.centerIn: parent
                                             text: modelData.name.charAt(0).toUpperCase()
                                             font.pixelSize: Theme.fontSizeLarge
-                                            font.weight: Font.Bold
-                                            color: modelData.attached ? Theme.primary : Theme.surfaceText
+                                            font.weight: Theme.fontWeightMedium
+                                            color: modelData.attached ? Theme.accentOnPrimaryContainer : Theme.surfaceText
                                         }
                                     }
 
@@ -450,7 +443,7 @@ DankModal {
                                         StyledText {
                                             text: modelData.name
                                             font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Medium
+                                            font.weight: Theme.fontWeightMedium
                                             color: Theme.surfaceText
                                             elide: Text.ElideRight
                                         }
@@ -459,8 +452,8 @@ DankModal {
                                             text: {
                                                 var parts = [];
                                                 if (modelData.windows !== "N/A")
-                                                    parts.push(modelData.windows === 1 ? I18n.tr("%1 window").arg(modelData.windows) : I18n.tr("%1 windows").arg(modelData.windows));
-                                                parts.push(modelData.attached ? I18n.tr("attached") : I18n.tr("detached"));
+                                                    parts.push(modelData.windows === 1 ? I18n.tr("%1 window", "singular, %1 is 1, windows in a multiplexer session").arg(modelData.windows) : I18n.tr("%1 windows", "plural, %1 is a count of windows in a multiplexer session").arg(modelData.windows));
+                                                parts.push(modelData.attached ? I18n.tr("attached", "multiplexer session state, a client is attached") : I18n.tr("detached", "multiplexer session state, no client attached"));
                                                 return parts.join(" \u2022 ");
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
@@ -470,9 +463,11 @@ DankModal {
 
                                     // Rename button (tmux only)
                                     Rectangle {
+                                        Accessible.role: Accessible.Button
+                                        Accessible.name: I18n.tr("Rename")
                                         Layout.preferredWidth: 36
                                         Layout.preferredHeight: 36
-                                        radius: 18
+                                        radius: Theme.fullRadius(width, height)
                                         visible: MuxService.supportsRename
                                         color: renameMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
 
@@ -494,9 +489,11 @@ DankModal {
 
                                     // Delete button
                                     Rectangle {
+                                        Accessible.role: Accessible.Button
+                                        Accessible.name: I18n.tr("Delete")
                                         Layout.preferredWidth: 36
                                         Layout.preferredHeight: 36
-                                        radius: 18
+                                        radius: Theme.fullRadius(width, height)
                                         color: deleteMouse.containsMouse ? Theme.errorContainer : Theme.withAlpha(Theme.errorContainer, 0)
 
                                         DankIcon {
@@ -538,7 +535,7 @@ DankModal {
                                 }
 
                                 StyledText {
-                                    text: muxModal.searchText.length > 0 ? I18n.tr("No sessions found") : I18n.tr("No active %1 sessions").arg(MuxService.displayName)
+                                    text: muxModal.searchText.length > 0 ? I18n.tr("No sessions found") : I18n.tr("No active %1 sessions", "empty state, %1 is the terminal multiplexer name").arg(MuxService.displayName)
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceVariantText
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -568,15 +565,15 @@ DankModal {
                         var shortcuts = [
                             {
                                 key: "↑↓",
-                                label: I18n.tr("Navigate")
+                                label: I18n.tr("Navigate", "verb, keyboard shortcut hint for arrow keys")
                             },
                             {
                                 key: "↵",
-                                label: I18n.tr("Attach")
+                                label: I18n.tr("Attach", "verb, shortcut hint, attach to the selected multiplexer session")
                             },
                             {
                                 key: "^N",
-                                label: I18n.tr("New")
+                                label: I18n.tr("New", "adjective, shortcut or button that creates a new session or note")
                             },
                             {
                                 key: "^D",
@@ -602,8 +599,8 @@ DankModal {
                         Rectangle {
                             width: keyText.width + Theme.spacingS
                             height: keyText.height + 4
-                            radius: 4
-                            color: Theme.surfaceContainerHighest
+                            radius: Theme.cornerRadiusXS
+                            color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
@@ -611,7 +608,7 @@ DankModal {
                                 anchors.centerIn: parent
                                 text: modelData.key
                                 font.pixelSize: Theme.fontSizeSmall - 1
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceVariantText
                             }
                         }

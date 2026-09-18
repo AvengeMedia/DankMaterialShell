@@ -1,6 +1,8 @@
 import QtQuick
+import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 import qs.Services
 
 StyledRect {
@@ -8,109 +10,86 @@ StyledRect {
 
     property var updatesList: []
     property bool isUpdating: false
+    property bool operationsBlocked: false
     property string currentUpdatingPlugin: ""
+    property var updateErrors: ({})
+
+    signal pluginUpdated(string pluginId)
+    signal updatesRequested(var plugins)
 
     width: parent.width
-    height: visible ? Math.max(200, innerColumn.implicitHeight + Theme.spacingL * 2) : 0
-    radius: Theme.cornerRadius
-    color: Theme.floatingWindowNestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
+    height: visible ? innerColumn.implicitHeight + Theme.spacingL * 2 : 0
+    radius: Theme.cornerRadiusM
+    color: Theme.surfaceContainerHigh
+    border.color: Theme.outlineVariant
+    border.width: Theme.outlineWidth
     clip: true
 
     visible: false
 
-    Behavior on height {
-        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
-        NumberAnimation {
-            duration: Theme.mediumDuration
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Behavior on opacity {
-        NumberAnimation {
-            duration: Theme.shortDuration
-        }
-    }
-
     function show(list) {
+        if (isUpdating || operationsBlocked)
+            return;
         updatesList = list || [];
         visible = true;
     }
 
     function hide() {
-        if (!isUpdating) {
-            visible = false;
-            updatesList = [];
-        }
+        if (isUpdating || operationsBlocked)
+            return;
+        visible = false;
+        updatesList = [];
+        updateErrors = ({});
     }
 
     function updateSingle(plugin) {
-        if (isUpdating)
-            return;
-        isUpdating = true;
-        currentUpdatingPlugin = plugin.name;
-
-        DMSService.update(plugin.id, response => {
-            isUpdating = false;
-            currentUpdatingPlugin = "";
-            if (response.error) {
-                ToastService.showError(I18n.tr("Failed to update %1: %2").arg(plugin.name).arg(response.error));
-            } else {
-                ToastService.showInfo(I18n.tr("Plugin updated: %1").arg(plugin.name));
-                PluginService.forceRescanPlugin(plugin.id);
-                DMSService.listInstalled();
-                updatesList = updatesList.filter(p => p.id !== plugin.id);
-                if (updatesList.length === 0) {
-                    root.hide();
-                }
-            }
-        });
+        updatesRequested([plugin]);
     }
 
     function updateAll() {
-        if (isUpdating)
+        updatesRequested(updatesList.slice());
+    }
+
+    function updatePlugins(list) {
+        if (isUpdating || operationsBlocked || list.length === 0)
             return;
         isUpdating = true;
-
-        var list = updatesList.slice();
-        var idx = 0;
-
+        updateErrors = ({});
+        let index = 0;
         function updateNext() {
-            if (idx >= list.length) {
+            if (index >= list.length) {
                 isUpdating = false;
                 currentUpdatingPlugin = "";
                 DMSService.listInstalled();
-                root.hide();
                 return;
             }
-
-            var plugin = list[idx];
+            const plugin = list[index++];
             currentUpdatingPlugin = plugin.name;
-
-            DMSService.update(plugin.id, response => {
+            PluginService.updatePlugin(plugin.id, response => {
                 if (response.error) {
-                    ToastService.showError(I18n.tr("Failed to update %1: %2").arg(plugin.name).arg(response.error));
-                } else {
-                    PluginService.forceRescanPlugin(plugin.id);
-                    updatesList = updatesList.filter(p => p.id !== plugin.id);
+                    updateErrors = Object.assign({}, updateErrors, {
+                        [plugin.id]: I18n.tr("Failed to update %1: %2", "plugin update error, %1 is the plugin name, %2 is the error message").arg(plugin.name).arg(response.error)
+                    });
+                    updateNext();
+                    return;
                 }
-                idx++;
+                root.pluginUpdated(plugin.id);
+                updatesList = updatesList.filter(entry => entry.id !== plugin.id);
                 updateNext();
             });
         }
-
         updateNext();
     }
 
     Column {
         id: innerColumn
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         anchors.margins: Theme.spacingL
         spacing: Theme.spacingM
 
-        Row {
+        RowLayout {
             width: parent.width
             spacing: Theme.spacingM
 
@@ -118,44 +97,56 @@ StyledRect {
                 name: "download"
                 size: Theme.iconSize
                 color: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.alignment: Qt.AlignVCenter
             }
 
             StyledText {
-                text: I18n.tr("Available Updates (%1)").arg(root.updatesList.length)
+                Layout.fillWidth: true
+                text: I18n.tr("Available Updates (%1)", "plugin updates dialog title, %1 is a count").arg(root.updatesList.length)
                 font.pixelSize: Theme.fontSizeLarge
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Item {
-                width: parent.width - parent.spacing * 2 - Theme.iconSize - parent.children[1].implicitWidth - collapseBtn.width
-                height: 1
+                wrapMode: Text.Wrap
             }
 
             DankActionButton {
                 id: collapseBtn
                 iconName: "close"
-                iconSize: Theme.iconSize - 2
+                Accessible.name: I18n.tr("Close")
+                iconSize: Theme.iconSizeMedium
                 iconColor: Theme.outline
-                anchors.verticalCenter: parent.verticalCenter
-                enabled: !root.isUpdating
+                Layout.alignment: Qt.AlignVCenter
+                enabled: !root.isUpdating && !root.operationsBlocked
                 onClicked: root.hide()
+            }
+        }
+
+        RowLayout {
+            width: parent.width
+            spacing: Theme.spacingS
+            visible: !root.isUpdating && root.updatesList.length > 0
+
+            DankIcon {
+                name: "warning"
+                size: Theme.iconSizeMedium
+                color: Theme.warning
+                Layout.alignment: Qt.AlignTop
+            }
+
+            StyledText {
+                Layout.fillWidth: true
+                text: I18n.tr("Plugin updates can change the code running in your session. Review the changes before updating.", "plugin update audit reminder")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.onSurfaceVariant
+                wrapMode: Text.Wrap
             }
         }
 
         Item {
             width: parent.width
-            height: isUpdating ? 40 : 0
+            height: isUpdating ? Theme.buttonHeightS : 0
             visible: isUpdating
             clip: true
-
-            Behavior on height {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                }
-            }
 
             Row {
                 anchors.centerIn: parent
@@ -168,7 +159,7 @@ StyledRect {
                 }
 
                 StyledText {
-                    text: root.currentUpdatingPlugin ? I18n.tr("Updating %1...").arg(root.currentUpdatingPlugin) : I18n.tr("Updating plugins...")
+                    text: root.currentUpdatingPlugin ? I18n.tr("Updating %1...", "plugin updates dialog progress, %1 is the plugin name").arg(root.currentUpdatingPlugin) : I18n.tr("Updating plugins...")
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -176,9 +167,17 @@ StyledRect {
             }
         }
 
+        StyledText {
+            width: parent.width
+            visible: Object.keys(root.updateErrors).length > 0
+            text: Object.values(root.updateErrors).join("\n")
+            color: Theme.error
+            wrapMode: Text.Wrap
+        }
+
         DankFlickable {
             width: parent.width
-            height: Math.min(listCol.implicitHeight, 300)
+            height: Math.min(listCol.implicitHeight, Theme.smallBreakpoint)
             clip: true
             contentHeight: listCol.implicitHeight
             visible: !isUpdating
@@ -191,76 +190,23 @@ StyledRect {
                 Repeater {
                     model: root.updatesList
 
-                    delegate: StyledRect {
-                        width: parent.width
-                        height: 64
-                        radius: Theme.cornerRadius
-                        color: Theme.floatingWindowNestedSurface
-                        border.color: Theme.outlineMedium
-                        border.width: Theme.layerOutlineWidth
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingM
-                            spacing: Theme.spacingM
-
-                            DankIcon {
-                                name: modelData.icon || "extension"
-                                size: Theme.iconSize
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Column {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingXS
-                                width: parent.width - Theme.iconSize - Theme.spacingM - actionButtonsRow.width - Theme.spacingM
-
-                                StyledText {
-                                    text: modelData.name || ""
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: Theme.surfaceText
-                                    elide: Text.ElideRight
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-
-                                StyledText {
-                                    text: modelData.author ? I18n.tr("by %1", "author attribution").arg(modelData.author) : ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    elide: Text.ElideRight
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-                            }
-
-                            Row {
-                                id: actionButtonsRow
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
-
-                                DankButton {
-                                    text: I18n.tr("Diff")
-                                    iconName: "open_in_new"
-                                    visible: !!modelData.diffUrl || !!modelData.repo
-                                    backgroundColor: Theme.floatingWindowFieldColor
-                                    textColor: Theme.surfaceText
-                                    onClicked: {
-                                        Qt.openUrlExternally(modelData.diffUrl || modelData.repo);
-                                    }
-                                }
-
-                                DankButton {
-                                    text: I18n.tr("Update")
-                                    iconName: "download"
-                                    enabled: !root.isUpdating
-                                    onClicked: {
-                                        root.updateSingle(modelData);
-                                    }
-                                }
-                            }
+                    delegate: SettingsRow {
+                        required property var modelData
+                        width: listCol.width
+                        iconName: modelData.icon || "extension"
+                        title: modelData.name || ""
+                        subtitle: modelData.author ? I18n.tr("by %1", "author attribution").arg(modelData.author) : ""
+                        DankActionButton {
+                            iconName: "open_in_new"
+                            tooltipText: I18n.tr("View Changes", "open plugin changes before updating")
+                            visible: !!modelData.diffUrl || !!modelData.repo
+                            onClicked: Qt.openUrlExternally(modelData.diffUrl || modelData.repo)
+                        }
+                        DankActionButton {
+                            iconName: "download"
+                            tooltipText: I18n.tr("Update", "verb, button installing a newer plugin version")
+                            enabled: !root.isUpdating && !root.operationsBlocked
+                            onClicked: root.updateSingle(modelData)
                         }
                     }
                 }
@@ -284,7 +230,7 @@ StyledRect {
             DankButton {
                 text: I18n.tr("Cancel")
                 iconName: "close"
-                backgroundColor: Theme.floatingWindowFieldColor
+                backgroundColor: Theme.surfaceContainerHigh
                 textColor: Theme.surfaceText
                 onClicked: root.hide()
             }
@@ -292,7 +238,7 @@ StyledRect {
             DankButton {
                 text: I18n.tr("Update All")
                 iconName: "download"
-                enabled: root.updatesList.length > 0
+                enabled: !root.operationsBlocked && root.updatesList.length > 0
                 onClicked: root.updateAll()
             }
         }

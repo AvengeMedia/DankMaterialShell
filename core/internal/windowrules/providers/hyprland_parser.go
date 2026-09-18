@@ -2,6 +2,7 @@ package providers
 
 import (
 	"fmt"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,19 +34,17 @@ type HyprlandWindowRule struct {
 }
 
 type HyprlandRulesParser struct {
-	configDir        string
-	processedFiles   map[string]bool
-	rules            []HyprlandWindowRule
-	currentSource    string
-	dmsRulesExists   bool
-	dmsPrimaryPath   string // dms/windowrules.lua preferred, else dms/windowrules.conf when present
-	dmsRulesIncluded bool
-	includeCount     int
-	dmsIncludePos    int
-	rulesAfterDMS    int
-	dmsProcessed     bool
-	configFormat     string
-	readOnly         bool
+	configDir      string
+	processedFiles map[string]bool
+	rules          []HyprlandWindowRule
+	currentSource  string
+	dmsRulesExists bool
+	dmsPrimaryPath string // dms/windowrules.lua preferred, else dms/windowrules.conf when present
+	walker         *configfrag.Walker
+	rulesAfterDMS  int
+	dmsProcessed   bool
+	configFormat   string
+	readOnly       bool
 
 	requireLineInMain int    // hyprland.lua line (1-based) where require("dms.windowrules") occurs; else -1
 	primaryHyprLua    string // absolute path to ~/.config/hypr/hyprland.lua when that is the main config
@@ -56,7 +55,7 @@ func NewHyprlandRulesParser(configDir string) *HyprlandRulesParser {
 		configDir:         configDir,
 		processedFiles:    make(map[string]bool),
 		rules:             []HyprlandWindowRule{},
-		dmsIncludePos:     -1,
+		walker:            configfrag.NewWalker(isDMSWindowRulesSourcePath),
 		requireLineInMain: -1,
 	}
 }
@@ -174,32 +173,12 @@ func (p *HyprlandRulesParser) parseFile(filePath string) error {
 }
 
 func (p *HyprlandRulesParser) handleSource(line string, baseDir string) {
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) < 2 {
-		return
-	}
-
-	sourcePath := strings.TrimSpace(parts[1])
-	isDMSSource := isDMSWindowRulesSourcePath(sourcePath)
-
-	p.includeCount++
-	if isDMSSource {
-		p.dmsRulesIncluded = true
-		p.dmsIncludePos = p.includeCount
+	matched := p.walker.IncludeAssignment(baseDir, line, func(absPath string) error {
+		return p.parseFile(absPath)
+	})
+	if matched {
 		p.dmsProcessed = true
 	}
-
-	fullPath := sourcePath
-	if !filepath.IsAbs(sourcePath) {
-		fullPath = filepath.Join(baseDir, sourcePath)
-	}
-
-	expanded, err := utils.ExpandPath(fullPath)
-	if err != nil {
-		return
-	}
-
-	_ = p.parseFile(expanded)
 }
 
 func (p *HyprlandRulesParser) parseLine(line string) {
@@ -297,37 +276,18 @@ func (p *HyprlandRulesParser) parseWindowRuleV2(content string, rule *HyprlandWi
 }
 
 func (p *HyprlandRulesParser) HasDMSRulesIncluded() bool {
-	return p.dmsRulesIncluded
+	return p.walker.Included()
+}
+
+var hyprlandRulesMessages = configfrag.Messages{
+	Missing:     "dms window rules fragment (windowrules.lua / windowrules.conf) does not exist",
+	NotIncluded: "dms window rules are not loaded (missing require/source for dms/windowrules)",
+	Overridden:  "Some DMS rules may be overridden by config rules",
+	Active:      "DMS window rules are active",
 }
 
 func (p *HyprlandRulesParser) buildDMSStatus() *windowrules.DMSRulesStatus {
-	status := &windowrules.DMSRulesStatus{
-		Exists:          p.dmsRulesExists,
-		Included:        p.dmsRulesIncluded,
-		IncludePosition: p.dmsIncludePos,
-		TotalIncludes:   p.includeCount,
-		RulesAfterDMS:   p.rulesAfterDMS,
-		ConfigFormat:    p.configFormat,
-		ReadOnly:        p.readOnly,
-	}
-
-	switch {
-	case !p.dmsRulesExists:
-		status.Effective = false
-		status.StatusMessage = "dms window rules fragment (windowrules.lua / windowrules.conf) does not exist"
-	case !p.dmsRulesIncluded:
-		status.Effective = false
-		status.StatusMessage = "dms window rules are not loaded (missing require/source for dms/windowrules)"
-	case p.rulesAfterDMS > 0:
-		status.Effective = true
-		status.OverriddenBy = p.rulesAfterDMS
-		status.StatusMessage = "Some DMS rules may be overridden by config rules"
-	default:
-		status.Effective = true
-		status.StatusMessage = "DMS window rules are active"
-	}
-
-	return status
+	return windowrules.DMSRulesStatusFrom(configfrag.BuildStatus(p.walker.Scan(), p.dmsRulesExists, p.rulesAfterDMS, p.configFormat, p.readOnly, hyprlandRulesMessages))
 }
 
 type HyprlandRulesParseResult struct {
@@ -455,83 +415,23 @@ func (p *HyprlandWritableProvider) GetRuleSet() (*windowrules.RuleSet, error) {
 	}, nil
 }
 
-func (p *HyprlandWritableProvider) SetRule(rule windowrules.WindowRule) error {
-	if err := p.ensureWritableConfig(); err != nil {
-		return err
-	}
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		rules = []windowrules.WindowRule{}
-	}
-
-	found := false
-	for i, r := range rules {
-		if r.ID == rule.ID {
-			rules[i] = rule
-			found = true
-			break
-		}
-	}
-	if !found {
-		rules = append(rules, rule)
-	}
-
-	return p.writeDMSRules(rules)
-}
-
-func (p *HyprlandWritableProvider) RemoveRule(id string) error {
-	if err := p.ensureWritableConfig(); err != nil {
-		return err
-	}
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-
-	newRules := make([]windowrules.WindowRule, 0, len(rules))
-	for _, r := range rules {
-		if r.ID != id {
-			newRules = append(newRules, r)
-		}
-	}
-
-	return p.writeDMSRules(newRules)
-}
-
-func (p *HyprlandWritableProvider) ReorderRules(ids []string) error {
-	if err := p.ensureWritableConfig(); err != nil {
-		return err
-	}
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-
-	ruleMap := make(map[string]windowrules.WindowRule)
-	for _, r := range rules {
-		ruleMap[r.ID] = r
-	}
-
-	newRules := make([]windowrules.WindowRule, 0, len(ids))
-	for _, id := range ids {
-		if r, ok := ruleMap[id]; ok {
-			newRules = append(newRules, r)
-			delete(ruleMap, id)
-		}
-	}
-
-	for _, r := range ruleMap {
-		newRules = append(newRules, r)
-	}
-
-	return p.writeDMSRules(newRules)
-}
-
-func (p *HyprlandWritableProvider) ensureWritableConfig() error {
+func (p *HyprlandWritableProvider) EnsureWritable() error {
 	if p.isLegacyConfigReadOnly() {
 		return fmt.Errorf("hyprland legacy conf configs are read-only; run dms setup to migrate to Lua before editing window rules")
 	}
 	return nil
+}
+
+func (p *HyprlandWritableProvider) SetRule(rule windowrules.WindowRule) error {
+	return windowrules.Set(p, rule)
+}
+
+func (p *HyprlandWritableProvider) RemoveRule(id string) error {
+	return windowrules.Remove(p, id)
+}
+
+func (p *HyprlandWritableProvider) ReorderRules(ids []string) error {
+	return windowrules.Reorder(p, ids)
 }
 
 func (p *HyprlandWritableProvider) isLegacyConfigReadOnly() bool {
@@ -827,7 +727,7 @@ func (p *HyprlandWritableProvider) loadDMSRulesFromLua(data []byte, rulesPath st
 	return rules, nil
 }
 
-func (p *HyprlandWritableProvider) writeDMSRules(rules []windowrules.WindowRule) error {
+func (p *HyprlandWritableProvider) WriteDMSRules(rules []windowrules.WindowRule) error {
 	rulesPath := p.GetOverridePath()
 
 	if err := os.MkdirAll(filepath.Dir(rulesPath), 0755); err != nil {
@@ -844,13 +744,6 @@ func (p *HyprlandWritableProvider) writeDMSRules(rules []windowrules.WindowRule)
 	}
 
 	return os.WriteFile(rulesPath, []byte(strings.Join(lines, "\n")), 0644)
-}
-
-func boolToInt(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }
 
 const hlWinRuleLower = "hl.window_rule"
@@ -942,10 +835,7 @@ func (p *HyprlandRulesParser) parseLuaWindowRules(content, baseDir, absPath stri
 				if err != nil {
 					continue
 				}
-				p.includeCount++
-				if isDMSWindowRulesRequireModule(mod) {
-					p.dmsRulesIncluded = true
-					p.dmsIncludePos = p.includeCount
+				if p.walker.RecordMatch(isDMSWindowRulesRequireModule(mod)) {
 					p.dmsProcessed = true
 				}
 				_ = p.parseFile(expanded)

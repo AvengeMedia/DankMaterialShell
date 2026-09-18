@@ -2,6 +2,7 @@ package providers
 
 import (
 	"fmt"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -553,47 +554,21 @@ type NiriParseResult struct {
 	Section            *NiriSection
 	ModKey             string
 	DMSBindsIncluded   bool
-	DMSStatus          *DMSBindsStatusInfo
+	DMSStatus          *configfrag.Status
 	ConflictingConfigs map[string]*NiriKeyBinding
 }
 
-type DMSBindsStatusInfo struct {
-	Exists          bool
-	Included        bool
-	IncludePosition int
-	TotalIncludes   int
-	BindsAfterDMS   int
-	Effective       bool
-	OverriddenBy    int
-	StatusMessage   string
+var niriBindsMessages = configfrag.Messages{
+	Missing:     "dms/binds.kdl does not exist",
+	NotIncluded: "dms/binds.kdl is not included in config.kdl",
+	Overridden:  "Some DMS binds may be overridden by config binds",
+	Active:      "DMS binds are active",
 }
 
-func (p *NiriParser) buildDMSStatus() *DMSBindsStatusInfo {
-	status := &DMSBindsStatusInfo{
-		Exists:          p.dmsBindsExists,
-		Included:        p.dmsBindsIncluded,
-		IncludePosition: p.dmsIncludePos,
-		TotalIncludes:   p.includeCount,
-		BindsAfterDMS:   p.bindsAfterDMS,
-	}
-
-	switch {
-	case !p.dmsBindsExists:
-		status.Effective = false
-		status.StatusMessage = "dms/binds.kdl does not exist"
-	case !p.dmsBindsIncluded:
-		status.Effective = false
-		status.StatusMessage = "dms/binds.kdl is not included in config.kdl"
-	case p.bindsAfterDMS > 0:
-		status.Effective = true
-		status.OverriddenBy = p.bindsAfterDMS
-		status.StatusMessage = "Some DMS binds may be overridden by config binds"
-	default:
-		status.Effective = true
-		status.StatusMessage = "DMS binds are active"
-	}
-
-	return status
+func (p *NiriParser) buildDMSStatus() *configfrag.Status {
+	scan := configfrag.IncludeScan{Count: p.includeCount, DMSPosition: p.dmsIncludePos, DMSSeen: p.dmsBindsIncluded}
+	status := configfrag.BuildStatus(scan, p.dmsBindsExists, p.bindsAfterDMS, "", false, niriBindsMessages)
+	return &status
 }
 
 func ParseNiriKeys(configDir string) (*NiriParseResult, error) {

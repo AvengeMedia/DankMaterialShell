@@ -8,10 +8,11 @@ import (
 
 	clipboardstore "github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	switch req.Method {
 	case "clipboard.getState":
 		handleGetState(conn, req, m)
@@ -62,11 +63,11 @@ func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	models.Respond(conn, req.ID, m.GetState())
 }
 
-func handleGetHistory(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetHistory(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	history := m.GetHistory()
 	for i := range history {
 		history[i].Data = nil
@@ -74,7 +75,7 @@ func handleGetHistory(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, history)
 }
 
-func handleGetEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -94,7 +95,7 @@ func handleGetEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, entry)
 }
 
-func handleDeleteEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handleDeleteEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -109,7 +110,7 @@ func handleDeleteEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "entry deleted"})
 }
 
-func handleDeleteEntries(conn *models.Conn, req models.Request, m *Manager) {
+func handleDeleteEntries(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	raw, ok := params.Any(req.Params, "ids")
 	if !ok {
 		models.RespondError(conn, req.ID, "missing 'ids' parameter")
@@ -174,12 +175,12 @@ func toEntryID(value any) (uint64, error) {
 	}
 }
 
-func handleClearHistory(conn *models.Conn, req models.Request, m *Manager) {
+func handleClearHistory(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	m.ClearHistory()
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "history cleared"})
 }
 
-func handleCopy(conn *models.Conn, req models.Request, m *Manager) {
+func handleCopy(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	text, err := params.String(req.Params, "text")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -194,7 +195,7 @@ func handleCopy(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "copied to clipboard"})
 }
 
-func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handleCopyEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -251,7 +252,7 @@ func handleCopyEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "copied to clipboard"})
 }
 
-func handlePaste(conn *models.Conn, req models.Request, m *Manager) {
+func handlePaste(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	text, err := m.PasteText()
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -261,7 +262,7 @@ func handlePaste(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, map[string]string{"text": text})
 }
 
-func handleSendPaste(conn *models.Conn, req models.Request) {
+func handleSendPaste(conn *ipc.ConnWriter, req ipc.Request) {
 	shift, _ := models.Get[bool](req, "shift")
 
 	if err := clipboardstore.SendPasteKeystroke(shift); err != nil {
@@ -272,14 +273,14 @@ func handleSendPaste(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "paste sent"})
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, m *Manager) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	clientID := fmt.Sprintf("clipboard-%d", req.ID)
 
 	ch := m.Subscribe(clientID)
 	defer m.Unsubscribe(clientID)
 
 	initialState := m.GetState()
-	if err := conn.WriteResponse(models.Response[State]{
+	if err := conn.WriteResponse(ipc.Response[State]{
 		ID:     req.ID,
 		Result: &initialState,
 	}); err != nil {
@@ -287,7 +288,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, m *Manager) {
 	}
 
 	for state := range ch {
-		if err := conn.WriteResponse(models.Response[State]{
+		if err := conn.WriteResponse(ipc.Response[State]{
 			ID:     req.ID,
 			Result: &state,
 		}); err != nil {
@@ -296,7 +297,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, m *Manager) {
 	}
 }
 
-func handleSearch(conn *models.Conn, req models.Request, m *Manager) {
+func handleSearch(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	p := SearchParams{
 		Query:    params.StringOpt(req.Params, "query", ""),
 		MimeType: params.StringOpt(req.Params, "mimeType", ""),
@@ -319,11 +320,11 @@ func handleSearch(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, m.Search(p))
 }
 
-func handleGetConfig(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetConfig(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	models.Respond(conn, req.ID, m.GetConfig())
 }
 
-func handleSetConfig(conn *models.Conn, req models.Request, m *Manager) {
+func handleSetConfig(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	cfg := m.GetConfig()
 
 	if v, ok := models.Get[float64](req, "maxHistory"); ok {
@@ -353,7 +354,7 @@ func handleSetConfig(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "config updated"})
 }
 
-func handleStore(conn *models.Conn, req models.Request, m *Manager) {
+func handleStore(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	data, err := params.String(req.Params, "data")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -370,7 +371,7 @@ func handleStore(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "stored"})
 }
 
-func handlePinEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handlePinEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -385,7 +386,7 @@ func handlePinEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "entry pinned"})
 }
 
-func handleUnpinEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handleUnpinEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -400,17 +401,17 @@ func handleUnpinEntry(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "entry unpinned"})
 }
 
-func handleGetPinnedEntries(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetPinnedEntries(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	pinned := m.GetPinnedEntries()
 	models.Respond(conn, req.ID, pinned)
 }
 
-func handleGetPinnedCount(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetPinnedCount(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	count := m.GetPinnedCount()
 	models.Respond(conn, req.ID, map[string]int{"count": count})
 }
 
-func handleCopyFile(conn *models.Conn, req models.Request, m *Manager) {
+func handleCopyFile(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	filePath, err := params.String(req.Params, "filePath")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -425,7 +426,7 @@ func handleCopyFile(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "copied"})
 }
 
-func handleEditEntry(conn *models.Conn, req models.Request, m *Manager) {
+func handleEditEntry(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	id, err := params.Int(req.Params, "id")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())

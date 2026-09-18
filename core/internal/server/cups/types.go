@@ -2,6 +2,7 @@ package cups
 
 import (
 	"io"
+	"net"
 	"sync"
 	"time"
 
@@ -89,6 +90,7 @@ type Manager struct {
 	lastNotifiedState *CUPSState
 	baseURL           string
 	probeRemoteFn     func(host string, port int, useTLS bool) (*RemotePrinterInfo, error)
+	dialFn            func(network, addr string, timeout time.Duration) (net.Conn, error)
 }
 
 type SubscriptionManagerInterface interface {

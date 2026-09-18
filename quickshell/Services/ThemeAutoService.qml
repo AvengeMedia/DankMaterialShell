@@ -149,12 +149,12 @@ Singleton {
     }
 
     Connections {
-        target: DisplayService
-        enabled: typeof DisplayService !== "undefined" && typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled && SessionData.themeModeAutoMode === "location" && !root.backendAvailable()
+        target: NightModeService
+        enabled: typeof NightModeService !== "undefined" && typeof SessionData !== "undefined" && SessionData.themeModeAutoEnabled && SessionData.themeModeAutoMode === "location" && !root.backendAvailable()
 
         function onGammaIsDayChanged() {
-            if (Theme.isLightMode !== DisplayService.gammaIsDay) {
-                Theme.setLightMode(DisplayService.gammaIsDay, true, true);
+            if (Theme.isLightMode !== NightModeService.gammaIsDay) {
+                Theme.setLightMode(NightModeService.gammaIsDay, true, true);
             }
         }
     }
@@ -368,8 +368,8 @@ Singleton {
     }
 
     function evaluateLocation() {
-        if (typeof DisplayService !== "undefined") {
-            const shouldBeLight = DisplayService.gammaIsDay;
+        if (typeof NightModeService !== "undefined") {
+            const shouldBeLight = NightModeService.gammaIsDay;
             if (Theme.isLightMode !== shouldBeLight) {
                 Theme.setLightMode(shouldBeLight, true, true);
             }

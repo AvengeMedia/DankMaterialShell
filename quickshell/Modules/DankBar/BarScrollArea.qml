@@ -11,6 +11,7 @@ MouseArea {
     property string xBehavior: "column"
     property string yBehavior: "workspace"
     property string screenName: ""
+    property var barConfig: null
     property real touchpadAccumulatorX: 0
     property real touchpadAccumulatorY: 0
     property real mouseAccumulatorX: 0
@@ -46,7 +47,7 @@ MouseArea {
     }
 
     function fire(accumulated, behavior) {
-        const reverse = SettingsData.reverseScrolling ? -1 : 1;
+        const reverse = SettingsData.widgetOption("workspaceSwitcher", SettingsData.barWidgetEntry(root.barConfig, "workspaceSwitcher"), "reverseScrolling") ? -1 : 1;
         const direction = accumulated * reverse < 0 ? 1 : -1;
         if (!handleScrollAction(behavior, direction))
             return;

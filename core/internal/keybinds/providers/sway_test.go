@@ -6,13 +6,6 @@ import (
 	"testing"
 )
 
-func TestSwayProviderName(t *testing.T) {
-	provider := NewSwayProvider("")
-	if provider.Name() != "sway" {
-		t.Errorf("Name() = %q, want %q", provider.Name(), "sway")
-	}
-}
-
 func TestSwayProviderDefaultPath(t *testing.T) {
 	provider := NewSwayProvider("")
 	configDir, err := os.UserConfigDir()
@@ -22,14 +15,6 @@ func TestSwayProviderDefaultPath(t *testing.T) {
 	expected := filepath.Join(configDir, "sway")
 	if provider.configPath != expected {
 		t.Errorf("configPath = %q, want %q", provider.configPath, expected)
-	}
-}
-
-func TestSwayProviderCustomPath(t *testing.T) {
-	customPath := "/custom/path"
-	provider := NewSwayProvider(customPath)
-	if provider.configPath != customPath {
-		t.Errorf("configPath = %q, want %q", provider.configPath, customPath)
 	}
 }
 

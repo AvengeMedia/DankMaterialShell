@@ -11,6 +11,7 @@ DockContextMenuBase {
 
     function showForButton(button, dockHeight, dockScreen, parentDockApps) {
         dockApps = parentDockApps || null;
+        options = parentDockApps?.options ?? ({});
         show(button, dockHeight, dockScreen);
     }
 
@@ -19,7 +20,7 @@ DockContextMenuBase {
         iconName: "folder_open"
         text: I18n.tr("Open Trash")
         onTriggered: {
-            TrashService.openTrash();
+            TrashService.openTrash(root.options);
             root.close();
         }
     }
@@ -29,7 +30,7 @@ DockContextMenuBase {
         iconName: "delete_forever"
         isDestructive: true
         enabled: !TrashService.isEmpty
-        text: TrashService.isEmpty ? I18n.tr("Empty Trash") : I18n.tr("Empty Trash (%1)").arg(TrashService.count)
+        text: TrashService.isEmpty ? I18n.tr("Empty Trash") : I18n.tr("Empty Trash (%1)", "verb, dock trash menu action, %1 is the item count").arg(TrashService.count)
         onTriggered: {
             TrashService.requestEmptyTrash();
             root.close();
@@ -48,7 +49,7 @@ DockContextMenuBase {
         text: I18n.tr("Settings")
         onTriggered: {
             SettingsSearchService.navigateToSection("dockTrash");
-            PopoutService.openSettingsWithTab("dock");
+            PopoutService.openSettingsWithTab("dock_widgets");
             root.close();
         }
     }

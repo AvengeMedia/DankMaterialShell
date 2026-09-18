@@ -8,17 +8,27 @@ DankModal {
     id: root
 
     property var parentPopout: null
+    property var currentFlow: null
+
+    function cancelAuth() {
+        const flow = currentFlow;
+        currentFlow = null;
+        close();
+        if (!flow || flow.isCompleted)
+            return;
+        flow.cancelAuthenticationRequest();
+    }
 
     layerNamespace: "dms:polkit-auth-surface"
     modalWidth: 460
-    modalHeight: 220
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    closeOnEscapeKey: true
+    modalHeight: Math.min(screenHeight - Theme.spacingXL * 2, Math.max(220, contentLoader?.item?.implicitHeight ?? 0))
+    closeOnEscapeKey: false
     closeOnBackgroundClick: false
     allowStacking: true
     keepPopoutsOpen: true
 
     onOpened: {
+        currentFlow = PolkitService.agent?.flow ?? null;
         if (parentPopout)
             parentPopout.customKeyboardFocus = WlrKeyboardFocus.None;
         Qt.callLater(() => {
@@ -46,6 +56,8 @@ DankModal {
 
     content: PolkitAuthContent {
         focus: true
+        currentFlow: root.currentFlow
+        onCancelRequested: root.cancelAuth()
         onCloseRequested: root.close()
     }
 }

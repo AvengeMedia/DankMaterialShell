@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import "../PamStack.js" as PamStack
 
 Singleton {
     id: root
@@ -64,7 +65,7 @@ Singleton {
     readonly property string homeDir: Quickshell.env("HOME") || ""
     readonly property string u2fKeysPath: homeDir ? homeDir + "/.config/Yubico/u2f_keys" : ""
     readonly property bool homeU2fKeysDetected: u2fKeysPath !== "" && u2fKeysWatcher.loaded && u2fKeysText.trim() !== ""
-    readonly property bool lockU2fCustomConfigDetected: pamModuleEnabled(dankshellU2fPamText, "pam_u2f")
+    readonly property bool lockU2fCustomConfigDetected: PamStack.moduleEnabled(dankshellU2fPamText, "pam_u2f")
     readonly property bool lockU2fCustomSourceDetected: (settingsRoot?.lockU2fPamPath || "") !== "" && customU2fPamWatcher.loaded
     readonly property bool greeterPamHasFprint: greeterPamStackHasModule("pam_fprintd")
     readonly property bool greeterPamHasU2f: greeterPamStackHasModule("pam_u2f")
@@ -91,7 +92,7 @@ Singleton {
             return forcedFprintAvailable ? "ready" : "probe_failed";
         if (!fingerprintProbeFinalized)
             return "probe_failed";
-        return parseFingerprintProbe(fingerprintProbeExitCode, fingerprintProbeOutput, pamFprintSupportDetected);
+        return PamStack.fingerprintProbeState(fingerprintProbeExitCode, fingerprintProbeOutput, pamFprintSupportDetected);
     }
 
     // --- Lock fingerprint capabilities ---
@@ -391,99 +392,9 @@ Singleton {
             greeterAutoLoginSyncDebounce.restart();
     }
 
-    // --- PAM parsing helpers ---
-
-    function stripPamComment(line) {
-        if (!line)
-            return "";
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith("#"))
-            return "";
-        const hashIdx = trimmed.indexOf("#");
-        if (hashIdx >= 0)
-            return trimmed.substring(0, hashIdx).trim();
-        return trimmed;
-    }
-
-    function pamModuleEnabled(pamText, moduleName) {
-        if (!pamText || !moduleName)
-            return false;
-        const lines = pamText.split(/\r?\n/);
-        for (let i = 0; i < lines.length; i++) {
-            const line = stripPamComment(lines[i]);
-            if (!line)
-                continue;
-            if (line.includes(moduleName))
-                return true;
-        }
-        return false;
-    }
-
-    function pamTextIncludesFile(pamText, filename) {
-        if (!pamText || !filename)
-            return false;
-        const lines = pamText.split(/\r?\n/);
-        for (let i = 0; i < lines.length; i++) {
-            const line = stripPamComment(lines[i]);
-            if (!line)
-                continue;
-            if (line.includes(filename) && (line.includes("include") || line.includes("substack") || line.startsWith("@include")))
-                return true;
-        }
-        return false;
-    }
-
     function greeterPamStackHasModule(moduleName) {
-        if (pamModuleEnabled(greetdPamText, moduleName))
-            return true;
         const includedPamStacks = [["system-auth", systemAuthPamText], ["common-auth", commonAuthPamText], ["password-auth", passwordAuthPamText], ["system-login", systemLoginPamText], ["system-local-login", systemLocalLoginPamText], ["common-auth-pc", commonAuthPcPamText], ["login", loginPamText]];
-        for (let i = 0; i < includedPamStacks.length; i++) {
-            const stack = includedPamStacks[i];
-            if (pamTextIncludesFile(greetdPamText, stack[0]) && pamModuleEnabled(stack[1], moduleName))
-                return true;
-        }
-        return false;
-    }
-
-    // --- Fingerprint probe output parsing ---
-
-    function hasEnrolledFingerprintOutput(output) {
-        const lower = (output || "").toLowerCase();
-        if (lower.includes("has fingers enrolled") || lower.includes("has fingerprints enrolled"))
-            return true;
-        const lines = lower.split(/\r?\n/);
-        for (let i = 0; i < lines.length; i++) {
-            const trimmed = lines[i].trim();
-            if (trimmed.startsWith("finger:"))
-                return true;
-            if (trimmed.startsWith("- ") && trimmed.includes("finger"))
-                return true;
-        }
-        return false;
-    }
-
-    function hasMissingFingerprintEnrollmentOutput(output) {
-        const lower = (output || "").toLowerCase();
-        return lower.includes("no fingers enrolled") || lower.includes("no fingerprints enrolled") || lower.includes("no prints enrolled");
-    }
-
-    function hasMissingFingerprintReaderOutput(output) {
-        const lower = (output || "").toLowerCase();
-        return lower.includes("no devices available") || lower.includes("no device available") || lower.includes("no devices found") || lower.includes("list_devices failed") || lower.includes("no device");
-    }
-
-    function parseFingerprintProbe(exitCode, output, pamFprintDetected) {
-        if (hasEnrolledFingerprintOutput(output))
-            return "ready";
-        if (hasMissingFingerprintEnrollmentOutput(output))
-            return "missing_enrollment";
-        if (hasMissingFingerprintReaderOutput(output))
-            return "missing_reader";
-        if (exitCode === 0)
-            return "missing_enrollment";
-        if (exitCode === 127 || (output || "").includes("__missing_command__"))
-            return "missing_pam_support";
-        return pamFprintDetected ? "probe_failed" : "missing_pam_support";
+        return PamStack.stackHasModule(greetdPamText, includedPamStacks, moduleName);
     }
 
     function checkPluginSettings() {

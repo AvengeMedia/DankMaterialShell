@@ -146,20 +146,6 @@ func TestConvertHyprlandRulesToWindowRules(t *testing.T) {
 	}
 }
 
-func TestHyprlandWritableProvider(t *testing.T) {
-	tmpDir := t.TempDir()
-	provider := NewHyprlandWritableProvider(tmpDir)
-
-	if provider.Name() != "hyprland" {
-		t.Errorf("Name() = %q, want hyprland", provider.Name())
-	}
-
-	expectedPath := filepath.Join(tmpDir, "dms", "windowrules.lua")
-	if provider.GetOverridePath() != expectedPath {
-		t.Errorf("GetOverridePath() = %q, want %q", provider.GetOverridePath(), expectedPath)
-	}
-}
-
 func TestHyprlandSetAndLoadDMSRules(t *testing.T) {
 	tmpDir := t.TempDir()
 	provider := NewHyprlandWritableProvider(tmpDir)
@@ -389,15 +375,6 @@ func TestFormatLuaManagedHyprRuleUsesLuaFieldNames(t *testing.T) {
 		if !strings.Contains(joined, want) {
 			t.Fatalf("formatted rule missing %q: %s", want, joined)
 		}
-	}
-}
-
-func TestBoolToInt(t *testing.T) {
-	if boolToInt(true) != 1 {
-		t.Error("boolToInt(true) should be 1")
-	}
-	if boolToInt(false) != 0 {
-		t.Error("boolToInt(false) should be 0")
 	}
 }
 

@@ -44,6 +44,8 @@ Singleton {
     property var powerMenuModalLoader: null
     property var powerMenuPopout: null
     property var powerMenuPopoutLoader: null
+    property var durationPopout: null
+    property var durationPopoutLoader: null
     property var processListModal: null
     property var processListModalLoader: null
     property var colorPickerModal: null
@@ -124,6 +126,7 @@ Singleton {
             "vpn": () => _unloadPopoutNow("vpnPopout", "vpnPopoutLoader"),
             "colorPicker": () => _unloadPopoutNow("colorPickerPopout", "colorPickerPopoutLoader"),
             "powerMenuPopout": () => _unloadPopoutNow("powerMenuPopout", "powerMenuPopoutLoader"),
+            "duration": () => _unloadPopoutNow("durationPopout", "durationPopoutLoader"),
             "systemUpdate": () => _unloadPopoutNow("systemUpdatePopout", "systemUpdateLoader"),
             "layout": () => _unloadPopoutNow("layoutPopout", "layoutPopoutLoader"),
             "clipboardHistory": () => _unloadPopoutNow("clipboardHistoryPopout", "clipboardHistoryPopoutLoader"),
@@ -145,12 +148,14 @@ Singleton {
 
     readonly property bool islandControlCenterOpen: dankIslandRouter?.controlCenterOpen ?? false
 
-    function routeToIsland(activityId, screen, shouldToggle, section) {
-        if (!_islandOwnsSharedTrigger(screen))
+    function routeToIsland(activityId, screen, shouldToggle, section, barId) {
+        if (barId && dankIslandRouter?.hasHostForScreen(screen, barId) !== true)
+            return false;
+        if (!barId && !_islandOwnsSharedTrigger(screen))
             return false;
         if (shouldToggle === true)
-            return dankIslandRouter.toggleActivity(activityId, screen ?? null, section || "") === true;
-        return dankIslandRouter.openActivity(activityId, screen ?? null, section || "") === true;
+            return dankIslandRouter.toggleActivity(activityId, screen ?? null, section || "", barId) === true;
+        return dankIslandRouter.openActivity(activityId, screen ?? null, section || "", barId) === true;
     }
 
     function closeIslandActivity(activityId) {
@@ -276,21 +281,12 @@ Singleton {
         _dankDashHasPosition = hasPos;
     }
 
-    // `tab` is a view id ("weather"); a numeric index into the visible tabs is
-    // still accepted for plugin compatibility.
-    function _dankDashTabId(tab) {
-        if (typeof tab === "string" && tab !== "")
-            return tab;
-        const ids = SettingsData.visibleDashTabIds();
-        return ids[typeof tab === "number" ? tab : 0] ?? "overview";
-    }
-
     function openDankDash(tab, x, y, width, section, screen) {
         _dankDashPendingTab = tab || 0;
         if (dankDashPopout) {
             if (arguments.length >= 6)
                 setPosition(dankDashPopout, x, y, width, section, screen);
-            dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
+            dankDashPopout.requestTab(_dankDashPendingTab);
             dankDashPopout.dashVisible = true;
             return;
         }
@@ -315,7 +311,7 @@ Singleton {
             if (dankDashPopout.dashVisible) {
                 dankDashPopout.dashVisible = false;
             } else {
-                dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
+                dankDashPopout.requestTab(_dankDashPendingTab);
                 dankDashPopout.dashVisible = true;
             }
             return;
@@ -337,7 +333,7 @@ Singleton {
 
         if (_dankDashWantsOpen) {
             _dankDashWantsOpen = false;
-            dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
+            dankDashPopout.requestTab(_dankDashPendingTab);
             dankDashPopout.dashVisible = true;
             return;
         }
@@ -346,7 +342,7 @@ Singleton {
             if (dankDashPopout.dashVisible) {
                 dankDashPopout.dashVisible = false;
             } else {
-                dankDashPopout.requestTab(_dankDashTabId(_dankDashPendingTab));
+                dankDashPopout.requestTab(_dankDashPendingTab);
                 dankDashPopout.dashVisible = true;
             }
         }
@@ -546,8 +542,7 @@ Singleton {
 
     function toggleSettingsWithTab(tabName: string) {
         if (settingsModal) {
-            var idx = settingsModal.resolveTabIndex(tabName);
-            settingsModal.setTabIndex(idx);
+            settingsModal.setPageName(tabName);
             settingsModal.toggle();
             return;
         }
@@ -586,8 +581,7 @@ Singleton {
                     settingsModal.hide();
                     return;
                 }
-                var idx = settingsModal.resolveTabIndex(tabName);
-                settingsModal.setTabIndex(idx);
+                settingsModal.setPageName(tabName);
                 CompositorService.activateToplevel(toplevel);
                 return;
             }
@@ -625,8 +619,7 @@ Singleton {
                 settingsModal?.setTabIndex(_settingsPendingTabIndex);
                 _settingsPendingTabIndex = -1;
             } else if (_settingsPendingTab) {
-                var idx = settingsModal?.resolveTabIndex(_settingsPendingTab) ?? -1;
-                settingsModal?.setTabIndex(idx);
+                settingsModal?.setPageName(_settingsPendingTab);
                 _settingsPendingTab = "";
             }
             settingsModal?.toggle();
@@ -975,6 +968,10 @@ Singleton {
 
     function unloadPowerMenuPopout() {
         _scheduleUnload("powerMenuPopout");
+    }
+
+    function unloadDurationPopout() {
+        _scheduleUnload("duration");
     }
 
     function ensureBluetoothPairingModal() {

@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import "../Common/OutputModel.js" as OutputModel
 
 Singleton {
     id: root
@@ -103,10 +104,6 @@ Singleton {
         return null;
     }
 
-    function getEnabledOutputs() {
-        return outputs.filter(output => output.enabled);
-    }
-
     function applyConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
@@ -167,122 +164,6 @@ Singleton {
         }, 5000);
     }
 
-    function setOutputEnabled(outputName, enabled, callback) {
-        const output = getOutput(outputName);
-        if (!output) {
-            log.warn("Output not found:", outputName);
-            if (callback) {
-                callback(false, "Output not found");
-            }
-            return;
-        }
-
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": enabled
-            }
-        ];
-
-        if (enabled && output.currentMode) {
-            heads[0].modeId = output.currentMode.id;
-        }
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputMode(outputName, modeId, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "modeId": modeId
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputCustomMode(outputName, width, height, refresh, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "customMode": {
-                    "width": width,
-                    "height": height,
-                    "refresh": refresh
-                }
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputPosition(outputName, x, y, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "position": {
-                    "x": x,
-                    "y": y
-                }
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputScale(outputName, scale, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "scale": scale
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputTransform(outputName, transform, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "transform": transform
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function setOutputAdaptiveSync(outputName, state, callback) {
-        const heads = [
-            {
-                "name": outputName,
-                "enabled": true,
-                "adaptiveSync": state
-            }
-        ];
-
-        applyConfiguration(heads, callback);
-    }
-
-    function configureOutput(config, callback) {
-        const heads = [config];
-        applyConfiguration(heads, callback);
-    }
-
-    function configureMultipleOutputs(configs, callback) {
-        applyConfiguration(configs, callback);
-    }
-
-    // High-level apply matching the generateOutputsConfig() pattern used by
-    // NiriService, HyprlandService and MangoService.  Instead of writing a
-    // config file, the changes are applied directly via the
-    // wlr-output-management protocol.
     function applyOutputsConfig(outputsData, connectedOutputs, callback) {
         if (!wlrOutputAvailable) {
             if (callback)
@@ -327,36 +208,13 @@ Singleton {
                         "y": output.logical.y ?? 0
                     };
                     head.scale = output.logical.scale ?? 1.0;
-                    head.transform = transformFromName(output.logical.transform);
+                    head.transform = OutputModel.transformIndex(output.logical.transform);
                 }
             }
             heads.push(head);
         }
 
         return heads;
-    }
-
-    function transformFromName(name) {
-        switch (name) {
-        case "Normal":
-            return 0;
-        case "90":
-            return 1;
-        case "180":
-            return 2;
-        case "270":
-            return 3;
-        case "Flipped":
-            return 4;
-        case "Flipped90":
-            return 5;
-        case "Flipped180":
-            return 6;
-        case "Flipped270":
-            return 7;
-        default:
-            return 0;
-        }
     }
 
     Connections {

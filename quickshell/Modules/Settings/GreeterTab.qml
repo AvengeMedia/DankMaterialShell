@@ -11,58 +11,10 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property var parentModal: null
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
-
-    readonly property bool greeterFprintToggleAvailable: SettingsData.greeterFingerprintCanEnable || SettingsData.greeterEnableFprint
-    readonly property bool greeterU2fToggleAvailable: SettingsData.greeterU2fCanEnable || SettingsData.greeterEnableU2f
-
-    function greeterFingerprintDescription() {
-        if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status");
-        if (SettingsData.greeterFingerprintSource === "pam")
-            return I18n.tr("PAM already provides fingerprint auth. Enable this to show it at login.", "greeter fingerprint login setting");
-
-        switch (SettingsData.greeterFingerprintReason) {
-        case "ready":
-            return I18n.tr("Applies on the next greeter sync", "greeter auth setting description");
-        case "missing_enrollment":
-            return I18n.tr("Fingerprint reader detected, but no prints are enrolled yet. You can enable this now and run Sync later.", "greeter fingerprint login setting");
-        case "missing_reader":
-            return I18n.tr("No fingerprint reader detected", "fingerprint setting status");
-        case "missing_pam_support":
-            return I18n.tr("Not available — install fprintd and pam_fprintd, or configure greetd PAM.", "greeter fingerprint login setting");
-        default:
-            return I18n.tr("Fingerprint availability could not be confirmed", "fingerprint setting status");
-        }
-    }
-
-    function greeterU2fDescription() {
-        if (SettingsData.greeterPamExternallyManaged)
-            return I18n.tr("Managed by the primary PAM source", "factor managed by PAM source status");
-        if (SettingsData.greeterU2fSource === "pam")
-            return I18n.tr("PAM already provides security-key auth. Enable this to show it at login.", "greeter security key login setting");
-
-        switch (SettingsData.greeterU2fReason) {
-        case "ready":
-            return I18n.tr("Applies on the next greeter sync", "greeter auth setting description");
-        case "missing_key_registration":
-            return I18n.tr("Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.", "security key setting status");
-        case "missing_pam_support":
-            return I18n.tr("Not available — install or configure pam_u2f, or configure greetd PAM.", "greeter security key login setting");
-        default:
-            return I18n.tr("Security-key availability could not be confirmed", "security key setting status");
-        }
-    }
-
-    function refreshAuthDetection() {
-        SettingsData.refreshAuthAvailability();
-    }
-
-    onVisibleChanged: {
-        if (visible)
-            refreshAuthDetection();
-    }
 
     ConfirmModal {
         id: greeterActionConfirm
@@ -117,7 +69,7 @@ Item {
         greeterActionConfirm.showWithOptions({
             "title": I18n.tr("Activate Greeter", "greeter action confirmation"),
             "message": I18n.tr("Activate the DMS greeter? A terminal will open for sudo authentication. Run Sync after activation to apply your settings."),
-            "confirmText": I18n.tr("Activate"),
+            "confirmText": I18n.tr("Activate", "verb, enable the greeter, also activate a wired network profile"),
             "cancelText": I18n.tr("Cancel"),
             "confirmColor": Theme.primary,
             "onConfirm": () => root.runGreeterInstallAction(),
@@ -147,7 +99,6 @@ Item {
     }
 
     Component.onCompleted: {
-        refreshAuthDetection();
         Qt.callLater(checkGreeterInstallState);
     }
 
@@ -320,65 +271,17 @@ Item {
         }
     }
 
-    readonly property var _lockDateFormatPresets: [
-        {
-            format: "",
-            label: I18n.tr("System Default", "date format option")
-        },
-        {
-            format: "ddd d",
-            label: I18n.tr("Day Date", "date format option")
-        },
-        {
-            format: "ddd MMM d",
-            label: I18n.tr("Day Month Date", "date format option")
-        },
-        {
-            format: "MMM d",
-            label: I18n.tr("Month Date", "date format option")
-        },
-        {
-            format: "M/d",
-            label: I18n.tr("Numeric (M/D)", "date format option")
-        },
-        {
-            format: "d/M",
-            label: I18n.tr("Numeric (D/M)", "date format option")
-        },
-        {
-            format: "ddd d MMM yyyy",
-            label: I18n.tr("Full with Year", "date format option")
-        },
-        {
-            format: "yyyy-MM-dd",
-            label: I18n.tr("ISO Date", "date format option")
-        },
-        {
-            format: "dddd, MMMM d",
-            label: I18n.tr("Full Day & Month", "date format option")
-        }
-    ]
+    SettingsPage {
+        id: mainColumn
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL + (syncPendingPill.shown ? syncPendingPill.height + Theme.spacingL : 0)
-        contentWidth: width
+        SettingsCard {
+            width: parent.width
+            iconName: "info"
+            title: I18n.tr("Status")
+            settingKey: "greeterStatus"
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
-
-            SettingsCard {
-                width: parent.width
-                iconName: "info"
-                title: I18n.tr("Status")
-                settingKey: "greeterStatus"
-
-                StyledText {
+            SettingsRow {
+                body: StyledText {
                     text: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
@@ -386,13 +289,10 @@ Item {
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignLeft
                 }
+            }
 
-                Item {
-                    width: 1
-                    height: Theme.spacingS
-                }
-
-                Rectangle {
+            SettingsRow {
+                body: Rectangle {
                     width: parent.width
                     height: Math.min(180, statusTextArea.implicitHeight + Theme.spacingM * 2)
                     radius: Theme.cornerRadius
@@ -422,13 +322,10 @@ Item {
                         verticalAlignment: Text.AlignTop
                     }
                 }
+            }
 
-                Item {
-                    width: 1
-                    height: Theme.spacingM
-                }
-
-                Flow {
+            SettingsRow {
+                body: Flow {
                     width: parent.width
                     spacing: Theme.spacingS
 
@@ -450,7 +347,7 @@ Item {
                     }
 
                     DankButton {
-                        text: I18n.tr("Sync")
+                        text: I18n.tr("Sync", "verb, button that copies settings to the login greeter")
                         iconName: "sync"
                         horizontalPadding: Theme.spacingL
                         onClicked: root.runGreeterSync()
@@ -458,202 +355,87 @@ Item {
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "fingerprint"
-                title: I18n.tr("Authentication")
+        SettingsCard {
+            SettingsNavRow {
                 settingKey: "greeterAuth"
+                tags: ["greeter", "login", "authentication", "pam", "fingerprint", "security", "key"]
+                title: I18n.tr("Authentication")
+                iconName: "fingerprint"
+                onClicked: root.parentModal?.navigateTo("greeter_auth")
+            }
+        }
 
-                StyledText {
-                    text: I18n.tr("Enable fingerprint or security key for DMS Greeter")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignLeft
-                }
+        SettingsCard {
+            title: I18n.tr("Appearance")
+            settingKey: "greeterAppearance"
+            tags: ["greeter", "login", "sync", "theme", "wallpaper"]
 
-                SettingsToggleRow {
-                    settingKey: "greeterPamExternallyManaged"
-                    tags: ["greeter", "pam", "managed", "external", "greetd", "auth"]
-                    text: I18n.tr("Use system PAM authentication", "system PAM policy toggle")
-                    description: I18n.tr("DMS removes its managed block from /etc/pam.d/greetd and stops write services", "greeter system PAM toggle description")
-                    checked: SettingsData.greeterPamExternallyManaged
-                    onToggled: checked => SettingsData.set("greeterPamExternallyManaged", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterEnableFprint"
-                    tags: ["greeter", "fingerprint", "fprintd", "login", "auth"]
-                    text: I18n.tr("Enable fingerprint at login")
-                    description: root.greeterFingerprintDescription()
-                    descriptionColor: (SettingsData.greeterFingerprintReason === "ready" || SettingsData.greeterFingerprintReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
-                    checked: SettingsData.greeterEnableFprint
-                    enabled: root.greeterFprintToggleAvailable && !SettingsData.greeterPamExternallyManaged
-                    onToggled: checked => SettingsData.set("greeterEnableFprint", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterEnableU2f"
-                    tags: ["greeter", "u2f", "security", "key", "login", "auth"]
-                    text: I18n.tr("Enable security key at login")
-                    description: root.greeterU2fDescription()
-                    descriptionColor: (SettingsData.greeterU2fReason === "ready" || SettingsData.greeterU2fReason === "configured_externally") ? Theme.surfaceVariantText : Theme.warning
-                    checked: SettingsData.greeterEnableU2f
-                    enabled: root.greeterU2fToggleAvailable && !SettingsData.greeterPamExternallyManaged
-                    onToggled: checked => SettingsData.set("greeterEnableU2f", checked)
-                }
+            SettingsRow {
+                subtitle: I18n.tr("Uses your wallpaper, fonts and lock screen settings.", "login screen appearance")
             }
 
-            SettingsCard {
-                width: parent.width
+            SettingsNavRow {
+                title: I18n.tr("Wallpaper & colors")
                 iconName: "palette"
-                title: I18n.tr("Appearance")
-                settingKey: "greeterAppearance"
-
-                StyledText {
-                    text: I18n.tr("Font")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    topPadding: Theme.spacingM
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsFontDropdownRow {
-                    settingKey: "greeterFontFamily"
-                    tags: ["greeter", "font", "typography"]
-                    text: I18n.tr("Greeter font")
-                    description: I18n.tr("Font used on the login screen")
-                    currentFont: SettingsData.greeterFontFamily || ""
-                    onFontSelected: family => SettingsData.set("greeterFontFamily", family)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterShowWeather"
-                    tags: ["greeter", "weather", "temperature", "login"]
-                    text: I18n.tr("Weather", "Enable weather display on the login screen")
-                    description: I18n.tr("Show weather on the login screen")
-                    checked: SettingsData.greeterShowWeather
-                    onToggled: checked => SettingsData.set("greeterShowWeather", checked)
-                }
-
-                StyledText {
-                    text: I18n.tr("Date format on greeter")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    topPadding: Theme.spacingM
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsDropdownRow {
-                    settingKey: "greeterLockDateFormat"
-                    tags: ["greeter", "date", "format"]
-                    text: I18n.tr("Date Format")
-                    description: I18n.tr("Format the date on the login screen")
-                    options: root._lockDateFormatPresets.map(p => p.label)
-                    currentValue: {
-                        var current = SettingsData.greeterLockDateFormat || SettingsData.lockDateFormat || "";
-                        var match = root._lockDateFormatPresets.find(p => p.format === current);
-                        if (match)
-                            return match.label;
-                        if (current)
-                            return I18n.tr("Custom") + ": " + current;
-                        return root._lockDateFormatPresets[0].label;
-                    }
-                    onValueChanged: value => {
-                        var preset = root._lockDateFormatPresets.find(p => p.label === value);
-                        SettingsData.set("greeterLockDateFormat", preset ? preset.format : "");
-                    }
-                }
-
-                StyledText {
-                    text: I18n.tr("Background")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    topPadding: Theme.spacingM
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                StyledText {
-                    text: I18n.tr("Use a custom image for the login screen, or leave empty to use desktop wallpaper")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsWallpaperPicker {
-                    width: parent.width
-                    path: SettingsData.greeterWallpaperPath
-                    fillMode: SettingsData.greeterWallpaperFillMode
-                    fallbackFillMode: SettingsData.wallpaperFillMode || "Fill"
-                    browserTitle: I18n.tr("Select greeter background image")
-                    fillModeSettingKey: "greeterWallpaperFillMode"
-                    fillModeTags: ["greeter", "wallpaper", "background", "fill"]
-                    onPathSelected: path => SettingsData.set("greeterWallpaperPath", path)
-                    onFillModeSelected: mode => SettingsData.set("greeterWallpaperFillMode", mode)
-                }
+                onClicked: root.parentModal?.navigateTo("personalization")
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "history"
-                title: I18n.tr("Behavior")
-                settingKey: "greeterBehavior"
-
-                StyledText {
-                    text: I18n.tr("Convenience options for the login screen")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterRememberLastSession"
-                    tags: ["greeter", "session", "remember", "login"]
-                    text: I18n.tr("Remember last session")
-                    description: I18n.tr("Pre-select the last used session on the greeter")
-                    checked: SettingsData.greeterRememberLastSession
-                    onToggled: checked => SettingsData.set("greeterRememberLastSession", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterRememberLastUser"
-                    tags: ["greeter", "user", "remember", "login", "username"]
-                    text: I18n.tr("Remember last user")
-                    description: I18n.tr("Pre-fill the last successful username on the greeter")
-                    checked: SettingsData.greeterRememberLastUser
-                    onToggled: checked => SettingsData.set("greeterRememberLastUser", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "greeterAutoLogin"
-                    tags: ["greeter", "autologin", "login", "startup", "password"]
-                    text: I18n.tr("Auto-login on startup")
-                    description: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession ? I18n.tr("Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.") : I18n.tr("Requires remembering the last user and session. Enable those options first.")
-                    checked: SettingsData.greeterAutoLogin
-                    enabled: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession
-                    onToggled: checked => SettingsData.set("greeterAutoLogin", checked)
-                }
+            SettingsNavRow {
+                title: I18n.tr("Fonts & motion")
+                iconName: "text_fields"
+                onClicked: root.parentModal?.navigateTo("typography")
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "extension"
-                title: I18n.tr("Dependencies & documentation")
-                settingKey: "greeterDeps"
+            SettingsNavRow {
+                title: I18n.tr("Lock screen")
+                iconName: "lock"
+                onClicked: root.parentModal?.navigateTo("lock_screen")
+            }
+        }
 
-                StyledText {
+        SettingsCard {
+            width: parent.width
+            iconName: "history"
+            title: I18n.tr("Behavior")
+            settingKey: "greeterBehavior"
+
+            SettingsToggleRow {
+                settingKey: "greeterRememberLastSession"
+                tags: ["greeter", "session", "remember", "login"]
+                text: I18n.tr("Remember last session")
+                checked: SettingsData.greeterRememberLastSession
+                onToggled: checked => SettingsData.set("greeterRememberLastSession", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "greeterRememberLastUser"
+                tags: ["greeter", "user", "remember", "login", "username"]
+                text: I18n.tr("Remember last user")
+                checked: SettingsData.greeterRememberLastUser
+                onToggled: checked => SettingsData.set("greeterRememberLastUser", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "greeterAutoLogin"
+                tags: ["greeter", "autologin", "login", "startup", "password"]
+                text: I18n.tr("Auto-login on startup")
+                description: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession ? I18n.tr("Skip the greeter password after boot until you sign out. Lock screen unlock is unchanged. Takes effect on the next reboot after sync.") : I18n.tr("Requires remembering the last user and session. Enable those options first.")
+                checked: SettingsData.greeterAutoLogin
+                enabled: SettingsData.greeterRememberLastUser && SettingsData.greeterRememberLastSession
+                onToggled: checked => SettingsData.set("greeterAutoLogin", checked)
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "extension"
+            title: I18n.tr("Dependencies & documentation")
+            settingKey: "greeterDeps"
+
+            SettingsRow {
+                body: StyledText {
                     text: I18n.tr("Requires greetd, dms-greeter, and your user in the greeter group (plus fprintd/pam_fprintd for fingerprint, pam_u2f for security keys).")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
@@ -661,8 +443,10 @@ Item {
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignLeft
                 }
+            }
 
-                StyledText {
+            SettingsRow {
+                body: StyledText {
                     text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"https://danklinux.com/docs/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
                     textFormat: Text.RichText
                     font.pixelSize: Theme.fontSizeSmall
@@ -694,7 +478,7 @@ Item {
         anchors.bottomMargin: shown ? Theme.spacingL : Theme.spacingXS
         width: pillRow.implicitWidth + Theme.spacingL * 2
         height: 44
-        radius: height / 2
+        radius: Theme.fullRadius(width, height)
         color: Theme.primary
         opacity: shown ? 1 : 0
         visible: opacity > 0
@@ -732,12 +516,12 @@ Item {
             DankIcon {
                 id: syncPillIcon
                 name: "sync"
-                size: Theme.iconSize - 4
+                size: Theme.iconSizeMedium
                 color: Theme.primaryText
                 anchors.verticalCenter: parent.verticalCenter
 
                 RotationAnimation on rotation {
-                    running: root.greeterSyncRunning && syncPendingPill.shown
+                    running: root.visible && root.greeterSyncRunning && syncPendingPill.shown
                     from: 0
                     to: 360
                     duration: 1000
@@ -750,7 +534,7 @@ Item {
             }
 
             StyledText {
-                text: root.greeterSyncRunning ? I18n.tr("Syncing...") : I18n.tr("Sync to apply")
+                text: root.greeterSyncRunning ? I18n.tr("Syncing...", "greeter settings status while sync is running") : I18n.tr("Sync to apply")
                 color: Theme.primaryText
                 font.pixelSize: Theme.fontSizeMedium
                 anchors.verticalCenter: parent.verticalCenter
@@ -758,7 +542,8 @@ Item {
 
             DankActionButton {
                 iconName: "close"
-                iconSize: Theme.iconSize - 6
+                Accessible.name: I18n.tr("Dismiss")
+                iconSize: Theme.iconSizeSmall
                 iconColor: Theme.primaryText
                 buttonSize: 28
                 anchors.verticalCenter: parent.verticalCenter

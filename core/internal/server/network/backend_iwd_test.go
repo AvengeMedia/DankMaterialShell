@@ -30,16 +30,6 @@ func TestIWDBackend_MarkIPConfigSeen(t *testing.T) {
 	att.mu.Unlock()
 }
 
-func TestIWDBackend_MarkIPConfigSeen_NoAttempt(t *testing.T) {
-	backend, _ := NewIWDBackend()
-
-	backend.attemptMutex.Lock()
-	backend.curAttempt = nil
-	backend.attemptMutex.Unlock()
-
-	backend.MarkIPConfigSeen()
-}
-
 func TestIWDBackend_OnPromptRetry(t *testing.T) {
 	backend, _ := NewIWDBackend()
 

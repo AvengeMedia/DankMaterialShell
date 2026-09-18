@@ -43,47 +43,13 @@ DankFloatingWindow {
             }
         }
 
-        MouseArea {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            height: headerRow.height + Theme.spacingM
-            onPressed: windowControls.tryStartMove()
-            onDoubleClicked: windowControls.tryToggleMaximize()
-        }
-
-        Item {
+        DankWindowHeader {
             id: headerRow
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: Theme.spacingM
-            height: Math.round(Theme.fontSizeMedium * 2.85)
-
-            Row {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                DankActionButton {
-                    visible: windowControls.canMaximize
-                    iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: windowControls.tryToggleMaximize()
-                }
-
-                DankActionButton {
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: root.dismiss()
-
-                    DankTooltip {
-                        text: I18n.tr("Close")
-                    }
-                }
-            }
+            controls: windowControls
+            onCloseRequested: root.dismiss()
         }
 
         DankFlickable {

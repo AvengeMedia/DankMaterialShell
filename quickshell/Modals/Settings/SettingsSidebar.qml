@@ -6,53 +6,79 @@ import qs.Common
 import qs.Modals.Settings
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
-Rectangle {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property int currentIndex: 0
+    property string currentPage: ""
+    property string activeCategoryId: ""
     property var parentModal: null
 
-    signal tabChangeRequested(int tabIndex)
-    property string _expandedIds: ","
-    property string _collapsedIds: ","
-    property string _autoExpandedIds: ","
+    signal pageRequested(string pageId)
+
     property bool searchActive: searchField.text.length > 0
     property int searchSelectedIndex: 0
-    property int keyboardHighlightIndex: -1
-    readonly property int navigationStateDuration: Theme.currentAnimationSpeed === SettingsData.AnimationSpeed.None ? 0 : Anims.settingsNavigationStateDuration
+    property string keyboardHighlightId: ""
+    readonly property var categoryStructure: SettingsTabs.structure
+    readonly property var navGroups: {
+        const groups = [];
+        let current = [];
+        for (const entry of categoryStructure) {
+            if (entry.separator) {
+                if (current.length)
+                    groups.push(current);
+                current = [];
+                continue;
+            }
+            current.push(entry);
+        }
+        if (current.length)
+            groups.push(current);
+        return groups;
+    }
 
     function focusSearch() {
         searchField.forceActiveFocus();
     }
 
-    function highlightNext() {
-        var flatItems = getFlatNavigableItems();
-        if (flatItems.length === 0)
+    function focusAfterNavigation() {
+        if (parentModal?.isCompactMode && !parentModal.menuVisible) {
+            parentModal.focusCurrentPage();
             return;
-        var currentPos = flatItems.findIndex(item => item.tabIndex === keyboardHighlightIndex);
-        if (currentPos === -1) {
-            currentPos = flatItems.findIndex(item => item.tabIndex === currentIndex);
         }
-        var nextPos = (currentPos + 1) % flatItems.length;
-        keyboardHighlightIndex = flatItems[nextPos].tabIndex;
-        autoExpandForTab(keyboardHighlightIndex);
+        focusSearch();
     }
 
-    function highlightPrevious() {
-        var flatItems = getFlatNavigableItems();
-        if (flatItems.length === 0)
-            return;
-        var currentPos = flatItems.findIndex(item => item.tabIndex === keyboardHighlightIndex);
-        if (currentPos === -1) {
-            currentPos = flatItems.findIndex(item => item.tabIndex === currentIndex);
+    function navigableIds() {
+        const ids = [];
+        for (const entry of categoryStructure) {
+            if (entry.separator || !SettingsTabs.isVisible(SettingsTabs.page(entry.id)))
+                continue;
+            ids.push(entry.id);
         }
-        var prevPos = (currentPos - 1 + flatItems.length) % flatItems.length;
-        keyboardHighlightIndex = flatItems[prevPos].tabIndex;
-        autoExpandForTab(keyboardHighlightIndex);
+        return ids;
+    }
+
+    function moveHighlight(delta) {
+        const ids = navigableIds();
+        if (ids.length === 0)
+            return;
+        let position = ids.indexOf(keyboardHighlightId);
+        if (position === -1)
+            position = ids.indexOf(SettingsTabs.isPluginPage(currentPage) ? currentPage : activeCategoryId);
+        keyboardHighlightId = ids[(position + delta + ids.length) % ids.length];
+    }
+
+    function selectHighlighted() {
+        if (!keyboardHighlightId)
+            return;
+        pageRequested(keyboardHighlightId);
+        keyboardHighlightId = "";
+        Qt.callLater(root.focusAfterNavigation);
     }
 
     function ensureRowVisible(item) {
@@ -65,328 +91,50 @@ Rectangle {
         sidebarFlickable.contentY = Math.max(0, Math.min(itemY - viewH / 4, sidebarFlickable.contentHeight - viewH));
     }
 
-    function selectHighlighted() {
-        if (keyboardHighlightIndex < 0)
+    function openBarWidget(widgetId, addIfMissing) {
+        const widget = BarWidgetCatalog.get(widgetId);
+        let where = SettingsData.locateBarWidget(widgetId, SettingsUiState.selectedBarId);
+        if (!where && addIfMissing) {
+            const barId = SettingsData.getBarConfig(SettingsUiState.selectedBarId) ? SettingsUiState.selectedBarId : (SettingsData.barConfigs[0]?.id ?? "default");
+            const section = widget?.section ?? "right";
+            const index = SettingsData.addBarWidget(barId, section, widgetId);
+            if (index >= 0)
+                where = {
+                    "barId": barId,
+                    "section": section,
+                    "index": index
+                };
+        }
+        if (!where)
             return;
-        var oldIndex = currentIndex;
-        var newIndex = keyboardHighlightIndex;
-        tabChangeRequested(newIndex);
-        autoCollapseIfNeeded(oldIndex, newIndex);
-        keyboardHighlightIndex = -1;
-        Qt.callLater(searchField.forceActiveFocus);
-    }
-
-    readonly property var categoryStructure: SettingsTabs.structure
-
-    function leaveHiddenTab(tabIndex) {
-        if (currentIndex !== tabIndex)
-            return;
-        tabChangeRequested(resolveTabIndex("dankbar_settings"));
-    }
-
-    Connections {
-        target: SettingsData
-
-        function onFrameEnabledChanged() {
-            if (!SettingsData.frameEnabled)
-                root.leaveHiddenTab(33);
-        }
-
-        function onIslandBarConfigsChanged() {
-            if (SettingsData.islandBarConfigs.length === 0)
-                root.leaveHiddenTab(46);
-        }
-    }
-
-    function isItemVisible(item) {
-        if (item.dmsOnly && !NetworkService.networkAvailable)
-            return false;
-        if (item.cupsOnly && !CupsService.cupsAvailable)
-            return false;
-        if (item.shortcutsOnly && !KeybindsService.available)
-            return false;
-        if (item.soundsOnly && !AudioService.soundsAvailable)
-            return false;
-        if (item.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
-            return false;
-        if (item.windowRulesCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
-            return false;
-        if (item.layoutCapable && !CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isMango)
-            return false;
-        if (item.niriOnly && !CompositorService.isNiri)
-            return false;
-        if (item.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
-            return false;
-        if (item.updaterOnly && !SystemUpdateService.sysupdateAvailable)
-            return false;
-        if (item.greeterOnly && !GreeterService.available)
-            return false;
-        if (item.autostartOnly && !DesktopService.autostartAvailable)
-            return false;
-        if (item.frameOnly && !SettingsData.frameEnabled)
-            return false;
-        if (item.islandOnly && SettingsData.islandBarConfigs.length === 0)
-            return false;
-        if (item.cellularOnly && (NetworkService.cellularDevices?.length ?? 0) === 0)
-            return false;
-        return true;
-    }
-
-    function hasVisibleChildren(category) {
-        if (!category.children)
-            return false;
-        return category.children.some(child => isItemVisible(child));
-    }
-
-    function isCategoryVisible(category) {
-        if (category.separator)
-            return true;
-        if (!isItemVisible(category))
-            return false;
-        if (category.children && !hasVisibleChildren(category))
-            return false;
-        return true;
-    }
-
-    function _setExpanded(id, expanded) {
-        var marker = "," + id + ",";
-        if (expanded) {
-            if (_expandedIds.indexOf(marker) < 0)
-                _expandedIds = _expandedIds + id + ",";
-            _collapsedIds = _collapsedIds.replace(marker, ",");
-        } else {
-            _expandedIds = _expandedIds.replace(marker, ",");
-            if (_collapsedIds.indexOf(marker) < 0)
-                _collapsedIds = _collapsedIds + id + ",";
-        }
-        SessionData.setSettingsSidebarState(_expandedIds, _collapsedIds);
-    }
-
-    function _setAutoExpanded(id, value) {
-        var marker = "," + id + ",";
-        if (value) {
-            if (_autoExpandedIds.indexOf(marker) < 0)
-                _autoExpandedIds = _autoExpandedIds + id + ",";
-        } else {
-            _autoExpandedIds = _autoExpandedIds.replace(marker, ",");
-        }
-    }
-
-    function _isAutoExpanded(id) {
-        return _autoExpandedIds.indexOf("," + id + ",") >= 0;
-    }
-
-    function toggleCategory(categoryId) {
-        _setExpanded(categoryId, !isCategoryExpanded(categoryId));
-        _setAutoExpanded(categoryId, false);
-    }
-
-    function isCategoryExpanded(categoryId) {
-        if (_collapsedIds.indexOf("," + categoryId + ",") >= 0)
-            return false;
-        if (_expandedIds.indexOf("," + categoryId + ",") >= 0)
-            return true;
-        var category = categoryStructure.find(cat => cat.id === categoryId);
-        if (category && category.collapsedByDefault)
-            return false;
-        return true;
-    }
-
-    function isChildActive(category) {
-        if (!category.children)
-            return false;
-        return category.children.some(child => child.tabIndex === currentIndex);
-    }
-
-    function findParentCategory(tabIndex) {
-        for (var i = 0; i < categoryStructure.length; i++) {
-            var cat = categoryStructure[i];
-            if (cat.children) {
-                for (var j = 0; j < cat.children.length; j++) {
-                    if (cat.children[j].tabIndex === tabIndex) {
-                        return cat;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    function autoExpandForTab(tabIndex) {
-        var parent = findParentCategory(tabIndex);
-        if (!parent)
-            return;
-
-        if (!isCategoryExpanded(parent.id)) {
-            _setExpanded(parent.id, true);
-            _setAutoExpanded(parent.id, true);
-        }
-    }
-
-    function autoCollapseIfNeeded(oldTabIndex, newTabIndex) {
-        var oldParent = findParentCategory(oldTabIndex);
-        var newParent = findParentCategory(newTabIndex);
-
-        if (oldParent && oldParent !== newParent && _isAutoExpanded(oldParent.id)) {
-            _setExpanded(oldParent.id, false);
-            _setAutoExpanded(oldParent.id, false);
-        }
-    }
-
-    function navigateNext() {
-        var flatItems = getFlatNavigableItems();
-        var currentPos = flatItems.findIndex(item => item.tabIndex === currentIndex);
-        var oldIndex = currentIndex;
-        var newIndex;
-        if (currentPos === -1) {
-            newIndex = flatItems[0]?.tabIndex ?? 0;
-        } else {
-            var nextPos = (currentPos + 1) % flatItems.length;
-            newIndex = flatItems[nextPos].tabIndex;
-        }
-        tabChangeRequested(newIndex);
-        autoCollapseIfNeeded(oldIndex, newIndex);
-        autoExpandForTab(newIndex);
-    }
-
-    function navigatePrevious() {
-        var flatItems = getFlatNavigableItems();
-        var currentPos = flatItems.findIndex(item => item.tabIndex === currentIndex);
-        var oldIndex = currentIndex;
-        var newIndex;
-        if (currentPos === -1) {
-            newIndex = flatItems[0]?.tabIndex ?? 0;
-        } else {
-            var prevPos = (currentPos - 1 + flatItems.length) % flatItems.length;
-            newIndex = flatItems[prevPos].tabIndex;
-        }
-        tabChangeRequested(newIndex);
-        autoCollapseIfNeeded(oldIndex, newIndex);
-        autoExpandForTab(newIndex);
-    }
-
-    function getFlatNavigableItems() {
-        var items = [];
-        for (var i = 0; i < categoryStructure.length; i++) {
-            var cat = categoryStructure[i];
-            if (cat.separator || !isCategoryVisible(cat))
-                continue;
-
-            if (cat.tabIndex !== undefined && !cat.children) {
-                items.push(cat);
-            }
-
-            if (cat.children) {
-                for (var j = 0; j < cat.children.length; j++) {
-                    var child = cat.children[j];
-                    if (isItemVisible(child)) {
-                        items.push(child);
-                    }
-                }
-            }
-        }
-        return items;
-    }
-
-    function resolveTabIndex(name: string): int {
-        if (!name)
-            return -1;
-
-        var normalized = name.toLowerCase().replace(/[_\-\s]/g, "");
-        if (normalized === "compositor")
-            normalized = "workspaces";
-
-        for (var i = 0; i < categoryStructure.length; i++) {
-            var cat = categoryStructure[i];
-            if (cat.separator)
-                continue;
-
-            var catId = (cat.id || "").toLowerCase().replace(/[_\-\s]/g, "");
-            if (catId === normalized) {
-                if (cat.tabIndex !== undefined)
-                    return cat.tabIndex;
-                if (cat.children && cat.children.length > 0)
-                    return cat.children[0].tabIndex;
-            }
-
-            if (cat.children) {
-                for (var j = 0; j < cat.children.length; j++) {
-                    var child = cat.children[j];
-                    var childId = (child.id || "").toLowerCase().replace(/[_\-\s]/g, "");
-                    if (childId === normalized)
-                        return child.tabIndex;
-                }
-            }
-        }
-        return -1;
-    }
-
-    property real __maxTextWidth: Math.max(__m1.advanceWidth, __m2.advanceWidth, __m3.advanceWidth, __m4.advanceWidth, __m5.advanceWidth, __m6.advanceWidth)
-    property real __calculatedWidth: Math.max(270, __maxTextWidth + Theme.iconSize * 2 + Theme.spacingM * 4 + Theme.spacingS * 2)
-
-    implicitWidth: __calculatedWidth
-    width: __calculatedWidth
-    height: parent.height
-    color: "transparent"
-    radius: Theme.cornerRadius
-
-    Component.onCompleted: {
-        root._expandedIds = SessionData.settingsSidebarExpandedIds;
-        root._collapsedIds = SessionData.settingsSidebarCollapsedIds;
-        GreeterService.refresh();
-    }
-
-    StyledTextMetrics {
-        id: __m1
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Widgets & Notifications")
-    }
-    StyledTextMetrics {
-        id: __m2
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Typography & Motion")
-    }
-    StyledTextMetrics {
-        id: __m3
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Keyboard Shortcuts")
-    }
-    StyledTextMetrics {
-        id: __m4
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Power & Security")
-    }
-    StyledTextMetrics {
-        id: __m5
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Dock & Launcher")
-    }
-    StyledTextMetrics {
-        id: __m6
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        text: I18n.tr("Personalization")
+        SettingsUiState.selectedBarId = where.barId;
+        SettingsUiState.selectedWidgetSection = where.section;
+        SettingsUiState.selectedWidgetIndex = where.index;
+        SettingsUiState.selectedDockId = "";
+        SettingsUiState.selectedWidgetTitle = widget?.text ?? widgetId;
+        SettingsUiState.selectedWidgetDescription = widget?.description ?? "";
+        SettingsUiState.selectedWidgetIcon = widget?.icon ?? "widgets";
+        pageRequested("dankbar_widgets");
+        if (BarWidgetCatalog.hasOptions(widgetId))
+            parentModal?.navigateTo("bar_widget");
     }
 
     function selectSearchResult(result) {
         if (!result)
             return;
-        if (result.section) {
-            SettingsSearchService.navigateToSection(result.section);
+        if (result.runtimeType === "barWidget" || result.runtimeType === "barWidgetAdd") {
+            openBarWidget(result.runtimeId, result.runtimeType === "barWidgetAdd");
+            keyboardHighlightId = "";
+            Qt.callLater(root.focusAfterNavigation);
+            return;
         }
-        var oldIndex = root.currentIndex;
-        tabChangeRequested(result.tabIndex);
-        autoCollapseIfNeeded(oldIndex, result.tabIndex);
-        autoExpandForTab(result.tabIndex);
-        if (result.runtimeType === "plugin" && result.runtimeId && root.parentModal?.openPluginSettings)
-            root.parentModal.openPluginSettings(result.runtimeId);
-        keyboardHighlightIndex = -1;
-        Qt.callLater(searchField.forceActiveFocus);
+        if (result.section)
+            SettingsSearchService.navigateToSection(result.section);
+        const page = result.page || SettingsTabs.pageForTabIndex(result.tabIndex);
+        if (page)
+            pageRequested(page);
+        keyboardHighlightId = "";
+        Qt.callLater(root.focusAfterNavigation);
     }
 
     function navigateSearchResults(delta) {
@@ -414,118 +162,130 @@ Rectangle {
         }
     }
 
+    implicitWidth: SettingsMetrics.sidebarWidth
+    width: implicitWidth
+    height: parent.height
+
+    Component.onCompleted: GreeterService.refresh()
+
+    Rectangle {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: Theme.dividerWidth
+        color: Theme.outlineVariant
+        visible: !(root.parentModal?.isCompactMode ?? false)
+    }
+
+    DankSearchField {
+        id: searchField
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.leftMargin: Theme.spacingL
+        anchors.rightMargin: Theme.spacingL
+        anchors.topMargin: Theme.spacingM
+        height: Theme.iconButtonSize + Theme.spacingM
+        placeholderText: I18n.tr("Search settings", "settings search field placeholder")
+        onTextChanged: {
+            SettingsSearchService.search(text);
+            root.searchSelectedIndex = 0;
+            sidebarFlickable.contentY = 0;
+            Qt.callLater(root.ensureSearchResultVisible);
+        }
+        keyForwardTargets: [keyHandler]
+
+        Item {
+            id: keyHandler
+            function navNext() {
+                if (root.searchActive) {
+                    root.navigateSearchResults(1);
+                    return;
+                }
+                root.moveHighlight(1);
+            }
+            function navPrev() {
+                if (root.searchActive) {
+                    root.navigateSearchResults(-1);
+                    return;
+                }
+                root.moveHighlight(-1);
+            }
+            function navSelect() {
+                if (root.searchActive && SettingsSearchService.results.length > 0) {
+                    root.selectSearchResult(SettingsSearchService.results[root.searchSelectedIndex]);
+                    return;
+                }
+                root.selectHighlighted();
+            }
+            Keys.onDownPressed: event => {
+                navNext();
+                event.accepted = true;
+            }
+            Keys.onUpPressed: event => {
+                navPrev();
+                event.accepted = true;
+            }
+            Keys.onTabPressed: event => {
+                if (!root.searchActive && root.keyboardHighlightId === "")
+                    return;
+                navNext();
+                event.accepted = true;
+            }
+            Keys.onBacktabPressed: event => {
+                if (!root.searchActive && root.keyboardHighlightId === "")
+                    return;
+                navPrev();
+                event.accepted = true;
+            }
+            Keys.onReturnPressed: event => {
+                navSelect();
+                event.accepted = true;
+            }
+            Keys.onEscapePressed: event => {
+                if (root.searchActive) {
+                    searchField.text = "";
+                    SettingsSearchService.clear();
+                } else {
+                    root.keyboardHighlightId = "";
+                }
+                event.accepted = true;
+            }
+        }
+    }
+
     DankFlickable {
         id: sidebarFlickable
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: searchField.bottom
+        anchors.bottom: parent.bottom
+        anchors.topMargin: SettingsMetrics.sidebarGroupGap
         clip: true
         contentHeight: sidebarColumn.height
 
         Column {
             id: sidebarColumn
             width: parent.width
-            leftPadding: Theme.spacingS
-            rightPadding: Theme.spacingS
+            leftPadding: Theme.spacingL
+            rightPadding: Theme.spacingL
             bottomPadding: Theme.spacingL
-            topPadding: Theme.spacingM + 2
-            spacing: Theme.spacingXXS
+            spacing: SettingsMetrics.sidebarGroupGap
 
             ProfileSection {
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                parentModal: root.parentModal
-            }
-
-            Rectangle {
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                height: 1
-                color: Theme.outline
-                opacity: 0.2
-            }
-
-            Item {
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                height: Theme.spacingXS
-            }
-
-            DankTextField {
-                id: searchField
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                placeholderText: I18n.tr("Search...")
-                leftIconName: "search"
-                leftIconSize: Theme.iconSize - 4
-                showClearButton: text.length > 0
-                onTextChanged: {
-                    SettingsSearchService.search(text);
-                    root.searchSelectedIndex = 0;
-                    sidebarFlickable.contentY = 0;
-                    Qt.callLater(root.ensureSearchResultVisible);
-                }
-                keyForwardTargets: [keyHandler]
-
-                Item {
-                    id: keyHandler
-                    function navNext() {
-                        if (root.searchActive) {
-                            root.navigateSearchResults(1);
-                        } else {
-                            root.highlightNext();
-                        }
-                    }
-                    function navPrev() {
-                        if (root.searchActive) {
-                            root.navigateSearchResults(-1);
-                        } else {
-                            root.highlightPrevious();
-                        }
-                    }
-                    function navSelect() {
-                        if (root.searchActive && SettingsSearchService.results.length > 0) {
-                            root.selectSearchResult(SettingsSearchService.results[root.searchSelectedIndex]);
-                        } else if (root.keyboardHighlightIndex >= 0) {
-                            root.selectHighlighted();
-                        }
-                    }
-                    Keys.onDownPressed: event => {
-                        navNext();
-                        event.accepted = true;
-                    }
-                    Keys.onUpPressed: event => {
-                        navPrev();
-                        event.accepted = true;
-                    }
-                    Keys.onTabPressed: event => {
-                        navNext();
-                        event.accepted = true;
-                    }
-                    Keys.onBacktabPressed: event => {
-                        navPrev();
-                        event.accepted = true;
-                    }
-                    Keys.onReturnPressed: event => {
-                        navSelect();
-                        event.accepted = true;
-                    }
-                    Keys.onEscapePressed: event => {
-                        if (root.searchActive) {
-                            searchField.text = "";
-                            SettingsSearchService.clear();
-                        } else {
-                            root.keyboardHighlightIndex = -1;
-                        }
-                        event.accepted = true;
-                    }
+                visible: !root.searchActive
+                onClicked: {
+                    root.pageRequested("user_accounts");
+                    Qt.callLater(root.focusAfterNavigation);
                 }
             }
 
             Column {
                 id: searchResultsColumn
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                spacing: Theme.spacingXXS
+                spacing: Theme.groupedListGap
                 visible: root.searchActive
-
-                Item {
-                    width: parent.width
-                    height: Theme.spacingS
-                }
 
                 Repeater {
                     id: searchResultsRepeater
@@ -533,87 +293,18 @@ Rectangle {
                         values: SettingsSearchService.results
                     }
 
-                    Rectangle {
+                    SettingsSidebarItem {
                         id: resultDelegate
                         required property int index
                         required property var modelData
 
-                        width: searchResultsColumn.width
-                        height: resultContent.height + Theme.spacingM * 2
-                        radius: Theme.cornerRadius
-                        color: {
-                            if (root.searchSelectedIndex === index)
-                                return Theme.buttonBg;
-                            if (resultMouseArea.containsMouse)
-                                return Theme.surfaceHover;
-                            return "transparent";
-                        }
-
-                        DankRipple {
-                            id: resultRipple
-                            rippleColor: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
-                            cornerRadius: resultDelegate.radius
-                            animationDuration: Anims.settingsNavigationRippleDuration
-                        }
-
-                        Row {
-                            id: resultContent
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingM
-
-                            DankIcon {
-                                name: resultDelegate.modelData.icon || "settings"
-                                size: Theme.iconSize - 2
-                                color: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Column {
-                                width: parent.width - Theme.iconSize - Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingXXS
-
-                                StyledText {
-                                    text: resultDelegate.modelData.label
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.Medium
-                                    color: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
-                                    width: parent.width
-                                    wrapMode: Text.Wrap
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-
-                                StyledText {
-                                    text: resultDelegate.modelData.category
-                                    font.pixelSize: Theme.fontSizeSmall - 1
-                                    color: root.searchSelectedIndex === resultDelegate.index ? Theme.withAlpha(Theme.buttonText, 0.7) : Theme.surfaceVariantText
-                                    width: parent.width
-                                    wrapMode: Text.Wrap
-                                    horizontalAlignment: Text.AlignLeft
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: resultMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: mouse => resultRipple.trigger(mouse.x, mouse.y)
-                            onClicked: root.selectSearchResult(resultDelegate.modelData)
-                        }
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: root.navigationStateDuration
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: Anims.expressiveEffects
-                            }
-                        }
+                        isFirstInGroup: index === 0
+                        isLastInGroup: index === SettingsSearchService.results.length - 1
+                        iconName: modelData.icon || "settings"
+                        title: modelData.label
+                        hint: modelData.category
+                        active: root.searchSelectedIndex === index
+                        onClicked: root.selectSearchResult(modelData)
                     }
                 }
 
@@ -628,215 +319,57 @@ Rectangle {
                 }
             }
 
-            Item {
+            Column {
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                height: Theme.spacingXS
+                spacing: SettingsMetrics.sidebarGroupGap
                 visible: !root.searchActive
-            }
 
-            Repeater {
-                model: root.categoryStructure
-
-                delegate: Column {
-                    id: categoryDelegate
-                    required property int index
-                    required property var modelData
-
-                    width: parent.width - parent.leftPadding - parent.rightPadding
-                    visible: !root.searchActive && root.isCategoryVisible(modelData)
-                    spacing: Theme.spacingXXS
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.15
-                        visible: categoryDelegate.modelData.separator === true
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: Theme.spacingS
-                        visible: categoryDelegate.modelData.separator === true
-                    }
-
-                    Rectangle {
-                        id: categoryRow
-                        width: parent.width
-                        height: Math.max(Theme.iconSize, Theme.fontSizeMedium) + Theme.spacingS * 2
-                        radius: Theme.cornerRadius
-                        visible: categoryDelegate.modelData.separator !== true
-
-                        readonly property bool hasTab: categoryDelegate.modelData.tabIndex !== undefined && !categoryDelegate.modelData.children
-                        readonly property bool isActive: hasTab && root.currentIndex === categoryDelegate.modelData.tabIndex
-                        readonly property bool isHighlighted: hasTab && root.keyboardHighlightIndex === categoryDelegate.modelData.tabIndex
-                        onIsHighlightedChanged: {
-                            if (isHighlighted)
-                                Qt.callLater(root.ensureRowVisible, categoryRow);
-                        }
-
-                        color: {
-                            if (isActive)
-                                return Theme.buttonBg;
-                            if (isHighlighted)
-                                return Theme.buttonHover;
-                            if (categoryMouseArea.containsMouse)
-                                return Theme.surfaceHover;
-                            return "transparent";
-                        }
-
-                        DankRipple {
-                            id: categoryRipple
-                            rippleColor: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
-                            cornerRadius: categoryRow.radius
-                            animationDuration: Anims.settingsNavigationRippleDuration
-                        }
-
-                        Row {
-                            id: categoryRowContent
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingM
-
-                            DankIcon {
-                                name: categoryDelegate.modelData.icon || ""
-                                size: Theme.iconSize - 2
-                                color: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: categoryDelegate.modelData.text || ""
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: (categoryRow.isActive || root.isChildActive(categoryDelegate.modelData)) ? Font.Medium : Font.Normal
-                                color: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        DankIcon {
-                            id: expandIcon
-                            name: root.isCategoryExpanded(categoryDelegate.modelData.id) ? "expand_less" : "expand_more"
-                            size: Theme.iconSize - 4
-                            color: Theme.surfaceVariantText
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: categoryDelegate.modelData.children !== undefined && categoryDelegate.modelData.children.length > 0
-                        }
-
-                        MouseArea {
-                            id: categoryMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: mouse => categoryRipple.trigger(mouse.x, mouse.y)
-                            onClicked: {
-                                root.keyboardHighlightIndex = -1;
-                                if (categoryDelegate.modelData.children) {
-                                    root.toggleCategory(categoryDelegate.modelData.id);
-                                } else if (categoryDelegate.modelData.tabIndex !== undefined) {
-                                    root.tabChangeRequested(categoryDelegate.modelData.tabIndex);
-                                }
-                                Qt.callLater(searchField.forceActiveFocus);
-                            }
-                        }
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: root.navigationStateDuration
-                                easing.type: Easing.BezierSpline
-                                easing.bezierCurve: Anims.expressiveEffects
-                            }
-                        }
-                    }
+                Repeater {
+                    model: root.navGroups
 
                     Column {
-                        id: childrenColumn
+                        id: groupColumn
+                        required property var modelData
+
                         width: parent.width
-                        spacing: Theme.spacingXXS
-                        visible: categoryDelegate.modelData.children !== undefined && root.isCategoryExpanded(categoryDelegate.modelData.id)
-                        clip: true
+                        spacing: Theme.groupedListGap
+
+                        readonly property var visibleIds: {
+                            const ids = [];
+                            for (const entry of modelData) {
+                                if (SettingsTabs.isVisible(SettingsTabs.page(entry.id)))
+                                    ids.push(entry.id);
+                            }
+                            return ids;
+                        }
 
                         Repeater {
-                            model: categoryDelegate.modelData.children || []
+                            model: groupColumn.modelData
 
-                            delegate: Rectangle {
-                                id: childDelegate
-                                required property int index
+                            SettingsSidebarItem {
+                                id: categoryRow
                                 required property var modelData
 
-                                readonly property bool isActive: root.currentIndex === modelData.tabIndex
-                                readonly property bool isHighlighted: root.keyboardHighlightIndex === modelData.tabIndex
+                                readonly property bool isHighlighted: root.keyboardHighlightId === modelData.id
                                 onIsHighlightedChanged: {
                                     if (isHighlighted)
-                                        Qt.callLater(root.ensureRowVisible, childDelegate);
+                                        Qt.callLater(root.ensureRowVisible, categoryRow);
                                 }
 
-                                width: childrenColumn.width
-                                height: Math.max(Theme.iconSize - 4, Theme.fontSizeSmall + 1) + Theme.spacingS * 2
-                                radius: Theme.cornerRadius
-                                visible: root.isItemVisible(modelData)
-                                color: {
-                                    if (isActive)
-                                        return Theme.buttonBg;
-                                    if (isHighlighted)
-                                        return Theme.buttonHover;
-                                    if (childMouseArea.containsMouse)
-                                        return Theme.surfaceHover;
-                                    return "transparent";
-                                }
-
-                                DankRipple {
-                                    id: childRipple
-                                    rippleColor: childDelegate.isActive ? Theme.buttonText : Theme.surfaceText
-                                    cornerRadius: childDelegate.radius
-                                    animationDuration: Anims.settingsNavigationRippleDuration
-                                }
-
-                                Row {
-                                    id: childRowContent
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: Theme.spacingL + Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingM
-
-                                    DankIcon {
-                                        name: childDelegate.modelData.icon || ""
-                                        size: Theme.iconSize - 4
-                                        color: childDelegate.isActive ? Theme.buttonText : Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        text: childDelegate.modelData.text || ""
-                                        font.pixelSize: Theme.fontSizeSmall + 1
-                                        font.weight: childDelegate.isActive ? Font.Medium : Font.Normal
-                                        color: childDelegate.isActive ? Theme.buttonText : Theme.surfaceText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: childMouseArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onPressed: mouse => childRipple.trigger(mouse.x, mouse.y)
-                                    onClicked: {
-                                        root.keyboardHighlightIndex = -1;
-                                        root.tabChangeRequested(childDelegate.modelData.tabIndex);
-                                        Qt.callLater(searchField.forceActiveFocus);
-                                    }
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: root.navigationStateDuration
-                                        easing.type: Easing.BezierSpline
-                                        easing.bezierCurve: Anims.expressiveEffects
-                                    }
+                                width: groupColumn.width
+                                visible: SettingsTabs.isVisible(SettingsTabs.page(modelData.id))
+                                isFirstInGroup: groupColumn.visibleIds[0] === modelData.id
+                                isLastInGroup: groupColumn.visibleIds[groupColumn.visibleIds.length - 1] === modelData.id
+                                iconName: modelData.icon || ""
+                                title: modelData.text || ""
+                                hint: SettingsTabs.hubHint(modelData)
+                                tone: modelData.tone || "primary"
+                                active: root.activeCategoryId === modelData.id && !SettingsTabs.isPluginPage(root.currentPage)
+                                highlighted: isHighlighted
+                                onClicked: {
+                                    root.keyboardHighlightId = "";
+                                    root.pageRequested(modelData.id);
+                                    Qt.callLater(root.focusAfterNavigation);
                                 }
                             }
                         }

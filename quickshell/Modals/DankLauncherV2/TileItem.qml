@@ -6,23 +6,11 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modals.DankLauncherV2.Components
 
-Rectangle {
+LauncherTile {
     id: root
-
-    property var item: null
-    property bool isSelected: false
-    property bool isHovered: itemArea.containsMouse
-    property var controller: null
-    property int flatIndex: -1
-
-    signal clicked
-    signal rightClicked(real mouseX, real mouseY)
-
-    radius: Theme.cornerRadius
-    color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
-    border.width: isSelected ? 2 : 0
-    border.color: Theme.primary
+    imageTile: true
 
     readonly property string toplevelId: item?.data?.toplevelId ?? ""
     readonly property var waylandToplevel: {
@@ -35,7 +23,7 @@ Rectangle {
     }
     readonly property bool hasScreencopy: waylandToplevel !== null
 
-    readonly property string iconValue: {
+    readonly property string imageIconValue: {
         if (!item)
             return "";
         if (hasScreencopy)
@@ -68,40 +56,34 @@ Rectangle {
         return ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "jxl", "avif", "heif", "exr"].indexOf(ext) >= 0;
     }
 
-    DankRipple {
-        id: rippleLayer
-        rippleColor: Theme.surfaceText
-        cornerRadius: root.radius
-    }
-
     Item {
         anchors.fill: parent
-        anchors.margins: 4
+        anchors.margins: Theme.spacingXS
 
         ClippingRectangle {
             id: imageContainer
             anchors.fill: parent
-            radius: Theme.cornerRadius - 2
-            color: Theme.surfaceContainerHigh
+            radius: Theme.cornerRadiusM
+            color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
 
             ScreencopyView {
                 id: screencopyView
                 anchors.fill: parent
-                captureSource: root.waylandToplevel
-                live: root.hasScreencopy
+                captureSource: root.visible ? root.waylandToplevel : null
+                live: root.visible && root.hasScreencopy
                 visible: root.hasScreencopy
 
                 Rectangle {
                     anchors.fill: parent
-                    color: root.isHovered ? Theme.withAlpha(Theme.surfaceVariant, 0.2) : Theme.withAlpha(Theme.surfaceVariant, 0)
+                    color: root.isHovered ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : Theme.withAlpha(Theme.surfaceVariant, 0)
                 }
             }
 
             AppIconRenderer {
                 anchors.fill: parent
-                iconValue: root.iconValue
+                iconValue: root.imageIconValue
                 iconSize: Math.min(parent.width, parent.height)
-                animate: root.item?.data?.animated === true
+                animate: root.visible && root.item?.data?.animated === true
                 fallbackText: (root.item?.name?.length > 0) ? root.item.name.charAt(0).toUpperCase() : "?"
                 materialIconSizeAdjustment: iconSize * 0.3
                 visible: !root.hasScreencopy
@@ -112,7 +94,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: labelText.implicitHeight + Theme.spacingS * 2
-                color: Theme.withAlpha(Theme.surfaceContainer, 0.85)
+                color: root.isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
                 visible: root.item?.name?.length > 0
 
                 StyledText {
@@ -123,7 +105,7 @@ Rectangle {
                     textFormat: root.item?._hRich ? Text.RichText : Text.PlainText
                     font.pixelSize: Theme.fontSizeSmall
                     font.family: Theme.fontFamily
-                    color: Theme.surfaceText
+                    color: root.contentColor
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
@@ -134,16 +116,16 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingXS
-                width: 20
-                height: 20
-                radius: 10
+                width: Theme.iconSizeMedium
+                height: Theme.iconSizeMedium
+                radius: Theme.fullRadius(width, height)
                 color: Theme.primary
                 visible: root.isSelected
 
                 DankIcon {
                     anchors.centerIn: parent
                     name: "check"
-                    size: 14
+                    size: Theme.iconSizeSmall
                     color: Theme.primaryText
                 }
             }
@@ -153,22 +135,21 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: Theme.spacingXS
-                width: root.hasScreencopy ? 28 : 40
-                height: root.hasScreencopy ? 28 : 16
-                radius: root.hasScreencopy ? 14 : 4
+                width: root.hasScreencopy ? Theme.buttonHeightXS : Theme.buttonHeightS
+                height: root.hasScreencopy ? Theme.buttonHeightXS : Theme.iconSizeSmall
+                radius: root.hasScreencopy ? Theme.fullRadius(width, height) : Theme.cornerRadiusXS
                 color: root.hasScreencopy ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, 0)
                 visible: attributionImage.status === Image.Ready
-                opacity: 0.95
 
                 Image {
                     id: attributionImage
                     anchors.fill: parent
-                    anchors.margins: root.hasScreencopy ? 4 : 0
+                    anchors.margins: root.hasScreencopy ? Theme.spacingXS : 0
                     fillMode: Image.PreserveAspectFit
                     source: root.item?.data?.attribution || ""
                     asynchronous: true
-                    sourceSize.width: 80
-                    sourceSize.height: 80
+                    sourceSize.width: LauncherMetrics.gridIconSize * 2
+                    sourceSize.height: LauncherMetrics.gridIconSize * 2
                     mipmap: true
                 }
             }
@@ -178,35 +159,9 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingXS
                 source: root.item?.type === "app" ? (root.item.source || "") : ""
-                glyphSize: 16
+                glyphSize: Theme.iconSizeSmall
                 badgeVisible: !root.isSelected
             }
-        }
-    }
-
-    MouseArea {
-        id: itemArea
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-        onPressed: mouse => {
-            if (mouse.button === Qt.LeftButton)
-                rippleLayer.trigger(mouse.x, mouse.y);
-        }
-        onClicked: mouse => {
-            if (mouse.button === Qt.RightButton) {
-                var scenePos = mapToItem(null, mouse.x, mouse.y);
-                root.rightClicked(scenePos.x, scenePos.y);
-                return;
-            }
-            root.clicked();
-        }
-
-        onPositionChanged: {
-            if (root.controller)
-                root.controller.keyboardNavigationActive = false;
         }
     }
 }

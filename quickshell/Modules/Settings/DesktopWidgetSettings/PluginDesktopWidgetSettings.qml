@@ -1,33 +1,22 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-Column {
+DesktopWidgetInstanceSettings {
     id: root
 
-    property string instanceId: ""
-    property var instanceData: null
     property string widgetType: ""
     property var widgetDef: null
 
-    readonly property var cfg: instanceData?.config ?? {}
     readonly property string settingsPath: {
         const path = widgetDef?.settingsComponent ?? "";
         // absolute paths must load via file: or sibling plugin types resolve against the qs: scheme and fail
         return path.startsWith("/") ? "file://" + path : path;
     }
 
-    function updateConfig(key, value) {
-        if (!instanceId)
-            return;
-        var updates = {};
-        updates[key] = value;
-        SettingsData.updateDesktopWidgetInstanceConfig(instanceId, updates);
-    }
+    showAppearance: false
+    showPlacement: settingsPath === ""
 
     QtObject {
         id: instanceScopedPluginService
@@ -62,14 +51,9 @@ Column {
         }
     }
 
-    width: parent?.width ?? 400
-    spacing: 0
-
     Loader {
-        id: pluginSettingsLoader
         width: parent.width
         active: root.settingsPath !== ""
-
         source: root.settingsPath
 
         onLoaded: {
@@ -83,59 +67,6 @@ Column {
                 item.pluginService = instanceScopedPluginService;
             if (item.reloadChildValues)
                 Qt.callLater(item.reloadChildValues);
-        }
-    }
-
-    Column {
-        width: parent.width
-        spacing: 0
-        visible: root.settingsPath === ""
-
-        SettingsDisplayPicker {
-            displayPreferences: cfg.displayPreferences ?? ["all"]
-            onPreferencesChanged: prefs => root.updateConfig("displayPreferences", prefs)
-        }
-
-        SettingsDivider {}
-
-        Item {
-            width: parent.width
-            height: resetRow.height + Theme.spacingM * 2
-
-            Row {
-                id: resetRow
-                x: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankButton {
-                    text: I18n.tr("Reset Position")
-                    backgroundColor: Theme.surfaceHover
-                    textColor: Theme.surfaceText
-                    buttonHeight: 36
-                    onClicked: {
-                        if (!root.instanceId)
-                            return;
-                        SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                            positions: {}
-                        });
-                    }
-                }
-
-                DankButton {
-                    text: I18n.tr("Reset Size")
-                    backgroundColor: Theme.surfaceHover
-                    textColor: Theme.surfaceText
-                    buttonHeight: 36
-                    onClicked: {
-                        if (!root.instanceId)
-                            return;
-                        SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                            positions: {}
-                        });
-                    }
-                }
-            }
         }
     }
 }

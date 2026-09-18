@@ -18,10 +18,10 @@ BasePill {
                 if (!SettingsData.weatherEnabled)
                     return 0;
                 if (root.isVerticalOrientation)
-                    return root.widgetThickness - root.horizontalPadding * 2;
+                    return root.contentThickness;
                 return Math.min(100 - root.horizontalPadding * 2, weatherRow.implicitWidth);
             }
-            implicitHeight: root.isVerticalOrientation ? weatherColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitHeight: root.isVerticalOrientation ? weatherColumn.implicitHeight : root.contentThickness
 
             Column {
                 id: weatherColumn
@@ -45,7 +45,7 @@ BasePill {
                         return temp;
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
+                    color: root.contentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
@@ -70,7 +70,7 @@ BasePill {
                     width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                    color: Theme.widgetTextColor
+                    color: root.contentColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

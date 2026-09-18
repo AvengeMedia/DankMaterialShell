@@ -13,26 +13,22 @@ DankModal {
     property string inputMessage: ""
     property string inputPlaceholder: ""
     property string inputText: ""
-    property string confirmButtonText: "Confirm"
-    property string cancelButtonText: "Cancel"
+    property string confirmButtonText: I18n.tr("Confirm")
+    property string cancelButtonText: I18n.tr("Cancel")
     property color confirmButtonColor: Theme.primary
     property var onConfirm: function (text) {}
     property var onCancel: function () {}
-    property int selectedButton: -1
-    property bool keyboardNavigation: false
 
     function show(title, message, onConfirmCallback, onCancelCallback) {
         inputTitle = title || "";
         inputMessage = message || "";
         inputPlaceholder = "";
         inputText = "";
-        confirmButtonText = "Confirm";
-        cancelButtonText = "Cancel";
+        confirmButtonText = I18n.tr("Confirm");
+        cancelButtonText = I18n.tr("Cancel");
         confirmButtonColor = Theme.primary;
         onConfirm = onConfirmCallback || (text => {});
         onCancel = onCancelCallback || (() => {});
-        selectedButton = -1;
-        keyboardNavigation = false;
         open();
     }
 
@@ -41,13 +37,11 @@ DankModal {
         inputMessage = options.message || "";
         inputPlaceholder = options.placeholder || "";
         inputText = options.initialText || "";
-        confirmButtonText = options.confirmText || "Confirm";
-        cancelButtonText = options.cancelText || "Cancel";
+        confirmButtonText = options.confirmText || I18n.tr("Confirm");
+        cancelButtonText = options.cancelText || I18n.tr("Cancel");
         confirmButtonColor = options.confirmColor || Theme.primary;
         onConfirm = options.onConfirm || (text => {});
         onCancel = options.onCancel || (() => {});
-        selectedButton = -1;
-        keyboardNavigation = false;
         open();
     }
 
@@ -66,18 +60,10 @@ DankModal {
         }
     }
 
-    function selectButton() {
-        if (selectedButton === 0) {
-            cancelAndClose();
-        } else {
-            confirmAndClose();
-        }
-    }
-
     shouldBeVisible: false
     allowStacking: true
-    modalWidth: 350
-    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 200
+    modalWidth: Math.min(Theme.dialogMaxWidth, screenWidth - Theme.spacingXL * 2)
+    modalHeight: contentLoader.item ? Math.min(contentLoader.item.implicitHeight, screenHeight - Theme.spacingXL * 2) : 200
     enableShadow: true
     shouldHaveFocus: true
     onBackgroundClicked: cancelAndClose()
@@ -89,210 +75,44 @@ DankModal {
         });
     }
 
-    content: Component {
-        FocusScope {
-            id: inputContent
+    content: DankDialog {
+        id: inputDialog
+        property alias textInputRef: textInput
 
-            anchors.fill: parent
-            implicitHeight: mainColumn.implicitHeight
-            focus: true
+        title: root.inputTitle
+        supportingText: root.inputMessage
+        onAccepted: root.confirmAndClose()
+        onRejected: root.cancelAndClose()
 
-            property alias textInputRef: textInput
+        DankTextField {
+            id: textInput
 
-            Keys.onPressed: function (event) {
-                const textFieldFocused = textInput.getActiveFocus();
-
-                switch (event.key) {
-                case Qt.Key_Escape:
-                    root.cancelAndClose();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_Tab:
-                    if (textFieldFocused) {
-                        root.keyboardNavigation = true;
-                        root.selectedButton = 0;
-                        textInput.setFocus(false);
-                    } else {
-                        root.keyboardNavigation = true;
-                        if (root.selectedButton === -1) {
-                            root.selectedButton = 0;
-                        } else if (root.selectedButton === 0) {
-                            root.selectedButton = 1;
-                        } else {
-                            root.selectedButton = -1;
-                            textInput.forceActiveFocus();
-                        }
-                    }
-                    event.accepted = true;
-                    break;
-                case Qt.Key_Left:
-                    if (!textFieldFocused) {
-                        root.keyboardNavigation = true;
-                        root.selectedButton = 0;
-                        event.accepted = true;
-                    }
-                    break;
-                case Qt.Key_Right:
-                    if (!textFieldFocused) {
-                        root.keyboardNavigation = true;
-                        root.selectedButton = 1;
-                        event.accepted = true;
-                    }
-                    break;
-                case Qt.Key_Return:
-                case Qt.Key_Enter:
-                    if (root.selectedButton !== -1) {
-                        root.selectButton();
-                    } else {
-                        root.confirmAndClose();
-                    }
-                    event.accepted = true;
-                    break;
-                }
-            }
-
-            Column {
-                id: mainColumn
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL
-                anchors.topMargin: Theme.spacingL
-                spacing: 0
-
-                StyledText {
-                    text: root.inputTitle
-                    font.pixelSize: Theme.fontSizeLarge
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                Item {
-                    width: 1
-                    height: Theme.spacingL
-                }
-
-                StyledText {
-                    text: root.inputMessage
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    visible: root.inputMessage !== ""
-                }
-
-                Item {
-                    width: 1
-                    height: root.inputMessage !== "" ? Theme.spacingL : 0
-                    visible: root.inputMessage !== ""
-                }
-
-                DankTextField {
-                    id: textInput
-
-                    width: parent.width
-                    height: 40
-                    font.pixelSize: Theme.fontSizeMedium
-                    placeholderText: root.inputPlaceholder
-                    placeholderColor: Theme.onSurface_38
-                    backgroundColor: Theme.surfaceVariantAlpha
-                    normalBorderColor: Theme.withAlpha(Theme.primary, 0)
-                    focusedBorderColor: Theme.primary
-                    borderWidth: 0
-                    focusedBorderWidth: 1
-                    text: root.inputText
-                    keyForwardTargets: [inputContent]
-                    onTextChanged: root.inputText = text
-                }
-
-                Item {
-                    width: 1
-                    height: Theme.spacingL * 1.5
-                }
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.spacingM
-
-                    Rectangle {
-                        width: 120
-                        height: 40
-                        radius: Theme.cornerRadius
-                        color: {
-                            if (root.keyboardNavigation && root.selectedButton === 0) {
-                                return Theme.primaryHover;
-                            } else if (cancelButton.containsMouse) {
-                                return Theme.surfacePressed;
-                            } else {
-                                return Theme.surfaceVariantAlpha;
-                            }
-                        }
-                        border.color: (root.keyboardNavigation && root.selectedButton === 0) ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                        border.width: (root.keyboardNavigation && root.selectedButton === 0) ? 1 : 0
-
-                        StyledText {
-                            text: root.cancelButtonText
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea {
-                            id: cancelButton
-
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.cancelAndClose()
-                        }
-                    }
-
-                    Rectangle {
-                        width: 120
-                        height: 40
-                        radius: Theme.cornerRadius
-                        color: {
-                            const baseColor = root.confirmButtonColor;
-                            if (root.keyboardNavigation && root.selectedButton === 1) {
-                                return Theme.withAlpha(baseColor, 1);
-                            } else if (confirmButton.containsMouse) {
-                                return Theme.withAlpha(baseColor, 0.9);
-                            } else {
-                                return baseColor;
-                            }
-                        }
-                        border.color: (root.keyboardNavigation && root.selectedButton === 1) ? "white" : Qt.rgba(1, 1, 1, 0)
-                        border.width: (root.keyboardNavigation && root.selectedButton === 1) ? 1 : 0
-
-                        StyledText {
-                            text: root.confirmButtonText
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.primaryText
-                            font.weight: Font.Medium
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea {
-                            id: confirmButton
-
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.confirmAndClose()
-                        }
-                    }
-                }
-
-                Item {
-                    width: 1
-                    height: Theme.spacingL
-                }
-            }
+            width: parent.width
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            labelText: root.inputPlaceholder || root.inputTitle
+            leftIconName: "edit"
+            text: root.inputText
+            onTextEdited: root.inputText = text
+            onAccepted: root.confirmAndClose()
         }
+
+        actions: [
+            DankButton {
+                maximumWidth: inputDialog.actionWidth
+                wrapText: true
+                text: root.cancelButtonText
+                backgroundColor: "transparent"
+                textColor: Theme.primary
+                onClicked: root.cancelAndClose()
+            },
+            DankButton {
+                maximumWidth: inputDialog.actionWidth
+                wrapText: true
+                text: root.confirmButtonText
+                backgroundColor: root.confirmButtonColor
+                onClicked: root.confirmAndClose()
+            }
+        ]
     }
 }

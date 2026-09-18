@@ -11,7 +11,7 @@ DankModal {
 
     property string confirmTitle: ""
     property string confirmMessage: ""
-    property string confirmButtonText: I18n.tr("Confirm")
+    property string confirmButtonText: I18n.tr("Confirm", "verb, default confirm button in dialogs")
     property string cancelButtonText: I18n.tr("Cancel")
     property color confirmButtonColor: Theme.primary
     property var onConfirm: function () {}

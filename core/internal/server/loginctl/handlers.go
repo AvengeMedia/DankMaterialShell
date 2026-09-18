@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	switch req.Method {
 	case "loginctl.getState":
 		handleGetState(conn, req, manager)
@@ -36,11 +37,11 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleLock(conn *models.Conn, req models.Request, manager *Manager) {
+func handleLock(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Lock(); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -48,7 +49,7 @@ func handleLock(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "locked"})
 }
 
-func handleUnlock(conn *models.Conn, req models.Request, manager *Manager) {
+func handleUnlock(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Unlock(); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -56,7 +57,7 @@ func handleUnlock(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "unlocked"})
 }
 
-func handleActivate(conn *models.Conn, req models.Request, manager *Manager) {
+func handleActivate(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Activate(); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -64,7 +65,7 @@ func handleActivate(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "activated"})
 }
 
-func handleSetIdleHint(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetIdleHint(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	idle, err := params.Bool(req.Params, "idle")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -78,7 +79,7 @@ func handleSetIdleHint(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "idle hint set"})
 }
 
-func handleSetLockedHint(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetLockedHint(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	locked, err := params.Bool(req.Params, "locked")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -92,7 +93,7 @@ func handleSetLockedHint(conn *models.Conn, req models.Request, manager *Manager
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "locked hint set"})
 }
 
-func handleSetLockBeforeSuspend(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetLockBeforeSuspend(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	enabled, err := params.Bool(req.Params, "enabled")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -103,7 +104,7 @@ func handleSetLockBeforeSuspend(conn *models.Conn, req models.Request, manager *
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "lock before suspend set"})
 }
 
-func handleSetSleepInhibitorEnabled(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSetSleepInhibitorEnabled(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	enabled, err := params.Bool(req.Params, "enabled")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -114,7 +115,7 @@ func handleSetSleepInhibitorEnabled(conn *models.Conn, req models.Request, manag
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "sleep inhibitor setting updated"})
 }
 
-func handleLockerReady(conn *models.Conn, req models.Request, manager *Manager) {
+func handleLockerReady(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	manager.lockTimerMu.Lock()
 	if manager.lockTimer != nil {
 		manager.lockTimer.Stop()
@@ -131,7 +132,7 @@ func handleLockerReady(conn *models.Conn, req models.Request, manager *Manager) 
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "ok"})
 }
 
-func handleTerminate(conn *models.Conn, req models.Request, manager *Manager) {
+func handleTerminate(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if err := manager.Terminate(); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -139,7 +140,7 @@ func handleTerminate(conn *models.Conn, req models.Request, manager *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "terminated"})
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	clientID := fmt.Sprintf("client-%p", conn)
 	stateChan := manager.Subscribe(clientID)
 	defer manager.Unsubscribe(clientID)
@@ -149,7 +150,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 		Type: EventStateChanged,
 		Data: initialState,
 	}
-	if err := conn.WriteResponse(models.Response[SessionEvent]{
+	if err := conn.WriteResponse(ipc.Response[SessionEvent]{
 		ID:     req.ID,
 		Result: &event,
 	}); err != nil {
@@ -161,7 +162,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 			Type: EventStateChanged,
 			Data: state,
 		}
-		if err := conn.WriteResponse(models.Response[SessionEvent]{
+		if err := conn.WriteResponse(ipc.Response[SessionEvent]{
 			Result: &event,
 		}); err != nil {
 			return

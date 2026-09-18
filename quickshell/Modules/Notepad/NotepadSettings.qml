@@ -131,7 +131,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: I18n.tr("Notepad Settings")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                     }
                 }
@@ -215,7 +215,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("Find in Text")
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                             }
 
@@ -275,7 +275,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("Font Size")
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                             }
 
@@ -295,6 +295,7 @@ Item {
                             DankActionButton {
                                 buttonSize: 32
                                 iconName: "remove"
+                                Accessible.name: I18n.tr("Decrease")
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.notepadFontSize > 8
                                 backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.5)
@@ -317,7 +318,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: SettingsData.notepadFontSize + "px"
                                     font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: Font.Medium
+                                    font.weight: Theme.fontWeightMedium
                                     color: Theme.surfaceText
                                 }
                             }
@@ -325,6 +326,7 @@ Item {
                             DankActionButton {
                                 buttonSize: 32
                                 iconName: "add"
+                                Accessible.name: I18n.tr("Increase")
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.notepadFontSize < 48
                                 backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.5)
@@ -352,7 +354,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: -Theme.spacingM
                             width: parent.width + Theme.spacingM
-                            text: I18n.tr("Surface Opacity")
+                            text: I18n.tr("Surface opacity")
                             description: I18n.tr("Override floating window transparency for Notepad")
                             checked: SettingsData.notepadTransparencyOverride >= 0
                             onToggled: checked => {
@@ -402,12 +404,12 @@ Item {
                             StyledText {
                                 text: I18n.tr("Default Mode")
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                             }
 
                             DankButtonGroup {
-                                model: [I18n.tr("Slideout"), I18n.tr("Popout")]
+                                model: [I18n.tr("Slideout", "noun, notepad default mode option, side panel"), I18n.tr("Popout", "noun, option to open in a popout window")]
                                 size: "small"
                                 currentIndex: SettingsData.notepadDefaultMode === "popout" ? 1 : 0
                                 onSelectionChanged: (index, selected) => {
@@ -426,7 +428,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("Open From")
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                             }
 
@@ -458,7 +460,7 @@ Item {
                             visible: !SettingsData.notepadUseCompositorGap
                             text: I18n.tr("Manual Gaps")
                             font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                         }
 
@@ -523,9 +525,9 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("Keyboard Shortcuts")
+                            text: I18n.tr("Keyboard shortcuts")
                             font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }

@@ -380,6 +380,7 @@ jobs:
               --exclude='.github' \
               --exclude='./tests' \
               --exclude='*.tar.gz' \
+              --exclude-from=../scripts/shell-test-excludes.txt \
               -czf ../_release_assets/dms-qml.tar.gz .)
 
           # Generate checksum for QML package

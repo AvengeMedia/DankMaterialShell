@@ -42,7 +42,7 @@ Rectangle {
                 anchors.centerIn: parent
                 name: root.iconName
                 size: Theme.iconSize - 6
-                color: Theme.primary
+                color: Theme.accentOnPrimaryContainer
             }
         }
 
@@ -54,7 +54,7 @@ Rectangle {
             StyledText {
                 text: root.title
                 font.pixelSize: Theme.fontSizeSmall
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
             }
 

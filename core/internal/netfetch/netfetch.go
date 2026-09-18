@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -19,22 +20,60 @@ type Options struct {
 	Timeout        time.Duration
 	ConnectTimeout time.Duration
 	IPv4Only       bool
+	CheckRedirect  func(req *http.Request, via []*http.Request) error
 }
 
+type StatusError struct {
+	Code int
+}
+
+func (e *StatusError) Error() string {
+	return fmt.Sprintf("HTTP %d", e.Code)
+}
+
+type transportKey struct {
+	connect  time.Duration
+	ipv4Only bool
+}
+
+var (
+	transportMu sync.Mutex
+	transports  = map[transportKey]*http.Transport{}
+)
+
 func (o Options) client() *http.Client {
+	return &http.Client{Transport: transportFor(o), CheckRedirect: o.CheckRedirect}
+}
+
+// A hand-built transport has no IdleConnTimeout, so a per-request one leaks its idle connections.
+func transportFor(o Options) *http.Transport {
 	connect := o.ConnectTimeout
 	if connect <= 0 {
 		connect = 5 * time.Second
 	}
+	key := transportKey{connect: connect, ipv4Only: o.IPv4Only}
+
+	transportMu.Lock()
+	defer transportMu.Unlock()
+
+	if transport, ok := transports[key]; ok {
+		return transport
+	}
 
 	dialer := &net.Dialer{Timeout: connect}
-	transport := &http.Transport{DialContext: dialer.DialContext}
+	transport := &http.Transport{
+		Proxy:               http.ProxyFromEnvironment,
+		DialContext:         dialer.DialContext,
+		IdleConnTimeout:     90 * time.Second,
+		TLSHandshakeTimeout: 10 * time.Second,
+	}
 	if o.IPv4Only {
 		transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 			return dialer.DialContext(ctx, "tcp4", addr)
 		}
 	}
-	return &http.Client{Transport: transport}
+	transports[key] = transport
+	return transport
 }
 
 func (o Options) request(ctx context.Context, url string) (*http.Request, error) {
@@ -94,7 +133,7 @@ func open(ctx context.Context, url string, opts Options) (io.ReadCloser, error) 
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		resp.Body.Close()
-		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
+		return nil, &StatusError{Code: resp.StatusCode}
 	}
 	return resp.Body, nil
 }

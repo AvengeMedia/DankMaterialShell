@@ -42,7 +42,7 @@
     "type": {
       "type": "string",
       "description": "Plugin type. Use 'composite' (or any value) together with 'components' to provide multiple surfaces from one plugin.",
-      "enum": ["widget", "daemon", "launcher", "desktop", "composite"]
+      "enum": ["widget", "daemon", "launcher", "desktop", "dash", "dashCard", "composite"]
     },
     "capabilities": {
       "type": "array",
@@ -80,10 +80,82 @@
           "type": "string",
           "description": "Launcher provider component (requires 'trigger')",
           "pattern": "^\\./.*\\.qml$"
+        },
+        "dash": {
+          "type": "string",
+          "description": "Dashboard tab component (DashTabComponent)",
+          "pattern": "^\\./.*\\.qml$"
+        },
+        "dashCard": {
+          "type": "string",
+          "description": "Dashboard overview card component (DashCardComponent)",
+          "pattern": "^\\./.*\\.qml$"
         }
       },
       "additionalProperties": false,
       "minProperties": 1
+    },
+    "dash": {
+      "type": "object",
+      "description": "Presentation for the dashboard surfaces. Falls back to 'icon' and 'name'.",
+      "properties": {
+        "icon": {
+          "type": "string",
+          "description": "Material icon for the dashboard tab"
+        },
+        "title": {
+          "type": "string",
+          "description": "Tab label"
+        },
+        "card": {
+          "type": "object",
+          "description": "Overview card presentation and default size in grid units. Widths are clamped to the user's column count (3 to 8).",
+          "properties": {
+            "icon": { "type": "string" },
+            "title": { "type": "string" },
+            "w": { "type": "integer", "minimum": 1, "maximum": 8 },
+            "h": { "type": "integer", "minimum": 1 },
+            "minW": { "type": "integer", "minimum": 1, "maximum": 8 },
+            "minH": { "type": "integer", "minimum": 1 },
+            "maxW": { "type": "integer", "minimum": 1, "maximum": 8 },
+            "maxH": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "options": {
+          "type": "array",
+          "description": "User options shown in the dashboard options sheet and Settings > Dashboard; values reach the tab and card as `options.<key>`",
+          "items": {
+            "type": "object",
+            "required": ["key", "type"],
+            "properties": {
+              "key": { "type": "string", "not": { "const": "widgets" }, "description": "Option key, read as options.<key>. 'widgets' is reserved for DashWidgetGrid layouts" },
+              "text": { "type": "string", "description": "Row label, translated through the plugin catalog" },
+              "description": { "type": "string", "description": "Secondary text under a toggle row, translated through the plugin catalog" },
+              "type": { "type": "string", "enum": ["toggle", "choice", "number"] },
+              "def": { "description": "Default value: boolean for toggle, choice value for choice, number for number" },
+              "choices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["value"],
+                  "properties": {
+                    "value": { "type": "string" },
+                    "text": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "step": { "type": "number", "exclusiveMinimum": 0 },
+              "unit": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "trigger": {
       "type": "string",

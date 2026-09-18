@@ -13,7 +13,9 @@ Item {
     property alias searchField: searchField
     property alias clipboardListView: clipboardListView
 
-    readonly property var filterOptions: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image")]
+    readonly property var entries: modal.activeTab === "saved" ? modal.pinnedEntries : modal.unpinnedEntries
+
+    readonly property var filterOptions: [I18n.tr("All"), I18n.tr("Text"), I18n.tr("Long Text"), I18n.tr("Image", "noun, clipboard entry type and filter option")]
     readonly property var filterValues: ["all", "text", "long_text", "image"]
 
     function closeFilterMenu() {
@@ -42,7 +44,7 @@ Item {
     }
 
     function contextEntryAtLocal(localX, localY) {
-        const listView = modal.activeTab === "saved" ? savedListView : clipboardListView;
+        const listView = clipboardListView;
         const entries = modal.activeTab === "saved" ? modal.pinnedEntries : modal.unpinnedEntries;
 
         if (!listView.visible || !entries)
@@ -69,7 +71,25 @@ Item {
 
     readonly property bool contextMenuActive: contextMenu.renderActive
 
+    LayoutMirroring.enabled: I18n.isRtl
+    LayoutMirroring.childrenInherit: true
+
     anchors.fill: parent
+
+    Connections {
+        target: clipboardContent.modal
+        function onActiveTabChanged() {
+            resetScroll.schedule();
+        }
+    }
+
+    DeferredAction {
+        id: resetScroll
+        onTriggered: {
+            clipboardListView.forceLayout();
+            clipboardListView.positionViewAtBeginning();
+        }
+    }
 
     ClipboardContextMenu {
         id: contextMenu
@@ -83,23 +103,14 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: Theme.spacingM
-        spacing: Theme.spacingM
+        anchors.margins: PopoutMetrics.contentPadding
+        spacing: PopoutMetrics.contentGap
         focus: false
 
         ClipboardHeader {
-            id: header
             width: parent.width
-            recentsCount: modal.unpinnedEntries.length
-            savedCount: modal.pinnedEntries.length
-            showKeyboardHints: modal.showKeyboardHints
-            activeTab: modal.activeTab
-            pinnedCount: modal.pinnedCount
-            clearsFilteredOnly: modal.clearsFilteredOnly
-            onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
-            onTabChanged: tabName => modal.activeTab = tabName
-            onClearAllClicked: modal.confirmClearAll()
-            onCloseClicked: modal.hide()
+            visible: !modal.popout
+            modal: clipboardContent.modal
         }
 
         Item {
@@ -107,14 +118,22 @@ Item {
             width: parent.width
             implicitHeight: searchField.height
 
-            DankTextField {
+            ClipboardActions {
+                id: inlineActions
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                visible: modal.popout
+                modal: clipboardContent.modal
+            }
+
+            DankSearchField {
                 id: searchField
 
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: inlineActions.visible ? inlineActions.left : parent.right
+                anchors.rightMargin: inlineActions.visible ? Theme.spacingS : 0
                 rightAccessoryWidth: filterButton.width + Theme.spacingS
-                placeholderText: ""
-                leftIconName: "search"
-                showClearButton: true
+                placeholderText: I18n.tr("Search", "search field placeholder") + "…"
                 focus: true
                 ignoreTabKeys: true
                 keyForwardTargets: [modal.modalFocusScope]
@@ -126,7 +145,6 @@ Item {
                     ClipboardService.keyboardNavigationActive = true;
                     Qt.callLater(function () {
                         clipboardListView.positionViewAtBeginning();
-                        savedListView.positionViewAtBeginning();
                     });
                 }
 
@@ -145,7 +163,7 @@ Item {
             DankActionButton {
                 id: filterButton
 
-                anchors.right: parent.right
+                anchors.right: searchField.right
                 anchors.rightMargin: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "filter_list"
@@ -190,30 +208,31 @@ Item {
     Item {
         id: listContainer
         anchors.top: headerColumn.bottom
-        anchors.topMargin: Theme.spacingM
+        anchors.topMargin: PopoutMetrics.contentGap
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.bottomMargin: (modal.showKeyboardHints ? (ClipboardConstants.keyboardHintsHeight + Theme.spacingM * 2) : 0) + Theme.spacingXS
+        anchors.leftMargin: PopoutMetrics.contentPadding
+        anchors.rightMargin: PopoutMetrics.contentPadding
+        anchors.bottomMargin: (modal.showKeyboardHints ? (ClipboardConstants.keyboardHintsHeight + PopoutMetrics.contentPadding * 2) : 0) + Theme.spacingXS
         clip: true
 
         DankListView {
             id: clipboardListView
+            reuseItems: true
+            highlightSelection: clipboardContent.modal.keyboardNavigationActive && clipboardContent.modal.selectedIndex >= 0
             anchors.fill: parent
             model: ScriptModel {
-                values: clipboardContent.modal.unpinnedEntries
+                values: clipboardContent.entries
                 objectProp: "id"
             }
-            visible: modal.activeTab === "recents"
 
             currentIndex: clipboardContent.modal ? clipboardContent.modal.selectedIndex : 0
-            spacing: Theme.spacingXS
+            spacing: Theme.groupedListGap
             interactive: true
             flickDeceleration: 1500
             maximumFlickVelocity: 2000
-            boundsBehavior: Flickable.DragAndOvershootBounds
+            boundsBehavior: Flickable.StopAtBounds
             boundsMovement: Flickable.FollowBoundsBehavior
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
@@ -232,11 +251,11 @@ Item {
             }
 
             StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No recent clipboard entries found") : I18n.tr("Connecting to clipboard service...")
+                text: !clipboardContent.modal.clipboardAvailable ? I18n.tr("Connecting to clipboard service...") : clipboardContent.modal.activeTab === "saved" ? I18n.tr("No saved clipboard entries") : I18n.tr("No recent clipboard entries found")
                 anchors.centerIn: parent
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
-                visible: clipboardContent.modal.unpinnedEntries.length === 0
+                visible: clipboardContent.entries.length === 0
             }
 
             delegate: ClipboardEntry {
@@ -246,105 +265,26 @@ Item {
                 width: clipboardListView.width
                 height: ClipboardConstants.itemHeight
                 entry: modelData
-                entryIndex: index + 1
                 itemIndex: index
                 isSelected: clipboardContent.modal?.keyboardNavigationActive && index === clipboardContent.modal.selectedIndex
                 modal: clipboardContent.modal
                 listView: clipboardListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)
                 onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
-                onDeleteRequested: clipboardContent.modal.deleteEntry(modelData)
+                onDeleteRequested: {
+                    if (clipboardContent.modal.activeTab === "saved") {
+                        clipboardContent.modal.deletePinnedEntry(modelData);
+                        return;
+                    }
+                    clipboardContent.modal.deleteEntry(modelData);
+                }
                 onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
                 onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
                 onEditRequested: clipboardContent.modal.editEntry(modelData)
-                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
-            }
-        }
-
-        DankListView {
-            id: savedListView
-            anchors.fill: parent
-            model: ScriptModel {
-                values: clipboardContent.modal.pinnedEntries
-                objectProp: "id"
-            }
-            visible: modal.activeTab === "saved"
-
-            currentIndex: clipboardContent.modal ? clipboardContent.modal.selectedIndex : 0
-            spacing: Theme.spacingXS
-            interactive: true
-            flickDeceleration: 1500
-            maximumFlickVelocity: 2000
-            boundsBehavior: Flickable.DragAndOvershootBounds
-            boundsMovement: Flickable.FollowBoundsBehavior
-            pressDelay: 0
-            flickableDirection: Flickable.VerticalFlick
-
-            function ensureVisible(index) {
-                if (index < 0 || index >= count) {
-                    return;
-                }
-                positionViewAtIndex(index, ListView.Contain);
-            }
-
-            onCurrentIndexChanged: {
-                if (clipboardContent.modal?.keyboardNavigationActive && currentIndex >= 0) {
-                    ensureVisible(currentIndex);
-                }
-            }
-
-            StyledText {
-                text: clipboardContent.modal.clipboardAvailable ? I18n.tr("No saved clipboard entries") : I18n.tr("Connecting to clipboard service...")
-                anchors.centerIn: parent
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceVariantText
-                visible: clipboardContent.modal.pinnedEntries.length === 0
-            }
-
-            delegate: ClipboardEntry {
-                required property int index
-                required property var modelData
-
-                width: savedListView.width
-                height: ClipboardConstants.itemHeight
-                entry: modelData
-                entryIndex: index + 1
-                itemIndex: index
-                isSelected: clipboardContent.modal?.keyboardNavigationActive && index === clipboardContent.modal.selectedIndex
-                modal: clipboardContent.modal
-                listView: savedListView
-                onCopyRequested: clipboardContent.modal.copyEntry(modelData)
-                onPasteRequested: clipboardContent.modal.pasteEntry(modelData)
-                onDeleteRequested: clipboardContent.modal.deletePinnedEntry(modelData)
-                onPinRequested: targetEntry => clipboardContent.modal.pinEntry(targetEntry)
-                onUnpinRequested: targetEntry => clipboardContent.modal.unpinEntry(targetEntry)
-                onEditRequested: clipboardContent.modal.editEntry(modelData)
-                onContextMenuRequested: (mouseX, mouseY) => clipboardContent.showContextMenu(modelData, mouseX, mouseY)
-            }
-        }
-
-        Rectangle {
-            id: bottomFade
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            height: 24
-            z: 100
-            visible: {
-                const listView = modal.activeTab === "recents" ? clipboardListView : savedListView;
-                if (listView.contentHeight <= listView.height)
-                    return false;
-                const atBottom = listView.contentY >= listView.contentHeight - listView.height - 5;
-                return !atBottom;
-            }
-            gradient: Gradient {
-                GradientStop {
-                    position: 0.0
-                    color: "transparent"
-                }
-                GradientStop {
-                    position: 1.0
-                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                onPreviewRequested: clipboardContent.modal.openPreview(index)
+                onContextMenuRequested: (mouseX, mouseY) => {
+                    const pos = mapToItem(null, mouseX, mouseY);
+                    clipboardContent.showContextMenu(modelData, pos.x, pos.y);
                 }
             }
         }
@@ -355,9 +295,9 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.bottomMargin: active ? Theme.spacingM : 0
+        anchors.leftMargin: PopoutMetrics.contentPadding
+        anchors.rightMargin: PopoutMetrics.contentPadding
+        anchors.bottomMargin: active ? PopoutMetrics.contentPadding : 0
         active: modal.showKeyboardHints
         height: active ? ClipboardConstants.keyboardHintsHeight : 0
 

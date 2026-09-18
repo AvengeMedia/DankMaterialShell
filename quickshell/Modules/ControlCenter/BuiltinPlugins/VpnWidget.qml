@@ -15,7 +15,7 @@ PluginComponent {
     readonly property bool vpnActivated: DMSNetworkService.connected && DMSNetworkService.activeState === "activated"
 
     ccWidgetIcon: "vpn_key"
-    ccWidgetPrimaryText: I18n.tr("VPN")
+    ccWidgetPrimaryText: I18n.tr("VPN", "virtual private network, widget and page title")
     ccWidgetSecondaryText: {
         if (vpnActivating)
             return I18n.tr("Connecting...");
@@ -31,8 +31,6 @@ PluginComponent {
     onCcWidgetToggled: DMSNetworkService.toggleVpn()
 
     ccDetailContent: Component {
-        VpnDetailContent {
-            listHeight: 260
-        }
+        VpnDetailContent {}
     }
 }

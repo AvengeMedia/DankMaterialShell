@@ -5,15 +5,40 @@ function spanWidthFor(baseWidth, widgetWidth, spacing) {
     if (w <= 50)
         return (baseWidth - spacing) / 2
     if (w <= 75)
-        return (baseWidth - spacing * 2) * 0.75
+        return (baseWidth - spacing * 3) * 0.75 + spacing * 2
     return baseWidth
+}
+
+function widgetWidths(id) {
+    switch (id) {
+    case "wifi":
+    case "bluetooth":
+    case "audioOutput":
+    case "audioInput":
+        return [50, 100]
+    default:
+        return [25, 50, 100]
+    }
+}
+
+function nearestWidgetWidth(id, requestedWidth, baseWidth, spacing) {
+    const widths = widgetWidths(id)
+    return widths.reduce((best, width) => {
+        const distance = Math.abs(spanWidthFor(baseWidth, width, spacing) - requestedWidth)
+        const bestDistance = Math.abs(spanWidthFor(baseWidth, best, spacing) - requestedWidth)
+        return distance < bestDistance ? width : best
+    }, widths[0])
+}
+
+function isCompactWidth(widgetWidth) {
+    return (widgetWidth || 50) <= 25
 }
 
 function isSliderWidget(id) {
     return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider"
 }
 
-function computeSlots(widgets, order, baseWidth, spacing, rowSpacing, sliderHeight, normalHeight) {
+function computeSlots(widgets, order, baseWidth, spacing, rowSpacing, sliderHeight, normalHeight, mirror) {
     const slots = []
     let x = 0
     let y = 0
@@ -39,7 +64,7 @@ function computeSlots(widgets, order, baseWidth, spacing, rowSpacing, sliderHeig
 
         x = countInRow === 0 ? 0 : rowRight + spacing
         slots[sourceIndex] = {
-            "x": x,
+            "x": mirror ? baseWidth - x - itemW : x,
             "y": y,
             "w": itemW,
             "h": itemH
@@ -53,61 +78,4 @@ function computeSlots(widgets, order, baseWidth, spacing, rowSpacing, sliderHeig
         "slots": slots,
         "totalHeight": y + rowMaxH
     }
-}
-
-function slotContainingPoint(slots, order, px, py) {
-    for (let p = 0; p < order.length; p++) {
-        const s = slots[order[p]]
-        if (!s)
-            continue
-        if (px >= s.x && px < s.x + s.w && py >= s.y && py < s.y + s.h)
-            return p
-    }
-    return -1
-}
-
-function calculateRowsAndWidgets(controlCenterColumn, expandedSection, expandedWidgetIndex) {
-    var rows = []
-    var currentRow = []
-    var currentWidth = 0
-    var expandedRow = -1
-
-    const widgets = SettingsData.controlCenterWidgets || []
-    const baseWidth = controlCenterColumn.width
-    const spacing = Theme.spacingS
-
-    for (var i = 0; i < widgets.length; i++) {
-        const widget = widgets[i]
-        const widgetWidth = widget.width || 50
-
-        var itemWidth
-        if (widgetWidth <= 25) {
-            itemWidth = (baseWidth - spacing * 3) / 4
-        } else if (widgetWidth <= 50) {
-            itemWidth = (baseWidth - spacing) / 2
-        } else if (widgetWidth <= 75) {
-            itemWidth = (baseWidth - spacing * 2) * 0.75
-        } else {
-            itemWidth = baseWidth
-        }
-
-        if (currentRow.length > 0 && (currentWidth + spacing + itemWidth > baseWidth)) {
-            rows.push([...currentRow])
-            currentRow = [widget]
-            currentWidth = itemWidth
-        } else {
-            currentRow.push(widget)
-            currentWidth += (currentRow.length > 1 ? spacing : 0) + itemWidth
-        }
-
-        if (expandedWidgetIndex === i) {
-            expandedRow = rows.length
-        }
-    }
-
-    if (currentRow.length > 0) {
-        rows.push(currentRow)
-    }
-
-    return { rows: rows, expandedRowIndex: expandedRow }
 }

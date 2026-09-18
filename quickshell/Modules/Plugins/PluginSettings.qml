@@ -240,7 +240,7 @@ Item {
                 StyledText {
                     text: I18n.tr("Display Settings")
                     font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                     color: Theme.surfaceText
                 }
 

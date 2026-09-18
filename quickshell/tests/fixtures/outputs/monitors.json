@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "configurations": [
+    {
+      "id": "auto_1a2b3c",
+      "name": "",
+      "outputs": {
+        "DP-1": {
+          "mode": "3840x2160@59.997",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1.5,
+          "transform": "Normal",
+          "vrr": true,
+          "disabled": false,
+          "niri": {
+            "vrrOnDemand": true
+          }
+        },
+        "eDP-1": {
+          "mode": "1920x1200@60.001",
+          "position": {
+            "x": 2560,
+            "y": 0
+          },
+          "scale": 1.3,
+          "transform": "Flipped90",
+          "vrr": false,
+          "disabled": false
+        }
+      }
+    },
+    {
+      "id": "profile_1700000000000_abc1234",
+      "name": "Desk",
+      "outputs": {
+        "Dell Inc. DELL U2720Q ABC123": {
+          "mode": "3840x2160@60.000",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 2,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {
+            "focusAtStartup": true
+          }
+        },
+        "BOE 0x0A1B Unknown": {
+          "mode": "1920x1200@60.001",
+          "position": {
+            "x": 1920,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": true
+        }
+      }
+    },
+    {
+      "name": "Missing id",
+      "outputs": {
+        "desc:Dell Inc. DELL U2720Q": {
+          "mode": "1920x1080@60.000",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "hyprland": {
+            "bitdepth": 10,
+            "mirror": "eDP-1"
+          }
+        }
+      }
+    },
+    {
+      "id": "profile_all_off",
+      "name": "All off",
+      "outputs": {
+        "DP-1": {
+          "mode": "3840x2160@59.997",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1.5,
+          "transform": "Normal",
+          "vrr": true,
+          "disabled": true
+        },
+        "DP-9": {
+          "mode": "1920x1080@60.000",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": true
+        }
+      }
+    },
+    {
+      "id": "profile_named_same_set",
+      "name": "Same set",
+      "outputs": {
+        "DP-1": {
+          "mode": "3840x2160@60.000",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false
+        },
+        "eDP-1": {
+          "mode": "1920x1200@48.000",
+          "position": {
+            "x": 3840,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "90",
+          "vrr": false,
+          "disabled": false
+        }
+      }
+    }
+  ]
+}

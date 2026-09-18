@@ -1,6 +1,6 @@
 # Plugin System
 
-Create widgets for DankBar and Control Center using dynamically-loaded QML components.
+Extend DMS with dynamically loaded QML components: bar and dock widgets, Control Center tiles, dash tabs and overview cards, desktop widgets, launcher providers and background daemons.
 
 ## Plugin Registry
 
@@ -8,7 +8,7 @@ Browse and discover community plugins at **https://plugins.danklinux.com/**
 
 ## Overview
 
-Plugins let you add custom widgets to DankBar and Control Center. They're discovered from `~/.config/DankMaterialShell/plugins/` and managed via PluginService.
+Plugins are discovered from `~/.config/DankMaterialShell/plugins/` and managed by PluginService. One plugin can provide a single surface or several (see [Composite Plugins](#composite-plugins)).
 
 ## Architecture
 
@@ -20,20 +20,20 @@ Plugins let you add custom widgets to DankBar and Control Center. They're discov
    - Handles loading, unloading, and state management
    - Provides data persistence for plugin settings
 
-2. **PluginsTab** (`Modules/Settings/PluginsTab.qml`)
-   - UI for managing available plugins
-   - Access plugin settings
+2. **Plugins hub** (`Modules/Settings/PluginsHubHeader.qml`, `Modules/Settings/PluginsManageTab.qml`)
+   - UI for managing available plugins and registries
 
-3. **PluginsTab Settings** (`Modules/Settings/PluginsTab.qml`)
-   - Accordion-style plugin configuration interface
-   - Dynamically loads plugin settings components inline
-   - Provides consistent settings interface with proper focus handling
+3. **Plugin settings page** (`Modules/Settings/PluginSettingsPage.qml`)
+   - Loads a plugin's settings component through `PluginSettingsHost`
 
-4. **DankBar Integration** (`Modules/DankBar/DankBar.qml`)
-   - Renders plugin widgets in the bar
+4. **Bar and dock integration** (`Modules/SurfaceWidgets/SurfaceWidgetFactory.qml`, `SurfaceWidgetHost.qml`)
+   - Renders plugin widgets in bars and docks with the same component
    - Merges plugin components with built-in widgets
-   - Supports left, center, and right sections
-   - Supports any dankbar position (top/left/right/bottom)
+   - Supports every bar and dock edge
+
+5. **Dash integration** (`Modules/DankDash/DashRegistry.qml`)
+   - Lists built-in and plugin tabs and overview cards
+   - Hosts plugin tabs in `DashTabHost.qml` and cards in `Overview/DashCardSlot.qml`
 
 Many widgets are implemented in the shared [dank-qml-common](https://github.com/AvengeMedia/dank-qml-common) library and re-exported by DMS. Plugins should keep importing `qs.Common`, `qs.Services`, `qs.Widgets`, and `qs.Modules.Plugins` — these remain the supported plugin API and are unaffected by where a widget is implemented.
 
@@ -83,9 +83,9 @@ The manifest file defines plugin metadata and configuration.
 - `description`: Short description of plugin functionality (displayed in UI)
 - `version`: Semantic version string (e.g., "1.0.0")
 - `author`: Plugin creator name or email
-- `type`: Plugin type - "widget", "daemon", "launcher", or "desktop"
+- `type`: Plugin type - "widget", "daemon", "launcher", "desktop", "dash", "dashCard", or "composite" (with `components`)
 - `capabilities`: Array of plugin capabilities  (e.g., ["dankbar-widget"], ["control-center"], ["monitoring"])
-- `component`: Relative path to main QML component file
+- `component`: Relative path to main QML component file, or `components` for a multi-surface plugin
 
 **Required for Launcher Type:**
 - `trigger`: Trigger string for launcher activation (e.g., "=", "#", "!")
@@ -144,7 +144,6 @@ PluginComponent {
         PopoutComponent {
             headerText: "My Plugin"
             detailsText: "Optional description text goes here"
-            showCloseButton: true
 
             // Your popout content goes here
             Column {
@@ -268,7 +267,6 @@ import qs.Modules.Plugins
 PopoutComponent {
     headerText: "Header Title"        // Main header text (bold, large)
     detailsText: "Description text"   // Optional description (smaller, gray)
-    showCloseButton: true             // Show X button in top-right
 
     // Access to exposed properties for dynamic sizing
     readonly property int headerHeight    // Height of header area
@@ -287,7 +285,6 @@ PopoutComponent {
 **PopoutComponent Properties:**
 - `headerText`: Main header text (optional, hidden if empty)
 - `detailsText`: Description text below header (optional, hidden if empty)
-- `showCloseButton`: Show close button in header (default: false)
 - `closePopout`: Function to close popout (auto-injected by PluginPopout)
 - `headerHeight`: Readonly height of header (0 if not visible)
 - `detailsHeight`: Readonly height of description (0 if not visible)
@@ -1292,7 +1289,9 @@ To create a launcher plugin, set the plugin type in `plugin.json`:
 }
 ```
 
-Launcher components are instantiated on first launcher open, not at shell startup. Put background work (timers, processes, IPC handlers) in a daemon surface.
+Launcher components are instantiated the first time the launcher asks them for items, not at shell startup or launcher open, so a plugin not allowed without a trigger is created once its trigger is typed or the launcher is filtered to it. Put background work (timers, processes, IPC handlers) in a daemon surface.
+
+Launcher results use shared Expressive rows and tiles in every launcher style. The item and action contracts are unchanged. List rows use a second line when `comment` is present; image and window preview tiles remain supported. Plugins do not need to supply a visual delegate.
 
 ### Launcher Component Contract
 
@@ -1399,7 +1398,7 @@ Uses the user's installed icon theme. Common examples: `firefox`, `chrome`, `fol
     categories: ["MyPlugin"]
 }
 ```
-When `icon` is omitted, the launcher hides the icon area and displays only the text, giving full width to the item name. Useful when you want emojis or symbols to be part of the item name itself.
+When `icon` is omitted, the launcher shows the first letter of the item name in a themed circle.
 
 ### Trigger System
 
@@ -1788,6 +1787,193 @@ See `PLUGINS/ExampleDesktopClock/` for a complete working example demonstrating:
 - Responsive sizing
 - Edit mode handling
 
+## Dash Plugins
+
+### Overview
+
+The dash popout (`dms ipc call dash open`) is a set of entries. Each entry can have a tab, an overview card, or both. The built-ins (Overview, Media, Wallpapers, Weather, Notifications, Clock, Calendar, User, System Monitor, CPU, Memory, Network, Disk, Battery) are the same kind of entry as a plugin, they just ship enabled.
+
+- `dash`: a full tab, built on `DashTabComponent`. Its id is `plugin_<pluginId>`, so `dms ipc call dash open plugin_dashTabExample` opens the example tab.
+- `dashCard`: a card in the overview grid, built on `DashCardComponent`. The grid is 6 columns by default (users pick 3 to 8 in the Overview options) and rows are 96 px tall. Users drag the corner handle to any size inside the range the manifest allows.
+
+Only enabled plugins show up. A disabled plugin has no tab, no card, no row under Settings → Dashboard and no entry in the Add widget menu. Its saved placement is kept, so re-enabling it puts the card back where it was.
+
+A plugin tab is enabled in the tab bar as soon as the plugin loads. Users hide it under Settings → Dashboard → Tabs. Cards are never placed automatically: users add them from the dash (three-dot menu → Edit → Add widget). A plugin with both surfaces gets one interaction for free: clicking its card opens its tab, and a tab hidden from the bar opens as a detail page with a back button.
+
+Both surfaces load lazily. A tab is created when it becomes current and destroyed when the user switches away. Cards are created with the overview grid. The dash content stays alive after the popout closes, so gate timers, animations and service refs on `live`.
+
+### Plugin Type Configuration
+
+A dash-only plugin uses the single file form like every other type:
+
+```json
+{
+    "id": "dashTabExample",
+    "name": "Stopwatch Example",
+    "type": "dash",
+    "capabilities": ["dash-tab"],
+    "component": "./StopwatchTab.qml",
+    "dash": { "title": "Stopwatch" }
+}
+```
+
+```json
+{
+    "id": "dashCardExample",
+    "name": "Progress Example",
+    "type": "dashCard",
+    "capabilities": ["dash-card"],
+    "component": "./ProgressCard.qml",
+    "dash": { "card": { "title": "Progress", "w": 2, "h": 1, "maxW": 4, "maxH": 2 } }
+}
+```
+
+A plugin with a tab and a card, or dash surfaces plus a bar widget or daemon, uses `components`:
+
+```json
+{
+    "id": "dashCounterExample",
+    "type": "composite",
+    "capabilities": ["dash-tab", "dash-card", "dankbar-widget"],
+    "components": {
+        "dash": "./CounterTab.qml",
+        "dashCard": "./CounterCard.qml",
+        "widget": "./CounterWidget.qml"
+    },
+    "dash": {
+        "title": "Counter",
+        "card": { "w": 2, "h": 1, "minW": 1, "minH": 1, "maxW": 3, "maxH": 2 }
+    }
+}
+```
+
+The `dash` block is optional. `icon` and `title` label the tab and fall back to the top-level `icon` and `name`. `card` names the card in the Add widget menu (`title`, `icon`, falling back to the tab label and icon), sets its default size in grid cells (`w`, `h`) and the range users may resize it within (`minW`, `minH`, `maxW`, `maxH`). Widths are clamped to the user's column count. Heights have no fixed limit, the screen bounds them at resize time. A card must lay itself out for every size in its range; the built-in cards switch layouts on their pixel size, and `Card` clips its content.
+
+`options` declares user options for the plugin's dash surfaces. Each entry has a `key`, a `text` label (translated through the plugin catalog), a `type` and a default `def`. Toggles also take a `description`:
+
+```json
+"options": [
+    { "key": "compact", "text": "Compact layout", "type": "toggle", "def": false, "description": "Hide the secondary line" },
+    { "key": "style", "text": "Style", "type": "choice", "def": "bars", "choices": [{ "value": "bars", "text": "Bars" }, { "value": "dots", "text": "Dots" }] },
+    { "key": "limit", "text": "Items", "type": "number", "def": 5, "min": 1, "max": 20, "step": 1 }
+]
+```
+
+The dash shows these rows in an options sheet (the tune button on a card in edit mode, Options in a tab's three-dot menu) and Settings → Dashboard lists the same rows. The tab and the card read the resolved values as `options.<key>` and re-evaluate when a value changes. Values live in `settings.json` under `dashOptions.plugin_<pluginId>`, apart from `pluginData`, and only non-default values are stored. Reset clears the declared keys only. `widgets` is reserved for the `DashWidgetGrid` layout and is ignored as an option key.
+
+`dash.options` only reach the dash surfaces. If a bar widget or daemon of the same plugin needs the value, use a `settings` component and `pluginData` instead.
+
+### Dash Tab Contract
+
+`DashTabComponent` (`Modules/Plugins/DashTabComponent.qml`) is an `Item` sized to the dash content area.
+
+Injected by the host:
+
+- `pluginId`, `pluginService`, `popoutService`
+- `entryId`: the registry id (`plugin_<pluginId>`)
+- `dashHost`: the popout, with `dashVisible`, `requestTab(id)` and `editMode`
+- `editMode`: bound to the dash edit mode
+- `live`: bound to "this tab is current and the dash is visible"
+- `targetScreen`, `active` and `rowBudget` (the number of 96 px rows that fit on the screen), when the tab declares those properties
+
+Provided by the base:
+
+- `options`: the resolved values of the manifest `dash.options`
+- `pluginData`: the plugin's persisted settings, refreshed on `pluginDataChanged`
+- `getData(key, default)` / `setData(key, value)`
+- `handleKeyEvent(event)`: override and return `true` to consume a key. The host asks the tab before its own handling (Ctrl+Tab and Ctrl+Shift+Tab stay reserved for switching tabs), so Escape can close a tab-local overlay before it closes the dash.
+
+Optional on the tab:
+
+- `implicitHeight`: the dash grows to fit it. The minimum is the overview grid height (`DashMetrics.tabMinHeight`)
+- `focusTarget`: the item that receives focus when Down enters the tab content
+- `restoreFocus()`: called when the dash opens on the tab or returns focus to it. Focus your content here with `Qt.OtherFocusReason` so no focus ring is drawn
+- `blocksTabNavigation`: true while an editor or local control group needs native Tab traversal; false returns Tab to the dash navigation
+- `menuActions`: actions shown in the tab's three-dot menu before Edit and Options. Each action has `label`, `iconName`, `action`, and optional `visible` and `enabled`
+- `signal tabRequested(string id)`: switch the dash to another tab (`"overview"`, `"media"`, `"wallpaper"`, `"weather"`, `"notifications"` or a `plugin_<id>`); a tab hidden from the bar opens as a detail page
+- `signal navFocusRequested`: return focus to the dash navigation
+
+Use `Card` from `qs.Modules.DankDash.Overview` for tiles inside a tab so they pick up the same surface colors, radius and tones as the overview.
+
+### Widgets inside a tab
+
+Assign a `DashWidgetGrid` to `DashTabComponent.widgetGrid` to get the dash Edit, Add widget, Reset and Clear All actions for free. Bind the grid's `entryId`, `live` and `editMode` to the tab, and the tab's `implicitHeight` and `focusTarget` to the grid.
+
+```qml
+DashTabComponent {
+    id: tab
+    widgetGrid: grid
+    implicitHeight: grid.implicitHeight
+    focusTarget: grid.focusTarget
+
+    DashWidgetGrid {
+        id: grid
+        width: parent.width
+        entryId: tab.entryId
+        live: tab.live
+        editMode: tab.editMode
+        definitions: [
+            {id: "counter", text: I18n.trFor("yourPlugin", "Counter"), icon: "counter_1", component: counter, w: 2, h: 2, minW: 1, minH: 1, maxW: 4, maxH: 3}
+        ]
+    }
+
+    Component {
+        id: counter
+        CounterWidget {}
+    }
+}
+```
+
+Import `qs.Modules.DankDash` for the grid. Each definition has a stable `id`, a translated `text`, an `icon`, a QML `component`, default `w`/`h` and optional `minW`/`minH`/`maxW`/`maxH`. The grid is 4 columns wide (2 when narrower than `Theme.smallBreakpoint`), independent of the overview column count. Set `enabled: false` to leave a widget in the Add menu initially. `graphics: true` exposes a per-widget Show graphics option.
+
+The grid saves order, size and graphics options in `dashOptions[entryId].widgets`. Missing definitions keep their saved placement. A saved empty list stays empty; Reset restores the current defaults. Widgets receive `widgetId`, `widgetOptions` and a bound `live` value if they declare those properties. The grid unloads widget content when `live` is false. Edit mode offers drag ordering, a resize handle, removal, and menu actions for keyboard ordering and sizing.
+
+### Dash Card Contract
+
+`DashCardComponent` (`Modules/Plugins/DashCardComponent.qml`) derives from the overview `Card`: a tonal surface with `pad`, an optional `title` label, a `tone` (`""`, `"primary"`, `"secondary"` or `"tertiary"`) that tints the surface, the matching `containerColor`, `contentColor`, `accentColor`, `onAccentColor`, `mutedColor` and `chipColor`, the resolved `options`, and `clickable` for a state layer and a `clicked` signal. Children are placed inside the padded content area.
+
+The host injects `pluginId`, `pluginService`, `popoutService` and `entryId`, and binds `live` (true while the overview is visible) and `interactive` (false while the user edits the grid). The base offers the same `pluginData`, `getData` and `setData` as the tab. When the plugin also has a tab, a click on a clickable card opens it; set `opensTab: false` to keep the click to yourself.
+
+Cards expose `focusTarget`, `handleKeyEvent(event)` and `blocksTabNavigation`. Clickable cards focus themselves by default; set `focusTarget` to a child control instead, or leave a non-clickable card at `null` and keyboard navigation skips it.
+
+Tab and Shift+Tab switch dash tabs while focus is on the dash navigation. The overview focuses the last focused card when it opens (calendar at first, remembered across opens) without a focus ring, and keys go straight to that card. Alt+Arrows or Alt+H/J/K/L move to the neighbouring card, Alt+Tab and Alt+Shift+Tab cycle cards, and the card that gains focus flashes a ring. On other tabs, Down enters the content. Inside content, Tab and Shift+Tab reach controls; Ctrl+Tab and Ctrl+Shift+Tab switch dash tabs from there. Escape closes local overlays first, then the dash.
+
+Return `true` from `handleKeyEvent(event)` for handled keys, or `false` for the host to continue. The host passes local Tab and Backtab through this method before leaving a component. Set `blocksTabNavigation` while an editor needs native child-control traversal, then emit `navFocusRequested()` to return to navigation. Child `Keys` handlers can consume keys before the host sees them.
+
+```qml
+DashCardComponent {
+    id: root
+    clickable: true
+    opensTab: false
+
+    function handleKeyEvent(event) {
+        switch (event.key) {
+        case Qt.Key_Left:
+            setData("count", Math.max(0, getData("count", 0) - 1));
+            return true;
+        case Qt.Key_Right:
+            setData("count", getData("count", 0) + 1);
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+### Opening the dash from other surfaces
+
+`popoutService.toggleDankDash(tabId, x, y, width, section, screen)` opens the dash on a tab. A bar or dock widget can wire it to its pill with the positioned `pillClickAction` form:
+
+```qml
+pillClickAction: (x, y, width, section, screen) => popoutService?.toggleDankDash("plugin_" + pluginId, x, y, width, section, screen)
+```
+
+### Example Plugins
+
+- [DashTabExample](./DashTabExample/): standalone tab (`"type": "dash"`), plugin state, `live` gating, keys, menu actions, options
+- [DashCardExample](./DashCardExample/): standalone card (`"type": "dashCard"`), responsive layout, tones, options
+- [DashCounterExample](./DashCounterExample/): tab + card + bar/dock widget sharing one counter, `DashWidgetGrid`
+
 ## Composite Plugins
 
 A single plugin can provide **multiple surfaces at once** — for example a background
@@ -1828,10 +2014,12 @@ Provide any subset of these keys in `components`:
 
 | Surface | Component contract | Notes |
 |---------|--------------------|-------|
-| `widget` | `PluginComponent` (bar pills + optional Control Center widget) | see [Widget Component](#widget-component) |
+| `widget` | `PluginComponent` (bar and dock pills + optional Control Center widget) | see [Widget Component](#widget-component) |
 | `desktop` | `DesktopPluginComponent` (or an `Item` following the desktop contract) | see [Desktop Plugins](#desktop-plugins) |
 | `daemon` | any `Item` exposing `pluginService` / `pluginId` | instantiated once; ideal for IPC handlers and background monitoring |
 | `launcher` | launcher contract (`getItems` / `executeItem`) | requires `trigger` (or empty-trigger mode); see [Launcher Plugins](#launcher-plugins) |
+| `dash` | `DashTabComponent` | a tab in the dashboard popout; see [Dash Plugins](#dash-plugins) |
+| `dashCard` | `DashCardComponent` | a card in the dashboard overview grid; see [Dash Plugins](#dash-plugins) |
 
 Each surface is loaded independently into its own registry, so the same plugin can show
 up in the bar **and** on the desktop **and** run a daemon simultaneously.
@@ -1871,10 +2059,15 @@ plugin.
   - [Calculator](https://github.com/rochacbruno/DankCalculator)
   - [Desktop Clock](./ExampleDesktopClock/)
   - [Composite Example](./ExampleCompositePlugin/)
+  - [Stopwatch tab](./DashTabExample/)
+  - [Progress card](./DashCardExample/)
+  - [Counter: tab, card and bar/dock widget](./DashCounterExample/)
+  - [Attached dock panel](./AttachedPanelExample/)
 - **PluginService**: `Services/PluginService.qml`
-- **Settings UI**: `Modules/Settings/PluginsTab.qml`
-- **DankBar Integration**: `Modules/DankBar/DankBar.qml`
-- **Launcher Integration**: `Modules/AppDrawer/AppLauncher.qml`
+- **Settings UI**: `Modules/Settings/PluginSettingsPage.qml`
+- **Bar and Dock Integration**: `Modules/SurfaceWidgets/SurfaceWidgetHost.qml`
+- **Dash Integration**: `Modules/DankDash/DashRegistry.qml`
+- **Launcher Integration**: `Modals/DankLauncherV2/Controller.qml`
 - **Desktop Widget Integration**: `Modules/DesktopWidgetLayer.qml`
 - **Theme Reference**: `Common/Theme.qml`
 - **Widget Library**: `Widgets/`
@@ -1890,3 +2083,5 @@ Share your plugins with the community:
 5. Document dependencies and permissions
 
 For plugin system improvements, submit issues or PRs to the main DMS repository.
+
+Widget plugins can also run in named docks. See the [surface widget contract](SURFACE_WIDGETS.md) and [attached panel example](AttachedPanelExample/).

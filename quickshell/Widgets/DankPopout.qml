@@ -21,6 +21,11 @@ Item {
     property real animationOffset: Theme.effectAnimOffset
     property list<real> animationEnterCurve: Theme.variantPopoutEnterCurve
     property list<real> animationExitCurve: Theme.variantPopoutExitCurve
+    property list<real> resizeCurve: Theme.variantPopoutResizeCurve
+    property int resizeDuration: animationDuration
+    property bool resizeMotion: false
+    property bool resizing: false
+    property bool surfaceFillsScreen: false
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property bool hoverDismissEnabled: false
@@ -31,11 +36,19 @@ Item {
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
     property bool fullHeightSurface: false
+    property real minimumSurfaceWidth: 0
     property bool _primeContent: false
 
-    property real storedBarThickness: Theme.barHeight - 4
+    property real storedBarThickness: Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1)
     property real storedBarSpacing: 4
     property var storedBarConfig: null
+    property var sourceRegistration: null
+    property bool closesWithSource: true
+    readonly property bool sourceActive: !sourceRegistration || BarWidgetService.registrationActive(sourceRegistration)
+    onSourceActiveChanged: if (!sourceActive && closesWithSource)
+        close()
+    property var sourceDock: null
+    readonly property var inlineDockBounds: storedBarConfig?.widgetExpansion === "inline" ? sourceDock?.surfaceBounds ?? null : null
     property bool triggerUsesOverlayLayer: false
     property var adjacentBarInfo: ({
             "topBar": 0,
@@ -49,6 +62,7 @@ Item {
 
     signal opened
     signal popoutClosed
+    signal closeAnimationFinished
     signal backgroundClicked
 
     readonly property var contentLoader: impl.item ? impl.item.contentLoader : _fallbackContentLoader
@@ -90,8 +104,14 @@ Item {
     readonly property real alignedY: impl.item ? impl.item.alignedY : 0
     readonly property real alignedWidth: impl.item ? impl.item.alignedWidth : 0
     readonly property real alignedHeight: impl.item ? impl.item.alignedHeight : 0
+    readonly property real renderedAlignedX: impl.item ? (impl.item.renderedAlignedX ?? impl.item.alignedX) : 0
     readonly property real renderedAlignedY: impl.item ? (impl.item.renderedAlignedY ?? impl.item.alignedY) : 0
+    readonly property real renderedAlignedWidth: impl.item ? (impl.item.renderedAlignedWidth ?? impl.item.alignedWidth) : 0
     readonly property real renderedAlignedHeight: impl.item ? (impl.item.renderedAlignedHeight ?? impl.item.alignedHeight) : 0
+
+    function alignedXFor(width) {
+        return impl.item?.alignedXFor(width) ?? 0;
+    }
     readonly property real maskX: impl.item ? impl.item.maskX : 0
     readonly property real maskY: impl.item ? impl.item.maskY : 0
     readonly property real maskWidth: impl.item ? impl.item.maskWidth : 0
@@ -101,7 +121,7 @@ Item {
     readonly property real barWidth: impl.item ? impl.item.barWidth : 0
     readonly property real barHeight: impl.item ? impl.item.barHeight : 0
     readonly property bool useConnectedBackend: _usesConnectedBackendForScreen(screen)
-    property var _resolvedBackend: null
+    property bool _resolvedConnected: false
     property bool _pendingOpen: false
 
     Timer {
@@ -116,7 +136,7 @@ Item {
     }
 
     onUseConnectedBackendChanged: _maybeResolveBackend()
-    Component.onCompleted: _resolvedBackend = _backendForScreen(screen)
+    Component.onCompleted: _loadHost(_usesConnectedBackendForScreen(screen))
 
     Connections {
         target: SettingsData
@@ -129,7 +149,7 @@ Item {
         function onFrameScreenPreferencesChanged() {
             root._maybeResolveBackend();
         }
-        function onShowDockChanged() {
+        function onDockConfigsChanged() {
             root._maybeResolveBackend();
         }
         function onBarConfigsChanged() {
@@ -141,21 +161,23 @@ Item {
         return CompositorService.usesConnectedFrameChromeForScreen(targetScreen);
     }
 
-    function _backendForScreen(targetScreen) {
-        return _usesConnectedBackendForScreen(targetScreen) ? connectedComp : standaloneComp;
-    }
-
     function _maybeResolveBackend() {
         _resolveBackendForScreen(screen);
     }
 
     function _resolveBackendForScreen(targetScreen) {
-        const backend = _backendForScreen(targetScreen);
-        if (_resolvedBackend === backend)
+        const connected = _usesConnectedBackendForScreen(targetScreen);
+        if (_resolvedConnected === connected)
             return;
         if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
             return;
-        _resolvedBackend = backend;
+        _loadHost(connected);
+    }
+
+    function _loadHost(connected) {
+        impl.sourceComponent = null;
+        _resolvedConnected = connected;
+        impl.sourceComponent = hostComponent;
     }
 
     function open() {
@@ -198,7 +220,7 @@ Item {
 
     // Fade out in place during morph switch transitions.
     function beginSupersededClose() {
-        if (impl.item?.beginSupersededClose)
+        if (impl.item)
             impl.item.beginSupersededClose();
     }
 
@@ -237,14 +259,79 @@ Item {
         return LayerShell.envUsesOverlay("DMS_DANKBAR_LAYER", (barConfig?.useOverlayLayer ?? false) || frameRequiresOverlay);
     }
 
-    function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {
+    function dockClearance(side, popupGap) {
+        if (!screen)
+            return 0;
+        const reserved = SettingsData.dockReservationForEdge(screen, side);
+        const frameInset = CompositorService.frameWindowVisibleForScreen(screen) ? SettingsData.frameEdgeInsetForSide(screen, side) : 0;
+        let clearance = reserved > 0 ? reserved + frameInset : 0;
+        if (sourceDock?.config?.enabled && sourceDock.reveal && sourceDock.connectedBarSide === side) {
+            const bounds = sourceDock.surfaceBounds;
+            switch (side) {
+            case "top":
+                clearance = Math.max(clearance, bounds.y + bounds.height);
+                break;
+            case "bottom":
+                clearance = Math.max(clearance, screen.height - bounds.y);
+                break;
+            case "left":
+                clearance = Math.max(clearance, bounds.x + bounds.width);
+                break;
+            case "right":
+                clearance = Math.max(clearance, screen.width - bounds.x);
+                break;
+            }
+        }
+        return clearance > 0 ? clearance + popupGap : 0;
+    }
+
+    function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig, sourceItem) {
+        sourceRegistration = BarWidgetService.registrationForItem(sourceItem);
+        sourceDock = null;
+        for (let item = sourceItem; item; item = item.parent) {
+            if (item.surfaceContext?.kind !== "dock")
+                continue;
+            sourceDock = item.surfaceContext.host;
+            break;
+        }
+        if (barConfig?.widgetExpansion === "inline" && sourceDock) {
+            const bounds = sourceDock.surfaceBounds;
+            const gap = CompositorService.usesConnectedFrameChromeForScreen(targetScreen) && !barConfig.useOverlayLayer ? 0 : (barConfig.popupGapsAuto !== false ? Math.max(4, barSpacing) : barConfig.popupGapsManual ?? 4);
+            switch (barPosition) {
+            case SettingsData.Position.Top:
+                y = bounds.y + bounds.height + gap;
+                break;
+            case SettingsData.Position.Bottom:
+                y = bounds.y - gap;
+                break;
+            case SettingsData.Position.Left:
+                x = bounds.x + bounds.width + gap;
+                break;
+            case SettingsData.Position.Right:
+                x = bounds.x - gap;
+                break;
+            }
+        }
+        if (barConfig?.widgetExpansion === "popout" && targetScreen) {
+            const anchor = BarWidgetService.naturalPopoutAnchor(targetScreen, sourceItem, section);
+            if (!anchor)
+                return;
+            x = anchor.trigger.x;
+            y = anchor.trigger.y;
+            width = anchor.trigger.width;
+            section = anchor.section;
+            barPosition = anchor.position;
+            barThickness = anchor.thickness;
+            barSpacing = anchor.spacing;
+            barConfig = anchor.config;
+        }
         triggerX = x;
         triggerY = y;
         triggerWidth = width;
         triggerSection = section;
         screen = targetScreen;
 
-        storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4);
+        storedBarThickness = barThickness !== undefined ? barThickness : Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1);
         storedBarSpacing = barSpacing !== undefined ? barSpacing : 4;
         storedBarConfig = barConfig;
         triggerUsesOverlayLayer = _triggerBarUsesOverlayLayer(targetScreen, barConfig);
@@ -258,7 +345,7 @@ Item {
     }
 
     function updateSurfacePosition() {
-        if (impl.item && typeof impl.item.updateSurfacePosition === "function")
+        if (impl.item)
             impl.item.updateSurfacePosition();
     }
 
@@ -269,9 +356,9 @@ Item {
         if (!presented)
             return false;
         const padding = 24;
-        const x = alignedX - padding;
+        const x = renderedAlignedX - padding;
         const y = renderedAlignedY - padding;
-        const w = alignedWidth + padding * 2;
+        const w = renderedAlignedWidth + padding * 2;
         const h = renderedAlignedHeight + padding * 2;
         return gx >= x && gx <= x + w && gy >= y && gy <= y + h;
     }
@@ -279,60 +366,36 @@ Item {
     Loader {
         id: impl
         active: root.screen !== null
-        sourceComponent: root._resolvedBackend
         onItemChanged: if (item)
             root._wireBackend(item)
     }
 
     Component {
-        id: standaloneComp
-        DankPopoutStandalone {}
-    }
+        id: hostComponent
+        DankPopoutHost {
+            id: host
 
-    Component {
-        id: connectedComp
-        DankPopoutConnected {}
+            popoutHandle: root
+            connected: root._resolvedConnected
+
+            onShouldBeVisibleChanged: {
+                if (root.shouldBeVisible !== host.shouldBeVisible)
+                    root.shouldBeVisible = host.shouldBeVisible;
+            }
+            onOpened: root.opened()
+            onCloseAnimationFinished: root.closeAnimationFinished()
+            onPopoutClosed: {
+                root.popoutClosed();
+                root._maybeResolveBackend();
+            }
+            onBackgroundClicked: root.backgroundClicked()
+        }
     }
 
     function _wireBackend(it) {
-        if (!it)
-            return;
-
-        it.popoutHandle = root;
-        it.layerNamespace = Qt.binding(() => root.layerNamespace);
-        it.content = Qt.binding(() => root.content);
-        it.overlayContent = Qt.binding(() => root.overlayContent);
-        it.popupWidth = Qt.binding(() => root.popupWidth);
-        it.popupHeight = Qt.binding(() => root.popupHeight);
-        it.triggerX = Qt.binding(() => root.triggerX);
-        it.triggerY = Qt.binding(() => root.triggerY);
-        it.triggerWidth = Qt.binding(() => root.triggerWidth);
-        it.triggerSection = Qt.binding(() => root.triggerSection);
-        it.positioning = Qt.binding(() => root.positioning);
-        it.animationDuration = Qt.binding(() => root.animationDuration);
-        it.animationScaleCollapsed = Qt.binding(() => root.animationScaleCollapsed);
-        it.animationOffset = Qt.binding(() => root.animationOffset);
-        it.animationEnterCurve = Qt.binding(() => root.animationEnterCurve);
-        it.animationExitCurve = Qt.binding(() => root.animationExitCurve);
-        it.suspendShadowWhileResizing = Qt.binding(() => root.suspendShadowWhileResizing);
-        it.customKeyboardFocus = Qt.binding(() => root.customKeyboardFocus);
-        it.backgroundInteractive = Qt.binding(() => root.backgroundInteractive);
-        it.contentHandlesKeys = Qt.binding(() => root.contentHandlesKeys);
-        it.fullHeightSurface = Qt.binding(() => root.fullHeightSurface);
-        it.storedBarThickness = Qt.binding(() => root.storedBarThickness);
-        it.storedBarSpacing = Qt.binding(() => root.storedBarSpacing);
-        it.storedBarConfig = Qt.binding(() => root.storedBarConfig);
-        it.triggerUsesOverlayLayer = Qt.binding(() => root.triggerUsesOverlayLayer);
-        it.adjacentBarInfo = Qt.binding(() => root.adjacentBarInfo);
-        it.screen = Qt.binding(() => root.screen);
-        it.effectiveBarPosition = Qt.binding(() => root.effectiveBarPosition);
-        it.effectiveBarBottomGap = Qt.binding(() => root.effectiveBarBottomGap);
-        it.hoverDismissEnabled = Qt.binding(() => root.hoverDismissEnabled);
-        it.hoverDismissSuspended = Qt.binding(() => root.effectiveHoverDismissSuspended);
-
         if (root.shouldBeVisible && !_pendingOpen)
             root.shouldBeVisible = false;
-        if (root._primeContent && typeof it.primeContent === "function")
+        if (root._primeContent)
             it.primeContent();
         if (_pendingOpen)
             _pendingOpenTimer.restart();
@@ -350,36 +413,10 @@ Item {
             impl.item.clearPrimedContent();
     }
 
-    Connections {
-        target: root
-        function onShouldBeVisibleChanged() {
-            if (!root.shouldBeVisible)
-                root.transientSurfaceTracker?.closeAll?.();
-            if (impl.item && impl.item.shouldBeVisible !== root.shouldBeVisible)
-                impl.item.shouldBeVisible = root.shouldBeVisible;
-        }
-    }
-
-    Connections {
-        target: impl.item
-        ignoreUnknownSignals: true
-
-        function onShouldBeVisibleChanged() {
-            if (impl.item && root.shouldBeVisible !== impl.item.shouldBeVisible)
-                root.shouldBeVisible = impl.item.shouldBeVisible;
-        }
-
-        function onOpened() {
-            root.opened();
-        }
-
-        function onPopoutClosed() {
-            root.popoutClosed();
-            root._maybeResolveBackend();
-        }
-
-        function onBackgroundClicked() {
-            root.backgroundClicked();
-        }
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible)
+            transientSurfaceTracker?.closeAll?.();
+        if (impl.item && impl.item.shouldBeVisible !== shouldBeVisible)
+            impl.item.shouldBeVisible = shouldBeVisible;
     }
 }

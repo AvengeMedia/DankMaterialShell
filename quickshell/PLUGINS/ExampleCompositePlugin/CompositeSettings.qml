@@ -11,7 +11,7 @@ PluginSettings {
         width: parent.width
         text: "Bar Widget — Emoji Cycler"
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 
@@ -69,7 +69,7 @@ PluginSettings {
         minimum: 500
         maximum: 10000
         unit: "ms"
-        leftIcon: "schedule"
+        startIcon: "schedule"
     }
 
     SliderSetting {
@@ -79,14 +79,14 @@ PluginSettings {
         defaultValue: 3
         minimum: 1
         maximum: 8
-        rightIcon: "emoji_emotions"
+        endIcon: "emoji_emotions"
     }
 
     StyledText {
         width: parent.width
         text: "Desktop Widget — Clock"
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 
@@ -131,7 +131,7 @@ PluginSettings {
         width: parent.width
         text: "Daemon — Wallpaper Hook"
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 

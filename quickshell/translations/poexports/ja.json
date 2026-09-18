@@ -5,6 +5,15 @@
   "%1 Animation Speed": {
     "%1 Animation Speed": "%1 アニメーション速度"
   },
+  "%1 DMS bind may be overridden by config binds that come after the include.": {
+    "%1 DMS bind may be overridden by config binds that come after the include.": ""
+  },
+  "%1 DMS binds may be overridden by config binds that come after the include.": {
+    "%1 DMS binds may be overridden by config binds that come after the include.": ""
+  },
+  "%1 KB": {
+    "%1 KB": ""
+  },
   "%1 Layout Overrides": {
     "%1 Layout Overrides": ""
   },
@@ -26,17 +35,35 @@
   "%1 adapters, none connected": {
     "%1 adapters, none connected": "アダプター %1 個、接続なし"
   },
+  "%1 already holds this screen edge": {
+    "%1 already holds this screen edge": ""
+  },
+  "%1 before": {
+    "%1 before": ""
+  },
   "%1 character": {
     "%1 character": "%1 文字"
   },
   "%1 characters": {
     "%1 characters": "%1 文字"
   },
+  "%1 class": {
+    "%1 class": ""
+  },
+  "%1 classes": {
+    "%1 classes": ""
+  },
   "%1 connected": {
     "%1 connected": "%1 件接続"
   },
   "%1 copied": {
     "%1 copied": "1% がコピーされました"
+  },
+  "%1 day": {
+    "%1 day": ""
+  },
+  "%1 days": {
+    "%1 days": ""
   },
   "%1 disconnected": {
     "%1 disconnected": "%1 件切断済み"
@@ -59,6 +86,15 @@
   "%1 h left": {
     "%1 h left": "残り %1 時間"
   },
+  "%1 holds this edge, so the dock stays hidden there": {
+    "%1 holds this edge, so the dock stays hidden there": ""
+  },
+  "%1 hour": {
+    "%1 hour": ""
+  },
+  "%1 hours": {
+    "%1 hours": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 は設定に含まれるようになりました"
   },
@@ -68,8 +104,26 @@
   "%1 issues found": {
     "%1 issues found": "問題 %1 件を検出"
   },
+  "%1 job": {
+    "%1 job": ""
+  },
+  "%1 jobs": {
+    "%1 jobs": ""
+  },
+  "%1 min": {
+    "%1 min": ""
+  },
   "%1 min left": {
     "%1 min left": "残り %1 分"
+  },
+  "%1 minute": {
+    "%1 minute": ""
+  },
+  "%1 minutes": {
+    "%1 minutes": ""
+  },
+  "%1 ms": {
+    "%1 ms": ""
   },
   "%1 notifications": {
     "%1 notifications": "通知 %1 件"
@@ -79,6 +133,18 @@
   },
   "%1 position": {
     "%1 position": ""
+  },
+  "%1 printer": {
+    "%1 printer": ""
+  },
+  "%1 printers": {
+    "%1 printers": ""
+  },
+  "%1 second": {
+    "%1 second": ""
+  },
+  "%1 seconds": {
+    "%1 seconds": ""
   },
   "%1 tasks": {
     "%1 tasks": "%1 件のタスク"
@@ -112,6 +178,12 @@
   },
   "%1: %2": {
     "%1: %2": "%1: %2"
+  },
+  "%1h %2m": {
+    "%1h %2m": ""
+  },
+  "%1m": {
+    "%1m": ""
   },
   "%1m ago": {
     "%1m ago": "%1分前"
@@ -284,6 +356,9 @@
   "50 seconds": {
     "50 seconds": "50秒"
   },
+  "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": {
+    "50 uses Material shapes. Lower values reduce rounding; higher values increase it.": ""
+  },
   "500 ms": {
     "500 ms": "500ミリ秒"
   },
@@ -328,6 +403,9 @@
   },
   "AC Power": {
     "AC Power": "AC電源"
+  },
+  "AM": {
+    "AM": ""
   },
   "API": {
     "API": "API"
@@ -413,6 +491,9 @@
   "Adapters": {
     "Adapters": "アダプター"
   },
+  "Adapters and saved configurations": {
+    "Adapters and saved configurations": ""
+  },
   "Adaptive": {
     "Adaptive": ""
   },
@@ -485,6 +566,12 @@
   "Add to Autostart": {
     "Add to Autostart": "自動起動に追加"
   },
+  "Add, remove and configure dock items": {
+    "Add, remove and configure dock items": ""
+  },
+  "Add, remove, reorder and configure": {
+    "Add, remove, reorder and configure": ""
+  },
   "Additional settings are managed by the Island": {
     "Additional settings are managed by the Island": ""
   },
@@ -524,8 +611,14 @@
   "Afternoon": {
     "Afternoon": "午後"
   },
+  "Album art backdrop": {
+    "Album art backdrop": ""
+  },
   "Alerts": {
     "Alerts": ""
+  },
+  "Alignment": {
+    "Alignment": ""
   },
   "All": {
     "All": "すべて"
@@ -553,6 +646,9 @@
   },
   "Allow clicks to pass through the widget": {
     "Allow clicks to pass through the widget": "クリックをウィジェットに透過させる"
+  },
+  "Allow critical": {
+    "Allow critical": ""
   },
   "Allow greeter access?": {
     "Allow greeter access?": "Greeter アクセスを許可しますか？"
@@ -632,6 +728,9 @@
   "Animation Style": {
     "Animation Style": "アニメーションスタイル"
   },
+  "Animation duration": {
+    "Animation duration": ""
+  },
   "Anonymous Identity": {
     "Anonymous Identity": "匿名 ID"
   },
@@ -671,6 +770,9 @@
   "App name or identity (e.g., firefox)": {
     "App name or identity (e.g., firefox)": ""
   },
+  "App theming": {
+    "App theming": ""
+  },
   "Appearance": {
     "Appearance": "外観"
   },
@@ -694,6 +796,9 @@
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": ""
+  },
+  "Apply": {
+    "Apply": ""
   },
   "Apply AUR updates alongside system updates when running 'Update All'.": {
     "Apply AUR updates alongside system updates when running 'Update All'.": ""
@@ -719,6 +824,9 @@
   "Apply island geometry changes immediately without spring overshoot": {
     "Apply island geometry changes immediately without spring overshoot": ""
   },
+  "Apply to": {
+    "Apply to": ""
+  },
   "Apply to Hardware": {
     "Apply to Hardware": "ハードウェアに適用"
   },
@@ -734,6 +842,9 @@
   "Apps": {
     "Apps": "アプリ"
   },
+  "Apps & widgets": {
+    "Apps & widgets": ""
+  },
   "Apps Dock": {
     "Apps Dock": "アプリドック"
   },
@@ -745,6 +856,9 @@
   },
   "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": {
     "Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.": ""
+  },
+  "Apps and commands started with the session": {
+    "Apps and commands started with the session": ""
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "アプリは使用頻度、最終使用日、アルファベット順の優先順位で並べられています。"
@@ -772,6 +886,12 @@
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "ディスプレイを配置し、解像度、リフレッシュレート、VRR を設定"
+  },
+  "Arrangement, resolution, scale, profiles": {
+    "Arrangement, resolution, scale, profiles": ""
+  },
+  "Artwork": {
+    "Artwork": ""
   },
   "At Startup": {
     "At Startup": "起動時"
@@ -827,6 +947,9 @@
   "Authenticate": {
     "Authenticate": "認証"
   },
+  "Authenticating...": {
+    "Authenticating...": ""
+  },
   "Authentication": {
     "Authentication": "認証"
   },
@@ -844,6 +967,9 @@
   },
   "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": {
     "Authentication changes need sudo. Opening terminal so you can use password or fingerprint.": "認証の変更には sudo が必要です。パスワードまたは指紋を使用できるよう端末を開きます。"
+  },
+  "Author": {
+    "Author": ""
   },
   "Authorize": {
     "Authorize": "許可"
@@ -965,6 +1091,9 @@
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "IP アドレスを使用して現在地を自動的に特定します"
   },
+  "Automatically enable while screen sharing": {
+    "Automatically enable while screen sharing": ""
+  },
   "Automatically hide the bar when the pointer moves away": {
     "Automatically hide the bar when the pointer moves away": "ポインターが離れたらバーを自動的に隠す"
   },
@@ -1025,6 +1154,9 @@
   "Backend": {
     "Backend": "バックエンド"
   },
+  "Backend and connection preference": {
+    "Backend and connection preference": ""
+  },
   "Background": {
     "Background": "背景"
   },
@@ -1043,6 +1175,9 @@
   "Background image": {
     "Background image": "背景画像"
   },
+  "Background, corners, spacing, widget style": {
+    "Background, corners, spacing, widget style": ""
+  },
   "Backlight device": {
     "Backlight device": "バックライトデバイス"
   },
@@ -1057,9 +1192,6 @@
   },
   "Band": {
     "Band": ""
-  },
-  "Bar": {
-    "Bar": "バー"
   },
   "Bar %1": {
     "Bar %1": "バー %1"
@@ -1085,8 +1217,17 @@
   "Bar shadow, border, and corners": {
     "Bar shadow, border, and corners": "バーの影、境界線、角"
   },
+  "Bar size": {
+    "Bar size": ""
+  },
+  "Bar surface and spacing": {
+    "Bar surface and spacing": ""
+  },
   "Bar visibility": {
     "Bar visibility": ""
+  },
+  "Bar widgets": {
+    "Bar widgets": ""
   },
   "Base color for shadows (opacity is applied automatically)": {
     "Base color for shadows (opacity is applied automatically)": "影の基本色（透明度は自動的に適用されます）"
@@ -1139,6 +1280,9 @@
   "Behavior": {
     "Behavior": "動作"
   },
+  "Better Lyrics": {
+    "Better Lyrics": ""
+  },
   "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "ロック画面をloginctlからのdbus信号にバインド。外部ロック画面を使用している場合は無効に"
   },
@@ -1180,6 +1324,9 @@
   },
   "Bluetooth Settings": {
     "Bluetooth Settings": "Bluetooth設定"
+  },
+  "Bluetooth media controls": {
+    "Bluetooth media controls": ""
   },
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth は利用できません"
@@ -1250,6 +1397,9 @@
   "Border with Background": {
     "Border with Background": "背景付き境界線"
   },
+  "Border, connected mode, arcs": {
+    "Border, connected mode, arcs": ""
+  },
   "Both": {
     "Both": ""
   },
@@ -1292,6 +1442,9 @@
   "Browse": {
     "Browse": "ブラウズ"
   },
+  "Browse Files": {
+    "Browse Files": ""
+  },
   "Browse Plugins": {
     "Browse Plugins": "プラグインを閲覧"
   },
@@ -1303,6 +1456,15 @@
   },
   "Browse or search plugins": {
     "Browse or search plugins": "プラグインを閲覧または検索"
+  },
+  "Browse, install, registries": {
+    "Browse, install, registries": ""
+  },
+  "Browser, terminal, file manager, media": {
+    "Browser, terminal, file manager, media": ""
+  },
+  "Built-in plugins": {
+    "Built-in plugins": ""
   },
   "Button Color": {
     "Button Color": "ボタンカラー"
@@ -1345,6 +1507,9 @@
   },
   "CUPS not available": {
     "CUPS not available": "CUPS は利用できません"
+  },
+  "CUPS printers, jobs and classes": {
+    "CUPS printers, jobs and classes": ""
   },
   "Calendar": {
     "Calendar": "カレンダー"
@@ -1397,6 +1562,12 @@
   "Caps Lock is on": {
     "Caps Lock is on": "Caps Lock がオンです"
   },
+  "Cards": {
+    "Cards": ""
+  },
+  "Carousel": {
+    "Carousel": ""
+  },
   "Cast Target": {
     "Cast Target": "キャスト先"
   },
@@ -1411,6 +1582,9 @@
   },
   "Cellular enabled": {
     "Cellular enabled": ""
+  },
+  "Center": {
+    "Center": ""
   },
   "Center Section": {
     "Center Section": "センターセクション"
@@ -1451,14 +1625,26 @@
   "Charge limit not supported on this hardware": {
     "Charge limit not supported on this hardware": ""
   },
+  "Charge limit, alerts, power profiles": {
+    "Charge limit, alerts, power profiles": ""
+  },
   "Charging": {
     "Charging": "充電中"
+  },
+  "Chart": {
+    "Chart": ""
   },
   "Check for system updates": {
     "Check for system updates": "システムアップデートを確認"
   },
+  "Check for updates": {
+    "Check for updates": ""
+  },
   "Check interval": {
     "Check interval": "確認間隔"
+  },
+  "Check interval, ignored packages, custom command": {
+    "Check interval, ignored packages, custom command": ""
   },
   "Check on startup": {
     "Check on startup": "起動時にチェック"
@@ -1559,6 +1745,9 @@
   "Circle": {
     "Circle": "円"
   },
+  "Class": {
+    "Class": ""
+  },
   "Class regex": {
     "Class regex": "クラス正規表現"
   },
@@ -1625,6 +1814,9 @@
   "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": {
     "Click expands only on an intentional press. Hybrid peeks the current compact face on hover": ""
   },
+  "Click method": {
+    "Click method": ""
+  },
   "Click the icon to mute": {
     "Click the icon to mute": ""
   },
@@ -1670,8 +1862,14 @@
   "Clock Style": {
     "Clock Style": "時計スタイル"
   },
+  "Clock format, calendar, weather location": {
+    "Clock format, calendar, weather location": ""
+  },
   "Clock, calendar, system info and profile": {
     "Clock, calendar, system info and profile": ""
+  },
+  "Clocks, system monitors, plugins": {
+    "Clocks, system monitors, plugins": ""
   },
   "Close": {
     "Close": "閉じる"
@@ -1694,6 +1892,9 @@
   "Codec switching is unavailable. WirePlumber wpexec was not found.": {
     "Codec switching is unavailable. WirePlumber wpexec was not found.": ""
   },
+  "Collapse": {
+    "Collapse": ""
+  },
   "Color": {
     "Color": "色"
   },
@@ -1715,8 +1916,14 @@
   "Color Picker": {
     "Color Picker": "カラーピッカー"
   },
+  "Color Profile": {
+    "Color Profile": ""
+  },
   "Color Temperature": {
     "Color Temperature": "色温度"
+  },
+  "Color Temperature Error": {
+    "Color Temperature Error": ""
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": "ロック画面を表示しないモニターに表示する色"
@@ -1726,6 +1933,9 @@
   },
   "Color shown for areas not covered by wallpaper": {
     "Color shown for areas not covered by wallpaper": ""
+  },
+  "Color space": {
+    "Color space": ""
   },
   "Color temperature for night mode": {
     "Color temperature for night mode": "ナイトモードの色温度"
@@ -1742,6 +1952,9 @@
   "Colorize Active": {
     "Colorize Active": "アクティブ項目を色付け"
   },
+  "Colors": {
+    "Colors": ""
+  },
   "Colors from wallpaper": {
     "Colors from wallpaper": "壁紙から取得した色"
   },
@@ -1753,6 +1966,9 @@
   },
   "Column Width": {
     "Column Width": "列幅"
+  },
+  "Columns": {
+    "Columns": ""
   },
   "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": {
     "Comma-separated list of layout names. Leave empty to use the system keyboard settings.": ""
@@ -1790,6 +2006,9 @@
   "Compact home clock pill in both width and height": {
     "Compact home clock pill in both width and height": ""
   },
+  "Compact width": {
+    "Compact width": ""
+  },
   "Completed": {
     "Completed": "完了"
   },
@@ -1801,6 +2020,9 @@
   },
   "Compositor actions (focus, move, etc.)": {
     "Compositor actions (focus, move, etc.)": ""
+  },
+  "Compositor and shell key bindings": {
+    "Compositor and shell key bindings": ""
   },
   "Config Format": {
     "Config Format": "設定形式"
@@ -1912,6 +2134,9 @@
   },
   "Connection failed": {
     "Connection failed": "接続に失敗しました"
+  },
+  "Connections and autoconnect": {
+    "Connections and autoconnect": ""
   },
   "Contains": {
     "Contains": "含む"
@@ -2102,6 +2327,9 @@
   "Current": {
     "Current": "現在"
   },
+  "Current (%1)": {
+    "Current (%1)": ""
+  },
   "Current Items": {
     "Current Items": "現在のアイテム"
   },
@@ -2147,11 +2375,17 @@
   "Current: %1": {
     "Current: %1": "現在: %1"
   },
+  "Cursor": {
+    "Cursor": ""
+  },
   "Cursor Size": {
     "Cursor Size": "カーソルサイズ"
   },
   "Cursor Theme": {
     "Cursor Theme": "カーソルテーマ"
+  },
+  "Cursor auto-hide timeout": {
+    "Cursor auto-hide timeout": ""
   },
   "Curve": {
     "Curve": "カーブ"
@@ -2324,6 +2558,9 @@
   "DankShell & System Icons (requires restart)": {
     "DankShell & System Icons (requires restart)": "DankShell とシステムアイコン（再起動が必要）"
   },
+  "Dark": {
+    "Dark": ""
+  },
   "Dark Mode": {
     "Dark Mode": "ダークモード"
   },
@@ -2335,6 +2572,9 @@
   },
   "Dark mode harmony": {
     "Dark mode harmony": "ダークモードハーモニー"
+  },
+  "Dark mode starts": {
+    "Dark mode starts": ""
   },
   "Dark or light mode follows the wallpaper brightness": {
     "Dark or light mode follows the wallpaper brightness": ""
@@ -2360,6 +2600,9 @@
   "Date format on greeter": {
     "Date format on greeter": "greeter の日付形式"
   },
+  "Date, time & region": {
+    "Date, time & region": ""
+  },
   "Dawn (Astronomical Twilight)": {
     "Dawn (Astronomical Twilight)": "夜明け（天文薄明）"
   },
@@ -2383,6 +2626,9 @@
   },
   "Deck": {
     "Deck": "デッキ"
+  },
+  "Decrease": {
+    "Decrease": ""
   },
   "Default": {
     "Default": "デフォルト"
@@ -2465,6 +2711,9 @@
   "Delete class \"%1\"?": {
     "Delete class \"%1\"?": "class \"%1\" を削除しますか?"
   },
+  "Delete profile": {
+    "Delete profile": ""
+  },
   "Delete profile \"%1\"?": {
     "Delete profile \"%1\"?": "プロファイル \"%1\" を削除しますか?"
   },
@@ -2504,6 +2753,9 @@
   "Desktop background images": {
     "Desktop background images": "デスクトップの背景画像"
   },
+  "Desktop widget plugins are configured per widget instance": {
+    "Desktop widget plugins are configured per widget instance": ""
+  },
   "Details for \"%1": {
     "Details for \"%1\"": "\"%1\" の詳細"
   },
@@ -2524,6 +2776,15 @@
   },
   "Device paired": {
     "Device paired": "デバイスがペアリングされました"
+  },
+  "Devices": {
+    "Devices": ""
+  },
+  "Dew point": {
+    "Dew point": ""
+  },
+  "Dew point %1": {
+    "Dew point %1": ""
   },
   "Diff": {
     "Diff": ""
@@ -2603,6 +2864,9 @@
   "Discover Devices": {
     "Discover Devices": "デバイスを検出"
   },
+  "Discover community plugins. Review their code before installing, and audit changes before updating.": {
+    "Discover community plugins. Review their code before installing, and audit changes before updating.": ""
+  },
   "Disk": {
     "Disk": "ディスク"
   },
@@ -2620,9 +2884,6 @@
   },
   "Dismiss": {
     "Dismiss": "解除"
-  },
-  "Display": {
-    "Display": "表示"
   },
   "Display Assignment": {
     "Display Assignment": "表示割り当て"
@@ -2651,6 +2912,9 @@
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "ワークスペース インジケーターにアプリのアイコンを表示"
   },
+  "Display assignment conflict": {
+    "Display assignment conflict": ""
+  },
   "Display brightness control": {
     "Display brightness control": "明るさコントロールを表示"
   },
@@ -2659,6 +2923,9 @@
   },
   "Display currently focused application title": {
     "Display currently focused application title": "現在フォーカスされているアプリケーションのタイトルを表示"
+  },
+  "Display family": {
+    "Display family": ""
   },
   "Display line numbers in editor": {
     "Display line numbers in editor": "エディタに行番号を表示する"
@@ -2684,8 +2951,14 @@
   "Displays": {
     "Displays": "表示"
   },
+  "Displays in \"%1": {
+    "Displays in \"%1\"": ""
+  },
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "アクティブなキーボードレイアウトを表示、切り替えを可能に"
+  },
+  "Displays, taskbar, auto-hide": {
+    "Displays, taskbar, auto-hide": ""
   },
   "Distance between display edge and island": {
     "Distance between display edge and island": ""
@@ -2695,6 +2968,9 @@
   },
   "Distribution": {
     "Distribution": "ディストリビューション"
+  },
+  "Distro badge": {
+    "Distro badge": ""
   },
   "Diverse palette spanning the full spectrum.": {
     "Diverse palette spanning the full spectrum.": "全スペクトルにまたがる多様なパレット。"
@@ -2714,8 +2990,14 @@
   "Dock margin, opacity, and border": {
     "Dock margin, opacity, and border": "ドックの余白、不透明度、境界線"
   },
+  "Dock moved to %1": {
+    "Dock moved to %1": ""
+  },
   "Dock window": {
     "Dock window": "ドックウィンドウ"
+  },
+  "Docks": {
+    "Docks": ""
   },
   "Docs": {
     "Docs": "ドキュメント"
@@ -2743,6 +3025,9 @@
   },
   "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": {
     "Drag groups above the clock to sit left of it, below to sit right. Click the eye to hide a group.": ""
+  },
+  "Drag the handle to reorder. Tap a widget for its settings, use the switch to hide it without changing spacing, or X to remove it.": {
+    "Drag the handle to reorder. Tap a widget for its settings, use the switch to hide it without changing spacing, or X to remove it.": ""
   },
   "Drag to Reorder": {
     "Drag to Reorder": "ドラッグして並べ替え"
@@ -2780,9 +3065,6 @@
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "ぼかしで壁紙を複製"
   },
-  "Duration": {
-    "Duration": "時間"
-  },
   "Dusk (Astronomical Twilight)": {
     "Dusk (Astronomical Twilight)": "夕暮れ（天文薄明）"
   },
@@ -2813,6 +3095,9 @@
   "Dynamic colors, presets": {
     "Dynamic colors, presets": "動的カラー、プリセット"
   },
+  "E": {
+    "E": ""
+  },
   "Edge": {
     "Edge": ""
   },
@@ -2827,6 +3112,9 @@
   },
   "Edge the launcher slides from": {
     "Edge the launcher slides from": "ランチャーのスライドを端から"
+  },
+  "Edge to edge": {
+    "Edge to edge": ""
   },
   "Edit": {
     "Edit": "編集"
@@ -2848,6 +3136,15 @@
   },
   "Edit event": {
     "Edit event": "イベントを編集"
+  },
+  "Edit mode": {
+    "Edit mode": ""
+  },
+  "Edit monitors": {
+    "Edit monitors": ""
+  },
+  "Edit widgets": {
+    "Edit widgets": ""
   },
   "Editing changes on %1": {
     "Editing changes on %1": "%1 の変更を編集中"
@@ -2929,6 +3226,9 @@
   },
   "Enable loginctl lock integration": {
     "Enable loginctl lock integration": "ログインロックの統合を有効に"
+  },
+  "Enable plugin to access settings": {
+    "Enable plugin to access settings": ""
   },
   "Enable security key at login": {
     "Enable security key at login": "ログイン時にセキュリティキーを有効にする"
@@ -3041,6 +3341,9 @@
   "Event title": {
     "Event title": "イベント名"
   },
+  "Every %1": {
+    "Every %1": ""
+  },
   "Every 15 minutes": {
     "Every 15 minutes": "15分ごと"
   },
@@ -3049,6 +3352,9 @@
   },
   "Every 4 hours": {
     "Every 4 hours": "4時間ごと"
+  },
+  "Every edge of this display is already taken": {
+    "Every edge of this display is already taken": ""
   },
   "Every hour": {
     "Every hour": "1時間ごと"
@@ -3068,6 +3374,9 @@
   "Exit node": {
     "Exit node": "出口ノード"
   },
+  "Expand": {
+    "Expand": ""
+  },
   "Expand Notifications": {
     "Expand Notifications": ""
   },
@@ -3083,6 +3392,9 @@
   "Explore": {
     "Explore": "探索"
   },
+  "Explore Plugins": {
+    "Explore Plugins": ""
+  },
   "Exponential": {
     "Exponential": "指数"
   },
@@ -3091,6 +3403,9 @@
   },
   "Expressive": {
     "Expressive": "表現豊か"
+  },
+  "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": {
+    "Extend DankMaterialShell with powerful plugins for widgets, launchers, and more": ""
   },
   "Extend battery life": {
     "Extend battery life": "バッテリー寿命を延ばす"
@@ -3112,6 +3427,9 @@
   },
   "Extract theme to JSON": {
     "Extract theme to JSON": ""
+  },
+  "Extreme": {
+    "Extreme": ""
   },
   "Fade": {
     "Fade": "フェード"
@@ -3206,6 +3524,9 @@
   "Failed to enable night mode": {
     "Failed to enable night mode": "ナイトモードの有効化に失敗しました"
   },
+  "Failed to enable plugin: %1": {
+    "Failed to enable plugin: %1": ""
+  },
   "Failed to extract theme": {
     "Failed to extract theme": ""
   },
@@ -3235,6 +3556,9 @@
   },
   "Failed to load keybinds": {
     "Failed to load keybinds": ""
+  },
+  "Failed to load settings": {
+    "Failed to load settings": ""
   },
   "Failed to move to trash": {
     "Failed to move to trash": "ゴミ箱への移動に失敗しました"
@@ -3368,6 +3692,12 @@
   "Failed: %1": {
     "Failed: %1": "失敗: %1"
   },
+  "Family": {
+    "Family": ""
+  },
+  "Family, weight, scale, animation speed": {
+    "Family, weight, scale, animation speed": ""
+  },
   "Features": {
     "Features": "機能"
   },
@@ -3391,6 +3721,9 @@
   },
   "File changed on disk": {
     "File changed on disk": "ディスク上のファイルが変更されました"
+  },
+  "File info": {
+    "File info": ""
   },
   "File manager used to open the trash. Pick \"custom\" to enter your own command.": {
     "File manager used to open the trash. Pick \"custom\" to enter your own command.": "ゴミ箱を開くために使用するファイルマネージャーです。独自のコマンドを入力するには「カスタム」を選択してください。"
@@ -3503,11 +3836,17 @@
   "Floating windows follow Surface Styling settings": {
     "Floating windows follow Surface Styling settings": ""
   },
+  "Floating, opacity and placement rules per app": {
+    "Floating, opacity and placement rules per app": ""
+  },
   "Floats above windows and other content": {
     "Floats above windows and other content": ""
   },
   "Fluent": {
     "Fluent": " Fluent"
+  },
+  "Fluid": {
+    "Fluid": ""
   },
   "Flush": {
     "Flush": ""
@@ -3523,6 +3862,9 @@
   },
   "Focus at Startup": {
     "Focus at Startup": "起動時にフォーカス"
+  },
+  "Focus ring": {
+    "Focus ring": ""
   },
   "Focused": {
     "Focused": "フォーカス中"
@@ -3548,6 +3890,9 @@
   "Folder": {
     "Folder": "フォルダー"
   },
+  "Folder, interval, daily time": {
+    "Folder, interval, daily time": ""
+  },
   "Folders": {
     "Folders": "フォルダー"
   },
@@ -3560,14 +3905,14 @@
   "Follow focus": {
     "Follow focus": "フォーカスに従う"
   },
+  "Follow playback": {
+    "Follow playback": ""
+  },
   "Follow the theme accent, or step from green to red as the battery drains.": {
     "Follow the theme accent, or step from green to red as the battery drains.": ""
   },
   "Follows the default launcher choice selected above.": {
     "Follows the default launcher choice selected above.": "上で選択した既定ランチャーに従います。"
-  },
-  "Font": {
-    "Font": "フォント"
   },
   "Font Family": {
     "Font Family": "フォントファミリー"
@@ -3581,11 +3926,20 @@
   "Font Weight": {
     "Font Weight": "フォントウェイト"
   },
+  "Font scale": {
+    "Font scale": ""
+  },
   "Font used for the clock and date on the lock screen": {
     "Font used for the clock and date on the lock screen": ""
   },
   "Font used on the login screen": {
     "Font used on the login screen": "ログイン画面で使用するフォント"
+  },
+  "Fonts & motion": {
+    "Fonts & motion": ""
+  },
+  "For %1": {
+    "For %1": ""
   },
   "For 1 hour": {
     "For 1 hour": "1時間"
@@ -3629,6 +3983,9 @@
   "Force terminal applications to always use dark color schemes": {
     "Force terminal applications to always use dark color schemes": "端末アプリで常に暗い配色を強制使用"
   },
+  "Forecast": {
+    "Forecast": ""
+  },
   "Forecast Not Available": {
     "Forecast Not Available": "予報は利用できません"
   },
@@ -3659,6 +4016,9 @@
   "Forgot network %1": {
     "Forgot network %1": "ネットワーク %1 を削除しました"
   },
+  "Format": {
+    "Format": ""
+  },
   "Format Legend": {
     "Format Legend": "フォーマット凡例"
   },
@@ -3688,6 +4048,9 @@
   },
   "Frequency": {
     "Frequency": "頻度"
+  },
+  "From %1": {
+    "From %1": ""
   },
   "Fruit Salad": {
     "Fruit Salad": "フルーツサラダ"
@@ -3737,6 +4100,9 @@
   "GTK colors applied successfully": {
     "GTK colors applied successfully": "GTK カラーが正常に適用されました"
   },
+  "GTK, Qt, portal, matugen templates": {
+    "GTK, Qt, portal, matugen templates": ""
+  },
   "Games": {
     "Games": "ゲーム"
   },
@@ -3754,6 +4120,9 @@
   },
   "Gaps": {
     "Gaps": ""
+  },
+  "Gaps, window borders, corner radius": {
+    "Gaps, window borders, corner radius": ""
   },
   "General": {
     "General": ""
@@ -3971,8 +4340,14 @@
   "Hide cursor after inactivity (0 = disabled)": {
     "Hide cursor after inactivity (0 = disabled)": "一定時間操作がないとカーソルを非表示にする（0 = 無効）"
   },
+  "Hide cursor on touch": {
+    "Hide cursor on touch": ""
+  },
   "Hide cursor when pressing keyboard keys": {
     "Hide cursor when pressing keyboard keys": "キーボード入力時にカーソルを非表示"
+  },
+  "Hide cursor when typing": {
+    "Hide cursor when typing": ""
   },
   "Hide cursor when using touch input": {
     "Hide cursor when using touch input": "タッチ入力時にカーソルを非表示"
@@ -3989,8 +4364,14 @@
   "Hide on Touch": {
     "Hide on Touch": "タッチ時に非表示"
   },
+  "Hide password": {
+    "Hide password": ""
+  },
   "Hide the bar when the pointer leaves even if a popout is still open": {
     "Hide the bar when the pointer leaves even if a popout is still open": "ポップアウトが開いていても、ポインターが離れたらバーを隠す"
+  },
+  "Hide when no updates": {
+    "Hide when no updates": ""
   },
   "Hide when no updates: OFF": {
     "Hide when no updates: OFF": ""
@@ -4004,11 +4385,17 @@
   "High Contrast": {
     "High Contrast": ""
   },
+  "High temperature": {
+    "High temperature": ""
+  },
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "ソースの色相を保持する忠実度の高いパレット。"
   },
   "Higher percentages give island more inertia": {
     "Higher percentages give island more inertia": ""
+  },
+  "Higher providers take priority. Turn all off to use local lyrics only.": {
+    "Higher providers take priority. Turn all off to use local lyrics only.": ""
   },
   "Higher values pull island toward its target more strongly": {
     "Higher values pull island toward its target more strongly": ""
@@ -4022,8 +4409,11 @@
   "Highlight the currently focused app inside workspace indicators": {
     "Highlight the currently focused app inside workspace indicators": "ワークスペースインジケーター内で現在フォーカス中のアプリを強調表示"
   },
-  "History": {
-    "History": "履歴"
+  "Highlight weekends": {
+    "Highlight weekends": ""
+  },
+  "History (%1)": {
+    "History (%1)": ""
   },
   "History Retention": {
     "History Retention": "履歴保持"
@@ -4034,6 +4424,9 @@
   "History cleared. %1 pinned entries kept.": {
     "History cleared. %1 pinned entries kept.": "履歴をクリアしました。固定済みエントリ %1 件は保持されました。"
   },
+  "History size, retention, paste behavior": {
+    "History size, retention, paste behavior": ""
+  },
   "Hold Duration": {
     "Hold Duration": "長押し時間"
   },
@@ -4042,6 +4435,9 @@
   },
   "Home Compact": {
     "Home Compact": ""
+  },
+  "Home layout, notifications, satellites": {
+    "Home layout, notifications, satellites": ""
   },
   "Horizontal": {
     "Horizontal": ""
@@ -4106,6 +4502,9 @@
   "How the wallpaper is scaled to fit the screen": {
     "How the wallpaper is scaled to fit the screen": ""
   },
+  "Hue": {
+    "Hue": ""
+  },
   "Humidity": {
     "Humidity": "湿度"
   },
@@ -4135,6 +4534,15 @@
   },
   "I Understand": {
     "I Understand": "わかりました"
+  },
+  "ICC Error": {
+    "ICC Error": ""
+  },
+  "ICC profile applied to %1": {
+    "ICC profile applied to %1": ""
+  },
+  "ICC profile removed from %1": {
+    "ICC profile removed from %1": ""
   },
   "IP": {
     "IP": "IP"
@@ -4181,6 +4589,9 @@
   "Identify": {
     "Identify": ""
   },
+  "Identity": {
+    "Identity": ""
+  },
   "Idle": {
     "Idle": "アイドル"
   },
@@ -4192,6 +4603,9 @@
   },
   "Idle Settings": {
     "Idle Settings": "アイドル設定"
+  },
+  "Idle timeouts, power menu, custom actions": {
+    "Idle timeouts, power menu, custom actions": ""
   },
   "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": {
     "If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps": "自動起動アプリのアイコンがシステムトレイに出ない場合、DMS が自動起動アプリより先に起動するよう systemd override を生成します"
@@ -4271,6 +4685,9 @@
   "Incorrect password - try again": {
     "Incorrect password - try again": "パスワードが間違っています - もう一度試してください"
   },
+  "Increase": {
+    "Increase": ""
+  },
   "Index Centering": {
     "Index Centering": ""
   },
@@ -4279,6 +4696,9 @@
   },
   "Indicator Style": {
     "Indicator Style": "インジケータースタイル"
+  },
+  "Indicators": {
+    "Indicators": ""
   },
   "Individual Batteries": {
     "Individual Batteries": "バッテリーごと"
@@ -4304,6 +4724,9 @@
   "Initialised": {
     "Initialised": "初期化済み"
   },
+  "Inline": {
+    "Inline": ""
+  },
   "Inner Gaps": {
     "Inner Gaps": ""
   },
@@ -4313,14 +4736,23 @@
   "Inner padding applied to each widget": {
     "Inner padding applied to each widget": "各ウィジェットに適用する内側余白"
   },
+  "Input": {
+    "Input": ""
+  },
   "Input Devices": {
     "Input Devices": "入力デバイス"
+  },
+  "Input Volume": {
+    "Input Volume": ""
   },
   "Input Volume Slider": {
     "Input Volume Slider": "入力音量スライダー"
   },
   "Insert your security key...": {
     "Insert your security key...": "セキュリティキーを挿入してください..."
+  },
+  "Inset padding": {
+    "Inset padding": ""
   },
   "Inset the Notepad from screen edges using the compositor's configured gaps": {
     "Inset the Notepad from screen edges using the compositor's configured gaps": "コンポジターで設定された余白を使って、メモ帳を画面端から内側に配置"
@@ -4364,11 +4796,17 @@
   "Installed first": {
     "Installed first": "インストール済みを先頭"
   },
+  "Installed plugin could not be loaded: %1": {
+    "Installed plugin could not be loaded: %1": ""
+  },
   "Installed: %1": {
     "Installed: %1": "インストール済み: %1"
   },
   "Installing: %1": {
     "Installing: %1": "インストール中: %1"
+  },
+  "Instrumental": {
+    "Instrumental": ""
   },
   "Integrations": {
     "Integrations": "統合"
@@ -4378,6 +4816,12 @@
   },
   "Intensity": {
     "Intensity": "強度"
+  },
+  "Intensity, color, light direction": {
+    "Intensity, color, light direction": ""
+  },
+  "Interface style": {
+    "Interface style": ""
   },
   "Interface:": {
     "Interface:": "インターフェース:"
@@ -4535,11 +4979,20 @@
   "LED device": {
     "LED device": "LED デバイス"
   },
+  "LRCLIB": {
+    "LRCLIB": ""
+  },
   "LabWC IRC Channel": {
     "LabWC IRC Channel": "LabWC IRC チャンネル"
   },
   "LabWC Website": {
     "LabWC Website": "LabWC ウェブサイト"
+  },
+  "Language, time and date locale": {
+    "Language, time and date locale": ""
+  },
+  "Lap detected": {
+    "Lap detected": ""
   },
   "Large": {
     "Large": "大"
@@ -4574,6 +5027,9 @@
   "Last launched just now": {
     "Last launched just now": "ただいま起動しました"
   },
+  "Last modified": {
+    "Last modified": ""
+  },
   "Latitude": {
     "Latitude": "緯度"
   },
@@ -4598,14 +5054,32 @@
   "Launcher Emerge Side": {
     "Launcher Emerge Side": "ランチャー側が出現"
   },
+  "Launching": {
+    "Launching": ""
+  },
   "Layer Outline Opacity": {
     "Layer Outline Opacity": "レイヤーアウトラインの透明度"
+  },
+  "Layer namespace dms:blurwallpaper, needs a niri blur rule": {
+    "Layer namespace dms:blurwallpaper, needs a niri blur rule": ""
+  },
+  "Layers": {
+    "Layers": ""
+  },
+  "Layers, fullscreen, exclusive zone": {
+    "Layers, fullscreen, exclusive zone": ""
   },
   "Layout": {
     "Layout": "レイアウト"
   },
   "Layout Overrides": {
     "Layout Overrides": "レイアウト上書き"
+  },
+  "Layout, authentication, screensaver": {
+    "Layout, authentication, screensaver": ""
+  },
+  "Layouts, repeat rate, num lock": {
+    "Layouts, repeat rate, num lock": ""
   },
   "Least Saturated": {
     "Least Saturated": ""
@@ -4652,6 +5126,9 @@
   "Light mode harmony": {
     "Light mode harmony": "ライトモードハーモニー"
   },
+  "Light mode starts": {
+    "Light mode starts": ""
+  },
   "Lightest": {
     "Lightest": ""
   },
@@ -4675,6 +5152,9 @@
   },
   "List": {
     "List": "リスト"
+  },
+  "Listening from": {
+    "Listening from": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "彩度の高いアクセントを備えた生き生きとしたパレット。"
@@ -4730,6 +5210,9 @@
   "Lock fade grace period": {
     "Lock fade grace period": "ロックフェードの猶予時間"
   },
+  "Lock screen content": {
+    "Lock screen content": ""
+  },
   "Lock screen font": {
     "Lock screen font": ""
   },
@@ -4738,6 +5221,9 @@
   },
   "Login": {
     "Login": "ログイン"
+  },
+  "Login screen appearance and authentication": {
+    "Login screen appearance and authentication": ""
   },
   "Long": {
     "Long": "長い"
@@ -4769,6 +5255,15 @@
   "Lower display refresh rate on battery": {
     "Lower display refresh rate on battery": ""
   },
+  "Lyrics": {
+    "Lyrics": ""
+  },
+  "Lyrics providers": {
+    "Lyrics providers": ""
+  },
+  "LyricsPlus": {
+    "LyricsPlus": ""
+  },
   "MAC": {
     "MAC": "MAC"
   },
@@ -4786,6 +5281,9 @@
   },
   "Make the bar background fully transparent": {
     "Make the bar background fully transparent": "バー背景を完全に透明にする"
+  },
+  "Manage Registries": {
+    "Manage Registries": ""
   },
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "DMS 機能を拡張するためのプラグインを管理および構成"
@@ -4843,6 +5341,12 @@
   },
   "Margin": {
     "Margin": "マージン"
+  },
+  "Mark complete": {
+    "Mark complete": ""
+  },
+  "Mark incomplete": {
+    "Mark incomplete": ""
   },
   "Marker Supply Empty": {
     "Marker Supply Empty": "マーカー供給量がない"
@@ -5000,6 +5504,9 @@
   "Media Volume": {
     "Media Volume": "メディア音量"
   },
+  "Media activity": {
+    "Media activity": ""
+  },
   "Medium": {
     "Medium": "中"
   },
@@ -5066,6 +5573,9 @@
   "Missing Environment Variables": {
     "Missing Environment Variables": "不足している環境変数"
   },
+  "Mixed": {
+    "Mixed": ""
+  },
   "Modal Background": {
     "Modal Background": "モーダル背景"
   },
@@ -5080,6 +5590,12 @@
   },
   "Model": {
     "Model": "モデル"
+  },
+  "Modem and mobile data": {
+    "Modem and mobile data": ""
+  },
+  "Moderate": {
+    "Moderate": ""
   },
   "Modular widget bar": {
     "Modular widget bar": "モジュール式ウィジェットバー"
@@ -5111,6 +5627,18 @@
   "Month Date": {
     "Month Date": "月 日付"
   },
+  "Moon": {
+    "Moon": ""
+  },
+  "Moonrise": {
+    "Moonrise": ""
+  },
+  "Moonset": {
+    "Moonset": ""
+  },
+  "More": {
+    "More": ""
+  },
   "Morning": {
     "Morning": "朝"
   },
@@ -5128,6 +5656,9 @@
   },
   "Motion Effects": {
     "Motion Effects": "モーションエフェクト"
+  },
+  "Mount": {
+    "Mount": ""
   },
   "Mount Points": {
     "Mount Points": "マウントポイント"
@@ -5150,11 +5681,17 @@
   "Move Widget": {
     "Move Widget": "ウィジェットを移動"
   },
+  "Move down": {
+    "Move down": ""
+  },
   "Move island and satellites left or right from display center": {
     "Move island and satellites left or right from display center": ""
   },
   "Move island and satellites up or down from display center": {
     "Move island and satellites up or down from display center": ""
+  },
+  "Move up": {
+    "Move up": ""
   },
   "Moving to Paused": {
     "Moving to Paused": "一時停止への移行"
@@ -5177,6 +5714,9 @@
   "Music Player": {
     "Music Player": "音楽プレーヤー"
   },
+  "Mute": {
+    "Mute": ""
+  },
   "Mute During Playback": {
     "Mute During Playback": "再生中はミュート"
   },
@@ -5185,6 +5725,9 @@
   },
   "Mute popups for %1": {
     "Mute popups for %1": "%1 のミュートポップアップ"
+  },
+  "Mute, ignore and priority rules per app": {
+    "Mute, ignore and priority rules per app": ""
   },
   "Muted": {
     "Muted": "ミュート済み"
@@ -5198,8 +5741,17 @@
   "My Online": {
     "My Online": "自分のオンライン"
   },
+  "N": {
+    "N": ""
+  },
+  "NE": {
+    "NE": ""
+  },
   "NM not supported": {
     "NM not supported": "NMが利用できません"
+  },
+  "NW": {
+    "NW": ""
   },
   "Named Workspace Icons": {
     "Named Workspace Icons": "名前付きワークスペースアイコン"
@@ -5240,6 +5792,9 @@
   "Network download and upload speed display": {
     "Network download and upload speed display": "ネットワークのダウンロードおよびアップロード速度を表示"
   },
+  "Networks, saved networks, hotspot": {
+    "Networks, saved networks, hotspot": ""
+  },
   "Neutral": {
     "Neutral": "中立"
   },
@@ -5276,6 +5831,15 @@
   "New group name...": {
     "New group name...": "新しいグループ名..."
   },
+  "New profile": {
+    "New profile": ""
+  },
+  "New shortcut": {
+    "New shortcut": ""
+  },
+  "New tab": {
+    "New tab": ""
+  },
   "Next": {
     "Next": "次へ"
   },
@@ -5299,6 +5863,9 @@
   },
   "Night mode failed: DMS gamma control not available": {
     "Night mode failed: DMS gamma control not available": "ナイトモードが失敗しました：DMSガンマ制御が利用できません"
+  },
+  "Night mode, gamma, contrast": {
+    "Night mode, gamma, contrast": ""
   },
   "Niri Integration": {
     "Niri Integration": "Niri 統合"
@@ -5417,6 +5984,9 @@
   "No codecs found": {
     "No codecs found": ""
   },
+  "No configurable settings": {
+    "No configurable settings": ""
+  },
   "No custom theme file": {
     "No custom theme file": "カスタムテーマファイルなし"
   },
@@ -5434,6 +6004,9 @@
   },
   "No display profiles found. Create them in Settings > Displays.": {
     "No display profiles found. Create them in Settings > Displays.": "ディスプレイプロファイルが見つかりませんでした。設定 > ディスプレイで作成してください。"
+  },
+  "No displays": {
+    "No displays": ""
   },
   "No drivers found": {
     "No drivers found": "ドライバーが見つかりませんでした"
@@ -5534,6 +6107,9 @@
   "No printers found": {
     "No printers found": "プリンターが見つかりませんでした"
   },
+  "No profile": {
+    "No profile": ""
+  },
   "No profiles": {
     "No profiles": "プロファイルなし"
   },
@@ -5596,6 +6172,9 @@
   },
   "No warnings": {
     "No warnings": "警告なし"
+  },
+  "No widgets": {
+    "No widgets": ""
   },
   "No widgets added. Click \"Add Widget\" to get started.": {
     "No widgets added. Click \"Add Widget\" to get started.": "ウィジェットは追加されていません。「Add Widget」をクリックして開始してください。"
@@ -5723,6 +6302,9 @@
   "OS Logo": {
     "OS Logo": "OSロゴ"
   },
+  "OSD": {
+    "OSD": ""
+  },
   "OSD Position": {
     "OSD Position": "OSD位置"
   },
@@ -5756,6 +6338,9 @@
   "On-screen Displays": {
     "On-screen Displays": "オンスクリーンディスプレイ"
   },
+  "On-screen keyboard": {
+    "On-screen keyboard": ""
+  },
   "Once a day": {
     "Once a day": "1日1回"
   },
@@ -5788,6 +6373,9 @@
   },
   "Opacity of foreground cards and nested surfaces on shell panels": {
     "Opacity of foreground cards and nested surfaces on shell panels": ""
+  },
+  "Opacity, borders, blur, shadows, corners": {
+    "Opacity, borders, blur, shadows, corners": ""
   },
   "Opaque": {
     "Opaque": "不透明"
@@ -5855,6 +6443,9 @@
   "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": {
     "Open widget popouts by hovering over the bar. Moving to another widget switches the popout.": ""
   },
+  "Open widgets": {
+    "Open widgets": ""
+  },
   "Open with...": {
     "Open with...": "別のアプリで開く..."
   },
@@ -5885,6 +6476,9 @@
   "Options": {
     "Options": "オプション"
   },
+  "Options of one widget instance": {
+    "Options of one widget instance": ""
+  },
   "Organize widgets into collapsible groups": {
     "Organize widgets into collapsible groups": "ウィジェットを折りたたみ可能なグループに整理"
   },
@@ -5899,6 +6493,9 @@
   },
   "Outer Gaps": {
     "Outer Gaps": ""
+  },
+  "Outer gap": {
+    "Outer gap": ""
   },
   "Outline": {
     "Outline": "アウトライン"
@@ -5921,6 +6518,9 @@
   "Output Tray Missing": {
     "Output Tray Missing": "アウトプットトレイが見つかりませんでした"
   },
+  "Output and input devices": {
+    "Output and input devices": ""
+  },
   "Output switched": {
     "Output switched": ""
   },
@@ -5929,9 +6529,6 @@
   },
   "Overflow": {
     "Overflow": "オーバーフロー"
-  },
-  "Overlay": {
-    "Overlay": ""
   },
   "Overridden by config": {
     "Overridden by config": "設定で上書きされています"
@@ -5987,6 +6584,9 @@
   "PIN": {
     "PIN": "PIN"
   },
+  "PM": {
+    "PM": ""
+  },
   "Package name (e.g., docker)": {
     "Package name (e.g., docker)": ""
   },
@@ -6016,6 +6616,12 @@
   },
   "Palette": {
     "Palette": ""
+  },
+  "Panel height (rows)": {
+    "Panel height (rows)": ""
+  },
+  "Panel width (columns)": {
+    "Panel width (columns)": ""
   },
   "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": {
     "Panels glide in from a larger distance at full size, no scale change, pure clean motion.": ""
@@ -6110,6 +6716,9 @@
   "Personalization": {
     "Personalization": "パーソナライゼーション"
   },
+  "Pick Color": {
+    "Pick Color": ""
+  },
   "Pick a different file manager in Settings → Dock → Trash.": {
     "Pick a different file manager in Settings → Dock → Trash.": "設定 → ドック → ゴミ箱で別のファイルマネージャーを選択してください。"
   },
@@ -6121,6 +6730,9 @@
   },
   "Pick how long to stay awake": {
     "Pick how long to stay awake": ""
+  },
+  "Pills": {
+    "Pills": ""
   },
   "Pin": {
     "Pin": "ピン留め"
@@ -6161,8 +6773,14 @@
   "Platform renderer (FreeType).": {
     "Platform renderer (FreeType).": ""
   },
+  "Play": {
+    "Play": ""
+  },
   "Play a video when the screen locks.": {
     "Play a video when the screen locks.": "画面がロックされたときに動画を再生します。"
+  },
+  "Play on": {
+    "Play on": ""
   },
   "Play sound after logging in": {
     "Play sound after logging in": "ログイン後にサウンドを再生"
@@ -6182,8 +6800,20 @@
   "Playback error: ": {
     "Playback error: ": "再生エラー: "
   },
+  "Playback position": {
+    "Playback position": ""
+  },
+  "Player style": {
+    "Player style": ""
+  },
+  "Players": {
+    "Players": ""
+  },
   "Playful": {
     "Playful": ""
+  },
+  "Playing": {
+    "Playing": ""
   },
   "Plays audio files": {
     "Plays audio files": "音声ファイルを再生します"
@@ -6212,6 +6842,12 @@
   "Plugin dependency missing": {
     "Plugin dependency missing": ""
   },
+  "Plugin details": {
+    "Plugin details": ""
+  },
+  "Plugin directory and registries": {
+    "Plugin directory and registries": ""
+  },
   "Plugin disabled: %1": {
     "Plugin disabled: %1": "プラグインが無効になっています: %1"
   },
@@ -6221,14 +6857,23 @@
   "Plugin is disabled - enable in Plugins settings to use": {
     "Plugin is disabled - enable in Plugins settings to use": "プラグインは無効です - 使用するにはプラグイン設定で有効にしてください"
   },
+  "Plugin not found: %1": {
+    "Plugin not found: %1": ""
+  },
   "Plugin reloaded: %1": {
     "Plugin reloaded: %1": "プラグインが再読み込みされました: %1"
+  },
+  "Plugin settings": {
+    "Plugin settings": ""
   },
   "Plugin uninstalled: %1": {
     "Plugin uninstalled: %1": "プラグインがアンインストールされました: %1"
   },
   "Plugin updated: %1": {
     "Plugin updated: %1": "プラグインが更新されました: %1"
+  },
+  "Plugin updates can change the code running in your session. Review the changes before updating.": {
+    "Plugin updates can change the code running in your session. Review the changes before updating.": ""
   },
   "Plugins": {
     "Plugins": "プラグイン"
@@ -6272,6 +6917,9 @@
   "Popups": {
     "Popups": ""
   },
+  "Popups, do not disturb, rules": {
+    "Popups, do not disturb, rules": ""
+  },
   "Port": {
     "Port": "ポート"
   },
@@ -6284,8 +6932,17 @@
   "Portal": {
     "Portal": "ポータル"
   },
+  "Portal & terminals": {
+    "Portal & terminals": ""
+  },
   "Position": {
     "Position": "位置"
+  },
+  "Position, appearance, island": {
+    "Position, appearance, island": ""
+  },
+  "Position, displays, auto-hide, behavior": {
+    "Position, displays, auto-hide, behavior": ""
   },
   "Position, pinned apps": {
     "Position, pinned apps": "位置、固定アプリ"
@@ -6301,6 +6958,9 @@
   },
   "Power & Sleep": {
     "Power & Sleep": "電源とスリープ"
+  },
+  "Power & battery": {
+    "Power & battery": ""
   },
   "Power Action Confirmation": {
     "Power Action Confirmation": "電源アクションの確認"
@@ -6350,6 +7010,9 @@
   "Preset Widths (%)": {
     "Preset Widths (%)": "プリセット幅（%）"
   },
+  "Presets": {
+    "Presets": ""
+  },
   "Press Ctrl+N or click 'New Session' to create one": {
     "Press Ctrl+N or click 'New Session' to create one": ""
   },
@@ -6382,6 +7045,9 @@
   },
   "Preview: %1": {
     "Preview: %1": "プレビュー: %1"
+  },
+  "Previous": {
+    "Previous": ""
   },
   "Previous page": {
     "Previous page": ""
@@ -6428,6 +7094,9 @@
   "Priority": {
     "Priority": "優先度"
   },
+  "Privacy": {
+    "Privacy": ""
+  },
   "Privacy Indicator": {
     "Privacy Indicator": "プライバシーインジケーター"
   },
@@ -6448,6 +7117,9 @@
   },
   "Processing": {
     "Processing": "進行中"
+  },
+  "Profile": {
+    "Profile": ""
   },
   "Profile Image Error": {
     "Profile Image Error": "プロフィール画像エラー"
@@ -6481,6 +7153,9 @@
   },
   "Profile when on Battery": {
     "Profile when on Battery": "バッテリー駆動時のプロファイル"
+  },
+  "Profiles": {
+    "Profiles": ""
   },
   "Protection": {
     "Protection": ""
@@ -6524,8 +7199,8 @@
   "RGB": {
     "RGB": "RGB"
   },
-  "Radius": {
-    "Radius": "半径"
+  "Radius strength": {
+    "Radius strength": ""
   },
   "Rain": {
     "Rain": "雨"
@@ -6577,6 +7252,9 @@
   },
   "Recommended available": {
     "Recommended available": "推奨が利用可能"
+  },
+  "Record": {
+    "Record": ""
   },
   "Reduce Motion": {
     "Reduce Motion": ""
@@ -6872,6 +7550,12 @@
   "Right-click bar widget to cycle": {
     "Right-click bar widget to cycle": "バーウィジェットを右クリックして循環"
   },
+  "Right-click empty space to edit": {
+    "Right-click empty space to edit": ""
+  },
+  "Ring": {
+    "Ring": ""
+  },
   "Ripple Effects": {
     "Ripple Effects": "リップル効果"
   },
@@ -6883,6 +7567,12 @@
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": "ウィンドウの角を丸くする"
+  },
+  "Route Bluetooth headset controls to the active DMS media player": {
+    "Route Bluetooth headset controls to the active DMS media player": ""
+  },
+  "Rows": {
+    "Rows": ""
   },
   "Rule": {
     "Rule": "ルール"
@@ -6935,14 +7625,23 @@
   "Running in terminal": {
     "Running in terminal": "端末で実行中"
   },
+  "S": {
+    "S": ""
+  },
   "SDR Brightness": {
     "SDR Brightness": "SDR の明るさ"
   },
   "SDR Saturation": {
     "SDR Saturation": "SDR の彩度"
   },
+  "SE": {
+    "SE": ""
+  },
   "SSID": {
     "SSID": ""
+  },
+  "SW": {
+    "SW": ""
   },
   "Satellite Widgets": {
     "Satellite Widgets": ""
@@ -7030,6 +7729,12 @@
   },
   "Scanning...": {
     "Scanning...": "スキャンしています..."
+  },
+  "Schedule": {
+    "Schedule": ""
+  },
+  "Schedule, sunset, wallpaper brightness": {
+    "Schedule, sunset, wallpaper brightness": ""
   },
   "Science": {
     "Science": "科学"
@@ -7133,9 +7838,6 @@
   "Security Key PAM Source": {
     "Security Key PAM Source": ""
   },
-  "Security key": {
-    "Security key": ""
-  },
   "Security key (%1)": {
     "Security key (%1)": ""
   },
@@ -7151,8 +7853,8 @@
   "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": {
     "Security-key support was detected, but no registered key was found yet. You can enable this now and register one later.": "セキュリティキー対応は検出されましたが、登録済みのキーはまだ見つかっていません。今すぐ有効にして、後で登録できます。"
   },
-  "Select": {
-    "Select": "選択"
+  "Segments": {
+    "Segments": ""
   },
   "Select Application": {
     "Select Application": "アプリケーションを選択"
@@ -7165,6 +7867,9 @@
   },
   "Select Dock Launcher Logo": {
     "Select Dock Launcher Logo": "Dock ランチャーロゴを選択"
+  },
+  "Select ICC Profile": {
+    "Select ICC Profile": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "ランチャーロゴを選ぶ"
@@ -7208,9 +7913,6 @@
   "Select background image": {
     "Select background image": ""
   },
-  "Select device": {
-    "Select device": "デバイスを選択"
-  },
   "Select device...": {
     "Select device...": "デバイスを選択..."
   },
@@ -7249,6 +7951,9 @@
   },
   "Selected image file not found.": {
     "Selected image file not found.": "選択した画像ファイルが見つかりませんでした。"
+  },
+  "Sends the playing track, artist and album name to enabled lyrics providers": {
+    "Sends the playing track, artist and album name to enabled lyrics providers": ""
   },
   "Separate": {
     "Separate": "Separate"
@@ -7388,9 +8093,6 @@
   "Shortcuts (%1)": {
     "Shortcuts (%1)": "ショートカット（%1）"
   },
-  "Show": {
-    "Show": "表示"
-  },
   "Show \"config reloaded\" Toast": {
     "Show \"config reloaded\" Toast": ""
   },
@@ -7450,6 +8152,9 @@
   },
   "Show Hour Numbers": {
     "Show Hour Numbers": "時間の数字を表示"
+  },
+  "Show I/O": {
+    "Show I/O": ""
   },
   "Show Icon": {
     "Show Icon": "アイコンを表示"
@@ -7513,6 +8218,9 @@
   },
   "Show Profile Image": {
     "Show Profile Image": "プロフィール画像を表示"
+  },
+  "Show QR Code": {
+    "Show QR Code": ""
   },
   "Show Reboot": {
     "Show Reboot": "再起動を表示"
@@ -7598,6 +8306,12 @@
   "Show cava audio visualizer in media widget": {
     "Show cava audio visualizer in media widget": "メディアウィジェットに cava オーディオビジュアライザーを表示"
   },
+  "Show city": {
+    "Show city": ""
+  },
+  "Show compositor": {
+    "Show compositor": ""
+  },
   "Show critical priority popups while Do Not Disturb is on": {
     "Show critical priority popups while Do Not Disturb is on": ""
   },
@@ -7616,6 +8330,12 @@
   "Show during Niri overview": {
     "Show during Niri overview": "Niri の概要表示中に表示"
   },
+  "Show filename": {
+    "Show filename": ""
+  },
+  "Show for": {
+    "Show for": ""
+  },
   "Show foreground surfaces on cards inside floating windows": {
     "Show foreground surfaces on cards inside floating windows": ""
   },
@@ -7625,8 +8345,23 @@
   "Show foreground surfaces on panels for stronger contrast": {
     "Show foreground surfaces on panels for stronger contrast": ""
   },
+  "Show graphics": {
+    "Show graphics": ""
+  },
+  "Show health": {
+    "Show health": ""
+  },
+  "Show hostname": {
+    "Show hostname": ""
+  },
   "Show in GB": {
     "Show in GB": "GB で表示"
+  },
+  "Show in bar": {
+    "Show in bar": ""
+  },
+  "Show in dock": {
+    "Show in dock": ""
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Niri の概要で入力時にランチャーオーバーレイを表示します。別のランチャーを使う場合は無効にしてください。"
@@ -7655,11 +8390,32 @@
   "Show on screens:": {
     "Show on screens:": "画面に表示:"
   },
+  "Show password": {
+    "Show password": ""
+  },
+  "Show readings": {
+    "Show readings": ""
+  },
+  "Show seekbar": {
+    "Show seekbar": ""
+  },
+  "Show temperature": {
+    "Show temperature": ""
+  },
   "Show the bar only when no windows are open": {
     "Show the bar only when no windows are open": "ウィンドウが開いていないときだけバーを表示"
   },
   "Show the bar when niri overview is active": {
     "Show the bar when niri overview is active": "niri overview が有効なときバーを表示"
+  },
+  "Show the current media activity": {
+    "Show the current media activity": ""
+  },
+  "Show trend": {
+    "Show trend": ""
+  },
+  "Show uptime": {
+    "Show uptime": ""
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "トップバーとコントロールセンターに天気情報を表示"
@@ -7691,6 +8447,9 @@
   "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": {
     "Shrink the media widget to fit shorter song titles while still respecting the configured maximum size": "設定した最大サイズを保ちながら、短い曲名に合わせてメディアウィジェットを縮小"
   },
+  "Shuffle": {
+    "Shuffle": ""
+  },
   "Shutdown": {
     "Shutdown": "シャットダウン"
   },
@@ -7709,11 +8468,17 @@
   "Single-Line Popup": {
     "Single-Line Popup": "1 行ポップアップ"
   },
+  "Size & spacing": {
+    "Size & spacing": ""
+  },
   "Size Constraints": {
     "Size Constraints": "サイズ制約"
   },
   "Size Offset": {
     "Size Offset": "サイズオフセット"
+  },
+  "Size, padding, opacity, borders": {
+    "Size, padding, opacity, borders": ""
   },
   "Sizing": {
     "Sizing": "サイズ設定"
@@ -7781,6 +8546,9 @@
   "Sorting & Layout": {
     "Sorting & Layout": "並べ替えとレイアウト"
   },
+  "Sound & media": {
+    "Sound & media": ""
+  },
   "Sound Theme": {
     "Sound Theme": "サウンドテーマ"
   },
@@ -7819,6 +8587,9 @@
   },
   "Speed": {
     "Speed": "速度"
+  },
+  "Speed, scrolling, tap to click": {
+    "Speed, scrolling, tap to click": ""
   },
   "Spool Area Full": {
     "Spool Area Full": "スプールエリアがいっぱい"
@@ -7877,6 +8648,9 @@
   "Starting hotspot...": {
     "Starting hotspot...": ""
   },
+  "Starting the hotspot disconnects Wi-Fi from \"%1\". The radio can't do both at once, so sharing internet needs another connection such as Ethernet.": {
+    "Starting the hotspot disconnects Wi-Fi from \"%1\". The radio can't do both at once, so sharing internet needs another connection such as Ethernet.": ""
+  },
   "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": {
     "Starting the hotspot will disconnect WiFi from \"%1\" — the radio can't do both at once. Sharing internet then requires another connection, such as Ethernet.": ""
   },
@@ -7916,11 +8690,20 @@
   "Stripes": {
     "Stripes": "ストライプ"
   },
+  "Style, shortcuts, search, hidden apps": {
+    "Style, shortcuts, search, hidden apps": ""
+  },
+  "Success": {
+    "Success": ""
+  },
   "Summary": {
     "Summary": "概要"
   },
   "Summary Font Size": {
     "Summary Font Size": "概要フォントサイズ"
+  },
+  "Sun": {
+    "Sun": ""
   },
   "Sunrise": {
     "Sunrise": "日の出"
@@ -7972,6 +8755,9 @@
   },
   "Surface Variant": {
     "Surface Variant": "サーフェスバリアント"
+  },
+  "Surface opacity": {
+    "Surface opacity": ""
   },
   "Surfaces emerge flush from the bar": {
     "Surfaces emerge flush from the bar": "表面はバーから平らに突き出ている"
@@ -8054,6 +8840,9 @@
   "Syncing...": {
     "Syncing...": ""
   },
+  "System & integrations": {
+    "System & integrations": ""
+  },
   "System App Theming": {
     "System App Theming": "システムアプリのテーマ設定"
   },
@@ -8093,6 +8882,9 @@
   "System notification area icons": {
     "System notification area icons": "システム通知エリアアイコン"
   },
+  "System sound theme and events": {
+    "System sound theme and events": ""
+  },
   "System sounds are not available. Install %1 for sound support.": {
     "System sounds are not available. Install %1 for sound support.": "システムサウンドは利用できません。サウンド対応のために %1 をインストールしてください。"
   },
@@ -8107,6 +8899,12 @@
   },
   "Tab": {
     "Tab": "タブ"
+  },
+  "Table": {
+    "Table": ""
+  },
+  "Tabs and weather": {
+    "Tabs and weather": ""
   },
   "Tags": {
     "Tags": "タグ"
@@ -8138,8 +8936,17 @@
   "Tap to Click": {
     "Tap to Click": ""
   },
+  "Tap to play": {
+    "Tap to play": ""
+  },
   "Task list used when adding tasks from the dash calendar": {
     "Task list used when adding tasks from the dash calendar": ""
+  },
+  "Taskbar": {
+    "Taskbar": ""
+  },
+  "Temperature": {
+    "Temperature": ""
   },
   "Terminal": {
     "Terminal": "ターミナル"
@@ -8207,6 +9014,9 @@
   "The WiFi adapter could not start access point mode.": {
     "The WiFi adapter could not start access point mode.": ""
   },
+  "The arrow points in the direction the wind is blowing. The label shows where it comes from.": {
+    "The arrow points in the direction the wind is blowing. The label shows where it comes from.": ""
+  },
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).": ""
   },
@@ -8216,8 +9026,20 @@
   "The custom command used when attaching to sessions (receives the session name as the first argument)": {
     "The custom command used when attaching to sessions (receives the session name as the first argument)": "セッション接続時に使うカスタムコマンド（第1引数としてセッション名を受け取ります）"
   },
+  "The direction label shows where the wind comes from.": {
+    "The direction label shows where the wind comes from.": ""
+  },
+  "The fill shows relative humidity. The badge shows the dew point temperature.": {
+    "The fill shows relative humidity. The badge shows the dew point temperature.": ""
+  },
+  "The fill shows today's precipitation probability.": {
+    "The fill shows today's precipitation probability.": ""
+  },
   "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": {
     "The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.": ""
+  },
+  "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": {
+    "The highlighted marker shows the UV category: low, moderate, high, very high, or extreme.": ""
   },
   "The island draws its own surface": {
     "The island draws its own surface": ""
@@ -8234,6 +9056,9 @@
   "The original shortcut was removed. Discard this edit or add a new shortcut.": {
     "The original shortcut was removed. Discard this edit or add a new shortcut.": ""
   },
+  "The quick brown fox jumps over the lazy dog": {
+    "The quick brown fox jumps over the lazy dog": ""
+  },
   "The result is unknown. Refresh before trying again.": {
     "The result is unknown. Refresh before trying again.": ""
   },
@@ -8248,9 +9073,6 @@
   },
   "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": {
     "The server certificate has changed since it was last trusted. Only continue if you recognize the new fingerprint.": ""
-  },
-  "Theme": {
-    "Theme": ""
   },
   "Theme & Colors": {
     "Theme & Colors": "テーマおよびカラー"
@@ -8270,6 +9092,9 @@
   "Theme worker failed (%1)": {
     "Theme worker failed (%1)": "テーマワーカーが失敗しました（1%）"
   },
+  "Theme, light and dark, matugen": {
+    "Theme, light and dark, matugen": ""
+  },
   "Themes": {
     "Themes": "テーマ"
   },
@@ -8287,6 +9112,9 @@
   },
   "Third-Party Plugin Warning": {
     "Third-Party Plugin Warning": "サードパーティ製プラグインの警告"
+  },
+  "Third-party plugins": {
+    "Third-party plugins": ""
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "サードパーティ製プラグインはコミュニティによって作成されており、DankMaterialShell では公式にサポートされていません。\n\nこれらのプラグインにはセキュリティおよびプライバシー上のリスクがある可能性があります。自己責任でインストールしてください。"
@@ -8402,6 +9230,9 @@
   "Title (optional)": {
     "Title (optional)": "タイトル（任意）"
   },
+  "Title font": {
+    "Title font": ""
+  },
   "Title is required": {
     "Title is required": "タイトルは必須です"
   },
@@ -8429,6 +9260,12 @@
   "Today": {
     "Today": "今日"
   },
+  "Today's forecast pressure: %1 to %2. The gauge shows the current reading within that range.": {
+    "Today's forecast pressure: %1 to %2. The gauge shows the current reading within that range.": ""
+  },
+  "Today's pressure forecast is steady. The gauge stays at the midpoint.": {
+    "Today's pressure forecast is steady. The gauge stays at the midpoint.": ""
+  },
   "Toggle bar visibility manually via IPC": {
     "Toggle bar visibility manually via IPC": "IPC でバーの表示を手動切替"
   },
@@ -8449,6 +9286,12 @@
   },
   "Tonal Spot": {
     "Tonal Spot": "Tonal Spot"
+  },
+  "Tone": {
+    "Tone": ""
+  },
+  "Tone curve": {
+    "Tone curve": ""
   },
   "Toner Empty": {
     "Toner Empty": "トナーが空です"
@@ -8525,6 +9368,9 @@
   "Tray Icon Fix": {
     "Tray Icon Fix": "トレイアイコン修正"
   },
+  "Tray icon tint": {
+    "Tray icon tint": ""
+  },
   "Trigger": {
     "Trigger": "トリガー"
   },
@@ -8570,11 +9416,20 @@
   "Type to search files": {
     "Type to search files": "入力してファイルを検索"
   },
+  "Typing in the overview opens the launcher": {
+    "Typing in the overview opens the launcher": ""
+  },
   "Typography": {
     "Typography": "タイポグラフィ"
   },
   "Typography & Motion": {
     "Typography & Motion": "タイポグラフィとモーション"
+  },
+  "URL": {
+    "URL": ""
+  },
+  "UV Index": {
+    "UV Index": ""
   },
   "Unavailable": {
     "Unavailable": "利用できません"
@@ -8612,6 +9467,9 @@
   "Uninstall…": {
     "Uninstall…": ""
   },
+  "Unison": {
+    "Unison": ""
+  },
   "Unknown": {
     "Unknown": "不明"
   },
@@ -8648,6 +9506,12 @@
   "Unload on Close": {
     "Unload on Close": "閉じたときにアンロード"
   },
+  "Unlock": {
+    "Unlock": ""
+  },
+  "Unlocking...": {
+    "Unlocking...": ""
+  },
   "Unmute": {
     "Unmute": "ミュート解除"
   },
@@ -8671,6 +9535,9 @@
   },
   "Unset": {
     "Unset": "未設定"
+  },
+  "Unsynced": {
+    "Unsynced": ""
   },
   "Until %1": {
     "Until %1": "%1まで"
@@ -8699,11 +9566,17 @@
   "Update": {
     "Update": "更新"
   },
+  "Update %1?": {
+    "Update %1?": ""
+  },
   "Update All": {
     "Update All": "すべて更新"
   },
   "Update Plugin": {
     "Update Plugin": "プラグインを更新"
+  },
+  "Update available": {
+    "Update available": ""
   },
   "Update failed: %1": {
     "Update failed: %1": "更新に失敗しました: %1"
@@ -8713,6 +9586,9 @@
   },
   "Updating plugins...": {
     "Updating plugins...": ""
+  },
+  "Updating...": {
+    "Updating...": ""
   },
   "Upgrading...": {
     "Upgrading...": "アップグレード中..."
@@ -8822,6 +9698,9 @@
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "システム設定からサウンドテーマを使用"
   },
+  "Use standard popups": {
+    "Use standard popups": ""
+  },
   "Use system PAM authentication": {
     "Use system PAM authentication": ""
   },
@@ -8870,6 +9749,9 @@
   "Users": {
     "Users": "ユーザー"
   },
+  "Users & accounts": {
+    "Users & accounts": ""
+  },
   "Uses sunrise/sunset times based on your location.": {
     "Uses sunrise/sunset times based on your location.": "位置情報に基づく日の出/日の入り時刻を使用する。"
   },
@@ -8878,6 +9760,9 @@
   },
   "Uses the spotlight-bar IPC action and always opens the minimal bar.": {
     "Uses the spotlight-bar IPC action and always opens the minimal bar.": "spotlight-bar IPC アクションを使い、常に最小バーを開きます。"
+  },
+  "Uses your wallpaper, fonts and lock screen settings.": {
+    "Uses your wallpaper, fonts and lock screen settings.": ""
   },
   "Using DankCalendar%1": {
     "Using DankCalendar%1": "DankCalendar%1 を使用中"
@@ -8933,6 +9818,12 @@
   "Version": {
     "Version": "バージョン"
   },
+  "Version %1": {
+    "Version %1": ""
+  },
+  "Version, links, diagnostics": {
+    "Version, links, diagnostics": ""
+  },
   "Vertical": {
     "Vertical": ""
   },
@@ -8969,8 +9860,17 @@
   "Video Screensaver": {
     "Video Screensaver": "動画スクリーンセーバー"
   },
+  "Video card gamma table": {
+    "Video card gamma table": ""
+  },
+  "View Changes": {
+    "View Changes": ""
+  },
   "Visibility": {
     "Visibility": "視界"
+  },
+  "Visibility, position, pinned apps, trash": {
+    "Visibility, position, pinned apps, trash": ""
   },
   "Visible Entry Actions": {
     "Visible Entry Actions": "表示するエントリアクション"
@@ -8983,6 +9883,9 @@
   },
   "Visual effect used when wallpaper changes": {
     "Visual effect used when wallpaper changes": "壁紙が変更される時に使用されるビジュアルエフェクト"
+  },
+  "Visualizer, album art, excluded players": {
+    "Visualizer, album art, excluded players": ""
   },
   "Volume": {
     "Volume": "音量"
@@ -8999,6 +9902,9 @@
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "音量、明るさ、その他のシステム OSD"
   },
+  "Volume, brightness, caps lock, position": {
+    "Volume, brightness, caps lock, position": ""
+  },
   "Votes": {
     "Votes": "票"
   },
@@ -9013,6 +9919,9 @@
   },
   "Wallpaper": {
     "Wallpaper": "壁紙"
+  },
+  "Wallpaper & colors": {
+    "Wallpaper & colors": ""
   },
   "Wallpaper Error": {
     "Wallpaper Error": "壁紙エラー"
@@ -9077,8 +9986,17 @@
   "Which PAM service the lock screen uses to authenticate": {
     "Which PAM service the lock screen uses to authenticate": ""
   },
+  "Which displays show the dock, popups, OSDs and wallpaper": {
+    "Which displays show the dock, popups, OSDs and wallpaper": ""
+  },
   "White": {
     "White": "白"
+  },
+  "White point": {
+    "White point": ""
+  },
+  "Wi-Fi": {
+    "Wi-Fi": ""
   },
   "Wi-Fi & Bluetooth": {
     "Wi-Fi & Bluetooth": ""
@@ -9143,6 +10061,12 @@
   "Widget removed": {
     "Widget removed": "ウィジェットを削除しました"
   },
+  "Widget settings": {
+    "Widget settings": ""
+  },
+  "Widget style": {
+    "Widget style": ""
+  },
   "Widgets": {
     "Widgets": "ウィジェット"
   },
@@ -9199,6 +10123,9 @@
   },
   "Window Rules": {
     "Window Rules": "ウィンドウルール"
+  },
+  "Window radius": {
+    "Window radius": ""
   },
   "Wipe": {
     "Wipe": "ワイプ"
@@ -9305,11 +10232,20 @@
   "Your system is up to date!": {
     "Your system is up to date!": "システムは最新です!"
   },
+  "adjective, printer state": {
+    "Idle": ""
+  },
   "admin": {
     "admin": "管理者"
   },
+  "adverb, wallpaper changes every day at a set time": {
+    "Daily": ""
+  },
   "attached": {
     "attached": "接続済み"
+  },
+  "battery stat label, charge or discharge rate in watts": {
+    "Power": ""
   },
   "brandon": {
     "brandon": "brandon"
@@ -9319,6 +10255,9 @@
   },
   "by %1": {
     "by %1": "%1 による"
+  },
+  "calendar event venue field label": {
+    "Location": ""
   },
   "checked %1d ago": {
     "checked %1d ago": ""
@@ -9386,6 +10325,9 @@
   "featured": {
     "featured": "おすすめ"
   },
+  "keyboard tab key name": {
+    "Tab": ""
+  },
   "khal": {
     "khal": "khal"
   },
@@ -9422,6 +10364,9 @@
   "minutes": {
     "minutes": "分"
   },
+  "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": {
+    "mpris-proxy is running and will create duplicate Bluetooth players. Disable it with: systemctl --user disable --now mpris-proxy.service": ""
+  },
   "ms": {
     "ms": "ms"
   },
@@ -9448,6 +10393,12 @@
   },
   "niri: failed to load config": {
     "niri: failed to load config": "niri: 設定の読み込みに失敗しました"
+  },
+  "notepad status, file has no unsaved changes": {
+    "Saved": ""
+  },
+  "noun, badge on a keybind that overrides the default": {
+    "Override": ""
   },
   "now": {
     "now": "今"
@@ -9515,6 +10466,9 @@
   "this app": {
     "this app": "このアプリ"
   },
+  "tmux and zellij sessions": {
+    "tmux and zellij sessions": ""
+  },
   "unmaintained": {
     "unmaintained": "メンテナンス停止"
   },
@@ -9538,6 +10492,18 @@
   },
   "v%1 by %2": {
     "v%1 by %2": "v%1 by %2"
+  },
+  "verb, clipboard entry action button tooltip": {
+    "Preview": ""
+  },
+  "verb, media player repeat mode button": {
+    "Repeat": ""
+  },
+  "weather visibility distance metric": {
+    "Visibility": ""
+  },
+  "wifi network status, network has a saved profile": {
+    "Saved": ""
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• 信頼できるソースからのみインストールする"

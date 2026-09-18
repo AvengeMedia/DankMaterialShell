@@ -79,7 +79,7 @@ Singleton {
             "shift": isTerminalFocused()
         }, function (response) {
             if (response.error) {
-                ToastService.showError(I18n.tr("Paste failed: %1").arg(response.error));
+                ToastService.showError(I18n.tr("Paste failed: %1", "clipboard error toast, %1 is the error message").arg(response.error));
             }
         });
     }
@@ -373,7 +373,7 @@ Singleton {
             refresh();
             historyCleared();
             if (hasPinned) {
-                ToastService.showInfo(I18n.tr("History cleared. %1 pinned entries kept.").arg(savedCount));
+                ToastService.showInfo(I18n.tr("History cleared. %1 pinned entries kept.", "clipboard toast, %1 is a count of pinned entries").arg(savedCount));
             }
         });
     }
@@ -408,6 +408,25 @@ Singleton {
 
     function canEditEntry(entry) {
         return !!entry && !(entry.isImage ?? false) && isTextMimeType(entry.mimeType);
+    }
+
+    function isImageMimeType(mimeType) {
+        return (mimeType || "").toString().toLowerCase().startsWith("image/");
+    }
+
+    function canPreviewEntry(entry) {
+        return !!entry && !!(entry.isImage ?? false) && typeof entry.id === "number" && isImageMimeType(entry.mimeType);
+    }
+
+    function imageDataUrl(data, mimeType) {
+        const rawData = (data || "").toString();
+        if (rawData.length === 0)
+            return "";
+        if (rawData.startsWith("data:"))
+            return rawData.startsWith("data:image/") ? rawData : "";
+        if (!isImageMimeType(mimeType))
+            return "";
+        return "data:" + mimeType + ";base64," + rawData;
     }
 
     function getEntryType(entry) {

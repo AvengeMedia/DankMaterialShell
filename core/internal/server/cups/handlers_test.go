@@ -11,6 +11,7 @@ import (
 	mocks_cups "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/cups"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/ipp"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -41,16 +42,16 @@ func TestHandleGetPrinters(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.getPrinters",
 	}
 
 	handleGetPrinters(conn, req, m)
 
-	var resp models.Response[[]Printer]
+	var resp ipc.Response[[]Printer]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -66,16 +67,16 @@ func TestHandleGetPrinters_Error(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.getPrinters",
 	}
 
 	handleGetPrinters(conn, req, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -98,9 +99,9 @@ func TestHandleGetJobs(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.getJobs",
 		Params: map[string]any{
@@ -110,7 +111,7 @@ func TestHandleGetJobs(t *testing.T) {
 
 	handleGetJobs(conn, req, m)
 
-	var resp models.Response[[]Job]
+	var resp ipc.Response[[]Job]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -125,9 +126,9 @@ func TestHandleGetJobs_MissingParam(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.getJobs",
 		Params: map[string]any{},
@@ -135,7 +136,7 @@ func TestHandleGetJobs_MissingParam(t *testing.T) {
 
 	handleGetJobs(conn, req, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -150,9 +151,9 @@ func TestHandlePausePrinter(t *testing.T) {
 	m := NewTestManager(mockClient, nil)
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.pausePrinter",
 		Params: map[string]any{
@@ -162,7 +163,7 @@ func TestHandlePausePrinter(t *testing.T) {
 
 	handlePausePrinter(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -177,9 +178,9 @@ func TestHandleResumePrinter(t *testing.T) {
 	m := NewTestManager(mockClient, nil)
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.resumePrinter",
 		Params: map[string]any{
@@ -189,7 +190,7 @@ func TestHandleResumePrinter(t *testing.T) {
 
 	handleResumePrinter(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -204,9 +205,9 @@ func TestHandleCancelJob(t *testing.T) {
 	m := NewTestManager(mockClient, nil)
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.cancelJob",
 		Params: map[string]any{
@@ -216,7 +217,7 @@ func TestHandleCancelJob(t *testing.T) {
 
 	handleCancelJob(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -231,9 +232,9 @@ func TestHandlePurgeJobs(t *testing.T) {
 	m := NewTestManager(mockClient, nil)
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.purgeJobs",
 		Params: map[string]any{
@@ -243,7 +244,7 @@ func TestHandlePurgeJobs(t *testing.T) {
 
 	handlePurgeJobs(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -258,16 +259,16 @@ func TestHandleRequest_UnknownMethod(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.unknownMethod",
 	}
 
 	HandleRequest(conn, req, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -285,12 +286,12 @@ func TestHandleGetDevices(t *testing.T) {
 
 	m := &Manager{client: mockClient}
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "cups.getDevices"}
+	req := ipc.Request{ID: 1, Method: "cups.getDevices"}
 	handleGetDevices(conn, req, m)
 
-	var resp models.Response[[]Device]
+	var resp ipc.Response[[]Device]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -307,12 +308,12 @@ func TestHandleGetPPDs(t *testing.T) {
 
 	m := &Manager{client: mockClient}
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "cups.getPPDs"}
+	req := ipc.Request{ID: 1, Method: "cups.getPPDs"}
 	handleGetPPDs(conn, req, m)
 
-	var resp models.Response[[]PPD]
+	var resp ipc.Response[[]PPD]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -330,12 +331,12 @@ func TestHandleGetClasses(t *testing.T) {
 
 	m := &Manager{client: mockClient}
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "cups.getClasses"}
+	req := ipc.Request{ID: 1, Method: "cups.getClasses"}
 	handleGetClasses(conn, req, m)
 
-	var resp models.Response[[]PrinterClass]
+	var resp ipc.Response[[]PrinterClass]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -351,9 +352,9 @@ func TestHandleCreatePrinter(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.createPrinter",
 		Params: map[string]any{
@@ -364,7 +365,7 @@ func TestHandleCreatePrinter(t *testing.T) {
 	}
 	handleCreatePrinter(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -375,12 +376,12 @@ func TestHandleCreatePrinter_MissingParams(t *testing.T) {
 	mockClient := mocks_cups.NewMockCUPSClientInterface(t)
 	m := &Manager{client: mockClient}
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "cups.createPrinter", Params: map[string]any{}}
+	req := ipc.Request{ID: 1, Method: "cups.createPrinter", Params: map[string]any{}}
 	handleCreatePrinter(conn, req, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -394,16 +395,16 @@ func TestHandleDeletePrinter(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.deletePrinter",
 		Params: map[string]any{"printerName": "printer1"},
 	}
 	handleDeletePrinter(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -417,16 +418,16 @@ func TestHandleAcceptJobs(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.acceptJobs",
 		Params: map[string]any{"printerName": "printer1"},
 	}
 	handleAcceptJobs(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -440,16 +441,16 @@ func TestHandleRejectJobs(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.rejectJobs",
 		Params: map[string]any{"printerName": "printer1"},
 	}
 	handleRejectJobs(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -463,16 +464,16 @@ func TestHandleSetPrinterShared(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.setPrinterShared",
 		Params: map[string]any{"printerName": "printer1", "shared": true},
 	}
 	handleSetPrinterShared(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -486,16 +487,16 @@ func TestHandleSetPrinterLocation(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.setPrinterLocation",
 		Params: map[string]any{"printerName": "printer1", "location": "Office"},
 	}
 	handleSetPrinterLocation(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -509,16 +510,16 @@ func TestHandleSetPrinterInfo(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.setPrinterInfo",
 		Params: map[string]any{"printerName": "printer1", "info": "Main Printer"},
 	}
 	handleSetPrinterInfo(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -532,16 +533,16 @@ func TestHandleMoveJob(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.moveJob",
 		Params: map[string]any{"jobID": float64(1), "destPrinter": "printer2"},
 	}
 	handleMoveJob(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -555,16 +556,16 @@ func TestHandlePrintTestPage(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.printTestPage",
 		Params: map[string]any{"printerName": "printer1"},
 	}
 	handlePrintTestPage(conn, req, m)
 
-	var resp models.Response[TestPageResult]
+	var resp ipc.Response[TestPageResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -579,16 +580,16 @@ func TestHandleAddPrinterToClass(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.addPrinterToClass",
 		Params: map[string]any{"className": "office", "printerName": "printer1"},
 	}
 	handleAddPrinterToClass(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -602,16 +603,16 @@ func TestHandleRemovePrinterFromClass(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.removePrinterFromClass",
 		Params: map[string]any{"className": "office", "printerName": "printer1"},
 	}
 	handleRemovePrinterFromClass(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -625,16 +626,16 @@ func TestHandleDeleteClass(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.deleteClass",
 		Params: map[string]any{"className": "office"},
 	}
 	handleDeleteClass(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -648,16 +649,16 @@ func TestHandleRestartJob(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.restartJob",
 		Params: map[string]any{"jobID": float64(1)},
 	}
 	handleRestartJob(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -671,16 +672,16 @@ func TestHandleHoldJob(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.holdJob",
 		Params: map[string]any{"jobID": float64(1)},
 	}
 	handleHoldJob(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)
@@ -694,16 +695,16 @@ func TestHandleHoldJob_WithHoldUntil(t *testing.T) {
 
 	m := NewTestManager(mockClient, nil)
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "cups.holdJob",
 		Params: map[string]any{"jobID": float64(1), "holdUntil": "no-hold"},
 	}
 	handleHoldJob(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp.Result)

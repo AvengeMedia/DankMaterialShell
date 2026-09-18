@@ -5,6 +5,7 @@ import qs.Widgets
 
 Item {
     id: root
+    readonly property bool isFloatingWindowSurface: impl.item?.isFloatingWindowSurface ?? true
     readonly property var log: Log.scoped("DankModal")
 
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
@@ -15,21 +16,21 @@ Item {
     property real modalHeight: 300
     property var targetScreen
     property bool showBackground: true
-    property real backgroundOpacity: 0.5
+    property real backgroundOpacity: Theme.scrimAlpha
     property string positioning: "center"
     property point customPosition: Qt.point(0, 0)
     property bool closeOnEscapeKey: true
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
     property int animationDuration: Theme.modalAnimationDuration
-    property real animationScaleCollapsed: 0.96
+    property real animationScaleCollapsed: Theme.popupEnterScale
     property real animationOffset: Theme.spacingL
     property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
-    property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-    property color borderColor: Theme.outlineMedium
+    property color backgroundColor: Theme.floatingWindowSurface
+    property color borderColor: Theme.outlineVariant
     property real borderWidth: 0
-    property real cornerRadius: Theme.cornerRadius
+    property real cornerRadius: Theme.windowRadius
     property bool enableShadow: true
     property bool shouldBeVisible: false
     property bool shouldHaveFocus: shouldBeVisible
@@ -76,6 +77,7 @@ Item {
     readonly property real alignedHeight: impl.item ? impl.item.alignedHeight : 0
 
     function open() {
+        _maybeResolveBackend();
         if (impl.item)
             impl.item.open();
     }
@@ -97,124 +99,75 @@ Item {
             impl.item.toggle();
     }
 
-    readonly property var _desiredBackend: FrameTransitionState.effectiveConnectedFrameModeActive ? connectedComp : standaloneComp
-    property var _resolvedBackend: null
+    readonly property bool _desiredConnected: FrameTransitionState.effectiveConnectedFrameModeActive
+    property bool _resolvedConnected: false
 
-    Component.onCompleted: _resolvedBackend = _desiredBackend
+    Component.onCompleted: _loadHost(_desiredConnected)
 
-    Connections {
-        target: SettingsData
-        function onConnectedFrameModeActiveChanged() {
-            root._maybeResolveBackend();
-        }
-    }
+    readonly property bool settingsConnectedFrameModeActive: SettingsData.connectedFrameModeActive
+
+    onSettingsConnectedFrameModeActiveChanged: _maybeResolveBackend()
 
     function _maybeResolveBackend() {
-        if (_resolvedBackend === _desiredBackend)
+        if (_resolvedConnected === _desiredConnected)
             return;
         if (impl.item && (impl.item.shouldBeVisible || impl.item.isClosing))
             return;
-        _resolvedBackend = _desiredBackend;
+        _loadHost(_desiredConnected);
+    }
+
+    function _loadHost(connected) {
+        impl.sourceComponent = null;
+        _resolvedConnected = connected;
+        impl.sourceComponent = hostComponent;
     }
 
     Loader {
         id: impl
-        sourceComponent: root._resolvedBackend
         onItemChanged: if (item)
             root._wireBackend(item)
     }
 
     Component {
-        id: standaloneComp
-        DankModalStandalone {}
-    }
+        id: hostComponent
+        DankModalHost {
+            id: host
 
-    Component {
-        id: connectedComp
-        DankModalConnected {}
+            modalHandle: root
+            connected: root._resolvedConnected
+
+            onShouldBeVisibleChanged: {
+                if (root.shouldBeVisible !== host.shouldBeVisible)
+                    root.shouldBeVisible = host.shouldBeVisible;
+            }
+            onShouldHaveFocusChanged: {
+                if (root.shouldHaveFocus !== host.shouldHaveFocus)
+                    root.shouldHaveFocus = host.shouldHaveFocus;
+            }
+            onOpened: root.opened()
+            onDialogClosed: {
+                root.dialogClosed();
+                root._maybeResolveBackend();
+            }
+            onBackgroundClicked: root.backgroundClicked()
+        }
     }
 
     function _wireBackend(it) {
-        if (!it)
-            return;
-
-        it.modalHandle = root;
-        it.layerNamespace = Qt.binding(() => root.layerNamespace);
-        it.content = Qt.binding(() => root.content);
-        it.directContent = Qt.binding(() => root.directContent);
-        it.modalWidth = Qt.binding(() => root.modalWidth);
-        it.modalHeight = Qt.binding(() => root.modalHeight);
-        it.targetScreen = Qt.binding(() => root.targetScreen);
-        it.showBackground = Qt.binding(() => root.showBackground);
-        it.backgroundOpacity = Qt.binding(() => root.backgroundOpacity);
-        it.positioning = Qt.binding(() => root.positioning);
-        it.customPosition = Qt.binding(() => root.customPosition);
-        it.closeOnEscapeKey = Qt.binding(() => root.closeOnEscapeKey);
-        it.closeOnBackgroundClick = Qt.binding(() => root.closeOnBackgroundClick);
-        it.animationType = Qt.binding(() => root.animationType);
-        it.animationDuration = Qt.binding(() => root.animationDuration);
-        it.animationScaleCollapsed = Qt.binding(() => root.animationScaleCollapsed);
-        it.animationOffset = Qt.binding(() => root.animationOffset);
-        it.animationEnterCurve = Qt.binding(() => root.animationEnterCurve);
-        it.animationExitCurve = Qt.binding(() => root.animationExitCurve);
-        it.backgroundColor = Qt.binding(() => root.backgroundColor);
-        it.borderColor = Qt.binding(() => root.borderColor);
-        it.borderWidth = Qt.binding(() => root.borderWidth);
-        it.cornerRadius = Qt.binding(() => root.cornerRadius);
-        it.enableShadow = Qt.binding(() => root.enableShadow);
-        it.allowFocusOverride = Qt.binding(() => root.allowFocusOverride);
-        it.allowStacking = Qt.binding(() => root.allowStacking);
-        it.keepContentLoaded = Qt.binding(() => root.keepContentLoaded);
-        it.keepPopoutsOpen = Qt.binding(() => root.keepPopoutsOpen);
-        it.customKeyboardFocus = Qt.binding(() => root.customKeyboardFocus);
-        it.useOverlayLayer = Qt.binding(() => root.useOverlayLayer);
-
         it.shouldBeVisible = root.shouldBeVisible;
         it.shouldHaveFocus = root.shouldHaveFocus;
-
-        if (it.modalFocusScope)
-            _modalFocusScope.parent = it.modalFocusScope;
+        _modalFocusScope.parent = it.modalFocusScope;
     }
 
-    Connections {
-        target: root
-        function onShouldBeVisibleChanged() {
-            if (!root.shouldBeVisible)
-                root.transientSurfaceTracker?.closeAll?.();
-            if (impl.item && impl.item.shouldBeVisible !== root.shouldBeVisible)
-                impl.item.shouldBeVisible = root.shouldBeVisible;
-        }
-        function onShouldHaveFocusChanged() {
-            if (impl.item && impl.item.shouldHaveFocus !== root.shouldHaveFocus)
-                impl.item.shouldHaveFocus = root.shouldHaveFocus;
-        }
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible)
+            transientSurfaceTracker?.closeAll?.();
+        if (impl.item && impl.item.shouldBeVisible !== shouldBeVisible)
+            impl.item.shouldBeVisible = shouldBeVisible;
     }
 
-    Connections {
-        target: impl.item
-        ignoreUnknownSignals: true
-
-        function onShouldBeVisibleChanged() {
-            if (impl.item && root.shouldBeVisible !== impl.item.shouldBeVisible)
-                root.shouldBeVisible = impl.item.shouldBeVisible;
-        }
-
-        function onShouldHaveFocusChanged() {
-            if (impl.item && root.shouldHaveFocus !== impl.item.shouldHaveFocus)
-                root.shouldHaveFocus = impl.item.shouldHaveFocus;
-        }
-
-        function onOpened() {
-            root.opened();
-        }
-
-        function onDialogClosed() {
-            root.dialogClosed();
-            root._maybeResolveBackend();
-        }
-
-        function onBackgroundClicked() {
-            root.backgroundClicked();
-        }
+    onShouldHaveFocusChanged: {
+        if (impl.item && impl.item.shouldHaveFocus !== shouldHaveFocus)
+            impl.item.shouldHaveFocus = shouldHaveFocus;
     }
 }

@@ -1,4 +1,6 @@
 import QtQuick
+import qs.Modules.Notifications
+import qs.DankCommon.Common as DC
 import Quickshell
 import qs.Common
 import qs.Services
@@ -10,6 +12,7 @@ Item {
     property string selectedFilterKey: "all"
     property var keyboardController: null
     property bool keyboardActive: false
+    property bool focusAllowed: true
     property int selectedIndex: -1
     property bool showKeyboardHints: false
 
@@ -104,12 +107,12 @@ Item {
             maxDays: 2
         },
         {
-            label: I18n.tr("7 days", "notification history filter"),
+            label: I18n.duration(7 * 86400),
             key: "7d",
             maxDays: 7
         },
         {
-            label: I18n.tr("30 days", "notification history filter"),
+            label: I18n.duration(30 * 86400),
             key: "30d",
             maxDays: 30
         },
@@ -204,9 +207,13 @@ Item {
     function removeWithScrollPreserve(itemId) {
         historyListView.savedY = historyListView.contentY;
         NotificationService.removeFromHistory(itemId);
-        Qt.callLater(() => {
-            historyListView.forceLayout();
-        });
+        layoutTimer.restart();
+    }
+
+    Timer {
+        id: layoutTimer
+        interval: 0
+        onTriggered: historyListView.forceLayout()
     }
 
     Column {
@@ -231,12 +238,11 @@ Item {
             width: parent.width
             height: parent.height - filterChips.height - Theme.spacingS
             clip: true
-            spacing: Theme.spacingS
-            readonly property real horizontalShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
-            readonly property real verticalShadowGutter: Theme.snap(Math.max(Theme.spacingS, 8), 1)
-            readonly property real delegateShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
-            topMargin: verticalShadowGutter
-            bottomMargin: verticalShadowGutter
+            spacing: Theme.groupedListGap
+
+            add: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.add : null
+            remove: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.fadeRemove : null
+            displaced: NotificationMetrics.animationsEnabled ? DC.ListViewTransitions.displaced : null
 
             model: ScriptModel {
                 id: historyModel
@@ -257,44 +263,58 @@ Item {
 
                 property real swipeOffset: 0
                 property bool isDismissing: false
-                readonly property real dismissThreshold: width * 0.35
+                readonly property real dismissThreshold: width * NotificationMetrics.swipeThreshold
                 property bool __delegateInitialized: false
 
-                Component.onCompleted: {
-                    Qt.callLater(() => {
-                        if (delegateRoot)
-                            delegateRoot.__delegateInitialized = true;
-                    });
+                Timer {
+                    interval: 0
+                    running: true
+                    onTriggered: delegateRoot.__delegateInitialized = true
                 }
 
                 width: ListView.view.width
-                height: historyCard.height + historyListView.delegateShadowGutter
-                clip: false
+                height: historyCard.height
+                clip: true
 
                 HistoryNotificationCard {
                     id: historyCard
-                    width: Math.max(0, parent.width - (historyListView.horizontalShadowGutter * 2))
-                    y: historyListView.delegateShadowGutter / 2
-                    x: historyListView.horizontalShadowGutter + delegateRoot.swipeOffset
+                    width: parent.width
+                    x: delegateRoot.swipeOffset
                     historyItem: modelData
-                    isSelected: root.keyboardActive && root.selectedIndex === index
-                    keyboardNavigationActive: root.keyboardActive
-                    opacity: 1 - Math.abs(delegateRoot.swipeOffset) / (delegateRoot.width * 0.5)
+                    firstInGroup: index === 0
+                    lastInGroup: index === historyListView.count - 1
+                    isSelected: root.keyboardActive && root.focusAllowed && root.selectedIndex === index
+                    keyboardNavigationActive: root.keyboardActive && root.focusAllowed
+                    opacity: Math.max(0, 1 - Math.abs(delegateRoot.swipeOffset) / delegateRoot.width)
 
                     Behavior on x {
-                        enabled: !swipeDragHandler.active && delegateRoot.__delegateInitialized
+                        enabled: !swipeDragHandler.active && !delegateRoot.isDismissing && delegateRoot.__delegateInitialized && NotificationMetrics.animationsEnabled
                         NumberAnimation {
                             duration: Theme.notificationExitDuration
-                            easing.type: Theme.standardEasing
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: NotificationMetrics.dismissCurve
                         }
                     }
 
                     Behavior on opacity {
-                        enabled: delegateRoot.__delegateInitialized
+                        enabled: delegateRoot.__delegateInitialized && NotificationMetrics.animationsEnabled
                         NumberAnimation {
                             duration: delegateRoot.__delegateInitialized ? Theme.notificationExitDuration : 0
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                         }
                     }
+                }
+
+                NumberAnimation {
+                    id: swipeDismissAnimation
+                    target: delegateRoot
+                    property: "swipeOffset"
+                    to: delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width
+                    duration: NotificationMetrics.animationsEnabled ? Theme.notificationExitDuration : 0
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: NotificationMetrics.dismissCurve
+                    onFinished: root.removeWithScrollPreserve(delegateRoot.modelData?.id || "")
                 }
 
                 DragHandler {
@@ -306,12 +326,12 @@ Item {
                     onActiveChanged: {
                         if (active || delegateRoot.isDismissing)
                             return;
-                        if (Math.abs(delegateRoot.swipeOffset) > delegateRoot.dismissThreshold) {
-                            delegateRoot.isDismissing = true;
-                            root.removeWithScrollPreserve(delegateRoot.modelData?.id || "");
-                        } else {
+                        if (Math.abs(delegateRoot.swipeOffset) <= delegateRoot.dismissThreshold) {
                             delegateRoot.swipeOffset = 0;
+                            return;
                         }
+                        delegateRoot.isDismissing = true;
+                        swipeDismissAnimation.restart();
                     }
 
                     onTranslationChanged: {
@@ -358,28 +378,38 @@ Item {
     }
 
     function handleKey(event) {
-        if (event.key === Qt.Key_Down || event.key === 16777237) {
-            if (!keyboardActive) {
-                keyboardActive = true;
-                selectedIndex = 0;
-            } else {
-                selectNext();
-            }
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Up || event.key === 16777235) {
-            if (keyboardActive) {
-                selectPrevious();
-            }
-            event.accepted = true;
-        } else if (keyboardActive && (event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace)) {
-            clearSelected();
-            event.accepted = true;
-        } else if ((event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) && (event.modifiers & Qt.ShiftModifier)) {
+        const dismissKey = event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace;
+        if (dismissKey && (event.modifiers & Qt.ShiftModifier)) {
             NotificationService.clearHistory();
             keyboardActive = false;
             selectedIndex = -1;
             event.accepted = true;
-        } else if (event.key === Qt.Key_F10) {
+            return;
+        }
+        switch (event.key) {
+        case Qt.Key_Down:
+            if (!keyboardActive) {
+                keyboardActive = true;
+                selectedIndex = 0;
+                event.accepted = true;
+                return;
+            }
+            selectNext();
+            event.accepted = true;
+            return;
+        case Qt.Key_Up:
+            if (keyboardActive)
+                selectPrevious();
+            event.accepted = true;
+            return;
+        case Qt.Key_Delete:
+        case Qt.Key_Backspace:
+            if (!keyboardActive)
+                return;
+            clearSelected();
+            event.accepted = true;
+            return;
+        case Qt.Key_F10:
             showKeyboardHints = !showKeyboardHints;
             event.accepted = true;
         }

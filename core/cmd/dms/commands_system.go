@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
@@ -258,7 +258,7 @@ func filterUpdateTargets(pkgs []sysupdate.Package) []sysupdate.Package {
 }
 
 func runSystemUpdateSetInterval(seconds int) {
-	resp, err := sendServerRequest(models.Request{
+	resp, err := sendServerRequest(ipc.Request{
 		ID:     1,
 		Method: "sysupdate.setInterval",
 		Params: map[string]any{"seconds": float64(seconds)},

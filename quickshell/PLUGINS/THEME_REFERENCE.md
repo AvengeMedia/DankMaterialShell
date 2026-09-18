@@ -33,29 +33,36 @@ Theme.spacingXL         // Extra large
 
 ## Border Radius
 
+`Theme.radiusStrength` ranges from 0 to 100, with the Material baseline at 50. `Theme.cornerRadius` aliases `Theme.cornerRadiusM`. Small and large aliases use S and L.
+
 ```qml
-Theme.cornerRadius      // Standard corner radius
-Theme.cornerRadiusSmall // Smaller radius
-Theme.cornerRadiusLarge // Larger radius
+Theme.cornerRadiusXS
+Theme.cornerRadiusS
+Theme.cornerRadiusM
+Theme.cornerRadiusL
+Theme.cornerRadiusLIncreased
+Theme.cornerRadiusXL
+Theme.cornerRadiusXLIncreased
+Theme.cornerRadiusXXL
+Theme.fullRadius(width, height)
+Theme.buttonRadius(width, height, buttonHeight, pressed, true)
 ```
+
+Use `fullRadius()` for pills and round controls so lower strength values reduce their rounding. `cornerRadiusFull` remains available for compatibility. See the shared [shape reference](../../dank-qml-common/SHAPES.md) for component baselines.
 
 ## Colors
 
 ### Surface Colors
 ```qml
 Theme.surface
-Theme.surfaceContainerLowest   // matugen-only (see note)
-Theme.surfaceContainerLow      // matugen-only (see note)
+Theme.surfaceContainerLowest
+Theme.surfaceContainerLow
 Theme.surfaceContainer
 Theme.surfaceContainerHigh
 Theme.surfaceContainerHighest
 ```
 
-> **Note:** Not every theme color is consumed by DMS's own UI. `surfaceContainerLowest`,
-> `surfaceContainerLow`, and `backgroundText` are currently unused by DMS components — they
-> exist to complete the Material palette and are exported to matugen templates (VS Code,
-> KDE, Firefox, Zed, etc.). They're still safe to reference in plugins; they just aren't
-> relied on internally.
+Use `Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))` for a nested fill that follows the foreground toggle and opacity. Outer floating windows use `Theme.floatingWindowSurface`. Pass raw surface colors to shared text fields; those widgets apply foreground opacity themselves.
 
 ### Text Colors
 ```qml
@@ -77,7 +84,8 @@ Theme.success
 
 ### Special Functions
 ```qml
-Theme.popupBackground()  // Popup background with opacity
+Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
 ```
 
 ## Common Patterns

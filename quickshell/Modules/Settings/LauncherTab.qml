@@ -14,6 +14,7 @@ Item {
     readonly property int keybindDataVersion: KeybindsService._dataVersion
     readonly property bool keybindsAvailable: KeybindsService.available
     readonly property string defaultLauncherKeybindSearch: "spotlight toggle"
+    readonly property string compositorLabel: CompositorService.displayName || I18n.tr("Compositor")
     readonly property string spotlightBarKeybindSearch: "spotlight-bar"
 
     function openKeybindsSearch(query) {
@@ -22,7 +23,7 @@ Item {
         if (typeof root.parentModal.showKeybindsSearch === "function") {
             root.parentModal.showKeybindsSearch(query);
         } else {
-            root.parentModal.showWithTabName("keybinds");
+            root.parentModal.navigateTo("keybinds");
         }
     }
 
@@ -44,1207 +45,293 @@ Item {
     FileBrowserModal {
         id: logoFileBrowser
         browserTitle: I18n.tr("Select Launcher Logo")
-        browserIcon: "image"
         browserType: "generic"
         filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
         onFileSelected: path => SettingsData.set("launcherLogoCustomPath", path.replace("file://", ""))
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            width: parent.width
+            iconName: "search"
+            title: I18n.tr("Default action")
+            settingKey: "launcherStyle"
 
-            SettingsCard {
-                width: parent.width
-                iconName: "search"
-                title: I18n.tr("Default Launcher")
-                settingKey: "launcherStyle"
-
-                SettingsControlledBy {
-                    visible: SettingsData.connectedFrameModeActive
-                    parentModal: root.parentModal
-                    section: "frameConnectedOptions"
-                    settingLabel: I18n.tr("Default Launcher")
-                    reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
-                }
-
-                StyledText {
-                    width: parent.width
-                    visible: !SettingsData.connectedFrameModeActive
-                    text: SettingsData.launcherStyle === "island" ? I18n.tr("Default launcher shortcuts open a native launcher activity inside Dank Island. Spotlight is used when the focused screen has no DankIsland.") : SettingsData.launcherStyle === "spotlight" ? I18n.tr("Default launcher shortcuts open the minimal Spotlight Bar. The dedicated Spotlight Bar shortcut below stays independent.") : I18n.tr("Default launcher shortcuts open the full launcher with mode tabs, grid view, and action panel.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                SettingsButtonGroupRow {
-                    visible: !SettingsData.connectedFrameModeActive
-                    settingKey: "launcherStyleSelector"
-                    tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
-                    text: I18n.tr("Default Opens")
-                    model: [I18n.tr("Full"), I18n.tr("Spotlight"), I18n.tr("Island")]
-                    currentIndex: SettingsData.launcherStyle === "island" ? 2 : SettingsData.launcherStyle === "spotlight" ? 1 : 0
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        SettingsData.set("launcherStyle", index === 2 ? "island" : index === 1 ? "spotlight" : "full");
-                    }
-                }
-
-                StyledRect {
-                    id: defaultShortcutCard
-                    width: parent.width
-                    height: defaultShortcutRow.implicitHeight + Theme.spacingM * 2
-                    radius: Theme.cornerRadius
-                    color: defaultShortcutMouse.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: 1
-
-                    Row {
-                        id: defaultShortcutRow
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        anchors.rightMargin: Theme.spacingM
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "keyboard"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: Math.max(0, parent.width - Theme.iconSize - defaultShortcutValue.width - Theme.spacingM * 2)
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXXS
-
-                            StyledText {
-                                text: I18n.tr("Default Launcher Shortcut")
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                elide: Text.ElideRight
-                            }
-
-                            StyledText {
-                                text: !root.keybindsAvailable ? I18n.tr("Bind the %1 IPC action in your compositor config.").arg("spotlight") : SettingsData.connectedFrameModeActive ? I18n.tr("Opens the connected launcher in Connected Frame Mode.") : I18n.tr("Follows the default launcher choice selected above.")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        StyledText {
-                            id: defaultShortcutValue
-                            text: root.keysLabel(root.defaultLauncherAction)
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                            horizontalAlignment: Text.AlignRight
-                            width: Math.min(170, implicitWidth)
-                            elide: Text.ElideRight
-                        }
-                    }
-
-                    MouseArea {
-                        id: defaultShortcutMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.openKeybindsSearch(root.defaultLauncherKeybindSearch)
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "launcherUseOverlayLayer"
-                    tags: ["launcher", "fullscreen", "overlay", "layer"]
-                    text: I18n.tr("Use Overlay Layer", "launcher layer toggle: use Wayland overlay layer")
-                    checked: SettingsData.launcherUseOverlayLayer
-                    onToggled: checked => SettingsData.set("launcherUseOverlayLayer", checked)
-                }
+            SettingsControlledBy {
+                visible: SettingsData.connectedFrameModeActive
+                parentModal: root.parentModal
+                section: "frameConnectedOptions"
+                settingLabel: I18n.tr("Default action")
+                reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "search"
-                title: I18n.tr("Spotlight Bar")
-                settingKey: "spotlightBarLauncher"
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("A separate minimal launcher action that works in Standalone, Separate Frame Mode, and Connected Frame Mode.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                StyledRect {
-                    id: spotlightShortcutCard
-                    width: parent.width
-                    height: spotlightShortcutRow.implicitHeight + Theme.spacingM * 2
-                    radius: Theme.cornerRadius
-                    color: spotlightShortcutMouse.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: 1
-
-                    Row {
-                        id: spotlightShortcutRow
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        anchors.rightMargin: Theme.spacingM
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "keyboard"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: Math.max(0, parent.width - Theme.iconSize - spotlightShortcutValue.width - Theme.spacingM * 2)
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXXS
-
-                            StyledText {
-                                text: I18n.tr("Spotlight Bar Shortcut")
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                width: parent.width
-                                elide: Text.ElideRight
-                            }
-
-                            StyledText {
-                                text: !root.keybindsAvailable ? I18n.tr("Bind the %1 IPC action in your compositor config.").arg("spotlight-bar") : I18n.tr("Uses the spotlight-bar IPC action and always opens the minimal bar.")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        StyledText {
-                            id: spotlightShortcutValue
-                            text: root.keysLabel(root.spotlightBarAction)
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                            horizontalAlignment: Text.AlignRight
-                            width: Math.min(170, implicitWidth)
-                            elide: Text.ElideRight
-                        }
-                    }
-
-                    MouseArea {
-                        id: spotlightShortcutMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.openKeybindsSearch(root.spotlightBarKeybindSearch)
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "spotlightBarShowModeChips"
-                    tags: ["launcher", "spotlight", "bar", "chips", "tabs", "modes"]
-                    text: I18n.tr("Show Mode Chips")
-                    description: I18n.tr("Show All, Apps, Files, and Plugins chips beside the Spotlight Bar input.")
-                    checked: SettingsData.spotlightBarShowModeChips
-                    onToggled: checked => SettingsData.set("spotlightBarShowModeChips", checked)
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "apps"
-                title: I18n.tr("Launcher Button Logo")
-                settingKey: "launcherLogo"
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Choose the logo displayed on the launcher button in DankBar")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                Item {
-                    width: parent.width
-                    height: logoModeGroup.implicitHeight
-                    clip: true
-
-                    DankButtonGroup {
-                        id: logoModeGroup
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        maximumWidth: parent.width
-                        buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                        minButtonWidth: parent.width < 480 ? 44 : 64
-                        textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                        model: {
-                            const modes = [I18n.tr("Apps Icon"), I18n.tr("OS Logo"), I18n.tr("Dank")];
-                            if (CompositorService.isNiri) {
-                                modes.push("niri");
-                            } else if (CompositorService.isHyprland) {
-                                modes.push("Hyprland");
-                            } else if (CompositorService.isMango) {
-                                modes.push("mango");
-                            } else if (CompositorService.isSway) {
-                                modes.push("Sway");
-                            } else if (CompositorService.isScroll) {
-                                modes.push("Scroll");
-                            } else if (CompositorService.isMiracle) {
-                                modes.push("Miracle");
-                            } else {
-                                modes.push(I18n.tr("Compositor"));
-                            }
-                            modes.push(I18n.tr("Custom"));
-                            return modes;
-                        }
-                        currentIndex: {
-                            if (SettingsData.launcherLogoMode === "apps")
-                                return 0;
-                            if (SettingsData.launcherLogoMode === "os")
-                                return 1;
-                            if (SettingsData.launcherLogoMode === "dank")
-                                return 2;
-                            if (SettingsData.launcherLogoMode === "compositor")
-                                return 3;
-                            if (SettingsData.launcherLogoMode === "custom")
-                                return 4;
-                            return 0;
-                        }
-                        onSelectionChanged: (index, selected) => {
-                            if (!selected)
-                                return;
-                            switch (index) {
-                            case 0:
-                                SettingsData.set("launcherLogoMode", "apps");
-                                break;
-                            case 1:
-                                SettingsData.set("launcherLogoMode", "os");
-                                break;
-                            case 2:
-                                SettingsData.set("launcherLogoMode", "dank");
-                                break;
-                            case 3:
-                                SettingsData.set("launcherLogoMode", "compositor");
-                                break;
-                            case 4:
-                                SettingsData.set("launcherLogoMode", "custom");
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    width: parent.width
-                    visible: SettingsData.launcherLogoMode === "custom"
-                    spacing: Theme.spacingM
-
-                    StyledRect {
-                        width: parent.width - selectButton.width - Theme.spacingM
-                        height: 36
-                        radius: Theme.cornerRadius
-                        color: Theme.floatingWindowFieldColor
-                        border.color: Theme.floatingWindowFieldBorderColor
-                        border.width: 1
-
-                        StyledText {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: SettingsData.launcherLogoCustomPath || I18n.tr("Select an image file...")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: SettingsData.launcherLogoCustomPath ? Theme.surfaceText : Theme.outlineButton
-                            width: parent.width - Theme.spacingM * 2
-                            wrapMode: Text.NoWrap
-                            elide: Text.ElideMiddle
-                            horizontalAlignment: Text.AlignLeft
-                        }
-                    }
-
-                    DankActionButton {
-                        id: selectButton
-                        iconName: "folder_open"
-                        width: 36
-                        height: 36
-                        onClicked: logoFileBrowser.open()
-                    }
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingL
-                    visible: SettingsData.launcherLogoMode !== "apps"
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        StyledText {
-                            text: I18n.tr("Color Override")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        Item {
-                            width: parent.width
-                            height: colorOverrideRow.implicitHeight
-                            clip: true
-
-                            Row {
-                                id: colorOverrideRow
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: Theme.spacingM
-
-                                DankButtonGroup {
-                                    id: colorModeGroup
-                                    maximumWidth: parent.parent.width - (colorPickerCircle.visible ? colorPickerCircle.width + Theme.spacingM : 0)
-                                    buttonPadding: parent.parent.width < 480 ? Theme.spacingS : Theme.spacingL
-                                    minButtonWidth: parent.parent.width < 480 ? 44 : 64
-                                    textSize: parent.parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                                    model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
-                                    currentIndex: {
-                                        const override = SettingsData.launcherLogoColorOverride;
-                                        if (override === "")
-                                            return 0;
-                                        if (override === "primary")
-                                            return 1;
-                                        if (override === "surface")
-                                            return 2;
-                                        return 3;
-                                    }
-                                    onSelectionChanged: (index, selected) => {
-                                        if (!selected)
-                                            return;
-                                        switch (index) {
-                                        case 0:
-                                            SettingsData.set("launcherLogoColorOverride", "");
-                                            break;
-                                        case 1:
-                                            SettingsData.set("launcherLogoColorOverride", "primary");
-                                            break;
-                                        case 2:
-                                            SettingsData.set("launcherLogoColorOverride", "surface");
-                                            break;
-                                        case 3:
-                                            const currentOverride = SettingsData.launcherLogoColorOverride;
-                                            const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface";
-                                            if (isPreset) {
-                                                SettingsData.set("launcherLogoColorOverride", "#ffffff");
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                Rectangle {
-                                    id: colorPickerCircle
-                                    visible: {
-                                        const override = SettingsData.launcherLogoColorOverride;
-                                        return override !== "" && override !== "primary" && override !== "surface";
-                                    }
-                                    width: 36
-                                    height: 36
-                                    radius: 18
-                                    color: {
-                                        const override = SettingsData.launcherLogoColorOverride;
-                                        if (override !== "" && override !== "primary" && override !== "surface")
-                                            return override;
-                                        return "#ffffff";
-                                    }
-                                    border.color: Theme.outline
-                                    border.width: 1
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            if (!PopoutService.colorPickerModal)
-                                                return;
-                                            PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride;
-                                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color");
-                                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                                                SettingsData.set("launcherLogoColorOverride", selectedColor);
-                                            };
-                                            PopoutService.colorPickerModal.show();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    SettingsSliderRow {
-                        settingKey: "launcherLogoSizeOffset"
-                        tags: ["launcher", "logo", "size", "offset", "scale"]
-                        text: I18n.tr("Size Offset")
-                        minimum: -12
-                        maximum: 12
-                        value: SettingsData.launcherLogoSizeOffset
-                        defaultValue: 0
-                        onSliderValueChanged: newValue => SettingsData.set("launcherLogoSizeOffset", newValue)
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: {
-                            const override = SettingsData.launcherLogoColorOverride;
-                            return override !== "" && override !== "primary" && override !== "surface";
-                        }
-
-                        SettingsSliderRow {
-                            settingKey: "launcherLogoBrightness"
-                            tags: ["launcher", "logo", "brightness", "color"]
-                            text: I18n.tr("Brightness")
-                            minimum: 0
-                            maximum: 100
-                            value: Math.round(SettingsData.launcherLogoBrightness * 100)
-                            unit: "%"
-                            defaultValue: 100
-                            onSliderValueChanged: newValue => SettingsData.set("launcherLogoBrightness", newValue / 100)
-                        }
-
-                        SettingsSliderRow {
-                            settingKey: "launcherLogoContrast"
-                            tags: ["launcher", "logo", "contrast", "color"]
-                            text: I18n.tr("Contrast")
-                            minimum: 0
-                            maximum: 200
-                            value: Math.round(SettingsData.launcherLogoContrast * 100)
-                            unit: "%"
-                            defaultValue: 100
-                            onSliderValueChanged: newValue => SettingsData.set("launcherLogoContrast", newValue / 100)
-                        }
-
-                        SettingsToggleRow {
-                            settingKey: "launcherLogoColorInvertOnMode"
-                            tags: ["launcher", "logo", "invert", "mode", "color"]
-                            text: I18n.tr("Invert on mode change")
-                            checked: SettingsData.launcherLogoColorInvertOnMode
-                            onToggled: checked => SettingsData.set("launcherLogoColorInvertOnMode", checked)
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "terminal"
-                title: I18n.tr("Launch Prefix")
-                settingKey: "launchPrefix"
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                DankTextField {
-                    width: parent.width
-                    text: SettingsData.launchPrefix
-                    placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
-                    onTextEdited: SettingsData.set("launchPrefix", text)
-                }
-
-                TerminalPickerRow {}
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "sort_by_alpha"
-                title: I18n.tr("Sorting & Layout")
-                settingKey: "launcherSorting"
-
-                SettingsToggleRow {
-                    settingKey: "sortAppsAlphabetically"
-                    tags: ["launcher", "sort", "alphabetically", "apps", "order"]
-                    text: I18n.tr("Sort Alphabetically")
-                    description: I18n.tr("When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.")
-                    checked: SettingsData.sortAppsAlphabetically
-                    onToggled: checked => SettingsData.set("sortAppsAlphabetically", checked)
-                }
-
-                SettingsSliderRow {
-                    settingKey: "appLauncherGridColumns"
-                    tags: ["launcher", "grid", "columns", "layout"]
-                    text: I18n.tr("Grid Columns")
-                    description: I18n.tr("Adjust the number of columns in grid view mode.")
-                    minimum: 2
-                    maximum: 8
-                    value: SettingsData.appLauncherGridColumns
-                    defaultValue: 5
-                    onSliderValueChanged: newValue => SettingsData.set("appLauncherGridColumns", newValue)
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "tune"
-                title: I18n.tr("Appearance", "launcher appearance settings")
-                settingKey: "dankLauncherV2Appearance"
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    StyledText {
-                        text: I18n.tr("Size", "launcher size option")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: sizeGroup.implicitHeight
-                        clip: true
-
-                        DankButtonGroup {
-                            id: sizeGroup
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            maximumWidth: parent.width
-                            buttonPadding: parent.width < 400 ? Theme.spacingS : Theme.spacingL
-                            minButtonWidth: parent.width < 400 ? 60 : 80
-                            textSize: parent.width < 400 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                            model: ["1", "2", "3", "4"]
-                            currentIndex: {
-                                switch (SettingsData.dankLauncherV2Size) {
-                                case "micro":
-                                    return 0;
-                                case "compact":
-                                    return 1;
-                                case "large":
-                                    return 3;
-                                default:
-                                    return 2;
-                                }
-                            }
-                            onSelectionChanged: (index, selected) => {
-                                if (!selected)
-                                    return;
-                                var sizes = ["micro", "compact", "medium", "large"];
-                                SettingsData.set("dankLauncherV2Size", sizes[index]);
-                            }
-                        }
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2ShowFooter"
-                    tags: ["launcher", "footer", "hints", "shortcuts"]
-                    text: I18n.tr("Show Footer", "launcher footer visibility")
-                    description: I18n.tr("Show mode tabs and keyboard hints at the bottom.", "launcher footer description")
-                    checked: SettingsData.dankLauncherV2ShowFooter
-                    enabled: SettingsData.dankLauncherV2Size !== "micro"
-                    onToggled: checked => SettingsData.set("dankLauncherV2ShowFooter", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2UnloadOnClose"
-                    tags: ["launcher", "unload", "close", "memory", "vram"]
-                    text: I18n.tr("Unload on Close")
-                    description: I18n.tr("Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.")
-                    checked: SettingsData.dankLauncherV2UnloadOnClose
-                    onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2ShowSourceBadges"
-                    tags: ["launcher", "appearance", "badge", "source", "flatpak"]
-                    text: I18n.tr("Show Package Source Badges")
-                    description: I18n.tr("Show Flatpak, Snap, AppImage, or Nix badge icons on launcher items.")
-                    checked: SettingsData.dankLauncherV2ShowSourceBadges
-                    onToggled: checked => SettingsData.set("dankLauncherV2ShowSourceBadges", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2BorderEnabled"
-                    tags: ["launcher", "border", "outline"]
-                    text: I18n.tr("Border", "launcher border option")
-                    checked: SettingsData.dankLauncherV2BorderEnabled
-                    onToggled: checked => SettingsData.set("dankLauncherV2BorderEnabled", checked)
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    visible: SettingsData.dankLauncherV2BorderEnabled
-
-                    SettingsSliderRow {
-                        settingKey: "dankLauncherV2BorderThickness"
-                        tags: ["launcher", "border", "thickness"]
-                        text: I18n.tr("Thickness", "border thickness")
-                        minimum: 1
-                        maximum: 6
-                        value: SettingsData.dankLauncherV2BorderThickness
-                        defaultValue: 2
-                        unit: "px"
-                        onSliderValueChanged: newValue => SettingsData.set("dankLauncherV2BorderThickness", newValue)
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        StyledText {
-                            text: I18n.tr("Color", "border color")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        Item {
-                            width: parent.width
-                            height: borderColorGroup.implicitHeight
-                            clip: true
-
-                            DankButtonGroup {
-                                id: borderColorGroup
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                maximumWidth: parent.width
-                                buttonPadding: parent.width < 400 ? Theme.spacingS : Theme.spacingL
-                                minButtonWidth: parent.width < 400 ? 50 : 70
-                                textSize: parent.width < 400 ? Theme.fontSizeSmall : Theme.fontSizeMedium
-                                model: [I18n.tr("Primary", "primary color"), I18n.tr("Secondary", "secondary color"), I18n.tr("Outline", "outline color"), I18n.tr("Text", "text color")]
-                                currentIndex: SettingsData.dankLauncherV2BorderColor === "secondary" ? 1 : SettingsData.dankLauncherV2BorderColor === "outline" ? 2 : SettingsData.dankLauncherV2BorderColor === "surfaceText" ? 3 : 0
-                                onSelectionChanged: (index, selected) => {
-                                    if (!selected)
-                                        return;
-                                    SettingsData.set("dankLauncherV2BorderColor", index === 1 ? "secondary" : index === 2 ? "outline" : index === 3 ? "surfaceText" : "primary");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "layers"
-                title: I18n.tr("Modal Background")
-                settingKey: "modalBackground"
-                tags: ["modal", "darken", "background", "overlay", "launcher"]
-
-                SettingsControlledBy {
-                    visible: SettingsData.frameEnabled
-                    parentModal: root.parentModal
-                    section: "frameBorder"
-                    settingLabel: I18n.tr("Darken Modal Background")
-                    reason: I18n.tr("Disabled by Frame Mode")
-                }
-
-                SettingsToggleRow {
-                    settingKey: "modalDarkenBackground"
-                    tags: ["modal", "darken", "background", "overlay", "launcher"]
-                    text: I18n.tr("Darken Modal Background")
-                    description: I18n.tr("Show darkened overlay behind modal dialogs")
-                    visible: !SettingsData.frameEnabled
-                    checked: SettingsData.modalDarkenBackground
-                    onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "open_in_new"
-                title: I18n.tr("Niri Integration").replace("Niri", "niri")
-                visible: CompositorService.isNiri
-
-                SettingsToggleRow {
-                    settingKey: "niriOverviewOverlayEnabled"
-                    tags: ["launcher", "niri", "overview", "overlay", "enable"]
-                    text: I18n.tr("Enable Overview Overlay")
-                    description: I18n.tr("Show launcher overlay when typing in Niri overview. Disable to use another launcher.")
-                    checked: SettingsData.niriOverviewOverlayEnabled
-                    onToggled: checked => SettingsData.set("niriOverviewOverlayEnabled", checked)
-                }
-
-                SettingsButtonGroupRow {
-                    visible: SettingsData.niriOverviewOverlayEnabled
-                    settingKey: "niriOverviewLauncherStyle"
-                    tags: ["launcher", "niri", "overview", "overlay", "style", "spotlight", "full"]
-                    text: I18n.tr("Default Opens")
-                    model: [I18n.tr("Full"), I18n.tr("Spotlight")]
-                    currentIndex: SettingsData.niriOverviewLauncherStyle === "spotlight" ? 1 : 0
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        SettingsData.set("niriOverviewLauncherStyle", index === 1 ? "spotlight" : "full");
-                    }
-                }
-            }
-
-            SettingsCard {
-                id: builtInPluginsCard
-                width: parent.width
-                iconName: "extension"
-                title: "DMS"
-                settingKey: "builtInPlugins"
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    Repeater {
-                        model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_power", "dms_vpn", "dms_colorpicker", "dms_qr_generator"]
-
-                        delegate: Rectangle {
-                            id: pluginDelegate
-                            required property string modelData
-                            required property int index
-                            readonly property var plugin: AppSearchService.builtInPlugins[modelData]
-
-                            width: parent.width
-                            height: 56
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
-
-                            Row {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingM
-
-                                DankIcon {
-                                    name: pluginDelegate.plugin?.cornerIcon ?? "extension"
-                                    size: Theme.iconSize
-                                    color: Theme.primary
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingXXS
-
-                                    StyledText {
-                                        text: pluginDelegate.plugin?.name ?? pluginDelegate.modelData
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        color: Theme.surfaceText
-                                    }
-
-                                    StyledText {
-                                        text: pluginDelegate.plugin?.comment ?? ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                    }
-                                }
-                            }
-
-                            Row {
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingM
-
-                                DankTextField {
-                                    id: triggerField
-                                    width: 60
-                                    visible: pluginDelegate.plugin?.isLauncher === true
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    placeholderText: I18n.tr("Trigger")
-                                    onTextEdited: SettingsData.setBuiltInPluginSetting(pluginDelegate.modelData, "trigger", text)
-                                    Component.onCompleted: text = SettingsData.getBuiltInPluginSetting(pluginDelegate.modelData, "trigger", pluginDelegate.plugin?.defaultTrigger ?? "")
-                                }
-
-                                DankToggle {
-                                    id: enableToggle
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    checked: SettingsData.getBuiltInPluginSetting(pluginDelegate.modelData, "enabled", true)
-                                    onToggled: SettingsData.setBuiltInPluginSetting(pluginDelegate.modelData, "enabled", checked)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                id: pluginVisibilityCard
-                width: parent.width
-                iconName: "filter_list"
-                title: I18n.tr("Plugin Visibility")
-                settingKey: "pluginVisibility"
-
-                property var allLauncherPlugins: {
-                    SettingsData.launcherPluginVisibility;
-                    SettingsData.launcherPluginOrder;
-                    SettingsData.dankLauncherV2IncludeFilesInAll;
-                    SettingsData.dankLauncherV2IncludeFoldersInAll;
-                    var plugins = [];
-                    var builtIn = AppSearchService.getBuiltInLauncherPlugins() || {};
-                    for (var pluginId in builtIn) {
-                        var plugin = builtIn[pluginId];
-                        plugins.push({
-                            id: pluginId,
-                            name: plugin.name || pluginId,
-                            icon: plugin.cornerIcon || "extension",
-                            iconType: "material",
-                            isBuiltIn: true,
-                            isVirtual: false,
-                            trigger: AppSearchService.getBuiltInPluginTrigger(pluginId) || ""
-                        });
-                    }
-                    var thirdParty = PluginService.getLauncherPlugins() || {};
-                    for (var pluginId in thirdParty) {
-                        var plugin = thirdParty[pluginId];
-                        var rawIcon = plugin.icon || "extension";
-                        plugins.push({
-                            id: pluginId,
-                            name: plugin.name || pluginId,
-                            icon: rawIcon.startsWith("material:") ? rawIcon.substring(9) : rawIcon.startsWith("unicode:") ? rawIcon.substring(8) : rawIcon,
-                            iconType: rawIcon.startsWith("unicode:") ? "unicode" : "material",
-                            isBuiltIn: false,
-                            isVirtual: false,
-                            trigger: PluginService.getPluginTrigger(pluginId) || ""
-                        });
-                    }
-                    if (SettingsData.dankLauncherV2IncludeFilesInAll) {
-                        plugins.push({
-                            id: "__files",
-                            name: I18n.tr("Files"),
-                            icon: "insert_drive_file",
-                            iconType: "material",
-                            isBuiltIn: false,
-                            isVirtual: true,
-                            trigger: "/"
-                        });
-                    }
-                    if (SettingsData.dankLauncherV2IncludeFoldersInAll) {
-                        plugins.push({
-                            id: "__folders",
-                            name: I18n.tr("Folders"),
-                            icon: "folder",
-                            iconType: "material",
-                            isBuiltIn: false,
-                            isVirtual: true,
-                            trigger: "/"
-                        });
-                    }
-                    return SettingsData.getOrderedLauncherPlugins(plugins);
-                }
-
-                function reorderPlugin(fromIndex, toIndex) {
-                    if (fromIndex === toIndex)
+            SettingsButtonGroupRow {
+                visible: !SettingsData.connectedFrameModeActive
+                settingKey: "launcherStyleSelector"
+                tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
+                resetKeys: ["launcherStyle"]
+                text: I18n.tr("Opens", "verb, row label, which launcher style the shortcut opens")
+                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar"), I18n.tr("Island")]
+                currentIndex: SettingsData.launcherStyle === "island" ? 2 : SettingsData.launcherStyle === "spotlight" ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
                         return;
-                    var currentOrder = allLauncherPlugins.map(p => p.id);
-                    var item = currentOrder.splice(fromIndex, 1)[0];
-                    currentOrder.splice(toIndex, 0, item);
-                    SettingsData.setLauncherPluginOrder(currentOrder);
+                    SettingsData.set("launcherStyle", index === 2 ? "island" : index === 1 ? "spotlight" : "full");
                 }
+            }
 
-                StyledText {
+            SettingsRow {
+                iconName: "keyboard"
+                title: I18n.tr("Shortcut", "noun, keyboard shortcut row in launcher settings")
+                subtitle: root.keybindsAvailable ? "" : I18n.tr("Bind the %1 IPC action in your compositor config.", "launcher shortcut hint, %1 is the ipc target name").arg("spotlight")
+                trailingBadge: root.keysLabel(root.defaultLauncherAction)
+                trailingBadgeColor: Theme.primary
+                showChevron: root.keybindsAvailable
+                clickable: root.keybindsAvailable
+                onClicked: root.openKeybindsSearch(root.defaultLauncherKeybindSearch)
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "overview_key"
+            title: I18n.tr("Overview")
+            settingKey: "launcherNiriOverview"
+            tags: ["launcher", "niri", "overview", "overlay"]
+            visible: CompositorService.isNiri
+
+            SettingsToggleRow {
+                settingKey: "niriOverviewOverlayEnabled"
+                tags: ["launcher", "niri", "overview", "overlay", "enable"]
+                text: I18n.tr("Overlay")
+                description: I18n.tr("Typing in the overview opens the launcher")
+                checked: SettingsData.niriOverviewOverlayEnabled
+                onToggled: checked => SettingsData.set("niriOverviewOverlayEnabled", checked)
+            }
+
+            SettingsButtonGroupRow {
+                visible: SettingsData.niriOverviewOverlayEnabled
+                settingKey: "niriOverviewLauncherStyle"
+                tags: ["launcher", "niri", "overview", "overlay", "style", "spotlight", "full"]
+                text: I18n.tr("Opens")
+                model: [I18n.tr("Full"), I18n.tr("Spotlight")]
+                currentIndex: SettingsData.niriOverviewLauncherStyle === "spotlight" ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.set("niriOverviewLauncherStyle", index === 1 ? "spotlight" : "full");
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "tune"
+            title: I18n.tr("Appearance")
+            settingKey: "dankLauncherV2Appearance"
+            tags: ["launcher", "size", "grid", "columns", "footer", "badges", "darken"]
+
+            SettingsButtonGroupRow {
+                readonly property var sizes: ["micro", "compact", "medium", "large"]
+
+                settingKey: "dankLauncherV2Size"
+                tags: ["launcher", "size", "micro", "compact", "medium", "large"]
+                text: I18n.tr("Size")
+                model: ["1", "2", "3", "4"]
+                currentIndex: {
+                    const index = sizes.indexOf(SettingsData.dankLauncherV2Size);
+                    return index >= 0 ? index : 2;
+                }
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.set("dankLauncherV2Size", sizes[index]);
+                }
+            }
+
+            SettingsSliderRow {
+                settingKey: "appLauncherGridColumns"
+                tags: ["launcher", "grid", "columns", "layout"]
+                text: I18n.tr("Grid columns")
+                unit: ""
+                minimum: 2
+                maximum: 8
+                value: SettingsData.appLauncherGridColumns
+                onSliderValueChanged: newValue => SettingsData.set("appLauncherGridColumns", newValue)
+            }
+
+            SettingsToggleRow {
+                settingKey: "dankLauncherV2ShowFooter"
+                tags: ["launcher", "footer", "hints", "shortcuts", "modes", "filters"]
+                text: I18n.tr("Show footer")
+                checked: SettingsData.dankLauncherV2ShowFooter
+                enabled: SettingsData.dankLauncherV2Size !== "micro"
+                onToggled: checked => SettingsData.set("dankLauncherV2ShowFooter", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "dankLauncherV2ShowSourceBadges"
+                tags: ["launcher", "appearance", "badge", "source", "flatpak", "snap", "appimage", "nix"]
+                text: I18n.tr("Show package source badges")
+                checked: SettingsData.dankLauncherV2ShowSourceBadges
+                onToggled: checked => SettingsData.set("dankLauncherV2ShowSourceBadges", checked)
+            }
+
+            SettingsControlledBy {
+                visible: SettingsData.frameEnabled
+                parentModal: root.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Darken modal background")
+                reason: I18n.tr("Disabled by Frame Mode")
+            }
+
+            SettingsToggleRow {
+                enabled: !SettingsData.frameEnabled
+                settingKey: "modalDarkenBackground"
+                tags: ["modal", "darken", "background", "overlay", "launcher"]
+                text: I18n.tr("Darken modal background")
+                checked: SettingsData.modalDarkenBackground
+                onToggled: checked => SettingsData.set("modalDarkenBackground", checked)
+            }
+        }
+
+        SettingsToggleCard {
+            width: parent.width
+            iconName: "border_style"
+            title: I18n.tr("Border")
+            settingKey: "dankLauncherV2BorderEnabled"
+            tags: ["launcher", "border", "outline"]
+            checked: SettingsData.dankLauncherV2BorderEnabled
+            onToggled: checked => SettingsData.set("dankLauncherV2BorderEnabled", checked)
+
+            SettingsSliderRow {
+                settingKey: "dankLauncherV2BorderThickness"
+                tags: ["launcher", "border", "thickness"]
+                text: I18n.tr("Thickness")
+                minimum: 1
+                maximum: 6
+                value: SettingsData.dankLauncherV2BorderThickness
+                unit: "px"
+                onSliderValueChanged: newValue => SettingsData.set("dankLauncherV2BorderThickness", newValue)
+            }
+
+            SettingsButtonGroupRow {
+                readonly property var colors: ["primary", "secondary", "outline", "surfaceText"]
+
+                settingKey: "dankLauncherV2BorderColor"
+                tags: ["launcher", "border", "color"]
+                text: I18n.tr("Color")
+                model: [I18n.tr("Primary", "primary color"), I18n.tr("Secondary", "secondary color"), I18n.tr("Outline", "outline color"), I18n.tr("Text", "text color")]
+                currentIndex: Math.max(0, colors.indexOf(SettingsData.dankLauncherV2BorderColor))
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.set("dankLauncherV2BorderColor", colors[index]);
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "search"
+            title: I18n.tr("Search", "launcher settings section title, noun")
+            settingKey: "searchOptions"
+
+            SettingsToggleRow {
+                settingKey: "searchAppActions"
+                tags: ["launcher", "search", "actions", "shortcuts", "desktop"]
+                text: I18n.tr("App actions")
+                checked: SessionData.searchAppActions
+                onToggled: checked => SessionData.setSearchAppActions(checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "rememberLastMode"
+                tags: ["launcher", "remember", "last", "mode", "tab"]
+                text: I18n.tr("Remember last mode")
+                checked: SettingsData.rememberLastMode
+                onToggled: checked => SettingsData.set("rememberLastMode", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "rememberLastQuery"
+                tags: ["launcher", "remember", "last", "search", "query"]
+                text: I18n.tr("Remember last query")
+                checked: SettingsData.rememberLastQuery
+                onToggled: checked => SettingsData.set("rememberLastQuery", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "sortAppsAlphabetically"
+                tags: ["launcher", "sort", "alphabetically", "apps", "order", "usage", "frequency"]
+                text: I18n.tr("Sort alphabetically")
+                checked: SettingsData.sortAppsAlphabetically
+                onToggled: checked => SettingsData.set("sortAppsAlphabetically", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "dankLauncherV2IncludeFilesInAll"
+                tags: ["launcher", "files", "dsearch", "all", "results", "indexed"]
+                text: I18n.tr("Include files in All tab")
+                checked: SettingsData.dankLauncherV2IncludeFilesInAll
+                onToggled: checked => SettingsData.set("dankLauncherV2IncludeFilesInAll", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "dankLauncherV2IncludeFoldersInAll"
+                tags: ["launcher", "folders", "dirs", "dsearch", "all", "results", "indexed"]
+                text: I18n.tr("Include folders in All tab")
+                checked: SettingsData.dankLauncherV2IncludeFoldersInAll
+                onToggled: checked => SettingsData.set("dankLauncherV2IncludeFoldersInAll", checked)
+            }
+        }
+
+        SettingsCard {
+            id: hiddenAppsCard
+            width: parent.width
+            iconName: "visibility_off"
+            title: I18n.tr("Hidden apps")
+            settingKey: "hiddenApps"
+
+            property var hiddenAppsModel: {
+                SessionData.hiddenApps;
+                const apps = [];
+                const allApps = AppSearchService.applications || [];
+                for (const hiddenId of SessionData.hiddenApps) {
+                    const app = allApps.find(a => (a.id || a.execString || a.exec) === hiddenId);
+                    if (app) {
+                        apps.push({
+                            id: hiddenId,
+                            name: app.name || hiddenId,
+                            icon: app.icon || "",
+                            comment: app.comment || ""
+                        });
+                    } else {
+                        apps.push({
+                            id: hiddenId,
+                            name: hiddenId,
+                            icon: "",
+                            comment: ""
+                        });
+                    }
+                }
+                return apps.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            SettingsRow {
+                body: StyledText {
                     width: parent.width
-                    text: I18n.tr("Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.")
+                    text: I18n.tr("Right-click an app in the launcher and choose 'Hide App'")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
                 }
-
-                Column {
-                    id: pluginVisibilityColumn
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    Repeater {
-                        model: pluginVisibilityCard.allLauncherPlugins
-
-                        delegate: Item {
-                            id: visibilityDelegateItem
-                            required property var modelData
-                            required property int index
-
-                            property bool held: pluginDragArea.pressed
-                            property real originalY: y
-
-                            width: pluginVisibilityColumn.width
-                            height: 52
-                            z: held ? 2 : 1
-
-                            Rectangle {
-                                id: visibilityDelegate
-                                width: parent.width
-                                height: 52
-                                radius: Theme.cornerRadius
-                                color: visibilityDelegateItem.held ? Theme.surfaceHover : Theme.floatingWindowFieldColor
-
-                                Row {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: 28
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingM
-
-                                    Item {
-                                        width: Theme.iconSize
-                                        height: Theme.iconSize
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            visible: visibilityDelegateItem.modelData.iconType !== "unicode"
-                                            name: visibilityDelegateItem.modelData.icon
-                                            size: Theme.iconSize
-                                            color: Theme.primary
-                                        }
-
-                                        StyledText {
-                                            anchors.centerIn: parent
-                                            visible: visibilityDelegateItem.modelData.iconType === "unicode"
-                                            text: visibilityDelegateItem.modelData.icon
-                                            font.pixelSize: Theme.iconSize
-                                            color: Theme.primary
-                                        }
-                                    }
-
-                                    Column {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: Theme.spacingXXS
-
-                                        Row {
-                                            spacing: Theme.spacingS
-
-                                            StyledText {
-                                                text: visibilityDelegateItem.modelData.name
-                                                font.pixelSize: Theme.fontSizeMedium
-                                                color: Theme.surfaceText
-                                            }
-
-                                            Rectangle {
-                                                visible: visibilityDelegateItem.modelData.isBuiltIn
-                                                width: dmsBadgeLabel.implicitWidth + Theme.spacingS
-                                                height: 16
-                                                radius: 8
-                                                color: Theme.primaryContainer
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                StyledText {
-                                                    id: dmsBadgeLabel
-                                                    anchors.centerIn: parent
-                                                    text: "DMS"
-                                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                                    color: Theme.primary
-                                                }
-                                            }
-                                        }
-
-                                        StyledText {
-                                            text: visibilityDelegateItem.modelData.trigger ? I18n.tr("Trigger: %1").arg(visibilityDelegateItem.modelData.trigger) : I18n.tr("No trigger")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-                                    }
-                                }
-
-                                DankToggle {
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: Theme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    checked: {
-                                        switch (visibilityDelegateItem.modelData.id) {
-                                        case "__files":
-                                            return SettingsData.dankLauncherV2IncludeFilesInAll;
-                                        case "__folders":
-                                            return SettingsData.dankLauncherV2IncludeFoldersInAll;
-                                        default:
-                                            return SettingsData.getPluginAllowWithoutTrigger(visibilityDelegateItem.modelData.id);
-                                        }
-                                    }
-                                    onToggled: function (isChecked) {
-                                        switch (visibilityDelegateItem.modelData.id) {
-                                        case "__files":
-                                            SettingsData.set("dankLauncherV2IncludeFilesInAll", isChecked);
-                                            break;
-                                        case "__folders":
-                                            SettingsData.set("dankLauncherV2IncludeFoldersInAll", isChecked);
-                                            break;
-                                        default:
-                                            SettingsData.setPluginAllowWithoutTrigger(visibilityDelegateItem.modelData.id, isChecked);
-                                        }
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: pluginDragArea
-                                anchors.left: parent.left
-                                anchors.top: parent.top
-                                width: 28
-                                height: parent.height
-                                hoverEnabled: true
-                                cursorShape: Qt.SizeVerCursor
-                                drag.target: visibilityDelegateItem.held ? visibilityDelegateItem : undefined
-                                drag.axis: Drag.YAxis
-                                preventStealing: true
-
-                                onPressed: {
-                                    visibilityDelegateItem.originalY = visibilityDelegateItem.y;
-                                }
-
-                                onReleased: {
-                                    if (!drag.active) {
-                                        visibilityDelegateItem.y = visibilityDelegateItem.originalY;
-                                        return;
-                                    }
-                                    const spacing = Theme.spacingS;
-                                    const itemH = visibilityDelegateItem.height + spacing;
-                                    var newIndex = Math.round(visibilityDelegateItem.y / itemH);
-                                    newIndex = Math.max(0, Math.min(newIndex, pluginVisibilityCard.allLauncherPlugins.length - 1));
-                                    pluginVisibilityCard.reorderPlugin(visibilityDelegateItem.index, newIndex);
-                                    visibilityDelegateItem.y = visibilityDelegateItem.originalY;
-                                }
-                            }
-
-                            DankIcon {
-                                x: Theme.spacingXS
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: "drag_indicator"
-                                size: 18
-                                color: Theme.outline
-                                opacity: pluginDragArea.containsMouse || pluginDragArea.pressed ? 1 : 0.5
-                            }
-
-                            Behavior on y {
-                                enabled: !pluginDragArea.pressed && !pluginDragArea.drag.active
-                                NumberAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-                    }
-
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("No launcher plugins installed.")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
-                        horizontalAlignment: Text.AlignHCenter
-                        visible: pluginVisibilityCard.allLauncherPlugins.length === 0
-                    }
-                }
             }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "search"
-                title: I18n.tr("Search Options")
-                settingKey: "searchOptions"
-
-                SettingsToggleRow {
-                    settingKey: "searchAppActions"
-                    tags: ["launcher", "search", "actions", "shortcuts"]
-                    text: I18n.tr("Search App Actions")
-                    description: I18n.tr("Include desktop actions (shortcuts) in search results.")
-                    checked: SessionData.searchAppActions
-                    onToggled: checked => SessionData.setSearchAppActions(checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "rememberLastMode"
-                    tags: ["launcher", "remember", "last", "mode", "tab"]
-                    text: I18n.tr("Remember Last Mode")
-                    description: I18n.tr("Restore the last selected mode (tab) when the launcher is opened")
-                    checked: SettingsData.rememberLastMode
-                    onToggled: checked => SettingsData.set("rememberLastMode", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "rememberLastQuery"
-                    tags: ["launcher", "remember", "last", "search", "query"]
-                    text: I18n.tr("Remember Last Query")
-                    description: I18n.tr("Autofill last remembered query when opened")
-                    checked: SettingsData.rememberLastQuery
-                    onToggled: checked => SettingsData.set("rememberLastQuery", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2IncludeFilesInAll"
-                    tags: ["launcher", "files", "dsearch", "all", "results", "indexed"]
-                    text: I18n.tr("Include Files in All Tab")
-                    description: I18n.tr("Merge indexed file results into the All tab (requires dsearch).")
-                    checked: SettingsData.dankLauncherV2IncludeFilesInAll
-                    onToggled: checked => SettingsData.set("dankLauncherV2IncludeFilesInAll", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "dankLauncherV2IncludeFoldersInAll"
-                    tags: ["launcher", "folders", "dirs", "dsearch", "all", "results", "indexed"]
-                    text: I18n.tr("Include Folders in All Tab")
-                    description: I18n.tr("Merge indexed folder results into the All tab (requires dsearch).")
-                    checked: SettingsData.dankLauncherV2IncludeFoldersInAll
-                    onToggled: checked => SettingsData.set("dankLauncherV2IncludeFoldersInAll", checked)
-                }
-            }
-
-            SettingsCard {
-                id: hiddenAppsCard
-                width: parent.width
-                iconName: "visibility_off"
-                title: I18n.tr("Hidden Apps")
-                settingKey: "hiddenApps"
-
-                property var hiddenAppsModel: {
-                    SessionData.hiddenApps;
-                    const apps = [];
-                    const allApps = AppSearchService.applications || [];
-                    for (const hiddenId of SessionData.hiddenApps) {
-                        const app = allApps.find(a => (a.id || a.execString || a.exec) === hiddenId);
-                        if (app) {
-                            apps.push({
-                                id: hiddenId,
-                                name: app.name || hiddenId,
-                                icon: app.icon || "",
-                                comment: app.comment || ""
-                            });
-                        } else {
-                            apps.push({
-                                id: hiddenId,
-                                name: hiddenId,
-                                icon: "",
-                                comment: ""
-                            });
-                        }
-                    }
-                    return apps.sort((a, b) => a.name.localeCompare(b.name));
-                }
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                Column {
+            SettingsRow {
+                body: Column {
                     id: hiddenAppsList
                     width: parent.width
                     spacing: Theme.spacingS
@@ -1265,18 +352,13 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingM
 
-                                Image {
+                                AppIconRenderer {
                                     width: 24
                                     height: 24
-                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
+                                    iconValue: modelData.icon || "application-x-executable"
+                                    iconSize: 24
+                                    fallbackText: (modelData.name || "?").charAt(0).toUpperCase()
                                     anchors.verticalCenter: parent.verticalCenter
-                                    onStatusChanged: {
-                                        if (status === Image.Error)
-                                            source = "image://icon/application-x-executable";
-                                    }
                                 }
 
                                 Column {
@@ -1286,7 +368,7 @@ Item {
                                     StyledText {
                                         text: modelData.name
                                         font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                         color: Theme.surfaceText
                                     }
 
@@ -1304,6 +386,7 @@ Item {
                                 anchors.rightMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
                                 iconName: "visibility"
+                                Accessible.name: I18n.tr("Show")
                                 iconSize: 18
                                 iconColor: Theme.primary
                                 onClicked: SessionData.showApp(modelData.id)
@@ -1321,41 +404,45 @@ Item {
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                id: appOverridesCard
-                width: parent.width
-                iconName: "edit"
-                title: I18n.tr("App Customizations")
-                settingKey: "appOverrides"
+        SettingsCard {
+            id: appOverridesCard
+            width: parent.width
+            iconName: "edit"
+            title: I18n.tr("App customizations")
+            settingKey: "appOverrides"
 
-                property var overridesModel: {
-                    SessionData.appOverrides;
-                    const items = [];
-                    const allApps = AppSearchService.applications || [];
-                    for (const appId in SessionData.appOverrides) {
-                        const override = SessionData.appOverrides[appId];
-                        const app = allApps.find(a => (a.id || a.execString || a.exec) === appId);
-                        items.push({
-                            id: appId,
-                            name: override.name || app?.name || appId,
-                            originalName: app?.name || appId,
-                            icon: override.icon || app?.icon || "",
-                            hasOverride: true
-                        });
-                    }
-                    return items.sort((a, b) => a.name.localeCompare(b.name));
+            property var overridesModel: {
+                SessionData.appOverrides;
+                const items = [];
+                const allApps = AppSearchService.applications || [];
+                for (const appId in SessionData.appOverrides) {
+                    const override = SessionData.appOverrides[appId];
+                    const app = allApps.find(a => (a.id || a.execString || a.exec) === appId);
+                    items.push({
+                        id: appId,
+                        name: override.name || app?.name || appId,
+                        originalName: app?.name || appId,
+                        icon: override.icon || app?.icon || "",
+                        hasOverride: true
+                    });
                 }
+                return items.sort((a, b) => a.name.localeCompare(b.name));
+            }
 
-                StyledText {
+            SettingsRow {
+                body: StyledText {
                     width: parent.width
-                    text: I18n.tr("Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.")
+                    text: I18n.tr("Right-click an app in the launcher and choose 'Edit App'")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     wrapMode: Text.WordWrap
                 }
+            }
 
-                Column {
+            SettingsRow {
+                body: Column {
                     id: overridesList
                     width: parent.width
                     spacing: Theme.spacingS
@@ -1376,18 +463,13 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.spacingM
 
-                                Image {
+                                AppIconRenderer {
                                     width: 24
                                     height: 24
-                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
+                                    iconValue: modelData.icon || "application-x-executable"
+                                    iconSize: 24
+                                    fallbackText: (modelData.name || "?").charAt(0).toUpperCase()
                                     anchors.verticalCenter: parent.verticalCenter
-                                    onStatusChanged: {
-                                        if (status === Image.Error)
-                                            source = "image://icon/application-x-executable";
-                                    }
                                 }
 
                                 Column {
@@ -1397,7 +479,7 @@ Item {
                                     StyledText {
                                         text: modelData.name
                                         font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                         color: Theme.surfaceText
                                     }
 
@@ -1414,6 +496,7 @@ Item {
                                 anchors.rightMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
                                 iconName: "delete"
+                                tooltipText: I18n.tr("Reset to default")
                                 iconSize: 18
                                 iconColor: Theme.error
                                 onClicked: SessionData.clearAppOverride(modelData.id)
@@ -1431,42 +514,461 @@ Item {
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                id: recentAppsCard
-                width: parent.width
-                iconName: "history"
-                title: I18n.tr("Recently Used Apps")
-                settingKey: "recentApps"
-                collapsible: true
-                expanded: false
+        SettingsCard {
+            id: pluginVisibilityCard
+            width: parent.width
+            iconName: "filter_list"
+            title: I18n.tr("Plugin visibility")
+            settingKey: "pluginVisibility"
 
-                property var rankedAppsModel: {
-                    var ranking = AppUsageHistoryData.appUsageRanking;
-                    if (!ranking)
-                        return [];
-                    var apps = [];
-                    for (var appId in ranking) {
-                        var appData = ranking[appId];
-                        apps.push({
-                            "id": appId,
-                            "name": appData.name,
-                            "exec": appData.exec,
-                            "icon": appData.icon,
-                            "comment": appData.comment,
-                            "usageCount": appData.usageCount,
-                            "lastUsed": appData.lastUsed
-                        });
-                    }
-                    apps.sort(function (a, b) {
-                        if (a.usageCount !== b.usageCount)
-                            return b.usageCount - a.usageCount;
-                        return a.name.localeCompare(b.name);
+            property var allLauncherPlugins: {
+                SettingsData.launcherPluginVisibility;
+                SettingsData.launcherPluginOrder;
+                SettingsData.dankLauncherV2IncludeFilesInAll;
+                SettingsData.dankLauncherV2IncludeFoldersInAll;
+                var plugins = [];
+                var builtIn = AppSearchService.getBuiltInLauncherPlugins() || {};
+                for (var pluginId in builtIn) {
+                    var plugin = builtIn[pluginId];
+                    plugins.push({
+                        id: pluginId,
+                        name: plugin.name || pluginId,
+                        icon: plugin.cornerIcon || "extension",
+                        iconType: "material",
+                        isBuiltIn: true,
+                        isVirtual: false,
+                        trigger: AppSearchService.getBuiltInPluginTrigger(pluginId) || ""
                     });
-                    return apps.slice(0, 20);
                 }
+                var thirdParty = PluginService.getLauncherPlugins() || {};
+                for (var pluginId in thirdParty) {
+                    var plugin = thirdParty[pluginId];
+                    var rawIcon = plugin.icon || "extension";
+                    plugins.push({
+                        id: pluginId,
+                        name: plugin.name || pluginId,
+                        icon: rawIcon.startsWith("material:") ? rawIcon.substring(9) : rawIcon.startsWith("unicode:") ? rawIcon.substring(8) : rawIcon,
+                        iconType: rawIcon.startsWith("unicode:") ? "unicode" : "material",
+                        isBuiltIn: false,
+                        isVirtual: false,
+                        trigger: PluginService.getPluginTrigger(pluginId) || ""
+                    });
+                }
+                if (SettingsData.dankLauncherV2IncludeFilesInAll) {
+                    plugins.push({
+                        id: "__files",
+                        name: I18n.tr("Files"),
+                        icon: "insert_drive_file",
+                        iconType: "material",
+                        isBuiltIn: false,
+                        isVirtual: true,
+                        trigger: "/"
+                    });
+                }
+                if (SettingsData.dankLauncherV2IncludeFoldersInAll) {
+                    plugins.push({
+                        id: "__folders",
+                        name: I18n.tr("Folders"),
+                        icon: "folder",
+                        iconType: "material",
+                        isBuiltIn: false,
+                        isVirtual: true,
+                        trigger: "/"
+                    });
+                }
+                return SettingsData.getOrderedLauncherPlugins(plugins);
+            }
 
-                Row {
+            SettingsRow {
+                body: StyledText {
+                    width: parent.width
+                    text: I18n.tr("Plugins shown in All mode without a trigger. Drag to reorder")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+            }
+
+            SettingsReorderList {
+                id: pluginList
+
+                model: pluginVisibilityCard.allLauncherPlugins
+                onReordered: indices => SettingsData.setLauncherPluginOrder(indices.map(i => pluginVisibilityCard.allLauncherPlugins[i].id))
+
+                delegate: SettingsReorderRow {
+                    id: pluginRow
+
+                    required property var modelData
+
+                    reorderList: pluginList
+                    title: modelData.name
+                    subtitle: modelData.trigger ? I18n.tr("Trigger: %1", "launcher plugin subtitle, %1 is the trigger prefix text").arg(modelData.trigger) : I18n.tr("No trigger")
+                    iconName: modelData.iconType !== "unicode" ? modelData.icon : ""
+                    trailingBadge: modelData.isBuiltIn ? "DMS" : ""
+                    textIcon: modelData.iconType === "unicode" ? modelData.icon : ""
+
+                    DankToggle {
+                        hideText: true
+                        checked: {
+                            switch (pluginRow.modelData.id) {
+                            case "__files":
+                                return SettingsData.dankLauncherV2IncludeFilesInAll;
+                            case "__folders":
+                                return SettingsData.dankLauncherV2IncludeFoldersInAll;
+                            default:
+                                return SettingsData.getPluginAllowWithoutTrigger(pluginRow.modelData.id);
+                            }
+                        }
+                        onToggled: isChecked => {
+                            switch (pluginRow.modelData.id) {
+                            case "__files":
+                                SettingsData.set("dankLauncherV2IncludeFilesInAll", isChecked);
+                                return;
+                            case "__folders":
+                                SettingsData.set("dankLauncherV2IncludeFoldersInAll", isChecked);
+                                return;
+                            default:
+                                SettingsData.setPluginAllowWithoutTrigger(pluginRow.modelData.id, isChecked);
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: pluginVisibilityCard.allLauncherPlugins.length === 0
+                body: StyledText {
+                    width: parent.width
+                    text: I18n.tr("No launcher plugins installed.")
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceVariantText
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "extension"
+            title: I18n.tr("Built-in plugins")
+            settingKey: "launcherBuiltInPlugins"
+            tags: ["launcher", "plugins", "trigger", "builtin", "settings", "notepad", "calculator", "clipboard", "power"]
+
+            Repeater {
+                model: ["dms_settings", "dms_notepad", "dms_sysmon", "dms_settings_search", "dms_clipboard_search", "dms_power", "dms_vpn", "dms_colorpicker", "dms_qr_generator"]
+
+                SettingsRow {
+                    id: builtInRow
+
+                    required property string modelData
+                    readonly property var plugin: AppSearchService.builtInPlugins[modelData]
+
+                    iconName: plugin?.cornerIcon ?? "extension"
+                    title: plugin?.name ?? modelData
+                    subtitle: plugin?.comment ?? ""
+
+                    DankTextField {
+                        outlined: true
+                        leftIconName: "keyboard"
+                        labelText: I18n.tr("Trigger", "noun, launcher plugin trigger prefix text field label")
+                        width: Theme.fontSizeMedium * 6 + Theme.iconButtonSize
+                        visible: builtInRow.plugin?.isLauncher === true
+                        anchors.verticalCenter: parent.verticalCenter
+                        onTextEdited: SettingsData.setBuiltInPluginSetting(builtInRow.modelData, "trigger", text)
+                        Component.onCompleted: text = SettingsData.getBuiltInPluginSetting(builtInRow.modelData, "trigger", builtInRow.plugin?.defaultTrigger ?? "")
+                    }
+
+                    DankToggle {
+                        hideText: true
+                        anchors.verticalCenter: parent.verticalCenter
+                        checked: SettingsData.getBuiltInPluginSetting(builtInRow.modelData, "enabled", true)
+                        onToggled: checked => SettingsData.setBuiltInPluginSetting(builtInRow.modelData, "enabled", checked)
+                    }
+                }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "horizontal_split"
+            title: I18n.tr("Spotlight bar")
+            settingKey: "spotlightBar"
+            tags: ["launcher", "spotlight", "bar", "shortcut", "chips"]
+
+            SettingsRow {
+                iconName: "keyboard"
+                title: I18n.tr("Shortcut")
+                subtitle: root.keybindsAvailable ? "" : I18n.tr("Bind the %1 IPC action in your compositor config.").arg("spotlight-bar")
+                trailingBadge: root.keysLabel(root.spotlightBarAction)
+                trailingBadgeColor: Theme.primary
+                showChevron: root.keybindsAvailable
+                clickable: root.keybindsAvailable
+                onClicked: root.openKeybindsSearch(root.spotlightBarKeybindSearch)
+            }
+
+            SettingsToggleRow {
+                settingKey: "spotlightBarShowModeChips"
+                tags: ["launcher", "spotlight", "bar", "chips", "tabs", "modes", "filters"]
+                text: I18n.tr("Show mode chips")
+                checked: SettingsData.spotlightBarShowModeChips
+                onToggled: checked => SettingsData.set("spotlightBarShowModeChips", checked)
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "rocket_launch"
+            title: I18n.tr("Launching", "launcher settings card about how apps are launched")
+            settingKey: "launcherLaunching"
+            tags: ["launcher", "prefix", "terminal", "uwsm"]
+
+            SettingsTextFieldRow {
+                settingKey: "launchPrefix"
+                tags: ["launcher", "prefix", "uwsm", "command", "launch"]
+                text: I18n.tr("Launch prefix")
+                leftIconName: "terminal"
+                placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
+                value: SettingsData.launchPrefix
+                onValueEdited: value => SettingsData.set("launchPrefix", value)
+            }
+
+            TerminalPickerRow {}
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "image"
+            title: I18n.tr("Launcher button")
+            settingKey: "launcherLogo"
+            tags: ["launcher", "logo", "icon", "button", "os", "distro", "custom", "color"]
+
+            SettingsButtonGroupRow {
+                readonly property var modes: ["apps", "os", "dank", "compositor", "custom"]
+
+                settingKey: "launcherLogoMode"
+                tags: ["launcher", "logo", "icon", "os", "distro", "compositor", "custom"]
+                text: I18n.tr("Icon")
+                model: [I18n.tr("Apps Icon"), I18n.tr("OS Logo"), "Dank", root.compositorLabel, I18n.tr("Custom")]
+                currentIndex: Math.max(0, modes.indexOf(SettingsData.launcherLogoMode))
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.set("launcherLogoMode", modes[index]);
+                }
+            }
+
+            SettingsRow {
+                visible: SettingsData.launcherLogoMode === "custom"
+                body: Row {
+                    width: parent.width
+                    spacing: Theme.spacingM
+
+                    StyledRect {
+                        width: parent.width - selectButton.width - Theme.spacingM
+                        height: 36
+                        radius: Theme.cornerRadius
+                        color: Theme.floatingWindowFieldColor
+                        border.color: Theme.floatingWindowFieldBorderColor
+                        border.width: Theme.outlineWidth
+
+                        StyledText {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: SettingsData.launcherLogoCustomPath || I18n.tr("Select an image file...")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: SettingsData.launcherLogoCustomPath ? Theme.surfaceText : Theme.outlineButton
+                            width: parent.width - Theme.spacingM * 2
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideMiddle
+                            horizontalAlignment: Text.AlignLeft
+                        }
+                    }
+
+                    DankActionButton {
+                        id: selectButton
+                        iconName: "folder_open"
+                        Accessible.name: I18n.tr("Select Launcher Logo")
+                        width: 36
+                        height: 36
+                        onClicked: logoFileBrowser.open()
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: SettingsData.launcherLogoMode !== "apps"
+                title: I18n.tr("Color override")
+                resetKeys: ["launcherLogoColorOverride"]
+                body: Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+
+                    Item {
+                        width: parent.width
+                        height: colorOverrideRow.implicitHeight
+                        clip: true
+
+                        Row {
+                            id: colorOverrideRow
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: Theme.spacingM
+
+                            DankButtonGroup {
+                                id: colorModeGroup
+                                maximumWidth: parent.parent.width - (colorPickerCircle.visible ? colorPickerCircle.width + Theme.spacingM : 0)
+                                buttonPadding: parent.parent.width < 480 ? Theme.spacingS : Theme.spacingL
+                                minButtonWidth: parent.parent.width < 480 ? 44 : 64
+                                textSize: parent.parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                                model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
+                                currentIndex: {
+                                    const override = SettingsData.launcherLogoColorOverride;
+                                    if (override === "")
+                                        return 0;
+                                    if (override === "primary")
+                                        return 1;
+                                    if (override === "surface")
+                                        return 2;
+                                    return 3;
+                                }
+                                onSelectionChanged: (index, selected) => {
+                                    if (!selected)
+                                        return;
+                                    switch (index) {
+                                    case 0:
+                                        SettingsData.set("launcherLogoColorOverride", "");
+                                        break;
+                                    case 1:
+                                        SettingsData.set("launcherLogoColorOverride", "primary");
+                                        break;
+                                    case 2:
+                                        SettingsData.set("launcherLogoColorOverride", "surface");
+                                        break;
+                                    case 3:
+                                        const currentOverride = SettingsData.launcherLogoColorOverride;
+                                        const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface";
+                                        if (isPreset) {
+                                            SettingsData.set("launcherLogoColorOverride", "#ffffff");
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                id: colorPickerCircle
+                                visible: {
+                                    const override = SettingsData.launcherLogoColorOverride;
+                                    return override !== "" && override !== "primary" && override !== "surface";
+                                }
+                                width: 36
+                                height: 36
+                                radius: Theme.fullRadius(width, height)
+                                color: {
+                                    const override = SettingsData.launcherLogoColorOverride;
+                                    if (override !== "" && override !== "primary" && override !== "surface")
+                                        return override;
+                                    return "#ffffff";
+                                }
+                                border.color: Theme.outline
+                                border.width: Theme.outlineWidth
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (!PopoutService.colorPickerModal)
+                                            return;
+                                        PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride;
+                                        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color");
+                                        PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                            SettingsData.set("launcherLogoColorOverride", selectedColor);
+                                        };
+                                        PopoutService.colorPickerModal.show();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsSliderRow {
+                visible: SettingsData.launcherLogoMode !== "apps"
+                settingKey: "launcherLogoSizeOffset"
+                tags: ["launcher", "logo", "size", "offset", "scale"]
+                text: I18n.tr("Size offset")
+                unit: "px"
+                minimum: -12
+                maximum: 12
+                value: SettingsData.launcherLogoSizeOffset
+                onSliderValueChanged: newValue => SettingsData.set("launcherLogoSizeOffset", newValue)
+            }
+
+            SettingsSliderRow {
+                visible: SettingsData.launcherLogoMode !== "apps" && !["", "primary", "surface"].includes(SettingsData.launcherLogoColorOverride)
+                settingKey: "launcherLogoBrightness"
+                tags: ["launcher", "logo", "brightness", "color"]
+                text: I18n.tr("Brightness")
+                minimum: 0
+                maximum: 100
+                value: Math.round(SettingsData.launcherLogoBrightness * 100)
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("launcherLogoBrightness", newValue / 100)
+            }
+
+            SettingsSliderRow {
+                visible: SettingsData.launcherLogoMode !== "apps" && !["", "primary", "surface"].includes(SettingsData.launcherLogoColorOverride)
+                settingKey: "launcherLogoContrast"
+                tags: ["launcher", "logo", "contrast", "color"]
+                text: I18n.tr("Contrast")
+                minimum: 0
+                maximum: 200
+                value: Math.round(SettingsData.launcherLogoContrast * 100)
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("launcherLogoContrast", newValue / 100)
+            }
+        }
+
+        SettingsCard {
+            id: recentAppsCard
+            width: parent.width
+            iconName: "history"
+            title: I18n.tr("Recently used apps")
+            settingKey: "recentApps"
+            collapsible: true
+            expanded: false
+
+            property var rankedAppsModel: {
+                var ranking = AppUsageHistoryData.appUsageRanking;
+                if (!ranking)
+                    return [];
+                var apps = [];
+                for (var appId in ranking) {
+                    var appData = ranking[appId];
+                    apps.push({
+                        "id": appId,
+                        "name": appData.name,
+                        "exec": appData.exec,
+                        "icon": appData.icon,
+                        "comment": appData.comment,
+                        "usageCount": appData.usageCount,
+                        "lastUsed": appData.lastUsed
+                    });
+                }
+                apps.sort(function (a, b) {
+                    if (a.usageCount !== b.usageCount)
+                        return b.usageCount - a.usageCount;
+                    return a.name.localeCompare(b.name);
+                });
+                return apps.slice(0, 20);
+            }
+
+            SettingsRow {
+                body: Row {
                     width: parent.width
                     spacing: Theme.spacingM
 
@@ -1482,7 +984,8 @@ Item {
                     DankActionButton {
                         id: clearAllButton
                         iconName: "delete_sweep"
-                        iconSize: Theme.iconSize - 2
+                        tooltipText: I18n.tr("Clear All")
+                        iconSize: Theme.iconSizeMedium
                         iconColor: Theme.error
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
@@ -1491,8 +994,10 @@ Item {
                         }
                     }
                 }
+            }
 
-                Column {
+            SettingsRow {
+                body: Column {
                     id: rankedAppsList
                     width: parent.width
                     spacing: Theme.spacingS
@@ -1516,24 +1021,19 @@ Item {
                                 StyledText {
                                     text: (index + 1).toString()
                                     font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: Font.Medium
+                                    font.weight: Theme.fontWeightMedium
                                     color: Theme.primary
                                     width: 20
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
-                                Image {
+                                AppIconRenderer {
                                     width: 24
                                     height: 24
-                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
+                                    iconValue: modelData.icon || "application-x-executable"
+                                    iconSize: 24
+                                    fallbackText: (modelData.name || "?").charAt(0).toUpperCase()
                                     anchors.verticalCenter: parent.verticalCenter
-                                    onStatusChanged: {
-                                        if (status === Image.Error)
-                                            source = "image://icon/application-x-executable";
-                                    }
                                 }
 
                                 Column {
@@ -1543,7 +1043,7 @@ Item {
                                     StyledText {
                                         text: modelData.name || I18n.tr("Unknown App")
                                         font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                         color: Theme.surfaceText
                                     }
 
@@ -1560,12 +1060,12 @@ Item {
                                             if (diffMins < 1)
                                                 return I18n.tr("Last launched just now");
                                             if (diffMins < 60)
-                                                return diffMins === 1 ? I18n.tr("Last launched %1 minute ago").arg(diffMins) : I18n.tr("Last launched %1 minutes ago").arg(diffMins);
+                                                return diffMins === 1 ? I18n.tr("Last launched %1 minute ago", "singular, app usage list in launcher settings, %1 is 1").arg(diffMins) : I18n.tr("Last launched %1 minutes ago", "plural, app usage list in launcher settings, %1 is a count").arg(diffMins);
                                             if (diffHours < 24)
-                                                return diffHours === 1 ? I18n.tr("Last launched %1 hour ago").arg(diffHours) : I18n.tr("Last launched %1 hours ago").arg(diffHours);
+                                                return diffHours === 1 ? I18n.tr("Last launched %1 hour ago", "singular, app usage list in launcher settings, %1 is 1").arg(diffHours) : I18n.tr("Last launched %1 hours ago", "plural, app usage list in launcher settings, %1 is a count").arg(diffHours);
                                             if (diffDays < 7)
-                                                return diffDays === 1 ? I18n.tr("Last launched %1 day ago").arg(diffDays) : I18n.tr("Last launched %1 days ago").arg(diffDays);
-                                            return I18n.tr("Last launched %1").arg(date.toLocaleDateString());
+                                                return diffDays === 1 ? I18n.tr("Last launched %1 day ago", "singular, app usage list in launcher settings, %1 is 1").arg(diffDays) : I18n.tr("Last launched %1 days ago", "plural, app usage list in launcher settings, %1 is a count").arg(diffDays);
+                                            return I18n.tr("Last launched %1", "app usage list in launcher settings, %1 is a localized date").arg(date.toLocaleDateString());
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
@@ -1579,6 +1079,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 circular: true
                                 iconName: "close"
+                                Accessible.name: I18n.tr("Remove")
                                 iconSize: 16
                                 iconColor: Theme.error
                                 onClicked: {
@@ -1600,6 +1101,31 @@ Item {
                         visible: recentAppsCard.rankedAppsModel.length === 0
                     }
                 }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            title: I18n.tr("Advanced")
+            settingKey: "launcherAdvanced"
+            tags: ["launcher", "advanced", "overlay", "layer", "unload", "memory"]
+            collapsible: true
+            expanded: false
+
+            SettingsToggleRow {
+                settingKey: "launcherUseOverlayLayer"
+                tags: ["launcher", "fullscreen", "overlay", "layer"]
+                text: I18n.tr("Use overlay layer")
+                checked: SettingsData.launcherUseOverlayLayer
+                onToggled: checked => SettingsData.set("launcherUseOverlayLayer", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "dankLauncherV2UnloadOnClose"
+                tags: ["launcher", "unload", "close", "memory", "vram"]
+                text: I18n.tr("Unload on close")
+                checked: SettingsData.dankLauncherV2UnloadOnClose
+                onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
             }
         }
     }

@@ -1,0 +1,108 @@
+import QtQuick
+import qs.Common
+import qs.Widgets
+
+Item {
+    id: root
+
+    property string text: ""
+    property alias actions: actionsRow.data
+    property bool collapsible: false
+    property bool expanded: true
+
+    activeFocusOnTab: collapsible && enabled
+    Accessible.role: collapsible ? Accessible.Button : Accessible.StaticText
+    Accessible.name: text
+    Accessible.onPressAction: {
+        if (collapsible && enabled)
+            toggleRequested();
+    }
+
+    Keys.onPressed: event => {
+        if (!collapsible || !enabled)
+            return;
+        switch (event.key) {
+        case Qt.Key_Space:
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            toggleRequested();
+            event.accepted = true;
+            break;
+        }
+    }
+
+    FocusRing {
+        radius: Theme.cornerRadiusS + Theme.focusRingOffset
+        visible: root.activeFocus && root.collapsible
+    }
+
+    signal toggleRequested
+
+    width: parent?.width ?? 0
+    height: Math.max(label.implicitHeight, actionsRow.implicitHeight, caret.height) + SettingsMetrics.sectionLabelTopGap + SettingsMetrics.sectionLabelBottomGap
+
+    StyledText {
+        id: label
+        anchors.left: parent.left
+        anchors.right: actionsRow.left
+        anchors.rightMargin: Theme.spacingS
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: (SettingsMetrics.sectionLabelTopGap - SettingsMetrics.sectionLabelBottomGap) / 2
+        text: root.text
+        font.pixelSize: Theme.fontSizeMedium
+        font.weight: Theme.fontWeightMedium
+        color: Theme.primary
+        wrapMode: Text.WordWrap
+        horizontalAlignment: Text.AlignLeft
+    }
+
+    Row {
+        id: actionsRow
+        anchors.right: root.collapsible ? caret.left : parent.right
+        anchors.rightMargin: root.collapsible ? Theme.spacingS : 0
+        anchors.verticalCenter: label.verticalCenter
+        spacing: Theme.spacingXS
+    }
+
+    DankIcon {
+        id: caret
+        anchors.right: parent.right
+        anchors.verticalCenter: label.verticalCenter
+        name: "expand_more"
+        size: Theme.iconSize
+        color: Theme.surfaceVariantText
+        visible: root.collapsible
+        rotation: root.expanded ? 180 : 0
+
+        Behavior on rotation {
+            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveFastSpatial
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+            }
+        }
+    }
+
+    Rectangle {
+        id: headerHit
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.topMargin: SettingsMetrics.sectionLabelTopGap - Theme.spacingXS
+        anchors.bottomMargin: SettingsMetrics.sectionLabelBottomGap - Theme.spacingXS
+        anchors.leftMargin: -Theme.spacingS
+        anchors.rightMargin: -Theme.spacingS
+        radius: Theme.cornerRadiusS
+        color: "transparent"
+        visible: root.collapsible
+        z: -1
+
+        StateLayer {
+            stateColor: Theme.primary
+            cornerRadius: parent.radius
+            onClicked: root.toggleRequested()
+        }
+    }
+}

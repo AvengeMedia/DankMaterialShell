@@ -3,10 +3,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
-StyledRect {
+Column {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
@@ -22,174 +21,73 @@ StyledRect {
     property bool expanded: true
     property real headerLeftPadding: 0
 
-    default property alias content: contentColumn.children
-    property alias headerActions: headerActionsRow.children
+    default property alias content: contentGroup.content
+    property alias headerActions: sectionLabel.actions
 
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
+    readonly property bool collapsed: collapsible && !expanded
+    readonly property bool hasHeader: root.title !== ""
+    property bool userToggledCollapse: false
 
     width: parent?.width ?? 0
-    height: {
-        var hasHeader = root.title !== "" || root.iconName !== "";
-        if (collapsed)
-            return headerRow.height + Theme.spacingL * 2;
-        var h = Theme.spacingL * 2 + contentColumn.height;
-        if (hasHeader)
-            h += headerRow.height + Theme.spacingM;
-        return h;
-    }
-    radius: Theme.cornerRadius
-    color: Theme.floatingWindowNestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
-
-    readonly property bool collapsed: collapsible && !expanded
-    readonly property bool hasHeader: root.title !== "" || root.iconName !== ""
-    property bool userToggledCollapse: false
+    spacing: 0
 
     Component.onCompleted: {
         if (!settingKey)
             return;
-        var key = settingKey;
+        const key = settingKey;
         Qt.callLater(() => {
             if (!root.parent)
                 return;
-            var flickable = QmlUtils.findParentFlickable(root.parent);
+            const flickable = QmlUtils.findParentFlickable(root.parent);
             if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable);
+                SettingsSearchService.registerCard(key, root, flickable, QmlUtils.findParentCollapsible(root.parent));
         });
     }
 
     Component.onDestruction: {
-        if (settingKey) {
-            SettingsSearchService.unregisterCard(settingKey);
+        if (settingKey)
+            SettingsSearchService.unregisterCard(settingKey, root);
+    }
+
+    SettingsSectionLabel {
+        id: sectionLabel
+        width: parent.width
+        text: root.title
+        visible: root.hasHeader
+        collapsible: root.collapsible
+        expanded: root.expanded
+        onToggleRequested: {
+            root.userToggledCollapse = true;
+            root.expanded = !root.expanded;
         }
     }
 
-    Behavior on height {
-        enabled: root.userToggledCollapse
-        NumberAnimation {
-            duration: Theme.shortDuration
-            easing.type: Theme.standardEasing
-            onRunningChanged: {
-                if (!running)
-                    root.userToggledCollapse = false;
-            }
-        }
-    }
+    Item {
+        id: collapseWrapper
+        visible: !root.collapsed || height > 0
+        enabled: !root.collapsed
+        width: parent.width
+        height: root.collapsed ? 0 : contentGroup.implicitHeight
+        clip: root.collapsible
 
-    Rectangle {
-        id: highlightBorder
-        anchors.fill: parent
-        anchors.margins: -2
-        radius: root.radius + 2
-        color: "transparent"
-        border.width: 2
-        border.color: Theme.primary
-        opacity: root.isHighlighted ? 1 : 0
-        visible: opacity > 0
-        z: 100
-
-        Behavior on opacity {
+        Behavior on height {
+            enabled: root.userToggledCollapse && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
             NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-    }
-
-    Column {
-        id: mainColumn
-        anchors.fill: parent
-        anchors.margins: Theme.spacingL
-        spacing: root.hasHeader ? Theme.spacingM : 0
-        clip: true
-
-        Item {
-            id: headerRow
-            width: parent.width
-            height: root.hasHeader ? Math.max(headerIcon.height, headerText.height, headerActionsRow.height) : 0
-            visible: root.hasHeader
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: root.headerLeftPadding
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    id: headerIcon
-                    name: root.iconName
-                    size: Theme.iconSize
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.iconName !== ""
-                }
-
-                StyledText {
-                    id: headerText
-                    text: root.title
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.title !== ""
-                    width: implicitWidth
-                    horizontalAlignment: Text.AlignLeft
-                }
-            }
-
-            Row {
-                id: headerActionsRow
-                anchors.right: root.collapsible ? caretIcon.left : parent.right
-                anchors.rightMargin: root.collapsible ? Theme.spacingS : 0
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-            }
-
-            DankIcon {
-                id: caretIcon
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                name: root.expanded ? "expand_less" : "expand_more"
-                size: Theme.iconSize - 2
-                color: Theme.surfaceVariantText
-                visible: root.collapsible
-            }
-
-            MouseArea {
-                anchors.left: parent.left
-                anchors.right: headerActionsRow.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                enabled: root.collapsible
-                cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
-                    root.userToggledCollapse = true;
-                    root.expanded = !root.expanded;
-                }
-            }
-
-            MouseArea {
-                visible: root.collapsible
-                anchors.left: caretIcon.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.leftMargin: -Theme.spacingS
-                enabled: root.collapsible
-                cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
-                    root.userToggledCollapse = true;
-                    root.expanded = !root.expanded;
+                duration: SettingsMetrics.transitionDuration
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                onRunningChanged: {
+                    if (!running)
+                        root.userToggledCollapse = false;
                 }
             }
         }
 
-        Column {
-            id: contentColumn
+        SettingsGroup {
+            id: contentGroup
             width: parent.width
-            spacing: Theme.spacingM
-            visible: !root.collapsed
+            highlighted: root.isHighlighted
         }
     }
 }

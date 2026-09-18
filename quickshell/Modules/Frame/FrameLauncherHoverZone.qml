@@ -18,7 +18,7 @@ Variants {
         required property var modelData
 
         readonly property string emergeSide: SettingsData.frameLauncherEmergeSide || "bottom"
-        readonly property bool eligible: SettingsData.frameEnabled && SettingsData.frameLauncherEdgeHover && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(zoneLoader.modelData, SettingsData.frameScreenPreferences) && CompositorService.usesConnectedFrameChromeForScreen(zoneLoader.modelData) && !SettingsData.barOccupiesSide(zoneLoader.modelData, zoneLoader.emergeSide) && !SettingsData.dockOccupiesSide(zoneLoader.emergeSide)
+        readonly property bool eligible: SettingsData.frameEnabled && SettingsData.frameLauncherEdgeHover && Theme.isConnectedEffect && SettingsData.isScreenInPreferences(zoneLoader.modelData, SettingsData.frameScreenPreferences) && CompositorService.usesConnectedFrameChromeForScreen(zoneLoader.modelData) && !SettingsData.barOccupiesSide(zoneLoader.modelData, zoneLoader.emergeSide) && !SettingsData.dockOccupiesSide(zoneLoader.modelData, zoneLoader.emergeSide)
 
         active: eligible
         asynchronous: false
@@ -43,7 +43,7 @@ Variants {
                 if (launcherOpen || _openedForCurrentHover)
                     return;
                 _openedForCurrentHover = true;
-                PopoutService.openDankLauncherV2(CompositorService.framePeerSurfacesUseOverlayForScreen(zoneLoader.modelData), true);
+                PopoutService.openDankLauncherV2(false, true);
             }
 
             screen: zoneLoader.modelData

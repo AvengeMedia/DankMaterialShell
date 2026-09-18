@@ -669,7 +669,7 @@ Singleton {
 
         whenCodecBackendReady(() => {
             if (!root.wpexecAvailable) {
-                callback(false, I18n.tr("Codec switching is unavailable. WirePlumber wpexec was not found."));
+                callback(false, I18n.tr("Codec switching is unavailable. WirePlumber wpexec was not found.", "bluetooth codec selector error, wpexec is a program name"));
                 return;
             }
 

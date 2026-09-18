@@ -2,10 +2,21 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Modules.DankBar
 import qs.Widgets
 
 Row {
     id: root
+
+    property bool dockPlacement: false
+    property bool widgetStyle: false
+    property var choices: barModes
+    property string selectedKey: activeBarMode
+    signal selected(string key)
+    onSelected: key => {
+        if (!dockPlacement && !widgetStyle)
+            applyBarMode(key);
+    }
 
     readonly property var barModes: [
         {
@@ -21,7 +32,11 @@ Row {
             "label": I18n.tr("Island")
         }
     ]
-    // Frame is a shell-wide surface; standard vs island is per bar instance.
+    readonly property real cardHeightRatio: 7.5
+    readonly property real previewWidthRatio: 2.9
+    readonly property real previewAspect: 0.62
+    readonly property real previewStripRatio: 0.55
+    readonly property real previewIslandRatio: 0.42
     readonly property var targetConfig: {
         SettingsData.barConfigs;
         SettingsUiState.selectedBarId;
@@ -58,25 +73,38 @@ Row {
     spacing: Theme.spacingS
 
     Repeater {
-        model: root.barModes
+        model: root.choices
 
         Rectangle {
             id: modeCard
             required property var modelData
-            readonly property bool isActive: root.activeBarMode === modelData.key
+            enabled: modelData.enabled ?? true
+            opacity: enabled ? 1 : SettingsMetrics.disabledOpacity
 
-            width: (root.width - Theme.spacingS * 2) / 3
-            height: Math.round(Theme.fontSizeMedium * 7.5)
+            readonly property bool isActive: root.selectedKey === modelData.key
+
+            width: (root.width - root.spacing * (root.choices.length - 1)) / Math.max(1, root.choices.length)
+            height: Math.round(Theme.fontSizeMedium * root.cardHeightRatio)
             radius: Theme.cornerRadius
             color: Theme.floatingWindowNestedSurface
-            border.width: isActive ? 2 : 1
+            border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
             border.color: isActive ? Theme.primary : Theme.outlineMedium
+
+            activeFocusOnTab: true
+            Accessible.role: Accessible.RadioButton
+            Accessible.name: modelData.label
+            Accessible.checked: isActive
+            Accessible.onPressAction: root.selected(modelData.key)
+            Keys.onSpacePressed: root.selected(modelData.key)
+            Keys.onReturnPressed: root.selected(modelData.key)
+
+            FocusRing {}
 
             Rectangle {
                 anchors.fill: parent
                 radius: parent.radius
                 color: Theme.primary
-                opacity: modeMouse.containsMouse ? 0.12 : 0
+                opacity: modeMouse.containsMouse ? Theme.stateLayerHover : 0
             }
 
             Column {
@@ -88,37 +116,70 @@ Row {
                     readonly property real edgePad: Math.max(2, Math.round(width * 0.045))
                     readonly property real stripSize: Math.round(width * 0.11)
 
-                    width: Math.round(Theme.iconSize * 2.9)
-                    height: Math.round(width * 0.62)
+                    width: Math.round(Theme.iconSize * root.previewWidthRatio)
+                    height: Math.round(width * root.previewAspect)
                     radius: Theme.spacingXS
                     color: Theme.surfaceContainerHighest
-                    border.width: 1
+                    border.width: Theme.outlineWidth
                     border.color: Theme.outline
                     anchors.horizontalCenter: parent.horizontalCenter
 
+                    BarSegment {
+                        visible: root.widgetStyle
+                        anchors.centerIn: parent
+                        scale: (screenPreview.width - screenPreview.edgePad * 2 - Theme.spacingS) / (Theme.iconSizeLarge * 3 + Theme.spacingXS * 2)
+                        spacing: modeCard.modelData.key === "segments" ? BarMetrics.segmentGap : Theme.spacingXS
+
+                        Repeater {
+                            model: 3
+                            BarPillSurface {
+                                required property int index
+                                width: Theme.iconSizeLarge
+                                height: Theme.iconSizeLarge
+                                thickness: Theme.iconSizeLarge
+                                style: modeCard.modelData.key
+                                joinedStart: style === "segments" && index > 0
+                                joinedEnd: style === "segments" && index < 2
+                                color: index === 1 ? Theme.primary : Theme.primaryContainer
+                            }
+                        }
+                    }
+
                     Rectangle {
-                        visible: modeCard.modelData.key === "standard"
+                        readonly property int edge: Number(modeCard.modelData.key)
+                        readonly property bool vertical: edge === SettingsData.Position.Left || edge === SettingsData.Position.Right
+                        visible: root.dockPlacement
+                        x: edge === SettingsData.Position.Right ? parent.width - width - screenPreview.edgePad : screenPreview.edgePad
+                        y: edge === SettingsData.Position.Bottom ? parent.height - height - screenPreview.edgePad : screenPreview.edgePad
+                        width: vertical ? screenPreview.stripSize : parent.width - screenPreview.edgePad * 2
+                        height: vertical ? parent.height - screenPreview.edgePad * 2 : screenPreview.stripSize
+                        radius: Theme.fullRadius(width, height)
+                        color: Theme.primary
+                    }
+
+                    Rectangle {
+                        visible: !root.widgetStyle && !root.dockPlacement && modeCard.modelData.key === "standard"
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.margins: screenPreview.edgePad
                         height: screenPreview.stripSize
-                        radius: height / 2
+                        radius: Theme.fullRadius(width, height)
                         color: Theme.primary
                     }
 
                     Rectangle {
-                        visible: modeCard.modelData.key === "frame"
+                        visible: !root.widgetStyle && modeCard.modelData.key === "frame"
                         anchors.fill: parent
                         anchors.margins: screenPreview.edgePad
                         radius: screenPreview.radius
                         color: "transparent"
-                        border.width: Math.max(2, Math.round(screenPreview.stripSize * 0.55))
+                        border.width: Math.max(Theme.outlineWidthFocused, Math.round(screenPreview.stripSize * root.previewStripRatio))
                         border.color: Theme.primary
                     }
 
                     Rectangle {
-                        visible: modeCard.modelData.key === "frame"
+                        visible: !root.widgetStyle && modeCard.modelData.key === "frame"
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -129,13 +190,13 @@ Row {
                     }
 
                     Rectangle {
-                        visible: modeCard.modelData.key === "island"
+                        visible: !root.widgetStyle && modeCard.modelData.key === "island"
                         anchors.top: parent.top
                         anchors.topMargin: screenPreview.edgePad
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: Math.round(parent.width * 0.42)
+                        width: Math.round(parent.width * root.previewIslandRatio)
                         height: screenPreview.stripSize
-                        radius: height / 2
+                        radius: Theme.fullRadius(width, height)
                         color: Theme.primary
                     }
                 }
@@ -143,7 +204,7 @@ Row {
                 StyledText {
                     text: modeCard.modelData.label
                     font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                     color: modeCard.isActive ? Theme.primary : Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -154,7 +215,7 @@ Row {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.applyBarMode(modeCard.modelData.key)
+                onClicked: root.selected(modeCard.modelData.key)
             }
         }
     }

@@ -50,20 +50,6 @@ Singleton {
         return false;
     }
 
-    function _isPopoutPresented(popout) {
-        if (!popout)
-            return false;
-        try {
-            if (popout.dashVisible !== undefined)
-                return !!popout.dashVisible;
-            if (popout.notificationHistoryVisible !== undefined)
-                return !!popout.notificationHistoryVisible;
-            return !!(popout.shouldBeVisible || popout.isClosing);
-        } catch (e) {
-            return false;
-        }
-    }
-
     function _openPopout(popout) {
         if (popout.dashVisible !== undefined) {
             let flagStayedTrue = popout.dashVisible === true;
@@ -240,7 +226,7 @@ Singleton {
     // Checks if the active popout is pinned for auto-dismissal
     function isActivePopoutPinned(screen) {
         const p = getActivePopout(screen);
-        if (!p || !_isPopoutPresented(p))
+        if (!p || !p.shouldBeVisible)
             return false;
         const dismissSuspended = p.effectiveHoverDismissSuspended ?? p.hoverDismissSuspended;
         return p.hoverDismissEnabled === false || dismissSuspended === true;
@@ -263,7 +249,7 @@ Singleton {
         const screenName = popout.screen.name;
         const currentPopout = currentPopoutsByScreen[screenName];
         const triggerId = triggerSource !== undefined ? triggerSource : tabIndex;
-        const alreadyPresented = currentPopout === popout && (hoverRequest ? _isPopoutPresented(popout) : popout.shouldBeVisible);
+        const alreadyPresented = currentPopout === popout && popout.shouldBeVisible;
 
         const willOpen = !(alreadyPresented && triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId);
         if (willOpen)

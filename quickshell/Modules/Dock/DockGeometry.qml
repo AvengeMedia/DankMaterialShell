@@ -11,16 +11,17 @@ QtObject {
     property string edge: "bottom"
     property bool dockVisible: false
     property bool autoHide: false
-    property real iconSize: 40
-    property real spacing: 4
+    property bool overlay: false
+    property real thickness: 64
+    property real reserveThickness: thickness
     property real borderThickness: 0
-    property real offset: 0
+    property real exclusiveOffset: 0
     property real margin: 0
     property real barSpacing: 0
     property real dpr: 1
 
     readonly property bool frameExclusionActive: CompositorService.frameWindowVisibleForScreen(screen)
-    readonly property bool usesConnectedFrameChrome: CompositorService.usesConnectedFrameChromeForScreen(screen)
+    readonly property bool usesConnectedFrameChrome: !overlay && CompositorService.usesConnectedFrameChromeForScreen(screen)
 
     readonly property real connectedJoinInset: {
         if (usesConnectedFrameChrome)
@@ -38,19 +39,17 @@ QtObject {
         return SettingsData.frameThickness;
     }
 
-    readonly property real effectiveMargin: usesConnectedFrameChrome ? 0 : margin
-    readonly property real visualOffset: usesConnectedFrameChrome ? 0 : offset
-    readonly property real reserveOffset: offset
-    readonly property real joinedEdgeMargin: usesConnectedFrameChrome ? 0 : (barSpacing + effectiveMargin + 1 + borderThickness)
+    readonly property real effectiveMargin: usesConnectedFrameChrome ? 0 : margin + borderThickness
+    readonly property real joinedEdgeMargin: usesConnectedFrameChrome ? 0 : (barSpacing + effectiveMargin)
     readonly property real bodyEdgeMargin: frameInset + joinedEdgeMargin
 
-    readonly property real bodyThickness: iconSize + spacing * 2 + borderThickness * 2
-    readonly property real visualThickness: bodyThickness + 10
-    readonly property real surfaceThickness: frameInset + visualThickness + spacing + effectiveMargin
-    readonly property real motionThickness: surfaceThickness + visualOffset
+    readonly property real bodyThickness: thickness
+    readonly property real visualThickness: bodyThickness
+    readonly property real surfaceThickness: bodyEdgeMargin + bodyThickness
+    readonly property real motionThickness: surfaceThickness
 
-    // Frame/bar edge exclusions already reserve the edge itself, so the dock
-    // reservation covers only the dock body and user offset beyond that edge.
-    readonly property real reserveZone: Theme.px(bodyThickness + reserveOffset + effectiveMargin, dpr)
+    // Frame and bar exclusions already reserve the edge itself; the dock reserves its own body,
+    // its margin, and the user's exclusive offset beyond that.
+    readonly property real reserveZone: Math.max(0, Theme.px(reserveThickness + effectiveMargin + exclusiveOffset, dpr))
     readonly property bool shouldReserveSpace: dockVisible && !autoHide && barSpacing <= 0
 }

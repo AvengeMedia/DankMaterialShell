@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 	"github.com/spf13/afero"
 )
 
@@ -221,33 +221,7 @@ func (m *Manager) HasUpdates(themeID string, registryTheme Theme) (bool, error) 
 		return false, err
 	}
 
-	return compareVersions(installed.Version, registryTheme.Version) < 0, nil
-}
-
-func compareVersions(installed, registry string) int {
-	installedParts := strings.Split(installed, ".")
-	registryParts := strings.Split(registry, ".")
-
-	maxLen := max(len(registryParts), len(installedParts))
-
-	for i := range maxLen {
-		var installedNum, registryNum int
-		if i < len(installedParts) {
-			fmt.Sscanf(installedParts[i], "%d", &installedNum)
-		}
-		if i < len(registryParts) {
-			fmt.Sscanf(registryParts[i], "%d", &registryNum)
-		}
-
-		if installedNum < registryNum {
-			return -1
-		}
-		if installedNum > registryNum {
-			return 1
-		}
-	}
-
-	return 0
+	return version.CompareVersions(installed.Version, registryTheme.Version) < 0, nil
 }
 
 func (m *Manager) GetThemesDir() string {

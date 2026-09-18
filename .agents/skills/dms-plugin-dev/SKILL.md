@@ -2,16 +2,17 @@
 name: dms-plugin-dev
 description: >
   Develop plugins for DankMaterialShell (DMS), a QML-based Linux desktop shell built on
-  Quickshell. Supports five plugin types: widget (bar + Control Center), daemon (background
-  service), launcher (search + actions), desktop (draggable desktop widgets), and composite
-  (multi-surface). Covers manifest creation, QML component development, startup checks,
+  Quickshell. Supports widget (bar, dock + Control Center), daemon (background service),
+  launcher (search + actions), desktop (draggable desktop widgets), dash (dash tab),
+  dashCard (dash overview card), and composite (multi-surface) plugins. Covers manifest
+  creation, QML component development, startup checks,
   settings UI, data persistence, theme integration, PopoutService usage, IPC runtime
   discovery, and external command execution. Use when the user wants to create, modify,
   or debug a DMS plugin, or asks about the DMS plugin API.
 compatibility: Designed for Claude Code (or similar products)
 metadata:
   author: DankMaterialShell
-  version: "1.1"
+  version: "1.2"
   domain: qml-desktop-development
   framework: DankMaterialShell
   languages: qml, javascript
@@ -22,8 +23,8 @@ allowed-tools: Bash Read Write Edit
 
 ## Overview
 
-DMS plugins extend the desktop shell with custom widgets, background services, launcher
-integrations, and desktop widgets. Plugins are QML components discovered from
+DMS plugins extend the desktop shell with bar and dock widgets, background services, launcher
+integrations, desktop widgets, and dash tabs and cards. Plugins are QML components discovered from
 `~/.config/DankMaterialShell/plugins/`.
 
 **Minimum plugin structure:**
@@ -38,28 +39,33 @@ integrations, and desktop widgets. Plugins are QML components discovered from
 
 **Plugin registry:** Community plugins are available at https://plugins.danklinux.com/
 
-**Five plugin types:**
+**Plugin types:**
 
-| Type        | Purpose                        | Base Component             | Bar pills | CC integration |
-|-------------|--------------------------------|----------------------------|-----------|----------------|
-| `widget`    | Bar widget + popout            | `PluginComponent`          | Yes       | Yes            |
-| `daemon`    | Background service             | `PluginComponent` (no UI)  | No        | Optional       |
-| `launcher`  | Searchable items in launcher   | `Item`                     | No        | No             |
-| `desktop`   | Draggable desktop widget       | `DesktopPluginComponent`   | No        | No             |
-| `composite` | Multi-surface plugin           | One component per surface  | Optional  | Optional       |
+| Type        | Purpose                        | Base Component             | Bar/dock pills | CC integration |
+|-------------|--------------------------------|----------------------------|----------------|----------------|
+| `widget`    | Bar or dock widget + popout    | `PluginComponent`          | Yes            | Yes            |
+| `daemon`    | Background service             | `PluginComponent` (no UI)  | No             | Optional       |
+| `launcher`  | Searchable items in launcher   | `Item`                     | No             | No             |
+| `desktop`   | Draggable desktop widget       | `DesktopPluginComponent`   | No             | No             |
+| `dash`      | Tab in the dash popout         | `DashTabComponent`         | No             | No             |
+| `dashCard`  | Card in the dash overview grid | `DashCardComponent`        | No             | No             |
+| `composite` | Multi-surface plugin           | One component per surface  | Optional       | Optional       |
 
 ## Step 1: Determine Plugin Type
 
 Choose the type based on what the plugin does:
 
-- **Shows in the bar?** - Use `widget`. Displays a pill in DankBar, optionally opens a popout,
-  optionally integrates with Control Center.
+- **Shows in the bar or a dock?** - Use `widget`. Displays a pill in DankBar or a dock (same
+  component), optionally opens a popout or an attached dock panel, optionally integrates with
+  Control Center.
 - **Runs in background only?** - Use `daemon`. No visible UI, reacts to events (wallpaper
   changes, notifications, battery level, etc.).
 - **Provides searchable/actionable items?** - Use `launcher`. Items appear in the DMS launcher
   with trigger-based filtering (e.g., type `=` for calculator, `:` for emoji).
 - **Shows on the desktop background?** - Use `desktop`. Draggable, resizable widget on the
   desktop layer.
+- **Full page in the dash?** - Use `dash`. A tab in the dash popout, id `plugin_<pluginId>`.
+- **Small tile on the dash overview?** - Use `dashCard`. A resizable card in the overview grid.
 - **Needs multiple surfaces?** - Use `composite`. A single plugin that registers any combination
   of the above (e.g., a daemon + bar widget + desktop widget). Each surface gets its own
   QML component file.
@@ -125,6 +131,11 @@ Create `plugin.json` in your plugin directory. See [plugin-manifest-reference.md
     "permissions": ["settings_read", "settings_write"]
 }
 ```
+
+**Standalone dash tab or card:** same single file form, `"type": "dash"` or `"type": "dashCard"`
+plus `"component"`. A tab and a card together (or with a bar widget) use `components` with the
+keys `dash` and `dashCard`. Both accept an optional `dash` block for labels, card size and
+options. See [dash-plugin-guide.md](references/dash-plugin-guide.md).
 
 **Key rules:**
 - `id` must be camelCase, matching pattern `^[a-zA-Z][a-zA-Z0-9]*$`
@@ -280,6 +291,62 @@ PluginComponent {
 
 See [daemon-plugin-guide.md](references/daemon-plugin-guide.md) for event-driven patterns and process execution.
 
+### Dash Tab
+
+```qml
+import QtQuick
+import qs.Common
+import qs.Widgets
+import qs.Modules.Plugins
+import qs.Modules.DankDash
+
+DashTabComponent {
+    id: root
+
+    property date now: new Date()
+
+    implicitHeight: DashMetrics.tabMinHeight
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.live
+        onTriggered: root.now = new Date()
+    }
+
+    StyledText {
+        anchors.centerIn: parent
+        text: root.now.toLocaleTimeString(I18n.locale())
+        color: Theme.surfaceText
+    }
+}
+```
+
+### Dash Card
+
+```qml
+import QtQuick
+import qs.Common
+import qs.Widgets
+import qs.Modules.Plugins
+
+DashCardComponent {
+    id: root
+
+    tone: options.tone ?? ""
+
+    StyledText {
+        anchors.centerIn: parent
+        text: I18n.trFor("myPlugin", "Hello")
+        color: root.contentColor
+    }
+}
+```
+
+Gate timers and animations on `live`; the dash content stays alive after the popout closes.
+Cards must lay out for every size in their manifest range. Use the card colors (`accentColor`,
+`contentColor`, `mutedColor`) so tones work. See [dash-plugin-guide.md](references/dash-plugin-guide.md).
+
 ### Composite
 
 For composite plugins, create a separate QML file per surface. Each surface uses the same
@@ -295,8 +362,7 @@ MyCompositePlugin/
   Settings.qml         # Shared settings for all surfaces
 ```
 
-Use `pluginService.pluginHasSurface(pluginId, "widget")` to check whether a specific surface
-is registered for a plugin at runtime.
+`pluginService.availablePlugins[pluginId].surfaces` lists the surfaces a plugin registered.
 
 ## Step 4: Add Startup Check (Optional)
 
@@ -431,7 +497,6 @@ PluginComponent {
         PopoutComponent {
             headerText: "My Plugin"
             detailsText: "Optional subtitle"
-            showCloseButton: true
 
             Column {
                 width: parent.width
@@ -450,7 +515,7 @@ PluginComponent {
 }
 ```
 
-**PopoutComponent properties:** `headerText`, `detailsText`, `showCloseButton`, `closePopout()` (auto-injected), `headerHeight` (readonly), `detailsHeight` (readonly).
+**PopoutComponent properties:** `headerText`, `detailsText`, `closePopout()` (auto-injected), `headerHeight` (readonly), `detailsHeight` (readonly).
 
 Calculate available content height: `popoutHeight - headerHeight - detailsHeight - spacing`
 
@@ -550,7 +615,7 @@ Lookup order: plugin file, then the global DMS catalog, then the English term. `
 1. Validate `plugin.json` against the schema at [assets/plugin-schema.json](assets/plugin-schema.json)
 2. Run the shell with verbose output: `qs -v -p $CONFIGPATH/quickshell/dms/shell.qml`
 3. Open Settings > Plugins > Scan for Plugins
-4. Enable your plugin and add it to the DankBar layout
+4. Enable your plugin and add it to the DankBar layout, a dock, or the dash (tabs show up on their own; add cards from the dash edit mode)
 
 **Runtime plugin discovery via IPC:**
 
@@ -588,6 +653,10 @@ Plugin IDs are validated against `^[a-zA-Z0-9_\-:]{1,64}$`.
 11. **Using `requires` instead of `dependencies`** - `requires` is deprecated; use `dependencies`
 12. **Providing both `component` and `components`** - Use one or the other, not both
 13. **Missing `trigger` on composite with launcher surface** - Still required when `components` has a `launcher` key
+14. **Using `"type": "widget"` for a dash tab** - Dash surfaces need `"type": "dash"` / `"dashCard"` or a `components` key
+15. **Timers in dash tabs or cards that ignore `live`** - The dash content outlives the popout; gate on `live`
+16. **Reading `dash.options` from a bar widget** - `options` only reach dash surfaces; share values through `settings` and `pluginData`
+17. **Raw theme colors in a dash card** - Use `accentColor` / `contentColor` / `mutedColor` so the card follows its tone
 
 ## Quick Reference: Imports
 
@@ -611,6 +680,16 @@ import QtQuick
 import qs.Common
 ```
 
+**Dash tab / card:**
+```qml
+import QtQuick
+import qs.Common
+import qs.Widgets
+import qs.Modules.Plugins
+import qs.Modules.DankDash          // DashMetrics, DashWidgetGrid
+import qs.Modules.DankDash.Overview // Card, for tiles inside a tab
+```
+
 **For clipboard/exec:** `import Quickshell`
 **For processes:** `import Quickshell.Io`
 **For networking:** `import Quickshell.Networking`
@@ -629,7 +708,8 @@ import qs.Common
 Load these on demand for detailed API documentation:
 
 - [plugin-manifest-reference.md](references/plugin-manifest-reference.md) - Complete plugin.json field reference and JSON schema
-- [widget-plugin-guide.md](references/widget-plugin-guide.md) - PluginComponent, bar pills, popouts, click actions, CC integration
+- [widget-plugin-guide.md](references/widget-plugin-guide.md) - PluginComponent, bar and dock pills, attached dock panels, popouts, click actions, CC integration
+- [dash-plugin-guide.md](references/dash-plugin-guide.md) - DashTabComponent, DashCardComponent, DashWidgetGrid, dash options, card sizing
 - [launcher-plugin-guide.md](references/launcher-plugin-guide.md) - getItems/executeItem, triggers, icon types, context menus, tile view
 - [desktop-plugin-guide.md](references/desktop-plugin-guide.md) - DesktopPluginComponent, sizing, edit mode, position persistence
 - [daemon-plugin-guide.md](references/daemon-plugin-guide.md) - Event-driven background services, process execution

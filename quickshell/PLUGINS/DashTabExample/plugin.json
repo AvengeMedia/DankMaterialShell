@@ -1,0 +1,31 @@
+{
+    "id": "dashTabExample",
+    "name": "Stopwatch Example",
+    "description": "A standalone dash tab: a stopwatch with laps that keeps time while the dash is closed",
+    "version": "1.0.0",
+    "author": "DankMaterialShell",
+    "type": "dash",
+    "capabilities": ["dash-tab"],
+    "component": "./StopwatchTab.qml",
+    "icon": "timer",
+    "dash": {
+        "title": "Stopwatch",
+        "options": [
+            {
+                "key": "hundredths",
+                "text": "Show hundredths",
+                "type": "toggle",
+                "def": true
+            },
+            {
+                "key": "laps",
+                "text": "Laps shown",
+                "type": "number",
+                "def": 5,
+                "min": 0,
+                "max": 10
+            }
+        ]
+    },
+    "requires_dms": ">=1.7.0"
+}

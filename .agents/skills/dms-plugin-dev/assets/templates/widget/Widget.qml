@@ -59,7 +59,6 @@ PluginComponent {
     // popoutContent: Component {
     //     PopoutComponent {
     //         headerText: "My Widget"
-    //         showCloseButton: true
     //
     //         Column {
     //             width: parent.width

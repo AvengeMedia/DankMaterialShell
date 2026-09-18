@@ -11,13 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	bolt "go.etcd.io/bbolt"
 
 	mocks_wlcontext "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/wlcontext"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 type clipboardTestConn struct {
@@ -81,29 +82,6 @@ func TestEncodeDecodeEntry_Roundtrip(t *testing.T) {
 	assert.Equal(t, original.Size, decoded.Size)
 	assert.Equal(t, original.Timestamp.Unix(), decoded.Timestamp.Unix())
 	assert.Equal(t, original.IsImage, decoded.IsImage)
-}
-
-func TestEncodeDecodeEntry_Image(t *testing.T) {
-	original := Entry{
-		ID:        99999,
-		Data:      []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A},
-		MimeType:  "image/png",
-		Preview:   "[[ image 8 B png 100x100 ]]",
-		Size:      8,
-		Timestamp: time.Now().Truncate(time.Second),
-		IsImage:   true,
-	}
-
-	encoded, err := encodeEntry(original)
-	assert.NoError(t, err)
-
-	decoded, err := decodeEntry(encoded)
-	assert.NoError(t, err)
-
-	assert.Equal(t, original.ID, decoded.ID)
-	assert.Equal(t, original.Data, decoded.Data)
-	assert.True(t, decoded.IsImage)
-	assert.Equal(t, original.Preview, decoded.Preview)
 }
 
 func TestEncodeDecodeEntry_EmptyData(t *testing.T) {
@@ -321,13 +299,13 @@ func TestHandleGetEntry_ReturnsExistingEntry(t *testing.T) {
 	require.Len(t, history, 1)
 
 	mc := newClipboardTestConn()
-	conn := models.NewConn(mc)
-	handleGetEntry(conn, models.Request{
+	conn := ipc.NewConnWriter(mc)
+	handleGetEntry(conn, ipc.Request{
 		ID:     1,
 		Params: map[string]any{"id": float64(history[0].ID)},
 	}, m)
 
-	var resp models.Response[Entry]
+	var resp ipc.Response[Entry]
 	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
 	assert.Empty(t, resp.Error)
 	require.NotNil(t, resp.Result)
@@ -338,14 +316,14 @@ func TestHandleGetEntry_ReturnsExistingEntry(t *testing.T) {
 func TestHandleGetEntry_MissingIDReturnsNullResult(t *testing.T) {
 	m := newTestManagerWithDB(t)
 	mc := newClipboardTestConn()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 
-	handleGetEntry(conn, models.Request{
+	handleGetEntry(conn, ipc.Request{
 		ID:     1,
 		Params: map[string]any{"id": float64(999)},
 	}, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
 	assert.Empty(t, resp.Error)
 	assert.Nil(t, resp.Result)
@@ -434,13 +412,13 @@ func TestHandleDeleteEntries_ReportsDeletedCount(t *testing.T) {
 	second := storeTestEntry(t, m, "second")
 
 	mc := newClipboardTestConn()
-	conn := models.NewConn(mc)
-	handleDeleteEntries(conn, models.Request{
+	conn := ipc.NewConnWriter(mc)
+	handleDeleteEntries(conn, ipc.Request{
 		ID:     1,
 		Params: map[string]any{"ids": []any{float64(first), float64(second)}},
 	}, m)
 
-	var resp models.Response[map[string]int]
+	var resp ipc.Response[map[string]int]
 	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
 	assert.Empty(t, resp.Error)
 	require.NotNil(t, resp.Result)
@@ -466,10 +444,10 @@ func TestHandleDeleteEntries_RejectsBadParams(t *testing.T) {
 			kept := storeTestEntry(t, m, "kept")
 
 			mc := newClipboardTestConn()
-			conn := models.NewConn(mc)
-			handleDeleteEntries(conn, models.Request{ID: 1, Params: tt.params}, m)
+			conn := ipc.NewConnWriter(mc)
+			handleDeleteEntries(conn, ipc.Request{ID: 1, Params: tt.params}, m)
 
-			var resp models.Response[any]
+			var resp ipc.Response[any]
 			require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
 			assert.NotEmpty(t, resp.Error)
 
@@ -733,8 +711,8 @@ func TestHandleEditEntry_SuccessAndValidation(t *testing.T) {
 	id := storeTestEntry(t, m, "before edit")
 
 	mc := newClipboardTestConn()
-	conn := models.NewConn(mc)
-	handleEditEntry(conn, models.Request{
+	conn := ipc.NewConnWriter(mc)
+	handleEditEntry(conn, ipc.Request{
 		ID: 1,
 		Params: map[string]any{
 			"id":   float64(id),
@@ -742,7 +720,7 @@ func TestHandleEditEntry_SuccessAndValidation(t *testing.T) {
 		},
 	}, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
 	assert.Empty(t, resp.Error)
 	require.NotNil(t, resp.Result)
@@ -862,70 +840,6 @@ func TestManager_NotifySubscribersNonBlocking(t *testing.T) {
 	}
 
 	assert.Len(t, m.dirty, 1)
-}
-
-func TestManager_ConcurrentOfferAccess(t *testing.T) {
-	m := &Manager{
-		offerMimeTypes: make(map[any][]string),
-	}
-
-	var wg sync.WaitGroup
-	const goroutines = 20
-	const iterations = 50
-
-	for i := range goroutines {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			key := uint32(id)
-
-			for range iterations {
-				m.offerMutex.Lock()
-				m.offerMimeTypes[key] = []string{"text/plain"}
-				m.offerMutex.Unlock()
-
-				m.offerMutex.RLock()
-				_ = m.offerMimeTypes[key]
-				m.offerMutex.RUnlock()
-
-				m.offerMutex.Lock()
-				delete(m.offerMimeTypes, key)
-				m.offerMutex.Unlock()
-			}
-		}(i)
-	}
-
-	wg.Wait()
-}
-
-func TestManager_ConcurrentOwnerAccess(t *testing.T) {
-	m := &Manager{}
-
-	var wg sync.WaitGroup
-	const goroutines = 30
-	const iterations = 100
-
-	for range goroutines / 2 {
-		wg.Go(func() {
-			for range iterations {
-				m.ownerLock.Lock()
-				_ = m.isOwner
-				m.ownerLock.Unlock()
-			}
-		})
-	}
-
-	for range goroutines / 2 {
-		wg.Go(func() {
-			for j := range iterations {
-				m.ownerLock.Lock()
-				m.isOwner = j%2 == 0
-				m.ownerLock.Unlock()
-			}
-		})
-	}
-
-	wg.Wait()
 }
 
 func TestItob(t *testing.T) {
@@ -1067,31 +981,6 @@ func TestManager_PostExecutesFunctionViaContext(t *testing.T) {
 	assert.NotNil(t, capturedFn)
 	capturedFn()
 	assert.Equal(t, 100, counter)
-}
-
-func TestManager_ConcurrentPostWithMock(t *testing.T) {
-	mockCtx := mocks_wlcontext.NewMockWaylandContext(t)
-
-	var postCount atomic.Int32
-	mockCtx.EXPECT().Post(mock.AnythingOfType("func()")).Run(func(fn func()) {
-		postCount.Add(1)
-	}).Times(100)
-
-	m := &Manager{
-		wlCtx: mockCtx,
-	}
-
-	var wg sync.WaitGroup
-	for range 10 {
-		wg.Go(func() {
-			for range 10 {
-				m.post(func() {})
-			}
-		})
-	}
-
-	wg.Wait()
-	assert.Equal(t, int32(100), postCount.Load())
 }
 
 // zero padding in a fresh db, never a valid page

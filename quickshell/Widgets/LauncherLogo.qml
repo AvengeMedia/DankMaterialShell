@@ -20,7 +20,6 @@ Item {
     property string customPath: ""
     property bool fallbackToApps: false
 
-    readonly property bool compositorAvailable: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc || CompositorService.isAqueous
     readonly property bool colorize: colorOverride !== ""
     readonly property string resolvedMode: {
         const fallback = fallbackToApps ? "apps" : "";
@@ -28,7 +27,7 @@ Item {
         case "custom":
             return customPath !== "" ? "custom" : fallback;
         case "compositor":
-            return compositorAvailable ? "compositor" : fallback;
+            return CompositorService.isKnownCompositor ? "compositor" : fallback;
         case "os":
         case "dank":
             return mode;

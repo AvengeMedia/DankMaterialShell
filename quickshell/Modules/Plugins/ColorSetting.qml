@@ -44,7 +44,7 @@ Column {
     StyledText {
         text: root.label
         font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 

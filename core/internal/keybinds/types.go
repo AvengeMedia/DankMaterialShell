@@ -1,5 +1,7 @@
 package keybinds
 
+import "github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
+
 type Keybind struct {
 	Key             string   `json:"key"`
 	Description     string   `json:"desc"`
@@ -54,4 +56,19 @@ type WritableProvider interface {
 	// providers this aliases to RemoveBind.
 	ResetBind(key string) error
 	GetOverridePath() string
+}
+
+func DMSBindsStatusFrom(s configfrag.Status) *DMSBindsStatus {
+	return &DMSBindsStatus{
+		Exists:          s.Exists,
+		Included:        s.Included,
+		IncludePosition: s.IncludePosition,
+		TotalIncludes:   s.TotalIncludes,
+		BindsAfterDMS:   s.EntriesAfterDMS,
+		Effective:       s.Effective,
+		OverriddenBy:    s.OverriddenBy,
+		StatusMessage:   s.StatusMessage,
+		ConfigFormat:    s.ConfigFormat,
+		ReadOnly:        s.ReadOnly,
+	}
 }

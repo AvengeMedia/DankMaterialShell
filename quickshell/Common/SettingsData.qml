@@ -4,20 +4,25 @@ pragma ComponentBehavior: Bound
 import QtCore
 import Qt.labs.folderlistmodel
 import QtQuick
+import "../DankCommon/Common/Shape.js" as Shape
 import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Common.settings
 import qs.Services
 import "GSettings.js" as GSettings
+import "LayoutResolver.js" as LayoutResolver
 import "settings/SettingsSpec.js" as Spec
 import "settings/SettingsStore.js" as Store
+import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
+import "settings/BarWidgetDefaults.js" as WidgetDefaults
+import "settings/DockConfig.js" as DockConfig
 
 Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 18
+    readonly property int settingsConfigVersion: 26
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -40,16 +45,11 @@ Singleton {
         Custom
     }
 
-    enum AnimationVariant {
-        Material,
-        Fluent,
-        Dynamic
-    }
-
     enum AnimationEffect {
         Standard,     // 0 — M3: scale-in, rises from below
         Directional,  // 1 — pure large slide, no scale
-        Depth         // 2 — medium slide with deep depth scale pop
+        Depth,        // 2 — medium slide with deep depth scale pop
+        Fluid
     }
 
     enum SuspendBehavior {
@@ -90,7 +90,7 @@ Singleton {
     property bool _hasLoaded: false
     property bool isReadOnly: false
     property var pluginSettings: ({})
-    property var builtInPluginSettings: ({})
+    property var builtInPluginSettings: Spec.SPEC.builtInPluginSettings.def
 
     function getBuiltInPluginSetting(pluginId, key, defaultValue) {
         if (!builtInPluginSettings[pluginId])
@@ -111,14 +111,15 @@ Singleton {
         saveSettings();
     }
 
-    property bool clipboardClickToPaste: false
-    property bool clipboardEnterToPaste: false
-    property bool clipboardRememberTypeFilter: false
-    property bool clipboardUseOverlayLayer: false
-    property string clipboardTypeFilter: "all"
-    property var clipboardVisibleEntryActions: ["pin", "edit", "delete"]
+    property bool clipboardClickToPaste: Spec.SPEC.clipboardClickToPaste.def
+    property bool clipboardEnterToPaste: Spec.SPEC.clipboardEnterToPaste.def
+    property bool clipboardRememberTypeFilter: Spec.SPEC.clipboardRememberTypeFilter.def
+    property bool clipboardUseOverlayLayer: Spec.SPEC.clipboardUseOverlayLayer.def
+    property string clipboardSize: Spec.SPEC.clipboardSize.def
+    property string clipboardTypeFilter: Spec.SPEC.clipboardTypeFilter.def
+    property var clipboardVisibleEntryActions: Spec.SPEC.clipboardVisibleEntryActions.def
 
-    property var launcherPluginVisibility: ({})
+    property var launcherPluginVisibility: Spec.SPEC.launcherPluginVisibility.def
 
     function getPluginAllowWithoutTrigger(pluginId) {
         if (!launcherPluginVisibility[pluginId])
@@ -135,7 +136,7 @@ Singleton {
         saveSettings();
     }
 
-    property var launcherPluginOrder: []
+    property var launcherPluginOrder: Spec.SPEC.launcherPluginOrder.def
     onLauncherPluginOrderChanged: saveSettings()
 
     function setLauncherPluginOrder(order) {
@@ -157,149 +158,155 @@ Singleton {
         });
     }
 
-    property alias dankBarLeftWidgetsModel: leftWidgetsModel
-    property alias dankBarCenterWidgetsModel: centerWidgetsModel
-    property alias dankBarRightWidgetsModel: rightWidgetsModel
+    property string currentThemeName: Spec.SPEC.currentThemeName.def
+    property string currentThemeCategory: Spec.SPEC.currentThemeCategory.def
+    property string customThemeFile: Spec.SPEC.customThemeFile.def
+    property var registryThemeVariants: Spec.SPEC.registryThemeVariants.def
+    property string matugenScheme: Spec.SPEC.matugenScheme.def
+    property bool matugenSmartMode: Spec.SPEC.matugenSmartMode.def
+    property string matugenSourceMode: Spec.SPEC.matugenSourceMode.def
+    property real matugenContrast: Spec.SPEC.matugenContrast.def
+    property bool runUserMatugenTemplates: Spec.SPEC.runUserMatugenTemplates.def
+    property string matugenTargetMonitor: Spec.SPEC.matugenTargetMonitor.def
+    property real popupTransparency: Spec.SPEC.popupTransparency.def
+    property bool floatingWindowSyncGlobal: Spec.SPEC.floatingWindowSyncGlobal.def
+    property real floatingWindowTransparency: Spec.SPEC.floatingWindowTransparency.def
+    property bool floatingWindowForegroundLayers: Spec.SPEC.floatingWindowForegroundLayers.def
+    property real floatingWindowForegroundTransparency: Spec.SPEC.floatingWindowForegroundTransparency.def
+    property bool dmsWindowsFloating: Spec.SPEC.dmsWindowsFloating.def
+    property string widgetBackgroundColor: Spec.SPEC.widgetBackgroundColor.def
+    property string widgetBackgroundCustomColor: Spec.SPEC.widgetBackgroundCustomColor.def
+    property real widgetBackgroundCustomStrength: Spec.SPEC.widgetBackgroundCustomStrength.def
+    property string widgetColorMode: Spec.SPEC.widgetColorMode.def
+    property string controlCenterTileColorMode: Spec.SPEC.controlCenterTileColorMode.def
+    property string buttonColorMode: Spec.SPEC.buttonColorMode.def
+    property int radiusStrength: Spec.SPEC.radiusStrength.def
+    readonly property real cornerRadius: Shape.radius("m", Shape.scaleForStrength(radiusStrength))
+    property int niriLayoutGapsOverride: Spec.SPEC.niriLayoutGapsOverride.def
+    property int niriLayoutRadiusOverride: Spec.SPEC.niriLayoutRadiusOverride.def
+    property int niriLayoutBorderSize: Spec.SPEC.niriLayoutBorderSize.def
+    property int hyprlandLayoutGapsOverride: Spec.SPEC.hyprlandLayoutGapsOverride.def
+    property int hyprlandLayoutGapsOutOverride: Spec.SPEC.hyprlandLayoutGapsOutOverride.def
+    property int hyprlandLayoutRadiusOverride: Spec.SPEC.hyprlandLayoutRadiusOverride.def
+    property int hyprlandLayoutBorderSize: Spec.SPEC.hyprlandLayoutBorderSize.def
+    property bool hyprlandResizeOnBorder: Spec.SPEC.hyprlandResizeOnBorder.def
+    property string hyprlandTilingLayout: Spec.SPEC.hyprlandTilingLayout.def
+    property bool hyprlandDwindlePreserveSplit: Spec.SPEC.hyprlandDwindlePreserveSplit.def
+    property bool hyprlandDwindleSmartSplit: Spec.SPEC.hyprlandDwindleSmartSplit.def
+    property int hyprlandDwindleForceSplit: Spec.SPEC.hyprlandDwindleForceSplit.def
+    property string hyprlandMasterOrientation: Spec.SPEC.hyprlandMasterOrientation.def
+    property string hyprlandMasterNewStatus: Spec.SPEC.hyprlandMasterNewStatus.def
+    property bool hyprlandMasterNewOnTop: Spec.SPEC.hyprlandMasterNewOnTop.def
+    property int hyprlandMasterSize: Spec.SPEC.hyprlandMasterSize.def
+    property string hyprlandScrollingDirection: Spec.SPEC.hyprlandScrollingDirection.def
+    property int hyprlandScrollingColumnWidth: Spec.SPEC.hyprlandScrollingColumnWidth.def
+    property bool hyprlandScrollingFullscreenOneColumn: Spec.SPEC.hyprlandScrollingFullscreenOneColumn.def
+    property bool hyprlandScrollingFollowFocus: Spec.SPEC.hyprlandScrollingFollowFocus.def
+    property int mangoLayoutGapsOverride: Spec.SPEC.mangoLayoutGapsOverride.def
+    property int mangoLayoutGapsOutOverride: Spec.SPEC.mangoLayoutGapsOutOverride.def
+    property int mangoLayoutRadiusOverride: Spec.SPEC.mangoLayoutRadiusOverride.def
+    property int mangoLayoutBorderSize: Spec.SPEC.mangoLayoutBorderSize.def
+    property bool mangoTrackpadNaturalScrolling: Spec.SPEC.mangoTrackpadNaturalScrolling.def
+    property string mouseAccelProfile: Spec.SPEC.mouseAccelProfile.def
+    property real mouseAccelSpeed: Spec.SPEC.mouseAccelSpeed.def
+    property bool mouseLeftHanded: Spec.SPEC.mouseLeftHanded.def
+    property bool mouseMiddleEmulation: Spec.SPEC.mouseMiddleEmulation.def
+    property bool mouseNaturalScroll: Spec.SPEC.mouseNaturalScroll.def
+    property real mouseScrollFactor: Spec.SPEC.mouseScrollFactor.def
+    property string mouseScrollMethod: Spec.SPEC.mouseScrollMethod.def
+    property string touchpadAccelProfile: Spec.SPEC.touchpadAccelProfile.def
+    property real touchpadAccelSpeed: Spec.SPEC.touchpadAccelSpeed.def
+    property string touchpadClickMethod: Spec.SPEC.touchpadClickMethod.def
+    property bool touchpadDisableOnExternalMouse: Spec.SPEC.touchpadDisableOnExternalMouse.def
+    property bool touchpadDisableWhileTyping: Spec.SPEC.touchpadDisableWhileTyping.def
+    property bool touchpadDragLock: Spec.SPEC.touchpadDragLock.def
+    property bool touchpadMiddleEmulation: Spec.SPEC.touchpadMiddleEmulation.def
+    property bool touchpadNaturalScroll: Spec.SPEC.touchpadNaturalScroll.def
+    property real touchpadScrollFactor: Spec.SPEC.touchpadScrollFactor.def
+    property string touchpadScrollMethod: Spec.SPEC.touchpadScrollMethod.def
+    property bool touchpadTapAndDrag: Spec.SPEC.touchpadTapAndDrag.def
+    property bool touchpadTapToClick: Spec.SPEC.touchpadTapToClick.def
 
-    property string currentThemeName: "purple"
-    property string currentThemeCategory: "generic"
-    property string customThemeFile: ""
-    property var registryThemeVariants: ({})
-    property string matugenScheme: "scheme-tonal-spot"
-    property bool matugenSmartMode: false
-    property string matugenSourceMode: "dominant"
-    property real matugenContrast: 0
-    property bool runUserMatugenTemplates: true
-    property string matugenTargetMonitor: ""
-    property real popupTransparency: 1.0
-    property real dockTransparency: 1
-    property bool floatingWindowSyncGlobal: true
-    property real floatingWindowTransparency: 1.0
-    property bool floatingWindowForegroundLayers: true
-    property real floatingWindowForegroundTransparency: 1.0
-    property bool dmsWindowsFloating: true
-    property string widgetBackgroundColor: "sch"
-    property string widgetBackgroundCustomColor: "#6750A4"
-    property real widgetBackgroundCustomStrength: 0.50
-    property string widgetColorMode: "default"
-    property string controlCenterTileColorMode: "primary"
-    property string buttonColorMode: "primary"
-    property real cornerRadius: 12
-    property int niriLayoutGapsOverride: -1
-    property int niriLayoutRadiusOverride: -1
-    property int niriLayoutBorderSize: -1
-    property int hyprlandLayoutGapsOverride: -1
-    property int hyprlandLayoutGapsOutOverride: -1
-    property int hyprlandLayoutRadiusOverride: -1
-    property int hyprlandLayoutBorderSize: -1
-    property bool hyprlandResizeOnBorder: false
-    property int mangoLayoutGapsOverride: -1
-    property int mangoLayoutGapsOutOverride: -1
-    property int mangoLayoutRadiusOverride: -1
-    property int mangoLayoutBorderSize: -1
-    property bool mangoTrackpadNaturalScrolling: true
-    property string mouseAccelProfile: "default"
-    property real mouseAccelSpeed: 0.0
-    property bool mouseLeftHanded: false
-    property bool mouseMiddleEmulation: false
-    property bool mouseNaturalScroll: false
-    property real mouseScrollFactor: 1.0
-    property string mouseScrollMethod: "default"
-    property string touchpadAccelProfile: "default"
-    property real touchpadAccelSpeed: 0.0
-    property string touchpadClickMethod: "default"
-    property bool touchpadDisableOnExternalMouse: false
-    property bool touchpadDisableWhileTyping: true
-    property bool touchpadDragLock: false
-    property bool touchpadMiddleEmulation: false
-    property bool touchpadNaturalScroll: true
-    property real touchpadScrollFactor: 1.0
-    property string touchpadScrollMethod: "default"
-    property bool touchpadTapAndDrag: true
-    property bool touchpadTapToClick: true
+    property string keyboardLayouts: Spec.SPEC.keyboardLayouts.def
+    property string keyboardVariants: Spec.SPEC.keyboardVariants.def
+    property string keyboardModel: Spec.SPEC.keyboardModel.def
+    property string keyboardOptions: Spec.SPEC.keyboardOptions.def
+    property string keyboardKeymapFile: Spec.SPEC.keyboardKeymapFile.def
+    property string keyboardTrackLayout: Spec.SPEC.keyboardTrackLayout.def
+    property int keyboardRepeatDelay: Spec.SPEC.keyboardRepeatDelay.def
+    property int keyboardRepeatRate: Spec.SPEC.keyboardRepeatRate.def
+    property bool keyboardNumlock: Spec.SPEC.keyboardNumlock.def
 
-    property string keyboardLayouts: ""
-    property string keyboardVariants: ""
-    property string keyboardModel: ""
-    property string keyboardOptions: ""
-    property string keyboardKeymapFile: ""
-    property string keyboardTrackLayout: ""
-    property int keyboardRepeatDelay: 0
-    property int keyboardRepeatRate: 0
-    property bool keyboardNumlock: false
-
-    property int firstDayOfWeek: -1
-    property bool showWeekNumber: false
-    property string calendarBackend: "auto"
-    property string defaultTaskCalendarId: ""
-    property bool audioShowStreamDevices: false
-    property string clockFormat: "auto"
+    property int firstDayOfWeek: Spec.SPEC.firstDayOfWeek.def
+    property bool showWeekNumber: Spec.SPEC.showWeekNumber.def
+    property string calendarBackend: Spec.SPEC.calendarBackend.def
+    property string defaultTaskCalendarId: Spec.SPEC.defaultTaskCalendarId.def
+    property bool audioShowStreamDevices: Spec.SPEC.audioShowStreamDevices.def
+    property string clockFormat: Spec.SPEC.clockFormat.def
     readonly property bool localeUses24Hour: {
         const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");
         return !/[aA]/.test(fmt);
     }
     readonly property bool use24HourClock: clockFormat === "24h" ? true : (clockFormat === "12h" ? false : localeUses24Hour)
-    property bool showSeconds: false
-    property bool padHours12Hour: false
-    property bool useFahrenheit: false
-    property string windSpeedUnit: "kmh"
-    property int animationSpeed: SettingsData.AnimationSpeed.Short
-    property int customAnimationDuration: 500
-    property bool syncComponentAnimationSpeeds: true
+    property bool showSeconds: Spec.SPEC.showSeconds.def
+    property bool padHours12Hour: Spec.SPEC.padHours12Hour.def
+    property bool useFahrenheit: Spec.SPEC.useFahrenheit.def
+    property string windSpeedUnit: Spec.SPEC.windSpeedUnit.def
+    property int animationDuration: Spec.SPEC.animationDuration.def
+    property bool syncComponentAnimationSpeeds: Spec.SPEC.syncComponentAnimationSpeeds.def
     onSyncComponentAnimationSpeedsChanged: saveSettings()
-    property int popoutAnimationSpeed: SettingsData.AnimationSpeed.Short
-    property int popoutCustomAnimationDuration: 150
-    property int modalAnimationSpeed: SettingsData.AnimationSpeed.Short
-    property int modalCustomAnimationDuration: 150
-    property bool reduceMotion: false
+    property int popoutAnimationDuration: Spec.SPEC.popoutAnimationDuration.def
+    property int modalAnimationDuration: Spec.SPEC.modalAnimationDuration.def
+    property bool reduceMotion: Spec.SPEC.reduceMotion.def
     onReduceMotionChanged: saveSettings()
-    property int springBounce: 1
+    property int springBounce: Spec.SPEC.springBounce.def
     onSpringBounceChanged: saveSettings()
-    property bool enableRippleEffects: true
+    property bool enableRippleEffects: Spec.SPEC.enableRippleEffects.def
     onEnableRippleEffectsChanged: saveSettings()
-    property int animationVariant: SettingsData.AnimationVariant.Material
-    onAnimationVariantChanged: saveSettings()
     property int motionEffect: SettingsData.AnimationEffect.Standard
     onMotionEffectChanged: saveSettings()
-    property bool m3ElevationEnabled: true
+    property bool m3ElevationEnabled: Spec.SPEC.m3ElevationEnabled.def
     onM3ElevationEnabledChanged: saveSettings()
-    property int m3ElevationIntensity: 12
+    property int m3ElevationIntensity: Spec.SPEC.m3ElevationIntensity.def
     onM3ElevationIntensityChanged: saveSettings()
-    property int m3ElevationOpacity: 30
+    property int m3ElevationOpacity: Spec.SPEC.m3ElevationOpacity.def
     onM3ElevationOpacityChanged: saveSettings()
-    property string m3ElevationColorMode: "default"
+    property string m3ElevationColorMode: Spec.SPEC.m3ElevationColorMode.def
     onM3ElevationColorModeChanged: saveSettings()
-    property string m3ElevationLightDirection: "top"
+    property string m3ElevationLightDirection: Spec.SPEC.m3ElevationLightDirection.def
     onM3ElevationLightDirectionChanged: saveSettings()
-    property string m3ElevationCustomColor: "#000000"
+    property string m3ElevationCustomColor: Spec.SPEC.m3ElevationCustomColor.def
     onM3ElevationCustomColorChanged: saveSettings()
-    property bool modalElevationEnabled: true
+    property bool modalElevationEnabled: Spec.SPEC.modalElevationEnabled.def
     onModalElevationEnabledChanged: saveSettings()
-    property bool popoutElevationEnabled: true
+    property bool popoutElevationEnabled: Spec.SPEC.popoutElevationEnabled.def
     onPopoutElevationEnabledChanged: saveSettings()
-    property bool barElevationEnabled: true
+    property bool barElevationEnabled: Spec.SPEC.barElevationEnabled.def
     onBarElevationEnabledChanged: saveSettings()
 
-    property bool blurEnabled: false
+    property bool blurEnabled: Spec.SPEC.blurEnabled.def
     onBlurEnabledChanged: saveSettings()
-    property bool blurForegroundLayers: true
+    property bool blurForegroundLayers: Spec.SPEC.blurForegroundLayers.def
     onBlurForegroundLayersChanged: saveSettings()
-    property real foregroundLayerTransparency: 1.0
-    property real blurLayerOutlineOpacity: 0.12
+    property real foregroundLayerTransparency: Spec.SPEC.foregroundLayerTransparency.def
+    property real blurLayerOutlineOpacity: Spec.SPEC.blurLayerOutlineOpacity.def
     onBlurLayerOutlineOpacityChanged: saveSettings()
-    property bool blurBorderEnabled: true
+    property bool blurBorderEnabled: Spec.SPEC.blurBorderEnabled.def
     onBlurBorderEnabledChanged: saveSettings()
-    property string blurBorderColor: "outline"
+    property string blurBorderColor: Spec.SPEC.blurBorderColor.def
     onBlurBorderColorChanged: saveSettings()
-    property string blurBorderCustomColor: "#ffffff"
+    property string blurBorderCustomColor: Spec.SPEC.blurBorderCustomColor.def
     onBlurBorderCustomColorChanged: saveSettings()
-    property real blurBorderOpacity: 0.35
+    property real blurBorderOpacity: Spec.SPEC.blurBorderOpacity.def
     onBlurBorderOpacityChanged: saveSettings()
-    property string wallpaperFillMode: "Fill"
-    property bool blurredWallpaperLayer: false
-    property bool blurWallpaperOnOverview: false
-    property string wallpaperBackgroundColorMode: "black"
-    property string wallpaperBackgroundCustomColor: "#000000"
+    property bool focusRingEnabled: Spec.SPEC.focusRingEnabled.def
+    property real focusRingWidth: Spec.SPEC.focusRingWidth.def
+    property string focusRingColor: Spec.SPEC.focusRingColor.def
+    property string wallpaperFillMode: Spec.SPEC.wallpaperFillMode.def
+    property bool blurredWallpaperLayer: Spec.SPEC.blurredWallpaperLayer.def
+    property bool blurWallpaperOnOverview: Spec.SPEC.blurWallpaperOnOverview.def
+    property string wallpaperBackgroundColorMode: Spec.SPEC.wallpaperBackgroundColorMode.def
+    property string wallpaperBackgroundCustomColor: Spec.SPEC.wallpaperBackgroundCustomColor.def
     readonly property color effectiveWallpaperBackgroundColor: {
         switch (wallpaperBackgroundColorMode) {
         case "black":
@@ -317,50 +324,50 @@ Singleton {
         }
     }
 
-    property bool frameEnabled: false
+    property bool frameEnabled: Spec.SPEC.frameEnabled.def
     onFrameEnabledChanged: {
         saveSettings();
         if (!_loading)
             updateFrameCompositorLayout();
     }
-    property real frameThickness: 16
+    property real frameThickness: Spec.SPEC.frameThickness.def
     onFrameThicknessChanged: saveSettings()
-    property int barInsetPaddingShared: -1
+    property int barInsetPaddingShared: Spec.SPEC.barInsetPaddingShared.def
     onBarInsetPaddingSharedChanged: saveSettings()
-    property bool barInsetPaddingSyncAll: false
+    property bool barInsetPaddingSyncAll: Spec.SPEC.barInsetPaddingSyncAll.def
     onBarInsetPaddingSyncAllChanged: saveSettings()
-    property int frameBarInsetPadding: -1
+    property int frameBarInsetPadding: Spec.SPEC.frameBarInsetPadding.def
     onFrameBarInsetPaddingChanged: saveSettings()
-    property real frameRounding: 23
+    property real frameRounding: Spec.SPEC.frameRounding.def
     onFrameRoundingChanged: saveSettings()
-    property string frameColor: ""
+    property string frameColor: Spec.SPEC.frameColor.def
     onFrameColorChanged: saveSettings()
-    property real frameOpacity: 1.0
+    property real frameOpacity: Spec.SPEC.frameOpacity.def
     onFrameOpacityChanged: saveSettings()
-    property var frameScreenPreferences: ["all"]
+    property var frameScreenPreferences: Spec.SPEC.frameScreenPreferences.def
     onFrameScreenPreferencesChanged: saveSettings()
-    property real frameBarSize: 40
+    property real frameBarSize: Spec.SPEC.frameBarSize.def
     onFrameBarSizeChanged: saveSettings()
-    property bool frameShowOnOverview: false
+    property bool frameShowOnOverview: Spec.SPEC.frameShowOnOverview.def
     onFrameShowOnOverviewChanged: saveSettings()
-    property bool frameBlurEnabled: true
+    property bool frameBlurEnabled: Spec.SPEC.frameBlurEnabled.def
     onFrameBlurEnabledChanged: saveSettings()
-    property bool frameCloseGaps: true
+    property bool frameCloseGaps: Spec.SPEC.frameCloseGaps.def
     onFrameCloseGapsChanged: saveSettings()
-    property string frameLauncherEmergeSide: "bottom"
+    property string frameLauncherEmergeSide: Spec.SPEC.frameLauncherEmergeSide.def
     onFrameLauncherEmergeSideChanged: saveSettings()
-    property bool frameLauncherArcExtender: false
+    property bool frameLauncherArcExtender: Spec.SPEC.frameLauncherArcExtender.def
     onFrameLauncherArcExtenderChanged: saveSettings()
-    property bool frameLauncherEdgeHover: false
+    property bool frameLauncherEdgeHover: Spec.SPEC.frameLauncherEdgeHover.def
     onFrameLauncherEdgeHoverChanged: saveSettings()
     readonly property string frameModalEmergeSide: frameLauncherEmergeSide === "top" ? "bottom" : "top"
-    property string frameMode: "connected"
+    property string frameMode: Spec.SPEC.frameMode.def
     onFrameModeChanged: {
         saveSettings();
         if (!_loading && frameEnabled)
             updateFrameCompositorLayout();
     }
-    property var connectedFrameBarStyleBackups: ({})
+    property var connectedFrameBarStyleBackups: Spec.SPEC.connectedFrameBarStyleBackups.def
     onConnectedFrameBarStyleBackupsChanged: saveSettings()
     readonly property bool connectedFrameModeActive: frameEnabled && frameMode === "connected"
     onConnectedFrameModeActiveChanged: {
@@ -380,209 +387,56 @@ Singleton {
         return fc;
     }
 
-    property bool showLauncherButton: true
-    property bool showWorkspaceSwitcher: true
-    property bool showFocusedWindow: true
-    property bool showWeather: true
-    property bool showMusic: true
-    property bool showClipboard: true
-    property bool showCpuUsage: true
-    property bool showMemUsage: true
-    property bool showCpuTemp: true
-    property bool showGpuTemp: true
-    property int selectedGpuIndex: 0
-    property var enabledGpuPciIds: []
-    property bool showSystemTray: true
-    property string systemTrayIconTintMode: "none"
-    property int systemTrayIconTintSaturation: 50
-    property int systemTrayIconTintStrength: 135
-    property bool showClock: true
-    property bool showNotificationButton: true
-    property bool showBattery: true
-    property bool showControlCenterButton: true
-    property bool showCapsLockIndicator: true
+    property string systemTrayIconTintMode: Spec.SPEC.systemTrayIconTintMode.def
+    property int systemTrayIconTintSaturation: Spec.SPEC.systemTrayIconTintSaturation.def
+    property int systemTrayIconTintStrength: Spec.SPEC.systemTrayIconTintStrength.def
 
-    property bool controlCenterShowNetworkIcon: true
-    property bool controlCenterShowBluetoothIcon: true
-    property bool controlCenterShowAudioIcon: true
-    property bool controlCenterShowAudioPercent: false
-    property bool controlCenterShowVpnIcon: true
-    property bool controlCenterShowBrightnessIcon: false
-    property bool controlCenterShowBrightnessPercent: false
-    property bool controlCenterShowMicIcon: false
-    property bool controlCenterShowMicPercent: true
-    property bool controlCenterShowBatteryIcon: false
-    property bool controlCenterShowPrinterIcon: false
-    property bool controlCenterShowScreenSharingIcon: true
-    property bool controlCenterShowIdleInhibitorIcon: false
-    property bool controlCenterShowDoNotDisturbIcon: false
-    property bool showPrivacyButton: true
-    property bool privacyShowMicIcon: false
-    property bool privacyShowCameraIcon: false
-    property bool privacyShowScreenShareIcon: false
+    property int controlCenterWidth: Spec.SPEC.controlCenterWidth.def
+    property var controlCenterWidgets: Spec.SPEC.controlCenterWidgets.def
 
-    property var controlCenterWidgets: [
-        {
-            "id": "volumeSlider",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "brightnessSlider",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "wifi",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "bluetooth",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "audioOutput",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "audioInput",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "nightMode",
-            "enabled": true,
-            "width": 50
-        },
-        {
-            "id": "darkMode",
-            "enabled": true,
-            "width": 50
-        }
-    ]
+    property var workspaceNameIcons: Spec.SPEC.workspaceNameIcons.def
+    property bool scrollTitleEnabled: Spec.SPEC.scrollTitleEnabled.def
+    property bool audioVisualizerEnabled: Spec.SPEC.audioVisualizerEnabled.def
+    property int audioWheelScrollAmount: Spec.SPEC.audioWheelScrollAmount.def
+    property bool bluetoothMprisEnabled: Spec.SPEC.bluetoothMprisEnabled.def
+    property var mediaExcludePlayers: Spec.SPEC.mediaExcludePlayers.def
+    property var mediaLyricsProviders: Spec.SPEC.mediaLyricsProviders.def
+    property var appIdSubstitutions: Spec.SPEC.appIdSubstitutions.def
+    property string centeringMode: Spec.SPEC.centeringMode.def
+    property string clockDateFormat: Spec.SPEC.clockDateFormat.def
+    property string lockDateFormat: Spec.SPEC.lockDateFormat.def
+    property bool greeterRememberLastSession: Spec.SPEC.greeterRememberLastSession.def
+    property bool greeterRememberLastUser: Spec.SPEC.greeterRememberLastUser.def
+    property bool greeterAutoLogin: Spec.SPEC.greeterAutoLogin.def
+    property bool greeterEnableFprint: Spec.SPEC.greeterEnableFprint.def
+    property bool greeterEnableU2f: Spec.SPEC.greeterEnableU2f.def
 
-    property bool showWorkspaceIndex: false
-    property bool showWorkspaceName: false
-    property bool showWorkspacePadding: false
-    property bool workspaceScrolling: false
-    property bool showWorkspaceApps: false
-    property bool workspaceDragReorder: true
-    property bool groupWorkspaceApps: true
-    property bool groupActiveWorkspaceApps: false
-    property int maxWorkspaceIcons: 3
-    property int workspaceAppIconSizeOffset: 0
-    property bool workspaceFollowFocus: false
-    property bool showOccupiedWorkspacesOnly: false
-    property bool reverseScrolling: false
-    property bool dwlShowAllTags: false
-    property bool workspaceActiveAppHighlightEnabled: false
-    property string workspaceColorMode: "default"
-    property string workspaceFocusedCustomColor: "#6750A4"
-    property string workspaceOccupiedColorMode: "none"
-    property string workspaceOccupiedCustomColor: "#625B71"
-    property string workspaceUnfocusedColorMode: "default"
-    property string workspaceUnfocusedCustomColor: "#49454E"
-    property string workspaceUrgentColorMode: "default"
-    property string workspaceUrgentCustomColor: "#B3261E"
-    property bool workspaceFocusedBorderEnabled: false
-    property string workspaceFocusedBorderColor: "primary"
-    property string workspaceFocusedBorderCustomColor: "#6750A4"
-    property int workspaceFocusedBorderThickness: 2
-    property bool workspaceUnfocusedMonitorSeparateAppearance: false
-    property string workspaceUnfocusedMonitorColorMode: "default"
-    property string workspaceUnfocusedMonitorFocusedCustomColor: "#6750A4"
-    property string workspaceUnfocusedMonitorOccupiedColorMode: "none"
-    property string workspaceUnfocusedMonitorOccupiedCustomColor: "#625B71"
-    property string workspaceUnfocusedMonitorUnfocusedColorMode: "default"
-    property string workspaceUnfocusedMonitorUnfocusedCustomColor: "#49454E"
-    property string workspaceUnfocusedMonitorUrgentColorMode: "default"
-    property string workspaceUnfocusedMonitorUrgentCustomColor: "#B3261E"
-    property bool workspaceUnfocusedMonitorBorderEnabled: false
-    property string workspaceUnfocusedMonitorBorderColor: "primary"
-    property string workspaceUnfocusedMonitorBorderCustomColor: "#6750A4"
-    property int workspaceUnfocusedMonitorBorderThickness: 2
-    property var workspaceNameIcons: ({})
-    property bool waveProgressEnabled: true
-    property bool scrollTitleEnabled: true
-    property bool mediaAdaptiveWidthEnabled: true
-    property bool audioVisualizerEnabled: true
-    property bool mediaUseAlbumArtAccent: false
-    property bool mediaWallpaperEnabled: true
-    property bool appleMusicAnimatedArtEnabled: false
-    property string audioScrollMode: "volume"
-    property int audioWheelScrollAmount: 5
-    property bool audioDeviceScrollVolumeEnabled: false
-    property var mediaExcludePlayers: []
-    property bool clockCompactMode: false
-    property int focusedWindowSize: 1
-    property bool focusedWindowCompactMode: false
-    property bool focusedWindowShowIcon: true
-    property bool runningAppsCompactMode: true
-    property int barMaxVisibleApps: 0
-    property int barMaxVisibleRunningApps: 0
-    property bool barShowOverflowBadge: true
-    property bool trayAutoOverflow: true
-    property bool trayPopupSingleLine: true
-    property int trayMaxVisibleItems: 0
-    property real trayIconSpacing: 0
-    property bool appsDockHideIndicators: false
-    property bool appsDockColorizeActive: false
-    property string appsDockActiveColorMode: "primary"
-    property bool appsDockEnlargeOnHover: false
-    property int appsDockEnlargePercentage: 125
-    property int appsDockIconSizePercentage: 100
-    property bool keyboardLayoutNameCompactMode: false
-    property bool keyboardLayoutNameShowIcon: false
-    property bool runningAppsCurrentWorkspace: true
-    property bool runningAppsGroupByApp: false
-    property bool runningAppsCurrentMonitor: false
-    property var appIdSubstitutions: []
-    property string centeringMode: "index"
-    property string clockDateFormat: ""
-    property string lockDateFormat: ""
-    property bool greeterRememberLastSession: true
-    property bool greeterRememberLastUser: true
-    property bool greeterAutoLogin: false
-    property bool greeterEnableFprint: false
-    property bool greeterEnableU2f: false
-    property bool greeterShowWeather: true
-    property string greeterWallpaperPath: ""
-    property string greeterLockDateFormat: ""
-    property string greeterFontFamily: ""
-    property string greeterWallpaperFillMode: ""
-    property int mediaSize: 1
-
-    property string appLauncherViewMode: "list"
-    property string spotlightModalViewMode: "list"
-    property string browserPickerViewMode: "grid"
-    property string appPickerViewMode: "grid"
-    property bool sortAppsAlphabetically: false
-    property int appLauncherGridColumns: 4
-    property bool closeNiriOverviewOnWindowFocus: true
-    property bool rememberLastQuery: false
-    property bool rememberLastMode: true
-    property var spotlightSectionViewModes: ({})
+    property string browserPickerViewMode: Spec.SPEC.browserPickerViewMode.def
+    property string appPickerViewMode: Spec.SPEC.appPickerViewMode.def
+    property bool sortAppsAlphabetically: Spec.SPEC.sortAppsAlphabetically.def
+    property int appLauncherGridColumns: Spec.SPEC.appLauncherGridColumns.def
+    property bool closeNiriOverviewOnWindowFocus: Spec.SPEC.closeNiriOverviewOnWindowFocus.def
+    property bool rememberLastQuery: Spec.SPEC.rememberLastQuery.def
+    property bool rememberLastMode: Spec.SPEC.rememberLastMode.def
+    property var spotlightSectionViewModes: Spec.SPEC.spotlightSectionViewModes.def
     onSpotlightSectionViewModesChanged: saveSettings()
-    property var appDrawerSectionViewModes: ({})
+    property var appDrawerSectionViewModes: Spec.SPEC.appDrawerSectionViewModes.def
     onAppDrawerSectionViewModesChanged: saveSettings()
-    property bool niriOverviewOverlayEnabled: true
-    property string niriOverviewLauncherStyle: "full"
-    property string dankLauncherV2Size: "compact"
-    property bool dankLauncherV2ShowSourceBadges: true
-    property bool dankLauncherV2BorderEnabled: false
-    property int dankLauncherV2BorderThickness: 2
-    property string dankLauncherV2BorderColor: "primary"
-    property bool dankLauncherV2ShowFooter: true
-    property bool dankLauncherV2UnloadOnClose: false
-    property bool dankLauncherV2IncludeFilesInAll: false
-    property bool dankLauncherV2IncludeFoldersInAll: false
-    property bool launcherUseOverlayLayer: false
-    property string launcherStyle: "full"
-    property bool spotlightBarShowModeChips: false
-    property bool keybindsFloatingWindow: false
+    property bool niriOverviewOverlayEnabled: Spec.SPEC.niriOverviewOverlayEnabled.def
+    property string niriOverviewLauncherStyle: Spec.SPEC.niriOverviewLauncherStyle.def
+    property string dankLauncherV2Size: Spec.SPEC.dankLauncherV2Size.def
+    property bool dankLauncherV2ShowSourceBadges: Spec.SPEC.dankLauncherV2ShowSourceBadges.def
+    property bool dankLauncherV2BorderEnabled: Spec.SPEC.dankLauncherV2BorderEnabled.def
+    property int dankLauncherV2BorderThickness: Spec.SPEC.dankLauncherV2BorderThickness.def
+    property string dankLauncherV2BorderColor: Spec.SPEC.dankLauncherV2BorderColor.def
+    property bool dankLauncherV2ShowFooter: Spec.SPEC.dankLauncherV2ShowFooter.def
+    property bool dankLauncherV2UnloadOnClose: Spec.SPEC.dankLauncherV2UnloadOnClose.def
+    property bool dankLauncherV2IncludeFilesInAll: Spec.SPEC.dankLauncherV2IncludeFilesInAll.def
+    property bool dankLauncherV2IncludeFoldersInAll: Spec.SPEC.dankLauncherV2IncludeFoldersInAll.def
+    property bool launcherUseOverlayLayer: Spec.SPEC.launcherUseOverlayLayer.def
+    property string launcherStyle: Spec.SPEC.launcherStyle.def
+    property bool spotlightBarShowModeChips: Spec.SPEC.spotlightBarShowModeChips.def
+    property bool keybindsFloatingWindow: Spec.SPEC.keybindsFloatingWindow.def
     onKeybindsFloatingWindowChanged: saveSettings()
 
     property string _legacyWeatherLocation: "New York, NY"
@@ -590,10 +444,9 @@ Singleton {
     property string _legacyVpnLastConnected: ""
     readonly property string weatherLocation: SessionData.weatherLocation
     readonly property string weatherCoordinates: SessionData.weatherCoordinates
-    property bool useAutoLocation: false
-    property bool weatherEnabled: true
+    property bool useAutoLocation: Spec.SPEC.useAutoLocation.def
+    property bool weatherEnabled: Spec.SPEC.weatherEnabled.def
 
-    readonly property var _dashTabIds: ["overview", "media", "wallpaper", "weather", "settings"]
     readonly property var _dashTabsDefault: [
         {
             "id": "overview",
@@ -612,12 +465,44 @@ Singleton {
             "enabled": true
         },
         {
-            "id": "settings",
-            "enabled": true
+            "id": "notifications",
+            "enabled": false
         }
     ]
-    property var dashTabs: _dashTabsDefault
+    property var dashTabs: Spec.SPEC.dashTabs.def
     onDashTabsChanged: saveSettings()
+
+    readonly property var _dashCardsDefault: [
+        {
+            "id": "clock",
+            "w": 2,
+            "h": 1
+        },
+        {
+            "id": "weather",
+            "w": 1,
+            "h": 1
+        },
+        {
+            "id": "notifications",
+            "w": 3,
+            "h": 5
+        },
+        {
+            "id": "calendar",
+            "w": 3,
+            "h": 3
+        },
+        {
+            "id": "media",
+            "w": 3,
+            "h": 1
+        }
+    ]
+    property var dashCards: Spec.SPEC.dashCards.def
+    onDashCardsChanged: saveSettings()
+    property var dashOptions: Spec.SPEC.dashOptions.def
+    onDashOptionsChanged: saveSettings()
 
     function getDashTabs() {
         const stored = Array.isArray(dashTabs) ? dashTabs : [];
@@ -625,7 +510,7 @@ Singleton {
         const seen = {};
         for (var i = 0; i < stored.length; i++) {
             const id = stored[i] && stored[i].id;
-            if (_dashTabIds.indexOf(id) < 0 || seen[id])
+            if (typeof id !== "string" || id === "" || seen[id])
                 continue;
             seen[id] = true;
             result.push({
@@ -633,23 +518,15 @@ Singleton {
                 "enabled": stored[i].enabled !== false
             });
         }
-        for (var j = 0; j < _dashTabIds.length; j++) {
-            if (!seen[_dashTabIds[j]])
-                result.push({
-                    "id": _dashTabIds[j],
-                    "enabled": true
-                });
+        for (var j = 0; j < _dashTabsDefault.length; j++) {
+            if (seen[_dashTabsDefault[j].id])
+                continue;
+            result.push({
+                "id": _dashTabsDefault[j].id,
+                "enabled": _dashTabsDefault[j].enabled
+            });
         }
         return result;
-    }
-
-    function visibleDashTabIds() {
-        return getDashTabs().filter(t => t.enabled && (t.id !== "weather" || weatherEnabled)).map(t => t.id);
-    }
-
-    function dashTabIndexForId(id) {
-        const idx = visibleDashTabIds().indexOf(id);
-        return idx < 0 ? 0 : idx;
     }
 
     function setDashTabOrder(ids) {
@@ -668,7 +545,13 @@ Singleton {
     }
 
     function setDashTabEnabled(id, on) {
-        dashTabs = getDashTabs().map(t => t.id === id ? {
+        const current = getDashTabs();
+        if (!current.some(t => t.id === id))
+            current.push({
+                "id": id,
+                "enabled": true
+            });
+        dashTabs = current.map(t => t.id === id ? {
                 "id": t.id,
                 "enabled": on
             } : t);
@@ -681,63 +564,59 @@ Singleton {
                 }));
     }
 
-    property string networkPreference: "auto"
+    function resetDashCards() {
+        dashCards = _dashCardsDefault.map(c => ({
+                    "id": c.id,
+                    "w": c.w,
+                    "h": c.h
+                }));
+        const options = Object.assign({}, dashOptions);
+        delete options.overview;
+        dashOptions = options;
+    }
 
-    property string iconThemeDark: "System Default"
-    property string iconThemeLight: "System Default"
-    property bool iconThemePerMode: false
+    property string networkPreference: Spec.SPEC.networkPreference.def
+
+    property string iconThemeDark: Spec.SPEC.iconThemeDark.def
+    property string iconThemeLight: Spec.SPEC.iconThemeLight.def
+    property bool iconThemePerMode: Spec.SPEC.iconThemePerMode.def
     readonly property string iconTheme: resolveIconTheme()
-    property var availableIconThemes: ["System Default"]
-    property string systemDefaultIconTheme: ""
+    property var availableIconThemes: Spec.SPEC.availableIconThemes.def
+    property string systemDefaultIconTheme: Spec.SPEC.systemDefaultIconTheme.def
 
-    property var cursorSettings: ({
-            "theme": "System Default",
-            "size": 24,
-            "niri": {
-                "hideWhenTyping": false,
-                "hideAfterInactiveMs": 0
-            },
-            "hyprland": {
-                "hideOnKeyPress": false,
-                "hideOnTouch": false,
-                "inactiveTimeout": 0
-            },
-            "mango": {
-                "cursorHideTimeout": 0
-            }
-        })
-    property var availableCursorThemes: ["System Default"]
-    property string systemDefaultCursorTheme: ""
+    property var cursorSettings: Spec.SPEC.cursorSettings.def
+    property var availableCursorThemes: Spec.SPEC.availableCursorThemes.def
+    property string systemDefaultCursorTheme: Spec.SPEC.systemDefaultCursorTheme.def
 
-    property string launcherLogoMode: "apps"
-    property string launcherLogoCustomPath: ""
-    property string launcherLogoColorOverride: ""
-    property bool launcherLogoColorInvertOnMode: false
-    property real launcherLogoBrightness: 0.5
-    property real launcherLogoContrast: 1
-    property int launcherLogoSizeOffset: 0
+    property string launcherLogoMode: Spec.SPEC.launcherLogoMode.def
+    property string launcherLogoCustomPath: Spec.SPEC.launcherLogoCustomPath.def
+    property string launcherLogoColorOverride: Spec.SPEC.launcherLogoColorOverride.def
+    property bool launcherLogoColorInvertOnMode: Spec.SPEC.launcherLogoColorInvertOnMode.def
+    property real launcherLogoBrightness: Spec.SPEC.launcherLogoBrightness.def
+    property real launcherLogoContrast: Spec.SPEC.launcherLogoContrast.def
+    property int launcherLogoSizeOffset: Spec.SPEC.launcherLogoSizeOffset.def
 
-    property string fontFamily: "Inter Variable"
-    property string monoFontFamily: "Fira Code"
+    property string fontFamily: Spec.SPEC.fontFamily.def
+    property string monoFontFamily: Spec.SPEC.monoFontFamily.def
+    property string displayFontFamily: Spec.SPEC.displayFontFamily.def
     property int fontWeight: Font.Normal
-    property real fontScale: 1.0
-    property real dankBarFontScale: 1.0
+    property real fontScale: Spec.SPEC.fontScale.def
     property int textRenderType: SettingsData.TextRenderType.Qt
     property int textRenderQuality: SettingsData.TextRenderQuality.Default
 
-    property bool notepadUseMonospace: true
-    property string notepadFontFamily: ""
-    property real notepadFontSize: 14
+    property bool notepadUseMonospace: Spec.SPEC.notepadUseMonospace.def
+    property string notepadFontFamily: Spec.SPEC.notepadFontFamily.def
+    property real notepadFontSize: Spec.SPEC.notepadFontSize.def
     property real notificationSummaryFontSize: Spec.SPEC.notificationSummaryFontSize.def
     property real notificationBodyFontSize: Spec.SPEC.notificationBodyFontSize.def
-    property bool notepadShowLineNumbers: false
-    property bool notepadAutoSave: false
-    property string notepadSlideoutSide: "right"
-    property string notepadDefaultMode: "slideout"
-    property real notepadTransparencyOverride: -1
-    property real notepadLastCustomTransparency: 0.7
-    property bool notepadUseCompositorGap: false
-    property int notepadEdgeGap: 0
+    property bool notepadShowLineNumbers: Spec.SPEC.notepadShowLineNumbers.def
+    property bool notepadAutoSave: Spec.SPEC.notepadAutoSave.def
+    property string notepadSlideoutSide: Spec.SPEC.notepadSlideoutSide.def
+    property string notepadDefaultMode: Spec.SPEC.notepadDefaultMode.def
+    property real notepadTransparencyOverride: Spec.SPEC.notepadTransparencyOverride.def
+    property real notepadLastCustomTransparency: Spec.SPEC.notepadLastCustomTransparency.def
+    property bool notepadUseCompositorGap: Spec.SPEC.notepadUseCompositorGap.def
+    property int notepadEdgeGap: Spec.SPEC.notepadEdgeGap.def
 
     property string activeCompositor: ""
 
@@ -780,158 +659,108 @@ Singleton {
     }
     onNotepadLastCustomTransparencyChanged: saveSettings()
 
-    property bool soundsEnabled: true
-    property bool useSystemSoundTheme: false
-    property bool soundNewNotification: true
-    property bool soundVolumeChanged: true
-    property bool soundPluggedIn: true
-    property bool soundLogin: false
-    property bool muteSoundsWhenMediaPlaying: true
+    property bool soundsEnabled: Spec.SPEC.soundsEnabled.def
+    property bool useSystemSoundTheme: Spec.SPEC.useSystemSoundTheme.def
+    property bool soundNewNotification: Spec.SPEC.soundNewNotification.def
+    property bool soundVolumeChanged: Spec.SPEC.soundVolumeChanged.def
+    property bool soundPluggedIn: Spec.SPEC.soundPluggedIn.def
+    property bool soundLogin: Spec.SPEC.soundLogin.def
+    property bool muteSoundsWhenMediaPlaying: Spec.SPEC.muteSoundsWhenMediaPlaying.def
 
-    property int acMonitorTimeout: 0
-    property int acLockTimeout: 0
-    property int acSuspendTimeout: 0
+    property int acMonitorTimeout: Spec.SPEC.acMonitorTimeout.def
+    property int acLockTimeout: Spec.SPEC.acLockTimeout.def
+    property int acSuspendTimeout: Spec.SPEC.acSuspendTimeout.def
     property int acSuspendBehavior: SettingsData.SuspendBehavior.Suspend
-    property string acProfileName: ""
-    property int acPostLockMonitorTimeout: 0
-    property int batteryMonitorTimeout: 0
-    property int batteryLockTimeout: 0
-    property int batterySuspendTimeout: 0
+    property string acProfileName: Spec.SPEC.acProfileName.def
+    property int acPostLockMonitorTimeout: Spec.SPEC.acPostLockMonitorTimeout.def
+    property int batteryMonitorTimeout: Spec.SPEC.batteryMonitorTimeout.def
+    property int batteryLockTimeout: Spec.SPEC.batteryLockTimeout.def
+    property int batterySuspendTimeout: Spec.SPEC.batterySuspendTimeout.def
     property int batterySuspendBehavior: SettingsData.SuspendBehavior.Suspend
-    property string batteryProfileName: ""
-    property int batteryPostLockMonitorTimeout: 0
-    property int batteryChargeLimit: 100
-    property bool batteryNotifyChargeLimit: false
-    property int batteryCriticalThreshold: 10
-    property bool batteryNotifyCritical: true
-    property int batteryLowThreshold: 20
-    property bool batteryNotifyLow: false
-    property int batteryChargeLimitNotificationType: 0
-    property int batteryLowNotificationType: 0
-    property int batteryCriticalNotificationType: 1
-    property bool batteryAutoPowerSaver: false
-    property bool lowerDisplayRefreshRateOnBattery: false
-    property bool showBatteryPercent: true
-    property bool showBatteryPercentOnlyOnBattery: false
-    property bool showBatteryTime: false
-    property bool showBatteryTimeOnlyOnBattery: false
-    property bool showBatteryPowerCharging: false
-    property bool showBatteryPowerDischarging: false
-    property string batteryStyle: "icon"
-    property bool lockBeforeSuspend: false
-    property bool loginctlLockIntegration: true
-    property bool fadeToLockEnabled: true
-    property int fadeToLockGracePeriod: 5
-    property bool fadeToDpmsEnabled: true
-    property int fadeToDpmsGracePeriod: 5
-    property string launchPrefix: ""
+    property string batteryProfileName: Spec.SPEC.batteryProfileName.def
+    property int batteryPostLockMonitorTimeout: Spec.SPEC.batteryPostLockMonitorTimeout.def
+    property int batteryChargeLimit: Spec.SPEC.batteryChargeLimit.def
+    property bool batteryNotifyChargeLimit: Spec.SPEC.batteryNotifyChargeLimit.def
+    property int batteryCriticalThreshold: Spec.SPEC.batteryCriticalThreshold.def
+    property bool batteryNotifyCritical: Spec.SPEC.batteryNotifyCritical.def
+    property int batteryLowThreshold: Spec.SPEC.batteryLowThreshold.def
+    property bool batteryNotifyLow: Spec.SPEC.batteryNotifyLow.def
+    property int batteryChargeLimitNotificationType: Spec.SPEC.batteryChargeLimitNotificationType.def
+    property int batteryLowNotificationType: Spec.SPEC.batteryLowNotificationType.def
+    property int batteryCriticalNotificationType: Spec.SPEC.batteryCriticalNotificationType.def
+    property bool batteryAutoPowerSaver: Spec.SPEC.batteryAutoPowerSaver.def
+    property bool lowerDisplayRefreshRateOnBattery: Spec.SPEC.lowerDisplayRefreshRateOnBattery.def
+    property bool lockBeforeSuspend: Spec.SPEC.lockBeforeSuspend.def
+    property bool loginctlLockIntegration: Spec.SPEC.loginctlLockIntegration.def
+    property bool fadeToLockEnabled: Spec.SPEC.fadeToLockEnabled.def
+    property int fadeToLockGracePeriod: Spec.SPEC.fadeToLockGracePeriod.def
+    property bool fadeToDpmsEnabled: Spec.SPEC.fadeToDpmsEnabled.def
+    property int fadeToDpmsGracePeriod: Spec.SPEC.fadeToDpmsGracePeriod.def
+    property string launchPrefix: Spec.SPEC.launchPrefix.def
 
-    property bool syncModeWithPortal: true
-    property bool terminalsAlwaysDark: false
+    property bool syncModeWithPortal: Spec.SPEC.syncModeWithPortal.def
+    property bool terminalsAlwaysDark: Spec.SPEC.terminalsAlwaysDark.def
 
-    property string muxType: "tmux"
-    property bool muxUseCustomCommand: false
-    property string muxCustomCommand: ""
-    property string muxSessionFilter: ""
+    property string muxType: Spec.SPEC.muxType.def
+    property bool muxUseCustomCommand: Spec.SPEC.muxUseCustomCommand.def
+    property string muxCustomCommand: Spec.SPEC.muxCustomCommand.def
+    property string muxSessionFilter: Spec.SPEC.muxSessionFilter.def
 
-    property bool runDmsMatugenTemplates: true
-    property bool matugenTemplateGtk: true
-    property bool matugenTemplateNiri: true
-    property bool matugenTemplateHyprland: true
-    property bool matugenTemplateMangowc: true
-    property bool matugenTemplateQt5ct: true
-    property bool matugenTemplateQt6ct: true
-    property bool matugenTemplateFcitx5: true
-    property bool matugenTemplateQtengine: true
-    property bool matugenTemplateFirefox: true
-    property bool matugenTemplatePywalfox: true
-    property bool matugenTemplateZenBrowser: true
-    property bool matugenTemplateVesktop: true
-    property bool matugenTemplateVencord: true
-    property bool matugenTemplateEquibop: true
-    property bool matugenTemplateGhostty: true
-    property bool matugenTemplateKitty: true
-    property bool matugenTemplateFoot: true
-    property bool matugenTemplateNeovim: false
-    property bool matugenTemplateAlacritty: true
-    property bool matugenTemplateWezterm: true
-    property bool matugenTemplateDgop: true
-    property bool matugenTemplateKcolorscheme: true
-    property bool matugenTemplateVscode: true
-    property bool matugenTemplateEmacs: true
-    property bool matugenTemplateZed: true
+    property bool runDmsMatugenTemplates: Spec.SPEC.runDmsMatugenTemplates.def
+    property bool matugenTemplateGtk: Spec.SPEC.matugenTemplateGtk.def
+    property bool matugenTemplateNiri: Spec.SPEC.matugenTemplateNiri.def
+    property bool matugenTemplateHyprland: Spec.SPEC.matugenTemplateHyprland.def
+    property bool matugenTemplateMangowc: Spec.SPEC.matugenTemplateMangowc.def
+    property bool matugenTemplateQt5ct: Spec.SPEC.matugenTemplateQt5ct.def
+    property bool matugenTemplateQt6ct: Spec.SPEC.matugenTemplateQt6ct.def
+    property bool matugenTemplateFcitx5: Spec.SPEC.matugenTemplateFcitx5.def
+    property bool matugenTemplateQtengine: Spec.SPEC.matugenTemplateQtengine.def
+    property bool matugenTemplateFirefox: Spec.SPEC.matugenTemplateFirefox.def
+    property bool matugenTemplatePywalfox: Spec.SPEC.matugenTemplatePywalfox.def
+    property bool matugenTemplateZenBrowser: Spec.SPEC.matugenTemplateZenBrowser.def
+    property bool matugenTemplateVesktop: Spec.SPEC.matugenTemplateVesktop.def
+    property bool matugenTemplateVencord: Spec.SPEC.matugenTemplateVencord.def
+    property bool matugenTemplateEquibop: Spec.SPEC.matugenTemplateEquibop.def
+    property bool matugenTemplateGhostty: Spec.SPEC.matugenTemplateGhostty.def
+    property bool matugenTemplateKitty: Spec.SPEC.matugenTemplateKitty.def
+    property bool matugenTemplateFoot: Spec.SPEC.matugenTemplateFoot.def
+    property bool matugenTemplateNeovim: Spec.SPEC.matugenTemplateNeovim.def
+    property bool matugenTemplateAlacritty: Spec.SPEC.matugenTemplateAlacritty.def
+    property bool matugenTemplateWezterm: Spec.SPEC.matugenTemplateWezterm.def
+    property bool matugenTemplateDgop: Spec.SPEC.matugenTemplateDgop.def
+    property bool matugenTemplateKcolorscheme: Spec.SPEC.matugenTemplateKcolorscheme.def
+    property bool matugenTemplateVscode: Spec.SPEC.matugenTemplateVscode.def
+    property bool matugenTemplateEmacs: Spec.SPEC.matugenTemplateEmacs.def
+    property bool matugenTemplateZed: Spec.SPEC.matugenTemplateZed.def
 
-    property var matugenTemplateNeovimSettings: ({
-            "dark": {
-                "baseTheme": "github_dark",
-                "harmony": 0.5
-            },
-            "light": {
-                "baseTheme": "github_light",
-                "harmony": 0.5
-            }
-        })
-    property bool matugenTemplateNeovimSetBackground: true
+    property var matugenTemplateNeovimSettings: Spec.SPEC.matugenTemplateNeovimSettings.def
+    property bool matugenTemplateNeovimSetBackground: Spec.SPEC.matugenTemplateNeovimSetBackground.def
 
-    property bool showDock: false
-    property bool dockAutoHide: false
-    property bool dockSmartAutoHide: false
-    property bool dockUseOverlayLayer: false
-    property bool dockShowOnFullscreen: false
-    property bool dockGroupByApp: false
-    property bool dockSeparatePinnedAndRunningApps: false
-    property bool dockRestoreSpecialWorkspaceOnClick: false
-    property bool dockOpenOnOverview: false
-    property int dockPosition: SettingsData.Position.Bottom
-    property real dockSpacing: 4
-    property real dockBottomGap: 0
-    property real dockMargin: 0
-    property real dockIconSize: 40
-    property string dockIndicatorStyle: "circle"
-    property bool dockBorderEnabled: false
-    property string dockBorderColor: "surfaceText"
-    property real dockBorderOpacity: 1.0
-    property int dockBorderThickness: 1
-    property bool dockIsolateDisplays: false
-    property bool dockLauncherEnabled: false
-    property string dockLauncherLogoMode: "apps"
-    property string dockLauncherLogoCustomPath: ""
-    property string dockLauncherLogoColorOverride: ""
-    property int dockLauncherLogoSizeOffset: 0
-    property real dockLauncherLogoBrightness: 0.5
-    property real dockLauncherLogoContrast: 1
-    property int dockMaxVisibleApps: 0
-    property int dockMaxVisibleRunningApps: 0
-    property bool dockShowOverflowBadge: true
-    property bool dockShowTrash: false
-    property string dockTrashFileManager: "default"
-    property string dockTrashCustomCommand: ""
+    property bool notificationOverlayEnabled: Spec.SPEC.notificationOverlayEnabled.def
+    property bool notificationPopupShadowEnabled: Spec.SPEC.notificationPopupShadowEnabled.def
+    property bool notificationPopupPrivacyMode: Spec.SPEC.notificationPopupPrivacyMode.def
+    property bool notificationPopupBodyInvokesAction: Spec.SPEC.notificationPopupBodyInvokesAction.def
+    property bool notificationForegroundLayers: Spec.SPEC.notificationForegroundLayers.def
+    property int overviewRows: Spec.SPEC.overviewRows.def
+    property int overviewColumns: Spec.SPEC.overviewColumns.def
+    property real overviewScale: Spec.SPEC.overviewScale.def
 
-    property bool notificationOverlayEnabled: false
-    property bool notificationPopupShadowEnabled: true
-    property bool notificationPopupPrivacyMode: false
-    property bool notificationPopupBodyInvokesAction: false
-    property bool notificationForegroundLayers: true
-    property int overviewRows: 2
-    property int overviewColumns: 5
-    property real overviewScale: 0.16
+    property bool modalDarkenBackground: Spec.SPEC.modalDarkenBackground.def
 
-    property bool modalDarkenBackground: true
+    property bool lockScreenShowPowerActions: Spec.SPEC.lockScreenShowPowerActions.def
+    property bool lockScreenShowSystemIcons: Spec.SPEC.lockScreenShowSystemIcons.def
+    property bool lockScreenShowTime: Spec.SPEC.lockScreenShowTime.def
+    property string lockScreenClockStyle: Spec.SPEC.lockScreenClockStyle.def
+    property bool lockScreenShowDate: Spec.SPEC.lockScreenShowDate.def
+    property bool lockScreenShowProfileImage: Spec.SPEC.lockScreenShowProfileImage.def
+    property bool lockScreenShowPasswordField: Spec.SPEC.lockScreenShowPasswordField.def
+    property bool lockScreenShowMediaPlayer: Spec.SPEC.lockScreenShowMediaPlayer.def
+    property bool lockScreenShowWeather: Spec.SPEC.lockScreenShowWeather.def
+    property bool lockScreenPowerOffMonitorsOnLock: Spec.SPEC.lockScreenPowerOffMonitorsOnLock.def
+    property bool lockAtStartup: Spec.SPEC.lockAtStartup.def
 
-    property bool lockScreenShowPowerActions: true
-    property bool lockScreenShowSystemIcons: true
-    property bool lockScreenShowTime: true
-    property string lockScreenClockStyle: "horizontal"
-    property bool lockScreenShowDate: true
-    property bool lockScreenShowProfileImage: true
-    property bool lockScreenShowPasswordField: true
-    property bool lockScreenShowMediaPlayer: true
-    property bool lockScreenShowWeather: true
-    property bool lockScreenPowerOffMonitorsOnLock: false
-    property bool lockAtStartup: false
-
-    property bool enableFprint: false
-    property int maxFprintTries: 15
+    property bool enableFprint: Spec.SPEC.enableFprint.def
+    property int maxFprintTries: Spec.SPEC.maxFprintTries.def
     readonly property bool fprintdAvailable: Processes.fprintdAvailable
     readonly property bool lockFingerprintCanEnable: Processes.lockFingerprintCanEnable
     readonly property bool lockFingerprintReady: Processes.lockFingerprintReady
@@ -940,8 +769,8 @@ Singleton {
     readonly property bool greeterFingerprintReady: Processes.greeterFingerprintReady
     readonly property string greeterFingerprintReason: Processes.greeterFingerprintReason
     readonly property string greeterFingerprintSource: Processes.greeterFingerprintSource
-    property bool enableU2f: false
-    property string u2fMode: "or"
+    property bool enableU2f: Spec.SPEC.enableU2f.def
+    property string u2fMode: Spec.SPEC.u2fMode.def
     readonly property bool u2fAvailable: Processes.u2fAvailable
     readonly property bool lockU2fCanEnable: Processes.lockU2fCanEnable
     readonly property bool lockU2fReady: Processes.lockU2fReady
@@ -950,46 +779,42 @@ Singleton {
     readonly property bool greeterU2fReady: Processes.greeterU2fReady
     readonly property string greeterU2fReason: Processes.greeterU2fReason
     readonly property string greeterU2fSource: Processes.greeterU2fSource
-    property string lockPamPath: ""
-    property bool lockPamInlineFprint: false
-    property bool lockPamInlineU2f: false
-    property bool lockPamExternallyManaged: false
-    property string lockU2fPamPath: ""
-    property string lockScreenSecurityKeyShortcut: "Ctrl+Q"
-    property bool lockScreenSecurityKeyShortcutEnabled: false
-    property bool greeterPamExternallyManaged: false
-    property string lockScreenInactiveColor: "#000000"
-    property int lockScreenNotificationMode: 0
-    property bool lockScreenVideoEnabled: false
-    property string lockScreenVideoPath: ""
-    property bool lockScreenVideoCycling: false
-    property string lockScreenWallpaperPath: ""
-    property string lockScreenWallpaperFillMode: ""
-    property string lockScreenFontFamily: ""
-    property bool hideBrightnessSlider: false
+    property string lockPamPath: Spec.SPEC.lockPamPath.def
+    property bool lockPamInlineFprint: Spec.SPEC.lockPamInlineFprint.def
+    property bool lockPamInlineU2f: Spec.SPEC.lockPamInlineU2f.def
+    property bool lockPamExternallyManaged: Spec.SPEC.lockPamExternallyManaged.def
+    property string lockU2fPamPath: Spec.SPEC.lockU2fPamPath.def
+    property string lockScreenSecurityKeyShortcut: Spec.SPEC.lockScreenSecurityKeyShortcut.def
+    property bool lockScreenSecurityKeyShortcutEnabled: Spec.SPEC.lockScreenSecurityKeyShortcutEnabled.def
+    property bool greeterPamExternallyManaged: Spec.SPEC.greeterPamExternallyManaged.def
+    property string lockScreenInactiveColor: Spec.SPEC.lockScreenInactiveColor.def
+    property int lockScreenNotificationMode: Spec.SPEC.lockScreenNotificationMode.def
+    property bool lockScreenVideoEnabled: Spec.SPEC.lockScreenVideoEnabled.def
+    property string lockScreenVideoPath: Spec.SPEC.lockScreenVideoPath.def
+    property bool lockScreenVideoCycling: Spec.SPEC.lockScreenVideoCycling.def
+    property string lockScreenWallpaperPath: Spec.SPEC.lockScreenWallpaperPath.def
+    property string lockScreenWallpaperFillMode: Spec.SPEC.lockScreenWallpaperFillMode.def
+    property string lockScreenFontFamily: Spec.SPEC.lockScreenFontFamily.def
 
-    property int notificationTimeoutLow: 5000
-    property int notificationTimeoutNormal: 5000
-    property int notificationTimeoutCritical: 0
-    property bool notificationIgnoreAppTimeout: false
-    property bool notificationCompactMode: false
-    property bool notificationShowTimeoutBar: false
-    property bool notificationDedupeEnabled: true
+    property int notificationTimeoutLow: Spec.SPEC.notificationTimeoutLow.def
+    property int notificationTimeoutNormal: Spec.SPEC.notificationTimeoutNormal.def
+    property int notificationTimeoutCritical: Spec.SPEC.notificationTimeoutCritical.def
+    property bool notificationIgnoreAppTimeout: Spec.SPEC.notificationIgnoreAppTimeout.def
+    property bool notificationCompactMode: Spec.SPEC.notificationCompactMode.def
+    property bool notificationShowTimeoutBar: Spec.SPEC.notificationShowTimeoutBar.def
+    property bool notificationDedupeEnabled: Spec.SPEC.notificationDedupeEnabled.def
     property int notificationPopupPosition: SettingsData.Position.Top
-    property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
-    property int notificationCustomAnimationDuration: 400
-    property bool notificationHistoryEnabled: true
-    property int notificationHistoryMaxCount: 50
-    property int notificationHistoryMaxAgeDays: 7
-    property bool notificationHistorySaveLow: true
-    property bool notificationHistorySaveNormal: true
-    property bool notificationHistorySaveCritical: true
-    property var notificationRules: []
-    property bool notificationDndAllowCritical: true
-    property bool notificationDndWhileScreenSharing: true
-    property bool notificationFocusedMonitor: false
-    // Island is a per-instance render mode: any bar config with island:true draws as an island
-    // instead of a DankBar, and carries its own island* look settings.
+    property int notificationAnimationDuration: Spec.SPEC.notificationAnimationDuration.def
+    property bool notificationHistoryEnabled: Spec.SPEC.notificationHistoryEnabled.def
+    property int notificationHistoryMaxCount: Spec.SPEC.notificationHistoryMaxCount.def
+    property int notificationHistoryMaxAgeDays: Spec.SPEC.notificationHistoryMaxAgeDays.def
+    property bool notificationHistorySaveLow: Spec.SPEC.notificationHistorySaveLow.def
+    property bool notificationHistorySaveNormal: Spec.SPEC.notificationHistorySaveNormal.def
+    property bool notificationHistorySaveCritical: Spec.SPEC.notificationHistorySaveCritical.def
+    property var notificationRules: Spec.SPEC.notificationRules.def
+    property bool notificationDndAllowCritical: Spec.SPEC.notificationDndAllowCritical.def
+    property bool notificationDndWhileScreenSharing: Spec.SPEC.notificationDndWhileScreenSharing.def
+    property bool notificationFocusedMonitor: Spec.SPEC.notificationFocusedMonitor.def
     readonly property var islandBarConfigs: {
         barConfigs;
         return (barConfigs || []).filter(cfg => cfg && cfg.island === true);
@@ -1012,6 +837,7 @@ Singleton {
             "islandMediaClockVisible": true,
             "islandNotificationBadgeClearOnOpen": false,
             "islandNotificationExpand": false,
+            "islandNotificationPopups": false,
             "islandHomeCompactTight": false,
             "islandHomeClockDisplay": "both",
             "islandHomeVolumeDisplay": "both",
@@ -1061,10 +887,7 @@ Singleton {
     }
 
     function islandStripThickness(bc) {
-        const reserve = Math.max(24, Math.min(128, islandSetting(bc, "islandReserveThickness")));
-        const compact = Math.max(24, Math.min(72, islandSetting(bc, "islandCompactThickness")));
-        const gap = Math.max(0, Math.min(48, islandSetting(bc, "islandOuterGap")));
-        return Math.max(reserve, gap + compact);
+        return LayoutResolver.islandThickness(bc, islandDefaults);
     }
     readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
     readonly property var _islandHomeLayoutDefault: [
@@ -1149,173 +972,58 @@ Singleton {
         });
     }
 
-    property bool osdAlwaysShowValue: false
+    property bool osdAlwaysShowValue: Spec.SPEC.osdAlwaysShowValue.def
     property int osdPosition: SettingsData.Position.BottomCenter
-    property bool osdVolumeEnabled: true
-    property bool osdMediaVolumeEnabled: true
-    property bool osdMediaPlaybackEnabled: false
-    property bool osdBrightnessEnabled: true
-    property bool osdIdleInhibitorEnabled: true
-    property bool osdMicMuteEnabled: true
-    property bool osdMicVolumeEnabled: true
-    property bool osdCapsLockEnabled: true
-    property bool osdPowerProfileEnabled: true
-    property bool osdAudioOutputEnabled: true
-    property bool osdWorkspaceEnabled: false
+    property bool osdVolumeEnabled: Spec.SPEC.osdVolumeEnabled.def
+    property bool osdMediaVolumeEnabled: Spec.SPEC.osdMediaVolumeEnabled.def
+    property bool osdMediaPlaybackEnabled: Spec.SPEC.osdMediaPlaybackEnabled.def
+    property bool osdBrightnessEnabled: Spec.SPEC.osdBrightnessEnabled.def
+    property bool osdIdleInhibitorEnabled: Spec.SPEC.osdIdleInhibitorEnabled.def
+    property bool osdMicMuteEnabled: Spec.SPEC.osdMicMuteEnabled.def
+    property bool osdMicVolumeEnabled: Spec.SPEC.osdMicVolumeEnabled.def
+    property bool osdCapsLockEnabled: Spec.SPEC.osdCapsLockEnabled.def
+    property bool osdPowerProfileEnabled: Spec.SPEC.osdPowerProfileEnabled.def
+    property bool osdAudioOutputEnabled: Spec.SPEC.osdAudioOutputEnabled.def
+    property bool osdWorkspaceEnabled: Spec.SPEC.osdWorkspaceEnabled.def
 
-    property bool powerActionConfirm: true
-    property real powerActionHoldDuration: 0.5
-    property var powerMenuActions: ["reboot", "logout", "poweroff", "lock", "suspend", "restart"]
-    property string powerMenuDefaultAction: "logout"
-    property bool powerMenuGridLayout: false
-    property string customPowerActionLock: ""
-    property string customPowerActionLogout: ""
-    property string customPowerActionSuspend: ""
-    property string customPowerActionHibernate: ""
-    property string customPowerActionReboot: ""
-    property string customPowerActionPowerOff: ""
-    property var customPowerButtons: []
+    property bool powerActionConfirm: Spec.SPEC.powerActionConfirm.def
+    property real powerActionHoldDuration: Spec.SPEC.powerActionHoldDuration.def
+    property var powerMenuActions: Spec.SPEC.powerMenuActions.def
+    property string powerMenuDefaultAction: Spec.SPEC.powerMenuDefaultAction.def
+    property bool powerMenuGridLayout: Spec.SPEC.powerMenuGridLayout.def
+    property string customPowerActionLock: Spec.SPEC.customPowerActionLock.def
+    property string customPowerActionLogout: Spec.SPEC.customPowerActionLogout.def
+    property string customPowerActionSuspend: Spec.SPEC.customPowerActionSuspend.def
+    property string customPowerActionHibernate: Spec.SPEC.customPowerActionHibernate.def
+    property string customPowerActionReboot: Spec.SPEC.customPowerActionReboot.def
+    property string customPowerActionPowerOff: Spec.SPEC.customPowerActionPowerOff.def
+    property var customPowerButtons: Spec.SPEC.customPowerButtons.def
 
-    property bool updaterHideWidget: false
-    property bool updaterCheckOnStart: false
-    property bool updaterUseCustomCommand: false
-    property string updaterCustomCommand: ""
-    property string updaterTerminalAdditionalParams: ""
-    property int updaterIntervalSeconds: 1800
-    property bool updaterIncludeFlatpak: true
-    property bool updaterAllowAUR: true
-    property bool updaterReopenAfterUpgrade: true
-    property var updaterIgnoredPackages: []
+    property bool updaterCheckOnStart: Spec.SPEC.updaterCheckOnStart.def
+    property bool updaterUseCustomCommand: Spec.SPEC.updaterUseCustomCommand.def
+    property string updaterCustomCommand: Spec.SPEC.updaterCustomCommand.def
+    property string updaterTerminalAdditionalParams: Spec.SPEC.updaterTerminalAdditionalParams.def
+    property int updaterIntervalSeconds: Spec.SPEC.updaterIntervalSeconds.def
+    property bool updaterIncludeFlatpak: Spec.SPEC.updaterIncludeFlatpak.def
+    property bool updaterAllowAUR: Spec.SPEC.updaterAllowAUR.def
+    property bool updaterReopenAfterUpgrade: Spec.SPEC.updaterReopenAfterUpgrade.def
+    property var updaterIgnoredPackages: Spec.SPEC.updaterIgnoredPackages.def
 
-    property string displayNameMode: "system"
-    property var screenPreferences: ({})
-    property var showOnLastDisplay: ({})
-    property var displayProfiles: ({})
-    property var displayPreviousRefreshModes: ({})
-    property bool displayProfileAutoSelect: false
-    property bool displayShowDisconnected: false
-    property bool displaySnapToEdge: true
+    property string displayNameMode: Spec.SPEC.displayNameMode.def
+    property var screenPreferences: Spec.SPEC.screenPreferences.def
+    property var showOnLastDisplay: Spec.SPEC.showOnLastDisplay.def
+    property var displayProfiles: Spec.SPEC.displayProfiles.def
+    property var displayPreviousRefreshModes: Spec.SPEC.displayPreviousRefreshModes.def
+    property bool displayProfileAutoSelect: Spec.SPEC.displayProfileAutoSelect.def
+    property bool displayShowDisconnected: Spec.SPEC.displayShowDisconnected.def
+    property bool displaySnapToEdge: Spec.SPEC.displaySnapToEdge.def
     property var barIpcRevealStates: ({})
 
-    property var barConfigs: [
-        {
-            "id": "default",
-            "name": "Main Bar",
-            "enabled": true,
-            "position": 0,
-            "screenPreferences": ["all"],
-            "showOnLastDisplay": true,
-            "leftWidgets": ["launcherButton", "workspaceSwitcher", "focusedWindow"],
-            "centerWidgets": ["music", "clock", "weather"],
-            "rightWidgets": ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
-            "spacing": 4,
-            "innerPadding": 4,
-            "barInsetPadding": -1,
-            "barLengthPadding": 0,
-            "bottomGap": 0,
-            "attachToScreenEdge": false,
-            "transparency": 1.0,
-            "widgetTransparency": 1.0,
-            "squareCorners": false,
-            "noBackground": false,
-            "maximizeWidgetIcons": false,
-            "maximizeWidgetText": false,
-            "removeWidgetPadding": false,
-            "widgetPadding": 8,
-            "batteryColorMode": "theme",
-            "gothCornersEnabled": false,
-            "gothCornerRadiusOverride": false,
-            "gothCornerRadiusValue": 12,
-            "borderEnabled": false,
-            "borderColor": "surfaceText",
-            "borderOpacity": 1.0,
-            "borderThickness": 1,
-            "widgetOutlineEnabled": false,
-            "widgetOutlineColor": "primary",
-            "widgetOutlineOpacity": 1.0,
-            "widgetOutlineThickness": 1,
-            "fontScale": 1.0,
-            "iconScale": 1.0,
-            "autoHide": false,
-            "autoHideStrict": false,
-            "autoHideDelay": 250,
-            "showOnWindowsOpen": false,
-            "openOnOverview": false,
-            "visible": true,
-            "popupGapsAuto": true,
-            "popupGapsManual": 4,
-            "maximizeDetection": true,
-            "useOverlayLayer": false,
-            "scrollEnabled": true,
-            "scrollXBehavior": "column",
-            "scrollYBehavior": "workspace",
-            "shadowIntensity": 0,
-            "shadowOpacity": 60,
-            "shadowColorMode": "default",
-            "shadowCustomColor": "#000000",
-            "clickThrough": false,
-            "hoverPopouts": false,
-            "hoverPopoutDelay": 150
-        }
-    ]
+    property var dockConfigs: Spec.SPEC.dockConfigs.def
+    property var barConfigs: Spec.SPEC.barConfigs.def
 
-    property bool desktopClockEnabled: false
-    property string desktopClockStyle: "analog"
-    property real desktopClockTransparency: 0.8
-    property string desktopClockColorMode: "primary"
-    property color desktopClockCustomColor: "#ffffff"
-    property bool desktopClockShowDate: true
-    property bool desktopClockShowAnalogNumbers: false
-    property bool desktopClockShowAnalogSeconds: true
-    property real desktopClockX: -1
-    property real desktopClockY: -1
-    property real desktopClockWidth: 280
-    property real desktopClockHeight: 180
-    property var desktopClockDisplayPreferences: ["all"]
-
-    property bool systemMonitorEnabled: false
-    property bool systemMonitorShowHeader: true
-    property real systemMonitorTransparency: 0.8
-    property string systemMonitorColorMode: "primary"
-    property color systemMonitorCustomColor: "#ffffff"
-    property bool systemMonitorShowCpu: true
-    property bool systemMonitorShowCpuGraph: true
-    property bool systemMonitorShowCpuTemp: true
-    property bool systemMonitorShowGpuTemp: false
-    property string systemMonitorGpuPciId: ""
-    property bool systemMonitorShowMemory: true
-    property bool systemMonitorShowMemoryGraph: true
-    property bool systemMonitorShowNetwork: true
-    property bool systemMonitorShowNetworkGraph: true
-    property bool systemMonitorShowDisk: true
-    property bool systemMonitorShowTopProcesses: false
-    property int systemMonitorTopProcessCount: 3
-    property string systemMonitorTopProcessSortBy: "cpu"
-    property string systemMonitorLayoutMode: "auto"
-    property int systemMonitorGraphInterval: 60
-    property real systemMonitorX: -1
-    property real systemMonitorY: -1
-    property real systemMonitorWidth: 320
-    property real systemMonitorHeight: 480
-    property var systemMonitorDisplayPreferences: ["all"]
-    property var systemMonitorVariants: []
-    property var desktopWidgetPositions: ({})
-    property var desktopWidgetInstances: []
-    property var desktopWidgetGroups: []
-
-    function getDesktopWidgetPosition(pluginId, screenKey, property, defaultValue) {
-        const pos = desktopWidgetPositions?.[pluginId]?.[screenKey]?.[property];
-        return pos !== undefined ? pos : defaultValue;
-    }
-
-    function updateDesktopWidgetPosition(pluginId, screenKey, updates) {
-        const allPositions = JSON.parse(JSON.stringify(desktopWidgetPositions || {}));
-        if (!allPositions[pluginId])
-            allPositions[pluginId] = {};
-        allPositions[pluginId][screenKey] = Object.assign({}, allPositions[pluginId][screenKey] || {}, updates);
-        desktopWidgetPositions = allPositions;
-        saveSettings();
-    }
+    property var desktopWidgetInstances: Spec.SPEC.desktopWidgetInstances.def
+    property var desktopWidgetGroups: Spec.SPEC.desktopWidgetGroups.def
 
     function getDefaultSystemMonitorConfig() {
         return {
@@ -1743,6 +1451,8 @@ Singleton {
 
     function revertGreeterSyncPending() {
         for (var key in SessionData.greeterSyncBaseline) {
+            if (!(key in Spec.SPEC))
+                continue;
             root[key] = SessionData.greeterSyncBaseline[key];
         }
         SessionData.greeterSyncBaseline = {};
@@ -1765,9 +1475,42 @@ Singleton {
         })
 
     function set(key, value) {
+        if (key === "cornerRadius") {
+            setCornerRadius(value);
+            return;
+        }
+        if (key === "radiusStrength")
+            value = Shape.normalizeStrength(value);
         Spec.set(root, key, value, saveSettings, _hooks);
         if (key === "frameEnabled" && value)
             clearIslandBars();
+    }
+
+    function hasSetting(key) {
+        return key in Spec.SPEC;
+    }
+
+    function specDefault(key) {
+        return SpecUtil.cloneDef(Spec.SPEC[key]?.def);
+    }
+
+    function isDefault(keys) {
+        return keys.every(key => !(key in Spec.SPEC) || SpecUtil.isDefault(root[key], Spec.SPEC[key].def));
+    }
+
+    function resetToDefault(keys) {
+        for (const key of keys) {
+            if (key in Spec.SPEC)
+                Spec.set(root, key, null, saveSettings, _hooks);
+        }
+    }
+
+    function barConfigDefault(field) {
+        return Spec.SPEC.barConfigs.def[0][field];
+    }
+
+    function dockConfigDefaults() {
+        return DockConfig.create("", "");
     }
 
     // Frame mode hosts bars inside the frame surface, which has nowhere to put an island.
@@ -1839,17 +1582,18 @@ Singleton {
 
         // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
         if (frameEnabled && islandBarConfigs.length > 0)
-        clearIslandBars();
+            clearIslandBars();
 
         if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
-        frameMode = "connected";
+            frameMode = "connected";
 
         if (obj?.iconTheme !== undefined && obj?.iconThemeDark === undefined)
-        iconThemeDark = obj.iconTheme;
+            iconThemeDark = obj.iconTheme;
 
         if (obj?.weatherLocation !== undefined)
-        _legacyWeatherLocation = obj.weatherLocation;
-
+            _legacyWeatherLocation = obj.weatherLocation;
+        if (obj?.weatherCoordinates !== undefined)
+            _legacyWeatherCoordinates = obj.weatherCoordinates;
         if (obj.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
             _legacyVpnLastConnected = obj.vpnLastConnected;
             SessionData.vpnLastConnected = _legacyVpnLastConnected;
@@ -2006,14 +1750,15 @@ Singleton {
         return splitSettings;
     }
     function saveSettings() {
-        if (_loading || !_hasLoaded) {
+        if (isGreeterMode || _loading || !_hasLoaded)
             return;
-        }
         settingsSaveDebounce.restart();
     }
     function _saveSettings() {
         let reason = null;
-        if (_loading) {
+        if (isGreeterMode) {
+            reason = "running in greeter mode."
+        } else if (_loading) {
             reason = "some files are being loaded";
         } else if (_parseError) {
             reason = "failed to parse settings.";
@@ -2032,7 +1777,7 @@ Singleton {
     }
 
     function savePluginSettings() {
-        if (_pluginSettingsLoading || _pluginParseError)
+        if (isGreeterMode || _pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
     }
@@ -2291,237 +2036,15 @@ Singleton {
     }
 
     function getPopupTriggerPosition(pos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig) {
-        const relativeX = pos.x;
-        const relativeY = pos.y;
-        const defaultBar = getPrimaryBarConfig();
-        const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4);
-        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const isConnected = connectedFrameModeActive;
-        const bottomGap = isConnected ? 0 : Math.max(0, rawBottomGap);
-
-        const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
-        const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
-        const popupGap = isConnected ? 0 : (useAutoGaps ? Math.max(4, spacing) : manualGapValue);
-        const edgeSpacing = isConnected ? 0 : spacing;
-
-        switch (position) {
-        case SettingsData.Position.Left:
-            return {
-                "x": barThickness + edgeSpacing + popupGap,
-                "y": relativeY,
-                "width": widgetWidth
-            };
-        case SettingsData.Position.Right:
-            return {
-                "x": (screen?.width || 0) - (barThickness + edgeSpacing + popupGap),
-                "y": relativeY,
-                "width": widgetWidth
-            };
-        case SettingsData.Position.Bottom:
-            return {
-                "x": relativeX,
-                "y": (screen?.height || 0) - (barThickness + edgeSpacing + bottomGap + popupGap),
-                "width": widgetWidth
-            };
-        default:
-            return {
-                "x": relativeX,
-                "y": barThickness + edgeSpacing + bottomGap + popupGap,
-                "width": widgetWidth
-            };
-        }
+        return ShellLayout.popupTrigger(pos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig);
     }
 
     function getAdjacentBarInfo(screen, barPosition, barConfig) {
-        if (!screen || !barConfig) {
-            return {
-                "topBar": 0,
-                "bottomBar": 0,
-                "leftBar": 0,
-                "rightBar": 0
-            };
-        }
-
-        if (barConfig.autoHide) {
-            return {
-                "topBar": 0,
-                "bottomBar": 0,
-                "leftBar": 0,
-                "rightBar": 0
-            };
-        }
-
-        const enabledBars = getEnabledBarConfigs();
-        const defaultBar = getPrimaryBarConfig();
-        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        let topBar = 0;
-        let bottomBar = 0;
-        let leftBar = 0;
-        let rightBar = 0;
-
-        for (var i = 0; i < enabledBars.length; i++) {
-            const other = enabledBars[i];
-            if (other.id === barConfig.id)
-                continue;
-            if (other.autoHide)
-                continue;
-            if (!barConfigCoversScreen(other, screen))
-                continue;
-            const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
-            const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-            const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing;
-
-            const useAutoGaps = other.popupGapsAuto !== undefined ? other.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true);
-            const manualGap = other.popupGapsManual !== undefined ? other.popupGapsManual : (defaultBar?.popupGapsManual ?? 4);
-            const popupGap = useAutoGaps ? Math.max(4, otherSpacing) : manualGap;
-
-            switch (other.position) {
-            case SettingsData.Position.Top:
-                topBar = Math.max(topBar, otherThickness + popupGap);
-                break;
-            case SettingsData.Position.Bottom:
-                bottomBar = Math.max(bottomBar, otherThickness + popupGap);
-                break;
-            case SettingsData.Position.Left:
-                leftBar = Math.max(leftBar, otherThickness + popupGap);
-                break;
-            case SettingsData.Position.Right:
-                rightBar = Math.max(rightBar, otherThickness + popupGap);
-                break;
-            }
-        }
-
-        // The island is not a bar, but it is chrome: popouts still have to clear its strip.
-        if (!isIslandBarConfig(barConfig)) {
-            topBar = Math.max(topBar, dankIslandEdgeOffset(screen, "top"));
-            bottomBar = Math.max(bottomBar, dankIslandEdgeOffset(screen, "bottom"));
-            leftBar = Math.max(leftBar, dankIslandEdgeOffset(screen, "left"));
-            rightBar = Math.max(rightBar, dankIslandEdgeOffset(screen, "right"));
-        }
-
-        return {
-            "topBar": topBar,
-            "bottomBar": bottomBar,
-            "leftBar": leftBar,
-            "rightBar": rightBar
-        };
+        return ShellLayout.adjacentInfo(screen, barConfig);
     }
 
     function getBarBounds(screen, barThickness, barPosition, barConfig) {
-        if (!screen) {
-            return {
-                "x": 0,
-                "y": 0,
-                "width": 0,
-                "height": 0,
-                "wingSize": 0
-            };
-        }
-
-        const defaultBar = getPrimaryBarConfig();
-        const wingRadius = (defaultBar?.gothCornerRadiusOverride ?? false) ? (defaultBar?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius;
-        const wingSize = (defaultBar?.gothCornersEnabled ?? false) ? Math.max(0, wingRadius) : 0;
-        const screenWidth = screen.width;
-        const screenHeight = screen.height;
-        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top);
-        const isConnected = connectedFrameModeActive;
-        const rawBottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0);
-        const bottomGap = isConnected ? 0 : rawBottomGap;
-
-        let topOffset = 0;
-        let bottomOffset = 0;
-        let leftOffset = 0;
-        let rightOffset = 0;
-
-        if (barConfig) {
-            const enabledBars = getEnabledBarConfigs();
-            for (var i = 0; i < enabledBars.length; i++) {
-                const other = enabledBars[i];
-                if (other.id === barConfig.id)
-                    continue;
-                if (!barConfigCoversScreen(other, screen))
-                    continue;
-                const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4);
-                const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4);
-                const otherThickness = Theme.barThickness(otherPadding, CompositorService.getScreenScale(screen)) + otherSpacing + wingSize;
-                const otherBottomGap = isConnected ? 0 : (other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0));
-
-                switch (other.position) {
-                case SettingsData.Position.Top:
-                    if (position === SettingsData.Position.Top && other.id < barConfig.id) {
-                        topOffset += otherThickness; // Simple stacking for same pos
-                    } else if (position === SettingsData.Position.Left || position === SettingsData.Position.Right) {
-                        topOffset = Math.max(topOffset, otherThickness);
-                    }
-                    break;
-                case SettingsData.Position.Bottom:
-                    if (position === SettingsData.Position.Bottom && other.id < barConfig.id) {
-                        bottomOffset += (otherThickness + otherBottomGap);
-                    } else if (position === SettingsData.Position.Left || position === SettingsData.Position.Right) {
-                        bottomOffset = Math.max(bottomOffset, otherThickness + otherBottomGap);
-                    }
-                    break;
-                case SettingsData.Position.Left:
-                    if (position === SettingsData.Position.Top || position === SettingsData.Position.Bottom) {
-                        leftOffset = Math.max(leftOffset, otherThickness);
-                    } else if (position === SettingsData.Position.Left && other.id < barConfig.id) {
-                        leftOffset += otherThickness;
-                    }
-                    break;
-                case SettingsData.Position.Right:
-                    if (position === SettingsData.Position.Top || position === SettingsData.Position.Bottom) {
-                        rightOffset = Math.max(rightOffset, otherThickness);
-                    } else if (position === SettingsData.Position.Right && other.id < barConfig.id) {
-                        rightOffset += otherThickness;
-                    }
-                    break;
-                }
-            }
-        }
-
-        switch (position) {
-        case SettingsData.Position.Top:
-            return {
-                "x": leftOffset,
-                "y": topOffset + bottomGap,
-                "width": screenWidth - leftOffset - rightOffset,
-                "height": barThickness + wingSize,
-                "wingSize": wingSize
-            };
-        case SettingsData.Position.Bottom:
-            return {
-                "x": leftOffset,
-                "y": screenHeight - barThickness - wingSize - bottomGap - bottomOffset,
-                "width": screenWidth - leftOffset - rightOffset,
-                "height": barThickness + wingSize,
-                "wingSize": wingSize
-            };
-        case SettingsData.Position.Left:
-            return {
-                "x": 0,
-                "y": topOffset,
-                "width": barThickness + wingSize,
-                "height": screenHeight - topOffset - bottomOffset,
-                "wingSize": wingSize
-            };
-        case SettingsData.Position.Right:
-            return {
-                "x": screenWidth - barThickness - wingSize,
-                "y": topOffset,
-                "width": barThickness + wingSize,
-                "height": screenHeight - topOffset - bottomOffset,
-                "wingSize": wingSize
-            };
-        }
-
-        return {
-            "x": 0,
-            "y": 0,
-            "width": 0,
-            "height": 0,
-            "wingSize": 0
-        };
+        return ShellLayout.barBounds(screen, barThickness, barPosition, barConfig);
     }
 
     function updateBarConfigs() {
@@ -2529,8 +2052,258 @@ Singleton {
         saveSettings();
     }
 
+    // Each screen edge can hold one dock, so resolution and reservation are always edge-scoped.
+    function dockConfigsForScreen(screen) {
+        if (typeof screen === "string")
+            screen = Quickshell.screens.find(s => s.name === screen);
+        if (!screen)
+            return [];
+        return DockConfig.resolveAll(dockConfigs, screen, Quickshell.screens, (config, target) => isScreenInPreferences(target, config.screenPreferences)).filter(config => !_barClaimsEdge(screen, config.position));
+    }
+
+    function dockConfigForScreenEdge(screen, side) {
+        return dockConfigsForScreen(screen).find(config => DockConfig.EDGES[config.position] === side) ?? null;
+    }
+
+    function dockConfigForScreen(screen) {
+        return dockConfigsForScreen(screen)[0] ?? null;
+    }
+
+    function _barClaimsEdge(screen, position) {
+        return barConfigs.some(bar => bar.enabled && (bar.visible ?? true) && bar.position === position && barConfigCoversScreen(bar, screen));
+    }
+
+    function taskbarInsetForEdge(screen, side) {
+        const config = dockConfigForScreenEdge(screen, side);
+        if (!config || config.mode !== "taskbar")
+            return 0;
+        const frameInset = !CompositorService.frameWindowVisibleForScreen(screen) ? 0 : !config.useOverlayLayer && CompositorService.usesConnectedFrameChromeForScreen(screen) ? frameEdgeReservation(screen, side) : frameThickness;
+        return DockConfig.effectiveThickness(config) + frameInset;
+    }
+
+    function dockReservationForEdge(screen, side) {
+        const config = dockConfigForScreenEdge(screen, side);
+        if (!config?.enabled || config.autoHide || config.smartAutoHide)
+            return 0;
+        return Math.max(0, DockConfig.effectiveThickness(config) + (config.mode === "taskbar" || (!config.useOverlayLayer && CompositorService.usesConnectedFrameChromeForScreen(screen)) ? 0 : config.margin + config.bottomGap));
+    }
+
+    function _screensCoveredBy(preferences) {
+        return Quickshell.screens.filter(screen => preferences.includes("all") || isScreenInPreferences(screen, preferences));
+    }
+
+    // A dock only clashes with something sharing both a screen and an edge; other edges stay free.
+    function dockAssignmentConflict(id, preferences, position) {
+        const edge = position ?? getDockConfig(id)?.position ?? SettingsData.Position.Bottom;
+        const covered = _screensCoveredBy(preferences);
+        for (const other of dockConfigs) {
+            if (other.id === id || other.position !== edge || !other.enabled)
+                continue;
+            if (covered.some(screen => isScreenInPreferences(screen, other.screenPreferences) || other.screenPreferences.includes("all")))
+                return other.name;
+        }
+        for (const bar of barConfigs) {
+            if (!bar.enabled || !(bar.visible ?? true) || bar.position !== edge)
+                continue;
+            if (covered.some(screen => barConfigCoversScreen(bar, screen)))
+                return bar.name || bar.id;
+        }
+        return "";
+    }
+
+    // Edges this configuration could still be moved to, with its current edge always offered.
+    function dockAvailableEdges(id, preferences) {
+        const current = getDockConfig(id)?.position;
+        return [SettingsData.Position.Top, SettingsData.Position.Bottom, SettingsData.Position.Left, SettingsData.Position.Right].filter(edge => edge === current || !dockAssignmentConflict(id, preferences, edge));
+    }
+
+    function dockConfigForAction(screen, selector) {
+        if (selector)
+            return getDockConfig(selector) || dockConfigs.find(config => config.name === selector) || null;
+        if (typeof screen === "string")
+            screen = Quickshell.screens.find(item => item.name === screen);
+        const resolved = dockConfigForScreen(screen);
+        if (resolved)
+            return resolved;
+        return dockConfigs.find(config => !config.screenPreferences.includes("all") && screen && isScreenInPreferences(screen, config.screenPreferences)) || dockConfigs.find(config => config.screenPreferences.includes("all")) || dockConfigs[0] || null;
+    }
+
+    function getDockConfig(id) {
+        return dockConfigs.find(config => config.id === id) ?? null;
+    }
+
+    function updateDockConfig(id, updates) {
+        const current = getDockConfig(id);
+        if (!current)
+            return;
+        const next = DockConfig.normalize([Object.assign({}, current, updates, {
+                id
+            })])[0];
+        if (!next)
+            return;
+        dockConfigs = dockConfigs.map(config => config.id === id ? next : config);
+        saveSettings();
+    }
+    // First edge in `order` that no enabled bar or dock already holds on the covered displays.
+    function firstFreeEdge(id, preferences, order) {
+        return order.find(edge => !dockAssignmentConflict(id, preferences, edge)) ?? -1;
+    }
+
+    function firstFreeDockEdge(id, preferences) {
+        return firstFreeEdge(id, preferences, [SettingsData.Position.Bottom, SettingsData.Position.Left, SettingsData.Position.Right, SettingsData.Position.Top]);
+    }
+
+    // A new dock shows up right away on every display when an edge is free for it.
+    function createDockConfig() {
+        const id = "dock_" + Date.now();
+        let name = I18n.tr("Dock");
+        let number = 2;
+        while (dockConfigs.some(config => config.name === name))
+            name = I18n.tr("Dock") + " " + number++;
+        const config = DockConfig.create(id, name);
+        const edge = firstFreeDockEdge(id, config.screenPreferences);
+        config.enabled = edge >= 0;
+        config.position = Math.max(SettingsData.Position.Top, edge);
+        dockConfigs = dockConfigs.concat([config]);
+        saveSettings();
+        return id;
+    }
+    function removeDockConfig(id) {
+        dockConfigs = dockConfigs.filter(config => config.id !== id);
+        SessionData.removeDockPins(id);
+        saveSettings();
+    }
+    function updateDockWidget(id, instanceId, updates) {
+        const config = getDockConfig(id);
+        if (!config)
+            return;
+        updateDockConfig(id, {
+            widgets: config.widgets.map(item => item.id === instanceId ? Object.assign({}, item, updates) : item)
+        });
+    }
+
+    // Pinning an app to a dock whose Apps row was removed would otherwise pin into nothing.
+    function ensureDockApps(id) {
+        const config = getDockConfig(id);
+        if (!config)
+            return;
+        const apps = config.widgets.find(item => item.widgetId === "appsDock");
+        if (apps && apps.enabled !== false)
+            return;
+        if (apps) {
+            updateDockWidget(id, apps.id, {
+                enabled: true
+            });
+            return;
+        }
+        updateDockConfig(id, {
+            widgets: config.widgets.concat([
+                {
+                    id: id + "_apps",
+                    widgetId: "appsDock",
+                    enabled: true
+                }
+            ])
+        });
+    }
+
     function getBarConfig(barId) {
         return barConfigs.find(cfg => cfg.id === barId) || null;
+    }
+
+    function barTransparency(config) {
+        if (config?.followInterfaceStyle !== false)
+            return popupTransparency;
+        return config?.transparency ?? 1.0;
+    }
+
+    function widgetOption(widgetType, data, key) {
+        return WidgetDefaults.option(widgetType, data, key);
+    }
+
+    function widgetDefaults(widgetType) {
+        return WidgetDefaults.DEFAULTS[widgetType] ?? {};
+    }
+
+    function barWidgetEntry(barConfig, widgetType) {
+        if (!barConfig)
+            return null;
+        for (const listKey of ["leftWidgets", "centerWidgets", "rightWidgets"]) {
+            for (const entry of barConfig[listKey] ?? []) {
+                const id = typeof entry === "string" ? entry : (entry.id ?? entry.widgetId);
+                if (id !== widgetType)
+                    continue;
+                return typeof entry === "string" ? {
+                    "id": entry
+                } : entry;
+            }
+        }
+        return null;
+    }
+
+    function addBarWidget(barId, sectionId, widgetId) {
+        const config = getBarConfig(barId);
+        if (!config)
+            return -1;
+        const entry = {
+            "id": widgetId,
+            "enabled": true
+        };
+        switch (widgetId) {
+        case "spacer":
+            entry.size = 20;
+            break;
+        case "gpuTemp":
+            entry.selectedGpuIndex = 0;
+            entry.pciId = "";
+            break;
+        case "diskUsage":
+            entry.mountPath = "/";
+            break;
+        }
+        const listKey = sectionId + "Widgets";
+        const list = (config[listKey] ?? []).slice();
+        list.push(entry);
+        const patch = {};
+        patch[listKey] = list;
+        updateBarConfig(barId, patch);
+        return list.length - 1;
+    }
+
+    function locateBarWidget(widgetId, preferredBarId) {
+        const ordered = barConfigs.slice().sort((a, b) => (b.id === preferredBarId) - (a.id === preferredBarId));
+        for (const config of ordered) {
+            for (const sectionId of ["left", "center", "right"]) {
+                const list = config[sectionId + "Widgets"] ?? [];
+                for (let i = 0; i < list.length; i++) {
+                    const id = typeof list[i] === "string" ? list[i] : list[i].id;
+                    if (id === widgetId)
+                        return {
+                            "barId": config.id,
+                            "section": sectionId,
+                            "index": i
+                        };
+                }
+            }
+        }
+        return null;
+    }
+
+    function updateBarWidget(barId, sectionId, index, updates) {
+        const config = getBarConfig(barId);
+        const listKey = sectionId + "Widgets";
+        const list = (config?.[listKey] ?? []).slice();
+        if (index < 0 || index >= list.length)
+            return;
+        const entry = typeof list[index] === "string" ? {
+            "id": list[index],
+            "enabled": true
+        } : Object.assign({}, list[index]);
+        Object.assign(entry, updates);
+        list[index] = entry;
+        const patch = {};
+        patch[listKey] = list;
+        updateBarConfig(barId, patch);
     }
 
     function setBarIsland(barId, on) {
@@ -2617,11 +2390,6 @@ Singleton {
         updateBarConfigs();
     }
 
-    // Bar-kind instances only. Islands reserve their own edges via dankIslandOwnsEdge.
-    function getEnabledBarConfigs() {
-        return barConfigs.filter(cfg => cfg.enabled && !isIslandBarConfig(cfg));
-    }
-
     function getBarKindConfigs() {
         return barConfigs.filter(cfg => !isIslandBarConfig(cfg));
     }
@@ -2636,88 +2404,26 @@ Singleton {
     }
 
     function _sideToPosition(side) {
-        switch (side) {
-        case "top":
-            return SettingsData.Position.Top;
-        case "bottom":
-            return SettingsData.Position.Bottom;
-        case "left":
-            return SettingsData.Position.Left;
-        case "right":
-            return SettingsData.Position.Right;
-        }
-        return -1;
+        return LayoutResolver.edges.indexOf(side);
     }
 
     function positionToSide(pos) {
-        switch (pos) {
-        case SettingsData.Position.Top:
-            return "top";
-        case SettingsData.Position.Bottom:
-            return "bottom";
-        case SettingsData.Position.Left:
-            return "left";
-        case SettingsData.Position.Right:
-            return "right";
-        }
-        return "";
+        return LayoutResolver.edgeName(pos);
     }
 
-    // Check if a bar occupies the specified screen edge
     function barOccupiesSide(screen, side) {
-        if (!screen)
-            return false;
-        const sidePos = _sideToPosition(side);
-        if (sidePos < 0)
-            return false;
-        const bars = getEnabledBarConfigs();
-        for (var i = 0; i < bars.length; i++) {
-            const bc = bars[i];
-            if (bc.position !== sidePos)
-                continue;
-            if (barConfigCoversScreen(bc, screen))
-                return true;
-        }
-        return false;
+        const position = _sideToPosition(side);
+        return position >= 0 && (ShellLayout.forScreen(screen)?.bars.some(input => input.config.position === position) ?? false);
     }
 
-    // Check if the dock occupies the specified screen edge.
-    function dockOccupiesSide(side) {
-        if (!showDock)
-            return false;
-        return dockPosition === _sideToPosition(side);
-    }
-
-    function getScreensSortedByPosition() {
-        const screens = [];
-        for (var i = 0; i < Quickshell.screens.length; i++) {
-            screens.push(Quickshell.screens[i]);
-        }
-        screens.sort((a, b) => {
-            if (a.x !== b.x)
-                return a.x - b.x;
-            return a.y - b.y;
-        });
-        return screens;
+    // Check if a dock occupies the specified screen edge.
+    function dockOccupiesSide(screen, side) {
+        const config = dockConfigForScreenEdge(screen, side);
+        return !!config?.enabled;
     }
 
     function getScreenModelIndex(screen) {
-        if (!screen || !screen.model)
-            return -1;
-        const sorted = getScreensSortedByPosition();
-        let modelCount = 0;
-        let screenIndex = -1;
-        for (var i = 0; i < sorted.length; i++) {
-            if (sorted[i].model === screen.model) {
-                if (sorted[i].name === screen.name) {
-                    screenIndex = modelCount;
-                }
-                modelCount++;
-            }
-        }
-        if (modelCount <= 1)
-            return -1;
-        return screenIndex;
+        return LayoutResolver.screenModelIndex(screen, Quickshell.screens);
     }
 
     function getScreenDisplayName(screen) {
@@ -2734,33 +2440,7 @@ Singleton {
     }
 
     function isScreenInPreferences(screen, prefs) {
-        if (!screen)
-            return false;
-
-        const screenDisplayName = getScreenDisplayName(screen);
-
-        return prefs.some(pref => {
-            if (typeof pref === "string") {
-                if (pref === "all" || pref === screen.name)
-                    return true;
-                if (displayNameMode === "model") {
-                    return pref === screenDisplayName;
-                }
-                return pref === screen.model;
-            }
-
-            if (displayNameMode === "model") {
-                if (pref.model && screen.model) {
-                    if (pref.modelIndex !== undefined) {
-                        const screenModelIndex = getScreenModelIndex(screen);
-                        return pref.model === screen.model && pref.modelIndex === screenModelIndex;
-                    }
-                    return pref.model === screen.model;
-                }
-                return false;
-            }
-            return pref.name === screen.name;
-        });
+        return LayoutResolver.screenMatches(screen, prefs, Quickshell.screens, displayNameMode);
     }
 
     function getFilteredScreens(componentId) {
@@ -2779,10 +2459,7 @@ Singleton {
     }
 
     function barConfigCoversScreen(bc, screen) {
-        var prefs = bc?.screenPreferences || ["all"];
-        if (prefs.includes("all") || isScreenInPreferences(screen, prefs))
-            return true;
-        return (bc?.showOnLastDisplay ?? false) && Quickshell.screens.length === 1;
+        return ShellLayout.coversScreen(bc, screen);
     }
 
     function isIslandBarConfig(bc) {
@@ -2790,74 +2467,42 @@ Singleton {
     }
 
     function activeIslandConfigsForScreen(screen) {
-        if (!screen)
-            return [];
-        return islandBarConfigs.filter(cfg => (cfg.enabled ?? false) && barConfigCoversScreen(cfg, screen));
+        return ShellLayout.islandConfigs(screen);
     }
 
-    // Only the first island claiming an edge renders there; the rest would stack on top of it.
     function islandConfigForEdge(screen, edge) {
-        return activeIslandConfigsForScreen(screen).find(cfg => islandEdge(cfg) === edge) ?? null;
+        return ShellLayout.edge(screen, edge)?.island ?? null;
     }
 
     function dankIslandCoversScreen(screen) {
         return activeIslandConfigsForScreen(screen).length > 0;
     }
 
+    function dankIslandHandlesNotifications(screen) {
+        return activeIslandConfigsForScreen(screen).some(cfg => !islandSetting(cfg, "islandNotificationPopups"));
+    }
+
     function dankIslandOwnsEdge(screen, edge) {
         return islandConfigForEdge(screen, edge) !== null;
     }
 
-    // Painted strip thickness on `edge`, including when floating drops the exclusive zone.
     function dankIslandEdgeOffset(screen, edge) {
-        const cfg = islandConfigForEdge(screen, edge);
-        return cfg ? islandStripThickness(cfg) : 0;
+        return ShellLayout.edge(screen, edge)?.islandThickness ?? 0;
     }
 
     function dankIslandIsSoleBarForScreen(screen) {
         return dankIslandCoversScreen(screen) && getActiveBarEdgesForScreen(screen).length === 0;
     }
 
-    // Edges an island already holds on every screen this config covers, so a second island
-    // instance cannot be dropped on top of it.
-    function islandEdgeTakenFor(bc, screen, edge) {
-        const owner = islandConfigForEdge(screen, edge);
-        return !!owner && owner.id !== bc?.id;
-    }
-
     function getActiveBarEdgesForScreen(screen) {
-        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).length > 0);
-    }
-
-    function getOverlayBarEdgesForScreen(screen) {
-        return ["top", "bottom", "left", "right"].filter(edge => getActiveBarConfigsForEdge(screen, edge).some(bc => bc.useOverlayLayer ?? false));
+        return ShellLayout.barEdges(screen, false);
     }
 
     readonly property real frameBarContentGap: frameBarInsetPadding < 0 ? frameThickness : frameBarInsetPadding
     readonly property real frameBarContentGapExtra: Math.max(0, frameBarContentGap - frameThickness)
 
-    function getActiveBarConfigsForEdge(screen, edge) {
-        if (!screen)
-            return [];
-        const sidePos = _sideToPosition(edge);
-        if (sidePos < 0 || dankIslandOwnsEdge(screen, edge))
-            return [];
-        return barConfigs.filter(bc => bc.enabled && (bc.position ?? SettingsData.Position.Top) === sidePos && !isIslandBarConfig(bc) && barConfigCoversScreen(bc, screen));
-    }
-
-    function getFrameHostedBarConfigsForEdge(screen, edge) {
-        return getActiveBarConfigsForEdge(screen, edge).filter(bc => !(bc.useOverlayLayer ?? false));
-    }
-
-    // Connected mode hosts one row per non-overlay bar; an edge holding only overlay bars keeps one band.
     function frameEdgeReservation(screen, edge) {
-        if (!screen)
-            return 0;
-        const active = getActiveBarConfigsForEdge(screen, edge);
-        if (active.length === 0)
-            return frameThickness;
-        const rows = FrameTransitionState.effectiveConnectedFrameModeActive ? active.filter(bc => !(bc.useOverlayLayer ?? false)) : active;
-        return frameBarSize * Math.max(1, rows.length);
+        return ShellLayout.frameReservation(screen, edge);
     }
 
     function frameEdgeInsetForSide(screen, side) {
@@ -2909,8 +2554,7 @@ Singleton {
     }
 
     function setCornerRadius(radius) {
-        set("cornerRadius", radius);
-        updateCompositorLayout();
+        set("radiusStrength", Shape.strengthFromRadius(radius));
     }
 
     function setWeatherLocation(displayName, coordinates) {
@@ -3027,78 +2671,6 @@ Singleton {
             env["HYPRCURSOR_THEME"] = themeName;
         }
         return env;
-    }
-
-    function setShowDock(enabled) {
-        showDock = enabled;
-        const defaultBar = getPrimaryBarConfig();
-        // -1 matches no Position, so island-only setups have no dock conflict.
-        const barPos = defaultBar ? (defaultBar.position ?? SettingsData.Position.Top) : -1;
-        if (enabled && dockPosition === barPos) {
-            if (barPos === SettingsData.Position.Top) {
-                setDockPosition(SettingsData.Position.Bottom);
-                return;
-            }
-            if (barPos === SettingsData.Position.Bottom) {
-                setDockPosition(SettingsData.Position.Top);
-                return;
-            }
-            if (barPos === SettingsData.Position.Left) {
-                setDockPosition(SettingsData.Position.Right);
-                return;
-            }
-            if (barPos === SettingsData.Position.Right) {
-                setDockPosition(SettingsData.Position.Left);
-                return;
-            }
-        }
-        saveSettings();
-    }
-
-    function setDockPosition(position) {
-        dockPosition = position;
-        const defaultBar = getPrimaryBarConfig();
-        // -1 matches no Position, so island-only setups have no dock conflict.
-        const barPos = defaultBar ? (defaultBar.position ?? SettingsData.Position.Top) : -1;
-        if (position === SettingsData.Position.Bottom && barPos === SettingsData.Position.Bottom && showDock) {
-            setDankBarPosition(SettingsData.Position.Top);
-        }
-        if (position === SettingsData.Position.Top && barPos === SettingsData.Position.Top && showDock) {
-            setDankBarPosition(SettingsData.Position.Bottom);
-        }
-        if (position === SettingsData.Position.Left && barPos === SettingsData.Position.Left && showDock) {
-            setDankBarPosition(SettingsData.Position.Right);
-        }
-        if (position === SettingsData.Position.Right && barPos === SettingsData.Position.Right && showDock) {
-            setDankBarPosition(SettingsData.Position.Left);
-        }
-        saveSettings();
-        Qt.callLater(() => forceDockLayoutRefresh());
-    }
-
-    function setDankBarPosition(position) {
-        const defaultBar = getPrimaryBarConfig();
-        if (!defaultBar)
-            return;
-        if (position === SettingsData.Position.Bottom && dockPosition === SettingsData.Position.Bottom && showDock) {
-            setDockPosition(SettingsData.Position.Top);
-            return;
-        }
-        if (position === SettingsData.Position.Top && dockPosition === SettingsData.Position.Top && showDock) {
-            setDockPosition(SettingsData.Position.Bottom);
-            return;
-        }
-        if (position === SettingsData.Position.Left && dockPosition === SettingsData.Position.Left && showDock) {
-            setDockPosition(SettingsData.Position.Right);
-            return;
-        }
-        if (position === SettingsData.Position.Right && dockPosition === SettingsData.Position.Right && showDock) {
-            setDockPosition(SettingsData.Position.Left);
-            return;
-        }
-        updateBarConfig(defaultBar.id, {
-            "position": position
-        });
     }
 
     function setDankBarLeftWidgets(order) {
@@ -3422,10 +2994,6 @@ Singleton {
         saveSettings();
         if (typeof Theme !== "undefined")
             Theme.reloadCustomThemeVariant();
-    }
-
-    function toggleShowDock() {
-        setShowDock(!showDock);
     }
 
     function getPluginSetting(pluginId, key, defaultValue) {
@@ -3821,6 +3389,59 @@ Singleton {
         }
         delegate: SettingsFile {
             id: settingsFile
+        }
+    }
+
+    readonly property string _greeterCacheDir: Quickshell.env("DMS_GREET_CFG_DIR") || "/var/cache/dms-greeter"
+
+    property string greeterSettingsBaseDir: root._greeterCacheDir
+
+    function setGreeterSettingsBaseDir(dir) {
+        const next = dir || root._greeterCacheDir;
+        if (greeterSettingsBaseDir === next)
+            return;
+        greeterSettingsBaseDir = next;
+        if (isGreeterMode)
+            greeterSettingsFile.reload();
+    }
+
+    function resetGreeterSettingsBaseDir() {
+        setGreeterSettingsBaseDir(root._greeterCacheDir);
+    }
+
+    function loadGreeterSettings(txt) {
+        _loading = true;
+        _hasLoaded = false;
+        try {
+            Store.parse(root, (txt && txt.trim()) ? JSON.parse(txt) : {});
+            _parseError = false;
+        } catch (e) {
+            _parseError = true;
+            log.error("Failed to parse greeter settings.json:", e.message);
+            Store.parse(root, {});
+        } finally {
+            _loading = false;
+        }
+        _hasLoaded = true;
+        applyStoredTheme();
+    }
+
+    FileView {
+        id: greeterSettingsFile
+
+        path: root.greeterSettingsBaseDir ? (root.greeterSettingsBaseDir + "/settings.json") : ""
+        preload: isGreeterMode
+        blockLoading: false
+        blockWrites: true
+        watchChanges: false
+        printErrors: false
+        onLoaded: {
+            if (isGreeterMode)
+                loadGreeterSettings(greeterSettingsFile.text());
+        }
+        onLoadFailed: {
+            if (isGreeterMode)
+                loadGreeterSettings("");
         }
     }
 

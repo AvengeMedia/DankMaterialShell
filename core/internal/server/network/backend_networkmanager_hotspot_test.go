@@ -11,12 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNetworkManagerBackendImplementsHotspotBackend(t *testing.T) {
-	var backend any = (*NetworkManagerBackend)(nil)
-	_, ok := backend.(HotspotBackend)
-	assert.True(t, ok)
-}
-
 func TestBuildHotspotSettings(t *testing.T) {
 	settings := buildHotspotSettings(HotspotRequest{
 		SSID:     "DMS Hotspot",

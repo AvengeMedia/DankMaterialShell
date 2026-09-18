@@ -20,49 +20,23 @@ Item {
         NetworkService.removeRef();
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
+        SettingsCard {
+            id: root
 
-            topPadding: 4
-            width: Math.min(600, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingL
+            settingKey: "networkStatus"
+            tags: ["status", "network", "connectivity", "internet"]
 
-            SettingsCard {
-                id: root
+            width: parent.width
 
-                title: I18n.tr("Status")
-                iconName: "lan"
-                settingKey: "networkStatus"
-                tags: ["status", "network", "connectivity", "internet"]
-
-                width: parent.width
-
-                Column {
+            SettingsRow {
+                body: Column {
                     id: overviewSection
 
                     width: parent.width
                     spacing: Theme.spacingM
-
-                    StyledText {
-                        text: I18n.tr("Overview of your network connections")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
 
                     Grid {
                         columns: 2
@@ -79,7 +53,7 @@ Item {
                             text: NetworkService.backend || I18n.tr("Unknown")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                         }
 
                         StyledText {
@@ -93,7 +67,7 @@ Item {
                             Rectangle {
                                 width: 8
                                 height: 8
-                                radius: 4
+                                radius: Theme.cornerRadiusXS
                                 anchors.verticalCenter: parent.verticalCenter
                                 color: {
                                     switch (NetworkService.networkStatus) {
@@ -115,7 +89,7 @@ Item {
                                     case "ethernet":
                                         return I18n.tr("Ethernet");
                                     case "wifi":
-                                        return I18n.tr("WiFi");
+                                        return I18n.tr("Wi-Fi", "wireless network, page and section title");
                                     case "cellular":
                                         return I18n.tr("Cellular");
                                     case "disconnected":
@@ -126,7 +100,7 @@ Item {
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                             }
                         }
 
@@ -151,7 +125,7 @@ Item {
                         visible: NetworkService.backend === "networkmanager" && [NetworkService.ethernetConnected, NetworkService.wifiConnected, NetworkService.cellularConnected].filter(v => v).length > 1
 
                         StyledText {
-                            text: I18n.tr("Preference")
+                            text: I18n.tr("Preference", "noun, which network connection type is preferred")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             anchors.verticalCenter: parent.verticalCenter
@@ -174,7 +148,7 @@ Item {
                             readonly property var labelsByValue: ({
                                     "auto": I18n.tr("Auto"),
                                     "ethernet": I18n.tr("Ethernet"),
-                                    "wifi": I18n.tr("WiFi"),
+                                    "wifi": I18n.tr("Wi-Fi", "wireless network, page and section title"),
                                     "cellular": I18n.tr("Cellular")
                                 })
 

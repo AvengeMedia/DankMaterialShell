@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../Common/Format.js" as Format
 
 PanelWindow {
     id: root
@@ -12,8 +13,10 @@ PanelWindow {
 
     property var modelData
     property bool shouldBeVisible: false
+    property bool _surfaceFrameReady: false
+    readonly property bool presented: shouldBeVisible && _surfaceFrameReady
     property real frozenWidth: 0
-    readonly property string copiedText: I18n.tr("Copied!")
+    readonly property string copiedText: I18n.tr("Copied!", "toast feedback after copying text to clipboard")
 
     readonly property real dpr: modelData ? CompositorService.getScreenScale(modelData) : 1
     readonly property real shadowBuffer: 5
@@ -21,17 +24,16 @@ PanelWindow {
     readonly property real islandTopOffset: SettingsData.dankIslandEdgeOffset(modelData, "top")
     readonly property real toastY: islandTopOffset > 0 ? islandTopOffset + Theme.spacingS : Theme.barHeight - 4 + (SettingsData.getPrimaryBarConfig()?.spacing ?? 4) + 2
 
-    Connections {
-        target: ToastService
-        function onToastVisibleChanged() {
-            if (ToastService.toastVisible) {
-                shouldBeVisible = true;
-                visible = true;
-            } else {
-                frozenWidth = toast.width;
-                shouldBeVisible = false;
-                closeTimer.restart();
-            }
+    readonly property bool serviceToastVisible: ToastService.toastVisible
+
+    onServiceToastVisibleChanged: {
+        if (serviceToastVisible) {
+            shouldBeVisible = true;
+            visible = true;
+        } else {
+            frozenWidth = toast.width;
+            shouldBeVisible = false;
+            closeTimer.restart();
         }
     }
 
@@ -47,6 +49,19 @@ PanelWindow {
 
     screen: modelData
     visible: shouldBeVisible
+    onVisibleChanged: {
+        if (!visible)
+            _surfaceFrameReady = false;
+    }
+
+    Connections {
+        target: toast.Window.window
+        enabled: root.visible && !root._surfaceFrameReady
+
+        function onFrameSwapped() {
+            root._surfaceFrameReady = true;
+        }
+    }
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -76,7 +91,7 @@ PanelWindow {
         function linkify(text) {
             if (!text)
                 return "";
-            const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const escaped = Format.escapeHtml(text);
             const linked = escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
             return linked.replace(/\n/g, "<br>");
         }
@@ -104,8 +119,8 @@ PanelWindow {
                 return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
             }
         }
-        radius: Theme.cornerRadius
-        opacity: shouldBeVisible ? 1 : 0
+        radius: Theme.windowRadius
+        opacity: presented ? 1 : 0
 
         Column {
             id: toastContent
@@ -163,7 +178,6 @@ PanelWindow {
                             return Theme.surfaceText;
                         }
                     }
-                    font.weight: Font.Medium
                     anchors.left: statusIcon.right
                     anchors.leftMargin: Theme.spacingM
                     anchors.right: ToastService.hasDetails ? expandButton.left : parent.right
@@ -176,6 +190,7 @@ PanelWindow {
                 DankActionButton {
                     id: expandButton
                     iconName: toast.expanded ? "expand_less" : "expand_more"
+                    Accessible.name: toast.expanded ? I18n.tr("Collapse", "verb, button that collapses an expanded item or section") : I18n.tr("Expand", "verb, button that expands a collapsed item or section")
                     iconSize: Theme.iconSize
                     iconColor: {
                         switch (ToastService.currentLevel) {
@@ -205,6 +220,7 @@ PanelWindow {
                 DankActionButton {
                     id: closeButton
                     iconName: "close"
+                    Accessible.name: I18n.tr("Close")
                     iconSize: Theme.iconSize
                     iconColor: {
                         switch (ToastService.currentLevel) {
@@ -230,7 +246,7 @@ PanelWindow {
                 width: parent.width
                 height: detailsColumn.height + Theme.spacingS * 2
                 color: ToastService.currentDetails.length > 0 ? Qt.rgba(0, 0, 0, 0.2) : "transparent"
-                radius: Theme.cornerRadius / 2
+                radius: Theme.cornerRadiusS
                 visible: toast.expanded && ToastService.hasDetails
                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -288,6 +304,7 @@ PanelWindow {
                         DankActionButton {
                             id: copyDetailsButton
                             iconName: "content_copy"
+                            Accessible.name: I18n.tr("Copy")
                             iconSize: Theme.iconSizeSmall
                             iconColor: {
                                 switch (ToastService.currentLevel) {
@@ -318,13 +335,11 @@ PanelWindow {
 
                             Rectangle {
                                 visible: copyDetailsButton.showTooltip
-                                width: detailsTooltipLabel.implicitWidth + 16
-                                height: detailsTooltipLabel.implicitHeight + 8
-                                color: Theme.surfaceContainer
-                                radius: Theme.cornerRadius
-                                border.width: 1
-                                border.color: Theme.outlineMedium
-                                y: -height - 4
+                                width: detailsTooltipLabel.implicitWidth + Theme.spacingM * 2
+                                height: detailsTooltipLabel.implicitHeight + Theme.spacingS * 2
+                                color: Theme.inverseSurface
+                                radius: Theme.cornerRadiusXS
+                                y: -height - Theme.spacingS
                                 x: -width / 2 + copyDetailsButton.width / 2
 
                                 StyledText {
@@ -332,7 +347,7 @@ PanelWindow {
                                     anchors.centerIn: parent
                                     text: root.copiedText
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
+                                    color: Theme.inverseOnSurface
                                 }
                             }
                         }
@@ -343,7 +358,7 @@ PanelWindow {
                         height: commandText.height + Theme.spacingS
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: Qt.rgba(0, 0, 0, 0.3)
-                        radius: Theme.cornerRadius / 2
+                        radius: Theme.cornerRadiusS
                         visible: ToastService.currentCommand.length > 0
 
                         StyledText {
@@ -371,6 +386,7 @@ PanelWindow {
                         DankActionButton {
                             id: copyButton
                             iconName: "content_copy"
+                            Accessible.name: I18n.tr("Copy Full Command")
                             iconSize: Theme.iconSizeSmall
                             iconColor: {
                                 switch (ToastService.currentLevel) {
@@ -403,13 +419,11 @@ PanelWindow {
 
                             Rectangle {
                                 visible: copyButton.showTooltip
-                                width: tooltipLabel.implicitWidth + 16
-                                height: tooltipLabel.implicitHeight + 8
-                                color: Theme.surfaceContainer
-                                radius: Theme.cornerRadius
-                                border.width: 1
-                                border.color: Theme.outlineMedium
-                                y: -height - 4
+                                width: tooltipLabel.implicitWidth + Theme.spacingM * 2
+                                height: tooltipLabel.implicitHeight + Theme.spacingS * 2
+                                color: Theme.inverseSurface
+                                radius: Theme.cornerRadiusXS
+                                y: -height - Theme.spacingS
                                 x: -width / 2 + copyButton.width / 2
 
                                 StyledText {
@@ -417,7 +431,7 @@ PanelWindow {
                                     anchors.centerIn: parent
                                     text: root.copiedText
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
+                                    color: Theme.inverseOnSurface
                                 }
                             }
                         }
@@ -465,11 +479,11 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: root
-        blurEnabled: root.shouldBeVisible
+        blurEnabled: root.presented
         blurX: toast.x
         blurY: toast.y
-        blurWidth: root.shouldBeVisible ? toast.width : 0
-        blurHeight: root.shouldBeVisible ? toast.height : 0
+        blurWidth: root.presented ? toast.width : 0
+        blurHeight: root.presented ? toast.height : 0
         blurRadius: toast.radius
     }
 }

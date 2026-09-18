@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import qs.Common
 
 Singleton {
     id: root
@@ -18,4 +19,30 @@ Singleton {
     readonly property int extendedBuffer: 200
     readonly property int keyboardHintsHeight: 80
     readonly property int headerHeight: 32
+
+    function sizeWidth(size) {
+        switch (size) {
+        case "micro":
+            return Theme.launcherWidthMicro;
+        case "medium":
+            return Theme.launcherWidthWide;
+        case "large":
+            return Theme.launcherWidthLarge;
+        default:
+            return modalWidth;
+        }
+    }
+
+    function sizeHeight(size) {
+        switch (size) {
+        case "micro":
+            return Theme.smallBreakpoint;
+        case "medium":
+            return Theme.launcherWidthWide;
+        case "large":
+            return Theme.launcherWidthLarge;
+        default:
+            return modalHeight;
+        }
+    }
 }

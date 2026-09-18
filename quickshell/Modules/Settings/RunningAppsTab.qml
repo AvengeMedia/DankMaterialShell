@@ -6,165 +6,74 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            width: parent.width
+            iconName: "find_replace"
+            title: I18n.tr("App ID substitutions")
+            settingKey: "appIdSubstitutions"
+            tags: ["app", "icon", "substitution", "replacement", "pattern", "window", "class", "regex"]
 
-            SettingsCard {
-                width: parent.width
-                iconName: "find_replace"
-                title: I18n.tr("App ID Substitutions")
-                settingKey: "appIdSubstitutions"
-                tags: ["app", "icon", "substitution", "replacement", "pattern", "window", "class", "regex"]
+            headerActions: [
+                DankActionButton {
+                    iconName: "restart_alt"
+                    tooltipText: I18n.tr("Reset to default")
+                    visible: JSON.stringify(SettingsData.appIdSubstitutions) !== JSON.stringify(SettingsData.getDefaultAppIdSubstitutions())
+                    iconColor: Theme.surfaceVariantText
+                    onClicked: SettingsData.resetAppIdSubstitutions()
+                },
+                DankActionButton {
+                    iconName: "add"
+                    Accessible.name: I18n.tr("Add")
+                    iconColor: Theme.primary
+                    onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
+                }
+            ]
 
-                headerActions: [
-                    DankActionButton {
-                        buttonSize: 36
-                        iconName: "restart_alt"
-                        iconSize: 20
-                        visible: JSON.stringify(SettingsData.appIdSubstitutions) !== JSON.stringify(SettingsData.getDefaultAppIdSubstitutions())
-                        iconColor: Theme.surfaceVariantText
-                        onClicked: SettingsData.resetAppIdSubstitutions()
-                    },
-                    DankActionButton {
-                        buttonSize: 36
-                        iconName: "add"
-                        iconSize: 20
-                        iconColor: Theme.primary
-                        onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
-                    }
-                ]
+            SettingsRow {
+                subtitle: I18n.tr("Map window class names to icon names for proper icon display")
+            }
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+            Repeater {
+                model: SettingsData.appIdSubstitutions
 
-                    StyledText {
-                        text: I18n.tr("Map window class names to icon names for proper icon display")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
-                        bottomPadding: Theme.spacingS
-                    }
+                delegate: SettingsGroup {
+                    id: substitutionGroup
+                    required property var modelData
+                    required property int index
+                    readonly property bool isSettingsRow: true
+                    readonly property bool transparentSlot: true
 
-                    Repeater {
-                        model: SettingsData.appIdSubstitutions
+                    SettingsTextFieldRow {
+                        id: patternField
+                        leftIconName: "filter_list"
+                        text: I18n.tr("Pattern", "noun, text field label for a match or filter pattern")
+                        value: substitutionGroup.modelData.pattern
+                        onEditingFinished: value => SettingsData.updateAppIdSubstitution(substitutionGroup.index, value, replacementField.value, substitutionGroup.modelData.type)
 
-                        delegate: Rectangle {
-                            id: subItem
-                            width: parent.width
-                            height: subColumn.implicitHeight + Theme.spacingM
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
-
-                            Column {
-                                id: subColumn
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingS
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    Column {
-                                        width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Pattern")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            id: patternField
-                                            width: parent.width
-                                            text: modelData.pattern
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            onEditingFinished: SettingsData.updateAppIdSubstitution(index, text, replacementField.text, modelData.type)
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - deleteBtn.width - Theme.spacingS) / 2
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Replacement")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            id: replacementField
-                                            width: parent.width
-                                            text: modelData.replacement
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            onEditingFinished: SettingsData.updateAppIdSubstitution(index, patternField.text, text, modelData.type)
-                                        }
-                                    }
-
-                                    Item {
-                                        id: deleteBtn
-                                        width: 32
-                                        height: 40
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                        }
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: "delete"
-                                            size: 18
-                                            color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: deleteArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: SettingsData.removeAppIdSubstitution(index)
-                                        }
-                                    }
-                                }
-
-                                Column {
-                                    width: 120
-                                    spacing: Theme.spacingXXS
-
-                                    StyledText {
-                                        text: I18n.tr("Type")
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        color: Theme.surfaceVariantText
-                                    }
-
-                                    DankDropdown {
-                                        width: parent.width
-                                        compactMode: true
-                                        dropdownWidth: 120
-                                        currentValue: modelData.type
-                                        options: ["exact", "contains", "regex"]
-                                        onValueChanged: value => SettingsData.updateAppIdSubstitution(index, modelData.pattern, modelData.replacement, value)
-                                    }
-                                }
-                            }
+                        actions: DankActionButton {
+                            iconName: "delete"
+                            iconColor: Theme.error
+                            Accessible.name: I18n.tr("Remove")
+                            onClicked: SettingsData.removeAppIdSubstitution(substitutionGroup.index)
                         }
+                    }
+
+                    SettingsTextFieldRow {
+                        id: replacementField
+                        leftIconName: "swap_horiz"
+                        text: I18n.tr("Replacement", "text field label, replacement for the matched app name pattern")
+                        value: substitutionGroup.modelData.replacement
+                        onEditingFinished: value => SettingsData.updateAppIdSubstitution(substitutionGroup.index, patternField.value, value, substitutionGroup.modelData.type)
+                    }
+
+                    SettingsDropdownRow {
+                        text: I18n.tr("Type")
+                        currentValue: substitutionGroup.modelData.type
+                        options: ["exact", "contains", "regex"]
+                        onValueChanged: value => SettingsData.updateAppIdSubstitution(substitutionGroup.index, substitutionGroup.modelData.pattern, substitutionGroup.modelData.replacement, value)
                     }
                 }
             }

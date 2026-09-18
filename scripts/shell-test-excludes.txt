@@ -1,0 +1,9 @@
+tests
+Tests
+testdata
+__tests__
+harness
+harnesses
+*.test.*
+tst_*.qml
+*_test.qml

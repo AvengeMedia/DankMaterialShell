@@ -78,21 +78,6 @@ func TestManager_Close(t *testing.T) {
 	})
 }
 
-func TestNewManager(t *testing.T) {
-	t.Run("attempts to create manager", func(t *testing.T) {
-		manager, err := NewManager()
-		if err != nil {
-			assert.Nil(t, manager)
-		} else {
-			assert.NotNil(t, manager)
-			assert.NotNil(t, manager.state)
-			assert.NotNil(t, manager.systemConn)
-
-			manager.Close()
-		}
-	})
-}
-
 func TestManager_GetState_EmptyState(t *testing.T) {
 	manager := &Manager{
 		state:      &FreedeskState{},
@@ -104,42 +89,6 @@ func TestManager_GetState_EmptyState(t *testing.T) {
 	assert.Empty(t, result.Accounts.UserName)
 	assert.False(t, result.Settings.Available)
 	assert.Equal(t, uint32(0), result.Settings.ColorScheme)
-}
-
-func TestManager_AccountsState_Modification(t *testing.T) {
-	manager := &Manager{
-		state: &FreedeskState{
-			Accounts: AccountsState{
-				Available: true,
-				UserName:  "testuser",
-			},
-		},
-		stateMutex: sync.RWMutex{},
-	}
-
-	state := manager.GetState()
-	state.Accounts.UserName = "modifieduser"
-
-	original := manager.GetState()
-	assert.Equal(t, "testuser", original.Accounts.UserName)
-}
-
-func TestManager_SettingsState_Modification(t *testing.T) {
-	manager := &Manager{
-		state: &FreedeskState{
-			Settings: SettingsState{
-				Available:   true,
-				ColorScheme: 0,
-			},
-		},
-		stateMutex: sync.RWMutex{},
-	}
-
-	state := manager.GetState()
-	state.Settings.ColorScheme = 1
-
-	original := manager.GetState()
-	assert.Equal(t, uint32(0), original.Settings.ColorScheme)
 }
 
 func TestManager_SelfEcho_ConsumesRegisteredWrites(t *testing.T) {

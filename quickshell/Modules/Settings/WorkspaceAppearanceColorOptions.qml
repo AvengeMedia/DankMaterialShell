@@ -24,19 +24,22 @@ Column {
     property string urgentCustomColorKey: ""
 
     property var extraTags: []
+    property var store: null
 
     width: parent?.width ?? 0
     spacing: Theme.spacingM
 
     ColorDropdownRow {
-        text: I18n.tr("Focused Color")
+        text: I18n.tr("Focused color")
         settingKey: root.focusedColorModeKey
         tags: ["workspace", "focused", "color", "custom"].concat(root.extraTags)
         options: root.focusedColorOptions
-        currentMode: SettingsData[root.focusedColorModeKey]
-        customColor: SettingsData[root.focusedCustomColorKey] || "#6750A4"
-        onModeSelected: mode => SettingsData.set(root.focusedColorModeKey, mode)
-        onCustomColorSelected: selectedColor => SettingsData.set(root.focusedCustomColorKey, selectedColor.toString())
+        resetStore: root.store
+        resetKeys: [root.focusedColorModeKey, root.focusedCustomColorKey]
+        currentMode: root.store.get(root.focusedColorModeKey)
+        customColor: root.store.get(root.focusedCustomColorKey) || "#6750A4"
+        onModeSelected: mode => root.store.set(root.focusedColorModeKey, mode)
+        onCustomColorSelected: selectedColor => root.store.set(root.focusedCustomColorKey, selectedColor.toString())
     }
 
     Rectangle {
@@ -47,15 +50,17 @@ Column {
     }
 
     ColorDropdownRow {
-        text: I18n.tr("Occupied Color")
+        text: I18n.tr("Occupied color")
         settingKey: root.occupiedColorModeKey
         tags: ["workspace", "occupied", "color", "custom"].concat(root.extraTags)
         visible: root.occupiedColorVisible
         options: root.occupiedColorOptions
-        currentMode: SettingsData[root.occupiedColorModeKey]
-        customColor: SettingsData[root.occupiedCustomColorKey] || "#625B71"
-        onModeSelected: mode => SettingsData.set(root.occupiedColorModeKey, mode)
-        onCustomColorSelected: selectedColor => SettingsData.set(root.occupiedCustomColorKey, selectedColor.toString())
+        resetStore: root.store
+        resetKeys: [root.occupiedColorModeKey, root.occupiedCustomColorKey]
+        currentMode: root.store.get(root.occupiedColorModeKey)
+        customColor: root.store.get(root.occupiedCustomColorKey) || "#625B71"
+        onModeSelected: mode => root.store.set(root.occupiedColorModeKey, mode)
+        onCustomColorSelected: selectedColor => root.store.set(root.occupiedCustomColorKey, selectedColor.toString())
     }
 
     Rectangle {
@@ -67,15 +72,17 @@ Column {
     }
 
     ColorDropdownRow {
-        text: I18n.tr("Unfocused Color")
+        text: I18n.tr("Unfocused color")
         settingKey: root.unfocusedColorModeKey
         tags: ["workspace", "unfocused", "color", "custom"].concat(root.extraTags)
         options: root.unfocusedColorOptions
         defaultColor: Theme.surfaceText
-        currentMode: SettingsData[root.unfocusedColorModeKey]
-        customColor: SettingsData[root.unfocusedCustomColorKey] || "#49454E"
-        onModeSelected: mode => SettingsData.set(root.unfocusedColorModeKey, mode)
-        onCustomColorSelected: selectedColor => SettingsData.set(root.unfocusedCustomColorKey, selectedColor.toString())
+        resetStore: root.store
+        resetKeys: [root.unfocusedColorModeKey, root.unfocusedCustomColorKey]
+        currentMode: root.store.get(root.unfocusedColorModeKey)
+        customColor: root.store.get(root.unfocusedCustomColorKey) || "#49454E"
+        onModeSelected: mode => root.store.set(root.unfocusedColorModeKey, mode)
+        onCustomColorSelected: selectedColor => root.store.set(root.unfocusedCustomColorKey, selectedColor.toString())
     }
 
     Rectangle {
@@ -87,15 +94,17 @@ Column {
     }
 
     ColorDropdownRow {
-        text: I18n.tr("Urgent Color")
+        text: I18n.tr("Urgent color")
         settingKey: root.urgentColorModeKey
         tags: ["workspace", "urgent", "color", "custom"].concat(root.extraTags)
         visible: root.urgentColorVisible
         options: root.urgentColorOptions
         defaultColor: Theme.error
-        currentMode: SettingsData[root.urgentColorModeKey]
-        customColor: SettingsData[root.urgentCustomColorKey] || "#B3261E"
-        onModeSelected: mode => SettingsData.set(root.urgentColorModeKey, mode)
-        onCustomColorSelected: selectedColor => SettingsData.set(root.urgentCustomColorKey, selectedColor.toString())
+        resetStore: root.store
+        resetKeys: [root.urgentColorModeKey, root.urgentCustomColorKey]
+        currentMode: root.store.get(root.urgentColorModeKey)
+        customColor: root.store.get(root.urgentCustomColorKey) || "#B3261E"
+        onModeSelected: mode => root.store.set(root.urgentColorModeKey, mode)
+        onCustomColorSelected: selectedColor => root.store.set(root.urgentCustomColorKey, selectedColor.toString())
     }
 }

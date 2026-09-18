@@ -1,6 +1,8 @@
 package bluez
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"slices"
 	"strings"
@@ -16,12 +18,14 @@ const (
 	adapter1Iface   = "org.bluez.Adapter1"
 	objectMgrIface  = "org.freedesktop.DBus.ObjectManager"
 	propertiesIface = "org.freedesktop.DBus.Properties"
+	dbusIface       = "org.freedesktop.DBus"
 )
 
 var bluezMatchRules = [][]dbus.MatchOption{
 	{dbus.WithMatchInterface(propertiesIface), dbus.WithMatchMember("PropertiesChanged")},
 	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")},
 	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesRemoved")},
+	{dbus.WithMatchSender(dbusIface), dbus.WithMatchInterface(dbusIface), dbus.WithMatchMember("NameOwnerChanged"), dbus.WithMatchArg(0, bluezService)},
 }
 
 func NewManager() (*Manager, error) {
@@ -41,11 +45,12 @@ func NewManager() (*Manager, error) {
 		},
 		stateMutex: sync.RWMutex{},
 
-		stopChan:   make(chan struct{}),
-		dbusConn:   conn,
-		signals:    make(chan *dbus.Signal, 256),
-		dirty:      make(chan struct{}, 1),
-		eventQueue: make(chan func(), 32),
+		stopChan:       make(chan struct{}),
+		dbusConn:       conn,
+		signals:        make(chan *dbus.Signal, 256),
+		dirty:          make(chan struct{}, 1),
+		eventQueue:     make(chan func(), 32),
+		adapterRefresh: make(chan struct{}, 1),
 	}
 
 	broker := NewSubscriptionBroker(m.broadcastPairingPrompt)
@@ -67,6 +72,12 @@ func NewManager() (*Manager, error) {
 
 	if err := m.startAgent(); err != nil {
 		return nil, fmt.Errorf("agent start failed: %w", err)
+	}
+
+	m.mprisPlayer = newMPRISPlayer(conn, m.dispatchPlayerCommand)
+	if err := m.mprisPlayer.export(); err != nil {
+		m.agent.Close()
+		return nil, err
 	}
 
 	if err := m.startSignalPump(); err != nil {
@@ -135,6 +146,11 @@ func (m *Manager) refreshAdapters() {
 	m.adapterPaths = paths
 	m.stateMutex.Unlock()
 
+	if m.mprisPlayer != nil {
+		if err := m.mprisPlayer.reconcile(paths); err != nil {
+			log.Warnf("[BluezManager] MPRIS registration reconcile failed: %v", err)
+		}
+	}
 	if !changed {
 		return
 	}
@@ -336,6 +352,27 @@ func (m *Manager) handleSignal(sig *dbus.Signal) {
 	case objectMgrIface + ".InterfacesRemoved":
 		m.maybeRefreshAdapters(sig)
 		m.notifySubscribers()
+
+	case dbusIface + ".NameOwnerChanged":
+		m.handleBluezOwnerChanged(sig)
+	}
+}
+
+func (m *Manager) handleBluezOwnerChanged(sig *dbus.Signal) {
+	if len(sig.Body) < 3 {
+		return
+	}
+	name, nameOK := sig.Body[0].(string)
+	oldOwner, oldOK := sig.Body[1].(string)
+	newOwner, newOK := sig.Body[2].(string)
+	if !nameOK || !oldOK || !newOK || name != bluezService {
+		return
+	}
+	if oldOwner != "" && m.mprisPlayer != nil {
+		m.mprisPlayer.clearRegistrations()
+	}
+	if newOwner != "" {
+		m.enqueueAdapterRefresh()
 	}
 }
 
@@ -343,8 +380,12 @@ func (m *Manager) maybeRefreshAdapters(sig *dbus.Signal) {
 	if !signalTouchesAdapter(sig) {
 		return
 	}
+	m.enqueueAdapterRefresh()
+}
+
+func (m *Manager) enqueueAdapterRefresh() {
 	select {
-	case m.eventQueue <- m.refreshAdapters:
+	case m.adapterRefresh <- struct{}{}:
 	default:
 	}
 }
@@ -452,6 +493,8 @@ func (m *Manager) eventWorker() {
 			return
 		case event := <-m.eventQueue:
 			event()
+		case <-m.adapterRefresh:
+			m.refreshAdapters()
 		}
 	}
 }
@@ -546,6 +589,132 @@ func (m *Manager) UnsubscribePairing(id string) {
 	if ch, ok := m.pairingSubscribers.LoadAndDelete(id); ok {
 		close(ch)
 	}
+}
+
+func newPlayerCommandLease() (string, error) {
+	var value [16]byte
+	if _, err := rand.Read(value[:]); err != nil {
+		return "", fmt.Errorf("generate MPRIS command lease: %w", err)
+	}
+	return hex.EncodeToString(value[:]), nil
+}
+
+func (m *Manager) hasPlayerCommandWaiterLocked() bool {
+	for _, id := range m.commandWaiters {
+		if _, ok := m.commandSubscribers.Load(id); ok {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Manager) promotePlayerCommandSubscriberLocked() error {
+	for len(m.commandWaiters) > 0 {
+		id := m.commandWaiters[0]
+		ch, ok := m.commandSubscribers.Load(id)
+		if !ok {
+			m.commandWaiters = m.commandWaiters[1:]
+			continue
+		}
+		lease, err := newPlayerCommandLease()
+		if err != nil {
+			return err
+		}
+		m.commandWaiters = m.commandWaiters[1:]
+		m.commandLease = lease
+		m.commandSubscription = id
+		ch <- PlayerCommand{Lease: lease}
+		return nil
+	}
+	return nil
+}
+
+func (m *Manager) SubscribePlayerCommands(id string) (chan PlayerCommand, error) {
+	ch := make(chan PlayerCommand, 16)
+	m.commandMutex.Lock()
+	defer m.commandMutex.Unlock()
+	if _, exists := m.commandSubscribers.Load(id); exists {
+		return nil, fmt.Errorf("mpris command subscriber %q already exists", id)
+	}
+	m.commandSubscribers.Store(id, ch)
+	m.commandWaiters = append(m.commandWaiters, id)
+	if m.commandSubscription == "" {
+		if err := m.promotePlayerCommandSubscriberLocked(); err != nil {
+			m.commandSubscribers.Delete(id)
+			close(ch)
+			return nil, err
+		}
+	}
+	return ch, nil
+}
+
+func (m *Manager) UnsubscribePlayerCommands(id string) {
+	m.commandMutex.Lock()
+	defer m.commandMutex.Unlock()
+
+	ch, removed := m.commandSubscribers.LoadAndDelete(id)
+	if removed {
+		close(ch)
+	}
+	m.commandWaiters = slices.DeleteFunc(m.commandWaiters, func(waiter string) bool {
+		return waiter == id
+	})
+	if m.commandSubscription != id {
+		return
+	}
+	m.commandLease = ""
+	m.commandSubscription = ""
+	if m.mprisPlayer != nil {
+		transition := disabledPlayerSnapshot()
+		if m.hasPlayerCommandWaiterLocked() {
+			transition = stalePlayerSnapshot(m.mprisPlayer.currentSnapshot())
+		}
+		if err := m.mprisPlayer.publish(transition, m.adapterPathsSnapshot()); err != nil {
+			log.Warnf("[BluezManager] MPRIS owner loss publish failed: %v", err)
+		}
+	}
+	if err := m.promotePlayerCommandSubscriberLocked(); err != nil {
+		if m.mprisPlayer != nil {
+			if disableErr := m.mprisPlayer.publish(disabledPlayerSnapshot(), m.adapterPathsSnapshot()); disableErr != nil {
+				log.Warnf("[BluezManager] MPRIS disable after promotion failure failed: %v", disableErr)
+			}
+		}
+		log.Warnf("[BluezManager] MPRIS command subscriber promotion failed: %v", err)
+	}
+}
+
+func (m *Manager) dispatchPlayerCommand(command PlayerCommand) *dbus.Error {
+	m.commandMutex.RLock()
+	defer m.commandMutex.RUnlock()
+
+	if m.commandSubscription == "" || m.commandLease == "" {
+		return commandDeliveryError("no active MPRIS command owner")
+	}
+	if m.mprisPlayer == nil || !supportsPlayerCommand(m.mprisPlayer.currentSnapshot(), command.Command) {
+		return notSupportedError(command.Command)
+	}
+	ch, ok := m.commandSubscribers.Load(m.commandSubscription)
+	if !ok {
+		return commandDeliveryError("active MPRIS command owner is unavailable")
+	}
+	select {
+	case ch <- command:
+		return nil
+	default:
+		return commandDeliveryError("active MPRIS command owner is not accepting commands")
+	}
+}
+
+func (m *Manager) PublishMPRIS(lease string, snapshot PlayerSnapshot) error {
+	if m.mprisPlayer == nil {
+		return fmt.Errorf("MPRIS player not initialized")
+	}
+	m.commandMutex.RLock()
+	defer m.commandMutex.RUnlock()
+	if lease == "" || lease != m.commandLease || m.commandSubscription == "" {
+		return fmt.Errorf("MPRIS publisher does not hold the active command lease")
+	}
+	return m.mprisPlayer.publish(snapshot, m.adapterPathsSnapshot())
 }
 
 func (m *Manager) broadcastPairingPrompt(prompt PairingPrompt) {
@@ -686,6 +855,12 @@ func (m *Manager) Close() {
 		_ = m.dbusConn.RemoveMatchSignal(rule...)
 	}
 
+	if m.mprisPlayer != nil {
+		if err := m.mprisPlayer.close(); err != nil {
+			log.Debugf("[BluezManager] MPRIS player close failed: %v", err)
+		}
+	}
+
 	if m.agent != nil {
 		m.agent.Close()
 	}
@@ -701,6 +876,17 @@ func (m *Manager) Close() {
 		m.pairingSubscribers.Delete(key)
 		return true
 	})
+
+	m.commandMutex.Lock()
+	m.commandSubscribers.Range(func(key string, ch chan PlayerCommand) bool {
+		close(ch)
+		m.commandSubscribers.Delete(key)
+		return true
+	})
+	m.commandLease = ""
+	m.commandSubscription = ""
+	m.commandWaiters = nil
+	m.commandMutex.Unlock()
 }
 
 func stateChanged(old, new *BluetoothState) bool {

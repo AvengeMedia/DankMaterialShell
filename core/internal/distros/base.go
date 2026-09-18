@@ -252,17 +252,17 @@ func (b *BaseDistribution) detectQuickshell() deps.Dependency {
 		}
 	}
 
-	version := matches[1]
+	installedVersion := matches[1]
 	variant := deps.VariantStable
 	if strings.Contains(versionStr, "git") || strings.Contains(versionStr, "+") {
 		variant = deps.VariantGit
 	}
 
-	if b.versionCompare(version, "0.2.0") >= 0 {
+	if version.CompareVersions(installedVersion, "0.2.0") >= 0 {
 		return deps.Dependency{
 			Name:        "quickshell",
 			Status:      deps.StatusInstalled,
-			Version:     version,
+			Version:     installedVersion,
 			Description: "QtQuick based desktop shell toolkit",
 			Required:    true,
 			Variant:     variant,
@@ -275,7 +275,7 @@ func (b *BaseDistribution) detectQuickshell() deps.Dependency {
 		Status:      deps.StatusNeedsUpdate,
 		Variant:     variant,
 		CanToggle:   true,
-		Version:     version,
+		Version:     installedVersion,
 		Description: "QtQuick based desktop shell toolkit (needs 0.2.0+)",
 		Required:    true,
 	}
@@ -381,30 +381,6 @@ func (b *BaseDistribution) detectWindowManager(wm deps.WindowManager) deps.Depen
 			Required:    true,
 		}
 	}
-}
-
-// Version comparison helper
-func (b *BaseDistribution) versionCompare(v1, v2 string) int {
-	parts1 := strings.Split(v1, ".")
-	parts2 := strings.Split(v2, ".")
-
-	for i := 0; i < len(parts1) && i < len(parts2); i++ {
-		if parts1[i] < parts2[i] {
-			return -1
-		}
-		if parts1[i] > parts2[i] {
-			return 1
-		}
-	}
-
-	if len(parts1) < len(parts2) {
-		return -1
-	}
-	if len(parts1) > len(parts2) {
-		return 1
-	}
-
-	return 0
 }
 
 // Common installation helper

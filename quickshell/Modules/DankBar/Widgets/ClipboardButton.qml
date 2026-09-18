@@ -1,6 +1,4 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -10,25 +8,11 @@ BasePill {
     id: root
 
     property bool isActive: false
-    property bool isAutoHideBar: false
     property bool dropConfirmed: false
 
     signal clipboardClicked
     signal showSavedItemsRequested
     signal clearAllRequested
-
-    readonly property real minTooltipY: {
-        if (!parentScreen || !(axis?.isVertical ?? false)) {
-            return 0;
-        }
-        if (isAutoHideBar) {
-            return 0;
-        }
-        if (parentScreen.y > 0) {
-            return barThickness + barSpacing;
-        }
-        return 0;
-    }
 
     function clamp(value, minValue, maxValue) {
         return Math.max(minValue, Math.min(maxValue, value));
@@ -81,29 +65,8 @@ BasePill {
     }
 
     function openContextMenu() {
-        const screen = root.parentScreen || Screen;
-        const screenX = screen.x || 0;
-        const screenY = screen.y || 0;
-        const isVertical = root.axis?.isVertical ?? false;
-        const edge = root.axis?.edge ?? "top";
-        const gap = Math.max(Theme.spacingXS, root.barSpacing ?? Theme.spacingXS);
-
-        const globalPos = root.mapToGlobal(root.width / 2, root.height / 2);
-        const relativeX = globalPos.x - screenX;
-        const relativeY = globalPos.y - screenY;
-
-        let anchorX = relativeX;
-        let anchorY = relativeY;
-
-        if (isVertical) {
-            anchorX = edge === "left" ? (root.barThickness + root.barSpacing + gap) : (screen.width - (root.barThickness + root.barSpacing + gap));
-            anchorY = relativeY + root.minTooltipY;
-        } else {
-            anchorX = relativeX;
-            anchorY = edge === "bottom" ? (screen.height - (root.barThickness + root.barSpacing + gap)) : (root.barThickness + root.barSpacing + gap);
-        }
-
-        contextMenuWindow.showAt(anchorX, anchorY, isVertical, edge, screen);
+        const anchor = root.contextMenuAnchor();
+        contextMenu.openFromBar(anchor);
     }
 
     MouseArea {
@@ -129,7 +92,7 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: icon.width
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.contentThickness
 
             property bool draggingOver: false
 
@@ -154,233 +117,36 @@ BasePill {
                 scale: draggingOver ? 1.2 : 1.0
 
                 Behavior on color {
-                    ColorAnimation { duration: 150 }
+                    ColorAnimation {
+                        duration: 150
+                    }
                 }
                 Behavior on scale {
-                    NumberAnimation { duration: 200; easing.type: Easing.OutBack }
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutBack
+                    }
                 }
             }
         }
     }
 
-    PanelWindow {
-        id: contextMenuWindow
-
-        WindowBlur {
-            targetWindow: contextMenuWindow
-            blurX: menuContainer.x
-            blurY: menuContainer.y
-            blurWidth: contextMenuWindow.visible ? menuContainer.width : 0
-            blurHeight: contextMenuWindow.visible ? menuContainer.height : 0
-            blurRadius: Theme.cornerRadius
-        }
-
-        WlrLayershell.namespace: "dms:clipboard-context-menu"
-
-        property bool isVertical: false
-        property string edge: "top"
-        property point anchorPos: Qt.point(0, 0)
-
-        function showAt(x, y, vertical, barEdge, targetScreen) {
-            if (targetScreen) {
-                contextMenuWindow.screen = targetScreen;
+    DankContextMenu {
+        id: contextMenu
+        layerNamespace: "dms:clipboard-context-menu"
+        menuItems: [
+            {
+                type: "item",
+                icon: "delete_sweep",
+                text: I18n.tr("Clear All"),
+                action: () => root.clearAllRequested()
+            },
+            {
+                type: "item",
+                icon: "push_pin",
+                text: I18n.tr("Show Saved Items"),
+                action: () => root.showSavedItemsRequested()
             }
-
-            anchorPos = Qt.point(x, y);
-            isVertical = vertical ?? false;
-            edge = barEdge ?? "top";
-
-            visible = true;
-
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.registerMenu(contextMenuWindow.screen.name, contextMenuWindow);
-            }
-        }
-
-        function closeMenu() {
-            visible = false;
-
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.unregisterMenu(contextMenuWindow.screen.name);
-            }
-        }
-
-        screen: null
-        visible: false
-        WlrLayershell.layer: WlrLayershell.Overlay
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        color: "transparent"
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        Component.onDestruction: {
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.unregisterMenu(contextMenuWindow.screen.name);
-            }
-        }
-
-        Connections {
-            target: PopoutManager
-            function onPopoutOpening() {
-                contextMenuWindow.closeMenu();
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            onClicked: contextMenuWindow.closeMenu()
-        }
-
-        Rectangle {
-            id: menuContainer
-
-            x: {
-                if (contextMenuWindow.isVertical) {
-                    if (contextMenuWindow.edge === "left") {
-                        return Math.min(contextMenuWindow.width - width - 10, contextMenuWindow.anchorPos.x);
-                    }
-                    return Math.max(10, contextMenuWindow.anchorPos.x - width);
-                }
-                const left = 10;
-                const right = contextMenuWindow.width - width - 10;
-                const want = contextMenuWindow.anchorPos.x - width / 2;
-                return Math.max(left, Math.min(right, want));
-            }
-            y: {
-                if (contextMenuWindow.isVertical) {
-                    const top = 10;
-                    const bottom = contextMenuWindow.height - height - 10;
-                    const want = contextMenuWindow.anchorPos.y - height / 2;
-                    return Math.max(top, Math.min(bottom, want));
-                }
-                if (contextMenuWindow.edge === "top") {
-                    return Math.min(contextMenuWindow.height - height - 10, contextMenuWindow.anchorPos.y);
-                }
-                return Math.max(10, contextMenuWindow.anchorPos.y - height);
-            }
-
-            width: Math.min(240, Math.max(170, menuColumn.implicitWidth + Theme.spacingS * 2))
-            height: Math.max(64, menuColumn.implicitHeight + Theme.spacingS * 2)
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
-
-            opacity: contextMenuWindow.visible ? 1 : 0
-            visible: opacity > 0
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.emphasizedEasing
-                }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.topMargin: 4
-                anchors.leftMargin: 2
-                anchors.rightMargin: -2
-                anchors.bottomMargin: -4
-                radius: parent.radius
-                color: Qt.rgba(0, 0, 0, 0.15)
-                z: -1
-            }
-
-            Column {
-                id: menuColumn
-                width: parent.width - Theme.spacingS * 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: Theme.spacingS
-                spacing: 1
-
-                Rectangle {
-                    id: clearAllItem
-                    width: parent.width
-                    height: 30
-                    radius: Theme.cornerRadius
-                    color: clearAllArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.rightMargin: Theme.spacingS
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "delete_sweep"
-                            size: 16
-                            color: Theme.surfaceText
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Clear All")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: clearAllArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            contextMenuWindow.closeMenu();
-                            root.clearAllRequested();
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id: savedItemsItem
-                    width: parent.width
-                    height: 30
-                    radius: Theme.cornerRadius
-                    color: savedItemsArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.rightMargin: Theme.spacingS
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "push_pin"
-                            size: 16
-                            color: Theme.surfaceText
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Show Saved Items")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: savedItemsArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            contextMenuWindow.closeMenu();
-                            root.showSavedItemsRequested();
-                        }
-                    }
-                }
-            }
-        }
+        ]
     }
 }

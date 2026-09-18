@@ -13,67 +13,78 @@ Item {
     property real artOpacity: 0.7
     property real surfaceTint: 0.3
     property real stableHeight: 0
+    property string artUrl: TrackArtService.resolvedArtUrl
 
     readonly property bool pinned: root.stableHeight > 0
     readonly property real anchorHeight: root.pinned ? root.stableHeight : root.height
+    readonly property real blurExtent: Math.max(root.width, root.anchorHeight) * 1.1
+    readonly property int blurDecodeSize: Math.min(384, Math.max(128, Math.ceil(root.blurExtent / 128) * 128))
 
     signal artReady
 
-    // Fall back to the live mpris url so the backdrop is never blank.
-    readonly property string curArt: {
-        const resolved = TrackArtService.resolvedArtUrl;
-        if (resolved !== "")
-            return resolved;
-        const p = root.activePlayer;
-        if (!p)
-            return "";
-        if (p.trackArtUrl)
-            return p.trackArtUrl;
-        const m = p.metadata;
-        return m && m["mpris:artUrl"] ? m["mpris:artUrl"].toString() : "";
-    }
-    // Two layers crossfade: new art loads into the hidden one and fades in once decoded.
+    readonly property string curArt: artUrl
     property bool _showA: true
+    readonly property bool transitioning: layerA.revealing || layerB.revealing
+    readonly property bool onScreen: visible && (Window.window?.visible ?? false)
 
     visible: layerA.ready || layerB.ready
 
     onCurArtChanged: syncArt()
+    onOnScreenChanged: {
+        if (onScreen)
+            return;
+        layerA.finishReveal();
+        layerB.finishReveal();
+    }
     Component.onCompleted: syncArt()
 
     function syncArt() {
-        if (curArt === "")
+        if (curArt === "") {
+            layerA.art = "";
+            layerB.art = "";
             return;
+        }
         const front = _showA ? layerA : layerB;
         const back = _showA ? layerB : layerA;
         if (front.art == curArt)
             return;
+        front.finishReveal();
         if (back.art == curArt) {
             if (back.ready)
-                _showA = !_showA;
+                promote(back);
             return;
         }
         back.art = curArt;
     }
 
-    // Flip only when the hidden layer holds the current art, ignoring stale Ready re-emits.
     function promote(layer) {
+        const front = _showA ? layerA : layerB;
         const back = _showA ? layerB : layerA;
         if (layer !== back || layer.art != curArt)
             return;
+        const animate = onScreen && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None;
         _showA = (layer === layerA);
+        if (animate)
+            layer.reveal();
+        else
+            layer.finishReveal();
         root.artReady();
     }
 
-    BgBlurLayer {
-        id: layerA
-        front: root._showA
-        onLoaded: root.promote(layerA)
-    }
+    Item {
+        anchors.fill: parent
+        opacity: root.artOpacity
+        layer.enabled: root.onScreen
 
-    BgBlurLayer {
-        id: layerB
-        front: !root._showA
-        onLoaded: root.promote(layerB)
+        BgBlurLayer {
+            id: layerA
+            front: root._showA
+        }
+
+        BgBlurLayer {
+            id: layerB
+            front: !root._showA
+        }
     }
 
     Rectangle {
@@ -87,33 +98,54 @@ Item {
         id: layer
         property alias art: layerImg.source
         readonly property bool ready: layerImg.status === Image.Ready && layerImg.source != ""
+        readonly property bool revealing: fadeIn.running
         property bool front: false
-        signal loaded
 
         anchors.fill: parent
         radius: root.radius
         color: "transparent"
         antialiasing: true
-        opacity: front ? root.artOpacity : 0
+        z: front ? 1 : 0
+        visible: front || root.transitioning
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 350
-                easing.type: Easing.InOutQuad
-            }
+        function reveal() {
+            fadeIn.restart();
+        }
+
+        function finishReveal() {
+            fadeIn.stop();
+            opacity = 1;
+        }
+
+        Timer {
+            id: promoteDeferred
+            interval: 0
+            onTriggered: root.promote(layer)
+        }
+
+        NumberAnimation {
+            id: fadeIn
+            target: layer
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: Theme.expressiveDurations.expressiveEffects
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
         }
 
         Image {
             id: layerImg
-            width: Math.max(parent.width, root.anchorHeight) * 1.1
+            width: root.blurExtent
             height: width
             fillMode: Image.PreserveAspectCrop
+            sourceSize: Qt.size(root.blurDecodeSize, root.blurDecodeSize)
             asynchronous: true
             cache: true
             visible: false
             onStatusChanged: {
                 if (status === Image.Ready && source != "")
-                    layer.loaded();
+                    promoteDeferred.restart();
             }
         }
 
@@ -123,7 +155,7 @@ Item {
             width: layerImg.width
             height: layerImg.height
             source: layerImg
-            blurEnabled: true
+            blurEnabled: root.onScreen
             blurMax: 64
             blur: 0.8
             saturation: -0.2

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Format staged .qml files using qmlls (the Qt QML language server).
+"""Format staged .qml files using qmlls (the Qt QML language server) and
+staged .js files using the qmlformat CLI (qmlls never answers a formatting
+request for a JavaScript document; .mjs is not supported by qmlformat).
 
-Per file:
+Per .qml file:
   1. Speak LSP over stdio to qmlls: initialize -> didOpen -> formatting,
      apply returned edits, save, `git add`.
   2. Run qmllint on the formatted file and warn about unused imports
      (informational only — never modifies files).
+
+Per .js file: run `qmlformat <file>`, write its stdout back, `git add`.
 
 Refuses to run if any staged file also has unstaged changes, since `git add`
 would silently absorb those into the commit.
@@ -25,6 +29,8 @@ TAB_SIZE = 4
 REQUEST_TIMEOUT = 30
 QMLLS_CANDIDATES = ["qmlls6", "qmlls"]
 QMLLINT_CANDIDATES = ["/usr/lib/qt6/bin/qmllint", "qmllint6", "qmllint"]
+QMLFORMAT_CANDIDATES = ["/usr/lib/qt6/bin/qmlformat", "qmlformat6", "qmlformat"]
+FORMATTED_SUFFIXES = (".qml", ".js")
 
 
 def git(*args, cwd=None):
@@ -41,9 +47,9 @@ def repo_root():
     return Path(git("rev-parse", "--show-toplevel").strip())
 
 
-def staged_qml_files(root):
+def staged_files(root):
     out = git("diff", "--cached", "--name-only", "--diff-filter=ACMR", cwd=root)
-    return [root / line for line in out.splitlines() if line.endswith(".qml")]
+    return [root / line for line in out.splitlines() if line.endswith(FORMATTED_SUFFIXES)]
 
 
 def has_unstaged_changes(root, file):
@@ -57,6 +63,22 @@ def find_qmlls():
         if path:
             return path
     return None
+
+
+def find_qmlformat():
+    for candidate in QMLFORMAT_CANDIDATES:
+        path = candidate if "/" in candidate and Path(candidate).is_file() else shutil.which(candidate)
+        if path:
+            return path
+    return None
+
+
+def format_js(qmlformat, file):
+    """Return qmlformat's output for a .js file, or None when it rejects the file."""
+    result = subprocess.run([qmlformat, str(file)], capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    return result.stdout
 
 
 def find_qmllint():
@@ -242,11 +264,33 @@ def start_client(qmlls, root):
     return client
 
 
+def format_js_files(qmlformat, root, files):
+    changed = 0
+    skipped = 0
+    for file in files:
+        rel = file.relative_to(root)
+        print(f"  {rel} ... ", end="", flush=True)
+        original = file.read_text()
+        new_text = format_js(qmlformat, file)
+        if new_text is None:
+            skipped += 1
+            print("skipped (qmlformat rejected the file)")
+            continue
+        if new_text == original:
+            print("unchanged")
+            continue
+        file.write_text(new_text)
+        git("add", "--", str(rel), cwd=root)
+        changed += 1
+        print("formatted & staged")
+    return changed, skipped
+
+
 def main():
     root = repo_root()
-    files = staged_qml_files(root)
+    files = staged_files(root)
     if not files:
-        print("No staged .qml files.")
+        print("No staged .qml or .js files.")
         return 0
 
     dirty = [f for f in files if has_unstaged_changes(root, f)]
@@ -256,6 +300,24 @@ def main():
             print(f"  {f.relative_to(root)}", file=sys.stderr)
         print("\nStash or stage those changes first.", file=sys.stderr)
         return 1
+
+    js_files = [f for f in files if f.suffix == ".js"]
+    files = [f for f in files if f.suffix == ".qml"]
+
+    changed = 0
+    skipped = 0
+    if js_files:
+        qmlformat = find_qmlformat()
+        if not qmlformat:
+            print(f"qmlformat not found (tried: {', '.join(QMLFORMAT_CANDIDATES)})", file=sys.stderr)
+            return 1
+        changed, skipped = format_js_files(qmlformat, root, js_files)
+
+    if not files:
+        print(f"\n{changed} of {len(js_files)} file(s) changed.")
+        if skipped:
+            print(f"{skipped} file(s) skipped (could not be formatted; see above).")
+        return 0
 
     qmlls = find_qmlls()
     if not qmlls:
@@ -267,8 +329,6 @@ def main():
         print("warning: qmllint with --json not found; skipping unused-import checks", file=sys.stderr)
 
     client = start_client(qmlls, root)
-    changed = 0
-    skipped = 0
     unused_by_file = {}
     try:
         for file in files:
@@ -332,7 +392,7 @@ def main():
                 if findings:
                     unused_by_file[file] = findings
 
-        print(f"\n{changed} of {len(files)} file(s) changed.")
+        print(f"\n{changed} of {len(files) + len(js_files)} file(s) changed.")
         if skipped:
             print(f"{skipped} file(s) skipped (could not be formatted; see above).")
 

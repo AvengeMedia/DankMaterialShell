@@ -60,52 +60,53 @@ ABBREVIATIONS = {
 
 CATEGORY_KEYWORDS = {
     "Personalization": ["customize", "custom", "personal", "appearance"],
-    "Time & Weather": ["clock", "forecast", "date"],
-    "Keyboard Shortcuts": ["keys", "bindings", "hotkey"],
+    "Time & weather": ["clock", "forecast", "date"],
+    "Keyboard shortcuts": ["keys", "bindings", "hotkey"],
     "Bar": ["panel", "topbar", "statusbar"],
     "Applications": ["apps", "programs", "window", "rules", "matching", "floating"],
     "Dock": ["taskbar", "launcher bar"],
     "Network": ["connectivity", "online"],
     "System": ["os", "linux"],
     "Launcher": ["start", "menu", "drawer"],
-    "Theme & Colors": ["appearance", "look", "style", "scheme"],
-    "Lock Screen": ["security", "login", "password"],
+    "Theme & colors": ["appearance", "look", "style", "scheme"],
+    "Lock screen": ["security", "login", "password"],
     "Plugins": ["extend", "addon"],
     "About": ["info", "version", "credits", "help"],
-    "Typography & Motion": ["fonts", "animation", "text"],
+    "Fonts & motion": ["fonts", "animation", "text"],
     "Sounds": ["audio", "sfx", "effects"],
-    "Media Player": ["music", "spotify", "mpris"],
+    "Media player": ["music", "spotify", "mpris"],
     "Notifications": ["alerts", "messages", "toast"],
-    "On-screen Displays": ["osd", "indicator", "popup"],
-    "Running Apps": ["windows", "tasks", "active"],
-    "System Updater": ["packages", "upgrade"],
-    "Power & Sleep": ["shutdown", "suspend", "energy"],
+    "On-screen displays": ["osd", "indicator", "popup"],
+    "Running apps": ["windows", "tasks", "active"],
+    "System updater": ["packages", "upgrade"],
+    "Power & sleep": ["shutdown", "suspend", "energy"],
     "Displays": ["monitor", "screen", "resolution"],
-    "Desktop Widgets": ["conky", "desktop clock"],
+    "Desktop widgets": ["conky", "desktop clock"],
     "Audio": ["sound", "volume", "speaker", "microphone", "headphones", "pipewire"],
     "Locale": ["locale", "language", "country"],
     "Greeter": ["login", "greetd", "display manager"],
     "Multiplexers": ["tmux", "zellij", "terminal"],
     "Frame": ["window", "border", "decoration"],
     "Dank Island": ["island", "activities", "dynamic island"],
-    "Default Apps": ["browser", "terminal", "handlers", "mime"],
+    "Default apps": ["browser", "terminal", "handlers", "mime"],
     "Users": ["accounts", "user", "profile"],
     "Autostart": ["startup", "launch", "boot"],
 }
 
 TAB_INDEX_MAP = {
-    "WallpaperTab.qml": 0,
     "TimeWeatherTab.qml": 1,
+    "WeatherSettingsTab.qml": 56,
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
     "DankDashTab.qml": 43,
     "DankIslandTab.qml": 46,
-    "WorkspacesTab.qml": 4,
     "CompositorLayoutTab.qml": 37,
     "WindowRulesTab.qml": 38,
-    "DockTab.qml": 5,
+    "DockGeneralTab.qml": 5,
+    "DockWidgetsTab.qml": 57,
+    "DockAppearanceTab.qml": 58,
+    "DockAdvancedTab.qml": 59,
     "DankBarAppearanceTab.qml": 6,
-    "WorkspaceAppearanceCard.qml": 4,
     "NetworkStatusTab.qml": 7,
     "NetworkEthernetTab.qml": 39,
     "NetworkWifiTab.qml": 40,
@@ -114,18 +115,22 @@ TAB_INDEX_MAP = {
     "PrinterTab.qml": 8,
     "LauncherTab.qml": 9,
     "ThemeColorsTab.qml": 10,
+    "ThemeAppsTab.qml": 50,
+    "ThemeScheduleTab.qml": 51,
+    "WallpaperCyclingTab.qml": 52,
+    "ShadowsTab.qml": 53,
+    "BarWidgetTab.qml": 54,
     "LockScreenTab.qml": 11,
-    "PluginsTab.qml": 12,
+    "PluginsManageTab.qml": 28,
     "AboutTab.qml": 13,
     "TypographyMotionTab.qml": 14,
     "SoundsTab.qml": 15,
     "MediaPlayerTab.qml": 16,
-    "NotificationsTab.qml": 17,
+    "NotificationRulesTab.qml": 55,
     "OSDTab.qml": 18,
     "RunningAppsTab.qml": 19,
     "SystemUpdaterTab.qml": 20,
     "PowerSleepTab.qml": 21,
-    "WidgetsTab.qml": 22,
     "ClipboardTab.qml": 23,
     "DisplayConfigTab.qml": 24,
     "GammaControlTab.qml": 25,
@@ -138,79 +143,56 @@ TAB_INDEX_MAP = {
     "FrameTab.qml": 33,
     "DefaultAppsTab.qml": 34,
     "UsersTab.qml": 35,
+    "UserAccountsTab.qml": 60,
+    "CreateUserTab.qml": 61,
+    "GreeterAuthTab.qml": 62,
     "AutoStartTab.qml": 36,
     "BatteryTab.qml": 42,
     "MouseTouchpadTab.qml": 44,
     "KeyboardTab.qml": 45,
 }
 
-FILE_CONDITION_MAP = {
-    "GreeterTab.qml": "greeterAvailable",
-    "MouseTouchpadTab.qml": "isNiri",
-    "KeyboardTab.qml": "isNiri",
-    "FrameTab.qml": "frameEnabled",
-    "DankIslandTab.qml": "islandEnabled",
-    "NetworkCellularTab.qml": "cellularAvailable",
+SIDEBAR_GATE_CONDITIONS = [
+    ("shortcutsOnly", "keybindsAvailable"),
+    ("soundsOnly", "soundsAvailable"),
+    ("cupsOnly", "cupsAvailable"),
+    ("greeterOnly", "greeterAvailable"),
+    ("dmsOnly", "networkAvailable"),
+    ("hyprlandNiriOnly", "isHyprlandOrNiri"),
+    ("clipboardOnly", "dmsConnected"),
+    ("niriOnly", "isNiri"),
+    ("pointerCapable", "pointerCapable"),
+    ("windowRulesCapable", "windowRulesCapable"),
+    ("layoutCapable", "layoutCapable"),
+    ("frameOnly", "frameEnabled"),
+    ("islandOnly", "islandEnabled"),
+    ("cellularOnly", "cellularAvailable"),
+]
+
+FILE_PAGE_MAP = {
+    "WallpaperColorsTab.qml": "personalization",
+    "ThemeSurfacesTab.qml": "theme_surfaces",
+    "WidgetsTab.qml": "dankbar_widgets",
+    "NotificationsTab.qml": "notifications",
+    "UserAccountsTab.qml": "user_accounts",
+    "BarHubHeader.qml": "dankbar",
+    "DockHubHeader.qml": "dock",
+    "PluginsHubHeader.qml": "plugins",
 }
 
-TAB_CATEGORY_MAP = {
-    0: "Personalization",
-    1: "Time & Weather",
-    2: "Keyboard Shortcuts",
-    3: "Bar",
-    4: "Bar",
-    5: "Dock",
-    6: "Bar",
-    7: "Network",
-    8: "System",
-    9: "Launcher",
-    10: "Theme & Colors",
-    11: "Lock Screen",
-    12: "Plugins",
-    13: "About",
-    14: "Typography & Motion",
-    15: "Sounds",
-    16: "Media Player",
-    17: "Notifications",
-    18: "On-screen Displays",
-    19: "Running Apps",
-    20: "System Updater",
-    21: "Power & Sleep",
-    22: "Bar",
-    23: "System",
-    24: "Displays",
-    25: "Displays",
-    26: "Displays",
-    27: "Desktop Widgets",
-    29: "Audio",
-    30: "Locale",
-    31: "Greeter",
-    32: "Multiplexers",
-    33: "Frame",
-    34: "Default Apps",
-    35: "Users",
-    36: "Autostart Apps",
-    37: "Personalization",
-    38: "Applications",
-    39: "Network",
-    40: "Network",
-    41: "Network",
-    42: "Power & Security",
-    43: "Dashboard",
-    44: "System",
-    45: "System",
-    46: "Island",
-    47: "Network",
-}
+TAB_META_DEFAULT = ("Settings", None, None)
 
 SEARCHABLE_COMPONENTS = [
     "SettingsCard",
     "SettingsToggleRow",
-    "SettingsSliderCard",
     "SettingsDropdownRow",
     "SettingsButtonGroupRow",
     "SettingsSliderRow",
     "SettingsToggleCard",
+    "SettingsSplitRow",
+    "SettingsNavRow",
+    "SettingsRow",
+    "ColorDropdownRow",
 ]
 
 STOPWORDS = {
@@ -251,7 +233,7 @@ STOPWORDS = {
 }
 
 
-def enrich_keywords(label, description, category, existing_tags):
+def enrich_keywords(label, description, category, existing_tags, parent_label=None):
     keywords = set(existing_tags)
 
     label_lower = label.lower()
@@ -270,12 +252,15 @@ def enrich_keywords(label, description, category, existing_tags):
             if term in desc_lower:
                 keywords.update(aliases)
 
-    if category in CATEGORY_KEYWORDS:
-        keywords.update(CATEGORY_KEYWORDS[category])
-
-    cat_lower = category.lower()
-    cat_words = re.split(r"[\s\-_&/]+", cat_lower)
-    keywords.update(w for w in cat_words if len(w) > 2)
+    for name in (category, parent_label):
+        if not name:
+            continue
+        keywords.update(CATEGORY_KEYWORDS.get(name, []))
+        name_lower = name.lower()
+        keywords.update(w for w in re.split(r"[\s\-_&/]+", name_lower) if len(w) > 2)
+        for term, aliases in ABBREVIATIONS.items():
+            if term in name_lower:
+                keywords.update(aliases)
 
     keywords = {k for k in keywords if k not in STOPWORDS and len(k) > 1}
     return sorted(keywords)
@@ -319,7 +304,7 @@ def parse_component_block(content, start_pos, component_name):
 
 
 def extract_property(block, prop_name):
-    pattern = rf"{prop_name}\s*:\s*([^\n]+)"
+    pattern = rf"\b{prop_name}\s*:\s*([^\n]+)"
     match = re.search(pattern, block)
     if match:
         return match.group(1).strip()
@@ -349,11 +334,12 @@ def load_wrapper_components(root_dir):
     return wrappers
 
 
-def find_settings_components(content, filename, wrappers):
+def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
     results = []
     file_tab_index = TAB_INDEX_MAP.get(filename, -1)
+    file_page = FILE_PAGE_MAP.get(filename)
 
-    if file_tab_index == -1:
+    if file_tab_index == -1 and not file_page:
         return results
 
     for component in SEARCHABLE_COMPONENTS + sorted(wrappers):
@@ -372,9 +358,6 @@ def find_settings_components(content, filename, wrappers):
                 continue
 
             tab_index = file_tab_index
-            tab_raw = extract_property(block, "tab")
-            if tab_raw and tab_raw.strip("\"'") == "appearance":
-                tab_index = 6
 
             title_raw = extract_property(block, "title") or defaults.get("title")
             text_raw = extract_property(block, "text") or defaults.get("text")
@@ -405,10 +388,25 @@ def find_settings_components(content, filename, wrappers):
                 description = extract_i18n_string(desc_raw)
 
             visible_raw = extract_property(block, "visible")
-            condition_key = FILE_CONDITION_MAP.get(filename)
+            page_meta = hub_meta.get(file_page) if file_page else None
+            condition_key = page_meta[2] if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)[2]
             if visible_raw:
                 if filename == "WorkspacesTab.qml" and setting_key == "workspaceFollowFocus":
                     condition_key = "workspaceFollowFocusCapable"
+                elif "CompositorService.supportsSmartDock" in visible_raw:
+                    condition_key = "smartDockCapable"
+                elif "CompositorService.supportsNativeOverview" in visible_raw:
+                    condition_key = "nativeOverviewCapable"
+                elif "CompositorService.supportsWorkspaceFollowFocus" in visible_raw:
+                    condition_key = "workspaceFollowFocusCapable"
+                elif "CompositorService.supportsWindowRules" in visible_raw or "CompositorService.supportsBarAutoHideReveal" in visible_raw:
+                    condition_key = "windowRulesCapable"
+                elif "CompositorService.supportsLayoutConfig" in visible_raw:
+                    condition_key = "layoutCapable"
+                elif "CompositorService.supportsPointerConfig" in visible_raw:
+                    condition_key = "pointerCapable"
+                elif "CompositorService.supportsInputConfig" in visible_raw:
+                    condition_key = "isNiri"
                 elif "CompositorService.isAqueous" in visible_raw:
                     if "CompositorService.isHyprland" in visible_raw:
                         condition_key = "smartDockCapable"
@@ -436,11 +434,9 @@ def find_settings_components(content, filename, wrappers):
                     condition_key = "dmsConnected"
                 elif "Theme.matugenAvailable" in visible_raw:
                     condition_key = "matugenAvailable"
-                elif "CompositorService.isDwl" in visible_raw:
-                    condition_key = "isDwl"
 
-            category = TAB_CATEGORY_MAP.get(tab_index, "Settings")
-            enriched_keywords = enrich_keywords(label, description, category, tags)
+            category, parent_label, _ = page_meta if page_meta else tab_meta.get(tab_index, TAB_META_DEFAULT)
+            enriched_keywords = enrich_keywords(label, description, category, tags, parent_label)
 
             entry = {
                 "section": setting_key,
@@ -450,6 +446,10 @@ def find_settings_components(content, filename, wrappers):
                 "keywords": enriched_keywords,
             }
 
+            if file_page:
+                entry["page"] = file_page
+            if parent_label:
+                entry["parentLabel"] = parent_label
             if icon:
                 entry["icon"] = icon
             if description:
@@ -462,124 +462,193 @@ def find_settings_components(content, filename, wrappers):
     return results
 
 
-def parse_tabs_from_sidebar(sidebar_file):
+def match_bracket(content, start, open_char, close_char):
+    depth = 0
+    for i in range(start, len(content)):
+        if content[i] == open_char:
+            depth += 1
+        elif content[i] == close_char:
+            depth -= 1
+            if depth == 0:
+                return i
+    return -1
+
+
+def split_objects(array_body):
+    objects = []
+    i = 0
+    while i < len(array_body):
+        if array_body[i] != "{":
+            i += 1
+            continue
+        end = match_bracket(array_body, i, "{", "}")
+        if end == -1:
+            break
+        objects.append(array_body[i : end + 1])
+        i = end + 1
+    return objects
+
+
+def string_prop(block, name):
+    match = re.search(rf'"{name}"\s*:\s*"([^"]*)"', block)
+    return match.group(1) if match else None
+
+
+def i18n_prop(block, name):
+    match = re.search(rf'"{name}"\s*:\s*([^\n]+)', block)
+    return extract_i18n_string(match.group(1)) if match else None
+
+
+def gate_condition(block):
+    for qml_flag, key in SIDEBAR_GATE_CONDITIONS:
+        if f'"{qml_flag}": true' in block:
+            return key
+    return None
+
+
+def parse_structure_entry(block, parent=None):
+    own = block
+    children_raw = ""
+    children_match = re.search(r'"children"\s*:\s*\[', block)
+    if children_match:
+        end = match_bracket(block, children_match.end() - 1, "[", "]")
+        children_raw = block[children_match.end() : end]
+        own = block[: children_match.start()] + block[end + 1 :]
+
+    tab_index_match = re.search(r'"tabIndex"\s*:\s*(\d+)', own)
+    entry = {
+        "id": string_prop(own, "id"),
+        "label": i18n_prop(own, "text"),
+        "icon": string_prop(own, "icon"),
+        "tabIndex": int(tab_index_match.group(1)) if tab_index_match else None,
+        "hint": i18n_prop(own, "hint"),
+        "separator": '"separator": true' in own,
+        "conditionKey": gate_condition(own) or (parent["conditionKey"] if parent else None),
+        "parentLabel": parent["label"] if parent else None,
+        "own": own,
+        "children": [],
+    }
+    entry["children"] = [parse_structure_entry(child, entry) for child in split_objects(children_raw)]
+    return entry
+
+
+def parse_structure(sidebar_file):
     with open(sidebar_file, "r", encoding="utf-8") as f:
         content = f.read()
-
-    pattern = r'"text"\s*:\s*I18n\.tr\("([^"]+)"(?:,\s*"[^"]+"(?:,\s*true)?)?\).*?"icon"\s*:\s*"([^"]+)".*?"tabIndex"\s*:\s*(\d+)'
-    tabs = []
-
-    for match in re.finditer(pattern, content, re.DOTALL):
-        label, icon, tab_idx = match.group(1), match.group(2), int(match.group(3))
-
-        before_text = content[: match.start()]
-        parent_match = re.search(
-            r'"text"\s*:\s*I18n\.tr\("([^"]+)"\)[^{]*"children"[^[]*\[[^{]*$',
-            before_text,
-        )
-        parent = parent_match.group(1) if parent_match else None
-
-        cond = None
-        snippet_end = content.find("}", match.end())
-        snippet = content[match.start() : snippet_end if snippet_end != -1 else len(content)]
-        for qml_cond, key in [
-            ("shortcutsOnly", "keybindsAvailable"),
-            ("soundsOnly", "soundsAvailable"),
-            ("cupsOnly", "cupsAvailable"),
-            ("greeterOnly", "greeterAvailable"),
-            ("dmsOnly", "dmsConnected"),
-            ("hyprlandNiriOnly", "isHyprlandOrNiri"),
-            ("clipboardOnly", "dmsConnected"),
-            ("niriOnly", "isNiri"),
-            ("windowRulesCapable", "windowRulesCapable"),
-            ("layoutCapable", "layoutCapable"),
-            ("frameOnly", "frameEnabled"),
-            ("islandOnly", "islandEnabled"),
-            ("cellularOnly", "cellularAvailable"),
-        ]:
-            if f'"{qml_cond}": true' in snippet:
-                cond = key
-                break
-
-        tabs.append(
-            {
-                "tabIndex": tab_idx,
-                "label": label,
-                "icon": icon,
-                "parent": parent,
-                "conditionKey": cond,
-            }
-        )
-
-    return tabs
+    start = content.find("structure: [")
+    if start == -1:
+        return []
+    array_start = content.index("[", start)
+    array_end = match_bracket(content, array_start, "[", "]")
+    return [parse_structure_entry(block) for block in split_objects(content[array_start + 1 : array_end])]
 
 
-def generate_tab_entries(sidebar_file, settings_entries=None):
-    tabs = parse_tabs_from_sidebar(sidebar_file)
-    settings_entries = settings_entries or []
+def flatten_leaves(entries):
+    leaves = []
+    for entry in entries:
+        if entry["separator"]:
+            continue
+        if entry["tabIndex"] is not None:
+            leaves.append(entry)
+        leaves.extend(flatten_leaves(entry["children"]))
+    return leaves
+
+
+def leaf_category(leaf):
+    if leaf["label"]:
+        return leaf["label"], leaf["parentLabel"]
+    return leaf["parentLabel"] or "Settings", None
+
+
+def build_tab_meta(leaves):
+    return {leaf["tabIndex"]: leaf_category(leaf) + (leaf["conditionKey"],) for leaf in leaves}
+
+
+def hubs_of(entries):
+    return [entry for entry in entries if entry["label"] and not entry["separator"] and (entry["children"] or entry["tabIndex"] is None)]
+
+
+def build_hub_meta(hubs):
+    return {hub["id"]: (hub["label"], None, hub["conditionKey"]) for hub in hubs}
+
+
+def generate_hub_entries(hubs):
+    entries = []
+    for hub in hubs:
+        child_labels = [child["label"] for child in hub["children"] if child["label"]]
+        keywords = set(enrich_keywords(hub["label"], " ".join(child_labels + [hub["hint"] or ""]), hub["label"], []))
+        for child_label in child_labels:
+            keywords.update(w for w in re.split(r"[\s\-_&/]+", child_label.lower()) if len(w) > 2)
+        entry = {
+            "section": f"_hub_{hub['id']}",
+            "label": hub["label"],
+            "tabIndex": hub["tabIndex"] if hub["tabIndex"] is not None else -1,
+            "page": hub["id"],
+            "category": hub["label"],
+            "keywords": sorted(k for k in keywords if k not in STOPWORDS),
+            "icon": hub["icon"],
+        }
+        if hub["conditionKey"]:
+            entry["conditionKey"] = hub["conditionKey"]
+        entries.append(entry)
+    return entries
+
+
+def generate_tab_entries(leaves, settings_entries):
     highlightable_labels = {
         (entry["tabIndex"], entry["label"])
         for entry in settings_entries
         if not str(entry["section"]).startswith("_tab_")
     }
-
-    label_counts = Counter([t["label"] for t in tabs])
+    label_counts = Counter(leaf["label"] for leaf in leaves if leaf["label"])
 
     entries = []
-    for tab in tabs:
+    for leaf in leaves:
+        base_label = leaf["label"]
+        if not base_label:
+            continue
         label = (
-            f"{tab['parent']}: {tab['label']}"
-            if label_counts[tab["label"]] > 1 and tab["parent"]
-            else tab["label"]
+            f"{leaf['parentLabel']}: {base_label}"
+            if label_counts[base_label] > 1 and leaf["parentLabel"]
+            else base_label
         )
-        category = TAB_CATEGORY_MAP.get(tab["tabIndex"], "Settings")
-
-        if (tab["tabIndex"], label) in highlightable_labels:
+        if (leaf["tabIndex"], label) in highlightable_labels:
             continue
 
-        keywords = enrich_keywords(tab["label"], None, category, [])
-
-        if tab["parent"]:
-            parent_keywords = [
-                w for w in re.split(r"[\s\-_&/]+", tab["parent"].lower()) if len(w) > 2
-            ]
-            keywords = sorted(
-                set(
-                    keywords
-                    + parent_keywords
-                    + [k for p in parent_keywords for k in ABBREVIATIONS.get(p, [])]
-                )
-            )
-
+        category, parent_label = leaf_category(leaf)
         entry = {
-            "section": f"_tab_{tab['tabIndex']}",
+            "section": f"_tab_{leaf['tabIndex']}",
             "label": label,
-            "tabIndex": tab["tabIndex"],
+            "tabIndex": leaf["tabIndex"],
             "category": category,
-            "keywords": keywords,
-            "icon": tab["icon"],
+            "keywords": enrich_keywords(base_label, leaf["hint"], category, [], parent_label),
+            "icon": leaf["icon"],
         }
-        if tab["conditionKey"]:
-            entry["conditionKey"] = tab["conditionKey"]
+        if parent_label:
+            entry["parentLabel"] = parent_label
+        if leaf["hint"]:
+            entry["description"] = leaf["hint"]
+        if leaf["conditionKey"]:
+            entry["conditionKey"] = leaf["conditionKey"]
         entries.append(entry)
 
     return entries
 
 
-def extract_settings_index(root_dir):
+def extract_settings_index(root_dir, tab_meta, hub_meta):
     settings_dir = Path(root_dir) / "Modules" / "Settings"
     wrappers = load_wrapper_components(root_dir)
     all_entries = []
     seen_keys = set()
 
     for qml_file in sorted(settings_dir.glob("*.qml")):
-        if qml_file.name not in TAB_INDEX_MAP:
+        if qml_file.name not in TAB_INDEX_MAP and qml_file.name not in FILE_PAGE_MAP:
             continue
 
         with open(qml_file, "r", encoding="utf-8") as f:
             content = f.read()
 
-        entries = find_settings_components(content, qml_file.name, wrappers)
+        entries = find_settings_components(content, qml_file.name, wrappers, tab_meta, hub_meta)
         for entry in entries:
             key = entry["section"]
             if key not in seen_keys:
@@ -587,17 +656,20 @@ def extract_settings_index(root_dir):
                 all_entries.append(entry)
 
     if "windowRules" not in seen_keys:
+        category, parent_label, _ = tab_meta.get(38, TAB_META_DEFAULT)
         all_entries.append(
             {
                 "section": "windowRules",
                 "label": "Window Rules",
                 "tabIndex": 38,
-                "category": "Applications",
+                "category": category,
+                "parentLabel": parent_label,
                 "keywords": enrich_keywords(
                     "Window Rules",
                     "Define compositor rules for window behavior",
-                    "Applications",
+                    category,
                     ["matching", "floating", "fullscreen", "opacity"],
+                    parent_label,
                 ),
                 "icon": "select_window",
                 "description": "Define compositor rules for window behavior",
@@ -606,17 +678,20 @@ def extract_settings_index(root_dir):
         )
 
     if "islandHomeLayout" not in seen_keys:
+        category, parent_label, _ = tab_meta.get(46, TAB_META_DEFAULT)
         all_entries.append(
             {
                 "section": "islandHomeLayout",
                 "label": "Home Layout",
                 "tabIndex": 46,
-                "category": "Island",
+                "category": category,
+                "parentLabel": parent_label,
                 "keywords": enrich_keywords(
                     "Home Layout",
                     "Order and hide the groups around the island clock",
-                    "Island",
+                    category,
                     ["media", "launcher", "weather", "battery", "volume", "brightness", "notifications", "badge", "left", "right", "hidden", "reorder"],
+                    parent_label,
                 ),
                 "icon": "home",
                 "description": "Order and hide the groups around the island clock",
@@ -624,19 +699,72 @@ def extract_settings_index(root_dir):
             }
         )
 
+    for entry in all_entries:
+        if entry.get("parentLabel") is None:
+            entry.pop("parentLabel", None)
+
     return all_entries
 
 
-def validate(all_entries, sidebar_file, root_dir):
+OPTION_LABEL_PATTERN = re.compile(r'\b(?:text|title):\s*I18n\.tr\("((?:[^"\\]|\\.)*)"')
+
+
+def extract_bar_widget_option_labels(root_dir):
+    options_dir = Path(root_dir) / "Modules" / "Settings" / "BarWidgetOptions"
+    entries = []
+    for qml_file in sorted(options_dir.glob("*Options.qml")):
+        labels = []
+        for label in OPTION_LABEL_PATTERN.findall(qml_file.read_text(encoding="utf-8")):
+            if not label or label in labels:
+                continue
+            labels.append(label)
+            entries.append(
+                {
+                    "section": f"barWidgetOption:{qml_file.name}:{len(labels)}",
+                    "label": label,
+                    "tabIndex": 22,
+                    "keywords": [],
+                    "runtimeType": "barWidgetOption",
+                    "optionFile": qml_file.name,
+                }
+            )
+    return entries
+
+
+def validate(all_entries, leaves, hubs, sidebar_file, root_dir):
     errors = []
     settings_dir = root_dir / "Modules" / "Settings"
+    hub_ids = {hub["id"] for hub in hubs}
+    for hub in hubs:
+        header = string_prop(hub["own"], "hubHeader")
+        if header and not (settings_dir / f"{header}.qml").exists():
+            errors.append(f"{hub['id']}: hubHeader '{header}' has no Modules/Settings/{header}.qml")
+    for page in FILE_PAGE_MAP.values():
+        if page not in hub_ids:
+            errors.append(f"FILE_PAGE_MAP page '{page}' is not a hub")
+    seen_ids = Counter()
+    for hub in hubs:
+        seen_ids[hub["id"]] += 1
+        for alias in re.findall(r'"([^"]+)"', (re.search(r'"aliases"\s*:\s*\[([^\]]*)\]', hub["own"]) or [None, ""])[1]):
+            seen_ids[alias] += 1
+    for leaf in leaves:
+        if leaf["children"]:
+            continue
+        seen_ids[leaf["id"]] += 1
+    for page_id, count in seen_ids.items():
+        if count > 1:
+            errors.append(f"page id '{page_id}' is declared {count} times")
     for tab_file in sorted(settings_dir.glob("*Tab.qml")):
-        if tab_file.name not in TAB_INDEX_MAP:
+        if tab_file.name not in TAB_INDEX_MAP and tab_file.name not in FILE_PAGE_MAP:
             errors.append(f"{tab_file.name} missing from TAB_INDEX_MAP")
 
     with open(sidebar_file, "r", encoding="utf-8") as f:
         sidebar_content = f.read()
-    sidebar_tabs = {int(n) for n in re.findall(r'"tabIndex"\s*:\s*(\d+)', sidebar_content)}
+    sidebar_tabs = {leaf["tabIndex"] for leaf in leaves}
+    file_backed_tabs = {leaf["tabIndex"] for leaf in leaves if not leaf["children"]}
+    mapped_tabs = set(TAB_INDEX_MAP.values())
+    for tab_index in sorted(file_backed_tabs - mapped_tabs):
+        errors.append(f"tabIndex {tab_index} in sidebar has no file in TAB_INDEX_MAP")
     with open(Path(__file__).parent / "en.json", "r", encoding="utf-8") as f:
         catalog_terms = {entry["term"] for entry in json.load(f)}
     known_labels = catalog_terms | set(re.findall(r'I18n\.tr\("([^"]+)"', sidebar_content))
@@ -645,10 +773,17 @@ def validate(all_entries, sidebar_file, root_dir):
         condition_keys = set(re.findall(r'"(\w+)":\s*\(\)\s*=>', f.read()))
 
     for entry in all_entries:
-        if entry["tabIndex"] not in sidebar_tabs:
+        page = entry.get("page")
+        if page and page not in hub_ids:
+            errors.append(f"{entry['section']}: page '{page}' is not a hub")
+        if entry["tabIndex"] == -1 and not page:
+            errors.append(f"{entry['section']}: tabIndex -1 without a page")
+        if entry["tabIndex"] != -1 and entry["tabIndex"] not in sidebar_tabs:
             errors.append(f"{entry['section']}: tabIndex {entry['tabIndex']} not in sidebar")
-        if entry["category"] not in known_labels:
-            errors.append(f"{entry['section']}: category '{entry['category']}' is not a catalog term")
+        for field in ("category", "parentLabel"):
+            value = entry.get(field)
+            if value and value not in known_labels:
+                errors.append(f"{entry['section']}: {field} '{value}' is not a catalog term")
         cond = entry.get("conditionKey")
         if cond and cond not in condition_keys:
             errors.append(f"{entry['section']}: unknown conditionKey '{cond}'")
@@ -666,13 +801,20 @@ def main():
     sidebar_file = root_dir / "Common" / "SettingsTabs.qml"
 
     print("Extracting settings search index...")
-    settings_entries = extract_settings_index(root_dir)
-    tab_entries = generate_tab_entries(sidebar_file, settings_entries)
+    structure = parse_structure(sidebar_file)
+    leaves = flatten_leaves(structure)
+    hubs = hubs_of(structure)
+    tab_meta = build_tab_meta(leaves)
+    hub_meta = build_hub_meta(hubs)
+    settings_entries = extract_settings_index(root_dir, tab_meta, hub_meta)
+    tab_entries = generate_tab_entries(leaves, settings_entries) + generate_hub_entries(hubs)
 
-    all_entries = tab_entries + settings_entries
+    option_entries = extract_bar_widget_option_labels(root_dir)
+
+    all_entries = tab_entries + settings_entries + option_entries
 
     all_entries.sort(key=lambda x: (x["tabIndex"], x["label"], x["section"]))
-    validate(all_entries, sidebar_file, root_dir)
+    validate(all_entries, leaves, hubs, sidebar_file, root_dir)
 
     output_path = script_dir / "settings_search_index.json"
     with open(output_path, "w", encoding="utf-8") as f:
@@ -681,6 +823,7 @@ def main():
 
     print(f"Found {len(settings_entries)} searchable settings")
     print(f"Found {len(tab_entries)} tab entries")
+    print(f"Found {len(option_entries)} bar widget option labels")
     print(f"Total: {len(all_entries)} entries")
     print(f"Output: {output_path}")
 

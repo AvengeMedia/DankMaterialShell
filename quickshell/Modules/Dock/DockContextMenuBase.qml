@@ -7,10 +7,12 @@ import qs.Widgets
 
 PanelWindow {
     id: root
+    property var options: ({})
 
     default property alias content: menuColumn.children
 
     property var anchorItem: null
+    property var surfaceContext: null
     property real dockVisibleHeight: 40
     property int margin: 10
     property string layerNamespace: "dms:dock-context-menu"
@@ -22,6 +24,7 @@ PanelWindow {
     function show(button, dockHeight, dockScreen) {
         if (dockScreen)
             screen = dockScreen;
+        surfaceContext = button?.dockApps?.surfaceContext ?? null;
         anchorItem = button;
         dockVisibleHeight = dockHeight || 40;
         visible = true;
@@ -31,83 +34,42 @@ PanelWindow {
         visible = false;
     }
 
-    function findDockBackground(item) {
-        if (!item)
-            return null;
-        if (item.objectName === "dockBackground")
-            return item;
-        for (let i = 0; i < item.children.length; i++) {
-            const found = findDockBackground(item.children[i]);
-            if (found)
-                return found;
-        }
-        return null;
-    }
-
     function updatePosition() {
-        if (!anchorItem || !screen) {
-            anchorPos = Qt.point(screen ? screen.width / 2 : 0, screen ? screen.height - 100 : 0);
+        if (!anchorItem || !screen)
             return;
-        }
-
-        const dockWindow = anchorItem.Window.window;
-        if (!dockWindow) {
-            anchorPos = Qt.point(screen.width / 2, screen.height - 100);
+        const point = surfaceContext?.screenPoint(anchorItem, anchorItem.width / 2, anchorItem.height / 2);
+        if (!point)
             return;
-        }
-
-        const buttonPosInDock = anchorItem.mapToItem(dockWindow.contentItem, 0, 0);
-        const dockBackground = findDockBackground(dockWindow.contentItem);
-        const actualDockHeight = dockBackground ? dockBackground.height : root.dockVisibleHeight;
-        const actualDockWidth = dockBackground ? dockBackground.width : dockWindow.width;
-        const dockMargin = SettingsData.dockMargin + 16;
-
-        // Connected mode hosts the dock inside the fullscreen frame surface, inset from the
-        // screen edge. Anchor off the dock body's real position instead of the screen edge.
-        const dockBgPos = dockBackground ? dockBackground.mapToItem(dockWindow.contentItem, 0, 0) : null;
-        const frameHosted = dockBgPos && dockWindow.width >= screen.width - 1 && dockWindow.height >= screen.height - 1;
-        let x = 0;
-        let y = 0;
-
-        switch (SettingsData.dockPosition) {
+        const extent = (surfaceContext?.thickness ?? dockVisibleHeight) / 2 + Theme.spacingS;
+        switch (root.options.position) {
         case SettingsData.Position.Left:
-            {
-                const dockTopMargin = Math.round((screen.height - dockWindow.height) / 2);
-                x = frameHosted ? (dockBgPos.x + actualDockWidth + dockMargin + 20) : (actualDockWidth + dockMargin + 20);
-                y = dockTopMargin + buttonPosInDock.y + anchorItem.height / 2;
-                break;
-            }
+            anchorPos = Qt.point(point.x + extent, point.y);
+            return;
         case SettingsData.Position.Right:
-            {
-                const dockTopMargin = Math.round((screen.height - dockWindow.height) / 2);
-                x = frameHosted ? (dockBgPos.x - dockMargin - 20) : (screen.width - actualDockWidth - dockMargin - 20);
-                y = dockTopMargin + buttonPosInDock.y + anchorItem.height / 2;
-                break;
-            }
+            anchorPos = Qt.point(point.x - extent, point.y);
+            return;
         case SettingsData.Position.Top:
-            {
-                const dockLeftMargin = Math.round((screen.width - dockWindow.width) / 2);
-                x = dockLeftMargin + buttonPosInDock.x + anchorItem.width / 2;
-                y = frameHosted ? (dockBgPos.y + actualDockHeight + dockMargin + 20) : (actualDockHeight + dockMargin + 20);
-                break;
-            }
-        case SettingsData.Position.Bottom:
+            anchorPos = Qt.point(point.x, point.y + extent);
+            return;
         default:
-            {
-                const dockLeftMargin = Math.round((screen.width - dockWindow.width) / 2);
-                x = dockLeftMargin + buttonPosInDock.x + anchorItem.width / 2;
-                y = frameHosted ? (dockBgPos.y - dockMargin - 20) : (screen.height - actualDockHeight - dockMargin - 20);
-                break;
-            }
+            anchorPos = Qt.point(point.x, point.y - extent);
         }
-
-        anchorPos = Qt.point(x, y);
     }
 
-    onAnchorItemChanged: updatePosition()
+    onAnchorItemChanged: {
+        if (!anchorItem) {
+            close();
+            return;
+        }
+        updatePosition();
+    }
     onVisibleChanged: {
-        if (visible)
+        if (visible) {
             updatePosition();
+            return;
+        }
+        anchorItem = null;
+        surfaceContext = null;
     }
 
     WindowBlur {
@@ -116,7 +78,7 @@ PanelWindow {
         blurY: menuContainer.y
         blurWidth: root.visible ? menuContainer.width : 0
         blurHeight: root.visible ? menuContainer.height : 0
-        blurRadius: Theme.cornerRadius
+        blurRadius: Theme.windowRadius
     }
 
     WlrLayershell.namespace: root.layerNamespace
@@ -137,31 +99,31 @@ PanelWindow {
     Rectangle {
         id: menuContainer
 
-        readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
+        readonly property bool isVertical: root.options.position === SettingsData.Position.Left || root.options.position === SettingsData.Position.Right
 
         x: {
             if (!isVertical) {
                 const want = root.anchorPos.x - width / 2;
                 return Math.max(10, Math.min(root.width - width - 10, want));
             }
-            if (SettingsData.dockPosition === SettingsData.Position.Right)
-                return Math.max(10, root.anchorPos.x - width + 30);
-            return Math.min(root.width - width - 10, root.anchorPos.x - 30);
+            if (root.options.position === SettingsData.Position.Right)
+                return Math.max(10, root.anchorPos.x - width);
+            return Math.min(root.width - width - 10, root.anchorPos.x);
         }
         y: {
             if (isVertical) {
                 const want = root.anchorPos.y - height / 2;
                 return Math.max(10, Math.min(root.height - height - 10, want));
             }
-            if (SettingsData.dockPosition === SettingsData.Position.Bottom)
-                return Math.max(10, root.anchorPos.y - height + 30);
-            return Math.min(root.height - height - 10, root.anchorPos.y - 30);
+            if (root.options.position === SettingsData.Position.Bottom)
+                return Math.max(10, root.anchorPos.y - height);
+            return Math.min(root.height - height - 10, root.anchorPos.y);
         }
 
         width: Math.min(root.menuMaxWidth, Math.max(root.menuMinWidth, menuColumn.implicitWidth + Theme.spacingS * 2))
         height: menuColumn.implicitHeight + Theme.spacingS * 2
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-        radius: Theme.cornerRadius
+        color: Theme.floatingSurface
+        radius: Theme.windowRadius
         border.color: BlurService.borderColor
         border.width: BlurService.borderWidth
 

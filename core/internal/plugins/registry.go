@@ -91,21 +91,11 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 		return false, "", "", err
 	}
 
-	// Fetch remote changes
-	err = repo.Fetch(&git.FetchOptions{})
-	if err != nil && err.Error() != "already up-to-date" {
-		// If fetch fails, we can't determine if there are updates
-		// Return false and the error
-		return false, "", "", err
-	}
-
-	// Get the HEAD reference
 	head, err := repo.Head()
 	if err != nil {
 		return false, "", "", err
 	}
 
-	// Get the remote HEAD reference (typically origin/HEAD or origin/main or origin/master)
 	remote, err := repo.Remote("origin")
 	if err != nil {
 		return false, "", "", err
@@ -116,11 +106,9 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 		return false, "", "", err
 	}
 
-	// Find the default branch remote ref
 	var remoteHead string
 	for _, ref := range refs {
 		if ref.Name().IsBranch() {
-			// Try common branch names
 			if ref.Name().Short() == "main" || ref.Name().Short() == "master" {
 				remoteHead = ref.Hash().String()
 				break
@@ -129,12 +117,10 @@ func (g *realGitClient) HasUpdates(path string) (bool, string, string, error) {
 	}
 
 	localHash := head.Hash().String()
-	// If we couldn't find a remote HEAD, assume no updates
 	if remoteHead == "" {
 		return false, localHash, "", nil
 	}
 
-	// Compare local HEAD with remote HEAD
 	return localHash != remoteHead, localHash, remoteHead, nil
 }
 

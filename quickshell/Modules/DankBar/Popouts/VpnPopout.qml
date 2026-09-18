@@ -1,8 +1,8 @@
 import QtQuick
-import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Details
 
 DankPopout {
@@ -36,7 +36,7 @@ DankPopout {
         Rectangle {
             id: content
 
-            implicitHeight: contentColumn.height + Theme.spacingL * 2
+            implicitHeight: contentColumn.height + PopoutMetrics.contentPadding * 2
             color: "transparent"
             focus: true
 
@@ -53,34 +53,23 @@ DankPopout {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingM
+                anchors.margins: PopoutMetrics.contentPadding
+                spacing: PopoutMetrics.contentGap
 
-                RowLayout {
-                    width: parent.width
-                    height: 32
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        text: I18n.tr("VPN Connections")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        Layout.fillWidth: true
-                    }
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: root.close()
-                    }
+                Item {
+                    id: actionsSlot
+                    anchors.right: parent.right
+                    width: childrenRect.width
+                    height: childrenRect.height
                 }
 
                 VpnDetailContent {
+                    id: vpnContent
                     width: parent.width
-                    listHeight: 200
+                    listHeight: CcMetrics.vpnPopoutListHeight
                     parentPopout: root
+
+                    Component.onCompleted: headerActions.parent = actionsSlot
                 }
             }
         }

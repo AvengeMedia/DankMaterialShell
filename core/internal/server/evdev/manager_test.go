@@ -10,38 +10,6 @@ import (
 	mocks "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/evdev"
 )
 
-func TestManager_Creation(t *testing.T) {
-	t.Run("manager created successfully with caps lock off", func(t *testing.T) {
-		mockDevice := mocks.NewMockEvdevDevice(t)
-		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
-
-		m := &Manager{
-			devices:   []EvdevDevice{mockDevice},
-			state:     State{Available: true, CapsLock: false},
-			closeChan: make(chan struct{}),
-		}
-
-		assert.NotNil(t, m)
-		assert.True(t, m.state.Available)
-		assert.False(t, m.state.CapsLock)
-	})
-
-	t.Run("manager created successfully with caps lock on", func(t *testing.T) {
-		mockDevice := mocks.NewMockEvdevDevice(t)
-		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
-
-		m := &Manager{
-			devices:   []EvdevDevice{mockDevice},
-			state:     State{Available: true, CapsLock: true},
-			closeChan: make(chan struct{}),
-		}
-
-		assert.NotNil(t, m)
-		assert.True(t, m.state.Available)
-		assert.True(t, m.state.CapsLock)
-	})
-}
-
 func TestManager_GetState(t *testing.T) {
 	mockDevice := mocks.NewMockEvdevDevice(t)
 	mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
@@ -354,9 +322,4 @@ func TestCapsLockFromDevices(t *testing.T) {
 		assert.True(t, ok)
 		assert.True(t, result)
 	})
-}
-
-func TestHasInputGroupAccess(t *testing.T) {
-	result := hasInputGroupAccess()
-	t.Logf("hasInputGroupAccess: %v", result)
 }

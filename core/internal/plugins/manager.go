@@ -669,6 +669,9 @@ func (m *Manager) HasUpdates(pluginID string, plugin Plugin) (hasUpdates bool, d
 	if plugin.Path != "" {
 		repoPath = m.repositoryPath(pluginID, LockedPlugin{Repo: plugin.Repo, Path: plugin.Path})
 	}
+	if resolved, err := filepath.EvalSymlinks(repoPath); err == nil {
+		repoPath = resolved
+	}
 	hasUp, localHash, remoteHash, err := m.gitClient.HasUpdates(repoPath)
 
 	if err != nil {

@@ -101,7 +101,6 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("You're All Set!", "greeter completion page title")
                     font.pixelSize: Theme.fontSizeXLarge
-                    font.weight: Font.Bold
                     color: Theme.surfaceText
                 }
             }
@@ -124,7 +123,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Layout")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -161,7 +160,7 @@ Item {
                     StyledText {
                         text: I18n.tr("DMS Shortcuts", "greeter keybinds section header")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -307,7 +306,7 @@ Item {
                             StyledText {
                                 text: I18n.tr("Configure Keybinds", "greeter configure keybinds link")
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.primary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -366,7 +365,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Configure", "greeter settings section header")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -397,7 +396,7 @@ Item {
                     GreeterSettingsCard {
                         width: (parent.width - Theme.spacingS) / 2
                         iconName: "format_paint"
-                        title: I18n.tr("Theme & Colors", "greeter settings link")
+                        title: I18n.tr("Theme & colors", "greeter settings link")
                         description: I18n.tr("Dynamic colors, presets", "greeter theme description")
                         onClicked: PopoutService.openSettingsWithTab("theme")
                     }
@@ -433,7 +432,7 @@ Item {
                         title: I18n.tr("Dock", "greeter settings link")
                         description: I18n.tr("Position, pinned apps", "greeter dock description")
                         visible: !KeybindsService.available
-                        onClicked: PopoutService.openSettingsWithTab("dock")
+                        onClicked: PopoutService.openSettingsWithTab("dock_general")
                     }
                 }
             }
@@ -463,7 +462,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Explore", "greeter explore section header")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }

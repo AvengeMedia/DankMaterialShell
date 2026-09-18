@@ -12,8 +12,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.widgetThickness - root.horizontalPadding * 2
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            implicitWidth: root.contentThickness
+            implicitHeight: root.contentThickness
 
             LauncherLogo {
                 anchors.centerIn: parent

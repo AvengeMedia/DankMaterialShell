@@ -91,7 +91,7 @@ Singleton {
             if (!response.result)
                 return;
             if (response.result.success) {
-                ToastService.showInfo(I18n.tr("VPN imported: %1").arg(response.result.name || ""));
+                ToastService.showInfo(I18n.tr("VPN imported: %1", "toast after importing a vpn profile, %1 is its name").arg(response.result.name || ""));
                 DMSNetworkService.refreshVpnProfiles();
                 importComplete(response.result.uuid || "", response.result.name || "");
                 return;

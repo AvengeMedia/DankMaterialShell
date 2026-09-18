@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Modules.DankBar.Widgets
 import qs.Services
@@ -13,17 +12,6 @@ Item {
     required property var controller
     required property var systemModel
 
-    readonly property string timeText: systemClock.date.toLocaleTimeString(I18n.locale(), SettingsData.getEffectiveTimeFormat())
-    readonly property string hourText: {
-        const hours = systemClock.date.getHours();
-        if (SettingsData.use24HourClock)
-            return String(hours).padStart(2, "0");
-        return String(hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours)).padStart(2, "0");
-    }
-    readonly property string minuteText: String(systemClock.date.getMinutes()).padStart(2, "0")
-    readonly property string monthText: systemClock.date.toLocaleDateString(I18n.locale(), "MMM")
-    readonly property string dayText: String(systemClock.date.getDate())
-    readonly property string dateText: systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.getEffectiveDateFormat("ddd MMM d"))
     readonly property bool tight: root.controller.homeCompactTight
     readonly property real slotSize: root.tight ? Theme.iconSize : Theme.iconSizeLarge
     readonly property real textSize: root.tight ? Theme.fontSizeSmall : Theme.fontSizeMedium
@@ -34,10 +22,10 @@ Item {
     readonly property string clockDisplay: root.controller.homeClockDisplay
     readonly property real edgePad: Math.max(root.groupSpacing, ((root.isVertical ? root.height - compactColumn.height : root.width - compactRow.width)) / 2)
     readonly property bool weatherSlotEnabled: root.controller.homeWeatherEnabled
-    readonly property var brightnessDevice: DisplayService.getCurrentDeviceInfo()
-    readonly property real brightnessMaximum: DisplayService.brightnessMaximum(root.brightnessDevice)
-    readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(DisplayService.brightnessLevel / root.brightnessMaximum * 100) : 0
-    readonly property int volumePercent: Math.min(AudioService.sinkMaxVolume, Math.round((AudioService.sink?.audio?.volume ?? 0) * 100))
+    readonly property var brightnessDevice: BrightnessService.getCurrentDeviceInfo()
+    readonly property real brightnessMaximum: BrightnessService.brightnessMaximum(root.brightnessDevice)
+    readonly property int brightnessPercent: root.brightnessMaximum > 0 ? Math.round(BrightnessService.brightnessLevel / root.brightnessMaximum * 100) : 0
+    readonly property int volumePercent: AudioService.sinkVolumePercent
     readonly property var groupIds: root.groupsForSide("left").concat(["clock"]).concat(root.groupsForSide("right"))
     readonly property real touchpadThreshold: 100
     property real wheelAccumulator: 0
@@ -57,7 +45,7 @@ Item {
         case "volume":
             return !!AudioService.sink?.audio;
         case "brightness":
-            return DisplayService.brightnessAvailable && !!root.brightnessDevice;
+            return BrightnessService.brightnessAvailable && !!root.brightnessDevice;
         }
         return true;
     }
@@ -123,8 +111,8 @@ Item {
         if (!root.brightnessDevice)
             return;
         SessionData.suppressOSDTemporarily();
-        const next = Math.max(DisplayService.brightnessMinimum(root.brightnessDevice), Math.min(root.brightnessMaximum, DisplayService.brightnessLevel + direction * 5));
-        DisplayService.setBrightness(next, root.brightnessDevice.id, true);
+        const next = Math.max(BrightnessService.brightnessMinimum(root.brightnessDevice), Math.min(root.brightnessMaximum, BrightnessService.brightnessLevel + direction * 5));
+        BrightnessService.setBrightness(next, root.brightnessDevice.id, true);
     }
 
     function connectivityIconName(type) {
@@ -205,470 +193,186 @@ Item {
     }
     Component.onDestruction: root.syncWeatherRef(false)
 
-    Connections {
-        target: compactRow
+    component IslandClock: ClockContent {
+        vertical: root.isVertical
+        displayMode: root.clockDisplay
+        fontSize: root.textSize
+        availableWidth: root.width
+        dateColor: Theme.surfaceTextMedium
+        separatorColor: Theme.primary
+    }
 
-        function onImplicitWidthChanged() {
-            root.pushMeasuredLength();
+    component ConnectivityIcon: Item {
+        id: connectivityIcon
+
+        required property string type
+
+        width: root.iconSize
+        height: root.iconSize
+        opacity: root.connectivityIconOpacity(connectivityIcon.type)
+
+        DankIcon {
+            id: connectivityGlyph
+
+            anchors.centerIn: parent
+            name: root.connectivityIconName(connectivityIcon.type)
+            size: root.statusIconSize
+            color: root.connectivityIconColor(connectivityIcon.type)
+
+            DankBlink {
+                target: connectivityGlyph
+                running: connectivityIcon.visible && root.connectivityBusy(connectivityIcon.type)
+            }
         }
     }
 
-    Connections {
-        target: compactColumn
+    component GroupHoverArea: IslandSlotHoverArea {
+        required property var group
 
-        function onImplicitHeightChanged() {
-            root.pushMeasuredLength();
+        enabled: !group.isClock
+        controller: root.controller
+        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+
+        function connectivityTypeAt(event) {
+            const clickPos = group.vertical ? event.y : event.x;
+            const groupMid = group.leadPad + (group.vertical ? group.height : group.width) / 2;
+            return clickPos < groupMid ? "wifi" : "bluetooth";
+        }
+
+        onClicked: event => {
+            if (event.button === Qt.MiddleButton) {
+                if (group.usesConnectivity)
+                    root.toggleConnectivity(connectivityTypeAt(event));
+                if (group.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
+                    MprisController.activePlayer.togglePlaying();
+                if (group.isVolume && AudioService.sink?.audio) {
+                    SessionData.suppressOSDTemporarily();
+                    AudioService.toggleMute();
+                }
+                return;
+            }
+            root.activateGroup(group.groupId);
+        }
+        onWheel: wheel => {
+            if (!group.isVolume && !group.isBrightness)
+                return;
+            root.adjustSystemLevel(group.groupId, wheel.angleDelta.y || wheel.angleDelta.x);
+            wheel.accepted = true;
         }
     }
 
-    SystemClock {
-        id: systemClock
-
-        precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
-    }
-
-    component HoverBackdrop: Rectangle {
-        property bool hovered: false
-
-        anchors.centerIn: parent
-        width: parent.width + Theme.spacingS
-        height: root.slotSize
-        radius: height / 2
-        color: hovered ? Theme.surfaceTextHover : "transparent"
-    }
-
-    component GroupItem: Item {
-        id: item
+    component HomeGroup: Item {
+        id: group
 
         required property string groupId
         required property int slotIndex
 
-        readonly property real leadPad: item.slotIndex === 0 ? root.edgePad : root.groupSpacing / 2
-        readonly property real trailPad: item.slotIndex === root.groupIds.length - 1 ? root.edgePad : root.groupSpacing / 2
-        readonly property bool isClock: item.groupId === "clock"
-        readonly property bool isMedia: item.groupId === "media"
-        readonly property bool isWeather: item.groupId === "weather"
-        readonly property bool isStatus: item.groupId === "status"
-        readonly property bool isNotifications: item.groupId === "notifications"
-        readonly property bool isVolume: item.groupId === "volume"
-        readonly property bool isBrightness: item.groupId === "brightness"
-        readonly property bool usesConnectivity: item.isStatus && root.controller.homeStatusContent === "connectivity"
-        readonly property bool usesBattery: item.isStatus && !item.usesConnectivity && BatteryService.batteryAvailable
+        readonly property bool vertical: root.isVertical
+        readonly property real leadPad: group.slotIndex === 0 ? root.edgePad : root.groupSpacing / 2
+        readonly property real trailPad: group.slotIndex === root.groupIds.length - 1 ? root.edgePad : root.groupSpacing / 2
+        readonly property bool isClock: group.groupId === "clock"
+        readonly property bool isMedia: group.groupId === "media"
+        readonly property bool isWeather: group.groupId === "weather"
+        readonly property bool isStatus: group.groupId === "status"
+        readonly property bool isNotifications: group.groupId === "notifications"
+        readonly property bool isVolume: group.groupId === "volume"
+        readonly property bool isBrightness: group.groupId === "brightness"
+        readonly property bool isSystemLevel: group.isVolume || group.isBrightness
+        readonly property bool usesConnectivity: group.isStatus && root.controller.homeStatusContent === "connectivity"
+        readonly property bool usesBattery: group.isStatus && !group.usesConnectivity && BatteryService.batteryAvailable
+        readonly property bool iconOnly: group.isMedia || (group.isStatus && !group.usesBattery && !group.usesConnectivity)
+        readonly property string levelDisplay: group.isVolume ? root.controller.homeVolumeDisplay : root.controller.homeBrightnessDisplay
+        readonly property int levelPercent: group.isVolume ? root.volumePercent : root.brightnessPercent
+        readonly property string levelReserve: group.isVolume ? String(AudioService.sinkMaxVolume) : "100"
 
-        width: {
-            if (item.isMedia)
-                return root.iconSize;
-            if (item.isWeather)
-                return weatherRow.implicitWidth;
-            if (item.isNotifications)
-                return notificationRow.implicitWidth;
-            if (item.isVolume || item.isBrightness)
-                return systemLevelRow.implicitWidth;
-            if (item.isStatus)
-                return item.usesConnectivity ? connectivityRow.implicitWidth : (item.usesBattery ? batteryMeter.width : root.iconSize);
-            return clockRow.implicitWidth;
-        }
-        height: root.slotSize
-
-        HoverBackdrop {
-            visible: item.isMedia || item.isWeather || item.isNotifications || item.isVolume || item.isBrightness || (item.isStatus && !item.usesBattery)
-            hovered: groupArea.containsMouse
-        }
-
-        AudioVisualization {
-            anchors.centerIn: parent
-            width: root.iconSize + Theme.spacingXS
-            height: width
-            maxBarHeight: Math.max(3, height - 2)
-            idleIconName: "graphic_eq"
-            visible: item.isMedia && root.controller.mediaAvailable
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            visible: item.isMedia && !root.controller.mediaAvailable
-            name: "search"
-            size: root.iconSize
-            color: Theme.surfaceTextMedium
-        }
-
-        Row {
-            id: clockRow
-
-            readonly property string displayMode: root.controller.homeClockDisplay
-
-            anchors.verticalCenter: parent.verticalCenter
-            visible: item.isClock
-            spacing: Theme.spacingS
-
-            NumericText {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: clockRow.displayMode !== "date"
-                isMonospace: false
-                text: root.timeText
-                reserveText: root.timeText.replace(/\d/g, "0")
-                width: Math.ceil(Math.max(implicitWidth, reservedWidth))
-                color: Theme.surfaceText
-                font.pixelSize: root.textSize
-            }
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: clockRow.displayMode === "both"
-                width: Theme.spacingXS
-                height: Theme.spacingXS
-                radius: height / 2
-                color: Theme.primary
-            }
-
-            StyledText {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: clockRow.displayMode !== "time"
-                text: root.dateText
-                color: Theme.surfaceTextMedium
-                font.pixelSize: root.textSize
-            }
-        }
-
-        Row {
-            id: notificationRow
-
-            anchors.verticalCenter: parent.verticalCenter
-            visible: item.isNotifications
-            spacing: Theme.spacingXXS
-
-            DankIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: "notifications"
-                size: root.statusIconSize
-                color: Theme.secondary
-            }
-
-            StyledText {
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.controller.unreadNotificationCount
-                color: Theme.surfaceTextSecondary
-                font.pixelSize: root.textSize
-            }
-        }
-
-        Row {
-            id: weatherRow
-
-            anchors.verticalCenter: parent.verticalCenter
-            visible: item.isWeather
-            spacing: Theme.spacingXXS
-
-            DankIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                size: root.statusIconSize
-                color: Theme.surfaceTextSecondary
-            }
-
-            StyledText {
-                anchors.verticalCenter: parent.verticalCenter
-                text: WeatherService.currentTempText()
-                color: Theme.surfaceTextSecondary
-                font.pixelSize: root.textSize
-            }
-        }
-
-        Row {
-            id: systemLevelRow
-
-            readonly property string displayMode: item.isVolume ? root.controller.homeVolumeDisplay : root.controller.homeBrightnessDisplay
-
-            anchors.verticalCenter: parent.verticalCenter
-            visible: item.isVolume || item.isBrightness
-            spacing: Theme.spacingXXS
-
-            DankIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: systemLevelRow.displayMode !== "percentage"
-                name: item.isVolume ? AudioService.sinkVolumeIconName : DisplayService.brightnessIconName(root.brightnessDevice, DisplayService.brightnessLevel)
-                size: root.statusIconSize
-                color: Theme.surfaceTextSecondary
-            }
-
-            NumericText {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: systemLevelRow.displayMode !== "icon"
-                text: (item.isVolume ? root.volumePercent : root.brightnessPercent) + "%"
-                reserveText: item.isVolume ? AudioService.sinkMaxVolume + "%" : "100%"
-                color: Theme.surfaceTextSecondary
-                font.pixelSize: root.textSize
-            }
-        }
-
-        BatteryMeter {
-            id: batteryMeter
-
-            anchors.centerIn: parent
-            visible: item.usesBattery
-            thickness: root.statusIconSize
-            fontSize: root.textSize
-            hovered: groupArea.containsMouse
-            meterStyle: root.controller.batteryStyle
-            levelColors: (root.controller.barConfig?.batteryColorMode ?? "theme") === "level"
-        }
-
-        Row {
-            id: connectivityRow
-
-            anchors.centerIn: parent
-            visible: item.usesConnectivity
-            spacing: Theme.spacingXXS
-
-            Item {
-                width: root.iconSize
-                height: root.iconSize
-                opacity: root.connectivityIconOpacity("wifi")
-
-                DankIcon {
-                    id: wifiIcon
-
-                    anchors.centerIn: parent
-                    name: root.connectivityIconName("wifi")
-                    size: root.statusIconSize
-                    color: root.connectivityIconColor("wifi")
-
-                    DankBlink {
-                        target: wifiIcon
-                        running: item.usesConnectivity && root.connectivityBusy("wifi")
-                    }
-                }
-            }
-
-            Item {
-                width: root.iconSize
-                height: root.iconSize
-                opacity: root.connectivityIconOpacity("bluetooth")
-
-                DankIcon {
-                    id: bluetoothIcon
-
-                    anchors.centerIn: parent
-                    name: root.connectivityIconName("bluetooth")
-                    size: root.statusIconSize
-                    color: root.connectivityIconColor("bluetooth")
-
-                    DankBlink {
-                        target: bluetoothIcon
-                        running: item.usesConnectivity && root.connectivityBusy("bluetooth")
-                    }
-                }
-            }
-        }
-
-        DankIcon {
-            anchors.centerIn: parent
-            visible: item.isStatus && !item.usesBattery && !item.usesConnectivity
-            name: "tune"
-            size: root.iconSize
-            color: Theme.surfaceText
-        }
-
-        IslandSlotHoverArea {
-            id: groupArea
-
-            anchors.verticalCenter: parent.verticalCenter
-            x: -item.leadPad
-            width: parent.width + item.leadPad + item.trailPad
-            height: root.height
-            enabled: !item.isClock
-            controller: root.controller
-            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-            onClicked: event => {
-                if (item.usesConnectivity) {
-                    const type = event.x < item.leadPad + item.width / 2 ? "wifi" : "bluetooth";
-                    if (event.button === Qt.MiddleButton) {
-                        root.toggleConnectivity(type);
-                        return;
-                    }
-                    root.controller.requestControlCenter("", false);
-                    return;
-                }
-                if (event.button === Qt.MiddleButton) {
-                    if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
-                        MprisController.activePlayer.togglePlaying();
-                    if (item.isVolume && AudioService.sink?.audio) {
-                        SessionData.suppressOSDTemporarily();
-                        AudioService.toggleMute();
-                    }
-                    return;
-                }
-                root.activateGroup(item.groupId);
-            }
-            onWheel: wheel => {
-                if (!item.isVolume && !item.isBrightness)
-                    return;
-                root.adjustSystemLevel(item.groupId, wheel.angleDelta.y || wheel.angleDelta.x);
-                wheel.accepted = true;
-            }
-        }
-    }
-
-    // Side edges only have the strip's width to work with, so every slot stacks its own content.
-    component VerticalGroupItem: Item {
-        id: item
-
-        required property string groupId
-        required property int slotIndex
-
-        readonly property real leadPad: item.slotIndex === 0 ? root.edgePad : root.groupSpacing / 2
-        readonly property real trailPad: item.slotIndex === root.groupIds.length - 1 ? root.edgePad : root.groupSpacing / 2
-        readonly property bool isClock: item.groupId === "clock"
-        readonly property bool isMedia: item.groupId === "media"
-        readonly property bool isWeather: item.groupId === "weather"
-        readonly property bool isStatus: item.groupId === "status"
-        readonly property bool isNotifications: item.groupId === "notifications"
-        readonly property bool isVolume: item.groupId === "volume"
-        readonly property bool isBrightness: item.groupId === "brightness"
-        readonly property bool usesConnectivity: item.isStatus && root.controller.homeStatusContent === "connectivity"
-        readonly property bool usesBattery: item.isStatus && !item.usesConnectivity && BatteryService.batteryAvailable
-
-        width: root.width
-        height: stack.implicitHeight
+        width: group.vertical ? root.width : (group.iconOnly ? root.iconSize : content.implicitWidth)
+        height: group.vertical ? content.implicitHeight : root.slotSize
 
         Rectangle {
             anchors.centerIn: parent
-            visible: !item.isClock
-            width: root.slotSize
-            height: parent.height + Theme.spacingXS
-            radius: Theme.cornerRadius
+            width: group.vertical ? root.slotSize : parent.width + Theme.spacingS
+            height: group.vertical ? parent.height + Theme.spacingXS : root.slotSize
+            radius: group.vertical ? Theme.cornerRadius : Theme.fullRadius(width, height)
             color: groupArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+            visible: !group.isClock && (group.vertical || !group.usesBattery)
         }
 
-        Column {
-            id: stack
+        Grid {
+            id: content
 
             anchors.centerIn: parent
-            spacing: 0
+            columns: group.vertical ? 1 : Math.max(1, content.visibleChildren.length)
+            spacing: group.vertical ? 0 : Theme.spacingXXS
+            horizontalItemAlignment: Grid.AlignHCenter
+            verticalItemAlignment: Grid.AlignVCenter
 
-            NumericText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isClock && root.clockDisplay !== "date"
-                isMonospace: false
-                text: root.hourText
-                reserveText: "00"
-                color: Theme.surfaceText
-                font.pixelSize: root.textSize
-            }
-
-            NumericText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isClock && root.clockDisplay !== "date"
-                isMonospace: false
-                text: root.minuteText
-                reserveText: "00"
-                color: Theme.surfaceTextMedium
-                font.pixelSize: root.textSize
-            }
-
-            Item {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isClock && root.clockDisplay === "both"
-                width: Theme.spacingXS
-                height: root.textSize
-
-                Rectangle {
-                    anchors.centerIn: parent
-                    width: Theme.spacingXS
-                    height: Theme.spacingXS
-                    radius: height / 2
-                    color: Theme.primary
-                }
-            }
-
-            StyledText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isClock && root.clockDisplay !== "time"
-                text: root.monthText
-                color: Theme.surfaceTextMedium
-                font.pixelSize: root.textSize
-            }
-
-            NumericText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isClock && root.clockDisplay !== "time"
-                isMonospace: false
-                text: root.dayText
-                reserveText: "00"
-                color: Theme.surfaceTextMedium
-                font.pixelSize: root.textSize
+            Loader {
+                active: group.isClock
+                visible: active
+                sourceComponent: IslandClock {}
             }
 
             AudioVisualization {
-                anchors.horizontalCenter: parent.horizontalCenter
                 width: root.iconSize + Theme.spacingXS
                 height: width
                 maxBarHeight: Math.max(3, height - 2)
                 idleIconName: "graphic_eq"
-                visible: item.isMedia && root.controller.mediaAvailable
+                visible: group.isMedia && root.controller.mediaAvailable
             }
 
             DankIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isMedia && !root.controller.mediaAvailable
+                visible: group.isMedia && !root.controller.mediaAvailable
                 name: "search"
                 size: root.iconSize
                 color: Theme.surfaceTextMedium
             }
 
             DankIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isWeather
+                visible: group.isWeather
                 name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
                 size: root.statusIconSize
                 color: Theme.surfaceTextSecondary
             }
 
             StyledText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isWeather
+                visible: group.isWeather
                 text: WeatherService.currentTempText()
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: root.textSize
             }
 
             DankIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isNotifications
+                visible: group.isNotifications
                 name: "notifications"
                 size: root.statusIconSize
                 color: Theme.secondary
             }
 
             StyledText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isNotifications
+                visible: group.isNotifications
                 text: root.controller.unreadNotificationCount
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: root.textSize
             }
 
             DankIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isVolume || item.isBrightness
-                name: item.isVolume ? AudioService.sinkVolumeIconName : DisplayService.brightnessIconName(root.brightnessDevice, DisplayService.brightnessLevel)
+                visible: group.isSystemLevel && (group.vertical || group.levelDisplay !== "percentage")
+                name: group.isVolume ? AudioService.sinkVolumeIconName : BrightnessService.brightnessIconName(root.brightnessDevice, BrightnessService.brightnessLevel)
                 size: root.statusIconSize
                 color: Theme.surfaceTextSecondary
             }
 
             NumericText {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: (item.isVolume || item.isBrightness) && (item.isVolume ? root.controller.homeVolumeDisplay : root.controller.homeBrightnessDisplay) !== "icon"
-                text: item.isVolume ? root.volumePercent : root.brightnessPercent
-                reserveText: item.isVolume ? String(AudioService.sinkMaxVolume) : "100"
+                visible: group.isSystemLevel && group.levelDisplay !== "icon"
+                text: group.vertical ? group.levelPercent : group.levelPercent + "%"
+                reserveText: group.vertical ? group.levelReserve : group.levelReserve + "%"
                 color: Theme.surfaceTextSecondary
                 font.pixelSize: root.textSize
             }
 
             BatteryMeter {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.usesBattery
-                vertical: true
+                visible: group.usesBattery
+                vertical: group.vertical
                 thickness: root.statusIconSize
                 fontSize: root.textSize
                 hovered: groupArea.containsMouse
@@ -676,98 +380,38 @@ Item {
                 levelColors: (root.controller.barConfig?.batteryColorMode ?? "theme") === "level"
             }
 
-            Column {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.usesConnectivity
+            Grid {
+                visible: group.usesConnectivity
+                columns: group.vertical ? 1 : 2
                 spacing: Theme.spacingXXS
 
-                Item {
-                    width: root.iconSize
-                    height: root.iconSize
-                    opacity: root.connectivityIconOpacity("wifi")
-
-                    DankIcon {
-                        id: verticalWifiIcon
-
-                        anchors.centerIn: parent
-                        name: root.connectivityIconName("wifi")
-                        size: root.statusIconSize
-                        color: root.connectivityIconColor("wifi")
-
-                        DankBlink {
-                            target: verticalWifiIcon
-                            running: item.usesConnectivity && root.connectivityBusy("wifi")
-                        }
-                    }
+                ConnectivityIcon {
+                    type: "wifi"
                 }
 
-                Item {
-                    width: root.iconSize
-                    height: root.iconSize
-                    opacity: root.connectivityIconOpacity("bluetooth")
-
-                    DankIcon {
-                        id: verticalBluetoothIcon
-
-                        anchors.centerIn: parent
-                        name: root.connectivityIconName("bluetooth")
-                        size: root.statusIconSize
-                        color: root.connectivityIconColor("bluetooth")
-
-                        DankBlink {
-                            target: verticalBluetoothIcon
-                            running: item.usesConnectivity && root.connectivityBusy("bluetooth")
-                        }
-                    }
+                ConnectivityIcon {
+                    type: "bluetooth"
                 }
             }
 
             DankIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: item.isStatus && !item.usesBattery && !item.usesConnectivity
+                visible: group.isStatus && !group.usesBattery && !group.usesConnectivity
                 name: "tune"
                 size: root.iconSize
                 color: Theme.surfaceText
             }
         }
 
-        IslandSlotHoverArea {
+        GroupHoverArea {
             id: groupArea
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: -item.leadPad
-            width: root.width
-            height: parent.height + item.leadPad + item.trailPad
-            enabled: !item.isClock
-            controller: root.controller
-            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-            onClicked: event => {
-                if (item.usesConnectivity) {
-                    const type = event.y < item.leadPad + item.height / 2 ? "wifi" : "bluetooth";
-                    if (event.button === Qt.MiddleButton) {
-                        root.toggleConnectivity(type);
-                        return;
-                    }
-                    root.controller.requestControlCenter("", false);
-                    return;
-                }
-                if (event.button === Qt.MiddleButton) {
-                    if (item.isMedia && root.controller.mediaAvailable && MprisController.activePlayer?.canTogglePlaying)
-                        MprisController.activePlayer.togglePlaying();
-                    if (item.isVolume && AudioService.sink?.audio) {
-                        SessionData.suppressOSDTemporarily();
-                        AudioService.toggleMute();
-                    }
-                    return;
-                }
-                root.activateGroup(item.groupId);
-            }
-            onWheel: wheel => {
-                if (!item.isVolume && !item.isBrightness)
-                    return;
-                root.adjustSystemLevel(item.groupId, wheel.angleDelta.y || wheel.angleDelta.x);
-                wheel.accepted = true;
-            }
+            group: group
+            anchors.verticalCenter: group.vertical ? undefined : parent.verticalCenter
+            anchors.horizontalCenter: group.vertical ? parent.horizontalCenter : undefined
+            x: group.vertical ? 0 : -group.leadPad
+            y: group.vertical ? -group.leadPad : 0
+            width: group.vertical ? root.width : parent.width + group.leadPad + group.trailPad
+            height: group.vertical ? parent.height + group.leadPad + group.trailPad : root.height
         }
     }
 
@@ -776,13 +420,14 @@ Item {
 
         anchors.centerIn: parent
         visible: !root.isVertical
+        onImplicitWidthChanged: root.pushMeasuredLength()
         height: root.slotSize
         spacing: root.groupSpacing
 
         Repeater {
             model: root.isVertical ? [] : root.groupIds
 
-            GroupItem {
+            HomeGroup {
                 required property var modelData
                 required property int index
                 groupId: String(modelData)
@@ -796,13 +441,14 @@ Item {
 
         anchors.centerIn: parent
         visible: root.isVertical
+        onImplicitHeightChanged: root.pushMeasuredLength()
         width: root.width
         spacing: root.groupSpacing
 
         Repeater {
             model: root.isVertical ? root.groupIds : []
 
-            VerticalGroupItem {
+            HomeGroup {
                 required property var modelData
                 required property int index
                 groupId: String(modelData)

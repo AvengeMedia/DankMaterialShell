@@ -75,16 +75,7 @@ func (n *NiriProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	}
 
 	if result.DMSStatus != nil {
-		sheet.DMSStatus = &keybinds.DMSBindsStatus{
-			Exists:          result.DMSStatus.Exists,
-			Included:        result.DMSStatus.Included,
-			IncludePosition: result.DMSStatus.IncludePosition,
-			TotalIncludes:   result.DMSStatus.TotalIncludes,
-			BindsAfterDMS:   result.DMSStatus.BindsAfterDMS,
-			Effective:       result.DMSStatus.Effective,
-			OverriddenBy:    result.DMSStatus.OverriddenBy,
-			StatusMessage:   result.DMSStatus.StatusMessage,
-		}
+		sheet.DMSStatus = keybinds.DMSBindsStatusFrom(*result.DMSStatus)
 	}
 
 	return sheet, nil

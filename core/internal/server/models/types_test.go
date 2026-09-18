@@ -1,9 +1,36 @@
 package models
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+
+	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/stretchr/testify/require"
+)
+
+func TestWireOmissions(t *testing.T) {
+	zero := 0
+	tests := []struct {
+		value any
+		json  string
+	}{
+		{ipc.Request{Method: "ping"}, `{"method":"ping"}`},
+		{ipc.Request{ID: 12, Method: "ping", Params: map[string]any{}}, `{"id":12,"method":"ping"}`},
+		{ipc.Response[int]{}, `{}`},
+		{ipc.Response[int]{ID: 12, Result: &zero}, `{"id":12,"result":0}`},
+		{ipc.Response[any]{ID: 12, Error: "failure"}, `{"id":12,"error":"failure"}`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.json, func(t *testing.T) {
+			data, err := json.Marshal(tt.value)
+			require.NoError(t, err)
+			require.JSONEq(t, tt.json, string(data))
+		})
+	}
+}
 
 func TestGet(t *testing.T) {
-	req := Request{Params: map[string]any{"name": "test", "count": 42, "enabled": true}}
+	req := ipc.Request{Params: map[string]any{"name": "test", "count": 42, "enabled": true}}
 
 	name, ok := Get[string](req, "name")
 	if !ok || name != "test" {
@@ -32,7 +59,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetOr(t *testing.T) {
-	req := Request{Params: map[string]any{"name": "test", "enabled": true}}
+	req := ipc.Request{Params: map[string]any{"name": "test", "enabled": true}}
 
 	if v := GetOr(req, "name", "default"); v != "test" {
 		t.Errorf("GetOr existing = %q; want 'test'", v)

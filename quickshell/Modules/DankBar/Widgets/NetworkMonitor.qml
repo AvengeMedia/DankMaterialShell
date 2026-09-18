@@ -8,17 +8,16 @@ import "../../../Common/Format.js" as Format
 BasePill {
     id: root
 
-    Component.onCompleted: {
-        DgopService.addRef(["network"]);
-    }
-    Component.onDestruction: {
-        DgopService.removeRef(["network"]);
+    Ref {
+        service: DgopService
+        modules: ["network"]
+        active: root.visible && root.enabled && (root.Window.window?.visible ?? false)
     }
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : contentRow.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitWidth: root.isVerticalOrientation ? root.contentThickness : contentRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : root.contentThickness
 
             Column {
                 id: contentColumn
@@ -29,7 +28,7 @@ BasePill {
                 DankIcon {
                     name: "network_check"
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: Theme.widgetTextColor
+                    color: root.contentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -71,7 +70,7 @@ BasePill {
                 DankIcon {
                     name: "network_check"
                     size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
-                    color: Theme.widgetTextColor
+                    color: root.contentColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -88,7 +87,7 @@ BasePill {
                     StyledText {
                         text: DgopService.networkRxRate > 0 ? Format.formatRate(DgopService.networkRxRate, 1) : "0 B/s"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
+                        color: root.contentColor
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignLeft
                         elide: Text.ElideNone
@@ -117,7 +116,7 @@ BasePill {
                     StyledText {
                         text: DgopService.networkTxRate > 0 ? Format.formatRate(DgopService.networkTxRate, 1) : "0 B/s"
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        color: Theme.widgetTextColor
+                        color: root.contentColor
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignLeft
                         elide: Text.ElideNone

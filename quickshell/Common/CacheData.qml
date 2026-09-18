@@ -24,10 +24,18 @@ Singleton {
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
     readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
-    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings"].concat(_pinKeys, _historyKeys)
+    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen"].concat(_pinKeys, _historyKeys)
 
     property string wallpaperLastPath: ""
     property string profileLastPath: ""
+    property string pluginViewFilter: "enabled"
+    property string dashFocusCardId: ""
+    property bool mediaLyricsOpen: false
+    property var pluginViewSort: ({
+            by: "modified",
+            descending: true
+        })
+    property var processFilterTypes: ["user", "system"]
 
     property var browserUsageHistory: ({})
     property var filePickerUsageHistory: ({})
@@ -171,6 +179,15 @@ Singleton {
 
                 wallpaperLastPath = cache.wallpaperLastPath !== undefined ? cache.wallpaperLastPath : "";
                 profileLastPath = cache.profileLastPath !== undefined ? cache.profileLastPath : "";
+                pluginViewFilter = ["all", "enabled", "disabled", "updates"].includes(cache.pluginViewFilter) ? cache.pluginViewFilter : "enabled";
+                dashFocusCardId = typeof cache.dashFocusCardId === "string" ? cache.dashFocusCardId : "";
+                mediaLyricsOpen = cache.mediaLyricsOpen === true;
+                const pluginSort = cache.pluginViewSort;
+                pluginViewSort = {
+                    by: ["name", "author", "modified"].includes(pluginSort?.by) ? pluginSort.by : "modified",
+                    descending: typeof pluginSort?.descending === "boolean" ? pluginSort.descending : true
+                };
+                processFilterTypes = Array.isArray(cache.processFilterTypes) ? cache.processFilterTypes.filter(value => value === "user" || value === "system") : ["user", "system"];
 
                 if (cache.fileBrowserSettings !== undefined) {
                     fileBrowserSettings = cache.fileBrowserSettings;
@@ -226,6 +243,11 @@ Singleton {
         const data = {
             "wallpaperLastPath": wallpaperLastPath,
             "profileLastPath": profileLastPath,
+            "processFilterTypes": processFilterTypes,
+            "pluginViewSort": pluginViewSort,
+            "pluginViewFilter": pluginViewFilter,
+            "dashFocusCardId": dashFocusCardId,
+            "mediaLyricsOpen": mediaLyricsOpen,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };

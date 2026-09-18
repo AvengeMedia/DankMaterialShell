@@ -5,9 +5,10 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/themes"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
-func HandleSearch(conn *models.Conn, req models.Request) {
+func HandleSearch(conn *ipc.ConnWriter, req ipc.Request) {
 	query, ok := models.Get[string](req, "query")
 	if !ok {
 		models.RespondError(conn, req.ID, "missing or invalid 'query' parameter")

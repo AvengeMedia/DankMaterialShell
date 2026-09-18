@@ -1,0 +1,53 @@
+import QtQuick
+import qs.Common
+import qs.Widgets
+
+Loader {
+    id: root
+
+    property string iconName: ""
+    property string label: ""
+    property color iconColor: Theme.onSecondaryContainer
+    property color backgroundColor: Theme.secondaryContainer
+    property bool tonal: true
+    property bool interactive: false
+    property bool available: true
+    readonly property bool hovered: item?.hovered ?? false
+
+    signal clicked
+
+    width: Theme.buttonHeightS
+    height: width
+    sourceComponent: interactive ? action : indicator
+
+    Component {
+        id: action
+
+        DankActionButton {
+            buttonSize: root.width
+            iconName: root.iconName
+            iconSize: Theme.iconSize
+            iconColor: root.iconColor
+            backgroundColor: !root.tonal ? "transparent" : enabled ? root.backgroundColor : Theme.onSurface_12
+            Accessible.name: root.label
+            enabled: root.available
+            onClicked: root.clicked()
+        }
+    }
+
+    Component {
+        id: indicator
+
+        Rectangle {
+            radius: Theme.fullRadius(width, height)
+            color: !root.tonal ? "transparent" : root.available ? root.backgroundColor : Theme.onSurface_12
+
+            DankIcon {
+                anchors.centerIn: parent
+                name: root.iconName
+                size: Theme.iconSize
+                color: root.available ? root.iconColor : Theme.onSurface_38
+            }
+        }
+    }
+}

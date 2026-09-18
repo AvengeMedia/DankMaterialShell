@@ -26,7 +26,6 @@ Column {
     FileBrowserModal {
         id: wallpaperBrowserModal
         browserTitle: root.browserTitle
-        browserIcon: "wallpaper"
         browserType: "wallpaper"
         showHiddenFiles: true
         fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
@@ -42,10 +41,12 @@ Column {
 
         DankTextField {
             id: wallpaperPathField
+            outlined: true
+            leftIconName: "wallpaper"
+            labelText: I18n.tr("Path")
             width: parent.width - browseWallpaperButton.width - Theme.spacingS
             placeholderText: root.placeholderText
             text: root.path
-            backgroundColor: Theme.floatingWindowFieldColor
             onTextChanged: {
                 if (text !== root.path)
                     root.pathSelected(text);
@@ -61,10 +62,10 @@ Column {
     }
 
     SettingsDropdownRow {
+        paintBackground: false
         settingKey: root.fillModeSettingKey
         tags: root.fillModeTags
         text: I18n.tr("Wallpaper fill mode")
-        description: I18n.tr("How the background image is scaled")
         options: root._fillModes.map(m => I18n.tr(m, "wallpaper fill mode"))
         currentValue: {
             var mode = (root.fillMode && root.fillMode !== "") ? root.fillMode : root.fallbackFillMode;

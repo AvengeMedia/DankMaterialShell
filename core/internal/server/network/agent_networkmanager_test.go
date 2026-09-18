@@ -548,18 +548,3 @@ func TestWiFiSecretCache(t *testing.T) {
 	b.clearCachedWiFiSecretBySSID("HomeNet")
 	assert.Nil(t, b.lookupCachedWiFiSecret("uuid-1", "802-11-wireless-security"))
 }
-
-func TestNmVariantMap(t *testing.T) {
-	// Test that nmVariantMap and nmSettingMap work correctly
-	settingMap := make(nmSettingMap)
-	variantMap := make(nmVariantMap)
-
-	variantMap["test-key"] = dbus.MakeVariant("test-value")
-	settingMap["test-setting"] = variantMap
-
-	assert.Contains(t, settingMap, "test-setting")
-	assert.Contains(t, settingMap["test-setting"], "test-key")
-
-	value := settingMap["test-setting"]["test-key"].Value()
-	assert.Equal(t, "test-value", value)
-}

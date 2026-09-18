@@ -8,15 +8,25 @@ DashTabFace {
     id: root
 
     activityId: "home"
+    entryId: DashRegistry.fallbackId
     tabComponent: Component {
         OverviewTab {
             live: root.live
-            onCloseDash: root.controller.requestCollapse()
-            onNavFocusRequested: root.focusFace()
-            onSwitchToMediaTab: root.controller.requestActivity("media", true, true)
-            onSwitchToWeatherTab: {
-                if (SettingsData.weatherEnabled)
-                    root.controller.requestWeather(false);
+            editMode: root.editMode
+            rowBudget: root.controller.dashboardRowBudget
+            onTabRequested: id => {
+                switch (id) {
+                case "media":
+                    root.controller.requestActivity("media", true, true);
+                    break;
+                case "weather":
+                    if (SettingsData.weatherEnabled)
+                        root.controller.requestWeather(false);
+                    break;
+                case "notifications":
+                    root.controller.requestNotificationCenter(false);
+                    break;
+                }
             }
         }
     }

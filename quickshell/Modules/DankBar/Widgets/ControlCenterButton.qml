@@ -14,20 +14,20 @@ BasePill {
     property var widgetData: null
     property string screenName: ""
     property string screenModel: ""
-    property bool showNetworkIcon: widgetData?.showNetworkIcon !== undefined ? widgetData.showNetworkIcon : SettingsData.controlCenterShowNetworkIcon
-    property bool showBluetoothIcon: widgetData?.showBluetoothIcon !== undefined ? widgetData.showBluetoothIcon : SettingsData.controlCenterShowBluetoothIcon
-    property bool showAudioIcon: widgetData?.showAudioIcon !== undefined ? widgetData.showAudioIcon : SettingsData.controlCenterShowAudioIcon
-    property bool showAudioPercent: widgetData?.showAudioPercent !== undefined ? widgetData.showAudioPercent : SettingsData.controlCenterShowAudioPercent
-    property bool showVpnIcon: widgetData?.showVpnIcon !== undefined ? widgetData.showVpnIcon : SettingsData.controlCenterShowVpnIcon
-    property bool showBrightnessIcon: widgetData?.showBrightnessIcon !== undefined ? widgetData.showBrightnessIcon : SettingsData.controlCenterShowBrightnessIcon
-    property bool showBrightnessPercent: widgetData?.showBrightnessPercent !== undefined ? widgetData.showBrightnessPercent : SettingsData.controlCenterShowBrightnessPercent
-    property bool showMicIcon: widgetData?.showMicIcon !== undefined ? widgetData.showMicIcon : SettingsData.controlCenterShowMicIcon
-    property bool showMicPercent: widgetData?.showMicPercent !== undefined ? widgetData.showMicPercent : SettingsData.controlCenterShowMicPercent
-    property bool showBatteryIcon: widgetData?.showBatteryIcon !== undefined ? widgetData.showBatteryIcon : SettingsData.controlCenterShowBatteryIcon
-    property bool showPrinterIcon: widgetData?.showPrinterIcon !== undefined ? widgetData.showPrinterIcon : SettingsData.controlCenterShowPrinterIcon
-    property bool showScreenSharingIcon: widgetData?.showScreenSharingIcon !== undefined ? widgetData.showScreenSharingIcon : SettingsData.controlCenterShowScreenSharingIcon
-    property bool showIdleInhibitorIcon: widgetData?.showIdleInhibitorIcon !== undefined ? widgetData.showIdleInhibitorIcon : SettingsData.controlCenterShowIdleInhibitorIcon
-    property bool showDoNotDisturbIcon: widgetData?.showDoNotDisturbIcon !== undefined ? widgetData.showDoNotDisturbIcon : SettingsData.controlCenterShowDoNotDisturbIcon
+    property bool showNetworkIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showNetworkIcon")
+    property bool showBluetoothIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showBluetoothIcon")
+    property bool showAudioIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showAudioIcon")
+    property bool showAudioPercent: SettingsData.widgetOption("controlCenterButton", widgetData, "showAudioPercent")
+    property bool showVpnIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showVpnIcon")
+    property bool showBrightnessIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showBrightnessIcon")
+    property bool showBrightnessPercent: SettingsData.widgetOption("controlCenterButton", widgetData, "showBrightnessPercent")
+    property bool showMicIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showMicIcon")
+    property bool showMicPercent: SettingsData.widgetOption("controlCenterButton", widgetData, "showMicPercent")
+    property bool showBatteryIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showBatteryIcon")
+    property bool showPrinterIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showPrinterIcon")
+    property bool showScreenSharingIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showScreenSharingIcon")
+    property bool showIdleInhibitorIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showIdleInhibitorIcon")
+    property bool showDoNotDisturbIcon: SettingsData.widgetOption("controlCenterButton", widgetData, "showDoNotDisturbIcon")
     property real touchpadThreshold: 100
     property real micAccumulator: 0
     property real volumeAccumulator: 0
@@ -172,7 +172,7 @@ BasePill {
 
     function getBrightnessIconName() {
         const deviceName = getEffectiveBrightnessDevice();
-        return DisplayService.brightnessIconName(DisplayService.getCurrentDeviceInfoByName(deviceName), DisplayService.getDeviceBrightness(deviceName));
+        return BrightnessService.brightnessIconName(BrightnessService.getCurrentDeviceInfoByName(deviceName), BrightnessService.getDeviceBrightness(deviceName));
     }
 
     function getScreenPinKey() {
@@ -197,7 +197,7 @@ BasePill {
     }
 
     function getEffectiveBrightnessDevice() {
-        return getPinnedBrightnessDevice() || DisplayService.getDefaultDevice();
+        return getPinnedBrightnessDevice() || BrightnessService.getDefaultDevice();
     }
 
     function handleVolumeWheel(delta) {
@@ -265,9 +265,9 @@ BasePill {
             brightnessAccumulator = 0;
         }
 
-        const currentBrightness = DisplayService.getDeviceBrightness(deviceName);
+        const currentBrightness = BrightnessService.getDeviceBrightness(deviceName);
         const newBrightness = delta > 0 ? Math.min(100, currentBrightness + step) : Math.max(1, currentBrightness - step);
-        DisplayService.setBrightness(newBrightness, deviceName);
+        BrightnessService.setBrightness(newBrightness, deviceName);
     }
 
     function getBrightness() {
@@ -275,7 +275,7 @@ BasePill {
         if (!deviceName) {
             return;
         }
-        return DisplayService.getDeviceBrightness(deviceName) / 100;
+        return BrightnessService.getDeviceBrightness(deviceName) / 100;
     }
 
     function getBatteryIconColor() {
@@ -340,7 +340,7 @@ BasePill {
         case "microphone":
             return root.showMicIcon;
         case "brightness":
-            return root.showBrightnessIcon && DisplayService.brightnessAvailable && root.getEffectiveBrightnessDevice().length > 0;
+            return root.showBrightnessIcon && BrightnessService.brightnessAvailable && root.getEffectiveBrightnessDevice().length > 0;
         case "battery":
             return root.showBatteryIcon && BatteryService.batteryAvailable;
         case "printer":
@@ -436,8 +436,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : controlIndicators.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? controlColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitWidth: root.isVerticalOrientation ? root.contentThickness : controlIndicators.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? controlColumn.implicitHeight : root.contentThickness
 
             Component.onCompleted: {
                 root._hRow = controlIndicators;
@@ -656,7 +656,7 @@ BasePill {
                             }
                         }
                         implicitWidth: width
-                        height: root.widgetThickness - root.horizontalPadding * 2
+                        height: root.contentThickness
                         visible: modelData.visible
 
                         Component.onCompleted: {

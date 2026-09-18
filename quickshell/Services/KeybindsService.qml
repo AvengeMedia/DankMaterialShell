@@ -102,30 +102,10 @@ Singleton {
             return "";
         }
     }
-    readonly property string dmsBindsPath: {
-        switch (currentProvider) {
-        case "niri":
-            return compositorConfigDir + "/dms/binds.kdl";
-        case "hyprland":
-            return compositorConfigDir + "/dms/binds.lua";
-        case "mangowc":
-            return compositorConfigDir + "/dms/binds.conf";
-        default:
-            return "";
-        }
-    }
-    readonly property string mainConfigPath: {
-        switch (currentProvider) {
-        case "niri":
-            return compositorConfigDir + "/config.kdl";
-        case "hyprland":
-            return compositorConfigDir + "/hyprland.lua";
-        case "mangowc":
-            return compositorConfigDir + "/config.conf";
-        default:
-            return "";
-        }
-    }
+    readonly property string includeCompositor: currentProvider === "mangowc" ? "mango" : currentProvider
+    readonly property var includePaths: ConfigIncludeResolve.includePaths("binds", includeCompositor, configDir)
+    readonly property string dmsBindsPath: includePaths?.fragmentFiles[0] ?? ""
+    readonly property string mainConfigPath: includePaths?.configFile ?? ""
     readonly property bool readOnly: currentProvider === "hyprland" && dmsStatus.readOnly === true
     readonly property var actionTypes: Actions.getActionTypes()
     readonly property var dmsActions: getDmsActions()
@@ -300,8 +280,7 @@ Singleton {
             root.lastError = "";
             root.dmsBindsIncluded = true;
             root.dmsBindsFixed();
-            const bindsRel = root.currentProvider === "niri" ? "dms/binds.kdl" : root.currentProvider === "hyprland" ? "dms/binds.lua" : "dms/binds.conf";
-            ToastService.showInfo(I18n.tr("Binds include added"), I18n.tr("%1 is now included in config").arg(bindsRel), "", "keybinds");
+            ToastService.showInfo(I18n.tr("Binds include added"), I18n.tr("%1 is now included in config", "keybinds toast, %1 is the binds file path").arg("dms/" + root.includePaths.fragmentFiles[0].split("/").pop()), "", "keybinds");
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
             Qt.callLater(root.forceReload);
@@ -315,50 +294,12 @@ Singleton {
             showHyprlandReadOnlyWarning();
             return;
         }
-        fixing = true;
         const timestamp = Math.floor(Date.now() / 1000);
         const backupPath = `${mainConfigPath}.dmsbackup${timestamp}`;
-        let script;
-        switch (currentProvider) {
-        case "niri":
-            script = ConfigIncludeResolve.buildRepairScript({
-                configFile: mainConfigPath,
-                backupFile: backupPath,
-                fragmentFile: compositorConfigDir + "/dms/binds.kdl",
-                grepPattern: 'include.*"dms/binds.kdl"',
-                includeLine: 'include "dms/binds.kdl"'
-            });
-            break;
-        case "hyprland":
-            script = ConfigIncludeResolve.buildRepairScript({
-                configFile: mainConfigPath,
-                backupFile: backupPath,
-                fragmentFiles: [compositorConfigDir + "/dms/binds.lua", compositorConfigDir + "/dms/binds-user.lua"],
-                includes: [
-                    {
-                        grepPattern: "dms.binds",
-                        includeLine: "require(\"dms.binds\")"
-                    },
-                    {
-                        grepPattern: "dms.binds-user",
-                        includeLine: "require(\"dms.binds-user\")"
-                    }
-                ]
-            });
-            break;
-        case "mangowc":
-            script = ConfigIncludeResolve.buildRepairScript({
-                configFile: mainConfigPath,
-                backupFile: backupPath,
-                fragmentFile: compositorConfigDir + "/dms/binds.conf",
-                grepPattern: "source.*dms/binds.conf",
-                includeLine: "source = ./dms/binds.conf"
-            });
-            break;
-        default:
-            fixing = false;
+        const script = ConfigIncludeResolve.repairScriptFor("binds", includeCompositor, configDir, backupPath);
+        if (!script)
             return;
-        }
+        fixing = true;
         fixProcess.command = ["sh", "-c", script];
         fixProcess.running = true;
     }

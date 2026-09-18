@@ -180,10 +180,3 @@ func TestWaylandOutputBoundsScaled(t *testing.T) {
 			b.X, b.Y, b.Width, b.Height)
 	}
 }
-
-func TestRegionGeometryString(t *testing.T) {
-	r := Region{X: 1920, Y: 1080, Width: 800, Height: 600}
-	if got := r.GeometryString(); got != "1920,1080 800x600" {
-		t.Fatalf("GeometryString() = %q, want %q", got, "1920,1080 800x600")
-	}
-}

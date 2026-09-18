@@ -10,12 +10,12 @@ Rectangle {
     property color tone: Theme.primary
     property bool onImage: false
 
-    height: 20
+    height: Theme.iconSize
     width: content.implicitWidth + Theme.spacingS * 2
-    radius: height / 2
-    color: onImage ? Theme.withAlpha(Theme.surfaceContainerHigh, 0.92) : Theme.withAlpha(tone, 0.12)
-    border.color: Theme.withAlpha(tone, onImage ? 0.5 : 0.35)
-    border.width: 1
+    radius: Theme.cornerRadiusS
+    color: Theme.surfaceContainerHigh
+    border.color: Theme.outlineVariant
+    border.width: Theme.outlineWidth
 
     Row {
         id: content
@@ -24,7 +24,7 @@ Rectangle {
 
         DankIcon {
             name: root.iconName
-            size: 11
+            size: Theme.iconSizeSmall
             color: root.tone
             visible: root.iconName.length > 0
             anchors.verticalCenter: parent.verticalCenter
@@ -32,8 +32,8 @@ Rectangle {
 
         StyledText {
             text: root.label
-            font.pixelSize: Theme.fontSizeSmall - 2
-            font.weight: Font.Medium
+            font.pixelSize: Theme.fontSizeSmall
+            font.weight: Theme.fontWeightMedium
             color: root.tone
             anchors.verticalCenter: parent.verticalCenter
         }

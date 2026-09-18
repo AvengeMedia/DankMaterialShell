@@ -6,8 +6,8 @@ import qs.Widgets
 DankOSD {
     id: root
 
-    osdWidth: Theme.iconSize + Theme.spacingS * 2
-    osdHeight: Theme.iconSize + Theme.spacingS * 2
+    osdWidth: Theme.osdHeight
+    osdHeight: Theme.osdHeight
     autoHideInterval: 2000
     enableMouseInteraction: false
 
@@ -15,15 +15,17 @@ DankOSD {
         target: SessionService
         function onInhibitorChanged() {
             if (SettingsData.osdIdleInhibitorEnabled) {
-                root.show()
+                root.show();
             }
         }
     }
 
-    content: DankIcon {
-        anchors.centerIn: parent
-        name: SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle"
-        size: Theme.iconSize
-        color: SessionService.idleInhibited ? Theme.primary : Theme.outline
+    content: Item {
+        OsdIcon {
+            tonal: false
+            anchors.centerIn: parent
+            iconName: SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle"
+            iconColor: SessionService.idleInhibited ? Theme.primary : Theme.outline
+        }
     }
 }

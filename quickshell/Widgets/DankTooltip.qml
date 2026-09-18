@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
-import qs.Services
 import qs.Widgets
 
 PanelWindow {
@@ -32,9 +31,10 @@ PanelWindow {
     }
 
     screen: targetScreen
-    implicitWidth: Math.min(300, Math.max(120, textContent.implicitWidth + Theme.spacingM * 2))
+    implicitWidth: Math.min(Theme.tooltipMaxWidth, textContent.implicitWidth) + Theme.spacingM * 2
     implicitHeight: textContent.implicitHeight + Theme.spacingS * 2
     color: "transparent"
+    mask: Region {}
     visible: false
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
@@ -65,21 +65,10 @@ PanelWindow {
         }
     }
 
-    WindowBlur {
-        targetWindow: root
-        blurX: 0
-        blurY: 0
-        blurWidth: root.visible ? root.width : 0
-        blurHeight: root.visible ? root.height : 0
-        blurRadius: Theme.cornerRadius
-    }
-
     Rectangle {
         anchors.fill: parent
-        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-        radius: Theme.cornerRadius
-        border.width: BlurService.borderWidth
-        border.color: BlurService.borderColor
+        color: Theme.inverseSurface
+        radius: Theme.cornerRadiusXS
 
         StyledText {
             id: textContent
@@ -87,11 +76,11 @@ PanelWindow {
             anchors.centerIn: parent
             text: root.text
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceText
+            color: Theme.inverseOnSurface
             wrapMode: Text.NoWrap
             maximumLineCount: 1
             elide: Text.ElideRight
-            width: Math.min(implicitWidth, 300 - Theme.spacingM * 2)
+            width: Math.min(implicitWidth, Theme.tooltipMaxWidth)
         }
     }
 }

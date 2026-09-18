@@ -78,3 +78,7 @@ function addToHistory(arr, val, max) {
         newArr.shift();
     return newArr;
 }
+
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}

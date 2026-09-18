@@ -1,13 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modules.Dock
 import qs.Services
 
-// Renders the dock inside the frame surface in connected mode: a single DockBody
-// positioned by SettingsData.dockPosition. It fills the frame and positions its own
-// content via its internal anchors/geometry using hostWindow.
 Item {
     id: host
 
@@ -15,16 +13,78 @@ Item {
     required property var targetScreen
 
     readonly property string screenName: targetScreen ? targetScreen.name : ""
+    // Every dock this screen shows that the frame is allowed to host, one per edge.
+    readonly property var configs: {
+        SettingsData.dockConfigs;
+        SettingsData.barConfigs;
+        return SettingsData.dockConfigsForScreen(targetScreen).filter(config => CompositorService.frameHostsDockForConfig(host.targetScreen, config));
+    }
+    readonly property bool interactionActive: dockRepeater.anyInteraction
+    readonly property bool editActive: dockRepeater.anyEdit
+    readonly property var dockBodyItems: dockRepeater.bodies
+    readonly property var dockMaskItems: dockRepeater.masks
 
-    // Exposed so FrameWindow can add the dock's hover strip to its input region.
-    readonly property alias dockMaskItem: dockBody.inputMaskItem
+    Repeater {
+        id: dockRepeater
 
-    DockBody {
-        id: dockBody
-        anchors.fill: parent
-        hostWindow: host.frameWindow
-        modelData: host.targetScreen
-        contextMenu: BarWidgetService.dockContextMenu
-        trashContextMenu: BarWidgetService.dockTrashContextMenu
+        property int revision: 0
+        readonly property var bodies: {
+            revision;
+            const items = [];
+            for (let i = 0; i < count; i++) {
+                const body = itemAt(i)?.body;
+                if (body) items.push(body);
+            }
+            return items;
+        }
+        readonly property var masks: dockRepeater.bodies.map(body => body.inputMaskItem).filter(Boolean)
+        readonly property bool anyInteraction: {
+            revision;
+            for (let i = 0; i < count; i++) {
+                if (itemAt(i)?.body?.interactionActive) return true;
+            }
+            return false;
+        }
+        readonly property bool anyEdit: {
+            revision;
+            for (let i = 0; i < count; i++) {
+                if (itemAt(i)?.body?.editMode) return true;
+            }
+            return false;
+        }
+
+        // Keyed so an edited config updates in place instead of rebuilding every dock body.
+        model: ScriptModel {
+            values: host.configs
+            objectProp: "id"
+        }
+
+        delegate: Item {
+            id: slot
+
+            required property var modelData
+            readonly property alias body: dockBody
+
+            anchors.fill: parent
+            visible: slot.modelData.enabled
+
+            onVisibleChanged: dockRepeater.revision++
+            Component.onCompleted: dockRepeater.revision++
+            Component.onDestruction: dockRepeater.revision++
+
+            DockBody {
+                id: dockBody
+
+                anchors.fill: parent
+                config: slot.modelData
+                hostWindow: host.frameWindow
+                modelData: host.targetScreen
+                contextMenu: BarWidgetService.dockContextMenu
+                trashContextMenu: BarWidgetService.dockTrashContextMenu
+
+                onInteractionActiveChanged: dockRepeater.revision++
+                onEditModeChanged: dockRepeater.revision++
+            }
+        }
     }
 }

@@ -58,8 +58,8 @@ override_dh_auto_install:
 		debian/dms/usr/share/applications/com.danklinux.dms.desktop
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/com.danklinux.dms.notepad.desktop \
 		debian/dms/usr/share/applications/com.danklinux.dms.notepad.desktop
-	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/danklogo.svg \
-		debian/dms/usr/share/icons/hicolor/scalable/apps/danklogo.svg
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/assets/com.danklinux.dms.svg \
+		debian/dms/usr/share/icons/hicolor/scalable/apps/com.danklinux.dms.svg
 
 	# Install QML files from source tarball
 	mkdir -p debian/dms/usr/share/quickshell/dms

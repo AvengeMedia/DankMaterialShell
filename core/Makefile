@@ -37,19 +37,11 @@ endif
 # Default target
 all: build
 
-# Copy the quickshell UI into the embed dir (gitignored) so tagged builds
-# can bake it into the binary. Dev-only files are stripped; scripts/ is kept
-# minus its dev entries, since Theme.qml and BluetoothService.qml run
-# gtk.sh/qt.sh/bluez-card-profile.lua out of the resolved shell dir.
-# tar -h dereferences the DankCommon submodule symlink; go:embed rejects
-# symlinks. .qmlls.ini is excluded at copy time: it's a symlink into the
-# quickshell runtime VFS and dereferencing it fails whenever the shell isn't
-# running.
 sync-shell:
 	@test -e $(SHELL_SRC)/DankCommon/Widgets/DankIcon.qml || { echo "DankCommon missing: run git submodule update --init"; exit 1; }
 	@rm -rf $(EMBED_DIR)
 	@mkdir -p $(EMBED_DIR)
-	@tar -C $(SHELL_SRC) --exclude=.qmlls.ini -chf - . | tar -C $(EMBED_DIR) -xf -
+	@tar -C $(SHELL_SRC) --exclude=.qmlls.ini --exclude-from=../scripts/shell-test-excludes.txt -chf - . | tar -C $(EMBED_DIR) -xf -
 	@rm -rf $(EMBED_DIR)/.git* $(EMBED_DIR)/.github
 	@rm -rf $(EMBED_DIR)/tests
 	@find $(EMBED_DIR) -type d \( -name .claude -o -name .vscode \) -prune -exec rm -rf {} +

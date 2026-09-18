@@ -50,7 +50,7 @@ PluginComponent {
                     text: "Detail Example Settings"
                     font.pixelSize: Theme.fontSizeLarge
                     color: Theme.surfaceText
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                 }
 
                 StyledText {

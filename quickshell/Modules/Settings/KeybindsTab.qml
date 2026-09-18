@@ -4,11 +4,14 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modals.Common
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 
 Item {
     id: keybindsTab
+
+    readonly property int contentMaxWidth: 650
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -221,7 +224,7 @@ Item {
 
     function getCategoryLabel(cat) {
         if (cat === "__overrides__")
-            return I18n.tr("Overrides");
+            return I18n.tr("Overrides", "noun plural, keybind category of user overridden shortcuts");
         return cat;
     }
 
@@ -284,7 +287,7 @@ Item {
         const baselineDraft = keybindsTab.editDraft;
         removeBindConfirm.showWithOptions({
             title: I18n.tr("Remove Shortcut?"),
-            message: KeybindsService.currentProvider === "hyprland" ? I18n.tr("Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.").arg(key) : I18n.tr("Remove the shortcut %1?").arg(key),
+            message: KeybindsService.currentProvider === "hyprland" ? I18n.tr("Remove the shortcut %1? An unbind entry will be saved to dms/binds-user.lua so it stays removed across DMS updates.", "hyprland remove shortcut confirmation, %1 is the key combination").arg(key) : I18n.tr("Remove the shortcut %1?", "remove shortcut confirmation, %1 is the key combination").arg(key),
             confirmText: I18n.tr("Remove"),
             confirmColor: Theme.primary,
             onConfirm: () => {
@@ -308,7 +311,7 @@ Item {
         const baselineDraft = keybindsTab.editDraft;
         removeBindConfirm.showWithOptions({
             title: I18n.tr("Reset to default"),
-            message: I18n.tr("Drop your override for %1 so the DMS default action re-applies?").arg(key),
+            message: I18n.tr("Drop your override for %1 so the DMS default action re-applies?", "reset shortcut confirmation, %1 is the key combination").arg(key),
             confirmText: I18n.tr("Reset"),
             confirmColor: Theme.primary,
             onConfirm: () => {
@@ -469,7 +472,7 @@ Item {
             bottomPadding: Theme.spacingXL
 
             StyledRect {
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: headerSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -500,9 +503,9 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: I18n.tr("Keyboard Shortcuts")
+                                text: I18n.tr("Shortcuts", "noun plural, keyboard shortcuts settings page heading")
                                 font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                                 width: parent.width
                                 horizontalAlignment: Text.AlignLeft
@@ -510,7 +513,7 @@ Item {
 
                             StyledText {
                                 readonly property string bindsFile: KeybindsService.requiresBindReview ? "aqueous-config" : KeybindsService.currentProvider === "niri" ? "dms/binds.kdl" : KeybindsService.currentProvider === "hyprland" ? "dms/binds-user.lua" : "dms/binds.conf"
-                                text: KeybindsService.requiresBindReview ? I18n.tr("Click any shortcut to edit Aqueous configuration", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1").arg(bindsFile)
+                                text: KeybindsService.requiresBindReview ? I18n.tr("Click any shortcut to edit Aqueous configuration", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings") : KeybindsService.readOnly ? I18n.tr("Hyprland conf mode is read-only in Settings") : I18n.tr("Click any shortcut to edit. Changes save to %1", "keyboard shortcuts page hint, %1 is the binds file path").arg(bindsFile)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -524,11 +527,10 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        DankTextField {
+                        DankSearchField {
                             id: searchField
                             width: parent.width - addButton.width - Theme.spacingM
-                            placeholderText: I18n.tr("Search keybinds...")
-                            leftIconName: "search"
+                            placeholderText: I18n.tr("Search shortcuts...")
                             onTextChanged: {
                                 keybindsTab.searchQuery = text;
                                 searchDebounce.restart();
@@ -541,6 +543,7 @@ Item {
                             height: searchField.height
                             circular: false
                             iconName: "add"
+                            Accessible.name: I18n.tr("New Keybind")
                             iconSize: Theme.iconSize
                             iconColor: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
@@ -554,7 +557,7 @@ Item {
 
             StyledRect {
                 id: warningBox
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: warningSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -566,7 +569,7 @@ Item {
 
                 color: (showLegacy || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0)
                 border.color: (showLegacy || showWarning || showSetup) ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.primary, 0)
-                border.width: 1
+                border.width: Theme.outlineWidth
                 visible: (showLegacy || showWarning || showSetup) && !KeybindsService.loading
 
                 Column {
@@ -598,11 +601,11 @@ Item {
                                     if (warningBox.showSetup)
                                         return I18n.tr("First Time Setup");
                                     if (warningBox.showWarning)
-                                        return I18n.tr("Possible Override Conflicts");
+                                        return I18n.tr("Possible override conflicts");
                                     return "";
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.primary
                                 width: parent.width
                                 horizontalAlignment: Text.AlignLeft
@@ -613,10 +616,10 @@ Item {
                                     if (warningBox.showLegacy)
                                         return I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.");
                                     if (warningBox.showSetup)
-                                        return I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg("dms/binds");
+                                        return I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.", "include setup banner, %1 is the dms config file name").arg("dms/binds");
                                     if (warningBox.showWarning) {
                                         const count = warningBox.status.overriddenBy;
-                                        return I18n.ntr("%1 DMS bind may be overridden by config binds that come after the include.", "%1 DMS binds may be overridden by config binds that come after the include.", count).arg(count);
+                                        return (count === 1 ? I18n.tr("%1 DMS bind may be overridden by config binds that come after the include.", "singular, keybinds warning, %1 is 1") : I18n.tr("%1 DMS binds may be overridden by config binds that come after the include.", "plural, keybinds warning, %1 is a count")).arg(count);
                                     }
                                     return "";
                                 }
@@ -631,7 +634,7 @@ Item {
                         DankButton {
                             id: fixButton
                             visible: !warningBox.showLegacy && warningBox.showSetup
-                            text: KeybindsService.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup")
+                            text: KeybindsService.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup", "verb, button that creates the dms include config file")
                             backgroundColor: Theme.primary
                             textColor: Theme.primaryText
                             enabled: !KeybindsService.fixing
@@ -643,7 +646,7 @@ Item {
             }
 
             StyledRect {
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: categorySection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -665,13 +668,14 @@ Item {
                             readonly property real chipHeight: allChip.implicitHeight + Theme.spacingM
                             width: allChip.implicitWidth + Theme.spacingL
                             height: chipHeight
-                            radius: chipHeight / 2
+                            radius: Theme.cornerRadiusS
                             color: !keybindsTab.selectedCategory ? Theme.primary : Theme.floatingWindowFieldColor
 
                             StyledText {
                                 id: allChip
                                 text: I18n.tr("All")
                                 font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Theme.fontWeightMedium
                                 color: !keybindsTab.selectedCategory ? Theme.primaryText : Theme.surfaceVariantText
                                 anchors.centerIn: parent
                             }
@@ -696,13 +700,14 @@ Item {
                                 readonly property real chipHeight: catText.implicitHeight + Theme.spacingM
                                 width: catText.implicitWidth + Theme.spacingL
                                 height: chipHeight
-                                radius: chipHeight / 2
+                                radius: Theme.cornerRadiusS
                                 color: keybindsTab.selectedCategory === modelData ? Theme.primary : (modelData === "__overrides__" ? Theme.withAlpha(Theme.primary, 0.15) : Theme.floatingWindowFieldColor)
 
                                 StyledText {
                                     id: catText
                                     text: keybindsTab.getCategoryLabel(modelData)
                                     font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Theme.fontWeightMedium
                                     color: keybindsTab.selectedCategory === modelData ? Theme.primaryText : (modelData === "__overrides__" ? Theme.primary : Theme.surfaceVariantText)
                                     anchors.centerIn: parent
                                 }
@@ -721,58 +726,69 @@ Item {
                 }
             }
 
-            Column {
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+            SettingsGroup {
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: keybindsTab.hasEditDraft && (keybindsTab.reviewingEdit || keybindsTab.editError !== "" || keybindsTab.editDraft.operation !== "set")
-                spacing: Theme.spacingM
 
-                StyledText {
-                    width: parent.width
+                SettingsRow {
                     visible: keybindsTab.reviewingEdit || keybindsTab.editError !== ""
-                    text: keybindsTab.editError || I18n.tr("Review the current bindings before saving this edit.", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
-                    color: Theme.error
-                    wrapMode: Text.WordWrap
+                    iconName: "error"
+                    iconColor: Theme.error
+                    subtitle: keybindsTab.editError || I18n.tr("Review the current bindings before saving this edit.", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
+                    subtitleColor: Theme.error
                 }
 
-                StyledText {
-                    width: parent.width
+                SettingsRow {
                     visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
-                    text: KeybindsService.describeBindReview(keybindsTab.editDraft, keybindsTab.reviewSnapshot)
-                    color: Theme.surfaceText
-                    wrapMode: Text.WordWrap
+                    subtitle: KeybindsService.describeBindReview(keybindsTab.editDraft, keybindsTab.reviewSnapshot)
+                    subtitleColor: Theme.surfaceText
                 }
 
-                Flow {
-                    width: parent.width
-                    spacing: Theme.spacingS
-                    DankButton {
-                        text: I18n.tr("Refresh")
-                        enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
-                        onClicked: keybindsTab.reloadEdit()
-                    }
-                    DankButton {
-                        text: I18n.tr("Accept reviewed changes", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
-                        visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
-                        enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
-                        onClicked: keybindsTab.acceptReview()
-                    }
-                    DankButton {
-                        text: I18n.tr("Discard")
-                        enabled: !keybindsTab.editBusy && !KeybindsService.bindMutationBusy
-                        onClicked: keybindsTab.discardEdit()
-                    }
-                    DankButton {
-                        text: I18n.tr("Remove")
-                        visible: keybindsTab.hasEditDraft && keybindsTab.editDraft.operation !== "set"
-                        enabled: !keybindsTab.editBusy && !keybindsTab.reviewingEdit && !keybindsTab.editInvalidated
-                        onClicked: keybindsTab.confirmEditRemoval()
+                SettingsRow {
+                    body: Row {
+                        LayoutMirroring.enabled: false
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        layoutDirection: Qt.RightToLeft
+
+                        DankButton {
+                            text: I18n.tr("Accept reviewed changes", "Aqueous keyboard shortcut editor, retaining an unsaved edit while reviewing current bindings")
+                            iconName: "check"
+                            visible: keybindsTab.reviewingEdit && !!keybindsTab.reviewSnapshot
+                            enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
+                            onClicked: keybindsTab.acceptReview()
+                        }
+
+                        DankButton {
+                            text: I18n.tr("Remove", "verb, button that removes an item from a list")
+                            iconName: "delete"
+                            visible: keybindsTab.hasEditDraft && keybindsTab.editDraft.operation !== "set"
+                            enabled: !keybindsTab.editBusy && !keybindsTab.reviewingEdit && !keybindsTab.editInvalidated
+                            onClicked: keybindsTab.confirmEditRemoval()
+                        }
+
+                        DankButton {
+                            text: I18n.tr("Discard")
+                            backgroundColor: "transparent"
+                            textColor: Theme.surfaceText
+                            enabled: !keybindsTab.editBusy && !KeybindsService.bindMutationBusy
+                            onClicked: keybindsTab.discardEdit()
+                        }
+
+                        DankActionButton {
+                            iconName: "refresh"
+                            iconColor: Theme.surfaceVariantText
+                            Accessible.name: I18n.tr("Refresh")
+                            enabled: !keybindsTab.editBusy && !keybindsTab.editInvalidated
+                            onClicked: keybindsTab.reloadEdit()
+                        }
                     }
                 }
             }
 
             StyledRect {
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: newBindSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -799,9 +815,9 @@ Item {
                         }
 
                         StyledText {
-                            text: I18n.tr("New Keybind")
+                            text: I18n.tr("New shortcut")
                             font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -843,7 +859,7 @@ Item {
             }
 
             StyledRect {
-                width: Math.min(650, parent.width - Theme.spacingL * 2)
+                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: bindsListHeader.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -873,10 +889,10 @@ Item {
                                 if (KeybindsService.loading)
                                     return I18n.tr("Shortcuts");
                                 const count = keybindsTab._filteredBinds.length;
-                                return count === 1 ? I18n.tr("Shortcut (%1)").arg(count) : I18n.tr("Shortcuts (%1)").arg(count);
+                                return count === 1 ? I18n.tr("Shortcut (%1)", "singular, keybind list heading, %1 is 1").arg(count) : I18n.tr("Shortcuts (%1)", "plural, keybind list heading, %1 is a count").arg(count);
                             }
                             font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -941,7 +957,7 @@ Item {
 
                         KeybindItem {
                             id: bindItem
-                            width: Math.min(650, parent.width - Theme.spacingL * 2)
+                            width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
                             anchors.horizontalCenter: parent.horizontalCenter
                             bindData: modelData
                             isExpanded: keybindsTab.expandedKey === modelData.action
@@ -993,16 +1009,15 @@ Item {
                                 }
                             }
 
-                            Connections {
-                                target: keybindsTab
-                                function on_EditingKeyChanged() {
-                                    if (!bindItem.isExpanded || !keybindsTab._editingKey)
-                                        return;
-                                    const keyExists = bindItem.keys.some(k => k.key === keybindsTab._editingKey);
-                                    if (keyExists) {
-                                        bindItem.restoreKey = keybindsTab._editingKey;
-                                        keybindsTab._editingKey = "";
-                                    }
+                            readonly property string tabEditingKey: keybindsTab._editingKey
+
+                            onTabEditingKeyChanged: {
+                                if (!isExpanded || !tabEditingKey)
+                                    return;
+                                const keyExists = keys.some(k => k.key === tabEditingKey);
+                                if (keyExists) {
+                                    restoreKey = tabEditingKey;
+                                    keybindsTab._editingKey = "";
                                 }
                             }
                         }

@@ -8,126 +8,128 @@ Item {
     id: root
 
     property string iconName: "volume_up"
-    property color iconColor: Theme.surfaceText
-    property color iconHoverColor: Theme.primary
-    property real iconSize: Theme.iconSize
+    property string insetIconName: ""
+    property string endIconName: ""
+    property string iconLabel: ""
     property bool iconInteractive: false
+    property color iconColor: Theme.onSecondaryContainer
+    property color iconBackgroundColor: Theme.secondaryContainer
+    property color fillColor: Theme.primary
     property int value: 0
     property int minimum: 0
     property int maximum: 100
     property string unit: "%"
     property string displayText: ""
     property bool sliderEnabled: true
-    property color thumbOutlineColor: Theme.surfaceContainer
+    property string sliderSize: "xs"
+    property bool vertical: false
+    property color thumbOutlineColor: Theme.surfaceContainerHigh
     property real horizontalPadding: -1
 
-    readonly property bool containsMouse: iconArea.containsMouse || levelSlider.containsMouse
+    readonly property bool containsMouse: levelSlider.containsMouse || icon.hovered
     readonly property bool showValueColumn: SettingsData.osdAlwaysShowValue
+    readonly property bool showEndIcon: endIconName.length > 0
     readonly property alias isDragging: levelSlider.isDragging
-    readonly property real effectiveHorizontalPadding: root.horizontalPadding >= 0 ? root.horizontalPadding : Math.max(Theme.spacingS, Math.round((height - root.iconSize) / 2))
+    readonly property real effectiveHorizontalPadding: horizontalPadding >= 0 ? horizontalPadding : Theme.spacingS
+    readonly property bool mirrored: !vertical && I18n.isRtl
+    readonly property real crossExtent: vertical ? width : height
+    readonly property real iconExtent: Math.min(vertical ? levelSlider.trackHeight : Theme.buttonHeightS, crossExtent - effectiveHorizontalPadding * 2)
+    readonly property real endPadding: showEndIcon ? Math.max(effectiveHorizontalPadding, (crossExtent - iconExtent) / 2) : effectiveHorizontalPadding
+    readonly property real itemSpacing: vertical && showEndIcon ? Theme.spacingM : Theme.spacingS
+    readonly property real valueExtent: showEndIcon ? iconExtent + itemSpacing : showValueColumn ? (vertical ? valueLabel.implicitHeight : valueLabel.reservedWidth) + itemSpacing : 0
 
     signal sliderValueChanged(int newValue)
     signal iconClicked
     signal hoverChanged(bool hovered)
 
     onContainsMouseChanged: root.hoverChanged(root.containsMouse)
+    height: Theme.osdHeight
+    LayoutMirroring.enabled: !vertical && I18n.isRtl
+    LayoutMirroring.childrenInherit: true
 
-    height: 40
+    OsdIcon {
+        id: icon
+
+        x: root.vertical ? (parent.width - width) / 2 : root.mirrored ? parent.width - width - root.endPadding : root.endPadding
+        y: root.vertical ? root.endPadding : (parent.height - height) / 2
+        width: root.iconExtent
+        height: width
+        iconName: root.iconName
+        iconColor: root.iconColor
+        backgroundColor: root.iconBackgroundColor
+        label: root.iconLabel
+        interactive: root.iconInteractive
+        available: root.sliderEnabled
+        onClicked: root.iconClicked()
+    }
 
     Item {
-        id: iconSlot
+        id: sliderSlot
 
-        width: root.iconSize
-        height: root.iconSize
-        anchors {
-            left: parent.left
-            leftMargin: root.effectiveHorizontalPadding
-            verticalCenter: parent.verticalCenter
-        }
+        x: root.vertical ? root.effectiveHorizontalPadding : root.mirrored ? root.endPadding + root.valueExtent : root.endPadding + icon.width + root.itemSpacing
+        y: root.vertical ? icon.y + icon.height + root.itemSpacing : 0
+        width: Math.max(0, root.vertical ? parent.width - root.effectiveHorizontalPadding * 2 : parent.width - root.endPadding * 2 - icon.width - root.itemSpacing - root.valueExtent)
+        height: Math.max(0, root.vertical ? parent.height - y - root.endPadding - root.valueExtent : parent.height)
 
-        DankIcon {
+        DankSlider {
+            id: levelSlider
+
             anchors.centerIn: parent
-            name: root.iconName
-            size: root.iconSize
-            color: iconArea.containsMouse && root.iconInteractive ? root.iconHoverColor : root.iconColor
-        }
+            width: root.vertical ? parent.height : parent.width
+            rotation: root.vertical ? -90 : 0
+            LayoutMirroring.enabled: !root.vertical && I18n.isRtl
+            size: root.sliderSize
+            insetIcon: root.insetIconName
+            insetIconPosition: root.vertical ? "end" : "start"
+            insetIconRotation: root.vertical ? 90 : 0
+            minimum: root.minimum
+            maximum: Math.max(root.minimum + 1, root.maximum)
+            enabled: root.sliderEnabled
+            showValue: false
+            unit: root.unit
+            fillColor: root.fillColor
+            thumbOutlineColor: root.thumbOutlineColor
+            valueOverride: root.value
+            onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
 
-        MouseArea {
-            id: iconArea
-
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: root.iconInteractive ? Qt.LeftButton : Qt.NoButton
-            cursorShape: root.iconInteractive ? Qt.PointingHandCursor : Qt.ArrowCursor
-            onClicked: {
-                if (root.iconInteractive)
-                    root.iconClicked();
+            Binding on value {
+                value: root.value
+                restoreMode: Binding.RestoreNone
+                when: !levelSlider.isDragging
             }
         }
     }
 
-    DankSlider {
-        id: levelSlider
-
-        anchors {
-            left: iconSlot.right
-            leftMargin: Theme.spacingS
-            right: valueSlot.left
-            rightMargin: root.showValueColumn ? Theme.spacingS : root.effectiveHorizontalPadding
-            verticalCenter: parent.verticalCenter
-        }
-        height: 40
-        minimum: root.minimum
-        maximum: Math.max(root.minimum + 1, root.maximum)
-        enabled: root.sliderEnabled
-        showValue: false
-        unit: root.unit
-        thumbOutlineColor: root.thumbOutlineColor
-        valueOverride: root.value
-        onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
-
-        Binding on value {
-            value: root.value
-            when: !levelSlider.isDragging
-        }
-    }
-
     Item {
-        id: valueSlot
+        id: valueContainer
 
-        anchors {
-            right: parent.right
-            rightMargin: root.showValueColumn ? root.effectiveHorizontalPadding : 0
-            top: parent.top
-            bottom: parent.bottom
-        }
-        width: root.showValueColumn ? valueLabel.reservedWidth : 0
-        visible: root.showValueColumn
+        x: root.vertical ? (parent.width - width) / 2 : root.mirrored ? root.endPadding : parent.width - width - root.endPadding
+        y: root.vertical ? parent.height - height - root.endPadding : (parent.height - height) / 2
+        width: root.showEndIcon ? root.iconExtent : root.vertical ? parent.width - root.effectiveHorizontalPadding * 2 : valueLabel.reservedWidth
+        height: root.showEndIcon ? root.iconExtent : valueLabel.implicitHeight
+        visible: root.showEndIcon || root.showValueColumn
 
         NumericText {
             id: valueLabel
 
-            anchors {
-                right: parent.right
-                top: parent.top
-                bottom: parent.bottom
-            }
-            text: root.displayText.length > 0 ? root.displayText : (Math.round(root.value) + root.unit)
-            reserveText: {
-                const samples = [root.minimum, root.maximum, root.value];
-                let widest = Math.round(root.maximum) + root.unit;
-                for (let i = 0; i < samples.length; i++) {
-                    const candidate = Math.round(samples[i]) + root.unit;
-                    if (candidate.length > widest.length)
-                        widest = candidate;
-                }
-                return widest;
-            }
-            color: Theme.surfaceText
+            anchors.fill: parent
+            text: !root.showEndIcon && root.displayText.length > 0 ? root.displayText : Math.round(root.value) + root.unit
+            reserveText: Math.round(root.maximum) + root.unit
+            color: !root.showEndIcon ? Theme.onSurface : root.sliderEnabled ? root.fillColor : Theme.onSurface_38
             font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Medium
-            horizontalAlignment: Text.AlignRight
+            font.weight: Theme.fontWeightMedium
+            horizontalAlignment: root.vertical || root.showEndIcon ? Text.AlignHCenter : Text.AlignRight
             verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+            visible: root.showValueColumn
+        }
+
+        DankIcon {
+            anchors.centerIn: parent
+            name: root.endIconName
+            size: Theme.iconSize
+            color: root.sliderEnabled ? root.fillColor : Theme.onSurface_38
+            visible: !root.showValueColumn
         }
     }
 }

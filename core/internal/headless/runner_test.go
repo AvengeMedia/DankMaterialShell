@@ -98,33 +98,6 @@ func TestDepExists(t *testing.T) {
 	}
 }
 
-func TestNewRunner(t *testing.T) {
-	cfg := Config{
-		Compositor:  "niri",
-		Terminal:    "ghostty",
-		IncludeDeps: []string{"dms-greeter"},
-		ExcludeDeps: []string{"some-pkg"},
-		Yes:         true,
-	}
-	r := NewRunner(cfg)
-
-	if r == nil {
-		t.Fatal("NewRunner returned nil")
-	}
-	if r.cfg.Compositor != "niri" {
-		t.Errorf("cfg.Compositor = %q, want %q", r.cfg.Compositor, "niri")
-	}
-	if r.cfg.Terminal != "ghostty" {
-		t.Errorf("cfg.Terminal = %q, want %q", r.cfg.Terminal, "ghostty")
-	}
-	if !r.cfg.Yes {
-		t.Error("cfg.Yes = false, want true")
-	}
-	if r.logChan == nil {
-		t.Error("logChan is nil")
-	}
-}
-
 func TestGetLogChan(t *testing.T) {
 	r := NewRunner(Config{})
 	ch := r.GetLogChan()
@@ -150,31 +123,6 @@ func TestLog(t *testing.T) {
 		r.log("message")
 	}
 	// If we reach here without hanging, the non-blocking send works
-}
-
-func TestRunRequiresYes(t *testing.T) {
-	// Verify that ErrConfirmationRequired is a distinct sentinel error
-	if ErrConfirmationRequired == nil {
-		t.Fatal("ErrConfirmationRequired should not be nil")
-	}
-	expected := "confirmation required: pass --yes to proceed"
-	if ErrConfirmationRequired.Error() != expected {
-		t.Errorf("ErrConfirmationRequired = %q, want %q", ErrConfirmationRequired.Error(), expected)
-	}
-}
-
-func TestConfigYesStoredCorrectly(t *testing.T) {
-	// Yes=false (default) should be stored
-	rNo := NewRunner(Config{Compositor: "niri", Terminal: "ghostty", Yes: false})
-	if rNo.cfg.Yes {
-		t.Error("cfg.Yes = true, want false")
-	}
-
-	// Yes=true should be stored
-	rYes := NewRunner(Config{Compositor: "niri", Terminal: "ghostty", Yes: true})
-	if !rYes.cfg.Yes {
-		t.Error("cfg.Yes = false, want true")
-	}
 }
 
 func TestValidConfigNamesCompleteness(t *testing.T) {
@@ -310,33 +258,6 @@ func TestBuildReplaceConfigs(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-func TestConfigReplaceConfigsStoredCorrectly(t *testing.T) {
-	r := NewRunner(Config{
-		Compositor:        "niri",
-		Terminal:          "ghostty",
-		ReplaceConfigs:    []string{"niri", "ghostty"},
-		ReplaceConfigsAll: false,
-	})
-	if len(r.cfg.ReplaceConfigs) != 2 {
-		t.Errorf("len(ReplaceConfigs) = %d, want 2", len(r.cfg.ReplaceConfigs))
-	}
-	if r.cfg.ReplaceConfigsAll {
-		t.Error("ReplaceConfigsAll = true, want false")
-	}
-
-	r2 := NewRunner(Config{
-		Compositor:        "niri",
-		Terminal:          "ghostty",
-		ReplaceConfigsAll: true,
-	})
-	if !r2.cfg.ReplaceConfigsAll {
-		t.Error("ReplaceConfigsAll = false, want true")
-	}
-	if len(r2.cfg.ReplaceConfigs) != 0 {
-		t.Errorf("len(ReplaceConfigs) = %d, want 0", len(r2.cfg.ReplaceConfigs))
 	}
 }
 

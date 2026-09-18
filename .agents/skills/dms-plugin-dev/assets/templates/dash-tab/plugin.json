@@ -1,0 +1,18 @@
+{
+    "id": "myDashTab",
+    "name": "My Dash Tab",
+    "description": "A custom dash tab",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "dash",
+    "capabilities": ["dash-tab"],
+    "component": "./Tab.qml",
+    "icon": "extension",
+    "dash": {
+        "title": "My Tab",
+        "options": [
+            { "key": "compact", "text": "Compact layout", "type": "toggle", "def": false }
+        ]
+    },
+    "requires_dms": ">=1.7.0"
+}

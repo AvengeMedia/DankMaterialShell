@@ -1,9 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modals.DankLauncherV2.Components
 
 FocusScope {
     id: root
@@ -153,14 +155,14 @@ FocusScope {
             return;
         case Qt.Key_Right:
             if (controller.getCurrentSectionViewMode() !== "list") {
-                controller.selectRight();
+                I18n.isRtl ? controller.selectLeft() : controller.selectRight();
                 return;
             }
             event.accepted = false;
             return;
         case Qt.Key_Left:
             if (controller.getCurrentSectionViewMode() !== "list") {
-                controller.selectLeft();
+                I18n.isRtl ? controller.selectRight() : controller.selectLeft();
                 return;
             }
             event.accepted = false;
@@ -182,7 +184,7 @@ FocusScope {
         case Qt.Key_L:
             if (hasCtrl) {
                 if (controller.getCurrentSectionViewMode() !== "list") {
-                    controller.selectRight();
+                    I18n.isRtl ? controller.selectLeft() : controller.selectRight();
                 }
                 return;
             }
@@ -191,7 +193,7 @@ FocusScope {
         case Qt.Key_H:
             if (hasCtrl) {
                 if (controller.getCurrentSectionViewMode() !== "list") {
-                    controller.selectLeft();
+                    I18n.isRtl ? controller.selectRight() : controller.selectLeft();
                 }
                 return;
             }
@@ -293,94 +295,63 @@ FocusScope {
             readonly property bool _connectedBottomEmerge: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
             readonly property bool _connectedArcAtFooter: _connectedBottomEmerge && !(root.parentModal?.launcherArcExtenderActive ?? false)
             readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
+            readonly property int edgeInset: root.parentModal?.paintedBorderWidth ?? Theme.outlineWidth
+            readonly property var modes: [
+                {
+                    label: I18n.tr("All"),
+                    mode: "all"
+                },
+                {
+                    label: I18n.tr("Apps", "launcher mode tab, short for applications"),
+                    mode: "apps"
+                },
+                {
+                    label: I18n.tr("Files"),
+                    mode: "files"
+                },
+                {
+                    label: I18n.tr("Plugins"),
+                    mode: "plugins"
+                }
+            ]
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: root.parentModal?.borderWidth ?? 1
-            anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            y: contentHolder.inverted ? 0 : (parent.height - height - (_connectedBottomEmerge ? 0 : (root.parentModal?.borderWidth ?? 1)))
-            height: showFooter ? ((_connectedArcAtFooter || contentHolder._connectedArcAtHeader) ? 76 : 36) : 0
+            anchors.leftMargin: footerBar.edgeInset
+            anchors.rightMargin: footerBar.edgeInset
+            y: contentHolder.inverted ? 0 : (parent.height - height - (_connectedBottomEmerge ? 0 : footerBar.edgeInset))
+            height: showFooter ? ((_connectedArcAtFooter || contentHolder._connectedArcAtHeader) ? LauncherMetrics.footerHeight + Theme.avatarSize : LauncherMetrics.footerHeight) : 0
             visible: showFooter
             clip: true
 
             Rectangle {
                 anchors.fill: parent
-                anchors.topMargin: -Theme.cornerRadius
-                // In connected mode the launcher provides the surface so update the toolbar for arcs
-                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !Theme.blurLayersActive
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                radius: Theme.cornerRadius
-            }
+                anchors.topMargin: -Theme.windowRadius
 
-            Row {
-                id: modeButtonsRow
+                visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !Theme.blurLayersActive
+                color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+                radius: Theme.windowRadius
+            }
+            DankFilterChips {
+                id: modeChips
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
-                layoutDirection: I18n.isRtl ? Qt.RightToLeft : Qt.LeftToRight
-                spacing: Theme.spacingXXS
-
-                Repeater {
-                    model: [
-                        {
-                            id: "all",
-                            label: I18n.tr("All"),
-                            icon: "search"
-                        },
-                        {
-                            id: "apps",
-                            label: I18n.tr("Apps"),
-                            icon: "apps"
-                        },
-                        {
-                            id: "files",
-                            label: I18n.tr("Files"),
-                            icon: "folder"
-                        },
-                        {
-                            id: "plugins",
-                            label: I18n.tr("Plugins"),
-                            icon: "extension"
-                        }
-                    ]
-
-                    Rectangle {
-                        required property var modelData
-                        required property int index
-
-                        width: buttonContent.width + Theme.spacingM * 2
-                        height: 28
-                        radius: Theme.cornerRadius
-                        color: controller.searchMode === modelData.id ? Theme.buttonBg : modeArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
-
-                        Row {
-                            id: buttonContent
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-
-                            DankIcon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: modelData.icon
-                                size: 14
-                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
-                            }
-
-                            StyledText {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modelData.label
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: controller.searchMode === modelData.id ? Theme.buttonText : Theme.surfaceText
-                            }
-                        }
-
-                        MouseArea {
-                            id: modeArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: controller.setMode(modelData.id)
-                        }
-                    }
+                width: implicitWidth
+                height: chipHeight
+                flow: Flow.TopToBottom
+                chipHeight: LauncherMetrics.footerChipHeight
+                chipPadding: Theme.spacingS
+                showCheck: false
+                activeFocusOnTab: false
+                model: footerBar.modes
+                Binding on currentIndex {
+                    value: footerBar.modes.findIndex(entry => entry.mode === controller.searchMode)
+                    restoreMode: Binding.RestoreNone
+                }
+                onSelectionChanged: index => {
+                    controller.setMode(footerBar.modes[index].mode);
+                    searchField.forceActiveFocus();
                 }
             }
 
@@ -394,86 +365,45 @@ FocusScope {
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "↑↓ " + I18n.tr("nav")
-                    font.pixelSize: Theme.fontSizeSmall - 1
-                    color: Theme.surfaceVariantText
+                    text: "↑↓ " + I18n.tr("nav", "launcher footer hint after arrow keys, short for navigate")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.onSurfaceVariant
                 }
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "↵ " + I18n.tr("Open")
-                    font.pixelSize: Theme.fontSizeSmall - 1
-                    color: Theme.surfaceVariantText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.onSurfaceVariant
                 }
 
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Tab " + I18n.tr("Actions")
-                    font.pixelSize: Theme.fontSizeSmall - 1
-                    color: Theme.surfaceVariantText
+                    text: I18n.tr("Tab", "keyboard tab key name", true) + " " + I18n.tr("Actions", "noun, launcher footer hint after the tab key, also section label")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.onSurfaceVariant
                     visible: actionPanel.hasActions
                 }
             }
         }
 
-        Row {
+        Item {
             id: searchRow
-            spacing: Theme.spacingS
+            height: searchField.height
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
             y: contentHolder.inverted ? (parent.height - height - Theme.spacingM) : Theme.spacingM
 
-            Rectangle {
-                id: pluginBadge
-                visible: controller.activePluginName.length > 0
-                width: visible ? pluginBadgeContent.implicitWidth + Theme.spacingM : 0
-                height: searchField.height
-                radius: 16
-                color: Theme.primary
-
-                Row {
-                    id: pluginBadgeContent
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingXS
-
-                    DankIcon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: "extension"
-                        size: 14
-                        color: Theme.primaryText
-                    }
-
-                    StyledText {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: controller.activePluginName
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.primaryText
-                    }
-                }
-
-                Behavior on width {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-            }
-
-            DankTextField {
+            LauncherSearchField {
                 id: searchField
-                width: parent.width - (pluginBadge.visible ? pluginBadge.width + Theme.spacingS : 0)
-                leftIconName: controller.activePluginId ? "extension" : controller.searchQuery.startsWith("/") ? "folder" : "search"
-                leftIconSize: Theme.iconSize
-                leftIconColor: Theme.surfaceVariantText
-                leftIconFocusedColor: Theme.primary
-                showClearButton: true
-                textColor: Theme.surfaceText
+                pluginName: controller.activePluginName
+                width: parent.width
+                textColor: Theme.onSurface
                 font.pixelSize: Theme.fontSizeLarge
                 enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
-                placeholderText: ""
+                placeholderText: I18n.tr("Search", "search field placeholder") + "…"
                 ignoreUpDownKeys: true
                 ignoreTabKeys: true
                 keyForwardTargets: [root]
@@ -511,16 +441,16 @@ FocusScope {
             anchors.bottom: contentHolder.inverted ? searchRow.top : footerBar.top
             anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
-            anchors.topMargin: contentHolder.inverted && !footerBar.showFooter ? Theme.spacingM : contentStack.gap
-            anchors.bottomMargin: contentHolder.inverted ? contentStack.gap : 0
-            readonly property real gap: Theme.spacingXS
+            anchors.topMargin: contentHolder.inverted && !footerBar.showFooter ? Theme.spacingM : (contentHolder.inverted || categoryRow.visible || fileFilterRow.visible ? contentStack.gap : 0)
+            anchors.bottomMargin: 0
+            readonly property real gap: controller.searchMode === "files" ? Theme.spacingS : Theme.spacingXS
             clip: false
 
             Row {
                 id: categoryRow
                 width: parent.width
                 readonly property bool showPluginCategories: controller.activePluginCategories.length > 0
-                height: showPluginCategories ? 36 : 0
+                height: showPluginCategories ? Theme.buttonHeightS : 0
                 visible: showPluginCategories
                 spacing: Theme.spacingS
                 anchors.top: parent.top
@@ -537,12 +467,15 @@ FocusScope {
 
                 DankDropdown {
                     id: categoryDropdown
+                    transientSurfaceTracker: root.transientSurfaceTracker
+                    focusPolicy: Qt.NoFocus
+                    focusReturnTarget: searchField
                     visible: categoryRow.showPluginCategories
-                    width: Math.min(200, parent.width)
+                    width: Math.min(Theme.fieldDefaultWidth, parent.width)
                     compactMode: true
-                    dropdownWidth: 200
-                    popupWidth: 240
-                    maxPopupHeight: 300
+                    dropdownWidth: Theme.fieldDefaultWidth
+                    popupWidth: Theme.fieldDefaultWidth + Theme.spacingXL * 2
+                    maxPopupHeight: Theme.menuMaxHeight
                     enableFuzzySearch: controller.activePluginCategories.length > 8
                     currentValue: {
                         const cats = controller.activePluginCategories;
@@ -592,92 +525,63 @@ FocusScope {
                     }
                 }
 
-                Row {
+                RowLayout {
                     id: fileFilterContent
                     width: parent.width
+                    height: Theme.buttonHeightS
                     spacing: Theme.spacingS
 
-                    Row {
-                        id: typeChips
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingXXS
+                    DankDropdown {
+                        id: typeDropdown
+                        focusPolicy: Qt.NoFocus
+                        focusReturnTarget: searchField
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        Layout.minimumWidth: 0
                         visible: DSearchService.supportsTypeFilter
+                        triggerHeight: fileFilterContent.height
+                        compactMode: true
+                        dropdownWidth: width
+                        maxPopupHeight: Theme.menuMaxHeight
+                        transientSurfaceTracker: root.transientSurfaceTracker
+                        currentValue: {
+                            switch (controller.fileSearchType) {
+                            case "file":
+                                return I18n.tr("Files");
+                            case "dir":
+                                return I18n.tr("Folders");
+                            default:
+                                return I18n.tr("All");
+                            }
+                        }
+                        options: [I18n.tr("All"), I18n.tr("Files"), I18n.tr("Folders")]
 
-                        Repeater {
-                            model: [
-                                {
-                                    id: "all",
-                                    label: I18n.tr("All"),
-                                    icon: "search"
-                                },
-                                {
-                                    id: "file",
-                                    label: I18n.tr("Files"),
-                                    icon: "insert_drive_file"
-                                },
-                                {
-                                    id: "dir",
-                                    label: I18n.tr("Folders"),
-                                    icon: "folder"
-                                }
-                            ]
-
-                            Rectangle {
-                                required property var modelData
-                                required property int index
-
-                                width: chipContent.width + Theme.spacingM * 2
-                                height: sortDropdown.height
-                                radius: Theme.cornerRadius
-                                color: controller.fileSearchType === modelData.id ? Theme.buttonBg : chipArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
-
-                                Row {
-                                    id: chipContent
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingXS
-
-                                    DankIcon {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        name: modelData.icon
-                                        size: 14
-                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
-                                    }
-
-                                    StyledText {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: modelData.label
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: controller.fileSearchType === modelData.id ? Theme.buttonText : Theme.surfaceVariantText
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: chipArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: controller.setFileSearchType(modelData.id)
-                                }
+                        onValueChanged: value => {
+                            switch (value) {
+                            case I18n.tr("Files"):
+                                controller.setFileSearchType("file");
+                                return;
+                            case I18n.tr("Folders"):
+                                controller.setFileSearchType("dir");
+                                return;
+                            default:
+                                controller.setFileSearchType("all");
                             }
                         }
                     }
 
-                    Rectangle {
-                        width: 1
-                        height: 20
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: Theme.outlineMedium
-                        visible: typeChips.visible
-                    }
-
                     DankDropdown {
                         id: sortDropdown
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: Math.min(130, parent.width / 3)
+                        focusPolicy: Qt.NoFocus
+                        focusReturnTarget: searchField
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        Layout.minimumWidth: 0
+                        triggerHeight: fileFilterContent.height
                         compactMode: true
-                        dropdownWidth: 130
-                        popupWidth: 150
-                        maxPopupHeight: 200
+                        dropdownWidth: width
+                        maxPopupHeight: Theme.menuMaxHeight
+                        transientSurfaceTracker: root.transientSurfaceTracker
                         currentValue: {
                             switch (controller.fileSearchSort) {
                             case "score":
@@ -692,7 +596,7 @@ FocusScope {
                                 return I18n.tr("Score");
                             }
                         }
-                        options: [I18n.tr("Score"), I18n.tr("Name"), I18n.tr("Modified"), I18n.tr("Size")]
+                        options: [I18n.tr("Score", "noun, launcher file search sort option, match relevance"), I18n.tr("Name"), I18n.tr("Modified"), I18n.tr("Size")]
 
                         onValueChanged: value => {
                             var sortMap = {};
@@ -706,11 +610,13 @@ FocusScope {
 
                     DankTextField {
                         id: extFilterField
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: Math.min(100, parent.width / 4)
-                        height: sortDropdown.height
-                        placeholderText: I18n.tr("ext")
-                        font.pixelSize: Theme.fontSizeSmall
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        Layout.minimumWidth: 0
+                        Layout.preferredHeight: fileFilterContent.height
+                        backgroundColor: Theme.surfaceContainer
+                        placeholderText: I18n.tr("ext", "launcher file search placeholder, short for file extension")
+                        font.pixelSize: Theme.fontSizeMedium
                         showClearButton: text.length > 0
 
                         onTextChanged: {
@@ -726,7 +632,7 @@ FocusScope {
                 anchors.top: fileFilterRow.visible ? fileFilterRow.bottom : (categoryRow.visible ? categoryRow.bottom : parent.top)
                 anchors.topMargin: (fileFilterRow.visible || categoryRow.visible) ? contentStack.gap : 0
                 anchors.bottom: actionPanel.top
-                anchors.bottomMargin: actionPanel.height > 0 || !contentHolder.inverted ? contentStack.gap : 0
+                anchors.bottomMargin: actionPanel.height > 0 ? contentStack.gap : (footerBar.showFooter || contentHolder.inverted ? 0 : Theme.spacingM)
                 opacity: {
                     if (!root.parentModal)
                         return 1;
@@ -737,6 +643,8 @@ FocusScope {
 
                 ResultsList {
                     id: resultsList
+                    focusReturnTarget: searchField
+                    keyForwardTargets: [root]
                     anchors.fill: parent
                     controller: root.controller
                     leadingSectionHeaderAtBottom: contentHolder.inverted

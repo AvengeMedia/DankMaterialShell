@@ -2,61 +2,54 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
-import Quickshell.Hyprland
-import Quickshell.I3
 import Quickshell.WindowManager
 import qs.Common
+import qs.Modules.DankBar
+import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import "../../../Common/WorkspaceModel.js" as WorkspaceModel
 
-Item {
+BasePill {
     id: root
 
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
-    property string screenName: ""
-    property real widgetHeight: 30
-    property real barThickness: 48
-    property var barConfig: null
-    property var blurBarWindow: null
-    property var hyprlandOverviewLoader: null
-    property var parentScreen: null
-    property real crossEdgeExtension: 0
+    enableBackgroundHover: false
 
-    readonly property bool isMango: CompositorService.isMango
+    property bool isVertical: axis?.isVertical ?? false
+    property var widgetData: null
+    property string screenName: ""
+    property var hyprlandOverviewLoader: null
+    property var surfaceContext: null
+    readonly property bool segmented: surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
+    readonly property real compactRatio: 0.7
+    readonly property real slimRatio: 0.5
+    readonly property real activeRatio: 1.05
+    readonly property real activeIconRatio: 1.6
+    readonly property real iconRatio: 1.2
+    readonly property real overviewTintAlpha: 0.18
+    readonly property real dragOpacity: 0.8
+    readonly property real hoverFadeAlpha: 0.7
+
     readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1"
 
-    property bool isFirst: false
-    property bool isLast: false
-    property real sectionSpacing: 0
-    property bool isLeftBarEdge: false
-    property bool isRightBarEdge: false
-    property bool isTopBarEdge: false
-    property bool isBottomBarEdge: false
-
-    readonly property real barEdgeExtension: 1000
-    readonly property real _leftMargin: isVertical ? 0 : (isLeftBarEdge && isFirst ? barEdgeExtension : (isFirst ? sectionSpacing : sectionSpacing / 2))
-    readonly property real _rightMargin: isVertical ? 0 : (isRightBarEdge && isLast ? barEdgeExtension : (isLast ? sectionSpacing : sectionSpacing / 2))
-    readonly property real _topMargin: isVertical ? (isTopBarEdge && isFirst ? barEdgeExtension : (isFirst ? sectionSpacing : sectionSpacing / 2)) : (axis?.edge === "top" ? crossEdgeExtension : 0)
-    readonly property real _bottomMargin: isVertical ? (isBottomBarEdge && isLast ? barEdgeExtension : (isLast ? sectionSpacing : sectionSpacing / 2)) : (axis?.edge === "bottom" ? crossEdgeExtension : 0)
-
-    property int _desktopEntriesUpdateTrigger: 0
-    readonly property var sortedToplevels: {
-        return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
+    function opt(key) {
+        return SettingsData.widgetOption("workspaceSwitcher", widgetData, key);
     }
 
+    property int _desktopEntriesUpdateTrigger: 0
+
     readonly property string effectiveScreenName: {
-        if (!SettingsData.workspaceFollowFocus)
+        if (!root.opt("workspaceFollowFocus"))
             return root.screenName;
         return BarWidgetService.getFocusedScreenName() || root.screenName;
     }
-    readonly property bool mangoOverviewActive: CompositorService.isMango && MangoService.isOutputInOverview(effectiveScreenName)
+    readonly property bool workspacesHiddenByOverview: CompositorService.workspacesHiddenByOverview(effectiveScreenName)
 
     readonly property bool isFocusedMonitor: {
         const focused = BarWidgetService.getFocusedScreenName();
         return focused === "" || root.screenName === "" || focused === root.screenName;
     }
-    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && SettingsData.workspaceUnfocusedMonitorSeparateAppearance && BarWidgetService.focusedScreenDetectionSupported
+    readonly property bool useUnfocusedAppearance: !isFocusedMonitor && root.opt("workspaceUnfocusedMonitorSeparateAppearance") && BarWidgetService.focusedScreenDetectionSupported
 
     readonly property var extProjection: (useExtWorkspace && parentScreen) ? WindowManager.screenProjection(CompositorService.isAqueous ? Quickshell.screens.find(s => s.name === effectiveScreenName) || parentScreen : parentScreen) : null
     readonly property bool useExtWorkspace: {
@@ -64,20 +57,11 @@ Item {
             return false;
         if (Quickshell.env("DMS_FORCE_EXTWS") === "1")
             return (WindowManager.windowsets?.length ?? 0) > 0;
-        if (!CompositorService.compositorDetected)
+        if (!CompositorService.compositorDetected || CompositorService.hasWorkspaceIpc)
             return false;
-        switch (CompositorService.compositor) {
-        case "niri":
-        case "hyprland":
-        case "mango":
-        case "sway":
-        case "scroll":
-        case "miracle":
-            return false;
-        default:
-            return (WindowManager.windowsets?.length ?? 0) > 0;
-        }
+        return (WindowManager.windowsets?.length ?? 0) > 0;
     }
+    readonly property bool useNativeWorkspaces: useAqueous || (!useExtWorkspace && CompositorService.hasWorkspaceIpc)
 
     Connections {
         target: DesktopEntries
@@ -86,313 +70,54 @@ Item {
         }
     }
 
-    Connections {
-        target: CompositorService
-        function onCompositorChanged() {
-            root._placeholderPool = [];
-            root._hyprSlotPool = {};
-        }
+    readonly property string compositorName: CompositorService.compositor
+
+    onCompositorNameChanged: {
+        _placeholderPool = [];
+        _hyprSlotPool = {};
     }
 
     property var currentWorkspace: {
-        if (useAqueous)
-            return AqueousService.workspacesForOutput(effectiveScreenName).find(w => w.active)?.id || "";
         if (useExtWorkspace)
             return getExtWorkspaceActiveWorkspace();
-
-        switch (CompositorService.compositor) {
-        case "niri":
-            return getNiriActiveWorkspace();
-        case "hyprland":
-            return getHyprlandActiveWorkspace();
-        case "mango":
-            const activeTags = getDwlActiveTags();
-            return activeTags.length > 0 ? activeTags[0] : -1;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            return getSwayActiveWorkspace();
-        default:
+        if (!useNativeWorkspaces)
             return 1;
-        }
-    }
-    property var dwlActiveTags: {
-        if (root.isMango) {
-            return getDwlActiveTags();
-        }
-        return [];
+        return CompositorService.currentWorkspaceKey(root.screenName, root.opt("workspaceFollowFocus"));
     }
     property var workspaceList: {
-        if (useAqueous) {
-            const baseList = AqueousService.workspacesForOutput(effectiveScreenName).filter(ws => !SettingsData.showOccupiedWorkspacesOnly || ws.active || AqueousService.toplevels.some(w => w.aqueousWorkspaceId === ws.id));
-            return SettingsData.showWorkspacePadding && baseList.length ? padWorkspaces(baseList) : baseList;
-        }
         if (useExtWorkspace) {
             const baseList = getExtWorkspaceWorkspaces();
-            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
+            return root.opt("showWorkspacePadding") ? padWorkspaces(baseList) : baseList;
         }
-
-        let baseList;
-        switch (CompositorService.compositor) {
-        case "niri":
-            baseList = getNiriWorkspaces();
-            break;
-        case "hyprland":
-            return hyprlandSlotList(getHyprlandWorkspaces());
-        case "mango":
-            if (root.mangoOverviewActive)
-                return [];
-            baseList = getDwlTags();
-            break;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            baseList = getSwayWorkspaces();
-            break;
-        default:
+        if (!useNativeWorkspaces)
             return [1];
-        }
-        return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
-    }
+        if (root.workspacesHiddenByOverview)
+            return [];
 
-    function getSwayWorkspaces() {
-        const workspaces = I3.workspaces?.values || [];
-        if (workspaces.length === 0)
-            return [
-                {
-                    "num": 1
-                }
-            ];
-
-        function mapWorkspace(ws) {
-            return {
-                "num": ws.number,
-                "name": stripSwayWorkspaceNumber(ws.number, ws.name),
-                "focused": ws.focused,
-                "active": ws.active,
-                "urgent": ws.urgent,
-                "monitor": ws.monitor
-            };
-        }
-
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            return workspaces.slice().sort(swayWorkspaceOrder).map(mapWorkspace);
-        }
-
-        const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === root.screenName);
-        return monitorWorkspaces.length > 0 ? monitorWorkspaces.sort(swayWorkspaceOrder).map(mapWorkspace) : [
-            {
-                "num": 1
-            }
-        ];
-    }
-
-    // sway/scroll fold `<num>:<name>` into the name field (num 1 → name "1:test"); drop the redundant prefix so the index option controls it
-    function stripSwayWorkspaceNumber(num, name) {
-        if (num === undefined || num === -1)
-            return name;
-        if (typeof name !== "string")
-            return name;
-        const prefix = num + ":";
-        if (!name.startsWith(prefix))
-            return name;
-        return name.slice(prefix.length);
-    }
-
-    // Numbered workspaces first in ascending order; purely-named workspaces (sway reports num -1) after, by name
-    function swayWorkspaceOrder(a, b) {
-        const keyA = a.num === -1 ? Number.MAX_SAFE_INTEGER : a.num;
-        const keyB = b.num === -1 ? Number.MAX_SAFE_INTEGER : b.num;
-        if (keyA !== keyB)
-            return keyA - keyB;
-        return (a.name ?? "").localeCompare(b.name ?? "");
-    }
-
-    // Sway reports num -1 for purely-named workspaces, so identity must fall back to name
-    function swayWorkspaceKey(ws) {
-        return ws.num !== -1 ? ws.num : ws.name;
-    }
-
-    function getSwayActiveWorkspace() {
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            return focusedWs ? swayWorkspaceKey(focusedWs) : 1;
-        }
-
-        const focusedWs = I3.workspaces?.values?.find(ws => ws.monitor?.name === root.screenName && ws.focused === true);
-        return focusedWs ? swayWorkspaceKey(focusedWs) : 1;
-    }
-
-    // Numbered workspaces first in id order, named (negative id) after, by name
-    function hyprlandWorkspaceOrder(a, b) {
-        const keyA = a.id < 0 ? Number.MAX_SAFE_INTEGER : a.id;
-        const keyB = b.id < 0 ? Number.MAX_SAFE_INTEGER : b.id;
-        if (keyA !== keyB)
-            return keyA - keyB;
-        return (a.name ?? "").localeCompare(b.name ?? "");
-    }
-
-    function hyprlandWorkspaceSelector(ws) {
-        if (!ws)
-            return 1;
-        return ws.id > 0 ? ws.id : "name:" + (ws.name ?? "");
-    }
-
-    // A hotplug can leave the workspace→monitor mapping stale so nothing matches this screen;
-    // show what the monitor itself reports rather than a fabricated workspace "1" (#3133)
-    function hyprlandMonitorWorkspaces(workspaces) {
-        const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === root.screenName);
-        if (monitorWorkspaces.length > 0)
-            return monitorWorkspaces.sort(hyprlandWorkspaceOrder);
-        const active = Hyprland.monitors?.values?.find(m => m.name === root.screenName)?.activeWorkspace;
-        return active ? [active] : [];
-    }
-
-    function getHyprlandWorkspaces() {
-        const workspaces = Hyprland.workspaces?.values || [];
-        if (workspaces.length === 0) {
-            return [
-                {
-                    id: 1,
-                    name: "1"
-                }
-            ];
-        }
-
-        // Hyprland gives named workspaces negative ids (from -1337 down); special
-        // workspaces always store a "special:" name prefix ("special" pre-colon era)
-        let filtered = workspaces.filter(ws => {
-            if (ws.id > 0)
-                return true;
-            const name = ws.name ?? "";
-            return name !== "special" && !name.startsWith("special:");
+        const baseList = CompositorService.workspacesForScreen(root.screenName, root.opt("workspaceFollowFocus"), {
+            "occupiedOnly": root.opt("showOccupiedWorkspacesOnly"),
+            "showAllTags": root.opt("dwlShowAllTags")
         });
-        if (filtered.length === 0) {
-            return [
-                {
-                    id: 1,
-                    name: "1"
-                }
-            ];
-        }
-
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            filtered = filtered.slice().sort(hyprlandWorkspaceOrder);
-        } else {
-            filtered = hyprlandMonitorWorkspaces(filtered);
-        }
-
-        if (!SettingsData.showOccupiedWorkspacesOnly) {
-            return filtered;
-        }
-
-        const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || []);
-        const activeWsId = root.currentWorkspace;
-        return filtered.filter(ws => {
-            if (ws.id === activeWsId)
-                return true;
-            return hyprlandToplevels.some(tl => tl.workspace?.id === ws.id);
-        });
-    }
-
-    function getHyprlandActiveWorkspace() {
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            return Hyprland.focusedWorkspace?.id || 1;
-        }
-
-        const monitor = Hyprland.monitors?.values?.find(m => m.name === root.screenName);
-        return monitor?.activeWorkspace?.id || 1;
+        if (CompositorService.ephemeralWorkspaces)
+            return hyprlandSlotList(baseList);
+        if (!root.opt("showWorkspacePadding") || (root.useAqueous && baseList.length === 0))
+            return baseList;
+        return padWorkspaces(baseList);
     }
 
     function getWorkspaceIcons(ws) {
         _desktopEntriesUpdateTrigger;
-        if (!SettingsData.showWorkspaceApps || !ws || useExtWorkspace || (useAqueous && ws._placeholder)) {
+        if (!root.opt("showWorkspaceApps") || !ws || !root.useNativeWorkspaces || ws.placeholder) {
             return [];
         }
-
-        let targetWorkspaceId;
-        if (useAqueous) {
-            targetWorkspaceId = ws.id;
-        } else if (CompositorService.isNiri) {
-            if (!ws || typeof ws !== "object") {
-                const wsNumber = typeof ws === "number" ? ws : -1;
-                if (wsNumber <= 0) {
-                    return [];
-                }
-                const workspace = NiriService.allWorkspaces.find(w => w.idx + 1 === wsNumber && w.output === root.effectiveScreenName);
-                if (!workspace) {
-                    return [];
-                }
-                targetWorkspaceId = workspace.id;
-            } else {
-                if (ws.id === undefined || ws.id === -1 || ws.idx === -1) {
-                    return [];
-                }
-                targetWorkspaceId = ws.id;
-            }
-        } else if (CompositorService.isHyprland) {
-            targetWorkspaceId = ws.id !== undefined ? ws.id : ws;
-        } else if (root.isMango) {
-            if (typeof ws !== "object" || ws.tag === undefined) {
-                return [];
-            }
-            targetWorkspaceId = ws.tag;
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            targetWorkspaceId = ws.num !== undefined ? ws.num : ws;
-        } else {
-            return [];
-        }
-
-        const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
 
         const byApp = {};
-        let isActiveWs = false;
-        if (CompositorService.isNiri) {
-            isActiveWs = NiriService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active);
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false;
-        } else if (root.isMango) {
-            const output = MangoService.getOutputState(root.effectiveScreenName);
-            if (output && output.tags) {
-                const tag = output.tags.find(t => t.tag === targetWorkspaceId);
-                isActiveWs = tag ? (tag.state === 1) : false;
-            }
-        } else {
-            isActiveWs = targetWorkspaceId === root.currentWorkspace;
-        }
+        const isActiveWs = CompositorService.workspaceAppsActive(ws, root.currentWorkspace);
 
-        wins.forEach((w, i) => {
-            if (!w) {
-                return;
-            }
-
-            if (CompositorService.isMango) {
-                // mangoTags are 1-based; targetWorkspaceId is 0-based.
-                if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
-                    return;
-            } else {
-                let winWs = null;
-                if (useAqueous) {
-                    winWs = w.aqueousWorkspaceId;
-                } else if (CompositorService.isNiri) {
-                    winWs = w.workspace_id;
-                } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                    winWs = w.workspace?.num;
-                } else {
-                    const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || []);
-                    const hyprToplevel = hyprlandToplevels.find(ht => ht.wayland === w);
-                    winWs = hyprToplevel?.workspace?.id;
-                }
-
-                if (winWs === undefined || winWs === null || winWs !== targetWorkspaceId) {
-                    return;
-                }
-            }
-
+        CompositorService.windowsOnWorkspace(ws).forEach((w, i) => {
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
             const moddedId = Paths.moddedAppId(keyBase);
-            const groupThisWs = SettingsData.groupWorkspaceApps && (!isActiveWs || SettingsData.groupActiveWorkspaceApps);
+            const groupThisWs = root.opt("groupWorkspaceApps") && (!isActiveWs || root.opt("groupActiveWorkspaceApps"));
             const key = groupThisWs ? moddedId : (w.aqueousKey || `${moddedId}_${i}`);
 
             if (!byApp[key]) {
@@ -406,7 +131,7 @@ Item {
                     "icon": icon,
                     "isQuickshell": isQuickshell,
                     "isSteamApp": isSteamApp,
-                    "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
+                    "active": !!(w.activated || w.is_focused),
                     "count": 1,
                     "windowId": w.address || w.id,
                     "windowSession": useAqueous ? w.aqueousSession : "",
@@ -414,44 +139,13 @@ Item {
                 };
             } else {
                 byApp[key].count++;
-                if ((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)) {
+                if (w.activated || w.is_focused) {
                     byApp[key].active = true;
                 }
             }
         });
 
         return Object.values(byApp);
-    }
-
-    function _makePlaceholder() {
-        if (useAqueous || useExtWorkspace)
-            return {
-                "id": "",
-                "name": "",
-                "active": false,
-                "_placeholder": true
-            };
-        if (CompositorService.isNiri)
-            return {
-                "id": -1,
-                "idx": -1,
-                "name": ""
-            };
-        if (CompositorService.isHyprland)
-            return {
-                "id": -1,
-                "name": ""
-            };
-        if (root.isMango)
-            return {
-                "tag": -1
-            };
-        if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-            return {
-                "num": -1,
-                "_placeholder": true
-            };
-        return -1;
     }
 
     // Hyprland creates/destroys workspaces on empty enter/leave; slots keyed by id keep delegate identity so pills animate instead of popping
@@ -462,10 +156,15 @@ Item {
 
         QtObject {
             property var ws: null
-            readonly property var id: ws ? ws.id : -1
-            readonly property string name: ws?.name ?? ""
-            readonly property bool urgent: ws?.urgent ?? false
         }
+    }
+
+    readonly property var _hyprPlaceholder: WorkspaceModel.placeholder()
+
+    function recordOf(entry) {
+        if (!entry || entry.ws === undefined)
+            return entry;
+        return entry.ws ?? _hyprPlaceholder;
     }
 
     function _hyprSlot(key, ws) {
@@ -481,7 +180,7 @@ Item {
 
     function hyprlandSlotList(raw) {
         const slots = raw.map(ws => _hyprSlot(ws.id > 0 ? ws.id : "name:" + (ws.name ?? ""), ws));
-        if (!SettingsData.showWorkspacePadding)
+        if (!root.opt("showWorkspacePadding"))
             return slots;
         // pad past the highest real id so a placeholder becomes that workspace's slot once created
         let nextId = raw.reduce((max, ws) => Math.max(max, ws.id ?? 0), 0);
@@ -498,112 +197,11 @@ Item {
         let slot = 0;
         while (padded.length < 3) {
             if (root._placeholderPool.length <= slot)
-                root._placeholderPool.push(root._makePlaceholder());
+                root._placeholderPool.push(WorkspaceModel.placeholder());
             padded.push(root._placeholderPool[slot]);
             slot++;
         }
         return padded;
-    }
-
-    function getNiriWorkspaces() {
-        if (NiriService.allWorkspaces.length === 0) {
-            return [
-                {
-                    "id": 1,
-                    "idx": 0,
-                    "name": ""
-                },
-                {
-                    "id": 2,
-                    "idx": 1,
-                    "name": ""
-                }
-            ];
-        }
-
-        const fallbackWorkspaces = [
-            {
-                "id": 1,
-                "idx": 0,
-                "name": ""
-            },
-            {
-                "id": 2,
-                "idx": 1,
-                "name": ""
-            }
-        ];
-
-        let workspaces;
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            const currentWorkspaces = NiriService.getCurrentOutputWorkspaces();
-            workspaces = currentWorkspaces.length > 0 ? currentWorkspaces : fallbackWorkspaces;
-        } else {
-            const displayWorkspaces = NiriService.allWorkspaces.filter(ws => ws.output === root.screenName);
-            workspaces = displayWorkspaces.length > 0 ? displayWorkspaces : fallbackWorkspaces;
-        }
-
-        workspaces = workspaces.slice().sort((a, b) => a.idx - b.idx);
-
-        if (!SettingsData.showOccupiedWorkspacesOnly) {
-            return workspaces;
-        }
-
-        return workspaces.filter(ws => {
-            if (ws.is_active)
-                return true;
-            return NiriService.windows?.some(win => win.workspace_id === ws.id) ?? false;
-        });
-    }
-
-    function getNiriActiveWorkspace() {
-        if (NiriService.allWorkspaces.length === 0) {
-            return 1;
-        }
-
-        if (!root.screenName || SettingsData.workspaceFollowFocus) {
-            return NiriService.getCurrentWorkspaceNumber();
-        }
-
-        const activeWs = NiriService.allWorkspaces.find(ws => ws.output === root.screenName && ws.is_active);
-        return activeWs ? activeWs.idx : 1;
-    }
-
-    function getDwlTags() {
-        if (!MangoService.available)
-            return [];
-
-        const targetScreen = root.effectiveScreenName;
-        const output = MangoService.getOutputState(targetScreen);
-        if (!output || !output.tags || output.tags.length === 0)
-            return [];
-
-        if (SettingsData.dwlShowAllTags) {
-            return output.tags.map(tag => ({
-                        "tag": tag.tag,
-                        "state": tag.state,
-                        "clients": tag.clients,
-                        "focused": tag.focused
-                    }));
-        }
-
-        const visibleTagIndices = MangoService.getVisibleTags(targetScreen);
-        return visibleTagIndices.map(tagIndex => {
-            const tagData = output.tags.find(t => t.tag === tagIndex);
-            return {
-                "tag": tagIndex,
-                "state": tagData?.state ?? 0,
-                "clients": tagData?.clients ?? 0,
-                "focused": tagData?.focused ?? false
-            };
-        });
-    }
-
-    function getDwlActiveTags() {
-        if (!MangoService.available)
-            return [];
-
-        return MangoService.getActiveTags(root.effectiveScreenName);
     }
 
     function getExtWorkspaceWorkspaces() {
@@ -640,63 +238,29 @@ Item {
         return activeWs || null;
     }
 
-    readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
-    readonly property real padding: (root.barConfig?.removeWidgetPadding ?? false) ? 0 : Theme.snap((root.barConfig?.widgetPadding ?? 12) * (widgetHeight / 30), dpr)
-    readonly property real visualWidth: isVertical ? widgetHeight : (workspaceRow.implicitWidth + padding * 2)
-    readonly property real visualHeight: isVertical ? (workspaceRow.implicitHeight + padding * 2) : widgetHeight
-    readonly property real appIconSize: Theme.barIconSize(barThickness, -6 + SettingsData.workspaceAppIconSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+    readonly property real appIconSize: Theme.barIconSize(barThickness, -6 + root.opt("workspaceAppIconSizeOffset"), root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
 
     function getRealWorkspaces() {
-        return root.workspaceList.filter(ws => {
-            if (useAqueous || useExtWorkspace)
-                return ws && !ws._placeholder;
-            if (CompositorService.isNiri)
-                return ws && ws.idx !== -1;
-            if (CompositorService.isHyprland)
-                return ws && ws.id !== -1;
-            if (root.isMango)
-                return ws && ws.tag !== -1;
-            if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                return ws && !ws._placeholder;
-            return ws !== -1;
-        });
+        return root.workspaceList.filter(ws => ws && !root.recordOf(ws).placeholder);
     }
 
-    function switchToWorkspaceByModelData(data) {
-        if (!data || data._placeholder)
+    function switchToWorkspaceByModelData(entry) {
+        const data = root.recordOf(entry);
+        if (!data || data.placeholder)
             return;
-
-        if (useAqueous) {
-            AqueousService.activateWorkspace(data);
-            return;
-        }
-
-        if (root.useExtWorkspace) {
-            if (typeof data.activate === "function")
-                data.activate();
+        if (root.useNativeWorkspaces) {
+            CompositorService.switchToWorkspace(data);
             return;
         }
+        if (root.useExtWorkspace && typeof data.activate === "function")
+            data.activate();
+    }
 
-        switch (CompositorService.compositor) {
-        case "niri":
-            if (data.id !== undefined)
-                NiriService.switchToWorkspace(data.id);
-            break;
-        case "hyprland":
-            if (data.id && data.id !== -1) {
-                HyprlandService.focusWorkspace(hyprlandWorkspaceSelector(data));
-            }
-            break;
-        case "mango":
-            if (data.tag !== undefined)
-                MangoService.switchToTag(root.screenName, data.tag);
-            break;
-        case "sway":
-        case "scroll":
-        case "miracle":
-            CompositorService.dispatchSwayWorkspace(data);
-            break;
-        }
+    function toggleHyprlandOverview() {
+        const overview = root.hyprlandOverviewLoader?.item;
+        if (!overview)
+            return;
+        overview.overviewOpen = !overview.overviewOpen;
     }
 
     function findClosestWorkspaceIndex(localX, localY) {
@@ -726,7 +290,7 @@ Item {
             const index = workspaces.findIndex(w => w.id === currentWorkspace);
             const next = Math.max(0, Math.min(workspaces.length - 1, index + (direction > 0 ? 1 : -1)));
             if (next !== index)
-                AqueousService.activateWorkspace(workspaces[next]);
+                CompositorService.switchToWorkspace(workspaces[next]);
             return;
         }
         if (useExtWorkspace) {
@@ -746,110 +310,27 @@ Item {
             const nextWorkspace = realWorkspaces[nextIndex];
             if (typeof nextWorkspace.activate === "function")
                 nextWorkspace.activate();
-        } else if (CompositorService.isNiri) {
-            const realWorkspaces = getRealWorkspaces();
-            if (realWorkspaces.length < 2) {
-                return;
-            }
-
-            const currentIndex = realWorkspaces.findIndex(ws => ws && ws.idx === root.currentWorkspace);
-            const validIndex = currentIndex === -1 ? 0 : currentIndex;
-            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
-
-            if (nextIndex === validIndex) {
-                return;
-            }
-
-            const nextWorkspace = realWorkspaces[nextIndex];
-            if (!nextWorkspace || nextWorkspace.id === undefined) {
-                return;
-            }
-            NiriService.switchToWorkspace(nextWorkspace.id);
-        } else if (CompositorService.isHyprland) {
-            const realWorkspaces = getRealWorkspaces();
-            if (realWorkspaces.length < 2) {
-                return;
-            }
-
-            const currentIndex = realWorkspaces.findIndex(ws => ws.id === root.currentWorkspace);
-            const validIndex = currentIndex === -1 ? 0 : currentIndex;
-            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
-
-            if (nextIndex === validIndex) {
-                return;
-            }
-
-            HyprlandService.focusWorkspace(hyprlandWorkspaceSelector(realWorkspaces[nextIndex]));
-        } else if (root.isMango) {
-            const realWorkspaces = getRealWorkspaces();
-            if (realWorkspaces.length < 2) {
-                return;
-            }
-
-            const currentIndex = realWorkspaces.findIndex(ws => ws.tag === root.currentWorkspace);
-            const validIndex = currentIndex === -1 ? 0 : currentIndex;
-            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
-
-            if (nextIndex === validIndex) {
-                return;
-            }
-
-            MangoService.switchToTag(root.screenName, realWorkspaces[nextIndex].tag);
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            const realWorkspaces = getRealWorkspaces();
-            if (realWorkspaces.length < 2) {
-                return;
-            }
-
-            const currentIndex = realWorkspaces.findIndex(ws => swayWorkspaceKey(ws) === root.currentWorkspace);
-            const validIndex = currentIndex === -1 ? 0 : currentIndex;
-            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0);
-
-            if (nextIndex === validIndex) {
-                return;
-            }
-
-            CompositorService.dispatchSwayWorkspace(realWorkspaces[nextIndex]);
+            return;
         }
+        if (!useNativeWorkspaces)
+            return;
+        CompositorService.stepWorkspace(getRealWorkspaces(), root.currentWorkspace, direction);
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
-        if (useAqueous)
-            return modelData?.number ?? "";
         if (root.useExtWorkspace)
             return index + 1;
-        if (CompositorService.isNiri)
-            return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
-        if (CompositorService.isHyprland)
-            return modelData?.id > 0 ? modelData.id : (modelData?.name ?? "");
-        if (root.isMango)
-            return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
-        if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-            return (modelData?.num !== undefined && modelData.num !== -1) ? modelData.num : (modelData?.name ?? "");
-        return modelData - 1;
+        if (!root.useNativeWorkspaces)
+            return modelData - 1;
+        return modelData?.idx ?? modelData?.name ?? "";
     }
 
     function getWorkspaceIndex(modelData, index) {
-        let isPlaceholder;
-        if (root.useAqueous || root.useExtWorkspace) {
-            isPlaceholder = modelData?._placeholder === true;
-        } else if (CompositorService.isNiri) {
-            isPlaceholder = modelData?.idx === -1;
-        } else if (CompositorService.isHyprland) {
-            isPlaceholder = modelData?.id === -1;
-        } else if (root.isMango) {
-            isPlaceholder = modelData?.tag === -1;
-        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            isPlaceholder = modelData?._placeholder === true;
-        } else {
-            isPlaceholder = modelData === -1;
-        }
-
-        if (isPlaceholder)
+        if (modelData?.placeholder === true)
             return index + 1;
 
         let workspaceName = "";
-        if (SettingsData.showWorkspaceName) {
+        if (root.opt("showWorkspaceName")) {
             workspaceName = modelData?.name ?? "";
 
             if (workspaceName && workspaceName !== "") {
@@ -862,7 +343,7 @@ Item {
         }
 
         if (workspaceName) {
-            if (SettingsData.showWorkspaceIndex) {
+            if (root.opt("showWorkspaceIndex")) {
                 const indexLabel = getWorkspaceIndexFallback(modelData, index);
                 return indexLabel ? `${indexLabel}: ${workspaceName}` : workspaceName;
             }
@@ -872,150 +353,73 @@ Item {
         return getWorkspaceIndexFallback(modelData, index);
     }
 
-    readonly property bool hasNativeWorkspaceSupport: useAqueous || CompositorService.isNiri || CompositorService.isHyprland || root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
-    readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
+    readonly property bool shouldShow: useNativeWorkspaces || (useExtWorkspace && hasWorkspaces)
 
     width: shouldShow ? (isVertical ? barThickness : visualWidth) : 0
     height: shouldShow ? (isVertical ? visualHeight : barThickness) : 0
     visible: shouldShow
 
-    Item {
-        id: visualBackground
-        width: root.visualWidth
-        height: root.visualHeight
-        anchors.centerIn: parent
-
-        Rectangle {
-            id: outline
-            anchors.centerIn: parent
-            width: {
-                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
-                return parent.width + borderWidth * 2;
-            }
-            height: {
-                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
-                return parent.height + borderWidth * 2;
-            }
-            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
-            color: "transparent"
-            border.width: {
-                if (barConfig?.widgetOutlineEnabled ?? false) {
-                    return barConfig?.widgetOutlineThickness ?? 1;
-                }
-                return 0;
-            }
-            border.color: {
-                if (!(barConfig?.widgetOutlineEnabled ?? false)) {
-                    return "transparent";
-                }
-                const colorOption = barConfig?.widgetOutlineColor || "primary";
-                const opacity = barConfig?.widgetOutlineOpacity ?? 1.0;
-                switch (colorOption) {
-                case "surfaceText":
-                    return Theme.withAlpha(Theme.surfaceText, opacity);
-                case "secondary":
-                    return Theme.withAlpha(Theme.secondary, opacity);
-                case "primary":
-                    return Theme.withAlpha(Theme.primary, opacity);
-                default:
-                    return Theme.withAlpha(Theme.primary, opacity);
-                }
-            }
-        }
-
-        Rectangle {
-            id: background
-            anchors.fill: parent
-            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
-            color: {
-                if ((barConfig?.noBackground ?? false))
-                    return "transparent";
-                const baseColor = Theme.widgetBaseBackgroundColor;
-                const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
-                if (Theme.widgetBackgroundHasAlpha) {
-                    return Theme.blendAlpha(baseColor, transparency);
-                }
-                return Theme.withAlpha(baseColor, transparency);
-            }
+    content: Component {
+        Item {
+            implicitWidth: workspaceRow.implicitWidth
+            implicitHeight: workspaceRow.implicitHeight
         }
     }
 
-    MouseArea {
-        id: edgeMouseArea
-        z: -1
-        x: -root._leftMargin
-        y: -root._topMargin
-        width: root.width + root._leftMargin + root._rightMargin
-        height: root.height + root._topMargin + root._bottomMargin
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+    property real touchpadAccumulator: 0
+    property real mouseAccumulator: 0
+    property bool scrollInProgress: false
 
-        property real touchpadAccumulator: 0
-        property real mouseAccumulator: 0
-        property bool scrollInProgress: false
+    Timer {
+        id: scrollCooldown
+        interval: 100
+        onTriggered: root.scrollInProgress = false
+    }
 
-        Timer {
-            id: scrollCooldown
-            interval: 100
-            onTriggered: parent.scrollInProgress = false
-        }
+    onRightClicked: {
+        CompositorService.workspaceSecondaryAction(null, root.effectiveScreenName);
+        root.toggleHyprlandOverview();
+    }
 
-        onClicked: mouse => {
-            const rootPos = edgeMouseArea.mapToItem(root, mouse.x, mouse.y);
-            switch (mouse.button) {
-            case Qt.RightButton:
-                if (CompositorService.isAqueous) {
-                    AqueousService.toggleOverview(root.effectiveScreenName);
-                } else if (CompositorService.isNiri) {
-                    NiriService.toggleOverview();
-                } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
-                    root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
-                }
-                break;
-            case Qt.LeftButton:
-                const idx = root.findClosestWorkspaceIndex(rootPos.x, rootPos.y);
-                if (idx >= 0)
-                    root.switchToWorkspaceByModelData(root.workspaceList[idx]);
-                break;
-            }
-        }
+    onPressedAt: (rootX, rootY) => {
+        const idx = root.findClosestWorkspaceIndex(rootX, rootY);
+        if (idx >= 0)
+            root.switchToWorkspaceByModelData(root.workspaceList[idx]);
+    }
 
-        onWheel: wheel => {
-            if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y)) {
-                wheel.accepted = false;
+    onWheel: wheel => {
+        if (Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y))
+            return;
+        wheel.accepted = true;
+
+        if (scrollInProgress)
+            return;
+
+        const delta = wheel.angleDelta.y;
+        const isTouchpad = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
+        const reverse = root.opt("reverseScrolling") ? -1 : 1;
+
+        if (isTouchpad) {
+            touchpadAccumulator += delta;
+            if (Math.abs(touchpadAccumulator) < 500)
                 return;
-            }
-
-            if (scrollInProgress)
-                return;
-
-            const delta = wheel.angleDelta.y;
-            const isTouchpad = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-            const reverse = SettingsData.reverseScrolling ? -1 : 1;
-
-            if (isTouchpad) {
-                touchpadAccumulator += delta;
-                if (Math.abs(touchpadAccumulator) < 500)
-                    return;
-                const direction = touchpadAccumulator * reverse < 0 ? 1 : -1;
-                root.switchWorkspace(direction);
-                scrollInProgress = true;
-                scrollCooldown.restart();
-                touchpadAccumulator = 0;
-                return;
-            }
-
-            mouseAccumulator += delta;
-            if (Math.abs(mouseAccumulator) < 120)
-                return;
-            const direction = mouseAccumulator * reverse < 0 ? 1 : -1;
+            const direction = touchpadAccumulator * reverse < 0 ? 1 : -1;
             root.switchWorkspace(direction);
             scrollInProgress = true;
             scrollCooldown.restart();
-            mouseAccumulator = 0;
+            touchpadAccumulator = 0;
+            return;
         }
+
+        mouseAccumulator += delta;
+        if (Math.abs(mouseAccumulator) < 120)
+            return;
+        const direction = mouseAccumulator * reverse < 0 ? 1 : -1;
+        root.switchWorkspace(direction);
+        scrollInProgress = true;
+        scrollCooldown.restart();
+        mouseAccumulator = 0;
     }
 
     property int dragSourceIndex: -1
@@ -1030,30 +434,29 @@ Item {
         }
     }
 
-    Flow {
+    BarSegment {
         id: workspaceRow
 
-        x: isVertical ? visualBackground.x : (parent.width - implicitWidth) / 2
-        y: isVertical ? (parent.height - implicitHeight) / 2 : visualBackground.y
-        spacing: Theme.spacingS
-        flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
+        anchors.centerIn: root.visualContent
+        spacing: root.segmented ? BarMetrics.segmentGap : Theme.spacingS
+        vertical: root.isVertical
 
         // mango reports active_tags=0 while the overview is open; surface it as a pill
         Item {
             id: overviewPill
-            visible: CompositorService.isMango && MangoService.inOverview
-            width: root.isVertical ? root.widgetHeight : overviewBg.width
-            height: root.isVertical ? overviewBg.height : root.widgetHeight
+            visible: CompositorService.workspacesHiddenByOverview(CompositorService.getFocusedScreenName())
+            width: root.isVertical ? root.widgetThickness : overviewBg.width
+            height: root.isVertical ? overviewBg.height : root.widgetThickness
 
             readonly property real labelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
 
             Rectangle {
                 id: overviewBg
                 anchors.centerIn: parent
-                width: root.isVertical ? Math.max(root.widgetHeight * 0.7, overviewContent.implicitWidth + Theme.spacingS) : (overviewContent.implicitWidth + Theme.spacingS * 2)
-                height: Math.max(root.widgetHeight * 0.5, overviewContent.implicitHeight + Theme.spacingXS)
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.primary, 0.18)
+                width: root.isVertical ? Math.max(root.widgetThickness * root.compactRatio, overviewContent.implicitWidth + Theme.spacingS) : (overviewContent.implicitWidth + Theme.spacingS * 2)
+                height: Math.max(root.widgetThickness * root.slimRatio, overviewContent.implicitHeight + Theme.spacingXS)
+                radius: BarMetrics.pillRadius(Math.min(width, height), BarMetrics.widgetStyle(root.barConfig))
+                color: Theme.withAlpha(Theme.primary, root.overviewTintAlpha)
 
                 Row {
                     id: overviewContent
@@ -1070,10 +473,10 @@ Item {
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: !root.isVertical
-                        text: I18n.tr("Overview")
+                        text: I18n.tr("Overview", "noun, niri compositor overview mode label")
                         color: Theme.primary
                         font.pixelSize: overviewPill.labelSize
-                        font.weight: Font.DemiBold
+                        font.weight: Theme.fontWeightMedium
                     }
                 }
             }
@@ -1081,7 +484,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: MangoService.dispatch("toggleoverview")
+                onClicked: CompositorService.toggleOverview(root.effectiveScreenName)
             }
         }
 
@@ -1105,7 +508,7 @@ Item {
                     const dropIdx = root.dragTargetIndex;
                     if (dropIdx < 0)
                         return 0;
-                    const shiftAmount = delegateRoot.width + Theme.spacingS;
+                    const shiftAmount = delegateRoot.width + workspaceRow.spacing;
                     if (dragIdx < dropIdx && index > dragIdx && index <= dropIdx)
                         return -shiftAmount;
                     if (dragIdx > dropIdx && index >= dropIdx && index < dragIdx)
@@ -1149,68 +552,22 @@ Item {
                     y: root.isVertical ? shiftYSpring.value : 0
                 }
 
+                readonly property var record: root.recordOf(modelData)
                 property bool isActive: {
-                    if (root.useAqueous)
-                        return modelData?.active === true;
-                    if (root.useExtWorkspace)
+                    if (root.useExtWorkspace || !root.useNativeWorkspaces)
                         return modelData === root.currentWorkspace;
-                    if (CompositorService.isNiri)
-                        return !!(modelData && modelData.idx === root.currentWorkspace);
-                    if (CompositorService.isHyprland)
-                        return !!(modelData && modelData.id === root.currentWorkspace);
-                    if (root.isMango)
-                        return !!(modelData && root.dwlActiveTags.includes(modelData.tag));
-                    if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                        return !!(modelData && root.swayWorkspaceKey(modelData) === root.currentWorkspace);
-                    return modelData === root.currentWorkspace;
+                    return CompositorService.isCurrentWorkspace(record, root.currentWorkspace);
                 }
-                property bool isOccupied: {
-                    if (root.useAqueous)
-                        return AqueousService.toplevels.some(w => w.aqueousWorkspaceId === modelData?.id);
-                    if (CompositorService.isHyprland)
-                        return Array.from(Hyprland.toplevels?.values || []).some(tl => tl.workspace?.id === modelData?.id);
-                    if (root.isMango)
-                        return modelData.clients > 0;
-                    if (CompositorService.isNiri)
-                        return NiriService.windows?.some(win => win.workspace_id === modelData?.id) ?? false;
-                    return false;
-                }
-                property bool isPlaceholder: {
-                    if (root.useAqueous || root.useExtWorkspace)
-                        return !!(modelData && modelData._placeholder);
-                    if (CompositorService.isNiri)
-                        return !!(modelData && modelData.idx === -1);
-                    if (CompositorService.isHyprland)
-                        return !!(modelData && modelData.id === -1);
-                    if (root.isMango)
-                        return !!(modelData && modelData.tag === -1);
-                    if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                        return !!(modelData && modelData._placeholder);
-                    return modelData === -1;
-                }
+                property bool isOccupied: root.useNativeWorkspaces && CompositorService.workspaceOccupied(record)
+                property bool isPlaceholder: !!(record && record.placeholder)
                 property bool isHovered: mouseArea.containsMouse
 
-                property var loadedWorkspaceData: null
                 property bool loadedIsUrgent: false
-                property bool isUrgent: {
-                    if (root.useAqueous)
-                        return modelData?.urgent === true;
-                    if (root.useExtWorkspace)
-                        return modelData?.urgent ?? false;
-                    if (CompositorService.isHyprland)
-                        return modelData?.urgent ?? false;
-                    if (CompositorService.isNiri)
-                        return loadedIsUrgent;
-                    if (root.isMango)
-                        return modelData?.state === 2;
-                    if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                        return loadedIsUrgent;
-                    return false;
-                }
+                property bool isUrgent: root.useNativeWorkspaces ? CompositorService.workspaceUrgent(record, loadedIsUrgent) : (modelData?.urgent ?? false)
                 readonly property var loadedIconData: {
                     if (isPlaceholder)
                         return null;
-                    const name = modelData?.name;
+                    const name = record?.name;
                     if (!name)
                         return null;
                     return SettingsData.getWorkspaceNameIcon(name);
@@ -1219,56 +576,21 @@ Item {
                 property var loadedIcons: []
 
                 readonly property int stableIconCount: {
-                    if (!SettingsData.showWorkspaceApps || isPlaceholder)
+                    if (!root.opt("showWorkspaceApps") || isPlaceholder)
                         return 0;
 
                     if (root.useAqueous)
                         return loadedIcons.length;
 
-                    let targetWorkspaceId;
-                    if (root.useExtWorkspace) {
-                        targetWorkspaceId = modelData?.id || modelData?.name;
-                    } else if (CompositorService.isNiri) {
-                        targetWorkspaceId = modelData?.id;
-                    } else if (CompositorService.isHyprland) {
-                        targetWorkspaceId = modelData?.id;
-                    } else if (root.isMango) {
-                        targetWorkspaceId = modelData?.tag;
-                    } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                        targetWorkspaceId = modelData?.num;
-                    }
-                    if (targetWorkspaceId === undefined || targetWorkspaceId === null)
+                    if (!root.useNativeWorkspaces)
                         return 0;
 
-                    const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels;
+                    const wins = CompositorService.windowsOnWorkspace(delegateRoot.record);
                     const seen = {};
                     let groupedCount = 0;
-                    let totalCount = 0;
 
                     for (let i = 0; i < wins.length; i++) {
                         const w = wins[i];
-                        if (!w)
-                            continue;
-
-                        let winWs = null;
-                        if (CompositorService.isNiri) {
-                            winWs = w.workspace_id;
-                        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                            winWs = w.workspace?.num;
-                        } else if (CompositorService.isHyprland) {
-                            const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || []);
-                            const hyprToplevel = hyprlandToplevels.find(ht => ht.wayland === w);
-                            winWs = hyprToplevel?.workspace?.id;
-                        }
-
-                        if (CompositorService.isMango) {
-                            if (!(w.mangoTags || []).includes(targetWorkspaceId + 1))
-                                continue;
-                        } else if (winWs !== targetWorkspaceId) {
-                            continue;
-                        }
-                        totalCount++;
-
                         const appKey = w.app_id || w.appId || w.class || w.windowClass || "unknown";
                         if (!seen[appKey]) {
                             seen[appKey] = true;
@@ -1276,26 +598,25 @@ Item {
                         }
                     }
 
-                    return (SettingsData.groupWorkspaceApps && (!isActive || SettingsData.groupActiveWorkspaceApps)) ? groupedCount : totalCount;
+                    return (root.opt("groupWorkspaceApps") && (!isActive || root.opt("groupActiveWorkspaceApps"))) ? groupedCount : wins.length;
                 }
 
-                readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5) : (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2))
-                readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetHeight * 1.05, root.appIconSize * 1.6) : Math.max(root.widgetHeight * 0.7, root.appIconSize * 1.2)) : (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5)
-                readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
-                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (root.useAqueous || CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
+                readonly property real baseWidth: root.isVertical ? (root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * root.slimRatio) : (isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio))
+                readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio)) : (root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * root.slimRatio)
+                readonly property bool hasWorkspaceName: root.opt("showWorkspaceName") && record?.name && record.name !== ""
                 readonly property real contentImplicitWidth: appIconsLoader.item?.contentWidth ?? 0
                 readonly property real contentImplicitHeight: appIconsLoader.item?.contentHeight ?? 0
 
                 readonly property real iconsExtraWidth: {
-                    if (!root.isVertical && SettingsData.showWorkspaceApps && stableIconCount > 0) {
-                        const numIcons = Math.min(stableIconCount, SettingsData.maxWorkspaceIcons);
+                    if (!root.isVertical && root.opt("showWorkspaceApps") && stableIconCount > 0) {
+                        const numIcons = Math.min(stableIconCount, root.opt("maxWorkspaceIcons"));
                         return numIcons * root.appIconSize + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0) + (isActive ? Theme.spacingXS : 0);
                     }
                     return 0;
                 }
                 readonly property real iconsExtraHeight: {
-                    if (root.isVertical && SettingsData.showWorkspaceApps && stableIconCount > 0) {
-                        const numIcons = Math.min(stableIconCount, SettingsData.maxWorkspaceIcons);
+                    if (root.isVertical && root.opt("showWorkspaceApps") && stableIconCount > 0) {
+                        const numIcons = Math.min(stableIconCount, root.opt("maxWorkspaceIcons"));
                         return numIcons * root.appIconSize + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0) + (isActive ? Theme.spacingXS : 0);
                     }
                     return 0;
@@ -1359,28 +680,28 @@ Item {
                     return root.useUnfocusedAppearance ? unfocusedCustom : focusedCustom;
                 }
 
-                readonly property color unfocusedColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUnfocusedColorMode, SettingsData.workspaceUnfocusedMonitorUnfocusedColorMode), Theme.surfaceTextAlpha, effectiveCustomColor(SettingsData.workspaceUnfocusedCustomColor, SettingsData.workspaceUnfocusedMonitorUnfocusedCustomColor), Theme.surfaceTextAlpha)
+                readonly property color unfocusedColor: colorFromMode(effectiveColorMode(root.opt("workspaceUnfocusedColorMode"), root.opt("workspaceUnfocusedMonitorUnfocusedColorMode")), Theme.surfaceTextAlpha, effectiveCustomColor(root.opt("workspaceUnfocusedCustomColor"), root.opt("workspaceUnfocusedMonitorUnfocusedCustomColor")), Theme.surfaceTextAlpha)
 
+                readonly property string activeColorMode: effectiveColorMode(root.opt("workspaceColorMode"), root.opt("workspaceUnfocusedMonitorColorMode"))
                 readonly property color activeColor: {
-                    const mode = effectiveColorMode(SettingsData.workspaceColorMode, SettingsData.workspaceUnfocusedMonitorColorMode);
-                    if (mode === "none")
+                    if (activeColorMode === "none")
                         return unfocusedColor;
-                    return colorFromMode(mode, Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedCustomColor, SettingsData.workspaceUnfocusedMonitorFocusedCustomColor), Theme.primary);
+                    return colorFromMode(activeColorMode, Theme.primary, effectiveCustomColor(root.opt("workspaceFocusedCustomColor"), root.opt("workspaceUnfocusedMonitorFocusedCustomColor")), Theme.primary);
                 }
 
                 readonly property color occupiedColor: {
-                    const mode = effectiveColorMode(SettingsData.workspaceOccupiedColorMode, SettingsData.workspaceUnfocusedMonitorOccupiedColorMode);
+                    const mode = effectiveColorMode(root.opt("workspaceOccupiedColorMode"), root.opt("workspaceUnfocusedMonitorOccupiedColorMode"));
                     if (mode === "none")
                         return unfocusedColor;
-                    return colorFromMode(mode, unfocusedColor, effectiveCustomColor(SettingsData.workspaceOccupiedCustomColor, SettingsData.workspaceUnfocusedMonitorOccupiedCustomColor), Theme.secondary);
+                    return colorFromMode(mode, unfocusedColor, effectiveCustomColor(root.opt("workspaceOccupiedCustomColor"), root.opt("workspaceUnfocusedMonitorOccupiedCustomColor")), Theme.secondary);
                 }
 
-                readonly property color urgentColor: colorFromMode(effectiveColorMode(SettingsData.workspaceUrgentColorMode, SettingsData.workspaceUnfocusedMonitorUrgentColorMode), Theme.error, effectiveCustomColor(SettingsData.workspaceUrgentCustomColor, SettingsData.workspaceUnfocusedMonitorUrgentCustomColor), Theme.error)
+                readonly property color urgentColor: colorFromMode(effectiveColorMode(root.opt("workspaceUrgentColorMode"), root.opt("workspaceUnfocusedMonitorUrgentColorMode")), Theme.error, effectiveCustomColor(root.opt("workspaceUrgentCustomColor"), root.opt("workspaceUnfocusedMonitorUrgentCustomColor")), Theme.error)
 
-                readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(SettingsData.workspaceFocusedBorderColor, SettingsData.workspaceUnfocusedMonitorBorderColor), Theme.primary, effectiveCustomColor(SettingsData.workspaceFocusedBorderCustomColor, SettingsData.workspaceUnfocusedMonitorBorderCustomColor), Theme.primary)
+                readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(root.opt("workspaceFocusedBorderColor"), root.opt("workspaceUnfocusedMonitorBorderColor")), Theme.primary, effectiveCustomColor(root.opt("workspaceFocusedBorderCustomColor"), root.opt("workspaceUnfocusedMonitorBorderCustomColor")), Theme.primary)
 
-                readonly property bool focusedBorderEnabledForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderEnabled : SettingsData.workspaceFocusedBorderEnabled
-                readonly property int focusedBorderThicknessForMonitor: root.useUnfocusedAppearance ? SettingsData.workspaceUnfocusedMonitorBorderThickness : SettingsData.workspaceFocusedBorderThickness
+                readonly property bool focusedBorderEnabledForMonitor: root.useUnfocusedAppearance ? root.opt("workspaceUnfocusedMonitorBorderEnabled") : root.opt("workspaceFocusedBorderEnabled")
+                readonly property int focusedBorderThicknessForMonitor: root.useUnfocusedAppearance ? root.opt("workspaceUnfocusedMonitorBorderThickness") : root.opt("workspaceFocusedBorderThickness")
 
                 function getContrastingIconColor(bgColor) {
                     return Theme.isLightColor(bgColor, 0.4) ? Qt.rgba(0.15, 0.15, 0.15, 1) : Qt.rgba(0.8, 0.8, 0.8, 1);
@@ -1389,7 +710,7 @@ Item {
                 readonly property color quickshellIconActiveColor: getContrastingIconColor(activeColor)
                 readonly property color quickshellIconInactiveColor: getContrastingIconColor(unfocusedColor)
 
-                readonly property color requestedColor: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, 0.7) : isOccupied ? occupiedColor : unfocusedColor
+                readonly property color requestedColor: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, root.hoverFadeAlpha) : isOccupied ? occupiedColor : unfocusedColor
 
                 property bool colorAnimationReady: false
 
@@ -1407,16 +728,14 @@ Item {
                     property bool dragging: false
                     property point dragStartPos: Qt.point(0, 0)
                     property real dragAxisOffset: 0
+                    readonly property var rootWorkspaceList: root.workspaceList
 
-                    Connections {
-                        target: root
-                        function onWorkspaceListChanged() {
-                            if (dragHandler.dragging) {
-                                dragHandler.dragging = false;
-                                dragHandler.dragAxisOffset = 0;
-                                mouseArea.mousePressed = false;
-                            }
-                        }
+                    onRootWorkspaceListChanged: {
+                        if (!dragging)
+                            return;
+                        dragging = false;
+                        dragAxisOffset = 0;
+                        mouseArea.mousePressed = false;
                     }
                 }
 
@@ -1431,14 +750,14 @@ Item {
                     property bool mousePressed: false
 
                     onPressed: mouse => {
-                        if (mouse.button === Qt.LeftButton && CompositorService.isNiri && SettingsData.workspaceDragReorder && !isPlaceholder) {
+                        if (mouse.button === Qt.LeftButton && CompositorService.workspaceReorderSupported && root.opt("workspaceDragReorder") && !isPlaceholder) {
                             mousePressed = true;
                             dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
                         }
                     }
 
                     onPositionChanged: mouse => {
-                        if (!mousePressed || !CompositorService.isNiri || !SettingsData.workspaceDragReorder || isPlaceholder)
+                        if (!mousePressed || !CompositorService.workspaceReorderSupported || !root.opt("workspaceDragReorder") || isPlaceholder)
                             return;
 
                         if (!dragHandler.dragging) {
@@ -1455,7 +774,7 @@ Item {
 
                         const rawAxisOffset = root.isVertical ? (mouse.y - dragHandler.dragStartPos.y) : (mouse.x - dragHandler.dragStartPos.x);
 
-                        const itemSize = (root.isVertical ? delegateRoot.height : delegateRoot.width) + Theme.spacingS;
+                        const itemSize = (root.isVertical ? delegateRoot.height : delegateRoot.width) + workspaceRow.spacing;
                         const maxOffsetPositive = (root.workspaceList.length - 1 - index) * itemSize;
                         const maxOffsetNegative = -index * itemSize;
                         const axisOffset = Math.max(maxOffsetNegative, Math.min(maxOffsetPositive, rawAxisOffset));
@@ -1479,7 +798,7 @@ Item {
 
                             if (sourceWs && targetWs && sourceWs.id !== undefined && targetWs.idx !== undefined) {
                                 root.suppressShiftAnimation = true;
-                                NiriService.moveWorkspaceToIndex(sourceWs.id, targetWs.idx);
+                                CompositorService.moveWorkspace(sourceWs, targetWs);
                                 Qt.callLater(() => root.suppressShiftAnimation = false);
                             }
                         }
@@ -1496,32 +815,10 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             if (delegateRoot.focusWindowAt(mouse.x, mouse.y))
                                 return;
-                            if (root.useAqueous) {
-                                root.switchToWorkspaceByModelData(modelData);
-                            } else if (root.useExtWorkspace) {
-                                if (typeof modelData?.activate === "function")
-                                    modelData.activate();
-                            } else if (CompositorService.isNiri) {
-                                if (modelData && modelData.id !== undefined) {
-                                    NiriService.switchToWorkspace(modelData.id);
-                                }
-                            } else if (CompositorService.isHyprland && modelData?.id) {
-                                HyprlandService.focusWorkspace(root.hyprlandWorkspaceSelector(modelData));
-                            } else if (root.isMango && modelData?.tag !== undefined) {
-                                MangoService.switchToTag(root.screenName, modelData.tag);
-                            } else if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && modelData?.num !== undefined) {
-                                CompositorService.dispatchSwayWorkspace(modelData);
-                            }
+                            root.switchToWorkspaceByModelData(modelData);
                         } else if (mouse.button === Qt.RightButton) {
-                            if (CompositorService.isAqueous) {
-                                AqueousService.toggleOverview(root.effectiveScreenName);
-                            } else if (CompositorService.isNiri) {
-                                NiriService.toggleOverview();
-                            } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
-                                root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen;
-                            } else if (root.isMango && modelData?.tag !== undefined) {
-                                MangoService.toggleTag(root.screenName, modelData.tag);
-                            }
+                            CompositorService.workspaceSecondaryAction(record, root.effectiveScreenName);
+                            root.toggleHyprlandOverview();
                         }
                     }
                 }
@@ -1531,43 +828,13 @@ Item {
                     interval: 50
                     onTriggered: {
                         if (isPlaceholder) {
-                            delegateRoot.loadedWorkspaceData = null;
                             delegateRoot.loadedIcons = [];
                             delegateRoot.loadedIsUrgent = false;
                             return;
                         }
 
-                        var wsData = null;
-                        if (root.useAqueous || root.useExtWorkspace) {
-                            wsData = modelData;
-                        } else if (CompositorService.isNiri) {
-                            wsData = modelData || null;
-                        } else if (CompositorService.isHyprland) {
-                            wsData = modelData;
-                        } else if (root.isMango) {
-                            wsData = modelData;
-                        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                            wsData = modelData;
-                        }
-                        delegateRoot.loadedWorkspaceData = wsData;
-                        if (CompositorService.isNiri) {
-                            const workspaceId = wsData?.id;
-                            delegateRoot.loadedIsUrgent = workspaceId ? NiriService.windows.some(w => w.workspace_id === workspaceId && w.is_urgent) : false;
-                        } else {
-                            delegateRoot.loadedIsUrgent = wsData?.urgent ?? false;
-                        }
-
-                        if (SettingsData.showWorkspaceApps) {
-                            if (root.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-                                delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
-                            } else if (CompositorService.isNiri) {
-                                delegateRoot.loadedIcons = root.getWorkspaceIcons(isPlaceholder ? null : modelData);
-                            } else {
-                                delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : (modelData === -1 ? null : modelData));
-                            }
-                        } else {
-                            delegateRoot.loadedIcons = [];
-                        }
+                        delegateRoot.loadedIsUrgent = CompositorService.loadWorkspaceUrgent(delegateRoot.record);
+                        delegateRoot.loadedIcons = root.opt("showWorkspaceApps") ? root.getWorkspaceIcons(delegateRoot.record) : [];
                     }
                 }
 
@@ -1582,7 +849,10 @@ Item {
                     const point = layout.mapFromItem(mouseArea, x, y);
                     const icon = layout.childAt(point.x, point.y);
                     if (root.useAqueous)
-                        return icon?.windowId ? {id: icon.windowId, session: icon.windowSession} : null;
+                        return icon?.windowId ? {
+                            id: icon.windowId,
+                            session: icon.windowSession
+                        } : null;
                     return icon?.windowId ?? null;
                 }
 
@@ -1590,42 +860,34 @@ Item {
                     const winId = delegateRoot.windowIdAt(x, y);
                     if (!winId)
                         return false;
-                    if (root.useAqueous) {
-                        AqueousService.command("window.activate", winId);
-                        return true;
-                    }
-                    if (CompositorService.isHyprland) {
-                        HyprlandService.focusWindow(winId);
-                        return true;
-                    }
-                    if (CompositorService.isNiri) {
-                        NiriService.focusWindow(winId);
-                        return true;
-                    }
-                    return false;
+                    return CompositorService.focusWindow(winId);
                 }
 
-                width: root.isVertical ? root.widgetHeight : visualWidth
-                height: root.isVertical ? visualHeight : root.widgetHeight
+                width: root.isVertical ? root.widgetThickness : visualWidth
+                height: root.isVertical ? visualHeight : root.widgetThickness
 
                 Behavior on width {
+                    enabled: !SettingsData.reduceMotion
                     NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
+                        duration: Theme.expressiveDurations.expressiveFastSpatial
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                     }
                 }
 
                 Behavior on height {
+                    enabled: !SettingsData.reduceMotion
                     NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
+                        duration: Theme.expressiveDurations.expressiveFastSpatial
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                     }
                 }
 
                 Rectangle {
                     id: focusedBorderRing
-                    x: root.isVertical ? (root.widgetHeight - width) / 2 : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetHeight - height) / 2
+                    x: root.isVertical ? (root.widgetThickness - width) / 2 : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2
                     width: {
                         const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualWidth + borderWidth * 2;
@@ -1634,51 +896,67 @@ Item {
                         const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualHeight + borderWidth * 2;
                     }
-                    radius: Theme.cornerRadius
+                    topLeftRadius: visualContent.topLeftRadius + border.width
+                    topRightRadius: visualContent.topRightRadius + border.width
+                    bottomLeftRadius: visualContent.bottomLeftRadius + border.width
+                    bottomRightRadius: visualContent.bottomRightRadius + border.width
                     color: "transparent"
                     border.width: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0
                     border.color: (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? focusedBorderColor : Theme.withAlpha(focusedBorderColor, 0)
 
                     Behavior on width {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on height {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on border.width {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on border.color {
+                        enabled: !SettingsData.reduceMotion
                         ColorAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveEffects
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                         }
                     }
                 }
 
-                Rectangle {
+                BarPillSurface {
                     id: visualContent
                     width: delegateRoot.visualWidth
                     height: delegateRoot.visualHeight
-                    x: root.isVertical ? (root.widgetHeight - width) / 2 : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetHeight - height) / 2
-                    radius: Theme.cornerRadius
+                    x: root.isVertical ? (root.widgetThickness - width) / 2 : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2
+                    thickness: Math.min(width, height)
+                    style: BarMetrics.widgetStyle(root.barConfig)
+                    vertical: root.isVertical
+                    joinedStart: root.segmented && index > 0
+                    joinedEnd: root.segmented && index < workspaceRepeater.count - 1
+                    pressed: mouseArea.pressed
                     color: delegateRoot.displayColor
-                    opacity: dragHandler.dragging ? 0.8 : 1.0
+                    opacity: dragHandler.dragging ? root.dragOpacity : 1.0
 
-                    border.width: dragHandler.dragging ? 2 : (isUrgent ? 2 : (isDropTarget ? 2 : 0))
+                    border.width: dragHandler.dragging || isUrgent || isDropTarget ? Theme.outlineWidthFocused : 0
                     border.color: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : Theme.withAlpha(Theme.primary, 0)))
 
                     transform: Translate {
@@ -1687,44 +965,54 @@ Item {
                     }
 
                     Behavior on opacity {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveEffects
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                         }
                     }
 
                     Behavior on width {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on height {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on border.width {
+                        enabled: !SettingsData.reduceMotion
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveFastSpatial
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
                         }
                     }
 
                     Behavior on border.color {
+                        enabled: !SettingsData.reduceMotion
                         ColorAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.expressiveDurations.expressiveEffects
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                         }
                     }
 
                     Loader {
                         id: appIconsLoader
                         anchors.fill: parent
-                        active: SettingsData.showWorkspaceApps || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
+                        active: root.opt("showWorkspaceApps") || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
                         sourceComponent: Item {
                             id: contentRoot
                             readonly property real contentWidth: contentRow.item?.implicitWidth ?? 0
@@ -1741,7 +1029,7 @@ Item {
                                 id: rowLayout
                                 Row {
                                     spacing: Theme.spacingXS
-                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
 
                                     Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -1769,35 +1057,35 @@ Item {
                                             text: loadedIconData?.value ?? ""
                                             color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            font.weight: (isActive && !isPlaceholder) ? Math.max(Theme.fontWeight, Font.DemiBold) : Theme.fontWeight
+                                            font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                         }
                                     }
 
                                     Item {
-                                        visible: ((SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon) || (loadedHasIcon && SettingsData.showWorkspaceName && hasWorkspaceName)
+                                        visible: ((root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon) || (loadedHasIcon && root.opt("showWorkspaceName") && hasWorkspaceName)
                                         width: wsIndexText.implicitWidth
                                         height: root.appIconSize
 
                                         StyledText {
                                             id: wsIndexText
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: loadedHasIcon ? (modelData?.name ?? "") : root.getWorkspaceIndex(modelData, index)
+                                            text: loadedHasIcon ? (record?.name ?? "") : root.getWorkspaceIndex(record, index)
                                             color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            font.weight: (isActive && !isPlaceholder) ? Math.max(Theme.fontWeight, Font.DemiBold) : Theme.fontWeight
+                                            font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                         }
                                     }
 
                                     Repeater {
                                         model: ScriptModel {
-                                            values: loadedIcons.slice(0, SettingsData.maxWorkspaceIcons)
+                                            values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
                                         }
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
                                             readonly property string windowSession: modelData.windowSession || ""
-                                            readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
+                                            readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
                                             readonly property real appOpacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
@@ -1814,8 +1102,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && rowAppIcon.status !== Image.Ready
                                                 color: Theme.surfaceContainer
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
                                                 opacity: appOpacity
 
@@ -1824,7 +1112,7 @@ Item {
                                                     text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
                                                     font.pixelSize: parent.width * 0.45
                                                     color: appGlyphColor
-                                                    font.weight: Font.Bold
+                                                    font.weight: Theme.fontWeightMedium
                                                 }
                                             }
 
@@ -1832,8 +1120,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && modelData.isSteamApp && rowSteamIcon.status !== Image.Ready
                                                 color: Theme.surfaceContainer
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
                                                 opacity: appOpacity
 
@@ -1879,8 +1167,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
                                                 color: "transparent"
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: focusedBorderColor
                                                 z: 1
                                             }
@@ -1896,7 +1184,7 @@ Item {
                                                 radius: root.appIconSize * 0.33
                                                 color: "black"
                                                 border.color: "white"
-                                                border.width: 1
+                                                border.width: Theme.outlineWidth
                                                 anchors.right: parent.right
                                                 anchors.bottom: parent.bottom
                                                 z: 2
@@ -1917,7 +1205,7 @@ Item {
                                 id: columnLayout
                                 Column {
                                     spacing: Theme.spacingXS
-                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
 
                                     DankIcon {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -1934,28 +1222,28 @@ Item {
                                         text: loadedIconData?.value ?? ""
                                         color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                        font.weight: (isActive && !isPlaceholder) ? Math.max(Theme.fontWeight, Font.DemiBold) : Theme.fontWeight
+                                        font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
 
                                     StyledText {
-                                        visible: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon
+                                        visible: (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: root.getWorkspaceIndex(modelData, index)
+                                        text: root.getWorkspaceIndex(record, index)
                                         color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                        font.weight: (isActive && !isPlaceholder) ? Math.max(Theme.fontWeight, Font.DemiBold) : Theme.fontWeight
+                                        font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
 
                                     Repeater {
                                         model: ScriptModel {
-                                            values: loadedIcons.slice(0, SettingsData.maxWorkspaceIcons)
+                                            values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
                                         }
                                         delegate: Item {
                                             width: root.appIconSize
                                             height: root.appIconSize
                                             readonly property var windowId: modelData.windowId
                                             readonly property string windowSession: modelData.windowSession || ""
-                                            readonly property bool appHighlightActive: SettingsData.workspaceActiveAppHighlightEnabled && modelData.active
+                                            readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
                                             readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
                                             readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
                                             readonly property real appOpacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
@@ -1972,8 +1260,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && colAppIcon.status !== Image.Ready
                                                 color: Theme.surfaceContainer
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
                                                 opacity: appOpacity
 
@@ -1982,7 +1270,7 @@ Item {
                                                     text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
                                                     font.pixelSize: parent.width * 0.45
                                                     color: appGlyphColor
-                                                    font.weight: Font.Bold
+                                                    font.weight: Theme.fontWeightMedium
                                                 }
                                             }
 
@@ -1990,8 +1278,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && modelData.isSteamApp && colSteamIcon.status !== Image.Ready
                                                 color: Theme.surfaceContainer
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
                                                 opacity: appOpacity
 
@@ -2037,8 +1325,8 @@ Item {
                                                 anchors.fill: parent
                                                 visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
                                                 color: "transparent"
-                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
-                                                border.width: 1
+                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                                border.width: Theme.outlineWidth
                                                 border.color: focusedBorderColor
                                                 z: 1
                                             }
@@ -2054,7 +1342,7 @@ Item {
                                                 radius: root.appIconSize * 0.33
                                                 color: "black"
                                                 border.color: "white"
-                                                border.width: 1
+                                                border.width: Theme.outlineWidth
                                                 anchors.right: parent.right
                                                 anchors.bottom: parent.bottom
                                                 z: 2
@@ -2084,29 +1372,15 @@ Item {
                     function onSortedToplevelsChanged() {
                         delegateRoot.updateAllData();
                     }
-                }
-                Connections {
-                    target: root
-                    function onCurrentWorkspaceChanged() {
+                    function onWorkspaceStateChanged() {
                         delegateRoot.updateAllData();
                     }
                 }
-                Connections {
-                    target: NiriService
-                    enabled: CompositorService.isNiri
-                    function onAllWorkspacesChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                    function onWindowUrgentChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                    function onWindowsChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                }
+                readonly property var rootCurrentWorkspace: root.currentWorkspace
+                onRootCurrentWorkspaceChanged: updateAllData()
                 Connections {
                     target: SettingsData
-                    function onShowWorkspaceAppsChanged() {
+                    function onBarConfigsChanged() {
                         delegateRoot.updateAllData();
                     }
                     function onWorkspaceNameIconsChanged() {
@@ -2114,48 +1388,6 @@ Item {
                     }
                     function onAppIdSubstitutionsChanged() {
                         delegateRoot.updateAllData();
-                    }
-                    function onGroupWorkspaceAppsChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                    function onGroupActiveWorkspaceAppsChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                }
-                Connections {
-                    target: MangoService
-                    enabled: root.isMango
-                    function onStateChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                }
-                Connections {
-                    target: Hyprland.workspaces
-                    enabled: CompositorService.isHyprland
-                    function onValuesChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                }
-                Connections {
-                    target: CompositorService.isHyprland ? Hyprland : null
-                    enabled: CompositorService.isHyprland
-                    function onRawEvent(event) {
-                        if (event.name === "activewindow" || event.name === "activewindowv2")
-                            delegateRoot.updateAllData();
-                    }
-                }
-                Connections {
-                    target: I3.workspaces
-                    enabled: (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                    function onValuesChanged() {
-                        delegateRoot.updateAllData();
-                    }
-                }
-                Connections {
-                    target: AqueousService
-                    function onStateChanged() {
-                        if (root.useAqueous)
-                            delegateRoot.updateAllData();
                     }
                 }
                 property var _extWindowsetsTrigger: root.useExtWorkspace ? WindowManager.windowsets : null
@@ -2165,30 +1397,5 @@ Item {
                 }
             }
         }
-    }
-
-    Component.onCompleted: {
-        _updateBlurRegistration();
-    }
-
-    property bool _blurRegistered: false
-    readonly property bool _shouldBlur: BlurService.enabled && blurBarWindow && blurBarWindow.registerBlurWidget && !(barConfig?.noBackground ?? false) && root.visible && root.width > 0
-
-    on_ShouldBlurChanged: _updateBlurRegistration()
-
-    function _updateBlurRegistration() {
-        if (_shouldBlur && !_blurRegistered) {
-            blurBarWindow.registerBlurWidget(visualBackground);
-            _blurRegistered = true;
-        } else if (!_shouldBlur && _blurRegistered) {
-            if (blurBarWindow && blurBarWindow.unregisterBlurWidget)
-                blurBarWindow.unregisterBlurWidget(visualBackground);
-            _blurRegistered = false;
-        }
-    }
-
-    Component.onDestruction: {
-        if (_blurRegistered && blurBarWindow && blurBarWindow.unregisterBlurWidget)
-            blurBarWindow.unregisterBlurWidget(visualBackground);
     }
 }

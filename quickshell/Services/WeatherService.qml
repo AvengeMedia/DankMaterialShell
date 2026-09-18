@@ -15,7 +15,10 @@ Singleton {
     property int refCount: 0
 
     property var selectedDate: new Date()
-    property var weather: ({
+    property var weather: emptyWeather()
+
+    function emptyWeather() {
+        return {
             "available": false,
             "loading": true,
             "temp": 0,
@@ -34,7 +37,8 @@ Singleton {
             "precipitationProbability": 0,
             "isDay": true,
             "forecast": []
-        })
+        };
+    }
 
     property var location: null
     property int updateInterval: 900000 // 15 minutes
@@ -82,36 +86,11 @@ Singleton {
             "99": "thunderstorm"
         })
 
-    property var nightWeatherIcons: ({
-            "0": "clear_night",
-            "1": "clear_night",
-            "2": "partly_cloudy_night",
-            "3": "cloud",
-            "45": "foggy",
-            "48": "foggy",
-            "51": "rainy",
-            "53": "rainy",
-            "55": "rainy",
-            "56": "rainy",
-            "57": "rainy",
-            "61": "rainy",
-            "63": "rainy",
-            "65": "rainy",
-            "66": "rainy",
-            "67": "rainy",
-            "71": "cloudy_snowing",
-            "73": "cloudy_snowing",
-            "75": "snowing_heavy",
-            "77": "cloudy_snowing",
-            "80": "rainy",
-            "81": "rainy",
-            "82": "rainy",
-            "85": "cloudy_snowing",
-            "86": "snowing_heavy",
-            "95": "thunderstorm",
-            "96": "thunderstorm",
-            "99": "thunderstorm"
-        })
+    readonly property var nightWeatherIcons: Object.assign({}, weatherIcons, {
+        "0": "clear_night",
+        "1": "clear_night",
+        "2": "partly_cloudy_night"
+    })
 
     function getWeatherIcon(code, isDay) {
         if (typeof isDay === "undefined") {
@@ -126,21 +105,21 @@ Singleton {
             "0": I18n.tr("Clear Sky"),
             "1": I18n.tr("Clear Sky"),
             "2": I18n.tr("Partly Cloudy"),
-            "3": I18n.tr("Overcast"),
-            "45": I18n.tr("Fog"),
+            "3": I18n.tr("Overcast", "weather condition name"),
+            "45": I18n.tr("Fog", "weather condition name"),
             "48": I18n.tr("Fog"),
-            "51": I18n.tr("Drizzle"),
+            "51": I18n.tr("Drizzle", "weather condition name"),
             "53": I18n.tr("Drizzle"),
             "55": I18n.tr("Drizzle"),
             "56": I18n.tr("Freezing Drizzle"),
             "57": I18n.tr("Freezing Drizzle"),
             "61": I18n.tr("Light Rain"),
-            "63": I18n.tr("Rain"),
+            "63": I18n.tr("Rain", "noun, weather condition name"),
             "65": I18n.tr("Heavy Rain"),
             "66": I18n.tr("Light Rain"),
             "67": I18n.tr("Heavy Rain"),
             "71": I18n.tr("Light Snow"),
-            "73": I18n.tr("Snow"),
+            "73": I18n.tr("Snow", "noun, weather condition name"),
             "75": I18n.tr("Heavy Snow"),
             "77": I18n.tr("Snow"),
             "80": I18n.tr("Light Rain"),
@@ -148,7 +127,7 @@ Singleton {
             "82": I18n.tr("Heavy Rain"),
             "85": I18n.tr("Light Snow Showers"),
             "86": I18n.tr("Heavy Snow Showers"),
-            "95": I18n.tr("Thunderstorm"),
+            "95": I18n.tr("Thunderstorm", "weather condition name"),
             "96": I18n.tr("Thunderstorm with Hail"),
             "99": I18n.tr("Thunderstorm with Hail")
         };
@@ -187,6 +166,24 @@ Singleton {
             return null;
         }
         return SunCalc.getTimes(date, location.latitude, location.longitude, location.elevation);
+    }
+
+    function getMoonTrack(date) {
+        if (!location)
+            return null;
+        const offset = (weather.utcOffsetSeconds ?? -date.getTimezoneOffset() * 60) * 1000;
+        const localDate = new Date(date.getTime() + offset);
+        const start = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate()) - offset;
+        const hour = 60 * 60 * 1000;
+        const altitude = time => Math.sin(SunCalc.getMoonPosition(new Date(time), location.latitude, location.longitude).altitude);
+        const values = [];
+        for (let i = 0; i <= 24; i++)
+            values.push(altitude(start + i * hour));
+        return {
+            values: values,
+            altitude: altitude(date.getTime()),
+            progress: (date.getTime() - start) / (24 * hour)
+        };
     }
 
     function getEcliptic(date, points = 60) {
@@ -256,12 +253,12 @@ Singleton {
                 end: new Date(times.goldenHourEnd)
             },
             {
-                name: I18n.tr("Morning"),
+                name: I18n.tr("Morning", "time of day period name in weather view"),
                 start: new Date(times.goldenHourEnd),
                 end: new Date(times.solarNoon)
             },
             {
-                name: I18n.tr("Afternoon"),
+                name: I18n.tr("Afternoon", "time of day period name in weather view"),
                 start: new Date(times.solarNoon),
                 end: new Date(times.goldenHour)
             },
@@ -314,7 +311,7 @@ Singleton {
         }
 
         return {
-            period: I18n.tr("Night"),
+            period: I18n.tr("Night", "noun, time of day period, also night mode state"),
             periodIndex: 0,
             periodPercent: 0,
             dayPercent: dayPercent
@@ -401,12 +398,14 @@ Singleton {
         var value;
         var unit;
         if (SettingsData.useFahrenheit) {
-            value = (distance / 1609.344).toFixed(1);
+            value = distance / 1609.344;
             unit = "mi";
             if (value < 1) {
                 value = Math.round(value * 5280 / 50) * 50;
                 unit = "ft";
+                return value + " " + unit;
             }
+            value = value.toFixed(1);
         } else {
             value = distance;
             unit = "m";
@@ -445,16 +444,9 @@ Singleton {
     }
 
     function formatForecastDay(isoString, index) {
+        const date = isoString ? new Date(isoString.slice(0, 10) + "T12:00:00") : new Date();
         if (!isoString)
-            return "--";
-
-        if (index === 0)
-            return I18n.tr("Today");
-        if (index === 1)
-            return I18n.tr("Tomorrow");
-
-        const date = new Date();
-        date.setDate(date.getDate() + index);
+            date.setDate(date.getDate() + index);
         const locale = I18n.locale();
         return locale.dayName(date.getDay(), Locale.ShortFormat);
     }
@@ -506,7 +498,7 @@ Singleton {
         if (lat == null || lon == null)
             return null;
 
-        const params = ["latitude=" + lat, "longitude=" + lon, "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m", "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max", "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility,cloud_cover", "timezone=auto", "forecast_days=7"];
+        const params = ["latitude=" + lat, "longitude=" + lon, "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m", "daily=sunrise,sunset,moonrise,moonset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max", "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility,cloud_cover,uv_index,dew_point_2m", "timezone=auto", "forecast_days=7"];
 
         return "https://api.open-meteo.com/v1/forecast?" + params.join('&');
     }
@@ -524,7 +516,7 @@ Singleton {
     }
 
     function updateLocation() {
-        const useAuto = SessionData.isGreeterMode ? GreetdSettings.useAutoLocation : SettingsData.useAutoLocation;
+        const useAuto = SettingsData.useAutoLocation;
         const coords = SessionData.isGreeterMode ? SessionData.weatherCoordinates : SettingsData.weatherCoordinates;
         const cityName = SessionData.isGreeterMode ? SessionData.weatherLocation : SettingsData.weatherLocation;
 
@@ -977,6 +969,7 @@ Singleton {
                             const tempMaxF = (tempMaxC * 9 / 5 + 32);
 
                             forecast.push({
+                                "rawDate": daily.time[i],
                                 "day": formatForecastDay(daily.time[i], i),
                                 "wCode": daily.weather_code?.[i] || 0,
                                 "tempMin": Math.round(tempMinC),
@@ -1000,6 +993,11 @@ Singleton {
                     const feelsLikeC = current.apparent_temperature || tempC;
                     const feelsLikeF = feelsLikeC * 9 / 5 + 32;
 
+                    const currentHour = hourly.time?.findIndex(time => time.slice(0, 13) === current.time?.slice(0, 13)) ?? -1;
+                    const hourlyValue = key => {
+                        const value = hourly[key]?.[currentHour];
+                        return Number.isFinite(value) ? value : null;
+                    };
                     root.lastFetchError = "";
                     root.weather = {
                         "available": true,
@@ -1017,7 +1015,14 @@ Singleton {
                         "sunset": formatTime(daily.sunset?.[0]) || "18:00",
                         "rawSunrise": daily.sunrise?.[0] || "",
                         "rawSunset": daily.sunset?.[0] || "",
-                        "uv": 0,
+                        "moonrise": daily.moonrise?.[0] ?? "",
+                        "moonset": daily.moonset?.[0] ?? "",
+                        "utcOffsetSeconds": data.utc_offset_seconds ?? null,
+                        "currentHourIndex": currentHour >= 0 ? currentHour : null,
+                        "uv": hourlyValue("uv_index"),
+                        "visibility": hourlyValue("visibility"),
+                        "dewPoint": hourlyValue("dew_point_2m"),
+                        "windDirection": Number.isFinite(current.wind_direction_10m) ? current.wind_direction_10m : null,
                         "pressure": Math.round(current.surface_pressure || 0),
                         "precipitationProbability": Math.round(daily.precipitation_probability_max?.[0] || 0),
                         "isDay": Boolean(current.is_day),
@@ -1090,26 +1095,7 @@ Singleton {
     Component.onCompleted: {
         SettingsData.weatherCoordinatesChanged.connect(() => {
             root.location = null;
-            root.weather = {
-                "available": false,
-                "loading": true,
-                "temp": 0,
-                "tempF": 0,
-                "feelsLike": 0,
-                "feelsLikeF": 0,
-                "city": "",
-                "country": "",
-                "wCode": 0,
-                "humidity": 0,
-                "wind": "",
-                "sunrise": "06:00",
-                "sunset": "18:00",
-                "uv": 0,
-                "pressure": 0,
-                "precipitationProbability": 0,
-                "isDay": true,
-                "forecast": []
-            };
+            root.weather = emptyWeather();
             root.lastFetchTime = 0;
             root.forceRefresh();
         });
@@ -1122,26 +1108,7 @@ Singleton {
 
         SettingsData.useAutoLocationChanged.connect(() => {
             root.location = null;
-            root.weather = {
-                "available": false,
-                "loading": true,
-                "temp": 0,
-                "tempF": 0,
-                "feelsLike": 0,
-                "feelsLikeF": 0,
-                "city": "",
-                "country": "",
-                "wCode": 0,
-                "humidity": 0,
-                "wind": "",
-                "sunrise": "06:00",
-                "sunset": "18:00",
-                "uv": 0,
-                "pressure": 0,
-                "precipitationProbability": 0,
-                "isDay": true,
-                "forecast": []
-            };
+            root.weather = emptyWeather();
             root.lastFetchTime = 0;
             root.forceRefresh();
         });

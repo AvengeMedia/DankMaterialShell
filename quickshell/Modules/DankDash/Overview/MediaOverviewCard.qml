@@ -1,200 +1,225 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.DankDash
+import "../../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
 
 Card {
     id: root
-    clip: false
-
-    signal clicked
 
     property MprisPlayer activePlayer: MprisController.activePlayer
     property bool live: Window.window?.visible ?? false
+    property bool isSeeking: false
 
-    Timer {
-        interval: 300
-        running: root.live && activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
-        repeat: true
-        onTriggered: activePlayer?.positionSupported && activePlayer.positionChanged()
+    readonly property bool playing: activePlayer?.playbackState === MprisPlaybackState.Playing
+    readonly property bool compact: height < DashMetrics.heightForRows(2)
+    readonly property bool narrow: width - pad * 2 < DashMetrics.overviewTransportWidth
+    readonly property bool tiny: compact && width - pad * 2 < DashMetrics.overviewTransportWidth + Theme.iconButtonSize
+    readonly property bool showArtwork: !compact && !narrow && height >= DashMetrics.heightForRows(3)
+    readonly property string titleText: MprisController.stableTitle || I18n.tr("Unknown Track")
+    readonly property string artistText: MprisController.stableArtist || I18n.tr("Unknown Artist")
+    readonly property string artUrl: TrackArtService.resolvedArtUrl
+    readonly property color accent: MediaAccentService.accent
+    readonly property bool showSeekbar: options.seekbar !== false && !tiny
+    readonly property bool circleArt: options.artStyle === "circle"
+    readonly property bool inlineMetadata: compact && titleLabel.implicitHeight + artistLabel.implicitHeight + trackText.spacing > transport.y - Theme.spacingXS
+    readonly property var playbackFocusTargets: [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
+
+    entryId: "media"
+    clickable: true
+    pad: compact ? Theme.spacingS : Theme.spacingM
+
+    Keys.onShortcutOverride: event => {
+        if (!root.interactive || event.key !== Qt.Key_F6)
+            return;
+        const targets = root.playbackFocusTargets.filter(item => item.visible && item.enabled);
+        const boundary = event.modifiers & Qt.ShiftModifier ? targets[0] : targets[targets.length - 1];
+        event.accepted = targets.length > 0 && !FocusNavigation.containsFocus(boundary);
     }
 
-    property bool isSeeking: false
+    function handleKeyEvent(event) {
+        if (!interactive || event.key !== Qt.Key_F6)
+            return false;
+        return FocusNavigation.moveFocus(playbackFocusTargets, !!(event.modifiers & Qt.ShiftModifier));
+    }
+
+    Timer {
+        interval: DashMetrics.mediaPositionPollInterval
+        running: root.live && root.visible && root.interactive && root.showSeekbar && root.playing && !root.isSeeking
+        repeat: true
+        onTriggered: root.activePlayer?.positionSupported && root.activePlayer.positionChanged()
+    }
+
+    Loader {
+        anchors.fill: parent
+        anchors.margins: -root.pad
+        active: root.live && MediaOptions.albumArtBackdrop && !!root.activePlayer
+
+        sourceComponent: MediaArtBackdrop {
+            radius: root.radius
+            activePlayer: root.activePlayer
+        }
+    }
 
     Column {
         anchors.centerIn: parent
-        spacing: Theme.spacingS
-        visible: !activePlayer
+        spacing: Theme.spacingXS
+        visible: !root.activePlayer
 
         DankIcon {
-            name: "music_note"
-            size: Theme.iconSize
-            color: Theme.surfaceTextSecondary
             anchors.horizontalCenter: parent.horizontalCenter
+            name: "music_note"
+            size: Theme.iconSizeLarge
+            color: root.accentColor
         }
 
         StyledText {
+            anchors.horizontalCenter: parent.horizontalCenter
             text: I18n.tr("No Media")
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceTextMedium
-            anchors.horizontalCenter: parent.horizontalCenter
+            color: root.mutedColor
         }
     }
 
-    Column {
-        anchors.centerIn: parent
-        width: parent.width - Theme.spacingXS * 2
-        spacing: Theme.spacingL
-        visible: activePlayer
+    Item {
+        id: content
+        anchors.fill: parent
+        visible: !!root.activePlayer
+        enabled: root.interactive
 
-        Item {
-            width: 140
-            height: 110
-            anchors.horizontalCenter: parent.horizontalCenter
-            clip: false
-
-            DankAlbumArt {
-                width: 110
-                height: 80
-                anchors.centerIn: parent
-                activePlayer: root.activePlayer
-                artUrl: TrackArtService.resolvedArtUrl
-                accentColor: MediaAccentService.accent
-                showAnimation: root.live && SettingsData.audioVisualizerEnabled
-                albumSize: 76
-                animationScale: 1.05
-            }
+        MediaArtwork {
+            id: artwork
+            anchors.right: parent.right
+            anchors.top: parent.top
+            width: root.showArtwork ? Math.max(0, Math.min(DashMetrics.overviewArtHero, parent.width / 3, seekBlock.y - Theme.spacingM)) : 0
+            height: width
+            cornerRadius: root.circleArt ? width / 2 : DashMetrics.mediaArtRadius
+            artUrl: root.artUrl
+            visible: root.showArtwork
         }
 
         Column {
-            width: parent.width
-            spacing: Theme.spacingXS
-            topPadding: Theme.spacingL
+            id: trackText
+            anchors.left: parent.left
+            anchors.right: artwork.visible ? artwork.left : parent.right
+            anchors.rightMargin: artwork.visible ? Theme.spacingM : 0
+            anchors.top: parent.top
+            spacing: Theme.spacingXXS
+            visible: !root.tiny
 
             StyledText {
-                text: MprisController.stableTitle || I18n.tr("Unknown")
-                font.pixelSize: Theme.fontSizeSmall
-                font.weight: Font.Medium
-                color: Theme.surfaceText
+                id: titleLabel
                 width: parent.width
+                text: root.inlineMetadata ? root.titleText + " · " + root.artistText : root.titleText
+                font.pixelSize: root.compact ? Theme.fontSizeMedium : Theme.fontSizeLarge
+                font.weight: Theme.fontWeightMedium
+                color: root.contentColor
                 elide: Text.ElideRight
-                maximumLineCount: 1
-                horizontalAlignment: Text.AlignHCenter
+                maximumLineCount: root.showArtwork ? 2 : 1
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
 
             StyledText {
-                text: MprisController.stableArtist || I18n.tr("Unknown Artist")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceTextMedium
+                id: artistLabel
                 width: parent.width
+                visible: !root.inlineMetadata
+                text: root.artistText
+                font.pixelSize: Theme.fontSizeSmall
+                color: root.mutedColor
                 elide: Text.ElideRight
                 maximumLineCount: 1
-                horizontalAlignment: Text.AlignHCenter
             }
-        }
-
-        DankSeekbar {
-            width: parent.width + 4
-            height: 20
-            x: -2
-            activePlayer: root.activePlayer
-            stableLength: MprisController.activePlayerStableLength
-            accentColor: MediaAccentService.accent
-            accentTrackColor: MediaAccentService.accentTrack
-            accentSubtleColor: MediaAccentService.accentSubtle
-            isSeeking: root.isSeeking
-            onIsSeekingChanged: root.isSeeking = isSeeking
         }
 
         Item {
-            width: parent.width
-            height: 32
+            id: seekBlock
+            anchors.left: parent.left
+            anchors.right: root.compact && !root.tiny ? transport.left : parent.right
+            anchors.rightMargin: root.compact && !root.tiny ? Theme.spacingS : 0
+            y: root.compact ? transport.y + (transport.height - height) / 2 : transport.y - height - Theme.spacingS
+            height: DashMetrics.overviewSeekHeight
+            visible: root.showSeekbar
 
-            Row {
-                spacing: Theme.spacingS
-                anchors.centerIn: parent
-
-                Rectangle {
-                    width: 28
-                    height: 28
-                    radius: 14
-                    anchors.verticalCenter: playPauseButton.verticalCenter
-                    color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "skip_previous"
-                        size: 14
-                        color: Theme.surfaceText
-                    }
-
-                    MouseArea {
-                        id: prevArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: MprisController.previousOrRewind()
-                    }
-                }
-
-                Rectangle {
-                    id: playPauseButton
-                    width: 32
-                    height: 32
-                    radius: 16
-                    color: MediaAccentService.accent
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
-                        size: 16
-                        color: MediaAccentService.onAccent
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: activePlayer?.togglePlaying()
-                    }
-                }
-
-                Rectangle {
-                    width: 28
-                    height: 28
-                    radius: 14
-                    anchors.verticalCenter: playPauseButton.verticalCenter
-                    color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "skip_next"
-                        size: 14
-                        color: Theme.surfaceText
-                    }
-
-                    MouseArea {
-                        id: nextArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: MprisController.next()
-                    }
-                }
+            DankSeekbar {
+                id: seekbar
+                anchors.fill: parent
+                activePlayer: root.activePlayer
+                stableLength: MprisController.activePlayerStableLength
+                accentColor: root.accent
+                accentTrackColor: MediaAccentService.accentTrack
+                accentSubtleColor: MediaAccentService.accentSubtle
+                isSeeking: root.isSeeking
+                onIsSeekingChanged: root.isSeeking = isSeeking
             }
         }
-    }
 
-    MouseArea {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 123
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.clicked()
-        visible: activePlayer
+        Item {
+            id: transport
+
+            readonly property bool stacked: root.narrow && !root.tiny
+            readonly property bool medium: !root.compact && width >= Theme.buttonHeightM * 4
+            readonly property real buttonHeight: medium ? Theme.buttonHeightM : Theme.buttonHeightS
+            readonly property real spacing: root.compact || stacked ? Theme.spacingXS : Theme.spacingS
+
+            anchors.right: parent.right
+            width: root.tiny ? parent.width : (root.compact ? DashMetrics.overviewTransportWidth : parent.width)
+            height: stacked ? buttonHeight * 2 + spacing : buttonHeight
+            y: root.tiny ? (parent.height - height) / 2 : parent.height - height
+
+            DankIconButton {
+                id: playButton
+                anchors.left: parent.left
+                anchors.top: parent.top
+                size: transport.medium ? "m" : "s"
+                width: {
+                    if (root.tiny || transport.stacked)
+                        return parent.width;
+                    if (root.compact)
+                        return DashMetrics.overviewPlayWidth;
+                    return (parent.width - transport.spacing * 2) / 2;
+                }
+                variant: "filled"
+                round: false
+                checkable: true
+                checked: root.playing
+                iconName: root.playing ? "pause" : "play_arrow"
+                Accessible.name: root.playing ? I18n.tr("Pause") : I18n.tr("Play")
+                enabled: !!root.activePlayer?.canTogglePlaying
+                contentColor: MediaAccentService.onAccentContainer
+                containerColor: MediaAccentService.accentContainer
+                onClicked: root.activePlayer.togglePlaying()
+            }
+
+            DankIconButton {
+                id: previousButton
+                anchors.left: transport.stacked ? parent.left : playButton.right
+                anchors.leftMargin: transport.stacked ? 0 : transport.spacing
+                anchors.bottom: parent.bottom
+                size: transport.medium ? "m" : "s"
+                width: transport.stacked ? (parent.width - transport.spacing) / 2 : (parent.width - playButton.width - transport.spacing * 2) / 2
+                iconName: "skip_previous"
+                Accessible.name: I18n.tr("Previous")
+                enabled: !!root.activePlayer?.canGoPrevious || (!!root.activePlayer?.canSeek && root.activePlayer.position > 8)
+                visible: !root.tiny
+                onClicked: MprisController.previousOrRewind()
+            }
+
+            DankIconButton {
+                id: nextButton
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                size: transport.medium ? "m" : "s"
+                width: previousButton.width
+                iconName: "skip_next"
+                Accessible.name: I18n.tr("Next")
+                enabled: !!root.activePlayer?.canGoNext
+                visible: !root.tiny
+                onClicked: MprisController.next()
+            }
+        }
     }
 }

@@ -2,8 +2,9 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../../../Common/Format.js" as Format
 
-Item {
+Column {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
@@ -17,10 +18,11 @@ Item {
     signal closeRequested
 
     readonly property bool _descriptionIsHtml: /<[a-z][^>]*>/i.test((eventData && eventData.description) || "")
+    readonly property string timeText: _timeText()
+    readonly property string locationUrl: _locationUrl()
 
-    // _locationUrl makes the location row clickable: a URL location opens
-    // directly, conference placeholders open the meeting link, and anything
-    // else opens as a geo: search in the maps app.
+    spacing: Theme.spacingS
+
     function _locationUrl() {
         const loc = ((eventData && eventData.location) || "").trim();
         if (loc === "")
@@ -42,7 +44,7 @@ Item {
     }
 
     function _inlineMarkdown(line) {
-        let out = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        let out = Format.escapeHtml(line);
         out = out.replace(/\\([\\`*_{}[\]()#+\-.!~>])/g, "$1");
         out = out.replace(/(?:https?:\/\/|www\.)[^\s<>)\]]*[^\s<>)\].,;:!?"']/g, (m, offset, s) => {
             const prev = offset > 0 ? s[offset - 1] : "";
@@ -57,8 +59,6 @@ Item {
         return out;
     }
 
-    // Descriptions arrive as HTML (Google) or markdown/plain text; both render
-    // as RichText so links become clickable anchors recolored to the theme.
     function _descriptionRichText() {
         const raw = ((eventData && eventData.description) || "").trim();
         if (raw === "")
@@ -109,270 +109,174 @@ Item {
         return dateStr + " · " + startStr + " – " + Qt.formatTime(eventData.end, fmt);
     }
 
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Qt.rgba(0, 0, 0, 0.45)
+    function openLocation() {
+        const url = root.locationUrl;
+        if (url.startsWith("geo:") && CalendarDankBackend.connected) {
+            CalendarDankBackend.sendRequest("system.openUri", {
+                "uri": url
+            }, response => {
+                if (response && response.error)
+                    Qt.openUrlExternally(url);
+            });
+            return;
+        }
+        Qt.openUrlExternally(url);
+    }
+
+    DetailRow {
+        iconName: "calendar_month"
+        text: {
+            if (!root.eventData)
+                return "";
+            const acc = root.eventData.account || "";
+            return root.eventData.calendar + (acc ? " · " + acc : "");
+        }
+        visible: !!(root.eventData && root.eventData.calendar)
+    }
+
+    DetailRow {
+        iconName: "place"
+        text: root.eventData ? root.eventData.location : ""
+        visible: !!(root.eventData && root.eventData.location)
+        link: root.locationUrl !== ""
+        onActivated: root.openLocation()
+    }
+
+    DetailRow {
+        iconName: "videocam"
+        text: I18n.tr("Join video call")
+        visible: !!(root.eventData && root.eventData.meetingUrl)
+        link: true
+        onActivated: Qt.openUrlExternally(root.eventData.meetingUrl)
+    }
+
+    DetailRow {
+        iconName: "link"
+        text: root.eventData ? root.eventData.url : ""
+        visible: !!(root.eventData && root.eventData.url)
+        link: true
+        wrapMode: Text.WrapAnywhere
+        onActivated: Qt.openUrlExternally(root.eventData.url)
+    }
+
+    StyledText {
+        id: descriptionText
+        width: parent.width
+        text: root._descriptionRichText()
+        visible: !!(root.eventData && root.eventData.description)
+        textFormat: Text.RichText
+        linkColor: Theme.primary
+        font.pixelSize: Theme.fontSizeSmall
+        color: Theme.surfaceText
+        horizontalAlignment: Text.AlignLeft
+        wrapMode: Text.Wrap
+        onLinkActivated: link => Qt.openUrlExternally(link)
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.closeRequested()
+            acceptedButtons: Qt.NoButton
+            cursorShape: descriptionText.hoveredLink !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor
         }
     }
 
-    Rectangle {
-        anchors.centerIn: parent
-        width: Math.min(parent.width - Theme.spacingL * 2, 380)
-        height: Math.min(parent.height - Theme.spacingM * 2, body.implicitHeight + Theme.spacingL * 2)
-        radius: Theme.cornerRadius
-        color: Theme.surfaceContainerHigh
-        border.color: Theme.outlineMedium
-        border.width: 1
-        clip: true
+    Row {
+        width: parent.width
+        spacing: Theme.spacingS
+        layoutDirection: Qt.RightToLeft
 
-        MouseArea {
-            anchors.fill: parent
-        }
-
-        DankActionButton {
-            id: closeButton
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.margins: Theme.spacingXS
-            circular: false
-            iconName: "close"
-            iconSize: 16
-            z: 1
+        DankButton {
+            text: I18n.tr("Close")
+            buttonHeight: Theme.buttonHeightS
             onClicked: root.closeRequested()
         }
 
-        DankFlickable {
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            anchors.topMargin: Theme.spacingL
-            contentWidth: width
-            contentHeight: body.implicitHeight
-            clip: true
+        DankButton {
+            text: I18n.tr("Delete")
+            iconName: "delete"
+            buttonHeight: Theme.buttonHeightS
+            backgroundColor: Theme.errorHover
+            textColor: Theme.error
+            visible: root.canEdit
+            onClicked: root.deleteRequested()
+        }
 
-            Column {
-                id: body
-                width: parent.width
-                spacing: Theme.spacingS
+        DankButton {
+            text: I18n.tr("Edit")
+            iconName: "edit"
+            buttonHeight: Theme.buttonHeightS
+            backgroundColor: Theme.primary
+            textColor: Theme.onPrimary
+            visible: root.canEdit
+            onClicked: root.editRequested()
+        }
+    }
 
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingS
+    component DetailRow: Rectangle {
+        id: detailRow
 
-                    Rectangle {
-                        width: 4
-                        height: titleText.implicitHeight
-                        radius: 2
-                        anchors.top: parent.top
-                        color: (root.eventData && root.eventData.color) ? root.eventData.color : Theme.primary
-                    }
+        property string iconName: ""
+        property string text: ""
+        property bool link: false
+        property int wrapMode: Text.Wrap
 
-                    StyledText {
-                        id: titleText
-                        width: parent.width - 4 - Theme.spacingS - closeButton.width
-                        text: root.eventData ? root.eventData.title : ""
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        horizontalAlignment: Text.AlignLeft
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 3
-                        elide: Text.ElideRight
-                    }
-                }
+        signal activated
 
-                StyledText {
-                    width: parent.width
-                    text: root._timeText()
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.Wrap
-                }
+        width: parent.width
+        height: detailContent.implicitHeight + Theme.spacingXS * 2
+        radius: Theme.cornerRadiusS
+        color: "transparent"
+        activeFocusOnTab: link
+        Accessible.role: link ? Accessible.Link : Accessible.StaticText
+        Accessible.name: text
 
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    visible: root.eventData && root.eventData.calendar
+        Keys.onPressed: event => {
+            if (!detailRow.link)
+                return;
+            switch (event.key) {
+            case Qt.Key_Space:
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                detailRow.activated();
+                event.accepted = true;
+                break;
+            }
+        }
 
-                    DankIcon {
-                        name: "calendar_month"
-                        size: 14
-                        color: Theme.surfaceVariantText
-                        anchors.top: parent.top
-                        anchors.topMargin: 2
-                    }
+        FocusRing {}
 
-                    StyledText {
-                        width: parent.width - 14 - Theme.spacingXS
-                        text: {
-                            if (!root.eventData)
-                                return "";
-                            const acc = root.eventData.account || "";
-                            return root.eventData.calendar + (acc ? " · " + acc : "");
-                        }
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 2
-                        elide: Text.ElideRight
-                    }
-                }
+        StateLayer {
+            visible: detailRow.link
+            disabled: !detailRow.link
+            stateColor: Theme.primary
+            cornerRadius: detailRow.radius
+            onClicked: detailRow.activated()
+        }
 
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    visible: root.eventData && root.eventData.location
+        Row {
+            id: detailContent
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: Theme.spacingXS
+            anchors.rightMargin: Theme.spacingXS
+            spacing: Theme.spacingXS
 
-                    DankIcon {
-                        name: "place"
-                        size: 14
-                        color: root._locationUrl() !== "" ? Theme.primary : Theme.surfaceVariantText
-                        anchors.top: parent.top
-                        anchors.topMargin: 2
-                    }
+            DankIcon {
+                name: detailRow.iconName
+                size: Theme.iconSizeSmall
+                color: detailRow.link ? Theme.primary : Theme.onSurfaceVariant
+                anchors.top: parent.top
+                anchors.topMargin: Theme.spacingXXS
+            }
 
-                    StyledText {
-                        width: parent.width - 14 - Theme.spacingXS
-                        text: root.eventData ? root.eventData.location : ""
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: root._locationUrl() !== "" ? Theme.primary : Theme.surfaceVariantText
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 2
-                        elide: Text.ElideRight
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: root._locationUrl() !== ""
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            // Qt.openUrlExternally can't handle geo: URIs, so
-                            // route those through the dankcal daemon's opener.
-                            onClicked: {
-                                const url = root._locationUrl();
-                                if (url.startsWith("geo:") && CalendarDankBackend.connected) {
-                                    CalendarDankBackend.sendRequest("system.openUri", {
-                                        "uri": url
-                                    }, response => {
-                                        if (response && response.error)
-                                            Qt.openUrlExternally(url);
-                                    });
-                                    return;
-                                }
-                                Qt.openUrlExternally(url);
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    visible: root.eventData && root.eventData.meetingUrl
-
-                    DankIcon {
-                        name: "videocam"
-                        size: 14
-                        color: Theme.primary
-                        anchors.top: parent.top
-                        anchors.topMargin: 2
-                    }
-
-                    StyledText {
-                        width: parent.width - 14 - Theme.spacingXS
-                        text: I18n.tr("Join video call")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.primary
-                        elide: Text.ElideRight
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (root.eventData && root.eventData.meetingUrl)
-                                    Qt.openUrlExternally(root.eventData.meetingUrl);
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-                    visible: root.eventData && root.eventData.url
-
-                    DankIcon {
-                        name: "link"
-                        size: 14
-                        color: Theme.primary
-                        anchors.top: parent.top
-                        anchors.topMargin: 2
-                    }
-
-                    StyledText {
-                        width: parent.width - 14 - Theme.spacingXS
-                        text: root.eventData ? root.eventData.url : ""
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.primary
-                        wrapMode: Text.WrapAnywhere
-                        maximumLineCount: 2
-                        elide: Text.ElideRight
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (root.eventData && root.eventData.url)
-                                    Qt.openUrlExternally(root.eventData.url);
-                            }
-                        }
-                    }
-                }
-
-                StyledText {
-                    id: descriptionText
-                    width: parent.width
-                    text: root._descriptionRichText()
-                    visible: root.eventData && root.eventData.description
-                    textFormat: Text.RichText
-                    linkColor: Theme.primary
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    horizontalAlignment: Text.AlignLeft
-                    wrapMode: Text.Wrap
-                    onLinkActivated: link => Qt.openUrlExternally(link)
-
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.NoButton
-                        cursorShape: descriptionText.hoveredLink !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    }
-                }
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingS
-                    visible: root.canEdit
-                    topPadding: Theme.spacingXS
-
-                    DankButton {
-                        text: I18n.tr("Edit")
-                        iconName: "edit"
-                        buttonHeight: 32
-                        onClicked: root.editRequested()
-                    }
-
-                    DankButton {
-                        text: I18n.tr("Delete")
-                        iconName: "delete"
-                        buttonHeight: 32
-                        backgroundColor: Theme.withAlpha(Theme.error, 0.15)
-                        textColor: Theme.error
-                        onClicked: root.deleteRequested()
-                    }
-                }
+            StyledText {
+                width: parent.width - Theme.iconSizeSmall - parent.spacing
+                text: detailRow.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: detailRow.link ? Theme.primary : Theme.onSurfaceVariant
+                wrapMode: detailRow.wrapMode
+                maximumLineCount: 2
+                elide: Text.ElideRight
             }
         }
     }

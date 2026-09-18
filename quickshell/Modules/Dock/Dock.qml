@@ -8,40 +8,59 @@ import qs.Widgets
 
 Variants {
     id: dockVariants
-    // Connected frame mode renders the dock inside the frame surface; skip the standalone window there.
-    model: (SettingsData.showDock || (CompositorService.isNiri && SettingsData.dockOpenOnOverview)) ? SettingsData.getFilteredScreens("dock").filter(screen => !CompositorService.frameHostsDockForScreen(screen)) : []
+    readonly property var dockSlots: {
+        SettingsData.dockConfigs;
+        SettingsData.barConfigs;
+        const slots = [];
+        for (const screen of Quickshell.screens) {
+            for (const config of SettingsData.dockConfigsForScreen(screen)) {
+                if (CompositorService.frameHostsDockForConfig(screen, config))
+                    continue;
+                slots.push(JSON.stringify([screen.name, config.id]));
+            }
+        }
+        return slots;
+    }
+
+    model: dockVariants.dockSlots
 
     property var contextMenu
     property var trashContextMenu
 
     delegate: PanelWindow {
         id: dock
+        readonly property alias body: body
 
-        property var modelData: item
+        required property var modelData
+        readonly property var identity: JSON.parse(modelData)
+        readonly property var targetScreen: ShellLayout.screenForName(identity[0])
+        readonly property var resolvedConfig: SettingsData.getDockConfig(identity[1])
+        // Keep the last resolved config so the body never sees a shapeless one while the delegate is torn down.
+        property var config: resolvedConfig
+        onResolvedConfigChanged: if (resolvedConfig)
+            config = resolvedConfig
 
-        screen: modelData
+        screen: dock.targetScreen
         color: "transparent"
 
         WlrLayershell.namespace: "dms:dock"
-        WlrLayershell.layer: body.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: body.editMode || body.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top
 
+        // Edit mode grows the window over the whole screen so the scrim captures every click.
         anchors {
-            top: !body.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top) : true
-            bottom: !body.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom) : true
-            left: !body.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Left)
-            right: !body.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Right)
+            top: body.editMode || (!body.isVertical ? (dock.config.position === SettingsData.Position.Top) : true)
+            bottom: body.editMode || (!body.isVertical ? (dock.config.position === SettingsData.Position.Bottom) : true)
+            left: body.editMode || (!body.isVertical ? true : (dock.config.position === SettingsData.Position.Left))
+            right: body.editMode || (!body.isVertical ? true : (dock.config.position === SettingsData.Position.Right))
         }
 
-        visible: {
-            if (CompositorService.isNiri && NiriService.inOverview) {
-                return SettingsData.dockOpenOnOverview;
-            }
-            return SettingsData.showDock;
-        }
+        visible: !!resolvedConfig?.enabled
+        WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : body.editMode ? WlrKeyboardFocus.Exclusive : body.interactionActive ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
         implicitWidth: body.surfaceImplicitWidth
         implicitHeight: body.surfaceImplicitHeight
-        exclusiveZone: body.surfaceExclusiveZone
+        readonly property bool manualPlacement: body.editMode || (body.isVertical && dock.config.mode === "taskbar")
+        exclusiveZone: manualPlacement ? -1 : body.surfaceExclusiveZone
 
         Component.onCompleted: SurfaceRecovery.track(dock)
         Component.onDestruction: SurfaceRecovery.untrack(dock)
@@ -56,42 +75,28 @@ Variants {
             blurRadius: body.blurRadius
         }
 
-        mask: Region {
+        mask: body.editMode ? null : bodyMask
+
+        Region {
+            id: bodyMask
             item: body.inputMaskItem
         }
 
         DockBody {
             id: body
             anchors.fill: parent
+            config: dock.config
             hostWindow: dock
-            modelData: dock.modelData
+            modelData: dock.targetScreen
             contextMenu: dockVariants.contextMenu
             trashContextMenu: dockVariants.trashContextMenu
         }
 
-        PanelWindow {
-            id: dockExclusion
-
-            screen: dock.screen || dock.modelData
-            visible: body.frameDockExclusionActive && body.shouldReserveDockSpace
-            color: "transparent"
-            mask: Region {}
-            implicitWidth: body.isVertical ? body.dockReserveZone : 1
-            implicitHeight: body.isVertical ? 1 : body.dockReserveZone
-            exclusiveZone: visible ? body.dockReserveZone : -1
-
-            WlrLayershell.namespace: "dms:dock-exclusion"
-            WlrLayershell.layer: WlrLayer.Top
-
-            Component.onCompleted: SurfaceRecovery.track(dockExclusion)
-            Component.onDestruction: SurfaceRecovery.untrack(dockExclusion)
-
-            anchors {
-                top: !body.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top) : true
-                bottom: !body.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom) : true
-                left: !body.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Left)
-                right: !body.isVertical ? true : (SettingsData.dockPosition === SettingsData.Position.Right)
-            }
+        EdgeExclusion {
+            screen: dock.targetScreen
+            edge: body.connectedBarSide
+            exclusionSize: (dock.manualPlacement || body.frameDockExclusionActive) && body.shouldReserveDockSpace ? body.dockReserveZone : 0
+            layerNamespace: "dms:dock-exclusion"
         }
     }
 }

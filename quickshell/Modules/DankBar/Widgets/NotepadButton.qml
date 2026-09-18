@@ -1,6 +1,4 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modules.Plugins
@@ -35,7 +33,6 @@ BasePill {
     readonly property var notepadInstance: resolveNotepadInstance()
     readonly property bool popoutDefault: SettingsData.notepadDefaultMode === "popout"
     readonly property bool isActive: popoutDefault ? (PopoutService.notepadPopout?.visible ?? false) : (notepadInstance?.isVisible ?? false)
-    property bool isAutoHideBar: false
 
     function showActiveSurface() {
         if (root.popoutDefault) {
@@ -51,22 +48,6 @@ BasePill {
         if (instance)
             instance.triggerUsesOverlayLayer = root.barUsesOverlayLayer;
         return instance;
-    }
-
-    readonly property real minTooltipY: {
-        if (!parentScreen || !(axis?.isVertical ?? false)) {
-            return 0;
-        }
-
-        if (isAutoHideBar) {
-            return 0;
-        }
-
-        if (parentScreen.y > 0) {
-            return barThickness + barSpacing;
-        }
-
-        return 0;
     }
 
     readonly property var savedTabEntries: {
@@ -101,35 +82,14 @@ BasePill {
     }
 
     function openContextMenu() {
-        const screen = root.parentScreen || Screen;
-        const screenX = screen.x || 0;
-        const screenY = screen.y || 0;
-        const isVertical = root.axis?.isVertical ?? false;
-        const edge = root.axis?.edge ?? "top";
-        const gap = Math.max(Theme.spacingXS, root.barSpacing ?? Theme.spacingXS);
-
-        const globalPos = root.mapToGlobal(root.width / 2, root.height / 2);
-        const relativeX = globalPos.x - screenX;
-        const relativeY = globalPos.y - screenY;
-
-        let anchorX = relativeX;
-        let anchorY = relativeY;
-
-        if (isVertical) {
-            anchorX = edge === "left" ? (root.barThickness + root.barSpacing + gap) : (screen.width - (root.barThickness + root.barSpacing + gap));
-            anchorY = relativeY + root.minTooltipY;
-        } else {
-            anchorX = relativeX;
-            anchorY = edge === "bottom" ? (screen.height - (root.barThickness + root.barSpacing + gap)) : (root.barThickness + root.barSpacing + gap);
-        }
-
-        contextMenuWindow.showAt(anchorX, anchorY, isVertical, edge, screen);
+        const anchor = root.contextMenuAnchor();
+        contextMenu.openFromBar(anchor);
     }
 
     content: Component {
         Item {
             implicitWidth: notepadIcon.width
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.contentThickness
 
             DankIcon {
                 id: notepadIcon
@@ -167,232 +127,21 @@ BasePill {
         }
     }
 
-    PanelWindow {
-        id: contextMenuWindow
-
-        WindowBlur {
-            targetWindow: contextMenuWindow
-            blurX: menuContainer.x
-            blurY: menuContainer.y
-            blurWidth: contextMenuWindow.visible ? menuContainer.width : 0
-            blurHeight: contextMenuWindow.visible ? menuContainer.height : 0
-            blurRadius: Theme.cornerRadius
-        }
-
-        WlrLayershell.namespace: "dms:notepad-context-menu"
-
-        property bool isVertical: false
-        property string edge: "top"
-        property point anchorPos: Qt.point(0, 0)
-
-        function showAt(x, y, vertical, barEdge, targetScreen) {
-            if (targetScreen) {
-                contextMenuWindow.screen = targetScreen;
+    DankContextMenu {
+        id: contextMenu
+        layerNamespace: "dms:notepad-context-menu"
+        menuItems: root.savedTabEntries.map(entry => ({
+                    type: "item",
+                    icon: "description",
+                    text: entry.tab?.title || I18n.tr("Saved Note"),
+                    action: () => root.openTabByIndex(entry.index)
+                })).concat([
+            {
+                type: "item",
+                icon: "add",
+                text: I18n.tr("Open a new note"),
+                action: () => root.openNewNote()
             }
-
-            anchorPos = Qt.point(x, y);
-            isVertical = vertical ?? false;
-            edge = barEdge ?? "top";
-
-            visible = true;
-
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.registerMenu(contextMenuWindow.screen.name, contextMenuWindow);
-            }
-        }
-
-        function closeMenu() {
-            visible = false;
-
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.unregisterMenu(contextMenuWindow.screen.name);
-            }
-        }
-
-        screen: null
-        visible: false
-        WlrLayershell.layer: WlrLayershell.Overlay
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        color: "transparent"
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        Component.onDestruction: {
-            if (contextMenuWindow.screen) {
-                TrayMenuManager.unregisterMenu(contextMenuWindow.screen.name);
-            }
-        }
-
-        Connections {
-            target: PopoutManager
-            function onPopoutOpening() {
-                contextMenuWindow.closeMenu();
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            z: 0
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            onClicked: contextMenuWindow.closeMenu()
-        }
-
-        Rectangle {
-            id: menuContainer
-            z: 1
-
-            x: {
-                if (contextMenuWindow.isVertical) {
-                    if (contextMenuWindow.edge === "left") {
-                        return Math.min(contextMenuWindow.width - width - 10, contextMenuWindow.anchorPos.x);
-                    }
-                    return Math.max(10, contextMenuWindow.anchorPos.x - width);
-                }
-                const left = 10;
-                const right = contextMenuWindow.width - width - 10;
-                const want = contextMenuWindow.anchorPos.x - width / 2;
-                return Math.max(left, Math.min(right, want));
-            }
-            y: {
-                if (contextMenuWindow.isVertical) {
-                    const top = 10;
-                    const bottom = contextMenuWindow.height - height - 10;
-                    const want = contextMenuWindow.anchorPos.y - height / 2;
-                    return Math.max(top, Math.min(bottom, want));
-                }
-                if (contextMenuWindow.edge === "top") {
-                    return Math.min(contextMenuWindow.height - height - 10, contextMenuWindow.anchorPos.y);
-                }
-                return Math.max(10, contextMenuWindow.anchorPos.y - height);
-            }
-
-            width: Math.min(260, Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2))
-            height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
-
-            opacity: contextMenuWindow.visible ? 1 : 0
-            visible: opacity > 0
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.emphasizedEasing
-                }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.topMargin: 4
-                anchors.leftMargin: 2
-                anchors.rightMargin: -2
-                anchors.bottomMargin: -4
-                radius: parent.radius
-                color: Qt.rgba(0, 0, 0, 0.15)
-                z: -1
-            }
-
-            Column {
-                id: menuColumn
-                width: parent.width - Theme.spacingS * 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: Theme.spacingS
-                spacing: 1
-
-                Repeater {
-                    model: root.savedTabEntries
-
-                    Rectangle {
-                        required property var modelData
-
-                        width: parent.width
-                        height: 30
-                        radius: Theme.cornerRadius
-                        color: tabArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.rightMargin: Theme.spacingS
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: "description"
-                                size: 16
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modelData.tab?.title || I18n.tr("Saved Note")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
-                            }
-                        }
-
-                        MouseArea {
-                            id: tabArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                contextMenuWindow.closeMenu();
-                                root.openTabByIndex(modelData.index);
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 30
-                    radius: Theme.cornerRadius
-                    color: newNoteArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.rightMargin: Theme.spacingS
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "add"
-                            size: 16
-                            color: Theme.surfaceText
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Open a new note")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: newNoteArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            contextMenuWindow.closeMenu();
-                            root.openNewNote();
-                        }
-                    }
-                }
-            }
-        }
+        ])
     }
 }

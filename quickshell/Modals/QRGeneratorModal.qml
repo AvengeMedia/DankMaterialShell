@@ -92,7 +92,7 @@ DankModal {
         }, response => {
             root.generating = false;
             if (response.error) {
-                ToastService.showError(I18n.tr("Failed to generate QR code: %1").arg(JSON.stringify(response.error)));
+                ToastService.showError(I18n.tr("Failed to generate QR code: %1", "error toast, %1 is the error details").arg(JSON.stringify(response.error)));
                 return;
             }
             if (!response.result)
@@ -130,7 +130,6 @@ DankModal {
             id: saveBrowser
 
             browserTitle: I18n.tr("Save QR Code")
-            browserIcon: "qr_code"
             browserType: "default"
             fileExtensions: ["*.png"]
             allowStacking: true
@@ -175,13 +174,14 @@ DankModal {
                         text: I18n.tr("QR Generator")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
-                        font.weight: Font.Bold
+                        font.weight: Theme.fontWeightMedium
                         Layout.alignment: Qt.AlignLeft
                         Layout.fillWidth: true
                     }
 
                     DankActionButton {
                         iconName: "close"
+                        Accessible.name: I18n.tr("Close")
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: root.hide()

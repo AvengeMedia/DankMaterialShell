@@ -821,6 +821,14 @@ Singleton {
         return /^(file|https?):\/\//.test(appIcon) || appIcon.includes("/") ? appIcon : "";
     }
 
+    function notificationAppIcon(appIcon, desktopEntry) {
+        if (appIcon)
+            return appIcon;
+        if (!desktopEntry)
+            return "";
+        return DesktopEntries.heuristicLookup(desktopEntry)?.icon || "";
+    }
+
     function notificationFallbackIcon(image, appIcon) {
         image = image || "";
         appIcon = appIcon || "";
@@ -1086,6 +1094,17 @@ Singleton {
         if (!dismissPump.running && _dismissQueue.length) {
             dismissPump.start();
         }
+    }
+
+    function permanentlyDismissNotification(wrapper) {
+        if (!wrapper?.notification)
+            return;
+        const sourceId = wrapper.notification.id.toString();
+        const timestamp = wrapper.time.getTime();
+        const historyEntry = historyList.find(item => item.sourceNotificationId === sourceId && item.timestamp === timestamp);
+        if (historyEntry)
+            removeFromHistory(historyEntry.id);
+        dismissNotification(wrapper);
     }
 
     function dismissNotification(wrapper) {
@@ -1438,6 +1457,13 @@ Singleton {
         }
         newExpandedMessages[messageId] = !newExpandedMessages[messageId];
         expandedMessages = newExpandedMessages;
+    }
+
+    Connections {
+        target: PrivacyService
+        function onScreensharingActiveChanged() {
+            SessionData.syncScreenShareDnd();
+        }
     }
 
     Connections {

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.Common
 import qs.Services
 
 Item {
@@ -20,11 +21,11 @@ Item {
     readonly property var spotlightContent: usingFallback ? fallback.spotlightContent : null
     readonly property bool openedFromOverview: usingFallback ? fallback.openedFromOverview : false
     readonly property var effectiveScreen: usingFallback ? fallback.effectiveScreen : null
-    readonly property real screenWidth: usingFallback ? fallback.screenWidth : 1920
-    readonly property real screenHeight: usingFallback ? fallback.screenHeight : 1080
+    readonly property real screenWidth: usingFallback ? fallback.screenWidth : Theme.mediumBreakpoint * 2
+    readonly property real screenHeight: usingFallback ? fallback.screenHeight : Theme.mediumBreakpoint
     readonly property real dpr: usingFallback ? fallback.dpr : 1
-    readonly property int modalWidth: usingFallback ? fallback.modalWidth : 680
-    readonly property int modalHeight: usingFallback ? fallback.modalHeight : 560
+    readonly property int modalWidth: usingFallback ? fallback.modalWidth : Theme.launcherWidthWide
+    readonly property int modalHeight: usingFallback ? fallback.modalHeight : Theme.launcherHeightDefault
     readonly property real modalX: usingFallback ? fallback.modalX : 0
     readonly property real modalY: usingFallback ? fallback.modalY : 0
     readonly property bool frameOwnsConnectedChrome: false
@@ -108,9 +109,11 @@ Item {
         dialogClosed();
     }
 
-    DankLauncherV2ModalSpotlight {
+    DankLauncherV2ModalHost {
         id: fallback
 
+        connected: false
+        spotlight: true
         modalHandle: root.modalHandle
         triggerUsesOverlayLayer: root.triggerUsesOverlayLayer
     }

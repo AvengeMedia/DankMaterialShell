@@ -76,8 +76,3 @@ func TestLogindBackend_SetBrightness_LEDDevice(t *testing.T) {
 		t.Errorf("SetBrightness() error = %v, want nil", err)
 	}
 }
-
-func TestLogindBackend_Close_NilConn(t *testing.T) {
-	backend := &LogindBackend{conn: nil}
-	backend.Close()
-}

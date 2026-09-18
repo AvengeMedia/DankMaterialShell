@@ -5,6 +5,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/spf13/afero"
 )
 
@@ -19,7 +20,7 @@ type SuccessResult struct {
 	Message string `json:"message"`
 }
 
-func HandleRequest(conn *models.Conn, req models.Request) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	switch req.Method {
 	case "registries.list":
 		HandleList(conn, req)
@@ -32,7 +33,7 @@ func HandleRequest(conn *models.Conn, req models.Request) {
 	}
 }
 
-func HandleList(conn *models.Conn, req models.Request) {
+func HandleList(conn *ipc.ConnWriter, req ipc.Request) {
 	sources := registries.Load(afero.NewOsFs())
 	result := make([]RegistryInfo, len(sources))
 	for i, s := range sources {
@@ -41,7 +42,7 @@ func HandleList(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, result)
 }
 
-func HandleAdd(conn *models.Conn, req models.Request) {
+func HandleAdd(conn *ipc.ConnWriter, req ipc.Request) {
 	name, ok := models.Get[string](req, "name")
 	if !ok {
 		models.RespondError(conn, req.ID, "missing or invalid 'name' parameter")
@@ -64,7 +65,7 @@ func HandleAdd(conn *models.Conn, req models.Request) {
 	})
 }
 
-func HandleRemove(conn *models.Conn, req models.Request) {
+func HandleRemove(conn *ipc.ConnWriter, req ipc.Request) {
 	name, ok := models.Get[string](req, "name")
 	if !ok {
 		models.RespondError(conn, req.ID, "missing or invalid 'name' parameter")

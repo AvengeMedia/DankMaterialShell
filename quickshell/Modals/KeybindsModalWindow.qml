@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Modals
 import qs.Services
@@ -48,77 +47,28 @@ DankFloatingWindow {
         anchors.fill: parent
         spacing: 0
 
-        Item {
+        DankWindowHeader {
+            id: titleBar
             width: parent.width
-            height: 48
             z: 10
+            controls: windowControls
+            title: KeybindsService.cheatsheet.title || I18n.tr("Keybinds")
+            onCloseRequested: win.hide()
 
-            MouseArea {
-                anchors.fill: parent
-                onPressed: windowControls.tryStartMove()
-                onDoubleClicked: windowControls.tryToggleMaximize()
-            }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingL
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "keyboard"
-                    size: Theme.iconSize
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: KeybindsService.cheatsheet.title || I18n.tr("Keybinds")
-                    font.pixelSize: Theme.fontSizeXLarge
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                DankActionButton {
-                    circular: false
-                    iconName: "close_fullscreen"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    tooltipText: I18n.tr("Dock window")
-                    onClicked: win.floatingToggleRequested()
-                }
-
-                DankActionButton {
-                    visible: windowControls.canMaximize
-                    circular: false
-                    iconName: win.maximized ? "fullscreen_exit" : "fullscreen"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: windowControls.tryToggleMaximize()
-                }
-
-                DankActionButton {
-                    circular: false
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: win.hide()
-                }
+            DankActionButton {
+                iconName: "close_fullscreen"
+                buttonSize: Theme.buttonHeightXXS
+                iconSize: Theme.iconSizeSmall
+                iconColor: Theme.surfaceText
+                tooltipText: I18n.tr("Dock window")
+                onClicked: win.floatingToggleRequested()
             }
         }
 
         KeybindsContent {
             id: keybindsContent
             width: parent.width
-            height: parent.height - 48
+            height: parent.height - titleBar.height
             showFloatingToggle: false
             floating: true
             onCloseRequested: win.hide()

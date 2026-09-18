@@ -117,15 +117,6 @@ func TestHandleUdevBrightnessChange_UnknownDevice(t *testing.T) {
 	}
 }
 
-func TestHandleUdevBrightnessChange_NilSysfsBackend(t *testing.T) {
-	m := &Manager{
-		sysfsBackend: nil,
-		stopChan:     make(chan struct{}),
-	}
-
-	m.handleUdevBrightnessChange("backlight:test", 500)
-}
-
 func TestHandleUdevBrightnessChange_DeviceNotInState(t *testing.T) {
 	m, _ := setupTestManager(t)
 
@@ -235,26 +226,4 @@ func TestHandleChange_InvalidBrightnessValue(t *testing.T) {
 	if state.Devices[0].Current != 500 {
 		t.Error("state should be unchanged with invalid brightness value")
 	}
-}
-
-func TestUdevMonitor_Close(t *testing.T) {
-	um := &UdevMonitor{stop: make(chan struct{})}
-
-	um.Close()
-
-	select {
-	case <-um.stop:
-	default:
-		t.Error("stop channel should be closed")
-	}
-}
-
-func TestHandleChange_NilSysfsBackend(t *testing.T) {
-	m := &Manager{
-		sysfsBackend: nil,
-		stopChan:     make(chan struct{}),
-	}
-	um := &UdevMonitor{stop: make(chan struct{})}
-
-	um.handleChange(m, "backlight", "test_device")
 }

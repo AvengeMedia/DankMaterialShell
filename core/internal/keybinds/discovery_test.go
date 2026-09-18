@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func TestDefaultDiscoveryConfig(t *testing.T) {
@@ -246,42 +244,5 @@ func TestAutoDiscoverProvidersNoFactory(t *testing.T) {
 	providers := registry.List()
 	if len(providers) != 0 {
 		t.Errorf("expected 0 providers without factory, got %d", len(providers))
-	}
-}
-
-func TestExpandPathInDiscovery(t *testing.T) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("Cannot get home directory")
-	}
-
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "tilde expansion",
-			input:    "~/test",
-			expected: filepath.Join(home, "test"),
-		},
-		{
-			name:     "absolute path",
-			input:    "/tmp/test",
-			expected: "/tmp/test",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := utils.ExpandPath(tt.input)
-			if err != nil {
-				t.Fatalf("expandPath failed: %v", err)
-			}
-
-			if result != tt.expected {
-				t.Errorf("utils.ExpandPath(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
 	}
 }

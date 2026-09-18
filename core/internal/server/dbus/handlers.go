@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
@@ -42,7 +43,7 @@ func extractObjectParams(p map[string]any, requirePath bool) (objectParams, erro
 	return objectParams{bus: bus, dest: dest, path: path, iface: iface}, nil
 }
 
-func HandleRequest(conn *models.Conn, req models.Request, m *Manager, clientID string) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID string) {
 	switch req.Method {
 	case "dbus.call":
 		handleCall(conn, req, m)
@@ -65,7 +66,7 @@ func HandleRequest(conn *models.Conn, req models.Request, m *Manager, clientID s
 	}
 }
 
-func handleCall(conn *models.Conn, req models.Request, m *Manager) {
+func handleCall(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -94,7 +95,7 @@ func handleCall(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, result)
 }
 
-func handleGetProperty(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetProperty(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -116,7 +117,7 @@ func handleGetProperty(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, result)
 }
 
-func handleSetProperty(conn *models.Conn, req models.Request, m *Manager) {
+func handleSetProperty(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -143,7 +144,7 @@ func handleSetProperty(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 }
 
-func handleGetAllProperties(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetAllProperties(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	op, err := extractObjectParams(req.Params, true)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -159,7 +160,7 @@ func handleGetAllProperties(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, result)
 }
 
-func handleIntrospect(conn *models.Conn, req models.Request, m *Manager) {
+func handleIntrospect(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -183,7 +184,7 @@ func handleIntrospect(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, result)
 }
 
-func handleListNames(conn *models.Conn, req models.Request, m *Manager) {
+func handleListNames(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	bus, err := params.String(req.Params, "bus")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -199,7 +200,7 @@ func handleListNames(conn *models.Conn, req models.Request, m *Manager) {
 	models.Respond(conn, req.ID, result)
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, m *Manager, clientID string) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager, clientID string) {
 	if id := params.StringOpt(req.Params, "clientId", ""); id != "" {
 		clientID = id
 	}
@@ -224,7 +225,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, m *Manager, clientID
 	models.Respond(conn, req.ID, result)
 }
 
-func handleUnsubscribe(conn *models.Conn, req models.Request, m *Manager) {
+func handleUnsubscribe(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	subID, err := params.String(req.Params, "subscriptionId")
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())

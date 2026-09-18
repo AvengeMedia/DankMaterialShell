@@ -23,9 +23,11 @@ DankPopout {
         Rectangle {
             id: popoutContainer
 
-            implicitHeight: popoutColumn.implicitHeight + Theme.spacingL * 2
+            implicitHeight: popoutColumn.implicitHeight + PopoutMetrics.contentPadding * 2
             color: "transparent"
             focus: true
+
+            readonly property bool rootShouldBeVisible: root.shouldBeVisible
 
             Component.onCompleted: {
                 if (root.shouldBeVisible) {
@@ -40,22 +42,19 @@ DankPopout {
                 }
             }
 
-            Connections {
-                target: root
-                function onShouldBeVisibleChanged() {
-                    if (root.shouldBeVisible) {
-                        Qt.callLater(() => {
-                            popoutContainer.forceActiveFocus();
-                        });
-                    }
+            onRootShouldBeVisibleChanged: {
+                if (rootShouldBeVisible) {
+                    Qt.callLater(() => {
+                        popoutContainer.forceActiveFocus();
+                    });
                 }
             }
 
             Column {
                 id: popoutColumn
-                width: parent.width - Theme.spacingS * 2
-                x: Theme.spacingS
-                y: Theme.spacingS
+                width: parent.width - PopoutMetrics.contentPadding * 2
+                x: PopoutMetrics.contentPadding
+                y: PopoutMetrics.contentPadding
                 spacing: Theme.spacingS
 
                 Loader {
@@ -73,7 +72,7 @@ DankPopout {
                             item.parentPopout = root;
                         }
                         if (item) {
-                            root.contentHeight = Qt.binding(() => item.implicitHeight + Theme.spacingS * 2);
+                            root.contentHeight = Qt.binding(() => item.implicitHeight + PopoutMetrics.contentPadding * 2);
                         }
                     }
                 }

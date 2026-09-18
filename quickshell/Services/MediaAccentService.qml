@@ -5,19 +5,47 @@ import Quickshell
 import QtQuick
 import qs.Common
 import qs.Services
+import "../DankCommon/Common/Contrast.js" as Contrast
 
-// Accent color extracted from the current track's album art via ColorQuantizer,
-// falling back to Theme.primary when no usable accent is available.
 Singleton {
     id: root
 
-    readonly property bool hasAccent: SettingsData.mediaUseAlbumArtAccent ? _accent !== null : true
-    readonly property color accent: SettingsData.mediaUseAlbumArtAccent && _accent !== null ? _accent : Theme.primary
+    readonly property bool hasAccent: MediaOptions.albumArtAccent ? _accent !== null : true
+    readonly property color accent: MediaOptions.albumArtAccent && _accent !== null ? _accent : Theme.primary
+    readonly property var lyricsHues: _lyricsHues()
+    readonly property var lyricsAccents: lyricsHues.map(color => _readableLyricColor(color))
+    readonly property color lyricsGroupAccent: _readableLyricColor(_mixHues(lyricsHues[0], lyricsHues[1], lyricsHues[2]))
 
-    readonly property color onAccent: SettingsData.mediaUseAlbumArtAccent && _accent !== null ? (() => {
-        const lum = 0.2126 * _accent.r + 0.7152 * _accent.g + 0.0722 * _accent.b;
-        return lum > 0.6 ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1);
-    })() : Theme.onPrimary
+    readonly property color accentContainer: _container(Theme.primaryContainer, Theme.isLightMode ? 0.3 : 0.55, Theme.isLightMode ? 0.9 : 0.42, 1.25)
+    readonly property color accentSecondaryContainer: _container(Theme.secondaryContainer, Theme.isLightMode ? 0.12 : 0.22, Theme.isLightMode ? 0.94 : 0.3, 1.08)
+    readonly property color readableAccent: contrastTo(accent, Theme.onSurface, Theme.surfaceContainerHigh, 4.5)
+
+    property color onAccent
+    property color onAccentContainer
+    property color onAccentSecondaryContainer
+
+    Binding {
+        target: root
+        property: "onAccent"
+        value: {
+            if (!MediaOptions.albumArtAccent || root._accent === null)
+                return Theme.onPrimary;
+            const color = root._accent;
+            return Contrast.ratio(color, Theme.contrastDark) >= Contrast.ratio(color, Theme.contrastLight) ? Theme.contrastDark : Theme.contrastLight;
+        }
+    }
+
+    Binding {
+        target: root
+        property: "onAccentContainer"
+        value: root._onContainer(Theme.onPrimaryContainer, 0.3, root.accentContainer)
+    }
+
+    Binding {
+        target: root
+        property: "onAccentSecondaryContainer"
+        value: root._onContainer(Theme.onSecondaryContainer, 0.12, root.accentSecondaryContainer)
+    }
 
     readonly property color accentHover: Theme.withAlpha(accent, 0.12)
     readonly property color accentPressed: Theme.withAlpha(accent, Theme.transparentBlurLayers ? 0.24 : 0.16)
@@ -25,35 +53,78 @@ Singleton {
     readonly property color accentTrack: Theme.withAlpha(accent, 0.28)
     readonly property color accentSubtle: Theme.withAlpha(accent, 0.55)
 
-    // Prefer the validated url, but fall back to the live mpris art so quantization
-    // starts as soon as the cover exists instead of waiting on the commit pipeline.
-    readonly property string artUrl: {
-        const resolved = TrackArtService.resolvedArtUrl;
-        if (resolved !== "")
-            return resolved;
-        const p = MprisController.activePlayer;
-        if (!p)
-            return "";
-        if (p.trackArtUrl)
-            return p.trackArtUrl;
-        const m = p.metadata;
-        return m && m["mpris:artUrl"] ? m["mpris:artUrl"].toString() : "";
+    readonly property string artUrl: TrackArtService.resolvedArtUrl
+    property var _accent: _pickAccent(TrackArtService.artwork.colors)
+
+    function _lyricsHues() {
+        if (!MediaOptions.albumArtAccent)
+            return [Theme.primary, Theme.tertiary, Theme.secondary];
+        const base = accent;
+        const hue = base.hsvSaturation < 0.18 || base.hsvHue < 0 ? Theme.tertiary.hsvHue : base.hsvHue;
+        const saturation = Math.max(0.28, Math.min(0.6, base.hsvSaturation));
+        const value = Math.max(0.78, base.hsvValue);
+        let companion = Qt.hsva((Math.max(0, hue) + 1 / 3) % 1, saturation, value, 1);
+        let score = 0;
+        for (const candidate of TrackArtService.artwork.colors) {
+            const difference = Math.abs(candidate.hsvHue - hue);
+            const separation = Math.min(difference, 1 - difference);
+            if (candidate.hsvSaturation < 0.18 || candidate.hsvValue < 0.3 || separation < 1 / 6)
+                continue;
+            const candidateScore = separation * candidate.hsvSaturation * candidate.hsvValue;
+            if (candidateScore <= score)
+                continue;
+            score = candidateScore;
+            companion = candidate;
+        }
+        const companionOffset = (companion.hsvHue - Math.max(0, hue) + 1) % 1;
+        const thirdOffset = companionOffset > 0.5 ? companionOffset / 2 : (companionOffset + 1) / 2;
+        const third = Qt.hsva((Math.max(0, hue) + thirdOffset) % 1, saturation, value, 1);
+        return [base, companion, third];
     }
 
-    // Hold the last accent across the brief artUrl blank between tracks; never reset to primary.
-    property var _accent: null
+    function _mixHues(first, second, fallback) {
+        const a = Math.max(0, first.hsvHue) * 2 * Math.PI;
+        const b = Math.max(0, second.hsvHue) * 2 * Math.PI;
+        const x = Math.cos(a) + Math.cos(b);
+        const y = Math.sin(a) + Math.sin(b);
+        if (x * x + y * y < 0.0001)
+            return fallback;
+        const hue = (Math.atan2(y, x) / (2 * Math.PI) + 1) % 1;
+        return Qt.hsva(hue, Math.max(first.hsvSaturation, second.hsvSaturation), Math.max(first.hsvValue, second.hsvValue), 1);
+    }
 
-    ColorQuantizer {
-        id: quantizer
-        source: root.artUrl
-        depth: 4
-        rescaleSize: 64
-        onColorsChanged: {
-            // Hold last accent only across the blank-art gap; else always recompute.
-            if (!colors || colors.length === 0)
-                return;
-            root._accent = root._pickAccent(colors);
+    function contrastTo(color, toward, background, target) {
+        if (Contrast.ratio(color, background) >= target)
+            return color;
+        let low = 0;
+        let high = 1;
+        for (let i = 0; i < 10; i++) {
+            const amount = (low + high) / 2;
+            if (Contrast.ratio(Theme.blend(color, toward, amount), background) >= target)
+                high = amount;
+            else
+                low = amount;
         }
+        return Theme.blend(color, toward, high);
+    }
+
+    function _container(fallback, saturationCap, value, cardContrast) {
+        if (!MediaOptions.albumArtAccent || _accent === null)
+            return fallback;
+        const seed = Qt.hsva(Math.max(0, _accent.hsvHue), Math.min(_accent.hsvSaturation, saturationCap), value, 1);
+        return contrastTo(seed, Theme.onSurface, Theme.surfaceContainerHigh, cardContrast);
+    }
+
+    function _onContainer(fallback, saturationCap, container) {
+        if (!MediaOptions.albumArtAccent || _accent === null)
+            return fallback;
+        const light = Theme.isLightMode;
+        const seed = Qt.hsva(Math.max(0, _accent.hsvHue), Math.min(_accent.hsvSaturation, saturationCap), light ? 0.25 : 0.95, 1);
+        return contrastTo(seed, light ? Theme.contrastDark : Theme.contrastLight, container, 4.5);
+    }
+
+    function _readableLyricColor(color) {
+        return contrastTo(color, Theme.onSurface, Theme.surfaceContainerLowest, 4.5);
     }
 
     function _pickAccent(colors) {

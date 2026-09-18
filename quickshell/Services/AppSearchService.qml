@@ -15,6 +15,7 @@ Singleton {
     property var applications: []
     property var _cachedCategories: null
     property var _cachedVisibleApps: null
+    property var _searchIndex: null
     property var _hiddenAppsSet: new Set()
 
     property var _transformCache: ({})
@@ -53,6 +54,7 @@ Singleton {
         applications = DesktopEntries.applications.values;
         _cachedCategories = null;
         _cachedVisibleApps = null;
+        _searchIndex = null;
         invalidateLauncherCache();
     }
 
@@ -104,6 +106,7 @@ Singleton {
     function _rebuildHiddenSet() {
         _hiddenAppsSet = new Set(SessionData.hiddenApps || []);
         _cachedVisibleApps = null;
+        _searchIndex = null;
     }
 
     function isAppHidden(app) {
@@ -111,6 +114,25 @@ Singleton {
             return false;
         const appId = app.id || app.execString || app.exec || "";
         return _hiddenAppsSet.has(appId);
+    }
+
+    function _visibleSearchIndex() {
+        if (_searchIndex !== null)
+            return _searchIndex;
+        const apps = getVisibleApplications();
+        _searchIndex = {
+            apps: apps,
+            entries: apps.map(app => ({
+                        app: app,
+                        name: (app.name || "").toLowerCase(),
+                        nameWords: tokenize(app.name || ""),
+                        genericName: (app.genericName || "").toLowerCase(),
+                        comment: (app.comment || "").toLowerCase(),
+                        id: (app.id || "").toLowerCase(),
+                        keywords: app.keywords ? app.keywords.map(k => k.toLowerCase()) : []
+                    }))
+        };
+        return _searchIndex;
     }
 
     function getVisibleApplications() {
@@ -138,6 +160,7 @@ Singleton {
         }
         function onAppOverridesChanged() {
             root._cachedVisibleApps = null;
+            root._searchIndex = null;
             root.invalidateLauncherCache();
         }
     }
@@ -224,7 +247,7 @@ Singleton {
             },
             "dms_vpn": {
                 id: "dms_vpn",
-                name: I18n.tr("VPN"),
+                name: I18n.tr("VPN", "virtual private network, widget and page title"),
                 cornerIcon: "vpn_key",
                 comment: "DMS",
                 defaultTrigger: "",
@@ -248,7 +271,7 @@ Singleton {
             },
             "dms_settings_search": {
                 id: "dms_settings_search",
-                name: I18n.tr("Settings Search"),
+                name: I18n.tr("Search settings", "launcher plugin name that searches DMS settings"),
                 cornerIcon: "search",
                 comment: I18n.tr("DMS Settings"),
                 defaultTrigger: "?",
@@ -401,7 +424,7 @@ Singleton {
                 const connecting = DMSNetworkService.isVpnConnectingUuid(id);
                 const typeLabel = VPNService.getVpnTypeFromProfile(profile);
                 return {
-                    name: profile.name || I18n.tr("VPN"),
+                    name: profile.name || I18n.tr("VPN", "virtual private network, widget and page title"),
                     icon: active ? "material:vpn_lock" : "material:vpn_key_off",
                     comment: typeLabel,
                     action: "vpn:" + id,
@@ -446,7 +469,7 @@ Singleton {
                 section: "settings",
                 icon: "material:" + r.icon,
                 comment: r.description || r.category,
-                action: "settings_nav:" + r.tabIndex + ":" + r.section,
+                action: r.page ? "settings_page:" + r.page : "settings_nav:" + r.tabIndex + ":" + r.section,
                 categories: ["Settings"],
                 keywords: r.keywords || [],
                 source: I18n.tr("Settings", "settings window title"),
@@ -473,6 +496,9 @@ Singleton {
                 PopoutService.openSettingsWithTabIndex(tabIndex);
                 return true;
             }
+        case "settings_page":
+            PopoutService.openSettingsWithTab(parts.slice(1).join(":"));
+            return true;
         case "qr_generate":
             PopoutService.showQRGeneratorModal(parts.slice(1).join(":"));
             return true;
@@ -560,9 +586,10 @@ Singleton {
     }
 
     function wordBoundaryMatch(text, query) {
-        const textWords = tokenize(text);
-        const queryWords = tokenize(query);
+        return wordBoundaryMatchWords(tokenize(text), tokenize(query));
+    }
 
+    function wordBoundaryMatchWords(textWords, queryWords) {
         if (queryWords.length === 0)
             return false;
         if (queryWords.length > textWords.length)
@@ -603,20 +630,23 @@ Singleton {
         return matrix[len1][len2];
     }
 
-    function fuzzyMatchScore(text, query) {
+    function fuzzyMatchScore(text, query, words) {
         const queryLower = query.toLowerCase();
         const maxDistance = query.length <= 2 ? 0 : query.length === 3 ? 1 : query.length <= 6 ? 2 : 3;
 
         let bestScore = 0;
 
-        const distance = levenshteinDistance(text.toLowerCase(), queryLower);
-        if (distance <= maxDistance) {
-            const maxLen = Math.max(text.length, query.length);
-            bestScore = 1 - (distance / maxLen);
+        if (Math.abs(text.length - query.length) <= maxDistance) {
+            const distance = levenshteinDistance(text.toLowerCase(), queryLower);
+            if (distance <= maxDistance) {
+                const maxLen = Math.max(text.length, query.length);
+                bestScore = 1 - (distance / maxLen);
+            }
         }
 
-        const words = tokenize(text);
-        for (const word of words) {
+        for (const word of words || tokenize(text)) {
+            if (Math.abs(word.length - query.length) > maxDistance)
+                continue;
             const wordDistance = levenshteinDistance(word, queryLower);
             if (wordDistance <= maxDistance) {
                 const maxLen = Math.max(word.length, query.length);
@@ -678,16 +708,19 @@ Singleton {
             return [];
 
         const queryLower = query.toLowerCase().trim();
+        const queryWords = tokenize(queryLower);
         const scoredApps = [];
         const results = [];
-        const visibleApps = getVisibleApplications();
+        const index = _visibleSearchIndex();
+        const visibleApps = index.apps;
 
-        for (const app of visibleApps) {
-            const name = (app.name || "").toLowerCase();
-            const genericName = (app.genericName || "").toLowerCase();
-            const comment = (app.comment || "").toLowerCase();
-            const id = (app.id || "").toLowerCase();
-            const keywords = app.keywords ? app.keywords.map(k => k.toLowerCase()) : [];
+        for (const entry of index.entries) {
+            const app = entry.app;
+            const name = entry.name;
+            const genericName = entry.genericName;
+            const comment = entry.comment;
+            const id = entry.id;
+            const keywords = entry.keywords;
 
             let textScore = 0;
             let matchType = "none";
@@ -698,7 +731,7 @@ Singleton {
             } else if (name.startsWith(queryLower)) {
                 textScore = 5000;
                 matchType = "prefix";
-            } else if (wordBoundaryMatch(name, queryLower)) {
+            } else if (wordBoundaryMatchWords(entry.nameWords, queryWords)) {
                 textScore = 3000;
                 matchType = "word_boundary";
             } else if (name.includes(queryLower)) {
@@ -735,7 +768,7 @@ Singleton {
             }
 
             if (matchType === "none") {
-                const fuzzyScore = fuzzyMatchScore(name, queryLower);
+                const fuzzyScore = fuzzyMatchScore(name, queryLower, entry.nameWords);
                 if (fuzzyScore > 0) {
                     textScore = fuzzyScore * 100;
                     matchType = "fuzzy";
@@ -820,24 +853,24 @@ Singleton {
     }
 
     readonly property var _categoryMap: ({
-            "AudioVideo": I18n.tr("Media"),
+            "AudioVideo": I18n.tr("Media", "launcher app category for audio and video apps"),
             "Audio": I18n.tr("Media"),
             "Video": I18n.tr("Media"),
-            "Development": I18n.tr("Development"),
+            "Development": I18n.tr("Development", "launcher app category"),
             "TextEditor": I18n.tr("Development"),
             "IDE": I18n.tr("Development"),
-            "Education": I18n.tr("Education"),
-            "Game": I18n.tr("Games"),
-            "Graphics": I18n.tr("Graphics"),
+            "Education": I18n.tr("Education", "launcher app category"),
+            "Game": I18n.tr("Games", "launcher app category"),
+            "Graphics": I18n.tr("Graphics", "launcher app category"),
             "Photography": I18n.tr("Graphics"),
             "Network": I18n.tr("Internet"),
             "WebBrowser": I18n.tr("Internet"),
             "Email": I18n.tr("Internet"),
-            "Office": I18n.tr("Office"),
+            "Office": I18n.tr("Office", "launcher app category"),
             "WordProcessor": I18n.tr("Office"),
             "Spreadsheet": I18n.tr("Office"),
             "Presentation": I18n.tr("Office"),
-            "Science": I18n.tr("Science"),
+            "Science": I18n.tr("Science", "launcher app category"),
             "Settings": I18n.tr("Settings"),
             "System": I18n.tr("System"),
             "Utility": I18n.tr("Utilities"),
@@ -1088,10 +1121,7 @@ Singleton {
                 }
                 root.refreshApplications();
             } else {
-                ToastService.showError(
-                    I18n.tr("Uninstall failed: %1", "uninstallation error").arg(appName),
-                    err
-                );
+                ToastService.showError(I18n.tr("Uninstall failed: %1", "uninstallation error").arg(appName), err);
             }
         }
     }

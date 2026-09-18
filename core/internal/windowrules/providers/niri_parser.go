@@ -2,6 +2,7 @@ package providers
 
 import (
 	"fmt"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -514,32 +515,16 @@ func (p *NiriRulesParser) HasDMSRulesIncluded() bool {
 	return p.dmsRulesIncluded
 }
 
+var niriRulesMessages = configfrag.Messages{
+	Missing:     "dms/windowrules.kdl does not exist",
+	NotIncluded: "dms/windowrules.kdl is not included in config.kdl",
+	Overridden:  "Some DMS rules may be overridden by config rules",
+	Active:      "DMS window rules are active",
+}
+
 func (p *NiriRulesParser) buildDMSStatus() *windowrules.DMSRulesStatus {
-	status := &windowrules.DMSRulesStatus{
-		Exists:          p.dmsRulesExists,
-		Included:        p.dmsRulesIncluded,
-		IncludePosition: p.dmsIncludePos,
-		TotalIncludes:   p.includeCount,
-		RulesAfterDMS:   p.rulesAfterDMS,
-	}
-
-	switch {
-	case !p.dmsRulesExists:
-		status.Effective = false
-		status.StatusMessage = "dms/windowrules.kdl does not exist"
-	case !p.dmsRulesIncluded:
-		status.Effective = false
-		status.StatusMessage = "dms/windowrules.kdl is not included in config.kdl"
-	case p.rulesAfterDMS > 0:
-		status.Effective = true
-		status.OverriddenBy = p.rulesAfterDMS
-		status.StatusMessage = "Some DMS rules may be overridden by config rules"
-	default:
-		status.Effective = true
-		status.StatusMessage = "DMS window rules are active"
-	}
-
-	return status
+	scan := configfrag.IncludeScan{Count: p.includeCount, DMSPosition: p.dmsIncludePos, DMSSeen: p.dmsRulesIncluded}
+	return windowrules.DMSRulesStatusFrom(configfrag.BuildStatus(scan, p.dmsRulesExists, p.rulesAfterDMS, "", false, niriRulesMessages))
 }
 
 type NiriRulesParseResult struct {
@@ -673,67 +658,20 @@ func (p *NiriWritableProvider) GetRuleSet() (*windowrules.RuleSet, error) {
 	}, nil
 }
 
+func (p *NiriWritableProvider) EnsureWritable() error {
+	return nil
+}
+
 func (p *NiriWritableProvider) SetRule(rule windowrules.WindowRule) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		rules = []windowrules.WindowRule{}
-	}
-
-	found := false
-	for i, r := range rules {
-		if r.ID == rule.ID {
-			rules[i] = rule
-			found = true
-			break
-		}
-	}
-	if !found {
-		rules = append(rules, rule)
-	}
-
-	return p.writeDMSRules(rules)
+	return windowrules.Set(p, rule)
 }
 
 func (p *NiriWritableProvider) RemoveRule(id string) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-
-	newRules := make([]windowrules.WindowRule, 0, len(rules))
-	for _, r := range rules {
-		if r.ID != id {
-			newRules = append(newRules, r)
-		}
-	}
-
-	return p.writeDMSRules(newRules)
+	return windowrules.Remove(p, id)
 }
 
 func (p *NiriWritableProvider) ReorderRules(ids []string) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-
-	ruleMap := make(map[string]windowrules.WindowRule)
-	for _, r := range rules {
-		ruleMap[r.ID] = r
-	}
-
-	newRules := make([]windowrules.WindowRule, 0, len(ids))
-	for _, id := range ids {
-		if r, ok := ruleMap[id]; ok {
-			newRules = append(newRules, r)
-			delete(ruleMap, id)
-		}
-	}
-
-	for _, r := range ruleMap {
-		newRules = append(newRules, r)
-	}
-
-	return p.writeDMSRules(newRules)
+	return windowrules.Reorder(p, ids)
 }
 
 var niriMetaCommentRegex = regexp.MustCompile(`^//\s*@id=(\S*)\s*@name=(.*)$`)
@@ -859,7 +797,7 @@ func (p *NiriWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error) 
 	return rules, nil
 }
 
-func (p *NiriWritableProvider) writeDMSRules(rules []windowrules.WindowRule) error {
+func (p *NiriWritableProvider) WriteDMSRules(rules []windowrules.WindowRule) error {
 	rulesPath := p.GetOverridePath()
 
 	if err := os.MkdirAll(filepath.Dir(rulesPath), 0755); err != nil {

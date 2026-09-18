@@ -3,9 +3,8 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.I3
 import qs.Common
+import "../Common/InstanceRegistry.js" as Registry
 
 Singleton {
     id: root
@@ -13,11 +12,10 @@ Singleton {
     property var widgetRegistry: ({})
     property var dankBarRepeater: null
 
-    // Bars rendered inside the frame surface (connected mode) have no DankBarWindow in the
-    // repeater, so they self-register here (screenName -> barId -> DankBarBody) for trigger routing.
     property var frameHostedBars: ({})
 
-    // Shared dock context-menu windows (created in DMSShell) so a frame-hosted dock can reach them.
+    signal dockEditRequested(string dockId)
+
     property var dockContextMenu: null
     property var dockTrashContextMenu: null
 
@@ -44,7 +42,6 @@ Singleton {
         frameHostedBars = next;
     }
 
-    // Horizontal bars first, then config order, matching the standalone repeater order.
     function frameBarsForScreen(screenName) {
         const bars = frameHostedBars[screenName] ?? {};
         const order = SettingsData.barConfigs.map(cfg => cfg.id);
@@ -55,8 +52,6 @@ Singleton {
         return Object.keys(bars).sort((a, b) => (vertical(a) - vertical(b)) || (order.indexOf(a) - order.indexOf(b))).map(barId => bars[barId]);
     }
 
-    // DankBar items self-register here (barConfig id -> DankBar) so frame-hosted bars can
-    // resolve their models/rootWindow reactively, independent of repeater load ordering.
     property var dankBarItems: ({})
 
     function registerDankBarItem(barId, item) {
@@ -78,98 +73,144 @@ Singleton {
     signal widgetRegistered(string widgetId, string screenName)
     signal widgetUnregistered(string widgetId, string screenName)
 
-    function registerWidget(widgetId, screenName, widgetRef) {
+    property int _legacySerial: 0
+
+    function registerWidget(widgetId, screenName, widgetRef, instanceId, context) {
         if (!widgetId || !screenName || !widgetRef)
-            return;
-
-        const nextRegistry = (typeof widgetRegistry === "object" && widgetRegistry !== null) ? Object.assign({}, widgetRegistry) : {};
-        const screenMap = (typeof nextRegistry[widgetId] === "object" && nextRegistry[widgetId] !== null) ? Object.assign({}, nextRegistry[widgetId]) : {};
-        screenMap[screenName] = widgetRef;
-        nextRegistry[widgetId] = screenMap;
-        widgetRegistry = nextRegistry;
-        widgetRegistered(widgetId, screenName);
-    }
-
-    function unregisterWidget(widgetId, screenName, widgetRef) {
-        if (!widgetId || !screenName)
-            return;
-        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
-            return;
-        if (!widgetRegistry[widgetId])
-            return;
-        if (widgetRef && widgetRegistry[widgetId][screenName] !== widgetRef)
-            return;
-
-        const nextRegistry = Object.assign({}, widgetRegistry);
-        const screenMap = (typeof nextRegistry[widgetId] === "object" && nextRegistry[widgetId] !== null) ? Object.assign({}, nextRegistry[widgetId]) : {};
-        delete screenMap[screenName];
-        if (Object.keys(screenMap).length === 0) {
-            delete nextRegistry[widgetId];
-        } else {
-            nextRegistry[widgetId] = screenMap;
-        }
-        widgetRegistry = nextRegistry;
-
-        widgetUnregistered(widgetId, screenName);
-    }
-
-    function getWidget(widgetId, screenName) {
-        if (typeof widgetRegistry !== "object" || widgetRegistry === null || !widgetRegistry[widgetId])
             return null;
-        if (screenName)
-            return widgetRegistry[widgetId][screenName] || null;
+        const previous = Object.values(widgetRegistry).find(entry => entry.item === widgetRef && entry.widgetId === widgetId && entry.screenName === screenName);
+        const identity = instanceId || previous?.instanceId || "legacy:" + (++_legacySerial);
+        const registration = {
+            key: Registry.key(screenName, identity),
+            widgetId,
+            screenName,
+            instanceId: identity,
+            item: widgetRef,
+            context: context ?? null
+        };
+        widgetRegistry = Object.assign({}, widgetRegistry, {
+            [registration.key]: registration
+        });
+        widgetRegistered(widgetId, screenName);
+        return registration;
+    }
 
-        const screens = Object.keys(widgetRegistry[widgetId]);
-        return screens.length > 0 ? widgetRegistry[widgetId][screens[0]] : null;
+    function releaseWidget(registration) {
+        const next = Registry.release(widgetRegistry, registration);
+        if (next === widgetRegistry)
+            return;
+        widgetRegistry = next;
+        widgetUnregistered(registration.widgetId, registration.screenName);
+    }
+
+    function unregisterWidget(widgetId, screenName, widgetRef, instanceId) {
+        if (!widgetRef)
+            return;
+        const registration = Object.values(widgetRegistry).find(entry => entry.widgetId === widgetId && entry.screenName === screenName && entry.item === widgetRef && (!instanceId || entry.instanceId === instanceId));
+        releaseWidget(registration);
+    }
+
+    function registrationForItem(sourceItem) {
+        const entries = Object.values(widgetRegistry);
+        for (let item = sourceItem; item; item = item.parent) {
+            const entry = entries.find(entry => entry.item === item || entry.context?.owner === item);
+            if (entry)
+                return entry;
+        }
+        return null;
+    }
+
+    function registrationActive(entry) {
+        if (!entry?.item || widgetRegistry[entry.key] !== entry || entry.item.effectiveVisible === false)
+            return false;
+        const context = entry.context;
+        if (!context?.surface?.screen)
+            return true;
+        if (!context.owner?.active || context.surface.config.enabled === false || context.surface.config.visible === false)
+            return false;
+        if (context.kind === "dock")
+            return SettingsData.dockConfigsForScreen(context.surface.screen).some(config => config.id === context.barId);
+        return ShellLayout.forScreen(entry.screenName)?.instances.some(instance => instance.barId === context.barId) === true;
+    }
+
+    function resolveWidget(widgetId, target) {
+        const configs = SettingsData.barConfigs.concat(SettingsData.dockConfigs ?? []).map(config => config.id);
+        return Registry.select(widgetRegistry, widgetId, target, configs, Quickshell.screens.map(screen => screen.name), registrationActive);
+    }
+
+    function getWidget(widgetId, screenName, instanceId) {
+        return resolveWidget(widgetId, {
+            screenName,
+            instanceId
+        })?.item ?? null;
+    }
+
+    function getWidgetInstance(widgetId, target) {
+        if (!target?.screenName || !target.barId || !target.section || !target.occurrenceId)
+            return null;
+        return resolveWidget(widgetId, target)?.item ?? null;
+    }
+
+    function naturalPopoutAnchor(screen, sourceItem, section) {
+        const source = registrationForItem(sourceItem);
+        if (source?.context?.kind !== "dock" && source?.context?.surface?.popupAnchor)
+            return source.context.surface.popupAnchor(source.item, section);
+        const widget = source ? resolveWidget(source.widgetId, {
+            screenName: screen?.name,
+            kind: "bar"
+        })?.item : null;
+        const context = registrationForItem(widget)?.context?.surface;
+        if (context?.popupAnchor)
+            return context.popupAnchor(widget, widget.section || section);
+        const bar = getBarWindowForScreen(screen?.name);
+        const config = widget?.barConfig ?? bar?.barConfig ?? null;
+        const position = config?.position ?? SettingsData.Position.Top;
+        const thickness = widget?.barThickness ?? bar?.effectiveBarThickness ?? Theme.barHeight;
+        const spacing = widget?.barSpacing ?? config?.spacing ?? Theme.spacingXS;
+        const targetSection = widget?.section ?? section ?? "center";
+        const vertical = position === SettingsData.Position.Left || position === SettingsData.Position.Right;
+        const fraction = targetSection === "left" ? 0 : targetSection === "right" ? 1 : 0.5;
+        const visual = widget?.visualContent ?? widget;
+        const point = visual ? visual.mapToItem(null, 0, 0) : Qt.point(vertical ? (position === SettingsData.Position.Left ? 0 : screen.width - thickness) : screen.width * fraction, vertical ? screen.height * fraction : (position === SettingsData.Position.Top ? 0 : screen.height - thickness));
+        const width = widget?.visualWidth ?? widget?.width ?? 0;
+        const trigger = SettingsData.getPopupTriggerPosition(point, screen, thickness, width, spacing, position, config);
+        return {
+            trigger,
+            section: targetSection,
+            position,
+            thickness,
+            spacing,
+            config
+        };
     }
 
     function getWidgetOnFocusedScreen(widgetId) {
-        if (typeof widgetRegistry !== "object" || widgetRegistry === null || !widgetRegistry[widgetId])
-            return null;
-
-        const focusedScreen = getFocusedScreenName();
-        if (focusedScreen && widgetRegistry[widgetId][focusedScreen])
-            return widgetRegistry[widgetId][focusedScreen];
-
-        const screens = Object.keys(widgetRegistry[widgetId]);
-        return screens.length > 0 ? widgetRegistry[widgetId][screens[0]] : null;
+        return getWidget(widgetId, getFocusedScreenName()) || getWidget(widgetId);
     }
 
     readonly property bool focusedScreenDetectionSupported: (CompositorService.isAqueous && AqueousService.available) || CompositorService.isHyprland || CompositorService.isNiri || CompositorService.isMango || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle
 
     function getFocusedScreenName() {
-        if (CompositorService.isAqueous && AqueousService.available)
-            return AqueousService.focusedOutput;
-        if (CompositorService.isHyprland && Hyprland.focusedMonitor)
-            return Hyprland.focusedMonitor.name;
-        if (CompositorService.isNiri && NiriService.currentOutput)
-            return NiriService.currentOutput;
-        if (CompositorService.isMango && MangoService.activeOutput)
-            return MangoService.activeOutput;
-        if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
-            return focusedWs?.monitor?.name || "";
-        }
-        return "";
+        return CompositorService.getFocusedScreenName();
     }
 
     function getRegisteredWidgetIds() {
         if (typeof widgetRegistry !== "object" || widgetRegistry === null)
             return [];
-        return Object.keys(widgetRegistry);
+        return [...new Set(Object.values(widgetRegistry).map(entry => entry.widgetId))];
     }
 
     function hasWidget(widgetId) {
-        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
-            return false;
-        return widgetRegistry[widgetId] && Object.keys(widgetRegistry[widgetId]).length > 0;
+        return getWidget(widgetId) !== null;
     }
 
-    function triggerWidgetPopout(widgetId) {
-        const widget = getWidgetOnFocusedScreen(widgetId);
+    function triggerWidgetPopout(widgetId, target) {
+        const widget = target ? resolveWidget(widgetId, target)?.item : getWidgetOnFocusedScreen(widgetId);
         if (!widget)
             return false;
 
+        const registration = registrationForItem(widget);
+        registration?.context?.surface?.ensureVisible(widget);
         if (typeof widget.triggerPopout === "function") {
             widget.triggerPopout();
             return true;
@@ -205,52 +246,34 @@ Singleton {
         return false;
     }
 
-    function getBarWindowForScreen(screenName) {
-        const hosted = frameBarsForScreen(screenName);
-        if (hosted.length > 0)
-            return hosted[0];
-
-        if (!dankBarRepeater)
-            return null;
-
-        for (var i = 0; i < dankBarRepeater.count; i++) {
-            const loader = dankBarRepeater.itemAt(i);
-            if (!loader?.item)
+    function barsForScreen(screenName, barId) {
+        const bars = [];
+        for (const config of SettingsData.barConfigs) {
+            if (barId && config.id !== barId)
                 continue;
-
-            const barItem = loader.item;
-            if (!barItem.barVariants?.instances)
+            const instance = ShellLayout.forScreen(screenName)?.instances.find(instance => instance.barId === config.id);
+            if (!instance || instance.kind === "island")
                 continue;
-
-            for (var j = 0; j < barItem.barVariants.instances.length; j++) {
-                const barInstance = barItem.barVariants.instances[j];
-                if (barInstance.modelData?.name === screenName)
-                    return barInstance;
-            }
+            const item = instance.kind === "frame" ? frameHostedBars[screenName]?.[config.id] : dankBarItems[config.id]?.barVariants?.instances.find(bar => bar.modelData?.name === screenName);
+            if (item)
+                bars.push(item);
         }
-        return null;
+        return bars.sort((a, b) => Number(a.isVertical) - Number(b.isVertical));
+    }
+
+    function getBarWindowForScreen(screenName, barId) {
+        return barsForScreen(screenName, barId)[0] ?? null;
     }
 
     function getBarWindowOnFocusedScreen() {
-        const focusedScreen = getFocusedScreenName();
-        if (!focusedScreen)
-            return getFirstBarWindow();
-        return getBarWindowForScreen(focusedScreen) || getFirstBarWindow();
+        return getBarWindowForScreen(getFocusedScreenName()) || getFirstBarWindow();
     }
 
     function getFirstBarWindow() {
-        if (dankBarRepeater) {
-            for (var i = 0; i < dankBarRepeater.count; i++) {
-                const barItem = dankBarRepeater.itemAt(i)?.item;
-                if (barItem?.barVariants?.instances?.length > 0)
-                    return barItem.barVariants.instances[0];
-            }
-        }
-
-        for (const screenName in frameHostedBars) {
-            const hosted = frameBarsForScreen(screenName);
-            if (hosted.length > 0)
-                return hosted[0];
+        for (const screen of Quickshell.screens) {
+            const bar = getBarWindowForScreen(screen.name);
+            if (bar)
+                return bar;
         }
         return null;
     }

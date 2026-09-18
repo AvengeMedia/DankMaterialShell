@@ -21,7 +21,7 @@ function transformApp(app, override, defaultActions, primaryActionLabel) {
         type: "app",
         name: override?.name || app.name || "",
         subtitle: override?.comment || app.comment || "",
-        icon: override?.icon || app.icon || "application-x-executable",
+        icon: override?.icon || app.icon || "",
         iconType: "image",
         section: "apps",
         data: app,
@@ -81,7 +81,7 @@ function transformCoreApp(app, openLabel) {
 }
 
 function transformBuiltInLauncherItem(item, pluginId, openLabel) {
-    var rawIcon = item.icon || "extension";
+    var rawIcon = item.icon || "";
     var icon = Utils.stripIconPrefix(rawIcon);
     var iconType = item.iconType;
     if (!iconType) {
@@ -222,7 +222,7 @@ function transformFileResult(file, openLabel, openFolderLabel, copyPathLabel, op
 }
 
 function transformPluginItem(item, pluginId, selectLabel) {
-    var rawIcon = item.icon || "extension";
+    var rawIcon = item.icon || "";
     var icon = Utils.stripIconPrefix(rawIcon);
     var iconType = item.iconType;
     if (!iconType) {

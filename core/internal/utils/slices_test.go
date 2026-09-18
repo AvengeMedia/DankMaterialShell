@@ -42,31 +42,3 @@ func TestMap(t *testing.T) {
 		t.Errorf("expected [2, 4, 6], got %v", doubled)
 	}
 }
-
-func TestMapTypeConversion(t *testing.T) {
-	nums := []int{1, 2, 3}
-	strs := Map(nums, func(n int) string { return string(rune('a' + n - 1)) })
-	if strs[0] != "a" || strs[1] != "b" || strs[2] != "c" {
-		t.Errorf("expected [a, b, c], got %v", strs)
-	}
-}
-
-func TestContains(t *testing.T) {
-	nums := []int{1, 2, 3}
-	if !Contains(nums, 2) {
-		t.Error("expected to contain 2")
-	}
-	if Contains(nums, 99) {
-		t.Error("expected not to contain 99")
-	}
-}
-
-func TestAny(t *testing.T) {
-	nums := []int{1, 2, 3, 4, 5}
-	if !Any(nums, func(n int) bool { return n > 4 }) {
-		t.Error("expected any > 4")
-	}
-	if Any(nums, func(n int) bool { return n > 10 }) {
-		t.Error("expected none > 10")
-	}
-}

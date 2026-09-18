@@ -1,671 +1,409 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
+import qs.DankCommon.Widgets as CommonWidgets
 
-FocusScope {
+DankDialog {
     id: root
-    readonly property var log: Log.scoped("ColorPickerContent")
 
-    property string pickerTitle: I18n.tr("Choose Color")
+    readonly property var log: Log.scoped("ColorPickerContent")
+    property string pickerTitle: I18n.tr("Choose color", "color picker title")
     property color initialColor: Theme.primary
     property bool showSaveButton: false
-
+    property bool pickingFromScreen: false
+    property int screenPickGeneration: 0
     property color currentColor: Theme.primary
     property real hue: 0
     property real saturation: 1
     property real value: 1
     property real alpha: 1
-    property real gradientX: 0
-    property real gradientY: 0
-
+    readonly property bool compact: contentItem.width < Theme.smallBreakpoint
+    readonly property bool validHex: /^#?[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hexInput.text.trim())
+    readonly property string rgbText: {
+        const channels = [currentColor.r, currentColor.g, currentColor.b].map(channel => Math.round(channel * 255)).join(", ");
+        if (alpha < 1)
+            return `rgba(${channels}, ${Number(alpha.toFixed(3))})`;
+        return `rgb(${channels})`;
+    }
+    readonly property string hsvText: {
+        const channels = [Math.round(hue * 360), Math.round(saturation * 100), Math.round(value * 100)];
+        if (alpha < 1)
+            channels.push(Math.round(alpha * 100));
+        return channels.join(", ");
+    }
     readonly property var standardColors: ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#d32f2f", "#c2185b", "#7b1fa2", "#512da8", "#303f9f", "#1976d2", "#0288d1", "#0097a7", "#00796b", "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000", "#f57c00", "#e64a19", "#c62828", "#ad1457", "#6a1b9a", "#4527a0", "#283593", "#1565c0", "#0277bd", "#00838f", "#00695c", "#2e7d32", "#558b2f", "#9e9d24", "#f9a825", "#ff8f00", "#ef6c00", "#d84315", "#ffffff", "#9e9e9e", "#212121"]
 
+    readonly property alias hexInput: hexInput
     signal colorSelected(color selectedColor)
     signal closeRequested
     signal hideRequested
     signal showRequested
 
-    property alias hexInput: hexInput
-
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
-
-    implicitHeight: mainColumn.implicitHeight + Theme.spacingM * 2
-    focus: true
-
+    title: pickerTitle
+    iconName: "palette"
+    popout: windowControls === null
+    padding: PopoutMetrics.contentPadding
+    contentSpacing: PopoutMetrics.contentGap
+    acceptEnabled: false
+    onRejected: closeRequested()
     Component.onCompleted: setColor(initialColor)
 
-    Keys.onEscapePressed: event => {
-        root.closeRequested();
-        event.accepted = true;
+    function focusInitial() {
+        gradientPicker.forceActiveFocus(Qt.OtherFocusReason);
     }
 
     function setColor(color) {
-        currentColor = color;
-        updateFromColor(color);
-    }
-
-    function copyColorToClipboard(colorValue) {
-        Quickshell.execDetached(["dms", "cl", "copy", colorValue]);
-        ToastService.showInfo(I18n.tr("Color %1 copied").arg(colorValue));
-        SessionData.addRecentColor(currentColor);
-    }
-
-    function updateFromColor(color) {
-        hue = color.hsvHue;
-        saturation = color.hsvSaturation;
-        value = color.hsvValue;
-        alpha = color.a;
-        gradientX = saturation;
-        gradientY = 1 - value;
+        const parsed = Qt.color(color);
+        hue = Math.max(0, parsed.hsvHue);
+        saturation = parsed.hsvSaturation;
+        value = parsed.hsvValue;
+        alpha = parsed.a;
+        currentColor = parsed;
+        hexInput.text = currentColor.toString();
     }
 
     function updateColor() {
         currentColor = Qt.hsva(hue, saturation, value, alpha);
+        hexInput.text = currentColor.toString();
     }
 
-    function updateColorFromGradient(x, y) {
-        saturation = Math.max(0, Math.min(1, x));
-        value = Math.max(0, Math.min(1, 1 - y));
-        updateColor();
+    function applyHex() {
+        if (!validHex)
+            return false;
+        const text = hexInput.text.trim();
+        setColor(text.startsWith("#") ? text : "#" + text);
+        return true;
     }
 
-    function applyPickedColor(colorStr) {
-        if (colorStr.length < 7 || !colorStr.startsWith('#'))
+    function copyColor(text) {
+        Quickshell.execDetached([Proc.dmsBin, "cl", "copy", text]);
+        ToastService.showInfo(I18n.tr("Color %1 copied", "color picker toast, %1 is the copied color value").arg(text));
+        SessionData.addRecentColor(currentColor);
+    }
+
+    function saveColor() {
+        if (!applyHex())
             return;
-        setColor(Qt.color(colorStr));
-        copyColorToClipboard(colorStr);
+        SessionData.addRecentColor(currentColor);
+        colorSelected(currentColor);
+        closeRequested();
+    }
+
+    function finishScreenPick(output, exitCode) {
+        pickingFromScreen = false;
+        if (exitCode !== 0 || !output.trim()) {
+            showRequested();
+            return;
+        }
+        try {
+            const result = JSON.parse(output);
+            if (/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(result?.hex ?? "")) {
+                setColor(result.hex);
+                copyColor(result.hex);
+            }
+        } catch (error) {
+            log.warn("Failed to parse dms color pick JSON:", error);
+        }
         showRequested();
     }
 
+    function cancelScreenPick() {
+        screenPickGeneration++;
+        pickingFromScreen = false;
+    }
+
     function pickColorFromScreen() {
+        if (pickingFromScreen)
+            return;
+        pickingFromScreen = true;
+        screenPickGeneration++;
         hideRequested();
-        Proc.runCommand("dms-color-pick", [Proc.dmsBin, "color", "pick", "--json"], (output, exitCode) => {
-            if (exitCode !== 0) {
-                log.warn("dms color pick exited with code:", exitCode);
-                showRequested();
-                return;
-            }
-            try {
-                const result = JSON.parse(output);
-                if (!result.hex) {
-                    log.warn("Failed to parse dms color pick output: missing hex");
-                    showRequested();
-                    return;
-                }
-                applyPickedColor(result.hex);
-            } catch (e) {
-                log.warn("Failed to parse dms color pick JSON:", e);
-                showRequested();
-            }
-        }, 0, Proc.noTimeout);
+    }
+
+    function startScreenPick() {
+        if (!pickingFromScreen)
+            return;
+        const generation = screenPickGeneration;
+        Proc.runCommand(null, [Proc.dmsBin, "color", "pick", "--json"], (output, exitCode) => {
+            if (generation === root.screenPickGeneration)
+                root.finishScreenPick(output, exitCode);
+        }, 0, Proc.noTimeout, root);
     }
 
     Column {
-        id: mainColumn
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: Theme.spacingM
-        spacing: Theme.spacingM
+        width: parent.width
+        spacing: Theme.spacingS
 
-        Row {
+        CommonWidgets.DankSaturationValuePicker {
+            id: gradientPicker
+
             width: parent.width
-            spacing: Theme.spacingS
-
-            Column {
-                width: parent.width - 90
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    text: root.pickerTitle
-                    font.pixelSize: Theme.fontSizeLarge
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                    anchors.left: parent.left
-                }
-
-                StyledText {
-                    text: I18n.tr("Select a color from the palette or use custom sliders")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceTextMedium
-                    anchors.left: parent.left
-                }
-            }
-
-            DankActionButton {
-                iconName: "colorize"
-                iconSize: Theme.iconSize - 4
-                iconColor: Theme.surfaceText
-                onClicked: () => {
-                    root.pickColorFromScreen();
-                }
-            }
-
-            DankActionButton {
-                iconName: "close"
-                iconSize: Theme.iconSize - 4
-                iconColor: Theme.surfaceText
-                onClicked: () => {
-                    root.closeRequested();
-                }
+            height: Theme.fieldDefaultWidth
+            hue: root.hue
+            saturation: root.saturation
+            value: root.value
+            onColorChanged: (saturation, value) => {
+                root.saturation = saturation;
+                root.value = value;
+                root.updateColor();
             }
         }
 
-        Row {
+        DankSlider {
+            id: hueSlider
+
             width: parent.width
-            spacing: Theme.spacingM
+            minimum: 0
+            maximum: 360
+            unit: "°"
+            fillColor: Theme.onSurface
+            showValue: false
+            wheelEnabled: false
+            Accessible.name: I18n.tr("Hue", "Hue angle in the color picker")
+            onSliderValueChanged: value => {
+                root.hue = value / 360;
+                root.updateColor();
+            }
 
-            Rectangle {
-                id: gradientPicker
-                width: parent.width - 70
-                height: 280
-                radius: Theme.cornerRadius
-                border.color: Theme.outlineStrong
-                border.width: 1
-                clip: true
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: Qt.hsva(root.hue, 1, 1, 1)
-
-                    Rectangle {
-                        anchors.fill: parent
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-                            GradientStop {
-                                position: 0.0
-                                color: "#ffffff"
-                            }
-                            GradientStop {
-                                position: 1.0
-                                color: "transparent"
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        gradient: Gradient {
-                            orientation: Gradient.Vertical
-                            GradientStop {
-                                position: 0.0
-                                color: "transparent"
-                            }
-                            GradientStop {
-                                position: 1.0
-                                color: "#000000"
-                            }
-                        }
-                    }
+            trackGradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop {
+                    position: 0
+                    color: Qt.hsva(0, 1, 1, 1)
                 }
-
-                Rectangle {
-                    id: pickerCircle
-                    width: 16
-                    height: 16
-                    radius: 8
-                    border.color: "white"
-                    border.width: 2
-                    color: "transparent"
-                    x: root.gradientX * parent.width - width / 2
-                    y: root.gradientY * parent.height - height / 2
-
-                    Rectangle {
-                        anchors.centerIn: parent
-                        width: parent.width - 4
-                        height: parent.height - 4
-                        radius: width / 2
-                        border.color: "black"
-                        border.width: 1
-                        color: "transparent"
-                    }
+                GradientStop {
+                    position: 1 / 6
+                    color: Qt.hsva(1 / 6, 1, 1, 1)
                 }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.CrossCursor
-                    onPressed: mouse => {
-                        const x = Math.max(0, Math.min(1, mouse.x / width));
-                        const y = Math.max(0, Math.min(1, mouse.y / height));
-                        root.gradientX = x;
-                        root.gradientY = y;
-                        root.updateColorFromGradient(x, y);
-                    }
-                    onPositionChanged: mouse => {
-                        if (pressed) {
-                            const x = Math.max(0, Math.min(1, mouse.x / width));
-                            const y = Math.max(0, Math.min(1, mouse.y / height));
-                            root.gradientX = x;
-                            root.gradientY = y;
-                            root.updateColorFromGradient(x, y);
-                        }
-                    }
+                GradientStop {
+                    position: 2 / 6
+                    color: Qt.hsva(2 / 6, 1, 1, 1)
+                }
+                GradientStop {
+                    position: 3 / 6
+                    color: Qt.hsva(3 / 6, 1, 1, 1)
+                }
+                GradientStop {
+                    position: 4 / 6
+                    color: Qt.hsva(4 / 6, 1, 1, 1)
+                }
+                GradientStop {
+                    position: 5 / 6
+                    color: Qt.hsva(5 / 6, 1, 1, 1)
+                }
+                GradientStop {
+                    position: 1
+                    color: Qt.hsva(1, 1, 1, 1)
                 }
             }
 
-            Rectangle {
-                id: hueSlider
-                width: 50
-                height: 280
-                radius: Theme.cornerRadius
-                border.color: Theme.outlineStrong
-                border.width: 1
+            Binding {
+                target: hueSlider
+                property: "value"
+                value: Math.round(root.hue * 360)
+            }
+        }
+    }
 
-                gradient: Gradient {
-                    orientation: Gradient.Vertical
-                    GradientStop {
-                        position: 0.00
-                        color: "#ff0000"
-                    }
-                    GradientStop {
-                        position: 0.17
-                        color: "#ffff00"
-                    }
-                    GradientStop {
-                        position: 0.33
-                        color: "#00ff00"
-                    }
-                    GradientStop {
-                        position: 0.50
-                        color: "#00ffff"
-                    }
-                    GradientStop {
-                        position: 0.67
-                        color: "#0000ff"
-                    }
-                    GradientStop {
-                        position: 0.83
-                        color: "#ff00ff"
-                    }
-                    GradientStop {
-                        position: 1.00
-                        color: "#ff0000"
-                    }
-                }
+    GridLayout {
+        width: parent.width
+        columns: root.compact ? 1 : 2
+        columnSpacing: PopoutMetrics.contentGap
+        rowSpacing: PopoutMetrics.contentGap
 
-                Rectangle {
-                    id: hueIndicator
-                    width: parent.width
-                    height: 4
-                    color: "white"
-                    border.color: "black"
-                    border.width: 1
-                    y: root.hue * parent.height - height / 2
-                }
+        RowLayout {
+            Layout.alignment: Qt.AlignBottom
+            Layout.fillWidth: true
+            Layout.preferredWidth: Theme.fieldDefaultWidth
+            spacing: Theme.spacingS
 
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.SizeVerCursor
-                    onPressed: mouse => {
-                        const h = Math.max(0, Math.min(1, mouse.y / height));
-                        root.hue = h;
-                        root.updateColor();
-                    }
-                    onPositionChanged: mouse => {
-                        if (pressed) {
-                            const h = Math.max(0, Math.min(1, mouse.y / height));
-                            root.hue = h;
-                            root.updateColor();
-                        }
-                    }
+            DankColorSwatch {
+                Layout.preferredWidth: hexInput.controlHeight
+                Layout.preferredHeight: hexInput.controlHeight
+                Layout.topMargin: hexInput.containerTop
+                swatchColor: root.currentColor
+                minPreviewAlpha: 0
+            }
+
+            DankTextField {
+                id: hexInput
+
+                Layout.fillWidth: true
+                outlined: true
+                controlHeight: Theme.fieldHeightLarge
+                labelText: I18n.tr("Hex", "color picker field label for the hexadecimal color code")
+                font.family: Theme.monoFontFamily
+                placeholderText: "#000000"
+                isError: !root.validHex
+                onAccepted: root.applyHex()
+                onEditingFinished: root.applyHex()
+            }
+
+            DankActionButton {
+                Layout.topMargin: hexInput.containerTop
+                iconName: "content_copy"
+                Accessible.name: I18n.tr("Copy")
+                enabled: root.validHex
+                onClicked: {
+                    if (root.applyHex())
+                        root.copyColor(root.currentColor.toString());
                 }
+            }
+
+            DankActionButton {
+                Layout.topMargin: hexInput.containerTop
+                iconName: "colorize"
+                Accessible.name: I18n.tr("Pick Color")
+                enabled: !root.pickingFromScreen
+                onClicked: root.pickColorFromScreen()
             }
         }
 
         Column {
-            width: parent.width
-            spacing: Theme.spacingS
+            Layout.fillWidth: true
+            Layout.preferredWidth: Theme.fieldDefaultWidth
+            spacing: Theme.spacingXS
 
-            StyledText {
-                text: I18n.tr("Material Colors")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-                font.weight: Font.Medium
-                anchors.left: parent.left
+            RowLayout {
+                width: parent.width
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: I18n.tr("Opacity")
+                    color: Theme.onSurfaceVariant
+                    font.pixelSize: Theme.fontSizeSmall
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                NumericText {
+                    text: Math.round(root.alpha * 100) + "%"
+                    color: Theme.onSurface
+                    font.pixelSize: Theme.fontSizeSmall
+                }
             }
 
-            GridView {
+            DankSlider {
+                id: opacitySlider
+
                 width: parent.width
-                height: 140
-                cellWidth: 38
-                cellHeight: 38
-                clip: true
-                interactive: false
+                minimum: 0
+                maximum: 100
+                showValue: false
+                wheelEnabled: false
+                Accessible.name: I18n.tr("Opacity")
+                onSliderValueChanged: value => {
+                    root.alpha = value / 100;
+                    root.updateColor();
+                }
+
+                Binding {
+                    target: opacitySlider
+                    property: "value"
+                    value: Math.round(root.alpha * 100)
+                }
+            }
+        }
+    }
+
+    SettingsGroup {
+        slotColor: Theme.foregroundColor(Theme.surfaceContainerHigh, root.windowControls !== null)
+
+        SettingsRow {
+            title: "RGB"
+            subtitle: root.rgbText
+            paddingH: Theme.spacingL
+            paddingV: Theme.spacingS
+
+            DankActionButton {
+                iconName: "content_copy"
+                Accessible.name: I18n.tr("Copy")
+                onClicked: root.copyColor(root.rgbText)
+            }
+        }
+
+        SettingsRow {
+            title: "HSV"
+            subtitle: root.hsvText
+            paddingH: Theme.spacingL
+            paddingV: Theme.spacingS
+
+            DankActionButton {
+                iconName: "content_copy"
+                Accessible.name: I18n.tr("Copy")
+                onClicked: root.copyColor(root.hsvText)
+            }
+        }
+    }
+
+    Column {
+        width: parent.width
+        spacing: Theme.spacingS
+
+        Grid {
+            id: palette
+
+            width: parent.width
+            columns: Math.max(1, Math.floor(width / Theme.buttonHeightXS))
+            spacing: 0
+
+            Repeater {
                 model: root.standardColors
 
-                delegate: Rectangle {
-                    width: 36
-                    height: 36
-                    color: modelData
-                    radius: 4
-                    border.color: Theme.outlineStrong
-                    border.width: 1
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: () => {
-                            const pickedColor = Qt.color(modelData);
-                            root.currentColor = pickedColor;
-                            root.updateFromColor(pickedColor);
-                        }
-                    }
+                CommonWidgets.DankColorButton {
+                    required property string modelData
+                    width: palette.width / palette.columns
+                    height: Theme.buttonHeightXS
+                    swatchColor: modelData
+                    selected: Qt.colorEqual(root.currentColor, swatchColor)
+                    onClicked: root.setColor(swatchColor)
                 }
             }
         }
+    }
 
-        Column {
+    Column {
+        width: parent.width
+        spacing: Theme.spacingS
+        visible: SessionData.recentColors.length > 0
+
+        StyledText {
             width: parent.width
-            spacing: Theme.spacingS
-
-            Row {
-                width: parent.width
-                spacing: Theme.spacingS
-
-                Column {
-                    width: 210
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Recent Colors")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-
-                        Repeater {
-                            model: 5
-
-                            Rectangle {
-                                width: 36
-                                height: 36
-                                radius: 4
-                                border.color: Theme.outlineStrong
-                                border.width: 1
-
-                                color: {
-                                    if (index < SessionData.recentColors.length) {
-                                        return SessionData.recentColors[index];
-                                    }
-                                    return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
-                                }
-
-                                opacity: index < SessionData.recentColors.length ? 1.0 : 0.3
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: index < SessionData.recentColors.length ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    enabled: index < SessionData.recentColors.length
-                                    onClicked: () => {
-                                        if (index < SessionData.recentColors.length) {
-                                            const pickedColor = SessionData.recentColors[index];
-                                            root.currentColor = pickedColor;
-                                            root.updateFromColor(pickedColor);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Column {
-                    width: parent.width - 330
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Opacity")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                    }
-
-                    DankSlider {
-                        width: parent.width
-                        value: Math.round(root.alpha * 100)
-                        minimum: 0
-                        maximum: 100
-                        showValue: false
-                        onSliderValueChanged: newValue => {
-                            root.alpha = newValue / 100;
-                            root.updateColor();
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: 100
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: root.currentColor
-                    border.color: Theme.outlineStrong
-                    border.width: 2
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+            text: I18n.tr("Recent Colors")
+            color: Theme.primary
+            font.pixelSize: Theme.fontSizeSmall
+            font.weight: Theme.fontWeightMedium
+            horizontalAlignment: Text.AlignLeft
         }
 
-        Column {
+        Flow {
             width: parent.width
-            spacing: Theme.spacingS
+            spacing: Theme.spacingXS
 
-            Row {
-                width: parent.width
-                spacing: Theme.spacingM
+            Repeater {
+                model: SessionData.recentColors.slice(0, 5)
 
-                Column {
-                    width: (parent.width - Theme.spacingM * 2) / 3
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Hex")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextMedium
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-
-                        DankTextField {
-                            id: hexInput
-                            width: parent.width - 36
-                            height: 36
-                            text: root.currentColor.toString()
-                            font.pixelSize: Theme.fontSizeMedium
-                            textColor: {
-                                if (text.length === 0)
-                                    return Theme.surfaceText;
-                                const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/;
-                                return hexPattern.test(text) ? Theme.surfaceText : Theme.error;
-                            }
-                            placeholderText: "#000000"
-                            backgroundColor: Theme.surfaceHover
-                            borderWidth: 1
-                            focusedBorderWidth: 2
-                            topPadding: Theme.spacingS
-                            bottomPadding: Theme.spacingS
-                            onAccepted: () => {
-                                const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/;
-                                if (!hexPattern.test(text))
-                                    return;
-                                const color = Qt.color(text);
-                                if (color) {
-                                    root.currentColor = color;
-                                    root.updateFromColor(color);
-                                }
-                            }
-                        }
-
-                        DankActionButton {
-                            iconName: "content_copy"
-                            iconSize: Theme.iconSize - 6
-                            iconColor: Theme.surfaceText
-                            buttonSize: 36
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: () => {
-                                root.copyColorToClipboard(hexInput.text);
-                            }
-                        }
-                    }
-                }
-
-                Column {
-                    width: (parent.width - Theme.spacingM * 2) / 3
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("RGB")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextMedium
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-
-                        Rectangle {
-                            width: parent.width - 36
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: Theme.surfaceHover
-                            border.color: Theme.outline
-                            border.width: 1
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: {
-                                    const r = Math.round(root.currentColor.r * 255);
-                                    const g = Math.round(root.currentColor.g * 255);
-                                    const b = Math.round(root.currentColor.b * 255);
-                                    if (root.alpha < 1) {
-                                        const a = Math.round(root.alpha * 255);
-                                        return `${r}, ${g}, ${b}, ${a}`;
-                                    }
-                                    return `${r}, ${g}, ${b}`;
-                                }
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                            }
-                        }
-
-                        DankActionButton {
-                            iconName: "content_copy"
-                            iconSize: Theme.iconSize - 6
-                            iconColor: Theme.surfaceText
-                            buttonSize: 36
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: () => {
-                                const r = Math.round(root.currentColor.r * 255);
-                                const g = Math.round(root.currentColor.g * 255);
-                                const b = Math.round(root.currentColor.b * 255);
-                                let rgbString;
-                                if (root.alpha < 1) {
-                                    const a = Math.round(root.alpha * 255);
-                                    rgbString = `rgba(${r}, ${g}, ${b}, ${a})`;
-                                } else {
-                                    rgbString = `rgb(${r}, ${g}, ${b})`;
-                                }
-                                Quickshell.execDetached(["dms", "cl", "copy", rgbString]);
-                                ToastService.showInfo(I18n.tr("%1 copied").arg(rgbString));
-                            }
-                        }
-                    }
-                }
-
-                Column {
-                    width: (parent.width - Theme.spacingM * 2) / 3
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("HSV")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextMedium
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingXS
-
-                        Rectangle {
-                            width: parent.width - 36
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: Theme.surfaceHover
-                            border.color: Theme.outline
-                            border.width: 1
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: {
-                                    const h = Math.round(root.hue * 360);
-                                    const s = Math.round(root.saturation * 100);
-                                    const v = Math.round(root.value * 100);
-                                    if (root.alpha < 1) {
-                                        const a = Math.round(root.alpha * 100);
-                                        return `${h}°, ${s}%, ${v}%, ${a}%`;
-                                    }
-                                    return `${h}°, ${s}%, ${v}%`;
-                                }
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                            }
-                        }
-
-                        DankActionButton {
-                            iconName: "content_copy"
-                            iconSize: Theme.iconSize - 6
-                            iconColor: Theme.surfaceText
-                            buttonSize: 36
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: () => {
-                                const h = Math.round(root.hue * 360);
-                                const s = Math.round(root.saturation * 100);
-                                const v = Math.round(root.value * 100);
-                                let hsvString;
-                                if (root.alpha < 1) {
-                                    const a = Math.round(root.alpha * 100);
-                                    hsvString = `${h}, ${s}, ${v}, ${a}`;
-                                } else {
-                                    hsvString = `${h}, ${s}, ${v}`;
-                                }
-                                Quickshell.execDetached(["dms", "cl", "copy", hsvString]);
-                                ToastService.showInfo(I18n.tr("HSV %1 copied").arg(hsvString));
-                            }
-                        }
-                    }
-                }
-            }
-
-            DankButton {
-                visible: root.showSaveButton
-                width: 70
-                buttonHeight: 36
-                text: I18n.tr("Save")
-                backgroundColor: Theme.primary
-                textColor: Theme.background
-                anchors.right: parent.right
-                onClicked: {
-                    SessionData.addRecentColor(root.currentColor);
-                    root.colorSelected(root.currentColor);
-                    root.closeRequested();
+                CommonWidgets.DankColorButton {
+                    required property var modelData
+                    swatchColor: modelData
+                    selected: Qt.colorEqual(root.currentColor, swatchColor)
+                    onClicked: root.setColor(swatchColor)
                 }
             }
         }
+    }
+
+    actions: DankButton {
+        maximumWidth: root.actionWidth
+        wrapText: true
+        text: I18n.tr("Save")
+        visible: root.showSaveButton
+        enabled: root.validHex
+        onClicked: root.saveColor()
     }
 }

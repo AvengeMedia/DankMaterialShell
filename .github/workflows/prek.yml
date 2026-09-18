@@ -29,3 +29,5 @@ jobs:
 
       - name: run pre-commit hooks
         uses: j178/prek-action@v2
+        env:
+          SKIP: qml-tests

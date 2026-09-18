@@ -1,4 +1,3 @@
-import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -8,19 +7,12 @@ import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
-import "../../Common/ConfigIncludeResolve.js" as ConfigIncludeResolve
-import "../../Common/Format.js" as Format
 
 Item {
     id: themeColorsTab
 
     property var parentModal: null
     property string pendingExtractJson: ""
-    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
-    readonly property bool frameModeActive: SettingsData.frameEnabled
-    property var cachedIconThemes: SettingsData.availableIconThemes
-    property var cachedCursorThemes: SettingsData.availableCursorThemes
-    readonly property bool matugenSmartCapable: Theme.matugenAvailable && DMSService.matugenSmartSupported
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.filter(option => DMSService.matugenSmartSupported || option.value !== "scheme-smart").map(option => option.label)
     property var cachedSourceModes: Theme.availableSourceModes.map(option => option.label)
     property var matugenSchemePreviews: ({})
@@ -29,9 +21,6 @@ Item {
     property real matugenPreviewContrast: 0
     property string matugenPreviewRequestKey: ""
     property var installedRegistryThemes: []
-    property var templateDetection: []
-    readonly property var neovimDarkBaseThemes: ["aquarium", "ashes", "aylin", "ayu_dark", "bearded-arc", "carbonfox", "catppuccin", "chadracula", "chadracula-evondev", "chadtain", "chocolate", "darcula-dark", "dark_horizon", "decay", "default-dark", "doomchad", "eldritch", "embark", "everblush", "everforest", "falcon", "flexoki", "flouromachine", "gatekeeper", "github_dark", "gruvbox", "gruvchad", "hiberbee", "horizon", "jabuti", "jellybeans", "kanagawa", "kanagawa-dragon", "material-darker", "material-deep-ocean", "melange", "midnight_breeze", "mito-laser", "monekai", "monochrome", "mountain", "neofusion", "nightfox", "nightlamp", "nightowl", "nord", "obsidian-ember", "oceanic-next", "onedark", "onenord", "oxocarbon", "palenight", "pastelDark", "pastelbeans", "penumbra_dark", "poimandres", "radium", "rosepine", "rxyhn", "scaryforest", "seoul256_dark", "solarized_dark", "solarized_osaka", "starlight", "sweetpastel", "tokyodark", "tokyonight", "tomorrow_night", "tundra", "vesper", "vscode_dark", "wombat", "yoru", "zenburn"]
-    readonly property var neovimLightBaseThemes: ["ayu_light", "blossom_light", "catppuccin-latte", "default-light", "everforest_light", "flex-light", "flexoki-light", "github_light", "gruvbox_light", "material-lighter", "nano-light", "oceanic-light", "one_light", "onenord_light", "penumbra_light", "rosepine-dawn", "seoul256_light", "solarized_light", "sunrise_breeze", "vscode_light"]
     readonly property var matugenSchemeColorMap: {
         const map = {};
         const mode = SessionData.isLightMode ? "light" : "dark";
@@ -42,244 +31,6 @@ Item {
                 map[option.label] = preview[mode];
         }
         return map;
-    }
-    readonly property var widgetBackgroundOptions: [({
-                "value": "sth",
-                "label": I18n.tr("Overlay", "widget background color option"),
-                "previewColor": Theme.blend(Theme.surfaceContainerHigh, Theme.surfaceText, 0.24)
-            }), ({
-                "value": "s",
-                "label": I18n.tr("Surface", "widget background color option")
-            }), ({
-                "value": "sc",
-                "label": I18n.tr("Surface Container", "widget background color option")
-            }), ({
-                "value": "sch",
-                "label": I18n.tr("Surface High", "widget background color option")
-            }), ({
-                "value": "primaryContainer",
-                "label": I18n.tr("Primary Container", "widget background color option")
-            }), ({
-                "value": "secondaryContainer",
-                "label": I18n.tr("Secondary Container", "widget background color option")
-            }), ({
-                "value": "tertiaryContainer",
-                "label": I18n.tr("Tertiary Container", "widget background color option")
-            }), ({
-                "value": "custom",
-                "label": I18n.tr("Custom", "widget background color option")
-            })]
-
-    property var cursorIncludeStatus: defaultIncludeStatus()
-    readonly property bool cursorReadOnly: CompositorService.isHyprland && cursorIncludeStatus.readOnly === true
-    property bool checkingCursorInclude: false
-    property bool fixingCursorInclude: false
-
-    property var windowRulesIncludeStatus: defaultIncludeStatus()
-    readonly property bool windowRulesReadOnly: CompositorService.isHyprland && windowRulesIncludeStatus.readOnly === true
-    property bool checkingWindowRulesInclude: false
-    property bool fixingWindowRulesInclude: false
-
-    readonly property var includeConfigSpecs: ({
-            "cursor": ({
-                    "niri": {
-                        "configName": "config.kdl",
-                        "fragmentName": "cursor.kdl",
-                        "grepPattern": 'include.*"dms/cursor.kdl"',
-                        "includeLine": 'include "dms/cursor.kdl"'
-                    },
-                    "hyprland": {
-                        "configName": "hyprland.lua",
-                        "fragmentName": "cursor.lua",
-                        "grepPattern": "dms.cursor",
-                        "includeLine": "require(\"dms.cursor\")"
-                    },
-                    "mango": {
-                        "configName": "config.conf",
-                        "fragmentName": "cursor.conf",
-                        "grepPattern": "source.*dms/cursor.conf",
-                        "includeLine": "source=./dms/cursor.conf"
-                    }
-                }),
-            "windowrules": ({
-                    "niri": {
-                        "configName": "config.kdl",
-                        "fragmentName": "windowrules.kdl",
-                        "grepPattern": 'include.*"dms/windowrules.kdl"',
-                        "includeLine": 'include "dms/windowrules.kdl"'
-                    },
-                    "hyprland": {
-                        "configName": "hyprland.lua",
-                        "fragmentName": "windowrules.lua",
-                        "grepPattern": "dms.windowrules",
-                        "includeLine": "require(\"dms.windowrules\")"
-                    },
-                    "mango": {
-                        "configName": "config.conf",
-                        "fragmentName": "windowrules.conf",
-                        "grepPattern": "dms/windowrules.conf",
-                        "includeLine": "source=./dms/windowrules.conf"
-                    }
-                })
-        })
-
-    function defaultIncludeStatus() {
-        return {
-            "exists": false,
-            "included": false,
-            "configFormat": "",
-            "readOnly": false
-        };
-    }
-
-    function getIncludeConfigPaths(includeKind) {
-        const spec = includeConfigSpecs[includeKind]?.[CompositorService.compositor];
-        if (!spec)
-            return null;
-        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/" + CompositorService.compositor;
-        return {
-            "configFile": configDir + "/" + spec.configName,
-            "fragmentFile": configDir + "/dms/" + spec.fragmentName,
-            "grepPattern": spec.grepPattern,
-            "includeLine": spec.includeLine
-        };
-    }
-
-    function checkIncludeStatus(includeKind, procTag, onFinished) {
-        const spec = includeConfigSpecs[includeKind]?.[CompositorService.compositor];
-        if (!spec) {
-            onFinished(defaultIncludeStatus());
-            return;
-        }
-        const compositor = CompositorService.compositor;
-        const compositorArg = (compositor === "mango") ? "mangowc" : compositor;
-        Proc.runCommand(procTag, [Proc.dmsBin, "config", "resolve-include", compositorArg, spec.fragmentName], (output, exitCode) => {
-            if (exitCode !== 0) {
-                onFinished(defaultIncludeStatus());
-                return;
-            }
-            try {
-                onFinished(JSON.parse(output.trim()));
-            } catch (e) {
-                onFinished(defaultIncludeStatus());
-            }
-        });
-    }
-
-    function checkCursorIncludeStatus() {
-        checkingCursorInclude = true;
-        checkIncludeStatus("cursor", "check-cursor-include", status => {
-            checkingCursorInclude = false;
-            cursorIncludeStatus = status;
-        });
-    }
-
-    function checkWindowRulesIncludeStatus() {
-        checkingWindowRulesInclude = true;
-        checkIncludeStatus("windowrules", "check-windowrules-include-theme", status => {
-            checkingWindowRulesInclude = false;
-            windowRulesIncludeStatus = status;
-        });
-    }
-
-    function fixInclude(includeKind, procTag, readOnly, onFinished) {
-        if (readOnly) {
-            ToastService.showWarning(I18n.tr("Hyprland conf mode"), I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings."), "dms setup", "hyprland-migration");
-            onFinished(false);
-            return;
-        }
-        const paths = getIncludeConfigPaths(includeKind);
-        if (!paths) {
-            onFinished(false);
-            return;
-        }
-        const unixTime = Math.floor(Date.now() / 1000);
-        const script = ConfigIncludeResolve.buildRepairScript({
-            configFile: paths.configFile,
-            backupFile: paths.configFile + ".backup" + unixTime,
-            fragmentFile: paths.fragmentFile,
-            grepPattern: paths.grepPattern,
-            includeLine: paths.includeLine
-        });
-        Proc.runCommand(procTag, ["sh", "-c", script], (output, exitCode) => onFinished(exitCode === 0));
-    }
-
-    function fixCursorInclude() {
-        fixingCursorInclude = true;
-        fixInclude("cursor", "fix-cursor-include", cursorReadOnly, success => {
-            fixingCursorInclude = false;
-            if (!success)
-                return;
-            checkCursorIncludeStatus();
-            SettingsData.updateCompositorCursor();
-        });
-    }
-
-    function fixWindowRulesInclude() {
-        fixingWindowRulesInclude = true;
-        fixInclude("windowrules", "fix-windowrules-include-theme", windowRulesReadOnly, success => {
-            fixingWindowRulesInclude = false;
-            if (!success)
-                return;
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
-            checkWindowRulesIncludeStatus();
-            CompositorService.applyDmsWindowFloatingRule();
-        });
-    }
-
-    function unsyncFloatingWindowSettings() {
-        if (!SettingsData.floatingWindowSyncGlobal)
-            return;
-        SettingsData.set("floatingWindowTransparency", SettingsData.popupTransparency);
-        SettingsData.set("floatingWindowForegroundLayers", SettingsData.blurForegroundLayers ?? true);
-        SettingsData.set("floatingWindowForegroundTransparency", SettingsData.foregroundLayerTransparency ?? 1.0);
-        SettingsData.set("floatingWindowSyncGlobal", false);
-    }
-
-    function isTemplateDetected(templateId) {
-        if (!templateDetection || templateDetection.length === 0)
-            return true;
-        var item = templateDetection.find(i => i.id === templateId);
-        return !item || item.detected !== false;
-    }
-
-    function getTemplateDescription(templateId, baseDescription) {
-        if (isTemplateDetected(templateId))
-            return baseDescription;
-        if (baseDescription)
-            return baseDescription + " · " + I18n.tr("Not detected");
-        return I18n.tr("Not detected");
-    }
-
-    function getTemplateDescriptionColor(templateId) {
-        if (isTemplateDetected(templateId))
-            return Theme.surfaceVariantText;
-        return Theme.warning;
-    }
-
-    function openSurfaceBorderColorPicker() {
-        PopoutService.colorPickerModal.selectedColor = SettingsData.blurBorderCustomColor ?? "#ffffff";
-        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Surface Border Color");
-        PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
-            SettingsData.set("blurBorderCustomColor", color.toString());
-        };
-        PopoutService.colorPickerModal.open();
-    }
-
-    function openM3ShadowColorPicker() {
-        PopoutService.colorPickerModal.selectedColor = SettingsData.m3ElevationCustomColor ?? "#000000";
-        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Shadow Color");
-        PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
-            SettingsData.set("m3ElevationCustomColor", color.toString());
-        };
-        PopoutService.colorPickerModal.show();
-    }
-
-    function warnIfMissingQtTheme() {
-        if (Quickshell.env("QT_QPA_PLATFORMTHEME") === "gtk3" || Quickshell.env("QT_QPA_PLATFORMTHEME") === "qt6ct" || Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") === "qt6ct" || SettingsData.qtengineActive || Quickshell.env("QT_QPA_PLATFORMTHEME") === "kde")
-            return;
-        ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set one of:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct OR\nQT_QPA_PLATFORMTHEME=qtengine\nas environment variables, and then restart the shell.\n\nOnly qt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
     }
 
     function refreshMatugenSchemePreviews() {
@@ -317,23 +68,10 @@ Item {
     }
 
     Component.onCompleted: {
-        SettingsData.detectAvailableIconThemes();
-        SettingsData.detectAvailableCursorThemes();
         if (DMSService.dmsAvailable)
             DMSService.listInstalledThemes();
         if (PopoutService.pendingThemeInstall)
             Qt.callLater(() => showThemeBrowser());
-        Proc.runCommand("template-check", [Proc.dmsBin, "matugen", "check"], (output, exitCode) => {
-            if (exitCode !== 0)
-                return;
-            try {
-                themeColorsTab.templateDetection = JSON.parse(output.trim());
-            } catch (e) {}
-        });
-        if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) {
-            checkCursorIncludeStatus();
-            checkWindowRulesIncludeStatus();
-        }
         refreshMatugenSchemePreviews();
     }
 
@@ -369,111 +107,18 @@ Item {
         }
     }
 
-    component IncludeWarningBox: StyledRect {
-        id: includeWarningBox
+    SettingsPage {
+        id: mainColumn
 
-        property bool checking: false
-        property bool fixing: false
-        property bool includeReadOnly: false
-        property bool alreadyIncluded: false
-        property bool visibleCondition: true
-        property string fragmentPath: ""
-        property var onSetup: function () {}
+        SettingsCard {
+            tab: "theme"
+            tags: ["color", "palette", "theme", "appearance"]
+            title: I18n.tr("Theme")
+            settingKey: "themeColor"
+            iconName: "palette"
 
-        readonly property bool showLegacy: includeReadOnly
-        readonly property bool showSetup: !showLegacy && !alreadyIncluded
-
-        width: parent.width
-        height: includeWarningContent.implicitHeight + Theme.spacingL * 2
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.primary, 0.15)
-        border.color: Theme.withAlpha(Theme.primary, 0.3)
-        border.width: 1
-        visible: visibleCondition && (showLegacy || showSetup) && !checking
-
-        Row {
-            id: includeWarningContent
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingM
-
-            DankIcon {
-                name: "warning"
-                size: Theme.iconSize
-                color: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Column {
-                width: parent.width - Theme.iconSize - (includeFixButton.visible ? includeFixButton.width + Theme.spacingM : 0) - Theme.spacingM
-                spacing: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
-
-                StyledText {
-                    text: includeWarningBox.showLegacy ? I18n.tr("Hyprland conf mode") : I18n.tr("First Time Setup")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.primary
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                StyledText {
-                    text: includeWarningBox.showLegacy ? I18n.tr("This install is still using hyprland.conf. Run dms setup to migrate before changing these settings.") : I18n.tr("Click 'Setup' to create %1 and add include to your compositor config.").arg(includeWarningBox.fragmentPath)
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-            }
-
-            DankButton {
-                id: includeFixButton
-                visible: !includeWarningBox.showLegacy && includeWarningBox.showSetup
-                text: includeWarningBox.fixing ? I18n.tr("Setting up...") : I18n.tr("Setup")
-                backgroundColor: Theme.primary
-                textColor: Theme.primaryText
-                enabled: !includeWarningBox.fixing
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: includeWarningBox.onSetup()
-            }
-        }
-    }
-
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
-
-        Column {
-            id: mainColumn
-            topPadding: 4
-
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
-
-            Loader {
-                width: parent.width
-                active: CompositorService.isAqueous
-                sourceComponent: AqueousAppearanceSettings {
-                    cursor: true
-                    settingKey: "aqueousCursor"
-                    title: I18n.tr("Aqueous cursor", "Aqueous compositor cursor synchronization settings")
-                    visible: CompositorService.isAqueous
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["color", "palette", "theme", "appearance"]
-                title: I18n.tr("Theme Color")
-                settingKey: "themeColor"
-                iconName: "palette"
-
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width
                     spacing: Theme.spacingS
 
@@ -497,7 +142,7 @@ Item {
                         }
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
@@ -519,8 +164,10 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
+            }
 
-                Column {
+            SettingsRow {
+                body: Column {
                     id: themeCategoryColumn
                     spacing: Theme.spacingM
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -610,7 +257,7 @@ Item {
                                     radius: width / 2
                                     color: Theme.getThemeColors(themeName).primary
                                     border.color: Theme.outline
-                                    border.width: (Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic) ? 2 : 1
+                                    border.width: (Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic) ? Theme.outlineWidthFocused : Theme.outlineWidth
                                     scale: (Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic) ? 1.1 : 1
 
                                     Rectangle {
@@ -651,191 +298,183 @@ Item {
                         }
                     }
 
-                    Column {
+                    Row {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
                         width: parent.width
                         spacing: Theme.spacingM
+
+                        StyledRect {
+                            width: 120
+                            height: 90
+                            radius: Theme.cornerRadius
+                            color: Theme.surfaceVariant
+
+                            ClippingRectangle {
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                radius: Theme.cornerRadius - Theme.outlineWidth
+                                color: "transparent"
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: {
+                                        var wp = Theme.wallpaperPath;
+                                        if (!wp || wp === "" || wp.startsWith("#"))
+                                            return "";
+                                        if (wp.startsWith("file://"))
+                                            wp = wp.substring(7);
+                                        return "file://" + wp.split('/').map(s => encodeURIComponent(s)).join('/');
+                                    }
+                                    fillMode: Image.PreserveAspectCrop
+                                    visible: Theme.wallpaperPath && !Theme.wallpaperPath.startsWith("#")
+                                    sourceSize.width: 120
+                                    sourceSize.height: 120
+                                    asynchronous: true
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                radius: Theme.cornerRadius - Theme.outlineWidth
+                                color: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#") ? Theme.wallpaperPath : Theme.withAlpha(Theme.wallpaperPath, 0)
+                                visible: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#")
+                            }
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? "error" : "palette"
+                                size: Theme.iconSizeLarge
+                                color: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceVariantText
+                                visible: !Theme.wallpaperPath
+                            }
+                        }
+
+                        Column {
+                            width: parent.width - 120 - Theme.spacingM - 36 - Theme.spacingM
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                text: {
+                                    if (ToastService.wallpaperErrorStatus === "error")
+                                        return I18n.tr("Wallpaper Error", "wallpaper error status");
+                                    if (ToastService.wallpaperErrorStatus === "matugen_missing")
+                                        return I18n.tr("Matugen Missing", "matugen not found status");
+                                    if (Theme.wallpaperPath)
+                                        return Theme.wallpaperPath.split('/').pop();
+                                    return I18n.tr("No wallpaper selected", "no wallpaper status");
+                                }
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.surfaceText
+                                elide: Text.ElideMiddle
+                                maximumLineCount: 1
+                                width: parent.width
+                            }
+
+                            StyledText {
+                                id: wallpaperPathText
+                                text: {
+                                    if (ToastService.wallpaperErrorStatus === "error")
+                                        return I18n.tr("Wallpaper processing failed", "wallpaper processing error");
+                                    if (ToastService.wallpaperErrorStatus === "matugen_missing")
+                                        return I18n.tr("Install matugen package for dynamic theming", "matugen installation hint");
+                                    if (Theme.wallpaperPath)
+                                        return Theme.wallpaperPath;
+                                    return I18n.tr("Dynamic colors from wallpaper", "dynamic colors description");
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceVariantText
+                                elide: Text.ElideMiddle
+                                maximumLineCount: 2
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        DankActionButton {
+                            buttonSize: 36
+                            iconName: "download"
+                            iconSize: Theme.iconSize
+                            backgroundColor: Theme.primaryHover
+                            iconColor: Theme.primary
+                            tooltipText: I18n.tr("Extract theme to JSON", "extract theme tooltip")
+                            anchors.bottom: parent.bottom
+                            onClicked: {
+                                pendingExtractJson = Theme.extractCurrentTheme();
+                                saveBrowserLoader.active = true;
+                                if (saveBrowserLoader.item)
+                                    saveBrowserLoader.item.open();
+                            }
+                        }
+                    }
+
+                    SettingsDropdownRow {
                         visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingM
-
-                            StyledRect {
-                                width: 120
-                                height: 90
-                                radius: Theme.cornerRadius
-                                color: Theme.surfaceVariant
-
-                                ClippingRectangle {
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    radius: Theme.cornerRadius - 1
-                                    color: "transparent"
-
-                                    Image {
-                                        anchors.fill: parent
-                                        source: {
-                                            var wp = Theme.wallpaperPath;
-                                            if (!wp || wp === "" || wp.startsWith("#"))
-                                                return "";
-                                            if (wp.startsWith("file://"))
-                                                wp = wp.substring(7);
-                                            return "file://" + wp.split('/').map(s => encodeURIComponent(s)).join('/');
-                                        }
-                                        fillMode: Image.PreserveAspectCrop
-                                        visible: Theme.wallpaperPath && !Theme.wallpaperPath.startsWith("#")
-                                        sourceSize.width: 120
-                                        sourceSize.height: 120
-                                        asynchronous: true
-                                    }
-                                }
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    radius: Theme.cornerRadius - 1
-                                    color: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#") ? Theme.wallpaperPath : Theme.withAlpha(Theme.wallpaperPath, 0)
-                                    visible: Theme.wallpaperPath && Theme.wallpaperPath.startsWith("#")
-                                }
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? "error" : "palette"
-                                    size: Theme.iconSizeLarge
-                                    color: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceVariantText
-                                    visible: !Theme.wallpaperPath
-                                }
-                            }
-
-                            Column {
-                                width: parent.width - 120 - Theme.spacingM - 36 - Theme.spacingM
-                                spacing: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                StyledText {
-                                    text: {
-                                        if (ToastService.wallpaperErrorStatus === "error")
-                                            return I18n.tr("Wallpaper Error", "wallpaper error status");
-                                        if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                            return I18n.tr("Matugen Missing", "matugen not found status");
-                                        if (Theme.wallpaperPath)
-                                            return Theme.wallpaperPath.split('/').pop();
-                                        return I18n.tr("No wallpaper selected", "no wallpaper status");
-                                    }
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    color: Theme.surfaceText
-                                    elide: Text.ElideMiddle
-                                    maximumLineCount: 1
-                                    width: parent.width
-                                }
-
-                                StyledText {
-                                    id: wallpaperPathText
-                                    text: {
-                                        if (ToastService.wallpaperErrorStatus === "error")
-                                            return I18n.tr("Wallpaper processing failed", "wallpaper processing error");
-                                        if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                            return I18n.tr("Install matugen package for dynamic theming", "matugen installation hint");
-                                        if (Theme.wallpaperPath)
-                                            return Theme.wallpaperPath;
-                                        return I18n.tr("Dynamic colors from wallpaper", "dynamic colors description");
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceVariantText
-                                    elide: Text.ElideMiddle
-                                    maximumLineCount: 2
-                                    width: parent.width
-                                    wrapMode: Text.WordWrap
-                                }
-                            }
-
-                            DankActionButton {
-                                buttonSize: 36
-                                iconName: "download"
-                                iconSize: Theme.iconSize
-                                backgroundColor: Theme.primaryHover
-                                iconColor: Theme.primary
-                                tooltipText: I18n.tr("Extract theme to JSON", "extract theme tooltip")
-                                anchors.bottom: wallpaperPathText.bottom
-                                onClicked: {
-                                    pendingExtractJson = Theme.extractCurrentTheme();
-                                    saveBrowserLoader.active = true;
-                                    if (saveBrowserLoader.item)
-                                        saveBrowserLoader.item.open();
+                        tab: "theme"
+                        tags: ["matugen", "palette", "algorithm", "dynamic"]
+                        settingKey: "matugenScheme"
+                        text: I18n.tr("Matugen palette")
+                        options: cachedMatugenSchemes
+                        optionColorMap: matugenSchemeColorMap
+                        currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
+                        enabled: Theme.matugenAvailable
+                        onValueChanged: value => {
+                            for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
+                                var option = Theme.availableMatugenSchemes[i];
+                                if (option.label === value) {
+                                    SettingsData.setMatugenScheme(option.value);
+                                    break;
                                 }
                             }
                         }
+                    }
 
-                        SettingsDropdownRow {
-                            tab: "theme"
-                            tags: ["matugen", "palette", "algorithm", "dynamic"]
-                            settingKey: "matugenScheme"
-                            text: I18n.tr("Matugen Palette")
-                            description: I18n.tr("Select the palette algorithm used for wallpaper-based colors")
-                            options: cachedMatugenSchemes
-                            optionColorMap: matugenSchemeColorMap
-                            currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
-                            enabled: Theme.matugenAvailable
-                            opacity: enabled ? 1 : 0.4
-                            onValueChanged: value => {
-                                for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
-                                    var option = Theme.availableMatugenSchemes[i];
-                                    if (option.label === value) {
-                                        SettingsData.setMatugenScheme(option.value);
-                                        break;
-                                    }
+                    StyledText {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+                        text: {
+                            var scheme = Theme.getMatugenScheme(SettingsData.matugenScheme);
+                            return scheme.description + " (" + scheme.value + ")";
+                        }
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width - Theme.spacingM * 2
+                        x: Theme.spacingM
+                    }
+
+                    SettingsDropdownRow {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+                        tab: "theme"
+                        tags: ["matugen", "seed", "source", "wallpaper", "dynamic"]
+                        settingKey: "matugenSourceMode"
+                        text: I18n.tr("Source color")
+                        options: cachedSourceModes
+                        currentValue: Theme.getSourceMode(SettingsData.matugenSourceMode).label
+                        enabled: Theme.matugenAvailable
+                        onValueChanged: value => {
+                            for (var i = 0; i < Theme.availableSourceModes.length; i++) {
+                                var option = Theme.availableSourceModes[i];
+                                if (option.label === value) {
+                                    SettingsData.setMatugenSourceMode(option.value);
+                                    break;
                                 }
                             }
                         }
+                    }
 
-                        StyledText {
-                            text: {
-                                var scheme = Theme.getMatugenScheme(SettingsData.matugenScheme);
-                                return scheme.description + " (" + scheme.value + ")";
-                            }
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width - Theme.spacingM * 2
-                            x: Theme.spacingM
-                        }
-
-                        SettingsDropdownRow {
-                            tab: "theme"
-                            tags: ["matugen", "seed", "source", "wallpaper", "dynamic"]
-                            settingKey: "matugenSourceMode"
-                            text: I18n.tr("Source Color")
-                            description: I18n.tr("Select which color is extracted from the wallpaper to seed the palette")
-                            options: cachedSourceModes
-                            currentValue: Theme.getSourceMode(SettingsData.matugenSourceMode).label
-                            enabled: Theme.matugenAvailable
-                            opacity: enabled ? 1 : 0.4
-                            onValueChanged: value => {
-                                for (var i = 0; i < Theme.availableSourceModes.length; i++) {
-                                    var option = Theme.availableSourceModes[i];
-                                    if (option.label === value) {
-                                        SettingsData.setMatugenSourceMode(option.value);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        SettingsSliderRow {
-                            tab: "theme"
-                            tags: ["matugen", "contrast", "dynamic"]
-                            settingKey: "matugenContrast"
-                            text: I18n.tr("Matugen Contrast")
-                            description: I18n.tr("Adjusts contrast of generated colors (-100 = minimum, 0 = standard, 100 = maximum)")
-                            value: Math.round(SettingsData.matugenContrast * 100)
-                            minimum: -100
-                            maximum: 100
-                            unit: "%"
-                            defaultValue: 0
-                            enabled: Theme.matugenAvailable
-                            opacity: enabled ? 1 : 0.4
-                            onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
-                        }
+                    SettingsSliderRow {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+                        tab: "theme"
+                        tags: ["matugen", "contrast", "dynamic"]
+                        settingKey: "matugenContrast"
+                        text: I18n.tr("Contrast", "noun, slider label for color or display contrast")
+                        value: Math.round(SettingsData.matugenContrast * 100)
+                        minimum: -100
+                        maximum: 100
+                        unit: "%"
+                        enabled: Theme.matugenAvailable
+                        onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
                     }
 
                     Column {
@@ -850,6 +489,7 @@ Item {
                             DankActionButton {
                                 buttonSize: 48
                                 iconName: "folder_open"
+                                Accessible.name: I18n.tr("Browse Files")
                                 iconSize: Theme.iconSize
                                 backgroundColor: Theme.primaryHover
                                 iconColor: Theme.primary
@@ -918,7 +558,7 @@ Item {
                                     radius: Theme.cornerRadius
                                     color: Theme.surfaceVariant
                                     border.color: isActive ? Theme.primary : Theme.outline
-                                    border.width: isActive ? 2 : 1
+                                    border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
                                     scale: isActive ? 1.03 : 1
 
                                     Behavior on scale {
@@ -931,7 +571,7 @@ Item {
                                     Image {
                                         id: previewImage
                                         anchors.fill: parent
-                                        anchors.margins: 2
+                                        anchors.margins: Theme.spacingXXS
                                         source: "file://" + themeCard.previewPath
                                         fillMode: Image.PreserveAspectFit
                                         smooth: true
@@ -959,7 +599,7 @@ Item {
                                             text: modelData.name
                                             font.pixelSize: themeGrid.cardWidth < 120 ? Theme.fontSizeSmall - 2 : Theme.fontSizeSmall
                                             color: "white"
-                                            font.weight: Font.Medium
+                                            font.weight: Theme.fontWeightMedium
                                             elide: Text.ElideRight
                                             width: parent.width - Theme.spacingXS * 2
                                             horizontalAlignment: Text.AlignHCenter
@@ -1003,7 +643,7 @@ Item {
                                             }
                                             font.pixelSize: themeGrid.cardWidth < 120 ? Theme.fontSizeSmall - 4 : Theme.fontSizeSmall - 2
                                             color: Theme.surface
-                                            font.weight: Font.Bold
+                                            font.weight: Theme.fontWeightMedium
                                         }
                                     }
 
@@ -1022,6 +662,8 @@ Item {
 
                                     Rectangle {
                                         id: deleteButton
+                                        Accessible.role: Accessible.Button
+                                        Accessible.name: I18n.tr("Delete")
                                         anchors.top: parent.top
                                         anchors.left: parent.left
                                         anchors.margins: themeGrid.cardWidth < 120 ? 2 : 4
@@ -1242,7 +884,7 @@ Item {
                                         radius: width / 2
                                         color: modelData.color || modelData[variantSelector.selectedFlavor]?.primary || Theme.primary
                                         border.color: Theme.outline
-                                        border.width: isSelected ? 2 : 1
+                                        border.width: isSelected ? Theme.outlineWidthFocused : Theme.outlineWidth
                                         scale: isSelected ? 1.1 : 1
 
                                         Rectangle {
@@ -1328,1824 +970,6 @@ Item {
                     }
                 }
             }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["light", "dark", "mode", "appearance", "automatic", "color", "schedule", "sunrise", "sunset"]
-                title: I18n.tr("Color Mode")
-                settingKey: "colorMode"
-                iconName: "contrast"
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    SettingsToggleRow {
-                        tab: "theme"
-                        tags: ["light", "dark", "mode"]
-                        settingKey: "isLightMode"
-                        text: I18n.tr("Light Mode")
-                        description: I18n.tr("Use light theme instead of dark theme")
-                        checked: SessionData.isLightMode
-                        onToggled: checked => {
-                            Theme.screenTransition();
-                            Theme.setLightMode(checked);
-                        }
-                    }
-
-                    SettingsToggleRow {
-                        tab: "theme"
-                        tags: ["matugen", "smart", "wallpaper", "auto", "mode"]
-                        settingKey: "matugenSmartMode"
-                        text: I18n.tr("Auto From Wallpaper", "toggle that lets wallpaper brightness decide light/dark mode")
-                        description: I18n.tr("Dark or light mode follows the wallpaper brightness")
-                        checked: SettingsData.matugenSmartMode
-                        visible: matugenSmartCapable
-                        enabled: Theme.currentTheme === Theme.dynamic
-                        opacity: enabled ? 1 : 0.4
-                        onToggled: checked => {
-                            if (checked && SessionData.themeModeAutoEnabled)
-                                SessionData.setThemeModeAutoEnabled(false);
-                            SettingsData.setMatugenSmartMode(checked);
-                        }
-                    }
-
-                    DankToggle {
-                        id: themeModeAutoToggle
-                        width: parent.width
-                        text: I18n.tr("Automatic Control")
-                        checked: SessionData.themeModeAutoEnabled
-                        onToggled: checked => {
-                            if (checked && SettingsData.matugenSmartMode)
-                                SettingsData.setMatugenSmartMode(false);
-                            SessionData.setThemeModeAutoEnabled(checked);
-                        }
-
-                        Connections {
-                            target: SessionData
-                            function onThemeModeAutoEnabledChanged() {
-                                themeModeAutoToggle.checked = SessionData.themeModeAutoEnabled;
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: SessionData.themeModeAutoEnabled
-
-                        DankToggle {
-                            width: parent.width
-                            text: I18n.tr("Share Gamma Control Settings")
-                            checked: SessionData.themeModeShareGammaSettings
-                            onToggled: checked => {
-                                SessionData.setThemeModeShareGammaSettings(checked);
-                            }
-                        }
-
-                        Item {
-                            width: parent.width
-                            height: 45 + Theme.spacingM
-
-                            DankTabBar {
-                                id: themeModeTabBar
-                                width: 200
-                                height: 45
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                model: [
-                                    {
-                                        "text": I18n.tr("Time", "theme auto mode tab"),
-                                        "icon": "access_time"
-                                    },
-                                    {
-                                        "text": I18n.tr("Location", "theme auto mode tab"),
-                                        "icon": "place"
-                                    }
-                                ]
-
-                                Component.onCompleted: {
-                                    currentIndex = SessionData.themeModeAutoMode === "location" ? 1 : 0;
-                                    Qt.callLater(updateIndicator);
-                                }
-
-                                onTabClicked: index => {
-                                    SessionData.setThemeModeAutoMode(index === 1 ? "location" : "time");
-                                    currentIndex = index;
-                                }
-
-                                Connections {
-                                    target: SessionData
-                                    function onThemeModeAutoModeChanged() {
-                                        themeModeTabBar.currentIndex = SessionData.themeModeAutoMode === "location" ? 1 : 0;
-                                        Qt.callLater(themeModeTabBar.updateIndicator);
-                                    }
-                                }
-                            }
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingM
-                            visible: SessionData.themeModeAutoMode === "time" && !SessionData.themeModeShareGammaSettings
-
-                            Column {
-                                spacing: Theme.spacingXS
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                Row {
-                                    spacing: Theme.spacingM
-
-                                    StyledText {
-                                        text: ""
-                                        width: 50
-                                        height: 20
-                                    }
-
-                                    StyledText {
-                                        text: I18n.tr("Hour")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        width: 70
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-
-                                    StyledText {
-                                        text: I18n.tr("Minute")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        width: 70
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingM
-
-                                    StyledText {
-                                        text: I18n.tr("Start")
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        color: Theme.surfaceText
-                                        width: 50
-                                        height: 40
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-
-                                    DankDropdown {
-                                        dropdownWidth: 70
-                                        currentValue: SessionData.themeModeStartHour.toString()
-                                        options: {
-                                            var hours = [];
-                                            for (var i = 0; i < 24; i++)
-                                                hours.push(i.toString());
-                                            return hours;
-                                        }
-                                        onValueChanged: value => {
-                                            SessionData.setThemeModeStartHour(parseInt(value));
-                                        }
-                                    }
-
-                                    DankDropdown {
-                                        dropdownWidth: 70
-                                        currentValue: SessionData.themeModeStartMinute.toString().padStart(2, '0')
-                                        options: {
-                                            var minutes = [];
-                                            for (var i = 0; i < 60; i += 5) {
-                                                minutes.push(i.toString().padStart(2, '0'));
-                                            }
-                                            return minutes;
-                                        }
-                                        onValueChanged: value => {
-                                            SessionData.setThemeModeStartMinute(parseInt(value));
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    spacing: Theme.spacingM
-
-                                    StyledText {
-                                        text: I18n.tr("End")
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        color: Theme.surfaceText
-                                        width: 50
-                                        height: 40
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-
-                                    DankDropdown {
-                                        dropdownWidth: 70
-                                        currentValue: SessionData.themeModeEndHour.toString()
-                                        options: {
-                                            var hours = [];
-                                            for (var i = 0; i < 24; i++)
-                                                hours.push(i.toString());
-                                            return hours;
-                                        }
-                                        onValueChanged: value => {
-                                            SessionData.setThemeModeEndHour(parseInt(value));
-                                        }
-                                    }
-
-                                    DankDropdown {
-                                        dropdownWidth: 70
-                                        currentValue: SessionData.themeModeEndMinute.toString().padStart(2, '0')
-                                        options: {
-                                            var minutes = [];
-                                            for (var i = 0; i < 60; i += 5) {
-                                                minutes.push(i.toString().padStart(2, '0'));
-                                            }
-                                            return minutes;
-                                        }
-                                        onValueChanged: value => {
-                                            SessionData.setThemeModeEndMinute(parseInt(value));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        SettingsLocationSection {
-                            width: parent.width
-                            visible: SessionData.themeModeAutoMode === "location" && !SessionData.themeModeShareGammaSettings
-                            description: I18n.tr("Uses sunrise/sunset times based on your location.")
-                        }
-
-                        StyledText {
-                            width: parent.width
-                            text: I18n.tr("Using shared settings from Gamma Control")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.primary
-                            wrapMode: Text.WordWrap
-                            horizontalAlignment: Text.AlignHCenter
-                            visible: SessionData.themeModeShareGammaSettings
-                        }
-
-                        Rectangle {
-                            width: parent.width
-                            height: statusRow.implicitHeight + Theme.spacingM * 2
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.outlineMedium
-                            border.width: Theme.layerOutlineWidth
-
-                            Row {
-                                id: statusRow
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingL
-                                width: parent.width - Theme.spacingM * 2
-
-                                Column {
-                                    spacing: Theme.spacingXXS
-                                    width: (parent.width - Theme.spacingL * 2) / 3
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    Row {
-                                        spacing: Theme.spacingS
-                                        anchors.horizontalCenter: parent.horizontalCenter
-
-                                        Rectangle {
-                                            width: 8
-                                            height: 8
-                                            radius: 4
-                                            color: SessionData.themeModeAutoEnabled ? Theme.success : Theme.error
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
-                                        StyledText {
-                                            text: I18n.tr("Automation")
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            color: Theme.surfaceText
-                                        }
-                                    }
-
-                                    StyledText {
-                                        text: SessionData.themeModeAutoEnabled ? I18n.tr("Enabled") : I18n.tr("Disabled")
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        horizontalAlignment: Text.AlignHCenter
-                                        width: parent.width
-                                    }
-                                }
-
-                                Column {
-                                    spacing: Theme.spacingXXS
-                                    width: (parent.width - Theme.spacingL * 2) / 3
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    Row {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        spacing: Theme.spacingS
-
-                                        DankIcon {
-                                            name: SessionData.isLightMode ? "light_mode" : "dark_mode"
-                                            size: Theme.iconSize
-                                            color: SessionData.isLightMode ? "#FFA726" : "#7E57C2"
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
-                                        StyledText {
-                                            text: SessionData.isLightMode ? I18n.tr("Light Mode") : I18n.tr("Dark Mode")
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Bold
-                                            color: Theme.surfaceText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-                                    }
-
-                                    StyledText {
-                                        text: I18n.tr("Active")
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        horizontalAlignment: Text.AlignHCenter
-                                        width: parent.width
-                                    }
-                                }
-
-                                Column {
-                                    spacing: Theme.spacingXXS
-                                    width: (parent.width - Theme.spacingL * 2) / 3
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    visible: SessionData.themeModeAutoEnabled && SessionData.themeModeNextTransition
-
-                                    Row {
-                                        spacing: Theme.spacingS
-                                        anchors.horizontalCenter: parent.horizontalCenter
-
-                                        DankIcon {
-                                            name: "schedule"
-                                            size: Theme.iconSize
-                                            color: Theme.primary
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
-                                        StyledText {
-                                            text: I18n.tr("Next Transition")
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Medium
-                                            color: Theme.surfaceText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-                                    }
-
-                                    StyledText {
-                                        text: Format.formatIsoTime(SessionData.themeModeNextTransition)
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        horizontalAlignment: Text.AlignHCenter
-                                        width: parent.width
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["transparency", "opacity", "widget", "styling"]
-                title: I18n.tr("Widget Styling")
-                settingKey: "widgetStyling"
-                iconName: "opacity"
-
-                SettingsButtonGroupRow {
-                    tab: "theme"
-                    tags: ["widget", "text", "style", "colorful", "default"]
-                    settingKey: "widgetColorMode"
-                    text: I18n.tr("Widget Text Style")
-                    description: I18n.tr("Choose neutral or accent-colored widget text")
-                    model: [I18n.tr("Default", "widget style option"), I18n.tr("Colorful", "widget style option")]
-                    currentIndex: SettingsData.widgetColorMode === "colorful" ? 1 : 0
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        SettingsData.set("widgetColorMode", index === 1 ? "colorful" : "default");
-                    }
-                }
-
-                ColorDropdownRow {
-                    tab: "theme"
-                    tags: ["widget", "background", "color", "surface", "material"]
-                    settingKey: "widgetBackgroundColor"
-                    text: I18n.tr("Widget Background Color")
-                    dropdownWidth: 220
-                    options: themeColorsTab.widgetBackgroundOptions
-                    currentMode: SettingsData.widgetBackgroundColor
-                    customColor: SettingsData.widgetBackgroundCustomColor || "#6750A4"
-                    pickerTitle: I18n.tr("Widget Background Color")
-                    onModeSelected: mode => SettingsData.set("widgetBackgroundColor", mode)
-                    onCustomColorSelected: selectedColor => SettingsData.set("widgetBackgroundCustomColor", selectedColor.toString())
-                }
-
-                SettingsSliderRow {
-                    id: widgetBackgroundCustomStrengthSlider
-                    visible: SettingsData.widgetBackgroundColor === "custom"
-                    tab: "theme"
-                    tags: ["widget", "background", "color", "custom", "blend"]
-                    settingKey: "widgetBackgroundCustomStrength"
-                    text: I18n.tr("Custom Blend")
-                    description: I18n.tr("Blend between Surface High and the selected custom color")
-                    value: Math.round(SettingsData.widgetBackgroundCustomStrength * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 40
-                    onSliderValueChanged: newValue => SettingsData.set("widgetBackgroundCustomStrength", newValue / 100)
-
-                    Binding {
-                        target: widgetBackgroundCustomStrengthSlider
-                        property: "value"
-                        value: Math.round(SettingsData.widgetBackgroundCustomStrength * 100)
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["control", "center", "tile", "button", "color", "active"]
-                    settingKey: "controlCenterTileColorMode"
-                    text: I18n.tr("Control Center Tile Color")
-                    description: I18n.tr("Active tile background and icon color", "control center tile color setting description")
-                    options: [I18n.tr("Primary", "tile color option"), I18n.tr("Primary Container", "tile color option"), I18n.tr("Secondary", "tile color option"), I18n.tr("Surface Variant", "tile color option")]
-                    optionColorMap: ({
-                            [I18n.tr("Primary", "tile color option")]: Theme.roleColor("primary"),
-                            [I18n.tr("Primary Container", "tile color option")]: Theme.roleColor("primaryContainer"),
-                            [I18n.tr("Secondary", "tile color option")]: Theme.roleColor("secondary"),
-                            [I18n.tr("Surface Variant", "tile color option")]: Theme.roleColor("surfaceVariant")
-                        })
-                    currentValue: {
-                        switch (SettingsData.controlCenterTileColorMode) {
-                        case "primaryContainer":
-                            return I18n.tr("Primary Container", "tile color option");
-                        case "secondary":
-                            return I18n.tr("Secondary", "tile color option");
-                        case "surfaceVariant":
-                            return I18n.tr("Surface Variant", "tile color option");
-                        default:
-                            return I18n.tr("Primary", "tile color option");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Primary Container", "tile color option")) {
-                            SettingsData.set("controlCenterTileColorMode", "primaryContainer");
-                        } else if (value === I18n.tr("Secondary", "tile color option")) {
-                            SettingsData.set("controlCenterTileColorMode", "secondary");
-                        } else if (value === I18n.tr("Surface Variant", "tile color option")) {
-                            SettingsData.set("controlCenterTileColorMode", "surfaceVariant");
-                        } else {
-                            SettingsData.set("controlCenterTileColorMode", "primary");
-                        }
-                    }
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["button", "color", "primary", "accent"]
-                    settingKey: "buttonColorMode"
-                    text: I18n.tr("Button Color")
-                    description: I18n.tr("Color for primary action buttons")
-                    options: [I18n.tr("Primary", "button color option"), I18n.tr("Primary Container", "button color option"), I18n.tr("Secondary", "button color option"), I18n.tr("Surface Variant", "button color option")]
-                    optionColorMap: ({
-                            [I18n.tr("Primary", "button color option")]: Theme.roleColor("primary"),
-                            [I18n.tr("Primary Container", "button color option")]: Theme.roleColor("primaryContainer"),
-                            [I18n.tr("Secondary", "button color option")]: Theme.roleColor("secondary"),
-                            [I18n.tr("Surface Variant", "button color option")]: Theme.roleColor("surfaceVariant")
-                        })
-                    currentValue: {
-                        switch (SettingsData.buttonColorMode) {
-                        case "primaryContainer":
-                            return I18n.tr("Primary Container", "button color option");
-                        case "secondary":
-                            return I18n.tr("Secondary", "button color option");
-                        case "surfaceVariant":
-                            return I18n.tr("Surface Variant", "button color option");
-                        default:
-                            return I18n.tr("Primary", "button color option");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Primary Container", "button color option")) {
-                            SettingsData.set("buttonColorMode", "primaryContainer");
-                        } else if (value === I18n.tr("Secondary", "button color option")) {
-                            SettingsData.set("buttonColorMode", "secondary");
-                        } else if (value === I18n.tr("Surface Variant", "button color option")) {
-                            SettingsData.set("buttonColorMode", "surfaceVariant");
-                        } else {
-                            SettingsData.set("buttonColorMode", "primary");
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["surface", "popup", "transparency", "opacity", "modal", "border", "outline", "corner", "radius"]
-                title: I18n.tr("Surface Styling")
-                settingKey: "surfaceStyling"
-                iconName: "layers"
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["surface", "popup", "transparency", "opacity", "modal"]
-                    settingKey: "popupTransparency"
-                    text: I18n.tr("Surface Opacity")
-                    description: I18n.tr("Controls opacity of shell surfaces, popouts, and modals", "Surface Opacity setting description")
-                    visible: !themeColorsTab.connectedFrameModeActive
-                    value: Math.round(SettingsData.popupTransparency * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => SettingsData.set("popupTransparency", newValue / 100)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
-                    settingKey: "blurForegroundLayers"
-                    text: I18n.tr("Foreground Layers")
-                    description: I18n.tr("Show foreground surfaces on panels for stronger contrast")
-                    checked: SettingsData.blurForegroundLayers ?? true
-                    onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["foreground", "layers", "opacity", "transparency", "contrast", "cards"]
-                    settingKey: "foregroundLayerTransparency"
-                    text: I18n.tr("Foreground Opacity")
-                    description: I18n.tr("Opacity of foreground cards and nested surfaces on shell panels")
-                    visible: SettingsData.blurForegroundLayers ?? true
-                    value: Math.round((SettingsData.foregroundLayerTransparency ?? 1.0) * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => SettingsData.set("foregroundLayerTransparency", newValue / 100)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["foreground", "layers", "outline", "border", "cards", "widgets", "notifications", "control center"]
-                    settingKey: "blurLayerOutlineOpacity"
-                    text: I18n.tr("Layer Outline Opacity")
-                    description: I18n.tr("Controls outlines around foreground cards, pills, and notification cards")
-                    value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
-                    minimum: 0
-                    maximum: 40
-                    unit: "%"
-                    defaultValue: 12
-                    onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["surface", "popup", "modal", "border", "outline", "edge"]
-                    settingKey: "blurBorderEnabled"
-                    text: I18n.tr("Surface Border Outline")
-                    description: I18n.tr("Outline around shell surfaces")
-                    checked: SettingsData.blurBorderEnabled ?? true
-                    onToggled: checked => SettingsData.set("blurBorderEnabled", checked)
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["surface", "popup", "modal", "border", "outline", "edge"]
-                    settingKey: "blurBorderColor"
-                    text: I18n.tr("Surface Border Color")
-                    description: I18n.tr("Border color around popouts, modals, and other shell surfaces")
-                    visible: SettingsData.blurBorderEnabled ?? true
-                    options: [I18n.tr("Outline", "surface border color"), I18n.tr("Primary", "surface border color"), I18n.tr("Secondary", "surface border color"), I18n.tr("Text Color", "surface border color"), I18n.tr("Custom", "surface border color")]
-                    optionColorMap: ({
-                            [I18n.tr("Outline", "surface border color")]: Theme.outline,
-                            [I18n.tr("Primary", "surface border color")]: Theme.primary,
-                            [I18n.tr("Secondary", "surface border color")]: Theme.secondary,
-                            [I18n.tr("Text Color", "surface border color")]: Theme.surfaceText,
-                            [I18n.tr("Custom", "surface border color")]: SettingsData.blurBorderCustomColor ?? "#ffffff"
-                        })
-                    currentValue: {
-                        switch (SettingsData.blurBorderColor) {
-                        case "primary":
-                            return I18n.tr("Primary", "surface border color");
-                        case "secondary":
-                            return I18n.tr("Secondary", "surface border color");
-                        case "surfaceText":
-                            return I18n.tr("Text Color", "surface border color");
-                        case "custom":
-                            return I18n.tr("Custom", "surface border color");
-                        default:
-                            return I18n.tr("Outline", "surface border color");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Primary", "surface border color")) {
-                            SettingsData.set("blurBorderColor", "primary");
-                        } else if (value === I18n.tr("Secondary", "surface border color")) {
-                            SettingsData.set("blurBorderColor", "secondary");
-                        } else if (value === I18n.tr("Text Color", "surface border color")) {
-                            SettingsData.set("blurBorderColor", "surfaceText");
-                        } else if (value === I18n.tr("Custom", "surface border color")) {
-                            SettingsData.set("blurBorderColor", "custom");
-                            openSurfaceBorderColorPicker();
-                        } else {
-                            SettingsData.set("blurBorderColor", "outline");
-                        }
-                    }
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["surface", "popup", "modal", "border", "opacity"]
-                    settingKey: "blurBorderOpacity"
-                    text: I18n.tr("Surface Border Opacity")
-                    description: I18n.tr("Controls the outline of popouts, modals, and other shell surfaces")
-                    visible: SettingsData.blurBorderEnabled ?? true
-                    value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 35
-                    onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["corner", "radius", "rounded", "square"]
-                    settingKey: "cornerRadius"
-                    text: I18n.tr("Corner Radius")
-                    description: I18n.tr("0 = square corners")
-                    value: SettingsData.cornerRadius
-                    minimum: 0
-                    maximum: 32
-                    unit: "px"
-                    defaultValue: 12
-                    onSliderValueChanged: newValue => SettingsData.setCornerRadius(newValue)
-                }
-
-                SettingsControlledBy {
-                    visible: themeColorsTab.connectedFrameModeActive
-                    parentModal: themeColorsTab.parentModal
-                    section: "frameOpacity"
-                    settingLabel: I18n.tr("Surface Opacity")
-                    reason: I18n.tr("Managed by Frame in Connected Mode")
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["floating", "window", "settings", "notepad", "authentication", "polkit", "opacity", "transparency", "foreground", "tile", "tiling"]
-                title: I18n.tr("Floating Windows")
-                settingKey: "floatingWindows"
-                iconName: "open_in_new"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["floating", "window", "sync", "global", "surface", "opacity"]
-                    settingKey: "floatingWindowSyncGlobal"
-                    text: I18n.tr("Sync with Global Settings")
-                    description: I18n.tr("Floating windows follow Surface Styling settings")
-                    checked: SettingsData.floatingWindowSyncGlobal ?? true
-                    onToggled: checked => SettingsData.set("floatingWindowSyncGlobal", checked)
-                }
-
-                SettingsSliderRow {
-                    id: floatingWindowOpacitySlider
-                    tab: "theme"
-                    tags: ["floating", "window", "opacity", "transparency"]
-                    settingKey: "floatingWindowTransparency"
-                    text: I18n.tr("Window Opacity")
-                    description: I18n.tr("Opacity of floating DMS windows like Settings, Notepad, and authentication prompts")
-                    value: Math.round(Theme.floatingWindowTransparency * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => {
-                        themeColorsTab.unsyncFloatingWindowSettings();
-                        SettingsData.set("floatingWindowTransparency", newValue / 100);
-                    }
-
-                    Binding {
-                        target: floatingWindowOpacitySlider
-                        property: "value"
-                        value: Math.round(Theme.floatingWindowTransparency * 100)
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["floating", "window", "foreground", "layers", "contrast", "cards", "blur", "glass"]
-                    settingKey: "floatingWindowForegroundLayers"
-                    text: I18n.tr("Foreground Layers")
-                    description: I18n.tr("Show foreground surfaces on cards inside floating windows")
-                    checked: Theme.floatingWindowForegroundLayers
-                    onToggled: checked => {
-                        themeColorsTab.unsyncFloatingWindowSettings();
-                        SettingsData.set("floatingWindowForegroundLayers", checked);
-                    }
-                }
-
-                SettingsSliderRow {
-                    id: floatingWindowForegroundOpacitySlider
-                    tab: "theme"
-                    tags: ["floating", "window", "foreground", "layers", "opacity", "transparency", "cards"]
-                    settingKey: "floatingWindowForegroundTransparency"
-                    text: I18n.tr("Foreground Opacity")
-                    description: I18n.tr("Opacity of cards and nested surfaces inside floating windows")
-                    visible: Theme.floatingWindowForegroundLayers
-                    value: Math.round(Theme.floatingWindowForegroundTransparency * 100)
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 100
-                    onSliderValueChanged: newValue => {
-                        themeColorsTab.unsyncFloatingWindowSettings();
-                        SettingsData.set("floatingWindowForegroundTransparency", newValue / 100);
-                    }
-
-                    Binding {
-                        target: floatingWindowForegroundOpacitySlider
-                        property: "value"
-                        value: Math.round(Theme.floatingWindowForegroundTransparency * 100)
-                        restoreMode: Binding.RestoreBinding
-                    }
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["floating", "window", "tile", "tiling", "compositor", "rule", "niri", "hyprland", "mango"]
-                    settingKey: "dmsWindowsFloating"
-                    text: I18n.tr("Open Windows Floating")
-                    description: I18n.tr("Open DMS windows floating instead of tiled")
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
-                    checked: SettingsData.dmsWindowsFloating ?? true
-                    onToggled: checked => {
-                        SettingsData.set("dmsWindowsFloating", checked);
-                        if (checked)
-                            themeColorsTab.checkWindowRulesIncludeStatus();
-                    }
-                }
-
-                IncludeWarningBox {
-                    visibleCondition: (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango) && (SettingsData.dmsWindowsFloating ?? true)
-                    checking: themeColorsTab.checkingWindowRulesInclude
-                    fixing: themeColorsTab.fixingWindowRulesInclude
-                    includeReadOnly: themeColorsTab.windowRulesReadOnly
-                    alreadyIncluded: themeColorsTab.windowRulesIncludeStatus.included
-                    fragmentPath: "dms/windowrules"
-                    onSetup: themeColorsTab.fixWindowRulesInclude
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["blur", "background", "transparency", "glass", "frosted"]
-                title: I18n.tr("Background Blur")
-                settingKey: "blurEnabled"
-                iconName: "blur_on"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["blur", "background", "transparency", "glass", "frosted"]
-                    settingKey: "blurEnabled"
-                    text: I18n.tr("Background Blur")
-                    description: !BlurService.available ? I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)") : I18n.tr("Blur the background behind bars, popouts, modals, and notifications. Requires compositor support. Adjust Opacity accordingly.")
-                    checked: SettingsData.blurEnabled ?? false
-                    enabled: BlurService.available
-                    onToggled: checked => SettingsData.set("blurEnabled", checked)
-                }
-
-                Item {
-                    width: parent.width
-                    height: xrayHintRow.implicitHeight
-                    visible: CompositorService.isNiri || CompositorService.isHyprland
-
-                    Row {
-                        id: xrayHintRow
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: "info"
-                            size: Theme.iconSizeSmall
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            width: parent.width - Theme.iconSizeSmall - Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Xray options are in Compositor → Layout")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.primary
-                            wrapMode: Text.Wrap
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: PopoutService.openSettingsWithTab("compositor_layout")
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["elevation", "shadow", "lift", "m3", "material"]
-                title: I18n.tr("Shadows")
-                settingKey: "m3ElevationEnabled"
-                iconName: "layers"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "lift", "m3", "material"]
-                    settingKey: "m3ElevationEnabled"
-                    text: I18n.tr("Shadows")
-                    description: I18n.tr("Material inspired shadows and elevation on modals, popouts, and dialogs")
-                    checked: SettingsData.m3ElevationEnabled ?? true
-                    onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "intensity", "blur", "m3"]
-                    settingKey: "m3ElevationIntensity"
-                    text: I18n.tr("Shadow Intensity")
-                    description: I18n.tr("Controls the base blur radius and offset of shadows")
-                    value: SettingsData.m3ElevationIntensity ?? 12
-                    minimum: 0
-                    maximum: 100
-                    unit: "px"
-                    defaultValue: 12
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationIntensity", newValue)
-                }
-
-                SettingsSliderRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "opacity", "transparency", "m3"]
-                    settingKey: "m3ElevationOpacity"
-                    text: I18n.tr("Shadow Opacity")
-                    value: SettingsData.m3ElevationOpacity ?? 30
-                    minimum: 0
-                    maximum: 100
-                    unit: "%"
-                    defaultValue: 30
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationOpacity", newValue)
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "color", "m3"]
-                    settingKey: "m3ElevationColorMode"
-                    text: I18n.tr("Shadow Color")
-                    description: I18n.tr("Base color for shadows (opacity is applied automatically)")
-                    options: [I18n.tr("Default (Black)", "shadow color option"), I18n.tr("Text Color", "shadow color option"), I18n.tr("Primary", "shadow color option"), I18n.tr("Surface Variant", "shadow color option"), I18n.tr("Custom", "shadow color option")]
-                    optionColorMap: ({
-                            [I18n.tr("Default (Black)", "shadow color option")]: "#000000",
-                            [I18n.tr("Text Color", "shadow color option")]: Theme.surfaceText,
-                            [I18n.tr("Primary", "shadow color option")]: Theme.primary,
-                            [I18n.tr("Surface Variant", "shadow color option")]: Theme.surfaceVariant,
-                            [I18n.tr("Custom", "shadow color option")]: SettingsData.m3ElevationCustomColor ?? "#000000"
-                        })
-                    currentValue: {
-                        switch (SettingsData.m3ElevationColorMode) {
-                        case "text":
-                            return I18n.tr("Text Color", "shadow color option");
-                        case "primary":
-                            return I18n.tr("Primary", "shadow color option");
-                        case "surfaceVariant":
-                            return I18n.tr("Surface Variant", "shadow color option");
-                        case "custom":
-                            return I18n.tr("Custom", "shadow color option");
-                        default:
-                            return I18n.tr("Default (Black)", "shadow color option");
-                        }
-                    }
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Primary", "shadow color option")) {
-                            SettingsData.set("m3ElevationColorMode", "primary");
-                        } else if (value === I18n.tr("Surface Variant", "shadow color option")) {
-                            SettingsData.set("m3ElevationColorMode", "surfaceVariant");
-                        } else if (value === I18n.tr("Custom", "shadow color option")) {
-                            SettingsData.set("m3ElevationColorMode", "custom");
-                            openM3ShadowColorPicker();
-                        } else if (value === I18n.tr("Text Color", "shadow color option")) {
-                            SettingsData.set("m3ElevationColorMode", "text");
-                        } else {
-                            SettingsData.set("m3ElevationColorMode", "default");
-                        }
-                    }
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "direction", "light", "advanced", "m3"]
-                    settingKey: "m3ElevationLightDirection"
-                    text: I18n.tr("Light Direction")
-                    description: I18n.tr("Controls shadow cast direction for elevation layers")
-                    options: [I18n.tr("Auto (Bar-aware)", "shadow direction option"), I18n.tr("Top (Default)", "shadow direction option"), I18n.tr("Top Left", "shadow direction option"), I18n.tr("Top Right", "shadow direction option"), I18n.tr("Bottom", "shadow direction option")]
-                    currentValue: {
-                        switch (SettingsData.m3ElevationLightDirection) {
-                        case "autoBar":
-                            return I18n.tr("Auto (Bar-aware)", "shadow direction option");
-                        case "topLeft":
-                            return I18n.tr("Top Left", "shadow direction option");
-                        case "topRight":
-                            return I18n.tr("Top Right", "shadow direction option");
-                        case "bottom":
-                            return I18n.tr("Bottom", "shadow direction option");
-                        default:
-                            return I18n.tr("Top (Default)", "shadow direction option");
-                        }
-                    }
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onValueChanged: value => {
-                        if (value === I18n.tr("Auto (Bar-aware)", "shadow direction option")) {
-                            SettingsData.set("m3ElevationLightDirection", "autoBar");
-                        } else if (value === I18n.tr("Top Left", "shadow direction option")) {
-                            SettingsData.set("m3ElevationLightDirection", "topLeft");
-                        } else if (value === I18n.tr("Top Right", "shadow direction option")) {
-                            SettingsData.set("m3ElevationLightDirection", "topRight");
-                        } else if (value === I18n.tr("Bottom", "shadow direction option")) {
-                            SettingsData.set("m3ElevationLightDirection", "bottom");
-                        } else {
-                            SettingsData.set("m3ElevationLightDirection", "top");
-                        }
-                    }
-                }
-
-                Item {
-                    visible: (SettingsData.m3ElevationEnabled ?? true) && SettingsData.m3ElevationColorMode === "custom"
-                    width: parent.width
-                    implicitHeight: 36
-                    height: implicitHeight
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingM
-
-                        StyledText {
-                            text: I18n.tr("Custom Shadow Color")
-                            color: Theme.surfaceText
-                            font.pixelSize: Theme.fontSizeMedium
-                            verticalAlignment: Text.AlignVCenter
-                        }
-
-                        Rectangle {
-                            width: 26
-                            height: 26
-                            radius: 13
-                            color: SettingsData.m3ElevationCustomColor ?? "#000000"
-                            border.color: Theme.outline
-                            border.width: 1
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: openM3ShadowColorPicker()
-                            }
-                        }
-                    }
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "modal", "dialog", "m3"]
-                    settingKey: "modalElevationEnabled"
-                    text: I18n.tr("Modal Shadows")
-                    description: I18n.tr("Shadow elevation on modals and dialogs")
-                    checked: SettingsData.modalElevationEnabled ?? true
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onToggled: checked => SettingsData.set("modalElevationEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "popout", "popup", "osd", "dropdown", "m3"]
-                    settingKey: "popoutElevationEnabled"
-                    text: I18n.tr("Popout Shadows")
-                    description: I18n.tr("Shadow elevation on popouts, OSDs, and dropdowns")
-                    checked: SettingsData.popoutElevationEnabled ?? true
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onToggled: checked => SettingsData.set("popoutElevationEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["elevation", "shadow", "bar", "panel", "navigation", "m3"]
-                    settingKey: "barElevationEnabled"
-                    text: I18n.tr("Bar Shadows")
-                    description: I18n.tr("Shadow elevation on bars and panels")
-                    checked: SettingsData.barElevationEnabled ?? true
-                    visible: SettingsData.m3ElevationEnabled ?? true
-                    onToggled: checked => SettingsData.set("barElevationEnabled", checked)
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["applications", "portal", "dark", "terminal"]
-                title: I18n.tr("Applications")
-                settingKey: "applications"
-                iconName: "apps"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["portal", "sync", "dark", "mode"]
-                    settingKey: "syncModeWithPortal"
-                    text: I18n.tr("Sync Mode with Portal")
-                    description: I18n.tr("Sync dark mode with settings portals for system-wide theme hints")
-                    checked: SettingsData.syncModeWithPortal
-                    onToggled: checked => SettingsData.set("syncModeWithPortal", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["terminal", "dark", "always"]
-                    settingKey: "terminalsAlwaysDark"
-                    text: I18n.tr("Terminals - Always use Dark Theme")
-                    description: I18n.tr("Force terminal applications to always use dark color schemes")
-                    checked: SettingsData.terminalsAlwaysDark
-                    onToggled: checked => SettingsData.set("terminalsAlwaysDark", checked)
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["cursor", "mouse", "pointer", "theme", "size"]
-                title: I18n.tr("Cursor Theme")
-                settingKey: "cursorTheme"
-                iconName: "mouse"
-                visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    IncludeWarningBox {
-                        checking: themeColorsTab.checkingCursorInclude
-                        fixing: themeColorsTab.fixingCursorInclude
-                        includeReadOnly: themeColorsTab.cursorReadOnly
-                        alreadyIncluded: themeColorsTab.cursorIncludeStatus.included
-                        fragmentPath: "dms/cursor"
-                        onSetup: themeColorsTab.fixCursorInclude
-                    }
-
-                    SettingsDropdownRow {
-                        tab: "theme"
-                        tags: ["cursor", "mouse", "pointer", "theme"]
-                        settingKey: "cursorTheme"
-                        text: I18n.tr("Cursor Theme")
-                        description: I18n.tr("Mouse pointer appearance")
-                        currentValue: SettingsData.cursorSettings.theme
-                        enableFuzzySearch: true
-                        popupWidthOffset: 100
-                        maxPopupHeight: 236
-                        options: cachedCursorThemes
-                        onValueChanged: value => {
-                            SettingsData.setCursorTheme(value);
-                        }
-                    }
-
-                    SettingsSliderRow {
-                        tab: "theme"
-                        tags: ["cursor", "mouse", "pointer", "size"]
-                        settingKey: "cursorSize"
-                        text: I18n.tr("Cursor Size")
-                        description: I18n.tr("Mouse pointer size in pixels")
-                        value: SettingsData.cursorSettings.size
-                        minimum: 12
-                        maximum: 128
-                        unit: "px"
-                        defaultValue: 24
-                        onSliderValueChanged: newValue => SettingsData.setCursorSize(newValue)
-                    }
-
-                    SettingsToggleRow {
-                        tab: "theme"
-                        tags: ["mango", "touchpad", "trackpad", "natural", "scrolling"]
-                        settingKey: "mangoTrackpadNaturalScrolling"
-                        text: I18n.tr("Natural Touchpad Scrolling")
-                        description: I18n.tr("Invert touchpad scroll direction")
-                        visible: CompositorService.isMango
-                        checked: SettingsData.mangoTrackpadNaturalScrolling
-                        onToggled: checked => SettingsData.set("mangoTrackpadNaturalScrolling", checked)
-                    }
-
-                    SettingsToggleRow {
-                        tab: "theme"
-                        tags: ["cursor", "hide", "typing"]
-                        settingKey: "cursorHideWhenTyping"
-                        text: I18n.tr("Hide When Typing")
-                        description: I18n.tr("Hide cursor when pressing keyboard keys")
-                        visible: CompositorService.isNiri || CompositorService.isHyprland
-                        checked: {
-                            if (CompositorService.isNiri)
-                                return SettingsData.cursorSettings.niri?.hideWhenTyping || false;
-                            if (CompositorService.isHyprland)
-                                return SettingsData.cursorSettings.hyprland?.hideOnKeyPress || false;
-                            return false;
-                        }
-                        onToggled: checked => {
-                            const updated = JSON.parse(JSON.stringify(SettingsData.cursorSettings));
-                            if (CompositorService.isNiri) {
-                                if (!updated.niri)
-                                    updated.niri = {};
-                                updated.niri.hideWhenTyping = checked;
-                            } else if (CompositorService.isHyprland) {
-                                if (!updated.hyprland)
-                                    updated.hyprland = {};
-                                updated.hyprland.hideOnKeyPress = checked;
-                            }
-                            SettingsData.set("cursorSettings", updated);
-                        }
-                    }
-
-                    SettingsToggleRow {
-                        tab: "theme"
-                        tags: ["cursor", "hide", "touch"]
-                        settingKey: "cursorHideOnTouch"
-                        text: I18n.tr("Hide on Touch")
-                        description: I18n.tr("Hide cursor when using touch input")
-                        visible: CompositorService.isHyprland
-                        checked: SettingsData.cursorSettings.hyprland?.hideOnTouch || false
-                        onToggled: checked => {
-                            const updated = JSON.parse(JSON.stringify(SettingsData.cursorSettings));
-                            if (!updated.hyprland)
-                                updated.hyprland = {};
-                            updated.hyprland.hideOnTouch = checked;
-                            SettingsData.set("cursorSettings", updated);
-                        }
-                    }
-
-                    SettingsSliderRow {
-                        tab: "theme"
-                        tags: ["cursor", "hide", "timeout", "inactive"]
-                        settingKey: "cursorHideAfterInactive"
-                        text: I18n.tr("Auto-Hide Timeout")
-                        description: I18n.tr("Hide cursor after inactivity (0 = disabled)")
-                        value: {
-                            if (CompositorService.isNiri)
-                                return SettingsData.cursorSettings.niri?.hideAfterInactiveMs || 0;
-                            if (CompositorService.isHyprland)
-                                return SettingsData.cursorSettings.hyprland?.inactiveTimeout || 0;
-                            if (CompositorService.isMango)
-                                return SettingsData.cursorSettings.mango?.cursorHideTimeout || 0;
-                            return 0;
-                        }
-                        minimum: 0
-                        maximum: CompositorService.isNiri ? 5000 : 10
-                        unit: CompositorService.isNiri ? "ms" : "s"
-                        defaultValue: 0
-                        onSliderValueChanged: newValue => {
-                            const updated = JSON.parse(JSON.stringify(SettingsData.cursorSettings));
-                            if (CompositorService.isNiri) {
-                                if (!updated.niri)
-                                    updated.niri = {};
-                                updated.niri.hideAfterInactiveMs = newValue;
-                            } else if (CompositorService.isHyprland) {
-                                if (!updated.hyprland)
-                                    updated.hyprland = {};
-                                updated.hyprland.inactiveTimeout = newValue;
-                            } else if (CompositorService.isMango) {
-                                if (!updated.mango)
-                                    updated.mango = {};
-                                updated.mango.cursorHideTimeout = newValue;
-                            }
-                            SettingsData.set("cursorSettings", updated);
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["icon", "theme", "system"]
-                title: I18n.tr("Icon Theme")
-                settingKey: "iconTheme"
-                iconName: "interests"
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "light", "dark", "mode"]
-                    settingKey: "iconThemePerMode"
-                    text: I18n.tr("Separate Light & Dark Themes")
-                    description: I18n.tr("Use different icon themes for light and dark mode")
-                    checked: SettingsData.iconThemePerMode
-                    onToggled: checked => SettingsData.setIconThemePerMode(checked)
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "system"]
-                    settingKey: "iconTheme"
-                    text: I18n.tr("Icon Theme")
-                    description: I18n.tr("DankShell & System Icons (requires restart)")
-                    visible: !SettingsData.iconThemePerMode
-                    currentValue: SettingsData.iconThemeDark
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 236
-                    options: cachedIconThemes
-                    onValueChanged: value => {
-                        SettingsData.setIconThemeForMode(value, false);
-                        warnIfMissingQtTheme();
-                    }
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "system", "dark"]
-                    settingKey: "iconThemeDark"
-                    text: I18n.tr("Dark Mode Icon Theme")
-                    description: I18n.tr("DankShell & System Icons (requires restart)")
-                    visible: SettingsData.iconThemePerMode
-                    currentValue: SettingsData.iconThemeDark
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 236
-                    options: cachedIconThemes
-                    onValueChanged: value => {
-                        SettingsData.setIconThemeForMode(value, false);
-                        warnIfMissingQtTheme();
-                    }
-                }
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "system", "light"]
-                    settingKey: "iconThemeLight"
-                    text: I18n.tr("Light Mode Icon Theme")
-                    description: I18n.tr("DankShell & System Icons (requires restart)")
-                    visible: SettingsData.iconThemePerMode
-                    currentValue: SettingsData.iconThemeLight
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 236
-                    options: cachedIconThemes
-                    onValueChanged: value => {
-                        SettingsData.setIconThemeForMode(value, true);
-                        warnIfMissingQtTheme();
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["matugen", "templates", "theming"]
-                title: I18n.tr("Matugen Templates")
-                settingKey: "matugenTemplates"
-                iconName: "auto_awesome"
-                collapsible: true
-                expanded: false
-                visible: Theme.matugenAvailable
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "user", "templates"]
-                    settingKey: "runUserMatugenTemplates"
-                    text: I18n.tr("Run User Templates")
-                    description: ""
-                    checked: SettingsData.runUserMatugenTemplates
-                    onToggled: checked => SettingsData.set("runUserMatugenTemplates", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "dms", "templates"]
-                    settingKey: "runDmsMatugenTemplates"
-                    text: I18n.tr("Run DMS Templates")
-                    description: ""
-                    checked: SettingsData.runDmsMatugenTemplates
-                    onToggled: checked => SettingsData.set("runDmsMatugenTemplates", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "gtk", "template"]
-                    settingKey: "matugenTemplateGtk"
-                    text: "GTK"
-                    description: getTemplateDescription("gtk", "")
-                    descriptionColor: getTemplateDescriptionColor("gtk")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateGtk
-                    onToggled: checked => SettingsData.set("matugenTemplateGtk", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "niri", "template"]
-                    settingKey: "matugenTemplateNiri"
-                    text: "niri"
-                    description: getTemplateDescription("niri", "")
-                    descriptionColor: getTemplateDescriptionColor("niri")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateNiri
-                    onToggled: checked => SettingsData.set("matugenTemplateNiri", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "hyprland", "template"]
-                    settingKey: "matugenTemplateHyprland"
-                    text: "Hyprland"
-                    description: getTemplateDescription("hyprland", "")
-                    descriptionColor: getTemplateDescriptionColor("hyprland")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateHyprland
-                    onToggled: checked => SettingsData.set("matugenTemplateHyprland", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "mangowc", "template"]
-                    settingKey: "matugenTemplateMangowc"
-                    text: "mangowc"
-                    description: getTemplateDescription("mangowc", "")
-                    descriptionColor: getTemplateDescriptionColor("mangowc")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateMangowc
-                    onToggled: checked => SettingsData.set("matugenTemplateMangowc", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "qt5ct", "template"]
-                    settingKey: "matugenTemplateQt5ct"
-                    text: "qt5ct"
-                    description: getTemplateDescription("qt5ct", "")
-                    descriptionColor: getTemplateDescriptionColor("qt5ct")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateQt5ct
-                    onToggled: checked => SettingsData.set("matugenTemplateQt5ct", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "qt6ct", "template"]
-                    settingKey: "matugenTemplateQt6ct"
-                    text: "qt6ct"
-                    description: getTemplateDescription("qt6ct", "")
-                    descriptionColor: getTemplateDescriptionColor("qt6ct")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateQt6ct
-                    onToggled: checked => SettingsData.set("matugenTemplateQt6ct", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "qtengine", "template", "qt"]
-                    settingKey: "matugenTemplateQtengine"
-                    text: "qtengine"
-                    description: getTemplateDescription("qtengine", "")
-                    descriptionColor: getTemplateDescriptionColor("qtengine")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateQtengine
-                    onToggled: checked => SettingsData.set("matugenTemplateQtengine", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "fcitx5", "input", "template"]
-                    settingKey: "matugenTemplateFcitx5"
-                    text: "Fcitx5"
-                    description: getTemplateDescription("fcitx5", "")
-                    descriptionColor: getTemplateDescriptionColor("fcitx5")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateFcitx5
-                    onToggled: checked => SettingsData.set("matugenTemplateFcitx5", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "firefox", "template"]
-                    settingKey: "matugenTemplateFirefox"
-                    text: "Firefox"
-                    description: getTemplateDescription("firefox", "")
-                    descriptionColor: getTemplateDescriptionColor("firefox")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateFirefox
-                    onToggled: checked => SettingsData.set("matugenTemplateFirefox", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "pywalfox", "template"]
-                    settingKey: "matugenTemplatePywalfox"
-                    text: "pywalfox"
-                    description: getTemplateDescription("pywalfox", "")
-                    descriptionColor: getTemplateDescriptionColor("pywalfox")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplatePywalfox
-                    onToggled: checked => SettingsData.set("matugenTemplatePywalfox", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "zenbrowser", "template"]
-                    settingKey: "matugenTemplateZenBrowser"
-                    text: "zenbrowser"
-                    description: getTemplateDescription("zenbrowser", "")
-                    descriptionColor: getTemplateDescriptionColor("zenbrowser")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateZenBrowser
-                    onToggled: checked => SettingsData.set("matugenTemplateZenBrowser", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "vesktop", "discord", "template"]
-                    settingKey: "matugenTemplateVesktop"
-                    text: "vesktop"
-                    description: getTemplateDescription("vesktop", "")
-                    descriptionColor: getTemplateDescriptionColor("vesktop")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateVesktop
-                    onToggled: checked => SettingsData.set("matugenTemplateVesktop", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "vencord", "discord", "template"]
-                    settingKey: "matugenTemplateVencord"
-                    text: "vencord"
-                    description: getTemplateDescription("vencord", "")
-                    descriptionColor: getTemplateDescriptionColor("vencord")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateVencord
-                    onToggled: checked => SettingsData.set("matugenTemplateVencord", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "equibop", "discord", "template"]
-                    settingKey: "matugenTemplateEquibop"
-                    text: "equibop"
-                    description: getTemplateDescription("equibop", "")
-                    descriptionColor: getTemplateDescriptionColor("equibop")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateEquibop
-                    onToggled: checked => SettingsData.set("matugenTemplateEquibop", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "ghostty", "terminal", "template"]
-                    settingKey: "matugenTemplateGhostty"
-                    text: "Ghostty"
-                    description: getTemplateDescription("ghostty", "")
-                    descriptionColor: getTemplateDescriptionColor("ghostty")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateGhostty
-                    onToggled: checked => SettingsData.set("matugenTemplateGhostty", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "kitty", "terminal", "template"]
-                    settingKey: "matugenTemplateKitty"
-                    text: "kitty"
-                    description: getTemplateDescription("kitty", "")
-                    descriptionColor: getTemplateDescriptionColor("kitty")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateKitty
-                    onToggled: checked => SettingsData.set("matugenTemplateKitty", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "foot", "terminal", "template"]
-                    settingKey: "matugenTemplateFoot"
-                    text: "foot"
-                    description: getTemplateDescription("foot", "")
-                    descriptionColor: getTemplateDescriptionColor("foot")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateFoot
-                    onToggled: checked => SettingsData.set("matugenTemplateFoot", checked)
-                }
-
-                SettingsDivider {
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                }
-
-                SettingsToggleRow {
-                    id: neovimThemeToggle
-                    tab: "theme"
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovim"
-                    text: "neovim"
-                    description: getTemplateDescription("nvim", I18n.tr("Required plugin: ") + "https://github.com/AvengeMedia/base46")
-                    descriptionColor: getTemplateDescriptionColor("nvim")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateNeovim
-                    onToggled: checked => SettingsData.set("matugenTemplateNeovim", checked)
-                }
-
-                SettingsDropdownRow {
-                    text: I18n.tr("Dark mode base")
-                    tab: "theme"
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovimSettings"
-                    description: "Base to derive dark theme from"
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                    currentValue: SettingsData.matugenTemplateNeovimSettings?.dark?.baseTheme ?? "github_dark"
-                    options: themeColorsTab.neovimDarkBaseThemes.concat(themeColorsTab.neovimLightBaseThemes)
-                    enableFuzzySearch: true
-                    onValueChanged: value => {
-                        const settings = SettingsData.matugenTemplateNeovimSettings;
-                        settings.dark.baseTheme = value;
-                        SettingsData.set("matugenTemplateNeovimSettings", settings);
-                    }
-                }
-
-                SettingsDropdownRow {
-                    text: I18n.tr("Light mode base")
-                    tab: "theme"
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovimSettings"
-                    description: "Base to derive light theme from"
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                    currentValue: SettingsData.matugenTemplateNeovimSettings?.light?.baseTheme ?? "github_light"
-                    options: themeColorsTab.neovimLightBaseThemes.concat(themeColorsTab.neovimDarkBaseThemes)
-                    enableFuzzySearch: true
-                    onValueChanged: value => {
-                        const settings = SettingsData.matugenTemplateNeovimSettings;
-                        settings.light.baseTheme = value;
-                        SettingsData.set("matugenTemplateNeovimSettings", settings);
-                    }
-                }
-
-                SettingsSliderRow {
-                    text: I18n.tr("Dark mode harmony")
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovimSettings"
-                    description: "How much should the base dark theme be tinted"
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                    minimum: 0
-                    maximum: 100
-                    value: (SettingsData.matugenTemplateNeovimSettings?.dark?.harmony ?? 0.5) * 100
-                    defaultValue: 50
-                    onSliderValueChanged: value => {
-                        const settings = SettingsData.matugenTemplateNeovimSettings;
-                        settings.dark.harmony = value / 100;
-                        SettingsData.set("matugenTemplateNeovimSettings", settings);
-                    }
-                }
-
-                SettingsSliderRow {
-                    text: I18n.tr("Light mode harmony")
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovimSettings"
-                    description: "How much should the base light theme be tinted"
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                    minimum: 0
-                    maximum: 100
-                    value: (SettingsData.matugenTemplateNeovimSettings?.light?.harmony ?? 0.5) * 100
-                    defaultValue: 50
-                    onSliderValueChanged: value => {
-                        const settings = SettingsData.matugenTemplateNeovimSettings;
-                        settings.light.harmony = value / 100;
-                        SettingsData.set("matugenTemplateNeovimSettings", settings);
-                    }
-                }
-
-                SettingsToggleRow {
-                    text: I18n.tr("Follow DMS background color")
-                    tags: ["matugen", "neovim", "terminal", "template"]
-                    settingKey: "matugenTemplateNeovimSetBackground"
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                    checked: SettingsData.matugenTemplateNeovimSetBackground ?? true
-                    onToggled: checked => SettingsData.set("matugenTemplateNeovimSetBackground", checked)
-                }
-
-                SettingsDivider {
-                    visible: neovimThemeToggle.visible && neovimThemeToggle.checked
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "alacritty", "terminal", "template"]
-                    settingKey: "matugenTemplateAlacritty"
-                    text: "Alacritty"
-                    description: getTemplateDescription("alacritty", "")
-                    descriptionColor: getTemplateDescriptionColor("alacritty")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateAlacritty
-                    onToggled: checked => SettingsData.set("matugenTemplateAlacritty", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "wezterm", "terminal", "template"]
-                    settingKey: "matugenTemplateWezterm"
-                    text: "WezTerm"
-                    description: getTemplateDescription("wezterm", "")
-                    descriptionColor: getTemplateDescriptionColor("wezterm")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateWezterm
-                    onToggled: checked => SettingsData.set("matugenTemplateWezterm", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "dgop", "template"]
-                    settingKey: "matugenTemplateDgop"
-                    text: "dgop"
-                    description: getTemplateDescription("dgop", "")
-                    descriptionColor: getTemplateDescriptionColor("dgop")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateDgop
-                    onToggled: checked => SettingsData.set("matugenTemplateDgop", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "kcolorscheme", "kde", "template"]
-                    settingKey: "matugenTemplateKcolorscheme"
-                    text: "KColorScheme"
-                    description: getTemplateDescription("kcolorscheme", "")
-                    descriptionColor: getTemplateDescriptionColor("kcolorscheme")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateKcolorscheme
-                    onToggled: checked => SettingsData.set("matugenTemplateKcolorscheme", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "vscode", "code", "template"]
-                    settingKey: "matugenTemplateVscode"
-                    text: "VS Code"
-                    description: getTemplateDescription("vscode", I18n.tr("Requires the DMS Theme extension from the editor marketplace", "vscode matugen template description"))
-                    descriptionColor: getTemplateDescriptionColor("vscode")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateVscode
-                    onToggled: checked => SettingsData.set("matugenTemplateVscode", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "emacs", "template"]
-                    settingKey: "matugenTemplateEmacs"
-                    text: "Emacs"
-                    description: getTemplateDescription("emacs", "")
-                    descriptionColor: getTemplateDescriptionColor("emacs")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateEmacs
-                    onToggled: checked => SettingsData.set("matugenTemplateEmacs", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "theme"
-                    tags: ["matugen", "zed", "template"]
-                    settingKey: "matugenTemplateZed"
-                    text: "Zed"
-                    description: getTemplateDescription("zed", "")
-                    descriptionColor: getTemplateDescriptionColor("zed")
-                    visible: SettingsData.runDmsMatugenTemplates
-                    checked: SettingsData.matugenTemplateZed
-                    onToggled: checked => SettingsData.set("matugenTemplateZed", checked)
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: warningText.implicitHeight + Theme.spacingM * 2
-                radius: Theme.cornerRadius
-                color: Theme.warningHover
-
-                Row {
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingM
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: "info"
-                        size: Theme.iconSizeSmall
-                        color: Theme.warning
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    StyledText {
-                        id: warningText
-                        font.pixelSize: Theme.fontSizeSmall
-                        text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).")
-                        wrapMode: Text.WordWrap
-                        width: parent.width - Theme.iconSizeSmall - Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["system", "app", "theming", "gtk", "qt"]
-                title: I18n.tr("System App Theming")
-                settingKey: "systemAppTheming"
-                iconName: "brush"
-                visible: Theme.matugenAvailable
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    Rectangle {
-                        width: (parent.width - Theme.spacingM) / 2
-                        height: 48
-                        radius: Theme.cornerRadius
-                        color: Theme.primaryHover
-
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "settings"
-                                size: 16
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Apply GTK Colors")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.primary
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Theme.applyGtkColors()
-                        }
-                    }
-
-                    Rectangle {
-                        width: (parent.width - Theme.spacingM) / 2
-                        height: 48
-                        radius: Theme.cornerRadius
-                        color: Theme.primaryHover
-
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "settings"
-                                size: 16
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Apply Qt Colors")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.primary
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Theme.applyQtColors()
-                        }
-                    }
-                }
-
-                StyledText {
-                    text: I18n.tr('Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.').arg(`<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/README.md#Theming" style="text-decoration:none; color:${Theme.primary};">adw-gtk3</a>`)
-                    textFormat: Text.RichText
-                    linkColor: Theme.primary
-                    onLinkActivated: url => Qt.openUrlExternally(url)
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        acceptedButtons: Qt.NoButton
-                        propagateComposedEvents: true
-                    }
-                }
-            }
         }
     }
 
@@ -3176,7 +1000,6 @@ Item {
             id: saveBrowser
 
             browserTitle: I18n.tr("Save Extracted Theme", "extract theme save dialog title")
-            browserIcon: "download"
             browserType: "default"
             fileExtensions: ["*.json"]
             allowStacking: true

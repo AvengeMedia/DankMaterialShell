@@ -33,13 +33,6 @@ func TestNewHyprlandProvider(t *testing.T) {
 	})
 }
 
-func TestHyprlandProviderName(t *testing.T) {
-	p := NewHyprlandProvider("")
-	if p.Name() != "hyprland" {
-		t.Errorf("Name() = %q, want %q", p.Name(), "hyprland")
-	}
-}
-
 func TestHyprlandProviderGetCheatSheet(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "hyprland.conf")

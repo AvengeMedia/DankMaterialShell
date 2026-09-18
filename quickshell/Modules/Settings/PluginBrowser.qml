@@ -1,30 +1,27 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
-DankFloatingWindow {
+RegistryBrowserWindow {
     id: root
 
     property var allPlugins: []
-    property string searchQuery: ""
     property var filteredPlugins: []
-    property int selectedIndex: -1
-    property bool keyboardNavigationActive: false
-    property bool isLoading: false
-    property var parentModal: null
-    parentWindow: parentModal
-    property bool pendingInstallHandled: false
     property string typeFilter: ""
     property string categoryFilter: "all"
     property var categoryFilterOptions: []
     property var availableLetters: []
     property string detailPluginId: ""
+    property string pendingRevealPluginId: ""
     property string loadError: ""
+    property string operationMessage: ""
+    property bool operationFailed: false
+    property bool operationPending: false
 
     readonly property var detailPlugin: resolveDetailPlugin(detailPluginId, allPlugins)
     readonly property bool activeCategorySort: normalizedSortMode(SessionData.pluginBrowserSortMode) === "category"
@@ -334,6 +331,26 @@ DankFloatingWindow {
         selectedIndex = -1;
         keyboardNavigationActive = false;
         refreshListLayout();
+        revealTimer.restart();
+    }
+
+    Timer {
+        id: revealTimer
+        interval: 0
+        onTriggered: {
+            if (!root.visible || !root.pendingRevealPluginId || root.isLoading)
+                return;
+            const index = root.filteredPlugins.findIndex(plugin => plugin.id === root.pendingRevealPluginId);
+            if (index < 0)
+                return;
+            root.selectedIndex = index;
+            root.keyboardNavigationActive = true;
+            pluginGrid.currentIndex = index;
+            pluginGrid.positionViewAtIndex(index, GridView.Contain);
+            pluginGrid.forceLayout();
+            pluginGrid.currentItem?.focusTarget?.forceActiveFocus(Qt.TabFocusReason);
+            root.pendingRevealPluginId = "";
+        }
     }
 
     function detailKeyFor(plugin) {
@@ -434,13 +451,43 @@ DankFloatingWindow {
         ensureSelectedVisible();
     }
 
+    function setThirdPartyVisible(show) {
+        if (!show) {
+            SessionData.setShowThirdPartyPlugins(false);
+            updateFilteredPlugins();
+            return;
+        }
+        thirdPartyConfirm.showWithOptions({
+            title: I18n.tr("Third-Party Plugin Warning"),
+            message: I18n.tr("Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk."),
+            confirmText: I18n.tr("I Understand"),
+            cancelText: I18n.tr("Cancel"),
+            onConfirm: () => {
+                SessionData.setShowThirdPartyPlugins(true);
+                root.updateFilteredPlugins();
+            }
+        });
+    }
+
     function installPlugin(pluginId, pluginName, enableAfterInstall) {
-        PluginService.installFromRegistry(pluginId, pluginName, enableAfterInstall, success => {
+        if (PluginService.installingPlugins[pluginId])
+            return;
+        operationFailed = false;
+        operationPending = true;
+        operationMessage = I18n.tr("Installing: %1", "installation progress").arg(pluginName);
+        PluginService.installFromRegistry(pluginId, pluginName, enableAfterInstall, (success, error) => {
+            operationPending = false;
+            operationFailed = !success;
+            operationMessage = success ? I18n.tr("Installed: %1", "installation success").arg(pluginName) : error;
             if (!success)
                 return;
+            pendingRevealPluginId = pluginId;
+            searchQuery = "";
+            typeFilter = "";
+            categoryFilter = "all";
+            detailPluginId = "";
+            SessionData.setPluginBrowserHideInstalled(false);
             refreshPlugins();
-            if (enableAfterInstall)
-                hide();
         });
     }
 
@@ -449,6 +496,8 @@ DankFloatingWindow {
         loadError = "";
         DMSService.listPlugins(response => {
             isLoading = false;
+            if (!visible)
+                return;
             if (response.error) {
                 loadError = response.error;
                 return;
@@ -466,7 +515,7 @@ DankFloatingWindow {
         pendingInstallHandled = true;
         var pluginId = PopoutService.pendingPluginInstall;
         PopoutService.pendingPluginInstall = "";
-        urlInstallConfirm.showWithOptions({
+        installConfirm.showWithOptions({
             "title": I18n.tr("Install Plugin", "plugin installation dialog title"),
             "message": I18n.tr("Install plugin '%1' from the DMS registry?", "plugin installation confirmation").arg(pluginId),
             "confirmText": I18n.tr("Install", "install action button"),
@@ -476,72 +525,52 @@ DankFloatingWindow {
         });
     }
 
-    function show() {
-        if (parentModal)
-            parentModal.shouldHaveFocus = false;
-        const wasVisible = visible;
-        visible = true;
-        if (wasVisible && PopoutService.pendingPluginInstall) {
-            pendingInstallHandled = false;
-            checkPendingInstall();
-        }
-        Qt.callLater(() => browserSearchField.forceActiveFocus());
-    }
-
-    function hide() {
-        visible = false;
-        if (!parentModal)
-            return;
-        parentModal.shouldHaveFocus = Qt.binding(() => parentModal.shouldBeVisible);
-        Qt.callLater(() => {
-            if (parentModal.modalFocusScope)
-                parentModal.modalFocusScope.forceActiveFocus();
-        });
-    }
-
     objectName: "pluginBrowser"
-    title: I18n.tr("Browse Plugins", "plugin browser window title")
-    minimumSize: Qt.size(520, 460)
-    implicitWidth: {
-        const maxWidth = screen ? screen.width - 120 : 1500;
-        if (parentModal && parentModal.width > 0)
-            return Math.round(Math.min(maxWidth, Math.max(640, parentModal.width * 0.8)));
-        return Math.min(maxWidth, 900);
-    }
-    implicitHeight: {
-        const maxHeight = screen ? screen.height - 80 : 960;
-        if (parentModal && parentModal.height > 0)
-            return Math.round(Math.min(maxHeight, Math.max(540, parentModal.height * 0.8)));
-        return Math.min(maxHeight, 760);
-    }
-    visible: false
+    title: I18n.tr("Browse plugins", "plugin browser window title")
+    headerTitle: I18n.tr("Browse plugins")
+    searchPlaceholder: I18n.tr("Search plugins...", "plugin search placeholder")
 
-    onClosed: hide()
+    function pendingInstallId() {
+        return PopoutService.pendingPluginInstall || "";
+    }
 
-    onVisibleChanged: {
-        if (visible) {
-            pendingInstallHandled = false;
-            refreshPlugins();
-            Qt.callLater(() => {
-                browserSearchField.forceActiveFocus();
-                checkPendingInstall();
-            });
-            return;
-        }
+    function refresh() {
+        refreshPlugins();
+    }
+
+    function applySearch() {
+        updateFilteredPlugins();
+    }
+
+    function resetContent() {
         allPlugins = [];
-        searchQuery = "";
         filteredPlugins = [];
-        selectedIndex = -1;
-        keyboardNavigationActive = false;
-        isLoading = false;
         loadError = "";
         detailPluginId = "";
+    }
+
+    function handleEscape() {
+        if (detailPluginId !== "") {
+            closePluginDetail();
+            return;
+        }
+        hide();
+    }
+
+    function activateSelected() {
+        if (detailPluginId !== "" || !keyboardNavigationActive || selectedIndex < 0)
+            return false;
+        openPluginDetail(filteredPlugins[selectedIndex]);
+        return true;
     }
 
     Connections {
         target: DMSService
 
         function onInstalledPluginsReceived(plugins) {
+            if (!root.visible)
+                return;
+            const selectedPluginId = root.pendingRevealPluginId || root.filteredPlugins[root.selectedIndex]?.id;
             var pluginMap = {};
             for (var i = 0; i < plugins.length; i++) {
                 var plugin = plugins[i];
@@ -558,1106 +587,611 @@ DankFloatingWindow {
             });
             root.allPlugins = updated;
             root.updateFilteredPlugins();
+            if (!selectedPluginId)
+                return;
+            root.pendingRevealPluginId = selectedPluginId;
+            revealTimer.restart();
         }
     }
 
-    ConfirmDialogOverlay {
-        id: urlInstallConfirm
+    aboveSearch: [
+        SettingsToggleRow {
+            id: thirdPartyControl
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: I18n.tr("Third-party plugins", "community plugin discovery control")
+            description: I18n.tr("Discover community plugins. Review their code before installing, and audit changes before updating.", "community plugin safety guidance")
+            checked: SessionData.showThirdPartyPlugins
+            iconName: "extension"
+            onToggled: show => root.setThirdPartyVisible(show)
+        },
+        DankCard {
+            id: operationStatus
+            readonly property color statusColor: root.operationFailed ? Theme.onErrorContainer : contentColor
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: visible ? implicitHeight : 0
+            implicitHeight: statusContent.implicitHeight + pad * 2
+            visible: root.operationMessage !== ""
+            tone: "primary"
+            pad: Theme.spacingM
+            color: root.operationFailed ? Theme.errorContainer : surfaceColor
+            Accessible.name: root.operationMessage
 
-        onDialogClosed: Qt.callLater(() => browserSearchField.forceActiveFocus())
-    }
+            RowLayout {
+                id: statusContent
+                anchors.fill: parent
+                spacing: Theme.spacingS
 
-    FocusScope {
-        id: browserKeyHandler
-
-        anchors.fill: parent
-        focus: true
-
-        Keys.onPressed: event => {
-            switch (event.key) {
-            case Qt.Key_Escape:
-                if (root.detailPluginId !== "") {
-                    root.closePluginDetail();
-                    event.accepted = true;
-                    return;
+                DankIcon {
+                    name: root.operationFailed ? "error" : root.operationPending ? "downloading" : "check_circle"
+                    size: Theme.iconSize
+                    color: operationStatus.statusColor
                 }
-                root.hide();
-                event.accepted = true;
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: root.operationMessage
+                    color: operationStatus.statusColor
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+    ]
+
+    belowSearch: [
+        Column {
+            id: sortControlsRow
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Theme.spacingS
+
+            DankFilterChips {
+                width: parent.width
+                model: root.sortChipOptions.slice(2)
+                currentIndex: Math.max(0, model.findIndex(option => option.id === root.normalizedSortMode(SessionData.pluginBrowserSortMode)))
+                onSelectionChanged: index => {
+                    const mode = model[index].id;
+                    if (mode !== "category")
+                        root.categoryFilter = "all";
+                    SessionData.setPluginBrowserSortMode(mode);
+                    root.updateFilteredPlugins();
+                }
+            }
+            DankFilterChips {
+                width: parent.width
+                model: root.sortChipOptions.slice(0, 2).map(option => ({
+                            label: option.label,
+                            value: option.id
+                        }))
+                multiSelect: true
+                selectedValues: [SessionData.pluginBrowserHideInstalled ? "hideInstalled" : "", SessionData.pluginBrowserInstalledFirst ? "installed" : ""]
+                onSelectionToggled: (index, selected) => {
+                    if (index === 0)
+                        SessionData.setPluginBrowserHideInstalled(selected);
+                    else
+                        SessionData.setPluginBrowserInstalledFirst(selected);
+                    root.updateFilteredPlugins();
+                }
+            }
+        },
+        Item {
+            id: categoryFiltersRow
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: root.showCategoryFilters ? Theme.buttonHeightS : 0
+            visible: root.showCategoryFilters
+            clip: true
+
+            RowLayout {
+                anchors.fill: parent
+                spacing: Theme.spacingS
+
+                StyledText {
+                    id: categoryFilterLabel
+                    text: I18n.tr("Filter", "plugin browser category filter label")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.onSurfaceVariant
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                DankDropdown {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Theme.buttonHeightS
+                    compactMode: true
+                    dropdownWidth: Math.max(Theme.smallBreakpoint / 2, categoryFiltersRow.width - categoryFilterLabel.implicitWidth - Theme.spacingS * 3)
+                    currentValue: root.categoryFilterLabelForKey(root.categoryFilter)
+                    options: root.categoryFilterDropdownLabels()
+                    onValueChanged: value => {
+                        var nextKey = root.categoryFilterKeyForLabel(value);
+                        if (nextKey === root.categoryFilter)
+                            return;
+                        root.categoryFilter = nextKey;
+                        root.updateFilteredPlugins();
+                    }
+                }
+            }
+        }
+    ]
+
+    listContent: [
+        DankGridView {
+            id: pluginGrid
+
+            property int columns: Math.max(1, Math.floor(width / (Theme.smallBreakpoint / 2 + Theme.spacingXL * 2)))
+            readonly property real cardSpacing: Theme.spacingM
+            readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * SettingsMetrics.choiceCardPreviewRatio)
+            readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
+
+            anchors.fill: parent
+            anchors.rightMargin: root.showLetterIndex ? Theme.iconButtonSize : 0
+            cellWidth: Math.floor(width / columns)
+            cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
+            model: root.filteredPlugins
+            clip: true
+            visible: !root.isLoading && root.loadError === ""
+            cacheBuffer: cellHeight * 2
+
+            delegate: Item {
+                id: cardCell
+
+                required property var modelData
+                required property int index
+                readonly property Item focusTarget: pluginCard.focusTarget
+
+                width: pluginGrid.cellWidth
+                height: pluginGrid.cellHeight
+
+                PluginCard {
+                    id: pluginCard
+                    anchors.fill: parent
+                    anchors.margins: pluginGrid.cardSpacing / 2
+                    plugin: cardCell.modelData
+                    busy: !!PluginService.installingPlugins[cardCell.modelData.id]
+                    previewHeight: pluginGrid.previewHeight
+                    installed: cardCell.modelData.installed || false
+                    selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
+                    onClicked: root.openPluginDetail(cardCell.modelData)
+                    onInstallRequested: root.installPlugin(cardCell.modelData.id, cardCell.modelData.name, cardCell.modelData.type === "desktop")
+                }
+            }
+        },
+        DankFlickable {
+            id: letterIndex
+            anchors.right: parent.right
+            anchors.top: pluginGrid.top
+            anchors.bottom: pluginGrid.bottom
+            width: Theme.iconButtonSize
+            visible: root.showLetterIndex && !root.isLoading && root.loadError === ""
+            contentHeight: letterColumn.implicitHeight
+            clip: true
+
+            Column {
+                id: letterColumn
+                width: parent.width
+                Repeater {
+                    model: root.availableLetters
+
+                    DankButton {
+                        required property string modelData
+                        width: letterIndex.width
+                        minimumWidth: 0
+                        horizontalPadding: 0
+                        buttonHeight: Theme.buttonHeightXS
+                        text: modelData
+                        backgroundColor: Theme.surfaceContainer
+                        textColor: Theme.onSurfaceVariant
+                        onClicked: root.scrollToLetter(modelData)
+                    }
+                }
+            }
+        },
+        Column {
+            anchors.centerIn: parent
+            spacing: Theme.spacingS
+            visible: !root.isLoading && root.loadError === "" && root.filteredPlugins.length === 0
+
+            DankIcon {
+                anchors.horizontalCenter: parent.horizontalCenter
+                name: "search_off"
+                size: Theme.iconButtonSize
+                color: Theme.onSurfaceVariant
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: I18n.tr("No plugins found", "empty plugin list")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceVariantText
+            }
+        },
+        Column {
+            anchors.centerIn: parent
+            spacing: Theme.spacingS
+            visible: !root.isLoading && root.loadError !== ""
+            width: parent.width
+
+            DankIcon {
+                anchors.horizontalCenter: parent.horizontalCenter
+                name: "cloud_off"
+                size: Theme.iconButtonSize
+                color: Theme.onSurfaceVariant
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: I18n.tr("Couldn't load plugins", "plugin registry fetch error")
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceVariantText
+            }
+
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: root.loadError
+                width: parent.width
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.onSurfaceVariant
+            }
+
+            DankButton {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: I18n.tr("Retry", "retry failed action button")
+                iconName: "refresh"
+                backgroundColor: Theme.surfaceContainerHighest
+                textColor: Theme.surfaceText
+                onClicked: root.refreshPlugins()
+            }
+        }
+    ]
+
+    overlay: Rectangle {
+        id: detailPane
+
+        property var plugin: ({})
+        property bool heroFallback: false
+        readonly property var livePlugin: root.detailPlugin
+
+        onLivePluginChanged: {
+            if (!livePlugin)
                 return;
-            case Qt.Key_Down:
-                root.selectNext();
-                event.accepted = true;
-                return;
-            case Qt.Key_Up:
-                root.selectPrevious();
-                event.accepted = true;
-                return;
-            case Qt.Key_Left:
-                if (!root.keyboardNavigationActive)
-                    return;
-                root.selectStep(-1);
-                event.accepted = true;
-                return;
-            case Qt.Key_Right:
-                if (!root.keyboardNavigationActive)
-                    return;
-                root.selectStep(1);
-                event.accepted = true;
-                return;
-            case Qt.Key_Return:
-            case Qt.Key_Enter:
-                if (root.detailPluginId !== "" || !root.keyboardNavigationActive || root.selectedIndex < 0)
-                    return;
-                root.openPluginDetail(root.filteredPlugins[root.selectedIndex]);
-                event.accepted = true;
-                return;
+            plugin = livePlugin;
+        }
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        anchors.bottom: parent.bottom
+        z: 10
+        color: Theme.floatingWindowSurface
+        opacity: root.detailPluginId !== "" ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveEffects
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
             }
         }
 
-        Item {
-            id: browserContent
+        Connections {
+            target: root
+            function onDetailPluginIdChanged() {
+                detailPane.heroFallback = false;
+                detailFlickable.contentY = 0;
+            }
+        }
+
+        MouseArea {
             anchors.fill: parent
-            anchors.margins: Theme.spacingL
+            hoverEnabled: true
+        }
 
-            Item {
-                id: headerArea
+        Item {
+            id: detailHeader
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: Theme.buttonHeightS
+
+            DankActionButton {
+                id: detailBackButton
                 anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                height: 44
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "arrow_back"
+                Accessible.name: I18n.tr("Back")
+                iconSize: Theme.iconSize
+                iconColor: Theme.surfaceText
+                onClicked: root.closePluginDetail()
+            }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: windowControls.tryStartMove()
-                    onDoubleClicked: windowControls.tryToggleMaximize()
-                }
+            DankIcon {
+                id: detailIcon
+                anchors.left: detailBackButton.right
+                anchors.leftMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                name: detailPane.plugin.icon || "extension"
+                size: Theme.iconSize
+                color: Theme.primary
+            }
+
+            StyledText {
+                anchors.left: detailIcon.right
+                anchors.leftMargin: Theme.spacingS
+                anchors.right: detailInstallButton.left
+                anchors.rightMargin: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
+                text: detailPane.plugin.name || ""
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Theme.fontWeightMedium
+                color: Theme.surfaceText
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            DankButton {
+                id: detailInstallButton
+                readonly property bool compatible: PluginService.checkPluginCompatibility(detailPane.plugin.requires_dms)
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: detailPane.plugin.installed ? I18n.tr("Installed", "adjective, plugin or theme is already installed, button state and filter chip") : compatible ? I18n.tr("Install") : I18n.tr("Requires %1", "version requirement").arg(detailPane.plugin.requires_dms || "")
+                iconName: detailPane.plugin.installed ? "check" : "download"
+                enabled: !detailPane.plugin.installed && compatible && !PluginService.installingPlugins[detailPane.plugin.id]
+                onClicked: root.installPlugin(detailPane.plugin.id, detailPane.plugin.name, detailPane.plugin.type === "desktop")
+            }
+        }
+
+        DankFlickable {
+            id: detailFlickable
+            anchors.top: detailHeader.bottom
+            anchors.topMargin: Theme.spacingM
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            clip: true
+            contentHeight: detailColumn.height + Theme.spacingL
+            contentWidth: width
+
+            Column {
+                id: detailColumn
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width)
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacingL
 
                 Rectangle {
-                    id: headerIconTile
-                    width: 40
-                    height: 40
-                    radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.primary, 0.12)
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                    height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
+                    radius: Theme.cornerRadiusM
+                    color: Theme.floatingWindowNestedSurface
+                    border.color: Theme.outlineVariant
+                    border.width: Theme.outlineWidth
 
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "store"
-                        size: Theme.iconSize
-                        color: Theme.primary
+                    ClippingRectangle {
+                        anchors.fill: parent
+                        anchors.margins: Theme.outlineWidth
+                        radius: Theme.cornerRadiusM - Theme.outlineWidth
+                        color: "transparent"
+
+                        CachingImage {
+                            id: heroImage
+                            anchors.fill: parent
+                            imagePath: detailPane.heroFallback ? PluginService.previewUrl(detailPane.plugin) : PluginService.heroUrl(detailPane.plugin)
+                            maxCacheSize: 1600
+                            fillMode: Image.PreserveAspectFit
+                            visible: status === Image.Ready
+                            onStatusChanged: {
+                                if (status !== Image.Error || detailPane.heroFallback)
+                                    return;
+                                detailPane.heroFallback = true;
+                            }
+                        }
                     }
+
+                    DankSpinner {
+                        anchors.centerIn: parent
+                        running: heroImage.status === Image.Loading
+                        visible: running
+                    }
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+                        visible: heroImage.imagePath.length === 0 || heroImage.status === Image.Error
+
+                        DankIcon {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            name: "image_not_supported"
+                            size: Theme.iconSizeLarge
+                            color: Theme.onSurfaceVariant
+                        }
+
+                        StyledText {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: heroImage.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.onSurfaceVariant
+                        }
+                    }
+                }
+
+                Flow {
+                    width: parent.width
+                    spacing: Theme.spacingXS
+
+                    Repeater {
+                        model: PluginService.badgeModel(detailPane.plugin)
+
+                        PluginBadge {
+                            required property var modelData
+                            label: modelData.label
+                            iconName: modelData.icon
+                            tone: PluginService.badgeTone(modelData.tone)
+                        }
+                    }
+
+                    PluginBadge {
+                        iconName: "thumb_up"
+                        label: detailPane.plugin.upvotes || 0
+                        tone: Theme.primary
+                        visible: !!detailPane.plugin.issueUrl
+                    }
+
+                    Repeater {
+                        model: root.detailMetaBadges(detailPane.plugin)
+
+                        PluginBadge {
+                            required property var modelData
+                            label: modelData.label
+                            iconName: modelData.icon
+                            tone: Theme.outline
+                        }
+                    }
+                }
+
+                StyledText {
+                    width: parent.width
+                    text: {
+                        const plugin = detailPane.plugin;
+                        const author = I18n.tr("by %1", "author attribution").arg(plugin.author || I18n.tr("Unknown", "unknown author"));
+                        const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
+                        const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
+                        return author + source + discuss;
+                    }
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.onSurfaceVariant
+                    linkColor: Theme.primary
+                    textFormat: Text.RichText
+                    onLinkActivated: url => Qt.openUrlExternally(url)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        acceptedButtons: Qt.NoButton
+                        propagateComposedEvents: true
+                    }
+                }
+
+                StyledText {
+                    width: parent.width
+                    text: detailPane.plugin.description || ""
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceText
+                    wrapMode: Text.WordWrap
+                    visible: (detailPane.plugin.description || "").length > 0
                 }
 
                 Column {
-                    anchors.left: headerIconTile.right
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.right: headerActions.left
-                    anchors.rightMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: (detailPane.plugin.capabilities || []).length > 0
 
                     StyledText {
-                        text: I18n.tr("Browse Plugins", "plugin browser header")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                        width: parent.width
+                        text: I18n.tr("Capabilities", "plugin detail section")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Theme.fontWeightMedium
+                        color: Theme.surfaceVariantText
                     }
 
-                    StyledText {
-                        text: {
-                            const description = I18n.tr("Install plugins from the DMS plugin registry", "plugin browser description");
-                            if (root.isLoading || root.allPlugins.length === 0)
-                                return description;
-                            return description + "  •  " + root.filteredPlugins.length + "/" + root.allPlugins.length;
-                        }
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.outline
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
+                    Flow {
                         width: parent.width
+                        spacing: Theme.spacingXS
+
+                        Repeater {
+                            model: detailPane.plugin.capabilities || []
+
+                            PluginBadge {
+                                required property string modelData
+                                label: modelData
+                                tone: Theme.primary
+                            }
+                        }
                     }
                 }
 
                 Row {
-                    id: headerActions
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingXS
-
-                    DankButton {
-                        text: SessionData.showThirdPartyPlugins ? I18n.tr("Hide 3rd Party") : I18n.tr("Show 3rd Party")
-                        iconName: SessionData.showThirdPartyPlugins ? "visibility_off" : "visibility"
-                        height: 28
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            if (SessionData.showThirdPartyPlugins) {
-                                SessionData.setShowThirdPartyPlugins(false);
-                                root.updateFilteredPlugins();
-                                return;
-                            }
-                            thirdPartyConfirmLoader.active = true;
-                            if (thirdPartyConfirmLoader.item)
-                                thirdPartyConfirmLoader.item.show();
-                        }
-                    }
-
-                    DankActionButton {
-                        iconName: "refresh"
-                        iconSize: 18
-                        iconColor: Theme.primary
-                        visible: !root.isLoading
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: root.refreshPlugins()
-                    }
-
-                    DankActionButton {
-                        visible: windowControls.canMaximize
-                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.outline
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: windowControls.tryToggleMaximize()
-                    }
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.outline
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: root.hide()
-                    }
-                }
-            }
-
-            DankTextField {
-                id: browserSearchField
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: headerArea.bottom
-                anchors.topMargin: Theme.spacingM
-                height: 48
-                leftIconName: "search"
-                leftIconSize: Theme.iconSize
-                leftIconColor: Theme.surfaceVariantText
-                leftIconFocusedColor: Theme.primary
-                showClearButton: true
-                textColor: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeMedium
-                placeholderText: I18n.tr("Search plugins...", "plugin search placeholder")
-                text: root.searchQuery
-                focus: true
-                ignoreLeftRightKeys: true
-                keyForwardTargets: [browserKeyHandler]
-                onTextEdited: {
-                    root.searchQuery = text;
-                    root.updateFilteredPlugins();
-                }
-            }
-
-            Flow {
-                id: sortControlsRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: browserSearchField.bottom
-                anchors.topMargin: Theme.spacingM
-                spacing: Theme.spacingS
-
-                Repeater {
-                    model: root.sortChipOptions
-
-                    Rectangle {
-                        id: sortChip
-                        required property var modelData
-
-                        property bool selected: root.isSortChipSelected(modelData.id, modelData.toggle)
-                        property bool hovered: chipMouseArea.containsMouse
-                        property bool pressed: chipMouseArea.pressed
-
-                        width: chipContent.implicitWidth + Theme.spacingM * 2
-                        height: 32
-                        radius: height / 2
-                        color: selected ? Theme.primary : Theme.surfaceVariant
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: parent.radius
-                            color: {
-                                if (sortChip.pressed)
-                                    return sortChip.selected ? Theme.primaryPressed : Theme.surfaceTextHover;
-                                if (sortChip.hovered)
-                                    return sortChip.selected ? Theme.primaryHover : Theme.surfaceTextHover;
-                                return "transparent";
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shorterDuration
-                                    easing.type: Theme.standardEasing
-                                }
-                            }
-                        }
-
-                        DankRipple {
-                            id: chipRipple
-                            cornerRadius: sortChip.radius
-                            rippleColor: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
-                        }
-
-                        Row {
-                            id: chipContent
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-
-                            DankIcon {
-                                name: sortChip.modelData.toggle ? "download_done" : "check"
-                                size: 16
-                                anchors.verticalCenter: parent.verticalCenter
-                                color: Theme.primaryText
-                                visible: sortChip.selected
-                            }
-
-                            StyledText {
-                                text: sortChip.modelData.label
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: sortChip.selected ? Font.Medium : Font.Normal
-                                color: sortChip.selected ? Theme.primaryText : Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            id: chipMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: mouse => chipRipple.trigger(mouse.x, mouse.y)
-                            onClicked: {
-                                if (sortChip.modelData.toggle) {
-                                    if (sortChip.modelData.id === "hideInstalled")
-                                        SessionData.setPluginBrowserHideInstalled(!SessionData.pluginBrowserHideInstalled);
-                                    else
-                                        SessionData.setPluginBrowserInstalledFirst(!SessionData.pluginBrowserInstalledFirst);
-                                } else {
-                                    if (sortChip.modelData.id !== "category")
-                                        root.categoryFilter = "all";
-                                    SessionData.setPluginBrowserSortMode(sortChip.modelData.id);
-                                }
-                                root.updateFilteredPlugins();
-                            }
-                        }
-                    }
-                }
-            }
-
-            Item {
-                id: categoryFiltersRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: sortControlsRow.bottom
-                anchors.topMargin: root.showCategoryFilters ? Theme.spacingS : 0
-                height: root.showCategoryFilters ? 40 : 0
-                visible: root.showCategoryFilters
-                clip: true
-
-                RowLayout {
-                    anchors.fill: parent
+                    width: parent.width
                     spacing: Theme.spacingS
-
-                    StyledText {
-                        id: categoryFilterLabel
-                        text: I18n.tr("Filter", "plugin browser category filter label")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.outline
-                        Layout.alignment: Qt.AlignVCenter
-                    }
-
-                    DankDropdown {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 32
-                        compactMode: true
-                        dropdownWidth: Math.max(240, categoryFiltersRow.width - categoryFilterLabel.implicitWidth - Theme.spacingS * 3)
-                        currentValue: root.categoryFilterLabelForKey(root.categoryFilter)
-                        options: root.categoryFilterDropdownLabels()
-                        onValueChanged: value => {
-                            var nextKey = root.categoryFilterKeyForLabel(value);
-                            if (nextKey === root.categoryFilter)
-                                return;
-                            root.categoryFilter = nextKey;
-                            root.updateFilteredPlugins();
-                        }
-                    }
-                }
-            }
-
-            Item {
-                id: listArea
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: categoryFiltersRow.bottom
-                anchors.topMargin: Theme.spacingM
-                anchors.bottom: parent.bottom
-
-                Item {
-                    anchors.fill: parent
-                    visible: root.isLoading
-
-                    DankSpinner {
-                        anchors.centerIn: parent
-                        running: root.isLoading
-                    }
-                }
-
-                DankGridView {
-                    id: pluginGrid
-
-                    property int columns: Math.max(1, Math.floor(width / 300))
-                    readonly property real cardSpacing: Theme.spacingM
-                    readonly property int previewHeight: Math.round((cellWidth - cardSpacing - Theme.spacingS * 2) * 0.52)
-                    readonly property int infoHeight: 100
-
-                    anchors.fill: parent
-                    anchors.rightMargin: root.showLetterIndex ? 22 : 0
-                    cellWidth: Math.floor(width / columns)
-                    cellHeight: previewHeight + infoHeight + Math.round(cardSpacing) + Theme.spacingS * 2 + Theme.spacingM
-                    model: root.filteredPlugins
-                    clip: true
-                    visible: !root.isLoading
-                    cacheBuffer: cellHeight * 2
-
-                    delegate: Item {
-                        id: cardCell
-
-                        required property var modelData
-                        required property int index
-
-                        width: pluginGrid.cellWidth
-                        height: pluginGrid.cellHeight
-
-                        PluginCard {
-                            anchors.fill: parent
-                            anchors.margins: pluginGrid.cardSpacing / 2
-                            plugin: cardCell.modelData
-                            previewHeight: pluginGrid.previewHeight
-                            installed: cardCell.modelData.installed || false
-                            selected: root.keyboardNavigationActive && cardCell.index === root.selectedIndex
-                            onClicked: root.openPluginDetail(cardCell.modelData)
-                            onInstallRequested: root.installPlugin(cardCell.modelData.id, cardCell.modelData.name, cardCell.modelData.type === "desktop")
-                        }
-                    }
-                }
-
-                Column {
-                    id: letterIndex
-                    anchors.right: parent.right
-                    anchors.top: pluginGrid.top
-                    anchors.bottom: pluginGrid.bottom
-                    width: 16
-                    visible: root.showLetterIndex && !root.isLoading
-                    spacing: 0
-
-                    Repeater {
-                        model: root.availableLetters
-
-                        Item {
-                            required property string modelData
-                            width: letterIndex.width
-                            height: Math.max(12, letterIndex.height / Math.max(1, root.availableLetters.length))
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: parent.modelData
-                                font.pixelSize: 10
-                                font.weight: Font.Medium
-                                color: letterMouseArea.containsMouse ? Theme.primary : Theme.outline
-                            }
-
-                            MouseArea {
-                                id: letterMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.scrollToLetter(parent.modelData)
-                            }
-                        }
-                    }
-                }
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingS
-                    visible: !root.isLoading && root.loadError === "" && root.filteredPlugins.length === 0
+                    visible: (detailPane.plugin.permissions || []).length > 0
 
                     DankIcon {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        name: "search_off"
-                        size: Theme.iconSize + 16
-                        color: Theme.outline
-                    }
-
-                    StyledText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: I18n.tr("No plugins found", "empty plugin list")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
-                    }
-                }
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingS
-                    visible: !root.isLoading && root.loadError !== ""
-
-                    DankIcon {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        name: "cloud_off"
-                        size: Theme.iconSize + 16
-                        color: Theme.outline
-                    }
-
-                    StyledText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: I18n.tr("Couldn't load plugins", "plugin registry fetch error")
-                        font.pixelSize: Theme.fontSizeMedium
+                        name: "security"
+                        size: Theme.iconSizeSmall
                         color: Theme.surfaceVariantText
                     }
 
-                    StyledText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.loadError
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.outline
-                    }
+                    Flow {
+                        width: parent.width - Theme.iconSize - Theme.spacingS
+                        spacing: Theme.spacingXS
 
-                    DankButton {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: I18n.tr("Retry", "retry failed action button")
-                        iconName: "refresh"
-                        backgroundColor: Theme.surfaceContainerHighest
-                        textColor: Theme.surfaceText
-                        onClicked: root.refreshPlugins()
-                    }
-                }
-            }
-
-            Rectangle {
-                id: detailPane
-
-                property var plugin: ({})
-                property bool heroFallback: false
-                readonly property var livePlugin: root.detailPlugin
-
-                onLivePluginChanged: {
-                    if (!livePlugin)
-                        return;
-                    plugin = livePlugin;
-                }
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: headerArea.bottom
-                anchors.topMargin: Theme.spacingM
-                anchors.bottom: parent.bottom
-                z: 10
-                color: Theme.floatingWindowSurface
-                opacity: root.detailPluginId !== "" ? 1 : 0
-                visible: opacity > 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-
-                Connections {
-                    target: root
-                    function onDetailPluginIdChanged() {
-                        detailPane.heroFallback = false;
-                        detailFlickable.contentY = 0;
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
-
-                Item {
-                    id: detailHeader
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: 40
-
-                    DankActionButton {
-                        id: detailBackButton
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        iconName: "arrow_back"
-                        iconSize: Theme.iconSize
-                        iconColor: Theme.surfaceText
-                        onClicked: root.closePluginDetail()
-                    }
-
-                    DankIcon {
-                        id: detailIcon
-                        anchors.left: detailBackButton.right
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: detailPane.plugin.icon || "extension"
-                        size: Theme.iconSize
-                        color: Theme.primary
-                    }
-
-                    StyledText {
-                        anchors.left: detailIcon.right
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.right: detailInstallButton.left
-                        anchors.rightMargin: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: detailPane.plugin.name || ""
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                    }
-
-                    Rectangle {
-                        id: detailInstallButton
-
-                        property string buttonState: {
-                            if (detailPane.plugin.installed)
-                                return "installed";
-                            if (!PluginService.checkPluginCompatibility(detailPane.plugin.requires_dms))
-                                return "incompatible";
-                            return "available";
-                        }
-
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        implicitWidth: Math.max(96, detailInstallRow.implicitWidth + Theme.spacingL * 2)
-                        width: implicitWidth
-                        height: 36
-                        radius: height / 2
-                        color: {
-                            switch (buttonState) {
-                            case "installed":
-                                return Theme.surfaceVariant;
-                            case "incompatible":
-                                return Theme.withAlpha(Theme.warning, 0.15);
-                            default:
-                                return Theme.primary;
-                            }
-                        }
-                        opacity: buttonState === "available" && detailInstallMouseArea.containsMouse ? 0.9 : 1
-                        border.width: buttonState !== "available" ? 1 : 0
-                        border.color: buttonState === "incompatible" ? Theme.warning : Theme.outline
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-
-                        Row {
-                            id: detailInstallRow
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-
-                            DankIcon {
-                                name: {
-                                    switch (detailInstallButton.buttonState) {
-                                    case "installed":
-                                        return "check";
-                                    case "incompatible":
-                                        return "warning";
-                                    default:
-                                        return "download";
-                                    }
-                                }
-                                size: 16
-                                color: {
-                                    switch (detailInstallButton.buttonState) {
-                                    case "installed":
-                                        return Theme.surfaceText;
-                                    case "incompatible":
-                                        return Theme.warning;
-                                    default:
-                                        return Theme.surface;
-                                    }
-                                }
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: {
-                                    switch (detailInstallButton.buttonState) {
-                                    case "installed":
-                                        return I18n.tr("Installed", "installed status");
-                                    case "incompatible":
-                                        return I18n.tr("Requires %1", "version requirement").arg(detailPane.plugin.requires_dms || "");
-                                    default:
-                                        return I18n.tr("Install", "install action button");
-                                    }
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                wrapMode: Text.NoWrap
-                                color: {
-                                    switch (detailInstallButton.buttonState) {
-                                    case "installed":
-                                        return Theme.surfaceText;
-                                    case "incompatible":
-                                        return Theme.warning;
-                                    default:
-                                        return Theme.surface;
-                                    }
-                                }
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            id: detailInstallMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: detailInstallButton.buttonState === "available" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: detailInstallButton.buttonState === "available"
-                            onClicked: root.installPlugin(detailPane.plugin.id, detailPane.plugin.name, detailPane.plugin.type === "desktop")
-                        }
-                    }
-                }
-
-                DankFlickable {
-                    id: detailFlickable
-                    anchors.top: detailHeader.bottom
-                    anchors.topMargin: Theme.spacingM
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    clip: true
-                    contentHeight: detailColumn.height + Theme.spacingL
-                    contentWidth: width
-
-                    Column {
-                        id: detailColumn
-                        width: Math.min(880, parent.width)
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: Theme.spacingL
-
-                        Rectangle {
-                            width: parent.width
-                            height: Math.round(width * 0.52)
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowNestedSurface
-                            border.color: Theme.withAlpha(Theme.outline, 0.2)
-                            border.width: 1
-
-                            ClippingRectangle {
-                                anchors.fill: parent
-                                anchors.margins: 1
-                                radius: Theme.cornerRadius - 1
-                                color: "transparent"
-
-                                CachingImage {
-                                    id: heroImage
-                                    anchors.fill: parent
-                                    imagePath: detailPane.heroFallback ? PluginService.previewUrl(detailPane.plugin) : PluginService.heroUrl(detailPane.plugin)
-                                    maxCacheSize: 1600
-                                    fillMode: Image.PreserveAspectFit
-                                    visible: status === Image.Ready
-                                    onStatusChanged: {
-                                        if (status !== Image.Error || detailPane.heroFallback)
-                                            return;
-                                        detailPane.heroFallback = true;
-                                    }
-                                }
-                            }
-
-                            DankSpinner {
-                                anchors.centerIn: parent
-                                running: heroImage.status === Image.Loading
-                                visible: running
-                            }
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
-                                visible: heroImage.imagePath.length === 0 || heroImage.status === Image.Error
-
-                                DankIcon {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    name: "image_not_supported"
-                                    size: Theme.iconSize + 8
-                                    color: Theme.outline
-                                }
-
-                                StyledText {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: heroImage.status === Image.Error ? I18n.tr("Screenshot unavailable", "plugin browser screenshot error") : I18n.tr("No screenshot provided", "plugin browser no screenshot")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.outline
-                                }
-                            }
-                        }
-
-                        Flow {
-                            width: parent.width
-                            spacing: Theme.spacingXS
-
-                            Repeater {
-                                model: PluginService.badgeModel(detailPane.plugin)
-
-                                PluginBadge {
-                                    required property var modelData
-                                    label: modelData.label
-                                    iconName: modelData.icon
-                                    tone: PluginService.badgeTone(modelData.tone)
-                                }
-                            }
+                        Repeater {
+                            model: detailPane.plugin.permissions || []
 
                             PluginBadge {
-                                iconName: "thumb_up"
-                                label: detailPane.plugin.upvotes || 0
-                                tone: Theme.primary
-                                visible: !!detailPane.plugin.issueUrl
-                            }
-
-                            Repeater {
-                                model: root.detailMetaBadges(detailPane.plugin)
-
-                                PluginBadge {
-                                    required property var modelData
-                                    label: modelData.label
-                                    iconName: modelData.icon
-                                    tone: Theme.outline
-                                }
-                            }
-                        }
-
-                        StyledText {
-                            width: parent.width
-                            text: {
-                                const plugin = detailPane.plugin;
-                                const author = I18n.tr("by %1", "author attribution").arg(plugin.author || I18n.tr("Unknown", "unknown author"));
-                                const source = plugin.repo ? ` • <a href="${plugin.repo}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("source", "source code link")}</a>` : "";
-                                const discuss = plugin.issueUrl ? ` • <a href="${plugin.issueUrl}" style="text-decoration:none; color:${Theme.primary};">${I18n.tr("discuss", "plugin discussion link")}</a>` : "";
-                                return author + source + discuss;
-                            }
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.outline
-                            linkColor: Theme.primary
-                            textFormat: Text.RichText
-                            onLinkActivated: url => Qt.openUrlExternally(url)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                acceptedButtons: Qt.NoButton
-                                propagateComposedEvents: true
-                            }
-                        }
-
-                        StyledText {
-                            width: parent.width
-                            text: detailPane.plugin.description || ""
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            wrapMode: Text.WordWrap
-                            visible: (detailPane.plugin.description || "").length > 0
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: (detailPane.plugin.capabilities || []).length > 0
-
-                            StyledText {
-                                text: I18n.tr("Capabilities", "plugin detail section")
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surfaceVariantText
-                            }
-
-                            Flow {
-                                width: parent.width
-                                spacing: Theme.spacingXS
-
-                                Repeater {
-                                    model: detailPane.plugin.capabilities || []
-
-                                    PluginBadge {
-                                        required property string modelData
-                                        label: modelData
-                                        tone: Theme.primary
-                                    }
-                                }
-                            }
-                        }
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: (detailPane.plugin.permissions || []).length > 0
-
-                            DankIcon {
-                                name: "security"
-                                size: Theme.iconSize - 6
-                                color: Theme.surfaceVariantText
-                            }
-
-                            Flow {
-                                width: parent.width - Theme.iconSize + 6 - Theme.spacingS
-                                spacing: Theme.spacingXS
-
-                                Repeater {
-                                    model: detailPane.plugin.permissions || []
-
-                                    PluginBadge {
-                                        required property string modelData
-                                        label: modelData
-                                        tone: Theme.secondary
-                                    }
-                                }
-                            }
-                        }
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: (detailPane.plugin.dependencies || []).length > 0
-
-                            DankIcon {
-                                name: "package_2"
-                                size: Theme.iconSize - 6
-                                color: Theme.surfaceVariantText
-                            }
-
-                            Flow {
-                                width: parent.width - Theme.iconSize + 6 - Theme.spacingS
-                                spacing: Theme.spacingXS
-
-                                Repeater {
-                                    model: detailPane.plugin.dependencies || []
-
-                                    PluginBadge {
-                                        required property string modelData
-                                        label: modelData
-                                        tone: Theme.outline
-                                    }
-                                }
-                            }
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: Theme.spacingS
-                            visible: root.relatedPlugins(detailPane.plugin).length > 0
-
-                            StyledText {
-                                text: I18n.tr("Related: %1", "related plugins").arg("").trim()
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surfaceVariantText
-                            }
-
-                            Flow {
-                                width: parent.width
-                                spacing: Theme.spacingXS
-
-                                Repeater {
-                                    model: root.relatedPlugins(detailPane.plugin)
-
-                                    Rectangle {
-                                        id: relatedChip
-
-                                        required property var modelData
-
-                                        height: 26
-                                        width: relatedRow.implicitWidth + Theme.spacingM * 2
-                                        radius: height / 2
-                                        color: relatedMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.2) : Theme.withAlpha(Theme.primary, 0.1)
-                                        border.color: Theme.withAlpha(Theme.primary, 0.3)
-                                        border.width: 1
-                                        opacity: modelData.key ? 1 : 0.6
-
-                                        Row {
-                                            id: relatedRow
-                                            anchors.centerIn: parent
-                                            spacing: Theme.spacingXXS
-
-                                            DankIcon {
-                                                name: "extension"
-                                                size: 12
-                                                color: Theme.primary
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-
-                                            StyledText {
-                                                text: relatedChip.modelData.name
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.primary
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            id: relatedMouseArea
-                                            anchors.fill: parent
-                                            enabled: relatedChip.modelData.key !== ""
-                                            hoverEnabled: enabled
-                                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            onClicked: root.detailPluginId = relatedChip.modelData.key
-                                        }
-                                    }
-                                }
+                                required property string modelData
+                                label: modelData
+                                tone: Theme.secondary
                             }
                         }
                     }
                 }
-            }
-        }
-    }
 
-    LazyLoader {
-        id: thirdPartyConfirmLoader
-        active: false
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: (detailPane.plugin.dependencies || []).length > 0
 
-        DankFloatingWindow {
-            id: thirdPartyConfirmModal
+                    DankIcon {
+                        name: "package_2"
+                        size: Theme.iconSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
 
-            parentWindow: root
+                    Flow {
+                        width: parent.width - Theme.iconSize - Theme.spacingS
+                        spacing: Theme.spacingXS
 
-            function show() {
-                visible = true;
-            }
+                        Repeater {
+                            model: detailPane.plugin.dependencies || []
 
-            function hide() {
-                visible = false;
-            }
-
-            objectName: "thirdPartyConfirm"
-            title: I18n.tr("Third-Party Plugin Warning")
-            implicitWidth: 500
-            implicitHeight: 350
-            visible: false
-
-            FocusScope {
-                anchors.fill: parent
-                focus: true
-
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Escape) {
-                        thirdPartyConfirmModal.hide();
-                        event.accepted = true;
+                            PluginBadge {
+                                required property string modelData
+                                label: modelData
+                                tone: Theme.outline
+                            }
+                        }
                     }
                 }
 
                 Column {
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingL
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "warning"
-                            size: Theme.iconSize
-                            color: Theme.warning
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Third-Party Plugin Warning")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - parent.spacing * 2 - Theme.iconSize - parent.children[1].implicitWidth - closeConfirmBtn.width
-                            height: 1
-                        }
-
-                        DankActionButton {
-                            id: closeConfirmBtn
-                            iconName: "close"
-                            iconSize: Theme.iconSize - 2
-                            iconColor: Theme.outline
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: thirdPartyConfirmModal.hide()
-                        }
-                    }
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: root.relatedPlugins(detailPane.plugin).length > 0
 
                     StyledText {
-                        width: parent.width
-                        text: I18n.tr("Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        wrapMode: Text.WordWrap
+                        text: I18n.tr("Related: %1", "related plugins").arg("").trim()
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Theme.fontWeightMedium
+                        color: Theme.surfaceVariantText
                     }
 
-                    Column {
+                    Flow {
                         width: parent.width
-                        spacing: Theme.spacingS
+                        spacing: Theme.spacingXS
 
-                        StyledText {
-                            text: I18n.tr("• Plugins may contain bugs or security issues")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
+                        Repeater {
+                            model: root.relatedPlugins(detailPane.plugin)
 
-                        StyledText {
-                            text: I18n.tr("• Review code before installation when possible")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-
-                        StyledText {
-                            text: I18n.tr("• Install only from trusted sources")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: parent.height - parent.spacing * 3 - y
-                    }
-
-                    Row {
-                        anchors.right: parent.right
-                        spacing: Theme.spacingM
-
-                        DankButton {
-                            text: I18n.tr("Cancel")
-                            iconName: "close"
-                            onClicked: thirdPartyConfirmModal.hide()
-                        }
-
-                        DankButton {
-                            text: I18n.tr("I Understand")
-                            iconName: "check"
-                            onClicked: {
-                                SessionData.setShowThirdPartyPlugins(true);
-                                root.updateFilteredPlugins();
-                                thirdPartyConfirmModal.hide();
+                            DankButton {
+                                required property var modelData
+                                text: modelData.name
+                                iconName: "extension"
+                                backgroundColor: Theme.secondaryContainer
+                                textColor: Theme.onSecondaryContainer
+                                enabled: modelData.key !== ""
+                                onClicked: root.detailPluginId = modelData.key
                             }
                         }
                     }
@@ -1666,8 +1200,8 @@ DankFloatingWindow {
         }
     }
 
-    FloatingWindowControls {
-        id: windowControls
-        targetWindow: root
+    ConfirmDialogOverlay {
+        id: thirdPartyConfirm
+        onDialogClosed: root.focusSearch()
     }
 }

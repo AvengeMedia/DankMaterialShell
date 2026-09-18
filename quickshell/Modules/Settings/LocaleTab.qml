@@ -6,7 +6,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: localeTab
 
-    readonly property string _systemDefaultLabel: I18n.tr("System Default")
+    readonly property string _systemDefaultLabel: I18n.tr("System default")
 
     function _localeDisplayName(localeCode) {
         if (!I18n.presentLocales[localeCode])
@@ -29,61 +29,48 @@ Item {
         return "";
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            tab: "locale"
+            tags: ["locale", "language", "country"]
+            title: I18n.tr("General")
+            iconName: "language"
 
-            SettingsCard {
+            SettingsDropdownRow {
+                id: localeDropdown
                 tab: "locale"
                 tags: ["locale", "language", "country"]
-                title: I18n.tr("General")
-                iconName: "language"
+                settingKey: "locale"
+                text: I18n.tr("Language", "interface language dropdown label")
+                options: localeTab._allLocaleOptions()
+                enableFuzzySearch: true
 
-                SettingsDropdownRow {
-                    id: localeDropdown
-                    tab: "locale"
-                    tags: ["locale", "language", "country"]
-                    settingKey: "locale"
-                    text: I18n.tr("Current Locale")
-                    description: I18n.tr("Change the locale used by the DMS interface.")
-                    options: localeTab._allLocaleOptions()
-                    enableFuzzySearch: true
-
-                    Component.onCompleted: {
-                        currentValue = SessionData.locale ? localeTab._localeDisplayName(SessionData.locale) : localeTab._systemDefaultLabel;
-                    }
-
-                    onValueChanged: value => {
-                        SessionData.set("locale", localeTab._codeForDisplayName(value));
-                    }
+                Component.onCompleted: {
+                    currentValue = SessionData.locale ? localeTab._localeDisplayName(SessionData.locale) : localeTab._systemDefaultLabel;
                 }
 
-                SettingsDropdownRow {
-                    id: timeLocaleDropdown
-                    tab: "locale"
-                    tags: ["locale", "time", "date", "format", "region"]
-                    settingKey: "timeLocale"
-                    text: I18n.tr("Time & Date Locale")
-                    description: I18n.tr("Change the locale used for date and time formatting, independent of the interface language.")
-                    options: localeTab._allLocaleOptions()
-                    enableFuzzySearch: true
+                onValueChanged: value => {
+                    SessionData.set("locale", localeTab._codeForDisplayName(value));
+                }
+            }
 
-                    Component.onCompleted: {
-                        currentValue = SessionData.timeLocale ? localeTab._localeDisplayName(SessionData.timeLocale) : localeTab._systemDefaultLabel;
-                    }
+            SettingsDropdownRow {
+                id: timeLocaleDropdown
+                tab: "locale"
+                tags: ["locale", "time", "date", "format", "region"]
+                settingKey: "timeLocale"
+                text: I18n.tr("Time and date")
+                options: localeTab._allLocaleOptions()
+                enableFuzzySearch: true
 
-                    onValueChanged: value => {
-                        SessionData.set("timeLocale", localeTab._codeForDisplayName(value));
-                    }
+                Component.onCompleted: {
+                    currentValue = SessionData.timeLocale ? localeTab._localeDisplayName(SessionData.timeLocale) : localeTab._systemDefaultLabel;
+                }
+
+                onValueChanged: value => {
+                    SessionData.set("timeLocale", localeTab._codeForDisplayName(value));
                 }
             }
         }

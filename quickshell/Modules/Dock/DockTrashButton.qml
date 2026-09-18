@@ -6,78 +6,35 @@ import qs.Widgets
 
 Item {
     id: root
+    required property var options
 
     clip: false
 
     property var dockApps: null
     property var contextMenu: null
     property var parentDockScreen: null
+    property real indicatorLane: 0
+    readonly property real laneOffset: (root.options.position === SettingsData.Position.Bottom || root.options.position === SettingsData.Position.Right ? -1 : 1) * root.indicatorLane / 2
     property real actualIconSize: 40
-    property real hoverAnimOffset: 0
+    readonly property real hoverAnimOffset: hoverBounce.offset
+
+    DockHoverBounce {
+        id: hoverBounce
+        hovered: root.isHovered
+        suppressed: mouseArea.pressed
+        barHosted: root.dockApps?.barHosted ?? false
+        position: root.options.position
+        distance: root.actualIconSize
+    }
 
     readonly property bool isHovered: mouseArea.containsMouse
     readonly property bool showTooltip: mouseArea.containsMouse
-    readonly property string tooltipText: TrashService.isEmpty ? I18n.tr("Trash") : (I18n.tr("Trash") + " (" + TrashService.count + ")")
+    readonly property string tooltipText: TrashService.isEmpty ? I18n.tr("Trash", "noun, trash can dock button tooltip and widget name") : (I18n.tr("Trash") + " (" + TrashService.count + ")")
 
-    readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
-    readonly property real animationDistance: actualIconSize
-    readonly property real animationDirection: {
-        switch (SettingsData.dockPosition) {
-        case SettingsData.Position.Top:
-        case SettingsData.Position.Left:
-            return 1;
-        case SettingsData.Position.Bottom:
-        case SettingsData.Position.Right:
-        default:
-            return -1;
-        }
-    }
+    readonly property bool isVertical: root.options.position === SettingsData.Position.Left || root.options.position === SettingsData.Position.Right
 
-    onIsHoveredChanged: {
-        if (mouseArea.pressed)
-            return;
-        if (!isHovered) {
-            bounceAnimation.stop();
-            exitAnimation.restart();
-            return;
-        }
-        exitAnimation.stop();
-        if (!bounceAnimation.running)
-            bounceAnimation.restart();
-    }
-
-    SequentialAnimation {
-        id: bounceAnimation
-        running: false
-
-        NumberAnimation {
-            target: root
-            property: "hoverAnimOffset"
-            to: animationDirection * animationDistance * 0.25
-            duration: Anims.durShort
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Anims.emphasizedAccel
-        }
-
-        NumberAnimation {
-            target: root
-            property: "hoverAnimOffset"
-            to: animationDirection * animationDistance * 0.2
-            duration: Anims.durShort
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Anims.emphasizedDecel
-        }
-    }
-
-    NumberAnimation {
-        id: exitAnimation
-        running: false
-        target: root
-        property: "hoverAnimOffset"
-        to: 0
-        duration: Anims.durShort
-        easing.type: Easing.BezierSpline
-        easing.bezierCurve: Anims.emphasizedDecel
+    function activate() {
+        TrashService.openTrash(root.options);
     }
 
     MouseArea {
@@ -90,7 +47,7 @@ Item {
         onClicked: mouse => {
             switch (mouse.button) {
             case Qt.LeftButton:
-                TrashService.openTrash();
+                TrashService.openTrash(root.options);
                 break;
             case Qt.RightButton:
                 if (contextMenu)
@@ -110,8 +67,11 @@ Item {
 
         Item {
             anchors.centerIn: parent
+            anchors.horizontalCenterOffset: root.isVertical ? root.laneOffset : 0
+            anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
             width: actualIconSize - 4
             height: actualIconSize - 4
+            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
 
             readonly property string iconPath: Paths.resolveIconPath(TrashService.isEmpty ? "user-trash" : "user-trash-full")
 

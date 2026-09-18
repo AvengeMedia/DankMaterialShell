@@ -6,8 +6,9 @@ import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
 import qs.Widgets
+import "./utils/sections.js" as Sections
 
-Rectangle {
+FocusScope {
     id: root
 
     required property var host
@@ -15,18 +16,164 @@ Rectangle {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
+    readonly property real gridHeight: widgetGrid.gridHeight
+    readonly property real bodyHeight: detailPage.shownSection !== "" ? Math.max(gridHeight, detailPage.preferredHeight) : gridHeight
     readonly property real targetImplicitHeight: {
-        let total = Theme.spacingL + headerPane.implicitHeight + Theme.spacingS + widgetGrid.targetImplicitHeight;
-        if (editControls.visible)
+        let total = CcMetrics.sheetPadding * 2 + headerPane.height + Theme.spacingS + bodyHeight;
+        if (host.editMode)
             total += Theme.spacingS + editControls.height;
-        return total + Theme.spacingL;
+        return total;
     }
-    property alias bluetoothCodecSelector: bluetoothCodecSelector
-    property alias audioPortSelector: audioPortSelector
+    property var pageHistory: []
+    readonly property bool panelResizing: panelResizer.resizing
+    readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidth
+    readonly property real editGutter: host.editMode ? PopoutMetrics.editOverflow : 0
+    readonly property DankPanelResizer panelResizer: DankPanelResizer {
+        popout: root.host
+        gutter: root.editGutter
+        stepWidth: CcMetrics.sheetWidthStep
+        widthFor: step => CcMetrics.sheetWidthForStep(step)
+        currentStep: () => CcMetrics.sheetStepFor(CcMetrics.sheetWidth)
+        minStep: CcMetrics.sheetStepMin
+        maxStep: CcMetrics.sheetStepMax
+        onPreview: step => CcMetrics.sheetPreviewWidth = CcMetrics.sheetWidthForStep(step)
+        onCommitted: step => {
+            SettingsData.set("controlCenterWidth", CcMetrics.sheetWidthForStep(step));
+            CcMetrics.sheetPreviewWidth = 0;
+        }
+        onCanceled: CcMetrics.sheetPreviewWidth = 0
+    }
 
     implicitHeight: targetImplicitHeight
-    color: "transparent"
-    clip: true
+    focus: true
+
+    function navigateTo(section) {
+        if (section === host.expandedSection)
+            return;
+        if (host.expandedSection)
+            pageHistory = pageHistory.concat([host.expandedSection]);
+        host.expandedSection = section;
+    }
+
+    function goBack() {
+        if (detailPage.dismissTransient())
+            return;
+        if (pageHistory.length > 0) {
+            const previous = pageHistory[pageHistory.length - 1];
+            pageHistory = pageHistory.slice(0, -1);
+            host.expandedSection = previous;
+            return;
+        }
+        host.collapseAll();
+    }
+
+    function openWidgetPage(widgetData) {
+        const section = Sections.sectionFor(widgetData);
+        if (host.expandedSection === section) {
+            goBack();
+            return;
+        }
+        navigateTo(section);
+    }
+
+    function showCodecSelector(device) {
+        presentSheet(codecSelectorLoader, device);
+    }
+
+    function showPortSelector(node) {
+        presentSheet(portSelectorLoader, node);
+    }
+
+    function presentSheet(loader, target) {
+        loader.active = true;
+        const sheet = loader.item;
+        if (!sheet)
+            return;
+        sheet.show(target);
+        if (!sheet.shown)
+            loader.active = false;
+    }
+
+    function releaseSheet(loader) {
+        if (loader.item?.shown)
+            return;
+        loader.active = false;
+    }
+
+    function openConfigOverlay(index, widgetData, anchor) {
+        if (widgetData.id === "brightnessSlider") {
+            openWidgetPage(widgetData);
+            return;
+        }
+        configOverlayLoader.active = true;
+        const overlay = configOverlayLoader.item;
+        if (!overlay)
+            return;
+        overlay.open(index, widgetData, anchor);
+    }
+
+    function releaseConfigOverlay() {
+        if (configOverlayLoader.item?.visible)
+            return;
+        configOverlayLoader.active = false;
+    }
+
+    Keys.onEscapePressed: event => {
+        if (configOverlayLoader.item?.visible) {
+            configOverlayLoader.item.close();
+            event.accepted = true;
+            return;
+        }
+        if (pageOpen) {
+            goBack();
+            event.accepted = true;
+            return;
+        }
+        host.close();
+        event.accepted = true;
+    }
+
+    readonly property string expandedSection: host.expandedSection ?? ""
+    readonly property bool editMode: host.editMode
+
+    onExpandedSectionChanged: {
+        if (expandedSection !== "")
+            return;
+        pageHistory = [];
+        forceActiveFocus();
+    }
+
+    onEditModeChanged: {
+        if (editMode)
+            host.collapseAll();
+        else
+            panelResizer.cancel();
+        forceActiveFocus();
+    }
+
+    DankGridEditChrome {
+        id: panelChrome
+
+        anchors.fill: parent
+        anchors.margins: PopoutMetrics.panelChromeInset - contentInset
+        z: 1
+        visible: root.host.editMode
+        edgeResize: true
+        horizontalResize: true
+        removable: false
+        edgeBandWidth: PopoutMetrics.panelResizeBand
+        cornerRadius: Math.max(0, Theme.windowRadius - PopoutMetrics.panelChromeInset)
+        buttonSize: Theme.iconSize
+        iconSize: PopoutMetrics.chromeIconSize
+        resizing: root.panelResizing
+        atDefault: CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault
+        sizeText: Math.round(CcMetrics.sheetWidth) + " " + I18n.tr("px", "Cursor size unit, pixels")
+        onResizeStarted: (px, py, signX) => root.panelResizer.begin(px, py, signX)
+        onResizeMoved: (px, py) => root.panelResizer.move(px, py)
+        onResizeEnded: root.panelResizer.end()
+        onResizeCanceled: root.panelResizer.cancel()
+    }
 
     WidgetModel {
         id: widgetModel
@@ -34,17 +181,17 @@ Rectangle {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.6)
-        radius: parent.radius
-        visible: root.host.powerMenuOpen
-        z: 5000
+        color: Qt.rgba(0, 0, 0, Theme.scrimAlpha)
+        opacity: root.host.powerMenuOpen ? 1 : 0
+        visible: opacity > 0
+        z: CcMetrics.overlayZ
 
         Behavior on opacity {
-            enabled: !Theme.isDirectionalEffect
+            enabled: CcMetrics.animationsEnabled
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: CcMetrics.fadeDuration
                 easing.type: Easing.BezierSpline
-                easing.bezierCurve: root.host.shouldBeVisible ? Theme.variantPopoutEnterCurve : Theme.variantPopoutExitCurve
+                easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
             }
         }
     }
@@ -55,15 +202,15 @@ Rectangle {
         anchors.fill: parent
         clip: true
         contentWidth: width
-        contentHeight: Math.max(height, mainColumn.implicitHeight + Theme.spacingM)
+        contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding * 2)
         interactive: contentHeight > height
 
         Column {
             id: mainColumn
 
-            width: contentFlickable.width - Theme.spacingL * 2
-            x: Theme.spacingL
-            y: Theme.spacingL
+            width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
+            x: CcMetrics.sheetPadding + root.editGutter
+            y: CcMetrics.sheetPadding
             spacing: Theme.spacingS
 
             HeaderPane {
@@ -71,6 +218,7 @@ Rectangle {
 
                 width: parent.width
                 editMode: root.host.editMode
+                live: root.host.shouldBeVisible
                 tapToClose: root.host.headerTogglesClose ?? false
                 onHeaderTapped: root.host.close()
                 onEditModeToggled: root.host.editMode = !root.host.editMode
@@ -79,53 +227,65 @@ Rectangle {
                     if (!loader)
                         return;
                     loader.active = true;
-                    if (loader.item) {
-                        const bounds = Qt.rect(root.host.alignedX, root.host.alignedY, root.host.popupWidth, root.host.popupHeight);
-                        loader.item.openFromControlCenter(bounds, root.host.screen);
-                    }
+                    if (!loader.item)
+                        return;
+                    const bounds = Qt.rect(root.host.alignedX, root.host.alignedY, root.host.popupWidth, root.host.popupHeight);
+                    loader.item.openFromControlCenter(bounds, root.host.screen);
                 }
                 onLockRequested: {
                     root.host.close();
                     root.host.lockRequested();
                 }
-                onSettingsButtonClicked: root.host.close()
+                onSettingsButtonClicked: root.host.openSettings()
             }
 
-            DragDropGrid {
-                id: widgetGrid
+            Item {
+                id: body
 
                 width: parent.width
-                editMode: root.host.editMode
-                maxPopoutHeight: {
-                    const screenHeight = (root.host.triggerScreen?.height ?? 1080);
-                    return screenHeight - 100 - Theme.spacingL - headerPane.implicitHeight - Theme.spacingS;
-                }
-                expandedSection: root.host.expandedSection
-                expandedWidgetIndex: root.host.expandedWidgetIndex
-                expandedWidgetData: root.host.expandedWidgetData
-                model: widgetModel
-                bluetoothCodecSelector: bluetoothCodecSelector
-                audioPortSelector: audioPortSelector
-                colorPickerModal: root.host.colorPickerModal
-                screenName: root.host.triggerScreen?.name || ""
-                screenModel: root.host.triggerScreen?.model || ""
-                parentScreen: root.host.triggerScreen
-                onExpandClicked: (widgetData, globalIndex) => {
-                    root.host.expandedWidgetIndex = globalIndex;
-                    root.host.expandedWidgetData = widgetData;
-                    if (widgetData.id === "diskUsage") {
-                        root.host.toggleSection("diskUsage_" + (widgetData.instanceId || "default"));
-                    } else if (widgetData.id === "brightnessSlider") {
-                        root.host.toggleSection("brightnessSlider_" + (widgetData.instanceId || "default"));
-                    } else {
-                        root.host.toggleSection(widgetData.id);
+                height: root.bodyHeight
+
+                CcTileGrid {
+                    id: widgetGrid
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    editMode: root.host.editMode
+                    model: widgetModel
+                    live: root.host.shouldBeVisible
+                    screenName: root.host.triggerScreen?.name || ""
+                    opacity: root.pageOpen ? 0 : 1
+                    visible: opacity > 0
+                    enabled: !root.pageOpen
+                    onExpandClicked: widgetData => root.openWidgetPage(widgetData)
+                    onRemoveWidget: index => widgetModel.removeWidget(index)
+                    onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
+                    onColorPickerRequested: root.host.openColorPicker()
+
+                    Behavior on opacity {
+                        enabled: CcMetrics.animationsEnabled
+                        NumberAnimation {
+                            duration: CcMetrics.fadeDuration
+                            easing.type: Easing.BezierSpline
+                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+                        }
                     }
                 }
-                onRemoveWidget: index => widgetModel.removeWidget(index)
-                onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
-                onToggleWidgetSize: index => widgetModel.toggleWidgetSize(index)
-                onCollapseRequested: root.host.collapseAll()
-                onConfigRequested: (idx, data, anchor) => widgetConfigOverlay.open(idx, data, anchor)
+
+                CcDetailPage {
+                    id: detailPage
+
+                    anchors.fill: parent
+                    section: root.host.expandedSection ?? ""
+                    model: widgetModel
+                    screenName: root.host.triggerScreen?.name || ""
+                    screenModel: root.host.triggerScreen?.model || ""
+                    onCodecSelectorRequested: device => root.showCodecSelector(device)
+                    onPortSelectorRequested: node => root.showPortSelector(node)
+                    onBackRequested: root.goBack()
+                    onCollapseRequested: root.host.collapseAll()
+                }
             }
 
             EditControls {
@@ -152,23 +312,40 @@ Rectangle {
         }
     }
 
-    BluetoothCodecSelector {
-        id: bluetoothCodecSelector
+    Loader {
+        id: codecSelectorLoader
 
         anchors.fill: parent
-        z: 10000
+        z: CcMetrics.overlayZ
+        active: false
+        sourceComponent: BluetoothCodecSelector {
+            onDismissed: Qt.callLater(root.releaseSheet, codecSelectorLoader)
+        }
     }
 
-    AudioPortSelector {
-        id: audioPortSelector
+    Loader {
+        id: portSelectorLoader
 
         anchors.fill: parent
-        z: 10000
+        z: CcMetrics.overlayZ
+        active: false
+        sourceComponent: AudioPortSelector {
+            onDismissed: Qt.callLater(root.releaseSheet, portSelectorLoader)
+        }
     }
 
-    WidgetConfigOverlay {
-        id: widgetConfigOverlay
+    Loader {
+        id: configOverlayLoader
 
         anchors.fill: parent
+        z: CcMetrics.overlayZ
+        active: false
+        sourceComponent: WidgetConfigOverlay {
+            onVisibleChanged: {
+                if (visible)
+                    return;
+                Qt.callLater(root.releaseConfigOverlay);
+            }
+        }
     }
 }

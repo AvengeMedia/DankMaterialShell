@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -8,8 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -81,9 +84,9 @@ func (m *mockConn) SetWriteDeadline(t time.Time) error { return nil }
 
 func TestRespondError(t *testing.T) {
 	mc := &mockConn{}
-	models.RespondError(models.NewConn(mc), 123, "test error")
+	models.RespondError(ipc.NewConnWriter(mc), 123, "test error")
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.Unmarshal(mc.written, &resp)
 	require.NoError(t, err)
 
@@ -95,9 +98,9 @@ func TestRespondError(t *testing.T) {
 func TestRespond(t *testing.T) {
 	mc := &mockConn{}
 	result := map[string]string{"foo": "bar"}
-	models.Respond(models.NewConn(mc), 123, result)
+	models.Respond(ipc.NewConnWriter(mc), 123, result)
 
-	var resp models.Response[map[string]string]
+	var resp ipc.Response[map[string]string]
 	err := json.Unmarshal(mc.written, &resp)
 	require.NoError(t, err)
 
@@ -107,52 +110,88 @@ func TestRespond(t *testing.T) {
 	assert.Equal(t, "bar", (*resp.Result)["foo"])
 }
 
-func TestRequest_JSON(t *testing.T) {
-	jsonStr := `{"id":123,"method":"test.method","params":{"key":"value"}}`
-	var req models.Request
-	err := json.Unmarshal([]byte(jsonStr), &req)
-	require.NoError(t, err)
+func TestExclusiveServiceRequiresExplicitSubscription(t *testing.T) {
+	tests := []struct {
+		name       string
+		services   []string
+		includeAll bool
+		want       bool
+	}{
+		{name: "explicit", services: []string{"mpris.command"}, want: true},
+		{name: "all excluded", services: []string{"all"}, want: false},
+		{name: "omitted excluded", services: nil, want: false},
+		{name: "regular service via all", services: []string{"all"}, includeAll: true, want: true},
+	}
 
-	assert.Equal(t, 123, req.ID)
-	assert.Equal(t, "test.method", req.Method)
-	assert.Equal(t, "value", req.Params["key"])
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			service := "mpris.command"
+			if tt.includeAll {
+				service = "bluetooth"
+			}
+			assert.Equal(t, tt.want, serviceSubscribed(tt.services, service, tt.includeAll))
+		})
+	}
 }
 
-func TestResponse_JSON(t *testing.T) {
-	t.Run("success response", func(t *testing.T) {
-		result := "success"
-		resp := models.Response[string]{
-			ID:     123,
-			Result: &result,
+func TestSubscriptionCancellationPromotesMPRISWaiter(t *testing.T) {
+	originalBluezManager := bluezManager
+	manager := &bluez.Manager{}
+	bluezManager = manager
+	defer func() { bluezManager = originalBluezManager }()
+
+	serverConn, clientConn := net.Pipe()
+	defer clientConn.Close()
+	defer serverConn.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		handleSubscribe(ctx, ipc.NewConnWriter(serverConn), ipc.Request{
+			ID:     42,
+			Method: "subscribe",
+			Params: map[string]any{"services": []any{"mpris.command"}},
+		})
+	}()
+
+	require.NoError(t, clientConn.SetReadDeadline(time.Now().Add(2*time.Second)))
+	decoder := json.NewDecoder(clientConn)
+	var ownerLease string
+	for ownerLease == "" {
+		var response ipc.Response[ServiceEvent]
+		require.NoError(t, decoder.Decode(&response))
+		if response.Result == nil || response.Result.Service != "mpris.command" {
+			continue
 		}
+		data, ok := response.Result.Data.(map[string]any)
+		require.True(t, ok)
+		ownerLease, _ = data["lease"].(string)
+	}
+	require.NotEmpty(t, ownerLease)
 
-		data, err := json.Marshal(resp)
-		require.NoError(t, err)
+	waiter, err := manager.SubscribePlayerCommands("waiter")
+	require.NoError(t, err)
+	select {
+	case event := <-waiter:
+		t.Fatalf("waiting subscriber received unexpected event: %#v", event)
+	default:
+	}
 
-		var decoded models.Response[string]
-		err = json.Unmarshal(data, &decoded)
-		require.NoError(t, err)
+	cancel()
 
-		assert.Equal(t, 123, decoded.ID)
-		assert.Equal(t, "success", *decoded.Result)
-		assert.Empty(t, decoded.Error)
-	})
+	select {
+	case event := <-waiter:
+		require.NotEmpty(t, event.Lease)
+		assert.NotEqual(t, ownerLease, event.Lease)
+	case <-time.After(2 * time.Second):
+		t.Fatal("waiting MPRIS subscriber was not promoted after connection cancellation")
+	}
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("subscription handler did not stop after connection cancellation")
+	}
 
-	t.Run("error response", func(t *testing.T) {
-		resp := models.Response[any]{
-			ID:    123,
-			Error: "test error",
-		}
-
-		data, err := json.Marshal(resp)
-		require.NoError(t, err)
-
-		var decoded models.Response[any]
-		err = json.Unmarshal(data, &decoded)
-		require.NoError(t, err)
-
-		assert.Equal(t, 123, decoded.ID)
-		assert.Equal(t, "test error", decoded.Error)
-		assert.Nil(t, decoded.Result)
-	})
+	manager.UnsubscribePlayerCommands("waiter")
 }

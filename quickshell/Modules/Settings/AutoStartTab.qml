@@ -11,6 +11,8 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property int contentMaxWidth: 550
+
     readonly property var log: Log.scoped("AutoStartTab")
     property var parentModal: null
     property var entries: []
@@ -299,12 +301,12 @@ Item {
             const merged = buildOverrideContent(text());
             if (merged !== text())
                 setText(merged);
-            ToastService.showInfo(I18n.tr("Systemd Override generated"));
+            ToastService.showInfo(I18n.tr("Systemd override generated"));
         }
 
         onLoadFailed: {
             setText("[Unit]\nAfter=dms.service\n");
-            ToastService.showInfo(I18n.tr("Systemd Override generated"));
+            ToastService.showInfo(I18n.tr("Systemd override generated"));
         }
 
         onSaveFailed: error => {
@@ -368,8 +370,8 @@ Item {
 
         Column {
             id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            topPadding: Theme.spacingXS
+            width: Math.min(root.contentMaxWidth, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
             visible: DesktopService.autostartAvailable
@@ -379,236 +381,168 @@ Item {
                 tags: ["autostart", "add", "entry", "command", "startup"]
                 width: parent.width
                 iconName: "add_circle"
-                title: I18n.tr("Add Entry")
+                title: I18n.tr("Add entry")
 
                 SettingsDropdownRow {
                     width: parent.width
-                    text: I18n.tr("Entry Type")
-                    description: I18n.tr("Choose whether to launch a desktop app or a command")
-                    currentValue: root.newEntryType === "desktop" ? I18n.tr("Desktop Application") : I18n.tr("Command Line")
-                    options: [I18n.tr("Desktop Application"), I18n.tr("Command Line")]
+                    text: I18n.tr("Type", "noun, dropdown label for the kind of entry")
+                    currentValue: root.newEntryType === "desktop" ? I18n.tr("Desktop app") : I18n.tr("Command line")
+                    options: [I18n.tr("Desktop app"), I18n.tr("Command line")]
                     onValueChanged: val => {
-                        root.newEntryType = val === I18n.tr("Desktop Application") ? "desktop" : "command";
+                        root.newEntryType = val === I18n.tr("Desktop app") ? "desktop" : "command";
                     }
                 }
 
-                Column {
-                    width: parent.width
+                SettingsRow {
                     visible: root.newEntryType === "desktop"
-                    spacing: Theme.spacingM
-
-                    Item {
-                        width: parent.width
-                        height: appLabelColumn.height
-
-                        Column {
-                            id: appLabelColumn
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: I18n.tr("Application")
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Select a desktop application")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
-                        }
-                    }
-
-                    Row {
+                    body: Column {
                         width: parent.width
                         spacing: Theme.spacingM
 
-                        StyledRect {
-                            height: 40
-                            radius: Theme.cornerRadius
-                            color: root.newEntryDesktopId ? Theme.floatingWindowFieldColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * 0.5 : 0)
-                            LayoutMirroring.enabled: I18n.isRtl
-                            LayoutMirroring.childrenInherit: true
+                        Item {
+                            width: parent.width
+                            height: appLabelColumn.height
 
-                            readonly property string selectedName: {
-                                if (!root.newEntryDesktopId)
-                                    return "";
-                                const app = root.desktopApps.find(a => (a.id || a.execString) === root.newEntryDesktopId);
-                                return app ? (app.name || app.id || "") : root.newEntryDesktopId;
-                            }
-
-                            width: parent.width - browseButton.width - Theme.spacingM
-
-                            Row {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
+                            Column {
+                                id: appLabelColumn
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingM
-                                visible: root.newEntryDesktopId !== ""
+                                spacing: Theme.spacingXS
 
-                                Image {
-                                    width: 24
-                                    height: 24
-                                    source: {
-                                        const app = root.desktopApps.find(a => (a.id || a.execString) === root.newEntryDesktopId);
-                                        return Paths.resolveIconUrl(app?.icon || "application-x-executable");
-                                    }
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
+                                StyledText {
+                                    text: I18n.tr("App", "noun, application picker label in autostart add entry")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Theme.fontWeightMedium
+                                    color: Theme.surfaceText
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingM
+
+                            StyledRect {
+                                height: 40
+                                radius: Theme.cornerRadius
+                                color: root.newEntryDesktopId ? Theme.floatingWindowFieldColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowForegroundLayers ? Theme.floatingWindowForegroundTransparency * 0.5 : 0)
+                                LayoutMirroring.enabled: I18n.isRtl
+                                LayoutMirroring.childrenInherit: true
+
+                                readonly property string selectedName: {
+                                    if (!root.newEntryDesktopId)
+                                        return "";
+                                    const app = root.desktopApps.find(a => (a.id || a.execString) === root.newEntryDesktopId);
+                                    return app ? (app.name || app.id || "") : root.newEntryDesktopId;
+                                }
+
+                                width: parent.width - browseButton.width - Theme.spacingM
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
-                                    onStatusChanged: {
-                                        if (status === Image.Error)
-                                            source = "image://icon/application-x-executable";
+                                    spacing: Theme.spacingM
+                                    visible: root.newEntryDesktopId !== ""
+
+                                    Image {
+                                        width: 24
+                                        height: 24
+                                        source: {
+                                            const app = root.desktopApps.find(a => (a.id || a.execString) === root.newEntryDesktopId);
+                                            return Paths.resolveIconUrl(app?.icon || "application-x-executable");
+                                        }
+                                        sourceSize.width: 24
+                                        sourceSize.height: 24
+                                        fillMode: Image.PreserveAspectFit
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        onStatusChanged: {
+                                            if (status === Image.Error)
+                                                source = "image://icon/application-x-executable";
+                                        }
+                                    }
+
+                                    StyledText {
+                                        text: parent.parent.selectedName
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
                                     }
                                 }
 
                                 StyledText {
-                                    text: parent.parent.selectedName
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
+                                    text: I18n.tr("No application selected")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceVariantText
+                                    visible: root.newEntryDesktopId === ""
                                 }
                             }
 
-                            StyledText {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: I18n.tr("No application selected")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                visible: root.newEntryDesktopId === ""
+                            DankButton {
+                                id: browseButton
+                                text: I18n.tr("Browse")
+                                iconName: "search"
+                                onClicked: appBrowserPopup.show()
                             }
                         }
 
-                        DankButton {
-                            id: browseButton
-                            text: I18n.tr("Browse")
-                            iconName: "search"
-                            onClicked: appBrowserPopup.show()
+                        DankTextField {
+                            outlined: true
+                            leftIconName: "terminal"
+                            labelText: I18n.tr("Command")
+                            supportingText: I18n.tr("Wrap the app command. %command% is replaced with the actual executable", "autostart command field hint, keep %command% verbatim")
+                            width: parent.width
+                            placeholderText: "%command%"
+                            text: root.newEntryCommandWrapper
+                            onTextChanged: root.newEntryCommandWrapper = text
                         }
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: wrapperLabelColumn.height
-
-                        Column {
-                            id: wrapperLabelColumn
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: I18n.tr("Command")
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Wrap the app command. %command% is replaced with the actual executable")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
-                        }
-                    }
-
-                    DankTextField {
-                        width: parent.width
-                        placeholderText: I18n.tr("%command%")
-                        text: root.newEntryCommandWrapper
-                        onTextChanged: root.newEntryCommandWrapper = text
                     }
                 }
 
-                Column {
-                    width: parent.width
+                SettingsRow {
                     visible: root.newEntryType === "command"
-                    spacing: Theme.spacingM
-
-                    Item {
+                    body: Column {
                         width: parent.width
-                        height: labelColumn.height
+                        spacing: Theme.spacingM
 
-                        Column {
-                            id: labelColumn
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: I18n.tr("Name")
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Display name for this entry")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
+                        DankTextField {
+                            outlined: true
+                            leftIconName: "badge"
+                            labelText: I18n.tr("Name")
+                            width: parent.width
+                            placeholderText: I18n.tr("e.g. My Script")
+                            text: root.newEntryName
+                            onTextChanged: root.newEntryName = text
                         }
-                    }
 
-                    DankTextField {
-                        width: parent.width
-                        placeholderText: I18n.tr("e.g. My Script")
-                        text: root.newEntryName
-                        onTextChanged: root.newEntryName = text
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: labelColumn2.height
-
-                        Column {
-                            id: labelColumn2
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: I18n.tr("Command")
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Full command to execute")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                            }
+                        DankTextField {
+                            outlined: true
+                            leftIconName: "terminal"
+                            labelText: I18n.tr("Command", "noun, text field label for a shell command")
+                            width: parent.width
+                            placeholderText: I18n.tr("e.g. /usr/bin/my-script --flag")
+                            text: root.newEntryExec
+                            onTextChanged: root.newEntryExec = text
                         }
-                    }
-
-                    DankTextField {
-                        width: parent.width
-                        placeholderText: I18n.tr("e.g. /usr/bin/my-script --flag")
-                        text: root.newEntryExec
-                        onTextChanged: root.newEntryExec = text
                     }
                 }
 
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                Item {
-                    width: parent.width
-                    height: Theme.spacingM
+                SettingsRow {
+                    body: StyledText {
+                        width: parent.width
+                        text: I18n.tr("These add entries to the XDG autostart directory (~/.config/autostart/*.desktop)")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        horizontalAlignment: Text.AlignHCenter
+                    }
                 }
 
                 DankButton {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: I18n.tr("Add to Autostart")
+                    text: I18n.tr("Add to autostart")
                     iconName: "add"
                     enabled: {
                         if (root.newEntryType === "desktop")
@@ -623,144 +557,150 @@ Item {
                 id: entriesCard
                 width: parent.width
                 iconName: "line_start"
-                title: I18n.tr("Autostart Entries")
+                title: I18n.tr("Entries", "card title listing autostart entries")
                 settingKey: "autostartEntries"
                 collapsible: true
                 expanded: true
 
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingM
+                SettingsRow {
+                    body: Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
 
-                    StyledText {
-                        width: parent.width - clearAllButton.width - Theme.spacingM
-                        text: I18n.tr("Applications and commands to start automatically when you log in")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                        StyledText {
+                            width: parent.width - clearAllButton.width - Theme.spacingM
+                            text: I18n.tr("Applications and commands to start automatically when you log in")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
 
-                    DankActionButton {
-                        id: clearAllButton
-                        iconName: "delete_sweep"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.error
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            for (let i = 0; i < root.entries.length; i++) {
-                                root.removeEntry(root.entries[i].filePath);
+                        DankActionButton {
+                            id: clearAllButton
+                            iconName: "delete_sweep"
+                            tooltipText: I18n.tr("Clear All")
+                            iconSize: Theme.iconSizeMedium
+                            iconColor: Theme.error
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: {
+                                for (let i = 0; i < root.entries.length; i++) {
+                                    root.removeEntry(root.entries[i].filePath);
+                                }
                             }
                         }
                     }
                 }
 
-                Column {
-                    id: entriesList
-                    width: parent.width
-                    spacing: Theme.spacingS
+                SettingsRow {
+                    body: Column {
+                        id: entriesList
+                        width: parent.width
+                        spacing: Theme.spacingS
 
-                    Repeater {
-                        model: root.entries
+                        Repeater {
+                            model: root.entries
 
-                        delegate: Rectangle {
-                            width: entriesList.width
-                            height: 48
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
-                            border.width: 0
+                            delegate: Rectangle {
+                                width: entriesList.width
+                                height: 48
+                                radius: Theme.cornerRadius
+                                color: Theme.floatingWindowFieldColor
+                                border.width: 0
 
-                            Row {
-                                anchors.left: parent.left
-                                anchors.right: entryToggle.left
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.rightMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    text: (index + 1).toString()
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: Font.Medium
-                                    color: Theme.primary
-                                    width: 20
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.right: entryToggle.left
+                                    anchors.leftMargin: Theme.spacingM
+                                    anchors.rightMargin: Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Image {
-                                    width: 24
-                                    height: 24
-                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    onStatusChanged: {
-                                        if (status === Image.Error)
-                                            source = "image://icon/application-x-executable";
-                                    }
-                                }
-
-                                Column {
-                                    width: parent.width - 20 - 24 - Theme.spacingM * 2
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingXXS
+                                    spacing: Theme.spacingM
 
                                     StyledText {
-                                        width: parent.width
-                                        text: modelData.name
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: modelData.hidden ? Theme.surfaceVariantText : Theme.surfaceText
-                                        maximumLineCount: 1
-                                        elide: Text.ElideRight
-                                        horizontalAlignment: Text.AlignLeft
-                                        opacity: modelData.hidden ? 0.6 : 1.0
-                                    }
-
-                                    StyledText {
-                                        width: parent.width
-                                        text: modelData.hidden ? I18n.tr("Disabled") : modelData.exec
+                                        text: (index + 1).toString()
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        maximumLineCount: 1
-                                        elide: Text.ElideRight
-                                        horizontalAlignment: Text.AlignLeft
+                                        font.weight: Theme.fontWeightMedium
+                                        color: Theme.primary
+                                        width: 20
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Image {
+                                        width: 24
+                                        height: 24
+                                        source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
+                                        sourceSize.width: 24
+                                        sourceSize.height: 24
+                                        fillMode: Image.PreserveAspectFit
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        onStatusChanged: {
+                                            if (status === Image.Error)
+                                                source = "image://icon/application-x-executable";
+                                        }
+                                    }
+
+                                    Column {
+                                        width: parent.width - 20 - 24 - Theme.spacingM * 2
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacingXXS
+
+                                        StyledText {
+                                            width: parent.width
+                                            text: modelData.name
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            font.weight: Theme.fontWeightMedium
+                                            color: modelData.hidden ? Theme.surfaceVariantText : Theme.surfaceText
+                                            maximumLineCount: 1
+                                            elide: Text.ElideRight
+                                            horizontalAlignment: Text.AlignLeft
+                                            opacity: modelData.hidden ? 0.6 : 1.0
+                                        }
+
+                                        StyledText {
+                                            width: parent.width
+                                            text: modelData.hidden ? I18n.tr("Disabled") : modelData.exec
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            maximumLineCount: 1
+                                            elide: Text.ElideRight
+                                            horizontalAlignment: Text.AlignLeft
+                                        }
                                     }
                                 }
-                            }
 
-                            DankToggle {
-                                id: entryToggle
-                                anchors.right: entryRemoveButton.left
-                                anchors.rightMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                checked: !modelData.hidden
-                                onToggled: checked => root.setHidden(modelData, !checked)
-                            }
+                                DankToggle {
+                                    id: entryToggle
+                                    anchors.right: entryRemoveButton.left
+                                    anchors.rightMargin: Theme.spacingS
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    checked: !modelData.hidden
+                                    onToggled: checked => root.setHidden(modelData, !checked)
+                                }
 
-                            DankActionButton {
-                                id: entryRemoveButton
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "close"
-                                iconSize: 16
-                                buttonSize: 32
-                                circular: true
-                                iconColor: Theme.error
-                                onClicked: root.removeEntry(modelData.filePath)
+                                DankActionButton {
+                                    id: entryRemoveButton
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: Theme.spacingS
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    iconName: "close"
+                                    Accessible.name: I18n.tr("Remove")
+                                    iconSize: 16
+                                    buttonSize: 32
+                                    circular: true
+                                    iconColor: Theme.error
+                                    onClicked: root.removeEntry(modelData.filePath)
+                                }
                             }
                         }
-                    }
 
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("No autostart entries")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
-                        horizontalAlignment: Text.AlignHCenter
-                        visible: root.entries.length === 0
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("No autostart entries")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceVariantText
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: root.entries.length === 0
+                        }
                     }
                 }
             }
@@ -770,26 +710,28 @@ Item {
                 tags: ["tray", "icons", "fix", "systemd"]
                 width: parent.width
                 iconName: "handyman"
-                title: I18n.tr("Tray Icon Fix")
+                title: I18n.tr("Tray icon fix")
                 visible: DesktopService.isSystemd
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    StyledText {
+                SettingsRow {
+                    body: Column {
                         width: parent.width
-                        text: I18n.tr("If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                    }
+                        spacing: Theme.spacingM
 
-                    DankButton {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: I18n.tr("Generate Override")
-                        iconName: "build"
-                        onClicked: root.generateTrayIconFixSystemdOverride()
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("If autostart app icons don't appear in the system tray, generate a systemd override to ensure DMS starts before autostart apps")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                        }
+
+                        DankButton {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: I18n.tr("Generate override")
+                            iconName: "build"
+                            onClicked: root.generateTrayIconFixSystemdOverride()
+                        }
                     }
                 }
             }

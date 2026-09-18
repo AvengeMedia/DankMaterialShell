@@ -1,246 +1,137 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
-import "../../Common/QmlUtils.js" as QmlUtils
 
-Column {
+ListSetting {
     id: root
 
-    required property string settingKey
-    required property string label
-    property string description: ""
     property var fields: []
-    property var defaultValue: []
-    property var items: defaultValue
 
-    width: parent.width
-    spacing: Theme.spacingM
+    delegate: rowDelegate
 
-    property bool isLoading: false
+    inputs: [
+        Flow {
+            width: parent.width
+            spacing: Theme.spacingS
 
-    Component.onCompleted: {
-        loadValue();
-    }
+            Repeater {
+                model: root.fields
 
-    function loadValue() {
-        const settings = QmlUtils.findSettings(root.parent);
-        if (settings) {
-            isLoading = true;
-            items = settings.loadValue(settingKey, defaultValue);
-            isLoading = false;
-        }
-    }
-
-    onItemsChanged: {
-        if (isLoading) {
-            return;
-        }
-        const settings = QmlUtils.findSettings(root.parent);
-        if (settings) {
-            settings.saveValue(settingKey, items);
-        }
-    }
-
-    function addItem(item) {
-        items = items.concat([item]);
-    }
-
-    function removeItem(index) {
-        const newItems = items.slice();
-        newItems.splice(index, 1);
-        items = newItems;
-    }
-
-    StyledText {
-        text: root.label
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        color: Theme.surfaceText
-    }
-
-    StyledText {
-        text: root.description
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.surfaceVariantText
-        width: parent.width
-        wrapMode: Text.WordWrap
-        visible: root.description !== ""
-    }
-
-    Flow {
-        width: parent.width
-        spacing: Theme.spacingS
-
-        Repeater {
-            model: root.fields
-
-            StyledText {
-                text: modelData.label
-                font.pixelSize: Theme.fontSizeSmall
-                font.weight: Font.Medium
-                color: Theme.surfaceText
-                width: modelData.width || 200
-            }
-        }
-    }
-
-    Flow {
-        id: inputRow
-        width: parent.width
-        spacing: Theme.spacingS
-
-        property var inputFields: []
-
-        Repeater {
-            id: inputRepeater
-            model: root.fields
-
-            DankTextField {
-                width: modelData.width || 200
-                placeholderText: modelData.placeholder || ""
-
-                Component.onCompleted: {
-                    inputRow.inputFields.push(this);
-                }
-
-                Keys.onReturnPressed: {
-                    addButton.clicked();
+                StyledText {
+                    text: modelData.label
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Theme.fontWeightMedium
+                    color: Theme.surfaceText
+                    width: modelData.width || 200
                 }
             }
-        }
+        },
+        Flow {
+            id: inputRow
+            width: parent.width
+            spacing: Theme.spacingS
 
-        DankButton {
-            id: addButton
-            width: 50
-            height: 36
-            text: I18n.tr("Add")
+            property var inputFields: []
 
-            onClicked: {
-                let newItem = {};
-                let hasValue = false;
+            Repeater {
+                model: root.fields
 
-                for (let i = 0; i < root.fields.length; i++) {
-                    const field = root.fields[i];
-                    const input = inputRow.inputFields[i];
-                    const value = input.text.trim();
+                DankTextField {
+                    width: modelData.width || 200
+                    placeholderText: modelData.placeholder || ""
 
-                    if (value !== "") {
-                        hasValue = true;
+                    Component.onCompleted: inputRow.inputFields.push(this)
+
+                    Keys.onReturnPressed: addButton.clicked()
+                }
+            }
+
+            DankButton {
+                id: addButton
+                width: 50
+                height: 36
+                text: I18n.tr("Add")
+
+                onClicked: {
+                    let newItem = {};
+                    let hasValue = false;
+
+                    for (let i = 0; i < root.fields.length; i++) {
+                        const field = root.fields[i];
+                        const value = inputRow.inputFields[i].text.trim();
+                        if (value !== "")
+                            hasValue = true;
+                        if (field.required && value === "")
+                            return;
+                        newItem[field.id] = value || (field.default || "");
                     }
 
-                    if (field.required && value === "") {
+                    if (!hasValue)
                         return;
-                    }
-
-                    newItem[field.id] = value || (field.default || "");
-                }
-
-                if (hasValue) {
                     root.addItem(newItem);
-                    for (let i = 0; i < inputRow.inputFields.length; i++) {
+                    for (let i = 0; i < inputRow.inputFields.length; i++)
                         inputRow.inputFields[i].text = "";
-                    }
-                    if (inputRow.inputFields.length > 0) {
+                    if (inputRow.inputFields.length > 0)
                         inputRow.inputFields[0].forceActiveFocus();
-                    }
                 }
             }
+        },
+        StyledText {
+            text: I18n.tr("Current Items")
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Theme.fontWeightMedium
+            color: Theme.surfaceText
+            visible: root.items.length > 0
         }
-    }
+    ]
 
-    StyledText {
-        text: I18n.tr("Current Items")
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        color: Theme.surfaceText
-        visible: root.items.length > 0
-    }
+    Component {
+        id: rowDelegate
 
-    Column {
-        width: parent.width
-        spacing: Theme.spacingS
+        StyledRect {
+            width: parent.width
+            height: 40
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            border.width: 0
 
-        Repeater {
-            model: root.items
+            required property int index
+            required property var modelData
 
-            StyledRect {
-                width: parent.width
-                height: 40
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.width: 0
+            Row {
+                id: itemRow
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingM
 
-                required property int index
-                required property var modelData
+                property var itemData: parent.modelData
 
-                Row {
-                    id: itemRow
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingM
-
-                    property var itemData: parent.modelData
-
-                    Repeater {
-                        model: root.fields
-
-                        StyledText {
-                            required property int index
-                            required property var modelData
-
-                            text: {
-                                const field = modelData;
-                                const item = itemRow.itemData;
-                                if (!field || !field.id || !item) {
-                                    return "";
-                                }
-                                const value = item[field.id];
-                                return value || "";
-                            }
-                            color: Theme.surfaceText
-                            font.pixelSize: Theme.fontSizeMedium
-                            width: modelData ? (modelData.width || 200) : 200
-                            elide: Text.ElideRight
-                        }
-                    }
-                }
-
-                Rectangle {
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 60
-                    height: 28
-                    color: removeArea.containsMouse ? Theme.errorHover : Theme.error
-                    radius: Theme.cornerRadius
+                Repeater {
+                    model: root.fields
 
                     StyledText {
-                        anchors.centerIn: parent
-                        text: I18n.tr("Remove")
-                        color: Theme.onError
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                    }
+                        required property int index
+                        required property var modelData
 
-                    MouseArea {
-                        id: removeArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.removeItem(index);
+                        text: {
+                            const field = modelData;
+                            const item = itemRow.itemData;
+                            if (!field || !field.id || !item)
+                                return "";
+                            return item[field.id] || "";
                         }
+                        color: Theme.surfaceText
+                        font.pixelSize: Theme.fontSizeMedium
+                        width: modelData ? (modelData.width || 200) : 200
+                        elide: Text.ElideRight
                     }
                 }
             }
-        }
 
-        StyledText {
-            text: I18n.tr("No items added yet")
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceVariantText
-            visible: root.items.length === 0
+            ListSettingRemoveButton {
+                onClicked: root.removeItem(index)
+            }
         }
     }
 }

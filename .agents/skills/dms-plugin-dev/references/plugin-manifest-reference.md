@@ -9,7 +9,7 @@
 | `description` | string | Short description (shown in UI) | Non-empty |
 | `version` | string | Semantic version | Pattern `^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$` |
 | `author` | string | Creator name or email | Non-empty |
-| `type` | string | Plugin type | One of: `widget`, `daemon`, `launcher`, `desktop`, `composite` |
+| `type` | string | Plugin type | One of: `widget`, `daemon`, `launcher`, `desktop`, `dash`, `dashCard`, `composite` |
 | `capabilities` | array | Plugin capabilities | At least 1 string item |
 
 One of `component` or `components` is required (not both):
@@ -17,7 +17,7 @@ One of `component` or `components` is required (not both):
 | Field | Type | Description | Validation |
 |-------|------|-------------|------------|
 | `component` | string | Path to main QML file (single-surface plugins) | Must start with `./`, end with `.qml` |
-| `components` | object | Map of surface name to QML path (multi-surface plugins) | At least 1 entry; keys: `widget`, `desktop`, `daemon`, `launcher` |
+| `components` | object | Map of surface name to QML path (multi-surface plugins) | At least 1 entry; keys: `widget`, `desktop`, `daemon`, `launcher`, `dash`, `dashCard` |
 
 ## Conditional Requirements
 
@@ -38,6 +38,7 @@ One of `component` or `components` is required (not both):
 | `requires` | array | Deprecated alias for `dependencies` |
 | `permissions` | array | Required permissions |
 | `trigger` | string | Launcher trigger string (required for launcher type) |
+| `dash` | object | Dash tab label, overview card size range and dash options. See Dash Block below. |
 
 ## Permissions
 
@@ -59,6 +60,8 @@ Capabilities are free-form strings that describe what the plugin does. Common va
 - `monitoring` - system/service monitoring
 - `launcher` - launcher search provider
 - `desktop-widget` - desktop background widget
+- `dash-tab` - dash tab
+- `dash-card` - dash overview card
 - `ai` - AI/LLM integration
 - `slideout` - uses slideout panel
 
@@ -119,7 +122,68 @@ The `components` field maps surface names to QML paths, allowing a single plugin
 }
 ```
 
-Valid surface keys: `widget`, `desktop`, `daemon`, `launcher`. Provide any subset. Each surface is loaded independently in the appropriate registry.
+Valid surface keys: `widget`, `desktop`, `daemon`, `launcher`, `dash`, `dashCard`. Provide any subset. Each surface is loaded independently in the appropriate registry.
+
+## Dash Block
+
+Plugins with a `dash` or `dashCard` surface can describe them in a `dash` object. Everything is optional.
+
+```json
+"dash": {
+    "icon": "timer",
+    "title": "Stopwatch",
+    "card": { "title": "Progress", "icon": "hourglass_bottom", "w": 2, "h": 1, "minW": 1, "minH": 1, "maxW": 4, "maxH": 2 },
+    "options": [
+        { "key": "compact", "text": "Compact layout", "type": "toggle", "def": false, "description": "Hide the secondary line" },
+        { "key": "style", "text": "Style", "type": "choice", "def": "bars", "choices": [{ "value": "bars", "text": "Bars" }, { "value": "dots", "text": "Dots" }] },
+        { "key": "limit", "text": "Items", "type": "number", "def": 5, "min": 1, "max": 20, "step": 1 }
+    ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `icon`, `title` | Tab icon and label. Fall back to the top-level `icon` and `name` |
+| `card.title`, `card.icon` | Card name and icon in the Add widget menu. Fall back to the tab label and icon |
+| `card.w`, `card.h` | Default size in grid cells. Columns are 3 to 8 (default 6), rows are 96 px |
+| `card.minW` .. `card.maxH` | Resize range. Widths clamp to the user's column count; heights have no fixed limit |
+| `options` | Rows in the dash options sheet and Settings > Dashboard. Read as `options.<key>` in the tab and card. Types: `toggle`, `choice`, `number`. `widgets` is a reserved key |
+
+## Dash Examples
+
+Standalone tab and standalone card use the single file form:
+
+```json
+{
+    "id": "dashTabExample",
+    "name": "Stopwatch Example",
+    "description": "A standalone dash tab",
+    "version": "1.0.0",
+    "author": "Developer Name",
+    "type": "dash",
+    "capabilities": ["dash-tab"],
+    "component": "./StopwatchTab.qml",
+    "dash": { "title": "Stopwatch" },
+    "requires_dms": ">=1.7.0"
+}
+```
+
+```json
+{
+    "id": "dashCardExample",
+    "name": "Progress Example",
+    "description": "A standalone overview card",
+    "version": "1.0.0",
+    "author": "Developer Name",
+    "type": "dashCard",
+    "capabilities": ["dash-card"],
+    "component": "./ProgressCard.qml",
+    "dash": { "card": { "w": 2, "h": 1, "maxW": 4, "maxH": 2 } },
+    "requires_dms": ">=1.7.0"
+}
+```
+
+A tab plus a card, or dash surfaces plus a bar widget, use `components` with `"type": "composite"`.
 
 ## Complete Example
 

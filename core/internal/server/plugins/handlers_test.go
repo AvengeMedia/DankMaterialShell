@@ -6,52 +6,22 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/net"
 	coreplugins "github.com/AvengeMedia/DankMaterialShell/core/internal/plugins"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-func TestHandleList(t *testing.T) {
-	mc := net.NewMockConn(t)
-	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
-	mc.EXPECT().Write(mock.Anything).Return(0, nil).Maybe()
-
-	req := models.Request{
-		ID:     123,
-		Method: "plugins.list",
-		Params: map[string]any{},
-	}
-
-	HandleList(conn, req)
-}
-
-func TestHandleListInstalled(t *testing.T) {
-	mc := net.NewMockConn(t)
-	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
-	mc.EXPECT().Write(mock.Anything).Return(0, nil).Maybe()
-
-	req := models.Request{
-		ID:     123,
-		Method: "plugins.listInstalled",
-		Params: map[string]any{},
-	}
-
-	HandleListInstalled(conn, req)
-}
-
 func TestHandleInstallMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
 		written = b
 		return len(b), nil
 	}).Maybe()
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     123,
 		Method: "plugins.install",
 		Params: map[string]any{},
@@ -59,7 +29,7 @@ func TestHandleInstallMissingName(t *testing.T) {
 
 	HandleInstall(conn, req)
 
-	var resp models.Response[SuccessResult]
+	var resp ipc.Response[SuccessResult]
 	err := json.Unmarshal(written, &resp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resp.Error)
@@ -69,14 +39,14 @@ func TestHandleInstallMissingName(t *testing.T) {
 func TestHandleInstallInvalidName(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
 		written = b
 		return len(b), nil
 	}).Maybe()
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     123,
 		Method: "plugins.install",
 		Params: map[string]any{
@@ -86,7 +56,7 @@ func TestHandleInstallInvalidName(t *testing.T) {
 
 	HandleInstall(conn, req)
 
-	var resp models.Response[SuccessResult]
+	var resp ipc.Response[SuccessResult]
 	err := json.Unmarshal(written, &resp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resp.Error)
@@ -95,14 +65,14 @@ func TestHandleInstallInvalidName(t *testing.T) {
 func TestHandleUninstallMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
 		written = b
 		return len(b), nil
 	}).Maybe()
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     123,
 		Method: "plugins.uninstall",
 		Params: map[string]any{},
@@ -110,7 +80,7 @@ func TestHandleUninstallMissingName(t *testing.T) {
 
 	HandleUninstall(conn, req)
 
-	var resp models.Response[SuccessResult]
+	var resp ipc.Response[SuccessResult]
 	err := json.Unmarshal(written, &resp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resp.Error)
@@ -119,14 +89,14 @@ func TestHandleUninstallMissingName(t *testing.T) {
 func TestHandleUpdateMissingName(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
 		written = b
 		return len(b), nil
 	}).Maybe()
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     123,
 		Method: "plugins.update",
 		Params: map[string]any{},
@@ -134,7 +104,7 @@ func TestHandleUpdateMissingName(t *testing.T) {
 
 	HandleUpdate(conn, req)
 
-	var resp models.Response[SuccessResult]
+	var resp ipc.Response[SuccessResult]
 	err := json.Unmarshal(written, &resp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resp.Error)
@@ -143,14 +113,14 @@ func TestHandleUpdateMissingName(t *testing.T) {
 func TestHandleSearchMissingQuery(t *testing.T) {
 	mc := net.NewMockConn(t)
 	mc.EXPECT().SetWriteDeadline(mock.Anything).Return(nil).Maybe()
-	conn := models.NewConn(mc)
+	conn := ipc.NewConnWriter(mc)
 	var written []byte
 	mc.EXPECT().Write(mock.Anything).RunAndReturn(func(b []byte) (int, error) {
 		written = b
 		return len(b), nil
 	}).Maybe()
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     123,
 		Method: "plugins.search",
 		Params: map[string]any{},
@@ -158,7 +128,7 @@ func TestHandleSearchMissingQuery(t *testing.T) {
 
 	HandleSearch(conn, req)
 
-	var resp models.Response[[]PluginInfo]
+	var resp ipc.Response[[]PluginInfo]
 	err := json.Unmarshal(written, &resp)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, resp.Error)
@@ -174,26 +144,6 @@ func TestSortPluginInfoByFirstParty(t *testing.T) {
 
 	assert.Equal(t, "first-party", plugins[0].Name)
 	assert.Equal(t, "third-party", plugins[1].Name)
-}
-
-func TestPluginInfoJSON(t *testing.T) {
-	info := PluginInfo{
-		Name:        "test",
-		Description: "test description",
-		Screenshot:  "https://raw.githubusercontent.com/test/repo/main/screenshot.png",
-		Installed:   true,
-		FirstParty:  true,
-	}
-
-	data, err := json.Marshal(info)
-	assert.NoError(t, err)
-
-	var unmarshaled PluginInfo
-	err = json.Unmarshal(data, &unmarshaled)
-	assert.NoError(t, err)
-	assert.Equal(t, info.Name, unmarshaled.Name)
-	assert.Equal(t, info.Installed, unmarshaled.Installed)
-	assert.Equal(t, info.Screenshot, unmarshaled.Screenshot)
 }
 
 func TestNormalizeScreenshotURL(t *testing.T) {
@@ -246,20 +196,4 @@ func TestPluginInfoFromPluginIncludesScreenshot(t *testing.T) {
 
 	assert.Equal(t, "https://raw.githubusercontent.com/AvengeMedia/dms-plugins/master/DankNotepadModule/screenshot.png", info.Screenshot)
 	assert.True(t, info.FirstParty)
-}
-
-func TestSuccessResult(t *testing.T) {
-	result := SuccessResult{
-		Success: true,
-		Message: "test message",
-	}
-
-	data, err := json.Marshal(result)
-	assert.NoError(t, err)
-
-	var unmarshaled SuccessResult
-	err = json.Unmarshal(data, &unmarshaled)
-	assert.NoError(t, err)
-	assert.True(t, unmarshaled.Success)
-	assert.Equal(t, "test message", unmarshaled.Message)
 }

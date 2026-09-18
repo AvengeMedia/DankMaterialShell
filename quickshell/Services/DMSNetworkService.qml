@@ -468,8 +468,8 @@ Singleton {
             vpnIsBusy = false;
             pendingVpnUuid = "";
             vpnBusyStartTime = 0;
-            const failedName = (vpnProfiles.find(p => p.uuid === state.vpnErrorUuid)?.name) || I18n.tr("VPN");
-            ToastService.showError(I18n.tr("%1: %2").arg(failedName).arg(incomingVpnError));
+            const failedName = (vpnProfiles.find(p => p.uuid === state.vpnErrorUuid)?.name) || I18n.tr("VPN", "virtual private network, widget and page title");
+            ToastService.showError(I18n.tr("%1: %2", "vpn error toast, %1 is the vpn name, %2 is the error").arg(failedName).arg(incomingVpnError));
         }
         vpnError = incomingVpnError;
         vpnErrorUuid = state.vpnErrorUuid || "";
@@ -483,7 +483,7 @@ Singleton {
             if (wifiConnected && currentWifiSSID === pendingConnectionSSID && wifiIP) {
                 const elapsed = Date.now() - pendingConnectionStartTime;
                 log.info("Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms");
-                ToastService.showInfo(I18n.tr("Connected to %1").arg(pendingConnectionSSID));
+                ToastService.showInfo(I18n.tr("Connected to %1", "wifi toast, %1 is the network name").arg(pendingConnectionSSID));
 
                 if (userPreference === "wifi" || userPreference === "auto") {
                     setConnectionPriority("wifi");
@@ -503,7 +503,7 @@ Singleton {
                     pendingConnectionSSID = "";
                 } else {
                     if (connectionError) {
-                        ToastService.showError(I18n.tr("Failed to connect to %1").arg(pendingConnectionSSID));
+                        ToastService.showError(I18n.tr("Failed to connect to %1", "wifi error toast, %1 is the network name").arg(pendingConnectionSSID));
                     }
                     connectionStatus = "failed";
                     pendingConnectionSSID = "";
@@ -668,7 +668,7 @@ Singleton {
                 isConnecting = false;
                 connectingSSID = "";
                 connectionStatus = "failed";
-                ToastService.showError(I18n.tr("Failed to start connection to %1").arg(ssid));
+                ToastService.showError(I18n.tr("Failed to start connection to %1", "wifi error toast, %1 is the network name").arg(ssid));
             }
         });
     }
@@ -747,7 +747,7 @@ Singleton {
             if (response.error) {
                 log.warn("Failed to forget network:", response.error);
             } else {
-                ToastService.showInfo(I18n.tr("Forgot network %1").arg(ssid));
+                ToastService.showInfo(I18n.tr("Forgot network %1", "toast after removing a saved wifi network, %1 is its name").arg(ssid));
 
                 savedConnections = savedConnections.filter(s => s.ssid !== ssid);
                 savedWifiNetworks = savedWifiNetworks.filter(s => s.ssid !== ssid);

@@ -6,7 +6,7 @@ Item {
     id: root
 
     property string source: ""
-    property int glyphSize: 14
+    property int glyphSize: Theme.iconSizeSmall
     property bool badgeVisible: true
 
     readonly property var sourceAsset: ({

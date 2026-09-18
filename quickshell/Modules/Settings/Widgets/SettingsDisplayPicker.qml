@@ -3,20 +3,22 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Widgets
 
-Item {
+Column {
     id: root
 
     property var displayPreferences: []
+    property bool emptyMeansAll: true
+    property bool allowEmpty: false
+    property bool showLastDisplay: false
+    property bool showOnLastDisplay: false
+    readonly property bool localAllDisplays: !Array.isArray(displayPreferences) || displayPreferences.includes("all") || (emptyMeansAll && displayPreferences.length === 0)
 
     signal preferencesChanged(var preferences)
+    signal lastDisplayToggled(bool checked)
 
-    property bool emptyMeansAll: true
-
-    function coversAllDisplays(prefs) {
-        return !Array.isArray(prefs) || prefs.includes("all") || (emptyMeansAll && prefs.length === 0);
-    }
+    width: parent?.width ?? 0
+    spacing: Theme.groupedListGap
 
     function screenPref(screen) {
         const pref = {
@@ -29,77 +31,37 @@ Item {
         return pref;
     }
 
-    property bool localAllDisplays: coversAllDisplays(displayPreferences)
+    SettingsToggleRow {
+        text: I18n.tr("All displays")
+        checked: root.localAllDisplays
+        onToggled: checked => root.preferencesChanged(checked ? ["all"] : Quickshell.screens.map(screen => root.screenPref(screen)))
+    }
 
-    onDisplayPreferencesChanged: localAllDisplays = coversAllDisplays(displayPreferences)
+    SettingsToggleRow {
+        text: I18n.tr("Show on last display")
+        visible: root.showLastDisplay
+        enabled: !root.localAllDisplays
+        checked: root.showOnLastDisplay
+        onToggled: checked => root.lastDisplayToggled(checked)
+    }
 
-    width: parent?.width ?? 0
-    height: displayColumn.height + Theme.spacingM * 2
+    Repeater {
+        model: Quickshell.screens
 
-    Column {
-        id: displayColumn
-        width: parent.width - Theme.spacingM * 2
-        x: Theme.spacingM
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingM
+        SettingsToggleRow {
+            required property var modelData
 
-        StyledText {
-            text: I18n.tr("Displays")
-            font.pixelSize: Theme.fontSizeMedium
-            color: Theme.surfaceText
-        }
-
-        DankToggle {
-            width: parent.width
-            text: I18n.tr("All displays")
-            checked: root.localAllDisplays
-            onToggled: isChecked => {
-                root.localAllDisplays = isChecked;
-                if (isChecked) {
-                    root.preferencesChanged(["all"]);
+            text: SettingsData.getScreenDisplayName(modelData)
+            description: modelData.width + "×" + modelData.height + " · " + (SettingsData.displayNameMode === "system" ? (modelData.model || I18n.tr("Unknown Model")) : modelData.name)
+            enabled: !root.localAllDisplays
+            checked: root.localAllDisplays || SettingsData.isScreenInPreferences(modelData, root.displayPreferences)
+            onToggled: checked => {
+                const prefs = (Array.isArray(root.displayPreferences) ? root.displayPreferences : []).filter(pref => pref !== "all" && !SettingsData.isScreenInPreferences(modelData, [pref]));
+                if (checked)
+                    prefs.push(root.screenPref(modelData));
+                if (!root.allowEmpty && prefs.length === 0)
                     return;
-                }
-                root.preferencesChanged(Quickshell.screens.map(s => root.screenPref(s)));
-            }
-        }
-
-        Column {
-            width: parent.width
-            spacing: Theme.spacingXS
-            visible: !root.localAllDisplays
-
-            Repeater {
-                model: Quickshell.screens
-
-                DankToggle {
-                    required property var modelData
-
-                    property bool localChecked: {
-                        const prefs = root.displayPreferences;
-                        if (!Array.isArray(prefs) || prefs.includes("all"))
-                            return true;
-                        return prefs.some(p => p.name === modelData.name);
-                    }
-
-                    width: parent.width
-                    text: SettingsData.getScreenDisplayName(modelData)
-                    description: modelData.width + "×" + modelData.height + " • " + (SettingsData.displayNameMode === "system" ? (modelData.model || I18n.tr("Unknown Model")) : modelData.name)
-                    checked: localChecked
-                    onToggled: isChecked => {
-                        var prefs = JSON.parse(JSON.stringify(root.displayPreferences));
-                        if (!Array.isArray(prefs) || prefs.includes("all"))
-                            prefs = [];
-                        prefs = prefs.filter(p => p.name !== modelData.name);
-                        if (isChecked)
-                            prefs.push(root.screenPref(modelData));
-                        if (prefs.length === 0) {
-                            localChecked = true;
-                            return;
-                        }
-                        localChecked = isChecked;
-                        root.preferencesChanged(prefs);
-                    }
-                }
+                root.preferencesChanged(prefs);
             }
         }
     }

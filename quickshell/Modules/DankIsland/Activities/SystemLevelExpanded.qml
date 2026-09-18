@@ -20,37 +20,16 @@ Item {
             width: parent.width
             spacing: Theme.spacingM
 
-            Rectangle {
-                width: 48
-                height: 48
-                radius: 18
-                color: Theme.primaryContainer
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: root.systemModel.iconName
-                    size: 27
-                    color: Theme.primary
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    enabled: root.systemModel.volumeActivity
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: root.systemModel.toggleMute()
-                }
-            }
-
             Column {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 48 - valueText.width - parent.spacing * 2
+                width: parent.width - valueText.width - parent.spacing
                 spacing: Theme.spacingXXS
 
                 StyledText {
                     text: root.systemModel.title
                     color: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.DemiBold
+                    font.weight: Theme.fontWeightMedium
                 }
 
                 StyledText {
@@ -67,7 +46,7 @@ Item {
                 text: root.systemModel.displayValue
                 color: Theme.primary
                 font.pixelSize: 28
-                font.weight: Font.DemiBold
+                font.weight: Theme.fontWeightMedium
             }
         }
 
@@ -75,7 +54,12 @@ Item {
             id: levelSlider
 
             width: parent.width
-            height: 40
+            size: "m"
+            insetIcon: root.systemModel.iconName
+            insetIconClickable: root.systemModel.volumeActivity
+            insetIconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
+            Accessible.name: root.systemModel.title
+            onInsetIconClicked: root.systemModel.toggleMute()
             minimum: root.systemModel.minimum
             maximum: Math.max(root.systemModel.minimum + 1, Math.round(root.systemModel.maximum))
             enabled: root.systemModel.available
@@ -87,6 +71,7 @@ Item {
 
             Binding on value {
                 value: Math.round(root.systemModel.value)
+                restoreMode: Binding.RestoreNone
                 when: !levelSlider.isDragging
             }
         }

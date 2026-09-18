@@ -40,15 +40,6 @@ Singleton {
         id: soundsLoader
         active: root.playersRequested && root.soundsAvailable
         source: "AudioSoundPlayers.qml"
-        onLoaded: {
-            item.volume = Qt.binding(() => root.notificationsVolume);
-            item.volumeChangeSource = Qt.binding(() => root.getSoundPath("audio-volume-change"));
-            item.powerPlugSource = Qt.binding(() => root.getSoundPath("power-plug"));
-            item.powerUnplugSource = Qt.binding(() => root.getSoundPath("power-unplug"));
-            item.normalNotificationSource = Qt.binding(() => root.getSoundPath("message"));
-            item.criticalNotificationSource = Qt.binding(() => root.getSoundPath("message-new-instant"));
-            item.loginSource = Qt.binding(() => root.getSoundPath("desktop-login"));
-        }
     }
 
     property var deviceAliases: ({})
@@ -67,6 +58,8 @@ Singleton {
         return SessionData.deviceMaxVolumes[name] ?? 100;
     }
 
+    readonly property int sinkVolumePercent: Math.min(sinkMaxVolume, Math.round((sink?.audio?.volume ?? 0) * 100))
+    readonly property int sourceVolumePercent: Math.round((source?.audio?.volume ?? 0) * 100)
     readonly property int wheelVolumeStep: SettingsData.audioWheelScrollAmount
 
     signal micMuteChanged
@@ -1047,15 +1040,19 @@ EOFCONFIG
         return audio.muted || audio.volume === 0;
     }
 
+    function volumeIcon(volume, muted) {
+        if (muted)
+            return "volume_off";
+        if (volume === 0)
+            return "volume_mute";
+        return volume <= 0.33 ? "volume_down" : "volume_up";
+    }
+
     function volumeIconName(node, noDeviceIcon = "volume_off") {
         const audio = node?.audio;
         if (!audio)
             return noDeviceIcon;
-        if (audio.muted)
-            return "volume_off";
-        if (audio.volume === 0)
-            return "volume_mute";
-        return audio.volume <= 0.33 ? "volume_down" : "volume_up";
+        return volumeIcon(audio.volume, audio.muted);
     }
 
     function sinkIcon(node) {

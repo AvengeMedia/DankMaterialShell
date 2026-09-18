@@ -378,21 +378,6 @@ func TestManager_Unsubscribe(t *testing.T) {
 	assert.False(t, exists)
 }
 
-func TestNewManager(t *testing.T) {
-	t.Run("attempts to create manager", func(t *testing.T) {
-		manager, err := NewManager()
-		if err != nil {
-			assert.Nil(t, manager)
-		} else {
-			assert.NotNil(t, manager)
-			assert.NotNil(t, manager.state)
-			assert.NotNil(t, manager.stopChan)
-
-			manager.Close()
-		}
-	})
-}
-
 func TestManager_GetState_ThreadSafe(t *testing.T) {
 	manager := &Manager{
 		state: &NetworkState{

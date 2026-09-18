@@ -1,14 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modules.DankBar
 import qs.Services
 
-// Renders the bar(s) inside the frame surface in connected mode: one DankBarBody per
-// active bar edge, positioned in the frame's cutout band. Reuses the existing DankBar
-// item (per bar config) as rootWindow so colour-picker, overview loader and widget
-// models are shared with the standalone path.
 Item {
     id: host
 
@@ -17,50 +14,29 @@ Item {
 
     readonly property string screenName: targetScreen ? targetScreen.name : ""
 
-    // Vertical edges first so horizontal bars paint over the corners; row 0 touches the screen edge.
-    readonly property var barSlots: {
-        SettingsData.barConfigs;
-        const out = [];
-        for (const edge of ["left", "right", "top", "bottom"]) {
-            const configs = SettingsData.getFrameHostedBarConfigsForEdge(host.targetScreen, edge);
-            configs.forEach((bc, row) => out.push({
-                    "barId": bc.id,
-                    "edge": edge,
-                    "row": row,
-                    "rowCount": configs.length
-                }));
-        }
-        return out;
+    readonly property var barSlots: ShellLayout.frameKeys(targetScreen)
+
+    ScriptModel {
+        id: slotModel
+        values: host.barSlots
     }
 
     Repeater {
-        model: host.barSlots
+        model: slotModel
 
         delegate: Item {
             id: slot
 
             required property var modelData
 
-            readonly property string edge: modelData.edge
-            readonly property string barId: modelData.barId
-            readonly property var dankBarItem: BarWidgetService.dankBarItems[modelData.barId] ?? null
-            readonly property var slotBarConfig: dankBarItem?.barConfig ?? SettingsData.getBarConfig(modelData.barId)
-            readonly property int edgeInset: {
-                switch (edge) {
-                case "left":
-                    return host.frameWindow.cutoutLeftInset;
-                case "right":
-                    return host.frameWindow.cutoutRightInset;
-                case "bottom":
-                    return host.frameWindow.cutoutBottomInset;
-                default:
-                    return host.frameWindow.cutoutTopInset;
-                }
-            }
-            readonly property int rowThickness: Math.floor(edgeInset / Math.max(1, modelData.rowCount))
-            readonly property int rowOffset: modelData.row * rowThickness
+            readonly property var layoutInstance: ShellLayout.instance(modelData)
+            readonly property string edge: layoutInstance?.edge ?? "top"
+            readonly property string barId: JSON.parse(modelData)[1]
+            readonly property var dankBarItem: BarWidgetService.dankBarItems[slot.barId] ?? null
+            readonly property var slotBarConfig: dankBarItem?.barConfig ?? SettingsData.getBarConfig(slot.barId)
+            readonly property int rowThickness: layoutInstance?.rowThickness ?? 0
+            readonly property int rowOffset: layoutInstance?.rowOffset ?? 0
 
-            // Slots span the full edge like standalone windows; DankBarContent applies the adjacency insets itself.
             x: {
                 switch (edge) {
                 case "left":
@@ -97,8 +73,14 @@ Item {
                     centerWidgetsModel: slot.dankBarItem?.centerWidgetsModel ?? null
                     rightWidgetsModel: slot.dankBarItem?.rightWidgetsModel ?? null
 
-                    Component.onCompleted: BarWidgetService.registerFrameBar(host.screenName, slot.barId, this)
-                    Component.onDestruction: BarWidgetService.unregisterFrameBar(host.screenName, slot.barId, this)
+                    property string registeredScreen: ""
+                    property string registeredBar: ""
+                    Component.onCompleted: {
+                        registeredScreen = host.screenName;
+                        registeredBar = slot.barId;
+                        BarWidgetService.registerFrameBar(registeredScreen, registeredBar, this);
+                    }
+                    Component.onDestruction: BarWidgetService.unregisterFrameBar(registeredScreen, registeredBar, this)
                 }
             }
         }

@@ -8,7 +8,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/qrcode"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 )
@@ -243,7 +243,7 @@ func fatalf(format string, args ...any) {
 }
 
 func fetchWifiQRContent(ssid string) (string, error) {
-	resp, err := sendServerRequest(models.Request{
+	resp, err := sendServerRequest(ipc.Request{
 		ID:     1,
 		Method: "network.qrcode-content",
 		Params: map[string]any{"ssid": ssid},

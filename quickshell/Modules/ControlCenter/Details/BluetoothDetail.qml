@@ -1,129 +1,31 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Bluetooth
 import qs.Common
+import qs.Modules.ControlCenter
+import qs.Modules.ControlCenter.Widgets
+import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
 
-Rectangle {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    implicitHeight: {
-        if (height > 0)
-            return height;
-        if (!BluetoothService.adapter?.enabled)
-            return headerRow.height;
-        return headerRow.height + bluetoothContent.height + Theme.spacingM;
-    }
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
-    focus: true
-
-    property var bluetoothCodecModalRef: null
+    readonly property string title: I18n.tr("Bluetooth")
+    readonly property var adapter: BluetoothService.adapter
+    readonly property bool adapterEnabled: adapter?.enabled ?? false
+    readonly property bool discovering: adapter?.discovering ?? false
+    readonly property var pinnedDevices: QmlUtils.normalizePinList((CacheData.bluetoothDevicePins || {})["preferredDevice"])
     property var devicesBeingPaired: new Set()
 
-    signal showCodecSelector(var device)
-
-    Component.onDestruction: closeTransientSurfaces()
-    onVisibleChanged: {
-        if (!visible)
-            closeTransientSurfaces();
-    }
-
-    Connections {
-        target: PopoutService.controlCenterPopout
-        function onShouldBeVisibleChanged() {
-            const popout = PopoutService.controlCenterPopout;
-            if (!popout || !popout.shouldBeVisible)
-                root.closeTransientSurfaces();
-        }
-    }
-
-    Keys.onPressed: event => {
-        if (event.key !== Qt.Key_Escape)
-            return;
-        if (bluetoothContextMenu.visible) {
-            bluetoothContextMenu.close();
-            event.accepted = true;
-            return;
-        }
-        PopoutService.closeControlCenter();
-        event.accepted = true;
-    }
-
-    function closeTransientSurfaces() {
-        if (bluetoothContextMenu.visible)
-            bluetoothContextMenu.close();
-        if (bluetoothCodecModalRef?.modalVisible)
-            bluetoothCodecModalRef.hide();
-    }
-
-    function isDeviceBeingPaired(deviceAddress) {
-        return devicesBeingPaired.has(deviceAddress);
-    }
-
-    function handlePairDevice(device) {
-        if (!device)
-            return;
-        const deviceAddr = device.address;
-        const pairingSet = devicesBeingPaired;
-
-        pairingSet.add(deviceAddr);
-        devicesBeingPairedChanged();
-
-        BluetoothService.pairDevice(device, function (response) {
-            pairingSet.delete(deviceAddr);
-            devicesBeingPairedChanged();
-
-            if (response.error) {
-                ToastService.showError(I18n.tr("Pairing failed"), response.error);
-                return;
-            }
-            if (!BluetoothService.enhancedPairingAvailable) {
-                ToastService.showSuccess(I18n.tr("Device paired"));
-            }
-        });
-    }
-
-    function updateDeviceCodecDisplay(deviceAddress, codecName) {
-        BluetoothService.updateDeviceCodec(deviceAddress, codecName);
-    }
-
-    function getPinnedDevices() {
-        const pins = CacheData.bluetoothDevicePins || {};
-        return QmlUtils.normalizePinList(pins["preferredDevice"]);
-    }
-
-    Row {
-        id: headerRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.topMargin: Theme.spacingS
-        height: 40
-
-        StyledText {
-            id: headerText
-            text: I18n.tr("Bluetooth Settings")
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.surfaceText
-            font.weight: Font.Medium
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Item {
-            width: Math.max(0, parent.width - headerText.implicitWidth - scanButton.width - Theme.spacingM - (adapterDropdown.visible ? adapterDropdown.width + Theme.spacingS : 0))
-            height: parent.height
-        }
+    readonly property Item headerActions: Row {
+        spacing: Theme.spacingS
 
         DankDropdown {
             id: adapterDropdown
@@ -137,8 +39,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             visible: BluetoothService.adapters.length > 1
             compactMode: true
-            dropdownWidth: 120
-            popupWidth: 200
+            dropdownWidth: CcMetrics.headerDropdownWidth
+            popupWidth: CcMetrics.headerPopupWidth
             alignPopupRight: true
             options: BluetoothService.adapters.map(a => adapterLabel(a))
             currentValue: BluetoothService.adapter ? adapterLabel(BluetoothService.adapter) : ""
@@ -148,641 +50,317 @@ Rectangle {
             }
         }
 
-        Item {
-            width: adapterDropdown.visible ? Theme.spacingS : 0
-            height: parent.height
+        DankButton {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.adapterEnabled
+            buttonHeight: Theme.buttonHeightXS
+            iconName: root.discovering ? "stop" : "bluetooth_searching"
+            iconSize: Theme.iconSizeSmall
+            text: root.discovering ? I18n.tr("Scanning...") : I18n.tr("Scan")
+            backgroundColor: Theme.secondaryContainer
+            textColor: Theme.onSecondaryContainer
+            onClicked: {
+                if (!root.adapter)
+                    return;
+                root.adapter.discovering = !root.adapter.discovering;
+            }
         }
+    }
 
-        Rectangle {
-            id: scanButton
+    signal showCodecSelector(var device)
 
-            readonly property bool adapterEnabled: BluetoothService.adapter?.enabled ?? false
-            readonly property bool isDiscovering: BluetoothService.adapter?.discovering ?? false
+    function dismissTransient() {
+        if (!deviceMenu.open)
+            return false;
+        deviceMenu.close();
+        return true;
+    }
 
-            width: 100
-            height: 36
-            radius: 18
-            color: scanMouseArea.containsMouse && adapterEnabled ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, 0)
-            border.color: adapterEnabled ? Theme.primary : Theme.outlineStrong
-            border.width: 0
-            visible: adapterEnabled
+    readonly property bool controlCenterPopoutVisible: PopoutService.controlCenterPopout?.shouldBeVisible ?? false
 
-            Row {
-                anchors.centerIn: parent
-                spacing: Theme.spacingXS
+    onControlCenterPopoutVisibleChanged: {
+        if (!controlCenterPopoutVisible)
+            deviceMenu.close();
+    }
 
-                DankIcon {
-                    name: scanButton.isDiscovering ? "stop" : "bluetooth_searching"
-                    size: 18
-                    color: scanButton.adapterEnabled ? Theme.primary : Theme.surfaceVariantText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+    function isDeviceBeingPaired(deviceAddress) {
+        return devicesBeingPaired.has(deviceAddress);
+    }
 
-                StyledText {
-                    text: scanButton.isDiscovering ? I18n.tr("Scanning...") : I18n.tr("Scan")
-                    color: scanButton.adapterEnabled ? Theme.primary : Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+    function handlePairDevice(device) {
+        if (!device)
+            return;
+        const deviceAddr = device.address;
+        const pairingSet = devicesBeingPaired;
+        pairingSet.add(deviceAddr);
+        devicesBeingPairedChanged();
+        BluetoothService.pairDevice(device, response => {
+            pairingSet.delete(deviceAddr);
+            devicesBeingPairedChanged();
+            if (response.error) {
+                ToastService.showError(I18n.tr("Pairing failed"), response.error);
+                return;
             }
+            if (!BluetoothService.enhancedPairingAvailable)
+                ToastService.showInfo(I18n.tr("Device paired"));
+        });
+    }
 
-            DankRipple {
-                id: scanRipple
-                cornerRadius: scanButton.radius
-            }
+    function togglePin(address) {
+        CacheData.set("bluetoothDevicePins", QmlUtils.togglePinEntry(CacheData.bluetoothDevicePins, "preferredDevice", address, CcMetrics.maxPins));
+    }
 
-            MouseArea {
-                id: scanMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                enabled: scanButton.adapterEnabled
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onPressed: mouse => scanRipple.trigger(mouse.x, mouse.y)
-                onClicked: {
-                    if (!BluetoothService.adapter)
+    function forgetDevice(device) {
+        if (!BluetoothService.enhancedPairingAvailable) {
+            device.forget();
+            return;
+        }
+        DMSService.bluetoothRemove(BluetoothService.getDevicePath(device), response => {
+            if (!response.error)
+                return;
+            ToastService.showError(I18n.tr("Failed to remove device"), response.error);
+        });
+    }
+
+    function openDeviceMenu(device, anchor) {
+        const connected = device.connected;
+        deviceMenu.items = [
+            {
+                "label": connected ? I18n.tr("Disconnect") : I18n.tr("Connect"),
+                "iconName": connected ? "bluetooth_disabled" : "bluetooth_connected",
+                "action": () => {
+                    if (connected) {
+                        device.disconnect();
                         return;
-                    BluetoothService.adapter.discovering = !BluetoothService.adapter.discovering;
+                    }
+                    BluetoothService.connectDeviceWithTrust(device);
                 }
+            },
+            {
+                "label": I18n.tr("Audio Codec"),
+                "iconName": "graphic_eq",
+                "visible": connected && BluetoothService.isAudioDevice(device),
+                "action": () => root.showCodecSelector(device)
+            },
+            {
+                "label": device.trusted ? I18n.tr("Untrust", "verb, bluetooth device menu action removing trust") : I18n.tr("Trust"),
+                "iconName": device.trusted ? "shield_with_heart" : "verified_user",
+                "action": () => device.trusted = !device.trusted
+            },
+            {
+                "label": I18n.tr("Forget Device"),
+                "iconName": "delete",
+                "destructive": true,
+                "action": () => root.forgetDevice(device)
             }
+        ];
+        deviceMenu.openAt(anchor);
+    }
+
+    ScriptModel {
+        id: pairedDevicesModel
+        objectProp: "address"
+        values: {
+            if (!root.adapter?.devices)
+                return [];
+            const pinnedList = root.pinnedDevices;
+            const devices = [...root.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))];
+            devices.sort((a, b) => {
+                const aPinnedIndex = pinnedList.indexOf(a.address);
+                const bPinnedIndex = pinnedList.indexOf(b.address);
+                if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
+                    if (aPinnedIndex === -1)
+                        return 1;
+                    if (bPinnedIndex === -1)
+                        return -1;
+                    return aPinnedIndex - bPinnedIndex;
+                }
+                if (a.connected !== b.connected)
+                    return a.connected ? -1 : 1;
+                return (b.signalStrength || 0) - (a.signalStrength || 0);
+            });
+            return devices;
+        }
+    }
+
+    ScriptModel {
+        id: availableDevicesModel
+        objectProp: "address"
+        values: {
+            if (!root.discovering || !Bluetooth.devices)
+                return [];
+            const filtered = Bluetooth.devices.values.filter(dev => dev && !dev.paired && !dev.pairing && !dev.blocked && (dev.signalStrength === undefined || dev.signalStrength > 0));
+            return BluetoothService.sortDevices(filtered);
         }
     }
 
     DankFlickable {
-        id: bluetoothContent
-        anchors.top: headerRow.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: Theme.spacingM
-        anchors.topMargin: Theme.spacingM
-        visible: BluetoothService.adapter?.enabled ?? false
-        contentHeight: bluetoothColumn.height
+        anchors.fill: parent
+        contentHeight: column.height
         clip: true
 
-        readonly property int maxPinnedDevices: 3
-
         Column {
-            id: bluetoothColumn
+            id: column
             width: parent.width
-            spacing: Theme.spacingS
+            spacing: Theme.spacingM
 
-            ScriptModel {
-                id: pairedDevicesModel
-                objectProp: "address"
-                values: {
-                    if (!BluetoothService.adapter?.devices)
-                        return [];
-
-                    const pinnedList = root.getPinnedDevices();
-                    const devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))];
-
-                    devices.sort((a, b) => {
-                        const aPinnedIndex = pinnedList.indexOf(a.address);
-                        const bPinnedIndex = pinnedList.indexOf(b.address);
-
-                        if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
-                            if (aPinnedIndex === -1)
-                                return 1;
-                            if (bPinnedIndex === -1)
-                                return -1;
-                            return aPinnedIndex - bPinnedIndex;
-                        }
-
-                        if (a.connected !== b.connected)
-                            return a.connected ? -1 : 1;
-
-                        return (b.signalStrength || 0) - (a.signalStrength || 0);
-                    });
-
-                    return devices;
+            CcGroup {
+                CcToggleRow {
+                    iconName: "bluetooth"
+                    iconColor: root.adapterEnabled ? Theme.primary : Theme.surfaceText
+                    text: I18n.tr("Bluetooth")
+                    description: root.adapter ? (root.adapter.name || root.adapter.adapterId) : I18n.tr("No Bluetooth adapter found")
+                    checked: root.adapterEnabled
+                    enabled: !!root.adapter
+                    onToggled: BluetoothService.toggleBluetooth()
                 }
             }
 
-            Repeater {
-                id: pairedRepeater
-                model: pairedDevicesModel
+            SettingsSectionLabel {
+                text: I18n.tr("Paired", "adjective, bluetooth paired devices section label and device status")
+                visible: pairedGroup.visible
+            }
 
-                delegate: Rectangle {
-                    id: pairedDelegate
-                    required property var modelData
-                    required property int index
+            CcGroup {
+                id: pairedGroup
+                visible: root.adapterEnabled && pairedRepeater.count > 0
 
-                    readonly property string currentCodec: {
-                        const codecs = BluetoothService.deviceCodecs;
-                        return codecs[modelData.address] || "";
-                    }
-                    readonly property bool isConnecting: modelData.state === BluetoothDeviceState.Connecting
-                    readonly property bool isConnected: modelData.connected
-                    readonly property bool isPinned: root.getPinnedDevices().includes(modelData.address)
-                    readonly property string deviceName: modelData.name || modelData.deviceName || I18n.tr("Unknown Device")
+                Repeater {
+                    id: pairedRepeater
+                    model: pairedDevicesModel
 
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
+                    CcListRow {
+                        id: pairedRow
 
-                    Component.onCompleted: {
-                        if (!isConnected)
-                            return;
-                        if (!BluetoothService.isAudioDevice(modelData))
-                            return;
-                        BluetoothService.refreshDeviceCodec(modelData);
-                    }
+                        required property var modelData
 
-                    color: {
-                        if (isConnecting)
-                            return Theme.warningHover;
-                        if (deviceMouseArea.containsMouse)
-                            return Theme.primaryHoverLight;
-                        return Theme.surfaceLight;
-                    }
-
-                    border.color: {
-                        if (isConnecting)
-                            return Theme.warning;
-                        if (isConnected)
-                            return Theme.primary;
-                        return Theme.outlineLight;
-                    }
-                    border.width: (isConnecting || isConnected) ? 2 : 1
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: BluetoothService.getDeviceIcon(pairedDelegate.modelData)
-                            size: Theme.iconSize - 4
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: {
-                                if (pairedDelegate.isConnecting)
-                                    return Theme.warning;
-                                if (pairedDelegate.isConnected)
-                                    return Theme.primary;
-                                return Theme.surfaceText;
-                            }
+                        readonly property string currentCodec: BluetoothService.deviceCodecs[modelData.address] || ""
+                        readonly property bool isConnecting: modelData.state === BluetoothDeviceState.Connecting
+                        readonly property bool isConnected: modelData.connected
+                        readonly property string deviceName: modelData.name || modelData.deviceName || I18n.tr("Unknown Device")
+                        readonly property string batteryText: {
+                            if (modelData.batteryAvailable)
+                                return Math.round(modelData.battery * 100) + "%";
+                            const lowered = deviceName.toLowerCase();
+                            const btBattery = BatteryService.bluetoothDevices.find(dev => dev.name === deviceName || dev.name.toLowerCase().includes(lowered) || lowered.includes(dev.name.toLowerCase()));
+                            return btBattery ? btBattery.percentage + "%" : "";
                         }
 
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 200
-
-                            StyledText {
-                                text: pairedDelegate.deviceName
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: pairedDelegate.isConnected ? Font.Medium : Font.Normal
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            Row {
-                                spacing: Theme.spacingXS
-
-                                StyledText {
-                                    text: {
-                                        if (pairedDelegate.isConnecting)
-                                            return I18n.tr("Connecting...");
-                                        if (!pairedDelegate.isConnected)
-                                            return I18n.tr("Paired");
-                                        if (!pairedDelegate.currentCodec)
-                                            return I18n.tr("Connected");
-                                        return I18n.tr("Connected") + " • " + pairedDelegate.currentCodec;
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: pairedDelegate.isConnecting ? Theme.warning : Theme.surfaceVariantText
-                                }
-
-                                StyledText {
-                                    readonly property var btBattery: {
-                                        const name = pairedDelegate.deviceName;
-                                        return BatteryService.bluetoothDevices.find(dev => dev.name === name || dev.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(dev.name.toLowerCase()));
-                                    }
-                                    text: {
-                                        // A reported 0% is valid; batteryAvailable distinguishes missing data.
-                                        // https://quickshell.org/docs/v0.3.1/types/Quickshell.Bluetooth/BluetoothDevice/
-                                        // https://bluez.readthedocs.io/en/latest/battery-api/
-                                        if (pairedDelegate.modelData.batteryAvailable)
-                                            return "• " + Math.round(pairedDelegate.modelData.battery * 100) + "%";
-                                        if (btBattery)
-                                            return "• " + btBattery.percentage + "%";
-                                        return "";
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    visible: text.length > 0
-                                }
-
-                                StyledText {
-                                    text: pairedDelegate.modelData.signalStrength > 0 ? "• " + pairedDelegate.modelData.signalStrength + "%" : ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    visible: text.length > 0
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.right: pairedOptionsButton.left
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: pinBluetoothRow.width + Theme.spacingS * 2
-                        height: 28
-                        radius: height / 2
-                        color: pairedDelegate.isPinned ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceText, 0.05)
-
-                        Row {
-                            id: pinBluetoothRow
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-
-                            DankIcon {
-                                name: "push_pin"
-                                size: 16
-                                color: pairedDelegate.isPinned ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: pairedDelegate.isPinned ? I18n.tr("Pinned") : I18n.tr("Pin")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: pairedDelegate.isPinned ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                        Component.onCompleted: {
+                            if (!isConnected || !BluetoothService.isAudioDevice(modelData))
+                                return;
+                            BluetoothService.refreshDeviceCodec(modelData);
                         }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                const pins = JSON.parse(JSON.stringify(CacheData.bluetoothDevicePins || {}));
-                                let pinnedList = QmlUtils.normalizePinList(pins["preferredDevice"]);
-                                const pinIndex = pinnedList.indexOf(pairedDelegate.modelData.address);
-
-                                if (pinIndex !== -1) {
-                                    pinnedList.splice(pinIndex, 1);
-                                } else {
-                                    pinnedList.unshift(pairedDelegate.modelData.address);
-                                    if (pinnedList.length > bluetoothContent.maxPinnedDevices)
-                                        pinnedList = pinnedList.slice(0, bluetoothContent.maxPinnedDevices);
-                                }
-
-                                if (pinnedList.length > 0) {
-                                    pins["preferredDevice"] = pinnedList;
-                                } else {
-                                    delete pins["preferredDevice"];
-                                }
-
-                                CacheData.set("bluetoothDevicePins", pins);
-                            }
+                        iconName: BluetoothService.getDeviceIcon(modelData)
+                        iconColor: {
+                            if (isConnecting)
+                                return Theme.warning;
+                            return isConnected ? Theme.primary : Theme.surfaceText;
                         }
-                    }
-
-                    DankActionButton {
-                        id: pairedOptionsButton
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        iconName: "more_horiz"
-                        buttonSize: 28
+                        active: isConnected
+                        title: deviceName
+                        subtitle: {
+                            if (isConnecting)
+                                return I18n.tr("Connecting...");
+                            const parts = [isConnected ? I18n.tr("Connected") : I18n.tr("Paired")];
+                            if (isConnected && currentCodec)
+                                parts.push(currentCodec);
+                            if (batteryText)
+                                parts.push(batteryText);
+                            if (modelData.signalStrength > 0)
+                                parts.push(modelData.signalStrength + "%");
+                            return parts.join(" • ");
+                        }
+                        subtitleColor: isConnecting ? Theme.warning : Theme.surfaceVariantText
+                        clickable: true
                         onClicked: {
-                            if (bluetoothContextMenu.visible) {
-                                bluetoothContextMenu.close();
+                            if (isConnected) {
+                                modelData.disconnect();
                                 return;
                             }
-                            bluetoothContextMenu.currentDevice = pairedDelegate.modelData;
-                            bluetoothContextMenu.popup(pairedOptionsButton, -bluetoothContextMenu.width + pairedOptionsButton.width, pairedOptionsButton.height + Theme.spacingXS);
+                            BluetoothService.connectDeviceWithTrust(modelData);
                         }
-                    }
 
-                    DankRipple {
-                        id: deviceRipple
-                        cornerRadius: pairedDelegate.radius
-                    }
-
-                    MouseArea {
-                        id: deviceMouseArea
-                        anchors.fill: parent
-                        anchors.rightMargin: pairedOptionsButton.width + Theme.spacingM + pinBluetoothRow.width + Theme.spacingS * 4
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: mouse => {
-                            const pos = mapToItem(pairedDelegate, mouse.x, mouse.y);
-                            deviceRipple.trigger(pos.x, pos.y);
-                        }
-                        onClicked: {
-                            if (pairedDelegate.isConnected) {
-                                pairedDelegate.modelData.disconnect();
-                                return;
-                            }
-                            BluetoothService.connectDeviceWithTrust(pairedDelegate.modelData);
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outlineStrong
-                visible: pairedRepeater.count > 0 && availableRepeater.count > 0
-            }
-
-            Item {
-                width: parent.width
-                height: 80
-                visible: (BluetoothService.adapter?.discovering ?? false) && availableRepeater.count === 0
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "sync"
-                    size: 24
-                    color: Theme.onSurface_38
-                    smoothTransform: BluetoothService.adapter?.discovering ?? false
-
-                    RotationAnimator on rotation {
-                        running: parent.visible
-                        loops: Animation.Infinite
-                        from: 0
-                        to: 360
-                        duration: 1500
-                    }
-                }
-            }
-
-            ScriptModel {
-                id: availableDevicesModel
-                objectProp: "address"
-                values: {
-                    if (!BluetoothService.adapter?.discovering)
-                        return [];
-                    if (!Bluetooth.devices)
-                        return [];
-
-                    const filtered = Bluetooth.devices.values.filter(dev => dev && !dev.paired && !dev.pairing && !dev.blocked && (dev.signalStrength === undefined || dev.signalStrength > 0));
-                    return BluetoothService.sortDevices(filtered);
-                }
-            }
-
-            Repeater {
-                id: availableRepeater
-                model: availableDevicesModel
-
-                delegate: Rectangle {
-                    id: availableDelegate
-                    required property var modelData
-                    required property int index
-
-                    readonly property bool canConnect: BluetoothService.canConnect(modelData)
-                    readonly property bool isBusy: BluetoothService.isDeviceBusy(modelData) || root.isDeviceBeingPaired(modelData.address)
-                    readonly property bool isInteractive: canConnect && !isBusy
-                    readonly property string deviceName: modelData.name || modelData.deviceName || I18n.tr("Unknown Device")
-
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: availableMouseArea.containsMouse && isInteractive ? Theme.primaryHoverLight : Theme.surfaceLight
-                    border.color: Theme.outlineLight
-                    border.width: 1
-                    opacity: isInteractive ? 1 : 0.6
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        spacing: Theme.spacingS
-
-                        DankIcon {
-                            name: BluetoothService.getDeviceIcon(availableDelegate.modelData)
-                            size: Theme.iconSize - 4
-                            color: Theme.surfaceText
+                        CcPinChip {
                             anchors.verticalCenter: parent.verticalCenter
+                            pinned: root.pinnedDevices.includes(pairedRow.modelData.address)
+                            onToggled: root.togglePin(pairedRow.modelData.address)
                         }
 
-                        Column {
+                        DankActionButton {
+                            id: optionsButton
                             anchors.verticalCenter: parent.verticalCenter
-                            width: 200
-
-                            StyledText {
-                                text: availableDelegate.deviceName
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            Row {
-                                spacing: Theme.spacingXS
-
-                                StyledText {
-                                    text: {
-                                        if (availableDelegate.modelData.pairing || availableDelegate.isBusy)
-                                            return I18n.tr("Pairing...");
-                                        if (availableDelegate.modelData.blocked)
-                                            return I18n.tr("Blocked");
-                                        return BluetoothService.getSignalStrength(availableDelegate.modelData);
-                                    }
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                }
-
-                                StyledText {
-                                    text: availableDelegate.modelData.signalStrength > 0 ? "• " + availableDelegate.modelData.signalStrength + "%" : ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    visible: text.length > 0 && !availableDelegate.modelData.pairing && !availableDelegate.modelData.blocked
-                                }
-                            }
+                            buttonSize: Theme.buttonHeightXS
+                            iconSize: Theme.iconSizeMedium
+                            iconName: "more_horiz"
+                            Accessible.name: I18n.tr("Options")
+                            iconColor: Theme.surfaceText
+                            onClicked: root.openDeviceMenu(pairedRow.modelData, optionsButton)
                         }
                     }
+                }
+            }
 
-                    StyledText {
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: {
-                            if (availableDelegate.isBusy)
+            CcEmptyState {
+                visible: root.adapterEnabled && root.discovering && availableRepeater.count === 0
+                spinning: true
+                title: I18n.tr("Scanning...")
+            }
+
+            SettingsSectionLabel {
+                text: I18n.tr("Available")
+                visible: availableGroup.visible
+            }
+
+            CcGroup {
+                id: availableGroup
+                visible: root.adapterEnabled && availableRepeater.count > 0
+
+                Repeater {
+                    id: availableRepeater
+                    model: availableDevicesModel
+
+                    CcListRow {
+                        required property var modelData
+
+                        readonly property bool canConnect: BluetoothService.canConnect(modelData)
+                        readonly property bool isBusy: BluetoothService.isDeviceBusy(modelData) || root.isDeviceBeingPaired(modelData.address)
+                        readonly property bool isInteractive: canConnect && !isBusy
+
+                        iconName: BluetoothService.getDeviceIcon(modelData)
+                        title: modelData.name || modelData.deviceName || I18n.tr("Unknown Device")
+                        subtitle: {
+                            if (modelData.pairing || isBusy)
+                                return I18n.tr("Pairing...", "bluetooth device status while pairing is in progress");
+                            if (modelData.blocked)
+                                return I18n.tr("Blocked", "adjective, bluetooth device status");
+                            const signal = BluetoothService.getSignalStrength(modelData);
+                            return modelData.signalStrength > 0 ? signal + " • " + modelData.signalStrength + "%" : signal;
+                        }
+                        trailingBadge: {
+                            if (isBusy)
                                 return I18n.tr("Pairing...");
-                            if (!availableDelegate.canConnect)
-                                return I18n.tr("Cannot pair");
-                            return I18n.tr("Pair");
+                            return canConnect ? I18n.tr("Pair") : I18n.tr("Cannot pair");
                         }
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: availableDelegate.isInteractive ? Theme.primary : Theme.surfaceVariantText
-                        font.weight: Font.Medium
-                    }
-
-                    DankRipple {
-                        id: availableRipple
-                        cornerRadius: availableDelegate.radius
-                    }
-
-                    MouseArea {
-                        id: availableMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: availableDelegate.isInteractive ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        enabled: availableDelegate.isInteractive
-                        onPressed: mouse => availableRipple.trigger(mouse.x, mouse.y)
-                        onClicked: root.handlePairDevice(availableDelegate.modelData)
+                        trailingBadgeColor: isInteractive ? Theme.primary : Theme.surfaceVariantText
+                        enabled: isInteractive
+                        clickable: true
+                        onClicked: root.handlePairDevice(modelData)
                     }
                 }
             }
 
-            Item {
-                width: parent.width
-                height: 60
-                visible: !BluetoothService.adapter
-
-                StyledText {
-                    anchors.centerIn: parent
-                    text: I18n.tr("No Bluetooth adapter found")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceVariantText
-                }
+            CcEmptyState {
+                visible: !root.adapter
+                iconName: "bluetooth_disabled"
+                title: I18n.tr("No Bluetooth adapter found")
             }
         }
     }
 
-    Menu {
-        id: bluetoothContextMenu
-        width: 150
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-        onClosed: Qt.callLater(() => root.forceActiveFocus())
-
-        property var currentDevice: null
-
-        readonly property bool hasDevice: currentDevice !== null
-        readonly property bool deviceConnected: currentDevice?.connected ?? false
-        readonly property bool showCodecOption: hasDevice && deviceConnected && BluetoothService.isAudioDevice(currentDevice)
-
-        background: Rectangle {
-            color: Theme.withAlpha(Theme.surfaceContainer, BlurService.enabled ? 0.96 : Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.width: BlurService.enabled ? BlurService.borderWidth : 0
-            border.color: BlurService.enabled ? BlurService.borderColor : Theme.outlineStrong
-        }
-
-        MenuItem {
-            text: bluetoothContextMenu.deviceConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
-            height: 32
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                if (!bluetoothContextMenu.hasDevice)
-                    return;
-                if (bluetoothContextMenu.deviceConnected) {
-                    bluetoothContextMenu.currentDevice.disconnect();
-                    return;
-                }
-                BluetoothService.connectDeviceWithTrust(bluetoothContextMenu.currentDevice);
-            }
-        }
-
-        MenuItem {
-            text: I18n.tr("Audio Codec")
-            height: bluetoothContextMenu.showCodecOption ? 32 : 0
-            visible: bluetoothContextMenu.showCodecOption
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                if (!bluetoothContextMenu.hasDevice)
-                    return;
-                if (!bluetoothContextMenu.currentDevice.connected)
-                    return;
-                if (!BluetoothService.isAudioDevice(bluetoothContextMenu.currentDevice))
-                    return;
-                showCodecSelector(bluetoothContextMenu.currentDevice);
-            }
-        }
-
-        MenuItem {
-            text: bluetoothContextMenu.currentDevice?.trusted ? I18n.tr("Untrust") : I18n.tr("Trust")
-            height: 32
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                if (!bluetoothContextMenu.hasDevice)
-                    return;
-                bluetoothContextMenu.currentDevice.trusted = !bluetoothContextMenu.currentDevice.trusted;
-            }
-        }
-
-        MenuItem {
-            text: I18n.tr("Forget Device")
-            height: 32
-
-            contentItem: StyledText {
-                text: parent.text
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.error
-                leftPadding: Theme.spacingS
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-                radius: Theme.cornerRadius / 2
-            }
-
-            onTriggered: {
-                if (!bluetoothContextMenu.hasDevice)
-                    return;
-                if (!BluetoothService.enhancedPairingAvailable) {
-                    bluetoothContextMenu.currentDevice.forget();
-                    return;
-                }
-
-                const devicePath = BluetoothService.getDevicePath(bluetoothContextMenu.currentDevice);
-                DMSService.bluetoothRemove(devicePath, response => {
-                    if (!response.error)
-                        return;
-                    ToastService.showError(I18n.tr("Failed to remove device"), response.error);
-                });
-            }
-        }
+    CcMenu {
+        id: deviceMenu
     }
 
     Connections {
@@ -790,9 +368,7 @@ Rectangle {
 
         function onBluetoothPairingRequest(data) {
             const modal = PopoutService.ensureBluetoothPairingModal();
-            if (!modal)
-                return;
-            if (modal.token === data.token)
+            if (!modal || modal.token === data.token)
                 return;
             modal.show(data);
         }

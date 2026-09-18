@@ -14,7 +14,7 @@ PluginSettings {
         width: parent.width
         text: I18n.trFor("exampleEmojiPlugin", "Emoji Cycler Settings")
         font.pixelSize: Theme.fontSizeLarge
-        font.weight: Font.Bold
+        font.weight: Theme.fontWeightMedium
         color: Theme.surfaceText
     }
 
@@ -86,7 +86,7 @@ PluginSettings {
         minimum: 500
         maximum: 10000
         unit: "ms"
-        leftIcon: "schedule"
+        startIcon: "schedule"
     }
 
     // Slider to control max emojis shown in the bar
@@ -98,7 +98,7 @@ PluginSettings {
         minimum: 1
         maximum: 8
         unit: ""
-        rightIcon: "emoji_emotions"
+        endIcon: "emoji_emotions"
     }
 
     StyledText {

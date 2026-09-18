@@ -43,9 +43,4 @@ Singleton {
         SessionData.resetGreeterSessionBaseDir();
         GreetdSettings.resetConfigBaseDir();
     }
-
-    readonly property string activeWallpaperOverridePath: {
-        const base = activeUsername && typeof GreeterUsersService !== "undefined" && GreeterUsersService.hasSyncedTheme(activeUsername) ? userCacheDir(activeUsername) : greetCfgDir;
-        return base ? base + "/greeter_wallpaper_override.jpg" : "";
-    }
 }

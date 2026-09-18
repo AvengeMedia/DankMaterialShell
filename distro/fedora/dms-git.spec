@@ -139,7 +139,7 @@ install -Dm644 assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.servic
 install -Dm644 assets/dms-open.desktop %{buildroot}%{_datadir}/applications/dms-open.desktop
 install -Dm644 assets/com.danklinux.dms.desktop %{buildroot}%{_datadir}/applications/com.danklinux.dms.desktop
 install -Dm644 assets/com.danklinux.dms.notepad.desktop %{buildroot}%{_datadir}/applications/com.danklinux.dms.notepad.desktop
-install -Dm644 assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
+install -Dm644 assets/com.danklinux.dms.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/com.danklinux.dms.svg
 
 %posttrans
 # Signal running DMS instances to reload
@@ -153,7 +153,7 @@ pkill -USR1 -x dms >/dev/null 2>&1 || :
 %{_datadir}/applications/dms-open.desktop
 %{_datadir}/applications/com.danklinux.dms.desktop
 %{_datadir}/applications/com.danklinux.dms.notepad.desktop
-%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
+%{_datadir}/icons/hicolor/scalable/apps/com.danklinux.dms.svg
 
 %files -n dms-cli
 %{_bindir}/dms

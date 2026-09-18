@@ -6,77 +6,27 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-Column {
+DesktopWidgetInstanceSettings {
     id: root
 
-    property string instanceId: ""
-    property var instanceData: null
-
-    readonly property var cfg: instanceData?.config ?? {}
-
-    function updateConfig(key, value) {
-        if (!instanceId)
-            return;
-        var updates = {};
-        updates[key] = value;
-        SettingsData.updateDesktopWidgetInstanceConfig(instanceId, updates);
-    }
-
-    width: parent?.width ?? 400
-    spacing: 0
-
     SettingsToggleRow {
-        text: I18n.tr("Show Header")
-        checked: cfg.showHeader ?? true
+        text: I18n.tr("Show header")
+        checked: root.cfg.showHeader ?? true
         onToggled: checked => root.updateConfig("showHeader", checked)
     }
 
     SettingsDivider {}
 
-    Item {
-        width: parent.width
-        height: graphIntervalColumn.height + Theme.spacingM * 2
-
-        Column {
-            id: graphIntervalColumn
-            width: parent.width - Theme.spacingM * 2
-            x: Theme.spacingM
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingS
-
-            StyledText {
-                text: I18n.tr("Graph Time Range")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-            }
-
-            DankButtonGroup {
-                model: ["1m", "5m", "10m", "30m"]
-                currentIndex: {
-                    switch (cfg.graphInterval ?? 60) {
-                    case 60:
-                        return 0;
-                    case 300:
-                        return 1;
-                    case 600:
-                        return 2;
-                    case 1800:
-                        return 3;
-                    default:
-                        return 0;
-                    }
-                }
-                buttonHeight: 32
-                minButtonWidth: 48
-                textSize: Theme.fontSizeSmall
-                checkEnabled: false
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    const values = [60, 300, 600, 1800];
-                    root.updateConfig("graphInterval", values[index]);
-                }
-            }
+    SettingsButtonGroupRow {
+        readonly property var intervals: [60, 300, 600, 1800]
+        text: I18n.tr("Graph time range")
+        model: ["1m", "5m", "10m", "30m"]
+        currentIndex: Math.max(0, intervals.indexOf(root.cfg.graphInterval ?? 60))
+        checkEnabled: false
+        onSelectionChanged: (index, selected) => {
+            if (!selected)
+                return;
+            root.updateConfig("graphInterval", intervals[index]);
         }
     }
 
@@ -84,48 +34,48 @@ Column {
 
     SettingsToggleRow {
         text: I18n.tr("CPU")
-        checked: cfg.showCpu ?? true
+        checked: root.cfg.showCpu ?? true
         onToggled: checked => root.updateConfig("showCpu", checked)
     }
 
     SettingsDivider {
-        visible: cfg.showCpu ?? true
+        visible: root.cfg.showCpu ?? true
     }
 
     SettingsToggleRow {
-        visible: cfg.showCpu ?? true
-        text: I18n.tr("CPU Graph")
-        checked: cfg.showCpuGraph ?? true
+        enabled: root.cfg.showCpu ?? true
+        text: I18n.tr("CPU graph")
+        checked: root.cfg.showCpuGraph ?? true
         onToggled: checked => root.updateConfig("showCpuGraph", checked)
     }
 
     SettingsDivider {
-        visible: cfg.showCpu ?? true
+        visible: root.cfg.showCpu ?? true
     }
 
     SettingsToggleRow {
-        visible: cfg.showCpu ?? true
-        text: I18n.tr("CPU Temperature")
-        checked: cfg.showCpuTemp ?? true
+        enabled: root.cfg.showCpu ?? true
+        text: I18n.tr("CPU temperature")
+        checked: root.cfg.showCpuTemp ?? true
         onToggled: checked => root.updateConfig("showCpuTemp", checked)
     }
 
     SettingsDivider {}
 
     SettingsToggleRow {
-        text: I18n.tr("GPU Temperature")
-        checked: cfg.showGpuTemp ?? false
+        text: I18n.tr("GPU temperature")
+        checked: root.cfg.showGpuTemp ?? false
         onToggled: checked => root.updateConfig("showGpuTemp", checked)
     }
 
     SettingsDivider {
-        visible: (cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
+        visible: (root.cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
     }
 
     Item {
         width: parent.width
         height: gpuSelectColumn.height + Theme.spacingM * 2
-        visible: (cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
+        visible: (root.cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
 
         Column {
             id: gpuSelectColumn
@@ -135,7 +85,7 @@ Column {
             spacing: Theme.spacingS
 
             StyledText {
-                text: I18n.tr("GPU")
+                text: I18n.tr("GPU", "graphics processor label in system monitor")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
             }
@@ -150,14 +100,14 @@ Column {
                     Rectangle {
                         required property var modelData
 
-                        readonly property bool isSelected: (cfg.gpuPciId ?? "") === modelData.pciId
+                        readonly property bool isSelected: (root.cfg.gpuPciId ?? "") === modelData.pciId
 
                         width: parent.width
                         height: 44
                         radius: Theme.cornerRadius
                         color: isSelected ? Theme.primarySelected : Theme.surfaceHover
                         border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                        border.width: 2
+                        border.width: Theme.outlineWidthFocused
 
                         Row {
                             anchors.fill: parent
@@ -208,18 +158,18 @@ Column {
 
     SettingsToggleRow {
         text: I18n.tr("Memory")
-        checked: cfg.showMemory ?? true
+        checked: root.cfg.showMemory ?? true
         onToggled: checked => root.updateConfig("showMemory", checked)
     }
 
     SettingsDivider {
-        visible: cfg.showMemory ?? true
+        visible: root.cfg.showMemory ?? true
     }
 
     SettingsToggleRow {
-        visible: cfg.showMemory ?? true
-        text: I18n.tr("Memory Graph")
-        checked: cfg.showMemoryGraph ?? true
+        enabled: root.cfg.showMemory ?? true
+        text: I18n.tr("Memory graph")
+        checked: root.cfg.showMemoryGraph ?? true
         onToggled: checked => root.updateConfig("showMemoryGraph", checked)
     }
 
@@ -227,18 +177,18 @@ Column {
 
     SettingsToggleRow {
         text: I18n.tr("Network")
-        checked: cfg.showNetwork ?? true
+        checked: root.cfg.showNetwork ?? true
         onToggled: checked => root.updateConfig("showNetwork", checked)
     }
 
     SettingsDivider {
-        visible: cfg.showNetwork ?? true
+        visible: root.cfg.showNetwork ?? true
     }
 
     SettingsToggleRow {
-        visible: cfg.showNetwork ?? true
-        text: I18n.tr("Network Graph")
-        checked: cfg.showNetworkGraph ?? true
+        enabled: root.cfg.showNetwork ?? true
+        text: I18n.tr("Network graph")
+        checked: root.cfg.showNetworkGraph ?? true
         onToggled: checked => root.updateConfig("showNetworkGraph", checked)
     }
 
@@ -246,101 +196,50 @@ Column {
 
     SettingsToggleRow {
         text: I18n.tr("Disk")
-        checked: cfg.showDisk ?? true
+        checked: root.cfg.showDisk ?? true
         onToggled: checked => root.updateConfig("showDisk", checked)
     }
 
     SettingsDivider {}
 
     SettingsToggleRow {
-        text: I18n.tr("Top Processes")
-        checked: cfg.showTopProcesses ?? false
+        text: I18n.tr("Top processes")
+        checked: root.cfg.showTopProcesses ?? false
         onToggled: checked => root.updateConfig("showTopProcesses", checked)
     }
 
     SettingsDivider {
-        visible: cfg.showTopProcesses ?? false
+        visible: root.cfg.showTopProcesses ?? false
     }
 
-    Item {
-        width: parent.width
-        height: topProcessesColumn.height + Theme.spacingM * 2
-        visible: cfg.showTopProcesses ?? false
+    SettingsButtonGroupRow {
+        readonly property var counts: [3, 5, 10]
+        visible: root.cfg.showTopProcesses ?? false
+        text: I18n.tr("Process count")
+        model: counts.map(count => String(count))
+        currentIndex: Math.max(0, counts.indexOf(root.cfg.topProcessCount ?? 3))
+        checkEnabled: false
+        onSelectionChanged: (index, selected) => {
+            if (!selected)
+                return;
+            root.updateConfig("topProcessCount", counts[index]);
+        }
+    }
 
-        Column {
-            id: topProcessesColumn
-            width: parent.width - Theme.spacingM * 2
-            x: Theme.spacingM
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingM
+    SettingsDivider {
+        visible: root.cfg.showTopProcesses ?? false
+    }
 
-            Row {
-                width: parent.width
-                spacing: Theme.spacingM
-
-                StyledText {
-                    width: parent.width - processCountButtons.width - Theme.spacingM
-                    text: I18n.tr("Process Count")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                DankButtonGroup {
-                    id: processCountButtons
-                    model: ["3", "5", "10"]
-                    currentIndex: {
-                        switch (cfg.topProcessCount ?? 3) {
-                        case 3:
-                            return 0;
-                        case 5:
-                            return 1;
-                        case 10:
-                            return 2;
-                        default:
-                            return 0;
-                        }
-                    }
-                    buttonHeight: 32
-                    minButtonWidth: 36
-                    textSize: Theme.fontSizeSmall
-                    checkEnabled: false
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        const values = [3, 5, 10];
-                        root.updateConfig("topProcessCount", values[index]);
-                    }
-                }
-            }
-
-            Row {
-                width: parent.width
-                spacing: Theme.spacingM
-
-                StyledText {
-                    width: parent.width - sortByButtons.width - Theme.spacingM
-                    text: I18n.tr("Sort By")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                DankButtonGroup {
-                    id: sortByButtons
-                    model: ["CPU", "MEM"]
-                    currentIndex: (cfg.topProcessSortBy ?? "cpu") === "cpu" ? 0 : 1
-                    buttonHeight: 32
-                    minButtonWidth: 48
-                    textSize: Theme.fontSizeSmall
-                    checkEnabled: false
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        root.updateConfig("topProcessSortBy", index === 0 ? "cpu" : "memory");
-                    }
-                }
-            }
+    SettingsButtonGroupRow {
+        visible: root.cfg.showTopProcesses ?? false
+        text: I18n.tr("Sort by")
+        model: ["CPU", "MEM"]
+        currentIndex: (root.cfg.topProcessSortBy ?? "cpu") === "cpu" ? 0 : 1
+        checkEnabled: false
+        onSelectionChanged: (index, selected) => {
+            if (!selected)
+                return;
+            root.updateConfig("topProcessSortBy", index === 0 ? "cpu" : "memory");
         }
     }
 
@@ -350,7 +249,7 @@ Column {
         text: I18n.tr("Layout")
         options: [I18n.tr("Auto"), I18n.tr("Grid"), I18n.tr("List")]
         currentValue: {
-            switch (cfg.layoutMode ?? "auto") {
+            switch (root.cfg.layoutMode ?? "auto") {
             case "grid":
                 return I18n.tr("Grid");
             case "list":
@@ -369,75 +268,6 @@ Column {
                 return;
             default:
                 root.updateConfig("layoutMode", "auto");
-            }
-        }
-    }
-
-    SettingsDivider {}
-
-    SettingsSliderRow {
-        text: I18n.tr("Transparency")
-        minimum: 0
-        maximum: 100
-        value: Math.round((cfg.transparency ?? 0.8) * 100)
-        unit: "%"
-        onSliderValueChanged: newValue => root.updateConfig("transparency", newValue / 100)
-    }
-
-    SettingsDivider {}
-
-    SettingsColorPicker {
-        colorMode: cfg.colorMode ?? "primary"
-        customColor: cfg.customColor ?? "#ffffff"
-        onColorModeSelected: mode => root.updateConfig("colorMode", mode)
-        onCustomColorSelected: selectedColor => root.updateConfig("customColor", selectedColor.toString())
-    }
-
-    SettingsDivider {}
-
-    SettingsDisplayPicker {
-        displayPreferences: cfg.displayPreferences ?? ["all"]
-        onPreferencesChanged: prefs => root.updateConfig("displayPreferences", prefs)
-    }
-
-    SettingsDivider {}
-
-    Item {
-        width: parent.width
-        height: resetRow.height + Theme.spacingM * 2
-
-        Row {
-            id: resetRow
-            x: Theme.spacingM
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingM
-
-            DankButton {
-                text: I18n.tr("Reset Position")
-                backgroundColor: Theme.surfaceHover
-                textColor: Theme.surfaceText
-                buttonHeight: 36
-                onClicked: {
-                    if (!root.instanceId)
-                        return;
-                    SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                        positions: {}
-                    });
-                }
-            }
-
-            DankButton {
-                text: I18n.tr("Reset Size")
-                backgroundColor: Theme.surfaceHover
-                textColor: Theme.surfaceText
-                buttonHeight: 36
-                onClicked: {
-                    if (!root.instanceId)
-                        return;
-                    SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                        positions: {}
-                    });
-                }
             }
         }
     }

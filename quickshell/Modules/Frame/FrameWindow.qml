@@ -21,7 +21,9 @@ PanelWindow {
     updatesEnabled: win._frameVisible
 
     WlrLayershell.namespace: "dms:frame"
-    WlrLayershell.layer: win._usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top
+    readonly property bool _dockEditActive: frameDockHostLoader.item?.editActive ?? false
+    WlrLayershell.layer: win._usesOverlayLayer || win._dockEditActive ? WlrLayer.Overlay : WlrLayer.Top
+    WlrLayershell.keyboardFocus: win._dockEditActive ? WlrKeyboardFocus.Exclusive : frameDockHostLoader.item?.interactionActive ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
     anchors {
@@ -32,8 +34,14 @@ PanelWindow {
     }
 
     color: "transparent"
-    // Click-through everywhere except the frame gutters and hosted bar strips.
+    // Click-through everywhere except the frame gutters and hosted bar strips. Dock edit mode takes the whole screen for its scrim.
     mask: Region {
+        Region {
+            x: 0
+            y: 0
+            width: win._dockEditActive ? win._windowRegionWidth : 0
+            height: win._dockEditActive ? win._windowRegionHeight : 0
+        }
         Region {
             readonly property bool present: win._frameActive && win.cutoutTopInset > 0
             x: 0
@@ -62,9 +70,19 @@ PanelWindow {
             width: present ? win.cutoutRightInset : 0
             height: present ? win._windowRegionHeight : 0
         }
-        // The frame-hosted dock's hover strip, so hover-reveal works through the frame surface.
+        // Each frame-hosted dock's hover strip, so hover-reveal works through the frame surface.
+        // Region takes no repeater, and a screen holds at most one dock per edge, so four slots cover it.
         Region {
-            item: frameDockHostLoader.item ? frameDockHostLoader.item.dockMaskItem : null
+            item: frameDockHostLoader.item?.dockMaskItems[0] ?? null
+        }
+        Region {
+            item: frameDockHostLoader.item?.dockMaskItems[1] ?? null
+        }
+        Region {
+            item: frameDockHostLoader.item?.dockMaskItems[2] ?? null
+        }
+        Region {
+            item: frameDockHostLoader.item?.dockMaskItems[3] ?? null
         }
     }
 
@@ -78,25 +96,114 @@ PanelWindow {
     readonly property int _windowRegionWidth: win._regionInt(win.width)
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
-    readonly property int _surfaceRevision: Number(ConnectedModeState.surfaceRevisions[win._screenName] || 0)
+    readonly property int _surfaceRevision: ConnectedModeState.surfaceRevisions[win._screenName] ?? 0
     readonly property var _popoutDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "popout")
-    readonly property var _dockDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "dock")
+    component DockBlurRegion: Region {
+        id: dockBlur
+        required property var dockSurface
+        readonly property var descriptor: dockSurface?.descriptor ?? ({
+                visible: false,
+                barSide: "bottom"
+            })
+        readonly property var geometry: dockSurface?.body ?? Qt.rect(0, 0, 0, 0)
+        readonly property real bodyRadius: dockSurface?.radius ?? 0
+        readonly property real connectorRadius: dockSurface?.connector ?? 0
+
+        Region {
+            id: _dockBodyBlurAnchor
+
+            readonly property bool _active: win._blurSurfacesActive && win._connectedActive && dockBlur.descriptor.visible && dockBlur.geometry.width > 0 && dockBlur.geometry.height > 0
+
+            radius: dockBlur.bodyRadius
+            x: _active ? Math.round(dockBlur.geometry.x) : 0
+            y: _active ? Math.round(dockBlur.geometry.y) : 0
+            width: _active ? Math.round(dockBlur.geometry.width) : 0
+            height: _active ? Math.round(dockBlur.geometry.height) : 0
+        }
+        Region {
+            id: _dockBodyBlurCap
+
+            readonly property string _side: dockBlur.descriptor.barSide
+            readonly property bool _active: _dockBodyBlurAnchor._active && _dockBodyBlurAnchor.width > 0 && _dockBodyBlurAnchor.height > 0
+            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(dockBlur.connectorRadius, _dockBodyBlurAnchor.width)) : _dockBodyBlurAnchor.width
+            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(dockBlur.connectorRadius, _dockBodyBlurAnchor.height)) : _dockBodyBlurAnchor.height
+
+            x: !_active ? 0 : (_side === "right" ? _dockBodyBlurAnchor.x + _dockBodyBlurAnchor.width - _capWidth : _dockBodyBlurAnchor.x)
+            y: !_active ? 0 : (_side === "bottom" ? _dockBodyBlurAnchor.y + _dockBodyBlurAnchor.height - _capHeight : _dockBodyBlurAnchor.y)
+            width: _active ? _capWidth : 0
+            height: _active ? _capHeight : 0
+        }
+        Region {
+            id: _dockLeftConnectorBlurAnchor
+
+            readonly property bool _active: _dockBodyBlurAnchor._active && dockBlur.connectorRadius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(dockBlur.descriptor.barSide, dockBlur.geometry, "left", 0, dockBlur.connectorRadius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
+            Region {
+                id: _dockLeftConnectorCutout
+
+                readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(dockBlur.descriptor.barSide, "left")
+
+                intersection: Intersection.Subtract
+                radius: dockBlur.connectorRadius
+                x: _active ? Math.round(win._connectorCutoutX(_dockLeftConnectorBlurAnchor.x, _dockLeftConnectorBlurAnchor.width, _arcCorner, dockBlur.connectorRadius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_dockLeftConnectorBlurAnchor.y, _dockLeftConnectorBlurAnchor.height, _arcCorner, dockBlur.connectorRadius)) : 0
+                width: _active ? Math.round(dockBlur.connectorRadius * 2) : 0
+                height: _active ? Math.round(dockBlur.connectorRadius * 2) : 0
+            }
+        }
+        Region {
+            id: _dockRightConnectorBlurAnchor
+
+            readonly property bool _active: _dockBodyBlurAnchor._active && dockBlur.connectorRadius > 0
+            readonly property var _rect: SurfaceGeometry.connectorRect(dockBlur.descriptor.barSide, dockBlur.geometry, "right", 0, dockBlur.connectorRadius, win._dpr)
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
+            Region {
+                id: _dockRightConnectorCutout
+
+                readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(dockBlur.descriptor.barSide, "right")
+
+                intersection: Intersection.Subtract
+                radius: dockBlur.connectorRadius
+                x: _active ? Math.round(win._connectorCutoutX(_dockRightConnectorBlurAnchor.x, _dockRightConnectorBlurAnchor.width, _arcCorner, dockBlur.connectorRadius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_dockRightConnectorBlurAnchor.y, _dockRightConnectorBlurAnchor.height, _arcCorner, dockBlur.connectorRadius)) : 0
+                width: _active ? Math.round(dockBlur.connectorRadius * 2) : 0
+                height: _active ? Math.round(dockBlur.connectorRadius * 2) : 0
+            }
+        }
+    }
+
+    readonly property var _dockSurfaces: ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
+        const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
+        const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
+        const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
+        const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
+        return {
+            descriptor: descriptor,
+            body: body,
+            radius: radius,
+            connector: connector
+        };
+    })
     readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
     readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
     readonly property bool _usesOverlayLayer: (win._modalDescriptor.presented && win._modalDescriptor.layer === "overlay") || (win._popoutDescriptor.presented && win._popoutDescriptor.layer === "overlay")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
-    readonly property bool _dockHostedHere: {
-        const dockVisible = SettingsData.showDock || ((CompositorService.isNiri || CompositorService.isAqueous) && SettingsData.dockOpenOnOverview);
-        if (!win._connectedActive || !dockVisible || SettingsData.dockUseOverlayLayer)
-            return false;
-        const screens = SettingsData.getFilteredScreens("dock");
-        for (let i = 0; i < screens.length; i++) {
-            if (screens[i] && screens[i].name === win._screenName)
-                return true;
-        }
-        return false;
-    }
+    readonly property bool _dockHostedHere: win._connectedActive && CompositorService.frameHostsDockForScreen(win.targetScreen)
+
     readonly property string _barSide: {
         const edges = win.barEdges;
         if (edges.includes("top"))
@@ -114,7 +221,6 @@ PanelWindow {
     readonly property var _popoutBodyGeometry: SurfaceGeometry.animatedBodyRect(win._popoutDescriptor, win._dpr)
     readonly property var _modalBodyGeometry: SurfaceGeometry.animatedBodyRect(win._modalDescriptor, win._dpr)
     readonly property var _notifBodyGeometry: SurfaceGeometry.bodyRect(win._notifDescriptor, win._dpr)
-    readonly property var _dockBodyGeometry: SurfaceGeometry.translatedBodyRect(win._dockDescriptor, win._dpr)
 
     readonly property real _popoutArcExtent: win._popoutHorizontal ? _popoutBodyBlurAnchor.height : _popoutBodyBlurAnchor.width
     readonly property real _modalArcExtent: win._modalHorizontal ? _modalBodyBlurAnchor.height : _modalBodyBlurAnchor.width
@@ -124,15 +230,6 @@ PanelWindow {
     readonly property real _modalConnectorRadiusRight: win._effectiveModalEndCcr
     readonly property real _notifConnectorRadiusLeft: win._effectiveNotifStartCcr
     readonly property real _notifConnectorRadiusRight: win._effectiveNotifEndCcr
-    readonly property real _dockBodyBlurRadiusValue: _dockBodyBlurAnchor._active ? Math.max(0, Math.min(win._surfaceRadius, _dockBodyBlurAnchor.width / 2, _dockBodyBlurAnchor.height / 2)) : win._surfaceRadius
-    readonly property real _dockConnectorRadiusValue: {
-        if (!_dockBodyBlurAnchor._active)
-            return win._ccr;
-        const thickness = SurfaceGeometry.isVertical(win._dockDescriptor.barSide) ? _dockBodyBlurAnchor.width : _dockBodyBlurAnchor.height;
-        const bodyRadius = win._dockBodyBlurRadiusValue;
-        const maxConnectorRadius = Math.max(0, thickness - bodyRadius - win._seamOverlap);
-        return Math.max(0, Math.min(win._ccr, bodyRadius, maxConnectorRadius));
-    }
 
     readonly property real _notifSideUnderlapValue: SurfaceGeometry.isVertical(win._notifDescriptor.barSide) ? win._seamOverlap : 0
     readonly property real _notifStartUnderlapValue: win._notifDescriptor.omitStartConnector ? win._seamOverlap : 0
@@ -177,7 +274,12 @@ PanelWindow {
         const R = win.width - win.cutoutRightInset;
         const B = win.height - win.cutoutBottomInset;
         const clampNear = function (side, b) {
-            const r = {"x": b.x, "y": b.y, "width": b.width, "height": b.height};
+            const r = {
+                "x": b.x,
+                "y": b.y,
+                "width": b.width,
+                "height": b.height
+            };
             if (side === "top") {
                 r.height = Math.max(0, b.y + b.height - T);
                 r.y = T;
@@ -228,7 +330,12 @@ PanelWindow {
                     "param": Qt.vector4d(active, 0, 0, 0)
                 });
             } else {
-                out.push({"rect": Qt.vector4d(0, 0, 0, 0), "corner": Qt.vector4d(0, 0, 0, 0), "k": Qt.vector4d(0, 0, 0, 0), "param": Qt.vector4d(0, 0, 0, 0)});
+                out.push({
+                    "rect": Qt.vector4d(0, 0, 0, 0),
+                    "corner": Qt.vector4d(0, 0, 0, 0),
+                    "k": Qt.vector4d(0, 0, 0, 0),
+                    "param": Qt.vector4d(0, 0, 0, 0)
+                });
             }
         }
         return out;
@@ -489,79 +596,17 @@ PanelWindow {
             }
         }
 
-        Region {
-            id: _dockBodyBlurAnchor
-
-            readonly property bool _active: win._blurSurfacesActive && win._connectedActive && win._dockDescriptor.visible && win._dockBodyGeometry.width > 0 && win._dockBodyGeometry.height > 0
-
-            radius: win._dockBodyBlurRadiusValue
-            x: _active ? Math.round(win._dockBodyGeometry.x) : 0
-            y: _active ? Math.round(win._dockBodyGeometry.y) : 0
-            width: _active ? Math.round(win._dockBodyGeometry.width) : 0
-            height: _active ? Math.round(win._dockBodyGeometry.height) : 0
+        DockBlurRegion {
+            dockSurface: win._dockSurfaces[0] ?? null
         }
-        Region {
-            id: _dockBodyBlurCap
-
-            readonly property string _side: win._dockDescriptor.barSide
-            readonly property bool _active: _dockBodyBlurAnchor._active && _dockBodyBlurAnchor.width > 0 && _dockBodyBlurAnchor.height > 0
-            readonly property int _capWidth: (_side === "left" || _side === "right") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.width)) : _dockBodyBlurAnchor.width
-            readonly property int _capHeight: (_side === "top" || _side === "bottom") ? Math.round(Math.min(win._dockConnectorRadiusValue, _dockBodyBlurAnchor.height)) : _dockBodyBlurAnchor.height
-
-            x: !_active ? 0 : (_side === "right" ? _dockBodyBlurAnchor.x + _dockBodyBlurAnchor.width - _capWidth : _dockBodyBlurAnchor.x)
-            y: !_active ? 0 : (_side === "bottom" ? _dockBodyBlurAnchor.y + _dockBodyBlurAnchor.height - _capHeight : _dockBodyBlurAnchor.y)
-            width: _active ? _capWidth : 0
-            height: _active ? _capHeight : 0
+        DockBlurRegion {
+            dockSurface: win._dockSurfaces[1] ?? null
         }
-        Region {
-            id: _dockLeftConnectorBlurAnchor
-
-            readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
-            readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "left", 0, win._dockConnectorRadiusValue, win._dpr)
-
-            x: _active ? Math.round(_rect.x) : 0
-            y: _active ? Math.round(_rect.y) : 0
-            width: _active ? Math.round(_rect.width) : 0
-            height: _active ? Math.round(_rect.height) : 0
-
-            Region {
-                id: _dockLeftConnectorCutout
-
-                readonly property bool _active: _dockLeftConnectorBlurAnchor.width > 0 && _dockLeftConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockDescriptor.barSide, "left")
-
-                intersection: Intersection.Subtract
-                radius: win._dockConnectorRadiusValue
-                x: _active ? Math.round(win._connectorCutoutX(_dockLeftConnectorBlurAnchor.x, _dockLeftConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue)) : 0
-                y: _active ? Math.round(win._connectorCutoutY(_dockLeftConnectorBlurAnchor.y, _dockLeftConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue)) : 0
-                width: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
-                height: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
-            }
+        DockBlurRegion {
+            dockSurface: win._dockSurfaces[2] ?? null
         }
-        Region {
-            id: _dockRightConnectorBlurAnchor
-
-            readonly property bool _active: _dockBodyBlurAnchor._active && win._dockConnectorRadiusValue > 0
-            readonly property var _rect: SurfaceGeometry.connectorRect(win._dockDescriptor.barSide, win._dockBodyGeometry, "right", 0, win._dockConnectorRadiusValue, win._dpr)
-
-            x: _active ? Math.round(_rect.x) : 0
-            y: _active ? Math.round(_rect.y) : 0
-            width: _active ? Math.round(_rect.width) : 0
-            height: _active ? Math.round(_rect.height) : 0
-
-            Region {
-                id: _dockRightConnectorCutout
-
-                readonly property bool _active: _dockRightConnectorBlurAnchor.width > 0 && _dockRightConnectorBlurAnchor.height > 0
-                readonly property string _arcCorner: ConnectorGeometry.arcCorner(win._dockDescriptor.barSide, "right")
-
-                intersection: Intersection.Subtract
-                radius: win._dockConnectorRadiusValue
-                x: _active ? Math.round(win._connectorCutoutX(_dockRightConnectorBlurAnchor.x, _dockRightConnectorBlurAnchor.width, _arcCorner, win._dockConnectorRadiusValue)) : 0
-                y: _active ? Math.round(win._connectorCutoutY(_dockRightConnectorBlurAnchor.y, _dockRightConnectorBlurAnchor.height, _arcCorner, win._dockConnectorRadiusValue)) : 0
-                width: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
-                height: _active ? Math.round(win._dockConnectorRadiusValue * 2) : 0
-            }
+        DockBlurRegion {
+            dockSurface: win._dockSurfaces[3] ?? null
         }
 
         Region {
@@ -928,7 +973,12 @@ PanelWindow {
         if (win._popoutDescriptor.visible && win._popoutDescriptor.screenName === win._screenName && p.width > 0 && p.height > 0)
             arr.push({
                 "side": win._popoutDescriptor.barSide,
-                "body": {"x": p.x, "y": p.y, "width": p.width, "height": p.height},
+                "body": {
+                    "x": p.x,
+                    "y": p.y,
+                    "width": p.width,
+                    "height": p.height
+                },
                 "radii": {
                     "farCr": win._effectivePopoutFarCcr,
                     "startCr": win._effectivePopoutStartCcr,
@@ -942,7 +992,12 @@ PanelWindow {
         if (win._frameActive && win._modalDescriptor.visible && m.width > 0 && m.height > 0)
             arr.push({
                 "side": win._modalDescriptor.barSide,
-                "body": {"x": m.x, "y": m.y, "width": m.width, "height": m.height},
+                "body": {
+                    "x": m.x,
+                    "y": m.y,
+                    "width": m.width,
+                    "height": m.height
+                },
                 "radii": {
                     "farCr": win._effectiveModalFarCcr,
                     "startCr": win._effectiveModalStartCcr,
@@ -957,7 +1012,12 @@ PanelWindow {
         if (win._frameActive && win._notifDescriptor.visible && nb.width > 0 && nb.height > 0)
             arr.push({
                 "side": win._notifDescriptor.barSide,
-                "body": {"x": n.x, "y": n.y, "width": n.width, "height": n.height},
+                "body": {
+                    "x": n.x,
+                    "y": n.y,
+                    "width": n.width,
+                    "height": n.height
+                },
                 "radii": {
                     "farCr": win._effectiveNotifFarCcr,
                     "startCr": win._effectiveNotifStartCcr,
@@ -967,20 +1027,28 @@ PanelWindow {
                     "surfaceRadius": win._surfaceRadius
                 }
             });
-        const dk = win._dockBodyGeometry;
-        if (win._connectedActive && win._dockDescriptor.visible && dk.width > 0 && dk.height > 0)
+        for (const surface of win._dockSurfaces) {
+            const dk = surface.body;
+            if (!win._connectedActive || !surface.descriptor.visible || dk.width <= 0 || dk.height <= 0)
+                continue;
             arr.push({
-                "side": win._dockDescriptor.barSide,
-                "body": {"x": dk.x, "y": dk.y, "width": dk.width, "height": dk.height},
+                "side": surface.descriptor.barSide,
+                "body": {
+                    "x": dk.x,
+                    "y": dk.y,
+                    "width": dk.width,
+                    "height": dk.height
+                },
                 "radii": {
-                    "farCr": win._dockConnectorRadiusValue,
-                    "startCr": win._dockConnectorRadiusValue,
-                    "endCr": win._dockConnectorRadiusValue,
+                    "farCr": surface.connector,
+                    "startCr": surface.connector,
+                    "endCr": surface.connector,
                     "farStartCr": 0,
                     "farEndCr": 0,
-                    "surfaceRadius": win._dockBodyBlurRadiusValue
+                    "surfaceRadius": surface.radius
                 }
             });
+        }
         return arr;
     }
 
@@ -1103,12 +1171,9 @@ PanelWindow {
         }
     }
 
-    Connections {
-        target: BlurService
-        function onEnabledChanged() {
-            win._scheduleBlurRebuild();
-        }
-    }
+    readonly property bool blurServiceEnabled: BlurService.enabled
+
+    onBlurServiceEnabledChanged: _scheduleBlurRebuild()
 
     onVisibleChanged: {
         if (visible) {

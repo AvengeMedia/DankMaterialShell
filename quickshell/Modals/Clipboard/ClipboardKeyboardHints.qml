@@ -7,6 +7,7 @@ Rectangle {
 
     property bool pasteAvailable: false
     property bool enterToPaste: false
+    readonly property string navigationHintsText: (enterToPaste ? I18n.tr("↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help")) + " • Ctrl+Space: " + I18n.tr("Preview")
     readonly property string hintsText: {
         if (!pasteAvailable)
             return I18n.tr("Ctrl+Tab: Switch Tab • Ctrl+S: Pin/Unpin • Shift+Del: Clear All • Esc: Close");
@@ -27,7 +28,7 @@ Rectangle {
         spacing: Theme.spacingXXS
 
         StyledText {
-            text: keyboardHints.enterToPaste ? I18n.tr("↑/↓: Navigate • Enter: Paste • Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help", "Keyboard hints when enter-to-paste is enabled") : I18n.tr("↑/↓: Navigate • Enter/Ctrl+C: Copy • Del: Delete • Ctrl+E: Edit • Ctrl+S: Pin/Unpin • F10: Help")
+            text: keyboardHints.navigationHintsText
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             width: parent.width

@@ -1,45 +1,27 @@
 package models
 
 import (
-	"net"
-
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-type Conn = ipc.ConnWriter
-
-func NewConn(c net.Conn) *Conn { return ipc.NewConnWriter(c) }
-
-type Request struct {
-	ID     int            `json:"id,omitempty"`
-	Method string         `json:"method"`
-	Params map[string]any `json:"params,omitempty"`
-}
-
-func Get[T any](r Request, key string) (T, bool) {
+func Get[T any](r ipc.Request, key string) (T, bool) {
 	v, err := params.Get[T](r.Params, key)
 	return v, err == nil
 }
 
-func GetOr[T any](r Request, key string, def T) T {
+func GetOr[T any](r ipc.Request, key string, def T) T {
 	return params.GetOpt(r.Params, key, def)
 }
 
-type Response[T any] struct {
-	ID     int    `json:"id,omitempty"`
-	Result *T     `json:"result,omitempty"`
-	Error  string `json:"error,omitempty"`
-}
-
-func RespondError(conn *Conn, id int, errMsg string) {
+func RespondError(conn *ipc.ConnWriter, id int, errMsg string) {
 	log.Errorf("DMS API Error: id=%d error=%s", id, errMsg)
-	_ = conn.WriteResponse(Response[any]{ID: id, Error: errMsg})
+	_ = conn.WriteResponse(ipc.Response[any]{ID: id, Error: errMsg})
 }
 
-func Respond[T any](conn *Conn, id int, result T) {
-	_ = conn.WriteResponse(Response[T]{ID: id, Result: &result})
+func Respond[T any](conn *ipc.ConnWriter, id int, result T) {
+	_ = conn.WriteResponse(ipc.Response[T]{ID: id, Result: &result})
 }
 
 type SuccessResult struct {

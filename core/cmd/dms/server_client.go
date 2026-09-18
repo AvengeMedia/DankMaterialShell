@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 // maxIPCMessageSize allows room for a 50 MB clipboard entry plus JSON/base64
 // overhead in the line-delimited IPC response.
 const maxIPCMessageSize = 96 * 1024 * 1024
 
-func sendServerRequest(req models.Request) (*models.Response[any], error) {
+func sendServerRequest(req ipc.Request) (*ipc.Response[any], error) {
 	socketPath := getServerSocketPath()
 
 	conn, err := net.Dial("unix", socketPath)
@@ -47,7 +47,7 @@ func sendServerRequest(req models.Request) (*models.Response[any], error) {
 		return nil, fmt.Errorf("failed to read response")
 	}
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	if err := json.Unmarshal(scanner.Bytes(), &resp); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -57,7 +57,7 @@ func sendServerRequest(req models.Request) (*models.Response[any], error) {
 
 // sendServerRequestFireAndForget sends a request without waiting for a response.
 // Useful for commands that trigger UI or async operations.
-func sendServerRequestFireAndForget(req models.Request) error {
+func sendServerRequestFireAndForget(req ipc.Request) error {
 	socketPath := getServerSocketPath()
 
 	conn, err := net.Dial("unix", socketPath)
@@ -88,7 +88,7 @@ func sendServerRequestFireAndForget(req models.Request) error {
 
 // tryServerRequest attempts to send a request but returns false if server unavailable.
 // Does not log errors - caller can decide what to do on failure.
-func tryServerRequest(req models.Request) (*models.Response[any], bool) {
+func tryServerRequest(req ipc.Request) (*ipc.Response[any], bool) {
 	resp, err := sendServerRequest(req)
 	if err != nil {
 		return nil, false

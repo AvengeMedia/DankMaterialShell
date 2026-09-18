@@ -9,6 +9,8 @@ import qs.Modules.Settings.Widgets
 Column {
     id: root
 
+    readonly property bool isSettingsRow: true
+
     property string text: ""
     property string description: ""
     property string settingKey: ""
@@ -43,11 +45,14 @@ Column {
         }
     }
 
+    property alias resetStore: modeRow.resetStore
+    property alias resetKeys: modeRow.resetKeys
+
     signal modeSelected(string mode)
     signal customColorSelected(color selectedColor)
 
     width: parent?.width ?? 0
-    spacing: Theme.spacingS
+    spacing: 0
 
     function optionLabels() {
         return options.map(option => option.label);
@@ -80,6 +85,8 @@ Column {
     }
 
     SettingsDropdownRow {
+        id: modeRow
+        groupItem: root
         text: root.text
         description: root.description
         tab: root.tab
@@ -89,71 +96,73 @@ Column {
         optionColorMap: root.optionColorMap
         currentValue: root.optionLabel(root.currentMode)
         dropdownWidth: root.dropdownWidth
+        paintBackground: !(root.parent?.isSettingsGroupHost ?? false)
         onValueChanged: value => root.modeSelected(root.optionValue(value))
     }
 
     Item {
         width: parent.width
-        height: root.currentMode === "custom" ? customChip.height : 0
+        height: root.currentMode === "custom" ? customChip.height + Theme.spacingM : 0
         opacity: root.currentMode === "custom" ? 1 : 0
         clip: true
 
         Behavior on height {
             NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
+                duration: SettingsMetrics.transitionDuration
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
             }
         }
 
         Behavior on opacity {
             NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
+                duration: SettingsMetrics.fadeDuration
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
             }
         }
 
         Rectangle {
             id: customChip
 
-            width: parent.width
-            height: 56
-            radius: Theme.cornerRadius
-            color: Theme.floatingWindowFieldColor
-            border.color: Theme.floatingWindowFieldBorderColor
-            border.width: 1
+            x: SettingsMetrics.rowPaddingH
+            width: parent.width - SettingsMetrics.rowPaddingH * 2
+            height: Theme.listItemHeight
+            radius: Theme.cornerRadiusM
+            color: Theme.foregroundColor(Theme.surfaceContainerHigh, true)
 
             Row {
                 anchors.fill: parent
-                anchors.leftMargin: Theme.spacingM
-                anchors.rightMargin: Theme.spacingM
+                anchors.leftMargin: SettingsMetrics.rowPaddingH
+                anchors.rightMargin: SettingsMetrics.rowPaddingH
                 spacing: Theme.spacingM
 
                 Rectangle {
-                    width: 36
-                    height: 36
-                    radius: 18
+                    width: Theme.avatarSize
+                    height: Theme.avatarSize
+                    radius: width / 2
                     color: root.customColor
                     border.color: Theme.outline
-                    border.width: 1
+                    border.width: Theme.outlineWidth
                     anchors.verticalCenter: parent.verticalCenter
 
                     DankIcon {
                         anchors.centerIn: parent
                         name: "colorize"
-                        size: 16
-                        color: Theme.isLightColor(root.customColor) ? "#000000" : "#ffffff"
+                        size: Theme.iconSizeSmall
+                        color: Theme.isLightColor(root.customColor) ? Theme.contrastDark : Theme.contrastLight
                     }
                 }
 
                 Column {
-                    width: parent.width - 36 - editIcon.width - Theme.spacingM * 2
+                    width: parent.width - Theme.avatarSize - editIcon.width - Theme.spacingM * 2
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXS
 
                     StyledText {
-                        text: I18n.tr("Custom Color")
+                        text: I18n.tr("Custom color")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         width: parent.width
                         horizontalAlignment: Text.AlignLeft
@@ -180,6 +189,7 @@ Column {
 
             StateLayer {
                 stateColor: Theme.surfaceText
+                cornerRadius: customChip.radius
                 onClicked: root.openCustomColorPicker()
             }
         }

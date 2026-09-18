@@ -258,7 +258,7 @@ Singleton {
             onExited: exitCode => {
                 const svc = root;
                 if (exitCode !== 0) {
-                    svc._emit("create", useraddProc.targetUser, false, (useraddProc.capturedErr || "").trim() || I18n.tr("useradd failed (exit %1)").arg(exitCode), useraddProc.cb);
+                    svc._emit("create", useraddProc.targetUser, false, (useraddProc.capturedErr || "").trim() || I18n.tr("useradd failed (exit %1)", "create user error, useradd is a command, %1 is exit code").arg(exitCode), useraddProc.cb);
                     Qt.callLater(() => useraddProc.destroy());
                     return;
                 }
@@ -310,7 +310,7 @@ Singleton {
                 Qt.callLater(() => chpasswdProc.destroy());
 
                 if (exitCode !== 0) {
-                    const msg = err || I18n.tr("Password change failed (exit %1)").arg(exitCode);
+                    const msg = err || I18n.tr("Password change failed (exit %1)", "user management error, %1 is the exit code").arg(exitCode);
                     if (op === "create") {
                         if (typeof cb === "function")
                             cb(false, msg);
@@ -349,7 +349,7 @@ Singleton {
                 Qt.callLater(() => userdelProc.destroy());
 
                 if (exitCode !== 0) {
-                    root._emit("delete", targetUser, false, err || I18n.tr("userdel failed (exit %1)").arg(exitCode), cb);
+                    root._emit("delete", targetUser, false, err || I18n.tr("userdel failed (exit %1)", "delete user error, userdel is a command, %1 is exit code").arg(exitCode), cb);
                 } else {
                     root.refresh();
                     root._emit("delete", targetUser, true, I18n.tr("User deleted"), cb);
@@ -379,7 +379,7 @@ Singleton {
                 Qt.callLater(() => greeterToggleProc.destroy());
 
                 if (exitCode !== 0) {
-                    root._emit("greeter", targetUser, false, err || I18n.tr("usermod failed (exit %1)").arg(exitCode), cb);
+                    root._emit("greeter", targetUser, false, err || I18n.tr("usermod failed (exit %1)", "user group change error, usermod is a command, %1 is exit code").arg(exitCode), cb);
                 } else {
                     root.refresh();
                     root._emit("greeter", targetUser, true, enableGreeter ? I18n.tr("Granted greeter login access") : I18n.tr("Removed greeter login access"), cb);

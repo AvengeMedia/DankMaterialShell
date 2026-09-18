@@ -20,7 +20,7 @@ FocusScope {
         Text {
             text: "Launcher Example Plugin Settings"
             font.pixelSize: 18
-            font.weight: Font.Bold
+            font.weight: Theme.fontWeightMedium
             color: "#FFFFFF"
         }
 
@@ -45,7 +45,7 @@ FocusScope {
             Text {
                 text: "Trigger Configuration"
                 font.pixelSize: 16
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: "#FFFFFF"
             }
 
@@ -153,7 +153,7 @@ FocusScope {
             Text {
                 text: "Example Items:"
                 font.pixelSize: 14
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: "#FFFFFF"
             }
 
@@ -194,7 +194,7 @@ FocusScope {
             Text {
                 text: "Usage:"
                 font.pixelSize: 14
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: "#FFFFFF"
             }
 

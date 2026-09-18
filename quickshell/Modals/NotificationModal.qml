@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
 import qs.Common
+import qs.Modules.Notifications
 import qs.Modals.Common
 import qs.Modules.Notifications.Center
 import qs.Services
@@ -68,9 +69,9 @@ DankModal {
         NotificationService.dismissLastNotification();
     }
 
-    modalWidth: Math.min(500, screenWidth - 48)
-    modalHeight: Math.min(700, screenHeight * 0.85)
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    modalWidth: Math.min(NotificationMetrics.modalWidth, screenWidth - Theme.spacingL * 2)
+    modalHeight: Math.min(NotificationMetrics.modalHeight, screenHeight * NotificationMetrics.modalScreenRatio)
+    backgroundColor: Theme.floatingWindowSurface
     visible: false
     onBackgroundClicked: hide()
     onOpened: () => {
@@ -225,8 +226,10 @@ DankModal {
 
                 NotificationHeader {
                     id: notificationHeader
+                    modal: true
                     keyboardController: modalKeyboardController
                     transientSurfaceTracker: notificationModal.transientSurfaceTracker
+                    onCloseRequested: notificationModal.hide()
                     onCurrentTabChanged: notificationModal.currentTab = currentTab
                     onSettingsRequested: {
                         notificationModal.hide();

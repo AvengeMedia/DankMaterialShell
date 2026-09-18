@@ -13,7 +13,7 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: icon.width
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.contentThickness
 
             DankIcon {
                 id: icon

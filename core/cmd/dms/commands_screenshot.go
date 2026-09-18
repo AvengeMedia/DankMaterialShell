@@ -412,7 +412,7 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if config.Notify {
-		thumbData, thumbW, thumbH := bufferToRGBThumbnail(result.Buffer, 256, result.Format)
+		thumbData, thumbW, thumbH := bufferToRGBAThumbnail(result.Buffer, 640, result.Format)
 		id := screenshot.SendNotification(screenshot.NotifyResult{
 			FilePath:  filePath,
 			Clipboard: config.Clipboard,
@@ -453,28 +453,21 @@ func writeImageToStdout(buf *screenshot.ShmBuffer, format screenshot.Format, qua
 	}
 }
 
-func bufferToRGBThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat uint32) ([]byte, int, int) {
-	srcW, srcH := buf.Width, buf.Height
-	scale := 1.0
-	if srcW > maxSize || srcH > maxSize {
-		if srcW > srcH {
-			scale = float64(maxSize) / float64(srcW)
-		} else {
-			scale = float64(maxSize) / float64(srcH)
-		}
+func bufferToRGBAThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat uint32) ([]byte, int, int) {
+	if buf == nil || buf.Width <= 0 || buf.Height <= 0 || maxSize <= 0 {
+		return nil, 0, 0
 	}
 
-	dstW := int(float64(srcW) * scale)
-	dstH := int(float64(srcH) * scale)
-	if dstW < 1 {
-		dstW = 1
-	}
-	if dstH < 1 {
-		dstH = 1
+	srcW, srcH := buf.Width, buf.Height
+	longest := max(srcW, srcH)
+	dstW, dstH := srcW, srcH
+	if longest > maxSize {
+		dstW = max(1, srcW*maxSize/longest)
+		dstH = max(1, srcH*maxSize/longest)
 	}
 
 	data := buf.Data()
-	rgb := make([]byte, dstW*dstH*3)
+	rgba := make([]byte, dstW*dstH*4)
 
 	is10Bit := screenshot.PixelFormat(pixelFormat).Is10Bit()
 
@@ -487,41 +480,42 @@ func bufferToRGBThumbnail(buf *screenshot.ShmBuffer, maxSize int, pixelFormat ui
 		swapRB = true
 	}
 
-	for y := 0; y < dstH; y++ {
-		srcY := int(float64(y) / scale)
-		if srcY >= srcH {
-			srcY = srcH - 1
-		}
-		for x := 0; x < dstW; x++ {
-			srcX := int(float64(x) / scale)
-			if srcX >= srcW {
-				srcX = srcW - 1
+	for y := range dstH {
+		y0, y1 := y*srcH/dstH, (y+1)*srcH/dstH
+		for x := range dstW {
+			x0, x1 := x*srcW/dstW, (x+1)*srcW/dstW
+			var r, g, b, samples uint64
+			for srcY := y0; srcY < y1; srcY++ {
+				for srcX := x0; srcX < x1; srcX++ {
+					si := srcY*buf.Stride + srcX*4
+					if si+3 >= len(data) {
+						continue
+					}
+					c0, c1, c2 := data[si], data[si+1], data[si+2]
+					if is10Bit {
+						v := binary.LittleEndian.Uint32(data[si:])
+						c0, c1, c2 = uint8(v>>2), uint8(v>>12), uint8(v>>22)
+					}
+					if swapRB {
+						c0, c2 = c2, c0
+					}
+					r += uint64(c0)
+					g += uint64(c1)
+					b += uint64(c2)
+					samples++
+				}
 			}
-			si := srcY*buf.Stride + srcX*4
-			di := (y*dstW + x) * 3
-			if si+3 >= len(data) {
+			if samples == 0 {
 				continue
 			}
-			switch {
-			case is10Bit:
-				v := binary.LittleEndian.Uint32(data[si:])
-				c0, c1, c2 := uint8(v>>2), uint8(v>>12), uint8(v>>22)
-				if swapRB {
-					c0, c2 = c2, c0
-				}
-				rgb[di+0], rgb[di+1], rgb[di+2] = c0, c1, c2
-			case swapRB:
-				rgb[di+0] = data[si+2]
-				rgb[di+1] = data[si+1]
-				rgb[di+2] = data[si+0]
-			default:
-				rgb[di+0] = data[si+0]
-				rgb[di+1] = data[si+1]
-				rgb[di+2] = data[si+2]
-			}
+			di := (y*dstW + x) * 4
+			rgba[di+0] = byte((r + samples/2) / samples)
+			rgba[di+1] = byte((g + samples/2) / samples)
+			rgba[di+2] = byte((b + samples/2) / samples)
+			rgba[di+3] = 255
 		}
 	}
-	return rgb, dstW, dstH
+	return rgba, dstW, dstH
 }
 
 func runScreenshotRegion(cmd *cobra.Command, args []string) {

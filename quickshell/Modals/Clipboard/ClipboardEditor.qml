@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -264,6 +265,7 @@ Item {
 
             DankActionButton {
                 iconName: "arrow_back"
+                Accessible.name: I18n.tr("Back")
                 iconSize: Theme.iconSize - 4
                 iconColor: Theme.surfaceText
                 anchors.left: parent.left
@@ -275,12 +277,13 @@ Item {
                 text: I18n.tr("Edit Clipboard")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.surfaceText
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 anchors.centerIn: parent
             }
 
             DankActionButton {
                 iconName: "close"
+                Accessible.name: I18n.tr("Close")
                 iconSize: Theme.iconSize - 4
                 iconColor: Theme.surfaceText
                 anchors.right: parent.right
@@ -295,7 +298,7 @@ Item {
             height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - Theme.spacingM * 2)
             leftIconName: "edit"
             placeholderText: I18n.tr("Edit clipboard text")
-            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            backgroundColor: Theme.surfaceContainerHigh
             normalBorderColor: Theme.outlineMedium
             focusedBorderColor: Theme.primary
             keyForwardTargets: [editorKeyHandler]
@@ -323,15 +326,13 @@ Item {
             }
         }
 
-        Row {
+        RowLayout {
             id: editorActions
             width: parent.width
             spacing: Theme.spacingS
 
             Item {
-                id: buttonSpacer
-                width: Math.max(0, parent.width - cancelButton.width - saveButton.width - Theme.spacingS)
-                height: 1
+                Layout.fillWidth: true
             }
 
             DankButton {
@@ -342,72 +343,22 @@ Item {
                 onClicked: modal.mode = "history"
             }
 
-            Item {
+            RowLayout {
                 id: saveButton
-
-                readonly property int buttonHeight: cancelButton.buttonHeight
-                readonly property int arrowWidth: Theme.iconSizeLarge
-
-                width: cancelButton.width
-                height: buttonHeight
+                spacing: Theme.spacingS
                 opacity: root.textLoaded ? 1 : 0.6
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.cornerRadius
-                    color: Theme.primary
-                }
-
-                Item {
-                    id: saveMainArea
-                    anchors.left: parent.left
-                    anchors.right: saveArrowArea.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                }
-
-                StyledText {
+                DankButton {
                     text: I18n.tr("Save")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.onPrimary
-                    anchors.centerIn: saveMainArea
-                }
-
-                Item {
-                    id: saveArrowArea
-                    width: saveButton.arrowWidth
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height - cancelButton.horizontalPadding
-                    color: Theme.withAlpha(Theme.onPrimary, 0.2)
-                    anchors.right: saveArrowArea.left
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                DankIcon {
-                    name: saveMenu.visible ? "expand_less" : "expand_more"
-                    size: Theme.iconSizeSmall
-                    color: Theme.onPrimary
-                    anchors.centerIn: saveArrowArea
-                }
-
-                StateLayer {
-                    z: 1
-                    anchors.fill: saveMainArea
-                    stateColor: Theme.onPrimary
+                    backgroundColor: Theme.primary
+                    textColor: Theme.onPrimary
                     onClicked: root.saveEntry("history")
                 }
 
-                StateLayer {
-                    z: 1
-                    anchors.fill: saveArrowArea
-                    stateColor: Theme.onPrimary
+                DankIconButton {
+                    variant: "filled"
+                    iconName: saveMenu.visible ? "expand_less" : "expand_more"
+                    tooltipText: I18n.tr("Save")
                     onClicked: root.toggleSaveMenu()
                 }
             }
@@ -423,7 +374,7 @@ Item {
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
             background: StyledRect {
-                radius: Theme.cornerRadius
+                radius: Theme.windowRadius
                 color: Theme.surfaceContainer
                 border.color: Theme.outlineMedium
                 border.width: 1

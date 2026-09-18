@@ -4,6 +4,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modals.Common
 
 Popup {
     id: processContextMenu
@@ -14,18 +15,21 @@ Popup {
     property var parentFocusItem: null
     property var transientSurfaceTracker: null
 
+    readonly property alias confirmationOpen: confirmation.visible
+
     signal menuClosed
     signal processKilled
 
-    onVisibleChanged: transientSurfaceTracker?.setActive(root, visible, null)
-    Component.onDestruction: transientSurfaceTracker?.unregister(root)
+    onVisibleChanged: transientSurfaceTracker?.setActive(processContextMenu, visible || confirmationOpen, null)
+    onConfirmationOpenChanged: transientSurfaceTracker?.setActive(processContextMenu, visible || confirmationOpen, null)
+    Component.onDestruction: transientSurfaceTracker?.unregister(processContextMenu)
 
     Connections {
         target: processContextMenu.transientSurfaceTracker
         ignoreUnknownSignals: true
 
         function onCloseRequested() {
-            processContextMenu.close();
+            processContextMenu.dismiss();
         }
     }
 
@@ -153,20 +157,91 @@ Popup {
     }
 
     function killProcess() {
-        if (processData)
-            Quickshell.execDetached(["kill", processData.pid.toString()]);
-        processKilled();
-        close();
+        requestKill(false);
     }
 
     function forceKillProcess() {
-        if (processData)
-            Quickshell.execDetached(["kill", "-9", processData.pid.toString()]);
-        processKilled();
-        close();
+        requestKill(true);
     }
 
-    width: 200
+    function requestKill(force) {
+        if (!processData || processData.pid <= 0 || (force && processData.pid <= 1000))
+            return;
+        confirmation.process = Object.assign({}, processData);
+        confirmation.forceKill = force;
+        close();
+        confirmation.open();
+    }
+
+    function dismiss() {
+        close();
+        confirmation.close();
+    }
+
+    Popup {
+        id: confirmation
+        property var process: null
+        property bool forceKill: false
+        parent: processContextMenu.parent
+        width: Math.min(ProcessListMetrics.dialogWidth, parent.width - Theme.spacingL * 2)
+        height: confirmationContent.implicitHeight + Theme.spacingL * 2
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        padding: Theme.spacingL
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        onOpened: {
+            confirmationContent.reset();
+            confirmationContent.selectedButton = 0;
+            confirmationContent.keyboardNavigation = true;
+            confirmationContent.forceActiveFocus();
+        }
+        onClosed: focusRestore.restart()
+
+        background: Rectangle {
+            color: Theme.surfaceContainerHigh
+            radius: Theme.windowRadius
+        }
+
+        contentItem: ConfirmDialogContent {
+            id: confirmationContent
+            confirmTitle: confirmation.forceKill ? I18n.tr("Force Kill (SIGKILL)") : I18n.tr("Kill Process")
+            confirmMessage: (confirmation.process?.command ?? "") + " (" + I18n.tr("PID") + " " + (confirmation.process?.pid ?? 0) + ")"
+            confirmButtonText: I18n.tr("Kill Process")
+            confirmButtonColor: Theme.error
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Backtab) {
+                    keyboardNavigation = true;
+                    selectedButton = selectedButton === 0 ? 1 : 0;
+                    event.accepted = true;
+                    return;
+                }
+                handleKey(event);
+            }
+            onCancelled: confirmation.close()
+            onButtonActivated: button => {
+                const pid = confirmation.process?.pid ?? 0;
+                const force = confirmation.forceKill;
+                confirmation.close();
+                if (button !== 1 || pid <= 0)
+                    return;
+                const args = force ? ["kill", "-9", pid.toString()] : ["kill", pid.toString()];
+                Quickshell.execDetached(args);
+                processContextMenu.processKilled();
+            }
+        }
+    }
+
+    DeferredAction {
+        id: focusRestore
+        onTriggered: {
+            if (!processContextMenu.confirmationOpen && processContextMenu.parentFocusItem?.visible)
+                processContextMenu.parentFocusItem.forceActiveFocus();
+        }
+    }
+
+    width: ProcessListMetrics.menuWidth
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     padding: 0
     modal: false
@@ -177,8 +252,7 @@ Popup {
         keyboardNavigation = false;
         selectedIndex = -1;
         menuClosed();
-        if (parentFocusItem)
-            Qt.callLater(() => parentFocusItem.forceActiveFocus());
+        focusRestore.restart();
     }
 
     onOpened: {
@@ -198,8 +272,8 @@ Popup {
     }
 
     contentItem: Rectangle {
-        color: Theme.floatingSurface
-        radius: Theme.cornerRadius
+        color: Theme.surfaceContainer
+        radius: Theme.windowRadius
         border.color: BlurService.borderColor
         border.width: BlurService.borderWidth
 
@@ -242,14 +316,14 @@ Popup {
             id: menuColumn
             anchors.fill: parent
             anchors.margins: Theme.spacingS
-            spacing: 1
+            spacing: Theme.groupedListGap
 
             Repeater {
                 model: menuItems
 
                 Item {
                     width: parent.width
-                    height: modelData.type === "separator" ? 5 : 32
+                    height: modelData.type === "separator" ? Theme.spacingS : Theme.menuItemHeight
                     visible: modelData.type !== "separator" || index > 0
 
                     property int itemVisibleIndex: {
@@ -264,7 +338,7 @@ Popup {
                     Rectangle {
                         visible: modelData.type === "separator"
                         width: parent.width - Theme.spacingS * 2
-                        height: 1
+                        height: Theme.dividerWidth
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
                         color: Theme.outlineStrong
@@ -274,8 +348,8 @@ Popup {
                         id: menuItem
                         visible: modelData.type !== "separator"
                         width: parent.width
-                        height: 32
-                        radius: Theme.cornerRadius
+                        height: Theme.menuItemHeight
+                        radius: Theme.cornerRadiusM
                         color: {
                             if (!modelData.enabled)
                                 return "transparent";
@@ -289,7 +363,6 @@ Popup {
                                 return Theme.primaryPressed;
                             return menuItemArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0);
                         }
-                        opacity: modelData.enabled ? 1 : 0.5
 
                         Row {
                             anchors.left: parent.left
@@ -301,10 +374,10 @@ Popup {
 
                             DankIcon {
                                 name: modelData.icon || ""
-                                size: 16
+                                size: Theme.iconSizeSmall
                                 color: {
                                     if (!modelData.enabled)
-                                        return Theme.surfaceVariantText;
+                                        return Theme.onSurface_38;
                                     const isSelected = keyboardNavigation && selectedIndex === index;
                                     if (modelData.dangerous && (menuItemArea.containsMouse || isSelected))
                                         return Theme.error;
@@ -316,10 +389,10 @@ Popup {
                             StyledText {
                                 text: modelData.text || ""
                                 font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Normal
+                                font.weight: Theme.fontWeight
                                 color: {
                                     if (!modelData.enabled)
-                                        return Theme.surfaceVariantText;
+                                        return Theme.onSurface_38;
                                     const isSelected = keyboardNavigation && selectedIndex === index;
                                     if (modelData.dangerous && (menuItemArea.containsMouse || isSelected))
                                         return Theme.error;
@@ -327,7 +400,7 @@ Popup {
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                                 elide: Text.ElideRight
-                                width: parent.width - 16 - Theme.spacingS
+                                width: parent.width - Theme.iconSizeSmall - Theme.spacingS
                             }
                         }
 

@@ -16,10 +16,11 @@ DockContextMenuBase {
     layerNamespace: "dms:dock-context-menu"
 
     function showForButton(button, data, dockHeight, hidePinOption, entry, dockScreen, parentDockApps) {
-        appData = data;
+        appData = Qt.binding(() => button?.appData ?? null);
         hidePin = hidePinOption || false;
         desktopEntry = entry || null;
         dockApps = parentDockApps || null;
+        options = dockApps?.options ?? ({});
         show(button, dockHeight, dockScreen);
     }
 
@@ -44,23 +45,25 @@ DockContextMenuBase {
                 anchors.right: minimizeButton.visible ? minimizeButton.left : closeButton.left
                 anchors.rightMargin: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
-                text: (modelData && modelData.title) ? modelData.title : I18n.tr("(Unnamed)")
+                text: (modelData && modelData.title) ? modelData.title : I18n.tr("(Unnamed)", "dock menu fallback for a window without a title")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
-                font.weight: Font.Normal
+                font.weight: Theme.fontWeight
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
             }
 
             Rectangle {
                 id: minimizeButton
+                Accessible.role: Accessible.Button
+                Accessible.name: modelData.minimized ? I18n.tr("Restore", "verb, action restoring a minimized window") : I18n.tr("Minimize", "verb, action minimizing a window")
                 visible: CompositorService.canMinimize(modelData)
                 anchors.right: closeButton.left
                 anchors.rightMargin: 2
                 anchors.verticalCenter: parent.verticalCenter
                 width: 20
                 height: 20
-                radius: 10
+                radius: Theme.cornerRadiusS
                 color: minimizeMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : "transparent"
 
                 DankIcon {
@@ -88,12 +91,14 @@ DockContextMenuBase {
 
             Rectangle {
                 id: closeButton
+                Accessible.role: Accessible.Button
+                Accessible.name: I18n.tr("Close Window")
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
                 width: 20
                 height: 20
-                radius: 10
+                radius: Theme.cornerRadiusS
                 color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.withAlpha(Theme.errorPressed, 0)
 
                 DankIcon {
@@ -189,7 +194,7 @@ DockContextMenuBase {
                 text: modelData.name || ""
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
-                font.weight: Font.Normal
+                font.weight: Theme.fontWeight
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
             }
@@ -257,7 +262,7 @@ DockContextMenuBase {
             text: root.appData && root.appData.isPinned ? I18n.tr("Unpin from Dock") : I18n.tr("Pin to Dock")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
-            font.weight: Font.Normal
+            font.weight: Theme.fontWeight
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
         }
@@ -279,9 +284,9 @@ DockContextMenuBase {
                     return;
 
                 if (root.appData.isPinned) {
-                    SessionData.removePinnedApp(root.appData.appId);
+                    root.dockApps.removePinnedApp(root.appData.appId);
                 } else {
-                    SessionData.addPinnedApp(root.appData.appId);
+                    root.dockApps.addPinnedApp(root.appData.appId);
                 }
                 root.close();
             }
@@ -330,7 +335,7 @@ DockContextMenuBase {
             text: I18n.tr("Launch on dGPU")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
-            font.weight: Font.Normal
+            font.weight: Theme.fontWeight
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
         }
@@ -385,7 +390,7 @@ DockContextMenuBase {
             text: root.appData && root.appData.type === "grouped" ? I18n.tr("Close All Windows") : I18n.tr("Close Window")
             font.pixelSize: Theme.fontSizeSmall
             color: closeArea.containsMouse ? Theme.error : Theme.surfaceText
-            font.weight: Font.Normal
+            font.weight: Theme.fontWeight
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
         }
@@ -410,6 +415,16 @@ DockContextMenuBase {
                 }
                 root.close();
             }
+        }
+    }
+    DockTrashMenuItem {
+        visible: root.dockApps?.surfaceContext?.kind === "dock"
+        width: parent.width
+        text: I18n.tr("Edit widgets")
+        iconName: "edit"
+        onTriggered: {
+            root.dockApps.surfaceContext.host.editMode = true;
+            root.close();
         }
     }
 }

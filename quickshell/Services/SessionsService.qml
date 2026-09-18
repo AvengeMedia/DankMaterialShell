@@ -126,7 +126,7 @@ Singleton {
         if (!session)
             session = findByUsername(target);
         if (!session) {
-            _fail("", target, I18n.tr("No active session found for %1").arg(target), callback);
+            _fail("", target, I18n.tr("No active session found for %1", "switch user error, %1 is a session id or username").arg(target), callback);
             return;
         }
         if (session.current) {
@@ -170,7 +170,7 @@ Singleton {
                 Qt.callLater(() => activateProc.destroy());
 
                 if (exitCode !== 0) {
-                    svc._fail(sessionId, username, err || I18n.tr("loginctl activate failed (exit %1)").arg(exitCode), cb);
+                    svc._fail(sessionId, username, err || I18n.tr("loginctl activate failed (exit %1)", "switch user error, loginctl is a command, %1 is exit code").arg(exitCode), cb);
                     return;
                 }
                 if (typeof cb === "function") {

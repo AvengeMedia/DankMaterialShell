@@ -102,20 +102,6 @@ func TestConvertNiriRulesToWindowRules(t *testing.T) {
 	}
 }
 
-func TestNiriWritableProvider(t *testing.T) {
-	tmpDir := t.TempDir()
-	provider := NewNiriWritableProvider(tmpDir)
-
-	if provider.Name() != "niri" {
-		t.Errorf("Name() = %q, want niri", provider.Name())
-	}
-
-	expectedPath := filepath.Join(tmpDir, "dms", "windowrules.kdl")
-	if provider.GetOverridePath() != expectedPath {
-		t.Errorf("GetOverridePath() = %q, want %q", provider.GetOverridePath(), expectedPath)
-	}
-}
-
 func TestNiriSetAndLoadDMSRules(t *testing.T) {
 	tmpDir := t.TempDir()
 	provider := NewNiriWritableProvider(tmpDir)

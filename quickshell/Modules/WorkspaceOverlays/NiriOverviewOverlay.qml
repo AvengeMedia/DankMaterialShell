@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Common
 import qs.Modals.DankLauncherV2
+import qs.Modals.DankLauncherV2.Components
 import qs.Services
 import qs.Widgets
 
@@ -160,15 +161,14 @@ Scope {
 
                 WindowBlur {
                     targetWindow: overlayWindow
-                    // Track the container's scale so blur shrinks with the content
-                    // during exit — otherwise blur pops away one frame after content.
                     readonly property real s: Math.min(1, spotlightContainer.scale)
                     readonly property bool active: overlayWindow.shouldShowSpotlight && spotlightContainer.opacity > 0
                     blurX: spotlightContainer.x + spotlightContainer.width * (1 - s) * 0.5
                     blurY: spotlightContainer.y + spotlightContainer.height * (1 - s) * 0.5
                     blurWidth: active ? spotlightContainer.width * s : 0
                     blurHeight: active ? spotlightContainer.height * s : 0
-                    blurRadius: Theme.cornerRadius
+                    blurRadius: spotlightContainer.cornerRadius
+                    blurBottomRadius: spotlightContainer.bottomRadius
                 }
 
                 onShouldShowSpotlightChanged: {
@@ -258,11 +258,8 @@ Scope {
                 Item {
                     id: spotlightContainer
 
-                    // Connected-frame mode: dock flush against the emerge-side frame
-                    // edge and slide in from beyond that edge. In any other mode the
-                    // spotlight stays centered — identical to master.
                     readonly property string connectedEmergeSide: SettingsData.frameLauncherEmergeSide || "bottom"
-                    readonly property real _centerY: overlayWindow.useSpotlightStyle ? Math.max(0, parent.height * 0.33 - 28) : (parent.height - height) / 2
+                    readonly property real _centerY: overlayWindow.useSpotlightStyle ? LauncherMetrics.spotlightY(parent.height, 0, 0) : (parent.height - height) / 2
                     readonly property real _connectedRestY: {
                         if (!Theme.isConnectedEffect || !overlayWindow.screen)
                             return _centerY;
@@ -280,32 +277,12 @@ Scope {
                         return Theme.snap(collapsed + (rest - collapsed) * slideMorph.value, overlayWindow.dpr);
                     }
 
-                    readonly property int baseWidth: {
-                        switch (SettingsData.dankLauncherV2Size) {
-                        case "micro":
-                            return 500;
-                        case "medium":
-                            return 720;
-                        case "large":
-                            return 860;
-                        default:
-                            return 620;
-                        }
-                    }
-                    readonly property int baseHeight: {
-                        switch (SettingsData.dankLauncherV2Size) {
-                        case "micro":
-                            return 480;
-                        case "medium":
-                            return 720;
-                        case "large":
-                            return 860;
-                        default:
-                            return 600;
-                        }
-                    }
-                    width: overlayWindow.useSpotlightStyle ? Math.min(680, overlayWindow.screen.width - 80) : Math.min(baseWidth, overlayWindow.screen.width - 100)
-                    height: overlayWindow.useSpotlightStyle ? Math.ceil(overlayWindow.launcherContent?.implicitHeight ?? 56) : Math.min(baseHeight, overlayWindow.screen.height - 100)
+                    readonly property int baseWidth: overlayWindow.useSpotlightStyle ? LauncherMetrics.spotlightWidth : LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)
+                    readonly property int baseHeight: LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)
+                    readonly property real cornerRadius: overlayWindow.useSpotlightStyle ? LauncherMetrics.spotlightRadius(width) : Theme.windowRadius
+                    readonly property real bottomRadius: overlayWindow.useSpotlightStyle ? LauncherMetrics.spotlightBottomRadius(width, height) : cornerRadius
+                    width: Math.min(baseWidth, overlayWindow.screen.width - LauncherMetrics.screenMargin)
+                    height: overlayWindow.useSpotlightStyle ? Math.ceil(overlayWindow.launcherContent?.implicitHeight ?? LauncherMetrics.pillHeight) : Math.min(baseHeight, overlayWindow.screen.height - LauncherMetrics.screenMargin)
 
                     readonly property bool animatingOut: niriOverviewScope.isClosing && overlayWindow.isSpotlightScreen
 
@@ -377,10 +354,12 @@ Scope {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                        radius: Theme.cornerRadius
+                        color: Theme.floatingWindowSurface
+                        radius: spotlightContainer.cornerRadius
+                        bottomLeftRadius: spotlightContainer.bottomRadius
+                        bottomRightRadius: spotlightContainer.bottomRadius
                         border.color: Theme.outlineMedium
-                        border.width: 1
+                        border.width: overlayWindow.useSpotlightStyle ? 0 : 1
                     }
 
                     FocusScope {

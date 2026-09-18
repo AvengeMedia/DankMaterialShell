@@ -56,12 +56,19 @@ TestCase {
     }
 
     function head(name, enabled) {
-        return { name: name, enabled: enabled };
+        return {
+            name: name,
+            enabled: enabled
+        };
     }
 
     function start(heads, currentOutput, linkUp = true) {
-        wlr = createTemporaryObject(wlrFactory, testCase, { outputs: heads });
-        socket = createTemporaryObject(socketFactory, testCase, { linkUp: linkUp });
+        wlr = createTemporaryObject(wlrFactory, testCase, {
+            outputs: heads
+        });
+        socket = createTemporaryObject(socketFactory, testCase, {
+            linkUp: linkUp
+        });
         adapter = createTemporaryObject(adapterFactory, testCase, {
             wlrOutputService: wlr,
             socket: socket,
@@ -72,7 +79,12 @@ TestCase {
     }
 
     function compareRequests(expected) {
-        compare(socket.requests, expected.map(item => ({ Output: { output: item[0], action: item[1] } })));
+        compare(socket.requests, expected.map(item => ({
+                    Output: {
+                        output: item[0],
+                        action: item[1]
+                    }
+                })));
     }
 
     function test_wlrSignalConfirmsDisabledTargetBeforePeersTurnOff() {
@@ -158,26 +170,28 @@ TestCase {
     }
 
     function test_outputMembershipIsCheckedForEachSend() {
-        start([head("DP-1", false), head("HDMI-A-1", true), head("eDP-1", true)], "eDP-1");
+        start([head("DP-1", false), head("DP-2", true), head("DP-3", true)], "DP-3");
         compare(adapter.cycleSingleOutput(), "OUTPUT_CYCLE_ACCEPTED");
-        socket.afterSend = function(request) {
+        compareRequests([["DP-1", "On"]]);
+        socket.afterSend = function (request) {
             if (request.Output.action === "Off")
                 wlr.outputs = [head("DP-1", true)];
         };
 
-        wlr.publish([head("DP-1", true), head("HDMI-A-1", true), head("eDP-1", true)]);
-        compareRequests([["DP-1", "On"], ["HDMI-A-1", "Off"]]);
+        wlr.publish([head("DP-1", true), head("DP-2", true), head("DP-3", true)]);
+        compareRequests([["DP-1", "On"], ["DP-2", "Off"]]);
     }
 
     function test_actualLinkIsCheckedForEachSend() {
-        start([head("DP-1", false), head("HDMI-A-1", true), head("eDP-1", true)], "eDP-1");
+        start([head("DP-1", false), head("DP-2", true), head("DP-3", true)], "DP-3");
         compare(adapter.cycleSingleOutput(), "OUTPUT_CYCLE_ACCEPTED");
-        socket.afterSend = function(request) {
+        compareRequests([["DP-1", "On"]]);
+        socket.afterSend = function (request) {
             if (request.Output.action === "Off")
                 socket.linkUp = false;
         };
 
-        wlr.publish([head("DP-1", true), head("HDMI-A-1", true), head("eDP-1", true)]);
-        compareRequests([["DP-1", "On"], ["HDMI-A-1", "Off"]]);
+        wlr.publish([head("DP-1", true), head("DP-2", true), head("DP-3", true)]);
+        compareRequests([["DP-1", "On"], ["DP-2", "Off"]]);
     }
 }

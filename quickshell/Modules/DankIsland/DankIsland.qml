@@ -11,26 +11,7 @@ Item {
 
     property var hyprlandOverviewLoader: null
 
-    // One host per (island instance, screen), skipping a screen edge another island already holds.
-    readonly property var hostSlots: {
-        SettingsData.barConfigs;
-        Quickshell.screens;
-        const slots = [];
-        for (const screen of Quickshell.screens) {
-            const claimed = {};
-            for (const config of SettingsData.activeIslandConfigsForScreen(screen)) {
-                const edge = SettingsData.islandEdge(config);
-                if (claimed[edge])
-                    continue;
-                claimed[edge] = true;
-                slots.push({
-                    "barId": config.id,
-                    "screen": screen
-                });
-            }
-        }
-        return slots;
-    }
+    readonly property var hostSlots: ShellLayout.islandKeys
 
     readonly property bool launcherOpen: root.activityOpen("launcher")
     readonly property bool controlCenterOpen: root.activityOpen("controlcenter")
@@ -51,48 +32,50 @@ Item {
         return root.hostWithActivity(activityId) !== null;
     }
 
-    function hostForExactScreen(screen) {
-        if (!screen)
-            return null;
-        for (const host of hosts()) {
-            if (host?.screen === screen || host?.screen?.name === screen.name)
-                return host;
-        }
-        return null;
+    function hostForExactScreen(screen, barId) {
+        return screen ? hostForScreenName(screen.name, barId) : null;
     }
 
-    function hostForScreenName(screenName) {
-        for (const host of hosts()) {
-            if (host?.screen?.name === screenName)
+    function hostForScreenName(screenName, barId) {
+        const instances = ShellLayout.forScreen(screenName)?.instances ?? [];
+        const ordered = instances.filter(instance => instance.kind === "island" && (!barId || instance.barId === barId)).sort((a, b) => Number(["left", "right"].includes(a.edge)) - Number(["left", "right"].includes(b.edge)) || a.configOrder - b.configOrder);
+        for (const instance of ordered) {
+            const host = hosts().find(host => host?.screen?.name === screenName && host.barId === instance.barId && host.islandController);
+            if (host)
                 return host;
         }
         return null;
     }
 
     function focusedHost() {
-        const focusedName = CompositorService.getFocusedScreen()?.name ?? "";
-        return focusedName ? root.hostForScreenName(focusedName) : null;
+        const focused = hostForScreenName(CompositorService.getFocusedScreenName());
+        if (focused)
+            return focused;
+        for (const screen of Quickshell.screens) {
+            const host = hostForScreenName(screen.name);
+            if (host)
+                return host;
+        }
+        return null;
     }
 
     function focusedIslandScreen() {
-        return root.focusedHost()?.screen ?? null;
+        return focusedHost()?.screen ?? null;
     }
 
-    function hasHostForScreen(screen) {
-        if (!screen)
-            return hosts().length > 0;
-        return root.hostForExactScreen(screen) !== null;
+    function hasHostForScreen(screen, barId) {
+        return screen ? hostForExactScreen(screen, barId) !== null : focusedHost() !== null;
     }
 
-    function hostForScreenOrFocused(screen) {
-        return root.hostForExactScreen(screen) ?? root.focusedHost();
+    function hostForScreenOrFocused(screen, barId) {
+        if (barId && !screen)
+            return null;
+        return screen ? hostForExactScreen(screen, barId) : focusedHost();
     }
 
-    function hostForScreen(screenName) {
-        const requestedName = (screenName || "").trim();
-        if (requestedName)
-            return root.hostForScreenName(requestedName);
-        return root.focusedHost() ?? (hosts()[0] ?? null);
+    function hostForScreen(screenName, barId) {
+        const requested = (screenName || "").trim();
+        return requested ? hostForScreenName(requested, barId) : barId ? null : focusedHost();
     }
 
     function activityName(activity) {
@@ -119,6 +102,10 @@ Item {
 
     function openActivityOn(host, activityId, section) {
         switch (activityId) {
+        case "media":
+            if (!host.islandController.mediaAvailable)
+                return host.islandController.requestActivity("home", true, true);
+            return host.islandController.requestActivity("media", true, true);
         case "launcher":
             return host.islandController.requestLauncher("", "", false);
         case "controlcenter":
@@ -133,18 +120,22 @@ Item {
         return host.islandController.requestActivity(activityId, true, true);
     }
 
-    function openActivity(activityId, screen, section): bool {
-        const host = root.hostForScreenOrFocused(screen);
+    function openActivity(activityId, screen, section, barId): bool {
+        const host = root.hostForScreenOrFocused(screen, barId);
         return host ? root.openActivityOn(host, activityId, section) === true : false;
     }
 
-    function toggleActivity(activityId, screen, section): bool {
-        const openHost = root.hostWithActivity(activityId);
+    function toggleActivity(activityId, screen, section, barId): bool {
+        const host = root.hostForScreenOrFocused(screen, barId);
+        if (!host)
+            return false;
+        const resolved = activityId === "media" && !host.islandController.mediaAvailable ? "home" : activityId;
+        const openHost = barId ? (host.islandController.activeActivity === resolved && host.islandController.expanded ? host : null) : root.hostWithActivity(resolved);
         if (openHost) {
             openHost.islandController.requestCollapse();
             return true;
         }
-        return root.openActivity(activityId, screen, section);
+        return root.openActivity(activityId, screen, section, barId);
     }
 
     function closeActivity(activityId): bool {
@@ -170,8 +161,8 @@ Item {
         return root.closeActivity("launcher");
     }
 
-    function ipcOpen(activity, screen) {
-        const host = root.hostForScreen(screen);
+    function ipcOpen(activity, screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return "DANK_ISLAND_UNAVAILABLE";
         const requested = root.activityName(activity);
@@ -180,19 +171,19 @@ Item {
         return `DANK_ISLAND_OPEN: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcToggle(activity, screen) {
-        const host = root.hostForScreen(screen);
+    function ipcToggle(activity, screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return "DANK_ISLAND_UNAVAILABLE";
         if (host.islandController.expanded && !host.islandController.notificationActive) {
             host.islandController.requestCollapse();
             return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
         }
-        return ipcOpen(activity, screen);
+        return ipcOpen(activity, screen, barId);
     }
 
-    function ipcShow(activity, screen) {
-        const host = root.hostForScreen(screen);
+    function ipcShow(activity, screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return "DANK_ISLAND_UNAVAILABLE";
         const requested = root.activityName(activity);
@@ -201,24 +192,24 @@ Item {
         return `DANK_ISLAND_SHOW: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcClose(screen) {
-        const host = root.hostForScreen(screen);
+    function ipcClose(screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return "DANK_ISLAND_UNAVAILABLE";
         host.islandController.requestCollapse();
         return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
     }
 
-    function ipcCycle(screen) {
-        const host = root.hostForScreen(screen);
+    function ipcCycle(screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return "DANK_ISLAND_UNAVAILABLE";
         host.islandController.cycleActivity(1, host.islandController.expanded);
         return `DANK_ISLAND_ACTIVITY: ${host.islandController.activeActivity}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcStatus(screen) {
-        const host = root.hostForScreen(screen);
+    function ipcStatus(screen, barId) {
+        const host = root.hostForScreen(screen, barId);
         if (!host)
             return JSON.stringify({
                 "available": false,
@@ -257,8 +248,9 @@ Item {
         delegate: DankIslandHostWindow {
             required property var modelData
 
-            screen: modelData.screen
-            barId: modelData.barId
+            readonly property var identity: JSON.parse(modelData)
+            screen: ShellLayout.screenForName(identity[0])
+            barId: identity[1]
             hyprlandOverviewLoader: root.hyprlandOverviewLoader
         }
     }
@@ -312,6 +304,14 @@ Item {
 
         function statusOn(screen: string): string {
             return root.ipcStatus(screen);
+        }
+
+        function openInstance(activity: string, screen: string, barId: string): string {
+            return root.ipcOpen(activity, screen, barId);
+        }
+
+        function toggleInstance(activity: string, screen: string, barId: string): string {
+            return root.ipcToggle(activity, screen, barId);
         }
 
         function notifications(): string {

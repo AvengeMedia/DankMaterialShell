@@ -1,12 +1,21 @@
 import QtQuick
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Item {
     id: root
 
     property string layerNamespacePlugin: "plugin"
 
+    property var surfaceContext: null
+    property var hostContext: null
+    property string widgetInstanceId: ""
+    property Component attachedContent: null
+    readonly property bool usesAttachedExpansion: !!attachedContent && ((surfaceContext?.inlineExpansion ?? false) || !hasPopout)
+    readonly property bool surfaceLive: (surfaceContext?.live ?? true) && effectiveVisible
+    readonly property bool attachedActive: surfaceContext?.host?.expansionOwner === root
+    readonly property bool interactionActive: attachedActive || pluginPopout.shouldBeVisible
     property var axis: null
     property string section: "center"
     property var parentScreen: null
@@ -24,6 +33,7 @@ Item {
     property bool isTopBarEdge: false
     property bool isBottomBarEdge: false
     property real sectionSpacing: 0
+    property string segmentRole: "solo"
     property real crossEdgeExtension: 0
 
     property string visibilityCommand: ""
@@ -31,7 +41,7 @@ Item {
     property bool conditionVisible: true
     property bool _visibilityOverride: false
     property bool _visibilityOverrideValue: true
-    readonly property bool _barRevealed: blurBarWindow?.barRevealed ?? true
+    readonly property bool _barRevealed: surfaceContext?.live ?? blurBarWindow?.barRevealed ?? true
 
     readonly property bool effectiveVisible: {
         if (_visibilityOverride)
@@ -201,6 +211,7 @@ Item {
         content: root.horizontalBarPill
         isFirst: root.isFirst
         isLast: root.isLast
+        segmentRole: root.segmentRole
         isLeftBarEdge: root.isLeftBarEdge
         isRightBarEdge: root.isRightBarEdge
         isTopBarEdge: root.isTopBarEdge
@@ -218,6 +229,7 @@ Item {
         }
 
         transitions: Transition {
+            enabled: !SettingsData.reduceMotion
             NumberAnimation {
                 properties: "width,opacity"
                 duration: Theme.shortDuration
@@ -225,32 +237,8 @@ Item {
             }
         }
 
-        onClicked: {
-            if (pillClickAction) {
-                if (pillClickAction.length === 0) {
-                    pillClickAction();
-                } else {
-                    const globalPos = mapToItem(null, 0, 0);
-                    const currentScreen = parentScreen || Screen;
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
-                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
-                }
-            } else if (hasPopout) {
-                pluginPopout.toggle();
-            }
-        }
-        onRightClicked: {
-            if (pillRightClickAction) {
-                if (pillRightClickAction.length === 0) {
-                    pillRightClickAction();
-                } else {
-                    const globalPos = mapToItem(null, 0, 0);
-                    const currentScreen = parentScreen || Screen;
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
-                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen);
-                }
-            }
-        }
+        onClicked: root.triggerPopout()
+        onRightClicked: root.runPillAction(root.pillRightClickAction)
     }
 
     BasePill {
@@ -270,6 +258,7 @@ Item {
         isVerticalOrientation: true
         isFirst: root.isFirst
         isLast: root.isLast
+        segmentRole: root.segmentRole
         isLeftBarEdge: root.isLeftBarEdge
         isRightBarEdge: root.isRightBarEdge
         isTopBarEdge: root.isTopBarEdge
@@ -287,6 +276,7 @@ Item {
         }
 
         transitions: Transition {
+            enabled: !SettingsData.reduceMotion
             NumberAnimation {
                 properties: "height,opacity"
                 duration: Theme.shortDuration
@@ -294,64 +284,70 @@ Item {
             }
         }
 
-        onClicked: {
-            if (pillClickAction) {
-                if (pillClickAction.length === 0) {
-                    pillClickAction();
-                } else {
-                    const globalPos = mapToItem(null, 0, 0);
-                    const currentScreen = parentScreen || Screen;
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
-                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
-                }
-            } else if (hasPopout) {
-                pluginPopout.toggle();
-            }
-        }
-        onRightClicked: {
-            if (pillRightClickAction) {
-                if (pillRightClickAction.length === 0) {
-                    pillRightClickAction();
-                } else {
-                    const globalPos = mapToItem(null, 0, 0);
-                    const currentScreen = parentScreen || Screen;
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
-                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen);
-                }
-            }
-        }
+        onClicked: root.triggerPopout()
+        onRightClicked: root.runPillAction(root.pillRightClickAction)
+    }
+
+    Component.onDestruction: {
+        if (attachedActive)
+            surfaceContext.dismissExpansion();
     }
 
     function closePopout() {
+        if (attachedActive)
+            surfaceContext.dismissExpansion();
         if (pluginPopout) {
             pluginPopout.close();
         }
     }
 
-    function triggerPopout() {
-        if (pillClickAction) {
-            if (pillClickAction.length === 0) {
-                pillClickAction();
-                return;
-            }
-            const pill = isVertical ? verticalPill : horizontalPill;
-            const globalPos = pill.mapToItem(null, 0, 0);
-            const currentScreen = parentScreen || Screen;
-            const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.width);
-            pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
+    function pillAnchor() {
+        const pill = isVertical ? verticalPill : horizontalPill;
+        if (surfaceContext?.popupAnchor)
+            return surfaceContext.popupAnchor(pill, section);
+        const screen = parentScreen || Screen;
+        const position = barConfig?.position ?? (isVertical ? 2 : 0);
+        return {
+            trigger: SettingsData.getPopupTriggerPosition(pill.visualContent.mapToItem(null, 0, 0), screen, barThickness, pill.visualWidth, barSpacing, position, barConfig),
+            screen,
+            section,
+            position,
+            thickness: barThickness,
+            spacing: barSpacing,
+            config: barConfig
+        };
+    }
+
+    function runPillAction(action) {
+        if (!action)
+            return;
+        if (action.length === 0) {
+            action();
             return;
         }
-        if (!hasPopout)
+        const anchor = pillAnchor();
+        if (anchor)
+            action(anchor.trigger.x, anchor.trigger.y, anchor.trigger.width, section, anchor.screen);
+    }
+
+    function positionPopout() {
+        const anchor = pillAnchor();
+        if (!anchor)
+            return false;
+        pluginPopout.setTriggerPosition(anchor.trigger.x, anchor.trigger.y, anchor.trigger.width, section, anchor.screen, anchor.position, anchor.thickness, anchor.spacing, anchor.config, root);
+        return true;
+    }
+
+    function triggerPopout() {
+        surfaceContext?.ensureVisible(root);
+        if (pillClickAction) {
+            runPillAction(pillClickAction);
             return;
-
-        const pill = isVertical ? verticalPill : horizontalPill;
-        const globalPos = pill.visualContent.mapToItem(null, 0, 0);
-        const currentScreen = parentScreen || Screen;
-        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
-        const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.visualWidth, barSpacing, barPosition, barConfig);
-
-        pluginPopout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barThickness, barSpacing, barConfig);
-        pluginPopout.toggle();
+        }
+        if (usesAttachedExpansion && surfaceContext?.requestExpansion(root))
+            return;
+        if (hasPopout && positionPopout())
+            pluginPopout.toggle();
     }
 
     function triggerHoverPopout(widgetHostId) {
@@ -359,16 +355,8 @@ Item {
             triggerPopout();
             return;
         }
-        if (!hasPopout)
+        if (!hasPopout || !positionPopout())
             return;
-
-        const pill = isVertical ? verticalPill : horizontalPill;
-        const globalPos = pill.visualContent.mapToItem(null, 0, 0);
-        const currentScreen = parentScreen || Screen;
-        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
-        const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.visualWidth, barSpacing, barPosition, barConfig);
-
-        pluginPopout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barThickness, barSpacing, barConfig);
         PopoutManager.requestHoverPopout(pluginPopout, undefined, widgetHostId || pluginId);
     }
 

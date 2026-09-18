@@ -8,6 +8,7 @@ import qs.Modules.Settings.Widgets
 
 Item {
     id: root
+    readonly property var log: Log.scoped("DefaultAppsTab")
 
     readonly property var appCategory: ({
             WebBrowser: 0,
@@ -86,7 +87,7 @@ Item {
     }
 
     readonly property string dmsChooserId: "dms-open.desktop"
-    readonly property string dmsChooserLabel: I18n.tr("DMS Chooser")
+    readonly property string dmsChooserLabel: I18n.tr("DMS chooser")
 
     function withDmsChooser(entries) {
         const filtered = (entries || []).filter(e => e.value !== root.dmsChooserId && e.value !== "dms-open");
@@ -270,112 +271,94 @@ Item {
 
     // Dropdowns
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            settingKey: "defaultAppsInternet"
+            tags: ["browser", "mail", "email", "web"]
+            title: I18n.tr("Internet", "Internet")
+            iconName: "public"
 
-            SettingsCard {
-                settingKey: "defaultAppsInternet"
-                tags: ["browser", "mail", "email", "web"]
-                title: I18n.tr("Internet", "Internet")
-                iconName: "public"
-
-                AppSelector {
-                    text: I18n.tr("Web Browser", "Web Browser")
-                    tags: ["web", "browser", "internet"]
-                    category: root.appCategory.WebBrowser
-                    description: I18n.tr("Handles links and opens HTML files", "Handles links and opens HTML files")
-                }
-
-                AppSelector {
-                    text: I18n.tr("Mail", "Mail")
-                    category: root.appCategory.Mail
-                    tags: ["mail", "email"]
-                    description: I18n.tr("Handles mailto links", "Handles mailto links")
-                }
-
-                AppSelector {
-                    text: I18n.tr("Maps", "Maps")
-                    category: root.appCategory.Maps
-                    tags: ["maps", "geo", "location"]
-                    description: I18n.tr("Handles geo: location links", "Handles geo: location links")
-                }
+            AppSelector {
+                text: I18n.tr("Web browser")
+                tags: ["web", "browser", "internet", "links", "html"]
+                category: root.appCategory.WebBrowser
             }
 
-            SettingsCard {
-                settingKey: "defaultAppsUtilities"
-                tags: ["file", "manager", "terminal", "editor"]
-                title: I18n.tr("Utilities", "Utilities")
-                iconName: "terminal"
-
-                AppSelector {
-                    text: I18n.tr("File Manager", "File Manager")
-                    tags: ["file", "manager", "directory", "sftp"]
-                    category: root.appCategory.FileManager
-                    description: I18n.tr("Manages files and directories", "Manages files and directories")
-                }
-                AppSelector {
-                    text: I18n.tr("Terminal", "Terminal")
-                    category: root.appCategory.Terminal
-                    tags: ["terminal", "console"]
-                    description: I18n.tr("Used for xdg-terminal-exec", "Used for xdg-terminal-exec")
-                }
-                AppSelector {
-                    text: I18n.tr("Calendar", "Calendar")
-                    category: root.appCategory.Calendar
-                    tags: ["calendar", "events"]
-                }
+            AppSelector {
+                text: I18n.tr("Mail", "Mail")
+                category: root.appCategory.Mail
+                tags: ["mail", "email", "mailto"]
             }
 
-            SettingsCard {
-                settingKey: "defaultAppsDocuments"
-                tags: ["pdf", "text", "reader", "office"]
-                title: I18n.tr("Documents", "Documents")
-                iconName: "edit_document"
-
-                AppSelector {
-                    text: I18n.tr("Text Editor", "Text Editor")
-                    category: root.appCategory.TextEditor
-                    tags: ["text", "editor"]
-                    description: I18n.tr("For editing plain text files", "For editing plain text files")
-                }
-                AppSelector {
-                    text: I18n.tr("PDF Reader", "PDF Reader")
-                    category: root.appCategory.PDFReader
-                    tags: ["pdf", "reader"]
-                }
+            AppSelector {
+                text: I18n.tr("Maps", "Maps")
+                category: root.appCategory.Maps
+                tags: ["maps", "geo", "location"]
             }
+        }
 
-            SettingsCard {
-                settingKey: "defaultAppsMultimedia"
-                tags: ["image", "video", "music", "viewer", "player"]
-                title: I18n.tr("Multimedia", "Multimedia")
-                iconName: "movie"
-                AppSelector {
-                    text: I18n.tr("Image Viewer", "Image Viewer")
-                    category: root.appCategory.ImageViewer
-                    tags: ["image", "viewer"]
-                }
-                AppSelector {
-                    text: I18n.tr("Video Player", "Video Player")
-                    category: root.appCategory.VideoPlayer
-                    tags: ["video", "player"]
-                }
-                AppSelector {
-                    text: I18n.tr("Music Player", "Music Player")
-                    category: root.appCategory.MusicPlayer
-                    tags: ["music", "player"]
-                    description: I18n.tr("Plays audio files", "Plays audio files")
-                }
+        SettingsCard {
+            settingKey: "defaultAppsUtilities"
+            tags: ["file", "manager", "terminal", "editor"]
+            title: I18n.tr("Utilities", "Utilities")
+            iconName: "terminal"
+
+            AppSelector {
+                text: I18n.tr("File manager")
+                tags: ["file", "manager", "directory", "sftp"]
+                category: root.appCategory.FileManager
+            }
+            AppSelector {
+                text: I18n.tr("Terminal", "Terminal")
+                category: root.appCategory.Terminal
+                tags: ["terminal", "console", "xdg-terminal-exec"]
+            }
+            AppSelector {
+                text: I18n.tr("Calendar", "Calendar")
+                category: root.appCategory.Calendar
+                tags: ["calendar", "events"]
+            }
+        }
+
+        SettingsCard {
+            settingKey: "defaultAppsDocuments"
+            tags: ["pdf", "text", "reader", "office"]
+            title: I18n.tr("Documents", "Documents")
+            iconName: "edit_document"
+
+            AppSelector {
+                text: I18n.tr("Text editor")
+                category: root.appCategory.TextEditor
+                tags: ["text", "editor"]
+            }
+            AppSelector {
+                text: I18n.tr("PDF reader")
+                category: root.appCategory.PDFReader
+                tags: ["pdf", "reader"]
+            }
+        }
+
+        SettingsCard {
+            settingKey: "defaultAppsMultimedia"
+            tags: ["image", "video", "music", "viewer", "player"]
+            title: I18n.tr("Multimedia", "Multimedia")
+            iconName: "movie"
+            AppSelector {
+                text: I18n.tr("Image viewer")
+                category: root.appCategory.ImageViewer
+                tags: ["image", "viewer"]
+            }
+            AppSelector {
+                text: I18n.tr("Video player")
+                category: root.appCategory.VideoPlayer
+                tags: ["video", "player"]
+            }
+            AppSelector {
+                text: I18n.tr("Music player")
+                category: root.appCategory.MusicPlayer
+                tags: ["music", "player", "audio"]
             }
         }
     }

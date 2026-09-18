@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 type LocationEvent struct {
@@ -11,7 +12,7 @@ type LocationEvent struct {
 	Data State  `json:"data"`
 }
 
-func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	switch req.Method {
 	case "location.getState":
 		handleGetState(conn, req, manager)
@@ -23,11 +24,11 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	clientID := fmt.Sprintf("client-%p", conn)
 	stateChan := manager.Subscribe(clientID)
 	defer manager.Unsubscribe(clientID)
@@ -38,7 +39,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 		Data: initialState,
 	}
 
-	if err := conn.WriteResponse(models.Response[LocationEvent]{
+	if err := conn.WriteResponse(ipc.Response[LocationEvent]{
 		ID:     req.ID,
 		Result: &event,
 	}); err != nil {
@@ -50,7 +51,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 			Type: "state_changed",
 			Data: state,
 		}
-		if err := conn.WriteResponse(models.Response[LocationEvent]{
+		if err := conn.WriteResponse(ipc.Response[LocationEvent]{
 			Result: &event,
 		}); err != nil {
 			return

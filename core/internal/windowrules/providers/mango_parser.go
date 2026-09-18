@@ -249,59 +249,20 @@ func (p *MangoWritableProvider) GetRuleSet() (*windowrules.RuleSet, error) {
 	}, nil
 }
 
+func (p *MangoWritableProvider) EnsureWritable() error {
+	return nil
+}
+
 func (p *MangoWritableProvider) SetRule(rule windowrules.WindowRule) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		rules = []windowrules.WindowRule{}
-	}
-	found := false
-	for i, r := range rules {
-		if r.ID == rule.ID {
-			rules[i] = rule
-			found = true
-			break
-		}
-	}
-	if !found {
-		rules = append(rules, rule)
-	}
-	return p.writeDMSRules(rules)
+	return windowrules.Set(p, rule)
 }
 
 func (p *MangoWritableProvider) RemoveRule(id string) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-	newRules := make([]windowrules.WindowRule, 0, len(rules))
-	for _, r := range rules {
-		if r.ID != id {
-			newRules = append(newRules, r)
-		}
-	}
-	return p.writeDMSRules(newRules)
+	return windowrules.Remove(p, id)
 }
 
 func (p *MangoWritableProvider) ReorderRules(ids []string) error {
-	rules, err := p.LoadDMSRules()
-	if err != nil {
-		return err
-	}
-	ruleMap := make(map[string]windowrules.WindowRule, len(rules))
-	for _, r := range rules {
-		ruleMap[r.ID] = r
-	}
-	newRules := make([]windowrules.WindowRule, 0, len(ids))
-	for _, id := range ids {
-		if r, ok := ruleMap[id]; ok {
-			newRules = append(newRules, r)
-			delete(ruleMap, id)
-		}
-	}
-	for _, r := range ruleMap {
-		newRules = append(newRules, r)
-	}
-	return p.writeDMSRules(newRules)
+	return windowrules.Reorder(p, ids)
 }
 
 // LoadDMSRules parses only the DMS override file, preserving @id/@name metadata.
@@ -341,7 +302,7 @@ func (p *MangoWritableProvider) LoadDMSRules() ([]windowrules.WindowRule, error)
 	return rules, nil
 }
 
-func (p *MangoWritableProvider) writeDMSRules(rules []windowrules.WindowRule) error {
+func (p *MangoWritableProvider) WriteDMSRules(rules []windowrules.WindowRule) error {
 	overridePath := p.GetOverridePath()
 	if err := os.MkdirAll(filepath.Dir(overridePath), 0o755); err != nil {
 		return err

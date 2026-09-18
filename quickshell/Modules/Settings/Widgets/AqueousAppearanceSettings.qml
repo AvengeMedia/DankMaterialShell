@@ -15,13 +15,15 @@ SettingsCard {
     readonly property var report: cursor ? snapshot?.desktop_cursor : snapshot?.desktop_typography
     readonly property bool partial: (report?.failed_count || 0) > 0
     readonly property bool supported: snapshot?.capabilities?.includes(cursor ? "cursor_sync" : "typography_sync") || false
+    readonly property bool working: busy || AqueousConfigService.busy
+    readonly property bool hasChanges: Object.keys(changes).length > 0
     title: cursor ? I18n.tr("Aqueous cursor", "Aqueous compositor cursor synchronization settings") : I18n.tr("Aqueous typography", "Aqueous compositor font synchronization settings")
     iconName: cursor ? "mouse" : "text_fields"
     tab: cursor ? "theme" : "typography"
     tags: ["aqueous", "appearance"]
 
     function reload() {
-        if (busy || AqueousConfigService.busy)
+        if (working)
             return;
         busy = true;
         AqueousConfigService.load((data, message) => {
@@ -55,6 +57,20 @@ SettingsCard {
         }
     }
 
+    function targetColor(target) {
+        switch (target.state) {
+        case "synced":
+            return Theme.success;
+        case "drifted":
+        case "partial":
+            return Theme.warning;
+        case "failed":
+            return Theme.error;
+        default:
+            return Theme.surfaceVariantText;
+        }
+    }
+
     function value(id) {
         if (Object.prototype.hasOwnProperty.call(changes, id))
             return changes[id];
@@ -68,10 +84,7 @@ SettingsCard {
     }
 
     function apply(retry) {
-        if (busy || !snapshot || AqueousConfigService.busy)
-            return;
-        const capability = cursor ? "cursor_sync" : "typography_sync";
-        if (!snapshot.capabilities?.includes(capability))
+        if (working || !supported)
             return;
         const draft = {
             expected_generation: snapshot.generation,
@@ -104,95 +117,107 @@ SettingsCard {
 
     Component.onCompleted: reload()
 
-    Column {
-        width: parent.width
-        spacing: Theme.spacingM
+    headerActions: DankActionButton {
+        iconName: "refresh"
+        iconColor: Theme.surfaceVariantText
+        Accessible.name: I18n.tr("Refresh")
+        enabled: !root.working
+        onClicked: root.reload()
+    }
 
-        SettingsDropdownRow {
-            width: parent.width
-            visible: root.cursor
-            enabled: root.supported && !root.busy
-            text: I18n.tr("Cursor Theme")
-            options: root.snapshot?.desktop_cursor?.themes || []
-            currentValue: root.value("desktop.cursor.theme") || "default"
-            onValueChanged: value => {
-                root.stage("desktop.cursor.theme", value);
+    SettingsDropdownRow {
+        visible: root.cursor
+        enabled: root.supported && !root.working
+        text: I18n.tr("Cursor Theme")
+        options: root.snapshot?.desktop_cursor?.themes || []
+        currentValue: root.value("desktop.cursor.theme") || "default"
+        onValueChanged: value => {
+            root.stage("desktop.cursor.theme", value);
+            root.stage("desktop.cursor.managed", true);
+        }
+    }
+
+    SettingsDropdownRow {
+        visible: !root.cursor
+        enabled: root.supported && !root.working
+        text: I18n.tr("Normal Font")
+        options: root.snapshot?.desktop_typography?.families || []
+        currentValue: root.value("desktop.font.family") || "sans-serif"
+        onValueChanged: value => {
+            root.stage("desktop.font.family", value);
+            root.stage("desktop.font.style", "");
+        }
+    }
+
+    SettingsSliderRow {
+        enabled: root.supported && !root.working
+        text: root.cursor ? I18n.tr("Cursor Size") : I18n.tr("Font Size")
+        minimum: root.cursor ? 12 : 6
+        maximum: root.cursor ? 128 : 30
+        value: root.value(root.cursor ? "desktop.cursor.size" : "desktop.font.size_pt") || (root.cursor ? 24 : 12)
+        unit: root.cursor ? I18n.tr("px", "Cursor size unit, pixels") : I18n.tr("pt", "Font size unit, points")
+        onSliderValueChanged: value => {
+            root.stage(root.cursor ? "desktop.cursor.size" : "desktop.font.size_pt", value);
+            if (root.cursor)
                 root.stage("desktop.cursor.managed", true);
+        }
+    }
+
+    SettingsRow {
+        visible: !root.cursor
+        subtitle: I18n.tr("DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.", "Aqueous font synchronization, describing which font settings DMS can represent")
+    }
+
+    SettingsRow {
+        visible: root.error !== "" || root.partial
+        iconName: "error"
+        iconColor: Theme.error
+        subtitle: root.error || I18n.tr("Error")
+        subtitleColor: Theme.error
+
+        DankButton {
+            visible: root.partial
+            text: I18n.tr("Retry")
+            enabled: root.supported && !root.working
+            onClicked: root.apply(true)
+        }
+    }
+
+    Repeater {
+        model: root.report?.targets || []
+
+        SettingsRow {
+            required property var modelData
+            title: modelData.id
+            trailingBadge: root.targetStatus(modelData)
+
+            DankBadge {
+                color: root.targetColor(modelData)
             }
         }
+    }
 
-        SettingsDropdownRow {
-            width: parent.width
-            visible: !root.cursor
-            enabled: root.supported && !root.busy
-            text: I18n.tr("Normal Font")
-            options: root.snapshot?.desktop_typography?.families || []
-            currentValue: root.value("desktop.font.family") || "sans-serif"
-            onValueChanged: value => {
-                root.stage("desktop.font.family", value);
-                root.stage("desktop.font.style", "");
-            }
-        }
-
-        SettingsSliderRow {
-            width: parent.width
-            enabled: root.supported && !root.busy
-            text: root.cursor ? I18n.tr("Cursor Size") : I18n.tr("Font Size")
-            minimum: root.cursor ? 12 : 6
-            maximum: root.cursor ? 128 : 30
-            value: root.value(root.cursor ? "desktop.cursor.size" : "desktop.font.size_pt") || (root.cursor ? 24 : 12)
-            unit: root.cursor ? I18n.tr("px", "Cursor size unit, pixels") : I18n.tr("pt", "Font size unit, points")
-            onSliderValueChanged: value => {
-                root.stage(root.cursor ? "desktop.cursor.size" : "desktop.font.size_pt", value);
-                if (root.cursor)
-                    root.stage("desktop.cursor.managed", true);
-            }
-        }
-
-        StyledText {
-            width: parent.width
-            visible: root.error !== "" || root.partial
-            text: root.error || I18n.tr("Error")
-            color: Theme.error
-            wrapMode: Text.WordWrap
-        }
-
-        Repeater {
-            model: root.report?.targets || []
-            StyledText {
-                required property var modelData
-                width: parent.width
-                text: I18n.tr("%1: %2", "Aqueous appearance sync target and its status").arg(modelData.id).arg(root.targetStatus(modelData))
-                color: Theme.surfaceVariantText
-                wrapMode: Text.WordWrap
-            }
-        }
-
-        StyledText {
-            width: parent.width
-            visible: !root.cursor
-            text: I18n.tr("DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.", "Aqueous font synchronization, describing which font settings DMS can represent")
-            color: Theme.surfaceVariantText
-            wrapMode: Text.WordWrap
-        }
-
-        Flow {
+    SettingsRow {
+        visible: root.hasChanges
+        body: Row {
+            LayoutMirroring.enabled: false
             width: parent.width
             spacing: Theme.spacingS
+            layoutDirection: Qt.RightToLeft
+
             DankButton {
-                text: I18n.tr("Apply Changes")
-                enabled: root.supported && !root.busy && !AqueousConfigService.busy && Object.keys(root.changes).length > 0
+                text: I18n.tr("Apply changes")
+                iconName: "check"
+                enabled: root.supported && !root.working
                 onClicked: root.apply(false)
             }
+
             DankButton {
-                text: I18n.tr("Retry")
-                enabled: root.supported && !root.busy && !AqueousConfigService.busy && root.partial
-                onClicked: root.apply(true)
-            }
-            DankButton {
-                text: I18n.tr("Refresh")
-                enabled: !root.busy && !AqueousConfigService.busy
-                onClicked: root.reload()
+                text: I18n.tr("Discard")
+                backgroundColor: "transparent"
+                textColor: Theme.surfaceText
+                enabled: !root.working
+                onClicked: root.changes = ({})
             }
         }
     }

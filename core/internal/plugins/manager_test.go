@@ -24,13 +24,6 @@ func setupTestManager(t *testing.T) (*Manager, afero.Fs, string) {
 	return manager, fs, pluginsDir
 }
 
-func TestNewManager(t *testing.T) {
-	manager, err := NewManager()
-	assert.NoError(t, err)
-	assert.NotNil(t, manager)
-	assert.NotEmpty(t, manager.pluginsDir)
-}
-
 func TestGetPluginsDir(t *testing.T) {
 	t.Run("uses XDG_CONFIG_HOME when set", func(t *testing.T) {
 		oldConfig := os.Getenv("XDG_CONFIG_HOME")
@@ -242,11 +235,6 @@ func TestListInstalled(t *testing.T) {
 		assert.Len(t, installed, 1)
 		assert.Equal(t, "Plugin1", installed[0])
 	})
-}
-
-func TestManagerGetPluginsDir(t *testing.T) {
-	manager, _, pluginsDir := setupTestManager(t)
-	assert.Equal(t, pluginsDir, manager.GetPluginsDir())
 }
 
 func TestInstallUpdatesLockfile(t *testing.T) {

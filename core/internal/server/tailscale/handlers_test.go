@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"tailscale.com/ipn"
@@ -47,12 +48,12 @@ func TestHandleGetStatus(t *testing.T) {
 	defer m.Close()
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "tailscale.getStatus"}
+	req := ipc.Request{ID: 1, Method: "tailscale.getStatus"}
 	handleGetStatus(conn, req, m)
 
-	var resp models.Response[TailscaleState]
+	var resp ipc.Response[TailscaleState]
 	err := json.NewDecoder(buf).Decode(&resp)
 	require.NoError(t, err)
 	assert.Equal(t, 1, resp.ID)
@@ -66,12 +67,12 @@ func TestHandleRefresh(t *testing.T) {
 	defer m.Close()
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "tailscale.refresh"}
+	req := ipc.Request{ID: 1, Method: "tailscale.refresh"}
 	handleRefresh(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	err := json.NewDecoder(buf).Decode(&resp)
 	require.NoError(t, err)
 	assert.Equal(t, 1, resp.ID)
@@ -98,12 +99,12 @@ func TestHandleActions(t *testing.T) {
 			defer m.Close()
 
 			buf := &bytes.Buffer{}
-			conn := models.NewConn(&mockConn{Buffer: buf})
+			conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-			req := models.Request{ID: 1, Method: tc.method, Params: tc.params}
+			req := ipc.Request{ID: 1, Method: tc.method, Params: tc.params}
 			HandleRequest(conn, req, m)
 
-			var resp models.Response[models.SuccessResult]
+			var resp ipc.Response[models.SuccessResult]
 			require.NoError(t, json.NewDecoder(buf).Decode(&resp))
 			assert.Equal(t, 1, resp.ID)
 			assert.Empty(t, resp.Error)
@@ -125,12 +126,12 @@ func TestHandleAction_BackendError(t *testing.T) {
 	defer m.Close()
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "tailscale.connect"}
+	req := ipc.Request{ID: 1, Method: "tailscale.connect"}
 	HandleRequest(conn, req, m)
 
-	var resp models.Response[models.SuccessResult]
+	var resp ipc.Response[models.SuccessResult]
 	require.NoError(t, json.NewDecoder(buf).Decode(&resp))
 	assert.Nil(t, resp.Result)
 	assert.Contains(t, resp.Error, "backend rejected edit")
@@ -141,12 +142,12 @@ func TestHandleRequest_UnknownMethod(t *testing.T) {
 	defer m.Close()
 
 	buf := &bytes.Buffer{}
-	conn := models.NewConn(&mockConn{Buffer: buf})
+	conn := ipc.NewConnWriter(&mockConn{Buffer: buf})
 
-	req := models.Request{ID: 1, Method: "tailscale.unknownMethod"}
+	req := ipc.Request{ID: 1, Method: "tailscale.unknownMethod"}
 	HandleRequest(conn, req, m)
 
-	var resp models.Response[any]
+	var resp ipc.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	require.NoError(t, err)
 	assert.Nil(t, resp.Result)

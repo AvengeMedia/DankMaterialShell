@@ -1,9 +1,8 @@
-function getWidgetForId(baseWidgetDefinitions, widgetId) {
-    return baseWidgetDefinitions.find(w => w.id === widgetId)
-}
+.import qs.Common as Common
+.import "layout.js" as LayoutUtils
 
 function addWidget(widgetId) {
-    var widgets = SettingsData.controlCenterWidgets.slice()
+    var widgets = Common.SettingsData.controlCenterWidgets.slice()
     var widget = {
         "id": widgetId,
         "enabled": true,
@@ -22,7 +21,7 @@ function addWidget(widgetId) {
     }
 
     widgets.push(widget)
-    SettingsData.set("controlCenterWidgets", widgets)
+    Common.SettingsData.set("controlCenterWidgets", widgets)
 }
 
 function generateUniqueId() {
@@ -30,46 +29,24 @@ function generateUniqueId() {
 }
 
 function removeWidget(index) {
-    var widgets = SettingsData.controlCenterWidgets.slice()
+    var widgets = Common.SettingsData.controlCenterWidgets.slice()
     if (index >= 0 && index < widgets.length) {
         widgets.splice(index, 1)
-        SettingsData.set("controlCenterWidgets", widgets)
+        Common.SettingsData.set("controlCenterWidgets", widgets)
     }
 }
 
-function toggleWidgetSize(index) {
-    var widgets = SettingsData.controlCenterWidgets.slice()
-    if (index >= 0 && index < widgets.length) {
-        const currentWidth = widgets[index].width || 50
-        const id = widgets[index].id || ""
-
-        if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput") {
-            widgets[index].width = currentWidth <= 50 ? 100 : 50
-        } else {
-            if (currentWidth <= 25) {
-                widgets[index].width = 50
-            } else if (currentWidth <= 50) {
-                widgets[index].width = 100
-            } else {
-                widgets[index].width = 25
-            }
-        }
-
-        SettingsData.set("controlCenterWidgets", widgets)
-    }
+function setWidgetWidth(index, width) {
+    const widgets = Common.SettingsData.controlCenterWidgets.slice()
+    const widget = widgets[index]
+    if (!widget || !LayoutUtils.widgetWidths(widget.id).includes(width) || (widget.width || 50) === width)
+        return
+    widgets[index] = Object.assign({}, widget, { "width": width })
+    Common.SettingsData.set("controlCenterWidgets", widgets)
 }
 
 function reorderWidgets(newOrder) {
-    SettingsData.set("controlCenterWidgets", newOrder)
-}
-
-function moveWidget(fromIndex, toIndex) {
-    let widgets = [...(SettingsData.controlCenterWidgets || [])]
-    if (fromIndex >= 0 && fromIndex < widgets.length && toIndex >= 0 && toIndex < widgets.length) {
-        const movedWidget = widgets.splice(fromIndex, 1)[0]
-        widgets.splice(toIndex, 0, movedWidget)
-        SettingsData.set("controlCenterWidgets", widgets)
-    }
+    Common.SettingsData.set("controlCenterWidgets", newOrder)
 }
 
 function resetToDefault() {
@@ -83,9 +60,9 @@ function resetToDefault() {
         {"id": "nightMode", "enabled": true, "width": 50},
         {"id": "darkMode", "enabled": true, "width": 50}
     ]
-    SettingsData.set("controlCenterWidgets", defaultWidgets)
+    Common.SettingsData.set("controlCenterWidgets", defaultWidgets)
 }
 
 function clearAll() {
-    SettingsData.set("controlCenterWidgets", [])
+    Common.SettingsData.set("controlCenterWidgets", [])
 }

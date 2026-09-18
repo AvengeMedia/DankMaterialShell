@@ -59,24 +59,6 @@ func TestSharedContext_PostQueueFull(t *testing.T) {
 	assert.Len(t, sc.cmdQueue, 2)
 }
 
-func TestSharedContext_StartMultipleTimes(t *testing.T) {
-	sc := newTestSharedContext(t, 256)
-	sc.started = true
-
-	var wg sync.WaitGroup
-	const goroutines = 10
-
-	for range goroutines {
-		wg.Go(func() {
-			sc.Start()
-		})
-	}
-
-	wg.Wait()
-
-	assert.True(t, sc.started)
-}
-
 func TestSharedContext_DrainCmdQueue(t *testing.T) {
 	sc := newTestSharedContext(t, 256)
 
@@ -90,14 +72,6 @@ func TestSharedContext_DrainCmdQueue(t *testing.T) {
 	sc.drainCmdQueue()
 
 	assert.Equal(t, 10, counter)
-	assert.Len(t, sc.cmdQueue, 0)
-}
-
-func TestSharedContext_DrainCmdQueueEmpty(t *testing.T) {
-	sc := newTestSharedContext(t, 256)
-
-	sc.drainCmdQueue()
-
 	assert.Len(t, sc.cmdQueue, 0)
 }
 

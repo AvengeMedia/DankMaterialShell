@@ -14,8 +14,9 @@ ClippingRectangle {
     required property var listView
     required property int itemIndex
     property bool disposed: false
+    property color iconColor: Theme.primary
 
-    radius: Theme.cornerRadius / 2
+    radius: Theme.cornerRadiusS
     color: "transparent"
     antialiasing: true
 
@@ -221,22 +222,21 @@ ClippingRectangle {
             }
         }
 
-        Connections {
-            target: listView
+        readonly property real listContentY: listView.contentY
+        readonly property real listHeight: listView.height
 
-            function onContentYChanged() {
-                if (thumbnailImage.isVisible || entryType !== "image") {
-                    return;
-                }
-                visibilityTimer.restart();
+        onListContentYChanged: {
+            if (isVisible || entryType !== "image") {
+                return;
             }
+            visibilityTimer.restart();
+        }
 
-            function onHeightChanged() {
-                if (thumbnailImage.isVisible || entryType !== "image") {
-                    return;
-                }
-                visibilityTimer.restart();
+        onListHeightChanged: {
+            if (isVisible || entryType !== "image") {
+                return;
             }
+            visibilityTimer.restart();
         }
     }
 
@@ -253,7 +253,7 @@ ClippingRectangle {
             }
         }
         size: Theme.iconSize
-        color: Theme.primary
+        color: thumbnail.iconColor
         anchors.centerIn: parent
     }
 }

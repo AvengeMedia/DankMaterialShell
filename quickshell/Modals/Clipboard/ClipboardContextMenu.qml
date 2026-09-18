@@ -1,140 +1,72 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import qs.Common
 import qs.Services
 import qs.Widgets
 
-Item {
+DankContextMenu {
     id: root
-
-    visible: false
-    width: 0
-    height: 0
 
     property var entry: null
     property var modal: null
     property var parentHandler: null
-    property real menuMargin: 8
-    property var targetScreen: null
-    property real anchorX: 0
-    property real anchorY: 0
-    property bool openState: false
-    property bool renderActive: false
-    property var transientSurfaceTracker: null
-    readonly property alias contextWindow: menuWindow
-    readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     readonly property bool hasPinnedDuplicate: !!entry && !entry.pinned && ClipboardService.getPinnedEntryByHash(entry.hash) !== null
     readonly property bool canEditEntry: ClipboardService.canEditEntry(entry)
     readonly property bool hasTextAlternative: !!entry && (entry.altMimeType ?? "") !== ""
-    readonly property string pinText: entry?.pinned || hasPinnedDuplicate ? I18n.tr("Unpin") : I18n.tr("Pin")
-    readonly property string pinIcon: entry?.pinned || hasPinnedDuplicate ? "keep_off" : "push_pin"
+    readonly property bool pinned: entry?.pinned || hasPinnedDuplicate
 
-    readonly property var menuItems: {
+    layerNamespace: "dms:clipboard-context-menu"
+
+    menuItems: {
         const items = [
             {
                 type: "item",
                 icon: "content_copy",
                 text: I18n.tr("Copy"),
                 action: copyEntry
-            },
-            {
-                type: "item",
-                icon: pinIcon,
-                text: pinText,
-                action: togglePin
             }
         ];
-
-        if (hasTextAlternative) {
-            items.splice(1, 0, {
+        if (hasTextAlternative)
+            items.push({
                 type: "item",
                 icon: "text_fields",
                 text: I18n.tr("Copy Text"),
                 action: copyEntryAsText
             });
-        }
-
-        if (canEditEntry) {
+        items.push({
+            type: "item",
+            icon: pinned ? "keep_off" : "push_pin",
+            text: pinned ? I18n.tr("Unpin", "verb, unpin a clipboard entry or wifi network") : I18n.tr("Pin", "verb, keep an item pinned in place"),
+            action: togglePin
+        });
+        if (canEditEntry)
             items.push({
                 type: "item",
                 icon: "edit",
                 text: I18n.tr("Edit"),
                 action: editEntry
             });
-        }
-
         items.push({
             type: "item",
             icon: "delete",
-            text: I18n.tr("Delete"),
+            text: I18n.tr("Delete", "verb, delete button and confirm action"),
             action: deleteEntry
         }, {
             type: "separator"
         }, {
             type: "item",
             icon: "content_paste",
-            text: I18n.tr("Paste"),
+            text: I18n.tr("Paste", "verb, clipboard entry action"),
             action: pasteEntry
         });
-
         return items;
     }
 
-    readonly property real minMenuWidth: 160
-    readonly property real maxMenuWidth: Math.max(0, (targetScreen?.width ?? 500) - menuMargin * 2)
-    readonly property real maxMenuHeight: Math.max(0, (targetScreen?.height ?? 600) - menuMargin * 2)
-    readonly property string longestMenuText: {
-        let longest = "";
-        for (let i = 0; i < menuItems.length; i++) {
-            const text = menuItems[i].text || "";
-            if (text.length > longest.length)
-                longest = text;
-        }
-        return longest;
-    }
-    readonly property real naturalMenuWidth: Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5)
-    readonly property real effectiveMenuWidth: Math.max(0, Math.min(maxMenuWidth, naturalMenuWidth))
-    readonly property real naturalMenuHeight: menuItemsHeight() + Theme.spacingS * 2
-    readonly property real effectiveMenuHeight: Math.min(maxMenuHeight, naturalMenuHeight)
-    readonly property bool menuScrolls: naturalMenuHeight > effectiveMenuHeight + 0.5
-
-    onRenderActiveChanged: transientSurfaceTracker?.setActive(root, renderActive, contextWindow)
-    Component.onDestruction: transientSurfaceTracker?.unregister(root)
-
-    Connections {
-        target: root.transientSurfaceTracker
-        ignoreUnknownSignals: true
-
-        function onCloseRequested() {
-            root.hide();
-        }
-    }
-
-    TextMetrics {
-        id: menuTextMetrics
-        text: root.longestMenuText
-        font.pixelSize: Theme.fontSizeSmall
-        font.weight: Font.Normal
-    }
-
-    function menuItemsHeight() {
-        let h = 0;
-        for (let i = 0; i < menuItems.length; i++) {
-            h += menuItems[i].type === "separator" ? 5 : 32;
-        }
-        if (menuItems.length > 1)
-            h += menuItems.length - 1;
-        return h;
-    }
+    onBackdropRightClicked: (x, y) => showFromWindowPoint(x, y)
 
     function show(x, y, targetEntry) {
         if (!targetEntry)
             return;
-
         entry = targetEntry;
 
         const host = modal?.surfaceHost ?? null;
@@ -151,35 +83,15 @@ Item {
                     x: screenX + x,
                     y: screenY + y
                 }));
-
-        targetScreen = screenRef;
-        anchorX = globalPos.x - screenX + 4;
-        anchorY = globalPos.y - screenY + 4;
-        renderActive = true;
-        openState = true;
-
-        Qt.callLater(() => menuFlickable.contentY = 0);
-    }
-
-    function hide() {
-        if (!renderActive)
-            return;
-        openState = false;
+        open(screenRef, globalPos.x - screenX + Theme.spacingXS, globalPos.y - screenY + Theme.spacingXS, false);
     }
 
     function showFromWindowPoint(x, y) {
-        if (!parentHandler || typeof parentHandler.contextEntryAtScreen !== "function") {
+        const hit = typeof parentHandler?.contextEntryAtScreen === "function" ? parentHandler.contextEntryAtScreen(x, y) : null;
+        if (!hit?.entry) {
             hide();
             return;
         }
-
-        const hit = parentHandler.contextEntryAtScreen(x, y);
-
-        if (!hit || !hit.entry) {
-            hide();
-            return;
-        }
-
         show(hit.x, hit.y, hit.entry);
     }
 
@@ -234,198 +146,5 @@ Item {
             return;
         modal?.pasteEntry(entry);
         hide();
-    }
-
-    PanelWindow {
-        id: menuWindow
-
-        screen: root.targetScreen
-        visible: root.renderActive
-        color: "transparent"
-
-        WlrLayershell.namespace: "dms:clipboard-context-menu"
-        WlrLayershell.layer: WlrLayershell.Overlay
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        WindowBlur {
-            targetWindow: menuWindow
-            blurX: root.blurActive ? menuContainer.x : 0
-            blurY: root.blurActive ? menuContainer.y : 0
-            blurWidth: root.blurActive ? menuContainer.width : 0
-            blurHeight: root.blurActive ? menuContainer.height : 0
-            blurRadius: Theme.cornerRadius
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            z: -1
-            enabled: root.renderActive
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    root.showFromWindowPoint(mouse.x, mouse.y);
-                    return;
-                }
-                root.hide();
-            }
-        }
-
-        Item {
-            anchors.fill: parent
-
-            Rectangle {
-                id: menuContainer
-                x: Math.max(root.menuMargin, Math.min(menuWindow.width - width - root.menuMargin, root.anchorX))
-                y: Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY))
-                width: root.effectiveMenuWidth
-                height: root.effectiveMenuHeight
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                radius: Theme.cornerRadius
-                border.color: BlurService.borderColor
-                border.width: BlurService.borderWidth
-                opacity: root.openState ? 1 : 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.emphasizedEasing
-                        onRunningChanged: {
-                            if (!running && !root.openState) {
-                                root.renderActive = false;
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.topMargin: 4
-                    anchors.leftMargin: 2
-                    anchors.rightMargin: -2
-                    anchors.bottomMargin: -4
-                    radius: parent.radius
-                    color: Qt.rgba(0, 0, 0, 0.15)
-                    z: -1
-                }
-
-                Flickable {
-                    id: menuFlickable
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingS
-                    clip: true
-                    contentWidth: width
-                    contentHeight: menuColumn.implicitHeight
-                    boundsBehavior: Flickable.StopAtBounds
-                    interactive: root.menuScrolls
-
-                    Column {
-                        id: menuColumn
-                        width: menuFlickable.width
-                        spacing: 1
-
-                        Repeater {
-                            model: root.menuItems
-
-                            Item {
-                                id: menuItemDelegate
-                                required property var modelData
-
-                                width: menuColumn.width
-                                height: modelData.type === "separator" ? 5 : 32
-
-                                Rectangle {
-                                    visible: menuItemDelegate.modelData.type === "separator"
-                                    width: parent.width - Theme.spacingS * 2
-                                    height: parent.height
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    color: "transparent"
-
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        width: parent.width
-                                        height: 1
-                                        color: Theme.outlineHeavy
-                                    }
-                                }
-
-                                Rectangle {
-                                    visible: menuItemDelegate.modelData.type === "item"
-                                    width: parent.width
-                                    height: parent.height
-                                    radius: Theme.cornerRadius
-                                    color: itemMouseArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-
-                                    Row {
-                                        anchors.left: parent.left
-                                        anchors.leftMargin: Theme.spacingS
-                                        anchors.right: parent.right
-                                        anchors.rightMargin: Theme.spacingS
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: Theme.spacingS
-
-                                        Item {
-                                            width: Theme.iconSize - 2
-                                            height: Theme.iconSize - 2
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            DankIcon {
-                                                visible: (menuItemDelegate.modelData?.icon ?? "").length > 0
-                                                name: menuItemDelegate.modelData?.icon ?? ""
-                                                size: Theme.iconSize - 2
-                                                color: Theme.surfaceText
-                                                opacity: 0.7
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-                                        }
-
-                                        StyledText {
-                                            text: menuItemDelegate.modelData.text || ""
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceText
-                                            font.weight: Font.Normal
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            elide: Text.ElideRight
-                                            width: parent.width - (Theme.iconSize - 2) - Theme.spacingS
-                                        }
-                                    }
-
-                                    DankRipple {
-                                        id: menuItemRipple
-                                        rippleColor: Theme.surfaceText
-                                        cornerRadius: Theme.cornerRadius
-                                    }
-
-                                    MouseArea {
-                                        id: itemMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                        onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
-                                        onClicked: mouse => {
-                                            if (mouse.button === Qt.RightButton) {
-                                                root.hide();
-                                                return;
-                                            }
-                                            const menuItem = menuItemDelegate.modelData;
-                                            if (menuItem.action)
-                                                menuItem.action();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }

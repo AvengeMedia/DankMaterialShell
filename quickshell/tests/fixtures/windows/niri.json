@@ -1,0 +1,146 @@
+{
+    "screens": {
+        "DP-1": { "width": 1920, "height": 1080 },
+        "HDMI-A-1": { "width": 1920, "height": 1080 },
+        "DP-3": { "width": 1280, "height": 720 }
+    },
+    "twoScreens": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": 12,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true },
+            { "id": 2, "idx": 2, "name": "web", "output": "DP-1", "is_active": false, "is_focused": false },
+            { "id": 5, "idx": 1, "name": null, "output": "HDMI-A-1", "is_active": true, "is_focused": false },
+            { "id": 6, "idx": 2, "name": null, "output": "HDMI-A-1", "is_active": false, "is_focused": false },
+            { "id": 8, "idx": 1, "name": null, "output": "DP-3", "is_active": false, "is_focused": false }
+        ],
+        "windows": [
+            { "id": 10, "pid": 100, "app_id": "firefox", "title": "Mozilla Firefox", "workspace_id": 1, "is_focused": true, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [0, 0], "window_size": [1920, 1080], "tile_size": [1920, 1080] }},
+            { "id": 12, "pid": 102, "app_id": "mpv", "title": "video", "workspace_id": 5, "is_focused": false, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [100, 100], "window_size": [800, 600], "tile_size": [800, 600] }},
+            { "id": 13, "pid": 103, "app_id": "gimp", "title": "gimp", "workspace_id": 6, "is_focused": false, "is_floating": false },
+            { "id": 14, "pid": 104, "app_id": "kitty", "title": null, "workspace_id": 8, "is_focused": false, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [0, 0], "window_size": [1280, 720], "tile_size": [1280, 720] }}
+        ],
+        "toplevels": [
+            { "appId": "firefox", "title": "Mozilla Firefox", "pid": 1, "screens": ["DP-1"] },
+            { "appId": "mpv", "title": "video", "pid": 2, "screens": ["HDMI-A-1"] },
+            { "appId": "gimp", "title": "gimp", "pid": 3, "screens": ["HDMI-A-1"] },
+            { "appId": "kitty", "title": "zsh", "pid": 4, "screens": ["DP-3"] }
+        ],
+        "sortedToplevels": [
+            { "niriWindowId": 10, "niriWorkspaceId": 1, "toplevel": 0 },
+            { "niriWindowId": 12, "niriWorkspaceId": 5, "toplevel": 1 },
+            { "niriWindowId": 13, "niriWorkspaceId": 6, "toplevel": 2 },
+            { "niriWindowId": 14, "niriWorkspaceId": 8 }
+        ]
+    },
+    "floatingAtEdge": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": null,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [
+            { "id": 20, "pid": 200, "app_id": "kitty", "title": "zsh", "workspace_id": 1, "is_focused": true, "is_floating": true, "layout": { "tile_pos_in_workspace_view": [200, 900], "window_size": [400, 300], "tile_size": [400, 300] }},
+            { "id": 21, "pid": 201, "app_id": "calc", "title": "calc", "workspace_id": 1, "is_focused": false, "is_floating": true, "layout": { "tile_pos_in_workspace_view": [500, 300], "window_size": [300, 200], "tile_size": [300, 200] }}
+        ],
+        "toplevels": [
+            { "appId": "kitty", "title": "zsh", "pid": 5, "screens": ["DP-1"] },
+            { "appId": "calc", "title": "calc", "pid": 6, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": [
+            { "niriWindowId": 21, "niriWorkspaceId": 1, "toplevel": 1 }
+        ]
+    },
+    "tiledNoGeometry": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": null,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [
+            { "id": 30, "pid": 300, "app_id": "gimp", "title": "gimp", "workspace_id": 1, "is_focused": true, "is_floating": false }
+        ],
+        "toplevels": [
+            { "appId": "gimp", "title": "gimp", "pid": 7, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": []
+    },
+    "floatingNoGeometry": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": null,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [
+            { "id": 31, "pid": 301, "app_id": "chrome", "title": null, "workspace_id": 1, "is_focused": true, "is_floating": true }
+        ],
+        "toplevels": [
+            { "appId": "chrome", "title": "Google Chrome", "pid": 8, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": []
+    },
+    "emptyWorkspace": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": 10,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [],
+        "toplevels": [
+            { "appId": "ghost", "title": "ghost", "pid": 9, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": []
+    },
+    "noActiveWorkspace": {
+        "currentOutput": "DP-3",
+        "lastFocusedWindowId": null,
+        "allWorkspaces": [
+            { "id": 8, "idx": 1, "name": null, "output": "DP-3", "is_active": false, "is_focused": false }
+        ],
+        "windows": [
+            { "id": 14, "pid": 104, "app_id": "kitty", "title": "zsh", "workspace_id": 8, "is_focused": true, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [0, 0], "window_size": [1280, 720], "tile_size": [1280, 720] }}
+        ],
+        "toplevels": [
+            { "appId": "kitty", "title": "zsh", "pid": 4, "screens": ["DP-3"] }
+        ],
+        "sortedToplevels": [
+            { "niriWindowId": 14, "niriWorkspaceId": 8, "toplevel": 0 }
+        ]
+    },
+    "unfocused": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": 10,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [
+            { "id": 10, "pid": 100, "app_id": "firefox", "title": "Mozilla Firefox", "workspace_id": 1, "is_focused": false, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [0, 0], "window_size": [1920, 1080], "tile_size": [1920, 1080] }},
+            { "id": 11, "pid": 101, "app_id": "kitty", "title": null, "workspace_id": 1, "is_focused": false, "is_floating": true, "layout": { "tile_pos_in_workspace_view": [50, 50], "window_size": [100, 100], "tile_size": [100, 100] }}
+        ],
+        "toplevels": [
+            { "appId": "firefox", "title": "Other", "pid": 1, "screens": ["DP-1"] },
+            { "appId": "firefox", "title": "Mozilla Firefox", "pid": 2, "screens": ["DP-1"] },
+            { "appId": "kitty", "title": "zsh", "pid": 3, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": []
+    },
+    "unfocusedSorted": {
+        "currentOutput": "DP-1",
+        "lastFocusedWindowId": 11,
+        "allWorkspaces": [
+            { "id": 1, "idx": 1, "name": null, "output": "DP-1", "is_active": true, "is_focused": true }
+        ],
+        "windows": [
+            { "id": 10, "pid": 100, "app_id": "firefox", "title": "Mozilla Firefox", "workspace_id": 1, "is_focused": false, "is_floating": false, "layout": { "tile_pos_in_workspace_view": [0, 0], "window_size": [1920, 1080], "tile_size": [1920, 1080] }},
+            { "id": 11, "pid": 101, "app_id": "kitty", "title": null, "workspace_id": 1, "is_focused": false, "is_floating": true, "layout": { "tile_pos_in_workspace_view": [50, 50], "window_size": [100, 100], "tile_size": [100, 100] }}
+        ],
+        "toplevels": [
+            { "appId": "firefox", "title": "Other", "pid": 1, "screens": ["DP-1"] },
+            { "appId": "firefox", "title": "Mozilla Firefox", "pid": 2, "screens": ["DP-1"] },
+            { "appId": "kitty", "title": "zsh", "pid": 3, "screens": ["DP-1"] }
+        ],
+        "sortedToplevels": [
+            { "niriWindowId": 11, "niriWorkspaceId": 1, "toplevel": 2 }
+        ]
+    }
+}

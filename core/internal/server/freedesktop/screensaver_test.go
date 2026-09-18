@@ -95,8 +95,3 @@ func TestGetActive_ReturnsCurrentState(t *testing.T) {
 	assert.Nil(t, dbusErr)
 	assert.True(t, active)
 }
-
-func TestScreensaverState_ActiveDefaultsFalse(t *testing.T) {
-	state := ScreensaverState{}
-	assert.False(t, state.Active)
-}

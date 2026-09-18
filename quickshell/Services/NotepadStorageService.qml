@@ -126,7 +126,7 @@ Singleton {
             root.tabs = [
                 {
                     id: id,
-                    title: I18n.tr("Untitled"),
+                    title: I18n.tr("Untitled", "default title of a new notepad tab or untitled window"),
                     filePath: filePath,
                     isTemporary: true,
                     lastModified: new Date().toISOString(),

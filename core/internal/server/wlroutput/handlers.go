@@ -8,6 +8,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 type HeadConfig struct {
@@ -30,7 +31,7 @@ type ConfigurationRequest struct {
 	Test  bool         `json:"test"`
 }
 
-func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	if manager == nil {
 		models.RespondError(conn, req.ID, "wlroutput manager not initialized")
 		return
@@ -50,11 +51,11 @@ func HandleRequest(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, manager *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	models.Respond(conn, req.ID, manager.GetState())
 }
 
-func handleApplyConfiguration(conn *models.Conn, req models.Request, manager *Manager, test bool) {
+func handleApplyConfiguration(conn *ipc.ConnWriter, req ipc.Request, manager *Manager, test bool) {
 	headsParam, ok := models.Get[any](req, "heads")
 	if !ok {
 		models.RespondError(conn, req.ID, "missing 'heads' parameter")
@@ -85,13 +86,13 @@ func handleApplyConfiguration(conn *models.Conn, req models.Request, manager *Ma
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: msg})
 }
 
-func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
+func handleSubscribe(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
 	clientID := fmt.Sprintf("client-%p", conn)
 	stateChan := manager.Subscribe(clientID)
 	defer manager.Unsubscribe(clientID)
 
 	initialState := manager.GetState()
-	if err := conn.WriteResponse(models.Response[State]{
+	if err := conn.WriteResponse(ipc.Response[State]{
 		ID:     req.ID,
 		Result: &initialState,
 	}); err != nil {
@@ -99,7 +100,7 @@ func handleSubscribe(conn *models.Conn, req models.Request, manager *Manager) {
 	}
 
 	for state := range stateChan {
-		if err := conn.WriteResponse(models.Response[State]{
+		if err := conn.WriteResponse(ipc.Response[State]{
 			Result: &state,
 		}); err != nil {
 			return

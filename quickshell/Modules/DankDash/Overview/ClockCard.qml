@@ -3,117 +3,70 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.DankDash
 
 Card {
     id: root
 
     property bool live: Window.window?.visible ?? false
 
-    Column {
-        anchors.centerIn: parent
-        spacing: 0
+    readonly property bool showSeconds: options.seconds === true
+    readonly property bool showDate: options.date === true
+    readonly property string hourText: {
+        const hours = systemClock.date.getHours();
+        if (SettingsData.use24HourClock)
+            return String(hours).padStart(2, "0");
+        const display = hours % 12 === 0 ? 12 : hours % 12;
+        return String(display).padStart(2, "0");
+    }
+    readonly property string minuteText: String(systemClock.date.getMinutes()).padStart(2, "0")
+    readonly property string secondText: String(systemClock.date.getSeconds()).padStart(2, "0")
 
-        Column {
-            spacing: -8
-            anchors.horizontalCenter: parent.horizontalCenter
+    entryId: "clock"
+    tone: options.tone ?? ""
+    pad: Theme.spacingL
 
-            Row {
-                spacing: 0
-                anchors.horizontalCenter: parent.horizontalCenter
-                LayoutMirroring.enabled: false
+    Loader {
+        anchors.fill: parent
+        sourceComponent: root.options.style === "analog" ? analogFace : digitalFace
+    }
 
-                StyledText {
-                    text: {
-                        if (SettingsData.use24HourClock) {
-                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(0);
-                        } else {
-                            const hours = systemClock?.date?.getHours();
-                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-                            return String(display).padStart(2, '0').charAt(0);
-                        }
-                    }
-                    font.pixelSize: 48
-                    color: Theme.primary
-                    font.weight: Font.Medium
-                    width: 28
-                    horizontalAlignment: Text.AlignHCenter
-                }
+    Component {
+        id: digitalFace
 
-                StyledText {
-                    text: {
-                        if (SettingsData.use24HourClock) {
-                            return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(1);
-                        } else {
-                            const hours = systemClock?.date?.getHours();
-                            const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-                            return String(display).padStart(2, '0').charAt(1);
-                        }
-                    }
-                    font.pixelSize: 48
-                    color: Theme.primary
-                    font.weight: Font.Medium
-                    width: 28
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-
-            Row {
-                spacing: 0
-                anchors.horizontalCenter: parent.horizontalCenter
-                LayoutMirroring.enabled: false
-
-                StyledText {
-                    text: String(systemClock?.date?.getMinutes()).padStart(2, '0').charAt(0)
-                    font.pixelSize: 48
-                    color: Theme.primary
-                    font.weight: Font.Medium
-                    width: 28
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                StyledText {
-                    text: String(systemClock?.date?.getMinutes()).padStart(2, '0').charAt(1)
-                    font.pixelSize: 48
-                    color: Theme.primary
-                    font.weight: Font.Medium
-                    width: 28
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
+        DankClockFace {
+            hours: root.hourText
+            minutes: root.minuteText
+            seconds: root.showSeconds ? root.secondText : ""
+            dateText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "MMMM d") : ""
+            dayText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "dddd") : ""
+            color: root.accentColor
+            supportingColor: root.tinted ? root.contentColor : root.mutedColor
         }
+    }
 
-        Row {
-            visible: SettingsData.showSeconds
-            spacing: 0
-            anchors.horizontalCenter: parent.horizontalCenter
+    Component {
+        id: analogFace
 
-            StyledText {
-                text: String(systemClock?.date?.getSeconds()).padStart(2, '0')
-                font.pixelSize: 24
-                color: Theme.withAlpha(Theme.primary, 0.7)
-                font.weight: Font.Medium
-                horizontalAlignment: Text.AlignHCenter
-            }
-        }
-
-        Item {
-            width: 1
-            height: Theme.spacingXS
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        StyledText {
-            text: systemClock?.date?.toLocaleDateString(I18n.locale(), "MMM dd")
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceTextMedium
-            anchors.horizontalCenter: parent.horizontalCenter
+        DankAnalogClock {
+            hours: systemClock.date.getHours()
+            minutes: systemClock.date.getMinutes()
+            seconds: systemClock.date.getSeconds()
+            showSeconds: root.showSeconds
+            showNumbers: root.options.numbers === true
+            numbersOutside: root.tinted
+            dateText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "MMM d") : ""
+            color: root.tinted ? root.onAccentColor : root.accentColor
+            numberColor: root.accentColor
+            backgroundColor: root.tinted ? root.accentColor : root.chipColor
+            facePadding: 0
         }
     }
 
     SystemClock {
         id: systemClock
         enabled: root.live
-        precision: root.live && SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
+        precision: root.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
     Connections {

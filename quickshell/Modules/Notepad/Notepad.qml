@@ -327,7 +327,7 @@ Item {
                         Layout.alignment: Qt.AlignVCenter
                         text: I18n.tr("File changed on disk")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         wrapMode: Text.NoWrap
                         elide: Text.ElideRight
@@ -336,6 +336,7 @@ Item {
                     DankActionButton {
                         Layout.alignment: Qt.AlignVCenter
                         iconName: "close"
+                        Accessible.name: I18n.tr("Dismiss")
                         iconSize: Theme.iconSizeSmall
                         iconColor: Theme.surfaceText
                         buttonSize: 28
@@ -562,7 +563,6 @@ Item {
             id: saveBrowser
 
             browserTitle: I18n.tr("Save Notepad File")
-            browserIcon: "save"
             browserType: "notepad_save"
             fileExtensions: ["*.txt", "*.md", "*.*"]
             allowStacking: true
@@ -629,7 +629,6 @@ Item {
             id: loadBrowser
 
             browserTitle: I18n.tr("Open Notepad File")
-            browserIcon: "folder_open"
             browserType: "notepad_load"
             fileExtensions: ["*"]
             allowStacking: true
@@ -695,7 +694,7 @@ Item {
                             text: I18n.tr("Unsaved changes")
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.surfaceText
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                         }
 
                         StyledText {
@@ -729,7 +728,7 @@ Item {
                                         text: I18n.tr("Don't Save")
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.surfaceText
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                     }
 
                                     MouseArea {
@@ -771,7 +770,7 @@ Item {
                                         text: I18n.tr("Save")
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.background
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                     }
 
                                     MouseArea {
@@ -806,6 +805,7 @@ Item {
                         anchors.topMargin: Theme.spacingM
                         anchors.rightMargin: Theme.spacingM
                         iconName: "close"
+                        Accessible.name: I18n.tr("Close")
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: {

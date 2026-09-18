@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/spf13/cobra"
 )
 
@@ -123,7 +123,7 @@ func runOpen(target string) {
 		params["url"] = target
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: method,
 		Params: params,

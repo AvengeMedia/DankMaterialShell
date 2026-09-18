@@ -14,7 +14,7 @@ USER_HOME := $(if $(SUDO_USER),$(shell getent passwd $(SUDO_USER) | cut -d: -f6)
 SYSTEMD_USER_DIR=$(USER_HOME)/.config/systemd/user
 
 SHELL_DIR=quickshell
-QMLTESTRUNNER ?= qmltestrunner
+QMLTESTRUNNER ?=
 SHELL_INSTALL_DIR=$(DATA_DIR)/quickshell/dms
 ASSETS_DIR=assets
 APPLICATIONS_DIR=$(DATA_DIR)/applications
@@ -44,7 +44,7 @@ lint-qml:
 
 .PHONY: test-qml
 test-qml:
-	QT_QPA_PLATFORM=offscreen $(QMLTESTRUNNER) -input quickshell/tests -o -,txt
+	QMLTESTRUNNER="$(QMLTESTRUNNER)" python3 quickshell/tests/run-qml.py
 
 # Pull the latest dank-qml-common and pin it everywhere it is consumed
 # (submodule pointer + nix flake input). Commit both in one change.
@@ -83,7 +83,7 @@ endif
 
 install-icon:
 	@echo "Installing icon..."
-	@install -D -m 644 $(ASSETS_DIR)/danklogo.svg $(ICON_DIR)/danklogo.svg
+	@install -D -m 644 $(ASSETS_DIR)/com.danklinux.dms.svg $(ICON_DIR)/com.danklinux.dms.svg
 	@gtk-update-icon-cache -q $(DATA_DIR)/icons/hicolor 2>/dev/null || true
 	@echo "Icon installed"
 
@@ -127,6 +127,7 @@ uninstall-systemd:
 
 uninstall-icon:
 	@echo "Removing icon..."
+	@rm -f $(ICON_DIR)/com.danklinux.dms.svg
 	@rm -f $(ICON_DIR)/danklogo.svg
 	@gtk-update-icon-cache -q $(DATA_DIR)/icons/hicolor 2>/dev/null || true
 	@echo "Icon removed"
@@ -152,7 +153,7 @@ help:
 	@echo "  build                - Same as 'all'"
 	@echo "  clean                - Clean build artifacts"
 	@echo "  lint-qml             - Run qmllint on shell entrypoints using the Quickshell tooling VFS"
-	@echo "  test-qml             - Run QML unit tests with Qt 6 qmltestrunner"
+	@echo "  test-qml             - Run shell logic, Qt unit tests and QML widget regressions"
 	@echo ""
 	@echo "Install:"
 	@echo "  install              - Build and install everything (requires sudo)"

@@ -12,30 +12,13 @@ BasePill {
     }
 
     property bool isHovered: clickArea.containsMouse
-    property bool isAutoHideBar: false
-
-    readonly property real minTooltipY: {
-        if (!parentScreen || !isVerticalOrientation) {
-            return 0;
-        }
-
-        if (isAutoHideBar) {
-            return 0;
-        }
-
-        if (parentScreen.y > 0) {
-            return barThickness + barSpacing;
-        }
-
-        return 0;
-    }
 
     signal toggleVpnPopup
 
     content: Component {
         Item {
             implicitWidth: icon.width
-            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.contentThickness
 
             DankIcon {
                 id: icon

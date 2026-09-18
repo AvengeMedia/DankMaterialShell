@@ -16,7 +16,6 @@ Column {
         id: ipLocationToggle
         width: parent.width
         text: I18n.tr("Use IP Location")
-        description: I18n.tr("Automatically detect location based on IP address")
         checked: SessionData.nightModeUseIPLocation || false
         onToggled: checked => {
             SessionData.setNightModeUseIPLocation(checked);
@@ -40,7 +39,7 @@ Column {
             text: I18n.tr("Manual Coordinates")
             font.pixelSize: Theme.fontSizeMedium
             color: Theme.surfaceText
-            font.weight: Font.Medium
+            font.weight: Theme.fontWeightMedium
         }
 
         Row {
@@ -51,21 +50,17 @@ Column {
                 width: (parent.width - Theme.spacingM) / 2
                 spacing: Theme.spacingXS
 
-                StyledText {
-                    text: I18n.tr("Latitude")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
                 DankTextField {
                     id: latitudeField
+                    outlined: true
+                    leftIconName: "location_on"
+                    labelText: I18n.tr("Latitude")
                     width: parent.width
-                    height: 48
+                    height: Theme.iconButtonSize + Theme.spacingS
                     text: ""
                     placeholderText: "40.7128"
                     backgroundColor: Theme.surfaceVariant
                     normalBorderColor: Theme.primarySelected
-                    focusedBorderColor: Theme.primary
                     keyNavigationTab: longitudeField
 
                     Component.onCompleted: {
@@ -93,21 +88,17 @@ Column {
                 width: (parent.width - Theme.spacingM) / 2
                 spacing: Theme.spacingXS
 
-                StyledText {
-                    text: I18n.tr("Longitude")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
                 DankTextField {
                     id: longitudeField
+                    outlined: true
+                    leftIconName: "location_on"
+                    labelText: I18n.tr("Longitude")
                     width: parent.width
-                    height: 48
+                    height: Theme.iconButtonSize + Theme.spacingS
                     text: ""
                     placeholderText: "-74.0060"
                     backgroundColor: Theme.surfaceVariant
                     normalBorderColor: Theme.primarySelected
-                    focusedBorderColor: Theme.primary
                     keyNavigationBacktab: latitudeField
 
                     Component.onCompleted: {
@@ -133,10 +124,10 @@ Column {
         }
 
         StyledText {
-            text: I18n.tr("Location Search")
+            text: I18n.tr("Location search")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
-            font.weight: Font.Medium
+            font.weight: Theme.fontWeightMedium
         }
 
         DankLocationSearch {

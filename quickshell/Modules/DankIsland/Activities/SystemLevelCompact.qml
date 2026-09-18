@@ -36,9 +36,8 @@ Item {
         anchors.fill: parent
         visible: !root.isVertical
         iconName: root.systemModel.iconName
-        iconSize: Math.min(Theme.iconSize, root.iconSize)
-        iconColor: root.systemModel.volumeActivity ? Theme.surfaceText : Theme.primary
         iconInteractive: root.systemModel.volumeActivity
+        iconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
         value: Math.round(root.systemModel.value)
         minimum: root.systemModel.minimum
         maximum: root.maximum
@@ -84,7 +83,7 @@ Item {
             text: root.systemModel.displayValue.length > 0 ? root.systemModel.displayValue : (Math.round(root.systemModel.value) + root.systemModel.unit)
             color: Theme.surfaceText
             font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Medium
+            font.weight: Theme.fontWeightMedium
         }
 
         Item {

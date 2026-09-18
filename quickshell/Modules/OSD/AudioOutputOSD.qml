@@ -9,16 +9,15 @@ DankOSD {
     property string deviceName: ""
     property string deviceIcon: "speaker"
 
-    osdWidth: Math.min(Math.max(120, Theme.iconSize + textMetrics.width + Theme.spacingS * 4), screenWidth - Theme.spacingM * 2)
-    osdHeight: 40 + Theme.spacingS * 2
+    osdWidth: Math.min(Math.max(120, Theme.buttonHeightS + textMetrics.width + Theme.spacingS * 4), screenWidth - Theme.spacingM * 2)
+    osdHeight: Theme.osdHeight
     autoHideInterval: 2500
     enableMouseInteraction: false
 
-    TextMetrics {
+    StyledTextMetrics {
         id: textMetrics
         font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        font.family: Theme.fontFamily
+        font.weight: Theme.fontWeightMedium
         text: root.deviceName
     }
 
@@ -39,27 +38,25 @@ DankOSD {
 
         anchors.centerIn: parent
         width: parent.width - Theme.spacingS * 2
-        height: 40
+        height: Theme.buttonHeightS
 
-        DankIcon {
+        OsdIcon {
             id: iconItem
-            width: Theme.iconSize
-            height: Theme.iconSize
+            width: Theme.buttonHeightS
+            height: width
             x: parent.gap
             anchors.verticalCenter: parent.verticalCenter
-            name: root.deviceIcon
-            size: Theme.iconSize
-            color: Theme.primary
+            iconName: root.deviceIcon
         }
 
         StyledText {
             id: textItem
-            x: parent.gap * 2 + Theme.iconSize
-            width: parent.width - Theme.iconSize - parent.gap * 3
+            x: parent.gap * 2 + iconItem.width
+            width: parent.width - iconItem.width - parent.gap * 3
             anchors.verticalCenter: parent.verticalCenter
             text: root.deviceName
             font.pixelSize: Theme.fontSizeMedium
-            font.weight: Font.Medium
+            font.weight: Theme.fontWeightMedium
             color: Theme.surfaceText
             elide: Text.ElideRight
         }

@@ -52,7 +52,7 @@ jobs:
           cache-dependency-path: ./core/go.sum
 
       - name: Test
-        run: go test -v ./...
+        run: go test -race -v ./...
 
       - name: Build dms
         run: go build -v ./cmd/dms

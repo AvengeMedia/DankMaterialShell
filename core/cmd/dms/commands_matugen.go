@@ -10,7 +10,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/matugen"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/spf13/cobra"
 )
 
@@ -136,7 +136,7 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 	wait, _ := cmd.Flags().GetBool("wait")
 	timeout, _ := cmd.Flags().GetDuration("timeout")
 
-	request := models.Request{
+	request := ipc.Request{
 		ID:     1,
 		Method: "matugen.queue",
 		Params: map[string]any{

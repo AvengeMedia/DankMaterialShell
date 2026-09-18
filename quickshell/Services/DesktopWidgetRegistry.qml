@@ -176,7 +176,7 @@ Singleton {
                 description: plugin.description || "",
                 type: "plugin",
                 component: null,
-                settingsComponent: plugin.settingsPath || null,
+                settingsComponent: PluginService.pluginComponentUrl(pluginId, plugin.settingsPath) || null,
                 defaultConfig: {
                     displayPreferences: ["all"]
                 },

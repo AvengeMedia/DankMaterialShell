@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Widgets
 import qs.Common
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
@@ -55,7 +56,7 @@ DankPopout {
             id: contentRoot
 
             implicitWidth: 340
-            implicitHeight: contentColumn.implicitHeight + Theme.spacingS * 2
+            implicitHeight: contentColumn.implicitHeight + PopoutMetrics.contentPadding * 2
             anchors.fill: parent
             color: "transparent"
             focus: true
@@ -68,17 +69,17 @@ DankPopout {
             Column {
                 id: contentColumn
                 anchors.fill: parent
-                anchors.margins: Theme.spacingS
+                anchors.margins: PopoutMetrics.contentPadding
                 spacing: Theme.spacingXXS
 
                 Row {
                     width: parent.width
-                    height: 28
+                    height: BarMetrics.menuRowHeight
                     spacing: Theme.spacingS
 
                     IconImage {
-                        width: 20
-                        height: 20
+                        width: Theme.iconSizeMedium
+                        height: Theme.iconSizeMedium
                         source: Paths.getAppIcon(root.appId, DesktopEntries.heuristicLookup(root.appId))
                         asynchronous: true
                         mipmap: true
@@ -87,11 +88,11 @@ DankPopout {
                     }
 
                     StyledText {
-                        width: parent.width - 20 - Theme.spacingS
+                        width: parent.width - Theme.iconSizeMedium - Theme.spacingS
                         text: root.appName
                         color: Theme.surfaceText
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        font.weight: Theme.fontWeightMedium
                         elide: Text.ElideRight
                         maximumLineCount: 2
                         wrapMode: Text.Wrap
@@ -119,32 +120,35 @@ DankPopout {
                         }
                     ]
 
-                    delegate: Rectangle {
+                    delegate: DankListRow {
+                        id: copyRow
                         required property var modelData
+                        required property int index
+                        readonly property real labelWidth: Theme.iconButtonSize + Theme.iconSizeLarge
 
                         width: contentColumn.width
-                        height: 40
-                        radius: Theme.cornerRadius
-                        color: copyArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
+                        implicitHeight: Theme.listItemHeight
+                        firstInGroup: index === 0
+                        lastInGroup: index === 2
 
                         Row {
                             anchors.fill: parent
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.rightMargin: Theme.spacingXS
+                            anchors.leftMargin: Theme.spacingL
+                            anchors.rightMargin: Theme.spacingL
                             spacing: Theme.spacingS
 
                             StyledText {
-                                width: 72
-                                text: modelData.label
-                                color: Theme.surfaceVariantText
+                                width: copyRow.labelWidth
+                                text: copyRow.modelData.label
+                                color: copyRow.supportingContentColor
                                 font.pixelSize: Theme.fontSizeSmall
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             StyledText {
-                                width: parent.width - 72 - Theme.spacingS
-                                text: modelData.value
-                                color: Theme.surfaceText
+                                width: parent.width - copyRow.labelWidth - Theme.spacingS
+                                text: copyRow.modelData.value
+                                color: copyRow.contentColor
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
                                 wrapMode: Text.Wrap
@@ -155,40 +159,28 @@ DankPopout {
                             }
                         }
 
-                        DankRipple {
-                            id: copyRipple
-                            rippleColor: Theme.surfaceText
-                            cornerRadius: parent.radius
-                        }
-
-                        MouseArea {
-                            id: copyArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            enabled: modelData.copyable
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onPressed: mouse => copyRipple.trigger(mouse.x, mouse.y)
-                            onClicked: root.copyValue(modelData.value)
+                        StateLayer {
+                            topLeftRadius: copyRow.firstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+                            topRightRadius: topLeftRadius
+                            bottomLeftRadius: copyRow.lastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+                            bottomRightRadius: bottomLeftRadius
+                            enabled: copyRow.modelData.copyable
+                            disabled: !copyRow.modelData.copyable
+                            onClicked: root.copyValue(copyRow.modelData.value)
                         }
                     }
                 }
 
                 Rectangle {
                     width: parent.width
-                    height: 1
+                    height: Theme.dividerWidth
                     color: Theme.outlineVariant
                 }
 
                 Item {
-                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango
+                    visible: CompositorService.supportsWindowRules
                     width: parent.width
-                    height: 32
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.cornerRadius
-                        color: ruleArea.containsMouse ? BlurService.hoverColor(Theme.widgetBaseHoverColor) : Theme.withAlpha(BlurService.hoverColor(Theme.widgetBaseHoverColor), 0)
-                    }
+                    height: BarMetrics.menuRowHeight
 
                     Row {
                         anchors.fill: parent
@@ -197,45 +189,28 @@ DankPopout {
 
                         DankIcon {
                             name: "rule"
-                            size: 16
+                            size: Theme.iconSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StyledText {
-                            text: I18n.tr("Add Window Rule")
+                            text: I18n.tr("Add window rule")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
 
-                    DankRipple {
-                        id: ruleRipple
-                        anchors.fill: parent
-                        rippleColor: Theme.surfaceText
-                        cornerRadius: Theme.cornerRadius
-                    }
-
-                    MouseArea {
-                        id: ruleArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: mouse => ruleRipple.trigger(mouse.x, mouse.y)
+                    StateLayer {
+                        cornerRadius: BarMetrics.menuItemRadius
                         onClicked: root.addWindowRule()
                     }
                 }
 
                 Item {
                     width: parent.width
-                    height: 32
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.cornerRadius
-                        color: killArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-                    }
+                    height: BarMetrics.menuRowHeight
 
                     Row {
                         anchors.fill: parent
@@ -244,7 +219,7 @@ DankPopout {
 
                         DankIcon {
                             name: "close"
-                            size: 16
+                            size: Theme.iconSizeSmall
                             color: Theme.error
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -257,20 +232,11 @@ DankPopout {
                         }
                     }
 
-                    DankRipple {
-                        id: killRipple
-                        anchors.fill: parent
-                        rippleColor: Theme.error
-                        cornerRadius: Theme.cornerRadius
-                    }
-
-                    MouseArea {
-                        id: killArea
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    StateLayer {
+                        cornerRadius: BarMetrics.menuItemRadius
+                        stateColor: Theme.error
                         enabled: root.pid > 0
-                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        onPressed: mouse => killRipple.trigger(mouse.x, mouse.y)
+                        disabled: root.pid <= 0
                         onClicked: root.killWindow()
                     }
                 }

@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -35,29 +34,28 @@ Item {
     property string instanceId: ""
     property var instanceData: null
 
-    readonly property var cfg: instanceData?.config ?? null
-    readonly property bool isInstance: instanceId !== "" && cfg !== null
+    readonly property var cfg: instanceData?.config ?? ({})
 
-    enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.systemMonitorEnabled
-    property bool showHeader: isInstance ? (cfg.showHeader ?? true) : SettingsData.systemMonitorShowHeader
-    property real transparency: isInstance ? (cfg.transparency ?? 0.8) : SettingsData.systemMonitorTransparency
-    property string colorMode: isInstance ? (cfg.colorMode ?? "primary") : SettingsData.systemMonitorColorMode
-    property color customColor: isInstance ? (cfg.customColor ?? "#ffffff") : SettingsData.systemMonitorCustomColor
-    property bool showCpu: isInstance ? (cfg.showCpu ?? true) : SettingsData.systemMonitorShowCpu
-    property bool showCpuGraph: isInstance ? (cfg.showCpuGraph ?? true) : SettingsData.systemMonitorShowCpuGraph
-    property bool showCpuTemp: isInstance ? (cfg.showCpuTemp ?? true) : SettingsData.systemMonitorShowCpuTemp
-    property bool showGpuTemp: isInstance ? (cfg.showGpuTemp ?? false) : SettingsData.systemMonitorShowGpuTemp
-    property string selectedGpuPciId: isInstance ? (cfg.gpuPciId ?? "") : SettingsData.systemMonitorGpuPciId
-    property bool showMemory: isInstance ? (cfg.showMemory ?? true) : SettingsData.systemMonitorShowMemory
-    property bool showMemoryGraph: isInstance ? (cfg.showMemoryGraph ?? true) : SettingsData.systemMonitorShowMemoryGraph
-    property bool showNetwork: isInstance ? (cfg.showNetwork ?? true) : SettingsData.systemMonitorShowNetwork
-    property bool showNetworkGraph: isInstance ? (cfg.showNetworkGraph ?? true) : SettingsData.systemMonitorShowNetworkGraph
-    property bool showDisk: isInstance ? (cfg.showDisk ?? true) : SettingsData.systemMonitorShowDisk
-    property bool showTopProcesses: isInstance ? (cfg.showTopProcesses ?? false) : SettingsData.systemMonitorShowTopProcesses
-    property int topProcessCount: isInstance ? (cfg.topProcessCount ?? 3) : SettingsData.systemMonitorTopProcessCount
-    property string topProcessSortBy: isInstance ? (cfg.topProcessSortBy ?? "cpu") : SettingsData.systemMonitorTopProcessSortBy
-    property string layoutMode: isInstance ? (cfg.layoutMode ?? "auto") : SettingsData.systemMonitorLayoutMode
-    property int graphInterval: isInstance ? (cfg.graphInterval ?? 60) : SettingsData.systemMonitorGraphInterval
+    enabled: instanceData?.enabled ?? true
+    property bool showHeader: cfg.showHeader ?? true
+    property real transparency: cfg.transparency ?? 0.8
+    property string colorMode: cfg.colorMode ?? "primary"
+    property color customColor: cfg.customColor ?? "#ffffff"
+    property bool showCpu: cfg.showCpu ?? true
+    property bool showCpuGraph: cfg.showCpuGraph ?? true
+    property bool showCpuTemp: cfg.showCpuTemp ?? true
+    property bool showGpuTemp: cfg.showGpuTemp ?? false
+    property string selectedGpuPciId: cfg.gpuPciId ?? ""
+    property bool showMemory: cfg.showMemory ?? true
+    property bool showMemoryGraph: cfg.showMemoryGraph ?? true
+    property bool showNetwork: cfg.showNetwork ?? true
+    property bool showNetworkGraph: cfg.showNetworkGraph ?? true
+    property bool showDisk: cfg.showDisk ?? true
+    property bool showTopProcesses: cfg.showTopProcesses ?? false
+    property int topProcessCount: cfg.topProcessCount ?? 3
+    property string topProcessSortBy: cfg.topProcessSortBy ?? "cpu"
+    property string layoutMode: cfg.layoutMode ?? "auto"
+    property int graphInterval: cfg.graphInterval ?? 60
 
     readonly property color accentColor: {
         switch (colorMode) {
@@ -77,6 +75,7 @@ Item {
 
     property string currentGpuPciIdRef: ""
     property var activeModuleRefs: []
+    readonly property bool monitoringActive: visible && enabled && (Window.window?.visible ?? false)
 
     property var cpuHistory: []
     property var memHistory: []
@@ -131,6 +130,8 @@ Item {
     }
 
     readonly property var requiredModules: {
+        if (!monitoringActive)
+            return [];
         var modules = ["system"];
         if (showCpu || showCpuTemp || showCpuGraph)
             modules.push("cpu");
@@ -142,6 +143,8 @@ Item {
             modules.push("disk", "diskmounts");
         if (showTopProcesses)
             modules.push("processes");
+        if (showGpuTemp && selectedGpuPciId)
+            modules.push("gpu");
         return modules;
     }
 
@@ -149,7 +152,8 @@ Item {
     function syncModuleRefs() {
         const prev = activeModuleRefs;
         activeModuleRefs = requiredModules;
-        DgopService.addRef(activeModuleRefs);
+        if (activeModuleRefs.length > 0)
+            DgopService.addRef(activeModuleRefs);
         if (prev.length === 0)
             return;
         DgopService.removeRef(prev);
@@ -169,6 +173,18 @@ Item {
             DgopService.removeGpuPciId(currentGpuPciIdRef);
     }
 
+    onMonitoringActiveChanged: {
+        updateGpuRef();
+        if (monitoringActive)
+            return;
+        cpuHistory = [];
+        memHistory = [];
+        netRxHistory = [];
+        netTxHistory = [];
+        diskReadHistory = [];
+        diskWriteHistory = [];
+    }
+
     onShowGpuTempChanged: updateGpuRef()
     onSelectedGpuPciIdChanged: updateGpuRef()
 
@@ -177,7 +193,7 @@ Item {
             DgopService.removeGpuPciId(currentGpuPciIdRef);
             currentGpuPciIdRef = "";
         }
-        if (!showGpuTemp || !selectedGpuPciId) {
+        if (!monitoringActive || !showGpuTemp || !selectedGpuPciId) {
             if (currentGpuPciIdRef) {
                 DgopService.removeGpuPciId(currentGpuPciIdRef);
                 currentGpuPciIdRef = "";
@@ -219,16 +235,11 @@ Item {
         }
     }
 
-    readonly property int sampleSeconds: sampleInterval / 1000
-
-    SystemClock {
-        id: sampleClock
-        precision: SystemClock.Seconds
-        onDateChanged: {
-            var sec = date.getSeconds();
-            if (sec % root.sampleSeconds === 0)
-                root.sampleData();
-        }
+    Timer {
+        interval: root.sampleInterval
+        running: root.monitoringActive
+        repeat: true
+        onTriggered: root.sampleData()
     }
 
     Rectangle {
@@ -451,7 +462,7 @@ Item {
                                     text: tile.tileType.toUpperCase()
                                     isMonospace: true
                                     font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: Font.Bold
+                                    font.weight: Theme.fontWeightMedium
                                     color: root.accentColor
                                 }
 
@@ -485,7 +496,7 @@ Item {
                                 text: DgopService.cpuUsage.toFixed(0) + "%"
                                 isMonospace: true
                                 font.pixelSize: Theme.fontSizeXLarge
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: root.textColor
                             }
 
@@ -494,7 +505,7 @@ Item {
                                 text: DgopService.memoryUsage.toFixed(0) + "%"
                                 isMonospace: true
                                 font.pixelSize: Theme.fontSizeXLarge
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: root.textColor
                             }
 
@@ -575,7 +586,7 @@ Item {
                                     text: temp > 0 ? temp.toFixed(0) + "°C" : "--"
                                     isMonospace: true
                                     font.pixelSize: Theme.fontSizeXLarge
-                                    font.weight: Font.Medium
+                                    font.weight: Theme.fontWeightMedium
                                     color: root.textColor
                                     Layout.alignment: tile.span > 1 ? Qt.AlignHCenter : Qt.AlignLeft
                                 }
@@ -594,14 +605,14 @@ Item {
                                 visible: tile.tileType === "cpu" || tile.tileType === "mem"
                                 Layout.fillWidth: true
                                 height: 4
-                                radius: 2
+                                radius: Theme.fullRadius(width, height)
                                 color: Theme.withAlpha(Theme.outline, 0.2)
 
                                 Rectangle {
                                     property real pct: tile.tileType === "cpu" ? DgopService.cpuUsage / 100 : DgopService.memoryUsage / 100
                                     width: parent.width * Math.min(1, pct)
                                     height: parent.height
-                                    radius: 2
+                                    radius: Theme.fullRadius(width, height)
                                     color: pct > 0.8 ? Theme.error : (pct > 0.6 ? Theme.warning : root.accentColor)
                                     Behavior on width {
                                         NumberAnimation {
@@ -634,7 +645,7 @@ Item {
                         text: "TOP BY " + root.topProcessSortBy.toUpperCase()
                         isMonospace: true
                         font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Bold
+                        font.weight: Theme.fontWeightMedium
                         color: root.accentColor
                     }
 
@@ -709,14 +720,14 @@ Item {
                         Rectangle {
                             Layout.fillWidth: true
                             height: 4
-                            radius: 2
+                            radius: Theme.fullRadius(width, height)
                             color: Theme.withAlpha(Theme.outline, 0.2)
 
                             Rectangle {
                                 property real pct: (modelData.used || 0) / Math.max(1, modelData.total || 1)
                                 width: parent.width * pct
                                 height: parent.height
-                                radius: 2
+                                radius: Theme.fullRadius(width, height)
                                 color: pct > 0.9 ? Theme.error : (pct > 0.75 ? Theme.warning : root.accentColor)
                             }
                         }

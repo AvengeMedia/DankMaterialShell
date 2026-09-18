@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/OutputModel.js" as OutputModel
 
 // Native MangoWM IPC client. mango advertises a JSON-over-Unix-socket protocol
 // via MANGO_INSTANCE_SIGNATURE; each connection issues one `watch <target>` verb
@@ -541,29 +542,6 @@ Singleton {
         }
     }
 
-    function transformToMango(transform) {
-        switch (transform) {
-        case "Normal":
-            return 0;
-        case "90":
-            return 1;
-        case "180":
-            return 2;
-        case "270":
-            return 3;
-        case "Flipped":
-            return 4;
-        case "Flipped90":
-            return 5;
-        case "Flipped180":
-            return 6;
-        case "Flipped270":
-            return 7;
-        default:
-            return 0;
-        }
-    }
-
     function generateOutputsConfig(outputsData, callback, skipReload) {
         if (!outputsData || Object.keys(outputsData).length === 0) {
             if (callback)
@@ -596,7 +574,7 @@ Singleton {
             const x = output.logical?.x ?? 0;
             const y = output.logical?.y ?? 0;
             const scale = output.logical?.scale ?? 1.0;
-            const transform = transformToMango(output.logical?.transform ?? "Normal");
+            const transform = OutputModel.transformIndex(output.logical?.transform ?? "Normal");
             const vrr = output.vrr_enabled ? 1 : 0;
 
             // Anchor the name regex: mango matches `name:` unanchored (first-match
@@ -630,11 +608,10 @@ Singleton {
         if (!CompositorService.isMango)
             return;
 
-        const defaultRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12;
         const defaultGaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.getPrimaryBarConfig()?.spacing ?? 4)) : 4;
         const defaultBorderSize = 2;
 
-        const cornerRadius = (typeof SettingsData !== "undefined" && SettingsData.mangoLayoutRadiusOverride >= 0) ? SettingsData.mangoLayoutRadiusOverride : defaultRadius;
+        const cornerRadius = Theme.windowRadius;
         const gapsOverride = typeof SettingsData !== "undefined" ? SettingsData.mangoLayoutGapsOverride : -1;
         const manageGaps = gapsOverride !== -2;
         const gapsIn = gapsOverride >= 0 ? gapsOverride : defaultGaps;

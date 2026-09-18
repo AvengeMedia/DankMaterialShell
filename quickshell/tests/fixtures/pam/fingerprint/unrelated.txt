@@ -1,0 +1,1 @@
+Usage: fprintd-list <username>

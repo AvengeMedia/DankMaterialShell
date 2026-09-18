@@ -29,6 +29,7 @@ PanelWindow {
     readonly property bool slideFromLeft: slideEdge === "left"
     readonly property real surfaceOriginX: slideFromLeft ? 0 : Math.max(0, (modelData?.width ?? width) - width)
     property Component content: null
+    property bool contentRequested: false
     property string title: ""
     property alias container: contentContainer
     property alias loadedItem: contentLoader.item
@@ -38,6 +39,7 @@ PanelWindow {
     signal revealed
 
     function show() {
+        contentRequested = true;
         mappedVisible = true;
         Qt.callLater(() => {
             isVisible = true;
@@ -118,6 +120,8 @@ PanelWindow {
     readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
+    onIsVisibleChanged: slideSpring.retarget(isVisible ? 0 : (slideFromLeft ? -slideContainer.width : slideContainer.width))
+
     mask: Region {
         item: Rectangle {
             x: root.slideFromLeft ? root.alignedEdgeGap : (root.width - slideContainer.width - root.alignedEdgeGap)
@@ -139,7 +143,7 @@ PanelWindow {
         anchors.leftMargin: root.alignedEdgeGap
 
         property bool slideSlowExit: false
-        readonly property var slideSpringParams: Theme.springPreset("default", slideSlowExit ? Math.round(Theme.expressiveDurations.expressiveDefaultSpatial) : 450)
+        readonly property var slideSpringParams: Theme.springPreset("default", slideSlowExit ? Math.round(Theme.expressiveDurations.expressiveDefaultSpatial) : Theme.expressiveDurations.expressiveDefaultSpatial)
         readonly property var widthSpringParams: Theme.springPreset("default", Theme.popoutAnimationDuration)
 
         SpringMotion {
@@ -180,14 +184,6 @@ PanelWindow {
         width: widthSpring.value
         height: root.alignedHeight - root.alignedEdgeGap * 2
 
-        Connections {
-            target: root
-            function onIsVisibleChanged() {
-                const target = root.isVisible ? 0 : (root.slideFromLeft ? -slideContainer.width : slideContainer.width);
-                slideSpring.retarget(target);
-            }
-        }
-
         Item {
             id: contentRect
             layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
@@ -208,10 +204,19 @@ PanelWindow {
             width: parent.width
             x: root.slideoutSlideSnapX
 
+            ElevationShadow {
+                anchors.fill: parent
+                visible: !Theme.isConnectedEffect
+                level: Theme.elevationLevel2
+                targetRadius: Theme.windowRadius
+                targetColor: contentRect.slideoutSurfaceColor
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
+            }
+
             Rectangle {
                 anchors.fill: parent
-                color: contentRect.slideoutSurfaceColor
-                radius: Theme.connectedSurfaceRadius
+                color: Theme.isConnectedEffect ? contentRect.slideoutSurfaceColor : "transparent"
+                radius: Theme.isConnectedEffect ? Theme.connectedSurfaceRadius : Theme.windowRadius
                 border.color: Theme.isConnectedEffect ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
                 border.width: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
             }
@@ -238,7 +243,7 @@ PanelWindow {
                             text: root.title
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.surfaceText
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                         }
                     }
 
@@ -249,6 +254,7 @@ PanelWindow {
                         DankActionButton {
                             id: expandButton
                             iconName: root.expandedWidth ? "unfold_less" : "unfold_more"
+                            tooltipText: root.expandedWidth ? I18n.tr("Collapse") : I18n.tr("Expand")
                             iconSize: Theme.iconSize - 4
                             iconColor: Theme.surfaceText
                             visible: root.expandable
@@ -264,6 +270,7 @@ PanelWindow {
                         DankActionButton {
                             id: closeButton
                             iconName: "close"
+                            Accessible.name: I18n.tr("Close")
                             iconSize: Theme.iconSize - 4
                             iconColor: Theme.surfaceText
                             onClicked: root.hide()
@@ -286,6 +293,7 @@ PanelWindow {
                 Loader {
                     id: contentLoader
                     anchors.fill: parent
+                    active: root.contentRequested
                     sourceComponent: root.content
                 }
             }
@@ -298,6 +306,6 @@ PanelWindow {
         blurY: root.slideoutBlurActive ? slideContainer.y : 0
         blurWidth: root.slideoutBlurActive ? slideContainer.width : 0
         blurHeight: root.slideoutBlurActive ? slideContainer.height : 0
-        blurRadius: Theme.connectedSurfaceRadius
+        blurRadius: Theme.isConnectedEffect ? Theme.connectedSurfaceRadius : Theme.windowRadius
     }
 }

@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	switch req.Method {
 	case "themes.list":
 		HandleList(conn, req)

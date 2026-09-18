@@ -25,7 +25,7 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: "black"
+        color: Theme.screenOffColor
         visible: root.active
 
         Loader {
@@ -36,7 +36,7 @@ Item {
             onLoaded: {
                 item.errorOccurred.connect((error, errorString) => {
                     log.warn("playback error:", errorString);
-                    ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("Playback error: ") + errorString);
+                    ToastService.showError(I18n.tr("Video screensaver"), I18n.tr("Playback error: ") + errorString);
                     root.dismiss();
                 });
                 if (root.videoSource) {
@@ -73,7 +73,7 @@ Item {
         onExited: exitCode => {
             if (exitCode !== 0 || !videoPicker.result) {
                 log.warn("no video found in folder");
-                ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("No video found in folder"));
+                ToastService.showError(I18n.tr("Video screensaver"), I18n.tr("No video found in folder"));
                 root.dismiss();
             }
         }
@@ -106,7 +106,7 @@ Item {
 
         MultimediaService.ensureProbed();
         if (!MultimediaService.available) {
-            ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("QtMultimedia is not available"));
+            ToastService.showError(I18n.tr("Video screensaver"), I18n.tr("QtMultimedia is not available"));
             return;
         }
 

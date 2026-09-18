@@ -144,32 +144,24 @@ DankFloatingWindow {
             }
         }
 
-        MouseArea {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            height: headerRow.height + Theme.spacingM
-            onPressed: windowControls.tryStartMove()
-            onDoubleClicked: windowControls.tryToggleMaximize()
-        }
-
-        Item {
+        DankWindowHeader {
             id: headerRow
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: Theme.spacingM
-            height: Math.round(Theme.fontSizeMedium * 2.85)
+            controls: windowControls
+            title: root.title
+            closeTooltipText: I18n.tr("Skip setup", "greeter skip button tooltip")
+            onCloseRequested: root.skip()
 
             Rectangle {
                 id: pageIndicatorContainer
                 readonly property real indicatorHeight: Math.round(Theme.fontSizeMedium * 2)
 
-                anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 width: pageIndicatorRow.width + Theme.spacingM * 2
                 height: indicatorHeight
-                radius: indicatorHeight / 2
+                radius: Theme.fullRadius(width, height)
                 color: Theme.floatingWindowNestedSurface
 
                 Row {
@@ -204,31 +196,6 @@ DankFloatingWindow {
                                 }
                             }
                         }
-                    }
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                DankActionButton {
-                    visible: windowControls.canMaximize
-                    iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: windowControls.tryToggleMaximize()
-                }
-
-                DankActionButton {
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: root.skip()
-
-                    DankTooltip {
-                        text: I18n.tr("Skip setup", "greeter skip button tooltip")
                     }
                 }
             }

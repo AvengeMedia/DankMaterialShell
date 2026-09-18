@@ -11,60 +11,45 @@ Item {
     property string searchText: ""
     property string expandedPid: ""
     property var contextMenu: null
-    property string processFilter: "all" // "all", "user", "system"
-    property bool active: true
+    readonly property var processFilterTypes: CacheData.processFilterTypes
+    readonly property real rowHeight: ProcessListMetrics.rowHeight
+    property bool active: visible
+    readonly property alias listView: processListView
+    readonly property alias sortChips: sortChips
+    onActiveFocusChanged: {
+        if (activeFocus)
+            processListView.forceActiveFocus();
+    }
+    onSelectedIndexChanged: {
+        if (keyboardNavigationActive)
+            selectionScroll.schedule();
+    }
+    onActiveChanged: {
+        if (active)
+            updateProcesses();
+    }
+    onSearchTextChanged: refreshFilter()
+    onProcessFilterTypesChanged: refreshFilter()
 
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property int forceRefreshCount: 0
 
-    readonly property bool pauseUpdates: (contextMenu?.visible ?? false) || expandedPid.length > 0
+    readonly property bool pauseUpdates: (contextMenu?.visible ?? false) || (contextMenu?.confirmationOpen ?? false) || expandedPid.length > 0
     readonly property bool shouldUpdate: !pauseUpdates || forceRefreshCount > 0
     property var cachedProcesses: []
-
-    signal openContextMenuRequested(int index, real x, real y, bool fromKeyboard)
 
     onFilteredProcessesChanged: {
         if (!shouldUpdate)
             return;
-        cachedProcesses = filteredProcesses;
+        updateProcesses();
         if (forceRefreshCount > 0)
             forceRefreshCount--;
     }
 
     onShouldUpdateChanged: {
         if (shouldUpdate)
-            cachedProcesses = filteredProcesses;
-    }
-
-    function getProcessIcon(command) {
-        const cmd = command.toLowerCase();
-        if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser") || cmd.includes("chromium"))
-            return "web";
-        if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim"))
-            return "code";
-        if (cmd.includes("terminal") || cmd.includes("bash") || cmd.includes("zsh"))
-            return "terminal";
-        if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify"))
-            return "music_note";
-        if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv"))
-            return "play_circle";
-        if (cmd.includes("systemd") || cmd.includes("elogind") || cmd.includes("kernel") || cmd.includes("kthread") || cmd.includes("kworker"))
-            return "settings";
-        return "memory";
-    }
-
-    function formatCpuUsage(cpu) {
-        return (cpu || 0).toFixed(1) + "%";
-    }
-
-    function formatMemoryUsage(memoryKB) {
-        const mem = memoryKB || 0;
-        if (mem < 1024)
-            return mem.toFixed(0) + " KB";
-        if (mem < 1024 * 1024)
-            return (mem / 1024).toFixed(1) + " MB";
-        return (mem / (1024 * 1024)).toFixed(1) + " GB";
+            updateProcesses();
     }
 
     readonly property var filteredProcesses: {
@@ -73,11 +58,7 @@ Item {
 
         let procs = DgopService.allProcesses.slice();
 
-        if (processFilter === "user") {
-            procs = procs.filter(p => p.username === UserInfoService.username);
-        } else if (processFilter === "system") {
-            procs = procs.filter(p => p.username !== UserInfoService.username);
-        }
+        procs = procs.filter(p => processFilterTypes.includes(p.username === UserInfoService.username ? "user" : "system"));
 
         if (searchText.length > 0) {
             const search = searchText.toLowerCase();
@@ -89,37 +70,44 @@ Item {
             });
         }
 
-        const asc = DgopService.sortAscending;
-        procs.sort((a, b) => {
-            let valueA, valueB, result;
-            switch (DgopService.currentSort) {
-            case "cpu":
-                valueA = a.cpu || 0;
-                valueB = b.cpu || 0;
-                result = valueB - valueA;
-                break;
-            case "memory":
-                valueA = a.memoryKB || 0;
-                valueB = b.memoryKB || 0;
-                result = valueB - valueA;
-                break;
-            case "name":
-                valueA = (a.command || "").toLowerCase();
-                valueB = (b.command || "").toLowerCase();
-                result = valueA.localeCompare(valueB);
-                break;
-            case "pid":
-                valueA = a.pid || 0;
-                valueB = b.pid || 0;
-                result = valueA - valueB;
-                break;
-            default:
-                return 0;
-            }
-            return asc ? -result : result;
-        });
+        procs.sort(DgopService.compareProcesses);
 
         return procs;
+    }
+
+    DeferredAction {
+        id: selectionScroll
+        onTriggered: {
+            root.ensureVisible();
+            if (processListView.activeFocus)
+                processListView.currentItem?.forceActiveFocus(Qt.TabFocusReason);
+        }
+    }
+
+    function refreshFilter() {
+        expandedPid = "";
+        updateProcesses();
+    }
+
+    function updateProcesses() {
+        if (!active || DgopService.allProcesses.length === 0)
+            return;
+        const pid = cachedProcesses[selectedIndex]?.pid;
+        cachedProcesses = filteredProcesses;
+        selectedIndex = pid === undefined ? -1 : cachedProcesses.findIndex(p => p.pid === pid);
+        if (selectedIndex < 0 && keyboardNavigationActive && cachedProcesses.length > 0)
+            selectedIndex = 0;
+    }
+
+    function requestKill(index) {
+        const process = cachedProcesses[index];
+        if (!process || !contextMenu)
+            return;
+        selectedIndex = index;
+        keyboardNavigationActive = true;
+        contextMenu.parentFocusItem = processListView;
+        contextMenu.processData = process;
+        contextMenu.killProcess();
     }
 
     function selectNext() {
@@ -178,7 +166,7 @@ Item {
             return;
         contextMenu.processData = process;
         const itemPos = delegate.mapToItem(contextMenu.parent, delegate.width / 2, delegate.height / 2);
-        contextMenu.parentFocusItem = root;
+        contextMenu.parentFocusItem = processListView;
         contextMenu.show(itemPos.x, itemPos.y, true);
     }
 
@@ -216,9 +204,15 @@ Item {
             return;
         case Qt.Key_K:
             if (event.modifiers & Qt.ControlModifier) {
-                selectPrevious();
+                requestKill(selectedIndex);
                 event.accepted = true;
             }
+            return;
+        case Qt.Key_Delete:
+            if (!keyboardNavigationActive)
+                return;
+            requestKill(selectedIndex);
+            event.accepted = true;
             return;
         case Qt.Key_Home:
             selectFirst();
@@ -251,557 +245,127 @@ Item {
         }
     }
 
-    readonly property var dgopModules: ["processes", "cpu", "memory", "system"]
-    property bool _dgopHeld: false
-
-    function syncDgopRef(wanted) {
-        if (wanted === _dgopHeld)
-            return;
-        _dgopHeld = wanted;
-        if (wanted)
-            DgopService.addRef(dgopModules);
-        else
-            DgopService.removeRef(dgopModules);
+    Item {
+        id: processKeys
+        Keys.onPressed: event => root.handleKey(event)
     }
 
-    onActiveChanged: syncDgopRef(active)
-
-    Component.onCompleted: {
-        syncDgopRef(active);
-        cachedProcesses = filteredProcesses;
+    Ref {
+        service: DgopService
+        modules: ["processes", "cpu", "memory", "system", "gpu"]
+        active: root.active
     }
 
-    Component.onDestruction: syncDgopRef(false)
+    Component.onCompleted: updateProcesses()
+
+    readonly property string dgopCurrentSort: DgopService.currentSort
+    readonly property bool dgopSortAscending: DgopService.sortAscending
+
+    onDgopCurrentSortChanged: {
+        sortChips.currentIndex = sortChips.sortKeys.indexOf(dgopCurrentSort);
+        refreshFilter();
+    }
+
+    onDgopSortAscendingChanged: refreshFilter()
+
+    Connections {
+        target: root.contextMenu
+        function onProcessKilled() {
+            root.expandedPid = "";
+            root.forceRefresh(3);
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 0
+        spacing: Theme.groupedListGap
 
-        Item {
+        RowLayout {
+            readonly property bool ascending: DgopService.sortAscending !== ["name", "pid"].includes(DgopService.currentSort)
             Layout.fillWidth: true
-            Layout.preferredHeight: 36
+            Layout.preferredHeight: ProcessListMetrics.headerHeight
+            spacing: Theme.spacingS
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacingS
-                anchors.rightMargin: Theme.spacingS
-                spacing: 0
-
-                SortableHeader {
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 200
-                    text: I18n.tr("Name")
-                    sortKey: "name"
-                    currentSort: DgopService.currentSort
-                    sortAscending: DgopService.sortAscending
-                    onClicked: DgopService.toggleSort("name")
-                    alignment: Text.AlignLeft
-                }
-
-                SortableHeader {
-                    Layout.preferredWidth: 100
-                    text: "CPU"
-                    sortKey: "cpu"
-                    currentSort: DgopService.currentSort
-                    sortAscending: DgopService.sortAscending
-                    onClicked: DgopService.toggleSort("cpu")
-                }
-
-                SortableHeader {
-                    Layout.preferredWidth: 100
-                    text: I18n.tr("Memory")
-                    sortKey: "memory"
-                    currentSort: DgopService.currentSort
-                    sortAscending: DgopService.sortAscending
-                    onClicked: DgopService.toggleSort("memory")
-                }
-
-                SortableHeader {
-                    Layout.preferredWidth: 80
-                    text: "PID"
-                    sortKey: "pid"
-                    currentSort: DgopService.currentSort
-                    sortAscending: DgopService.sortAscending
-                    onClicked: DgopService.toggleSort("pid")
-                }
-
-                Item {
-                    Layout.preferredWidth: 40
-                }
+            DankFilterChips {
+                id: sortChips
+                Layout.fillWidth: true
+                readonly property var sortKeys: ["name", "cpu", "memory", "pid"]
+                model: [I18n.tr("Name"), I18n.tr("CPU"), I18n.tr("Memory"), I18n.tr("PID")]
+                currentIndex: sortKeys.indexOf(DgopService.currentSort)
+                chipPadding: Theme.spacingM
+                onSelectionChanged: index => DgopService.toggleSort(sortKeys[index])
             }
-        }
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: Theme.outlineLight
+            DankActionButton {
+                id: sortDirection
+                KeyNavigation.tab: processListView.currentItem ?? processListView
+                iconName: parent.ascending ? "arrow_upward" : "arrow_downward"
+                Accessible.name: parent.ascending ? I18n.tr("Ascending", "sort direction, smallest value first") : I18n.tr("Descending", "sort direction, largest value first")
+                onClicked: DgopService.toggleSort(DgopService.currentSort)
+            }
         }
 
         DankListView {
             id: processListView
-
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: Theme.spacingXXS
+            reuseItems: true
+            highlightSelection: root.keyboardNavigationActive && root.selectedIndex >= 0
+            activeFocusOnTab: true
+            Keys.onPressed: event => root.handleKey(event)
+            onActiveFocusChanged: {
+                if (activeFocus && root.selectedIndex < 0)
+                    root.selectFirst();
+            }
+            spacing: Theme.groupedListGap
+            currentIndex: root.selectedIndex
+            add: null
+            remove: null
+            displaced: null
+            move: null
 
             model: ScriptModel {
                 values: root.cachedProcesses
                 objectProp: "pid"
             }
 
-            delegate: ProcessItem {
+            delegate: ProcessRow {
                 required property var modelData
                 required property int index
-
                 width: processListView.width
+                rowHeight: root.rowHeight
+                keyForwardTargets: [processKeys]
+                KeyNavigation.backtab: sortDirection
                 process: modelData
+                firstInGroup: index === 0
+                lastInGroup: index === processListView.count - 1
                 isExpanded: root.expandedPid === (modelData?.pid ?? -1).toString()
                 isSelected: root.keyboardNavigationActive && root.selectedIndex === index
-                contextMenu: root.contextMenu
-                onToggleExpand: {
-                    const pidStr = (modelData?.pid ?? -1).toString();
-                    root.expandedPid = (root.expandedPid === pidStr) ? "" : pidStr;
-                }
                 onClicked: {
+                    processListView.forceActiveFocus(Qt.MouseFocusReason);
                     root.keyboardNavigationActive = true;
                     root.selectedIndex = index;
+                    root.toggleExpand();
                 }
+                onKillRequested: root.requestKill(index)
                 onContextMenuRequested: (mouseX, mouseY) => {
-                    if (root.contextMenu) {
-                        root.contextMenu.processData = modelData;
-                        root.contextMenu.parentFocusItem = root;
-                        const globalPos = mapToItem(root.contextMenu.parent, mouseX, mouseY);
-                        root.contextMenu.show(globalPos.x, globalPos.y, false);
-                    }
+                    if (!root.contextMenu)
+                        return;
+                    root.selectedIndex = index;
+                    root.keyboardNavigationActive = true;
+                    root.contextMenu.processData = modelData;
+                    root.contextMenu.parentFocusItem = processListView;
+                    const pos = mapToItem(root.contextMenu.parent, mouseX, mouseY);
+                    root.contextMenu.show(pos.x, pos.y, false);
                 }
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 300
-                height: 100
-                radius: Theme.cornerRadius
-                color: "transparent"
-                visible: root.cachedProcesses.length === 0
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: root.searchText.length > 0 ? "search_off" : "hourglass_empty"
-                        size: 32
-                        color: Theme.surfaceVariantText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("No matching processes", "empty state in process list")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceVariantText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        visible: root.searchText.length > 0
-                    }
-                }
-            }
-        }
-    }
-
-    component SortableHeader: Item {
-        id: headerItem
-
-        property string text: ""
-        property string sortKey: ""
-        property string currentSort: ""
-        property bool sortAscending: false
-        property int alignment: Text.AlignHCenter
-
-        signal clicked
-
-        readonly property bool isActive: sortKey === currentSort
-
-        height: 36
-
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: 2
-            radius: Theme.cornerRadius
-            color: headerItem.isActive ? Theme.primaryHover : (headerMouseArea.containsMouse ? Theme.surfaceTextLight : Theme.withAlpha(Theme.surfaceTextLight, 0))
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.shortDuration
-                }
-            }
-        }
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: Theme.spacingS
-            anchors.rightMargin: Theme.spacingS
-            spacing: Theme.spacingXS
-
-            Item {
-                Layout.fillWidth: headerItem.alignment === Text.AlignLeft
-                visible: headerItem.alignment !== Text.AlignLeft
             }
 
             StyledText {
-                text: headerItem.text
-                font.pixelSize: Theme.fontSizeSmall
-                font.family: SettingsData.monoFontFamily
-                font.weight: headerItem.isActive ? Font.Bold : Font.Medium
-                color: headerItem.isActive ? Theme.primary : Theme.surfaceText
-                opacity: headerItem.isActive ? 1 : 0.8
-            }
-
-            DankIcon {
-                name: headerItem.sortAscending ? "arrow_upward" : "arrow_downward"
-                size: Theme.fontSizeSmall
-                color: Theme.primary
-                visible: headerItem.isActive
-            }
-
-            Item {
-                Layout.fillWidth: headerItem.alignment !== Text.AlignLeft
-                visible: headerItem.alignment === Text.AlignLeft
-            }
-        }
-
-        MouseArea {
-            id: headerMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: headerItem.clicked()
-        }
-    }
-
-    component ProcessItem: Rectangle {
-        id: processItemRoot
-
-        property var process: null
-        property bool isExpanded: false
-        property bool isSelected: false
-        property var contextMenu: null
-
-        signal toggleExpand
-        signal clicked
-        signal contextMenuRequested(real mouseX, real mouseY)
-
-        readonly property int processPid: process?.pid ?? 0
-        readonly property real processCpu: process?.cpu ?? 0
-        readonly property int processMemKB: process?.memoryKB ?? 0
-        readonly property string processCmd: process?.command ?? ""
-        readonly property string processFullCmd: process?.fullCommand ?? processCmd
-
-        height: isExpanded ? (44 + expandedRect.height + Theme.spacingXS) : 44
-        radius: Theme.cornerRadius
-        color: {
-            if (isSelected)
-                return Theme.primaryPressed;
-            return processMouseArea.containsMouse ? Theme.primaryBackground : Theme.withAlpha(Theme.primaryBackground, 0);
-        }
-        border.color: {
-            if (isSelected)
-                return Theme.primarySelected;
-            return processMouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0);
-        }
-        border.width: 1
-        clip: true
-
-        Behavior on height {
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-            }
-        }
-
-        MouseArea {
-            id: processMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    processItemRoot.contextMenuRequested(mouse.x, mouse.y);
-                    return;
-                }
-                processItemRoot.clicked();
-                processItemRoot.toggleExpand();
-            }
-        }
-
-        Column {
-            anchors.fill: parent
-            spacing: 0
-
-            Item {
-                width: parent.width
-                height: 44
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.spacingS
-                    anchors.rightMargin: Theme.spacingS
-                    spacing: 0
-
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.minimumWidth: 200
-                        height: parent.height
-
-                        Row {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: root.getProcessIcon(processItemRoot.processCmd)
-                                size: Theme.iconSize - 4
-                                color: {
-                                    if (processItemRoot.processCpu > 80)
-                                        return Theme.error;
-                                    if (processItemRoot.processCpu > 50)
-                                        return Theme.warning;
-                                    return Theme.surfaceText;
-                                }
-                                opacity: 0.8
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: processItemRoot.processCmd
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                                elide: Text.ElideRight
-                                width: Math.min(implicitWidth, 280)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-                    }
-
-                    Item {
-                        Layout.preferredWidth: 100
-                        height: parent.height
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 70
-                            height: 24
-                            radius: Theme.cornerRadius
-                            color: {
-                                if (processItemRoot.processCpu > 80)
-                                    return Theme.errorPressed;
-                                if (processItemRoot.processCpu > 50)
-                                    return Theme.warningHover;
-                                return Theme.surfaceTextLight;
-                            }
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: root.formatCpuUsage(processItemRoot.processCpu)
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Bold
-                                color: {
-                                    if (processItemRoot.processCpu > 80)
-                                        return Theme.error;
-                                    if (processItemRoot.processCpu > 50)
-                                        return Theme.warning;
-                                    return Theme.surfaceText;
-                                }
-                            }
-                        }
-                    }
-
-                    Item {
-                        Layout.preferredWidth: 100
-                        height: parent.height
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 70
-                            height: 24
-                            radius: Theme.cornerRadius
-                            color: {
-                                if (processItemRoot.processMemKB > 2 * 1024 * 1024)
-                                    return Theme.errorPressed;
-                                if (processItemRoot.processMemKB > 1024 * 1024)
-                                    return Theme.warningHover;
-                                return Theme.surfaceTextLight;
-                            }
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: root.formatMemoryUsage(processItemRoot.processMemKB)
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Bold
-                                color: {
-                                    if (processItemRoot.processMemKB > 2 * 1024 * 1024)
-                                        return Theme.error;
-                                    if (processItemRoot.processMemKB > 1024 * 1024)
-                                        return Theme.warning;
-                                    return Theme.surfaceText;
-                                }
-                            }
-                        }
-                    }
-
-                    Item {
-                        Layout.preferredWidth: 80
-                        height: parent.height
-
-                        StyledText {
-                            anchors.centerIn: parent
-                            text: processItemRoot.processPid > 0 ? processItemRoot.processPid.toString() : ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.family: SettingsData.monoFontFamily
-                            color: Theme.surfaceVariantText
-                        }
-                    }
-
-                    Item {
-                        Layout.preferredWidth: 40
-                        height: parent.height
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: processItemRoot.isExpanded ? "expand_less" : "expand_more"
-                            size: Theme.iconSize - 4
-                            color: Theme.surfaceVariantText
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                id: expandedRect
-                width: parent.width - Theme.spacingM * 2
-                height: processItemRoot.isExpanded ? (expandedContent.implicitHeight + Theme.spacingS * 2) : 0
-                anchors.horizontalCenter: parent.horizontalCenter
-                radius: Theme.cornerRadius - 2
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.6)
-                clip: true
-                visible: processItemRoot.isExpanded
-
-                Behavior on height {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
-
-                Column {
-                    id: expandedContent
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: Theme.spacingS
-                    spacing: Theme.spacingXS
-
-                    RowLayout {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        StyledText {
-                            id: cmdLabel
-                            text: I18n.tr("Full Command:", "process detail label")
-                            font.pixelSize: Theme.fontSizeSmall - 2
-                            font.weight: Font.Bold
-                            color: Theme.surfaceVariantText
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-
-                        StyledText {
-                            id: cmdText
-                            text: processItemRoot.processFullCmd
-                            font.pixelSize: Theme.fontSizeSmall - 2
-                            font.family: SettingsData.monoFontFamily
-                            color: Theme.surfaceText
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-                            elide: Text.ElideMiddle
-                        }
-
-                        Rectangle {
-                            id: copyBtn
-                            Layout.preferredWidth: 24
-                            Layout.preferredHeight: 24
-                            Layout.alignment: Qt.AlignVCenter
-                            radius: Theme.cornerRadius - 2
-                            color: copyMouseArea.containsMouse ? Theme.primaryPressed : Theme.withAlpha(Theme.primaryPressed, 0)
-
-                            DankIcon {
-                                anchors.centerIn: parent
-                                name: "content_copy"
-                                size: 14
-                                color: copyMouseArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
-                            }
-
-                            MouseArea {
-                                id: copyMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    Quickshell.execDetached(["dms", "cl", "copy", processItemRoot.processFullCmd]);
-                                }
-                            }
-                        }
-                    }
-
-                    Row {
-                        spacing: Theme.spacingL
-
-                        Row {
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: "PPID:"
-                                font.pixelSize: Theme.fontSizeSmall - 2
-                                font.weight: Font.Bold
-                                color: Theme.surfaceVariantText
-                            }
-
-                            StyledText {
-                                text: (processItemRoot.process?.ppid ?? 0) > 0 ? processItemRoot.process.ppid.toString() : "--"
-                                font.pixelSize: Theme.fontSizeSmall - 2
-                                font.family: SettingsData.monoFontFamily
-                                color: Theme.surfaceText
-                            }
-                        }
-
-                        Row {
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: "Mem:"
-                                font.pixelSize: Theme.fontSizeSmall - 2
-                                font.weight: Font.Bold
-                                color: Theme.surfaceVariantText
-                            }
-
-                            StyledText {
-                                text: (processItemRoot.process?.memoryPercent ?? 0).toFixed(1) + "%"
-                                font.pixelSize: Theme.fontSizeSmall - 2
-                                font.family: SettingsData.monoFontFamily
-                                color: Theme.surfaceText
-                            }
-                        }
-                    }
-                }
+                anchors.centerIn: parent
+                text: root.searchText.length > 0 || root.processFilterTypes.length < 2 || DgopService.allProcesses.length > 0 ? I18n.tr("No matching processes", "empty state in process list") : I18n.tr("Loading...")
+                color: Theme.onSurfaceVariant
+                visible: processListView.count === 0
             }
         }
     }

@@ -1,31 +1,37 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
-import qs.Widgets
+import qs.Modules.Notifications as Notifications
 
-Rectangle {
+Notifications.NotificationCard {
     id: root
-
     required property var historyItem
     property bool isSelected: false
     property bool keyboardNavigationActive: false
-    property bool descriptionExpanded: NotificationService.expandedMessages[historyItem?.id ? (historyItem.id + "_hist") : ""] || false
-    property bool __initialized: false
 
-    Component.onCompleted: {
-        Qt.callLater(() => {
-            if (root)
-                root.__initialized = true;
-        });
+    notificationData: ({
+            appName: historyItem.appName || "",
+            appIcon: historyItem.appIcon || "",
+            desktopEntry: historyItem.desktopEntry || "",
+            image: historyItem.image || "",
+            summary: historyItem.summary || "",
+            htmlBody: historyItem.htmlBody || historyItem.body || "",
+            body: historyItem.body || "",
+            urgency: historyItem.urgency,
+            timeStr: formatHistoryTime(historyItem.timestamp),
+            displayImage: NotificationService.notificationImageSource(historyItem.image || "", historyItem.appIcon || ""),
+            hasDisplayImage: NotificationService.notificationHasImage(historyItem.image || ""),
+            fallbackIconName: NotificationService.notificationFallbackIcon(historyItem.image || "", historyItem.appIcon || "")
+        })
+    descriptionExpanded: NotificationService.expandedMessages[(historyItem?.id || "") + "_hist"] || false
+    keyboardSelected: isSelected && keyboardNavigationActive
+    showActions: false
+    onExpandRequested: NotificationService.toggleMessageExpansion((historyItem?.id || "") + "_hist")
+    onBodyClicked: {
+        if (canExpand)
+            expandRequested();
     }
-
-    readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
-    readonly property real iconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
-    readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
-    readonly property real collapsedContentHeight: iconSize + cardPadding
-    readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight
+    onDismissRequested: NotificationService.removeFromHistory(historyItem.id)
 
     function formatHistoryTime(timestamp) {
         NotificationService.timeUpdateTick;
@@ -37,8 +43,8 @@ Rectangle {
         const hours = Math.floor(minutes / 60);
         if (hours < 1) {
             if (minutes < 1)
-                return I18n.tr("now");
-            return I18n.tr("%1m ago").arg(minutes);
+                return I18n.tr("now", "relative timestamp for the current moment");
+            return I18n.tr("%1m ago", "notification relative time, %1 is a number of minutes").arg(minutes);
         }
         const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -55,230 +61,5 @@ Rectangle {
         } catch (e) {
             return timeStr;
         }
-    }
-
-    width: parent ? parent.width : 400
-    height: baseCardHeight + contentItem.extraHeight
-    radius: Theme.cornerRadius
-    clip: false
-    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-
-    ElevationShadow {
-        id: shadowLayer
-        anchors.fill: parent
-        z: -1
-        level: Theme.elevationLevel1
-        fallbackOffset: 1
-        targetRadius: root.radius
-        targetColor: root.color
-        borderColor: root.border.color
-        borderWidth: root.border.width
-        shadowEnabled: root.shadowsAllowed
-    }
-
-    color: {
-        if (isSelected && keyboardNavigationActive)
-            return Theme.primaryPressed;
-        return Theme.notificationFloatingSurfaceHigh;
-    }
-    border.color: {
-        if (isSelected && keyboardNavigationActive)
-            return Theme.withAlpha(Theme.primary, 0.5);
-        if (historyItem.urgency === 2)
-            return Theme.primarySelected;
-        return Theme.outlineMedium;
-    }
-    border.width: {
-        if (isSelected && keyboardNavigationActive)
-            return 1.5;
-        if (historyItem.urgency === 2)
-            return 2;
-        return Theme.layerOutlineWidth;
-    }
-
-    Behavior on border.color {
-        enabled: root.__initialized
-        ColorAnimation {
-            duration: root.__initialized ? Theme.shortDuration : 0
-            easing.type: Theme.standardEasing
-        }
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: parent.radius
-        visible: historyItem.urgency === 2
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0.0
-                color: Theme.primary
-            }
-            GradientStop {
-                position: 0.02
-                color: Theme.primary
-            }
-            GradientStop {
-                position: 0.021
-                color: "transparent"
-            }
-        }
-    }
-
-    Item {
-        id: contentItem
-
-        readonly property real expandedTextHeight: descriptionText.contentHeight
-        readonly property real collapsedLineCount: compactMode ? 1 : 2
-        readonly property real collapsedLineHeight: descriptionText.font.pixelSize * 1.2 * collapsedLineCount
-        readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedLineHeight + 2) ? (expandedTextHeight - collapsedLineHeight) : 0
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.topMargin: cardPadding
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
-        height: collapsedContentHeight + extraHeight
-
-        DankCircularImage {
-            id: iconContainer
-            cacheImages: false
-
-            width: iconSize
-            height: iconSize
-            anchors.left: parent.left
-            anchors.top: parent.top
-
-            imageSource: NotificationService.notificationImageSource(historyItem.image || "", historyItem.appIcon || "")
-            hasImage: NotificationService.notificationHasImage(historyItem.image || "")
-            fallbackIcon: NotificationService.notificationFallbackIcon(historyItem.image || "", historyItem.appIcon || "")
-            fallbackText: {
-                const appName = historyItem.appName || "?";
-                return appName.charAt(0).toUpperCase();
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -2
-                radius: width / 2
-                color: "transparent"
-                border.color: root.color
-                border.width: 5
-                visible: parent.hasImage
-                antialiasing: true
-            }
-        }
-
-        Rectangle {
-            anchors.left: iconContainer.right
-            anchors.leftMargin: Theme.spacingM
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: contentSpacing
-            color: "transparent"
-
-            Column {
-                width: parent.width
-                anchors.top: parent.top
-                spacing: Theme.notificationContentSpacing
-
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-
-                    Item {
-                        width: Math.max(0, parent.width - historySeparator.implicitWidth - Math.max(historyTimeText.implicitWidth, 72) - parent.spacing * 2)
-                        height: historyTitleText.implicitHeight
-                        visible: historyTitleText.text.length > 0
-
-                        StyledText {
-                            id: historyTitleText
-                            anchors.fill: parent
-                            text: {
-                                let title = historyItem.summary || "";
-                                const appName = historyItem.appName || "";
-                                const prefix = appName + " • ";
-                                if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
-                                    title = title.substring(prefix.length);
-                                }
-                                return title;
-                            }
-                            color: Theme.surfaceText
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            elide: Text.ElideRight
-                            maximumLineCount: 1
-                        }
-                    }
-                    StyledText {
-                        id: historySeparator
-                        text: (historyTitleText.text.length > 0 && historyTimeText.text.length > 0) ? " • " : ""
-                        color: Theme.surfaceTextMedium
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Normal
-                    }
-                    StyledText {
-                        id: historyTimeText
-                        text: root.formatHistoryTime(historyItem.timestamp)
-                        color: Theme.surfaceTextMedium
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Normal
-                        visible: text.length > 0
-                    }
-                }
-
-                StyledText {
-                    id: descriptionText
-                    property bool hasMoreText: truncated
-
-                    text: historyItem.htmlBody || historyItem.body || ""
-                    textFormat: Text.StyledText
-                    color: Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
-                    width: parent.width
-                    elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
-                    maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
-                    wrapMode: Text.WordWrap
-                    visible: text.length > 0
-                    linkColor: Theme.primary
-                    onLinkActivated: link => Qt.openUrlExternally(link)
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : (parent.hasMoreText || descriptionExpanded) ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-                        onClicked: mouse => {
-                            if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
-                                const messageId = historyItem?.id ? (historyItem.id + "_hist") : "";
-                                NotificationService.toggleMessageExpansion(messageId);
-                            }
-                        }
-
-                        propagateComposedEvents: true
-                        onPressed: mouse => {
-                            if (parent.hoveredLink)
-                                mouse.accepted = false;
-                        }
-                        onReleased: mouse => {
-                            if (parent.hoveredLink)
-                                mouse.accepted = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    DankActionButton {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: cardPadding
-        anchors.rightMargin: Theme.spacingL
-        iconName: "close"
-        iconSize: compactMode ? 16 : 18
-        buttonSize: compactMode ? 24 : 28
-        onClicked: NotificationService.removeFromHistory(historyItem.id)
     }
 }

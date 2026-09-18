@@ -66,16 +66,18 @@ FocusScope {
             spacing: Theme.spacingM
 
             Rectangle {
-                width: 40
-                height: 40
+                Accessible.role: Accessible.Button
+                Accessible.name: I18n.tr("Back")
+                width: Theme.buttonHeightS
+                height: Theme.buttonHeightS
                 radius: Theme.cornerRadius
                 color: backButtonArea.containsMouse ? Theme.surfaceHover : Theme.withAlpha(Theme.surfaceHover, 0)
 
                 DankIcon {
                     anchors.centerIn: parent
                     name: "arrow_back"
-                    size: 20
-                    color: Theme.surfaceText
+                    size: Theme.iconSizeMedium
+                    color: Theme.onSurface
                 }
 
                 MouseArea {
@@ -88,11 +90,11 @@ FocusScope {
             }
 
             Image {
-                width: 40
-                height: 40
+                width: Theme.buttonHeightS
+                height: Theme.buttonHeightS
                 source: Paths.resolveIconUrl(root.editingApp?.icon || "application-x-executable")
-                sourceSize.width: 40
-                sourceSize.height: 40
+                sourceSize.width: Theme.buttonHeightS
+                sourceSize.height: Theme.buttonHeightS
                 fillMode: Image.PreserveAspectFit
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -104,25 +106,25 @@ FocusScope {
                 StyledText {
                     text: I18n.tr("Edit App")
                     font.pixelSize: Theme.fontSizeLarge
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
+                    color: Theme.onSurface
+                    font.weight: Theme.fontWeightMedium
                 }
 
                 StyledText {
                     text: root.editingApp?.name || ""
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
+                    color: Theme.onSurfaceVariant
                 }
             }
         }
 
         Rectangle {
             width: parent.width
-            height: 1
+            height: Theme.outlineWidth
             color: Theme.outlineMedium
         }
 
-        Flickable {
+        DankFlickable {
             width: parent.width
             height: parent.height - y - buttonsRow.height - Theme.spacingM
             contentHeight: editFieldsColumn.height
@@ -141,8 +143,8 @@ FocusScope {
                     StyledText {
                         text: I18n.tr("Name")
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        color: Theme.onSurface
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     DankTextField {
@@ -161,8 +163,8 @@ FocusScope {
                     StyledText {
                         text: I18n.tr("Icon")
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        color: Theme.onSurface
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     DankTextField {
@@ -179,10 +181,10 @@ FocusScope {
                     spacing: Theme.spacingXS
 
                     StyledText {
-                        text: I18n.tr("Description")
+                        text: I18n.tr("Description", "noun, text field label")
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        color: Theme.onSurface
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     DankTextField {
@@ -201,14 +203,14 @@ FocusScope {
                     StyledText {
                         text: I18n.tr("Environment Variables")
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        color: Theme.onSurface
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     StyledText {
                         text: "KEY=value KEY2=value2"
-                        font.pixelSize: Theme.fontSizeSmall - 1
-                        color: Theme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.onSurfaceVariant
                     }
 
                     DankTextField {
@@ -227,8 +229,8 @@ FocusScope {
                     StyledText {
                         text: I18n.tr("Extra Arguments")
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                        color: Theme.onSurface
+                        font.weight: Theme.fontWeightMedium
                     }
 
                     DankTextField {
@@ -247,77 +249,24 @@ FocusScope {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingM
 
-            Rectangle {
-                id: resetButton
-                width: 90
-                height: 40
-                radius: Theme.cornerRadius
-                color: resetButtonArea.containsMouse ? Theme.surfacePressed : Theme.surfaceVariantAlpha
+            DankButton {
+                text: I18n.tr("Reset", "verb, button that restores defaults")
+                backgroundColor: Theme.surfaceContainerHigh
+                textColor: Theme.error
                 visible: SessionData.getAppOverride(root.editAppId) !== null
-
-                StyledText {
-                    text: I18n.tr("Reset")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.error
-                    font.weight: Font.Medium
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: resetButtonArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.resetAppOverride()
-                }
+                onClicked: root.resetAppOverride()
             }
 
-            Rectangle {
-                id: cancelButton
-                width: 90
-                height: 40
-                radius: Theme.cornerRadius
-                color: cancelButtonArea.containsMouse ? Theme.surfacePressed : Theme.surfaceVariantAlpha
-
-                StyledText {
-                    text: I18n.tr("Cancel")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: cancelButtonArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.closeRequested()
-                }
+            DankButton {
+                text: I18n.tr("Cancel")
+                backgroundColor: Theme.surfaceContainerHigh
+                textColor: Theme.onSurface
+                onClicked: root.closeRequested()
             }
 
-            Rectangle {
-                id: saveButton
-                width: 90
-                height: 40
-                radius: Theme.cornerRadius
-                color: saveButtonArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.9) : Theme.primary
-
-                StyledText {
-                    text: I18n.tr("Save")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.primaryText
-                    font.weight: Font.Medium
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: saveButtonArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.saveAppOverride()
-                }
+            DankButton {
+                text: I18n.tr("Save")
+                onClicked: root.saveAppOverride()
             }
         }
     }

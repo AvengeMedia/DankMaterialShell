@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.ControlCenter.Widgets
 import qs.Modules.Plugins
 import qs.Modules.Settings.DisplayConfig
 
@@ -59,152 +60,54 @@ PluginComponent {
     }
 
     ccDetailContent: Component {
-        Rectangle {
+        Item {
             id: detailRoot
-            implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
-            radius: Theme.cornerRadius
-            color: Theme.nestedSurface
-            border.color: Theme.outlineMedium
-            border.width: Theme.layerOutlineWidth
 
-            Column {
-                id: detailColumn
+            readonly property string title: I18n.tr("Display Profiles")
+            readonly property Item headerActions: CcSettingsButton {
+                settingsTab: "displays"
+            }
+
+            DankFlickable {
                 anchors.fill: parent
-                anchors.margins: Theme.spacingM
-                spacing: Theme.spacingS
-
-                Item {
-                    width: parent.width
-                    height: 32
-
-                    StyledText {
-                        text: I18n.tr("Display Profiles")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Row {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingS
-
-                        Rectangle {
-                            id: autoButton
-                            width: autoLabel.implicitWidth + Theme.spacingL * 2
-                            height: 28
-                            radius: 14
-                            color: root.autoMode ? Theme.primaryPressed : (autoMouseArea.containsMouse ? Theme.surfaceLight : Theme.withAlpha(Theme.surfaceLight, 0))
-                            border.color: root.autoMode ? Theme.primary : Theme.outlineMedium
-                            border.width: root.autoMode ? 1 : Theme.layerOutlineWidth
-
-                            StyledText {
-                                id: autoLabel
-                                anchors.centerIn: parent
-                                text: I18n.tr("Auto")
-                                color: root.autoMode ? Theme.primary : Theme.surfaceVariantText
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                id: autoMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.setAutoMode(!root.autoMode)
-                            }
-                        }
-
-                        DankActionButton {
-                            id: settingsButton
-                            anchors.verticalCenter: parent.verticalCenter
-                            iconName: "settings"
-                            buttonSize: 28
-                            iconSize: 16
-                            iconColor: Theme.surfaceVariantText
-                            onClicked: {
-                                PopoutService.closeControlCenter();
-                                PopoutService.openSettingsWithTab("displays");
-                            }
-                        }
-                    }
-                }
-
-                StyledText {
-                    visible: root.autoMode
-                    width: parent.width
-                    text: I18n.tr("Auto mode is on. Manual profile selection is disabled.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
-
-                StyledText {
-                    visible: root.profiles.length === 0
-                    width: parent.width
-                    text: I18n.tr("No display profiles found. Create them in Settings > Displays.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                }
+                contentHeight: detailColumn.height
+                clip: true
 
                 Column {
-                    visible: root.profiles.length > 0
+                    id: detailColumn
                     width: parent.width
-                    spacing: Theme.spacingXS
-                    opacity: root.autoMode ? 0.55 : 1.0
+                    spacing: Theme.spacingM
 
-                    Repeater {
-                        model: root.profiles
+                    CcGroup {
+                        CcToggleRow {
+                            text: I18n.tr("Auto")
+                            description: root.autoMode ? I18n.tr("Auto mode is on. Manual profile selection is disabled.") : ""
+                            checked: root.autoMode
+                            onToggled: checked => root.setAutoMode(checked)
+                        }
+                    }
 
-                        delegate: Rectangle {
-                            required property var modelData
+                    CcEmptyState {
+                        visible: root.profiles.length === 0
+                        iconName: "monitor"
+                        title: I18n.tr("No display profiles found. Create them in Settings > Displays.")
+                    }
 
-                            readonly property bool isActive: modelData.id === root.activeProfileId && !root.autoMode
+                    CcGroup {
+                        visible: root.profiles.length > 0
 
-                            width: detailColumn.width
-                            height: 44
-                            radius: Theme.cornerRadius
-                            color: {
-                                if (isActive)
-                                    return Theme.primaryHover;
-                                if (profileMouseArea.containsMouse)
-                                    return Theme.surfaceLight;
-                                return Theme.floatingSurface;
-                            }
-                            border.color: isActive ? Theme.primary : Theme.outlineMedium
-                            border.width: isActive ? 1 : Theme.layerOutlineWidth
+                        Repeater {
+                            model: root.profiles
 
-                            StyledText {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modelData.name
-                                color: Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: isActive ? Font.Medium : Font.Normal
-                            }
+                            CcListRow {
+                                required property var modelData
 
-                            StyledText {
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: isActive
-                                text: I18n.tr("Active")
-                                color: Theme.primary
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                id: profileMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
+                                iconName: "monitor"
+                                title: modelData.name
+                                active: modelData.id === root.activeProfileId && !root.autoMode
+                                showActiveCheck: true
                                 enabled: !root.autoMode
-                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                clickable: true
                                 onClicked: DisplayConfigState.activateProfile(modelData.id)
                             }
                         }

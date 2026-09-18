@@ -12,11 +12,15 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("DgopService")
 
+    signal statsUpdated
+
     property int refCount: 0
     readonly property bool powerSaver: PowerProfileWatcher.currentProfile === PowerProfile.PowerSaver
     property int updateInterval: refCount > 0 ? (powerSaver ? 6000 : 3000) : (powerSaver ? 60000 : 30000)
     property bool isUpdating: false
     property bool pendingUpdate: false
+    property int subscriptionGeneration: 0
+    readonly property bool pollingActive: dgopAvailable && refCount > 0 && enabledModules.length > 0
     readonly property bool dgopAvailable: DMSService.isConnected && DMSService.capabilities.includes("dgop")
     property bool sessionGpuIdsSeeded: false
 
@@ -59,6 +63,7 @@ Singleton {
     property real diskWriteRate: 0
     property var lastDiskStats: null
     property var diskMounts: []
+    property bool diskMountsRequested: false
     property var diskDevices: []
 
     property var processes: []
@@ -80,7 +85,7 @@ Singleton {
     property string uptime: ""
     property string shortUptime: ""
 
-    property int historySize: 60
+    readonly property int historySize: 60
     property var cpuHistory: []
     property var memoryHistory: []
     property var networkHistory: ({
@@ -109,6 +114,9 @@ Singleton {
                 }
             }
         }
+
+        if (modulesChanged)
+            subscriptionGeneration++;
 
         if (modulesChanged || refCount === 1) {
             enabledModules = enabledModules.slice(); // Force property change
@@ -142,20 +150,54 @@ Singleton {
             }
         }
 
-        if (modulesChanged) {
-            enabledModules = enabledModules.slice(); // Force property change
-            moduleRefCounts = Object.assign({}, moduleRefCounts); // Force property change
+        if (!modulesChanged)
+            return;
+        subscriptionGeneration++;
+        enabledModules = enabledModules.slice();
+        moduleRefCounts = Object.assign({}, moduleRefCounts);
+        releaseUnusedData();
+        pendingUpdate = pollingActive && isUpdating;
+        if (!pollingActive)
+            primeTimer.stop();
+    }
 
-            // Clear cursor data when CPU or process modules are no longer active
-            if (!enabledModules.includes("cpu")) {
-                cpuCursor = "";
-                cpuSampleCount = 0;
-            }
-            if (!enabledModules.includes("processes")) {
-                procCursor = "";
-                allProcesses = [];
-                processes = [];
-            }
+    function hasModule(module) {
+        return refCount > 0 && (enabledModules.includes(module) || enabledModules.includes("all"));
+    }
+
+    function releaseUnusedData() {
+        if (!hasModule("cpu")) {
+            cpuCursor = "";
+            cpuSampleCount = 0;
+            cpuHistory = [];
+            perCoreCpuUsage = [];
+        }
+        if (!hasModule("memory"))
+            memoryHistory = [];
+        if (!hasModule("network")) {
+            networkHistory = {
+                rx: [],
+                tx: []
+            };
+            networkInterfaces = [];
+            lastNetworkStats = null;
+            networkRxRate = 0;
+            networkTxRate = 0;
+        }
+        if (!hasModule("disk")) {
+            diskHistory = {
+                read: [],
+                write: []
+            };
+            diskDevices = [];
+            lastDiskStats = null;
+            diskReadRate = 0;
+            diskWriteRate = 0;
+        }
+        if (!hasModule("processes")) {
+            procCursor = "";
+            allProcesses = [];
+            processes = [];
         }
     }
 
@@ -203,8 +245,7 @@ Singleton {
     }
 
     function updateAllStats() {
-        if (!dgopAvailable || refCount === 0 || enabledModules.length === 0) {
-            isUpdating = false;
+        if (!pollingActive) {
             pendingUpdate = false;
             return;
         }
@@ -220,15 +261,16 @@ Singleton {
         }
 
         isUpdating = true;
+        const generation = subscriptionGeneration;
         DMSService.sendRequest("dgop.meta", params, response => {
             if (!response.result) {
                 log.warn("dgop.meta failed:", response.error || "empty result");
-                isUpdating = false;
-            } else {
+            } else if (pollingActive && generation === subscriptionGeneration) {
                 parseData(response.result);
             }
 
-            if (pendingUpdate) {
+            isUpdating = false;
+            if (pendingUpdate && pollingActive) {
                 pendingUpdate = false;
                 primeTimer.restart();
             }
@@ -259,6 +301,33 @@ Singleton {
         });
     }
 
+    function initializeDiskMounts() {
+        if (!dgopAvailable || diskMountsRequested || hasModule("diskmounts"))
+            return;
+        if (!SettingsData.controlCenterWidgets.some(widget => widget.id === "diskUsage" && widget.enabled !== false))
+            return;
+        diskMountsRequested = true;
+        const previousMounts = diskMounts;
+        DMSService.sendRequest("dgop.meta", {
+            modules: ["diskmounts"]
+        }, response => {
+            if (!response.result?.diskmounts) {
+                log.warn("Initial disk mounts request failed:", response.error || "empty result");
+                return;
+            }
+            if (diskMounts !== previousMounts)
+                return;
+            diskMounts = response.result.diskmounts;
+        });
+    }
+
+    Connections {
+        target: SettingsData
+        function onControlCenterWidgetsChanged() {
+            root.initializeDiskMounts();
+        }
+    }
+
     function buildMetaParams() {
         if (enabledModules.length === 0)
             return null;
@@ -273,7 +342,7 @@ Singleton {
             }
         }
 
-        if (gpuPciIds.length > 0 && finalModules.indexOf("gpu-temp") === -1) {
+        if (hasModule("gpu") && gpuPciIds.length > 0 && finalModules.indexOf("gpu-temp") === -1) {
             finalModules.push("gpu-temp");
         }
 
@@ -310,7 +379,8 @@ Singleton {
     }
 
     function parseData(data) {
-        if (data.cpu) {
+        const sampleTime = Date.now();
+        if (hasModule("cpu") && data.cpu) {
             const cpu = data.cpu;
             cpuSampleCount++;
 
@@ -331,7 +401,7 @@ Singleton {
             }
         }
 
-        if (data.memory) {
+        if (hasModule("memory") && data.memory) {
             const mem = data.memory;
             const totalKB = mem.total || 0;
             const availableKB = mem.available || 0;
@@ -353,7 +423,7 @@ Singleton {
             addToHistory(memoryHistory, memoryUsage);
         }
 
-        if (data.network && Array.isArray(data.network)) {
+        if (hasModule("network") && data.network && Array.isArray(data.network)) {
             networkInterfaces = data.network;
 
             let totalRx = 0;
@@ -364,7 +434,7 @@ Singleton {
             }
 
             if (lastNetworkStats) {
-                const timeDiff = updateInterval / 1000;
+                const timeDiff = Math.max(1, sampleTime - lastNetworkStats.time) / 1000;
                 const rxDiff = totalRx - lastNetworkStats.rx;
                 const txDiff = totalTx - lastNetworkStats.tx;
                 networkRxRate = Math.max(0, rxDiff / timeDiff);
@@ -373,12 +443,13 @@ Singleton {
                 addToHistory(networkHistory.tx, networkTxRate / 1024);
             }
             lastNetworkStats = {
+                "time": sampleTime,
                 "rx": totalRx,
                 "tx": totalTx
             };
         }
 
-        if (data.disk && Array.isArray(data.disk)) {
+        if (hasModule("disk") && data.disk && Array.isArray(data.disk)) {
             diskDevices = data.disk;
 
             let totalRead = 0;
@@ -389,7 +460,7 @@ Singleton {
             }
 
             if (lastDiskStats) {
-                const timeDiff = updateInterval / 1000;
+                const timeDiff = Math.max(1, sampleTime - lastDiskStats.time) / 1000;
                 const readDiff = totalRead - lastDiskStats.read;
                 const writeDiff = totalWrite - lastDiskStats.write;
                 diskReadRate = Math.max(0, readDiff / timeDiff);
@@ -398,16 +469,18 @@ Singleton {
                 addToHistory(diskHistory.write, diskWriteRate / (1024 * 1024));
             }
             lastDiskStats = {
+                "time": sampleTime,
                 "read": totalRead,
                 "write": totalWrite
             };
         }
 
-        if (data.diskmounts) {
+        if (hasModule("diskmounts") && data.diskmounts) {
+            diskMountsRequested = true;
             diskMounts = data.diskmounts || [];
         }
 
-        if (data.processes && Array.isArray(data.processes)) {
+        if (hasModule("processes") && data.processes && Array.isArray(data.processes)) {
             if (data.cursor) {
                 procCursor = data.cursor;
             }
@@ -467,7 +540,7 @@ Singleton {
             }
         }
 
-        if (data.system) {
+        if (hasModule("system") && data.system) {
             const sys = data.system;
             loadAverage = sys.loadavg || "";
             processCount = sys.processes || 0;
@@ -486,13 +559,13 @@ Singleton {
             biosVersion = (hwData.bios && hwData.bios.version) || "";
         }
 
-        isUpdating = false;
+        statsUpdated();
     }
 
     function addToHistory(array, value) {
         array.push(value);
         if (array.length > historySize) {
-            array.shift();
+            array.splice(0, array.length - historySize);
         }
     }
 
@@ -566,42 +639,34 @@ Singleton {
         applySorting();
     }
 
+    function compareProcesses(a, b) {
+        let result;
+        switch (currentSort) {
+        case "cpu":
+            result = (b.cpu || 0) - (a.cpu || 0);
+            break;
+        case "memory":
+            result = (b.memoryKB || 0) - (a.memoryKB || 0);
+            break;
+        case "name":
+            result = (a.command || "").toLowerCase().localeCompare((b.command || "").toLowerCase());
+            break;
+        case "pid":
+            result = (a.pid || 0) - (b.pid || 0);
+            break;
+        default:
+            return 0;
+        }
+        if (result === 0)
+            return (a.pid || 0) - (b.pid || 0);
+        return sortAscending ? -result : result;
+    }
+
     function applySorting() {
         if (!allProcesses || allProcesses.length === 0)
             return;
 
-        const asc = sortAscending;
-        const sorted = allProcesses.slice();
-        sorted.sort((a, b) => {
-            let valueA, valueB, result;
-
-            switch (currentSort) {
-            case "cpu":
-                valueA = a.cpu || 0;
-                valueB = b.cpu || 0;
-                result = valueB - valueA;
-                break;
-            case "memory":
-                valueA = a.memoryKB || 0;
-                valueB = b.memoryKB || 0;
-                result = valueB - valueA;
-                break;
-            case "name":
-                valueA = (a.command || "").toLowerCase();
-                valueB = (b.command || "").toLowerCase();
-                result = valueA.localeCompare(valueB);
-                break;
-            case "pid":
-                valueA = a.pid || 0;
-                valueB = b.pid || 0;
-                result = valueA - valueB;
-                break;
-            default:
-                return 0;
-            }
-            return asc ? -result : result;
-        });
-
+        const sorted = allProcesses.slice().sort(compareProcesses);
         processes = sorted.slice(0, processLimit);
     }
 
@@ -614,7 +679,7 @@ Singleton {
     Timer {
         id: updateTimer
         interval: root.updateInterval
-        running: root.dgopAvailable && root.refCount > 0 && root.enabledModules.length > 0
+        running: root.pollingActive
         repeat: true
         triggeredOnStart: true
         onTriggered: root.updateAllStats()
@@ -626,6 +691,7 @@ Singleton {
 
         initializeGpuMetadata();
         initializeSystemMetadata();
+        initializeDiskMounts();
 
         if (!sessionGpuIdsSeeded && SessionData.enabledGpuPciIds && SessionData.enabledGpuPciIds.length > 0) {
             sessionGpuIdsSeeded = true;

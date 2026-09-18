@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/notify"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/spf13/cobra"
 )
 
@@ -77,7 +77,7 @@ func watchNotificationAction(id uint32, path string) {
 	if id == 0 {
 		return
 	}
-	resp, ok := tryServerRequest(models.Request{
+	resp, ok := tryServerRequest(ipc.Request{
 		Method: "notify.watchAction",
 		Params: map[string]any{"id": id, "path": path},
 	})

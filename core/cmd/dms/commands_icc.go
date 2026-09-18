@@ -11,8 +11,8 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/spf13/cobra"
 )
 
@@ -103,7 +103,7 @@ func listAvailableProfiles() []string {
 
 func runICCList(cmd *cobra.Command, args []string) {
 	// Get current assignments from running server
-	req := models.Request{
+	req := ipc.Request{
 		Method: "wayland.icc.getStatus",
 	}
 	resp, err := sendServerRequest(req)
@@ -306,7 +306,7 @@ func runICCApply(cmd *cobra.Command, args []string) {
 	}
 
 	// Send IPC request to running server
-	req := models.Request{
+	req := ipc.Request{
 		Method: "wayland.icc.apply",
 		Params: map[string]any{
 			"output": outputName,
@@ -379,7 +379,7 @@ func dropCopiedProfile(path string, copied bool) {
 func runICCRemove(cmd *cobra.Command, args []string) {
 	outputName := args[0]
 
-	req := models.Request{
+	req := ipc.Request{
 		Method: "wayland.icc.remove",
 		Params: map[string]any{
 			"output": outputName,
@@ -409,7 +409,7 @@ func runICCSetTemp(cmd *cobra.Command, args []string) {
 		log.Fatalf("Temperature %d out of range (1000-10000, or 0 to follow the schedule)", temp)
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		Method: "wayland.icc.setTemp",
 		Params: map[string]any{
 			"output": outputName,
@@ -436,7 +436,7 @@ func runICCSetTemp(cmd *cobra.Command, args []string) {
 func fetchICCOutputTemps() map[string]int {
 	temps := make(map[string]int)
 
-	resp, err := sendServerRequest(models.Request{Method: "wayland.icc.getTemps"})
+	resp, err := sendServerRequest(ipc.Request{Method: "wayland.icc.getTemps"})
 	if err != nil || resp.Result == nil {
 		return temps
 	}
@@ -466,7 +466,7 @@ func formatOutputTemp(temps map[string]int, output string) string {
 }
 
 func runICCStatus(cmd *cobra.Command, args []string) {
-	req := models.Request{
+	req := ipc.Request{
 		Method: "wayland.icc.getStatus",
 	}
 

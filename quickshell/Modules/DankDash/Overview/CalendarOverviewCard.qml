@@ -1,34 +1,39 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.DankDash
 import "../../../Common/DateOnly.js" as DateOnly
 
-Rectangle {
+Card {
     id: root
-    readonly property var log: Log.scoped("CalendarOverviewCard")
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
-
-    implicitWidth: SettingsData.showWeekNumber ? 736 : 700
-
+    property bool live: Window.window?.visible ?? false
     property bool showEventDetails: false
     property date selectedDate: systemClock.date
     property var selectedDateEvents: []
-    property bool hasEvents: selectedDateEvents && selectedDateEvents.length > 0
-    property var detailEvent: null
-    property bool showEditor: false
-    property var editorEvent: null
+    readonly property bool hasEvents: selectedDateEvents && selectedDateEvents.length > 0
+    readonly property bool canCreate: CalendarService.canCreateEvents
 
-    signal closeDash
+    property int eventsRevision: 0
+
     signal navFocusRequested
+    signal detailRequested(var eventData)
+    signal editorRequested(var eventData, var initialDate)
+
+    focusTarget: root
+    blocksTabNavigation: showEventDetails
+    activeFocusOnTab: interactive
+
+    entryId: "calendar"
+    pad: Theme.spacingS
 
     function weekStartQt() {
-        if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0) {
+        if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0)
             return Qt.locale().firstDayOfWeek;
-        }
         return SettingsData.firstDayOfWeek;
     }
 
@@ -46,53 +51,35 @@ Rectangle {
         return dateOnly.addDays(add);
     }
 
-    function getWeekNumber(dateOnly) {
-        const weekStartDay = startOfWeek(dateOnly);
-
-        let week1Start;
-
-        if (weekStartJs() === 1) {
-            // ISO 8601 Standard, week start on Monday
-            // A week belongs to the year its Thursday falls in
-            // So we have to get the yearTarget from weekStartDay instead of dateOnly
-            const yearTarget = weekStartDay.addDays(3); // Monday + 3 = Thursday
-
-            // Week 1 is the week containing Jan 4th
-            week1Start = startOfWeek(DateOnly.of(yearTarget.year, 0, 4));
-        } else {
-            // Traditional / US Standard, week start on Sunday
-            // A week belongs to the year its Sunday falls in
-            const yearTarget = weekStartDay.addDays(6); // Monday + 6 = Sunday
-
-            // Week 1 is the week containing Jan 1st
-            week1Start = startOfWeek(DateOnly.of(yearTarget.year, 0, 1));
-        }
-
+    function getWeekNumber(dateObj) {
+        const weekStartDay = startOfWeek(DateOnly.fromDate(dateObj));
+        const isoWeeks = weekStartJs() === 1;
+        const yearTarget = weekStartDay.addDays(isoWeeks ? 3 : 6);
+        const week1Start = startOfWeek(DateOnly.of(yearTarget.year, 0, isoWeeks ? 4 : 1));
         const diffDays = week1Start.daysUntil(weekStartDay);
         return Math.floor(diffDays / 7) + 1;
     }
 
+    function eventColorsFor(date) {
+        if (!CalendarService.calendarAvailable || !CalendarService.hasEventsForDate(date))
+            return [];
+        return CalendarService.getEventsForDate(date).map(event => event.color?.length ? event.color : Theme.primary);
+    }
+
     function updateSelectedDateEvents() {
-        const events = (CalendarService && CalendarService.calendarAvailable) ? CalendarService.getEventsForDate(selectedDate) : [];
+        const events = CalendarService.calendarAvailable ? CalendarService.getEventsForDate(selectedDate) : [];
         if (JSON.stringify(events) === JSON.stringify(selectedDateEvents))
             return;
         selectedDateEvents = events;
     }
 
     function loadEventsForMonth() {
-        if (!CalendarService || !CalendarService.calendarAvailable) {
+        if (!CalendarService.calendarAvailable)
             return;
-        }
-
         const year = calendarGrid.displayDate.getFullYear();
         const month = calendarGrid.displayDate.getMonth();
-
-        const firstOfMonth = DateOnly.firstOfMonth(year, month);
-        const lastOfMonth = DateOnly.lastOfMonth(year, month);
-
-        const startDate = startOfWeek(firstOfMonth).addDays(-7);
-        const endDate = endOfWeek(lastOfMonth).addDays(7);
-
+        const startDate = startOfWeek(DateOnly.firstOfMonth(year, month)).addDays(-7);
+        const endDate = endOfWeek(DateOnly.lastOfMonth(year, month)).addDays(7);
         CalendarService.loadEvents(startDate.toDate(), endDate.toDate());
     }
 
@@ -104,31 +91,38 @@ Rectangle {
         loadEventsForMonth();
     }
 
+    function selectDay(dayDate) {
+        calendarGrid.selectedDate = dayDate;
+        root.selectedDate = dayDate;
+    }
+
     function moveSelection(days) {
         const moved = DateOnly.fromDate(calendarGrid.selectedDate).addDays(days);
         const d = moved.toDate();
-        calendarGrid.selectedDate = d;
-        root.selectedDate = d;
-        if (moved.month !== calendarGrid.displayDate.getMonth() || moved.year !== calendarGrid.displayDate.getFullYear()) {
-            calendarGrid.displayDate = d;
-            loadEventsForMonth();
-        }
-    }
-
-    function shiftMonth(delta) {
-        let d = new Date(calendarGrid.displayDate);
-        d.setMonth(d.getMonth() + delta);
+        selectDay(d);
+        if (moved.month === calendarGrid.displayDate.getMonth() && moved.year === calendarGrid.displayDate.getFullYear())
+            return;
         calendarGrid.displayDate = d;
         loadEventsForMonth();
     }
 
+    function shiftMonth(delta) {
+        calendarGrid.displayDate = DateOnly.fromDate(calendarGrid.displayDate).addMonths(delta).toDate();
+        loadEventsForMonth();
+    }
+
+    function openEditor(eventData) {
+        root.editorRequested(eventData, root.selectedDate);
+    }
+
     function handleKeyEvent(event) {
-        if (showEventDetails) {
-            if (event.key === Qt.Key_Escape) {
-                showEventDetails = false;
-                return true;
-            }
+        if (!interactive)
             return false;
+        if (showEventDetails) {
+            if (event.key !== Qt.Key_Escape)
+                return false;
+            showEventDetails = false;
+            return true;
         }
         switch (event.key) {
         case Qt.Key_Left:
@@ -171,9 +165,9 @@ Rectangle {
     onShowEventDetailsChanged: {
         if (showEventDetails) {
             taskInput.forceActiveFocus();
-        } else {
-            navFocusRequested();
+            return;
         }
+        navFocusRequested();
     }
 
     Component.onCompleted: {
@@ -182,955 +176,673 @@ Rectangle {
     }
 
     Connections {
+        target: CalendarService
+
         function onEventsByDateChanged() {
-            updateSelectedDateEvents();
+            root.eventsRevision++;
+            root.updateSelectedDateEvents();
         }
 
         function onCalendarAvailableChanged() {
-            if (CalendarService && CalendarService.calendarAvailable) {
-                loadEventsForMonth();
-            }
-            updateSelectedDateEvents();
+            if (CalendarService.calendarAvailable)
+                root.loadEventsForMonth();
+            root.updateSelectedDateEvents();
         }
-
-        target: CalendarService
-        enabled: CalendarService !== null
     }
 
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: 1
+    Rectangle {
+        id: dankWarning
 
-    Column {
-        id: cardColumn
-        anchors.fill: parent
-        anchors.margins: Theme.spacingM
-        spacing: Theme.spacingS
+        readonly property bool showWarning: CalendarService.dankNeedsLaunch ?? false
 
-        readonly property real warningInset: dankWarning.visible ? dankWarning.height + spacing : 0
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        visible: showWarning
+        height: showWarning ? Math.max(Theme.buttonHeightXS, warningRow.implicitHeight) + Theme.spacingXS * 2 : 0
+        radius: Theme.cornerRadiusS
+        color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
 
-        Rectangle {
-            id: dankWarning
-            width: parent.width
-            readonly property bool showWarning: CalendarService?.dankNeedsLaunch ?? false
-            visible: showWarning
-            height: showWarning ? Math.max(28, warningRow.implicitHeight) + Theme.spacingS : 0
-            radius: Theme.cornerRadius
-            color: Theme.warningHover
-            border.color: Theme.withAlpha(Theme.warning, 0.35)
-            border.width: 1
+        Row {
+            id: warningRow
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: Theme.spacingS
+            anchors.rightMargin: Theme.spacingS
+            spacing: Theme.spacingS
+
+            DankIcon {
+                name: "warning"
+                size: Theme.iconSizeSmall
+                color: Theme.warning
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                width: parent.width - Theme.iconSizeSmall - Theme.spacingS - (launchButton.visible ? launchButton.width + Theme.spacingS : 0)
+                anchors.verticalCenter: parent.verticalCenter
+                text: CalendarService.dankBinaryExists ? I18n.tr("DankCalendar isn't running") : I18n.tr("DankCalendar isn't installed")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                wrapMode: Text.Wrap
+            }
+
+            DankButton {
+                id: launchButton
+                anchors.verticalCenter: parent.verticalCenter
+                visible: CalendarService.dankBinaryExists
+                text: I18n.tr("Launch")
+                buttonHeight: Theme.buttonHeightXS
+                backgroundColor: Theme.primary
+                textColor: Theme.onPrimary
+                onClicked: CalendarService.launchDankCalendar()
+            }
+        }
+    }
+
+    Item {
+        id: header
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: dankWarning.bottom
+        anchors.topMargin: dankWarning.visible ? Theme.spacingS : 0
+        height: DashMetrics.monthNavSize
+
+        Item {
+            anchors.fill: parent
+            visible: !root.showEventDetails
+
+            NavButton {
+                anchors.left: parent.left
+                iconName: I18n.isRtl ? "chevron_right" : "chevron_left"
+                iconColor: Theme.onSurfaceVariant
+                Accessible.name: I18n.tr("Previous")
+                onClicked: root.shiftMonth(-1)
+            }
+
+            StyledText {
+                anchors.centerIn: parent
+                width: parent.width - DashMetrics.monthNavSize * 4
+                text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Theme.fontWeightMedium
+                color: Theme.surfaceText
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+            }
 
             Row {
-                id: warningRow
-                anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: Theme.spacingS
-                anchors.rightMargin: Theme.spacingS
-                spacing: Theme.spacingS
 
-                DankIcon {
-                    name: "warning"
-                    size: 16
-                    color: Theme.warning
-                    anchors.verticalCenter: parent.verticalCenter
+                NavButton {
+                    readonly property bool isToday: {
+                        const now = systemClock.date;
+                        const disp = calendarGrid.displayDate;
+                        const sel = calendarGrid.selectedDate;
+                        return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth() && sel.toDateString() === now.toDateString();
+                    }
+
+                    iconName: "today"
+                    enabled: !isToday
+                    Accessible.name: I18n.tr("Today")
+                    onClicked: root.goToToday()
                 }
 
-                StyledText {
-                    width: parent.width - 16 - Theme.spacingS - (launchButton.visible ? launchButton.width + Theme.spacingS : 0)
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: (CalendarService && CalendarService.dankBinaryExists) ? I18n.tr("DankCalendar isn't running") : I18n.tr("DankCalendar isn't installed")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    horizontalAlignment: Text.AlignLeft
-                    wrapMode: Text.Wrap
-                }
-
-                DankButton {
-                    id: launchButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: CalendarService && CalendarService.dankBinaryExists
-                    text: I18n.tr("Launch")
-                    buttonHeight: 26
-                    backgroundColor: Theme.primary
-                    textColor: Theme.primaryText
-                    onClicked: CalendarService.launchDankCalendar()
+                NavButton {
+                    iconName: I18n.isRtl ? "chevron_left" : "chevron_right"
+                    iconColor: Theme.onSurfaceVariant
+                    Accessible.name: I18n.tr("Next")
+                    onClicked: root.shiftMonth(1)
                 }
             }
         }
 
         Item {
-            width: parent.width
-            height: 40
-            visible: showEventDetails
+            anchors.fill: parent
+            visible: root.showEventDetails
 
-            DankActionButton {
-                buttonSize: 32
-                iconSize: 14
-                iconName: "arrow_back"
-                iconColor: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
+            NavButton {
                 anchors.left: parent.left
-                anchors.leftMargin: Theme.spacingS
+                iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
                 onClicked: root.showEventDetails = false
             }
 
-            DankActionButton {
-                buttonSize: 32
-                iconSize: 16
-                iconName: "event"
-                iconColor: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacingS
-                visible: CalendarService && CalendarService.canCreateEvents
-                onClicked: {
-                    root.editorEvent = null;
-                    root.showEditor = true;
-                }
-            }
-
             StyledText {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 32 + Theme.spacingS * 2
-                anchors.rightMargin: (CalendarService && CalendarService.canCreateEvents) ? 32 + Theme.spacingS * 2 : Theme.spacingS
-                height: 40
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.centerIn: parent
+                width: parent.width - DashMetrics.monthNavSize * 2 - Theme.spacingS * 2
                 text: {
-                    const dateStr = Qt.formatDate(selectedDate, "MMM d");
-                    if (selectedDateEvents && selectedDateEvents.length > 0) {
-                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 task", "task count next to a date") : I18n.tr("%1 tasks", "task count next to a date, %1 is the number of tasks").arg(selectedDateEvents.length);
-                        return dateStr + " • " + eventCount;
-                    }
-                    return dateStr;
+                    const dateStr = Qt.formatDate(root.selectedDate, "MMM d");
+                    if (!root.hasEvents)
+                        return dateStr;
+                    const count = root.selectedDateEvents.length;
+                    const eventCount = count === 1 ? I18n.tr("1 task", "task count next to a date") : I18n.tr("%1 tasks", "task count next to a date, %1 is the number of tasks").arg(count);
+                    return dateStr + " • " + eventCount;
                 }
                 font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
-                font.weight: Font.Medium
-                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
                 elide: Text.ElideRight
             }
+
+            NavButton {
+                anchors.right: parent.right
+                iconName: "add"
+                visible: root.canCreate
+                Accessible.name: I18n.tr("New event")
+                onClicked: root.openEditor(null)
+            }
         }
+    }
 
-        Row {
-            width: parent.width
-            height: 28
-            visible: !showEventDetails
+    Item {
+        id: body
 
-            DankActionButton {
-                buttonSize: 28
-                iconSize: 14
-                iconName: "chevron_left"
-                iconColor: Theme.primary
-                onClicked: root.shiftMonth(-1)
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        anchors.topMargin: Theme.spacingS
+        anchors.bottom: parent.bottom
+
+        DankMonthGrid {
+            id: calendarGrid
+
+            anchors.fill: parent
+            visible: !root.showEventDetails
+            displayDate: systemClock.date
+            selectedDate: systemClock.date
+            today: systemClock.date
+            firstDayOfWeek: root.weekStartJs()
+            dayNames: {
+                const days = [];
+                const qtFirst = root.weekStartQt();
+                for (let i = 0; i < 7; ++i)
+                    days.push(I18n.locale().dayName(((qtFirst - 1 + i) % 7) + 1, Locale.ShortFormat));
+                return days;
             }
-
-            StyledText {
-                width: parent.width - 84
-                height: 28
-                text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-                font.weight: Font.Medium
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            DankActionButton {
-                readonly property bool isToday: {
-                    const now = systemClock.date;
-                    const disp = calendarGrid.displayDate;
-                    const sel = calendarGrid.selectedDate;
-                    return disp.getFullYear() === now.getFullYear() && disp.getMonth() === now.getMonth() && sel.getFullYear() === now.getFullYear() && sel.getMonth() === now.getMonth() && sel.getDate() === now.getDate();
-                }
-
-                buttonSize: 28
-                iconSize: 14
-                iconName: "today"
-                iconColor: enabled ? Theme.primary : Theme.surfaceTextMedium
-                enabled: !isToday
-                opacity: enabled ? 1 : 0.38
-                tooltipText: I18n.tr("Today")
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                    }
-                }
-
-                onClicked: root.goToToday()
-            }
-
-            DankActionButton {
-                buttonSize: 28
-                iconSize: 14
-                iconName: "chevron_right"
-                iconColor: Theme.primary
-                onClicked: root.shiftMonth(1)
+            showWeekNumbers: SettingsData.showWeekNumber
+            highlightWeekends: root.options.weekends === true
+            weekColumnWidth: DashMetrics.weekColumnWidth
+            weekNumberFor: date => root.getWeekNumber(date)
+            dotColorsFor: date => root.eventColorsFor(date)
+            revision: root.eventsRevision
+            interactive: root.interactive
+            onDayClicked: date => {
+                root.forceActiveFocus(Qt.MouseFocusReason);
+                root.selectDay(date);
+                root.showEventDetails = true;
             }
         }
 
-        Row {
-            width: parent.width
-            height: parent.height - 28 - Theme.spacingS - cardColumn.warningInset
-            visible: !showEventDetails
-            spacing: SettingsData.showWeekNumber ? Theme.spacingS : 0
+        Column {
+            anchors.fill: parent
+            visible: root.showEventDetails
+            spacing: Theme.spacingS
 
-            Column {
-                id: weekNumberColumn
-                visible: SettingsData.showWeekNumber
-                width: SettingsData.showWeekNumber ? 28 : 0
-                height: parent.height
-                spacing: Theme.spacingS
+            DankFlickable {
+                id: flickableArea
+                width: parent.width
+                height: parent.height - taskInput.height - parent.spacing
+                clip: true
+                contentWidth: width
+                contentHeight: listViewContainer.height
+                interactive: listViewContainer.draggedItem === null
 
                 Item {
+                    id: listViewContainer
+
+                    property var draggedItem: null
+                    property bool orderChanged: false
+
                     width: parent.width
-                    height: 18
-                }
+                    height: 0
 
-                Grid {
-                    width: parent.width
-                    height: parent.height - 18 - Theme.spacingS
-                    columns: 1
-                    rows: 6
-
-                    Repeater {
-                        model: 6
-                        Rectangle {
-                            width: parent.width
-                            height: parent.height / 6
-                            color: "transparent"
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: {
-                                    const rowDate = calendarGrid.firstDay.addDays(index * 7);
-                                    return root.getWeekNumber(rowDate);
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceTextSecondary
-                                font.weight: Font.Medium
-                            }
+                    function sortedItems() {
+                        const items = [];
+                        for (let i = 0; i < repeater.count; i++) {
+                            const item = repeater.itemAt(i);
+                            if (item)
+                                items.push(item);
                         }
-                    }
-                }
-            }
-
-            Column {
-                width: SettingsData.showWeekNumber ? (parent.width - weekNumberColumn.width - parent.spacing) : parent.width
-                height: parent.height
-                spacing: Theme.spacingS
-
-                Row {
-                    width: parent.width
-                    height: 18
-
-                    Repeater {
-                        model: {
-                            const days = [];
-                            const qtFirst = weekStartQt();
-                            for (let i = 0; i < 7; ++i) {
-                                const qtDay = ((qtFirst - 1 + i) % 7) + 1;
-                                days.push(I18n.locale().dayName(qtDay, Locale.ShortFormat));
-                            }
-                            return days;
-                        }
-
-                        Rectangle {
-                            width: parent.width / 7
-                            height: 18
-                            color: "transparent"
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: modelData
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceTextSecondary
-                                font.weight: Font.Medium
-                            }
-                        }
-                    }
-                }
-
-                Grid {
-                    id: calendarGrid
-                    width: parent.width
-                    height: parent.height - 18 - Theme.spacingS
-                    columns: 7
-                    rows: 6
-
-                    property date displayDate: systemClock.date
-                    property date selectedDate: systemClock.date
-
-                    readonly property var firstDay: {
-                        const firstOfMonth = DateOnly.firstOfMonth(displayDate.getFullYear(), displayDate.getMonth());
-                        return startOfWeek(firstOfMonth);
+                        items.sort((a, b) => a.visualIndex - b.visualIndex);
+                        return items;
                     }
 
-                    Repeater {
-                        model: 42
-
-                        Rectangle {
-                            readonly property var dayDate: calendarGrid.firstDay.addDays(index)
-                            readonly property bool isCurrentMonth: dayDate.month === calendarGrid.displayDate.getMonth()
-                            readonly property bool isToday: dayDate.equals(DateOnly.fromDate(systemClock.date))
-                            readonly property bool isSelected: dayDate.equals(DateOnly.fromDate(calendarGrid.selectedDate))
-
-                            width: parent.width / 7
-                            height: parent.height / 6
-                            color: "transparent"
-
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: Math.min(parent.width - 4, parent.height - 4, 32)
-                                height: width
-                                color: isToday ? Theme.primaryHover : dayArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                                radius: Theme.cornerRadius
-                                border.color: (isSelected && !isToday) ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                                border.width: (isSelected && !isToday) ? 1 : 0
-
-                                StyledText {
-                                    anchors.centerIn: parent
-                                    text: dayDate.day
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: isToday ? Theme.primary : isCurrentMonth ? Theme.surfaceText : Theme.surfaceVariantText
-                                    font.weight: isToday ? Font.Medium : Font.Normal
-                                }
-
-                                Row {
-                                    anchors.bottom: parent.bottom
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    anchors.bottomMargin: 3
-                                    spacing: Theme.spacingXXS
-                                    visible: CalendarService && CalendarService.calendarAvailable && CalendarService.hasEventsForDate(dayDate.toDate())
-
-                                    Repeater {
-                                        model: {
-                                            const evs = CalendarService.getEventsForDate(dayDate.toDate());
-                                            const seen = [];
-                                            for (let i = 0; i < evs.length && seen.length < 3; i++) {
-                                                const c = (evs[i].color && evs[i].color.length) ? evs[i].color : "primary";
-                                                if (seen.indexOf(c) === -1)
-                                                    seen.push(c);
-                                            }
-                                            return seen;
-                                        }
-
-                                        Rectangle {
-                                            width: 5
-                                            height: 5
-                                            radius: 2.5
-                                            color: modelData === "primary" ? (isToday ? Qt.lighter(Theme.primary, 1.3) : Theme.primary) : modelData
-                                            opacity: isToday ? 0.95 : 0.8
-                                        }
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: dayArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    calendarGrid.selectedDate = dayDate.toDate();
-                                    root.selectedDate = dayDate.toDate();
-                                    root.showEventDetails = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Flickable {
-            id: flickableArea
-            width: parent.width - Theme.spacingS * 2
-            height: parent.height - (showEventDetails ? 40 + 42 : 28 + 18) - Theme.spacingS - cardColumn.warningInset
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: showEventDetails
-            clip: true
-            contentWidth: width
-            contentHeight: listViewContainer.height
-            interactive: listViewContainer.draggedItem === null
-
-            Item {
-                id: listViewContainer
-                width: parent.width
-                height: 100
-
-                property var draggedItem: null
-                property bool orderChanged: false
-
-                function resetAndLayout() {
-                    for (let i = 0; i < repeater.count; i++) {
-                        let item = repeater.itemAt(i);
-                        if (item) {
+                    function resetAndLayout() {
+                        for (let i = 0; i < repeater.count; i++) {
+                            const item = repeater.itemAt(i);
+                            if (!item)
+                                continue;
                             item.visualIndex = i;
                             item.isDragging = false;
                             item.isEditing = false;
                         }
-                    }
-                    updateLayout();
-                }
-
-                function updateLayout() {
-                    let items = [];
-                    for (let i = 0; i < repeater.count; i++) {
-                        let item = repeater.itemAt(i);
-                        if (item) {
-                            items.push(item);
-                        }
-                    }
-                    items.sort((a, b) => a.visualIndex - b.visualIndex);
-
-                    let currentY = 0;
-                    for (let i = 0; i < items.length; i++) {
-                        let item = items[i];
-                        if (item && !item.isDragging) {
-                            item.y = currentY;
-                        }
-                        if (item) {
-                            currentY += item.height + Theme.spacingXS;
-                        }
-                    }
-                    listViewContainer.height = Math.max(0, currentY - Theme.spacingXS);
-                }
-
-                function checkAndReorder(dragged) {
-                    let items = [];
-                    for (let i = 0; i < repeater.count; i++) {
-                        let item = repeater.itemAt(i);
-                        if (item) {
-                            items.push(item);
-                        }
-                    }
-                    items.sort((a, b) => a.visualIndex - b.visualIndex);
-
-                    let swapped = false;
-
-                    // Helper to get target Y position without animation offsets
-                    function getTargetY(index) {
-                        let y = 0;
-                        for (let i = 0; i < index; i++) {
-                            y += items[i].height + Theme.spacingXS;
-                        }
-                        return y;
-                    }
-
-                    while (true) {
-                        let draggedIdx = items.indexOf(dragged);
-                        if (draggedIdx === -1)
-                            break;
-
-                        let didSwap = false;
-
-                        // Check item above
-                        if (draggedIdx > 0) {
-                            let above = items[draggedIdx - 1];
-                            let targetYAbove = getTargetY(draggedIdx - 1);
-                            if (above && dragged.y < (targetYAbove + above.height / 2)) {
-                                // Swap visualIndex
-                                let temp = dragged.visualIndex;
-                                dragged.visualIndex = above.visualIndex;
-                                above.visualIndex = temp;
-
-                                // Swap in local array
-                                items[draggedIdx] = above;
-                                items[draggedIdx - 1] = dragged;
-
-                                listViewContainer.orderChanged = true;
-                                swapped = true;
-                                didSwap = true;
-                            }
-                        }
-
-                        // Check item below
-                        if (!didSwap && draggedIdx < items.length - 1) {
-                            let below = items[draggedIdx + 1];
-                            let targetYBelow = getTargetY(draggedIdx + 1);
-                            if (below && (dragged.y + dragged.height) > (targetYBelow + below.height / 2)) {
-                                // Swap visualIndex
-                                let temp = dragged.visualIndex;
-                                dragged.visualIndex = below.visualIndex;
-                                below.visualIndex = temp;
-
-                                // Swap in local array
-                                items[draggedIdx] = below;
-                                items[draggedIdx + 1] = dragged;
-
-                                listViewContainer.orderChanged = true;
-                                swapped = true;
-                                didSwap = true;
-                            }
-                        }
-
-                        if (!didSwap) {
-                            break;
-                        }
-                    }
-
-                    if (swapped) {
                         updateLayout();
                     }
-                }
 
-                function saveNewOrder() {
-                    if (!orderChanged)
+                    function updateLayout() {
+                        const items = sortedItems();
+                        let currentY = 0;
+                        for (let i = 0; i < items.length; i++) {
+                            if (!items[i].isDragging)
+                                items[i].y = currentY;
+                            currentY += items[i].height + Theme.groupedListGap;
+                        }
+                        listViewContainer.height = Math.max(0, currentY - Theme.groupedListGap);
+                    }
+
+                    function checkAndReorder(dragged) {
+                        const items = sortedItems();
+                        let swapped = false;
+
+                        const targetY = index => {
+                            let y = 0;
+                            for (let i = 0; i < index; i++)
+                                y += items[i].height + Theme.groupedListGap;
+                            return y;
+                        };
+
+                        for (; ; ) {
+                            const draggedIdx = items.indexOf(dragged);
+                            if (draggedIdx < 0)
+                                break;
+                            let neighbour = null;
+                            let neighbourIdx = -1;
+                            if (draggedIdx > 0 && dragged.y < targetY(draggedIdx - 1) + items[draggedIdx - 1].height / 2)
+                                neighbourIdx = draggedIdx - 1;
+                            else if (draggedIdx < items.length - 1 && dragged.y + dragged.height > targetY(draggedIdx + 1) + items[draggedIdx + 1].height / 2)
+                                neighbourIdx = draggedIdx + 1;
+                            if (neighbourIdx < 0)
+                                break;
+                            neighbour = items[neighbourIdx];
+                            const temp = dragged.visualIndex;
+                            dragged.visualIndex = neighbour.visualIndex;
+                            neighbour.visualIndex = temp;
+                            items[draggedIdx] = neighbour;
+                            items[neighbourIdx] = dragged;
+                            listViewContainer.orderChanged = true;
+                            swapped = true;
+                        }
+
+                        if (swapped)
+                            updateLayout();
+                    }
+
+                    function saveNewOrder() {
+                        if (!orderChanged)
+                            return;
+                        const orderedIds = sortedItems().map(item => item.taskId).filter(id => id.startsWith("task_")).map(id => id.replace("task_", ""));
+                        if (orderedIds.length > 0)
+                            CalendarService.reorderTasksForDate(root.selectedDate, orderedIds);
+                        orderChanged = false;
+                    }
+
+                    Repeater {
+                        id: repeater
+                        model: root.selectedDateEvents
+
+                        onModelChanged: Qt.callLater(listViewContainer.resetAndLayout)
+
+                        delegate: EventRow {}
+                    }
+                }
+            }
+
+            DankTextField {
+                id: taskInput
+                width: parent.width
+                height: DashMetrics.taskInputHeight
+                cornerRadius: Theme.fullRadius(width, height)
+                font.pixelSize: Theme.fontSizeSmall
+                leftIconName: "add_task"
+                leftIconSize: Theme.iconSizeSmall
+                placeholderText: I18n.tr("Add a task...", "placeholder in the new-task input field")
+                hidePlaceholderOnFocus: false
+                keyForwardTargets: [taskKeyHandler]
+
+                onAccepted: {
+                    const txt = text.trim();
+                    if (txt === "")
                         return;
-
-                    let items = [];
-                    for (let i = 0; i < repeater.count; i++) {
-                        let item = repeater.itemAt(i);
-                        if (item) {
-                            items.push(item);
-                        }
-                    }
-                    items.sort((a, b) => a.visualIndex - b.visualIndex);
-
-                    let orderedIds = [];
-                    for (let i = 0; i < items.length; i++) {
-                        let tid = items[i].taskId;
-                        if (tid && tid.startsWith("task_")) {
-                            orderedIds.push(tid.replace("task_", ""));
-                        }
-                    }
-                    if (orderedIds.length > 0) {
-                        CalendarService.reorderTasksForDate(root.selectedDate, orderedIds);
-                    }
-                    orderChanged = false;
+                    CalendarService.addTaskForDate(root.selectedDate, txt);
+                    text = "";
                 }
 
-                Repeater {
-                    id: repeater
-                    model: selectedDateEvents
+                Item {
+                    id: taskKeyHandler
 
-                    onModelChanged: {
-                        Qt.callLater(listViewContainer.resetAndLayout);
-                    }
-
-                    delegate: Rectangle {
-                        id: taskItem
-                        width: parent ? parent.width : 0
-                        height: isEditing ? 34 : (eventContent.implicitHeight + Theme.spacingS)
-                        radius: Theme.cornerRadius
-
-                        property int modelIndex: index
-                        property int visualIndex: index
-                        property string taskId: (modelData && modelData.id) ? modelData.id : ""
-                        property bool isDragging: false
-                        property bool isEditing: false
-                        property real dragMouseOffsetY: 0
-
-                        onModelIndexChanged: {
-                            visualIndex = modelIndex;
-                        }
-
-                        onYChanged: {
-                            if (isDragging) {
-                                listViewContainer.checkAndReorder(taskItem);
-                            }
-                        }
-
-                        readonly property bool isLocalTask: taskId.startsWith("task_")
-                        readonly property bool isDankTask: taskId.startsWith("vtodo_")
-                        readonly property bool isTask: isLocalTask || isDankTask
-                        readonly property bool canModify: isLocalTask || (isDankTask && modelData && !modelData.readOnly)
-                        readonly property string quickUrl: {
-                            if (isTask || !modelData)
-                                return "";
-                            if (modelData.meetingUrl)
-                                return modelData.meetingUrl;
-                            const loc = (modelData.location || "").trim();
-                            if (/^https?:\/\/\S+$/i.test(loc))
-                                return loc;
-                            if (/^www\.\S+$/i.test(loc))
-                                return "https://" + loc;
-                            return modelData.url || "";
-                        }
-                        readonly property string quickUrlLabel: {
-                            const u = quickUrl.replace(/^https?:\/\//i, "");
-                            if (u.length <= 40)
-                                return u;
-                            return u.slice(0, 39) + "…";
-                        }
-                        readonly property color baseAccent: {
-                            if (isLocalTask || !modelData || !modelData.color || !modelData.color.length)
-                                return Theme.primary;
-                            return modelData.color;
-                        }
-                        readonly property color accentColor: (isTask && modelData && modelData.completed) ? Theme.withAlpha(baseAccent, 0.4) : baseAccent
-                        readonly property color surfaceColor: isDragging ? Theme.primaryPressed : (eventMouseArea.containsMouse ? Theme.primaryBackground : Theme.nestedSurface)
-
-                        color: surfaceColor
-                        border.color: isDragging ? Theme.primary : (eventMouseArea.containsMouse ? Theme.primaryPressed : Theme.outlineMedium)
-                        border.width: (isDragging || eventMouseArea.containsMouse) ? 1 : Theme.layerOutlineWidth
-
-                        scale: isDragging ? 1.02 : 1.0
-                        z: isDragging ? 100 : visualIndex
-
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: 100
-                            }
-                        }
-
-                        Behavior on y {
-                            id: yBehavior
-                            enabled: !taskItem.isDragging
-                            NumberAnimation {
-                                duration: 150
-                                easing.type: Easing.OutQuad
-                            }
-                        }
-
-                        Component.onCompleted: {
-                            visualIndex = index;
-                            listViewContainer.updateLayout();
-                        }
-
-                        onHeightChanged: {
-                            listViewContainer.updateLayout();
-                        }
-
-                        onIsEditingChanged: {
-                            if (isEditing) {
-                                editInput.forceActiveFocus();
-                                editInput.selectAll();
-                            }
-                        }
-
-                        Item {
-                            id: accentClip
-                            width: 4
-                            clip: true
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            anchors.left: parent.left
-
-                            Rectangle {
-                                width: taskItem.width
-                                height: taskItem.height
-                                radius: taskItem.radius
-                                color: taskItem.accentColor
-                                anchors.top: parent.top
-                                anchors.left: parent.left
-                            }
-                        }
-
-                        // Drag Handle
-                        Rectangle {
-                            id: dragHandle
-                            width: 24
-                            height: 24
-                            anchors.left: parent.left
-                            anchors.leftMargin: 8
-                            anchors.verticalCenter: parent.verticalCenter
-                            radius: Theme.cornerRadius
-                            color: "transparent"
-                            visible: taskItem.isLocalTask && !taskItem.isEditing
-
-                            DankIcon {
-                                anchors.centerIn: parent
-                                name: "drag_indicator"
-                                size: 14
-                                color: dragMouseArea.containsMouse ? Theme.primary : Theme.surfaceTextMedium
-                            }
-
-                            MouseArea {
-                                id: dragMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.SizeAllCursor
-                                preventStealing: true
-
-                                drag.target: taskItem
-                                drag.axis: Drag.YAxis
-                                drag.minimumY: 0
-                                drag.maximumY: listViewContainer.height - taskItem.height
-
-                                onPressed: {
-                                    taskItem.isDragging = true;
-                                    listViewContainer.orderChanged = false;
-                                    listViewContainer.draggedItem = taskItem;
-                                }
-
-                                onPositionChanged: {
-                                    // Handled natively by MouseArea.drag
-                                }
-
-                                onReleased: {
-                                    taskItem.isDragging = false;
-                                    listViewContainer.draggedItem = null;
-                                    if (listViewContainer.orderChanged) {
-                                        listViewContainer.saveNewOrder();
-                                    } else {
-                                        listViewContainer.updateLayout();
-                                    }
-                                }
-
-                                onCanceled: {
-                                    taskItem.isDragging = false;
-                                    listViewContainer.draggedItem = null;
-                                    listViewContainer.resetAndLayout();
-                                }
-                            }
-                        }
-
-                        Column {
-                            id: eventContent
-
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.leftMargin: taskItem.isLocalTask ? 60 : taskItem.isDankTask ? 36 : (Theme.spacingS + 6)
-                            anchors.rightMargin: taskItem.canModify ? 64 : (taskItem.quickUrl !== "" ? 32 + Theme.spacingS : Theme.spacingXS)
-                            spacing: Theme.spacingXXS
-                            visible: !taskItem.isEditing
-
-                            StyledText {
-                                width: parent.width
-                                text: modelData ? modelData.title : ""
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: (taskItem.isTask && modelData && modelData.completed) ? Theme.surfaceTextSecondary : Theme.surfaceText
-                                font.weight: Font.Medium
-                                horizontalAlignment: Text.AlignLeft
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
-                            }
-
-                            StyledText {
-                                width: parent.width
-                                text: {
-                                    if (!modelData)
-                                        return "";
-                                    const cal = (modelData.calendar && modelData.calendar.length) ? " · " + modelData.calendar : "";
-                                    if (modelData.allDay)
-                                        return I18n.tr("All day", "calendar task with no specific time") + cal;
-                                    if (modelData.start && modelData.end) {
-                                        const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-                                        const startTime = Qt.formatTime(modelData.start, timeFormat);
-                                        if (modelData.start.toDateString() !== modelData.end.toDateString() || modelData.start.getTime() !== modelData.end.getTime())
-                                            return startTime + " – " + Qt.formatTime(modelData.end, timeFormat) + cal;
-                                        return startTime + cal;
-                                    }
-                                    return "";
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceTextMedium
-                                font.weight: Font.Normal
-                                horizontalAlignment: Text.AlignLeft
-                                visible: text !== "" && !taskItem.isLocalTask
-                            }
-                        }
-
-                        DankTextField {
-                            id: editInput
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.leftMargin: 36
-                            anchors.rightMargin: 64
-                            anchors.verticalCenter: parent.verticalCenter
-                            height: 28
-                            visible: taskItem.isEditing
-                            font.pixelSize: Theme.fontSizeSmall
-                            backgroundColor: "transparent"
-                            borderWidth: 0
-                            focusedBorderWidth: 0
-                            topPadding: 0
-                            bottomPadding: 0
-                            text: modelData ? modelData.title : ""
-                            keyForwardTargets: [editKeyHandler]
-
-                            onAccepted: {
-                                let txt = text.trim();
-                                if (txt !== "" && modelData && modelData.id) {
-                                    CalendarService.editTask(modelData.id, txt);
-                                }
-                                taskItem.isEditing = false;
-                            }
-
-                            Item {
-                                id: editKeyHandler
-
-                                Keys.onEscapePressed: event => {
-                                    taskItem.isEditing = false;
-                                    event.accepted = true;
-                                }
-                            }
-                        }
-
-                        // Main body MouseArea (declared before the delete/edit buttons so they sit on top)
-                        MouseArea {
-                            id: eventMouseArea
-
-                            anchors.fill: parent
-                            anchors.leftMargin: taskItem.isLocalTask ? 32 : 6
-                            anchors.rightMargin: taskItem.canModify ? 64 : 0
-                            hoverEnabled: true
-                            cursorShape: modelData ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: modelData && !taskItem.isEditing
-                            onClicked: {
-                                if (!modelData)
-                                    return;
-                                if (taskItem.isTask && taskItem.canModify) {
-                                    CalendarService.toggleTask(modelData.id);
-                                    return;
-                                }
-                                root.detailEvent = modelData;
-                            }
-                        }
-
-                        DankActionButton {
-                            buttonSize: 24
-                            iconSize: 14
-                            iconName: (modelData && modelData.meetingUrl) ? "videocam" : "link"
-                            iconColor: Theme.primary
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: taskItem.quickUrl !== ""
-                            tooltipText: taskItem.quickUrlLabel
-                            tooltipSide: "left"
-                            onClicked: Qt.openUrlExternally(taskItem.quickUrl)
-                        }
-
-                        DankActionButton {
-                            buttonSize: 24
-                            iconSize: 16
-                            iconName: (modelData && modelData.completed) ? "check_box" : "check_box_outline_blank"
-                            iconColor: (modelData && modelData.completed) ? Theme.primary : Theme.surfaceText
-                            anchors.left: parent.left
-                            anchors.leftMargin: taskItem.isLocalTask ? (taskItem.isEditing ? 8 : 32) : 8
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: taskItem.isTask
-                            enabled: taskItem.canModify && !taskItem.isEditing
-                            onClicked: CalendarService.toggleTask(modelData.id)
-                        }
-
-                        DankActionButton {
-                            id: deleteButton
-                            buttonSize: 24
-                            iconSize: 14
-                            iconName: taskItem.isEditing ? "close" : "delete"
-                            iconColor: taskItem.isEditing ? Theme.surfaceText : Theme.error
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: taskItem.canModify
-                            onClicked: {
-                                if (taskItem.isEditing) {
-                                    taskItem.isEditing = false;
-                                    return;
-                                }
-                                if (modelData && modelData.id)
-                                    CalendarService.removeTask(modelData.id);
-                            }
-                        }
-
-                        DankActionButton {
-                            buttonSize: 24
-                            iconSize: 14
-                            iconName: taskItem.isEditing ? "check" : "edit"
-                            iconColor: taskItem.isEditing ? Theme.primary : Theme.surfaceText
-                            anchors.right: deleteButton.left
-                            anchors.rightMargin: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: taskItem.canModify
-                            onClicked: {
-                                if (!taskItem.isEditing) {
-                                    taskItem.isEditing = true;
-                                    return;
-                                }
-                                let txt = editInput.text.trim();
-                                if (txt !== "" && modelData && modelData.id)
-                                    CalendarService.editTask(modelData.id, txt);
-                                taskItem.isEditing = false;
-                            }
-                        }
+                    Keys.onEscapePressed: event => {
+                        root.showEventDetails = false;
+                        event.accepted = true;
                     }
                 }
+            }
+        }
+    }
+
+    component NavButton: DankActionButton {
+        buttonSize: DashMetrics.monthNavSize
+        iconSize: DashMetrics.monthNavIconSize
+        iconColor: Theme.primary
+    }
+
+    component EventRow: Rectangle {
+        id: taskItem
+
+        required property int index
+        required property var modelData
+
+        property int visualIndex: index
+        property bool isDragging: false
+        property bool isEditing: false
+
+        readonly property string taskId: modelData?.id ?? ""
+        readonly property bool isLocalTask: taskId.startsWith("task_")
+        readonly property bool isDankTask: taskId.startsWith("vtodo_")
+        readonly property bool isTask: isLocalTask || isDankTask
+        readonly property bool completed: isTask && !!modelData?.completed
+        readonly property bool canModify: isLocalTask || (isDankTask && !!modelData && !modelData.readOnly)
+        readonly property string quickUrl: {
+            if (isTask || !modelData)
+                return "";
+            if (modelData.meetingUrl)
+                return modelData.meetingUrl;
+            const loc = (modelData.location || "").trim();
+            if (/^https?:\/\/\S+$/i.test(loc))
+                return loc;
+            if (/^www\.\S+$/i.test(loc))
+                return "https://" + loc;
+            return modelData.url || "";
+        }
+        readonly property color baseAccent: (isLocalTask || !modelData?.color?.length) ? Theme.primary : modelData.color
+        readonly property color accentColor: completed ? Theme.withAlpha(baseAccent, Theme.stateLayerDrag) : baseAccent
+        readonly property real leadingWidth: Theme.spacingM + DashMetrics.eventAccentWidth + Theme.spacingM + (isLocalTask ? DashMetrics.eventActionSize + Theme.spacingXS : 0) + (isTask ? DashMetrics.eventActionSize + Theme.spacingXS : 0)
+        readonly property real trailingWidth: {
+            if (canModify)
+                return DashMetrics.eventActionSize * 2 + Theme.spacingXS + Theme.spacingS * 2;
+            if (quickUrl !== "")
+                return DashMetrics.eventActionSize + Theme.spacingS * 2;
+            return Theme.spacingS;
+        }
+
+        width: parent ? parent.width : 0
+        height: Math.max(DashMetrics.eventRowMinHeight, eventContent.implicitHeight + Theme.spacingS * 2)
+        radius: Theme.cornerRadiusM
+        color: isDragging ? Theme.withAlpha(Theme.primary, Theme.stateLayerDrag) : Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+        z: isDragging ? 100 : visualIndex
+        activeFocusOnTab: !!modelData && !isEditing && root.interactive
+
+        function activate() {
+            if (isTask && canModify) {
+                CalendarService.toggleTask(taskId);
+                return;
+            }
+            root.detailRequested(modelData);
+        }
+
+        Keys.onPressed: event => {
+            if (!activeFocusOnTab)
+                return;
+            switch (event.key) {
+            case Qt.Key_Space:
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                activate();
+                event.accepted = true;
+                break;
+            }
+        }
+
+        FocusRing {}
+
+        onIndexChanged: visualIndex = index
+
+        onYChanged: {
+            if (isDragging)
+                listViewContainer.checkAndReorder(taskItem);
+        }
+
+        Behavior on y {
+            enabled: !taskItem.isDragging && DashMetrics.animationsEnabled
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveFastSpatial
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.standard
+            }
+        }
+
+        Component.onCompleted: {
+            visualIndex = index;
+            listViewContainer.updateLayout();
+        }
+
+        onHeightChanged: listViewContainer.updateLayout()
+
+        onIsEditingChanged: {
+            if (!isEditing)
+                return;
+            editInput.forceActiveFocus();
+            editInput.selectAll();
+        }
+
+        function commitEdit() {
+            const txt = editInput.text.trim();
+            if (txt !== "" && taskItem.taskId !== "")
+                CalendarService.editTask(taskItem.taskId, txt);
+            taskItem.isEditing = false;
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.spacingM
+            anchors.verticalCenter: parent.verticalCenter
+            width: DashMetrics.eventAccentWidth
+            height: parent.height - Theme.spacingM * 2
+            radius: Theme.fullRadius(width, height)
+            color: taskItem.accentColor
+        }
+
+        DankIcon {
+            id: dragHandle
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.spacingM + DashMetrics.eventAccentWidth + Theme.spacingM
+            anchors.verticalCenter: parent.verticalCenter
+            name: "drag_indicator"
+            size: DashMetrics.eventActionIconSize
+            color: dragMouseArea.containsMouse ? Theme.primary : Theme.onSurfaceVariant
+            visible: taskItem.isLocalTask && !taskItem.isEditing
+
+            MouseArea {
+                id: dragMouseArea
+                anchors.fill: parent
+                anchors.margins: -Theme.spacingS
+                hoverEnabled: true
+                cursorShape: Qt.SizeAllCursor
+                preventStealing: true
+                drag.target: taskItem
+                drag.axis: Drag.YAxis
+                drag.minimumY: 0
+                drag.maximumY: listViewContainer.height - taskItem.height
+
+                onPressed: {
+                    taskItem.isDragging = true;
+                    listViewContainer.orderChanged = false;
+                    listViewContainer.draggedItem = taskItem;
+                }
+
+                onReleased: {
+                    taskItem.isDragging = false;
+                    listViewContainer.draggedItem = null;
+                    if (listViewContainer.orderChanged)
+                        listViewContainer.saveNewOrder();
+                    else
+                        listViewContainer.updateLayout();
+                }
+
+                onCanceled: {
+                    taskItem.isDragging = false;
+                    listViewContainer.draggedItem = null;
+                    listViewContainer.resetAndLayout();
+                }
+            }
+        }
+
+        DankActionButton {
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.spacingM + DashMetrics.eventAccentWidth + Theme.spacingM + (taskItem.isLocalTask && !taskItem.isEditing ? DashMetrics.eventActionSize + Theme.spacingXS : 0)
+            anchors.verticalCenter: parent.verticalCenter
+            buttonSize: DashMetrics.eventActionSize
+            iconSize: DashMetrics.eventActionIconSize
+            iconName: taskItem.completed ? "check_box" : "check_box_outline_blank"
+            Accessible.name: taskItem.completed ? I18n.tr("Mark incomplete") : I18n.tr("Mark complete")
+            iconColor: taskItem.completed ? Theme.primary : Theme.onSurfaceVariant
+            visible: taskItem.isTask
+            enabled: taskItem.canModify && !taskItem.isEditing
+            onClicked: CalendarService.toggleTask(taskItem.taskId)
+        }
+
+        Column {
+            id: eventContent
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: taskItem.leadingWidth
+            anchors.rightMargin: taskItem.trailingWidth
+            spacing: Theme.spacingXXS
+            visible: !taskItem.isEditing
+
+            StyledText {
+                width: parent.width
+                text: taskItem.modelData?.title ?? ""
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
+                color: taskItem.completed ? Theme.onSurfaceVariant : Theme.surfaceText
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            StyledText {
+                width: parent.width
+                text: {
+                    const data = taskItem.modelData;
+                    if (!data)
+                        return "";
+                    const cal = data.calendar?.length ? " · " + data.calendar : "";
+                    if (data.allDay)
+                        return I18n.tr("All day", "calendar task with no specific time") + cal;
+                    if (!data.start || !data.end)
+                        return "";
+                    const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
+                    const startTime = Qt.formatTime(data.start, timeFormat);
+                    if (data.start.getTime() !== data.end.getTime())
+                        return startTime + " – " + Qt.formatTime(data.end, timeFormat) + cal;
+                    return startTime + cal;
+                }
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.onSurfaceVariant
+                visible: text !== "" && !taskItem.isLocalTask
             }
         }
 
         DankTextField {
-            id: taskInput
-            width: parent.width - Theme.spacingS * 2
-            height: 34
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: showEventDetails
+            id: editInput
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: taskItem.leadingWidth
+            anchors.rightMargin: taskItem.trailingWidth
+            anchors.verticalCenter: parent.verticalCenter
+            height: DashMetrics.eventActionSize
+            visible: taskItem.isEditing
             font.pixelSize: Theme.fontSizeSmall
-            backgroundColor: Theme.nestedSurface
-            normalBorderColor: Theme.outlineMedium
-            placeholderText: I18n.tr("Add a task...", "placeholder in the new-task input field")
-            hidePlaceholderOnFocus: false
-            keyForwardTargets: [taskKeyHandler]
-
-            onAccepted: {
-                let txt = text.trim();
-                if (txt !== "") {
-                    CalendarService.addTaskForDate(root.selectedDate, txt);
-                    text = "";
-                }
-            }
+            backgroundColor: "transparent"
+            borderWidth: 0
+            focusedBorderWidth: 0
+            topPadding: 0
+            bottomPadding: 0
+            text: taskItem.modelData?.title ?? ""
+            keyForwardTargets: [editKeyHandler]
+            onAccepted: taskItem.commitEdit()
 
             Item {
-                id: taskKeyHandler
+                id: editKeyHandler
 
                 Keys.onEscapePressed: event => {
-                    root.showEventDetails = false;
+                    taskItem.isEditing = false;
                     event.accepted = true;
                 }
             }
         }
-    }
 
-    Loader {
-        anchors.fill: parent
-        z: 1000
-        active: root.detailEvent !== null
+        StateLayer {
+            anchors.leftMargin: taskItem.leadingWidth
+            anchors.rightMargin: taskItem.trailingWidth
+            cornerRadius: taskItem.radius
+            stateColor: taskItem.accentColor
+            disabled: !taskItem.modelData || taskItem.isEditing || !root.interactive
+            onClicked: taskItem.activate()
+        }
 
-        sourceComponent: CalendarEventDetail {
-            eventData: root.detailEvent
-            canEdit: CalendarService && CalendarService.canCreateEvents && root.detailEvent && !root.detailEvent.readOnly && !(root.detailEvent.id && root.detailEvent.id.startsWith("task_"))
-            onCloseRequested: root.detailEvent = null
-            onEditRequested: {
-                root.editorEvent = root.detailEvent;
-                root.detailEvent = null;
-                root.showEditor = true;
-            }
-            onDeleteRequested: {
-                if (root.detailEvent && root.detailEvent.id)
-                    CalendarService.deleteEvent(root.detailEvent.id, null);
-                root.detailEvent = null;
+        DankActionButton {
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingS
+            anchors.verticalCenter: parent.verticalCenter
+            buttonSize: DashMetrics.eventActionSize
+            iconSize: DashMetrics.eventActionIconSize
+            iconName: taskItem.modelData?.meetingUrl ? "videocam" : "link"
+            iconColor: Theme.primary
+            visible: taskItem.quickUrl !== "" && !taskItem.canModify
+            tooltipText: taskItem.quickUrl
+            tooltipSide: "left"
+            onClicked: Qt.openUrlExternally(taskItem.quickUrl)
+        }
+
+        DankActionButton {
+            id: deleteButton
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingS
+            anchors.verticalCenter: parent.verticalCenter
+            buttonSize: DashMetrics.eventActionSize
+            iconSize: DashMetrics.eventActionIconSize
+            iconName: taskItem.isEditing ? "close" : "delete"
+            Accessible.name: taskItem.isEditing ? I18n.tr("Cancel") : I18n.tr("Delete")
+            iconColor: taskItem.isEditing ? Theme.onSurfaceVariant : Theme.error
+            visible: taskItem.canModify
+            onClicked: {
+                if (taskItem.isEditing) {
+                    taskItem.isEditing = false;
+                    return;
+                }
+                if (taskItem.taskId !== "")
+                    CalendarService.removeTask(taskItem.taskId);
             }
         }
-    }
 
-    Loader {
-        anchors.fill: parent
-        z: 1000
-        active: root.showEditor
-
-        sourceComponent: CalendarEventEditor {
-            eventData: root.editorEvent
-            initialDate: root.selectedDate
-            onCloseRequested: {
-                root.showEditor = false;
-                root.editorEvent = null;
-            }
-            onSaved: {
-                root.showEditor = false;
-                root.editorEvent = null;
+        DankActionButton {
+            anchors.right: deleteButton.left
+            anchors.rightMargin: Theme.spacingXS
+            anchors.verticalCenter: parent.verticalCenter
+            buttonSize: DashMetrics.eventActionSize
+            iconSize: DashMetrics.eventActionIconSize
+            iconName: taskItem.isEditing ? "check" : "edit"
+            Accessible.name: taskItem.isEditing ? I18n.tr("Save") : I18n.tr("Edit")
+            iconColor: taskItem.isEditing ? Theme.primary : Theme.onSurfaceVariant
+            visible: taskItem.canModify
+            onClicked: {
+                if (taskItem.isEditing) {
+                    taskItem.commitEdit();
+                    return;
+                }
+                taskItem.isEditing = true;
             }
         }
     }
 
     SystemClock {
         id: systemClock
+        enabled: root.live
         precision: SystemClock.Hours
     }
 
@@ -1138,6 +850,8 @@ Rectangle {
         target: SessionService
 
         function onSessionResumed() {
+            if (!root.live)
+                return;
             systemClock.enabled = false;
             systemClock.enabled = true;
         }

@@ -25,17 +25,6 @@ func (m *mockProvider) GetCheatSheet() (*CheatSheet, error) {
 	}, nil
 }
 
-func TestNewRegistry(t *testing.T) {
-	r := NewRegistry()
-	if r == nil {
-		t.Fatal("NewRegistry returned nil")
-	}
-
-	if r.providers == nil {
-		t.Error("providers map is nil")
-	}
-}
-
 func TestRegisterProvider(t *testing.T) {
 	tests := []struct {
 		name        string

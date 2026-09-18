@@ -1,0 +1,27 @@
+{
+    "id": "myDashCard",
+    "name": "My Dash Card",
+    "description": "A custom dash overview card",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "type": "dashCard",
+    "capabilities": ["dash-card"],
+    "component": "./Card.qml",
+    "icon": "extension",
+    "dash": {
+        "card": { "w": 2, "h": 1, "minW": 1, "minH": 1, "maxW": 3, "maxH": 2 },
+        "options": [
+            {
+                "key": "tone",
+                "text": "Tone",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    { "value": "", "text": "Surface" },
+                    { "value": "primary", "text": "Primary" }
+                ]
+            }
+        ]
+    },
+    "requires_dms": ">=1.7.0"
+}

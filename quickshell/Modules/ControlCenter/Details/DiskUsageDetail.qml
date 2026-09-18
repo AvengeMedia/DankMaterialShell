@@ -1,24 +1,24 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
+import qs.Modules.ControlCenter
+import qs.Modules.ControlCenter.Widgets
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
     property string currentMountPath: "/"
-    property string instanceId: ""
+
+    readonly property string title: I18n.tr("Disk usage")
+    readonly property var mounts: DgopService.diskMounts || []
 
     signal mountPathChanged(string newMountPath)
-
-    implicitHeight: diskContent.height + Theme.spacingM
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
 
     Ref {
         service: DgopService
@@ -26,146 +26,55 @@ Rectangle {
         active: root.visible && (root.Window.window?.visible ?? false)
     }
 
+    function usageOf(mount) {
+        return parseFloat((mount.percent || "0").replace("%", "")) || 0;
+    }
+
     DankFlickable {
-        id: diskContent
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: Theme.spacingM
-        anchors.topMargin: Theme.spacingM
-        contentHeight: diskColumn.height
+        anchors.fill: parent
+        contentHeight: column.height
         clip: true
 
         Column {
-            id: diskColumn
+            id: column
             width: parent.width
-            spacing: Theme.spacingS
+            spacing: Theme.spacingM
 
-            Item {
-                width: parent.width
-                height: 100
-                visible: !DgopService.dgopAvailable || !DgopService.diskMounts || DgopService.diskMounts.length === 0
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        name: DgopService.dgopAvailable ? "storage" : "error"
-                        size: 32
-                        color: DgopService.dgopAvailable ? Theme.primary : Theme.error
-                    }
-
-                    StyledText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: DgopService.dgopAvailable ? I18n.tr("No disk data available") : I18n.tr("dgop not available")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
+            CcEmptyState {
+                visible: !DgopService.dgopAvailable || root.mounts.length === 0
+                iconName: DgopService.dgopAvailable ? "storage" : "error"
+                iconColor: DgopService.dgopAvailable ? Theme.primary : Theme.error
+                title: DgopService.dgopAvailable ? I18n.tr("No disk data available") : I18n.tr("dgop not available")
             }
 
-            Repeater {
-                model: DgopService.diskMounts || []
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
+            CcGroup {
+                visible: root.mounts.length > 0
 
-                    width: parent.width
-                    height: 80
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceLight
-                    border.color: modelData.mount === currentMountPath ? Theme.primary : Theme.outlineLight
-                    border.width: modelData.mount === currentMountPath ? 2 : 1
+                Repeater {
+                    model: root.mounts
 
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: Theme.spacingM
-                        spacing: Theme.spacingM
+                    CcListRow {
+                        required property var modelData
 
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXXS
+                        readonly property real usage: root.usageOf(modelData)
 
-                            DankIcon {
-                                name: "storage"
-                                size: Theme.iconSize
-                                color: {
-                                    const percentStr = modelData.percent?.replace("%", "") || "0";
-                                    const percent = parseFloat(percentStr) || 0;
-                                    if (percent > 90)
-                                        return Theme.error;
-                                    if (percent > 75)
-                                        return Theme.warning;
-                                    return modelData.mount === currentMountPath ? Theme.primary : Theme.surfaceText;
-                                }
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            StyledText {
-                                text: {
-                                    const percentStr = modelData.percent?.replace("%", "") || "0";
-                                    const percent = parseFloat(percentStr) || 0;
-                                    return percent.toFixed(0) + "%";
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
+                        iconName: "storage"
+                        iconColor: {
+                            if (usage > CcMetrics.diskCriticalPercent)
+                                return Theme.error;
+                            if (usage > CcMetrics.diskWarnPercent)
+                                return Theme.warning;
+                            return active ? Theme.primary : Theme.surfaceText;
                         }
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.parent.width - parent.parent.anchors.leftMargin - parent.spacing - 50 - Theme.spacingM
-
-                            StyledText {
-                                text: modelData.mount === "/" ? I18n.tr("Root Filesystem") : modelData.mount
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: modelData.mount === currentMountPath ? Font.Medium : Font.Normal
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            StyledText {
-                                text: modelData.mount
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                elide: Text.ElideRight
-                                width: parent.width
-                                visible: modelData.mount !== "/"
-                                horizontalAlignment: Text.AlignLeft
-                            }
-
-                            StyledText {
-                                text: `${modelData.used || "?"} / ${modelData.size || "?"}`
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                elide: Text.ElideRight
-                                width: parent.width
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
-                    }
-
-                    DankRipple {
-                        id: mountRipple
-                        cornerRadius: parent.radius
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: mouse => mountRipple.trigger(mouse.x, mouse.y)
+                        active: modelData.mount === root.currentMountPath
+                        showActiveCheck: true
+                        title: modelData.mount === "/" ? I18n.tr("Root Filesystem") : modelData.mount
+                        subtitle: `${modelData.used || "?"} / ${modelData.size || "?"}` + (modelData.mount === "/" ? "" : " • " + modelData.mount)
+                        trailingBadge: usage.toFixed(0) + "%"
+                        clickable: true
                         onClicked: {
-                            currentMountPath = modelData.mount;
-                            mountPathChanged(modelData.mount);
+                            root.currentMountPath = modelData.mount;
+                            root.mountPathChanged(modelData.mount);
                         }
                     }
                 }

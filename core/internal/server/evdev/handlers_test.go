@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	mocks "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/evdev"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
 type mockNetConn struct {
@@ -56,8 +56,8 @@ func TestHandleRequest(t *testing.T) {
 		}
 
 		mc := newMockNetConn()
-		conn := models.NewConn(mc)
-		req := models.Request{
+		conn := ipc.NewConnWriter(mc)
+		req := ipc.Request{
 			ID:     123,
 			Method: "evdev.getState",
 			Params: map[string]any{},
@@ -65,7 +65,7 @@ func TestHandleRequest(t *testing.T) {
 
 		HandleRequest(conn, req, m)
 
-		var resp models.Response[State]
+		var resp ipc.Response[State]
 		err := json.NewDecoder(mc.writeBuf).Decode(&resp)
 		require.NoError(t, err)
 
@@ -86,8 +86,8 @@ func TestHandleRequest(t *testing.T) {
 		}
 
 		mc := newMockNetConn()
-		conn := models.NewConn(mc)
-		req := models.Request{
+		conn := ipc.NewConnWriter(mc)
+		req := ipc.Request{
 			ID:     456,
 			Method: "evdev.unknownMethod",
 			Params: map[string]any{},
@@ -95,7 +95,7 @@ func TestHandleRequest(t *testing.T) {
 
 		HandleRequest(conn, req, m)
 
-		var resp models.Response[any]
+		var resp ipc.Response[any]
 		err := json.NewDecoder(mc.writeBuf).Decode(&resp)
 		require.NoError(t, err)
 
@@ -103,34 +103,4 @@ func TestHandleRequest(t *testing.T) {
 		assert.NotEmpty(t, resp.Error)
 		assert.Contains(t, resp.Error, "unknown method")
 	})
-}
-
-func TestHandleGetState(t *testing.T) {
-	mockDevice := mocks.NewMockEvdevDevice(t)
-	mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
-
-	m := &Manager{
-		devices:   []EvdevDevice{mockDevice},
-		state:     State{Available: true, CapsLock: false},
-		closeChan: make(chan struct{}),
-	}
-
-	mc := newMockNetConn()
-	conn := models.NewConn(mc)
-	req := models.Request{
-		ID:     789,
-		Method: "evdev.getState",
-		Params: map[string]any{},
-	}
-
-	handleGetState(conn, req, m)
-
-	var resp models.Response[State]
-	err := json.NewDecoder(mc.writeBuf).Decode(&resp)
-	require.NoError(t, err)
-
-	assert.Equal(t, 789, resp.ID)
-	assert.NotNil(t, resp.Result)
-	assert.True(t, resp.Result.Available)
-	assert.False(t, resp.Result.CapsLock)
 }

@@ -1,0 +1,147 @@
+{
+  "niri": {
+    "gaming": {
+      "modes": [
+        { "width": 2560, "height": 1440, "refresh_rate": 144000 },
+        { "width": 2560, "height": 1440, "refresh_rate": 120000 },
+        { "width": 2560, "height": 1440, "refresh_rate": 60000 },
+        { "width": 1920, "height": 1080, "refresh_rate": 60000 }
+      ],
+      "current_mode": 0,
+      "vrr_enabled": false
+    },
+    "nearSixty": {
+      "modes": [
+        { "width": 1920, "height": 1080, "refresh_rate": 120000 },
+        { "width": 1920, "height": 1080, "refresh_rate": 60000 },
+        { "width": 1920, "height": 1080, "refresh_rate": 59940 }
+      ],
+      "current_mode": 0,
+      "vrr_enabled": false
+    },
+    "single": {
+      "modes": [
+        { "width": 1920, "height": 1200, "refresh_rate": 60000 }
+      ],
+      "current_mode": 0,
+      "vrr_enabled": false
+    },
+    "vrr": {
+      "modes": [
+        { "width": 3440, "height": 1440, "refresh_rate": 144000 },
+        { "width": 3440, "height": 1440, "refresh_rate": 60000 }
+      ],
+      "current_mode": 0,
+      "vrr_enabled": true
+    },
+    "far": {
+      "modes": [
+        { "width": 2560, "height": 1440, "refresh_rate": 144000 },
+        { "width": 2560, "height": 1440, "refresh_rate": 90000 }
+      ],
+      "current_mode": 0,
+      "vrr_enabled": false
+    },
+    "atSixty": {
+      "modes": [
+        { "width": 2560, "height": 1440, "refresh_rate": 144000 },
+        { "width": 2560, "height": 1440, "refresh_rate": 60000 }
+      ],
+      "current_mode": 1,
+      "vrr_enabled": false
+    },
+    "noCurrent": {
+      "modes": [
+        { "width": 1920, "height": 1080, "refresh_rate": 60000 }
+      ]
+    },
+    "badCurrent": {
+      "modes": [
+        { "width": 1920, "height": 1080, "refresh_rate": 60000 }
+      ],
+      "current_mode": 9
+    }
+  },
+  "wlr": {
+    "gaming": {
+      "enabled": true,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 0, "width": 2560, "height": 1440, "refresh": 144000 },
+      "modes": [
+        { "id": 0, "width": 2560, "height": 1440, "refresh": 144000 },
+        { "id": 1, "width": 2560, "height": 1440, "refresh": 120000 },
+        { "id": 2, "width": 2560, "height": 1440, "refresh": 60000 },
+        { "id": 3, "width": 1920, "height": 1080, "refresh": 60000 }
+      ]
+    },
+    "nearSixty": {
+      "enabled": true,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 10, "width": 1920, "height": 1080, "refresh": 120000 },
+      "modes": [
+        { "id": 10, "width": 1920, "height": 1080, "refresh": 120000 },
+        { "id": 11, "width": 1920, "height": 1080, "refresh": 60000 },
+        { "id": 12, "width": 1920, "height": 1080, "refresh": 59940 }
+      ]
+    },
+    "single": {
+      "enabled": true,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 20, "width": 1920, "height": 1200, "refresh": 60000 },
+      "modes": [
+        { "id": 20, "width": 1920, "height": 1200, "refresh": 60000 }
+      ]
+    },
+    "vrr": {
+      "enabled": true,
+      "adaptiveSync": 1,
+      "currentMode": { "id": 30, "width": 3440, "height": 1440, "refresh": 144000 },
+      "modes": [
+        { "id": 30, "width": 3440, "height": 1440, "refresh": 144000 },
+        { "id": 31, "width": 3440, "height": 1440, "refresh": 60000 }
+      ]
+    },
+    "disabled": {
+      "enabled": false,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 40, "width": 2560, "height": 1440, "refresh": 144000 },
+      "modes": [
+        { "id": 40, "width": 2560, "height": 1440, "refresh": 144000 },
+        { "id": 41, "width": 2560, "height": 1440, "refresh": 60000 }
+      ]
+    },
+    "far": {
+      "enabled": true,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 50, "width": 2560, "height": 1440, "refresh": 144000 },
+      "modes": [
+        { "id": 50, "width": 2560, "height": 1440, "refresh": 144000 },
+        { "id": 51, "width": 2560, "height": 1440, "refresh": 90000 }
+      ]
+    }
+  },
+  "modeStrings": [
+    "2560x1440@144.000",
+    "2560x1440@59.940",
+    "2560x1440@60",
+    "2560x1440@60.00",
+    "2560x1440@61.500",
+    "1920x1080@60.000",
+    "1920x1080@59.94",
+    "1920x1080@120",
+    "1920x1080",
+    "bogus",
+    "",
+    "1920x1080@60.0001"
+  ],
+  "modes": [
+    null,
+    {},
+    { "width": 2560, "height": 1440, "refresh_rate": 143998 },
+    { "id": 1, "width": 3840, "height": 2160, "refresh": 59997 },
+    { "width": 1920, "height": 1080, "refresh_rate": 60000, "refresh": 48000 },
+    { "width": 1920, "height": 1080, "refresh_rate": 0, "refresh": 48000 },
+    { "id": 0, "width": 1920, "height": 1080, "refresh": 60 },
+    { "width": 1920, "height": 1080, "refresh": 60000 }
+  ]
+}

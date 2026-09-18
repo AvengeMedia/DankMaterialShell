@@ -143,6 +143,7 @@ DankPopout {
 
             surfaceHost: root
             transientSurfaceTracker: root.transientSurfaceTracker
+            popout: true
             clearConfirmDialog: clearConfirmDialog
             onCloseRequested: root.hide()
             onInstantCloseRequested: root.hide()

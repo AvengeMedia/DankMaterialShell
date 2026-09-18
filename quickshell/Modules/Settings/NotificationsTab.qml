@@ -4,16 +4,20 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 
-Item {
+Column {
     id: root
 
+    property var parentModal: null
+
+    width: parent?.width ?? 0
+    spacing: Theme.spacingL
+
     Component.onCompleted: {
-        if (SettingsData._pendingExpandNotificationRules) {
-            SettingsData._pendingExpandNotificationRules = false;
-            notificationRulesCard.userToggledCollapse = true;
-            notificationRulesCard.expanded = true;
-            SettingsData._pendingNotificationRuleIndex = -1;
-        }
+        if (!SettingsData._pendingExpandNotificationRules)
+            return;
+        SettingsData._pendingExpandNotificationRules = false;
+        SettingsData._pendingNotificationRuleIndex = -1;
+        Qt.callLater(() => root.parentModal?.navigateTo("notification_rules"));
     }
 
     function indexedRules(predicate) {
@@ -23,7 +27,6 @@ Item {
                 })).filter(entry => predicate(entry.rule));
     }
 
-    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute")
     readonly property var dndBypassRules: indexedRules(rule => rule.bypassDnd === true)
 
     readonly property var timeoutOptions: [
@@ -32,1007 +35,454 @@ Item {
             value: 0
         },
         {
-            text: I18n.tr("1 second"),
+            text: I18n.duration(1),
             value: 1000
         },
         {
-            text: I18n.tr("3 seconds"),
+            text: I18n.duration(3),
             value: 3000
         },
         {
-            text: I18n.tr("5 seconds"),
+            text: I18n.duration(5),
             value: 5000
         },
         {
-            text: I18n.tr("8 seconds"),
+            text: I18n.duration(8),
             value: 8000
         },
         {
-            text: I18n.tr("10 seconds"),
+            text: I18n.duration(10),
             value: 10000
         },
         {
-            text: I18n.tr("15 seconds"),
+            text: I18n.duration(15),
             value: 15000
         },
         {
-            text: I18n.tr("30 seconds"),
+            text: I18n.duration(30),
             value: 30000
         },
         {
-            text: I18n.tr("1 minute"),
+            text: I18n.duration(60),
             value: 60000
         },
         {
-            text: I18n.tr("2 minutes"),
+            text: I18n.duration(120),
             value: 120000
         },
         {
-            text: I18n.tr("5 minutes"),
+            text: I18n.duration(300),
             value: 300000
         },
         {
-            text: I18n.tr("10 minutes"),
+            text: I18n.duration(600),
             value: 600000
-        }
-    ]
-
-    readonly property var notificationRuleFieldOptions: [
-        {
-            value: "appName",
-            label: I18n.tr("App Names", "notification rule match field option")
-        },
-        {
-            value: "desktopEntry",
-            label: I18n.tr("Desktop Entry", "notification rule match field option")
-        },
-        {
-            value: "summary",
-            label: I18n.tr("Summary", "notification rule match field option")
-        },
-        {
-            value: "body",
-            label: I18n.tr("Body", "notification rule match field option")
-        }
-    ]
-
-    readonly property var notificationRuleMatchTypeOptions: [
-        {
-            value: "contains",
-            label: I18n.tr("Contains", "notification rule match type option")
-        },
-        {
-            value: "exact",
-            label: I18n.tr("Exact", "notification rule match type option")
-        },
-        {
-            value: "regex",
-            label: I18n.tr("Regex", "notification rule match type option")
-        }
-    ]
-
-    readonly property var notificationRuleActionOptions: [
-        {
-            value: "default",
-            label: I18n.tr("Default", "notification rule action option")
-        },
-        {
-            value: "mute",
-            label: I18n.tr("Mute Popups", "notification rule action option")
-        },
-        {
-            value: "ignore",
-            label: I18n.tr("Ignore Completely", "notification rule action option")
-        },
-        {
-            value: "popup_only",
-            label: I18n.tr("Popup Only", "notification rule action option")
-        },
-        {
-            value: "no_history",
-            label: I18n.tr("No History", "notification rule action option")
-        }
-    ]
-
-    readonly property var notificationRuleUrgencyOptions: [
-        {
-            value: "default",
-            label: I18n.tr("Default", "notification rule urgency option")
-        },
-        {
-            value: "low",
-            label: I18n.tr("Low Priority", "notification rule urgency option")
-        },
-        {
-            value: "normal",
-            label: I18n.tr("Normal Priority", "notification rule urgency option")
-        },
-        {
-            value: "critical",
-            label: I18n.tr("Critical Priority", "notification rule urgency option")
         }
     ]
 
     function getTimeoutText(value) {
         if (value === undefined || value === null || isNaN(value))
-            return I18n.tr("5 seconds");
+            return I18n.duration(5);
         for (let i = 0; i < timeoutOptions.length; i++) {
             if (timeoutOptions[i].value === value)
                 return timeoutOptions[i].text;
         }
         if (value === 0)
             return I18n.tr("Never");
-        if (value < 1000)
-            return value + "ms";
-        if (value < 60000)
-            return Math.round(value / 1000) + " " + I18n.tr("seconds");
-        return Math.round(value / 60000) + " " + I18n.tr("minutes");
+        return I18n.duration(value / 1000);
     }
 
-    function getRuleOptionLabel(options, value, fallback) {
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === value)
-                return options[i].label;
+    function applyTimeout(key, text) {
+        const option = timeoutOptions.find(opt => opt.text === text);
+        if (option)
+            SettingsData.set(key, option.value);
+    }
+
+    SettingsCard {
+        iconName: "notifications"
+        title: I18n.tr("Popups", "notification settings card title, popup notifications")
+        settingKey: "notificationPopups"
+
+        SettingsDropdownRow {
+            settingKey: "notificationPopupPosition"
+            tags: ["notification", "popup", "position", "screen", "location"]
+            text: I18n.tr("Position")
+            currentValue: {
+                if (SettingsData.notificationPopupPosition === -1)
+                    return I18n.tr("Top Center", "screen position option");
+                switch (SettingsData.notificationPopupPosition) {
+                case SettingsData.Position.Top:
+                    return I18n.tr("Top Right", "screen position option");
+                case SettingsData.Position.Bottom:
+                    return I18n.tr("Bottom Left", "screen position option");
+                case SettingsData.Position.Left:
+                    return I18n.tr("Top Left", "screen position option");
+                case SettingsData.Position.Right:
+                    return I18n.tr("Bottom Right", "screen position option");
+                case SettingsData.Position.BottomCenter:
+                    return I18n.tr("Bottom Center", "screen position option");
+                default:
+                    return I18n.tr("Top Right", "screen position option");
+                }
+            }
+            options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
+            onValueChanged: value => {
+                switch (value) {
+                case I18n.tr("Top Right", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Top);
+                    break;
+                case I18n.tr("Top Left", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Left);
+                    break;
+                case I18n.tr("Top Center", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", -1);
+                    break;
+                case I18n.tr("Bottom Center", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", SettingsData.Position.BottomCenter);
+                    break;
+                case I18n.tr("Bottom Right", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Right);
+                    break;
+                case I18n.tr("Bottom Left", "screen position option"):
+                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
+                    break;
+                }
+                NotificationService.sendTestNotifications();
+            }
         }
-        return fallback;
-    }
 
-    function getRuleOptionValue(options, label, fallback) {
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].label === label)
-                return options[i].value;
+        SettingsToggleRow {
+            settingKey: "notificationFocusedMonitor"
+            tags: ["notification", "popup", "focused", "monitor", "display", "screen", "active"]
+            text: I18n.tr("Focused display only")
+            checked: SettingsData.notificationFocusedMonitor
+            onToggled: checked => SettingsData.set("notificationFocusedMonitor", checked)
         }
-        return fallback;
+
+        SettingsToggleRow {
+            settingKey: "notificationOverlayEnabled"
+            tags: ["notification", "overlay", "fullscreen", "priority"]
+            text: I18n.tr("Over fullscreen")
+            checked: SettingsData.notificationOverlayEnabled
+            onToggled: checked => SettingsData.set("notificationOverlayEnabled", checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationCompactMode"
+            tags: ["notification", "compact", "size", "display", "mode"]
+            text: I18n.tr("Compact")
+            checked: SettingsData.notificationCompactMode
+            onToggled: checked => SettingsData.set("notificationCompactMode", checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationDedupeEnabled"
+            tags: ["notification", "duplicate", "dedupe", "stack", "coalesce", "repeat"]
+            text: I18n.tr("Suppress duplicates")
+            checked: SettingsData.notificationDedupeEnabled
+            onToggled: checked => SettingsData.set("notificationDedupeEnabled", checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationPopupBodyInvokesAction"
+            tags: ["notification", "popup", "click", "body", "action", "invoke", "expand", "open"]
+            text: I18n.tr("Body click runs default action")
+            checked: SettingsData.notificationPopupBodyInvokesAction
+            onToggled: checked => SettingsData.set("notificationPopupBodyInvokesAction", checked)
+        }
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsCard {
+        title: I18n.tr("Timeouts", "notification settings card title, popup dismiss times per urgency")
+        settingKey: "notificationTimeouts"
+        tags: ["notification", "timeout", "duration", "expire", "priority"]
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsDropdownRow {
+            settingKey: "notificationTimeoutLow"
+            tags: ["notification", "timeout", "low", "priority", "duration"]
+            text: I18n.tr("Low")
+            currentValue: root.getTimeoutText(SettingsData.notificationTimeoutLow)
+            options: root.timeoutOptions.map(opt => opt.text)
+            onValueChanged: value => root.applyTimeout("notificationTimeoutLow", value)
+        }
 
-            SettingsCard {
+        SettingsDropdownRow {
+            settingKey: "notificationTimeoutNormal"
+            tags: ["notification", "timeout", "normal", "priority", "duration"]
+            text: I18n.tr("Normal")
+            currentValue: root.getTimeoutText(SettingsData.notificationTimeoutNormal)
+            options: root.timeoutOptions.map(opt => opt.text)
+            onValueChanged: value => root.applyTimeout("notificationTimeoutNormal", value)
+        }
+
+        SettingsDropdownRow {
+            settingKey: "notificationTimeoutCritical"
+            tags: ["notification", "timeout", "critical", "priority", "duration"]
+            text: I18n.tr("Critical", "adjective, critical notification urgency row label")
+            currentValue: root.getTimeoutText(SettingsData.notificationTimeoutCritical)
+            options: root.timeoutOptions.map(opt => opt.text)
+            onValueChanged: value => root.applyTimeout("notificationTimeoutCritical", value)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationIgnoreAppTimeout"
+            tags: ["notification", "timeout", "expire", "app", "override", "duration"]
+            text: I18n.tr("Ignore app-requested timeout")
+            checked: SettingsData.notificationIgnoreAppTimeout
+            onToggled: checked => SettingsData.set("notificationIgnoreAppTimeout", checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationShowTimeoutBar"
+            tags: ["notification", "timeout", "progress", "bar", "timer", "countdown"]
+            text: I18n.tr("Timeout progress bar")
+            checked: SettingsData.notificationShowTimeoutBar
+            onToggled: checked => SettingsData.set("notificationShowTimeoutBar", checked)
+        }
+    }
+
+    SettingsCard {
+        iconName: "notifications_off"
+        title: I18n.tr("Do not disturb")
+        settingKey: "doNotDisturb"
+
+        SettingsToggleRow {
+            settingKey: "doNotDisturb"
+            tags: ["notification", "dnd", "mute", "silent", "suppress"]
+            text: I18n.tr("Do not disturb")
+            checked: SessionData.doNotDisturb
+            onToggled: checked => SessionData.setDoNotDisturb(checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationDndWhileScreenSharing"
+            tags: ["notification", "dnd", "screenshare", "sharing", "privacy"]
+            text: I18n.tr("Automatically enable while screen sharing", "do not disturb auto enable while screen sharing toggle")
+            checked: SettingsData.notificationDndWhileScreenSharing
+            onToggled: checked => SettingsData.set("notificationDndWhileScreenSharing", checked)
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationDndAllowCritical"
+            tags: ["notification", "dnd", "critical", "priority", "urgent", "bypass"]
+            text: I18n.tr("Allow critical")
+            checked: SettingsData.notificationDndAllowCritical
+            onToggled: checked => SettingsData.set("notificationDndAllowCritical", checked)
+        }
+
+        SettingsRow {
+            body: Column {
                 width: parent.width
-                iconName: "notifications"
-                title: I18n.tr("Popups")
-                settingKey: "notificationPopups"
+                spacing: Theme.spacingS
 
-                // Font size selectors for summary and body
-                SettingsDropdownRow {
-                    settingKey: "notificationSummaryFontSize"
-                    tags: ["notification", "font", "summary", "size"]
-                    text: I18n.tr("Summary Font Size")
-                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
-                    currentValue: (SettingsData.notificationSummaryFontSize || I18n.tr("Unset")).toString()
-                    onValueChanged: value => {
-                        SettingsData.set("notificationSummaryFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
-                        NotificationService.sendTestNotifications();
-                    }
-                }
-
-                SettingsDropdownRow {
-                    settingKey: "notificationBodyFontSize"
-                    tags: ["notification", "font", "body", "size"]
-                    text: I18n.tr("Body Font Size")
-                    description: I18n.tr("Set the font size for notification body text (htmlBody)")
-                    options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
-                    currentValue: (SettingsData.notificationBodyFontSize || I18n.tr("Unset")).toString()
-                    onValueChanged: value => {
-                        SettingsData.set("notificationBodyFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
-                        NotificationService.sendTestNotifications();
-                    }
-                }
-
-                SettingsDropdownRow {
-                    settingKey: "notificationPopupPosition"
-                    tags: ["notification", "popup", "position", "screen", "location"]
-                    text: I18n.tr("Popup Position")
-                    description: I18n.tr("Choose where notification popups appear on screen")
-                    currentValue: {
-                        if (SettingsData.notificationPopupPosition === -1)
-                            return I18n.tr("Top Center", "screen position option");
-                        switch (SettingsData.notificationPopupPosition) {
-                        case SettingsData.Position.Top:
-                            return I18n.tr("Top Right", "screen position option");
-                        case SettingsData.Position.Bottom:
-                            return I18n.tr("Bottom Left", "screen position option");
-                        case SettingsData.Position.Left:
-                            return I18n.tr("Top Left", "screen position option");
-                        case SettingsData.Position.Right:
-                            return I18n.tr("Bottom Right", "screen position option");
-                        case SettingsData.Position.BottomCenter:
-                            return I18n.tr("Bottom Center", "screen position option");
-                        default:
-                            return I18n.tr("Top Right", "screen position option");
-                        }
-                    }
-                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
-                    onValueChanged: value => {
-                        switch (value) {
-                        case I18n.tr("Top Right", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", SettingsData.Position.Top);
-                            break;
-                        case I18n.tr("Top Left", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", SettingsData.Position.Left);
-                            break;
-                        case I18n.tr("Top Center", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", -1);
-                            break;
-                        case I18n.tr("Bottom Center", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", SettingsData.Position.BottomCenter);
-                            break;
-                        case I18n.tr("Bottom Right", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", SettingsData.Position.Right);
-                            break;
-                        case I18n.tr("Bottom Left", "screen position option"):
-                            SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
-                            break;
-                        }
-                        NotificationService.sendTestNotifications();
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationOverlayEnabled"
-                    tags: ["notification", "overlay", "fullscreen", "priority"]
-                    text: I18n.tr("Notification Overlay")
-                    description: I18n.tr("Display all priorities over fullscreen apps")
-                    checked: SettingsData.notificationOverlayEnabled
-                    onToggled: checked => SettingsData.set("notificationOverlayEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationCompactMode"
-                    tags: ["notification", "compact", "size", "display", "mode"]
-                    text: I18n.tr("Compact")
-                    description: I18n.tr("Use smaller notification cards")
-                    checked: SettingsData.notificationCompactMode
-                    onToggled: checked => SettingsData.set("notificationCompactMode", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationForegroundLayers"
-                    tags: ["notification", "foreground", "layers", "surface", "blur", "glass", "contrast", "cards"]
-                    text: I18n.tr("Foreground Layers")
-                    description: I18n.tr("Show foreground surfaces on notification cards")
-                    checked: SettingsData.notificationForegroundLayers ?? true
-                    onToggled: checked => SettingsData.set("notificationForegroundLayers", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationShowTimeoutBar"
-                    tags: ["notification", "timeout", "progress", "bar", "timer", "countdown"]
-                    text: I18n.tr("Timeout Progress Bar")
-                    description: I18n.tr("Show a bar that drains as the popup's auto-dismiss timer runs")
-                    checked: SettingsData.notificationShowTimeoutBar
-                    onToggled: checked => SettingsData.set("notificationShowTimeoutBar", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationDedupeEnabled"
-                    tags: ["notification", "duplicate", "dedupe", "stack", "coalesce", "repeat"]
-                    text: I18n.tr("Suppress Duplicate Notifications")
-                    description: SettingsData.notificationDedupeEnabled ? I18n.tr("Identical alerts show as one popup instead of stacking") : I18n.tr("Identical alerts stack as separate notification cards")
-                    checked: SettingsData.notificationDedupeEnabled
-                    onToggled: checked => SettingsData.set("notificationDedupeEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationPopupShadowEnabled"
-                    tags: ["notification", "popup", "shadow", "radius", "rounded"]
-                    text: I18n.tr("Popup Shadow")
-                    description: I18n.tr("Show drop shadow on notification popups. Requires M3 Elevation to be enabled in Theme & Colors.")
-                    checked: SettingsData.notificationPopupShadowEnabled
-                    onToggled: checked => SettingsData.set("notificationPopupShadowEnabled", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationPopupPrivacyMode"
-                    tags: ["notification", "popup", "privacy", "body", "content", "hide"]
-                    text: I18n.tr("Privacy Mode")
-                    description: I18n.tr("Hide notification content until expanded; popups show collapsed by default")
-                    checked: SettingsData.notificationPopupPrivacyMode
-                    onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationPopupBodyInvokesAction"
-                    tags: ["notification", "popup", "click", "body", "action", "invoke", "expand", "open"]
-                    text: I18n.tr("Body Click Runs Default Action")
-                    description: I18n.tr("Clicking a popup runs its first action instead of expanding the body")
-                    checked: SettingsData.notificationPopupBodyInvokesAction
-                    onToggled: checked => SettingsData.set("notificationPopupBodyInvokesAction", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationFocusedMonitor"
-                    tags: ["notification", "popup", "focused", "monitor", "display", "screen", "active"]
-                    text: I18n.tr("Focused Monitor Only")
-                    checked: SettingsData.notificationFocusedMonitor
-                    onToggled: checked => SettingsData.set("notificationFocusedMonitor", checked)
-                }
-
-                Item {
+                StyledText {
+                    text: I18n.tr("Right-click a notification and choose \"Allow in Do Not Disturb\" to add an app")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
                     width: parent.width
-                    height: notificationAnimationColumn.implicitHeight + Theme.spacingM * 2
-
-                    Column {
-                        id: notificationAnimationColumn
-                        width: parent.width - Theme.spacingM * 2
-                        x: Theme.spacingM
-                        anchors.top: parent.top
-                        anchors.topMargin: Theme.spacingM
-                        spacing: Theme.spacingS
-
-                        SettingsButtonGroupRow {
-                            settingKey: "notificationAnimationSpeed"
-                            tags: ["notification", "animation", "speed", "duration"]
-                            text: I18n.tr("Animation Speed")
-                            description: I18n.tr("Control animation duration for notification popups and history")
-                            model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
-                            currentIndex: SettingsData.notificationAnimationSpeed
-                            onSelectionChanged: (index, selected) => {
-                                if (!selected)
-                                    return;
-                                SettingsData.set("notificationAnimationSpeed", index);
-                            }
-                        }
-
-                        SettingsSliderRow {
-                            id: animationDurationSlider
-                            settingKey: "notificationCustomAnimationDuration"
-                            tags: ["notification", "animation", "duration", "custom", "speed"]
-                            text: I18n.tr("Duration")
-                            description: I18n.tr("Base duration for animations (drag to use Custom)")
-                            minimum: 100
-                            maximum: 800
-                            value: Theme.notificationAnimationBaseDuration
-                            unit: "ms"
-                            defaultValue: 400
-                            onSliderValueChanged: newValue => {
-                                if (SettingsData.notificationAnimationSpeed !== SettingsData.AnimationSpeed.Custom) {
-                                    SettingsData.set("notificationAnimationSpeed", SettingsData.AnimationSpeed.Custom);
-                                }
-                                SettingsData.set("notificationCustomAnimationDuration", newValue);
-                            }
-
-                            Connections {
-                                target: Theme
-                                function onNotificationAnimationBaseDurationChanged() {
-                                    animationDurationSlider.value = Theme.notificationAnimationBaseDuration;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "notifications_off"
-                title: I18n.tr("Do Not Disturb")
-                settingKey: "doNotDisturb"
-
-                SettingsToggleRow {
-                    settingKey: "doNotDisturb"
-                    tags: ["notification", "dnd", "mute", "silent", "suppress"]
-                    text: I18n.tr("Enable Do Not Disturb")
-                    description: I18n.tr("Suppress notification popups while enabled")
-                    checked: SessionData.doNotDisturb
-                    onToggled: checked => SessionData.setDoNotDisturb(checked)
+                    bottomPadding: Theme.spacingS
                 }
 
-                SettingsToggleRow {
-                    settingKey: "notificationDndWhileScreenSharing"
-                    tags: ["notification", "dnd", "screenshare", "sharing", "privacy"]
-                    text: I18n.tr("Automatically enable while screen sharing", "do not disturb auto enable while screen sharing toggle")
-                    description: I18n.tr("Turn on Do Not Disturb while a screen share is active", "do not disturb auto enable while screen sharing description")
-                    checked: SettingsData.notificationDndWhileScreenSharing
-                    onToggled: checked => SettingsData.set("notificationDndWhileScreenSharing", checked)
-                }
+                Repeater {
+                    model: root.dndBypassRules
 
-                SettingsToggleRow {
-                    settingKey: "notificationDndAllowCritical"
-                    tags: ["notification", "dnd", "critical", "priority", "urgent", "bypass"]
-                    text: I18n.tr("Critical Priority")
-                    description: I18n.tr("Show critical priority popups while Do Not Disturb is on")
-                    checked: SettingsData.notificationDndAllowCritical
-                    onToggled: checked => SettingsData.set("notificationDndAllowCritical", checked)
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        text: I18n.tr("Apps allowed to show popups while Do Not Disturb is on. Right-click a notification and choose \"Allow in Do Not Disturb\" to add one here.")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
+                    delegate: Rectangle {
                         width: parent.width
-                        bottomPadding: Theme.spacingS
-                    }
+                        height: dndBypassRow.implicitHeight + Theme.spacingS * 2
+                        radius: Theme.cornerRadius
+                        color: Theme.floatingWindowFieldColor
 
-                    Repeater {
-                        model: root.dndBypassRules
+                        Row {
+                            id: dndBypassRow
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingS
+                            spacing: Theme.spacingM
 
-                        delegate: Rectangle {
-                            width: parent.width
-                            height: dndBypassRow.implicitHeight + Theme.spacingS * 2
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
+                            StyledText {
+                                id: dndBypassLabel
+                                text: modelData.rule.pattern || I18n.tr("Unknown")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
 
-                            Row {
-                                id: dndBypassRow
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingM
+                            Item {
+                                width: Math.max(0, parent.width - parent.spacing * 2 - dndBypassLabel.width - dndBypassRemoveBtn.width)
+                                height: 1
+                            }
 
-                                StyledText {
-                                    id: dndBypassLabel
-                                    text: modelData.rule.pattern || I18n.tr("Unknown")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Item {
-                                    width: Math.max(0, parent.width - parent.spacing * 2 - dndBypassLabel.width - dndBypassRemoveBtn.width)
-                                    height: 1
-                                }
-
-                                DankActionButton {
-                                    id: dndBypassRemoveBtn
-                                    buttonSize: 28
-                                    iconName: "delete"
-                                    iconSize: 18
-                                    iconColor: Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
-                                }
+                            DankActionButton {
+                                id: dndBypassRemoveBtn
+                                buttonSize: 28
+                                iconName: "delete"
+                                Accessible.name: I18n.tr("Remove")
+                                iconSize: 18
+                                iconColor: Theme.surfaceVariantText
+                                anchors.verticalCenter: parent.verticalCenter
+                                onClicked: SettingsData.removeNotificationRule(modelData.index)
                             }
                         }
                     }
                 }
             }
+        }
+    }
 
-            SettingsCard {
-                id: notificationRulesCard
-                width: parent.width
-                iconName: "rule_settings"
-                title: I18n.tr("Rules")
-                settingKey: "notificationRules"
-                tags: ["notification", "rules", "mute", "ignore", "priority", "regex", "history"]
-                collapsible: true
-                expanded: false
+    SettingsCard {
+        settingKey: "notificationLinks"
 
-                headerActions: [
-                    DankActionButton {
-                        buttonSize: 36
-                        iconName: "restart_alt"
-                        iconSize: 20
-                        visible: JSON.stringify(SettingsData.notificationRules) !== JSON.stringify(SettingsData.getDefaultNotificationRules())
-                        iconColor: Theme.surfaceVariantText
-                        onClicked: SettingsData.resetNotificationRules()
-                    },
-                    DankActionButton {
-                        buttonSize: 36
-                        iconName: "add"
-                        iconSize: 20
-                        iconColor: Theme.primary
-                        onClicked: {
-                            SettingsData.addNotificationRule();
-                            notificationRulesCard.userToggledCollapse = true;
-                            notificationRulesCard.expanded = true;
-                        }
-                    }
-                ]
+        SettingsNavRow {
+            iconName: "rule_settings"
+            title: I18n.tr("Rules")
+            hint: SettingsTabs.page("notification_rules")?.hint ?? ""
+            onClicked: root.parentModal?.navigateTo("notification_rules")
+        }
+    }
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+    SettingsCard {
+        iconName: "visibility_off"
+        title: I18n.tr("Privacy", "notification settings card title")
+        settingKey: "notificationPrivacy"
+        tags: ["notification", "privacy", "hide", "content", "lock"]
 
-                    StyledText {
-                        text: I18n.tr("Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
-                        bottomPadding: Theme.spacingS
-                    }
+        SettingsToggleRow {
+            settingKey: "notificationPopupPrivacyMode"
+            tags: ["notification", "popup", "privacy", "body", "content", "hide"]
+            text: I18n.tr("Privacy mode")
+            checked: SettingsData.notificationPopupPrivacyMode
+            onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
+        }
 
-                    Repeater {
-                        model: SettingsData.notificationRules
-
-                        delegate: Rectangle {
-                            id: ruleItem
-                            width: parent.width
-                            height: ruleColumn.implicitHeight + Theme.spacingM
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
-
-                            Column {
-                                id: ruleColumn
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingS
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    StyledText {
-                                        id: ruleLabel
-                                        text: I18n.tr("Rule %1").arg(index + 1)
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Item {
-                                        width: Math.max(0, parent.width - ruleLabel.implicitWidth - enableToggle.width - deleteBtn.width - Theme.spacingS * 3)
-                                        height: 1
-                                    }
-
-                                    DankToggle {
-                                        id: enableToggle
-                                        width: 40
-                                        height: 24
-                                        hideText: true
-                                        checked: modelData.enabled !== false
-                                        onToggled: checked => SettingsData.updateNotificationRuleField(index, "enabled", checked)
-                                    }
-
-                                    Item {
-                                        id: deleteBtn
-                                        width: 28
-                                        height: 28
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                        }
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: "delete"
-                                            size: 18
-                                            color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: deleteArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: SettingsData.removeNotificationRule(index)
-                                        }
-                                    }
-                                }
-
-                                Column {
-                                    width: parent.width
-                                    spacing: Theme.spacingXXS
-
-                                    StyledText {
-                                        text: I18n.tr("Pattern")
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        color: Theme.surfaceVariantText
-                                    }
-
-                                    DankTextField {
-                                        width: parent.width
-                                        text: modelData.pattern || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        placeholderText: I18n.tr("Pattern")
-                                        onEditingFinished: SettingsData.updateNotificationRuleField(index, "pattern", text)
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Field")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 165
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleFieldOptions, modelData.field, root.notificationRuleFieldOptions[0].label)
-                                            options: root.notificationRuleFieldOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "field", root.getRuleOptionValue(root.notificationRuleFieldOptions, value, "appName"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Type")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleMatchTypeOptions, modelData.matchType, root.notificationRuleMatchTypeOptions[0].label)
-                                            options: root.notificationRuleMatchTypeOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "matchType", root.getRuleOptionValue(root.notificationRuleMatchTypeOptions, value, "contains"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Action")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 170
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleActionOptions, modelData.action, root.notificationRuleActionOptions[0].label)
-                                            options: root.notificationRuleActionOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "action", root.getRuleOptionValue(root.notificationRuleActionOptions, value, "default"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Priority")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 165
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleUrgencyOptions, modelData.urgency, root.notificationRuleUrgencyOptions[0].label)
-                                            options: root.notificationRuleUrgencyOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "urgency", root.getRuleOptionValue(root.notificationRuleUrgencyOptions, value, "default"))
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    StyledText {
-                                        id: bypassDndLabel
-                                        text: I18n.tr("Allow in Do Not Disturb")
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        color: Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Item {
-                                        width: Math.max(0, parent.width - bypassDndLabel.implicitWidth - bypassDndToggle.width - Theme.spacingS * 2)
-                                        height: 1
-                                    }
-
-                                    DankToggle {
-                                        id: bypassDndToggle
-                                        width: 40
-                                        height: 24
-                                        hideText: true
-                                        checked: modelData.bypassDnd === true
-                                        onToggled: checked => SettingsData.updateNotificationRuleField(index, "bypassDnd", checked)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        SettingsDropdownRow {
+            settingKey: "lockScreenNotificationMode"
+            tags: ["lock", "screen", "notification", "notifications", "privacy"]
+            text: I18n.tr("Lock screen content")
+            options: [I18n.tr("Disabled", "lock screen notification mode option"), I18n.tr("Count only", "lock screen notification mode option"), I18n.tr("App names", "lock screen notification mode option"), I18n.tr("Full content", "lock screen notification mode option")]
+            currentValue: options[SettingsData.lockScreenNotificationMode] || options[0]
+            onValueChanged: value => {
+                const idx = options.indexOf(value);
+                if (idx < 0)
+                    return;
+                SettingsData.set("lockScreenNotificationMode", idx);
             }
+        }
+    }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "volume_off"
-                title: I18n.tr("Muted Apps")
-                settingKey: "mutedApps"
-                tags: ["notification", "mute", "unmute", "popup"]
+    SettingsCard {
+        iconName: "history"
+        title: I18n.tr("History")
+        settingKey: "notificationHistory"
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+        SettingsToggleRow {
+            settingKey: "notificationHistoryEnabled"
+            tags: ["notification", "history", "enable", "disable", "save"]
+            text: I18n.tr("History")
+            checked: SettingsData.notificationHistoryEnabled
+            onToggled: checked => SettingsData.set("notificationHistoryEnabled", checked)
+        }
 
-                    StyledText {
-                        text: mutedRules.length > 0 ? I18n.tr("Apps with notification popups muted. Unmute or delete to remove.") : I18n.tr("No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
-                        bottomPadding: Theme.spacingS
-                    }
-
-                    Repeater {
-                        model: mutedRules
-
-                        delegate: Rectangle {
-                            width: parent.width
-                            height: mutedRow.implicitHeight + Theme.spacingS * 2
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
-
-                            Row {
-                                id: mutedRow
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    id: mutedAppLabel
-                                    text: (modelData.rule && modelData.rule.pattern) ? modelData.rule.pattern : I18n.tr("Unknown")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Item {
-                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - mutedDeleteBtn.width - Theme.spacingS * 5)
-                                    height: 1
-                                }
-
-                                DankButton {
-                                    id: unmuteBtn
-                                    text: I18n.tr("Unmute")
-                                    backgroundColor: Theme.floatingWindowFieldColor
-                                    textColor: Theme.primary
-                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
-                                }
-
-                                Item {
-                                    id: mutedDeleteBtn
-                                    width: 28
-                                    height: 28
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: Theme.cornerRadius
-                                        color: mutedDeleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                    }
-
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "delete"
-                                        size: 18
-                                        color: mutedDeleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                    }
-
-                                    MouseArea {
-                                        id: mutedDeleteArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: SettingsData.removeNotificationRule(modelData.index)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        SettingsDropdownRow {
+            settingKey: "notificationHistoryMaxAgeDays"
+            tags: ["notification", "history", "max", "age", "days", "retention"]
+            text: I18n.tr("Retention", "notification history setting label, how long entries are kept")
+            readonly property var retentionDays: [0, 1, 3, 7, 14, 30]
+            options: retentionDays.map(days => days === 0 ? I18n.tr("Forever", "notification history retention option") : I18n.duration(days * 86400))
+            currentValue: {
+                const index = retentionDays.indexOf(SettingsData.notificationHistoryMaxAgeDays);
+                return index >= 0 ? options[index] : I18n.duration(SettingsData.notificationHistoryMaxAgeDays * 86400);
             }
-
-            SettingsCard {
-                width: parent.width
-                iconName: "lock"
-                title: I18n.tr("Lock Screen", "lock screen notifications settings card")
-                settingKey: "lockScreenNotifications"
-
-                SettingsDropdownRow {
-                    settingKey: "lockScreenNotificationMode"
-                    tags: ["lock", "screen", "notification", "notifications", "privacy"]
-                    text: I18n.tr("Notification Display", "lock screen notification privacy setting")
-                    description: I18n.tr("Control what notification information is shown on the lock screen", "lock screen notification privacy setting")
-                    options: [I18n.tr("Disabled", "lock screen notification mode option"), I18n.tr("Count Only", "lock screen notification mode option"), I18n.tr("App Names", "lock screen notification mode option"), I18n.tr("Full Content", "lock screen notification mode option")]
-                    currentValue: options[SettingsData.lockScreenNotificationMode] || options[0]
-                    onValueChanged: value => {
-                        const idx = options.indexOf(value);
-                        if (idx >= 0) {
-                            SettingsData.set("lockScreenNotificationMode", idx);
-                        }
-                    }
-                }
+            onValueChanged: value => {
+                const index = options.indexOf(value);
+                SettingsData.set("notificationHistoryMaxAgeDays", index >= 0 ? retentionDays[index] : 7);
             }
+        }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "timer"
-                title: I18n.tr("Timeouts")
-                settingKey: "notificationTimeouts"
-                collapsible: true
-                expanded: false
+        SettingsSliderRow {
+            settingKey: "notificationHistoryMaxCount"
+            tags: ["notification", "history", "max", "count", "limit"]
+            text: I18n.tr("Maximum entries")
+            value: SettingsData.notificationHistoryMaxCount
+            minimum: 10
+            maximum: 200
+            step: 10
+            unit: ""
+            onSliderValueChanged: newValue => SettingsData.set("notificationHistoryMaxCount", newValue)
+        }
 
-                SettingsDropdownRow {
-                    settingKey: "notificationTimeoutLow"
-                    tags: ["notification", "timeout", "low", "priority", "duration"]
-                    text: I18n.tr("Low Priority")
-                    currentValue: root.getTimeoutText(SettingsData.notificationTimeoutLow)
-                    options: root.timeoutOptions.map(opt => opt.text)
-                    onValueChanged: value => {
-                        for (let i = 0; i < root.timeoutOptions.length; i++) {
-                            if (root.timeoutOptions[i].text === value) {
-                                SettingsData.set("notificationTimeoutLow", root.timeoutOptions[i].value);
-                                break;
-                            }
-                        }
-                    }
-                }
+        SettingsToggleRow {
+            settingKey: "notificationHistorySaveLow"
+            tags: ["notification", "history", "save", "low", "priority"]
+            text: I18n.tr("Low")
+            checked: SettingsData.notificationHistorySaveLow
+            onToggled: checked => SettingsData.set("notificationHistorySaveLow", checked)
+        }
 
-                SettingsDropdownRow {
-                    settingKey: "notificationTimeoutNormal"
-                    tags: ["notification", "timeout", "normal", "priority", "duration"]
-                    text: I18n.tr("Normal Priority")
-                    currentValue: root.getTimeoutText(SettingsData.notificationTimeoutNormal)
-                    options: root.timeoutOptions.map(opt => opt.text)
-                    onValueChanged: value => {
-                        for (let i = 0; i < root.timeoutOptions.length; i++) {
-                            if (root.timeoutOptions[i].text === value) {
-                                SettingsData.set("notificationTimeoutNormal", root.timeoutOptions[i].value);
-                                break;
-                            }
-                        }
-                    }
-                }
+        SettingsToggleRow {
+            settingKey: "notificationHistorySaveNormal"
+            tags: ["notification", "history", "save", "normal", "priority"]
+            text: I18n.tr("Normal")
+            checked: SettingsData.notificationHistorySaveNormal
+            onToggled: checked => SettingsData.set("notificationHistorySaveNormal", checked)
+        }
 
-                SettingsDropdownRow {
-                    settingKey: "notificationTimeoutCritical"
-                    tags: ["notification", "timeout", "critical", "priority", "duration"]
-                    text: I18n.tr("Critical Priority")
-                    currentValue: root.getTimeoutText(SettingsData.notificationTimeoutCritical)
-                    options: root.timeoutOptions.map(opt => opt.text)
-                    onValueChanged: value => {
-                        for (let i = 0; i < root.timeoutOptions.length; i++) {
-                            if (root.timeoutOptions[i].text === value) {
-                                SettingsData.set("notificationTimeoutCritical", root.timeoutOptions[i].value);
-                                break;
-                            }
-                        }
-                    }
-                }
+        SettingsToggleRow {
+            settingKey: "notificationHistorySaveCritical"
+            tags: ["notification", "history", "save", "critical", "priority"]
+            text: I18n.tr("Critical")
+            checked: SettingsData.notificationHistorySaveCritical
+            onToggled: checked => SettingsData.set("notificationHistorySaveCritical", checked)
+        }
+    }
 
-                SettingsToggleRow {
-                    settingKey: "notificationIgnoreAppTimeout"
-                    tags: ["notification", "timeout", "expire", "app", "override", "duration"]
-                    text: I18n.tr("Ignore App-Requested Timeout")
-                    description: I18n.tr("Always use the durations above, even if an app requests a shorter or longer one")
-                    checked: SettingsData.notificationIgnoreAppTimeout
-                    onToggled: checked => SettingsData.set("notificationIgnoreAppTimeout", checked)
-                }
+    SettingsCard {
+        iconName: "palette"
+        title: I18n.tr("Appearance")
+        settingKey: "notificationAppearance"
+        tags: ["notification", "font", "size", "layers", "animation", "speed"]
+
+        SettingsDropdownRow {
+            settingKey: "notificationSummaryFontSize"
+            tags: ["notification", "font", "summary", "size"]
+            text: I18n.tr("Summary font size")
+            options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+            currentValue: (SettingsData.notificationSummaryFontSize || I18n.tr("Unset")).toString()
+            onValueChanged: value => {
+                SettingsData.set("notificationSummaryFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                NotificationService.sendTestNotifications();
             }
+        }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "history"
-                title: I18n.tr("History Settings")
-                settingKey: "notificationHistory"
-
-                SettingsToggleRow {
-                    settingKey: "notificationHistoryEnabled"
-                    tags: ["notification", "history", "enable", "disable", "save"]
-                    text: I18n.tr("Enable History", "notification history toggle label")
-                    description: I18n.tr("Save dismissed notifications to history", "notification history toggle description")
-                    checked: SettingsData.notificationHistoryEnabled
-                    onToggled: checked => SettingsData.set("notificationHistoryEnabled", checked)
-                }
-
-                SettingsSliderRow {
-                    settingKey: "notificationHistoryMaxCount"
-                    tags: ["notification", "history", "max", "count", "limit"]
-                    text: I18n.tr("Maximum History")
-                    description: I18n.tr("Maximum number of notifications to keep", "notification history limit")
-                    value: SettingsData.notificationHistoryMaxCount
-                    minimum: 10
-                    maximum: 200
-                    step: 10
-                    unit: ""
-                    defaultValue: 50
-                    onSliderValueChanged: newValue => SettingsData.set("notificationHistoryMaxCount", newValue)
-                }
-
-                SettingsDropdownRow {
-                    settingKey: "notificationHistoryMaxAgeDays"
-                    tags: ["notification", "history", "max", "age", "days", "retention"]
-                    text: I18n.tr("History Retention", "notification history retention settings label")
-                    description: I18n.tr("Auto-delete notifications older than this", "notification history setting")
-                    currentValue: {
-                        switch (SettingsData.notificationHistoryMaxAgeDays) {
-                        case 0:
-                            return I18n.tr("Forever", "notification history retention option");
-                        case 1:
-                            return I18n.tr("1 day", "notification history retention option");
-                        case 3:
-                            return I18n.tr("3 days", "notification history retention option");
-                        case 7:
-                            return I18n.tr("7 days", "notification history retention option");
-                        case 14:
-                            return I18n.tr("14 days", "notification history retention option");
-                        case 30:
-                            return I18n.tr("30 days", "notification history retention option");
-                        default:
-                            return SettingsData.notificationHistoryMaxAgeDays + " " + I18n.tr("days");
-                        }
-                    }
-                    options: [I18n.tr("Forever", "notification history retention option"), I18n.tr("1 day", "notification history retention option"), I18n.tr("3 days", "notification history retention option"), I18n.tr("7 days", "notification history retention option"), I18n.tr("14 days", "notification history retention option"), I18n.tr("30 days", "notification history retention option")]
-                    onValueChanged: value => {
-                        let days = 7;
-                        if (value === I18n.tr("Forever", "notification history retention option"))
-                            days = 0;
-                        else if (value === I18n.tr("1 day", "notification history retention option"))
-                            days = 1;
-                        else if (value === I18n.tr("3 days", "notification history retention option"))
-                            days = 3;
-                        else if (value === I18n.tr("7 days", "notification history retention option"))
-                            days = 7;
-                        else if (value === I18n.tr("14 days", "notification history retention option"))
-                            days = 14;
-                        else if (value === I18n.tr("30 days", "notification history retention option"))
-                            days = 30;
-                        SettingsData.set("notificationHistoryMaxAgeDays", days);
-                    }
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationHistorySaveLow"
-                    tags: ["notification", "history", "save", "low", "priority"]
-                    text: I18n.tr("Low Priority")
-                    description: I18n.tr("Save low priority notifications to history", "notification history setting")
-                    checked: SettingsData.notificationHistorySaveLow
-                    onToggled: checked => SettingsData.set("notificationHistorySaveLow", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationHistorySaveNormal"
-                    tags: ["notification", "history", "save", "normal", "priority"]
-                    text: I18n.tr("Normal Priority")
-                    description: I18n.tr("Save normal priority notifications to history", "notification history setting")
-                    checked: SettingsData.notificationHistorySaveNormal
-                    onToggled: checked => SettingsData.set("notificationHistorySaveNormal", checked)
-                }
-
-                SettingsToggleRow {
-                    settingKey: "notificationHistorySaveCritical"
-                    tags: ["notification", "history", "save", "critical", "priority"]
-                    text: I18n.tr("Critical Priority")
-                    description: I18n.tr("Save critical priority notifications to history", "notification history setting")
-                    checked: SettingsData.notificationHistorySaveCritical
-                    onToggled: checked => SettingsData.set("notificationHistorySaveCritical", checked)
-                }
+        SettingsDropdownRow {
+            settingKey: "notificationBodyFontSize"
+            tags: ["notification", "font", "body", "size"]
+            text: I18n.tr("Body font size")
+            options: [I18n.tr("Unset"), "10", "12", "14", "16", "18"]
+            currentValue: (SettingsData.notificationBodyFontSize || I18n.tr("Unset")).toString()
+            onValueChanged: value => {
+                SettingsData.set("notificationBodyFontSize", Number(value === I18n.tr("Unset") ? 0 : value));
+                NotificationService.sendTestNotifications();
             }
+        }
+
+        SettingsToggleRow {
+            settingKey: "notificationForegroundLayers"
+            tags: ["notification", "foreground", "layers", "surface", "blur", "glass", "contrast", "cards"]
+            text: I18n.tr("Foreground layers")
+            checked: SettingsData.notificationForegroundLayers ?? true
+            onToggled: checked => SettingsData.set("notificationForegroundLayers", checked)
+        }
+
+        SettingsSliderRow {
+            settingKey: "notificationAnimationDuration"
+            tags: ["notification", "animation", "duration", "speed"]
+            text: I18n.tr("Animation duration")
+            minimumLabel: I18n.tr("Off")
+            minimum: 0
+            maximum: 800
+            value: SettingsData.notificationAnimationDuration
+            unit: "ms"
+            onSliderValueChanged: newValue => SettingsData.set("notificationAnimationDuration", newValue)
         }
     }
 }

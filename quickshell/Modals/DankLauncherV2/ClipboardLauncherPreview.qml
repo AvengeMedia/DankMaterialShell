@@ -13,32 +13,17 @@ Rectangle {
     property string cachedMimeType: ""
     property var _requestedEntryId: null
 
-    readonly property bool canLoadImage: typeof entry?.id === "number" && !!entry?.isImage && String(entry?.mimeType ?? "").startsWith("image/")
-    readonly property string sourceUrl: resolvedSourceUrl(cachedImageData, cachedMimeType || (entry?.mimeType ?? ""))
+    readonly property bool canLoadImage: ClipboardService.canPreviewEntry(entry)
+    readonly property string sourceUrl: ClipboardService.imageDataUrl(cachedImageData, cachedMimeType || (entry?.mimeType ?? ""))
 
-    radius: Math.max(6, Theme.cornerRadius - 2)
+    radius: Theme.cornerRadiusM
     clip: true
-    color: Theme.surfaceContainerHigh
-    border.color: Theme.withAlpha(Theme.outline, 0.16)
-    border.width: 1
+    color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+    border.color: Theme.outlineVariant
+    border.width: Theme.outlineWidth
 
     onEntryChanged: reloadPreview()
     Component.onCompleted: reloadPreview()
-
-    function isImageMimeType(mimeType) {
-        return (mimeType || "").toString().toLowerCase().startsWith("image/");
-    }
-
-    function resolvedSourceUrl(data, mimeType) {
-        const rawData = (data || "").toString();
-        if (rawData.length === 0)
-            return "";
-        if (rawData.startsWith("data:"))
-            return rawData.startsWith("data:image/") ? rawData : "";
-        if (!isImageMimeType(mimeType))
-            return "";
-        return "data:" + mimeType + ";base64," + rawData;
-    }
 
     function reloadPreview() {
         if (!canLoadImage || typeof entry?.id !== "number") {
@@ -47,7 +32,7 @@ Rectangle {
             cachedMimeType = "";
             return;
         }
-        // Entry objects are rebuilt per search; same id means same content
+
         if (entry.id === _requestedEntryId)
             return;
 
@@ -72,7 +57,7 @@ Rectangle {
             const result = response.result;
             const mimeType = (result.mimeType ?? entry?.mimeType ?? "").toString();
             const data = (result.data ?? "").toString();
-            if (data.length === 0 || !resolvedSourceUrl(data, mimeType)) {
+            if (data.length === 0 || !ClipboardService.imageDataUrl(data, mimeType)) {
                 _requestedEntryId = null;
                 return;
             }
@@ -88,8 +73,8 @@ Rectangle {
         asynchronous: true
         cache: false
         smooth: true
-        sourceSize.width: 128
-        sourceSize.height: 128
+        sourceSize.width: Theme.launcherTileSize
+        sourceSize.height: Theme.launcherTileSize
         fillMode: Image.PreserveAspectCrop
         visible: status === Image.Ready
     }
@@ -97,7 +82,7 @@ Rectangle {
     DankIcon {
         anchors.centerIn: parent
         name: "image"
-        size: Math.min(22, Math.max(16, root.height * 0.46))
+        size: Math.min(Theme.iconSize, Math.max(Theme.iconSizeSmall, root.height / 2))
         color: Theme.primary
         visible: previewImage.status !== Image.Ready
     }

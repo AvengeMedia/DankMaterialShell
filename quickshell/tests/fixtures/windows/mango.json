@@ -1,0 +1,22 @@
+{
+    "twoOutputs": {
+        "outputs": {
+            "DP-1": { "x": 0, "y": 0, "activeTags": [1] },
+            "DP-2": { "x": 1920, "y": 0, "activeTags": [] }
+        },
+        "windows": [
+            { "id": 1, "pid": 201, "monitor": "DP-1", "tags": [1], "x": 0, "y": 0, "width": 1920, "height": 1000, "is_minimized": false, "is_maximized": false, "is_fullscreen": false },
+            { "id": 2, "pid": 202, "monitor": "DP-1", "tags": [2], "x": 0, "y": 1040, "width": 400, "height": 40, "is_minimized": false, "is_maximized": true, "is_fullscreen": false },
+            { "id": 3, "pid": 203, "monitor": "DP-1", "tags": [1], "x": 0, "y": 1040, "width": 400, "height": 40, "is_minimized": true, "is_maximized": true, "is_fullscreen": false },
+            { "id": 4, "pid": 204, "monitor": "DP-2", "tags": [3], "x": 2020, "y": 100, "width": 800, "height": 600, "is_minimized": false, "is_maximized": true, "is_fullscreen": false }
+        ]
+    },
+    "maximizedActive": {
+        "outputs": {
+            "DP-1": { "x": 0, "y": 0, "activeTags": [1] }
+        },
+        "windows": [
+            { "id": 5, "pid": 205, "monitor": "DP-1", "tags": [1, 2], "x": 0, "y": 0, "width": 1920, "height": 1080, "is_minimized": false, "is_maximized": false, "is_fullscreen": true }
+        ]
+    }
+}

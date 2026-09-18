@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 	"github.com/AvengeMedia/dgop/gops"
 )
@@ -14,7 +15,7 @@ const metaTimeout = 10 * time.Second
 
 var util = gops.NewGopsUtil()
 
-func HandleRequest(conn *models.Conn, req models.Request) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 	switch req.Method {
 	case "dgop.meta":
 		handleMeta(conn, req)
@@ -29,7 +30,7 @@ func HandleRequest(conn *models.Conn, req models.Request) {
 	}
 }
 
-func handleMeta(conn *models.Conn, req models.Request) {
+func handleMeta(conn *ipc.ConnWriter, req ipc.Request) {
 	modules := params.StringSlice(req.Params, "modules")
 	if len(modules) == 0 {
 		models.RespondError(conn, req.ID, "modules is required")
@@ -60,7 +61,7 @@ func handleMeta(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, meta)
 }
 
-func handleGPU(conn *models.Conn, req models.Request) {
+func handleGPU(conn *ipc.ConnWriter, req ipc.Request) {
 	gpu, err := util.GetGPUInfo()
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -70,7 +71,7 @@ func handleGPU(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, gpu)
 }
 
-func handleHardware(conn *models.Conn, req models.Request) {
+func handleHardware(conn *ipc.ConnWriter, req ipc.Request) {
 	hw, err := util.GetSystemHardware()
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
@@ -80,7 +81,7 @@ func handleHardware(conn *models.Conn, req models.Request) {
 	models.Respond(conn, req.ID, hw)
 }
 
-func handleModules(conn *models.Conn, req models.Request) {
+func handleModules(conn *ipc.ConnWriter, req ipc.Request) {
 	modules, err := util.GetModules()
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())

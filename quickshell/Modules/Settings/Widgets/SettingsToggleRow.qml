@@ -1,54 +1,46 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import qs.Common
-import qs.Services
 import qs.Widgets
-import "../../../Common/QmlUtils.js" as QmlUtils
 
-DankToggle {
+SettingsRow {
     id: root
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
+    property string text: ""
+    property string description: ""
+    property color descriptionColor: Theme.surfaceVariantText
+    property bool checked: false
+    property bool toggling: false
 
-    property string tab: ""
-    property var tags: []
-    property string settingKey: ""
+    signal toggled(bool checked)
 
-    readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
-
-    width: parent?.width ?? 0
-
-    Component.onCompleted: {
-        if (!settingKey)
+    title: text
+    subtitle: description
+    subtitleColor: descriptionColor
+    clickable: true
+    resetByKeys: false
+    onResetRequested: {
+        if (!resetByKeys)
+            toggled(!checked);
+    }
+    Accessible.role: Accessible.CheckBox
+    Accessible.checkable: true
+    Accessible.checked: checked
+    Accessible.onToggleAction: root.clicked()
+    onClicked: {
+        if (!enabled || toggling)
             return;
-        var key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            var flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable);
-        });
+        toggled(!checked);
     }
 
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey);
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.primary, root.isHighlighted ? 0.2 : 0)
-        visible: root.isHighlighted
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
+    DankToggle {
+        hideText: true
+        text: root.text
+        description: root.description
+        activeFocusOnTab: false
+        Accessible.ignored: true
+        checked: root.checked
+        enabled: root.enabled
+        toggling: root.toggling
+        onToggled: value => root.toggled(value)
     }
 }

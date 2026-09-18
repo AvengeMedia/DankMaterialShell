@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/notify"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -34,9 +35,11 @@ func SendNotification(result NotifyResult) uint32 {
 		actions = []string{"default", "Open"}
 	}
 
-	hints := map[string]dbus.Variant{}
+	hints := map[string]dbus.Variant{
+		"desktop-entry": dbus.MakeVariant(notify.AppID),
+	}
 	if len(result.ImageData) > 0 && result.Width > 0 && result.Height > 0 {
-		rowstride := result.Width * 3
+		rowstride := result.Width * 4
 		hints["image_data"] = dbus.MakeVariant(struct {
 			Width         int32
 			Height        int32
@@ -49,9 +52,9 @@ func SendNotification(result NotifyResult) uint32 {
 			Width:         int32(result.Width),
 			Height:        int32(result.Height),
 			Rowstride:     int32(rowstride),
-			HasAlpha:      false,
+			HasAlpha:      true,
 			BitsPerSample: 8,
-			Channels:      3,
+			Channels:      4,
 			Data:          result.ImageData,
 		})
 	} else if result.FilePath != "" {
@@ -75,7 +78,7 @@ func SendNotification(result NotifyResult) uint32 {
 		0,
 		"DMS",
 		uint32(0),
-		"",
+		notify.AppID,
 		summary,
 		body,
 		actions,

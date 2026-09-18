@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/icc"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func TestGenerateGammaRamp(t *testing.T) {
@@ -96,29 +95,6 @@ func TestWhitepointProgression(t *testing.T) {
 				temps[i-1], temp, prevBlue, wp.b)
 		}
 		prevBlue = wp.b
-	}
-}
-
-func TestClamp(t *testing.T) {
-	tests := []struct {
-		val      float64
-		min      float64
-		max      float64
-		expected float64
-	}{
-		{5, 0, 10, 5},
-		{-5, 0, 10, 0},
-		{15, 0, 10, 10},
-		{0, 0, 10, 0},
-		{10, 0, 10, 10},
-	}
-
-	for _, tt := range tests {
-		result := utils.Clamp(tt.val, tt.min, tt.max)
-		if result != tt.expected {
-			t.Errorf("clamp(%f, %f, %f) = %f, want %f",
-				tt.val, tt.min, tt.max, result, tt.expected)
-		}
 	}
 }
 

@@ -575,43 +575,43 @@ Singleton {
         case "reboot":
             return {
                 "icon": "restart_alt",
-                "label": I18n.tr("Reboot"),
+                "label": I18n.tr("Reboot", "verb, power menu action"),
                 "key": "R"
             };
         case "softreboot":
             return {
                 "icon": "autorenew",
-                "label": I18n.tr("Soft Reboot"),
+                "label": I18n.tr("Soft reboot"),
                 "key": "B"
             };
         case "logout":
             return {
                 "icon": "logout",
-                "label": I18n.tr("Log Out"),
+                "label": I18n.tr("Log out"),
                 "key": "X"
             };
         case "poweroff":
             return {
                 "icon": "power_settings_new",
-                "label": I18n.tr("Power Off"),
+                "label": I18n.tr("Power off"),
                 "key": "P"
             };
         case "lock":
             return {
                 "icon": "lock",
-                "label": I18n.tr("Lock"),
+                "label": I18n.tr("Lock", "verb, power menu action that locks the screen"),
                 "key": "L"
             };
         case "suspend":
             return {
                 "icon": "bedtime",
-                "label": I18n.tr("Suspend"),
+                "label": I18n.tr("Suspend", "verb, power menu action"),
                 "key": "S"
             };
         case "hibernate":
             return {
                 "icon": "ac_unit",
-                "label": I18n.tr("Hibernate"),
+                "label": I18n.tr("Hibernate", "verb, power menu action"),
                 "key": "H"
             };
         case "restart":
@@ -702,11 +702,11 @@ Singleton {
         _armExpireTimer();
     }
 
-    function toggleIdleInhibit() {
+    function toggleIdleInhibit(durationMinutes) {
         if (idleInhibited) {
             disableIdleInhibit();
         } else {
-            enableIdleInhibit();
+            enableIdleInhibit(durationMinutes);
         }
     }
 

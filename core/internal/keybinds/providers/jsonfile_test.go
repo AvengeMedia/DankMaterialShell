@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 func TestNewJSONFileProvider(t *testing.T) {
@@ -240,42 +238,5 @@ func TestJSONFileProviderNonexistentFile(t *testing.T) {
 	_, err = p.GetCheatSheet()
 	if err == nil {
 		t.Error("expected error for nonexistent file, got nil")
-	}
-}
-
-func TestExpandPath(t *testing.T) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("Cannot get home directory")
-	}
-
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "tilde expansion",
-			input:    "~/test",
-			expected: filepath.Join(home, "test"),
-		},
-		{
-			name:     "no expansion needed",
-			input:    "/absolute/path",
-			expected: "/absolute/path",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := utils.ExpandPath(tt.input)
-			if err != nil {
-				t.Fatalf("expandPath failed: %v", err)
-			}
-
-			if result != tt.expected {
-				t.Errorf("utils.ExpandPath(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
 	}
 }

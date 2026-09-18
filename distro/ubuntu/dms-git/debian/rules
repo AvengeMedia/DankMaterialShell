@@ -69,8 +69,8 @@ override_dh_auto_install:
 		debian/dms-git/usr/share/applications/com.danklinux.dms.desktop
 	install -Dm644 dms-git-repo/assets/com.danklinux.dms.notepad.desktop \
 		debian/dms-git/usr/share/applications/com.danklinux.dms.notepad.desktop
-	install -Dm644 dms-git-repo/assets/danklogo.svg \
-		debian/dms-git/usr/share/icons/hicolor/scalable/apps/danklogo.svg
+	install -Dm644 dms-git-repo/assets/com.danklinux.dms.svg \
+		debian/dms-git/usr/share/icons/hicolor/scalable/apps/com.danklinux.dms.svg
 
 override_dh_auto_clean:
 	# Don't delete dms-git-repo directory - it's part of the source package (native format)

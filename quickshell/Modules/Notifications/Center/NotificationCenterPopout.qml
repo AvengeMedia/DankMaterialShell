@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.Notifications
 import qs.Services
 import qs.Widgets
 
@@ -8,10 +9,21 @@ DankPopout {
 
     layerNamespace: "dms:notification-center-popout"
     fullHeightSurface: true
+    contentHandlesKeys: true
+    onOpened: contentFocusTimer.restart()
+
+    Timer {
+        id: contentFocusTimer
+        interval: 0
+        onTriggered: {
+            if (root.shouldBeVisible)
+                root.contentLoader.item?.forceActiveFocus();
+        }
+    }
 
     property bool notificationHistoryVisible: false
     property var triggerScreen: null
-    property real stablePopupHeight: 400
+    property real stablePopupHeight: NotificationMetrics.popupWidth
     property real _lastAlignedContentHeight: -1
     property bool _pendingSizedOpen: false
     property bool _heightUpdatePending: false
@@ -24,7 +36,7 @@ DankPopout {
                 notificationList.forceLayout();
             }
         }
-        const target = item ? Theme.px(item.implicitHeight, dpr) : 400;
+        const target = item ? Theme.px(item.implicitHeight, dpr) : NotificationMetrics.popupWidth;
         if (Math.abs(target - _lastAlignedContentHeight) < 0.5)
             return;
         _lastAlignedContentHeight = target;
@@ -50,7 +62,7 @@ DankPopout {
         }
     }
 
-    popupWidth: 400 + Theme.spacingL
+    popupWidth: NotificationMetrics.popupWidth + Theme.spacingL
     popupHeight: stablePopupHeight
     positioning: ""
     suspendShadowWhileResizing: false
@@ -61,7 +73,6 @@ DankPopout {
         notificationHistoryVisible = !notificationHistoryVisible;
     }
 
-    // Re-open without toggling the flag (used when retargeting to another monitor).
     function present() {
         openSized();
     }
@@ -141,12 +152,9 @@ DankPopout {
         }
     }
 
-    Connections {
-        target: contentLoader.item
-        function onImplicitHeightChanged() {
-            root.queueStablePopupHeightUpdate();
-        }
-    }
+    readonly property real contentImplicitHeight: contentLoader.item?.implicitHeight ?? 0
+
+    onContentImplicitHeightChanged: queueStablePopupHeightUpdate()
 
     onDprChanged: updateStablePopupHeight()
 
@@ -196,16 +204,14 @@ DankPopout {
 
             Keys.onPressed: event => body.handleKey(event)
 
-            Connections {
-                target: root
+            readonly property bool rootShouldBeVisible: root.shouldBeVisible
 
-                function onShouldBeVisibleChanged() {
-                    if (root.shouldBeVisible) {
-                        Qt.callLater(() => notificationContent.forceActiveFocus());
-                        return;
-                    }
-                    notificationContent.focus = false;
+            onRootShouldBeVisibleChanged: {
+                if (rootShouldBeVisible) {
+                    Qt.callLater(() => notificationContent.forceActiveFocus());
+                    return;
                 }
+                focus = false;
             }
 
             QtObject {
@@ -214,7 +220,7 @@ DankPopout {
                 readonly property bool shouldBeVisible: root.shouldBeVisible
                 readonly property var screen: root.screen
                 readonly property var transientSurfaceTracker: root.transientSurfaceTracker
-                readonly property real maxContentHeight: (root.screen?.height ?? 1080) * 0.8
+                readonly property real maxContentHeight: (root.screen?.height ?? 1080) * NotificationMetrics.screenHeightRatio
 
                 function close() {
                     root.notificationHistoryVisible = false;

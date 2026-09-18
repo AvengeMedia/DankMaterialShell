@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -42,9 +43,7 @@ type HyprlandParser struct {
 	configDir          string
 	currentSource      string
 	dmsBindsExists     bool
-	dmsBindsIncluded   bool
-	includeCount       int
-	dmsIncludePos      int
+	walker             *configfrag.Walker
 	bindsAfterDMS      int
 	dmsBindKeys        map[string]bool
 	configBindKeys     map[string]bool
@@ -68,7 +67,7 @@ func NewHyprlandParser(configDir string) *HyprlandParser {
 		contentLines:       []string{},
 		readingLine:        0,
 		configDir:          configDir,
-		dmsIncludePos:      -1,
+		walker:             configfrag.NewWalker(isDMSBindsPrimarySourcePath),
 		dmsBindKeys:        make(map[string]bool),
 		configBindKeys:     make(map[string]bool),
 		conflictingConfigs: make(map[string]*HyprlandKeyBinding),
@@ -304,52 +303,21 @@ func ParseHyprlandKeys(path string) (*HyprlandSection, error) {
 type HyprlandParseResult struct {
 	Section            *HyprlandSection
 	DMSBindsIncluded   bool
-	DMSStatus          *HyprlandDMSStatus
+	DMSStatus          *configfrag.Status
 	ConflictingConfigs map[string]*HyprlandKeyBinding
 	DefaultDMSKeys     map[string]bool // keys with a DMS default in binds.{lua,conf}
 }
 
-type HyprlandDMSStatus struct {
-	Exists          bool
-	Included        bool
-	IncludePosition int
-	TotalIncludes   int
-	BindsAfterDMS   int
-	Effective       bool
-	OverriddenBy    int
-	StatusMessage   string
-	ConfigFormat    string
-	ReadOnly        bool
+var hyprlandBindsMessages = configfrag.Messages{
+	Missing:     "dms/binds.lua (or legacy binds.conf) does not exist",
+	NotIncluded: "dms binds are not loaded from Hyprland config (require / source)",
+	Overridden:  "Some DMS binds may be overridden by config binds",
+	Active:      "DMS binds are active",
 }
 
-func (p *HyprlandParser) buildDMSStatus() *HyprlandDMSStatus {
-	status := &HyprlandDMSStatus{
-		Exists:          p.dmsBindsExists,
-		Included:        p.dmsBindsIncluded,
-		IncludePosition: p.dmsIncludePos,
-		TotalIncludes:   p.includeCount,
-		BindsAfterDMS:   p.bindsAfterDMS,
-		ConfigFormat:    p.configFormat,
-		ReadOnly:        p.readOnly,
-	}
-
-	switch {
-	case !p.dmsBindsExists:
-		status.Effective = false
-		status.StatusMessage = "dms/binds.lua (or legacy binds.conf) does not exist"
-	case !p.dmsBindsIncluded:
-		status.Effective = false
-		status.StatusMessage = "dms binds are not loaded from Hyprland config (require / source)"
-	case p.bindsAfterDMS > 0:
-		status.Effective = true
-		status.OverriddenBy = p.bindsAfterDMS
-		status.StatusMessage = "Some DMS binds may be overridden by config binds"
-	default:
-		status.Effective = true
-		status.StatusMessage = "DMS binds are active"
-	}
-
-	return status
+func (p *HyprlandParser) buildDMSStatus() *configfrag.Status {
+	status := configfrag.BuildStatus(p.walker.Scan(), p.dmsBindsExists, p.bindsAfterDMS, p.configFormat, p.readOnly, hyprlandBindsMessages)
+	return &status
 }
 
 func (p *HyprlandParser) formatBindKey(kb *HyprlandKeyBinding) string {
@@ -545,37 +513,17 @@ func (p *HyprlandParser) parseFileWithSource(filePath, sectionName string) (*Hyp
 }
 
 func (p *HyprlandParser) handleSource(line string, section *HyprlandSection, baseDir string) {
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) < 2 {
-		return
-	}
-
-	sourcePath := strings.TrimSpace(parts[1])
-	isDMSSource := isDMSBindsPrimarySourcePath(sourcePath)
-
-	p.includeCount++
-	if isDMSSource {
-		p.dmsBindsIncluded = true
-		p.dmsIncludePos = p.includeCount
+	matched := p.walker.IncludeAssignment(baseDir, line, func(absPath string) error {
+		includedSection, err := p.parseFileWithSource(absPath, "")
+		if err != nil {
+			return err
+		}
+		section.Children = append(section.Children, *includedSection)
+		return nil
+	})
+	if matched {
 		p.dmsProcessed = true
 	}
-
-	fullPath := sourcePath
-	if !filepath.IsAbs(sourcePath) {
-		fullPath = filepath.Join(baseDir, sourcePath)
-	}
-
-	expanded, err := utils.ExpandPath(fullPath)
-	if err != nil {
-		return
-	}
-
-	includedSection, err := p.parseFileWithSource(expanded, "")
-	if err != nil {
-		return
-	}
-
-	section.Children = append(section.Children, *includedSection)
 }
 
 func (p *HyprlandParser) parseDMSBindsDirectly(dmsBindsPath string, section *HyprlandSection) {
@@ -662,11 +610,7 @@ func (p *HyprlandParser) parseLuaLines(content string, baseDir, absPath, section
 				if rel == "" {
 					continue
 				}
-				isDMS := isDMSBindsPrimarySourcePath(rel)
-				p.includeCount++
-				if isDMS {
-					p.dmsBindsIncluded = true
-					p.dmsIncludePos = p.includeCount
+				if p.walker.Record(rel) {
 					p.dmsProcessed = true
 				}
 				fullPath := luaconfig.ModuleToPath(rootDir, mod)
@@ -862,7 +806,7 @@ func ParseHyprlandKeysWithDMS(path string) (*HyprlandParseResult, error) {
 
 	return &HyprlandParseResult{
 		Section:            section,
-		DMSBindsIncluded:   parser.dmsBindsIncluded,
+		DMSBindsIncluded:   parser.walker.Included(),
 		DMSStatus:          parser.buildDMSStatus(),
 		ConflictingConfigs: parser.conflictingConfigs,
 		DefaultDMSKeys:     parser.defaultDMSKeys,

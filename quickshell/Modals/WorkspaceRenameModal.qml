@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -8,14 +7,13 @@ DankFloatingWindow {
     id: root
     readonly property var log: Log.scoped("WorkspaceRenameModal")
 
-    readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
     property var aqueousWorkspace: null
     property bool renaming: false
 
     objectName: "workspaceRenameModal"
     title: I18n.tr("Rename Workspace")
-    minimumSize: Qt.size(400, 160)
-    maximumSize: Qt.size(400, 160)
+    minimumSize: Qt.size(400, renameDialog.implicitHeight)
+    maximumSize: Qt.size(400, renameDialog.implicitHeight)
     visible: false
 
     onClosed: hide()
@@ -88,166 +86,51 @@ DankFloatingWindow {
         renaming = false;
     }
 
-    FocusScope {
-        id: contentFocusScope
+    DankDialog {
+        id: renameDialog
 
         anchors.fill: parent
-        focus: true
+        windowControls: renameWindowControls
+        title: root.title
+        supportingText: I18n.tr("Enter a new name for this workspace")
+        acceptEnabled: !root.renaming
+        onAccepted: root.submitAndClose()
+        onRejected: root.hide()
 
-        Keys.onEscapePressed: event => {
-            hide();
-            event.accepted = true;
+        DankTextField {
+            id: nameInput
+
+            width: parent.width
+            outlined: true
+            controlHeight: Theme.fieldHeightLarge
+            labelText: I18n.tr("Workspace name")
+            leftIconName: "edit"
+            enabled: root.visible && !root.renaming
+            onAccepted: root.submitAndClose()
         }
 
-        Column {
-            id: contentCol
-            anchors.centerIn: parent
-            width: parent.width - Theme.spacingL * 2
-            spacing: Theme.spacingM
-
-            Item {
-                width: contentCol.width
-                height: Math.max(headerText.height, buttonRow.height)
-
-                MouseArea {
-                    anchors.left: parent.left
-                    anchors.right: buttonRow.left
-                    anchors.rightMargin: Theme.spacingM
-                    height: parent.height
-                    onPressed: windowControls.tryStartMove()
-                    onDoubleClicked: windowControls.tryToggleMaximize()
-                }
-
-                StyledText {
-                    id: headerText
-                    text: I18n.tr("Enter a new name for this workspace")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceTextMedium
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - buttonRow.width - Theme.spacingM
-                }
-
-                Row {
-                    id: buttonRow
-                    anchors.right: parent.right
-                    spacing: Theme.spacingXS
-
-                    DankActionButton {
-                        visible: windowControls.canMaximize
-                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: windowControls.tryToggleMaximize()
-                    }
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: hide()
-                    }
-                }
+        actions: [
+            DankButton {
+                maximumWidth: renameDialog.actionWidth
+                wrapText: true
+                text: I18n.tr("Cancel")
+                backgroundColor: "transparent"
+                textColor: Theme.primary
+                onClicked: root.hide()
+            },
+            DankButton {
+                maximumWidth: renameDialog.actionWidth
+                wrapText: true
+                text: I18n.tr("Rename", "verb, rename button")
+                enabled: !root.renaming
+                busy: root.renaming
+                onClicked: root.submitAndClose()
             }
-
-            Rectangle {
-                width: parent.width
-                height: inputFieldHeight
-                radius: Theme.cornerRadius
-                color: Theme.surfaceHover
-                border.color: nameInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                border.width: nameInput.activeFocus ? 2 : 1
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: nameInput.forceActiveFocus()
-                }
-
-                DankTextField {
-                    id: nameInput
-
-                    anchors.fill: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    textColor: Theme.surfaceText
-                    placeholderText: I18n.tr("Workspace name")
-                    backgroundColor: "transparent"
-                    enabled: root.visible && !root.renaming
-                    onAccepted: submitAndClose()
-                }
-            }
-
-            Item {
-                width: parent.width
-                height: 40
-
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingM
-
-                    Rectangle {
-                        width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
-                        height: 36
-                        radius: Theme.cornerRadius
-                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : Theme.withAlpha(Theme.surfaceTextHover, 0)
-                        border.color: Theme.surfaceVariantAlpha
-                        border.width: 1
-
-                        StyledText {
-                            id: cancelText
-                            anchors.centerIn: parent
-                            text: I18n.tr("Cancel")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        MouseArea {
-                            id: cancelArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: hide()
-                        }
-                    }
-
-                    Rectangle {
-                        width: Math.max(80, renameText.contentWidth + Theme.spacingM * 2)
-                        height: 36
-                        radius: Theme.cornerRadius
-                        color: renameArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-
-                        StyledText {
-                            id: renameText
-                            anchors.centerIn: parent
-                            text: I18n.tr("Rename")
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.background
-                            font.weight: Font.Medium
-                        }
-
-                        MouseArea {
-                            id: renameArea
-                            enabled: !root.renaming
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: submitAndClose()
-                        }
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        ]
     }
 
     FloatingWindowControls {
-        id: windowControls
+        id: renameWindowControls
         targetWindow: root
     }
 }

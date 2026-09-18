@@ -1,0 +1,66 @@
+{
+    "twoScreens": {
+        "focusedWorkspaceId": 3,
+        "monitors": [
+            { "name": "DP-1", "activeWorkspaceId": 3 },
+            { "name": "HDMI-A-1", "activeWorkspaceId": 2 }
+        ],
+        "workspaces": [
+            { "id": 1, "name": "1", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": false, "urgent": false },
+            { "id": 3, "name": "3", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": true, "urgent": false },
+            { "id": 2, "name": "2", "monitor": "HDMI-A-1", "ipcMonitor": "HDMI-A-1", "active": true, "urgent": true },
+            { "id": -1337, "name": "chat", "monitor": "HDMI-A-1", "ipcMonitor": "HDMI-A-1", "active": false, "urgent": false },
+            { "id": -98, "name": "special:scratch", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": false, "urgent": false },
+            { "id": 4, "name": "4", "monitor": "HDMI-A-1", "ipcMonitor": "HDMI-A-1", "active": false, "urgent": false }
+        ],
+        "toplevels": [
+            { "address": "0xa", "workspace": 3, "wayland": true },
+            { "address": "0xb", "workspace": 4, "wayland": true },
+            { "address": "0xc", "workspace": 1, "wayland": false }
+        ]
+    },
+    "staleMonitor": {
+        "focusedWorkspaceId": 5,
+        "monitors": [
+            { "name": "DP-1", "activeWorkspaceId": 1 },
+            { "name": "DP-2", "activeWorkspaceId": 5 }
+        ],
+        "workspaces": [
+            { "id": 1, "name": "1", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": true, "urgent": false },
+            { "id": 5, "name": "5", "monitor": "DP-1", "ipcMonitor": "DP-2", "active": true, "urgent": false }
+        ],
+        "toplevels": []
+    },
+    "specialActive": {
+        "focusedWorkspaceId": -98,
+        "monitors": [{ "name": "DP-1", "activeWorkspaceId": -98 }],
+        "workspaces": [
+            { "id": 1, "name": "1", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": false, "urgent": false },
+            { "id": -98, "name": "special:scratch", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": true, "urgent": false }
+        ],
+        "toplevels": []
+    },
+    "namedActive": {
+        "focusedWorkspaceId": -1337,
+        "monitors": [{ "name": "HDMI-A-1", "activeWorkspaceId": -1337 }],
+        "workspaces": [
+            { "id": 2, "name": "2", "monitor": "HDMI-A-1", "ipcMonitor": "HDMI-A-1", "active": false, "urgent": false },
+            { "id": -1337, "name": "chat", "monitor": "HDMI-A-1", "ipcMonitor": "HDMI-A-1", "active": true, "urgent": false }
+        ],
+        "toplevels": []
+    },
+    "onlySpecial": {
+        "focusedWorkspaceId": null,
+        "monitors": [{ "name": "DP-1", "activeWorkspaceId": null }],
+        "workspaces": [
+            { "id": -98, "name": "special:scratch", "monitor": "DP-1", "ipcMonitor": "DP-1", "active": false, "urgent": false }
+        ],
+        "toplevels": []
+    },
+    "empty": {
+        "focusedWorkspaceId": null,
+        "monitors": [],
+        "workspaces": [],
+        "toplevels": []
+    }
+}

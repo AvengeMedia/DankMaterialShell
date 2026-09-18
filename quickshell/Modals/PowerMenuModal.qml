@@ -3,6 +3,7 @@ import qs.Common
 import qs.Modals.Common
 import qs.Services
 import qs.Modules.PowerMenu
+import qs.DankCommon.Session
 
 DankModal {
     id: root
@@ -10,6 +11,10 @@ DankModal {
     layerNamespace: "dms:power-menu"
     keepPopoutsOpen: true
     useOverlayLayer: true
+    animationType: "fade"
+    animationDuration: LockMetrics.effectsDuration
+    animationEnterCurve: Theme.expressiveCurves.expressiveEffects
+    animationExitCurve: Theme.expressiveCurves.expressiveEffects
 
     property rect parentBounds: Qt.rect(0, 0, 0, 0)
     property var parentScreen: null
@@ -31,8 +36,8 @@ DankModal {
     }
 
     shouldBeVisible: false
-    modalWidth: contentLoader.item?.desiredWidth ?? 400
-    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight : 300
+    modalWidth: contentLoader.item?.desiredWidth ?? LockMetrics.powerMenuWidth
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight : LockMetrics.powerGridButtonHeight
     enableShadow: true
     targetScreen: parentScreen
     positioning: parentBounds.width > 0 ? "custom" : "center"

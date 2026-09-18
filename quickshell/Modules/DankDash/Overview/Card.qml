@@ -1,24 +1,43 @@
 import QtQuick
 import qs.Common
+import qs.Widgets
+import qs.Modules.DankDash
 
-Rectangle {
-    id: card
+DankCard {
+    id: root
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
+    property Item focusTarget: clickable ? root : null
+    property bool blocksTabNavigation: false
 
-    property int pad: Theme.spacingM
+    activeFocusOnTab: interactive && focusTarget !== null
+    showFocusRing: false
+    restRadius: DashMetrics.cardRadius
 
-    radius: Theme.cornerRadius
-    color: Theme.nestedSurface
-    border.color: Theme.outlineMedium
-    border.width: 1
-
-    default property alias content: contentItem.data
-
-    Item {
-        id: contentItem
-        anchors.fill: parent
-        anchors.margins: card.pad
+    function handleKeyEvent(event) {
+        return false;
     }
+
+    Keys.onPressed: event => {
+        event.accepted = false;
+        if (!interactive)
+            return;
+        if (handleKeyEvent(event)) {
+            event.accepted = true;
+            return;
+        }
+        if (!acceptsInput)
+            return;
+        switch (event.key) {
+        case Qt.Key_Space:
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            root.clicked();
+            event.accepted = true;
+            break;
+        }
+    }
+
+    property string entryId: ""
+
+    readonly property var options: DashRegistry.resolvedOptions(entryId)
 }

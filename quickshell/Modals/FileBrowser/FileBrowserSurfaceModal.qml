@@ -7,7 +7,7 @@ DankModal {
     id: fileBrowserSurfaceModal
 
     property string browserTitle: "Select File"
-    property string browserIcon: "folder_open"
+    property string browserIcon: "folder_open" // !TODO: plugin compat, the window header no longer draws an icon
     property string browserType: "generic"
     property var fileExtensions: ["*.*"]
     property alias filterExtensions: fileBrowserSurfaceModal.fileExtensions
@@ -22,7 +22,7 @@ DankModal {
     layerNamespace: "dms:filebrowser"
     modalWidth: 800
     modalHeight: 600
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    backgroundColor: Theme.floatingWindowSurface
     closeOnEscapeKey: true
     closeOnBackgroundClick: true
     allowStacking: true
@@ -53,7 +53,6 @@ DankModal {
         focus: true
 
         browserTitle: fileBrowserSurfaceModal.browserTitle
-        browserIcon: fileBrowserSurfaceModal.browserIcon
         browserType: fileBrowserSurfaceModal.browserType
         fileExtensions: fileBrowserSurfaceModal.fileExtensions
         showHiddenFiles: fileBrowserSurfaceModal.showHiddenFiles

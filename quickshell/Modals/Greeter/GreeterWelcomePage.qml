@@ -45,7 +45,6 @@ Item {
                 StyledText {
                     text: I18n.tr("Welcome to DankMaterialShell", "greeter welcome page title")
                     font.pixelSize: Theme.fontSizeXLarge + 4
-                    font.weight: Font.Bold
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -73,7 +72,7 @@ Item {
             StyledText {
                 text: I18n.tr("Features", "greeter welcome page section header")
                 font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.Medium
+                font.weight: Theme.fontWeightMedium
                 color: Theme.surfaceText
             }
 
@@ -113,8 +112,7 @@ Item {
                     title: I18n.tr("Multi-Monitor", "greeter feature card title")
                     description: I18n.tr("Per-screen config", "greeter feature card description")
                     onClicked: {
-                        const hasDisplayConfig = CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isMango;
-                        PopoutService.openSettingsWithTab(hasDisplayConfig ? "display_config" : "display_widgets");
+                        PopoutService.openSettingsWithTab(CompositorService.supportsDisplayConfig ? "display_config" : "display_widgets");
                     }
                 }
 

@@ -102,7 +102,7 @@ Item {
                         anchors.centerIn: parent
                         name: "extension"
                         size: Theme.iconSize + 4
-                        color: Theme.primary
+                        color: Theme.accentOnPrimaryContainer
                     }
                 }
 
@@ -113,7 +113,6 @@ Item {
                     StyledText {
                         text: I18n.tr("Popular Plugins", "greeter plugins page title")
                         font.pixelSize: Theme.fontSizeXLarge
-                        font.weight: Font.Bold
                         color: Theme.surfaceText
                     }
 
@@ -201,7 +200,7 @@ Item {
             GreeterSettingsCard {
                 width: parent.width
                 iconName: "explore"
-                title: I18n.tr("Browse Plugins", "plugin browser window title")
+                title: I18n.tr("Browse plugins", "plugin browser window title")
                 description: I18n.tr("Browse or search plugins")
                 visible: !root.isLoading && root.loadError === ""
                 onClicked: PopoutService.openSettingsWithTab("plugins")

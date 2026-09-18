@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modals.Common
+import qs.Modals.DankLauncherV2.Components
 import qs.Widgets
 import qs.Services
 
@@ -303,7 +304,6 @@ DankModal {
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.title
                         font.pixelSize: Theme.fontSizeLarge + 4
-                        font.weight: Font.Bold
                         color: Theme.surfaceText
                     }
 
@@ -317,6 +317,7 @@ DankModal {
                             buttonSize: 36
                             circular: false
                             iconName: "view_list"
+                            Accessible.name: I18n.tr("List")
                             iconSize: 20
                             iconColor: root.viewMode === "list" ? Theme.primary : Theme.surfaceText
                             backgroundColor: root.viewMode === "list" ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
@@ -329,6 +330,7 @@ DankModal {
                             buttonSize: 36
                             circular: false
                             iconName: "grid_view"
+                            Accessible.name: I18n.tr("Grid")
                             iconSize: 20
                             iconColor: root.viewMode === "grid" ? Theme.primary : Theme.surfaceText
                             backgroundColor: root.viewMode === "grid" ? Theme.primaryHover : Theme.withAlpha(Theme.primaryHover, 0)
@@ -339,17 +341,12 @@ DankModal {
                     }
                 }
 
-                DankTextField {
+                DankSearchField {
                     id: searchField
 
                     width: parent.width - Theme.spacingS * 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: 52
-                    leftIconName: "search"
-                    leftIconSize: Theme.iconSize
-                    leftIconColor: Theme.surfaceVariantText
-                    leftIconFocusedColor: Theme.primary
-                    showClearButton: true
                     font.pixelSize: Theme.fontSizeLarge
                     enabled: root.shouldBeVisible
                     ignoreLeftRightKeys: root.viewMode !== "list"
@@ -452,22 +449,24 @@ DankModal {
                             }
                         }
 
-                        delegate: AppLauncherListDelegate {
-                            listView: appList
-                            itemHeight: 60
+                        delegate: LauncherRow {
+                            required property var model
+                            required property int index
+
+                            width: appList.width
+                            height: 60
                             iconSize: 40
                             showDescription: false
-
-                            isCurrentItem: index === root.selectedIndex
-                            keyboardNavigationActive: root.keyboardNavigationActive
-                            hoverUpdatesSelection: true
-
-                            onItemClicked: (idx, modelData) => {
-                                launchApplication(modelData);
-                            }
-
-                            onKeyboardNavigationReset: {
+                            item: ({
+                                    name: model.name,
+                                    icon: model.icon,
+                                    type: "app"
+                                })
+                            isSelected: index === root.selectedIndex
+                            onClicked: launchApplication(model)
+                            onPointerMoved: {
                                 root.keyboardNavigationActive = false;
+                                appList.currentIndex = index;
                             }
                         }
                     }
@@ -506,21 +505,22 @@ DankModal {
                             }
                         }
 
-                        delegate: AppLauncherGridDelegate {
-                            gridView: appGrid
-                            cellWidth: appGrid.cellWidth
-                            cellHeight: appGrid.cellHeight
+                        delegate: LauncherTile {
+                            required property var model
+                            required property int index
 
-                            currentIndex: root.selectedIndex
-                            keyboardNavigationActive: root.keyboardNavigationActive
-                            hoverUpdatesSelection: true
-
-                            onItemClicked: (idx, modelData) => {
-                                launchApplication(modelData);
-                            }
-
-                            onKeyboardNavigationReset: {
+                            width: appGrid.cellWidth - LauncherMetrics.tileGap
+                            height: appGrid.cellHeight - LauncherMetrics.tileGap
+                            item: ({
+                                    name: model.name,
+                                    icon: model.icon,
+                                    type: "app"
+                                })
+                            isSelected: index === root.selectedIndex
+                            onClicked: launchApplication(model)
+                            onPointerMoved: {
                                 root.keyboardNavigationActive = false;
+                                appGrid.currentIndex = index;
                             }
                         }
                     }
@@ -594,7 +594,7 @@ DankModal {
                         anchors.rightMargin: Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
                         checked: root.rememberChoice
-                        text: I18n.tr("Always use this app for %1").arg(root.mimeType)
+                        text: I18n.tr("Always use this app for %1", "app picker checkbox, %1 is a mime type").arg(root.mimeType)
                         onToggled: checked => {
                             root.rememberChoice = checked;
                         }

@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
@@ -20,7 +21,7 @@ DankPopout {
         triggerScreen = screen;
         root.screen = screen;
 
-        storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4);
+        storedBarThickness = barThickness !== undefined ? barThickness : Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1);
         storedBarSpacing = barSpacing !== undefined ? barSpacing : 4;
         storedBarConfig = barConfig;
 
@@ -48,11 +49,11 @@ DankPopout {
     readonly property var layoutNames: ({
             "CT": I18n.tr("Center Tiling"),
             "G": I18n.tr("Grid"),
-            "K": I18n.tr("Deck"),
-            "M": I18n.tr("Monocle"),
+            "K": I18n.tr("Deck", "window tiling layout name in layout picker"),
+            "M": I18n.tr("Monocle", "window tiling layout name in layout picker"),
             "RT": I18n.tr("Right Tiling"),
-            "S": I18n.tr("Scrolling"),
-            "T": I18n.tr("Tiling"),
+            "S": I18n.tr("Scrolling", "window tiling layout name in layout picker"),
+            "T": I18n.tr("Tiling", "window tiling layout name in layout picker"),
             "VG": I18n.tr("Vertical Grid"),
             "VK": I18n.tr("Vertical Deck"),
             "VS": I18n.tr("Vertical Scrolling"),
@@ -111,7 +112,7 @@ DankPopout {
         Rectangle {
             id: layoutContent
 
-            implicitHeight: contentColumn.implicitHeight + Theme.spacingL * 2
+            implicitHeight: contentColumn.implicitHeight + PopoutMetrics.contentPadding * 2
             color: "transparent"
             focus: true
 
@@ -128,118 +129,71 @@ DankPopout {
                 }
             }
 
-            Connections {
-                target: root
-                function onShouldBeVisibleChanged() {
-                    if (root.shouldBeVisible) {
-                        Qt.callLater(() => {
-                            layoutContent.forceActiveFocus();
-                        });
-                    }
+            readonly property bool rootShouldBeVisible: root.shouldBeVisible
+
+            onRootShouldBeVisibleChanged: {
+                if (rootShouldBeVisible) {
+                    Qt.callLater(() => {
+                        layoutContent.forceActiveFocus();
+                    });
                 }
             }
 
             Column {
                 id: contentColumn
 
-                width: parent.width - Theme.spacingL * 2
+                width: parent.width - PopoutMetrics.contentPadding * 2
                 anchors.left: parent.left
                 anchors.top: parent.top
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingM
-
-                Row {
-                    width: parent.width
-                    height: 40
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: "view_quilt"
-                        size: Theme.iconSizeLarge
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Column {
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - Theme.iconSizeLarge - 32 - Theme.spacingM * 2
-
-                        StyledText {
-                            text: I18n.tr("Layout")
-                            font.pixelSize: Theme.fontSizeXLarge
-                            color: Theme.surfaceText
-                            font.weight: Font.Bold
-                        }
-
-                        StyledText {
-                            text: root.currentLayoutSymbol
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceTextMedium
-                        }
-                    }
-
-                    Rectangle {
-                        width: 32
-                        height: 32
-                        radius: 16
-                        color: closeLayoutArea.containsMouse ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-                        anchors.top: parent.top
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: "close"
-                            size: Theme.iconSize - 4
-                            color: closeLayoutArea.containsMouse ? Theme.error : Theme.surfaceText
-                        }
-
-                        MouseArea {
-                            id: closeLayoutArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onPressed: {
-                                root.close();
-                            }
-                        }
-                    }
-                }
+                anchors.margins: PopoutMetrics.contentPadding
+                spacing: PopoutMetrics.contentGap
 
                 StyledText {
                     text: I18n.tr("Available Layouts")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceTextMedium
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                 }
 
                 Column {
+                    id: layoutList
                     width: parent.width
-                    spacing: Theme.spacingS
+                    spacing: Theme.groupedListGap
 
                     Repeater {
+                        id: layoutRepeater
                         model: MangoService.layouts
 
-                        delegate: Rectangle {
+                        delegate: DankListItem {
+                            id: layoutRow
                             required property string modelData
                             required property int index
 
-                            property bool isActive: modelData === root.currentLayoutSymbol
+                            readonly property bool isActive: modelData === root.currentLayoutSymbol
 
-                            width: parent.width
-                            height: 40
-                            radius: Theme.cornerRadius
-                            color: layoutArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
+                            width: layoutList.width
+                            implicitHeight: BarMetrics.popoutRowTwoLineHeight
+                            firstInGroup: index === 0
+                            lastInGroup: index === layoutRepeater.count - 1
+                            isSelected: isActive
+                            Accessible.name: root.getLayoutName(modelData)
+                            onClicked: {
+                                if (!root.triggerScreen || !MangoService.available)
+                                    return;
+                                MangoService.setLayout(root.triggerScreen.name, index);
+                                root.close();
+                            }
 
                             Row {
                                 anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingS
+                                anchors.leftMargin: Theme.spacingL
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
+                                spacing: Theme.spacingM
 
                                 DankIcon {
-                                    name: root.getLayoutIcon(modelData)
-                                    size: 20
-                                    color: parent.parent.isActive ? Theme.primary : Theme.surfaceText
+                                    name: root.getLayoutIcon(layoutRow.modelData)
+                                    size: Theme.iconSizeMedium
+                                    color: layoutRow.isActive ? Theme.primary : layoutRow.contentColor
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -248,42 +202,17 @@ DankPopout {
                                     spacing: Theme.spacingXXS
 
                                     StyledText {
-                                        text: root.getLayoutName(modelData)
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: parent.parent.parent.isActive ? Theme.primary : Theme.surfaceText
-                                        font.weight: parent.parent.parent.isActive ? Font.Medium : Font.Normal
+                                        text: root.getLayoutName(layoutRow.modelData)
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: layoutRow.isActive ? Theme.primary : layoutRow.contentColor
+                                        font.weight: layoutRow.isActive ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
 
                                     StyledText {
-                                        text: modelData
+                                        text: layoutRow.modelData
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextMedium
+                                        color: layoutRow.supportingContentColor
                                     }
-                                }
-                            }
-
-                            MouseArea {
-                                id: layoutArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPressed: {
-                                    if (!root.triggerScreen) {
-                                        return;
-                                    }
-                                    if (!MangoService.available) {
-                                        return;
-                                    }
-
-                                    MangoService.setLayout(root.triggerScreen.name, index);
-                                    root.close();
-                                }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
                                 }
                             }
                         }

@@ -14,6 +14,10 @@ import (
 )
 
 const (
+	AppID = "com.danklinux.dms"
+
+	appName = "DMS"
+
 	notifyDest      = "org.freedesktop.Notifications"
 	notifyPath      = "/org/freedesktop/Notifications"
 	notifyInterface = "org.freedesktop.Notifications"
@@ -40,7 +44,10 @@ func Send(n Notification) (uint32, error) {
 	}
 
 	if n.AppName == "" {
-		n.AppName = "DMS"
+		n.AppName = appName
+	}
+	if n.Icon == "" && n.AppName == appName {
+		n.Icon = AppID
 	}
 	if n.Timeout == 0 {
 		n.Timeout = 5000
@@ -62,6 +69,9 @@ func Send(n Notification) (uint32, error) {
 	}
 
 	hints := map[string]dbus.Variant{}
+	if n.AppName == appName {
+		hints["desktop-entry"] = dbus.MakeVariant(AppID)
+	}
 	if n.FilePath != "" {
 		imgPath := n.FilePath
 		if !strings.HasPrefix(imgPath, "file://") {

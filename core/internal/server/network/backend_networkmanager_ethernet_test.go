@@ -67,10 +67,6 @@ func TestNetworkManagerBackend_ActivateWiredConnection_NoDevice(t *testing.T) {
 	assert.Contains(t, err.Error(), "no ethernet device available")
 }
 
-func TestNetworkManagerBackend_ActivateWiredConnection_NotFound(t *testing.T) {
-	t.Skip("ActivateWiredConnection creates a new Settings instance internally, cannot be fully mocked")
-}
-
 func TestNetworkManagerBackend_ListEthernetConnections_NoDevice(t *testing.T) {
 	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
 

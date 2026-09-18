@@ -10,6 +10,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/registries"
 	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -67,20 +68,6 @@ func (m *mockGitClient) CheckoutRevision(path string, revision string) error {
 		return m.checkoutFunc(path, revision)
 	}
 	return nil
-}
-
-func TestNewRegistry(t *testing.T) {
-	registry, err := NewRegistry()
-	assert.NoError(t, err)
-	assert.NotNil(t, registry)
-	assert.NotEmpty(t, registry.cacheDir)
-	require.NotEmpty(t, registry.registries)
-	assert.Equal(t, registries.OfficialName, registry.registries[0].Name)
-}
-
-func TestGetCacheDir(t *testing.T) {
-	cacheDir := getCacheDir()
-	assert.Contains(t, cacheDir, "/tmp/dankdots-plugin-registry")
 }
 
 func TestRealGitClientRevisionCheckout(t *testing.T) {
@@ -557,4 +544,46 @@ func TestUpdate(t *testing.T) {
 		assert.Len(t, registry.plugins, 1)
 		assert.Equal(t, "x", registry.plugins[0].ID)
 	})
+}
+
+func TestRealGitClientChecksUpdatesWithoutFetching(t *testing.T) {
+	t.Setenv("GIT_CONFIG_GLOBAL", "")
+	t.Setenv("GIT_CONFIG_SYSTEM", "")
+	remotePath := t.TempDir()
+	remote, err := git.PlainInit(remotePath, false)
+	require.NoError(t, err)
+	worktree, err := remote.Worktree()
+	require.NoError(t, err)
+	signature := &object.Signature{Name: "DMS Test", Email: "test@example.com", When: time.Unix(1, 0)}
+	commit := func(content string) plumbing.Hash {
+		t.Helper()
+		require.NoError(t, os.WriteFile(filepath.Join(remotePath, "value.txt"), []byte(content), 0o644))
+		_, err := worktree.Add("value.txt")
+		require.NoError(t, err)
+		hash, err := worktree.Commit(content, &git.CommitOptions{Author: signature})
+		require.NoError(t, err)
+		return hash
+	}
+	first := commit("one")
+	localPath := t.TempDir()
+	local, err := git.PlainClone(localPath, &git.CloneOptions{URL: remotePath})
+	require.NoError(t, err)
+	client := &realGitClient{}
+	updated, localHash, remoteHash, err := client.HasUpdates(localPath)
+	require.NoError(t, err)
+	assert.False(t, updated)
+	assert.Equal(t, first.String(), localHash)
+	assert.Equal(t, first.String(), remoteHash)
+
+	second := commit("two")
+	updated, localHash, remoteHash, err = client.HasUpdates(localPath)
+	require.NoError(t, err)
+	assert.True(t, updated)
+	assert.Equal(t, first.String(), localHash)
+	assert.Equal(t, second.String(), remoteHash)
+	_, err = local.CommitObject(second)
+	assert.ErrorIs(t, err, plumbing.ErrObjectNotFound)
+	require.NoError(t, local.DeleteRemote("origin"))
+	_, _, _, err = client.HasUpdates(localPath)
+	assert.Error(t, err)
 }

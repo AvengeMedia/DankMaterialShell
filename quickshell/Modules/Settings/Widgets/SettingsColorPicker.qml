@@ -10,7 +10,7 @@ Item {
 
     property string colorMode: "primary"
     property color customColor: "#ffffff"
-    property string pickerTitle: I18n.tr("Choose Color")
+    property string pickerTitle: I18n.tr("Choose color", "color picker title")
 
     signal colorModeSelected(string mode)
     signal customColorSelected(color selectedColor)
@@ -59,30 +59,30 @@ Item {
                     required property int index
 
                     width: (parent.width - Theme.spacingS * 2) / 3
-                    height: 60
+                    height: Theme.listItemHeight + Theme.spacingXS
                     radius: Theme.cornerRadius
                     color: root.colorMode === modelData.id ? Theme.primarySelected : Theme.surfaceHover
                     border.color: root.colorMode === modelData.id ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                    border.width: 2
+                    border.width: Theme.outlineWidthFocused
 
                     Column {
                         anchors.centerIn: parent
                         spacing: Theme.spacingXS
 
                         Rectangle {
-                            width: 24
-                            height: 24
-                            radius: 12
+                            width: Theme.iconSize
+                            height: Theme.iconSize
+                            radius: Theme.fullRadius(width, height)
                             color: modelData.color
                             border.color: Theme.outline
-                            border.width: 1
+                            border.width: Theme.outlineWidth
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             DankIcon {
                                 visible: modelData.id === "custom"
                                 anchors.centerIn: parent
                                 name: "colorize"
-                                size: 14
+                                size: Theme.iconSizeSmall
                                 color: Theme.background
                             }
                         }

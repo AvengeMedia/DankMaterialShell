@@ -9,7 +9,7 @@ Singleton {
     id: root
 
     readonly property var log: Log.scoped("AppleMusicArt")
-    readonly property bool enabled: SettingsData.appleMusicAnimatedArtEnabled
+    readonly property bool enabled: MediaOptions.animatedArt
 
     // file:// url of the current album's downloaded animated cover, or empty.
     property string animatedArtUrl: ""

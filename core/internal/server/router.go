@@ -1,8 +1,8 @@
 package server
 
 import (
+	"context"
 	"fmt"
-	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
@@ -15,6 +15,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/location"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
+	serverLyrics "github.com/AvengeMedia/DankMaterialShell/core/internal/server/lyrics"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/mime"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
@@ -28,224 +29,205 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
-func RouteRequest(conn *models.Conn, req models.Request) {
-	if strings.HasPrefix(req.Method, "network.") {
+var requestMux = newRequestMux()
+
+func RouteRequest(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request) {
+	requestMux.ServeIPC(ctx, conn, req, nil)
+}
+
+func requestHandler(handle func(*ipc.ConnWriter, ipc.Request)) ipc.Handler {
+	return func(_ context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
+		handle(conn, req)
+	}
+}
+
+func newRequestMux() *ipc.Mux {
+	mux := ipc.NewMux()
+	mux.Handle("ping", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		models.Respond(conn, req.ID, "pong")
+	}))
+	mux.Handle("getServerInfo", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		models.Respond(conn, req.ID, getServerInfo())
+	}))
+	mux.Handle("subscribe", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
+		handleSubscribe(ctx, conn, req)
+	})
+	mux.Handle("matugen.queue", requestHandler(handleMatugenQueue))
+	mux.Handle("matugen.status", requestHandler(handleMatugenStatus))
+	mux.Handle("clipboard.getConfig", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		models.Respond(conn, req.ID, clipboard.LoadConfig())
+	}))
+	mux.Handle("clipboard.setConfig", requestHandler(handleClipboardSetConfig))
+
+	mux.HandlePrefix("network.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if networkManager == nil {
 			models.RespondError(conn, req.ID, "network manager not initialized")
 			return
 		}
 		network.HandleRequest(conn, req, networkManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "plugins.") {
-		serverPlugins.HandleRequest(conn, req)
-		return
-	}
+	mux.HandlePrefix("plugins.", requestHandler(serverPlugins.HandleRequest))
 
-	if strings.HasPrefix(req.Method, "themes.") {
-		serverThemes.HandleRequest(conn, req)
-		return
-	}
+	mux.HandlePrefix("themes.", requestHandler(serverThemes.HandleRequest))
 
-	if strings.HasPrefix(req.Method, "registries.") {
-		serverRegistries.HandleRequest(conn, req)
-		return
-	}
+	mux.HandlePrefix("registries.", requestHandler(serverRegistries.HandleRequest))
 
-	if strings.HasPrefix(req.Method, "theme.auto.") {
+	mux.HandlePrefix("theme.auto.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if themeModeManager == nil {
 			models.RespondError(conn, req.ID, "theme mode manager not initialized")
 			return
 		}
 		thememode.HandleRequest(conn, req, themeModeManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "wallpaper.") {
+	mux.HandlePrefix("wallpaper.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if wallpaperManager == nil {
 			models.RespondError(conn, req.ID, "wallpaper manager not initialized")
 			return
 		}
 		wallpaper.HandleRequest(conn, req, wallpaperManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "loginctl.") {
+	mux.HandlePrefix("loginctl.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if loginctlManager == nil {
 			models.RespondError(conn, req.ID, "loginctl manager not initialized")
 			return
 		}
 		loginctl.HandleRequest(conn, req, loginctlManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "freedesktop.") {
+	mux.HandlePrefix("freedesktop.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if freedesktopManager == nil {
 			models.RespondError(conn, req.ID, "freedesktop manager not initialized")
 			return
 		}
 		freedesktop.HandleRequest(conn, req, freedesktopManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "wayland.") {
+	mux.HandlePrefix("wayland.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if waylandManager == nil {
 			models.RespondError(conn, req.ID, "wayland manager not initialized")
 			return
 		}
 		wayland.HandleRequest(conn, req, waylandManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "bluetooth.") {
+	mux.HandlePrefix("bluetooth.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if bluezManager == nil {
 			models.RespondError(conn, req.ID, "bluetooth manager not initialized")
 			return
 		}
 		bluez.HandleRequest(conn, req, bluezManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "mime.") {
-		mime.HandleRequest(conn, req)
-		return
-	}
+	mux.HandlePrefix("mime.", requestHandler(mime.HandleRequest))
 
-	if strings.HasPrefix(req.Method, "dgop.") {
-		serverDgop.HandleRequest(conn, req)
-		return
-	}
+	mux.HandlePrefix("dgop.", requestHandler(serverDgop.HandleRequest))
 
-	if strings.HasPrefix(req.Method, "browser.") || strings.HasPrefix(req.Method, "apppicker.") {
+	mux.HandlePrefix("lyrics.", requestHandler(serverLyrics.HandleRequest))
+
+	appPickerHandler := requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if appPickerManager == nil {
 			models.RespondError(conn, req.ID, "apppicker manager not initialized")
 			return
 		}
 		apppicker.HandleRequest(conn, req, appPickerManager)
-		return
-	}
+	})
+	mux.HandlePrefix("browser.", appPickerHandler)
+	mux.HandlePrefix("apppicker.", appPickerHandler)
 
-	if strings.HasPrefix(req.Method, "cups.") {
+	mux.HandlePrefix("cups.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		mgr, err := ensureCupsManager()
 		if err != nil {
 			models.RespondError(conn, req.ID, "CUPS manager not initialized")
 			return
 		}
 		cups.HandleRequest(conn, req, mgr)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "tailscale.") {
+	mux.HandlePrefix("tailscale.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if tailscaleManager == nil {
 			models.RespondError(conn, req.ID, "Tailscale not available")
 			return
 		}
 		tailscale.HandleRequest(conn, req, tailscaleManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "brightness.") {
+	mux.HandlePrefix("brightness.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if brightnessManager == nil {
 			models.RespondError(conn, req.ID, "brightness manager not initialized")
 			return
 		}
 		brightness.HandleRequest(conn, req, brightnessManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "wlroutput.") {
+	mux.HandlePrefix("wlroutput.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if wlrOutputManager == nil {
 			models.RespondError(conn, req.ID, "wlroutput manager not initialized")
 			return
 		}
 		wlroutput.HandleRequest(conn, req, wlrOutputManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "evdev.") {
+	mux.HandlePrefix("evdev.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if evdevManager == nil {
 			models.RespondError(conn, req.ID, "evdev manager not initialized")
 			return
 		}
 		evdev.HandleRequest(conn, req, evdevManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "dbus.") {
+	mux.HandlePrefix("dbus.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if dbusManager == nil {
 			models.RespondError(conn, req.ID, "dbus manager not initialized")
 			return
 		}
 		serverDbus.HandleRequest(conn, req, dbusManager, dbusClientID)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "clipboard.") {
-		switch req.Method {
-		case "clipboard.getConfig":
-			cfg := clipboard.LoadConfig()
-			models.Respond(conn, req.ID, cfg)
-			return
-		case "clipboard.setConfig":
-			handleClipboardSetConfig(conn, req)
-			return
-		}
+	mux.HandlePrefix("clipboard.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if clipboardManager == nil {
 			models.RespondError(conn, req.ID, "clipboard manager not initialized")
 			return
 		}
 		clipboard.HandleRequest(conn, req, clipboardManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "location.") {
+	mux.HandlePrefix("location.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if locationManager == nil {
 			models.RespondError(conn, req.ID, "location manager not initialized")
 			return
 		}
 		location.HandleRequest(conn, req, locationManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "notify.") {
+	mux.HandlePrefix("notify.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if notifyActionsManager == nil {
 			models.RespondError(conn, req.ID, "notification action manager not initialized")
 			return
 		}
 		notifyactions.HandleRequest(conn, req, notifyActionsManager)
-		return
-	}
+	}))
 
-	if strings.HasPrefix(req.Method, "sysupdate.") {
+	mux.HandlePrefix("sysupdate.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		if sysUpdateManager == nil {
 			models.RespondError(conn, req.ID, "sysupdate manager not initialized")
 			return
 		}
 		sysupdate.HandleRequest(conn, req, sysUpdateManager)
-		return
-	}
+	}))
 
-	switch req.Method {
-	case "ping":
-		models.Respond(conn, req.ID, "pong")
-	case "getServerInfo":
-		info := getServerInfo()
-		models.Respond(conn, req.ID, info)
-	case "subscribe":
-		handleSubscribe(conn, req)
-	case "matugen.queue":
-		handleMatugenQueue(conn, req)
-	case "matugen.status":
-		handleMatugenStatus(conn, req)
-	default:
+	mux.HandlePrefix("", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
-	}
+	}))
+	return mux
 }
 
-func handleClipboardSetConfig(conn *models.Conn, req models.Request) {
+func handleClipboardSetConfig(conn *ipc.ConnWriter, req ipc.Request) {
 	cfg := clipboard.LoadConfig()
 
 	if v, ok := models.Get[float64](req, "maxHistory"); ok {

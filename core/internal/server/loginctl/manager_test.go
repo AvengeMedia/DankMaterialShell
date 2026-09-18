@@ -278,19 +278,3 @@ func TestManager_SnapshotState(t *testing.T) {
 	snapshot.Locked = true
 	assert.False(t, manager.state.Locked)
 }
-
-func TestNewManager(t *testing.T) {
-	t.Run("attempts to create manager", func(t *testing.T) {
-		manager, err := NewManager()
-		if err != nil {
-			assert.Nil(t, manager)
-		} else {
-			assert.NotNil(t, manager)
-			assert.NotNil(t, manager.state)
-			assert.NotNil(t, &manager.subscribers)
-			assert.NotNil(t, manager.stopChan)
-
-			manager.Close()
-		}
-	})
-}

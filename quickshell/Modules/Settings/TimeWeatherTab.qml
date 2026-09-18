@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -9,9 +7,16 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    property bool _internalChange: false
+    property var parentModal: null
 
-    readonly property string _systemDefaultLabel: I18n.tr("System Default")
+    readonly property string _systemDefaultLabel: I18n.tr("System default")
+    readonly property var presetDateFormats: ["ddd d", "ddd MMM d", "MMM d", "M/d", "d/M", "ddd d MMM yyyy", "yyyy-MM-dd", "dddd, MMMM d"]
+    property bool editingBarFormat: false
+    property bool editingLockFormat: false
+
+    function isCustomFormat(format) {
+        return !!format && !presetDateFormats.includes(format);
+    }
 
     function weekStartQt() {
         if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
@@ -27,347 +32,269 @@ Item {
         return Array(7).fill(0).map((_, i) => new Date(Date.UTC(2026, 2, 1 + i, 0, 0, 0)).toLocaleDateString(I18n.locale(), "dddd")).map(d => d[0].toUpperCase() + d.slice(1));
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
+        SettingsCard {
+            tab: "time"
+            tags: ["time", "clock", "format", "24hour"]
+            title: I18n.tr("Time")
+            settingKey: "timeFormat"
+            iconName: "schedule"
 
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
-
-            SettingsCard {
+            SettingsDropdownRow {
                 tab: "time"
-                tags: ["time", "clock", "format", "24hour"]
-                title: I18n.tr("Time Format")
-                settingKey: "timeFormat"
-                iconName: "schedule"
-
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["time", "24hour", "12hour", "format", "locale"]
-                    settingKey: "clockFormat"
-                    text: I18n.tr("Time Format")
-                    description: I18n.tr("Use 24-hour time format instead of 12-hour AM/PM")
-                    readonly property var _sample: new Date(2000, 0, 1, 13, 0, 0)
-                    readonly property string _twelve: Qt.formatTime(_sample, "h:mm AP")
-                    readonly property string _twentyFour: Qt.formatTime(_sample, "HH:mm")
-                    options: [I18n.tr("System Default"), _twelve, _twentyFour]
-                    currentValue: {
-                        switch (SettingsData.clockFormat) {
-                        case "12h":
-                            return _twelve;
-                        case "24h":
-                            return _twentyFour;
-                        default:
-                            return I18n.tr("System Default");
-                        }
-                    }
-                    onValueChanged: value => {
-                        if (value === _twelve) {
-                            SettingsData.set("clockFormat", "12h");
-                            return;
-                        }
-                        if (value === _twentyFour) {
-                            SettingsData.set("clockFormat", "24h");
-                            return;
-                        }
-                        SettingsData.set("clockFormat", "auto");
+                tags: ["time", "24hour", "12hour", "format", "locale"]
+                settingKey: "clockFormat"
+                text: I18n.tr("Format", "noun, time or date format setting label")
+                readonly property var _sample: new Date(2000, 0, 1, 13, 0, 0)
+                readonly property string _twelve: Qt.formatTime(_sample, "h:mm AP")
+                readonly property string _twentyFour: Qt.formatTime(_sample, "HH:mm")
+                options: [I18n.tr("System default"), _twelve, _twentyFour]
+                currentValue: {
+                    switch (SettingsData.clockFormat) {
+                    case "12h":
+                        return _twelve;
+                    case "24h":
+                        return _twentyFour;
+                    default:
+                        return I18n.tr("System default");
                     }
                 }
-
-                SettingsToggleRow {
-                    tab: "time"
-                    tags: ["time", "seconds", "clock"]
-                    settingKey: "showSeconds"
-                    text: I18n.tr("Show Seconds")
-                    checked: SettingsData.showSeconds
-                    onToggled: checked => SettingsData.set("showSeconds", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "time"
-                    tags: ["time", "12hour", "format", "padding", "leading", "zero"]
-                    settingKey: "padHours12Hour"
-                    text: I18n.tr("Pad Hours")
-                    description: "02:31 PM vs 2:31 PM"
-                    checked: SettingsData.padHours12Hour
-                    onToggled: checked => SettingsData.set("padHours12Hour", checked)
-                    visible: !SettingsData.use24HourClock
+                onValueChanged: value => {
+                    if (value === _twelve) {
+                        SettingsData.set("clockFormat", "12h");
+                        return;
+                    }
+                    if (value === _twentyFour) {
+                        SettingsData.set("clockFormat", "24h");
+                        return;
+                    }
+                    SettingsData.set("clockFormat", "auto");
                 }
             }
 
-            SettingsCard {
+            SettingsToggleRow {
                 tab: "time"
-                tags: ["date", "format", "calendar"]
-                title: I18n.tr("Date Format")
-                settingKey: "dateFormat"
-                iconName: "calendar_today"
+                tags: ["time", "seconds", "clock"]
+                settingKey: "showSeconds"
+                text: I18n.tr("Show seconds")
+                checked: SettingsData.showSeconds
+                onToggled: checked => SettingsData.set("showSeconds", checked)
+            }
 
-                SettingsToggleRow {
-                    tab: "time"
-                    tags: ["show", "week"]
-                    settingKey: "showWeekNumber"
-                    text: I18n.tr("Show Week Number")
-                    checked: SettingsData.showWeekNumber
-                    onToggled: checked => SettingsData.set("showWeekNumber", checked)
+            SettingsToggleRow {
+                enabled: !SettingsData.use24HourClock
+                tab: "time"
+                tags: ["time", "12hour", "format", "padding", "leading", "zero"]
+                settingKey: "padHours12Hour"
+                text: I18n.tr("Leading zero on hours")
+                checked: SettingsData.padHours12Hour
+                onToggled: checked => SettingsData.set("padHours12Hour", checked)
+            }
+        }
+
+        SettingsCard {
+            tab: "time"
+            tags: ["date", "format", "calendar"]
+            title: I18n.tr("Date")
+            settingKey: "dateFormat"
+            iconName: "calendar_today"
+
+            SettingsToggleRow {
+                tab: "time"
+                tags: ["show", "week"]
+                settingKey: "showWeekNumber"
+                text: I18n.tr("Show week number")
+                checked: SettingsData.showWeekNumber
+                onToggled: checked => SettingsData.set("showWeekNumber", checked)
+            }
+
+            SettingsDropdownRow {
+                tab: "time"
+                tags: ["first", "day", "week"]
+                settingKey: "firstDayOfWeek"
+                text: I18n.tr("First day of week")
+                options: [root._systemDefaultLabel].concat(root._dayNames())
+                currentValue: {
+                    if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
+                        return root._systemDefaultLabel;
+                    return root._dayNames()[root.weekStartJs()];
                 }
-
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["first", "day", "week"]
-                    settingKey: "firstDayOfWeek"
-                    text: I18n.tr("First Day of Week")
-                    options: [root._systemDefaultLabel].concat(root._dayNames())
-                    currentValue: {
-                        if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
-                            return root._systemDefaultLabel;
-                        return root._dayNames()[root.weekStartJs()];
+                onValueChanged: value => {
+                    if (value === root._systemDefaultLabel) {
+                        SettingsData.set("firstDayOfWeek", -1);
+                        return;
                     }
-                    onValueChanged: value => {
-                        if (value === root._systemDefaultLabel) {
-                            SettingsData.set("firstDayOfWeek", -1);
-                            return;
+                    SettingsData.set("firstDayOfWeek", root._dayNames().indexOf(value));
+                }
+            }
+
+            SettingsDropdownRow {
+                tab: "time"
+                tags: ["date", "format", "topbar"]
+                settingKey: "clockDateFormat"
+                text: I18n.tr("Bar format")
+                description: I18n.tr("Preview: %1", "date format setting description, %1 is the current date formatted").arg(SettingsData.clockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(I18n.locale(), "ddd d"))
+                options: [I18n.tr("System default", "date format option"), I18n.tr("Day date", "date format option"), I18n.tr("Day month date", "date format option"), I18n.tr("Month date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with year", "date format option"), I18n.tr("ISO date", "date format option"), I18n.tr("Full day & month", "date format option"), I18n.tr("Custom", "date format option") + "…"]
+                currentValue: {
+                    if (!SettingsData.clockDateFormat || SettingsData.clockDateFormat.length === 0)
+                        return I18n.tr("System default", "date format option");
+                    const presets = [
+                        {
+                            "format": "ddd d",
+                            "label": I18n.tr("Day date", "date format option")
+                        },
+                        {
+                            "format": "ddd MMM d",
+                            "label": I18n.tr("Day month date", "date format option")
+                        },
+                        {
+                            "format": "MMM d",
+                            "label": I18n.tr("Month date", "date format option")
+                        },
+                        {
+                            "format": "M/d",
+                            "label": I18n.tr("Numeric (M/D)", "date format option")
+                        },
+                        {
+                            "format": "d/M",
+                            "label": I18n.tr("Numeric (D/M)", "date format option")
+                        },
+                        {
+                            "format": "ddd d MMM yyyy",
+                            "label": I18n.tr("Full with year", "date format option")
+                        },
+                        {
+                            "format": "yyyy-MM-dd",
+                            "label": I18n.tr("ISO date", "date format option")
+                        },
+                        {
+                            "format": "dddd, MMMM d",
+                            "label": I18n.tr("Full day & month", "date format option")
                         }
-                        SettingsData.set("firstDayOfWeek", root._dayNames().indexOf(value));
-                    }
+                    ];
+                    const match = presets.find(p => p.format === SettingsData.clockDateFormat);
+                    return match ? match.label : I18n.tr("Custom") + ": " + SettingsData.clockDateFormat;
                 }
+                onValueChanged: value => {
+                    const formatMap = {};
+                    formatMap[I18n.tr("System default", "date format option")] = "";
+                    formatMap[I18n.tr("Day date", "date format option")] = "ddd d";
+                    formatMap[I18n.tr("Day month date", "date format option")] = "ddd MMM d";
+                    formatMap[I18n.tr("Month date", "date format option")] = "MMM d";
+                    formatMap[I18n.tr("Numeric (M/D)", "date format option")] = "M/d";
+                    formatMap[I18n.tr("Numeric (D/M)", "date format option")] = "d/M";
+                    formatMap[I18n.tr("Full with year", "date format option")] = "ddd d MMM yyyy";
+                    formatMap[I18n.tr("ISO date", "date format option")] = "yyyy-MM-dd";
+                    formatMap[I18n.tr("Full day & month", "date format option")] = "dddd, MMMM d";
+                    root.editingBarFormat = value === I18n.tr("Custom", "date format option") + "…";
+                    if (root.editingBarFormat)
+                        return;
+                    SettingsData.set("clockDateFormat", formatMap[value]);
+                }
+            }
 
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["calendar", "backend", "daemon", "khal", "dankcalendar", "events"]
-                    settingKey: "calendarBackend"
-                    text: I18n.tr("Calendar Backend")
-                    description: {
-                        const resolved = CalendarService.activeBackend;
-                        switch (resolved) {
-                        case "dankcal":
-                            return I18n.tr("Using DankCalendar%1", "calendar backend status").arg(CalendarService.isDankActive && CalendarService.calendars.length > 0 ? "" : " (connecting…)");
-                        case "khal":
-                            return I18n.tr("Using khal", "calendar backend status");
-                        default:
-                            return I18n.tr("No calendar source available", "calendar backend status");
+            DankTextField {
+                id: customFormatInput
+                outlined: true
+                leftIconName: "calendar_today"
+                labelText: I18n.tr("Format")
+                width: parent.width - Theme.spacingM * 2
+                x: Theme.spacingM
+                visible: root.editingBarFormat || root.isCustomFormat(SettingsData.clockDateFormat)
+                placeholderText: I18n.tr("Enter custom top bar format (e.g., ddd MMM d)")
+                text: SettingsData.clockDateFormat
+                onTextChanged: {
+                    if (visible && text)
+                        SettingsData.set("clockDateFormat", text);
+                }
+            }
+
+            SettingsDropdownRow {
+                tab: "time"
+                tags: ["date", "format", "lock", "screen"]
+                settingKey: "lockDateFormat"
+                text: I18n.tr("Lock screen format")
+                description: I18n.tr("Preview: %1").arg(SettingsData.lockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(I18n.locale(), Locale.LongFormat))
+                options: [I18n.tr("System default", "date format option"), I18n.tr("Day date", "date format option"), I18n.tr("Day month date", "date format option"), I18n.tr("Month date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with year", "date format option"), I18n.tr("ISO date", "date format option"), I18n.tr("Full day & month", "date format option"), I18n.tr("Custom", "date format option") + "…"]
+                currentValue: {
+                    if (!SettingsData.lockDateFormat || SettingsData.lockDateFormat.length === 0)
+                        return I18n.tr("System default", "date format option");
+                    const presets = [
+                        {
+                            "format": "ddd d",
+                            "label": I18n.tr("Day date", "date format option")
+                        },
+                        {
+                            "format": "ddd MMM d",
+                            "label": I18n.tr("Day month date", "date format option")
+                        },
+                        {
+                            "format": "MMM d",
+                            "label": I18n.tr("Month date", "date format option")
+                        },
+                        {
+                            "format": "M/d",
+                            "label": I18n.tr("Numeric (M/D)", "date format option")
+                        },
+                        {
+                            "format": "d/M",
+                            "label": I18n.tr("Numeric (D/M)", "date format option")
+                        },
+                        {
+                            "format": "ddd d MMM yyyy",
+                            "label": I18n.tr("Full with year", "date format option")
+                        },
+                        {
+                            "format": "yyyy-MM-dd",
+                            "label": I18n.tr("ISO date", "date format option")
+                        },
+                        {
+                            "format": "dddd, MMMM d",
+                            "label": I18n.tr("Full day & month", "date format option")
                         }
-                    }
-                    readonly property var _backendValues: ["auto", "khal", "dankcal"]
-                    readonly property var _backendLabels: [I18n.tr("Auto", "calendar backend option"), I18n.tr("khal", "calendar backend option"), I18n.tr("DankCalendar", "calendar backend option")]
-                    options: _backendLabels
-                    currentValue: _backendLabels[Math.max(0, _backendValues.indexOf(SettingsData.calendarBackend))]
-                    onValueChanged: value => {
-                        const idx = _backendLabels.indexOf(value);
-                        if (idx < 0)
-                            return;
-                        SettingsData.set("calendarBackend", _backendValues[idx]);
-                    }
+                    ];
+                    const match = presets.find(p => p.format === SettingsData.lockDateFormat);
+                    return match ? match.label : I18n.tr("Custom") + ": " + SettingsData.lockDateFormat;
                 }
-
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["calendar", "tasks", "list", "default", "caldav", "todo"]
-                    settingKey: "defaultTaskCalendarId"
-                    visible: CalendarService.isDankActive && _taskLists.length > 0
-                    text: I18n.tr("Default Task List")
-                    description: I18n.tr("Task list used when adding tasks from the dash calendar")
-                    readonly property var _taskLists: (CalendarService.calendars || []).filter(c => c.holdsTasks && !c.readOnly && !c.hidden)
-                    readonly property var _labels: [I18n.tr("Auto")].concat(_taskLists.map(c => c.name))
-                    options: _labels
-                    currentValue: {
-                        const idx = _taskLists.findIndex(c => c.id === SettingsData.defaultTaskCalendarId);
-                        return idx >= 0 ? _labels[idx + 1] : I18n.tr("Auto");
-                    }
-                    onValueChanged: value => {
-                        const idx = _labels.indexOf(value);
-                        SettingsData.set("defaultTaskCalendarId", idx > 0 ? _taskLists[idx - 1].id : "");
-                    }
+                onValueChanged: value => {
+                    const formatMap = {};
+                    formatMap[I18n.tr("System default", "date format option")] = "";
+                    formatMap[I18n.tr("Day date", "date format option")] = "ddd d";
+                    formatMap[I18n.tr("Day month date", "date format option")] = "ddd MMM d";
+                    formatMap[I18n.tr("Month date", "date format option")] = "MMM d";
+                    formatMap[I18n.tr("Numeric (M/D)", "date format option")] = "M/d";
+                    formatMap[I18n.tr("Numeric (D/M)", "date format option")] = "d/M";
+                    formatMap[I18n.tr("Full with year", "date format option")] = "ddd d MMM yyyy";
+                    formatMap[I18n.tr("ISO date", "date format option")] = "yyyy-MM-dd";
+                    formatMap[I18n.tr("Full day & month", "date format option")] = "dddd, MMMM d";
+                    root.editingLockFormat = value === I18n.tr("Custom", "date format option") + "…";
+                    if (root.editingLockFormat)
+                        return;
+                    SettingsData.set("lockDateFormat", formatMap[value]);
                 }
+            }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
+            DankTextField {
+                id: customLockFormatInput
+                outlined: true
+                leftIconName: "calendar_today"
+                labelText: I18n.tr("Format")
+                width: parent.width - Theme.spacingM * 2
+                x: Theme.spacingM
+                visible: root.editingLockFormat || root.isCustomFormat(SettingsData.lockDateFormat)
+                placeholderText: I18n.tr("Enter custom lock screen format (e.g., dddd, MMMM d)")
+                text: SettingsData.lockDateFormat
+                onTextChanged: {
+                    if (visible && text)
+                        SettingsData.set("lockDateFormat", text);
                 }
+            }
 
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["date", "format", "topbar"]
-                    settingKey: "clockDateFormat"
-                    text: I18n.tr("Top Bar Format")
-                    description: I18n.tr("Preview: %1").arg(SettingsData.clockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(I18n.locale(), "ddd d"))
-                    options: [I18n.tr("System Default", "date format option"), I18n.tr("Day Date", "date format option"), I18n.tr("Day Month Date", "date format option"), I18n.tr("Month Date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with Year", "date format option"), I18n.tr("ISO Date", "date format option"), I18n.tr("Full Day & Month", "date format option"), I18n.tr("Custom...", "date format option")]
-                    currentValue: {
-                        if (!SettingsData.clockDateFormat || SettingsData.clockDateFormat.length === 0)
-                            return I18n.tr("System Default", "date format option");
-                        const presets = [
-                            {
-                                "format": "ddd d",
-                                "label": I18n.tr("Day Date", "date format option")
-                            },
-                            {
-                                "format": "ddd MMM d",
-                                "label": I18n.tr("Day Month Date", "date format option")
-                            },
-                            {
-                                "format": "MMM d",
-                                "label": I18n.tr("Month Date", "date format option")
-                            },
-                            {
-                                "format": "M/d",
-                                "label": I18n.tr("Numeric (M/D)", "date format option")
-                            },
-                            {
-                                "format": "d/M",
-                                "label": I18n.tr("Numeric (D/M)", "date format option")
-                            },
-                            {
-                                "format": "ddd d MMM yyyy",
-                                "label": I18n.tr("Full with Year", "date format option")
-                            },
-                            {
-                                "format": "yyyy-MM-dd",
-                                "label": I18n.tr("ISO Date", "date format option")
-                            },
-                            {
-                                "format": "dddd, MMMM d",
-                                "label": I18n.tr("Full Day & Month", "date format option")
-                            }
-                        ];
-                        const match = presets.find(p => p.format === SettingsData.clockDateFormat);
-                        return match ? match.label : I18n.tr("Custom") + ": " + SettingsData.clockDateFormat;
-                    }
-                    onValueChanged: value => {
-                        const formatMap = {};
-                        formatMap[I18n.tr("System Default", "date format option")] = "";
-                        formatMap[I18n.tr("Day Date", "date format option")] = "ddd d";
-                        formatMap[I18n.tr("Day Month Date", "date format option")] = "ddd MMM d";
-                        formatMap[I18n.tr("Month Date", "date format option")] = "MMM d";
-                        formatMap[I18n.tr("Numeric (M/D)", "date format option")] = "M/d";
-                        formatMap[I18n.tr("Numeric (D/M)", "date format option")] = "d/M";
-                        formatMap[I18n.tr("Full with Year", "date format option")] = "ddd d MMM yyyy";
-                        formatMap[I18n.tr("ISO Date", "date format option")] = "yyyy-MM-dd";
-                        formatMap[I18n.tr("Full Day & Month", "date format option")] = "dddd, MMMM d";
-                        if (value === I18n.tr("Custom...", "date format option")) {
-                            customFormatInput.visible = true;
-                        } else {
-                            customFormatInput.visible = false;
-                            SettingsData.set("clockDateFormat", formatMap[value]);
-                        }
-                    }
-                }
-
-                DankTextField {
-                    id: customFormatInput
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
-                    visible: false
-                    placeholderText: I18n.tr("Enter custom top bar format (e.g., ddd MMM d)")
-                    text: SettingsData.clockDateFormat
-                    onTextChanged: {
-                        if (visible && text)
-                            SettingsData.set("clockDateFormat", text);
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
-
-                SettingsDropdownRow {
-                    tab: "time"
-                    tags: ["date", "format", "lock", "screen"]
-                    settingKey: "lockDateFormat"
-                    text: I18n.tr("Lock Screen Format")
-                    description: I18n.tr("Preview: %1").arg(SettingsData.lockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(I18n.locale(), Locale.LongFormat))
-                    options: [I18n.tr("System Default", "date format option"), I18n.tr("Day Date", "date format option"), I18n.tr("Day Month Date", "date format option"), I18n.tr("Month Date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with Year", "date format option"), I18n.tr("ISO Date", "date format option"), I18n.tr("Full Day & Month", "date format option"), I18n.tr("Custom...", "date format option")]
-                    currentValue: {
-                        if (!SettingsData.lockDateFormat || SettingsData.lockDateFormat.length === 0)
-                            return I18n.tr("System Default", "date format option");
-                        const presets = [
-                            {
-                                "format": "ddd d",
-                                "label": I18n.tr("Day Date", "date format option")
-                            },
-                            {
-                                "format": "ddd MMM d",
-                                "label": I18n.tr("Day Month Date", "date format option")
-                            },
-                            {
-                                "format": "MMM d",
-                                "label": I18n.tr("Month Date", "date format option")
-                            },
-                            {
-                                "format": "M/d",
-                                "label": I18n.tr("Numeric (M/D)", "date format option")
-                            },
-                            {
-                                "format": "d/M",
-                                "label": I18n.tr("Numeric (D/M)", "date format option")
-                            },
-                            {
-                                "format": "ddd d MMM yyyy",
-                                "label": I18n.tr("Full with Year", "date format option")
-                            },
-                            {
-                                "format": "yyyy-MM-dd",
-                                "label": I18n.tr("ISO Date", "date format option")
-                            },
-                            {
-                                "format": "dddd, MMMM d",
-                                "label": I18n.tr("Full Day & Month", "date format option")
-                            }
-                        ];
-                        const match = presets.find(p => p.format === SettingsData.lockDateFormat);
-                        return match ? match.label : I18n.tr("Custom") + ": " + SettingsData.lockDateFormat;
-                    }
-                    onValueChanged: value => {
-                        const formatMap = {};
-                        formatMap[I18n.tr("System Default", "date format option")] = "";
-                        formatMap[I18n.tr("Day Date", "date format option")] = "ddd d";
-                        formatMap[I18n.tr("Day Month Date", "date format option")] = "ddd MMM d";
-                        formatMap[I18n.tr("Month Date", "date format option")] = "MMM d";
-                        formatMap[I18n.tr("Numeric (M/D)", "date format option")] = "M/d";
-                        formatMap[I18n.tr("Numeric (D/M)", "date format option")] = "d/M";
-                        formatMap[I18n.tr("Full with Year", "date format option")] = "ddd d MMM yyyy";
-                        formatMap[I18n.tr("ISO Date", "date format option")] = "yyyy-MM-dd";
-                        formatMap[I18n.tr("Full Day & Month", "date format option")] = "dddd, MMMM d";
-                        if (value === I18n.tr("Custom...", "date format option")) {
-                            customLockFormatInput.visible = true;
-                        } else {
-                            customLockFormatInput.visible = false;
-                            SettingsData.set("lockDateFormat", formatMap[value]);
-                        }
-                    }
-                }
-
-                DankTextField {
-                    id: customLockFormatInput
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
-                    visible: false
-                    placeholderText: I18n.tr("Enter custom lock screen format (e.g., dddd, MMMM d)")
-                    text: SettingsData.lockDateFormat
-                    onTextChanged: {
-                        if (visible && text)
-                            SettingsData.set("lockDateFormat", text);
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: 0.15
-                }
-
-                Rectangle {
+            SettingsRow {
+                visible: customFormatInput.visible || customLockFormatInput.visible
+                body: Rectangle {
                     width: parent.width - Theme.spacingM * 2
                     x: Theme.spacingM
                     height: formatHelp.implicitHeight + Theme.spacingM * 2
@@ -383,10 +310,10 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Format Legend")
+                            text: I18n.tr("Format legend")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.primary
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                         }
 
                         Row {
@@ -458,595 +385,60 @@ Item {
                     }
                 }
             }
+        }
 
-            SettingsCard {
+        SettingsCard {
+            tab: "time"
+            title: I18n.tr("Calendar")
+            settingKey: "calendarSettings"
+            iconName: "event"
+            tags: ["calendar", "backend", "tasks", "events"]
+
+            SettingsDropdownRow {
                 tab: "time"
-                tags: ["weather", "enable", "forecast"]
-                title: I18n.tr("Weather")
-                settingKey: "weather"
-                iconName: "cloud"
-
-                SettingsToggleRow {
-                    tab: "time"
-                    tags: ["weather", "enable"]
-                    settingKey: "weatherEnabled"
-                    text: I18n.tr("Enable Weather")
-                    description: I18n.tr("Show weather information in top bar and control center")
-                    checked: SettingsData.weatherEnabled
-                    onToggled: checked => SettingsData.set("weatherEnabled", checked)
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: 0
-                    visible: SettingsData.weatherEnabled
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.15
-                    }
-
-                    SettingsToggleRow {
-                        tab: "time"
-                        tags: ["weather", "imperial", "fahrenheit", "units"]
-                        settingKey: "useFahrenheit"
-                        text: I18n.tr("Use Imperial Units")
-                        description: I18n.tr("Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)")
-                        checked: SettingsData.useFahrenheit
-                        onToggled: checked => SettingsData.set("useFahrenheit", checked)
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.15
-                        visible: !SettingsData.useFahrenheit
-                    }
-
-                    SettingsToggleRow {
-                        tab: "time"
-                        tags: ["weather", "wind", "speed", "units", "metric"]
-                        settingKey: "windSpeedUnit"
-                        text: I18n.tr("Wind Speed in m/s")
-                        description: I18n.tr("Use meters per second instead of km/h for wind speed")
-                        checked: SettingsData.windSpeedUnit === "ms"
-                        onToggled: checked => SettingsData.set("windSpeedUnit", checked ? "ms" : "kmh")
-                        visible: !SettingsData.useFahrenheit
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.15
-                    }
-
-                    SettingsToggleRow {
-                        tab: "time"
-                        tags: ["weather", "location", "auto", "gps"]
-                        settingKey: "useAutoLocation"
-                        text: I18n.tr("Auto Location")
-                        description: I18n.tr("Automatically determine your location using your IP address")
-                        checked: SettingsData.useAutoLocation
-                        onToggled: checked => SettingsData.set("useAutoLocation", checked)
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: !SettingsData.useAutoLocation
-
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: Theme.outline
-                            opacity: 0.15
-                        }
-
-                        Item {
-                            width: parent.width
-                            height: locationContent.height
-
-                            Column {
-                                id: locationContent
-                                width: parent.width - Theme.spacingM * 2
-                                x: Theme.spacingM
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    text: I18n.tr("Custom Location")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Medium
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingM
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingM) / 2
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            text: I18n.tr("Latitude")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            id: latitudeInput
-                                            width: parent.width
-                                            height: 48
-                                            placeholderText: "40.7128"
-                                            backgroundColor: Theme.surfaceVariant
-                                            normalBorderColor: Theme.primarySelected
-                                            focusedBorderColor: Theme.primary
-                                            keyNavigationTab: longitudeInput
-
-                                            Component.onCompleted: {
-                                                root._internalChange = true;
-                                                if (SettingsData.weatherCoordinates) {
-                                                    const coords = SettingsData.weatherCoordinates.split(',');
-                                                    if (coords.length > 0)
-                                                        text = coords[0].trim();
-                                                }
-                                                root._internalChange = false;
-                                            }
-
-                                            Connections {
-                                                target: SettingsData
-                                                function onWeatherCoordinatesChanged() {
-                                                    if (SettingsData.weatherCoordinates) {
-                                                        const coords = SettingsData.weatherCoordinates.split(',');
-                                                        if (coords.length > 0)
-                                                            latitudeInput.text = coords[0].trim();
-                                                    }
-                                                }
-                                            }
-
-                                            onTextEdited: {
-                                                if (root._internalChange)
-                                                    return;
-                                                if (text && longitudeInput.text) {
-                                                    const coords = text + "," + longitudeInput.text;
-                                                    SessionData.weatherCoordinates = coords;
-                                                    SessionData.weatherLocation = "";
-                                                    SessionData.saveSettings();
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingM) / 2
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            text: I18n.tr("Longitude")
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankTextField {
-                                            id: longitudeInput
-                                            width: parent.width
-                                            height: 48
-                                            placeholderText: "-74.0060"
-                                            backgroundColor: Theme.surfaceVariant
-                                            normalBorderColor: Theme.primarySelected
-                                            focusedBorderColor: Theme.primary
-                                            keyNavigationTab: locationSearchInput
-                                            keyNavigationBacktab: latitudeInput
-
-                                            Component.onCompleted: {
-                                                root._internalChange = true;
-                                                if (SettingsData.weatherCoordinates) {
-                                                    const coords = SettingsData.weatherCoordinates.split(',');
-                                                    if (coords.length > 1)
-                                                        text = coords[1].trim();
-                                                }
-                                                root._internalChange = false;
-                                            }
-
-                                            Connections {
-                                                target: SettingsData
-                                                function onWeatherCoordinatesChanged() {
-                                                    if (SettingsData.weatherCoordinates) {
-                                                        const coords = SettingsData.weatherCoordinates.split(',');
-                                                        if (coords.length > 1)
-                                                            longitudeInput.text = coords[1].trim();
-                                                    }
-                                                }
-                                            }
-
-                                            onTextEdited: {
-                                                if (root._internalChange)
-                                                    return;
-                                                if (text && latitudeInput.text) {
-                                                    const coords = latitudeInput.text + "," + text;
-                                                    SessionData.weatherCoordinates = coords;
-                                                    SessionData.weatherLocation = "";
-                                                    SessionData.saveSettings();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Column {
-                                    width: parent.width
-                                    spacing: Theme.spacingXS
-
-                                    StyledText {
-                                        text: I18n.tr("Location Search")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        font.weight: Font.Medium
-                                    }
-
-                                    DankLocationSearch {
-                                        id: locationSearchInput
-                                        width: parent.width
-                                        currentLocation: SettingsData.weatherLocation
-                                        placeholderText: I18n.tr("New York, NY")
-                                        keyNavigationBacktab: longitudeInput
-                                        onLocationSelected: (displayName, coordinates) => {
-                                            root._internalChange = true;
-                                            SettingsData.setWeatherLocation(displayName, coordinates);
-                                            const coords = coordinates.split(',');
-                                            if (coords.length >= 2) {
-                                                latitudeInput.text = coords[0].trim();
-                                                longitudeInput.text = coords[1].trim();
-                                            }
-                                            root._internalChange = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                tags: ["calendar", "backend", "daemon", "khal", "dankcalendar", "events"]
+                settingKey: "calendarBackend"
+                text: I18n.tr("Calendar backend")
+                readonly property var _backendValues: ["auto", "khal", "dankcal"]
+                readonly property var _backendLabels: [I18n.tr("Auto", "calendar backend option"), I18n.tr("khal", "calendar backend option"), I18n.tr("DankCalendar", "calendar backend option")]
+                options: _backendLabels
+                currentValue: _backendLabels[Math.max(0, _backendValues.indexOf(SettingsData.calendarBackend))]
+                onValueChanged: value => {
+                    const idx = _backendLabels.indexOf(value);
+                    if (idx < 0)
+                        return;
+                    SettingsData.set("calendarBackend", _backendValues[idx]);
                 }
             }
 
-            SettingsCard {
+            SettingsDropdownRow {
                 tab: "time"
-                tags: ["weather", "current", "display"]
-                title: I18n.tr("Current Weather")
+                tags: ["calendar", "tasks", "list", "default", "caldav", "todo"]
+                settingKey: "defaultTaskCalendarId"
+                visible: CalendarService.isDankActive && _taskLists.length > 0
+                text: I18n.tr("Default task list")
+                readonly property var _taskLists: (CalendarService.calendars || []).filter(c => c.holdsTasks && !c.readOnly && !c.hidden)
+                readonly property var _labels: [I18n.tr("Auto")].concat(_taskLists.map(c => c.name))
+                options: _labels
+                currentValue: {
+                    const idx = _taskLists.findIndex(c => c.id === SettingsData.defaultTaskCalendarId);
+                    return idx >= 0 ? _labels[idx + 1] : I18n.tr("Auto");
+                }
+                onValueChanged: value => {
+                    const idx = _labels.indexOf(value);
+                    SettingsData.set("defaultTaskCalendarId", idx > 0 ? _taskLists[idx - 1].id : "");
+                }
+            }
+        }
+
+        SettingsCard {
+            SettingsNavRow {
+                tab: "time"
                 settingKey: "weather"
-                iconName: "visibility"
-                visible: SettingsData.weatherEnabled
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingL
-                    visible: !WeatherService.weather.available
-
-                    DankIcon {
-                        name: "cloud_off"
-                        size: Theme.iconSize * 2
-                        color: Theme.surfaceTextSecondary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("No Weather Data Available")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceTextMedium
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    visible: WeatherService.weather.available
-
-                    Item {
-                        width: parent.width
-                        height: 70
-
-                        DankRefreshButton {
-                            id: refreshButton
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            iconSize: Theme.iconSize - 4
-                            iconColor: Theme.onSurface_38
-                            busy: refreshTimer.running
-                            onClicked: {
-                                WeatherService.forceRefresh();
-                                refreshTimer.restart();
-                            }
-
-                            Timer {
-                                id: refreshTimer
-                                interval: 2000
-                            }
-                        }
-
-                        Item {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: weatherIcon.width + tempColumn.width + sunriseColumn.width + Theme.spacingM * 2
-                            height: 70
-
-                            DankIcon {
-                                id: weatherIcon
-                                name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                                size: Theme.iconSize * 1.5
-                                color: Theme.primary
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                layer.enabled: Theme.elevationEnabled
-                                layer.effect: MultiEffect {
-                                    shadowEnabled: Theme.elevationEnabled
-                                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
-                                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
-                                    shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
-                                    blurMax: Theme.elevationBlurMax
-                                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
-                                    shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
-                                }
-                            }
-
-                            Column {
-                                id: tempColumn
-                                spacing: Theme.spacingXS
-                                anchors.left: weatherIcon.right
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Item {
-                                    width: tempText.width + unitText.width + Theme.spacingXS
-                                    height: tempText.height
-
-                                    StyledText {
-                                        id: tempText
-                                        text: (SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp) + "°"
-                                        font.pixelSize: Theme.fontSizeLarge + 4
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Light
-                                        anchors.left: parent.left
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        id: unitText
-                                        text: SettingsData.useFahrenheit ? "F" : "C"
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        color: Theme.surfaceTextMedium
-                                        anchors.left: tempText.right
-                                        anchors.leftMargin: Theme.spacingXS
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                if (WeatherService.weather.available)
-                                                    SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit);
-                                            }
-                                            enabled: WeatherService.weather.available
-                                        }
-                                    }
-                                }
-
-                                StyledText {
-                                    property var feelsLike: SettingsData.useFahrenheit ? (WeatherService.weather.feelsLikeF || WeatherService.weather.tempF) : (WeatherService.weather.feelsLike || WeatherService.weather.temp)
-                                    text: I18n.tr("Feels Like %1°").arg(feelsLike)
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceTextSecondary
-                                }
-
-                                StyledText {
-                                    text: WeatherService.weather.city || ""
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceTextMedium
-                                    visible: text.length > 0
-                                }
-                            }
-
-                            Column {
-                                id: sunriseColumn
-                                spacing: Theme.spacingXS
-                                anchors.left: tempColumn.right
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: WeatherService.weather.sunrise && WeatherService.weather.sunset
-
-                                Item {
-                                    width: sunriseIcon.width + sunriseText.width + Theme.spacingXS
-                                    height: sunriseIcon.height
-
-                                    DankIcon {
-                                        id: sunriseIcon
-                                        name: "wb_twilight"
-                                        size: Theme.iconSize - 6
-                                        color: Theme.surfaceTextSecondary
-                                        anchors.left: parent.left
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        id: sunriseText
-                                        text: WeatherService.weather.sunrise || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextSecondary
-                                        anchors.left: sunriseIcon.right
-                                        anchors.leftMargin: Theme.spacingXS
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-
-                                Item {
-                                    width: sunsetIcon.width + sunsetText.width + Theme.spacingXS
-                                    height: sunsetIcon.height
-
-                                    DankIcon {
-                                        id: sunsetIcon
-                                        name: "bedtime"
-                                        size: Theme.iconSize - 6
-                                        color: Theme.surfaceTextSecondary
-                                        anchors.left: parent.left
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    StyledText {
-                                        id: sunsetText
-                                        text: WeatherService.weather.sunset || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceTextSecondary
-                                        anchors.left: sunsetIcon.right
-                                        anchors.leftMargin: Theme.spacingXS
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outlineStrong
-                    }
-
-                    GridLayout {
-                        id: metricsGrid
-
-                        readonly property var metrics: [
-                            {
-                                "key": "feelsLike",
-                                "icon": "device_thermostat",
-                                "label": I18n.tr("Feels Like")
-                            },
-                            {
-                                "key": "humidity",
-                                "icon": "humidity_low",
-                                "label": I18n.tr("Humidity")
-                            },
-                            {
-                                "key": "wind",
-                                "icon": "air",
-                                "label": I18n.tr("Wind")
-                            },
-                            {
-                                "key": "pressure",
-                                "icon": "speed",
-                                "label": I18n.tr("Pressure")
-                            },
-                            {
-                                "key": "rain",
-                                "icon": "rainy",
-                                "label": I18n.tr("Rain Chance")
-                            },
-                            {
-                                "key": "visibility",
-                                "icon": "wb_sunny",
-                                "label": I18n.tr("Visibility")
-                            }
-                        ]
-
-                        function valueFor(key) {
-                            const weather = WeatherService.weather;
-                            switch (key) {
-                            case "feelsLike":
-                                return (SettingsData.useFahrenheit ? (weather.feelsLikeF || weather.tempF) : (weather.feelsLike || weather.temp)) + "°";
-                            case "humidity":
-                                return weather.humidity ? weather.humidity + "%" : "--";
-                            case "wind":
-                                SettingsData.windSpeedUnit;
-                                SettingsData.useFahrenheit;
-                                return WeatherService.formatSpeed(weather.wind) || "--";
-                            case "pressure":
-                                if (!weather.pressure)
-                                    return "--";
-                                return SettingsData.useFahrenheit ? (weather.pressure * 0.02953).toFixed(2) + " inHg" : weather.pressure + " hPa";
-                            case "rain":
-                                return weather.precipitationProbability ? weather.precipitationProbability + "%" : "0%";
-                            default:
-                                return I18n.tr("Good");
-                            }
-                        }
-
-                        width: parent.width
-                        height: implicitHeight
-                        columns: 3
-                        columnSpacing: Theme.spacingS
-                        rowSpacing: Theme.spacingS
-
-                        Repeater {
-                            model: metricsGrid.metrics
-
-                            Rectangle {
-                                id: tile
-
-                                required property var modelData
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                implicitHeight: Math.max(95, tileContent.implicitHeight + Theme.spacingS * 2)
-                                radius: Theme.cornerRadius
-                                color: Theme.floatingWindowNestedSurface
-                                border.color: Theme.outlineMedium
-                                border.width: Theme.layerOutlineWidth
-
-                                Column {
-                                    id: tileContent
-                                    anchors.centerIn: parent
-                                    width: parent.width - Theme.spacingXXS * 2
-                                    spacing: Theme.spacingXS
-
-                                    Rectangle {
-                                        width: 32
-                                        height: 32
-                                        radius: 16
-                                        color: Theme.primaryHover
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: tile.modelData.icon
-                                            size: Theme.iconSize - 4
-                                            color: Theme.primary
-                                        }
-                                    }
-
-                                    Column {
-                                        width: parent.width
-                                        spacing: Theme.spacingXXS
-                                        StyledText {
-                                            text: tile.modelData.label
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceTextMedium
-                                            width: parent.width
-                                            horizontalAlignment: Text.AlignHCenter
-                                        }
-                                        StyledText {
-                                            text: metricsGrid.valueFor(tile.modelData.key)
-                                            font.pixelSize: Theme.fontSizeSmall + 1
-                                            color: Theme.surfaceText
-                                            font.weight: Font.Medium
-                                            anchors.horizontalCenter: parent.horizontalCenter
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                enabled: tile.modelData.key === "wind" && !SettingsData.useFahrenheit
-                                                hoverEnabled: enabled
-                                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                                onClicked: SettingsData.set("windSpeedUnit", SettingsData.windSpeedUnit === "kmh" ? "ms" : "kmh")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                tags: ["weather", "location", "units"]
+                title: I18n.tr("Weather")
+                iconName: "partly_cloudy_day"
+                onClicked: root.parentModal?.navigateTo("weather")
             }
         }
     }

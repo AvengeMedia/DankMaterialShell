@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import qs.Common
 
 Item {
@@ -6,12 +7,14 @@ Item {
 
     property string confirmTitle: ""
     property string confirmMessage: ""
+    property string reviewUrl: ""
+    property Item returnFocusItem: null
     property string confirmButtonText: I18n.tr("Confirm")
     property string cancelButtonText: I18n.tr("Cancel")
     property color confirmButtonColor: Theme.primary
     property var onConfirm: function () {}
     property var onCancel: function () {}
-    property real backgroundOpacity: 0.5
+    property real backgroundOpacity: Theme.scrimAlpha
 
     signal dialogClosed
 
@@ -25,20 +28,32 @@ Item {
     }
 
     function showWithOptions(options) {
+        returnFocusItem = root.Window.window?.activeFocusItem ?? null;
         confirmTitle = options.title || "";
         confirmMessage = options.message || "";
+        reviewUrl = options.reviewUrl || "";
         confirmButtonText = options.confirmText || I18n.tr("Confirm");
         cancelButtonText = options.cancelText || I18n.tr("Cancel");
         confirmButtonColor = options.confirmColor || Theme.primary;
         onConfirm = options.onConfirm || (() => {});
         onCancel = options.onCancel || (() => {});
-        dialogContent.reset();
         visible = true;
-        overlayFocusScope.forceActiveFocus();
+        dialogContent.reset();
+        Qt.callLater(focusDialog);
+    }
+
+    function focusDialog() {
+        if (!visible)
+            return;
+        dialogContent.focusSelection();
     }
 
     function close() {
         visible = false;
+        const focusItem = returnFocusItem;
+        returnFocusItem = null;
+        if (focusItem?.visible && focusItem.enabled)
+            focusItem.forceActiveFocus(Qt.OtherFocusReason);
         dialogClosed();
     }
 
@@ -57,6 +72,16 @@ Item {
     visible: false
     z: 100
 
+    Connections {
+        target: root.Window.window
+        enabled: root.visible
+
+        function onActiveFocusItemChanged() {
+            if (!overlayFocusScope.activeFocus)
+                Qt.callLater(root.focusDialog);
+        }
+    }
+
     FocusScope {
         id: overlayFocusScope
 
@@ -67,7 +92,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: "black"
+            color: Theme.scrimColor
             opacity: root.backgroundOpacity
         }
 
@@ -78,14 +103,13 @@ Item {
         }
 
         Rectangle {
-            width: 350
-            height: dialogContent.implicitHeight + Theme.spacingL
+            width: Math.min(Theme.smallBreakpoint, parent.width - Theme.spacingL * 2)
+            height: dialogContent.implicitHeight + Theme.spacingL * 2
             anchors.centerIn: parent
-            radius: Theme.cornerRadius
-            // No compositor blur behind an in-window card; popupTransparency would show raw content through
-            color: Theme.surfaceContainer
-            border.color: Theme.outlineMedium
-            border.width: 1
+            radius: Theme.windowRadius
+            color: Theme.surfaceContainerHigh
+            border.color: Theme.outlineVariant
+            border.width: Theme.outlineWidth
 
             MouseArea {
                 anchors.fill: parent
@@ -103,6 +127,7 @@ Item {
                 anchors.topMargin: Theme.spacingL
                 confirmTitle: root.confirmTitle
                 confirmMessage: root.confirmMessage
+                reviewUrl: root.reviewUrl
                 confirmButtonText: root.confirmButtonText
                 cancelButtonText: root.cancelButtonText
                 confirmButtonColor: root.confirmButtonColor

@@ -11,6 +11,7 @@ QtObject {
 
     required property IslandController controller
     required property var targetScreen
+    property bool enabled: true
 
     property var currentWrapper: null
     property string appName: ""
@@ -71,7 +72,7 @@ QtObject {
     }
 
     function adopt(wrapper) {
-        if (!wrapper || !NotificationService.isFocusedScreen(root.targetScreen))
+        if (!enabled || !wrapper || !NotificationService.isFocusedScreen(root.targetScreen))
             return false;
 
         const isCritical = wrapper.urgency === NotificationUrgency.Critical;
@@ -113,6 +114,18 @@ QtObject {
         if (latest && (latest === currentWrapper || adopt(latest)))
             return;
         if (!currentWrapper || visible.indexOf(currentWrapper) !== -1)
+            return;
+        currentWrapper = null;
+        controller.completeNotification();
+        scheduleDisplayFieldClear();
+    }
+
+    onEnabledChanged: {
+        if (enabled) {
+            syncVisibleNotifications();
+            return;
+        }
+        if (!currentWrapper)
             return;
         currentWrapper = null;
         controller.completeNotification();

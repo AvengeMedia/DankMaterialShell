@@ -3,15 +3,12 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+DankListItem {
     id: root
 
     required property var entry
-    required property int entryIndex
     required property int itemIndex
-    required property bool isSelected
     required property var modal
-    required property var listView
 
     signal copyRequested
     signal pasteRequested
@@ -19,7 +16,7 @@ Rectangle {
     signal pinRequested(var targetEntry)
     signal unpinRequested(var targetEntry)
     signal editRequested
-    signal contextMenuRequested(real mouseX, real mouseY)
+    signal previewRequested
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
@@ -32,49 +29,21 @@ Rectangle {
     readonly property bool showPinAction: visibleEntryActions.includes("pin")
     readonly property bool showEditAction: visibleEntryActions.includes("edit")
     readonly property bool showDeleteAction: visibleEntryActions.includes("delete")
-    readonly property bool showPinnedIndicator: hasPinnedDuplicate && !showPinAction
-    readonly property bool showAnyAction: showCopyAction || showPasteAction || showPinAction || showEditAction || showDeleteAction || showPinnedIndicator
+    readonly property bool showPreviewAction: ClipboardService.canPreviewEntry(entry)
+    readonly property bool showPinnedIndicator: effectivePinned && !showPinAction
+    readonly property bool showAnyAction: showCopyAction || showPasteAction || showPinAction || showEditAction || showDeleteAction || showPinnedIndicator || showPreviewAction
 
-    radius: Theme.cornerRadius
-    color: {
-        if (isSelected) {
-            return Theme.primaryPressed;
+    keyForwardTargets: [modal.modalFocusScope]
+    firstInGroup: itemIndex === 0
+    lastInGroup: itemIndex === listView.count - 1
+    Accessible.name: entryPreview
+    Accessible.description: entryType === "image" ? I18n.tr("Image") : I18n.tr("Text")
+    onClicked: {
+        if (SettingsData.clipboardClickToPaste) {
+            pasteRequested();
+            return;
         }
-        return mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
-    }
-
-    DankRipple {
-        id: rippleLayer
-        rippleColor: Theme.surfaceText
-        cornerRadius: root.radius
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: mouse => {
-            const scenePos = mapToItem(null, mouse.x, mouse.y);
-            contextMenuRequested(scenePos.x, scenePos.y);
-        }
-    }
-
-    Rectangle {
-        id: indexBadge
-        anchors.left: parent.left
-        anchors.leftMargin: Theme.spacingM
-        anchors.verticalCenter: parent.verticalCenter
-        width: 24
-        height: 24
-        radius: 12
-        color: Theme.primarySelected
-
-        StyledText {
-            anchors.centerIn: parent
-            text: entryIndex.toString()
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Bold
-            color: Theme.primary
-        }
+        copyRequested();
     }
 
     Row {
@@ -85,41 +54,56 @@ Rectangle {
         spacing: Theme.spacingXS
         visible: root.showAnyAction
 
+        DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
+            iconName: "preview"
+            tooltipText: I18n.tr("Preview", "verb, clipboard entry action button tooltip", true)
+            iconSize: Theme.iconSizeSmall
+            iconColor: root.contentColor
+            visible: root.showPreviewAction
+            onClicked: root.previewRequested()
+        }
+
         Item {
-            width: 40
-            height: 40
+            width: Theme.iconButtonSize
+            height: Theme.iconButtonSize
             visible: root.showPinnedIndicator
 
-            // Status indicator only; the Pin action remains hidden.
             DankIcon {
                 anchors.centerIn: parent
                 name: "push_pin"
-                size: Theme.iconSize - 6
-                color: Theme.primary
+                size: Theme.iconSizeSmall
+                color: root.colorForRole(Theme.primary)
             }
         }
 
         DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
             iconName: "content_copy"
-            iconSize: Theme.iconSize - 6
-            iconColor: Theme.surfaceText
+            Accessible.name: I18n.tr("Copy")
+            iconSize: Theme.iconSizeSmall
+            iconColor: root.contentColor
             visible: root.showCopyAction
             onClicked: copyRequested()
         }
 
         DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
             iconName: "content_paste"
-            iconSize: Theme.iconSize - 6
-            iconColor: Theme.surfaceText
+            Accessible.name: I18n.tr("Paste")
+            iconSize: Theme.iconSizeSmall
+            iconColor: root.contentColor
             visible: root.showPasteAction
             onClicked: pasteRequested()
         }
 
         DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
             iconName: "push_pin"
-            iconSize: Theme.iconSize - 6
-            iconColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primary : Theme.surfaceText
-            backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : Theme.withAlpha(Theme.primarySelected, 0)
+            Accessible.name: root.effectivePinned ? I18n.tr("Unpin") : I18n.tr("Pin", "verb, keep an item pinned in place")
+            iconSize: Theme.iconSizeSmall
+            iconFilled: root.effectivePinned
+            iconColor: root.effectivePinned ? root.colorForRole(Theme.primary) : root.contentColor
             visible: root.showPinAction
             onClicked: {
                 if (entry.pinned) {
@@ -135,10 +119,13 @@ Rectangle {
         }
 
         DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
             iconName: "edit"
-            iconSize: Theme.iconSize - 6
-            iconColor: Theme.surfaceText
+            Accessible.name: I18n.tr("Edit")
+            iconSize: Theme.iconSizeSmall
+            iconColor: root.contentColor
             visible: root.showEditAction
+            enabled: root.entryType !== "image"
 
             onClicked: {
                 if (entryType === "image") {
@@ -149,30 +136,32 @@ Rectangle {
         }
 
         DankActionButton {
+            Keys.forwardTo: [root.modal.modalFocusScope]
             iconName: "close"
-            iconSize: Theme.iconSize - 6
-            iconColor: Theme.surfaceText
+            Accessible.name: I18n.tr("Delete")
+            iconSize: Theme.iconSizeSmall
+            iconColor: root.contentColor
             visible: root.showDeleteAction
             onClicked: deleteRequested()
         }
     }
 
     Item {
-        anchors.left: indexBadge.right
+        anchors.left: parent.left
         anchors.leftMargin: Theme.spacingM
         anchors.right: root.showAnyAction ? actionButtons.left : parent.right
         anchors.rightMargin: root.showAnyAction ? Theme.spacingM : Theme.spacingS
         anchors.verticalCenter: parent.verticalCenter
-        // height: contentColumn.implicitHeight
         height: ClipboardConstants.itemHeight
         clip: true
 
         ClipboardThumbnail {
             id: thumbnail
+            iconColor: root.colorForRole(Theme.primary)
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             width: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
-            height: entryType === "image" ? ClipboardConstants.itemHeight - 4 : Theme.iconSize // 100 - 4 = 96, 96:72 = 4:3
+            height: entryType === "image" ? ClipboardConstants.itemHeight - Theme.spacingXS : Theme.iconSize
             entry: root.entry
             entryType: root.entryType
             modal: root.modal
@@ -200,8 +189,8 @@ Rectangle {
                     }
                 }
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.primary
-                font.weight: Font.Medium
+                color: root.colorForRole(Theme.primary)
+                font.weight: Theme.fontWeightMedium
                 width: parent.width
                 elide: Text.ElideRight
             }
@@ -209,37 +198,12 @@ Rectangle {
             StyledText {
                 text: entryPreview
                 font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
+                color: root.contentColor
                 width: parent.width
                 wrapMode: Text.WordWrap
                 maximumLineCount: entryType === "long_text" ? 3 : 1
                 elide: Text.ElideRight
                 textFormat: Text.PlainText
-            }
-        }
-    }
-
-    MouseArea {
-        id: mouseArea
-        anchors.left: parent.left
-        anchors.right: root.showAnyAction ? actionButtons.left : parent.right
-        anchors.rightMargin: root.showAnyAction ? Theme.spacingS : 0
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
-        onPressed: mouse => {
-            if (mouse.button === Qt.LeftButton) {
-                const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
-                rippleLayer.trigger(pos.x, pos.y);
-            }
-        }
-        onClicked: {
-            if (SettingsData.clipboardClickToPaste) {
-                pasteRequested();
-            } else {
-                copyRequested();
             }
         }
     }

@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 
+import qs.Modules.SurfaceWidgets
 import QtQuick
 import qs.Common
 import qs.Modules.DankDash
@@ -16,7 +17,6 @@ Item {
     required property var notificationModel
     required property var launcherController
     property var launcherTransientSurfaceTracker: null
-    property var notificationTransientSurfaceTracker: null
     property var effectiveScreen: null
     property bool reducedMotion: false
     property real springStiffness: 560
@@ -27,6 +27,7 @@ Item {
     property string palette: "default"
     property bool highContrast: false
     property real transparency: 1
+    property string requestedWindow: ""
 
     readonly property color surfaceColor: {
         if (root.highContrast)
@@ -58,7 +59,17 @@ Item {
 
     readonly property alias inputMaskItem: inputEnvelope
     readonly property alias fittsStripItem: fittsStrip
+    readonly property alias surfaceMotion: motion
     readonly property bool motionRunning: motion.running
+    onMotionRunningChanged: {
+        if (!motionRunning && requestedWindow)
+            openWindow.restart();
+        if (motionRunning) {
+            motionStartBounds = Qt.rect(currentVisualX, currentVisualY, currentVisualWidth, currentVisualHeight);
+            return;
+        }
+        controller.releaseIdleVisuals();
+    }
     readonly property real springTimeConstantMs: motion.timeConstantMs
     property real trackedCrossExtent: 0
     property real fadeCompactCross: 48
@@ -82,6 +93,8 @@ Item {
     readonly property real targetScreenX: targetVisualX + root.hostOriginX
     readonly property real targetScreenY: targetVisualY + root.hostOriginY
     readonly property real targetVisualWidth: motion.targetWidth
+    readonly property real currentScreenX: currentVisualX + root.hostOriginX
+    readonly property real currentScreenY: currentVisualY + root.hostOriginY
     readonly property real targetVisualHeight: motion.targetHeight
     readonly property real currentVisualAlong: isVertical ? motion.currentHeight : motion.currentWidth
     readonly property real targetVisualAlong: isVertical ? motion.targetHeight : motion.targetWidth
@@ -90,6 +103,43 @@ Item {
         if (Math.abs(span) < 1)
             return controller.expanded ? 1 : 0;
         return Math.max(0, Math.min(1, (currentVisualCross - fadeCompactCross) / span));
+    }
+
+    readonly property QtObject resizeGeometry: QtObject {
+        readonly property real renderedX: root.currentScreenX
+        readonly property real renderedY: root.currentScreenY
+
+        function screenXFor(width) {
+            if (!root.isVertical)
+                return Math.round((root.alongExtent - width) / 2 + motion.targetOffsetAlong) + root.hostOriginX;
+            const cross = Math.round(motion.targetOffsetCross);
+            return (root.farEdge ? root.crossExtent - cross - width : cross) + root.hostOriginX;
+        }
+    }
+
+    function openAfterCollapse(windowName) {
+        requestedWindow = windowName;
+        controller.requestCollapse();
+        openWindow.restart();
+    }
+
+    DeferredAction {
+        id: openWindow
+
+        onTriggered: {
+            if (root.motionRunning || root.controller.expanded)
+                return;
+            const requested = root.requestedWindow;
+            root.requestedWindow = "";
+            switch (requested) {
+            case "settings":
+                PopoutService.focusOrToggleSettings();
+                break;
+            case "colorPicker":
+                PopoutService.showColorPicker();
+                break;
+            }
+        }
     }
 
     function descriptorCross(target) {
@@ -149,17 +199,12 @@ Item {
         function onTargetDescriptorChanged() {
             root.applyTarget();
         }
-    }
 
-    Connections {
-        target: motion
-
-        function onRunningChanged() {
-            if (motion.running) {
-                root.motionStartBounds = Qt.rect(root.currentVisualX, root.currentVisualY, root.currentVisualWidth, root.currentVisualHeight);
+        function onExpandedChanged() {
+            if (!root.controller.expanded)
                 return;
-            }
-            root.controller.releaseIdleVisuals();
+            openWindow.cancel();
+            root.requestedWindow = "";
         }
     }
 
@@ -196,17 +241,14 @@ Item {
         height: (motion.running ? Math.max(root.motionStartBounds.y + root.motionStartBounds.height, root.targetVisualY + motion.targetHeight) : root.targetVisualY + motion.targetHeight) + overshootBudget - y
     }
 
-    Rectangle {
+    MorphSurface {
         id: island
+        motion: root.surfaceMotion
 
         x: root.currentVisualX
         y: root.currentVisualY
         width: root.currentVisualWidth
         height: root.currentVisualHeight
-        topLeftRadius: Math.max(0, motion.currentTopLeftRadius)
-        topRightRadius: Math.max(0, motion.currentTopRightRadius)
-        bottomLeftRadius: Math.max(0, motion.currentBottomLeftRadius)
-        bottomRightRadius: Math.max(0, motion.currentBottomRightRadius)
         color: root.effectiveSurfaceColor
         border.width: root.notificationAccentColor !== "transparent" ? 1.5 : (root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0))
         border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : (root.highContrast ? Theme.outlineStrong : (root.popupStyled ? BlurService.borderColor : "transparent"))
@@ -333,6 +375,7 @@ Item {
 
         HomeExpanded {
             controller: root.controller
+            resizeGeometry: root.resizeGeometry
         }
     }
 
@@ -350,6 +393,7 @@ Item {
 
         MediaExpanded {
             controller: root.controller
+            resizeGeometry: root.resizeGeometry
         }
     }
 
@@ -407,11 +451,13 @@ Item {
 
         ControlCenterExpanded {
             controller: root.controller
+            onWindowRequested: windowName => root.openAfterCollapse(windowName)
             effectiveScreen: root.effectiveScreen
             alignedX: root.targetScreenX
             alignedY: root.targetScreenY
             alignedWidth: root.targetVisualWidth
             alignedHeight: root.targetVisualHeight
+            resizeGeometry: root.resizeGeometry
         }
     }
 
@@ -431,6 +477,7 @@ Item {
 
         WallpaperExpanded {
             controller: root.controller
+            resizeGeometry: root.resizeGeometry
             effectiveScreen: root.effectiveScreen
         }
     }
@@ -451,6 +498,7 @@ Item {
 
         WeatherExpanded {
             controller: root.controller
+            resizeGeometry: root.resizeGeometry
         }
     }
 
@@ -503,8 +551,7 @@ Item {
 
         NotificationCenterExpanded {
             controller: root.controller
-            effectiveScreen: root.effectiveScreen
-            transientSurfaceTracker: root.notificationTransientSurfaceTracker
+            resizeGeometry: root.resizeGeometry
         }
     }
 

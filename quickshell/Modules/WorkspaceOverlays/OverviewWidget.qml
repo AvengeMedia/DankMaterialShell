@@ -304,7 +304,7 @@ Item {
                         anchors.centerIn: parent
                         text: workspace.workspaceValue
                         font.pixelSize: Theme.fontSizeXLarge * 6
-                        font.weight: Font.DemiBold
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.withAlpha(Theme.surfaceText, workspace.workspaceExists ? 0.2 : 0.1)
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -497,7 +497,7 @@ Item {
                             anchors.centerIn: parent
                             text: labelItem.workspaceMonitorName
                             font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter

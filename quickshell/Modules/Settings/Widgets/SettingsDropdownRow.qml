@@ -1,55 +1,51 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import qs.Common
-import qs.Services
 import qs.Widgets
-import "../../../Common/QmlUtils.js" as QmlUtils
 
-DankDropdown {
+SettingsRow {
     id: root
 
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
+    property string text: ""
+    property string description: ""
+    property string currentValue: ""
+    property alias options: dropdown.options
+    property alias optionIcons: dropdown.optionIcons
+    property alias optionIconMap: dropdown.optionIconMap
+    property alias optionColorMap: dropdown.optionColorMap
+    property alias enableFuzzySearch: dropdown.enableFuzzySearch
+    property alias popupWidthOffset: dropdown.popupWidthOffset
+    property alias maxPopupHeight: dropdown.maxPopupHeight
+    property alias openUpwards: dropdown.openUpwards
+    property alias popupWidth: dropdown.popupWidth
+    property alias alignPopupRight: dropdown.alignPopupRight
+    property alias dropdownWidth: dropdown.dropdownWidth
+    property alias emptyText: dropdown.emptyText
+    property alias menuBlurEnabled: dropdown.menuBlurEnabled
+    property alias transientSurfaceTracker: dropdown.transientSurfaceTracker
+    property alias menuOpen: dropdown.menuOpen
+    property bool addHorizontalPadding: true
 
-    property string tab: ""
-    property var tags: []
-    property string settingKey: ""
+    signal valueChanged(string value)
 
-    readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
-
-    width: parent?.width ?? 0
-    addHorizontalPadding: true
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.primary, root.isHighlighted ? 0.2 : 0)
-        visible: root.isHighlighted
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
+    function openDropdownMenu() {
+        dropdown.openDropdownMenu();
     }
 
-    Component.onCompleted: {
-        if (!settingKey)
-            return;
-        var key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            var flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable);
-        });
+    function closeDropdownMenu() {
+        dropdown.closeDropdownMenu();
     }
 
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey);
+    title: text
+    subtitle: description
+    onCurrentValueChanged: dropdown.currentValue = currentValue
+
+    DankDropdown {
+        id: dropdown
+        enabled: root.enabled
+        Accessible.name: root.text
+        Accessible.description: root.description + (root.description ? " · " : "") + currentValue
+        width: Math.min(dropdownWidth, root.width - SettingsMetrics.rowPaddingH * 2)
+        Component.onCompleted: currentValue = root.currentValue
+        onValueChanged: value => root.valueChanged(value)
     }
 }

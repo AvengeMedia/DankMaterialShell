@@ -15,10 +15,14 @@ PanelWindow {
     property alias contentLoader: contentLoader
     property var modelData
     property bool shouldBeVisible: false
+    property bool _surfaceFrameReady: false
+    readonly property bool presented: shouldBeVisible && _surfaceFrameReady
     property int autoHideInterval: 2000
     property bool enableMouseInteraction: false
-    property real osdWidth: Theme.iconSize + Theme.spacingS * 2
-    property real osdHeight: Theme.iconSize + Theme.spacingS * 2
+    property real osdWidth: Theme.osdHeight
+    property real osdHeight: Theme.osdHeight
+    property color surfaceColor: Theme.surfaceContainerHigh
+    property real surfaceRadius: Theme.fullRadius(alignedWidth, alignedHeight)
     property int animationDuration: Theme.mediumDuration
     property var animationEasing: Theme.emphasizedEasing
 
@@ -69,27 +73,39 @@ PanelWindow {
 
     screen: modelData
     visible: false
+    onVisibleChanged: {
+        if (!visible)
+            _surfaceFrameReady = false;
+    }
 
     Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            if (!root.visible && !root.shouldBeVisible)
-                return;
-            const currentScreenName = root.screen?.name;
-            if (!currentScreenName) {
-                root.hide();
-                return;
-            }
-            for (let i = 0; i < Quickshell.screens.length; i++) {
-                if (Quickshell.screens[i].name === currentScreenName)
-                    return;
-            }
-            root.shouldBeVisible = false;
-            root.visible = false;
-            hideTimer.stop();
-            closeTimer.stop();
-            osdHidden();
+        target: osdContainer.Window.window
+        enabled: root.visible && !root._surfaceFrameReady
+
+        function onFrameSwapped() {
+            root._surfaceFrameReady = true;
         }
+    }
+
+    readonly property var quickshellScreens: Quickshell.screens
+
+    onQuickshellScreensChanged: {
+        if (!visible && !shouldBeVisible)
+            return;
+        const currentScreenName = screen?.name;
+        if (!currentScreenName) {
+            hide();
+            return;
+        }
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name === currentScreenName)
+                return;
+        }
+        shouldBeVisible = false;
+        visible = false;
+        hideTimer.stop();
+        closeTimer.stop();
+        osdHidden();
     }
 
     WlrLayershell.layer: LayerShell.fromEnv("DMS_OSD_LAYER", WlrLayer.Overlay, {
@@ -104,9 +120,9 @@ PanelWindow {
         targetWindow: root
         blurX: shadowBuffer
         blurY: shadowBuffer
-        blurWidth: shouldBeVisible ? alignedWidth : 0
-        blurHeight: shouldBeVisible ? alignedHeight : 0
-        blurRadius: Theme.cornerRadius
+        blurWidth: presented ? alignedWidth : 0
+        blurHeight: presented ? alignedHeight : 0
+        blurRadius: root.surfaceRadius
     }
 
     color: "transparent"
@@ -114,7 +130,7 @@ PanelWindow {
     readonly property real dpr: CompositorService.getScreenScale(screen)
     readonly property real screenWidth: screen.width
     readonly property real screenHeight: screen.height
-    readonly property real shadowBuffer: 15
+    readonly property real shadowBuffer: Theme.elevationRenderPadding(Theme.elevationLevel2, Theme.elevationLightDirection, Theme.spacingXS, Theme.spacingS, Theme.spacingL)
     readonly property real alignedWidth: Theme.px(osdWidth, dpr)
     readonly property real alignedHeight: Theme.px(osdHeight, dpr)
 
@@ -159,7 +175,6 @@ PanelWindow {
                 break;
             }
         }
-        // Legacy OSDs still instantiate on island screens, so the strip has to be reserved for them.
         offsets.top = Math.max(offsets.top, SettingsData.dankIslandEdgeOffset(screen, "top"));
         offsets.bottom = Math.max(offsets.bottom, SettingsData.dankIslandEdgeOffset(screen, "bottom"));
         offsets.left = Math.max(offsets.left, SettingsData.dankIslandEdgeOffset(screen, "left"));
@@ -167,16 +182,8 @@ PanelWindow {
         return offsets;
     }
 
-    readonly property real dockThickness: {
-        if (!SettingsData.showDock)
-            return 0;
-        return SettingsData.dockIconSize + SettingsData.dockSpacing * 2 + 10;
-    }
-
-    readonly property real dockOffset: {
-        if (!SettingsData.showDock || SettingsData.dockAutoHide || SettingsData.dockSmartAutoHide)
-            return 0;
-        return dockThickness + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin;
+    function dockOffsetForEdge(side) {
+        return SettingsData.dockReservationForEdge(screen, side);
     }
 
     readonly property real alignedX: {
@@ -187,12 +194,12 @@ PanelWindow {
         case SettingsData.Position.Left:
         case SettingsData.Position.Bottom:
         case SettingsData.Position.LeftCenter:
-            const leftDockOffset = SettingsData.dockPosition === SettingsData.Position.Left ? dockOffset : 0;
+            const leftDockOffset = root.dockOffsetForEdge("left");
             return Theme.snap(margin + Math.max(barEdgeOffsets.left, leftDockOffset), dpr);
         case SettingsData.Position.Top:
         case SettingsData.Position.Right:
         case SettingsData.Position.RightCenter:
-            const rightDockOffset = SettingsData.dockPosition === SettingsData.Position.Right ? dockOffset : 0;
+            const rightDockOffset = root.dockOffsetForEdge("right");
             return Theme.snap(screenWidth - alignedWidth - margin - Math.max(barEdgeOffsets.right, rightDockOffset), dpr);
         case SettingsData.Position.TopCenter:
         case SettingsData.Position.BottomCenter:
@@ -209,12 +216,12 @@ PanelWindow {
         case SettingsData.Position.Top:
         case SettingsData.Position.Left:
         case SettingsData.Position.TopCenter:
-            const topDockOffset = SettingsData.dockPosition === SettingsData.Position.Top ? dockOffset : 0;
+            const topDockOffset = root.dockOffsetForEdge("top");
             return Theme.snap(margin + Math.max(barEdgeOffsets.top, topDockOffset), dpr);
         case SettingsData.Position.Right:
         case SettingsData.Position.Bottom:
         case SettingsData.Position.BottomCenter:
-            const bottomDockOffset = SettingsData.dockPosition === SettingsData.Position.Bottom ? dockOffset : 0;
+            const bottomDockOffset = root.dockOffsetForEdge("bottom");
             return Theme.snap(screenHeight - alignedHeight - margin - Math.max(barEdgeOffsets.bottom, bottomDockOffset), dpr);
         case SettingsData.Position.LeftCenter:
         case SettingsData.Position.RightCenter:
@@ -245,12 +252,12 @@ PanelWindow {
         velocityEpsilon: 0.001
         stiffness: root.scaleSpringParams.stiffness
         damping: root.scaleSpringParams.damping
-        value: root.shouldBeVisible ? 1 : 0.9
+        value: root.presented ? 1 : Theme.popupEnterScale
 
-        Component.onCompleted: snapTo(root.shouldBeVisible ? 1 : 0.9)
+        Component.onCompleted: snapTo(root.presented ? 1 : Theme.popupEnterScale)
     }
 
-    onShouldBeVisibleChanged: osdScaleSpring.retarget(root.shouldBeVisible ? 1 : 0.9)
+    onPresentedChanged: osdScaleSpring.retarget(root.presented ? 1 : Theme.popupEnterScale)
 
     Timer {
         id: hideTimer
@@ -283,32 +290,22 @@ PanelWindow {
         y: shadowBuffer
         width: alignedWidth
         height: alignedHeight
-        opacity: shouldBeVisible ? 1 : 0
+        opacity: presented ? 1 : 0
         scale: osdScaleSpring.value
 
         property bool childHovered: false
         readonly property real popupSurfaceAlpha: Theme.popupTransparency
 
-        Rectangle {
-            id: background
-            anchors.fill: parent
-            radius: Theme.cornerRadius
-            color: "transparent"
-            border.color: BlurService.borderColor
-            border.width: BlurService.borderWidth
-            z: -1
-        }
-
         ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
-            z: -1
-            level: Theme.elevationLevel3
-            fallbackOffset: 6
-            targetRadius: Theme.cornerRadius
-            targetColor: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
-            borderColor: Theme.outlineMedium
-            borderWidth: 1
+            z: -2
+            level: Theme.elevationLevel2
+            fallbackOffset: Theme.spacingXS
+            targetRadius: root.surfaceRadius
+            targetColor: Theme.withAlpha(root.surfaceColor, osdContainer.popupSurfaceAlpha)
+            borderColor: Theme.outlineVariant
+            borderWidth: 0
             shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
         }
 

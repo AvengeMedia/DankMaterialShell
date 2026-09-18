@@ -1,5 +1,7 @@
 package windowrules
 
+import "github.com/AvengeMedia/DankMaterialShell/core/internal/configfrag"
+
 type MatchCriteria struct {
 	AppID              string `json:"appId,omitempty"`
 	Title              string `json:"title,omitempty"`
@@ -114,4 +116,19 @@ type WritableProvider interface {
 	RemoveRule(id string) error
 	ReorderRules(ids []string) error
 	GetOverridePath() string
+}
+
+func DMSRulesStatusFrom(s configfrag.Status) *DMSRulesStatus {
+	return &DMSRulesStatus{
+		Exists:          s.Exists,
+		Included:        s.Included,
+		IncludePosition: s.IncludePosition,
+		TotalIncludes:   s.TotalIncludes,
+		RulesAfterDMS:   s.EntriesAfterDMS,
+		Effective:       s.Effective,
+		OverriddenBy:    s.OverriddenBy,
+		StatusMessage:   s.StatusMessage,
+		ConfigFormat:    s.ConfigFormat,
+		ReadOnly:        s.ReadOnly,
+	}
 }

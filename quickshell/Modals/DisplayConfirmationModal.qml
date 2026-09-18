@@ -81,21 +81,21 @@ DankModal {
                     text: I18n.tr("Confirm Display Changes")
                     font.pixelSize: Theme.fontSizeLarge
                     color: Theme.surfaceText
-                    font.weight: Font.Medium
+                    font.weight: Theme.fontWeightMedium
                 }
 
                 Rectangle {
                     width: parent.width
                     height: 70
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
 
                     StyledText {
                         anchors.centerIn: parent
                         text: root.countdown + "s"
                         font.pixelSize: Theme.fontSizeXLarge * 1.5
                         color: Theme.primary
-                        font.weight: Font.Bold
+                        font.weight: Theme.fontWeightMedium
                     }
                 }
 
@@ -137,10 +137,10 @@ DankModal {
                                 id: revertText
 
                                 anchors.centerIn: parent
-                                text: I18n.tr("Revert")
+                                text: I18n.tr("Revert", "verb, undo display changes in confirmation dialog")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                             }
 
                             MouseArea {
@@ -169,7 +169,7 @@ DankModal {
                                 text: I18n.tr("Keep Changes")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.background
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                             }
 
                             MouseArea {
@@ -201,6 +201,7 @@ DankModal {
                 anchors.topMargin: Theme.spacingM
                 anchors.rightMargin: Theme.spacingM
                 iconName: "close"
+                Accessible.name: I18n.tr("Close")
                 iconSize: Theme.iconSize - 4
                 iconColor: Theme.surfaceText
                 onClicked: {

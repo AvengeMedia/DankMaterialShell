@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import "../Common/GSettings.js" as GSettings // ! This import is actually used even though qmlls claims it isnt, do not delete
 
 Singleton {
     id: root

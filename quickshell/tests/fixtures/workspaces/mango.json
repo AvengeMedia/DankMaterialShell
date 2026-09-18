@@ -1,0 +1,50 @@
+{
+    "available": {
+        "available": true,
+        "tagCount": 5,
+        "outputs": {
+            "DP-1": {
+                "tags": [
+                    { "tag": 0, "state": 0, "clients": 0, "focused": false },
+                    { "tag": 1, "state": 0, "clients": 2, "focused": false },
+                    { "tag": 2, "state": 1, "clients": 1, "focused": true },
+                    { "tag": 3, "state": 2, "clients": 1, "focused": false },
+                    { "tag": 4, "state": 0, "clients": 0, "focused": false }
+                ],
+                "activeTags": [2],
+                "visibleTags": [1, 2, 3],
+                "inOverview": false
+            },
+            "HDMI-A-1": {
+                "tags": [
+                    { "tag": 0, "state": 1, "clients": 0, "focused": true },
+                    { "tag": 1, "state": 1, "clients": 0, "focused": false },
+                    { "tag": 2, "state": 0, "clients": 4, "focused": false }
+                ],
+                "activeTags": [0, 1],
+                "visibleTags": [0, 1, 2],
+                "inOverview": false
+            },
+            "DP-2": {
+                "tags": [
+                    { "tag": 0, "state": 0, "clients": 1, "focused": false },
+                    { "tag": 1, "state": 0, "clients": 0, "focused": false }
+                ],
+                "activeTags": [],
+                "visibleTags": [],
+                "inOverview": true
+            }
+        },
+        "windows": [
+            { "appId": "alacritty", "mangoTags": [3] },
+            { "appId": "firefox", "mangoTags": [2, 3] },
+            { "appId": "untagged" }
+        ]
+    },
+    "unavailable": {
+        "available": false,
+        "tagCount": 9,
+        "outputs": {},
+        "windows": []
+    }
+}

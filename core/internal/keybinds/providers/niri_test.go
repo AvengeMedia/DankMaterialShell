@@ -6,13 +6,6 @@ import (
 	"testing"
 )
 
-func TestNiriProviderName(t *testing.T) {
-	provider := NewNiriProvider("")
-	if provider.Name() != "niri" {
-		t.Errorf("Name() = %q, want %q", provider.Name(), "niri")
-	}
-}
-
 func TestNiriProviderGetCheatSheet(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.kdl")

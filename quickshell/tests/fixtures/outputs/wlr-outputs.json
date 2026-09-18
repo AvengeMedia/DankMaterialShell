@@ -1,0 +1,64 @@
+{
+  "outputs": [
+    {
+      "id": 1,
+      "name": "DP-1",
+      "enabled": true,
+      "make": "Dell Inc.",
+      "model": "DELL U2720Q",
+      "serialNumber": "ABC123",
+      "x": 0,
+      "y": 0,
+      "scale": 1.5,
+      "transform": 0,
+      "adaptiveSyncSupported": true,
+      "adaptiveSync": 1,
+      "currentMode": { "id": 1, "width": 3840, "height": 2160, "refresh": 59997 },
+      "modes": [
+        { "id": 0, "width": 3840, "height": 2160, "refresh": 60000, "preferred": true },
+        { "id": 1, "width": 3840, "height": 2160, "refresh": 59997 },
+        { "id": 2, "width": 1920, "height": 1080, "refresh": 60000 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eDP-1",
+      "enabled": true,
+      "make": "BOE",
+      "model": "0x0A1B",
+      "serialNumber": "",
+      "x": 2560,
+      "y": 0,
+      "scale": 1.3,
+      "transform": 5,
+      "adaptiveSyncSupported": false,
+      "adaptiveSync": 0,
+      "currentMode": { "id": 7, "width": 1920, "height": 1200, "refresh": 60001 },
+      "modes": [
+        { "id": 7, "width": 1920, "height": 1200, "refresh": 60001, "preferred": true },
+        { "id": 8, "width": 1920, "height": 1200, "refresh": 48000 }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "HDMI-A-1",
+      "enabled": false,
+      "make": "LG Electronics",
+      "model": "LG ULTRAGEAR",
+      "serialNumber": "0x0001",
+      "x": 0,
+      "y": 0,
+      "scale": 0,
+      "transform": 0,
+      "adaptiveSyncSupported": true,
+      "adaptiveSync": 0,
+      "currentMode": null,
+      "modes": [
+        { "id": 20, "width": 2560, "height": 1440, "refresh": 144000, "preferred": true }
+      ]
+    }
+  ],
+  "liveMonitors": {
+    "eDP-1": { "x": 2600, "y": 10, "scale": 1.6, "transformIndex": 1 }
+  }
+}

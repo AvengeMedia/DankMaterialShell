@@ -22,17 +22,15 @@ Item {
     readonly property var allInstances: SettingsData.desktopWidgetInstances || []
     readonly property var allGroups: SettingsData.desktopWidgetGroups || []
 
-    property bool dragActive: false
-    property string dragInstanceId: ""
-    property string dragSourceKey: ""
-    property int dragSourceIndex: -1
-    property var dragWidgetData: null
-    property bool dragTargetValid: false
-    property string dragTargetKey: ""
-    property int dragTargetIndex: -1
-    property bool proxyVisible: false
-    property real proxyX: 0
-    property real proxyY: 0
+    readonly property bool dragActive: dragGroup.active
+    property alias reorderGroup: dragGroup
+
+    SettingsReorderGroup {
+        id: dragGroup
+
+        coordinateItem: root
+        onTransferred: (source, sourceIndex, target, targetIndex) => SettingsData.moveDesktopWidgetInstanceToGroup(source.model[sourceIndex].id, target.groupKey || null, targetIndex)
+    }
 
     function storageKeyFor(sectionKey) {
         return sectionKey === "" ? "_ungrouped" : sectionKey;
@@ -51,71 +49,6 @@ Item {
         var states = Object.assign({}, expandedStates);
         states[instanceId] = expanded;
         expandedStates = states;
-    }
-
-    function hitTestSection(sec, gy) {
-        const top = sec.mapToItem(root, 0, 0).y;
-        if (gy < top || gy > top + sec.height)
-            return false;
-        root.dragTargetValid = true;
-        root.dragTargetKey = sec.sectionKey;
-        root.dragTargetIndex = sec.insertionIndexForGlobalY(gy);
-        return true;
-    }
-
-    function updateDropTarget(gc) {
-        for (var i = 0; i < groupsRepeater.count; i++) {
-            const sec = groupsRepeater.itemAt(i);
-            if (sec && sec.visible && hitTestSection(sec, gc.y))
-                return;
-        }
-        if (ungroupedSection.visible && hitTestSection(ungroupedSection, gc.y))
-            return;
-        root.dragTargetValid = false;
-        root.dragTargetKey = "";
-        root.dragTargetIndex = -1;
-    }
-
-    function handleDragStarted(instanceId, groupId, index, widgetData, gc) {
-        root.dragActive = true;
-        root.dragInstanceId = instanceId;
-        root.dragSourceKey = groupId ? groupId : "";
-        root.dragSourceIndex = index;
-        root.dragWidgetData = widgetData;
-        root.dragTargetValid = false;
-        root.dragTargetKey = root.dragSourceKey;
-        root.dragTargetIndex = index;
-        root.proxyX = gc.x;
-        root.proxyY = gc.y;
-        root.proxyVisible = true;
-    }
-
-    function handleDragMoved(gc) {
-        if (!root.dragActive)
-            return;
-        root.proxyX = gc.x;
-        root.proxyY = gc.y;
-        updateDropTarget(gc);
-    }
-
-    function handleDragEnded() {
-        if (!root.dragActive)
-            return;
-        if (root.dragTargetValid) {
-            var idx = root.dragTargetIndex;
-            if (root.dragTargetKey === root.dragSourceKey && idx > root.dragSourceIndex)
-                idx -= 1;
-            SettingsData.moveDesktopWidgetInstanceToGroup(root.dragInstanceId, root.dragTargetKey === "" ? null : root.dragTargetKey, idx);
-        }
-        root.dragActive = false;
-        root.dragInstanceId = "";
-        root.dragSourceKey = "";
-        root.dragSourceIndex = -1;
-        root.dragWidgetData = null;
-        root.dragTargetValid = false;
-        root.dragTargetKey = "";
-        root.dragTargetIndex = -1;
-        root.proxyVisible = false;
     }
 
     function showWidgetBrowser() {
@@ -152,80 +85,53 @@ Item {
         }
     }
 
-    DankFlickable {
-        anchors.fill: parent
-        clip: true
-        contentHeight: mainColumn.height + Theme.spacingXL
-        contentWidth: width
+    SettingsPage {
+        id: mainColumn
 
-        Column {
-            id: mainColumn
-            topPadding: 4
-            width: Math.min(550, parent.width - Theme.spacingL * 2)
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.spacingXL
+        SettingsCard {
+            settingKey: "desktopWidgetsManage"
+            tags: ["desktop", "widgets", "clock", "conky"]
+            width: parent.width
 
-            SettingsCard {
-                settingKey: "desktopWidgetsManage"
-                tags: ["desktop", "widgets", "clock", "conky"]
-                width: parent.width
-                iconName: "widgets"
-                title: I18n.tr("Desktop Widgets")
-
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width - Theme.spacingM * 2
                     x: Theme.spacingM
                     spacing: Theme.spacingM
-
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("Add and configure widgets that appear on your desktop")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        horizontalAlignment: Text.AlignLeft
-                    }
 
                     Row {
                         spacing: Theme.spacingM
 
                         DankButton {
-                            text: I18n.tr("Add Widget")
+                            text: I18n.tr("Add widget")
                             iconName: "add"
                             onClicked: root.showWidgetBrowser()
                         }
 
                         DankButton {
-                            text: I18n.tr("Browse Plugins")
+                            text: I18n.tr("Browse plugins")
                             iconName: "store"
                             onClicked: root.showDesktopPluginBrowser()
                         }
                     }
                 }
             }
+        }
 
-            SettingsCard {
-                settingKey: "desktopWidgetGroups"
-                tags: ["groups", "profiles", "layouts"]
-                width: parent.width
-                iconName: "folder"
-                title: I18n.tr("Groups")
-                collapsible: true
-                expanded: root.allGroups.length > 0
+        SettingsCard {
+            settingKey: "desktopWidgetGroups"
+            tags: ["groups", "profiles", "layouts"]
+            width: parent.width
+            iconName: "folder"
+            title: I18n.tr("Groups", "noun, card title for desktop widget groups")
+            collapsible: true
+            expanded: root.allGroups.length > 0
 
-                Column {
+            SettingsRow {
+                body: Column {
                     width: parent.width - Theme.spacingM * 2
                     x: Theme.spacingM
                     spacing: Theme.spacingM
-
-                    StyledText {
-                        width: parent.width
-                        text: I18n.tr("Organize widgets into collapsible groups")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        horizontalAlignment: Text.AlignLeft
-                    }
 
                     Row {
                         spacing: Theme.spacingS
@@ -233,8 +139,10 @@ Item {
 
                         DankTextField {
                             id: newGroupField
+                            outlined: true
+                            leftIconName: "folder"
+                            labelText: I18n.tr("Name")
                             width: parent.width - addGroupBtn.width - Theme.spacingS
-                            placeholderText: I18n.tr("New group name...")
                             text: root.newGroupName
                             onTextChanged: root.newGroupName = text
                             onAccepted: {
@@ -273,7 +181,7 @@ Item {
                                 required property int index
 
                                 width: parent.width
-                                height: 40
+                                height: Math.max(Theme.iconButtonSize, groupNameLoader.height + Theme.spacingS)
                                 radius: Theme.cornerRadius
                                 color: groupMouseArea.containsMouse ? Theme.surfaceHover : Theme.floatingWindowFieldColor
 
@@ -285,18 +193,23 @@ Item {
 
                                     DankIcon {
                                         name: "folder"
+                                        visible: !groupNameLoader.active
                                         size: Theme.iconSizeSmall
                                         color: Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
                                     Loader {
+                                        id: groupNameLoader
                                         active: root.editingGroupId === groupItem.modelData.id
-                                        width: active ? parent.width - Theme.iconSizeSmall - deleteGroupBtn.width - Theme.spacingS * 3 : 0
-                                        height: active ? 32 : 0
+                                        width: active ? parent.width - deleteGroupBtn.width - Theme.spacingS : 0
+                                        height: active && item ? item.implicitHeight : 0
                                         anchors.verticalCenter: parent.verticalCenter
 
                                         sourceComponent: DankTextField {
+                                            outlined: true
+                                            leftIconName: "folder"
+                                            labelText: I18n.tr("Name")
                                             text: groupItem.modelData.name
                                             onAccepted: {
                                                 if (!text.trim())
@@ -331,6 +244,7 @@ Item {
                                     DankActionButton {
                                         id: deleteGroupBtn
                                         iconName: "delete"
+                                        Accessible.name: I18n.tr("Delete")
                                         backgroundColor: Theme.withAlpha(Theme.error, 0.15)
                                         iconColor: Theme.error
                                         anchors.verticalCenter: parent.verticalCenter
@@ -353,58 +267,26 @@ Item {
                     }
                 }
             }
+        }
 
-            Repeater {
-                id: groupsRepeater
-                model: root.allGroups
-
-                DesktopWidgetGroupSection {
-                    required property var modelData
-                    required property int index
-
-                    width: mainColumn.width
-                    coordinator: root
-                    groupId: modelData.id
-                    groupName: modelData.name
-                    isUngrouped: false
-                    showHeader: true
-                    collapsed: root.groupCollapsedStates[modelData.id] ?? false
-                    instances: root.allInstances.filter(inst => inst.group === modelData.id)
-                    expandedStates: root.expandedStates
-                    visible: instances.length > 0 || root.dragActive
-
-                    onCollapseToggled: key => root.toggleCollapsed(key)
-                    onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
-                    onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
-                    onDeleteRequested: instanceId => {
-                        SettingsData.removeDesktopWidgetInstance(instanceId);
-                        ToastService.showInfo(I18n.tr("Widget removed"));
-                    }
-                    onDragStarted: (instanceId, groupId, index, widgetData, globalCenter) => root.handleDragStarted(instanceId, groupId, index, widgetData, globalCenter)
-                    onDragMoved: globalCenter => root.handleDragMoved(globalCenter)
-                    onDragEnded: root.handleDragEnded()
-                }
-            }
+        Repeater {
+            id: groupsRepeater
+            model: root.allGroups
 
             DesktopWidgetGroupSection {
-                id: ungroupedSection
+                required property var modelData
+                required property int index
 
-                readonly property var ungroupedInstances: root.allInstances.filter(inst => {
-                    if (!inst.group)
-                        return true;
-                    return !root.allGroups.some(g => g.id === inst.group);
-                })
-
-                width: mainColumn.width
-                coordinator: root
-                groupId: null
-                groupName: I18n.tr("Ungrouped")
-                isUngrouped: true
-                showHeader: root.allGroups.length > 0
-                collapsed: root.groupCollapsedStates["_ungrouped"] ?? false
-                instances: ungroupedInstances
+                width: mainColumn.columnWidth
+                reorderGroup: dragGroup
+                groupId: modelData.id
+                groupName: modelData.name
+                isUngrouped: false
+                showHeader: true
+                collapsed: root.groupCollapsedStates[modelData.id] ?? false
+                instances: root.allInstances.filter(inst => inst.group === modelData.id)
                 expandedStates: root.expandedStates
-                visible: ungroupedInstances.length > 0 || root.dragActive
+                visible: instances.length > 0 || root.dragActive
 
                 onCollapseToggled: key => root.toggleCollapsed(key)
                 onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
@@ -413,27 +295,55 @@ Item {
                     SettingsData.removeDesktopWidgetInstance(instanceId);
                     ToastService.showInfo(I18n.tr("Widget removed"));
                 }
-                onDragStarted: (instanceId, groupId, index, widgetData, globalCenter) => root.handleDragStarted(instanceId, groupId, index, widgetData, globalCenter)
-                onDragMoved: globalCenter => root.handleDragMoved(globalCenter)
-                onDragEnded: root.handleDragEnded()
             }
+        }
 
-            StyledText {
-                visible: root.allInstances.length === 0
-                text: I18n.tr("No widgets added. Click \"Add Widget\" to get started.")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceVariantText
-                width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignLeft
+        DesktopWidgetGroupSection {
+            id: ungroupedSection
+
+            readonly property var ungroupedInstances: root.allInstances.filter(inst => {
+                if (!inst.group)
+                    return true;
+                return !root.allGroups.some(g => g.id === inst.group);
+            })
+
+            width: mainColumn.columnWidth
+            reorderGroup: dragGroup
+            groupId: null
+            groupName: I18n.tr("Ungrouped", "section header for desktop widgets without a group")
+            isUngrouped: true
+            showHeader: root.allGroups.length > 0
+            collapsed: root.groupCollapsedStates["_ungrouped"] ?? false
+            instances: ungroupedInstances
+            expandedStates: root.expandedStates
+            visible: ungroupedInstances.length > 0 || root.dragActive
+
+            onCollapseToggled: key => root.toggleCollapsed(key)
+            onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
+            onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
+            onDeleteRequested: instanceId => {
+                SettingsData.removeDesktopWidgetInstance(instanceId);
+                ToastService.showInfo(I18n.tr("Widget removed"));
             }
+        }
 
-            SettingsCard {
-                width: parent.width
-                iconName: "info"
-                title: I18n.tr("Help")
+        StyledText {
+            visible: root.allInstances.length === 0
+            text: I18n.tr("No widgets added. Click \"Add widget\" to get started.")
+            font.pixelSize: Theme.fontSizeMedium
+            color: Theme.surfaceVariantText
+            width: parent.width
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignLeft
+        }
 
-                Column {
+        SettingsCard {
+            width: parent.width
+            iconName: "info"
+            title: I18n.tr("Help", "noun, card title for desktop widget usage tips")
+
+            SettingsRow {
+                body: Column {
                     width: parent.width - Theme.spacingM * 2
                     x: Theme.spacingM
                     spacing: Theme.spacingM
@@ -445,7 +355,7 @@ Item {
                         Rectangle {
                             width: 40
                             height: 40
-                            radius: 20
+                            radius: Theme.fullRadius(width, height)
                             color: Theme.primarySelected
 
                             DankIcon {
@@ -462,9 +372,9 @@ Item {
                             width: parent.width - 40 - Theme.spacingM
 
                             StyledText {
-                                text: I18n.tr("Move Widget")
+                                text: I18n.tr("Move", "verb, help item title for moving a desktop widget")
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                                 width: parent.width
                                 horizontalAlignment: Text.AlignLeft
@@ -487,7 +397,7 @@ Item {
                         Rectangle {
                             width: 40
                             height: 40
-                            radius: 20
+                            radius: Theme.fullRadius(width, height)
                             color: Theme.primarySelected
 
                             DankIcon {
@@ -504,9 +414,9 @@ Item {
                             width: parent.width - 40 - Theme.spacingM
 
                             StyledText {
-                                text: I18n.tr("Resize Widget")
+                                text: I18n.tr("Resize", "verb, help item title for resizing a desktop widget")
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                                 width: parent.width
                                 horizontalAlignment: Text.AlignLeft
@@ -529,7 +439,7 @@ Item {
                         Rectangle {
                             width: 40
                             height: 40
-                            radius: 20
+                            radius: Theme.fullRadius(width, height)
                             color: Theme.primarySelected
 
                             DankIcon {
@@ -546,9 +456,9 @@ Item {
                             width: parent.width - 40 - Theme.spacingM
 
                             StyledText {
-                                text: I18n.tr("Reorder & Group")
+                                text: I18n.tr("Reorder & group")
                                 font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Medium
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.surfaceText
                                 width: parent.width
                                 horizontalAlignment: Text.AlignLeft
@@ -569,44 +479,7 @@ Item {
         }
     }
 
-    Item {
-        id: dragProxy
-
-        visible: root.proxyVisible
-        x: root.proxyX - width / 2
-        y: root.proxyY - height / 2
-        width: proxyContent.implicitWidth + Theme.spacingM * 2
-        height: 40
-        z: 9999
-
-        Rectangle {
-            anchors.fill: parent
-            radius: Theme.cornerRadius + 4
-            color: Theme.secondaryContainer
-            border.color: Theme.primary
-            border.width: 2
-            opacity: 0.95
-
-            Row {
-                id: proxyContent
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
-
-                DankIcon {
-                    name: (root.dragWidgetData && root.dragWidgetData.icon) ? root.dragWidgetData.icon : "widgets"
-                    size: Theme.iconSize
-                    color: Theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: (root.dragWidgetData && root.dragWidgetData.name) ? root.dragWidgetData.name : ""
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        }
+    SettingsReorderPreview {
+        group: dragGroup
     }
 }

@@ -1,0 +1,55 @@
+{
+    "id": "dashCardExample",
+    "name": "Progress Example",
+    "description": "A standalone overview card showing how much of the day, week, month or year has passed",
+    "version": "1.0.0",
+    "author": "DankMaterialShell",
+    "type": "dashCard",
+    "capabilities": ["dash-card"],
+    "component": "./ProgressCard.qml",
+    "icon": "hourglass_bottom",
+    "dash": {
+        "card": {
+            "title": "Progress",
+            "w": 2,
+            "h": 1,
+            "minW": 1,
+            "minH": 1,
+            "maxW": 4,
+            "maxH": 2
+        },
+        "options": [
+            {
+                "key": "period",
+                "text": "Period",
+                "type": "choice",
+                "def": "day",
+                "choices": [
+                    { "value": "day", "text": "Day" },
+                    { "value": "week", "text": "Week" },
+                    { "value": "month", "text": "Month" },
+                    { "value": "year", "text": "Year" }
+                ]
+            },
+            {
+                "key": "remaining",
+                "text": "Show time left",
+                "type": "toggle",
+                "def": true
+            },
+            {
+                "key": "tone",
+                "text": "Tone",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    { "value": "", "text": "Surface" },
+                    { "value": "primary", "text": "Primary" },
+                    { "value": "secondary", "text": "Secondary" },
+                    { "value": "tertiary", "text": "Tertiary" }
+                ]
+            }
+        ]
+    },
+    "requires_dms": ">=1.7.0"
+}

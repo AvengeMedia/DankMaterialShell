@@ -1,140 +1,189 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
 import qs.Services
 import qs.Modules.ControlCenter.BuiltinPlugins
+import qs.Modules.ControlCenter.Widgets
 import "../utils/widgets.js" as WidgetUtils
 
 QtObject {
     id: root
-    readonly property var log: Log.scoped("WidgetModel")
 
-    property var vpnBuiltinInstance: null
-    property var cupsBuiltinInstance: null
-    property var tailscaleBuiltinInstance: null
-    property var displayProfilesBuiltinInstance: null
+    property var builtinInstances: ({})
+    readonly property var _pluginWidgetsCache: ({})
 
-    property var vpnLoader: Loader {
-        active: false
-        sourceComponent: Component {
-            VpnWidget {}
+    readonly property var builtinDefinitions: [
+        {
+            "id": "builtin_vpn",
+            "component": vpnComponent
+        },
+        {
+            "id": "builtin_cups",
+            "component": cupsComponent
+        },
+        {
+            "id": "builtin_tailscale",
+            "component": tailscaleComponent
+        },
+        {
+            "id": "builtin_display_profiles",
+            "component": displayProfilesComponent
         }
+    ]
 
-        onItemChanged: {
-            root.vpnBuiltinInstance = item;
-        }
+    readonly property Component vpnComponent: Component {
+        VpnWidget {}
+    }
+    readonly property Component cupsComponent: Component {
+        CupsWidget {}
+    }
+    readonly property Component tailscaleComponent: Component {
+        TailscaleWidget {}
+    }
+    readonly property Component displayProfilesComponent: Component {
+        DisplayProfilesWidget {}
+    }
 
-        Connections {
-            target: SettingsData
-            function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const hasVpnWidget = widgets.some(w => w.id === "builtin_vpn");
-                if (!hasVpnWidget && vpnLoader.active) {
-                    log.debug("VpnWidget: No VPN widget in control center, deactivating loader");
-                    vpnLoader.active = false;
-                }
-            }
+    readonly property Instantiator builtinLoaders: Instantiator {
+        model: root.builtinDefinitions
+
+        delegate: Loader {
+            required property var modelData
+
+            active: (SettingsData.controlCenterWidgets || []).some(w => w.id === modelData.id)
+            sourceComponent: modelData.component
+            onItemChanged: root.setBuiltinInstance(modelData.id, item)
         }
     }
 
-    property var cupsLoader: Loader {
-        active: false
-        sourceComponent: Component {
-            CupsWidget {}
-        }
+    function setBuiltinInstance(id, item) {
+        const next = Object.assign({}, builtinInstances);
+        if (item)
+            next[id] = item;
+        else
+            delete next[id];
+        builtinInstances = next;
+    }
 
-        onItemChanged: {
-            root.cupsBuiltinInstance = item;
+    readonly property Component networkTile: Component {
+        NetworkTile {}
+    }
+    readonly property Component bluetoothTile: Component {
+        BluetoothTile {}
+    }
+    readonly property Component audioOutputTile: Component {
+        AudioDeviceTile {}
+    }
+    readonly property Component audioInputTile: Component {
+        AudioDeviceTile {
+            isInput: true
         }
-
-        onActiveChanged: {
-            if (!active) {
-                root.cupsBuiltinInstance = null;
-            }
+    }
+    readonly property Component nightModeTile: Component {
+        NightModeTile {}
+    }
+    readonly property Component darkModeTile: Component {
+        DarkModeTile {}
+    }
+    readonly property Component dndTile: Component {
+        DndTile {}
+    }
+    readonly property Component idleInhibitTile: Component {
+        IdleInhibitTile {}
+    }
+    readonly property Component batteryTile: Component {
+        BatteryTile {}
+    }
+    readonly property Component diskUsageTile: Component {
+        DiskUsageTile {}
+    }
+    readonly property Component colorPickerTile: Component {
+        ColorPickerTile {}
+    }
+    readonly property Component pluginTile: Component {
+        PluginTile {}
+    }
+    readonly property Component volumeSliderRow: Component {
+        AudioSliderRow {
+            node: AudioService.sink
+            maxVolume: AudioService.sinkMaxVolume
+            playFeedback: true
         }
+    }
+    readonly property Component inputVolumeSliderRow: Component {
+        AudioSliderRow {
+            node: AudioService.source
+            isInput: true
+        }
+    }
+    readonly property Component brightnessSliderRow: Component {
+        BrightnessSliderRow {}
+    }
 
-        Connections {
-            target: SettingsData
-            function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const hasCupsWidget = widgets.some(w => w.id === "builtin_cups");
-                if (!hasCupsWidget && cupsLoader.active) {
-                    log.debug("CupsWidget: No CUPS widget in control center, deactivating loader");
-                    cupsLoader.active = false;
-                }
-            }
+    function componentForWidget(widgetData) {
+        const id = widgetData.id || "";
+        if (id.startsWith("builtin_") || id.startsWith("plugin_"))
+            return pluginTile;
+        switch (id) {
+        case "wifi":
+            return networkTile;
+        case "bluetooth":
+            return bluetoothTile;
+        case "audioOutput":
+            return audioOutputTile;
+        case "audioInput":
+            return audioInputTile;
+        case "volumeSlider":
+            return volumeSliderRow;
+        case "inputVolumeSlider":
+            return inputVolumeSliderRow;
+        case "brightnessSlider":
+            return brightnessSliderRow;
+        case "nightMode":
+            return nightModeTile;
+        case "darkMode":
+            return darkModeTile;
+        case "doNotDisturb":
+            return dndTile;
+        case "idleInhibitor":
+            return idleInhibitTile;
+        case "battery":
+            return batteryTile;
+        case "diskUsage":
+            return diskUsageTile;
+        case "colorPicker":
+            return colorPickerTile;
+        default:
+            return null;
         }
     }
 
-    property var tailscaleLoader: Loader {
-        active: false
-        sourceComponent: Component {
-            TailscaleWidget {}
+    readonly property Connections pluginWatcher: Connections {
+        target: PluginService
+
+        function onPluginLoaded() {
+            root._pluginWidgetsCache.widgets = null;
         }
 
-        onItemChanged: {
-            root.tailscaleBuiltinInstance = item;
-        }
-
-        onActiveChanged: {
-            if (!active) {
-                root.tailscaleBuiltinInstance = null;
-            }
-        }
-
-        Connections {
-            target: SettingsData
-            function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const hasTailscaleWidget = widgets.some(w => w.id === "builtin_tailscale");
-                if (!hasTailscaleWidget && tailscaleLoader.active) {
-                    root.log.debug("No Tailscale widget in control center, deactivating loader");
-                    tailscaleLoader.active = false;
-                }
-            }
+        function onPluginUnloaded() {
+            root._pluginWidgetsCache.widgets = null;
         }
     }
 
-    property var displayProfilesLoader: Loader {
-        active: false
-        sourceComponent: Component {
-            DisplayProfilesWidget {}
-        }
-
-        onItemChanged: {
-            root.displayProfilesBuiltinInstance = item;
-        }
-
-        onActiveChanged: {
-            if (!active)
-                root.displayProfilesBuiltinInstance = null;
-        }
-
-        Connections {
-            target: SettingsData
-            function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || [];
-                const hasWidget = widgets.some(w => w.id === "builtin_display_profiles");
-                if (!hasWidget && displayProfilesLoader.active) {
-                    root.log.debug("No Display Profiles widget in control center, deactivating loader");
-                    displayProfilesLoader.active = false;
-                }
-            }
-        }
-    }
-
-    readonly property var coreWidgetDefinitions: [
+    readonly property var baseWidgetDefinitions: [
         {
             "id": "nightMode",
-            "text": I18n.tr("Night Mode"),
+            "text": I18n.tr("Night mode"),
             "description": I18n.tr("Blue light filter"),
             "icon": "nightlight",
             "type": "toggle",
-            "enabled": DisplayService.automationAvailable,
-            "warning": !DisplayService.automationAvailable ? I18n.tr("Requires night mode support") : undefined
+            "enabled": NightModeService.automationAvailable,
+            "warning": !NightModeService.automationAvailable ? I18n.tr("Requires night mode support") : undefined
         },
         {
             "id": "darkMode",
-            "text": I18n.tr("Dark Mode"),
+            "text": I18n.tr("Dark mode"),
             "description": I18n.tr("System theme toggle"),
             "icon": "contrast",
             "type": "toggle",
@@ -142,7 +191,7 @@ QtObject {
         },
         {
             "id": "doNotDisturb",
-            "text": I18n.tr("Do Not Disturb"),
+            "text": I18n.tr("Do not disturb"),
             "description": I18n.tr("Block notifications"),
             "icon": "do_not_disturb_on",
             "type": "toggle",
@@ -204,8 +253,8 @@ QtObject {
             "description": I18n.tr("Display brightness control"),
             "icon": "brightness_6",
             "type": "slider",
-            "enabled": DisplayService.brightnessAvailable,
-            "warning": !DisplayService.brightnessAvailable ? I18n.tr("Brightness control not available") : undefined,
+            "enabled": BrightnessService.brightnessAvailable,
+            "warning": !BrightnessService.brightnessAvailable ? I18n.tr("Brightness control not available") : undefined,
             "allowMultiple": true
         },
         {
@@ -226,7 +275,7 @@ QtObject {
         },
         {
             "id": "diskUsage",
-            "text": I18n.tr("Disk Usage"),
+            "text": I18n.tr("Disk usage"),
             "description": I18n.tr("Filesystem usage monitoring"),
             "icon": "storage",
             "type": "action",
@@ -244,7 +293,7 @@ QtObject {
         },
         {
             "id": "builtin_vpn",
-            "text": I18n.tr("VPN"),
+            "text": I18n.tr("VPN", "virtual private network, widget and page title"),
             "description": I18n.tr("VPN Connections"),
             "icon": "vpn_key",
             "type": "builtin_plugin",
@@ -258,8 +307,8 @@ QtObject {
             "description": I18n.tr("Print Server Management"),
             "icon": "Print",
             "type": "builtin_plugin",
-            "enabled": CupsService.available,
-            "warning": !CupsService.available ? I18n.tr("CUPS not available") : undefined,
+            "enabled": CupsService.cupsAvailable,
+            "warning": !CupsService.cupsAvailable ? I18n.tr("CUPS not available") : undefined,
             "isBuiltinPlugin": true
         },
         {
@@ -284,6 +333,8 @@ QtObject {
     ]
 
     function getPluginWidgets() {
+        if (_pluginWidgetsCache.widgets)
+            return _pluginWidgetsCache.widgets;
         const plugins = [];
         const loadedPlugins = PluginService.getLoadedPlugins();
 
@@ -327,13 +378,12 @@ QtObject {
             });
         }
 
+        _pluginWidgetsCache.widgets = plugins;
         return plugins;
     }
 
-    readonly property var baseWidgetDefinitions: coreWidgetDefinitions
-
     function getWidgetForId(widgetId) {
-        return WidgetUtils.getWidgetForId(baseWidgetDefinitions, widgetId);
+        return baseWidgetDefinitions.find(w => w.id === widgetId);
     }
 
     function addWidget(widgetId) {
@@ -344,12 +394,8 @@ QtObject {
         WidgetUtils.removeWidget(index);
     }
 
-    function toggleWidgetSize(index) {
-        WidgetUtils.toggleWidgetSize(index);
-    }
-
-    function moveWidget(fromIndex, toIndex) {
-        WidgetUtils.moveWidget(fromIndex, toIndex);
+    function setWidgetWidth(index, width) {
+        WidgetUtils.setWidgetWidth(index, width);
     }
 
     function reorderWidgets(newOrder) {

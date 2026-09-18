@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Modules.DankBar
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
@@ -9,9 +10,11 @@ BasePill {
 
     section: "right"
 
-    property bool showMicIcon: SettingsData.privacyShowMicIcon
-    property bool showCameraIcon: SettingsData.privacyShowCameraIcon
-    property bool showScreenSharingIcon: SettingsData.privacyShowScreenShareIcon
+    property var widgetData: null
+
+    property bool showMicIcon: SettingsData.widgetOption("privacyIndicator", widgetData, "privacyShowMicIcon")
+    property bool showCameraIcon: SettingsData.widgetOption("privacyIndicator", widgetData, "privacyShowCameraIcon")
+    property bool showScreenSharingIcon: SettingsData.widgetOption("privacyIndicator", widgetData, "privacyShowScreenShareIcon")
 
     readonly property bool hasActivePrivacy: showMicIcon || showCameraIcon || showScreenSharingIcon || PrivacyService.anyPrivacyActive
     readonly property int activeCount: (showMicIcon ? 1 : PrivacyService.microphoneActive) + (showCameraIcon ? 1 : PrivacyService.cameraActive) + (showScreenSharingIcon ? 1 : PrivacyService.screensharingActive)
@@ -67,8 +70,8 @@ BasePill {
                 visible: root.isVerticalOrientation && root.hasActivePrivacy
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showMicIcon || PrivacyService.microphoneActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -88,8 +91,8 @@ BasePill {
                 }
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showCameraIcon || PrivacyService.cameraActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -102,21 +105,21 @@ BasePill {
                     }
 
                     Rectangle {
-                        width: 6
-                        height: 6
-                        radius: 3
+                        width: BarMetrics.indicatorDot
+                        height: BarMetrics.indicatorDot
+                        radius: Theme.cornerRadiusFull
                         color: Theme.error
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.rightMargin: -2
-                        anchors.topMargin: -1
+                        anchors.rightMargin: -Theme.spacingXXS
+                        anchors.topMargin: -Theme.hairline(root.dpr)
                         visible: PrivacyService.cameraActive
                     }
                 }
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showScreenSharingIcon || PrivacyService.screensharingActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -136,8 +139,8 @@ BasePill {
                 visible: !root.isVerticalOrientation && root.hasActivePrivacy
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showMicIcon || PrivacyService.microphoneActive
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -157,8 +160,8 @@ BasePill {
                 }
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showCameraIcon || PrivacyService.cameraActive
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -171,21 +174,21 @@ BasePill {
                     }
 
                     Rectangle {
-                        width: 6
-                        height: 6
-                        radius: 3
+                        width: BarMetrics.indicatorDot
+                        height: BarMetrics.indicatorDot
+                        radius: Theme.cornerRadiusFull
                         color: Theme.error
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.rightMargin: -2
-                        anchors.topMargin: -1
+                        anchors.rightMargin: -Theme.spacingXXS
+                        anchors.topMargin: -Theme.hairline(root.dpr)
                         visible: PrivacyService.cameraActive
                     }
                 }
 
                 Item {
-                    width: 18
-                    height: 18
+                    width: BarMetrics.iconSlot
+                    height: BarMetrics.iconSlot
                     visible: root.showScreenSharingIcon || PrivacyService.screensharingActive
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -220,7 +223,7 @@ BasePill {
             anchors.centerIn: parent
             text: PrivacyService.getPrivacySummary()
             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-            color: Theme.widgetTextColor
+            color: root.contentColor
         }
 
         Rectangle {

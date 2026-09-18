@@ -2,15 +2,14 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
-import qs.Services
-import qs.Widgets
-import "../../../Common/QmlUtils.js" as QmlUtils
 
-StyledRect {
+Item {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
+
+    readonly property bool isSettingsRow: true
 
     property string tab: ""
     property var tags: []
@@ -21,122 +20,60 @@ StyledRect {
     property string iconName: ""
     property bool checked: false
 
-    default property alias content: expandedContent.children
-    readonly property bool hasContent: expandedContent.children.length > 0
+    property alias resetStore: header.resetStore
+    property alias resetKeys: header.resetKeys
+    property alias modified: header.modified
+
+    default property alias content: expandedContent.data
+    readonly property bool hasContent: expandedContent.visibleChildren.length > 0
+    readonly property bool standalone: !(parent?.isSettingsGroupHost ?? false)
 
     signal toggled(bool checked)
 
     width: parent?.width ?? 0
-    height: Theme.spacingL * 2 + mainColumn.height
-    radius: Theme.cornerRadius
-    color: Theme.floatingWindowNestedSurface
-    border.color: Theme.outlineMedium
-    border.width: Theme.layerOutlineWidth
+    height: column.height
 
-    Component.onCompleted: {
-        if (!settingKey)
-            return;
-        const key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            const flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable);
-        });
-    }
-
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey);
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.groupedListOuterRadius
+        color: SettingsMetrics.rowColor
+        visible: root.standalone
     }
 
     Column {
-        id: mainColumn
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        spacing: Theme.spacingM
+        id: column
+        width: parent.width
+        spacing: 0
+
+        SettingsToggleRow {
+            id: header
+            groupItem: root
+            width: parent.width
+            tab: root.tab
+            tags: root.tags
+            settingKey: root.settingKey
+            text: root.title
+            description: root.description
+            iconName: root.iconName
+            checked: root.checked
+            enabled: root.enabled
+            paintBackground: false
+            onToggled: value => root.toggled(value)
+        }
 
         Item {
             width: parent.width
-            height: headerColumn.height
+            height: root.hasContent ? expandedContent.height + Theme.spacingM : 0
 
             Column {
-                id: headerColumn
+                id: expandedContent
+                enabled: root.checked
                 anchors.left: parent.left
-                anchors.right: toggleSwitch.left
-                anchors.rightMargin: Theme.spacingM
-                spacing: Theme.spacingXS
-
-                Row {
-                    spacing: Theme.spacingM
-                    width: parent.width
-
-                    DankIcon {
-                        id: headerIcon
-                        name: root.iconName
-                        size: Theme.iconSize
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: root.iconName !== ""
-                    }
-
-                    StyledText {
-                        id: headerText
-                        text: root.title
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: root.title !== ""
-                        width: parent.width - (headerIcon.visible ? headerIcon.width + parent.spacing : 0)
-                        horizontalAlignment: Text.AlignLeft
-                    }
-                }
-
-                StyledText {
-                    id: descriptionText
-                    text: root.description
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                    visible: root.description !== ""
-                }
-            }
-
-            DankToggle {
-                id: toggleSwitch
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                hideText: true
-                checked: root.checked
-                enabled: root.enabled
-                onToggled: checked => root.toggled(checked)
+                anchors.leftMargin: SettingsMetrics.rowPaddingH
+                anchors.rightMargin: SettingsMetrics.rowPaddingH
+                spacing: Theme.spacingM
             }
-
-            StateLayer {
-                anchors.fill: parent
-                disabled: !root.enabled
-                stateColor: Theme.primary
-                cornerRadius: root.radius
-                onClicked: {
-                    if (!root.enabled)
-                        return;
-                    root.toggled(!root.checked);
-                }
-            }
-        }
-
-        Column {
-            id: expandedContent
-            width: parent.width
-            spacing: Theme.spacingM
-            visible: root.checked && root.hasContent
         }
     }
 }

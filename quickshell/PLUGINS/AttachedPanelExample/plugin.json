@@ -1,0 +1,12 @@
+{
+    "id": "attachedPanelExample",
+    "name": "Attached Panel Example",
+    "description": "A widget with an optional attached dock panel and a normal bar popout",
+    "version": "1.0.0",
+    "author": "DMS contributors",
+    "type": "widget",
+    "capabilities": ["dankbar-widget"],
+    "component": "./AttachedPanelExample.qml",
+    "icon": "sticky_note_2",
+    "requires_dms": ">=1.7.0"
+}

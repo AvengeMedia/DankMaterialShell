@@ -44,7 +44,7 @@ Rectangle {
             text: root.text
             font.pixelSize: Theme.fontSizeSmall
             color: root.isDestructive && area.containsMouse && root.enabled ? Theme.error : Theme.surfaceText
-            font.weight: Font.Normal
+            font.weight: Theme.fontWeight
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
         }

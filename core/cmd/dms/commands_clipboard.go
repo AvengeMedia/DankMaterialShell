@@ -30,7 +30,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/wlclipboard"
 	"github.com/spf13/cobra"
 )
@@ -430,7 +430,7 @@ func runCommand(args []string, stdin []byte) {
 }
 
 func runClipHistory(cmd *cobra.Command, args []string) {
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.getHistory",
 	}
@@ -501,7 +501,7 @@ func runClipGet(cmd *cobra.Command, args []string) {
 	}
 
 	if clipGetCopy {
-		req := models.Request{
+		req := ipc.Request{
 			ID:     1,
 			Method: "clipboard.copyEntry",
 			Params: map[string]any{"id": id},
@@ -519,7 +519,7 @@ func runClipGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.getEntry",
 		Params: map[string]any{
@@ -565,7 +565,7 @@ func runClipDelete(cmd *cobra.Command, args []string) {
 		log.Fatalf("Invalid ID: %v", err)
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.deleteEntry",
 		Params: map[string]any{
@@ -586,7 +586,7 @@ func runClipDelete(cmd *cobra.Command, args []string) {
 }
 
 func runClipClear(cmd *cobra.Command, args []string) {
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.clearHistory",
 	}
@@ -621,7 +621,7 @@ func runClipSearch(cmd *cobra.Command, args []string) {
 		params["isImage"] = false
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.search",
 		Params: params,
@@ -688,7 +688,7 @@ func runClipSearch(cmd *cobra.Command, args []string) {
 }
 
 func runClipConfigGet(cmd *cobra.Command, args []string) {
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.getConfig",
 	}
@@ -742,7 +742,7 @@ func runClipConfigSet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.setConfig",
 		Params: params,
@@ -761,7 +761,7 @@ func runClipConfigSet(cmd *cobra.Command, args []string) {
 }
 
 func runClipExport(cmd *cobra.Command, args []string) {
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.getHistory",
 	}
@@ -1005,7 +1005,7 @@ func downloadToTempFile(rawURL string) (string, error) {
 }
 
 func copyFileToClipboard(filePath string) error {
-	req := models.Request{
+	req := ipc.Request{
 		ID:     1,
 		Method: "clipboard.copyFile",
 		Params: map[string]any{"filePath": filePath},

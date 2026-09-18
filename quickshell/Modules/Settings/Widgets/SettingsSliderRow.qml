@@ -1,155 +1,89 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import qs.Common
-import qs.Services
 import qs.Widgets
-import "../../../Common/QmlUtils.js" as QmlUtils
 
-Item {
+SettingsRow {
     id: root
-
-    LayoutMirroring.enabled: I18n.isRtl
-    LayoutMirroring.childrenInherit: true
-
-    property string tab: ""
-    property var tags: []
-    property string settingKey: ""
 
     property string text: ""
     property string description: ""
-
-    readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
-
-    Component.onCompleted: {
-        if (!settingKey)
-            return;
-        var key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            var flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable);
-        });
-    }
-
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey);
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.primary, root.isHighlighted ? 0.2 : 0)
-        visible: root.isHighlighted
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-    }
-    property alias value: slider.value
+    property string minimumLabel: ""
+    property real value: 0
     property alias minimum: slider.minimum
     property alias maximum: slider.maximum
     property alias step: slider.step
+    property alias showStops: slider.showStops
     property alias unit: slider.unit
     property alias decimals: slider.decimals
-    property alias wheelEnabled: slider.wheelEnabled
     property alias thumbOutlineColor: slider.thumbOutlineColor
-    property int defaultValue: -1
+    property alias size: slider.size
+
+    readonly property bool atMinimum: minimumLabel !== "" && slider.value === slider.minimum
+    readonly property int stepAmount: Math.max(1, step)
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)
 
-    DankTooltipV2 {
-        id: sharedTooltip
+    function nudge(direction) {
+        const next = Math.max(minimum, Math.min(maximum, slider.value + direction * stepAmount));
+        if (next === slider.value)
+            return;
+        slider.value = next;
+        sliderValueChanged(next);
+        sliderDragFinished(next);
     }
 
-    width: parent?.width ?? 0
-    height: headerRow.height + Theme.spacingXS + slider.height
+    title: text
+    subtitle: description
+    onValueChanged: slider.value = Math.round(value)
 
-    Column {
-        id: contentColumn
-        width: parent.width - Theme.spacingM * 2
-        x: Theme.spacingM
+    StyledText {
+        text: root.minimumLabel
+        font.pixelSize: Theme.fontSizeSmall
+        color: Theme.surfaceVariantText
+        visible: root.atMinimum
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingXS
+    }
 
-        Row {
-            id: headerRow
-            width: parent.width
-            height: labelColumn.height
-            spacing: Theme.spacingS
+    body: Row {
+        width: parent.width
+        spacing: Theme.spacingS
 
-            Column {
-                id: labelColumn
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-                width: parent.width - resetButtonContainer.width - Theme.spacingS
-
-                StyledText {
-                    text: root.text
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    visible: root.text !== ""
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                }
-
-                StyledText {
-                    text: root.description
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    visible: root.description !== ""
-                    horizontalAlignment: Text.AlignLeft
-                }
-            }
-
-            Item {
-                id: resetButtonContainer
-                width: root.defaultValue >= 0 ? 36 : 0
-                height: 36
-                anchors.verticalCenter: parent.verticalCenter
-
-                DankActionButton {
-                    id: resetButton
-                    anchors.centerIn: parent
-                    buttonSize: 36
-                    iconName: "restart_alt"
-                    iconSize: 20
-                    visible: root.defaultValue >= 0 && slider.value !== root.defaultValue
-                    iconColor: Theme.surfaceVariantText
-                    onClicked: {
-                        slider.value = root.defaultValue;
-                        root.sliderValueChanged(root.defaultValue);
-                        root.sliderDragFinished(root.defaultValue);
-                    }
-                    onEntered: {
-                        sharedTooltip.show(I18n.tr("Reset"), resetButton, 0, 0, "bottom");
-                    }
-                    onExited: {
-                        sharedTooltip.hide();
-                    }
-                }
-            }
+        DankActionButton {
+            buttonSize: Theme.iconButtonSize
+            iconName: "remove"
+            Accessible.name: I18n.tr("Decrease", "verb, minus button next to a settings slider")
+            iconSize: Theme.iconSizeMedium
+            iconColor: Theme.surfaceVariantText
+            enabled: root.enabled && slider.value > slider.minimum
+            anchors.verticalCenter: parent.verticalCenter
+            onClicked: root.nudge(-1)
         }
 
         DankSlider {
             id: slider
-            width: parent.width
-            height: 32
-            showValue: true
-            wheelEnabled: false
-            thumbOutlineColor: Theme.surfaceContainerHigh
+            Accessible.name: root.text
+            Accessible.description: root.description
+            size: "s"
+            width: parent.width - (Theme.iconButtonSize + parent.spacing) * 2
+            anchors.verticalCenter: parent.verticalCenter
+            enabled: root.enabled
+            showValue: !root.atMinimum
+            wheelEnabled: root.wheelEnabled
+            Component.onCompleted: value = Math.round(root.value)
             onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
             onSliderDragFinished: finalValue => root.sliderDragFinished(finalValue)
+        }
+
+        DankActionButton {
+            buttonSize: Theme.iconButtonSize
+            iconName: "add"
+            Accessible.name: I18n.tr("Increase", "verb, plus button next to a settings slider")
+            iconSize: Theme.iconSizeMedium
+            iconColor: Theme.surfaceVariantText
+            enabled: root.enabled && slider.value < slider.maximum
+            anchors.verticalCenter: parent.verticalCenter
+            onClicked: root.nudge(1)
         }
     }
 }

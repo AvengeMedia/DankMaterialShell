@@ -2,9 +2,10 @@ package evdev
 
 import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/ipc"
 )
 
-func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
+func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	switch req.Method {
 	case "evdev.getState":
 		handleGetState(conn, req, m)
@@ -13,6 +14,6 @@ func HandleRequest(conn *models.Conn, req models.Request, m *Manager) {
 	}
 }
 
-func handleGetState(conn *models.Conn, req models.Request, m *Manager) {
+func handleGetState(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	models.Respond(conn, req.ID, m.GetState())
 }

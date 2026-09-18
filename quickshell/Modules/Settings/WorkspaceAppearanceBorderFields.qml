@@ -12,6 +12,7 @@ Column {
     property string borderCustomColorKey: ""
     property string borderThicknessKey: ""
     property var extraTags: []
+    property var store: null
 
     width: parent?.width ?? 0
     spacing: Theme.spacingS
@@ -19,24 +20,27 @@ Column {
 
     ColorDropdownRow {
         width: parent.width - parent.leftPadding
-        text: I18n.tr("Border Color")
+        text: I18n.tr("Border color")
         settingKey: root.borderColorKey
+        resetStore: root.store
+        resetKeys: [root.borderColorKey, root.borderCustomColorKey]
         tags: ["workspace", "focused", "border", "color", "custom"].concat(root.extraTags)
         options: root.borderColorOptions
-        currentMode: SettingsData[root.borderColorKey]
-        customColor: SettingsData[root.borderCustomColorKey] || "#6750A4"
-        onModeSelected: mode => SettingsData.set(root.borderColorKey, mode)
-        onCustomColorSelected: selectedColor => SettingsData.set(root.borderCustomColorKey, selectedColor.toString())
+        currentMode: root.store.get(root.borderColorKey)
+        customColor: root.store.get(root.borderCustomColorKey) || "#6750A4"
+        onModeSelected: mode => root.store.set(root.borderColorKey, mode)
+        onCustomColorSelected: selectedColor => root.store.set(root.borderCustomColorKey, selectedColor.toString())
     }
 
     SettingsSliderRow {
         width: parent.width - parent.leftPadding
         text: I18n.tr("Thickness")
-        value: SettingsData[root.borderThicknessKey]
+        resetStore: root.store
+        resetKeys: [root.borderThicknessKey]
+        value: root.store.get(root.borderThicknessKey)
         minimum: 1
         maximum: 6
         unit: "px"
-        defaultValue: 2
-        onSliderValueChanged: newValue => SettingsData.set(root.borderThicknessKey, newValue)
+        onSliderValueChanged: newValue => root.store.set(root.borderThicknessKey, newValue)
     }
 }

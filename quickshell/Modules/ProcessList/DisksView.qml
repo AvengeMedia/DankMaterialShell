@@ -8,12 +8,10 @@ import "../../Common/Format.js" as Format
 Item {
     id: root
 
-    Component.onCompleted: {
-        DgopService.addRef(["disk", "diskmounts"]);
-    }
-
-    Component.onDestruction: {
-        DgopService.removeRef(["disk", "diskmounts"]);
+    Ref {
+        service: DgopService
+        modules: ["disk", "diskmounts"]
+        active: root.visible
     }
 
     ColumnLayout {
@@ -48,7 +46,7 @@ Item {
                         StyledText {
                             text: I18n.tr("Disk I/O", "disk io header in system monitor")
                             font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Bold
+                            font.weight: Theme.fontWeightMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -70,7 +68,7 @@ Item {
                                 text: Format.formatRate(DgopService.diskReadRate)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Bold
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.primary
                             }
                         }
@@ -88,7 +86,7 @@ Item {
                                 text: Format.formatRate(DgopService.diskWriteRate)
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Bold
+                                font.weight: Theme.fontWeightMedium
                                 color: Theme.warning
                             }
                         }
@@ -121,7 +119,7 @@ Item {
                     StyledText {
                         text: I18n.tr("Mount Points", "mount points header in system monitor")
                         font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Bold
+                        font.weight: Theme.fontWeightMedium
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -197,7 +195,7 @@ Item {
                                         text: modelData?.mount ?? ""
                                         font.pixelSize: Theme.fontSizeSmall
                                         font.family: SettingsData.monoFontFamily
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.fontWeightMedium
                                         color: Theme.surfaceText
                                     }
                                 }
@@ -234,13 +232,13 @@ Item {
                                 Rectangle {
                                     width: parent.width
                                     height: 8
-                                    radius: 4
+                                    radius: Theme.fullRadius(width, height)
                                     color: Theme.outlineHeavy
 
                                     Rectangle {
                                         width: parent.width * Math.min(1, parent.parent.parent.parent.usedPct)
                                         height: parent.height
-                                        radius: 4
+                                        radius: Theme.fullRadius(width, height)
                                         color: {
                                             const pct = parent.parent.parent.parent.usedPct;
                                             if (pct > 0.95)
@@ -289,7 +287,7 @@ Item {
                                 text: modelData?.percent ?? ""
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.family: SettingsData.monoFontFamily
-                                font.weight: Font.Bold
+                                font.weight: Theme.fontWeightMedium
                                 color: {
                                     const pct = parent.parent.usedPct;
                                     if (pct > 0.95)

@@ -1,15 +1,30 @@
 name: QML tests
 
 on:
+  push:
+    paths:
+      - "quickshell/**"
+      - "dank-qml-common"
+      - "Makefile"
+      - "core/Makefile"
+      - "scripts/shell-test-excludes.txt"
+      - "flake.nix"
+      - ".pre-commit-config.yaml"
+      - ".github/workflows/qml-tests.yml"
+      - ".github/workflows/prek.yml"
   pull_request:
     branches: [master, main, "stable-*"]
     paths:
       - "quickshell/**"
       - "dank-qml-common"
       - "Makefile"
-      - "flake.*"
-      - "distro/nix/**"
+      - "core/Makefile"
+      - "scripts/shell-test-excludes.txt"
+      - "flake.nix"
+      - ".pre-commit-config.yaml"
       - ".github/workflows/qml-tests.yml"
+      - ".github/workflows/prek.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,15 +32,31 @@ permissions:
 jobs:
   test-qml:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    container: archlinux:base
+    timeout-minutes: 10
     steps:
+      - name: Install test dependencies
+        run: |
+          pacman-key --init
+          pacman -Syu --noconfirm --needed git make nodejs python quickshell qt6-declarative niri xorg-server-xvfb libxcursor ttf-dejavu dbus python-dbus-next
+
+      - name: Record runtime versions
+        run: |
+          pacman -Q quickshell qt6-declarative niri
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: recursive
+          persist-credentials: false
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Run QML tests
-        run: nix develop --command make test-qml
+      - name: Run QML pre-commit hook
+        uses: j178/prek-action@5337cb91e0fa35a7ff31b9ca345126d8bbbcdf16
+        with:
+          prek-version: "0.5.2"
+          extra-args: qml-tests --all-files
+          cache: ${{ github.event_name != 'pull_request' }}
+        env:
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: ${{ github.workspace }}
