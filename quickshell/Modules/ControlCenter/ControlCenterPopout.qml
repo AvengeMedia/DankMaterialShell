@@ -19,6 +19,10 @@ DankPopout {
     property string pendingSection: ""
     property var triggerScreen: null
     property bool editMode: false
+    readonly property int gridColumnCap: CcMetrics.columnCapFor((triggerScreen?.width ?? CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2 + Theme.spacingL * 2) - PopoutMetrics.editOverflow * 2 - Theme.spacingL * 2)
+    readonly property int gridColumns: Math.min(CcMetrics.gridColumns, gridColumnCap)
+    readonly property real sheetContentWidth: CcMetrics.sheetWidthFor(gridColumns)
+    readonly property real availableHeight: _maxPopupHeight()
     property bool powerMenuOpen: powerMenuModalLoader?.item?.shouldBeVisible ?? false
     property var colorPickerModal: null
     property var powerMenuModalLoader: null
@@ -84,7 +88,7 @@ DankPopout {
         expandedSection = "";
     }
 
-    popupWidth: CcMetrics.sheetWidth + (editMode ? PopoutMetrics.editOverflow * 2 : 0)
+    popupWidth: sheetContentWidth + (editMode ? PopoutMetrics.editOverflow * 2 : 0)
     popupHeight: Math.min(_maxPopupHeight(), Math.max(CcMetrics.minHeight, contentLoader.item?.targetImplicitHeight ?? CcMetrics.minHeight))
     triggerWidth: CcMetrics.triggerWidth
     positioning: ""

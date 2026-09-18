@@ -64,7 +64,7 @@ LauncherTile {
             id: imageContainer
             anchors.fill: parent
             radius: Theme.cornerRadiusM
-            color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+            color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
 
             ScreencopyView {
                 id: screencopyView
@@ -94,7 +94,7 @@ LauncherTile {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: labelText.implicitHeight + Theme.spacingS * 2
-                color: root.isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+                color: root.isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
                 visible: root.item?.name?.length > 0
 
                 StyledText {
@@ -138,7 +138,7 @@ LauncherTile {
                 width: root.hasScreencopy ? Theme.buttonHeightXS : Theme.buttonHeightS
                 height: root.hasScreencopy ? Theme.buttonHeightXS : Theme.iconSizeSmall
                 radius: root.hasScreencopy ? Theme.fullRadius(width, height) : Theme.cornerRadiusXS
-                color: root.hasScreencopy ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, 0)
+                color: root.hasScreencopy ? Theme.chipSurface : Theme.withAlpha(Theme.chipSurface, 0)
                 visible: attributionImage.status === Image.Ready
 
                 Image {

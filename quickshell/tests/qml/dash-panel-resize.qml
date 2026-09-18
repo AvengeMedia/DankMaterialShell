@@ -60,8 +60,8 @@ ShellRoot {
     }
 
     function ccGain() {
-        const w0 = CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2;
-        return edgeGain(root.cc, w0, w0 + CcMetrics.sheetWidthStep);
+        const gutter = PopoutMetrics.editOverflow * 2;
+        return edgeGain(root.cc, CcMetrics.sheetWidthFor(CcMetrics.defaultColumns) + gutter, CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1) + gutter);
     }
 
     property real dragOriginX: 0
@@ -313,24 +313,24 @@ ShellRoot {
                     check(root.cc.popupWidth === CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2, "control center edit mode adds the handle gutter");
                     check(root.cc.contentWindow.anchors.right, "control center edit mode anchors the surface to both sides");
                     beginDrag(root.cc, ccContent);
-                    dragTo(root.cc, ccContent, 13.4 * ccGain(), 0);
-                    check(CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault + 104, "control center preview snaps to the step: " + CcMetrics.sheetWidth);
+                    dragTo(root.cc, ccContent, 1.4 * ccGain(), 0);
+                    check(CcMetrics.gridColumns === CcMetrics.defaultColumns + 1 && CcMetrics.sheetWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1), "control center preview snaps to a column: " + CcMetrics.sheetWidth);
                     check(snapped(root.cc), "control center drag snaps the body");
-                    check(root.cc.popupWidth === CcMetrics.sheetWidthDefault + 104 + PopoutMetrics.editOverflow * 2, "control center popout follows the preview");
+                    check(root.cc.popupWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1) + PopoutMetrics.editOverflow * 2, "control center popout follows the preview");
                     ccContent.panelResizer.end();
-                    check(SettingsData.controlCenterWidth === CcMetrics.sheetWidthDefault + 104, "control center width stored: " + SettingsData.controlCenterWidth);
-                    check(CcMetrics.sheetPreviewWidth === 0, "control center preview cleared");
+                    check(SettingsData.controlCenterColumns === CcMetrics.defaultColumns + 1, "control center columns stored: " + SettingsData.controlCenterColumns);
+                    check(CcMetrics.columnPreview === 0, "control center preview cleared");
                     beginDrag(root.cc, ccContent);
                     dragTo(root.cc, ccContent, -400, 0);
-                    check(CcMetrics.sheetWidth === CcMetrics.sheetWidthForStep(CcMetrics.sheetStepMin) && CcMetrics.sheetWidth >= CcMetrics.sheetWidthMin, "control center clamps to the lowest step: " + CcMetrics.sheetWidth);
-                    dragTo(root.cc, ccContent, -13.4 * ccGain(), 0);
-                    check(CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault, "control center lands back on the default");
+                    check(CcMetrics.gridColumns === CcMetrics.minimumColumns, "control center clamps to the fewest columns: " + CcMetrics.gridColumns);
+                    dragTo(root.cc, ccContent, -1.4 * ccGain(), 0);
+                    check(CcMetrics.gridColumns === CcMetrics.defaultColumns && CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault, "control center lands back on the default");
                     ccContent.panelResizer.cancel();
                     beginDrag(root.cc, ccContent, -1);
-                    dragTo(root.cc, ccContent, -13.4 * ccGain(), 0);
-                    check(CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault + 208, "left handle grows the control center: " + CcMetrics.sheetWidth);
+                    dragTo(root.cc, ccContent, -1.4 * ccGain(), 0);
+                    check(CcMetrics.gridColumns === CcMetrics.defaultColumns + 2, "left handle grows the control center: " + CcMetrics.gridColumns);
                     root.cc.editMode = false;
-                    check(CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault + 104, "leaving edit mode cancels the control center drag");
+                    check(CcMetrics.gridColumns === CcMetrics.defaultColumns + 1, "leaving edit mode cancels the control center drag");
                     root.cc.close();
                     interval = 500;
                 }

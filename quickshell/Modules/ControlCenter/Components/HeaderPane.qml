@@ -93,15 +93,15 @@ Item {
 
     Row {
         id: actionButtonsRow
-        width: Theme.iconButtonSize * 4 + spacing * 3
-        height: Theme.iconButtonSize
+        width: CcMetrics.headerActionSize * 4 + spacing * 3
+        height: CcMetrics.headerActionSize
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
         DankActionButton {
-            buttonSize: Theme.iconButtonSize
-            iconSize: Theme.iconSize
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
             iconName: "lock"
             iconColor: Theme.surfaceText
             Accessible.name: I18n.tr("Lock")
@@ -109,8 +109,8 @@ Item {
         }
 
         DankActionButton {
-            buttonSize: Theme.iconButtonSize
-            iconSize: Theme.iconSize
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
             iconName: "power_settings_new"
             iconColor: Theme.surfaceText
             Accessible.name: I18n.tr("Power")
@@ -118,8 +118,8 @@ Item {
         }
 
         DankActionButton {
-            buttonSize: Theme.iconButtonSize
-            iconSize: Theme.iconSize
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
             iconName: "settings"
             iconColor: Theme.surfaceText
             Accessible.name: I18n.tr("Settings")
@@ -127,8 +127,8 @@ Item {
         }
 
         DankActionButton {
-            buttonSize: Theme.iconButtonSize
-            iconSize: Theme.iconSize
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
             iconName: root.editMode ? "done" : "edit"
             iconColor: root.editMode ? Theme.onSecondaryContainer : Theme.surfaceText
             backgroundColor: root.editMode ? Theme.secondaryContainer : "transparent"

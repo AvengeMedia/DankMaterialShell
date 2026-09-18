@@ -31,11 +31,12 @@ Singleton {
     readonly property real wallpaperThumbRatio: 10 / 16
     readonly property real disabledOpacity: 0.38
     readonly property real highlightBlend: 0.2
-    readonly property real activeHintAlpha: 0.8
     readonly property real bannerTextMinWidth: 100
     readonly property real fontMenuExtraWidth: 100
-    readonly property color rowColor: Theme.foregroundColor(Theme.surfaceContainerHigh, true)
+    readonly property real swatchTileMinWidth: 96
+    readonly property color rowColor: Theme.foregroundColor(Theme.cardSurface, true)
     readonly property color rowHighlightColor: Theme.withAlpha(Theme.primary, highlightBlend)
+    readonly property color selectedRowColor: Theme.blend(rowColor, Theme.onSurface, Theme.stateLayerDrag)
     readonly property int transitionDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property int fadeDuration: Theme.expressiveDurations.expressiveEffects
 }

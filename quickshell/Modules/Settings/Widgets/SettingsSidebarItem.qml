@@ -8,7 +8,7 @@ Rectangle {
     property string iconName: ""
     property string title: ""
     property string hint: ""
-    property string tone: "primary"
+    property string accent: ""
     property bool active: false
     property bool highlighted: false
 
@@ -31,18 +31,9 @@ Rectangle {
         }
     }
 
-    readonly property color toneColor: {
-        switch (tone) {
-        case "secondary":
-            return Theme.secondary;
-        case "tertiary":
-            return Theme.tertiary;
-        case "error":
-            return Theme.onErrorContainer;
-        default:
-            return Theme.primary;
-        }
-    }
+    readonly property var accentPair: Theme.accent(accent)
+    readonly property color badgeColor: accentPair?.container ?? Theme.withAlpha(Theme.primary, Theme.tonalTintAlpha)
+    readonly property color glyphColor: accentPair?.onContainer ?? Theme.primary
     property bool isFirstInGroup: true
     property bool isLastInGroup: true
     readonly property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
@@ -54,13 +45,7 @@ Rectangle {
     topRightRadius: topRadius
     bottomLeftRadius: bottomRadius
     bottomRightRadius: bottomRadius
-    color: {
-        if (active)
-            return Theme.selectedContainer;
-        if (highlighted)
-            return Theme.blend(SettingsMetrics.rowColor, Theme.primary, SettingsMetrics.highlightBlend);
-        return SettingsMetrics.rowColor;
-    }
+    color: active ? SettingsMetrics.selectedRowColor : SettingsMetrics.rowColor
 
     Behavior on color {
         enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -78,7 +63,7 @@ Rectangle {
         bottomLeftRadius: root.bottomRadius
         bottomRightRadius: root.bottomRadius
         color: Theme.surfaceText
-        opacity: mouseArea.pressed ? Theme.stateLayerPressed : (mouseArea.containsMouse ? Theme.stateLayerHover : 0)
+        opacity: mouseArea.pressed ? Theme.stateLayerPressed : (mouseArea.containsMouse || root.highlighted ? Theme.stateLayerHover : 0)
 
         Behavior on opacity {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -92,21 +77,11 @@ Rectangle {
 
     DankRipple {
         id: ripple
-        rippleColor: root.active ? Theme.onSelectedContainer : Theme.surfaceText
+        rippleColor: Theme.surfaceText
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
         bottomRightRadius: root.bottomRadius
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        anchors.margins: -Theme.focusRingOffset
-        radius: root.topRadius + Theme.focusRingOffset
-        color: "transparent"
-        border.width: Theme.focusRingWidth
-        border.color: Theme.focusRingColor
-        visible: root.activeFocus
     }
 
     Rectangle {
@@ -117,7 +92,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacingL
         anchors.verticalCenter: parent.verticalCenter
-        color: root.active ? Theme.primary : Theme.withAlpha(root.toneColor, Theme.tonalTintAlpha)
+        color: root.badgeColor
 
         Behavior on color {
             enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -132,7 +107,7 @@ Rectangle {
             anchors.centerIn: parent
             name: root.iconName
             size: Theme.iconSizeMedium
-            color: root.active ? Theme.onPrimary : root.toneColor
+            color: root.glyphColor
         }
     }
 
@@ -150,7 +125,7 @@ Rectangle {
             text: root.title
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
-            color: root.active ? Theme.onSelectedContainer : Theme.surfaceText
+            color: Theme.surfaceText
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignLeft
         }
@@ -159,7 +134,7 @@ Rectangle {
             width: parent.width
             text: root.hint
             font.pixelSize: Theme.fontSizeSmall
-            color: root.active ? Theme.withAlpha(Theme.onSelectedContainer, SettingsMetrics.activeHintAlpha) : Theme.surfaceVariantText
+            color: Theme.surfaceVariantText
             wrapMode: Text.WordWrap
             maximumLineCount: 2
             elide: Text.ElideRight

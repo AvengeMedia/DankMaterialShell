@@ -59,7 +59,6 @@ Item {
                         minimum: 50
                         maximum: 200
                         step: 5
-                        unit: "%"
                         value: Math.round(SessionData.displayContrast * 100)
                         onSliderValueChanged: newValue => NightModeService.setDisplayContrast(newValue / 100)
                     }

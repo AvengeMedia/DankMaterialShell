@@ -76,7 +76,7 @@ Item {
         width: Math.min(root.panelWidth, root.width - Theme.spacingL * 2)
         height: column.implicitHeight + Theme.spacingL * 2
         radius: Theme.windowRadius
-        color: Theme.surfaceContainerHigh
+        color: Theme.nestedSurface
         opacity: root.shown ? 1 : 0
         scale: root.shown ? 1 : CcMetrics.popupEnterScale
 

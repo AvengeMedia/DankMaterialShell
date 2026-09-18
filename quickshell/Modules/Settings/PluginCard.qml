@@ -16,6 +16,7 @@ DankCard {
     property string previewSource: PluginService.previewUrl(plugin)
     property var badges: PluginService.badgeModel(plugin)
     property bool allowUninstall: false
+    property var palette: null
     property real previewHeight: Math.round((width - Theme.spacingS * 2) * SettingsMetrics.choiceCardPreviewRatio)
     readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
     readonly property bool compatible: PluginService.checkPluginCompatibility(plugin.requires_dms)
@@ -25,7 +26,7 @@ DankCard {
 
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
     radius: Theme.cornerRadiusM
-    color: Theme.surfaceContainerHighest
+    color: Theme.floatingWindowNestedSurface
     border.color: Theme.focusRingColor
     border.width: selected ? Theme.focusRingWidth : 0
     pad: 0
@@ -44,7 +45,7 @@ DankCard {
         ClippingRectangle {
             anchors.fill: parent
             radius: Theme.cornerRadiusS
-            color: Theme.surfaceContainerLow
+            color: Theme.chipSurface
 
             CachingImage {
                 id: cardPreview
@@ -69,6 +70,18 @@ DankCard {
                 running: cardPreview.status === Image.Loading
                 visible: running
             }
+        }
+
+        DankPaletteSwatch {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: Theme.spacingXS
+            width: Theme.iconSizeMedium
+            height: Theme.iconSizeMedium
+            visible: !!root.palette?.primary
+            primaryColor: root.palette?.primary ?? Theme.primary
+            secondaryColor: root.palette?.secondary ?? primaryColor
+            tertiaryColor: root.palette?.tertiary ?? secondaryColor
         }
 
         Row {

@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -10,6 +11,12 @@ import time
 import sys
 
 repo = Path(__file__).resolve().parents[2]
+
+
+def settings_config_version():
+    source = (repo / "quickshell/Common/SettingsData.qml").read_text()
+    match = re.search(r"readonly property int settingsConfigVersion: (\d+)", source)
+    return int(match.group(1))
 
 
 def read_line(fd):
@@ -55,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix="dms-surface-test-") as temporary:
 
     if not suite:
         link_tree(root / "qml", fixtures[0])
-    settings = {"configVersion": 26, "barConfigs": [], "showDock": False, "frameEnabled": False, "disableLockScreen": True, "loginctlLockIntegration": False, "enableDynamicTheming": False}
+    settings = {"configVersion": settings_config_version(), "barConfigs": [], "showDock": False, "frameEnabled": False, "disableLockScreen": True, "loginctlLockIntegration": False, "enableDynamicTheming": False}
     for name in ["acMonitorTimeout", "acLockTimeout", "acSuspendTimeout", "batteryMonitorTimeout", "batteryLockTimeout", "batterySuspendTimeout"]:
         settings[name] = 0
     if os.environ.get("DMS_FIXTURE_SETTINGS"):

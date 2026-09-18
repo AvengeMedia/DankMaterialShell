@@ -6,6 +6,7 @@ import qs.Modules.DankBar
 import qs.Modules.DankBar.Widgets
 import qs.Modules.OSD
 import qs.DankCommon.Common as DC
+import "Common/WorkspaceModel.js" as WorkspaceModel
 
 ShellRoot {
     id: root
@@ -41,15 +42,13 @@ ShellRoot {
         return (item.children || []).reduce((result, child) => result.concat(texts(child)), []);
     }
 
-    function hyprlandRecord(id, name) {
+    function hyprlandRaw(id, name) {
         return {
             "id": id,
-            "idx": id,
             "name": name,
-            "output": root.output,
-            "active": false,
-            "placeholder": false,
-            "urgent": false
+            "monitor": {
+                "name": root.output
+            }
         };
     }
 
@@ -222,13 +221,24 @@ ShellRoot {
                             }
                         }
                     });
-                    root.switcher.workspaceList = root.switcher.hyprlandSlotList([root.hyprlandRecord(1, "web"), root.hyprlandRecord(3, "")]);
+                    root.switcher.widgetData = {
+                        "id": "workspaceSwitcher",
+                        "showWorkspaceName": true,
+                        "showWorkspacePadding": true
+                    };
+                    root.switcher.workspaceList = root.switcher.hyprlandSlotList(WorkspaceModel.hyprlandWorkspacesForScreen({
+                        "workspaces": [root.hyprlandRaw(1, "web"), root.hyprlandRaw(3, "")],
+                        "monitors": [],
+                        "focusedWorkspace": null,
+                        "toplevels": []
+                    }, root.output, false, false, 3));
                     advance();
                     return;
                 case 6:
                     if (root.pills().length !== 3 || waited < 4)
                         return;
-                    root.check(root.pills().map(pill => root.texts(pill).join("|")).join() === "1: web,3,3", "hyprland slot pills label from their record, got " + root.pills().map(pill => root.texts(pill).join("|")).join());
+                    root.check(root.pills().map(pill => root.texts(pill).join("|")).join() === "web,2,3", "hyprland slot pills label from their record, got " + root.pills().map(pill => root.texts(pill).join("|")).join());
+                    root.check(root.pills().every(pill => !pill.isPlaceholder), "hyprland padding slots are real workspaces");
                     console.log("FIXTURE_PASS");
                     stop();
                     Qt.quit();

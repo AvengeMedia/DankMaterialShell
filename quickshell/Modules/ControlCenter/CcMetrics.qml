@@ -5,30 +5,32 @@ import Quickshell
 import qs.Common
 
 Singleton {
-    readonly property real sheetWidthDefault: 550
-    readonly property real sheetWidthMin: 400
-    readonly property real sheetWidthMax: 800
-    readonly property real sheetWidthStep: Theme.spacingS
-    property real sheetPreviewWidth: 0
-    readonly property real sheetWidth: sheetPreviewWidth > 0 ? sheetPreviewWidth : clampSheetWidth(SettingsData.controlCenterWidth)
+    readonly property real sheetWidthDefault: sheetWidthFor(defaultColumns)
+    readonly property int defaultColumns: 8
+    readonly property int minimumColumns: 6
     readonly property real sheetPadding: PopoutMetrics.contentPadding
+    readonly property real columnWidth: tileHeight
+    property int columnPreview: 0
+    readonly property int gridColumns: columnPreview > 0 ? columnPreview : clampColumns(SettingsData.controlCenterColumns)
+    readonly property real sheetWidth: sheetWidthFor(gridColumns)
 
-    readonly property int sheetStepMin: Math.ceil((sheetWidthMin - sheetWidthDefault) / sheetWidthStep)
-    readonly property int sheetStepMax: Math.floor((sheetWidthMax - sheetWidthDefault) / sheetWidthStep)
-
-    function clampSheetWidth(value) {
-        const width = Number(value);
-        if (!Number.isFinite(width) || width <= 0)
-            return sheetWidthDefault;
-        return sheetWidthForStep(sheetStepFor(width));
+    function clampColumns(value) {
+        const columns = Math.round(Number(value));
+        if (!Number.isFinite(columns) || columns <= 0)
+            return defaultColumns;
+        return Math.max(minimumColumns, columns);
     }
 
-    function sheetWidthForStep(step) {
-        return sheetWidthDefault + Math.max(sheetStepMin, Math.min(sheetStepMax, step)) * sheetWidthStep;
+    function columnCapFor(availableWidth) {
+        return Math.max(1, Math.floor((availableWidth - sheetPadding * 2 + gridGap) / (columnWidth + gridGap)));
     }
 
-    function sheetStepFor(width) {
-        return Math.round((width - sheetWidthDefault) / sheetWidthStep);
+    function rowCapFor(availableHeight, cellHeight = gridRowUnit) {
+        return Math.max(1, Math.floor((availableHeight + gridGap) / (cellHeight + gridGap)));
+    }
+
+    function sheetWidthFor(columns) {
+        return sheetPadding * 2 + columns * columnWidth + (columns - 1) * gridGap;
     }
     readonly property real maxHeightInset: 100
     readonly property real minHeight: 300
@@ -36,15 +38,22 @@ Singleton {
     readonly property real triggerWidth: 80
 
     readonly property real tileHeight: 64
-    readonly property real sliderRowHeight: tileHeight
+    readonly property real gridRowUnit: tileHeight
+    readonly property real expandedTileMinWidth: columnWidth * 3 + gridGap * 2
+    readonly property real sliderRowHeight: Theme.minimumTouchTargetSize
     readonly property real gridGap: Theme.spacingS
     readonly property real tilePaddingH: Theme.spacingL
-    readonly property real tileIconSize: Theme.iconSizeLarge
-    readonly property real iconBoxSize: 48
+    readonly property real iconScale: SettingsData.controlCenterIconScale
+    readonly property real tileIconSize: Theme.iconSizeLarge * iconScale
+    readonly property real iconBoxSize: Theme.minimumTouchTargetSize * iconScale
     readonly property real tileActiveRadius: Theme.scaledRadius(24, tileHeight / 2)
+    readonly property real tallTileRadius: Theme.cornerRadiusXL
     readonly property real iconBoxActiveRadius: Theme.cornerRadiusL
-    readonly property real iconBoxIconSize: Theme.iconSize
+    readonly property real iconBoxIconSize: Theme.iconSize * iconScale
+    readonly property real tallMeterThickness: 28
     readonly property real tileTextGap: Theme.spacingM
+    readonly property real headerActionSize: Theme.iconButtonSize * iconScale
+    readonly property real headerActionIconSize: Theme.iconSize * iconScale
     readonly property int wheelVolumeStep: 5
 
     readonly property real headerAvatarSize: 56
@@ -60,7 +69,7 @@ Singleton {
 
     readonly property real rowPaddingH: Theme.spacingL
     readonly property real rowPaddingV: Theme.spacingM
-    readonly property color rowColor: Theme.foregroundColor(Theme.surfaceContainerHigh)
+    readonly property color rowColor: Theme.foregroundColor(Theme.cardSurface)
     readonly property int maxPins: 3
     readonly property real statusDotSize: 8
     readonly property real spinnerStroke: 2

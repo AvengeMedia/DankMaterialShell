@@ -284,4 +284,23 @@ PluginComponent {
             }
         }
     }
+    ccExpandedContent: Component {
+        CcTileActions {
+            actions: [
+                {
+                    text: I18n.tr("None", "Tailscale exit node: none selected"),
+                    icon: "alt_route",
+                    active: TailscaleService.currentExitNode === null,
+                    enabled: TailscaleService.connected,
+                    trigger: () => TailscaleService.clearExitNode(null)
+                }
+            ].concat(TailscaleService.exitNodeOptions.map(peer => ({
+                        text: peer.hostname,
+                        icon: "alt_route",
+                        active: TailscaleService.currentExitNode?.id === peer.id,
+                        enabled: TailscaleService.connected,
+                        trigger: () => TailscaleService.setExitNode(peer.id, null)
+                    })))
+        }
+    }
 }

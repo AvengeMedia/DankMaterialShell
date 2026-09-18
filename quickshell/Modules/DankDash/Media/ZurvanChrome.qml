@@ -32,7 +32,7 @@ MediaChromeBase {
     readonly property bool lowResArt: artSide > 0 && artSide < artworkSize * renderScale * DashMetrics.mediaArtLowResRatio
 
     artSize: DashMetrics.mediaArtSizeDash
-    surfaceColor: Theme.foregroundColor(Theme.surfaceContainer, false)
+    surfaceColor: DashMetrics.cardColor
     baseHeight: Math.max(DashMetrics.tabMinHeight, padding * 2 + (compact ? naturalArtSize + Theme.spacingXL + paneMinHeight : Math.max(naturalArtSize, paneMinHeight)))
     focusTargets: (viewToggle.visible ? [viewToggle] : []).concat(artTransportLoader.item?.focusTargets ?? [], [playerButton], seekbar.canSeek && seekBlock.visible ? [seekbar] : [], transport.focusTargets, sourceGroup.focusTargets)
     panelButtons: [playerButton].concat(sourceGroup.panelButtons)
@@ -84,7 +84,7 @@ MediaChromeBase {
                 width: viewToggle.width + Theme.spacingXS * 2
                 height: viewToggle.height + Theme.spacingXS * 2
                 radius: Theme.fullRadius(width, height)
-                color: Theme.surfaceContainerHighest
+                color: Theme.chipSurface
                 visible: root.player.lyricsEnabled
                 opacity: revealed ? 1 : 0
 

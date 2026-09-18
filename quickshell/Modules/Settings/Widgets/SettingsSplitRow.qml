@@ -13,6 +13,14 @@ SettingsRow {
     clickable: true
     onClicked: navigated()
 
+    DankIcon {
+        name: "chevron_right"
+        size: Theme.iconSize
+        color: Theme.surfaceVariantText
+        rotation: I18n.isRtl ? 180 : 0
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
     Rectangle {
         width: Theme.dividerWidth
         height: SettingsMetrics.splitDividerHeight

@@ -16,7 +16,7 @@ with tempfile.TemporaryDirectory(prefix="dms-grid-edit-test-") as temporary:
             continue
         (root / "qml" / source.name).symlink_to(source)
     (root / "qml/shell.qml").write_text((repo / "quickshell/tests/qml/grid-edit.qml").read_text())
-    settings = {"configVersion": 26, "barConfigs": [], "showDock": False, "frameEnabled": False, "disableLockScreen": True, "loginctlLockIntegration": False, "enableDynamicTheming": False}
+    settings = {"configVersion": 27, "barConfigs": [], "showDock": False, "frameEnabled": False, "disableLockScreen": True, "loginctlLockIntegration": False, "enableDynamicTheming": False}
     for name in ["acMonitorTimeout", "acLockTimeout", "acSuspendTimeout", "batteryMonitorTimeout", "batteryLockTimeout", "batterySuspendTimeout"]:
         settings[name] = 0
     (root / "config/DankMaterialShell/settings.json").write_text(json.dumps(settings))

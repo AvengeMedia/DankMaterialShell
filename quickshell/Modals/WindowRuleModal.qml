@@ -548,7 +548,7 @@ DankFloatingWindow {
         width: condRow.implicitWidth + Theme.spacingM * 2
         height: root.inputFieldHeight
         radius: Theme.cornerRadiusM
-        color: enabled ? Theme.surfaceHover : Theme.onSurface_12
+        color: enabled ? Theme.chipSurface : Theme.onSurface_12
         border.width: Theme.outlineWidth
         border.color: !enabled ? "transparent" : mc.triState === 0 ? Theme.outlineStrong : mc.stateColor[mc.triState]
         enabled: root.visible && !mc.readOnly

@@ -142,7 +142,7 @@ CcListRow {
                     width: fieldContent.width + Theme.spacingM * 2
                     height: Theme.buttonHeightXS
                     radius: Theme.cornerRadiusS
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.chipSurface
 
                     Row {
                         id: fieldContent

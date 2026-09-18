@@ -151,7 +151,7 @@ Item {
                                 return Theme.errorHover;
                             if (vendor.includes("intel"))
                                 return Theme.withAlpha(Theme.info, 0.08);
-                            return Theme.surfaceHover;
+                            return Theme.cardSurface;
                         }
                         border.color: {
                             const vendor = (modelData?.vendor ?? "").toLowerCase();

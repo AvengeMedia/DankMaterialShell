@@ -11,8 +11,6 @@ DankGridEditChrome {
     signal configRequested(var anchor)
 
     hasOptions: widgetData.id === "diskUsage" || widgetData.id === "brightnessSlider" || widgetData.id === "idleInhibitor" || String(widgetData.id ?? "").startsWith("plugin_")
-    horizontalResize: true
-    cornerRadius: Theme.fullRadius(width, CcMetrics.tileHeight)
     buttonSize: Theme.iconSize
     iconSize: PopoutMetrics.chromeIconSize
 

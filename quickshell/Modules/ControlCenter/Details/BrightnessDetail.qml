@@ -110,13 +110,6 @@ Item {
         return (device.name || "").includes("kbd") ? "keyboard" : "lightbulb";
     }
 
-    function deviceTitle(device) {
-        const name = device.name || "";
-        if (device.class !== "backlight")
-            return name;
-        return name.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-    }
-
     function deviceClassLabel(device) {
         switch (device.class || "") {
         case "backlight":
@@ -192,7 +185,7 @@ Item {
                         iconName: root.deviceIcon(modelData, deviceBrightness)
                         active: deviceName === root.currentDeviceName
                         showActiveCheck: true
-                        title: root.deviceTitle(modelData)
+                        title: BrightnessService.deviceTitle(modelData)
                         subtitle: deviceName + " • " + root.deviceClassLabel(modelData)
                         trailingBadge: Math.round(deviceBrightness) + "%"
                         clickable: true

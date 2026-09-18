@@ -328,7 +328,7 @@ Item {
                         z: -1
                         visible: delegateRoot.visible
                         opacity: delegateRoot.opacity
-                        color: Theme.foregroundColor(Theme.surfaceContainerLow, Theme.isFloatingWindow(root))
+                        color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
                         radius: Theme.groupedListInnerRadius
                         topLeftRadius: delegateRoot.modelData?.firstInGroup ? Theme.groupedListOuterRadius : radius
                         topRightRadius: topLeftRadius
@@ -416,7 +416,7 @@ Item {
                                     z: -1
                                     visible: delegateRoot.visible
                                     opacity: delegateRoot.opacity
-                                    color: Theme.foregroundColor(Theme.surfaceContainerLow, Theme.isFloatingWindow(root))
+                                    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
                                     radius: Theme.cornerRadiusL
                                 }
 
@@ -516,7 +516,7 @@ Item {
             }
             GradientStop {
                 position: 1.0
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                color: Theme.readableSurface
             }
         }
     }

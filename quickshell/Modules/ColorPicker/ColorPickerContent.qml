@@ -312,7 +312,7 @@ DankDialog {
     }
 
     SettingsGroup {
-        slotColor: Theme.foregroundColor(Theme.surfaceContainerHigh, root.windowControls !== null)
+        slotColor: Theme.foregroundColor(Theme.cardSurface, root.windowControls !== null)
 
         SettingsRow {
             title: "RGB"

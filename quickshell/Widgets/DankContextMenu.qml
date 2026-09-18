@@ -253,7 +253,7 @@ Item {
                 y: Math.max(root.menuMargin, Math.min(menuWindow.height - height - root.menuMargin, root.anchorY))
                 width: root.effectiveMenuWidth
                 height: root.effectiveMenuHeight
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                color: Theme.readableSurface
                 radius: Theme.windowRadius
                 border.color: BlurService.borderColor
                 border.width: BlurService.borderWidth

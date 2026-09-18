@@ -92,7 +92,7 @@ ListSetting {
             width: parent.width
             height: 40
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.chipSurface
             border.width: 0
 
             required property int index

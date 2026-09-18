@@ -217,16 +217,44 @@ PluginComponent {
 - `ccWidgetPrimaryText`: Main label
 - `ccWidgetSecondaryText`: Subtitle/status
 - `ccWidgetIsActive`: Active state styling
-- `ccDetailContent`: Optional dropdown panel (use for CompoundPill)
+- `ccWidgetIsToggle`: Whether the icon toggles state; set false for action-only tiles
+- `ccExpandedContent`: Optional inline controls for larger tiles
+- `ccExpandedMinimumHeight`: Minimum height for inline controls, default `Theme.listItemHeight`
+- `ccDetailContent`: Optional detail page
 
 **Signals:**
 - `ccWidgetToggled()`: Fired when icon clicked
-- `ccWidgetExpanded()`: Fired when expand area clicked (CompoundPill only)
+- `ccWidgetExpanded()`: Fired when opening the detail page
 
-**Widget Sizing:**
-- 25% width → SmallToggleButton (icon only)
-- 50% width → ToggleButton (no detail) or CompoundPill (with detail)
-- Users can resize in edit mode
+**Widget sizing:**
+
+The grid uses square cells, with eight columns by default. A standard strip is
+4×1; a 2×2 tile is square. Users resize tiles and the panel in edit mode. Panel
+width and tile height are limited by the current screen, independently of each
+other. Saved spans are retained when displaying a tile on a smaller screen.
+The standard tile adapts its icon and labels automatically. Larger tiles can load
+`ccExpandedContent` below the header when enough space is available.
+
+Use `CcTileContent` from `qs.Modules.ControlCenter.Widgets` for inline content.
+Its `tile` is supplied by the host. It exposes `columns`, `rows`, `live`,
+`contentColor`, and `subtitleColor`; `width` and `height` are the available space.
+Content is disabled in edit mode and destroyed when the Control Center closes or
+shrinks below the minimum size. Keep persistent state in the plugin instance.
+
+```qml
+ccExpandedContent: Component {
+    CcTileContent {
+        DankButton {
+            maximumWidth: parent.width
+            text: I18n.trFor("myPlugin", "Run")
+            onClicked: root.runAction()
+        }
+    }
+}
+```
+
+Existing plugins need no changes to use the standard responsive tile. Custom
+inline controls must fit their allocated space and gate ongoing work on `live`.
 
 **Custom Click Actions:**
 

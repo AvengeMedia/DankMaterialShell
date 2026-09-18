@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 
 CcTile {
+    id: root
 
     iconName: "contrast"
     iconRotation: SessionData.isLightMode ? 180 : 0
@@ -16,5 +17,20 @@ CcTile {
         const newMode = !SessionData.isLightMode;
         Theme.screenTransition();
         Theme.setLightMode(newMode);
+    }
+    expandedContent: Component {
+        CcTileActions {
+            actions: [false, true].map(light => ({
+                        text: light ? I18n.tr("Light") : I18n.tr("Dark"),
+                        icon: light ? "light_mode" : "dark_mode",
+                        active: light === SessionData.isLightMode,
+                        trigger: () => {
+                            if (light === SessionData.isLightMode)
+                                return;
+                            Theme.screenTransition();
+                            Theme.setLightMode(light);
+                        }
+                    }))
+        }
     }
 }

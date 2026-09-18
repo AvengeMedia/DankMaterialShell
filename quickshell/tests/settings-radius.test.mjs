@@ -11,7 +11,7 @@ test("legacy migration preserves explicit radii and defaults sparse settings to 
             const original = { configVersion: version, cornerRadius: radius, niriLayoutRadiusOverride: 17 };
             const migrated = store.migrateToVersion(original, 26);
             assert.equal(migrated.radiusStrength, strength);
-            assert.equal(migrated.configVersion, 26);
+            assert.equal(migrated.configVersion, 27);
             assert.equal("cornerRadius" in migrated, false);
             assert.equal(migrated.niriLayoutRadiusOverride, 17);
             assert.equal(original.configVersion, version);

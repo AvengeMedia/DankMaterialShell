@@ -67,7 +67,7 @@ Column {
         iconsClickable: root.iconsClickable
         unit: root.unit
         wheelEnabled: false
-        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+        thumbOutlineColor: Theme.withAlpha(Theme.cardSurface, Theme.popupTransparency)
         onSliderValueChanged: newValue => {
             root.value = newValue;
         }

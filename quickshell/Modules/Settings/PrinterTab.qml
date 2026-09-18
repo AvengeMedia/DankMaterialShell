@@ -619,7 +619,7 @@ Item {
                                     text: printerDelegate.isStopped ? I18n.tr("Resume", "verb, button that resumes a paused printer") : I18n.tr("Pause")
                                     iconName: printerDelegate.isStopped ? "play_arrow" : "pause"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.surfaceLight
+                                    backgroundColor: Theme.chipSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.isStopped) {
@@ -634,7 +634,7 @@ Item {
                                     text: I18n.tr("Test page")
                                     iconName: "description"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.surfaceLight
+                                    backgroundColor: Theme.chipSurface
                                     textColor: Theme.surfaceText
                                     onClicked: CupsService.printTestPage(printerDelegate.modelData)
                                 }
@@ -643,7 +643,7 @@ Item {
                                     text: printerDelegate.printerData?.accepting ? I18n.tr("Reject jobs") : I18n.tr("Accept jobs")
                                     iconName: printerDelegate.printerData?.accepting ? "block" : "check_circle"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.surfaceLight
+                                    backgroundColor: Theme.chipSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         if (printerDelegate.printerData?.accepting) {
@@ -672,7 +672,7 @@ Item {
                                     text: I18n.tr("Clear All")
                                     iconName: "delete_sweep"
                                     buttonHeight: Theme.buttonHeightXS
-                                    backgroundColor: Theme.surfaceLight
+                                    backgroundColor: Theme.chipSurface
                                     textColor: Theme.surfaceText
                                     onClicked: {
                                         purgeJobsConfirm.showWithOptions({

@@ -1,6 +1,8 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import Quickshell.Bluetooth
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 CcTile {
     id: root
@@ -46,4 +48,40 @@ CcTile {
     enabled: widgetDef?.enabled ?? true
 
     onClicked: BluetoothService.toggleBluetooth()
+    expandedContent: Component {
+        CcTileActions {
+            readonly property var pins: QmlUtils.normalizePinList((CacheData.bluetoothDevicePins || {}).preferredDevice)
+            readonly property var devices: {
+                if (!root.adapterOn || !root.adapter?.devices)
+                    return [];
+                return root.adapter.devices.values.filter(device => device && (device.paired || device.trusted)).sort((a, b) => {
+                    const aPin = pins.indexOf(a.address);
+                    const bPin = pins.indexOf(b.address);
+                    if (aPin !== bPin)
+                        return (aPin < 0 ? Infinity : aPin) - (bPin < 0 ? Infinity : bPin);
+                    return Number(b.connected) - Number(a.connected);
+                });
+            }
+            actions: devices.map(device => ({
+                        text: root.deviceLabel(device),
+                        icon: BluetoothService.getDeviceIcon(device),
+                        toggle: true,
+                        active: device.connected,
+                        enabled: device.state !== BluetoothDeviceState.Connecting,
+                        trigger: () => {
+                            if (device.connected) {
+                                device.disconnect();
+                                return;
+                            }
+                            BluetoothService.connectDeviceWithTrust(device);
+                        }
+                    })).concat([
+                {
+                    text: I18n.tr("Devices"),
+                    icon: "bluetooth_searching",
+                    trigger: () => root.expandClicked()
+                }
+            ])
+        }
+    }
 }

@@ -119,7 +119,7 @@ Row {
                     width: Math.round(Theme.iconSize * root.previewWidthRatio)
                     height: Math.round(width * root.previewAspect)
                     radius: Theme.spacingXS
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.chipSurface
                     border.width: Theme.outlineWidth
                     border.color: Theme.outline
                     anchors.horizontalCenter: parent.horizontalCenter

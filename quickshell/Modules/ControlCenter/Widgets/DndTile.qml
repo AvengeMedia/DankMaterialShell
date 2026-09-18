@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 
 CcTile {
+    id: root
 
     iconName: "do_not_disturb_on"
     title: I18n.tr("Do not disturb")
@@ -17,4 +18,9 @@ CcTile {
     showExpand: true
 
     onClicked: SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
+    expandedContent: Component {
+        CcDurationActions {
+            onSelected: minutes => SessionData.setDoNotDisturb(true, minutes)
+        }
+    }
 }

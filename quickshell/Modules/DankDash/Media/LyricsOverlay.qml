@@ -31,6 +31,7 @@ FocusScope {
     readonly property real currentLineY: transcript.currentItem?.y ?? 0
     readonly property real shapeInset: Math.ceil(Math.min(radius, width / 2, height / 2) * (1 - Math.SQRT1_2))
     readonly property bool compact: content.height < Theme.listItemTwoLineHeight * 2
+    readonly property real leadFontSize: Math.round(Math.max(Theme.fontSizeXLarge, Math.min(Theme.fontSizeDisplay, transcript.height / DashMetrics.lyricsLeadHeightDivisor, transcript.width / DashMetrics.lyricsLeadWidthDivisor)))
     readonly property string message: {
         switch (controller.state) {
         case "loading":
@@ -303,6 +304,7 @@ FocusScope {
                             accent: modelData.chorus ? MediaAccentService.lyricsGroupAccent : MediaAccentService.lyricsAccents[(modelData.voiceIndex ?? 0) % MediaAccentService.lyricsAccents.length]
                             synced: root.controller.synced
                             following: root.following
+                            leadFontSize: root.leadFontSize
                             distance: lyric ? Math.abs(lyric.index - root.activeIndex) : 0
                             animationsEnabled: root.animationsEnabled
                             inViewport: {
@@ -331,7 +333,7 @@ FocusScope {
             Accessible.name: I18n.tr("Follow playback", "Resume automatic scrolling of lyrics")
             tooltipText: root.compact ? Accessible.name : ""
             iconName: "my_location"
-            backgroundColor: Theme.surfaceContainerHigh
+            backgroundColor: Theme.chipSurface
             textColor: MediaAccentService.readableAccent
             onClicked: {
                 root.following = true;

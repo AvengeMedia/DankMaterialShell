@@ -413,7 +413,7 @@ Item {
                                 DankButton {
                                     id: unmuteBtn
                                     text: I18n.tr("Unmute")
-                                    backgroundColor: Theme.surfaceContainerHigh
+                                    backgroundColor: Theme.chipSurface
                                     textColor: Theme.primary
                                     onClicked: SettingsData.removeNotificationRule(modelData.index)
                                 }

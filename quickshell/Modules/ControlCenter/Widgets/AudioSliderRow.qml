@@ -20,15 +20,13 @@ CcSliderRow {
         return audible ? "mic" : "mic_off";
     }
     sliderLabel: isInput ? I18n.tr("Input Volume") : I18n.tr("Volume")
-    insetIconClickable: audio !== null && interactive
-    insetIconLabel: audio?.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
+    iconLabel: audio?.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
     sliderEnabled: audio !== null
     minimum: 0
     maximum: maxVolume
-    unit: "%"
     valueOverride: volumePercent
 
-    onInsetIconClicked: {
+    onIconClicked: {
         if (!audio)
             return;
         SessionData.suppressOSDTemporarily();

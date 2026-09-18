@@ -13,7 +13,7 @@ Rectangle {
     height: Theme.iconSize
     width: content.implicitWidth + Theme.spacingS * 2
     radius: Theme.cornerRadiusS
-    color: Theme.surfaceContainerHigh
+    color: Theme.chipSurface
     border.color: Theme.outlineVariant
     border.width: Theme.outlineWidth
 

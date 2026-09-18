@@ -159,7 +159,7 @@ DankModal {
                 width: parent.width
                 height: bodyCol.implicitHeight + Theme.spacingM * 2
                 radius: Theme.cornerRadiusL
-                color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+                color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
 
                 Row {
                     anchors.fill: parent

@@ -108,7 +108,7 @@ Item {
                             iconName: modelData.icon || ""
                             iconSize: Theme.iconSizeSmall
                             text: modelData.label
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
                             onClicked: {
                                 const minutes = modelData.minutesFn ? root.minutesUntilTomorrowMorning() : modelData.minutes;

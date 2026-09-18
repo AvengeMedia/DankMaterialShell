@@ -7,62 +7,79 @@ import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/ThemePalette.js" as ThemePalette
 
 Item {
     id: themeColorsTab
 
     property var parentModal: null
     property string pendingExtractJson: ""
-    property var cachedMatugenSchemes: Theme.availableMatugenSchemes.filter(option => DMSService.matugenSmartSupported || option.value !== "scheme-smart").map(option => option.label)
     property var cachedSourceModes: Theme.availableSourceModes.map(option => option.label)
     property var matugenSchemePreviews: ({})
-    property string matugenPreviewSource: ""
-    property string matugenPreviewImage: ""
-    property real matugenPreviewContrast: 0
     property string matugenPreviewRequestKey: ""
+    property string matugenPreviewLoadedKey: ""
+    readonly property string matugenPreviewSource: Theme.getMatugenColor("source_color", Theme.primary).toString()
+    readonly property string matugenPreviewImage: (Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : ""
+    readonly property string matugenPreviewKey: matugenPreviewSource + "|" + (SettingsData.matugenContrast ?? 0) + "|" + matugenPreviewImage
+    property bool matugenGenerating: false
+    readonly property var currentPalette: ThemePalette.pick({
+        "primary": Theme.primary,
+        "secondary": Theme.secondary,
+        "tertiary": Theme.tertiary,
+        "primaryContainer": Theme.primaryContainer,
+        "info": Theme.info,
+        "error": Theme.error,
+        "warning": Theme.warning
+    })
+    property bool matugenPreviewFailed: false
+    readonly property bool matugenPreviewsReady: !matugenGenerating && (matugenPreviewLoadedKey === matugenPreviewKey || matugenPreviewFailed || !Theme.matugenAvailable)
+    onMatugenPreviewKeyChanged: refreshMatugenSchemePreviews()
     property var installedRegistryThemes: []
-    readonly property var matugenSchemeColorMap: {
-        const map = {};
+    readonly property var matugenSchemeOptions: {
         const mode = SessionData.isLightMode ? "light" : "dark";
-        for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
-            const option = Theme.availableMatugenSchemes[i];
-            const preview = matugenSchemePreviews[option.value] || matugenSchemePreviews["scheme-tonal-spot"];
-            if (preview?.[mode])
-                map[option.label] = preview[mode];
+        const options = [];
+        for (const option of Theme.availableMatugenSchemes) {
+            if (option.value === "scheme-smart" && !DMSService.matugenSmartSupported)
+                continue;
+            const colors = (matugenSchemePreviews[option.value] ?? matugenSchemePreviews["scheme-tonal-spot"])?.[mode];
+            // a dms binary older than the tri-color preview returns the primary hex as a plain string
+            const primary = typeof colors === "string" ? colors : (colors?.primary ?? Theme.primary.toString());
+            options.push({
+                "value": option.value,
+                "label": option.label,
+                "primary": primary,
+                "secondary": colors?.secondary ?? primary,
+                "tertiary": colors?.tertiary ?? primary
+            });
         }
-        return map;
+        return options;
     }
 
     function refreshMatugenSchemePreviews() {
         if (!Theme.matugenAvailable)
             return;
-        const sourceColor = Theme.getMatugenColor("source_color", Theme.primary).toString();
-        const contrast = SettingsData.matugenContrast ?? 0;
-        const imagePath = (Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : "";
-        const requestKey = sourceColor + "|" + contrast + "|" + imagePath;
-        if (sourceColor === matugenPreviewSource && contrast === matugenPreviewContrast && imagePath === matugenPreviewImage && Object.keys(matugenSchemePreviews).length > 0)
-            return;
-        if (requestKey === matugenPreviewRequestKey)
+        const requestKey = matugenPreviewKey;
+        if (requestKey === matugenPreviewLoadedKey || requestKey === matugenPreviewRequestKey)
             return;
         matugenPreviewRequestKey = requestKey;
+        matugenPreviewFailed = false;
 
-        const args = [Proc.dmsBin, "matugen", "preview", "--source-color", sourceColor, "--contrast", contrast.toString()];
-        if (imagePath)
-            args.push("--image", imagePath);
+        const args = [Proc.dmsBin, "matugen", "preview", "--source-color", matugenPreviewSource, "--contrast", String(SettingsData.matugenContrast ?? 0)];
+        if (matugenPreviewImage)
+            args.push("--image", matugenPreviewImage);
         Proc.runCommand("", args, (output, exitCode) => {
             if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
                 return;
+            themeColorsTab.matugenPreviewRequestKey = "";
             if (exitCode !== 0) {
-                themeColorsTab.matugenPreviewRequestKey = "";
+                themeColorsTab.matugenPreviewFailed = true;
                 return;
             }
             try {
                 themeColorsTab.matugenSchemePreviews = JSON.parse(output.trim());
-                themeColorsTab.matugenPreviewSource = sourceColor;
-                themeColorsTab.matugenPreviewImage = imagePath;
-                themeColorsTab.matugenPreviewContrast = contrast;
+                themeColorsTab.matugenPreviewLoadedKey = requestKey;
             } catch (e) {
-                themeColorsTab.matugenPreviewRequestKey = "";
+                themeColorsTab.matugenPreviewFailed = true;
             }
         });
     }
@@ -92,18 +109,14 @@ Item {
 
     Connections {
         target: Theme
-        function onMatugenColorsChanged() {
-            themeColorsTab.refreshMatugenSchemePreviews();
-        }
         function onMatugenAvailableChanged() {
             themeColorsTab.refreshMatugenSchemePreviews();
         }
-    }
-
-    Connections {
-        target: SettingsData
-        function onMatugenContrastChanged() {
-            themeColorsTab.refreshMatugenSchemePreviews();
+        function onThemeGenerationStarting() {
+            themeColorsTab.matugenGenerating = true;
+        }
+        function onMatugenCompleted() {
+            themeColorsTab.matugenGenerating = false;
         }
     }
 
@@ -134,11 +147,9 @@ Item {
                             return "";
                         }
                         text: {
-                            if (Theme.currentTheme === Theme.dynamic)
-                                return I18n.tr("Current Theme: %1", "current theme label").arg(I18n.tr("Dynamic", "dynamic theme name"));
                             if (Theme.currentThemeCategory === "registry" && registryThemeName)
                                 return I18n.tr("Current Theme: %1", "current theme label").arg(registryThemeName);
-                            return I18n.tr("Current Theme: %1", "current theme label").arg(Theme.getThemeColors(Theme.currentThemeName).name);
+                            return I18n.tr("Current Theme: %1", "current theme label").arg(Theme.currentThemeLabel);
                         }
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
@@ -214,12 +225,11 @@ Item {
                                     Theme.switchThemeCategory("generic", "blue");
                                     break;
                                 case 1:
-                                    if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                        ToastService.showError(I18n.tr("matugen not found - install matugen package for dynamic theming", "matugen error"));
-                                    else if (ToastService.wallpaperErrorStatus === "error")
-                                        ToastService.showError(I18n.tr("Wallpaper processing failed - check wallpaper path", "wallpaper error"));
-                                    else
-                                        Theme.switchThemeCategory("dynamic", Theme.dynamic);
+                                    if (ToastService.wallpaperErrorStatus === "matugen_missing" || ToastService.wallpaperErrorStatus === "error") {
+                                        ToastService.showError(ToastService.wallpaperErrorStatus === "matugen_missing" ? I18n.tr("matugen not found - install matugen package for dynamic theming", "matugen error") : I18n.tr("Wallpaper processing failed - check wallpaper path", "wallpaper error"));
+                                        break;
+                                    }
+                                    Theme.switchThemeCategory("dynamic", Theme.dynamic);
                                     break;
                                 case 2:
                                     Theme.switchThemeCategory("custom", "custom");
@@ -240,7 +250,7 @@ Item {
                         Grid {
                             id: genericColorGrid
                             property var colorList: ["blue", "purple", "green", "orange", "red", "cyan", "pink", "amber", "coral", "monochrome"]
-                            property int dotSize: parent.width < 300 ? 28 : 32
+                            property int dotSize: Theme.minimumTouchTargetSize
                             columns: Math.ceil(colorList.length / 2)
                             rowSpacing: Theme.spacingS
                             columnSpacing: Theme.spacingS
@@ -252,31 +262,34 @@ Item {
                                 Rectangle {
                                     required property string modelData
                                     property string themeName: modelData
+                                    readonly property var colors: Theme.getThemeColors(themeName)
+                                    readonly property var palette: ThemePalette.pick(colors)
+                                    readonly property bool isActive: Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic
                                     width: genericColorGrid.dotSize
                                     height: genericColorGrid.dotSize
                                     radius: width / 2
-                                    color: Theme.getThemeColors(themeName).primary
-                                    border.color: Theme.outline
-                                    border.width: (Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic) ? Theme.outlineWidthFocused : Theme.outlineWidth
-                                    scale: (Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic) ? 1.1 : 1
+                                    color: "transparent"
+                                    scale: isActive ? 1.1 : 1
 
-                                    Rectangle {
-                                        width: nameText.contentWidth + Theme.spacingS * 2
-                                        height: nameText.contentHeight + Theme.spacingXS * 2
-                                        color: Theme.floatingWindowSurface
-                                        radius: Theme.cornerRadius
-                                        anchors.bottom: parent.top
-                                        anchors.bottomMargin: Theme.spacingXS
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        visible: mouseArea.containsMouse
+                                    DankPaletteSwatch {
+                                        anchors.fill: parent
+                                        primaryColor: parent.palette.primary
+                                        secondaryColor: parent.palette.secondary
+                                        tertiaryColor: parent.palette.tertiary
+                                    }
 
-                                        StyledText {
-                                            id: nameText
-                                            text: Theme.getThemeColors(parent.parent.themeName).name
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceText
-                                            anchors.centerIn: parent
-                                        }
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "check"
+                                        size: Theme.iconSizeMedium
+                                        color: Theme.isLightColor(parent.colors.primary) ? Theme.contrastDark : Theme.contrastLight
+                                        visible: parent.isActive
+                                    }
+
+                                    DankTooltipHost {
+                                        text: parent.colors.name
+                                        target: parent
+                                        hoverArea: mouseArea
                                     }
 
                                     MouseArea {
@@ -307,7 +320,7 @@ Item {
                             width: 120
                             height: 90
                             radius: Theme.cornerRadius
-                            color: Theme.surfaceVariant
+                            color: Theme.floatingWindowNestedSurface
 
                             ClippingRectangle {
                                 anchors.fill: parent
@@ -409,23 +422,29 @@ Item {
                         }
                     }
 
-                    SettingsDropdownRow {
+                    SettingsRow {
                         visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
                         tab: "theme"
                         tags: ["matugen", "palette", "algorithm", "dynamic"]
                         settingKey: "matugenScheme"
-                        text: I18n.tr("Matugen palette")
-                        options: cachedMatugenSchemes
-                        optionColorMap: matugenSchemeColorMap
-                        currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
+                        title: I18n.tr("Matugen palette")
                         enabled: Theme.matugenAvailable
-                        onValueChanged: value => {
-                            for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
-                                var option = Theme.availableMatugenSchemes[i];
-                                if (option.label === value) {
-                                    SettingsData.setMatugenScheme(option.value);
-                                    break;
-                                }
+                        body: Item {
+                            width: parent.width
+                            height: themeColorsTab.matugenPreviewsReady ? schemeGrid.implicitHeight : Theme.minimumTouchTargetSize
+
+                            DankSpinner {
+                                anchors.centerIn: parent
+                                running: !themeColorsTab.matugenPreviewsReady
+                                visible: running
+                            }
+
+                            SettingsSwatchGrid {
+                                id: schemeGrid
+                                visible: themeColorsTab.matugenPreviewsReady
+                                options: themeColorsTab.matugenSchemeOptions
+                                currentValue: SettingsData.matugenScheme
+                                onSelected: value => SettingsData.setMatugenScheme(value)
                             }
                         }
                     }
@@ -472,7 +491,6 @@ Item {
                         value: Math.round(SettingsData.matugenContrast * 100)
                         minimum: -100
                         maximum: 100
-                        unit: "%"
                         enabled: Theme.matugenAvailable
                         onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
                     }
@@ -487,7 +505,7 @@ Item {
                             spacing: Theme.spacingM
 
                             DankActionButton {
-                                buttonSize: 48
+                                buttonSize: Theme.minimumTouchTargetSize
                                 iconName: "folder_open"
                                 Accessible.name: I18n.tr("Browse Files")
                                 iconSize: Theme.iconSize
@@ -496,8 +514,19 @@ Item {
                                 onClicked: fileBrowserModal.open()
                             }
 
+                            DankPaletteSwatch {
+                                id: customSwatch
+                                width: Theme.minimumTouchTargetSize
+                                height: Theme.minimumTouchTargetSize
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: !!SettingsData.customThemeFile
+                                primaryColor: themeColorsTab.currentPalette.primary
+                                secondaryColor: themeColorsTab.currentPalette.secondary
+                                tertiaryColor: themeColorsTab.currentPalette.tertiary
+                            }
+
                             Column {
-                                width: parent.width - 48 - Theme.spacingM
+                                width: parent.width - Theme.minimumTouchTargetSize - Theme.spacingM - (customSwatch.visible ? customSwatch.width + Theme.spacingM : 0)
                                 spacing: Theme.spacingXS
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -556,7 +585,7 @@ Item {
                                     width: themeGrid.cardWidth
                                     height: themeGrid.cardHeight
                                     radius: Theme.cornerRadius
-                                    color: Theme.surfaceVariant
+                                    color: Theme.floatingWindowNestedSurface
                                     border.color: isActive ? Theme.primary : Theme.outline
                                     border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
                                     scale: isActive ? 1.03 : 1
@@ -584,6 +613,19 @@ Item {
                                         size: themeGrid.cardWidth < 120 ? 24 : 32
                                         color: Theme.primary
                                         visible: previewImage.status === Image.Error || previewImage.status === Image.Null
+                                    }
+
+                                    DankPaletteSwatch {
+                                        readonly property var palette: ThemePalette.pick((Theme.isLightMode ? themeCard.modelData.light : themeCard.modelData.dark) ?? themeCard.modelData.dark)
+                                        anchors.top: parent.top
+                                        anchors.left: parent.left
+                                        anchors.margins: Theme.spacingXS
+                                        width: Theme.iconSizeMedium
+                                        height: Theme.iconSizeMedium
+                                        visible: !!palette
+                                        primaryColor: palette?.primary ?? Theme.primary
+                                        secondaryColor: palette?.secondary ?? primaryColor
+                                        tertiaryColor: palette?.tertiary ?? secondaryColor
                                     }
 
                                     Rectangle {

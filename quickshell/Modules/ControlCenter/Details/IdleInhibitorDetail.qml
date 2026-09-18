@@ -104,7 +104,7 @@ Item {
                             iconName: modelData.icon || ""
                             iconSize: Theme.iconSizeSmall
                             text: modelData.label
-                            backgroundColor: Theme.surfaceContainerHighest
+                            backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
                             onClicked: SessionService.enableIdleInhibit(modelData.minutes)
                         }

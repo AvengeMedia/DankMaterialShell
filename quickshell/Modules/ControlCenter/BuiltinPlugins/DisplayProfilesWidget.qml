@@ -152,4 +152,23 @@ PluginComponent {
             }
         }
     }
+    ccExpandedContent: Component {
+        CcTileActions {
+            actions: [
+                {
+                    text: I18n.tr("Auto"),
+                    icon: "auto_mode",
+                    toggle: true,
+                    active: root.autoMode,
+                    trigger: () => root.setAutoMode(!root.autoMode)
+                }
+            ].concat(root.profiles.map(profile => ({
+                        text: profile.name,
+                        icon: "monitor",
+                        active: !root.autoMode && profile.id === root.activeProfileId,
+                        enabled: !root.autoMode,
+                        trigger: () => DisplayConfigState.activateProfile(profile.id)
+                    })))
+        }
+    }
 }

@@ -59,7 +59,6 @@ Item {
                 resetStore: bar
                 resetKeys: ["islandTransparency"]
                 text: I18n.tr("Opacity", "island settings: island surface opacity slider")
-                unit: "%"
                 minimum: 0
                 maximum: 100
                 step: 1
@@ -236,7 +235,6 @@ Item {
                 value: (bar.selectedBarConfig?.borderOpacity ?? 1.0) * 100
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         borderOpacity: finalValue / 100
                     })
@@ -296,7 +294,6 @@ Item {
                 value: Math.round((bar.selectedBarConfig?.fontScale ?? 1.0) * 100)
                 minimum: 50
                 maximum: 200
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         fontScale: newValue / 100
                     })
@@ -311,7 +308,6 @@ Item {
                 value: Math.round((bar.selectedBarConfig?.iconScale ?? 1.0) * 100)
                 minimum: 50
                 maximum: 200
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         iconScale: newValue / 100
                     })
@@ -428,7 +424,6 @@ Item {
                 value: (bar.selectedBarConfig?.widgetTransparency ?? 1.0) * 100
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         widgetTransparency: finalValue / 100
                     })
@@ -512,7 +507,6 @@ Item {
                 value: (bar.selectedBarConfig?.widgetOutlineOpacity ?? 1.0) * 100
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         widgetOutlineOpacity: finalValue / 100
                     })
@@ -597,7 +591,6 @@ Item {
                 value: SettingsData.systemTrayIconTintSaturation ?? 50
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintSaturation", finalValue)
             }
 
@@ -609,7 +602,6 @@ Item {
                 value: SettingsData.systemTrayIconTintStrength ?? 135
                 minimum: 0
                 maximum: 200
-                unit: "%"
                 onSliderDragFinished: finalValue => SettingsData.set("systemTrayIconTintStrength", finalValue)
             }
         }

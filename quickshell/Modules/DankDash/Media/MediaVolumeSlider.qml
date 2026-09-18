@@ -26,10 +26,9 @@ DankSlider {
     Accessible.name: I18n.tr("Volume")
     minimum: 0
     maximum: Math.max(1, Math.round(maximumVolume))
-    unit: "%"
     wheelStep: SettingsData.audioWheelScrollAmount
     wheelInsideScrollable: true
-    thumbOutlineColor: Theme.surfaceContainerHigh
+    thumbOutlineColor: Theme.cardSurface
     fillColor: accent
     fillTextColor: accentText
     trackColor: MediaAccentService.accentTrack

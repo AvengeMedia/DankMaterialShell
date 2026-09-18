@@ -46,7 +46,7 @@ Item {
         width: root.buttonSize + (root.showOptionsButton ? root.touchTargetSize : 0)
         height: root.buttonSize
         radius: Theme.fullRadius(width, height)
-        color: Theme.surfaceContainerHighest
+        color: Theme.chipSurface
         border.color: Theme.primary
         border.width: Theme.outlineWidth
         visible: root.removable
@@ -100,7 +100,7 @@ Item {
         width: sizeLabel.implicitWidth + Theme.spacingM * 2
         height: root.buttonSize
         radius: Theme.fullRadius(width, height)
-        color: root.atDefault ? Theme.primary : Theme.surfaceContainerHighest
+        color: root.atDefault ? Theme.primary : Theme.chipSurface
         visible: root.resizing && root.sizeText.length > 0
 
         StyledText {
@@ -114,7 +114,7 @@ Item {
     }
 
     readonly property real gripRadius: Math.max(0, Math.min(cornerRadius, width / 2 - contentInset, height / 2 - contentInset) - Theme.outlineWidthFocused / 2)
-    readonly property real handleOverhang: edgeResize ? contentInset : Theme.spacingS / 2
+    readonly property real handleOverhang: edgeResize || Math.min(width, height) - contentInset * 2 < touchTargetSize * 2 ? contentInset : Theme.spacingS / 2
     readonly property real gripInset: handleOverhang - Theme.spacingS / 2
 
     component ResizeBand: MouseArea {

@@ -261,7 +261,6 @@ Item {
                 resetStore: bar
                 resetKeys: ["islandSatelliteTransparency"]
                 text: I18n.tr("Opacity", "island settings: satellite background opacity slider")
-                unit: "%"
                 minimum: 0
                 maximum: 100
                 step: 1
@@ -287,6 +286,5 @@ Item {
                 onSliderValueChanged: value => bar.apply("islandSatelliteGap", value)
             }
         }
-
     }
 }

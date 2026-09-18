@@ -228,7 +228,6 @@ Column {
             value: Math.round(root.apps.get("launcherLogoBrightness") * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: value => root.apps.set("launcherLogoBrightness", value / 100)
         }
 
@@ -240,7 +239,6 @@ Column {
             value: Math.round(root.apps.get("launcherLogoContrast") * 100)
             minimum: 0
             maximum: 200
-            unit: "%"
             onSliderValueChanged: value => root.apps.set("launcherLogoContrast", value / 100)
         }
     }
@@ -342,7 +340,6 @@ Column {
             minimum: 100
             maximum: 150
             step: 5
-            unit: "%"
             onSliderValueChanged: newValue => root.page.set("appsDockEnlargePercentage", newValue)
         }
 
@@ -354,7 +351,6 @@ Column {
             minimum: 50
             maximum: 200
             step: 5
-            unit: "%"
             onSliderValueChanged: newValue => root.page.set("appsDockIconSizePercentage", newValue)
         }
 

@@ -76,7 +76,7 @@ DankModal {
     useOverlayLayer: SettingsData.clipboardUseOverlayLayer
     modalWidth: Math.min(ClipboardConstants.sizeWidth(SettingsData.clipboardSize), screenWidth - Theme.spacingXL * 2)
     modalHeight: Math.min(ClipboardConstants.sizeHeight(SettingsData.clipboardSize), screenHeight - Theme.spacingXL * 2)
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.floatingWindowTransparency)
+    backgroundColor: Theme.floatingWindowSurface
     borderColor: Theme.outlineVariant
     borderWidth: Theme.outlineWidth
     enableShadow: true

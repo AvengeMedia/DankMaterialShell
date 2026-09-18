@@ -52,7 +52,7 @@ Scope {
 
                 HyprlandFocusGrab {
                     id: grab
-                    windows: [root]
+                    windows: overviewLoader.item?.windowMenuWindow ? [root, overviewLoader.item.windowMenuWindow] : [root]
                     active: false
                     property bool hasBeenActivated: false
                     onActiveChanged: {

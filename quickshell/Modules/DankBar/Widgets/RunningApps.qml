@@ -503,6 +503,22 @@ BasePill {
                             targetWindow.minimized = true;
                     }
                 });
+            const scratchpad = CompositorService.windowScratchpadName(currentWindow);
+            if (scratchpad)
+                items.push({
+                    type: "item",
+                    icon: "outbox",
+                    text: I18n.tr("Move out of scratchpad"),
+                    action: () => CompositorService.moveWindowOutOfSpecial(windowContextMenu.currentWindow)
+                });
+            for (const name of scratchpad ? [] : CompositorService.specialWorkspaceNames) {
+                items.push({
+                    type: "item",
+                    icon: "inbox",
+                    text: name === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
+                    action: () => CompositorService.moveWindowToSpecial(windowContextMenu.currentWindow, name)
+                });
+            }
             items.push({
                 type: "item",
                 icon: "close",

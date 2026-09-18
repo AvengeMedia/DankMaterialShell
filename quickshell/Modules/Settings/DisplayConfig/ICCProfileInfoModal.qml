@@ -69,34 +69,44 @@ DankModal {
         if (!p)
             return [];
 
-        return [{
-            "label": I18n.tr("Version", "Version"),
-            "value": p.version || ""
-        }, {
-            "label": I18n.tr("Class", "ICC profile class, e.g. monitor, scanner, printer"),
-            "value": p.class || ""
-        }, {
-            "label": I18n.tr("Color space", "ICC profile color space"),
-            "value": p.colorSpace || ""
-        }, {
-            "label": I18n.tr("Tone curve", "How the ICC profile stores its tone reproduction curves"),
-            "value": toneCurveText(p)
-        }, {
-            "label": I18n.tr("Video card gamma table", "Video card gamma table (vcgt) carried by the profile"),
-            "value": vcgtText(p)
-        }, {
-            "label": I18n.tr("White point", "White point the ICC profile was produced for"),
-            "value": whitePointText(p)
-        }, {
-            "label": I18n.tr("Active", "Active"),
-            "value": p.active ? I18n.tr("Yes", "Yes") : I18n.tr("No", "No")
-        }, {
-            "label": I18n.tr("Size", "Size"),
-            "value": sizeText(p)
-        }, {
-            "label": I18n.tr("Modified", "Modified"),
-            "value": modifiedText(p)
-        }];
+        return [
+            {
+                "label": I18n.tr("Version", "Version"),
+                "value": p.version || ""
+            },
+            {
+                "label": I18n.tr("Class", "ICC profile class, e.g. monitor, scanner, printer"),
+                "value": p.class || ""
+            },
+            {
+                "label": I18n.tr("Color space", "ICC profile color space"),
+                "value": p.colorSpace || ""
+            },
+            {
+                "label": I18n.tr("Tone curve", "How the ICC profile stores its tone reproduction curves"),
+                "value": toneCurveText(p)
+            },
+            {
+                "label": I18n.tr("Video card gamma table", "Video card gamma table (vcgt) carried by the profile"),
+                "value": vcgtText(p)
+            },
+            {
+                "label": I18n.tr("White point", "White point the ICC profile was produced for"),
+                "value": whitePointText(p)
+            },
+            {
+                "label": I18n.tr("Active", "Active"),
+                "value": p.active ? I18n.tr("Yes", "Yes") : I18n.tr("No", "No")
+            },
+            {
+                "label": I18n.tr("Size", "Size"),
+                "value": sizeText(p)
+            },
+            {
+                "label": I18n.tr("Modified", "Modified"),
+                "value": modifiedText(p)
+            }
+        ];
     }
 
     modalWidth: 580
@@ -153,7 +163,7 @@ DankModal {
                     width: parent.width
                     height: parent.height - 120
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
+                    color: Theme.floatingWindowNestedSurface
                     border.color: Theme.outlineStrong
                     border.width: 1
                     clip: true

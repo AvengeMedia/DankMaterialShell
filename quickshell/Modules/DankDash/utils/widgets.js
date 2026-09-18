@@ -1,3 +1,5 @@
+.import "../../../Common/GridLayout.js" as GridLayout
+
 function resolve(definitions, saved) {
     const source = Array.isArray(saved) ? saved : definitions.filter(d => d.enabled !== false);
     const seen = Object.create(null);
@@ -12,17 +14,11 @@ function resolve(definitions, saved) {
             return item;
         return {
             id: item.id,
-            w: dimension(item.w, spec.minW, spec.maxW, spec.w),
-            h: dimension(item.h, spec.minH, spec.maxH, spec.h),
+            w: GridLayout.dimension(item.w, spec.minW, spec.maxW, spec.w),
+            h: GridLayout.dimension(item.h, spec.minH, spec.maxH, spec.h),
             graphics: typeof item.graphics === "boolean" ? item.graphics : true
         };
     });
-}
-
-function dimension(value, minimum, maximum, fallback) {
-    const min = minimum ?? 1;
-    const max = Math.max(min, maximum ?? fallback ?? min);
-    return Math.max(min, Math.min(max, Number.isInteger(value) ? value : (fallback ?? min)));
 }
 
 function replace(items, index, changes) {

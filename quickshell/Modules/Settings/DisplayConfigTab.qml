@@ -165,7 +165,7 @@ Item {
                         text: ""
                         buttonHeight: 40
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
                         enabled: !SettingsData.displayProfileAutoSelect
                         onClicked: {
@@ -181,7 +181,7 @@ Item {
                         text: ""
                         buttonHeight: 40
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.openEditMonitorsDialog()
@@ -194,7 +194,7 @@ Item {
                         text: ""
                         buttonHeight: 40
                         horizontalPadding: Theme.spacingM
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.error
                         enabled: root.selectedProfileId !== "" && !SettingsData.displayProfileAutoSelect
                         onClicked: root.showDeleteConfirmDialog = true

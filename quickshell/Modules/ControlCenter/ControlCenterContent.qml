@@ -27,22 +27,25 @@ FocusScope {
     }
     property var pageHistory: []
     readonly property bool panelResizing: panelResizer.resizing
-    readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidth
+    readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidthFor(gridColumns)
+    readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2 + Theme.spacingL * 2) - PopoutMetrics.editOverflow * 2 - Theme.spacingL * 2)
+    readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
+    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - CcMetrics.headerHeight - Theme.spacingS * 2 - editControls.height
     readonly property real editGutter: host.editMode ? PopoutMetrics.editOverflow : 0
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.host
         gutter: root.editGutter
-        stepWidth: CcMetrics.sheetWidthStep
-        widthFor: step => CcMetrics.sheetWidthForStep(step)
-        currentStep: () => CcMetrics.sheetStepFor(CcMetrics.sheetWidth)
-        minStep: CcMetrics.sheetStepMin
-        maxStep: CcMetrics.sheetStepMax
-        onPreview: step => CcMetrics.sheetPreviewWidth = CcMetrics.sheetWidthForStep(step)
-        onCommitted: step => {
-            SettingsData.set("controlCenterWidth", CcMetrics.sheetWidthForStep(step));
-            CcMetrics.sheetPreviewWidth = 0;
+        stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
+        widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
+        currentStep: () => root.gridColumns
+        minStep: Math.min(CcMetrics.minimumColumns, root.gridColumnCap)
+        maxStep: root.gridColumnCap
+        onPreview: columns => CcMetrics.columnPreview = columns
+        onCommitted: columns => {
+            SettingsData.set("controlCenterColumns", columns);
+            CcMetrics.columnPreview = 0;
         }
-        onCanceled: CcMetrics.sheetPreviewWidth = 0
+        onCanceled: CcMetrics.columnPreview = 0
     }
 
     implicitHeight: targetImplicitHeight
@@ -167,8 +170,8 @@ FocusScope {
         buttonSize: Theme.iconSize
         iconSize: PopoutMetrics.chromeIconSize
         resizing: root.panelResizing
-        atDefault: CcMetrics.sheetWidth === CcMetrics.sheetWidthDefault
-        sizeText: Math.round(CcMetrics.sheetWidth) + " " + I18n.tr("px", "Cursor size unit, pixels")
+        atDefault: root.gridColumns === Math.min(CcMetrics.defaultColumns, root.gridColumnCap)
+        sizeText: root.gridColumns + "×" + widgetGrid.slotLayout.rows
         onResizeStarted: (px, py, signX) => root.panelResizer.begin(px, py, signX)
         onResizeMoved: (px, py) => root.panelResizer.move(px, py)
         onResizeEnded: root.panelResizer.end()
@@ -177,6 +180,8 @@ FocusScope {
 
     WidgetModel {
         id: widgetModel
+        columns: root.gridColumns
+        maximumRows: widgetGrid.maximumRows
     }
 
     Rectangle {
@@ -247,6 +252,8 @@ FocusScope {
 
                 CcTileGrid {
                     id: widgetGrid
+                    columns: root.gridColumns
+                    availableHeight: root.availableGridHeight
 
                     anchors.left: parent.left
                     anchors.right: parent.right

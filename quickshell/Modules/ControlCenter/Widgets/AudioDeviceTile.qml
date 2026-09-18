@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Services
+import qs.Widgets
 
 CcTile {
     id: root
@@ -31,7 +32,26 @@ CcTile {
     active: !!audio && !audio.muted
     showExpand: true
     enabled: widgetDef?.enabled ?? true
+    tallContent: Component {
+        Item {
+            DankRingGauge {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.min(parent.width, parent.height)
+                height: width
+                value: root.audio ? Math.min(1, root.audio.volume * 100 / root.maxVolume) : -1
+                ringColor: root.active ? Theme.primary : Theme.surfaceVariantText
 
+                StyledText {
+                    anchors.centerIn: parent
+                    text: root.audio ? Math.round(root.audio.volume * 100) + "%" : "--"
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Theme.fontWeightMedium
+                    color: root.contentColor
+                }
+            }
+        }
+    }
     onClicked: {
         if (!audio)
             return;
@@ -46,5 +66,27 @@ CcTile {
         audio.muted = false;
         audio.volume = Math.max(0, Math.min(maxVolume, current + step)) / 100;
         wheelEvent.accepted = true;
+    }
+    expandedContent: Component {
+        Item {
+            AudioSliderRow {
+                id: volume
+                width: parent.width
+                node: root.node
+                isInput: root.isInput
+                maxVolume: root.maxVolume
+                playFeedback: !root.isInput
+                interactive: root.interactive
+            }
+
+            CcAudioDevices {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: volume.bottom
+                anchors.topMargin: Theme.spacingS
+                anchors.bottom: parent.bottom
+                isInput: root.isInput
+            }
+        }
     }
 }

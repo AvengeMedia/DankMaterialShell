@@ -20,7 +20,7 @@ StyledRect {
     width: parent.width
     height: visible ? innerColumn.implicitHeight + Theme.spacingL * 2 : 0
     radius: Theme.cornerRadiusM
-    color: Theme.surfaceContainerHigh
+    color: Theme.floatingWindowNestedSurface
     border.color: Theme.outlineVariant
     border.width: Theme.outlineWidth
     clip: true
@@ -230,7 +230,7 @@ StyledRect {
             DankButton {
                 text: I18n.tr("Cancel")
                 iconName: "close"
-                backgroundColor: Theme.surfaceContainerHigh
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: root.hide()
             }

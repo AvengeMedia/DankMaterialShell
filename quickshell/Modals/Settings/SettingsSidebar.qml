@@ -303,6 +303,7 @@ Item {
                         iconName: modelData.icon || "settings"
                         title: modelData.label
                         hint: modelData.category
+                        accent: SettingsTabs.accentFor(modelData.page || SettingsTabs.pageForTabIndex(modelData.tabIndex))
                         active: root.searchSelectedIndex === index
                         onClicked: root.selectSearchResult(modelData)
                     }
@@ -363,7 +364,7 @@ Item {
                                 iconName: modelData.icon || ""
                                 title: modelData.text || ""
                                 hint: SettingsTabs.hubHint(modelData)
-                                tone: modelData.tone || "primary"
+                                accent: SettingsTabs.accentFor(modelData.id)
                                 active: root.activeCategoryId === modelData.id && !SettingsTabs.isPluginPage(root.currentPage)
                                 highlighted: isHighlighted
                                 onClicked: {

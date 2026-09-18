@@ -53,7 +53,10 @@ QtObject {
     property real controlCenterMaxHeight: 640
     property string editingActivity: ""
     readonly property real controlCenterSheetInset: 30
-    readonly property real controlCenterMaxWidth: (editingActivity === "controlcenter" ? CcMetrics.sheetWidthMax : CcMetrics.sheetWidth) + controlCenterSheetInset + PopoutMetrics.editOverflow * 2
+    readonly property int controlCenterColumnCap: CcMetrics.columnCapFor(dashboardAvailableWidth - controlCenterSheetInset - PopoutMetrics.editOverflow * 2)
+    readonly property int controlCenterColumns: Math.min(CcMetrics.gridColumns, controlCenterColumnCap)
+    readonly property real controlCenterSheetWidth: CcMetrics.sheetWidthFor(controlCenterColumns)
+    readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset + PopoutMetrics.editOverflow * 2
     readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, destinationContentHeight("controlcenter")))
 
     readonly property bool compactDense: compactThickness < 40
@@ -384,7 +387,7 @@ QtObject {
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
     readonly property var mediaExpandedTarget: dashboardTargetFor("media")
     readonly property var launcherExpandedTarget: sheetTarget(680, 560)
-    readonly property var controlCenterExpandedTarget: sheetTarget(CcMetrics.sheetWidth + controlCenterSheetInset + editGutterFor("controlcenter") * 2, controlCenterHeight)
+    readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset + editGutterFor("controlcenter") * 2, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(root.isVertical ? 240 : (SettingsData.osdAlwaysShowValue ? 330 : 282), compactFaceThickness)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
     readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinLength, Math.min(notificationCompactMaxLength, notificationContentLength))), compactFaceThickness)

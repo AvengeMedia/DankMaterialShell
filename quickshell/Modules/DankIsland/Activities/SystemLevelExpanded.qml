@@ -65,7 +65,7 @@ Item {
             enabled: root.systemModel.available
             showValue: false
             unit: root.systemModel.unit
-            thumbOutlineColor: Theme.surfaceContainerHigh
+            thumbOutlineColor: Theme.hostSurface
             valueOverride: Math.round(root.systemModel.value)
             onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / maximum)
 

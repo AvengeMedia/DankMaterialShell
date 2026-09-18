@@ -104,7 +104,7 @@ Item {
                                 height: 28
                                 radius: Theme.cornerRadiusL
                                 width: importVpnRow.width + Theme.spacingM * 2
-                                color: importVpnArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                color: importVpnArea.containsMouse ? Theme.primaryHoverLight : Theme.chipSurface
                                 opacity: VPNService.importing ? 0.5 : 1.0
 
                                 Row {
@@ -140,7 +140,7 @@ Item {
                                 height: 28
                                 radius: Theme.cornerRadiusL
                                 width: disconnectAllRow.width + Theme.spacingM * 2
-                                color: disconnectAllArea.containsMouse ? Theme.errorHover : Theme.surfaceLight
+                                color: disconnectAllArea.containsMouse ? Theme.errorHover : Theme.chipSurface
                                 visible: DMSNetworkService.connected
                                 opacity: DMSNetworkService.isBusy ? 0.5 : 1.0
 
@@ -230,7 +230,7 @@ Item {
                                 width: parent.width
                                 height: isExpanded ? 56 + vpnExpandedContent.height : 56
                                 radius: Theme.cornerRadius
-                                color: vpnRowArea.containsMouse ? Theme.primaryHoverLight : (isActive ? Theme.primaryPressed : Theme.surfaceLight)
+                                color: vpnRowArea.containsMouse ? Theme.primaryHoverLight : (isActive ? Theme.primaryPressed : Theme.floatingWindowNestedSurface)
                                 border.width: isActive ? Theme.outlineWidthFocused : 0
                                 border.color: Theme.primary
                                 opacity: DMSNetworkService.isBusy ? 0.6 : 1.0

@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modals.FileBrowser
@@ -137,6 +138,23 @@ Item {
         if (visible) {
             refreshAuthDetection();
             refreshAuthServices();
+        }
+    }
+
+    LazyLoader {
+        id: wallpaperBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Select lock screen background image")
+            browserType: "wallpaper"
+            showHiddenFiles: true
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
+            onFileSelected: path => {
+                SettingsData.set("lockScreenWallpaperPath", path);
+                close();
+            }
         }
     }
 
@@ -333,13 +351,14 @@ Item {
                 onToggled: checked => SettingsData.set("lockScreenShowMediaPlayer", checked)
             }
 
-            SettingsNavRow {
+            SettingsSplitRow {
                 settingKey: "lockScreenShowWeather"
                 tab: "lock_screen"
                 tags: ["weather", "temperature"]
                 title: I18n.tr("Weather")
-                hint: SettingsData.lockScreenShowWeather ? I18n.tr("Enabled") : I18n.tr("Disabled")
-                onClicked: root.parentModal?.navigateTo("weather")
+                checked: SettingsData.lockScreenShowWeather
+                onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
+                onNavigated: root.parentModal?.navigateTo("weather")
             }
 
             SettingsDropdownRow {
@@ -372,34 +391,43 @@ Item {
             }
 
             SettingsRow {
-                body: StyledText {
-                    text: I18n.tr("Background")
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Theme.fontWeightMedium
-                    color: Theme.surfaceText
-                    topPadding: Theme.spacingM
+                settingKey: "lockScreenWallpaperPath"
+                tags: ["lock", "screen", "wallpaper", "background", "image"]
+                title: I18n.tr("Background")
+                resetKeys: ["lockScreenWallpaperPath"]
+                body: SettingsWallpaperThumb {
+                    width: (parent.width - Theme.spacingL) / 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    placeholderIcon: "lock"
+                    emptyText: I18n.tr("Use desktop wallpaper")
+                    allowColor: false
+                    path: SettingsData.lockScreenWallpaperPath
+                    onBrowse: {
+                        wallpaperBrowserLoader.active = true;
+                        if (wallpaperBrowserLoader.item)
+                            wallpaperBrowserLoader.item.open();
+                    }
+                    onClear: SettingsData.set("lockScreenWallpaperPath", "")
                 }
             }
 
-            SettingsRow {
-                body: StyledText {
-                    text: I18n.tr("Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                }
-            }
+            SettingsDropdownRow {
+                readonly property var fillModes: ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"]
+                readonly property var fillModeLabels: fillModes.map(mode => I18n.tr(mode, "wallpaper fill mode"))
 
-            SettingsWallpaperPicker {
-                width: parent.width
-                path: SettingsData.lockScreenWallpaperPath
-                fillMode: SettingsData.lockScreenWallpaperFillMode
-                browserTitle: I18n.tr("Select lock screen background image")
-                fillModeSettingKey: "lockScreenWallpaperFillMode"
-                fillModeTags: ["lock", "screen", "wallpaper", "background", "fill"]
-                onPathSelected: path => SettingsData.set("lockScreenWallpaperPath", path)
-                onFillModeSelected: mode => SettingsData.set("lockScreenWallpaperFillMode", mode)
+                settingKey: "lockScreenWallpaperFillMode"
+                tags: ["lock", "screen", "wallpaper", "background", "fill"]
+                text: I18n.tr("Wallpaper fill mode")
+                options: fillModeLabels
+                currentValue: {
+                    const idx = fillModes.indexOf(SettingsData.lockScreenWallpaperFillMode || "Fill");
+                    return fillModeLabels[idx >= 0 ? idx : fillModes.indexOf("Fill")];
+                }
+                onValueChanged: value => {
+                    const idx = fillModeLabels.indexOf(value);
+                    if (idx >= 0)
+                        SettingsData.set("lockScreenWallpaperFillMode", fillModes[idx]);
+                }
             }
         }
 
@@ -583,7 +611,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         focus: capturing
                         text: capturing ? I18n.tr("Press key...", "lock screen security key shortcut key combination capture prompt") : SettingsData.lockScreenSecurityKeyShortcut
-                        backgroundColor: capturing ? Theme.selectedContainer : Theme.surfaceContainerHigh
+                        backgroundColor: capturing ? Theme.selectedContainer : Theme.chipSurface
                         textColor: Theme.surfaceText
 
                         property bool capturing: false

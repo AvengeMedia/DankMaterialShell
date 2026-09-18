@@ -133,7 +133,7 @@ Item {
         width: CcMetrics.menuMinWidth
         height: column.implicitHeight + Theme.spacingS * 2
         radius: Theme.windowRadius
-        color: Theme.surfaceContainer
+        color: Theme.nestedSurface
         opacity: root._open ? 1 : 0
         scale: root._open ? 1 : CcMetrics.popupEnterScale
         transformOrigin: I18n.isRtl ? Item.TopLeft : Item.TopRight

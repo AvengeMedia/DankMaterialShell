@@ -112,7 +112,7 @@ DankFloatingWindow {
 
                             readonly property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
 
-                            color: isSelected ? Theme.withAlpha(Theme.primary, 0.16) : appArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                            color: isSelected ? Theme.withAlpha(Theme.primary, 0.16) : appArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.floatingWindowNestedSurface
                             border.color: isSelected ? Theme.primary : Theme.outlineMedium
                             border.width: isSelected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
 

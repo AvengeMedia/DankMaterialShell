@@ -165,7 +165,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: I18n.tr("Retry", "retry failed action button")
                     iconName: "refresh"
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
                     onClicked: root.refresh()
                 }

@@ -10,7 +10,7 @@ DankRingGauge {
     property string iconName: ""
     property real iconSize: Theme.iconSizeSmall
     property color iconColor: Theme.primary
-    property color discColor: Theme.surfaceContainerHighest
+    property color discColor: Theme.chipSurface
 
     readonly property real discSize: hasRing ? width - (strokeWidth + DashMetrics.gaugeGap) * 2 : width
 

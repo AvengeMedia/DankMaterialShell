@@ -11,7 +11,6 @@ Column {
     property var items: []
     property var allWidgets: []
     property string title: ""
-    property string titleIcon: "widgets"
     property string sectionId: ""
 
     signal itemEnabledChanged(string sectionId, string itemId, bool enabled)
@@ -31,65 +30,28 @@ Column {
     height: implicitHeight
     spacing: Theme.spacingM
 
-    Item {
-        width: parent.width
-        height: Math.max(headerRow.implicitHeight, centeringModeRow.implicitHeight)
-        LayoutMirroring.enabled: I18n.isRtl
-        LayoutMirroring.childrenInherit: true
-
-        Row {
-            id: headerRow
-            spacing: Theme.spacingM
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-
-            DankIcon {
-                name: root.titleIcon
-                size: Theme.iconSize
-                color: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            StyledText {
-                text: root.title
-                font.pixelSize: Theme.fontSizeLarge
-                font.weight: Theme.fontWeightMedium
-                color: Theme.surfaceText
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        Row {
-            id: centeringModeRow
-            spacing: Theme.spacingXS
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            visible: root.sectionId === "center"
-
+    SettingsSectionLabel {
+        text: root.title
+        actions: [
             DankActionButton {
-                id: indexCenterButton
-                buttonSize: 28
+                buttonSize: Theme.buttonHeightXXS
                 iconName: "format_list_numbered"
                 tooltipText: I18n.tr("Index centering")
-                iconSize: 16
+                iconSize: Theme.iconSizeSmall
                 iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
-                onClicked: {
-                    SettingsData.set("centeringMode", "index");
-                }
-            }
-
+                visible: root.sectionId === "center"
+                onClicked: SettingsData.set("centeringMode", "index")
+            },
             DankActionButton {
-                id: geometricCenterButton
-                buttonSize: 28
+                buttonSize: Theme.buttonHeightXXS
                 iconName: "center_focus_weak"
                 tooltipText: I18n.tr("Geometric centering")
-                iconSize: 16
+                iconSize: Theme.iconSizeSmall
                 iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
-                onClicked: {
-                    SettingsData.set("centeringMode", "geometric");
-                }
+                visible: root.sectionId === "center"
+                onClicked: SettingsData.set("centeringMode", "geometric")
             }
-        }
+        ]
     }
 
     SettingsReorderList {

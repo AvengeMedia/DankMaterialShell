@@ -173,7 +173,7 @@ Item {
 
                     Item {
                         width: parent.width
-                        height: 36
+                        height: maxVolSlider.height
 
                         StyledText {
                             id: maxVolLabel
@@ -193,14 +193,12 @@ Item {
                             anchors.right: parent.right
                             anchors.rightMargin: Theme.spacingM
                             anchors.verticalCenter: parent.verticalCenter
-                            height: 36
                             minimum: 100
                             maximum: 200
                             step: 5
                             showValue: true
                             wheelEnabled: false
                             centerMinimum: true
-                            unit: "%"
                             onSliderValueChanged: newValue => {
                                 SessionData.setDeviceMaxVolume(modelData.name, newValue);
                             }

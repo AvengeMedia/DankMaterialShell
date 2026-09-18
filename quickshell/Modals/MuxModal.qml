@@ -326,7 +326,7 @@ DankModal {
                 width: parent.width
                 height: 56
                 radius: Theme.cornerRadius
-                color: muxModal.selectedIndex === -1 ? Theme.selectedContainer : (newMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.surfaceContainer)
+                color: muxModal.selectedIndex === -1 ? Theme.selectedContainer : (newMouse.containsMouse ? Theme.foregroundColor(Theme.chipSurface, true) : Theme.floatingWindowNestedSurface)
 
                 RowLayout {
                     anchors.fill: parent
@@ -403,7 +403,7 @@ DankModal {
                                 width: parent.width
                                 height: 64
                                 radius: Theme.cornerRadius
-                                color: muxModal.selectedIndex === index ? Theme.selectedContainer : (sessionMouse.containsMouse ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainerHigh, 0))
+                                color: muxModal.selectedIndex === index ? Theme.selectedContainer : (sessionMouse.containsMouse ? Theme.cardSurface : Theme.withAlpha(Theme.cardSurface, 0))
 
                                 MouseArea {
                                     id: sessionMouse
@@ -424,7 +424,7 @@ DankModal {
                                         Layout.preferredWidth: 40
                                         Layout.preferredHeight: 40
                                         radius: Theme.fullRadius(width, height)
-                                        color: modelData.attached ? Theme.primaryContainer : Theme.surfaceContainerHigh
+                                        color: modelData.attached ? Theme.primaryContainer : Theme.chipSurface
 
                                         StyledText {
                                             anchors.centerIn: parent
@@ -469,7 +469,7 @@ DankModal {
                                         Layout.preferredHeight: 36
                                         radius: Theme.fullRadius(width, height)
                                         visible: MuxService.supportsRename
-                                        color: renameMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
+                                        color: renameMouse.containsMouse ? Theme.chipSurface : Theme.withAlpha(Theme.chipSurface, 0)
 
                                         DankIcon {
                                             anchors.centerIn: parent
@@ -600,7 +600,7 @@ DankModal {
                             width: keyText.width + Theme.spacingS
                             height: keyText.height + 4
                             radius: Theme.cornerRadiusXS
-                            color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+                            color: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {

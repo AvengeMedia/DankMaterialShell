@@ -10,6 +10,7 @@ var DEFAULTS = {
         showWorkspaceIndex: false,
         showWorkspaceName: false,
         showWorkspacePadding: false,
+        workspacePaddingCount: 3,
         showWorkspaceApps: false,
         workspaceDragReorder: true,
         maxWorkspaceIcons: 3,
@@ -18,6 +19,7 @@ var DEFAULTS = {
         groupActiveWorkspaceApps: false,
         workspaceFollowFocus: false,
         showOccupiedWorkspacesOnly: false,
+        showSpecialWorkspaces: false,
         reverseScrolling: false,
         dwlShowAllTags: false,
         workspaceActiveAppHighlightEnabled: false,
@@ -152,7 +154,7 @@ var DEFAULTS = {
 
 // entry key -> settings.json key that held the value before config version 18
 var MIGRATED_GLOBALS = {
-    workspaceSwitcher: sameNames(["showWorkspaceIndex", "showWorkspaceName", "showWorkspacePadding", "showWorkspaceApps", "workspaceDragReorder", "maxWorkspaceIcons", "workspaceAppIconSizeOffset", "groupWorkspaceApps", "groupActiveWorkspaceApps", "workspaceFollowFocus", "showOccupiedWorkspacesOnly", "reverseScrolling", "dwlShowAllTags", "workspaceActiveAppHighlightEnabled", "workspaceColorMode", "workspaceFocusedCustomColor", "workspaceOccupiedColorMode", "workspaceOccupiedCustomColor", "workspaceUnfocusedColorMode", "workspaceUnfocusedCustomColor", "workspaceUrgentColorMode", "workspaceUrgentCustomColor", "workspaceFocusedBorderEnabled", "workspaceFocusedBorderColor", "workspaceFocusedBorderCustomColor", "workspaceFocusedBorderThickness", "workspaceUnfocusedMonitorSeparateAppearance", "workspaceUnfocusedMonitorColorMode", "workspaceUnfocusedMonitorFocusedCustomColor", "workspaceUnfocusedMonitorOccupiedColorMode", "workspaceUnfocusedMonitorOccupiedCustomColor", "workspaceUnfocusedMonitorUnfocusedColorMode", "workspaceUnfocusedMonitorUnfocusedCustomColor", "workspaceUnfocusedMonitorUrgentColorMode", "workspaceUnfocusedMonitorUrgentCustomColor", "workspaceUnfocusedMonitorBorderEnabled", "workspaceUnfocusedMonitorBorderColor", "workspaceUnfocusedMonitorBorderCustomColor", "workspaceUnfocusedMonitorBorderThickness"]),
+    workspaceSwitcher: sameNames(["showWorkspaceIndex", "showWorkspaceName", "showWorkspacePadding", "workspacePaddingCount", "showWorkspaceApps", "workspaceDragReorder", "maxWorkspaceIcons", "workspaceAppIconSizeOffset", "groupWorkspaceApps", "groupActiveWorkspaceApps", "workspaceFollowFocus", "showOccupiedWorkspacesOnly", "reverseScrolling", "dwlShowAllTags", "workspaceActiveAppHighlightEnabled", "workspaceColorMode", "workspaceFocusedCustomColor", "workspaceOccupiedColorMode", "workspaceOccupiedCustomColor", "workspaceUnfocusedColorMode", "workspaceUnfocusedCustomColor", "workspaceUrgentColorMode", "workspaceUrgentCustomColor", "workspaceFocusedBorderEnabled", "workspaceFocusedBorderColor", "workspaceFocusedBorderCustomColor", "workspaceFocusedBorderThickness", "workspaceUnfocusedMonitorSeparateAppearance", "workspaceUnfocusedMonitorColorMode", "workspaceUnfocusedMonitorFocusedCustomColor", "workspaceUnfocusedMonitorOccupiedColorMode", "workspaceUnfocusedMonitorOccupiedCustomColor", "workspaceUnfocusedMonitorUnfocusedColorMode", "workspaceUnfocusedMonitorUnfocusedCustomColor", "workspaceUnfocusedMonitorUrgentColorMode", "workspaceUnfocusedMonitorUrgentCustomColor", "workspaceUnfocusedMonitorBorderEnabled", "workspaceUnfocusedMonitorBorderColor", "workspaceUnfocusedMonitorBorderCustomColor", "workspaceUnfocusedMonitorBorderThickness"]),
     clock: sameNames(["clockCompactMode"]),
     music: sameNames(["mediaSize", "mediaAdaptiveWidthEnabled", "audioScrollMode"]),
     focusedWindow: sameNames(["focusedWindowCompactMode", "focusedWindowShowIcon", "focusedWindowSize"]),

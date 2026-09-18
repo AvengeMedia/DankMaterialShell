@@ -296,7 +296,7 @@ FocusScope {
 
     Column {
         anchors.fill: parent
-        anchors.leftMargin: Theme.spacingS
+        anchors.leftMargin: root.isCompactMode ? Theme.spacingS : SettingsMetrics.scrollGutter
         anchors.rightMargin: root.isCompactMode ? Theme.spacingS : SettingsMetrics.scrollGutter
         spacing: 0
 

@@ -16,6 +16,7 @@ DankPopout {
     readonly property string windowTitle: currentWindow?.title || ""
     readonly property string appName: appId ? Paths.getAppName(appId, DesktopEntries.heuristicLookup(Paths.moddedAppId(appId))) : I18n.tr("Unknown")
     readonly property int pid: processId
+    readonly property string scratchpadName: CompositorService.windowScratchpadName(currentWindow)
 
     layerNamespace: "dms:focused-window-popout"
     popupWidth: 340
@@ -175,6 +176,79 @@ DankPopout {
                     width: parent.width
                     height: Theme.dividerWidth
                     color: Theme.outlineVariant
+                }
+
+                Item {
+                    visible: root.scratchpadName !== ""
+                    width: parent.width
+                    height: BarMetrics.menuRowHeight
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.spacingS
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "outbox"
+                            size: Theme.iconSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Move out of scratchpad")
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeSmall
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    StateLayer {
+                        cornerRadius: BarMetrics.menuItemRadius
+                        onClicked: {
+                            CompositorService.moveWindowOutOfSpecial(root.currentWindow);
+                            root.close();
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: root.scratchpadName !== "" ? [] : CompositorService.specialWorkspaceNames
+
+                    Item {
+                        required property string modelData
+
+                        width: parent.width
+                        height: BarMetrics.menuRowHeight
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.leftMargin: Theme.spacingS
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: "inbox"
+                                size: Theme.iconSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: modelData === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(modelData)
+                                color: Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        StateLayer {
+                            cornerRadius: BarMetrics.menuItemRadius
+                            onClicked: {
+                                CompositorService.moveWindowToSpecial(root.currentWindow, modelData);
+                                root.close();
+                            }
+                        }
+                    }
                 }
 
                 Item {

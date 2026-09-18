@@ -369,7 +369,7 @@ Item {
             DankButton {
                 text: I18n.tr("Run Again", "greeter doctor page button")
                 iconName: "refresh"
-                backgroundColor: Theme.surfaceContainerHighest
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: root.runDoctor()
             }

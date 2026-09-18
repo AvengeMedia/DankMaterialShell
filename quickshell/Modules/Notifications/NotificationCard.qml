@@ -8,6 +8,8 @@ import qs.Widgets
 Rectangle {
     id: root
 
+    property color surfaceColor: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+    property color chipColor: Theme.chipSurface
     property var notificationData: null
     property bool interactive: true
     property bool headerOnly: false
@@ -71,7 +73,7 @@ Rectangle {
     topRightRadius: topLeftRadius
     bottomLeftRadius: lastInGroup ? outerRadius : radius
     bottomRightRadius: bottomLeftRadius
-    color: Theme.notificationFloatingSurfaceHigh
+    color: surfaceColor
     clip: true
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
@@ -208,7 +210,7 @@ Rectangle {
                     width: notificationCount.implicitWidth + Theme.spacingS * 2
                     height: Theme.iconSize
                     radius: Theme.fullRadius(width, height)
-                    color: Theme.surfaceContainerHighest
+                    color: root.chipColor
 
                     StyledText {
                         id: notificationCount
@@ -225,7 +227,7 @@ Rectangle {
                     iconName: root.groupExpanded ? "expand_less" : "expand_more"
                     buttonHeight: NotificationMetrics.controlSize
                     horizontalPadding: Theme.spacingS
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: root.chipColor
                     textColor: Theme.onSurfaceVariant
                     Accessible.name: root.groupExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                     onClicked: root.groupToggleRequested()
@@ -234,7 +236,7 @@ Rectangle {
                 DankActionButton {
                     visible: root.interactive && root.canExpand && root.groupCount <= 1
                     iconName: root.descriptionExpanded ? "expand_less" : "expand_more"
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: root.chipColor
                     width: NotificationMetrics.controlSize + Theme.spacingS
                     buttonSize: NotificationMetrics.controlSize
                     iconSize: Theme.iconSizeSmall

@@ -155,48 +155,12 @@ Item {
 
                         required property var modelData
 
-                        readonly property var audio: modelData?.audio ?? null
-                        readonly property real volumePercent: audio ? Math.round(audio.volume * 100) : 0
-
                         title: AudioService.displayName(modelData) + ": " + (modelData?.properties?.["media.name"] || "")
 
-                        body: DankSlider {
-                            id: streamSlider
-                            width: parent.width
-                            size: "m"
-                            insetIcon: AudioService.volumeIconName(streamRow.modelData)
-                            insetIconClickable: streamRow.audio !== null
-                            insetIconLabel: streamRow.audio?.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
-                            Accessible.name: streamRow.title
-                            onInsetIconClicked: {
-                                if (!streamRow.audio)
-                                    return;
-                                SessionData.suppressOSDTemporarily();
-                                streamRow.audio.muted = !streamRow.audio.muted;
-                            }
-                            enabled: streamRow.audio !== null
-                            minimum: 0
-                            maximum: 100
-                            showValue: true
-                            unit: "%"
-                            valueOverride: streamRow.volumePercent
-                            onSliderValueChanged: newValue => {
-                                if (!streamRow.audio)
-                                    return;
-                                SessionData.suppressOSDTemporarily();
-                                streamRow.audio.volume = newValue / 100;
-                                if (newValue > 0 && streamRow.audio.muted)
-                                    streamRow.audio.muted = false;
-                                AudioService.playVolumeChangeSoundIfEnabled();
-                            }
-
-                            Binding {
-                                target: streamSlider
-                                property: "value"
-                                value: Math.min(100, streamRow.volumePercent)
-                                restoreMode: Binding.RestoreNone
-                                when: !streamSlider.isDragging
-                            }
+                        body: AudioSliderRow {
+                            node: streamRow.modelData
+                            sliderLabel: streamRow.title
+                            playFeedback: true
                         }
 
                         PwObjectTracker {

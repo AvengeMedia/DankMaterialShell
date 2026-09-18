@@ -283,7 +283,7 @@ Item {
                         width: parent.width
                         height: Math.round(Theme.fontSizeMedium * 2.85)
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainerHighest
+                        color: Theme.chipSurface
 
                         Rectangle {
                             anchors.fill: parent

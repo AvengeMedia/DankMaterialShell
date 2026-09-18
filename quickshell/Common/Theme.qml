@@ -6,6 +6,7 @@ import QtQuick
 import "../DankCommon/Common/Shape.js" as Shape
 import "../DankCommon/Common/Surface.js" as Surface
 import "../DankCommon/Common/Contrast.js" as Contrast
+import "../DankCommon/Common/Accents.js" as Accents
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -146,6 +147,15 @@ Singleton {
     property var customThemeRawData: null
     readonly property var currentThemeVariants: customThemeRawData?.variants || null
     readonly property string currentThemeId: customThemeRawData?.id || ""
+    readonly property string currentThemeLabel: {
+        if (currentTheme === dynamic)
+            return I18n.tr("Dynamic", "dynamic theme name");
+        const name = getThemeColors(currentThemeName)?.name || customThemeRawData?.name;
+        if (name)
+            return name;
+        const file = typeof SettingsData !== "undefined" ? SettingsData.customThemeFile : "";
+        return file ? file.split("/").pop() : "";
+    }
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
@@ -428,12 +438,17 @@ Singleton {
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest || surfaceContainerHigh
     property color surfaceBright: currentThemeData.surfaceBright || (isLightMode ? surface : surfaceContainerHighest)
     property color surfaceDim: currentThemeData.surfaceDim || (isLightMode ? surfaceContainer : background)
+    readonly property color hostSurface: surface
+    readonly property color cardSurface: surfaceContainer
+    readonly property color chipSurface: surfaceContainerHigh
+    readonly property color chipSurfaceNested: surfaceContainerHighest
     property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
     property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
     property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
     readonly property bool tonalPrimaryContainer: Contrast.isTonal(primaryContainer, surfaceText)
     readonly property color selectedContainer: tonalPrimaryContainer ? primaryContainer : Contrast.tintedContainer(surfaceContainerHigh, primary, surfaceText)
     readonly property color accentOnPrimaryContainer: Contrast.ratio(primary, primaryContainer) >= 3 ? primary : onPrimaryContainer
+    readonly property var accents: Accents.derive(primary, isLightMode, currentThemeData.accents ?? null)
     property color inverseSurface: currentThemeData.inverseSurface || surfaceText
     property color inverseOnSurface: currentThemeData.inverseOnSurface || surface
 
@@ -533,10 +548,10 @@ Singleton {
     readonly property bool transparentBlurLayers: blurLayersActive && !foregroundLayers
     readonly property real foregroundLayerTransparency: typeof SettingsData === "undefined" ? 1.0 : (SettingsData.foregroundLayerTransparency ?? 1.0)
     readonly property bool notificationForegroundLayers: typeof SettingsData === "undefined" || (SettingsData.notificationForegroundLayers ?? true)
-    readonly property color readableSurface: withAlpha(surfaceContainer, popupTransparency)
-    readonly property color readableSurfaceHigh: withAlpha(surfaceContainerHigh, popupTransparency)
+    readonly property color readableSurface: withAlpha(hostSurface, popupTransparency)
+    readonly property color readableSurfaceHigh: withAlpha(cardSurface, popupTransparency)
     readonly property color floatingSurface: readableSurface
-    readonly property color floatingSurfaceHigh: foregroundColor(surfaceContainerHigh)
+    readonly property color floatingSurfaceHigh: foregroundColor(cardSurface)
     readonly property bool floatingWindowSynced: typeof SettingsData === "undefined" || (SettingsData.floatingWindowSyncGlobal ?? true)
     readonly property real floatingWindowTransparency: {
         if (typeof SettingsData === "undefined" || floatingWindowSynced)
@@ -556,14 +571,18 @@ Singleton {
         return Surface.isFloatingWindow(item);
     }
 
+    function accent(name) {
+        return accents[name] ?? null;
+    }
+
     function foregroundColor(baseColor, floatingWindow = false) {
         return blendAlpha(baseColor, floatingWindow ? floatingWindowForegroundAlpha : foregroundAlpha);
     }
 
-    readonly property color floatingWindowSurface: withAlpha(surfaceContainer, floatingWindowTransparency)
-    readonly property color floatingWindowSurfaceHigh: foregroundColor(surfaceContainerHigh, true)
+    readonly property color floatingWindowSurface: withAlpha(hostSurface, floatingWindowTransparency)
+    readonly property color floatingWindowSurfaceHigh: foregroundColor(cardSurface, true)
     readonly property color floatingWindowNestedSurface: floatingWindowSurfaceHigh
-    readonly property color notepadWindowSurface: withAlpha(surfaceContainer, notepadTransparency)
+    readonly property color notepadWindowSurface: withAlpha(hostSurface, notepadTransparency)
     readonly property color nestedSurface: floatingSurfaceHigh
     readonly property color notificationFloatingSurface: notificationForegroundLayers ? readableSurface : withAlpha(readableSurface, 0)
     readonly property color notificationFloatingSurfaceHigh: notificationForegroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
@@ -572,9 +591,9 @@ Singleton {
     readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
     readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
     readonly property real floatingWindowFieldAlpha: floatingWindowForegroundAlpha
-    readonly property color floatingWindowFieldColor: withAlpha(surfaceContainerHigh, floatingWindowFieldAlpha)
+    readonly property color floatingWindowFieldColor: withAlpha(chipSurface, floatingWindowFieldAlpha)
     readonly property real popupFieldAlpha: foregroundAlpha
-    readonly property color popupFieldColor: withAlpha(surfaceContainerHigh, popupFieldAlpha)
+    readonly property color popupFieldColor: withAlpha(chipSurface, popupFieldAlpha)
     readonly property color popupFieldBorderColor: withAlpha(outline, blurLayersActive ? 0.16 : layerOutlineOpacity)
     readonly property color popupFieldFocusedBorderColor: withAlpha(primary, blurLayersActive ? 0.72 : 1.0)
     readonly property color floatingWindowFieldBorderColor: popupFieldBorderColor
@@ -652,7 +671,7 @@ Singleton {
         }
     }
 
-    readonly property color ccPillInactiveBg: transparentBlurLayers ? withAlpha(surfaceContainerHigh, 0.08) : nestedSurface
+    readonly property color ccPillInactiveBg: transparentBlurLayers ? withAlpha(cardSurface, 0.08) : nestedSurface
 
     readonly property color ccTileActiveText: {
         switch (SettingsData.controlCenterTileColorMode) {
@@ -683,7 +702,7 @@ Singleton {
     readonly property color buttonText: {
         switch (SettingsData.buttonColorMode) {
         case "primaryContainer":
-            return primary;
+            return onPrimaryContainer;
         case "secondary":
             return surfaceText;
         case "surfaceVariant":
@@ -991,8 +1010,8 @@ Singleton {
     }
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
-            return withAlpha(surfaceContainer, popupTransparency);
-        return isConnectedEffect ? withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : withAlpha(surfaceContainer, popupTransparency);
+            return withAlpha(hostSurface, popupTransparency);
+        return isConnectedEffect ? withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : withAlpha(hostSurface, popupTransparency);
     }
     readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : windowRadius
     readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
@@ -1242,15 +1261,13 @@ Singleton {
     readonly property real avatarSize: 36
     readonly property real sliderTrackHeight: 16
     readonly property real sliderHandleWidth: 4
-    readonly property real sliderHandleWidthDesktop: 6
-    readonly property real sliderHandleWidthDesktopPressed: 4
-    readonly property real sliderHandleHeightDesktop: 32
+    readonly property real sliderHandleWidthPressed: 2
     readonly property real sliderHandleHeight: 44
     readonly property real sliderHandleGap: 6
     readonly property real sliderTrackHeightS: 24
     readonly property real sliderHandleHeightS: 44
     readonly property real sliderTrackHeightM: 40
-    readonly property real sliderHandleHeightM: 44
+    readonly property real sliderHandleHeightM: 52
     readonly property real sliderTrackHeightL: 56
     readonly property real sliderHandleHeightL: 68
     readonly property real sliderTrackHeightXL: 96
@@ -1541,7 +1558,7 @@ Singleton {
     property real notepadTransparency: SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : floatingWindowTransparency
 
     property bool widgetBackgroundHasAlpha: {
-        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch";
+        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sc";
         return colorMode === "sth" || colorMode === "custom";
     }
 
@@ -1559,7 +1576,7 @@ Singleton {
     readonly property real widgetBackgroundCustomStrength: Math.max(0, Math.min(1, typeof SettingsData !== "undefined" ? (SettingsData.widgetBackgroundCustomStrength ?? 0.4) : 0.4))
 
     property var widgetBaseBackgroundColor: {
-        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch";
+        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sc";
         switch (colorMode) {
         case "s":
             return surface;

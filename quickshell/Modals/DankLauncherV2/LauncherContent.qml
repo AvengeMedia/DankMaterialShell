@@ -329,7 +329,7 @@ FocusScope {
                 anchors.topMargin: -Theme.windowRadius
 
                 visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !Theme.blurLayersActive
-                color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+                color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
                 radius: Theme.windowRadius
             }
             DankFilterChips {
@@ -614,7 +614,7 @@ FocusScope {
                         Layout.preferredWidth: 1
                         Layout.minimumWidth: 0
                         Layout.preferredHeight: fileFilterContent.height
-                        backgroundColor: Theme.surfaceContainer
+                        backgroundColor: Theme.floatingWindowFieldColor
                         placeholderText: I18n.tr("ext", "launcher file search placeholder, short for file extension")
                         font.pixelSize: Theme.fontSizeMedium
                         showClearButton: text.length > 0

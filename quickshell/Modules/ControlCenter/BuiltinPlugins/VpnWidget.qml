@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Details
 import qs.Modules.Plugins
 
@@ -32,5 +33,17 @@ PluginComponent {
 
     ccDetailContent: Component {
         VpnDetailContent {}
+    }
+    ccExpandedContent: Component {
+        CcTileActions {
+            actions: DMSNetworkService.profiles.map(profile => ({
+                        text: profile.name,
+                        icon: "vpn_key",
+                        toggle: true,
+                        active: DMSNetworkService.vpnStateForUuid(profile.uuid) === "activated",
+                        enabled: !DMSNetworkService.isVpnConnectingUuid(profile.uuid),
+                        trigger: () => DMSNetworkService.toggle(profile.uuid)
+                    }))
+        }
     }
 }

@@ -386,6 +386,7 @@ const HYPRLAND_ACTIONS = {
         { id: "movetoworkspacesilent +1", label: "Move to Next (silent)" },
         { id: "movetoworkspacesilent -1", label: "Move to Previous (silent)" },
         { id: "togglespecialworkspace", label: "Toggle Special Workspace" },
+        { id: "movetoworkspace +0", label: "Move Out of Special Workspace" },
         { id: "focusworkspaceoncurrentmonitor", label: "Focus Workspace on Current Monitor" },
         { id: "renameworkspace", label: "Rename Workspace" }
     ],

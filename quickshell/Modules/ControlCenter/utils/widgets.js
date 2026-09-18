@@ -1,68 +1,106 @@
 .import qs.Common as Common
-.import "layout.js" as LayoutUtils
+.import "../../../Common/GridLayout.js" as GridLayout
 
-function addWidget(widgetId) {
-    var widgets = Common.SettingsData.controlCenterWidgets.slice()
-    var widget = {
+function isSliderWidget(id) {
+    return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
+}
+
+function sizeSpec(id, columns, rows = Infinity) {
+    return {
+        "w": 4,
+        "h": 1,
+        "minW": 1,
+        "maxW": columns,
+        "minH": 1,
+        "maxH": rows
+    };
+}
+
+function clampSize(widget, columns, rows = Infinity) {
+    const spec = sizeSpec(widget.id || "", columns, rows);
+    const size = {
+        "w": GridLayout.dimension(widget.w, spec.minW, spec.maxW, spec.w),
+        "h": GridLayout.dimension(widget.h, spec.minH, spec.maxH, spec.h)
+    };
+    if (!isSliderWidget(widget.id) || size.w > 1 || size.h > 1)
+        return size;
+    if (rows > 1)
+        return {
+            "w": 1,
+            "h": 2
+        };
+    return {
+        "w": Math.min(2, columns),
+        "h": 1
+    };
+}
+
+function addWidget(widgetId, columns) {
+    const widgets = Common.SettingsData.controlCenterWidgets.slice();
+    const widget = Object.assign({
         "id": widgetId,
-        "enabled": true,
-        "width": 50
-    }
+        "enabled": true
+    }, clampSize({
+        "id": widgetId
+    }, columns));
 
     if (widgetId === "diskUsage") {
-        widget.instanceId = generateUniqueId()
-        widget.mountPath = "/"
-        widget.showMountPath = true
+        widget.instanceId = generateUniqueId();
+        widget.mountPath = "/";
+        widget.showMountPath = true;
     }
 
     if (widgetId === "brightnessSlider") {
-        widget.instanceId = generateUniqueId()
-        widget.deviceName = ""
+        widget.instanceId = generateUniqueId();
+        widget.deviceName = "";
     }
 
-    widgets.push(widget)
-    Common.SettingsData.set("controlCenterWidgets", widgets)
+    widgets.push(widget);
+    Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
 function generateUniqueId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2)
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
 function removeWidget(index) {
-    var widgets = Common.SettingsData.controlCenterWidgets.slice()
-    if (index >= 0 && index < widgets.length) {
-        widgets.splice(index, 1)
-        Common.SettingsData.set("controlCenterWidgets", widgets)
-    }
+    const widgets = Common.SettingsData.controlCenterWidgets.slice();
+    if (index < 0 || index >= widgets.length)
+        return;
+    widgets.splice(index, 1);
+    Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
-function setWidgetWidth(index, width) {
-    const widgets = Common.SettingsData.controlCenterWidgets.slice()
-    const widget = widgets[index]
-    if (!widget || !LayoutUtils.widgetWidths(widget.id).includes(width) || (widget.width || 50) === width)
-        return
-    widgets[index] = Object.assign({}, widget, { "width": width })
-    Common.SettingsData.set("controlCenterWidgets", widgets)
+function setWidgetSize(index, changes, columns, rows = Infinity) {
+    const widgets = Common.SettingsData.controlCenterWidgets.slice();
+    const widget = widgets[index];
+    if (!widget)
+        return;
+    const size = Object.assign({}, widget, clampSize(Object.assign({}, widget, changes), columns, rows));
+    if (changes.w === undefined)
+        size.w = widget.w;
+    if (changes.h === undefined)
+        size.h = widget.h;
+    if (size.w === widget.w && size.h === widget.h)
+        return;
+    widgets[index] = Object.assign({}, widget, size);
+    Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
 function reorderWidgets(newOrder) {
-    Common.SettingsData.set("controlCenterWidgets", newOrder)
+    Common.SettingsData.set("controlCenterWidgets", newOrder);
 }
 
-function resetToDefault() {
-    const defaultWidgets = [
-        {"id": "volumeSlider", "enabled": true, "width": 50},
-        {"id": "brightnessSlider", "enabled": true, "width": 50},
-        {"id": "wifi", "enabled": true, "width": 50},
-        {"id": "bluetooth", "enabled": true, "width": 50},
-        {"id": "audioOutput", "enabled": true, "width": 50},
-        {"id": "audioInput", "enabled": true, "width": 50},
-        {"id": "nightMode", "enabled": true, "width": 50},
-        {"id": "darkMode", "enabled": true, "width": 50}
-    ]
-    Common.SettingsData.set("controlCenterWidgets", defaultWidgets)
+function resetToDefault(columns) {
+    const ids = ["volumeSlider", "brightnessSlider", "wifi", "bluetooth", "audioOutput", "audioInput", "nightMode", "darkMode"];
+    Common.SettingsData.set("controlCenterWidgets", ids.map(id => Object.assign({
+            "id": id,
+            "enabled": true
+        }, clampSize({
+            "id": id
+        }, columns))));
 }
 
 function clearAll() {
-    Common.SettingsData.set("controlCenterWidgets", [])
+    Common.SettingsData.set("controlCenterWidgets", []);
 }

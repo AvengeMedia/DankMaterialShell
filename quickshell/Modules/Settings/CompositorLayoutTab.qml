@@ -322,7 +322,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 value: SettingsData.hyprlandMasterSize
                 minimum: 10
                 maximum: 90
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("hyprlandMasterSize", newValue)
             }
 
@@ -349,7 +348,6 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 value: SettingsData.hyprlandScrollingColumnWidth
                 minimum: 10
                 maximum: 100
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("hyprlandScrollingColumnWidth", newValue)
             }
 

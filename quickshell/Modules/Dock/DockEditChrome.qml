@@ -20,7 +20,7 @@ Rectangle {
     implicitWidth: content.implicitWidth + Theme.spacingL * 2
     implicitHeight: content.implicitHeight + Theme.spacingM * 2
     radius: Theme.cornerRadiusXL
-    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+    color: Theme.readableSurface
     border.color: BlurService.borderColor
     border.width: BlurService.borderWidth
 

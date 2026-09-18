@@ -102,7 +102,6 @@ Item {
                 minimum: 75
                 maximum: 150
                 value: Math.round(SettingsData.fontScale * 100)
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("fontScale", newValue / 100)
             }
             SettingsFontDropdownRow {
@@ -168,7 +167,7 @@ Item {
                         width: motionPreview.laneWidth
                         height: parent.height
                         radius: Theme.cornerRadiusL
-                        color: Theme.surfaceContainerLowest
+                        color: Theme.chipSurface
 
                         StyledText {
                             x: parent.width - width - Theme.spacingL

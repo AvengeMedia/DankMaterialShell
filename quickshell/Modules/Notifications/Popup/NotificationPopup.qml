@@ -638,7 +638,7 @@ PanelWindow {
             sourceWidth: Math.max(0, content.width - (content.cardInset * 2))
             sourceHeight: Math.max(0, content.height - (content.cardInset * 2))
             targetRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            targetColor: Theme.notificationFloatingSurfaceHigh
+            targetColor: Theme.notificationFloatingSurface
             borderColor: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, Theme.stateLayerPressed) : Theme.outlineVariant
             borderWidth: win.notificationData && win.notificationData.urgency === NotificationUrgency.Critical ? Theme.outlineWidthFocused : 0
         }
@@ -656,7 +656,7 @@ PanelWindow {
         ClippingRectangle {
             id: backgroundContainer
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurfaceHigh
+            color: Theme.notificationFloatingSurface
             anchors.fill: parent
             anchors.margins: content.cardInset
             clip: true
@@ -684,6 +684,8 @@ PanelWindow {
 
                 NotificationCard {
                     id: notificationCard
+                    surfaceColor: Theme.notificationFloatingSurface
+                    chipColor: Theme.chipSurface
                     width: parent.width
                     notificationData: win.notificationData
                     descriptionExpanded: win.descriptionExpanded
@@ -694,7 +696,7 @@ PanelWindow {
                     dismissText: I18n.tr("Clear")
                     animateHeight: false
                     outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-                    color: Theme.notificationFloatingSurfaceHigh
+                    color: Theme.notificationFloatingSurface
                     onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
                     onCloseRequested: win.dismissPopupReliably()
                     onDismissRequested: {

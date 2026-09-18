@@ -15,6 +15,7 @@ Item {
     property bool focusAllowed: true
     property int selectedIndex: -1
     property bool showKeyboardHints: false
+    property bool nested: false
 
     function getStartOfDay(date) {
         const d = new Date(date);
@@ -251,9 +252,8 @@ Item {
             }
 
             NotificationEmptyState {
+                parent: historyListView
                 visible: historyListView.count === 0
-                y: Theme.spacingL
-                anchors.horizontalCenter: parent.horizontalCenter
             }
 
             delegate: Item {
@@ -281,6 +281,7 @@ Item {
                     width: parent.width
                     x: delegateRoot.swipeOffset
                     historyItem: modelData
+                    nested: root.nested
                     firstInGroup: index === 0
                     lastInGroup: index === historyListView.count - 1
                     isSelected: root.keyboardActive && root.focusAllowed && root.selectedIndex === index

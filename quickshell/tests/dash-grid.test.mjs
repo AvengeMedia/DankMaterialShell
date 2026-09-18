@@ -4,7 +4,7 @@ import vm from "node:vm";
 import test from "node:test";
 
 const grid = vm.createContext({});
-vm.runInContext(readFileSync(new URL("../Modules/DankDash/utils/grid.js", import.meta.url), "utf8"), grid);
+vm.runInContext(readFileSync(new URL("../Common/GridLayout.js", import.meta.url), "utf8"), grid);
 const cards = [{ id: "clock", w: 2, h: 1 }, { id: "weather", w: 1, h: 1 }, { id: "notifications", w: 3, h: 5 }, { id: "calendar", w: 3, h: 3 }, { id: "media", w: 3, h: 1 }];
 const order = cards.map((card, i) => i);
 const unit = { w: 1, h: 1 };

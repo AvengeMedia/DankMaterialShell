@@ -60,7 +60,6 @@ Item {
                 value: SettingsData.m3ElevationOpacity ?? 30
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("m3ElevationOpacity", newValue)
             }
 
@@ -281,7 +280,6 @@ Item {
                 resetKeys: ["shadowOpacity"]
                 minimum: 10
                 maximum: 100
-                unit: "%"
                 value: bar.selectedBarConfig?.shadowOpacity ?? 60
                 onSliderValueChanged: newValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         shadowOpacity: newValue

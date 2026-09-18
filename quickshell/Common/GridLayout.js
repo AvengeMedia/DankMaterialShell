@@ -1,58 +1,58 @@
 function packCells(cards, order, columns, isAvailable) {
-    const cells = []
-    const heights = []
+    const cells = [];
+    const heights = [];
     for (let c = 0; c < columns; c++)
-        heights.push(0)
-    let rows = 0
+        heights.push(0);
+    let rows = 0;
 
     for (let p = 0; p < order.length; p++) {
-        const sourceIndex = order[p]
-        const card = cards[sourceIndex]
+        const sourceIndex = order[p];
+        const card = cards[sourceIndex];
         if (!card)
-            continue
+            continue;
         if (isAvailable && !isAvailable(card.id)) {
-            cells[sourceIndex] = null
-            continue
+            cells[sourceIndex] = null;
+            continue;
         }
 
-        const w = Math.max(1, Math.min(columns, card.w || 1))
-        const h = Math.max(1, card.h || 1)
-        let bestX = 0
-        let bestY = Infinity
+        const w = Math.max(1, Math.min(columns, card.w || 1));
+        const h = Math.max(1, card.h || 1);
+        let bestX = 0;
+        let bestY = Infinity;
         for (let x = 0; x + w <= columns; x++) {
-            let y = 0
+            let y = 0;
             for (let c = x; c < x + w; c++)
-                y = Math.max(y, heights[c])
+                y = Math.max(y, heights[c]);
             if (y >= bestY)
-                continue
-            bestY = y
-            bestX = x
+                continue;
+            bestY = y;
+            bestX = x;
         }
         for (let c = bestX; c < bestX + w; c++)
-            heights[c] = bestY + h
-        rows = Math.max(rows, bestY + h)
+            heights[c] = bestY + h;
+        rows = Math.max(rows, bestY + h);
         cells[sourceIndex] = {
             "col": bestX,
             "row": bestY,
             "cols": w,
             "rows": h
-        }
+        };
     }
 
     return {
         "cells": cells,
         "rows": rows
-    }
+    };
 }
 
 function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable) {
-    const packed = packCells(cards, order, columns, isAvailable)
-    const colW = (width - gap * (columns - 1)) / columns
+    const packed = packCells(cards, order, columns, isAvailable);
+    const colW = (width - gap * (columns - 1)) / columns;
     const slots = packed.cells.map(cell => {
         if (!cell)
-            return null
-        const px = cell.col * (colW + gap)
-        const pw = cell.cols * colW + (cell.cols - 1) * gap
+            return null;
+        const px = cell.col * (colW + gap);
+        const pw = cell.cols * colW + (cell.cols - 1) * gap;
         return {
             "x": mirror ? width - px - pw : px,
             "y": cell.row * (rowUnit + gap),
@@ -62,62 +62,64 @@ function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailab
             "row": cell.row,
             "cols": cell.cols,
             "rows": cell.rows
-        }
-    })
+        };
+    });
 
     return {
         "slots": slots,
         "rows": packed.rows,
         "totalHeight": packed.rows > 0 ? packed.rows * rowUnit + (packed.rows - 1) * gap : 0
-    }
+    };
 }
 
 function rowLimit(cards, order, columns, rows, isAvailable) {
-    return Math.max(rows, packCells(cards, order, columns, isAvailable).rows)
+    return Math.max(rows, packCells(cards, order, columns, isAvailable).rows);
 }
 
 function fitWithin(cards, order, columns, limit, index, want, min, isAvailable) {
-    let best = null
+    let best = null;
     for (let w = Math.min(columns, want.w); w >= min.w; w--) {
         for (let h = want.h; h >= min.h; h--) {
-            const trial = cards.slice()
+            const trial = cards.slice();
             trial[index] = Object.assign({}, cards[index], {
                 "w": w,
                 "h": h
-            })
+            });
             if (packCells(trial, order, columns, isAvailable).rows > limit)
-                continue
-            const distance = want.w - w + want.h - h
-            const better = !best || distance < best.distance || (distance === best.distance && w * h > best.w * best.h)
+                continue;
+            const distance = want.w - w + want.h - h;
+            const better = !best || distance < best.distance || (distance === best.distance && w * h > best.w * best.h);
             if (better)
                 best = {
                     "w": w,
                     "h": h,
                     "distance": distance
-                }
-            break
+                };
+            break;
         }
     }
     return best ? {
         "w": best.w,
         "h": best.h
-    } : null
+    } : null;
 }
 
 function fitResize(cards, order, columns, rows, index, want, min, isAvailable) {
-    const limit = rowLimit(cards, order, columns, rows, isAvailable)
-    return fitWithin(cards, order, columns, limit, index, want, min, isAvailable)
+    const limit = rowLimit(cards, order, columns, rows, isAvailable);
+    return fitWithin(cards, order, columns, limit, index, want, min, isAvailable);
 }
 
 function fitNewCard(cards, columns, rows, id, want, min, isAvailable) {
-    const order = cards.map((card, i) => i)
-    const limit = rowLimit(cards, order, columns, rows, isAvailable)
-    const trial = cards.concat([{
-        "id": id,
-        "w": want.w,
-        "h": want.h
-    }])
-    return fitWithin(trial, order.concat([cards.length]), columns, limit, cards.length, want, min, isAvailable)
+    const order = cards.map((card, i) => i);
+    const limit = rowLimit(cards, order, columns, rows, isAvailable);
+    const trial = cards.concat([
+        {
+            "id": id,
+            "w": want.w,
+            "h": want.h
+        }
+    ]);
+    return fitWithin(trial, order.concat([cards.length]), columns, limit, cards.length, want, min, isAvailable);
 }
 
 function neighborInDirection(rects, index, direction) {
@@ -156,4 +158,10 @@ function axisScore(gap, cross) {
 
 function crossGap(a, aSize, b, bSize) {
     return Math.max(0, b - (a + aSize), a - (b + bSize));
+}
+
+function dimension(value, minimum, maximum, fallback) {
+    const min = minimum ?? 1;
+    const max = Math.max(min, maximum ?? fallback ?? min);
+    return Math.max(min, Math.min(max, Number.isInteger(value) ? value : (fallback ?? min)));
 }

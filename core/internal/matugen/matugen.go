@@ -126,9 +126,23 @@ type ColorsOutput struct {
 	} `json:"colors"`
 }
 
+type SchemeColors struct {
+	Primary   string `json:"primary"`
+	Secondary string `json:"secondary"`
+	Tertiary  string `json:"tertiary"`
+}
+
 type SchemePreview struct {
-	Dark  string `json:"dark"`
-	Light string `json:"light"`
+	Dark  SchemeColors `json:"dark"`
+	Light SchemeColors `json:"light"`
+}
+
+func schemeColors(output, mode string) SchemeColors {
+	return SchemeColors{
+		Primary:   extractMatugenColor(output, "primary", mode),
+		Secondary: extractMatugenColor(output, "secondary", mode),
+		Tertiary:  extractMatugenColor(output, "tertiary", mode),
+	}
 }
 
 var previewSchemeTypes = []string{
@@ -161,9 +175,9 @@ func PreviewSchemes(sourceColor string, contrast float64, imagePath string) (map
 			return nil, fmt.Errorf("preview %s: %w", schemeType, err)
 		}
 
-		dark := extractMatugenColor(output, "primary", "dark")
-		light := extractMatugenColor(output, "primary", "light")
-		if dark == "" || light == "" {
+		dark := schemeColors(output, "dark")
+		light := schemeColors(output, "light")
+		if dark.Primary == "" || light.Primary == "" {
 			return nil, fmt.Errorf("preview %s: primary colors missing from matugen output", schemeType)
 		}
 		previews[schemeType] = SchemePreview{Dark: dark, Light: light}
@@ -192,9 +206,9 @@ func smartSchemePreview(fallback SchemePreview, contrast float64, imagePath stri
 		log.Warnf("Smart scheme preview failed falling back to tonal-spot: %v", err)
 		return fallback
 	}
-	dark := extractMatugenColor(output, "primary", "dark")
-	light := extractMatugenColor(output, "primary", "light")
-	if dark == "" || light == "" {
+	dark := schemeColors(output, "dark")
+	light := schemeColors(output, "light")
+	if dark.Primary == "" || light.Primary == "" {
 		log.Warn("Smart scheme preview failed falling back to tonal-spot: primary colors missing from matugen output")
 		return fallback
 	}

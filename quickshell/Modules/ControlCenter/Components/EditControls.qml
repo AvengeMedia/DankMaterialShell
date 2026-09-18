@@ -127,7 +127,7 @@ Row {
         buttonHeight: Theme.buttonHeightS
         iconName: "settings_backup_restore"
         text: I18n.tr("Defaults", "noun, control center edit button restoring the default layout")
-        backgroundColor: Theme.surfaceContainerHighest
+        backgroundColor: Theme.chipSurface
         textColor: Theme.surfaceText
         onClicked: root.resetToDefault()
     }

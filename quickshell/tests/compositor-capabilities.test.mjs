@@ -92,6 +92,10 @@ test("workspace urgency and follow focus cover every compositor but labwc", () =
     expectSet("supportsWorkspaceFollowFocus", ["niri", "hyprland", "mango", "sway", "scroll", "miracle", "aqueous"]);
 });
 
+test("persistent workspaces cover compositors that open a missing workspace on demand", () => {
+    expectSet("supportsPersistentWorkspaces", ["hyprland", "mango", "sway", "scroll", "miracle"]);
+});
+
 test("native overview is niri and aqueous, pointer is niri and mango, input is niri", () => {
     expectSet("supportsNativeOverview", ["niri", "aqueous"]);
     expectSet("supportsPointerConfig", ["niri", "mango"]);

@@ -21,6 +21,7 @@ T.Control {
     property string settingKey: ""
 
     property string title: ""
+    property bool singleLineTitle: false
     property string subtitle: ""
     property color subtitleColor: Theme.surfaceVariantText
     property string iconName: ""
@@ -229,7 +230,7 @@ T.Control {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingL
-                visible: leadingSlot.children.length > 0 || leadingIcon.visible
+                visible: leadingSlot.children.length > 0 || root.iconName !== ""
                 opacity: root.enabled ? 1 : SettingsMetrics.disabledOpacity
 
                 Row {
@@ -266,7 +267,8 @@ T.Control {
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Theme.fontWeightMedium
                     color: root.titleColor
-                    wrapMode: Text.WordWrap
+                    wrapMode: root.singleLineTitle ? Text.NoWrap : Text.WordWrap
+                    elide: root.singleLineTitle ? Text.ElideRight : Text.ElideNone
                     visible: root.title !== ""
                     horizontalAlignment: Text.AlignLeft
                 }

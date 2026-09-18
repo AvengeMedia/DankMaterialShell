@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.BuiltinPlugins
 import qs.Modules.ControlCenter.Widgets
 import "../utils/widgets.js" as WidgetUtils
@@ -10,6 +11,8 @@ import "../utils/widgets.js" as WidgetUtils
 QtObject {
     id: root
 
+    property int columns: CcMetrics.gridColumns
+    property int maximumRows: CcMetrics.rowCapFor(CcMetrics.fallbackScreenHeight)
     property var builtinInstances: ({})
     readonly property var _pluginWidgetsCache: ({})
 
@@ -387,15 +390,15 @@ QtObject {
     }
 
     function addWidget(widgetId) {
-        WidgetUtils.addWidget(widgetId);
+        WidgetUtils.addWidget(widgetId, columns);
     }
 
     function removeWidget(index) {
         WidgetUtils.removeWidget(index);
     }
 
-    function setWidgetWidth(index, width) {
-        WidgetUtils.setWidgetWidth(index, width);
+    function setWidgetSize(index, changes) {
+        WidgetUtils.setWidgetSize(index, changes, columns, maximumRows);
     }
 
     function reorderWidgets(newOrder) {
@@ -403,7 +406,7 @@ QtObject {
     }
 
     function resetToDefault() {
-        WidgetUtils.resetToDefault();
+        WidgetUtils.resetToDefault(columns);
     }
 
     function clearAll() {

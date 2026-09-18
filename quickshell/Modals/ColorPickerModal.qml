@@ -1,78 +1,58 @@
 import QtQuick
 import Quickshell.Io
 import qs.Common
+import qs.Modals.Common
 import qs.Modules.ColorPicker
-import qs.Widgets
-import qs.DankCommon.Widgets as CommonWidgets
 
-DankFloatingWindow {
+DankModal {
     id: root
+
+    layerNamespace: "dms:color-picker"
 
     property string pickerTitle: I18n.tr("Choose color", "color picker title")
     property color selectedColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary
     property var onColorSelectedCallback: null
-    property alias shouldBeVisible: root.visible
-    readonly property alias pickerContent: pickerContent
 
     signal colorSelected(color selectedColor)
 
     objectName: "colorPickerModal"
-    title: pickerTitle
-    implicitWidth: Theme.dialogMaxWidth
-    implicitHeight: Math.min(pickerContent.implicitHeight, (screen?.height ?? 1080) - Theme.spacingXL * 2)
-    minimumSize: Qt.size(Math.min(Theme.smallBreakpoint, screen?.width ?? Theme.smallBreakpoint), Math.min(Theme.fieldDefaultWidth * 2, screen?.height ?? Theme.fieldDefaultWidth * 2))
-    visible: false
-    contentVisible: !captureGuard.active
+    modalWidth: Theme.dialogMaxWidth
+    modalHeight: Math.min(screenHeight - Theme.spacingXL * 2, contentLoader?.item?.implicitHeight ?? 0)
+    keepContentLoaded: true
+    allowStacking: true
 
     function show() {
-        captureGuard.cancel();
-        pickerContent.cancelScreenPick();
-        pickerContent.setColor(selectedColor);
-        visible = true;
-        focusTimer.restart();
+        open();
+        contentLoader?.item?.setColor(selectedColor);
     }
 
     function hide() {
-        captureGuard.cancel();
-        pickerContent.cancelScreenPick();
-        visible = false;
-        onColorSelectedCallback = null;
-    }
-
-    function open() {
-        show();
-    }
-
-    function close() {
-        hide();
+        close();
     }
 
     function hideInstant() {
-        hide();
+        instantClose();
     }
 
     function toggle() {
-        visible ? hide() : show();
+        shouldBeVisible ? hide() : show();
     }
 
     function toggleInstant() {
-        toggle();
+        shouldBeVisible ? hideInstant() : show();
     }
 
-    onSelectedColorChanged: pickerContent.setColor(selectedColor)
-    onClosed: hide()
+    onSelectedColorChanged: contentLoader?.item?.setColor(selectedColor)
+    onBackgroundClicked: hide()
+    onOpened: Qt.callLater(() => contentLoader?.item?.focusInitial())
+    onDialogClosed: {
+        if (contentLoader?.item?.pickingFromScreen)
+            return;
+        onColorSelectedCallback = null;
+    }
     onColorSelected: color => {
         if (typeof onColorSelectedCallback === "function")
             onColorSelectedCallback(color);
-    }
-
-    Timer {
-        id: focusTimer
-        interval: 0
-        onTriggered: {
-            if (root.visible)
-                pickerContent.focusInitial();
-        }
     }
 
     IpcHandler {
@@ -114,36 +94,19 @@ DankFloatingWindow {
         target: "color-picker"
     }
 
-    ColorPickerContent {
-        id: pickerContent
-
-        anchors.fill: parent
-        windowControls: windowControls
-        pickerTitle: root.pickerTitle
-        initialColor: root.selectedColor
-        showSaveButton: typeof root.onColorSelectedCallback === "function"
-        onColorSelected: color => root.colorSelected(color)
-        onCloseRequested: root.hide()
-        onHideRequested: captureGuard.prepare()
-        onShowRequested: {
-            captureGuard.cancel();
-            root.visible = true;
-            focusTimer.restart();
-        }
-    }
-
-    FloatingWindowControls {
-        id: windowControls
-        targetWindow: root
-    }
-
-    CommonWidgets.WindowCaptureGuard {
-        id: captureGuard
-
-        targetWindow: root
-        onReady: {
-            root.visible = false;
-            pickerContent.startScreenPick();
+    content: Component {
+        ColorPickerContent {
+            anchors.fill: parent
+            pickerTitle: root.pickerTitle
+            initialColor: root.selectedColor
+            showSaveButton: typeof root.onColorSelectedCallback === "function"
+            onColorSelected: color => root.colorSelected(color)
+            onCloseRequested: root.hide()
+            onHideRequested: {
+                root.hideInstant();
+                startScreenPick();
+            }
+            onShowRequested: root.show()
         }
     }
 }

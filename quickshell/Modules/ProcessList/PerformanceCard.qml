@@ -21,7 +21,7 @@ Rectangle {
     property color extraInfoColor: Theme.surfaceVariantText
 
     radius: Theme.cornerRadiusL
-    color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(card))
+    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(card))
 
     Connections {
         target: DgopService

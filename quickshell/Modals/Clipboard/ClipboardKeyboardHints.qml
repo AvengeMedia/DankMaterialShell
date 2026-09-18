@@ -16,7 +16,7 @@ Rectangle {
 
     height: ClipboardConstants.keyboardHintsHeight
     radius: Theme.cornerRadius
-    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
+    color: Theme.floatingWindowNestedSurface
     border.color: Theme.primary
     border.width: 2
     opacity: visible ? 1 : 0

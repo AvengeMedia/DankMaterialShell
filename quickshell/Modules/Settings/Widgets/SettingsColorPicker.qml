@@ -61,7 +61,7 @@ Item {
                     width: (parent.width - Theme.spacingS * 2) / 3
                     height: Theme.listItemHeight + Theme.spacingXS
                     radius: Theme.cornerRadius
-                    color: root.colorMode === modelData.id ? Theme.primarySelected : Theme.surfaceHover
+                    color: root.colorMode === modelData.id ? Theme.primarySelected : Theme.chipSurface
                     border.color: root.colorMode === modelData.id ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                     border.width: Theme.outlineWidthFocused
 

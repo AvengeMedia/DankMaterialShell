@@ -81,67 +81,20 @@ Column {
             checked: root.page.value("showOccupiedWorkspacesOnly")
             onToggled: checked => root.page.set("showOccupiedWorkspacesOnly", checked)
         }
+
+        SettingsToggleRow {
+            resetStore: root.page
+            resetKeys: ["showSpecialWorkspaces"]
+            text: I18n.tr("Show scratchpads")
+            description: I18n.tr("Special workspaces appear last; click to show or hide")
+            visible: CompositorService.isHyprland
+            checked: root.page.value("showSpecialWorkspaces")
+            onToggled: checked => root.page.set("showSpecialWorkspaces", checked)
+        }
     }
 
     WorkspaceAppearanceCard {
         store: root.page.store
-    }
-
-    SettingsCard {
-        title: I18n.tr("Icons")
-        settingKey: "workspaceIcons"
-        visible: NiriService.hasNamedWorkspaces()
-
-        Repeater {
-            model: NiriService.getNamedWorkspaces()
-
-            SettingsRow {
-                required property string modelData
-
-                title: modelData
-
-                DankIconPicker {
-                    id: iconPicker
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Component.onCompleted: {
-                        const iconData = SettingsData.getWorkspaceNameIcon(modelData);
-                        if (iconData)
-                            setIcon(iconData.value, iconData.type);
-                    }
-
-                    onIconSelected: (iconName, iconType) => {
-                        SettingsData.setWorkspaceNameIcon(modelData, {
-                            "type": iconType,
-                            "value": iconName
-                        });
-                        setIcon(iconName, iconType);
-                    }
-
-                    Connections {
-                        target: SettingsData
-                        function onWorkspaceIconsUpdated() {
-                            const iconData = SettingsData.getWorkspaceNameIcon(modelData);
-                            if (iconData) {
-                                iconPicker.setIcon(iconData.value, iconData.type);
-                                return;
-                            }
-                            iconPicker.setIcon("", "icon");
-                        }
-                    }
-                }
-
-                DankActionButton {
-                    buttonSize: Theme.iconButtonSize
-                    iconName: "close"
-                    Accessible.name: I18n.tr("Remove")
-                    iconSize: Theme.iconSizeMedium
-                    iconColor: Theme.error
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: SettingsData.removeWorkspaceNameIcon(modelData)
-                }
-            }
-        }
     }
 
     SettingsCard {
@@ -153,9 +106,22 @@ Column {
         SettingsToggleRow {
             resetStore: root.page
             resetKeys: ["showWorkspacePadding"]
-            text: I18n.tr("Padding")
+            text: I18n.tr("Minimum workspaces")
+            description: CompositorService.supportsPersistentWorkspaces ? I18n.tr("Workspaces up to the count are always shown and can be opened") : I18n.tr("Empty placeholders fill the switcher up to the count")
             checked: root.page.value("showWorkspacePadding")
             onToggled: checked => root.page.set("showWorkspacePadding", checked)
+        }
+
+        SettingsSliderRow {
+            resetStore: root.page
+            resetKeys: ["workspacePaddingCount"]
+            enabled: root.page.value("showWorkspacePadding")
+            text: I18n.tr("Workspace count")
+            unit: ""
+            value: root.page.value("workspacePaddingCount")
+            minimum: 2
+            maximum: 10
+            onSliderValueChanged: newValue => root.page.set("workspacePaddingCount", newValue)
         }
 
         SettingsToggleRow {

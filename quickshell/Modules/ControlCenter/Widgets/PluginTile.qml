@@ -15,11 +15,15 @@ CcTile {
     title: instance?.ccWidgetPrimaryText || widgetDef?.text || I18n.tr("Plugin")
     subtitle: instance?.ccWidgetSecondaryText || ""
     active: instance?.ccWidgetIsActive ?? false
+    toggle: instance?.ccWidgetIsToggle ?? true
     showExpand: hasDetail
+    opensPage: (!toggle || compact) && hasDetail
+    expandedContent: instance?.ccExpandedContent ?? null
+    expandedMinimumHeight: instance?.ccExpandedMinimumHeight ?? Theme.listItemHeight
     enabled: instance !== null
 
     onClicked: {
-        if (compact && hasDetail) {
+        if ((compact || !toggle) && hasDetail) {
             expandClicked();
             return;
         }

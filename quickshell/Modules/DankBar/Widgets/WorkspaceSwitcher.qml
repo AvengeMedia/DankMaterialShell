@@ -96,11 +96,13 @@ BasePill {
 
         const baseList = CompositorService.workspacesForScreen(root.screenName, root.opt("workspaceFollowFocus"), {
             "occupiedOnly": root.opt("showOccupiedWorkspacesOnly"),
-            "showAllTags": root.opt("dwlShowAllTags")
+            "showAllTags": root.opt("dwlShowAllTags"),
+            "minCount": root.opt("showWorkspacePadding") ? root.opt("workspacePaddingCount") : 0,
+            "showSpecial": root.opt("showSpecialWorkspaces")
         });
         if (CompositorService.ephemeralWorkspaces)
             return hyprlandSlotList(baseList);
-        if (!root.opt("showWorkspacePadding") || (root.useAqueous && baseList.length === 0))
+        if (!root.opt("showWorkspacePadding") || CompositorService.supportsPersistentWorkspaces || (root.useAqueous && baseList.length === 0))
             return baseList;
         return padWorkspaces(baseList);
     }
@@ -159,12 +161,10 @@ BasePill {
         }
     }
 
-    readonly property var _hyprPlaceholder: WorkspaceModel.placeholder()
-
     function recordOf(entry) {
         if (!entry || entry.ws === undefined)
             return entry;
-        return entry.ws ?? _hyprPlaceholder;
+        return entry.ws;
     }
 
     function _hyprSlot(key, ws) {
@@ -179,14 +179,7 @@ BasePill {
     }
 
     function hyprlandSlotList(raw) {
-        const slots = raw.map(ws => _hyprSlot(ws.id > 0 ? ws.id : "name:" + (ws.name ?? ""), ws));
-        if (!root.opt("showWorkspacePadding"))
-            return slots;
-        // pad past the highest real id so a placeholder becomes that workspace's slot once created
-        let nextId = raw.reduce((max, ws) => Math.max(max, ws.id ?? 0), 0);
-        while (slots.length < 3)
-            slots.push(_hyprSlot(++nextId, null));
-        return slots;
+        return raw.map(ws => _hyprSlot(ws.id > 0 ? ws.id : (ws.special ? "special:" : "name:") + (ws.name ?? ""), ws));
     }
 
     // Stable placeholder instances so ScriptModel (identity-diffed) reuses padding delegates instead of recreating them on workspace churn
@@ -194,8 +187,9 @@ BasePill {
 
     function padWorkspaces(list) {
         const padded = list.slice();
+        const minCount = root.opt("workspacePaddingCount");
         let slot = 0;
-        while (padded.length < 3) {
+        while (padded.length < minCount) {
             if (root._placeholderPool.length <= slot)
                 root._placeholderPool.push(WorkspaceModel.placeholder());
             padded.push(root._placeholderPool[slot]);
@@ -249,7 +243,7 @@ BasePill {
         if (!data || data.placeholder)
             return;
         if (root.useNativeWorkspaces) {
-            CompositorService.switchToWorkspace(data);
+            CompositorService.switchToWorkspace(data, root.effectiveScreenName);
             return;
         }
         if (root.useExtWorkspace && typeof data.activate === "function")
@@ -314,7 +308,8 @@ BasePill {
         }
         if (!useNativeWorkspaces)
             return;
-        CompositorService.stepWorkspace(getRealWorkspaces(), root.currentWorkspace, direction);
+        // specials are overlays you toggle, not positions you scroll to
+        CompositorService.stepWorkspace(getRealWorkspaces().map(ws => root.recordOf(ws)).filter(ws => ws.special !== true), root.currentWorkspace, direction);
     }
 
     function getWorkspaceIndexFallback(modelData, index) {
@@ -570,7 +565,13 @@ BasePill {
                     const name = record?.name;
                     if (!name)
                         return null;
-                    return SettingsData.getWorkspaceNameIcon(name);
+                    const custom = SettingsData.getWorkspaceNameIcon(name);
+                    if (custom || record.special !== true)
+                        return custom;
+                    return {
+                        "type": "icon",
+                        "value": "inbox"
+                    };
                 }
                 readonly property bool loadedHasIcon: loadedIconData !== null
                 property var loadedIcons: []
@@ -1101,7 +1102,7 @@ BasePill {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && rowAppIcon.status !== Image.Ready
-                                                color: Theme.surfaceContainer
+                                                color: Theme.chipSurface
                                                 radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
                                                 border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
@@ -1119,7 +1120,7 @@ BasePill {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && modelData.isSteamApp && rowSteamIcon.status !== Image.Ready
-                                                color: Theme.surfaceContainer
+                                                color: Theme.chipSurface
                                                 radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
                                                 border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
@@ -1259,7 +1260,7 @@ BasePill {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && !modelData.isSteamApp && colAppIcon.status !== Image.Ready
-                                                color: Theme.surfaceContainer
+                                                color: Theme.chipSurface
                                                 radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
                                                 border.width: Theme.outlineWidth
                                                 border.color: appBorderColor
@@ -1277,7 +1278,7 @@ BasePill {
                                             Rectangle {
                                                 anchors.fill: parent
                                                 visible: !modelData.isQuickshell && modelData.isSteamApp && colSteamIcon.status !== Image.Ready
-                                                color: Theme.surfaceContainer
+                                                color: Theme.chipSurface
                                                 radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
                                                 border.width: Theme.outlineWidth
                                                 border.color: appBorderColor

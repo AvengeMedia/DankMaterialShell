@@ -439,6 +439,13 @@ Singleton {
         return deviceInfo.class === "ddc" ? "" : "%";
     }
 
+    function deviceTitle(device) {
+        const name = device?.name || "";
+        if (device?.class !== "backlight")
+            return name;
+        return name.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+    }
+
     function brightnessIconName(deviceInfo, level) {
         if (!deviceInfo)
             return "brightness_medium";

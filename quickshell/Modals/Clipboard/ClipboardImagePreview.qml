@@ -82,7 +82,7 @@ ClippingRectangle {
         anchors.fill: parent
         anchors.margins: Theme.spacingL
         radius: Theme.cornerRadiusL
-        color: Theme.surfaceContainerHigh
+        color: Theme.floatingWindowNestedSurface
         border.color: Theme.outlineVariant
         border.width: Theme.outlineWidth
 

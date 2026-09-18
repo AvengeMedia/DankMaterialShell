@@ -262,7 +262,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
                             iconName: "menu_book"
                             iconSize: 18
-                            backgroundColor: Theme.surfaceTextHover
+                            backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://danklinux.com/docs")
                         }
@@ -273,7 +273,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
                             iconName: "extension"
                             iconSize: 18
-                            backgroundColor: Theme.surfaceTextHover
+                            backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://plugins.danklinux.com")
                         }
@@ -284,7 +284,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : "GitHub"
                             iconName: "code"
                             iconSize: 18
-                            backgroundColor: Theme.surfaceTextHover
+                            backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell")
                         }

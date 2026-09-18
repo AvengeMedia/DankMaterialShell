@@ -8,6 +8,10 @@ Notifications.NotificationCard {
     required property var historyItem
     property bool isSelected: false
     property bool keyboardNavigationActive: false
+    property bool nested: false
+
+    surfaceColor: Theme.foregroundColor(nested ? Theme.chipSurface : Theme.cardSurface, Theme.isFloatingWindow(root))
+    chipColor: nested ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerFocus) : Theme.chipSurface
 
     notificationData: ({
             appName: historyItem.appName || "",

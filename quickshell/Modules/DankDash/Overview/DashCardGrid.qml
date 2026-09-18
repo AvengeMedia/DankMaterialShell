@@ -4,7 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 import qs.Modules.DankDash
-import "../utils/grid.js" as GridUtils
+import "../../../Common/GridLayout.js" as GridUtils
 import "../utils/cards.js" as CardUtils
 import "../../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
 

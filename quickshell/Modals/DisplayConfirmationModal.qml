@@ -88,7 +88,7 @@ DankModal {
                     width: parent.width
                     height: 70
                     radius: Theme.cornerRadius
-                    color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+                    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
 
                     StyledText {
                         anchors.centerIn: parent

@@ -115,8 +115,8 @@ Singleton {
     readonly property real cardRadius: Theme.cornerRadius
     readonly property real surfaceRadius: Theme.cornerRadiusXL
     readonly property real mutedAlpha: 0.72
-    readonly property color cardColor: Theme.foregroundColor(Theme.surfaceContainerHigh, false)
-    readonly property color chipColor: Theme.foregroundColor(Theme.surfaceContainerHighest, false)
+    readonly property color cardColor: Theme.foregroundColor(Theme.cardSurface, false)
+    readonly property color chipColor: Theme.foregroundColor(Theme.chipSurface, false)
     readonly property real optionSheetWidth: 440
 
     readonly property real avatarSize: Theme.buttonHeightM
@@ -195,6 +195,8 @@ Singleton {
     readonly property real lyricsNearOpacity: 0.55
     readonly property real lyricsFarOpacity: 0.3
     readonly property real lyricsLineHeight: 1.25
+    readonly property real lyricsLeadHeightDivisor: 12
+    readonly property real lyricsLeadWidthDivisor: 11
     readonly property int wheelNotch: 120
 
     readonly property int dailyVisibleCount: 7

@@ -192,8 +192,8 @@ DankModal {
                                 if (isSelected)
                                     return Theme.primaryHoverLight;
                                 if (mouseArea.containsMouse)
-                                    return Theme.surfacePressed;
-                                return Theme.surfaceHover;
+                                    return Theme.foregroundColor(Theme.chipSurface, true);
+                                return Theme.floatingWindowNestedSurface;
                             }
 
                             border.color: isActive ? Theme.primary : (isSelected ? Theme.withAlpha(Theme.primary, 0.5) : Theme.withAlpha(Theme.primary, 0))
@@ -207,7 +207,7 @@ DankModal {
                                 width: 20
                                 height: 20
                                 radius: Theme.cornerRadiusXS
-                                color: isActive ? Theme.primaryPressed : Theme.surfaceTextHover
+                                color: isActive ? Theme.primaryPressed : Theme.chipSurface
                                 border.color: isActive ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                                 border.width: isActive ? 1 : 0
 

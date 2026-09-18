@@ -44,10 +44,14 @@ CcSliderRow {
 
     iconName: BrightnessService.brightnessAvailable && targetDevice ? BrightnessService.brightnessIconName(targetDevice, targetBrightness) : "brightness_low"
     sliderLabel: I18n.tr("Brightness")
+    iconLabel: I18n.tr("Configure")
+    iconTooltip: targetDevice ? BrightnessService.deviceTitle(targetDevice) : ""
     sliderEnabled: BrightnessService.brightnessAvailable && targetDeviceName.length > 0
     minimum: BrightnessService.brightnessMinimum(targetDevice)
     maximum: BrightnessService.brightnessMaximum(targetDevice)
     unit: BrightnessService.brightnessUnit(targetDevice)
+
+    onIconClicked: expandClicked()
 
     onSliderValueChanged: newValue => {
         if (!BrightnessService.brightnessAvailable || !targetDeviceName)

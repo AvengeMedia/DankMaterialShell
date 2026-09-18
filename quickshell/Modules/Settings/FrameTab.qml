@@ -105,7 +105,6 @@ Item {
                 settingKey: "frameOpacity"
                 tags: ["frame", "border", "surface", "popup", "opacity", "transparency"]
                 text: I18n.tr("Surface opacity")
-                unit: "%"
                 minimum: 0
                 maximum: 100
                 value: SettingsData.frameOpacity * 100

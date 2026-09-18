@@ -38,7 +38,7 @@ Item {
         case "dim":
             return Theme.surfaceDim;
         }
-        return Theme.surfaceContainerHigh;
+        return Theme.hostSurface;
     }
     readonly property bool popupStyled: root.controller.expanded
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))

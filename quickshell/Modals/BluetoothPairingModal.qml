@@ -149,7 +149,7 @@ DankModal {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
+                    color: Theme.floatingWindowFieldColor
                     border.color: pinInputField.activeFocus ? Theme.primary : Theme.outlineStrong
                     border.width: pinInputField.activeFocus ? 2 : 1
                     visible: requestType === "pin"
@@ -184,7 +184,7 @@ DankModal {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
+                    color: Theme.floatingWindowFieldColor
                     border.color: passkeyInputField.activeFocus ? Theme.primary : Theme.outlineStrong
                     border.width: passkeyInputField.activeFocus ? 2 : 1
                     visible: requestType === "passkey"
@@ -219,7 +219,7 @@ DankModal {
                     width: parent.width
                     height: 56
                     radius: Theme.cornerRadius
-                    color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+                    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
                     visible: requestType === "confirm" || requestType === "display-passkey"
 
                     Column {

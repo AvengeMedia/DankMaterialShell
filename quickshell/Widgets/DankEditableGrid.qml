@@ -40,6 +40,7 @@ Item {
     }
 
     function syncTiles() {
+        animateLayout = false;
         cancelInteraction();
         const seen = {};
         const keys = sourceItems.map(item => {

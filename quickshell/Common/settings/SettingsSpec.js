@@ -55,7 +55,7 @@ var LOCAL_SPEC = {
         def: true
     },
     widgetBackgroundColor: {
-        def: "sch"
+        def: "sc"
     },
     widgetBackgroundCustomColor: {
         def: "#6750A4"
@@ -383,50 +383,61 @@ var LOCAL_SPEC = {
     systemTrayIconTintStrength: {
         def: 135
     },
-    controlCenterWidth: {
-        def: 550
+    controlCenterColumns: {
+        def: 8
+    },
+    controlCenterIconScale: {
+        def: 1.0
     },
     controlCenterWidgets: {
         def: [
             {
                 id: "volumeSlider",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "brightnessSlider",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "wifi",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "bluetooth",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "audioOutput",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "audioInput",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "nightMode",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             },
             {
                 id: "darkMode",
                 enabled: true,
-                width: 50
+                w: 4,
+                h: 1
             }
         ]
     },

@@ -21,6 +21,9 @@ Card {
     }
     readonly property string minuteText: String(systemClock.date.getMinutes()).padStart(2, "0")
     readonly property string secondText: String(systemClock.date.getSeconds()).padStart(2, "0")
+    readonly property string dateText: showDate ? systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.getEffectiveDateFormat("ddd, MMM d")) : ""
+    readonly property color supportingColor: tinted ? contentColor : mutedColor
+    readonly property real supportLine: Theme.fontSizeMedium * 1.5
 
     entryId: "clock"
     tone: options.tone ?? ""
@@ -38,28 +41,75 @@ Card {
             hours: root.hourText
             minutes: root.minuteText
             seconds: root.showSeconds ? root.secondText : ""
-            dateText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "MMMM d") : ""
-            dayText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "dddd") : ""
+            dateText: root.dateText
             color: root.accentColor
-            supportingColor: root.tinted ? root.contentColor : root.mutedColor
+            supportingColor: root.supportingColor
         }
     }
 
     Component {
         id: analogFace
 
-        DankAnalogClock {
-            hours: systemClock.date.getHours()
-            minutes: systemClock.date.getMinutes()
-            seconds: systemClock.date.getSeconds()
-            showSeconds: root.showSeconds
-            showNumbers: root.options.numbers === true
-            numbersOutside: root.tinted
-            dateText: root.showDate ? systemClock.date.toLocaleDateString(I18n.locale(), "MMM d") : ""
-            color: root.tinted ? root.onAccentColor : root.accentColor
-            numberColor: root.accentColor
-            backgroundColor: root.tinted ? root.accentColor : root.chipColor
-            facePadding: 0
+        Item {
+            id: face
+
+            readonly property real span: Math.min(width, height)
+            readonly property bool insideDate: root.dateText !== "" && span > Theme.buttonHeightM * 2 && dialMetrics.advanceWidth <= span * 0.5
+            readonly property bool sideDate: root.dateText !== "" && !insideDate && width - height >= dateMetrics.advanceWidth + Theme.spacingS
+            readonly property bool belowDate: root.dateText !== "" && !insideDate && !sideDate
+            readonly property real dialSize: belowDate ? Math.min(width, height - root.supportLine - Theme.spacingS) : span
+            readonly property real groupWidth: sideDate ? dialSize + Theme.spacingS + dateMetrics.advanceWidth : dialSize
+            readonly property real groupHeight: belowDate ? dialSize + Theme.spacingS + root.supportLine : dialSize
+
+            DankAnalogClock {
+                id: dial
+                x: (face.width - face.groupWidth) / 2
+                y: (face.height - face.groupHeight) / 2
+                width: face.dialSize
+                height: face.dialSize
+                hours: systemClock.date.getHours()
+                minutes: systemClock.date.getMinutes()
+                seconds: systemClock.date.getSeconds()
+                showSeconds: root.showSeconds
+                showNumbers: root.options.numbers === true
+                numbersOutside: root.tinted
+                dateText: face.insideDate ? root.dateText : ""
+                color: root.tinted ? root.onAccentColor : root.accentColor
+                numberColor: root.accentColor
+                backgroundColor: root.tinted ? root.accentColor : root.chipColor
+                facePadding: 0
+            }
+
+            StyledText {
+                id: dateLabel
+                visible: face.sideDate || face.belowDate
+                x: face.sideDate ? dial.x + dial.width + Theme.spacingS : 0
+                y: face.sideDate ? (face.height - height) / 2 : dial.y + dial.height + Theme.spacingS
+                width: face.sideDate ? dateMetrics.advanceWidth : face.width
+                height: root.supportLine
+                text: root.dateText
+                color: root.supportingColor
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
+                minimumPixelSize: Theme.fontSizeSmall
+                fontSizeMode: Text.HorizontalFit
+                horizontalAlignment: face.sideDate ? Text.AlignLeft : Text.AlignHCenter
+                wrapMode: Text.NoWrap
+                elide: Text.ElideRight
+            }
+
+            TextMetrics {
+                id: dateMetrics
+                font: dateLabel.font
+                text: root.dateText
+            }
+
+            TextMetrics {
+                id: dialMetrics
+                font.family: dateLabel.font.family
+                font.pixelSize: Theme.fontSizeSmall
+                text: root.dateText
+            }
         }
     }
 

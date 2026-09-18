@@ -1650,7 +1650,7 @@ Item {
             readonly property alias contentWrapper: contentWrapper
             readonly property alias blur: popoutBlur
             readonly property real surfaceRadius: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceRadius : Theme.windowRadius
-            readonly property color surfaceColor: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            readonly property color surfaceColor: root.usesConnectedSurfaceChrome ? Theme.connectedSurfaceColor : Theme.readableSurface
             readonly property color surfaceBorderColor: root.usesConnectedSurfaceChrome ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
             readonly property real surfaceBorderWidth: root.usesConnectedSurfaceChrome ? 0 : BlurService.borderWidth
             readonly property real surfaceTopLeftRadius: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barLeft) ? 0 : surfaceRadius
@@ -1945,7 +1945,7 @@ Item {
                     direction: root.effectiveShadowDirection
                     fallbackOffset: root.shadowFallbackOffset
                     targetRadius: Theme.windowRadius
-                    targetColor: root._fluidMotionActive ? Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency) : "transparent"
+                    targetColor: root._fluidMotionActive ? Theme.readableSurface : "transparent"
                     shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
                 }
 
@@ -1985,7 +1985,7 @@ Item {
                         anchors.fill: parent
                         visible: !root._fluidMotionActive
                         radius: Theme.windowRadius
-                        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                        color: Theme.readableSurface
                     }
                 }
 

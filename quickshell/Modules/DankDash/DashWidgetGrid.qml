@@ -5,7 +5,7 @@ import qs.Common
 import qs.Widgets
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.DankDash.Overview
-import "utils/grid.js" as GridUtils
+import "../../Common/GridLayout.js" as GridUtils
 import "utils/widgets.js" as WidgetUtils
 import "../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
 
@@ -144,8 +144,8 @@ Item {
                 onResizeRequested: (requestedWidth, requestedHeight) => {
                     const cellWidth = (grid.width + DashMetrics.gridGap) / root.columns;
                     grid.previewSize(index, {
-                        w: WidgetUtils.dimension(Math.round((requestedWidth + DashMetrics.gridGap) / cellWidth), spec.minW, spec.maxW, spec.w),
-                        h: WidgetUtils.dimension(Math.round((requestedHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)), spec.minH, spec.maxH, spec.h)
+                        w: GridUtils.dimension(Math.round((requestedWidth + DashMetrics.gridGap) / cellWidth), spec.minW, spec.maxW, spec.w),
+                        h: GridUtils.dimension(Math.round((requestedHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)), spec.minH, spec.maxH, spec.h)
                     });
                 }
 

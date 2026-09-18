@@ -200,7 +200,7 @@ Popup {
         onClosed: focusRestore.restart()
 
         background: Rectangle {
-            color: Theme.surfaceContainerHigh
+            color: Theme.nestedSurface
             radius: Theme.windowRadius
         }
 
@@ -272,7 +272,7 @@ Popup {
     }
 
     contentItem: Rectangle {
-        color: Theme.surfaceContainer
+        color: Theme.nestedSurface
         radius: Theme.windowRadius
         border.color: BlurService.borderColor
         border.width: BlurService.borderWidth

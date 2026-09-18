@@ -57,8 +57,30 @@ Singleton {
             ensureDmsLuaConfigs();
     }
 
+    // workspaceString + monitor pairs from `hyprctl workspacerules`, refreshed on configreloaded
+    property var workspaceRules: []
+
+    function refreshWorkspaceRules() {
+        if (!CompositorService.isHyprland)
+            return;
+        Proc.runCommand("hyprctl-workspacerules", ["hyprctl", "-j", "workspacerules"], (output, exitCode) => {
+            if (exitCode !== 0)
+                return;
+            try {
+                const rules = JSON.parse(output);
+                workspaceRules = Array.isArray(rules) ? rules.filter(rule => rule.monitor).map(rule => ({
+                    "workspaceString": rule.workspaceString,
+                    "monitor": rule.monitor
+                })) : [];
+            } catch (error) {
+                log.warn("workspacerules parse failed:", error);
+            }
+        });
+    }
+
     Component.onCompleted: {
         if (CompositorService.isHyprland) {
+            refreshWorkspaceRules();
             refreshLuaConfigStatus();
             if (luaConfigActive)
                 ensureDmsLuaConfigs();
@@ -633,6 +655,14 @@ hl.layer_rule({
         } else {
             const dispatcher = follow ? "movetoworkspace" : "movetoworkspacesilent";
             Hyprland.dispatch(`${dispatcher} ${workspace},${selector}`);
+        }
+    }
+
+    function focusMonitor(monitor) {
+        if (luaConfigActive) {
+            Hyprland.dispatch(`hl.dsp.focus({ monitor = ${luaString(monitor)} })`);
+        } else {
+            Hyprland.dispatch(`focusmonitor ${monitor}`);
         }
     }
 

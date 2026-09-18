@@ -65,6 +65,8 @@ Item {
     property string ccWidgetSecondaryText: ""
     property bool ccWidgetIsActive: false
     property bool ccWidgetIsToggle: true
+    property Component ccExpandedContent: null
+    property real ccExpandedMinimumHeight: Theme.listItemHeight
     property Component ccDetailContent: null
     property real ccDetailHeight: 250
 

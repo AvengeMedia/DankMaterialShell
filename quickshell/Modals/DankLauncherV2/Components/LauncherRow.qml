@@ -238,7 +238,7 @@ DankListItem {
             width: typeBadge.implicitWidth + Theme.spacingS * 2
             height: Theme.iconSizeMedium
             radius: Theme.fullRadius(width, height)
-            color: Theme.surfaceVariantAlpha
+            color: Theme.chipSurface
             anchors.verticalCenter: parent.verticalCenter
 
             StyledText {

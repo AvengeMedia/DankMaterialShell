@@ -18,6 +18,9 @@ Item {
     property var transientSurfaceTracker: null
     property bool firstInList: true
     property bool lastInList: true
+    property bool nested: false
+    readonly property color cardSurfaceColor: Theme.foregroundColor(nested ? Theme.chipSurface : Theme.cardSurface, Theme.isFloatingWindow(root))
+    readonly property color cardChipColor: nested ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerFocus) : Theme.chipSurface
     readonly property real expandedTargetHeight: {
         let total = groupHeader.height;
         for (const child of expandedContent.children) {
@@ -73,6 +76,8 @@ Item {
     Notifications.NotificationCard {
         id: collapsedCard
         width: parent.width
+        surfaceColor: root.cardSurfaceColor
+        chipColor: root.cardChipColor
         visible: !root.expanded
         notificationData: root.notificationGroup?.latestNotification ?? null
         groupCount: root.notificationGroup?.count || 0
@@ -145,7 +150,7 @@ Item {
                     iconName: "expand_less"
                     buttonHeight: NotificationMetrics.controlSize
                     horizontalPadding: Theme.spacingS
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: root.cardChipColor
                     textColor: Theme.onSurfaceVariant
                     Accessible.name: I18n.tr("Collapse")
                     onClicked: root.toggleGroup()
@@ -177,6 +182,8 @@ Item {
 
                 Notifications.NotificationCard {
                     id: message
+                    surfaceColor: root.cardSurfaceColor
+                    chipColor: root.cardChipColor
                     x: row.swipeOffset + row.adjacentSwipeInfluence
                     width: parent.width
                     notificationData: row.modelData

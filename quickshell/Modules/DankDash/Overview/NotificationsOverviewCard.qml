@@ -14,7 +14,7 @@ Card {
     }
 
     entryId: "notifications"
-    title: I18n.tr("Notifications")
+    Accessible.name: I18n.tr("Notifications")
     pad: Theme.spacingM
 
     NotificationsTab {
@@ -22,5 +22,6 @@ Card {
         anchors.fill: parent
         live: root.live
         interactive: root.interactive
+        nested: true
     }
 }

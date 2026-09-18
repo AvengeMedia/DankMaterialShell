@@ -916,7 +916,6 @@ Item {
                 minimum: 0
                 maximum: 100
                 value: Math.round(SettingsData.launcherLogoBrightness * 100)
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("launcherLogoBrightness", newValue / 100)
             }
 
@@ -928,7 +927,6 @@ Item {
                 minimum: 0
                 maximum: 200
                 value: Math.round(SettingsData.launcherLogoContrast * 100)
-                unit: "%"
                 onSliderValueChanged: newValue => SettingsData.set("launcherLogoContrast", newValue / 100)
             }
         }

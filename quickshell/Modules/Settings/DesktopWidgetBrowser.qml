@@ -41,7 +41,7 @@ WidgetPickerWindow {
             height: 72
             radius: Theme.cornerRadius
             property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-            color: isSelected ? Theme.primarySelected : widgetArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+            color: isSelected ? Theme.primarySelected : widgetArea.containsMouse ? Theme.primaryHover : Theme.floatingWindowNestedSurface
             border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.2)
             border.width: isSelected ? Theme.outlineWidthFocused : Theme.outlineWidth
 

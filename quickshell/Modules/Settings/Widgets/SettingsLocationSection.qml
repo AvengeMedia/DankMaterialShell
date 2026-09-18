@@ -59,7 +59,7 @@ Column {
                     height: Theme.iconButtonSize + Theme.spacingS
                     text: ""
                     placeholderText: "40.7128"
-                    backgroundColor: Theme.surfaceVariant
+                    backgroundColor: Theme.floatingWindowFieldColor
                     normalBorderColor: Theme.primarySelected
                     keyNavigationTab: longitudeField
 
@@ -97,7 +97,7 @@ Column {
                     height: Theme.iconButtonSize + Theme.spacingS
                     text: ""
                     placeholderText: "-74.0060"
-                    backgroundColor: Theme.surfaceVariant
+                    backgroundColor: Theme.floatingWindowFieldColor
                     normalBorderColor: Theme.primarySelected
                     keyNavigationBacktab: latitudeField
 

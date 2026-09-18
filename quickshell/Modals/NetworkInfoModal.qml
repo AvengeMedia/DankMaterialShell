@@ -94,7 +94,7 @@ DankModal {
                     width: parent.width
                     height: parent.height - 140
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
+                    color: Theme.floatingWindowNestedSurface
                     border.color: Theme.outlineStrong
                     border.width: 1
                     clip: true

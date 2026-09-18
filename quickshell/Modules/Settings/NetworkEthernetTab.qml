@@ -84,7 +84,7 @@ Item {
                                 width: parent.width
                                 height: isExpanded ? 56 + ethExpandedContent.height : 56
                                 radius: Theme.cornerRadius
-                                color: ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                color: ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
                                 border.width: isConnected ? Theme.outlineWidthFocused : 0
                                 border.color: Theme.primary
                                 clip: true
@@ -380,7 +380,7 @@ Item {
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceLight
+                                color: wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
                                 border.width: modelData.isActive ? Theme.outlineWidthFocused : 0
                                 border.color: Theme.primary
 

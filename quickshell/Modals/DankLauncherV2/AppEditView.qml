@@ -251,7 +251,7 @@ FocusScope {
 
             DankButton {
                 text: I18n.tr("Reset", "verb, button that restores defaults")
-                backgroundColor: Theme.surfaceContainerHigh
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.error
                 visible: SessionData.getAppOverride(root.editAppId) !== null
                 onClicked: root.resetAppOverride()
@@ -259,7 +259,7 @@ FocusScope {
 
             DankButton {
                 text: I18n.tr("Cancel")
-                backgroundColor: Theme.surfaceContainerHigh
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.onSurface
                 onClicked: root.closeRequested()
             }

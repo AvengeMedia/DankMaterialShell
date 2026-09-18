@@ -1,6 +1,8 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.Modules.Network
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 CcTile {
     id: root
@@ -99,5 +101,39 @@ CcTile {
         if (status === "ethernet" || status === "cellular" || NetworkService.wifiToggling)
             return;
         NetworkService.toggleWifiRadio();
+    }
+    expandedContent: Component {
+        CcTileActions {
+            readonly property var pins: QmlUtils.normalizePinList((CacheData.wifiNetworkPins || {}).preferredWifi)
+            readonly property var networks: {
+                if (!NetworkService.wifiEnabled)
+                    return [];
+                return (NetworkService.wifiNetworks || []).filter(network => network.ssid).slice().sort((a, b) => {
+                    const aPin = pins.indexOf(a.ssid);
+                    const bPin = pins.indexOf(b.ssid);
+                    if (aPin !== bPin)
+                        return (aPin < 0 ? Infinity : aPin) - (bPin < 0 ? Infinity : bPin);
+                    const current = NetworkService.currentWifiSSID;
+                    if ((a.ssid === current) !== (b.ssid === current))
+                        return a.ssid === current ? -1 : 1;
+                    return (b.signal || 0) - (a.signal || 0);
+                });
+            }
+            actions: networks.map(network => ({
+                        text: network.ssid,
+                        icon: "wifi",
+                        active: NetworkService.wifiConnected && network.ssid === NetworkService.currentWifiSSID,
+                        enabled: !NetworkService.wifiToggling && !(NetworkService.isWifiConnecting && NetworkService.connectingSSID === network.ssid),
+                        trigger: () => WifiConnectionActions.connectToNetwork(network, {
+                                connected: NetworkService.wifiConnected && network.ssid === NetworkService.currentWifiSSID
+                            })
+                    })).concat([
+                {
+                    text: I18n.tr("Select network", "network status"),
+                    icon: "wifi_find",
+                    trigger: () => root.expandClicked()
+                }
+            ])
+        }
     }
 }

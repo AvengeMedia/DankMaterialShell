@@ -251,7 +251,7 @@ DankFloatingWindow {
                     visible: root.currentPage > 0
                     text: I18n.tr("Back", "greeter back button")
                     iconName: "arrow_back"
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
                     onClicked: root.prevPage()
                 }

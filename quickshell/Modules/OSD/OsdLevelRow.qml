@@ -23,7 +23,7 @@ Item {
     property bool sliderEnabled: true
     property string sliderSize: "xs"
     property bool vertical: false
-    property color thumbOutlineColor: Theme.surfaceContainerHigh
+    property color thumbOutlineColor: Theme.hostSurface
     property real horizontalPadding: -1
 
     readonly property bool containsMouse: levelSlider.containsMouse || icon.hovered

@@ -21,7 +21,7 @@ PanelWindow {
     property bool enableMouseInteraction: false
     property real osdWidth: Theme.osdHeight
     property real osdHeight: Theme.osdHeight
-    property color surfaceColor: Theme.surfaceContainerHigh
+    property color surfaceColor: Theme.hostSurface
     property real surfaceRadius: Theme.fullRadius(alignedWidth, alignedHeight)
     property int animationDuration: Theme.mediumDuration
     property var animationEasing: Theme.emphasizedEasing

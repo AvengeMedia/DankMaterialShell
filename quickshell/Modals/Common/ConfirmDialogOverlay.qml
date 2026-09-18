@@ -107,7 +107,7 @@ Item {
             height: dialogContent.implicitHeight + Theme.spacingL * 2
             anchors.centerIn: parent
             radius: Theme.windowRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
             border.color: Theme.outlineVariant
             border.width: Theme.outlineWidth
 

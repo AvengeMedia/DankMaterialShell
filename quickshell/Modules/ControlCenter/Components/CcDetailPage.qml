@@ -35,7 +35,7 @@ Item {
     }
     readonly property real offscreenX: I18n.isRtl ? -width : width
 
-    visible: shownSection !== "" || panel.x !== offscreenX
+    visible: shownSection !== ""
 
     function dismissTransient() {
         const item = pageItem;

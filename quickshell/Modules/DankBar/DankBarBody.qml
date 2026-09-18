@@ -389,10 +389,10 @@ Item {
 
     readonly property bool isVertical: axis.isVertical
 
-    readonly property color _surfaceContainer: Theme.surfaceContainer
+    readonly property color _hostSurface: Theme.hostSurface
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: SettingsData.barTransparency(barConfig)
-    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_hostSurface, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -908,7 +908,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.surfaceContainerHigh, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.hostSurface, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
                     }
 
                     SectionSurface {
@@ -924,7 +924,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.surfaceContainerHigh, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.hostSurface, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
                     }
 
                     MouseArea {
@@ -939,11 +939,11 @@ Item {
                         anchors.fill: parent
                         propagateComposedEvents: true
                         z: -1
-                        scrollEnabled: barConfig?.scrollEnabled ?? true
-                        xBehavior: barConfig?.scrollXBehavior ?? "column"
-                        yBehavior: barConfig?.scrollYBehavior ?? "workspace"
+                        scrollEnabled: barWindow.barConfig?.scrollEnabled ?? true
+                        xBehavior: barWindow.barConfig?.scrollXBehavior ?? "column"
+                        yBehavior: barWindow.barConfig?.scrollYBehavior ?? "workspace"
                         screenName: barWindow.screenName
-                        barConfig: barConfig
+                        barConfig: barWindow.barConfig
                         onWorkspaceSwitchRequested: direction => topBarContent.switchWorkspace(direction)
                     }
 

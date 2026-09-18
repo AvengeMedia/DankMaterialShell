@@ -193,10 +193,10 @@ PanelWindow {
 
             readonly property color slideoutSurfaceColor: {
                 if (root.customTransparency >= 0)
-                    return Theme.withAlpha(Theme.surfaceContainer, root.customTransparency);
+                    return Theme.withAlpha(Theme.hostSurface, root.customTransparency);
                 if (Theme.isConnectedEffect)
                     return Theme.connectedSurfaceColor;
-                return Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency);
+                return Theme.readableSurface;
             }
 
             anchors.top: parent.top

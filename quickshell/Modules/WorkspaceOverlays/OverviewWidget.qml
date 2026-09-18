@@ -13,6 +13,37 @@ Item {
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
     readonly property real dpr: CompositorService.getScreenScale(panelWindow.screen)
     readonly property int workspacesShown: SettingsData.overviewRows * SettingsData.overviewColumns
+    readonly property alias windowMenuWindow: windowMenu.contextWindow
+
+    function openWindowMenu(item, x, y) {
+        const address = item.windowData?.address;
+        if (!address || CompositorService.specialWorkspaceNames.length === 0)
+            return;
+        windowMenu.targetWindow = address;
+        const pos = item.mapToGlobal(x, y);
+        windowMenu.open(panelWindow.screen, pos.x - (panelWindow.screen?.x || 0), pos.y - (panelWindow.screen?.y || 0), false);
+    }
+
+    // scratchpad windows are not in the grid, so the menu only ever offers a move in
+    DankContextMenu {
+        id: windowMenu
+
+        property string targetWindow: ""
+
+        layerNamespace: "dms:overview-window-context-menu"
+        menuItems: CompositorService.specialWorkspaceNames.map(name => ({
+                    type: "item",
+                    icon: "inbox",
+                    text: name === "special" ? I18n.tr("Move to scratchpad") : I18n.tr("Move to scratchpad: %1", "%1 is the named special workspace").arg(name),
+                    action: () => {
+                        CompositorService.moveWindowToSpecial(windowMenu.targetWindow, name);
+                        Qt.callLater(() => {
+                            Hyprland.refreshToplevels();
+                            Hyprland.refreshWorkspaces();
+                        });
+                    }
+                }))
+    }
 
     readonly property var allWorkspaces: Hyprland.workspaces?.values || []
     readonly property var allWorkspaceIds: {
@@ -249,7 +280,7 @@ Item {
         implicitWidth: workspaceGrid.implicitWidth + padding * 2
         implicitHeight: workspaceGrid.implicitHeight + padding * 2
         radius: Theme.cornerRadius
-        color: Theme.surfaceContainer
+        color: Theme.hostSurface
 
         ElevationShadow {
             anchors.fill: parent
@@ -257,7 +288,7 @@ Item {
             level: Theme.elevationLevel2
             fallbackOffset: 4
             targetRadius: Theme.cornerRadius
-            targetColor: Theme.surfaceContainer
+            targetColor: Theme.hostSurface
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             shadowEnabled: Theme.elevationEnabled
         }
@@ -283,8 +314,8 @@ Item {
                     property bool isActive: workspaceObj?.active ?? false
                     property bool isOnThisMonitor: (workspaceObj && root.monitor) ? (workspaceObj.monitor?.name === root.monitor.name) : true
                     property bool hasWindows: (workspaceValue > 0) ? root.workspaceHasWindows(workspaceValue) : false
-                    property color defaultWorkspaceColor: workspaceExists ? Theme.surfaceContainer : Theme.withAlpha(Theme.surfaceContainer, 0.3)
-                    property color hoveredWorkspaceColor: Qt.lighter(defaultWorkspaceColor, 1.1)
+                    property color defaultWorkspaceColor: workspaceExists ? Theme.cardSurface : Theme.withAlpha(Theme.cardSurface, 0.3)
+                    property color hoveredWorkspaceColor: Theme.hoverTint(defaultWorkspaceColor)
                     property color hoveredBorderColor: Theme.surfaceVariant
                     property bool hoveredWhileDragging: false
                     property bool shouldShowActiveIndicator: isActive && isOnThisMonitor && hasWindows
@@ -456,6 +487,13 @@ Item {
                             }
                         }
                     }
+
+                    // on top of dragArea so a right press never starts a drag
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton
+                        onClicked: mouse => root.openWindowMenu(window, mouse.x, mouse.y)
+                    }
                 }
             }
         }
@@ -489,7 +527,7 @@ Item {
                         width: monitorNameText.contentWidth + Theme.spacingS * 2
                         height: monitorNameText.contentHeight + Theme.spacingXS * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surface
+                        color: Theme.chipSurface
                         visible: labelItem.workspaceExists && labelItem.workspaceMonitorName !== ""
 
                         StyledText {

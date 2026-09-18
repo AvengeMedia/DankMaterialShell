@@ -80,11 +80,13 @@ ShellRoot {
                 SettingsData.controlCenterWidgets = [
                     {
                         id: "darkMode",
-                        width: 25
+                        w: 1,
+                        h: 1
                     },
                     {
                         id: "diskUsage",
-                        width: 25
+                        w: 1,
+                        h: 1
                     }
                 ];
                 SettingsData.dashCards = [
@@ -109,7 +111,7 @@ ShellRoot {
             function resize(grid, dx, dy, touch) {
                 const slot = slotFor(grid, 0);
                 const x = I18n.isRtl ? 6 : slot.width - 6;
-                const y = grid === ccGrid ? slot.height / 2 : slot.height - 6;
+                const y = slot.height - 6;
                 const start = pointOn(slot, x, y);
                 const sequence = touch ? touchEvent(scene) : null;
                 if (touch)
@@ -170,7 +172,7 @@ ShellRoot {
 
             function cancelResize(grid) {
                 const slot = slotFor(grid, 0);
-                const start = pointOn(slot, slot.width - 6, grid === ccGrid ? slot.height / 2 : slot.height - 6);
+                const start = pointOn(slot, slot.width - 6, slot.height - 6);
                 const before = JSON.stringify(grid.sourceItems);
                 mousePress(scene, start.x, start.y);
                 mouseMove(scene, start.x + 140, start.y + 104);
@@ -186,13 +188,13 @@ ShellRoot {
 
             function run() {
                 reset();
-                resize(ccGrid, 130, 0, false);
-                check(SettingsData.controlCenterWidgets[0].width === 50, "control center mouse resize persists");
+                resize(ccGrid, ccGrid.cellWidth, ccGrid.cellWidth, false);
+                check(SettingsData.controlCenterWidgets[0].w === 2 && SettingsData.controlCenterWidgets[0].h === 2, "control center mouse resize persists both axes");
                 resize(dashGrid, 140, 104, false);
                 check(SettingsData.dashCards[0].w === 3 && SettingsData.dashCards[0].h === 3, "dashboard mouse resize persists both axes");
                 reset();
-                resize(ccGrid, 130, 0, true);
-                check(SettingsData.controlCenterWidgets[0].width === 50, "control center touch resize persists");
+                resize(ccGrid, ccGrid.cellWidth, 0, true);
+                check(SettingsData.controlCenterWidgets[0].w === 2 && SettingsData.controlCenterWidgets[0].h === 1, "control center touch resize persists");
                 resize(dashGrid, 140, 104, true);
                 check(SettingsData.dashCards[0].w === 3 && SettingsData.dashCards[0].h === 3, "dashboard touch resize persists both axes");
                 reset();
@@ -206,8 +208,8 @@ ShellRoot {
                 reset();
                 SessionData.locale = "ar";
                 wait(400);
-                resize(ccGrid, -130, 0, false);
-                check(SettingsData.controlCenterWidgets[0].width === 50, "RTL control center resize persists");
+                resize(ccGrid, -ccGrid.cellWidth, 0, false);
+                check(SettingsData.controlCenterWidgets[0].w === 2, "RTL control center resize persists");
                 resize(dashGrid, -140, 104, true);
                 check(SettingsData.dashCards[0].w === 3 && SettingsData.dashCards[0].h === 3, "RTL dashboard resize persists");
                 reset();

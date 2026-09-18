@@ -26,7 +26,7 @@ CcSheetDialog {
 
     SettingsGroup {
         width: parent.width
-        slotColor: Theme.surfaceContainerHighest
+        slotColor: Theme.chipSurface
 
         Repeater {
             model: root.specs

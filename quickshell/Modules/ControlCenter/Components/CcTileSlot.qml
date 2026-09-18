@@ -2,15 +2,17 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 import qs.Modules.ControlCenter
-import "../utils/layout.js" as LayoutUtils
+import "../utils/widgets.js" as WidgetUtils
+import "../../../Common/GridLayout.js" as GridUtils
 
 DankEditableGridSlot {
     id: root
 
     readonly property var widgetData: JSON.parse(json)
-    readonly property bool isSlider: LayoutUtils.isSliderWidget(widgetData.id || "")
-    readonly property int previewWidth: resizing ? grid.sizePreview.changes.width : (widgetData.width || 50)
-    readonly property bool compact: LayoutUtils.isCompactWidth(previewWidth)
+    readonly property var sizeSpec: WidgetUtils.sizeSpec(widgetData.id || "", grid.columns, grid.maximumRows)
+    readonly property int cols: slot?.cols ?? 1
+    readonly property int rows: slot?.rows ?? 1
+    readonly property bool compact: cols <= 2 && rows === 1
     readonly property var tileItem: tileLoader.item
 
     onPressAndHold: {
@@ -20,10 +22,21 @@ DankEditableGridSlot {
     }
 
     onResizeRequested: (requestedWidth, requestedHeight) => {
-        const width = LayoutUtils.nearestWidgetWidth(widgetData.id, requestedWidth, grid.width, CcMetrics.gridGap);
-        grid.previewSize(index, {
-            "width": width
-        });
+        let width = GridUtils.dimension(Math.round((requestedWidth + CcMetrics.gridGap) / grid.cellWidth), sizeSpec.minW, sizeSpec.maxW, sizeSpec.w);
+        let height = GridUtils.dimension(Math.round((requestedHeight + CcMetrics.gridGap) / grid.cellWidth), sizeSpec.minH, sizeSpec.maxH, sizeSpec.h);
+        const current = WidgetUtils.clampSize(widgetData, grid.columns, grid.maximumRows);
+        if (WidgetUtils.isSliderWidget(widgetData.id) && width === 1 && height === 1) {
+            if (width !== current.w && sizeSpec.maxH > 1)
+                height = 2;
+            else
+                width = Math.min(2, sizeSpec.maxW);
+        }
+        const changes = {};
+        if (width !== current.w)
+            changes.w = width;
+        if (height !== current.h)
+            changes.h = height;
+        grid.previewSize(index, changes);
     }
 
     Loader {
@@ -69,6 +82,20 @@ DankEditableGridSlot {
 
     Binding {
         target: root.tileItem
+        property: "columns"
+        value: root.cols
+        when: root.tileItem !== null
+    }
+
+    Binding {
+        target: root.tileItem
+        property: "rows"
+        value: root.rows
+        when: root.tileItem !== null
+    }
+
+    Binding {
+        target: root.tileItem
         property: "compact"
         value: root.compact
         when: root.tileItem !== null
@@ -96,7 +123,8 @@ DankEditableGridSlot {
         widgetData: root.widgetData
         dragging: root.dragging
         resizing: root.resizing
-        cornerRadius: root.isSlider ? Theme.cornerRadiusM : (root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height))
+        cornerRadius: root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height)
+        sizeText: root.cols + "×" + root.rows
         onResizeStarted: (px, py) => root.beginResize(px, py)
         onResizeMoved: (px, py) => root.resizeTo(px, py)
         onResizeEnded: root.finishResize()

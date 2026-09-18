@@ -47,7 +47,7 @@ Item {
                 gradient: Gradient {
                     GradientStop {
                         position: 0
-                        color: Theme.surface
+                        color: Theme.hostSurface
                     }
                     GradientStop {
                         position: 0.5
@@ -55,7 +55,7 @@ Item {
                     }
                     GradientStop {
                         position: 1
-                        color: Theme.surface
+                        color: Theme.hostSurface
                     }
                 }
             }

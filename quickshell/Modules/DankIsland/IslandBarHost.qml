@@ -74,7 +74,7 @@ Item {
     readonly property var springDampingRange: [10, 100]
     readonly property var springMassRange: [0.25, 3]
     readonly property int destinationMaxHeight: Math.max(destinationMinHeight, Math.min(destinationMaxHeightLimit, (root.screen?.height ?? referenceScreenHeight) - screenMargin))
-    readonly property int maxActivityHeight: Math.max(controller.dashboardHeight, destinationMaxHeight)
+    readonly property int maxActivityHeight: Math.max(controller.dashboardHeight, controller.controlCenterHeight, destinationMaxHeight)
     readonly property int maxActivityWidth: Math.max(controller.dashboardMaxWidth, controller.controlCenterMaxWidth, Math.min(activityMaxWidth, Math.max(activityMinWidth, (root.screen?.width ?? referenceScreenWidth) - screenMargin)))
     readonly property int hostThickness: outerGap + (root.isVertical ? maxActivityWidth : maxActivityHeight) + Theme.spacingS
     readonly property real maximumAlongOffset: root.isVertical ? Math.max(0, (height - maxActivityHeight) / 2 - Theme.spacingS) : Math.max(0, (width - maxActivityWidth) / 2 - Theme.spacingS)
@@ -194,7 +194,7 @@ Item {
         launcherCycleEnabled: SettingsData.launcherStyle === "island"
         dashboardAvailableWidth: Math.max(0, (root.screen?.width ?? root.referenceScreenWidth) - root.windowMarginLeft - root.windowMarginRight - (root.isVertical ? root.outerGap : 0) - Theme.spacingL * 2)
         dashboardAvailableHeight: Math.max(0, (root.screen?.height ?? root.referenceScreenHeight) - root.windowMarginTop - root.windowMarginBottom - (root.isVertical ? 0 : root.outerGap) - Theme.spacingL * 2)
-        controlCenterMaxHeight: root.destinationMaxHeight
+        controlCenterMaxHeight: dashboardAvailableHeight
         notificationExpandAllowed: root.setting("islandNotificationExpand")
         unreadNotificationCount: root.setting("islandNotificationBadgeClearOnOpen") ? NotificationService.unreadCount : NotificationService.notifications.length
         hoverOpenDelay: Math.max(0, Math.min(root.maxHoverDelay, root.setting("islandHoverOpenDelay")))

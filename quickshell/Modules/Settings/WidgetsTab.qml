@@ -618,7 +618,7 @@ Item {
                         width: resetContentRow.implicitWidth + Theme.spacingM * 2
                         height: 28
                         radius: Theme.cornerRadius
-                        color: resetArea.containsMouse ? Theme.surfacePressed : Theme.surfaceVariant
+                        color: resetArea.containsMouse ? Theme.hoverTint(Theme.chipSurface) : Theme.chipSurface
                         Layout.alignment: Qt.AlignVCenter
                         border.width: 0
 
@@ -678,48 +678,37 @@ Item {
             width: parent.width
             spacing: Theme.spacingL
 
-            StyledRect {
+            WidgetsTabSection {
+                id: leftSection
                 width: parent.width
-                height: leftSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-
-                WidgetsTabSection {
-                    id: leftSection
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    title: selectedBarIsVertical ? I18n.tr("Top section") : I18n.tr("Left section")
-                    titleIcon: "format_align_left"
-                    sectionId: "left"
-                    allWidgets: widgetsTab.baseWidgetDefinitions
-                    items: widgetsTab.getItemsForSection("left")
-                    onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                        widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
-                    }
-                    highlightedId: widgetsTab.highlightedId
-                    highlightedSection: widgetsTab.highlightedSection
-                    onItemOrderChanged: (sectionId, indices) => {
-                        const items = widgetsTab.getWidgetsForSection(sectionId);
-                        widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
-                    }
-                    reorderGroup: dragGroup
-                    onDragStarted: {
-                        widgetsTab.highlightedSection = "";
-                        widgetsTab.highlightedId = "";
-                    }
-                    onAddWidget: sectionId => {
-                        showWidgetSelectionPopup(sectionId);
-                    }
-                    onRemoveWidget: (sectionId, index) => {
-                        widgetsTab.removeWidgetFromSection(sectionId, index);
-                    }
-                    onSpacerSizeChanged: (sectionId, index, size) => {
-                        widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
-                    }
-                    onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
+                title: selectedBarIsVertical ? I18n.tr("Top section") : I18n.tr("Left section")
+                sectionId: "left"
+                allWidgets: widgetsTab.baseWidgetDefinitions
+                items: widgetsTab.getItemsForSection("left")
+                onItemEnabledChanged: (sectionId, itemId, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                 }
+                highlightedId: widgetsTab.highlightedId
+                highlightedSection: widgetsTab.highlightedSection
+                onItemOrderChanged: (sectionId, indices) => {
+                    const items = widgetsTab.getWidgetsForSection(sectionId);
+                    widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
+                }
+                reorderGroup: dragGroup
+                onDragStarted: {
+                    widgetsTab.highlightedSection = "";
+                    widgetsTab.highlightedId = "";
+                }
+                onAddWidget: sectionId => {
+                    showWidgetSelectionPopup(sectionId);
+                }
+                onRemoveWidget: (sectionId, index) => {
+                    widgetsTab.removeWidgetFromSection(sectionId, index);
+                }
+                onSpacerSizeChanged: (sectionId, index, size) => {
+                    widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
+                }
+                onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
             }
 
             SettingsCard {
@@ -741,93 +730,70 @@ Item {
                 }
             }
 
-            StyledRect {
+            WidgetsTabSection {
+                id: centerSection
                 width: parent.width
-                height: centerSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-                visible: !widgetsTab.dankIslandOwnsSelectedBarCenter
-
-                WidgetsTabSection {
-                    id: centerSection
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    title: selectedBarIsVertical ? I18n.tr("Middle section") : I18n.tr("Center section")
-                    titleIcon: "format_align_center"
-                    sectionId: "center"
-                    allWidgets: widgetsTab.baseWidgetDefinitions
-                    items: widgetsTab.getItemsForSection("center")
-                    onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                        widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
-                    }
-                    highlightedId: widgetsTab.highlightedId
-                    highlightedSection: widgetsTab.highlightedSection
-                    onItemOrderChanged: (sectionId, indices) => {
-                        const items = widgetsTab.getWidgetsForSection(sectionId);
-                        widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
-                    }
-                    reorderGroup: dragGroup
-                    onDragStarted: {
-                        widgetsTab.highlightedSection = "";
-                        widgetsTab.highlightedId = "";
-                    }
-                    onAddWidget: sectionId => {
-                        showWidgetSelectionPopup(sectionId);
-                    }
-                    onRemoveWidget: (sectionId, index) => {
-                        widgetsTab.removeWidgetFromSection(sectionId, index);
-                    }
-                    onSpacerSizeChanged: (sectionId, index, size) => {
-                        widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
-                    }
-                    onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
+                title: selectedBarIsVertical ? I18n.tr("Middle section") : I18n.tr("Center section")
+                sectionId: "center"
+                allWidgets: widgetsTab.baseWidgetDefinitions
+                items: widgetsTab.getItemsForSection("center")
+                onItemEnabledChanged: (sectionId, itemId, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                 }
+                highlightedId: widgetsTab.highlightedId
+                highlightedSection: widgetsTab.highlightedSection
+                onItemOrderChanged: (sectionId, indices) => {
+                    const items = widgetsTab.getWidgetsForSection(sectionId);
+                    widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
+                }
+                reorderGroup: dragGroup
+                onDragStarted: {
+                    widgetsTab.highlightedSection = "";
+                    widgetsTab.highlightedId = "";
+                }
+                onAddWidget: sectionId => {
+                    showWidgetSelectionPopup(sectionId);
+                }
+                onRemoveWidget: (sectionId, index) => {
+                    widgetsTab.removeWidgetFromSection(sectionId, index);
+                }
+                onSpacerSizeChanged: (sectionId, index, size) => {
+                    widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
+                }
+                onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
             }
 
-            StyledRect {
+            WidgetsTabSection {
+                id: rightSection
                 width: parent.width
-                height: rightSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.floatingWindowNestedSurface
-                border.color: Theme.outlineMedium
-                border.width: Theme.layerOutlineWidth
-
-                WidgetsTabSection {
-                    id: rightSection
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    title: selectedBarIsVertical ? I18n.tr("Bottom section") : I18n.tr("Right section")
-                    titleIcon: "format_align_right"
-                    sectionId: "right"
-                    allWidgets: widgetsTab.baseWidgetDefinitions
-                    items: widgetsTab.getItemsForSection("right")
-                    onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                        widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
-                    }
-                    highlightedId: widgetsTab.highlightedId
-                    highlightedSection: widgetsTab.highlightedSection
-                    onItemOrderChanged: (sectionId, indices) => {
-                        const items = widgetsTab.getWidgetsForSection(sectionId);
-                        widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
-                    }
-                    reorderGroup: dragGroup
-                    onDragStarted: {
-                        widgetsTab.highlightedSection = "";
-                        widgetsTab.highlightedId = "";
-                    }
-                    onAddWidget: sectionId => {
-                        showWidgetSelectionPopup(sectionId);
-                    }
-                    onRemoveWidget: (sectionId, index) => {
-                        widgetsTab.removeWidgetFromSection(sectionId, index);
-                    }
-                    onSpacerSizeChanged: (sectionId, index, size) => {
-                        widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
-                    }
-                    onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
+                title: selectedBarIsVertical ? I18n.tr("Bottom section") : I18n.tr("Right section")
+                sectionId: "right"
+                allWidgets: widgetsTab.baseWidgetDefinitions
+                items: widgetsTab.getItemsForSection("right")
+                onItemEnabledChanged: (sectionId, itemId, enabled) => {
+                    widgetsTab.handleItemEnabledChanged(sectionId, itemId, enabled);
                 }
+                highlightedId: widgetsTab.highlightedId
+                highlightedSection: widgetsTab.highlightedSection
+                onItemOrderChanged: (sectionId, indices) => {
+                    const items = widgetsTab.getWidgetsForSection(sectionId);
+                    widgetsTab.setWidgetsForSection(sectionId, indices.map(i => items[i]));
+                }
+                reorderGroup: dragGroup
+                onDragStarted: {
+                    widgetsTab.highlightedSection = "";
+                    widgetsTab.highlightedId = "";
+                }
+                onAddWidget: sectionId => {
+                    showWidgetSelectionPopup(sectionId);
+                }
+                onRemoveWidget: (sectionId, index) => {
+                    widgetsTab.removeWidgetFromSection(sectionId, index);
+                }
+                onSpacerSizeChanged: (sectionId, index, size) => {
+                    widgetsTab.handleSpacerSizeChanged(sectionId, index, size);
+                }
+                onConfigureWidget: (sectionId, index) => widgetsTab.configureWidget(sectionId, index)
             }
         }
     }

@@ -53,7 +53,7 @@ Rectangle {
     readonly property int computedIconSize: Math.min(root.maxIconSize, Math.max(root.minIconSize, width * root.iconSizeRatio))
 
     radius: Theme.cornerRadiusL
-    color: externalHighlight ? "transparent" : isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.surfaceContainerLow, Theme.isFloatingWindow(root))
+    color: externalHighlight ? "transparent" : isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
 
     Rectangle {
         anchors.fill: parent

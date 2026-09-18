@@ -120,7 +120,6 @@ Item {
                 value: Math.round((dock.config?.borderOpacity ?? 1) * 100)
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 onSliderValueChanged: value => dock.setOption("borderOpacity", value / 100)
             }
 

@@ -47,7 +47,7 @@ SettingsCard {
     readonly property var borderColorOptions: colorOptions(["surfaceText", "primary", "primaryContainer", "secondary", "secondaryContainer", "tertiary", "tertiaryContainer", "custom"])
 
     function isFocusedAppearanceSection(section) {
-        return ["workspaceAppearance", "workspaceColorMode", "workspaceOccupiedColorMode", "workspaceUnfocusedColorMode", "workspaceUrgentColorMode", "workspaceFocusedBorderEnabled", "workspaceFocusedBorderColor", "workspaceFocusedBorderThickness"].includes(section);
+        return ["workspaceAppearance", "workspaceIcons", "workspaceColorMode", "workspaceOccupiedColorMode", "workspaceUnfocusedColorMode", "workspaceUrgentColorMode", "workspaceFocusedBorderEnabled", "workspaceFocusedBorderColor", "workspaceFocusedBorderThickness"].includes(section);
     }
 
     SettingsRow {
@@ -196,5 +196,66 @@ SettingsCard {
         borderColorKey: "workspaceUnfocusedMonitorBorderColor"
         borderCustomColorKey: "workspaceUnfocusedMonitorBorderCustomColor"
         borderThicknessKey: "workspaceUnfocusedMonitorBorderThickness"
+    }
+
+    readonly property var namedWorkspaces: NiriService.getNamedWorkspaces().concat(CompositorService.specialWorkspaceNames)
+
+    SettingsRow {
+        visible: root.namedWorkspaces.length > 0
+        settingKey: "workspaceIcons"
+        tags: ["workspace", "icon", "named", "scratchpad", "special"]
+        title: I18n.tr("Icons")
+        subtitle: I18n.tr("Named workspaces and scratchpads")
+    }
+
+    Repeater {
+        model: root.namedWorkspaces
+
+        SettingsRow {
+            required property string modelData
+
+            title: modelData
+
+            DankIconPicker {
+                id: iconPicker
+                anchors.verticalCenter: parent.verticalCenter
+
+                Component.onCompleted: {
+                    const iconData = SettingsData.getWorkspaceNameIcon(modelData);
+                    if (iconData)
+                        setIcon(iconData.value, iconData.type);
+                }
+
+                onIconSelected: (iconName, iconType) => {
+                    SettingsData.setWorkspaceNameIcon(modelData, {
+                        "type": iconType,
+                        "value": iconName
+                    });
+                    setIcon(iconName, iconType);
+                }
+
+                Connections {
+                    target: SettingsData
+                    function onWorkspaceIconsUpdated() {
+                        const iconData = SettingsData.getWorkspaceNameIcon(modelData);
+                        if (iconData) {
+                            iconPicker.setIcon(iconData.value, iconData.type);
+                            return;
+                        }
+                        iconPicker.setIcon("", "icon");
+                    }
+                }
+            }
+
+            DankActionButton {
+                buttonSize: Theme.iconButtonSize
+                iconName: "close"
+                Accessible.name: I18n.tr("Remove")
+                iconSize: Theme.iconSizeMedium
+                iconColor: Theme.error
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: SettingsData.removeWorkspaceNameIcon(modelData)
+            }
+        }
     }
 }

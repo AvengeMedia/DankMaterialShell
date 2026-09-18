@@ -530,7 +530,7 @@ DankModal {
                     width: parent.width
                     height: 52
                     radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
+                    color: Theme.floatingWindowNestedSurface
                     border.color: Theme.outlineMedium
                     border.width: 1
                     visible: root.showTargetData && root.targetData.length > 0
@@ -556,7 +556,7 @@ DankModal {
                         height: 44
                         text: root.editableTargetData
                         keyForwardTargets: [appContent]
-                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.5)
+                        backgroundColor: Theme.floatingWindowFieldColor
                         onTextEdited: root.editableTargetData = text
                         Keys.onLeftPressed: event => {
                             if (cursorPosition === 0)

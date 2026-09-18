@@ -5,6 +5,7 @@ import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/ThemePalette.js" as ThemePalette
 
 RegistryBrowserWindow {
     id: root
@@ -103,6 +104,10 @@ RegistryBrowserWindow {
                 tone: "info"
             });
         return badges;
+    }
+
+    function themePalette(theme) {
+        return ThemePalette.pick((Theme.isLightMode ? theme.light : theme.dark) ?? theme.dark);
     }
 
     function themePreviewUrl(theme) {
@@ -368,6 +373,7 @@ RegistryBrowserWindow {
                     fallbackIcon: "palette"
                     previewSource: root.themePreviewUrl(cardCell.modelData)
                     badges: root.themeBadges(cardCell.modelData)
+                    palette: root.themePalette(cardCell.modelData)
                     allowUninstall: true
                     previewHeight: themeGrid.previewHeight
                     installed: cardCell.modelData.installed || false

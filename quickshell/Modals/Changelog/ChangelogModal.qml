@@ -92,7 +92,7 @@ DankFloatingWindow {
                 DankButton {
                     text: I18n.tr("Open in Browser")
                     iconName: "open_in_new"
-                    backgroundColor: Theme.surfaceContainerHighest
+                    backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
                     onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-6-release")
                 }

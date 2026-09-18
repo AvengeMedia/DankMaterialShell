@@ -82,7 +82,7 @@ Rectangle {
         height: Math.round(Theme.fontSizeSmall * 1.67)
         width: categoryText.implicitWidth + Theme.spacingS
         radius: Theme.spacingXS
-        color: Theme.surfaceContainerHighest
+        color: Theme.chipSurface
         visible: !!(root.resultData?.category)
 
         StyledText {

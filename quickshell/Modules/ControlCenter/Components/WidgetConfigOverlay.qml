@@ -78,7 +78,7 @@ Item {
         width: CcMetrics.configMenuWidth
         height: menu.implicitHeight + Theme.spacingS * 2
         radius: Theme.windowRadius
-        color: Theme.surfaceContainer
+        color: Theme.nestedSurface
         x: Math.max(Theme.spacingS, Math.min(root.anchorX + root.anchorWidth - width, root.width - width - Theme.spacingS))
         y: root.anchorY - height - Theme.spacingS < Theme.spacingS ? root.anchorY + root.anchorHeight + Theme.spacingS : root.anchorY - height - Theme.spacingS
         opacity: root.visible ? 1 : 0

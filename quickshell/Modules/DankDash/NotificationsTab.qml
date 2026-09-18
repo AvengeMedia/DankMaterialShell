@@ -10,6 +10,7 @@ FocusScope {
 
     property bool live: false
     property bool interactive: true
+    property bool nested: false
     property string entryId: "notifications"
     property int currentTab: 0
     readonly property bool hasNotifications: list.count > 0
@@ -125,6 +126,7 @@ FocusScope {
     KeyboardNavigatedNotificationList {
         id: list
         anchors.fill: parent
+        nested: root.nested
         anchors.bottomMargin: footer.height + Theme.spacingM
         visible: root.currentTab === 0
         keyboardController: keyboard
@@ -140,6 +142,7 @@ FocusScope {
         visible: active
         sourceComponent: HistoryNotificationList {
             focusAllowed: root.activeFocus
+            nested: root.nested
         }
     }
 

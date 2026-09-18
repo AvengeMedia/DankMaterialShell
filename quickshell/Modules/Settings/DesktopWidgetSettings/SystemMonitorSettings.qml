@@ -105,7 +105,7 @@ DesktopWidgetInstanceSettings {
                         width: parent.width
                         height: 44
                         radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primarySelected : Theme.surfaceHover
+                        color: isSelected ? Theme.primarySelected : Theme.chipSurface
                         border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: Theme.outlineWidthFocused
 

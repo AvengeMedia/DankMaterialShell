@@ -209,7 +209,7 @@ BasePill {
         width: tooltipText.contentWidth + Theme.spacingM * 2
         height: tooltipText.contentHeight + Theme.spacingS * 2
         radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+        color: Theme.readableSurface
         border.color: Theme.outlineMedium
         border.width: 1
         visible: false

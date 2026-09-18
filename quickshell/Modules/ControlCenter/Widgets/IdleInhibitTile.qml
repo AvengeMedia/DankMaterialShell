@@ -18,4 +18,9 @@ CcTile {
     showExpand: true
 
     onClicked: SessionService.toggleIdleInhibit(widgetData.durationMinutes)
+    expandedContent: Component {
+        CcDurationActions {
+            onSelected: minutes => SessionService.enableIdleInhibit(minutes)
+        }
+    }
 }

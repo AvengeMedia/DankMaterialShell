@@ -133,6 +133,8 @@ Singleton {
     readonly property bool supportsDisplayConfig: isNiri || isHyprland || isMango || isAqueous
     readonly property bool supportsBarAutoHideReveal: isNiri || isHyprland || isMango
     readonly property bool supportsWorkspaces: isNiri || isHyprland || isMango || isAqueous
+    // compositors where a workspace that does not exist yet is still a valid switch target
+    readonly property bool supportsPersistentWorkspaces: isHyprland || isMango || isSway || isScroll || isMiracle
     readonly property bool supportsWorkspaceUrgency: isKnownCompositor && !isLabwc
     readonly property bool supportsWorkspaceFollowFocus: isKnownCompositor && !isLabwc
     readonly property bool supportsSmartDock: isNiri || isHyprland || isMango || isAqueous
@@ -829,6 +831,73 @@ Singleton {
         return true;
     }
 
+    readonly property var specialWorkspaceNames: {
+        if (!isHyprland)
+            return [];
+        const names = ["special"];
+        for (const ws of Hyprland.workspaces?.values || []) {
+            if (!WorkspaceModel.hyprlandSpecial(ws))
+                continue;
+            const name = WorkspaceModel.hyprlandSpecialDisplayName(ws.name ?? "");
+            if (!names.includes(name))
+                names.push(name);
+        }
+        return names;
+    }
+
+    function hyprlandAddressFor(window) {
+        return isHyprland ? (_hyprlandToplevelFor(window)?.address ?? "") : "";
+    }
+
+    // IPC callers pass Hyprland's own names, prefixed or not
+    function _scratchpadName(name) {
+        const bare = WorkspaceModel.hyprlandSpecialDisplayName(String(name ?? ""));
+        return !bare || bare === "special" ? "special" : bare;
+    }
+
+    function toggleSpecialWorkspace(name) {
+        if (!isHyprland)
+            return;
+        const bare = _scratchpadName(name);
+        HyprlandService.toggleSpecial(bare === "special" ? "" : bare);
+    }
+
+    function _hyprlandToplevelFor(window) {
+        if (!window)
+            return null;
+        const byAddress = typeof window === "string";
+        for (const t of Hyprland.toplevels?.values || []) {
+            if (byAddress ? t.address === window : t.wayland === window)
+                return t;
+        }
+        return null;
+    }
+
+    function windowScratchpadName(window) {
+        if (!isHyprland)
+            return "";
+        const t = _hyprlandToplevelFor(window);
+        const ws = String(t?.lastIpcObject?.workspace?.name || t?.workspace?.name || "");
+        return WorkspaceModel.hyprlandSpecialName(ws) ? WorkspaceModel.hyprlandSpecialDisplayName(ws) : "";
+    }
+
+    // "+0" is Hyprland's own way out but resolves against the focused monitor, so prefer the window's monitor when known
+    function moveWindowOutOfSpecial(window) {
+        const t = _hyprlandToplevelFor(window);
+        if (!t?.address)
+            return;
+        const target = t.monitor?.activeWorkspace?.id;
+        HyprlandService.moveToWorkspace(target > 0 ? target : "+0", t.address, true);
+    }
+
+    function moveWindowToSpecial(window, name) {
+        const address = hyprlandAddressFor(window);
+        if (!address)
+            return;
+        const bare = _scratchpadName(name);
+        HyprlandService.moveToWorkspace(bare === "special" ? "special" : "special:" + bare, address, false);
+    }
+
     function hyprlandVisibleSpecialWorkspaceOnScreen(screenOrName) {
         const screenName = _screenName(screenOrName);
         if (!isHyprland || !screenName)
@@ -859,6 +928,7 @@ Singleton {
             return;
         Hyprland.refreshMonitors();
         Hyprland.refreshWorkspaces();
+        HyprlandService.refreshWorkspaceRules();
     }
 
     function _screenForName(screenOrName) {
@@ -1514,6 +1584,12 @@ Singleton {
             },
             get toplevels() {
                 return Array.from(Hyprland.toplevels?.values || []);
+            },
+            get workspaceRules() {
+                return HyprlandService.workspaceRules;
+            },
+            get visibleSpecials() {
+                return root.hyprlandVisibleSpecialWorkspaces;
             }
         };
     }
@@ -1575,16 +1651,16 @@ Singleton {
         case "niri":
             return WorkspaceModel.niriWorkspacesForScreen(_niriWorkspaceState(), screenName, followFocus, options.occupiedOnly, _workspaceRecords);
         case "hyprland":
-            return WorkspaceModel.hyprlandWorkspacesForScreen(_hyprlandWorkspaceState(), screenName, followFocus, options.occupiedOnly);
+            return WorkspaceModel.hyprlandWorkspacesForScreen(_hyprlandWorkspaceState(), screenName, followFocus, options.occupiedOnly, options.minCount, options.showSpecial);
         case "mango":
             {
                 const name = _followedScreen(screenName, followFocus);
-                return WorkspaceModel.mangoWorkspacesForScreen(_mangoWorkspaceState(name), name, options.showAllTags);
+                return WorkspaceModel.mangoWorkspacesForScreen(_mangoWorkspaceState(name), name, options.showAllTags, options.minCount);
             }
         case "sway":
         case "scroll":
         case "miracle":
-            return WorkspaceModel.i3WorkspacesForScreen(_i3WorkspaceState(), screenName, followFocus);
+            return WorkspaceModel.i3WorkspacesForScreen(_i3WorkspaceState(), screenName, followFocus, options.minCount);
         case "aqueous":
             {
                 const name = _followedScreen(screenName, followFocus);
@@ -1621,6 +1697,8 @@ Singleton {
         case "mango":
         case "aqueous":
             return record.active === true;
+        case "hyprland":
+            return record.special === true ? record.active === true : record.id === currentKey;
         default:
             return _workspaceKey(record) === currentKey;
         }
@@ -1693,6 +1771,8 @@ Singleton {
         case "scroll":
         case "miracle":
             return WorkspaceModel.i3WorkspaceFocused(_i3WorkspaceState(), record);
+        case "hyprland":
+            return isCurrentWorkspace(record, currentKey);
         default:
             return record.id === currentKey;
         }
@@ -1719,7 +1799,7 @@ Singleton {
         }
     }
 
-    function switchToWorkspace(record) {
+    function switchToWorkspace(record, screenName) {
         if (!record || record.placeholder)
             return;
         switch (compositor) {
@@ -1727,6 +1807,13 @@ Singleton {
             NiriService.switchToWorkspace(record.id);
             return;
         case "hyprland":
+            if (record.special === true) {
+                // togglespecialworkspace acts on the focused monitor, so a pill on another monitor's bar focuses that monitor first
+                if (screenName && screenName !== Hyprland.focusedMonitor?.name)
+                    HyprlandService.focusMonitor(screenName);
+                HyprlandService.toggleSpecial(record.name === "special" ? "" : record.name);
+                return;
+            }
             HyprlandService.focusWorkspace(record.id > 0 ? record.id : "name:" + (record.name ?? ""));
             return;
         case "mango":

@@ -18,7 +18,7 @@ Rectangle {
 
     radius: Theme.cornerRadiusM
     clip: true
-    color: Theme.foregroundColor(Theme.surfaceContainerHigh, Theme.isFloatingWindow(root))
+    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
     border.color: Theme.outlineVariant
     border.width: Theme.outlineWidth
 

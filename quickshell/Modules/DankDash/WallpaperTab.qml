@@ -660,7 +660,7 @@ Item {
                             id: wallpaperCard
                             anchors.fill: parent
                             anchors.margins: Theme.spacingXS
-                            color: Theme.foregroundColor(Theme.surfaceContainerHighest, Theme.isFloatingWindow(root))
+                            color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
                             radius: DashMetrics.wallpaperThumbRadius
 
                             ClippingRectangle {
@@ -922,7 +922,7 @@ Item {
         anchors.rightMargin: Theme.spacingM
         anchors.bottomMargin: DashMetrics.wallpaperOverlayBottomMargin
         z: DashMetrics.overlayZ + 1
-        surfaceColor: Theme.readableSurface
+        surfaceColor: Theme.nestedSurface
         sortBy: root.sortBy
         sortAscending: root.sortAscending
         onSortBySelected: value => {
@@ -951,7 +951,7 @@ Item {
         id: pageJumpPopup
         width: DashMetrics.pageJumpWidth
         height: jumpColumn.height + Theme.spacingM * 2
-        color: Theme.readableSurface
+        color: Theme.nestedSurface
         radius: Theme.cornerRadiusM
         visible: false
         z: DashMetrics.overlayZ + 1

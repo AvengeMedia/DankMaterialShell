@@ -129,7 +129,7 @@ Column {
             width: parent.width - SettingsMetrics.rowPaddingH * 2
             height: Theme.listItemHeight
             radius: Theme.cornerRadiusM
-            color: Theme.foregroundColor(Theme.surfaceContainerHigh, true)
+            color: Theme.chipSurface
 
             Row {
                 anchors.fill: parent

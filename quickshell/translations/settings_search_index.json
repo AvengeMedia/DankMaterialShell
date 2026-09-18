@@ -491,37 +491,6 @@
     "page": "theme_surfaces"
   },
   {
-    "section": "colorMode",
-    "label": "Color mode",
-    "tabIndex": -1,
-    "category": "Wallpaper & colors",
-    "keywords": [
-      "appearance",
-      "automatic",
-      "background",
-      "bg",
-      "color",
-      "colors",
-      "colour",
-      "colours",
-      "dark",
-      "desktop",
-      "hue",
-      "image",
-      "light",
-      "mode",
-      "palette",
-      "picture",
-      "schedule",
-      "sunrise",
-      "sunset",
-      "tint",
-      "wallpaper"
-    ],
-    "page": "personalization",
-    "icon": "dark_mode"
-  },
-  {
     "section": "surfaceColors",
     "label": "Colors",
     "tabIndex": -1,
@@ -533,42 +502,13 @@
       "colors",
       "colour",
       "colours",
-      "control center",
       "hue",
       "interface",
       "palette",
       "style",
-      "tile",
       "tint"
     ],
     "page": "theme_surfaces"
-  },
-  {
-    "section": "themeColorsLink",
-    "label": "Colors",
-    "tabIndex": -1,
-    "category": "Wallpaper & colors",
-    "keywords": [
-      "appearance",
-      "background",
-      "bg",
-      "color",
-      "colors",
-      "colour",
-      "colours",
-      "desktop",
-      "dynamic",
-      "hue",
-      "image",
-      "matugen",
-      "palette",
-      "picture",
-      "theme",
-      "tint",
-      "wallpaper"
-    ],
-    "page": "personalization",
-    "icon": "format_paint"
   },
   {
     "section": "notificationCompactMode",
@@ -592,22 +532,20 @@
     "page": "notifications"
   },
   {
-    "section": "controlCenterTileColorMode",
-    "label": "Control Center tile color",
+    "section": "controlCenterIcons",
+    "label": "Control Center",
     "tabIndex": -1,
     "category": "Interface style",
     "keywords": [
-      "active",
-      "button",
       "center",
-      "color",
-      "colour",
       "control",
-      "hue",
+      "control center",
+      "icon",
       "interface",
+      "scale",
+      "size",
       "style",
-      "tile",
-      "tint"
+      "tile"
     ],
     "page": "theme_surfaces"
   },
@@ -708,34 +646,6 @@
       "wallpaper"
     ],
     "page": "personalization"
-  },
-  {
-    "section": "isLightMode",
-    "label": "Dark mode",
-    "tabIndex": -1,
-    "category": "Wallpaper & colors",
-    "keywords": [
-      "background",
-      "bg",
-      "colors",
-      "colour",
-      "colours",
-      "dark",
-      "dark mode",
-      "desktop",
-      "hue",
-      "image",
-      "light",
-      "mode",
-      "night",
-      "palette",
-      "picture",
-      "theme",
-      "tint",
-      "wallpaper"
-    ],
-    "page": "personalization",
-    "icon": "dark_mode"
   },
   {
     "section": "iconThemeDark",
@@ -1201,6 +1111,24 @@
       "toast"
     ],
     "page": "notifications"
+  },
+  {
+    "section": "controlCenterIconScale",
+    "label": "Icon scale",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "center",
+      "control",
+      "header",
+      "icon",
+      "interface",
+      "scale",
+      "size",
+      "style",
+      "tile"
+    ],
+    "page": "theme_surfaces"
   },
   {
     "section": "iconTheme",
@@ -2111,6 +2039,36 @@
     "icon": "memory"
   },
   {
+    "section": "colorMode",
+    "label": "Theme & colors",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "dark",
+      "desktop",
+      "hue",
+      "image",
+      "light",
+      "look",
+      "mode",
+      "palette",
+      "picture",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "schedule"
+  },
+  {
     "section": "focusRingWidth",
     "label": "Thickness",
     "tabIndex": -1,
@@ -2122,6 +2080,26 @@
       "style",
       "thickness",
       "width"
+    ],
+    "page": "theme_surfaces"
+  },
+  {
+    "section": "controlCenterTileColorMode",
+    "label": "Tile color",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "active",
+      "button",
+      "center",
+      "color",
+      "colour",
+      "control",
+      "hue",
+      "interface",
+      "style",
+      "tile",
+      "tint"
     ],
     "page": "theme_surfaces"
   },
@@ -2250,7 +2228,8 @@
       "tint",
       "wallpaper"
     ],
-    "page": "personalization"
+    "page": "personalization",
+    "icon": "schedule"
   },
   {
     "section": "windowRadius",
@@ -5145,7 +5124,8 @@
       "wallpaper",
       "wallpaper colors"
     ],
-    "parentLabel": "Wallpaper & colors"
+    "parentLabel": "Wallpaper & colors",
+    "icon": "download"
   },
   {
     "section": "matugenSourceMode",
@@ -5353,6 +5333,24 @@
       "security",
       "shuffle",
       "video"
+    ],
+    "parentLabel": "Security"
+  },
+  {
+    "section": "lockScreenWallpaperPath",
+    "label": "Background",
+    "tabIndex": 11,
+    "category": "Lock screen",
+    "keywords": [
+      "background",
+      "image",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "wallpaper"
     ],
     "parentLabel": "Security"
   },
@@ -5900,6 +5898,29 @@
     ],
     "parentLabel": "Security",
     "icon": "movie"
+  },
+  {
+    "section": "lockScreenWallpaperFillMode",
+    "label": "Wallpaper fill mode",
+    "tabIndex": 11,
+    "category": "Lock screen",
+    "keywords": [
+      "background",
+      "bg",
+      "desktop",
+      "fill",
+      "image",
+      "lock",
+      "lockscreen",
+      "login",
+      "mode",
+      "password",
+      "picture",
+      "screen",
+      "security",
+      "wallpaper"
+    ],
+    "parentLabel": "Security"
   },
   {
     "section": "lockScreenShowWeather",
@@ -8181,7 +8202,7 @@
     "optionFile": "SystemMonitorOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
     "label": "Drag to reorder",
     "tabIndex": 22,
     "keywords": [],
@@ -8205,7 +8226,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
     "label": "Follow display focus",
     "tabIndex": 22,
     "keywords": [],
@@ -8237,7 +8258,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
     "label": "Group apps",
     "tabIndex": 22,
     "keywords": [],
@@ -8261,7 +8282,7 @@
     "optionFile": "RunningAppsOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:12",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
     "label": "Group on active workspace",
     "tabIndex": 22,
     "keywords": [],
@@ -8277,7 +8298,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:13",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:14",
     "label": "Highlight focused app",
     "tabIndex": 22,
     "keywords": [],
@@ -8315,14 +8336,6 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "SystemTrayOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
-    "label": "Icons",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
     "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:2",
@@ -8413,6 +8426,14 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
+    "label": "Minimum workspaces",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
     "section": "barWidgetOption:SystemMonitorOptions.qml:5",
     "label": "Mount",
     "tabIndex": 22,
@@ -8461,15 +8482,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
-    "label": "Padding",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "WorkspaceSwitcherOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:15",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:16",
     "label": "Reverse scroll direction",
     "tabIndex": 22,
     "keywords": [],
@@ -8509,7 +8522,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:17",
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:18",
     "label": "Show all tags",
     "tabIndex": 22,
     "keywords": [],
@@ -8605,6 +8618,14 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:8",
+    "label": "Show scratchpads",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
     "section": "barWidgetOption:SystemMonitorOptions.qml:2",
     "label": "Show swap",
     "tabIndex": 22,
@@ -8683,6 +8704,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "AppsDockOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:11",
+    "label": "Workspace count",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
     "section": "clipboardRememberTypeFilter",

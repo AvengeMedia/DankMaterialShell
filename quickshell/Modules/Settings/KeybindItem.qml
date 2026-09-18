@@ -356,7 +356,7 @@ Item {
                             width: root._keysColumnWidth
                             height: root._chipHeight
                             radius: root._chipHeight / 4
-                            color: isSelected ? Theme.primary : Theme.surfaceVariant
+                            color: isSelected ? Theme.primary : Theme.chipSurface
 
                             Rectangle {
                                 anchors.fill: parent
@@ -583,7 +583,7 @@ Item {
                                 width: editKeyChipText.implicitWidth + Theme.spacingM
                                 height: root._chipHeight
                                 radius: root._chipHeight / 4
-                                color: isSelected ? Theme.primary : Theme.surfaceVariant
+                                color: isSelected ? Theme.primary : Theme.chipSurface
 
                                 Rectangle {
                                     anchors.fill: parent
@@ -617,7 +617,7 @@ Item {
                             width: root._chipHeight
                             height: root._chipHeight
                             radius: root._chipHeight / 4
-                            color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
+                            color: root.addingNewKey ? Theme.primary : Theme.chipSurface
                             visible: !root.isNew && !root.readOnly
 
                             Rectangle {
@@ -823,7 +823,7 @@ Item {
                         Layout.preferredWidth: root._inputHeight
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
-                        color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
+                        color: root.addingNewKey ? Theme.primary : Theme.chipSurface
                         visible: root.keys.length === 1 && !root.isNew && !root.readOnly
 
                         Rectangle {
@@ -905,7 +905,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: root._buttonHeight
                                 radius: Theme.cornerRadius
-                                color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.floatingWindowFieldColor
+                                color: root._actionType === modelData.id ? Theme.chipSurface : Theme.floatingWindowFieldColor
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : Theme.withAlpha(Theme.outlineVariant, 0))
                                 border.width: Theme.outlineWidth
                                 clip: true
@@ -1285,7 +1285,7 @@ Item {
                         Layout.preferredWidth: root._inputHeight
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceVariant
+                        color: Theme.chipSurface
 
                         Rectangle {
                             anchors.fill: parent
@@ -1599,7 +1599,7 @@ Item {
                         Layout.preferredWidth: root._inputHeight
                         Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceVariant
+                        color: Theme.chipSurface
 
                         Rectangle {
                             anchors.fill: parent
@@ -1964,7 +1964,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Reset to default")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.primary
                         visible: root.editingKeyIndex >= 0 && root.editingKeyIndex < root.keys.length && root.keys[root.editingKeyIndex].isOverride === true && root.keys[root.editingKeyIndex].hasDefault === true && !root.isNew && !root.readOnly
                         onClicked: root.resetBind(root._originalKey)
@@ -1984,7 +1984,7 @@ Item {
                     DankButton {
                         text: I18n.tr("Cancel")
                         buttonHeight: root._buttonHeight
-                        backgroundColor: Theme.surfaceContainerHigh
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
                         visible: root.hasChanges || root.isNew || root.retainEdits
                         onClicked: {

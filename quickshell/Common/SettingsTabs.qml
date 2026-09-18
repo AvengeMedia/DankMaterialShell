@@ -15,7 +15,6 @@ Singleton {
             "id": "personalization",
             "text": I18n.tr("Wallpaper & colors"),
             "icon": "palette",
-            "tone": "tertiary",
             "tabIndex": 0,
             "hubHeader": "WallpaperColorsTab",
             "aliases": ["wallpaper", "theme_cursor_icons"],
@@ -57,7 +56,6 @@ Singleton {
         {
             "id": "theme_surfaces",
             "text": I18n.tr("Interface style"),
-            "tone": "tertiary",
             "icon": "layers",
             "tabIndex": 48,
             "hubHeader": "ThemeSurfacesTab",
@@ -76,13 +74,12 @@ Singleton {
         {
             "id": "typography",
             "text": I18n.tr("Fonts & motion"),
-            "tone": "tertiary",
             "icon": "text_fields",
             "tabIndex": 14,
             "hint": I18n.tr("Family, weight, scale, animation speed")
         },
         {
-            "id": "separator_desktop",
+            "id": "separator_1",
             "separator": true
         },
         {
@@ -90,7 +87,6 @@ Singleton {
             "text": I18n.tr("Bar"),
             "icon": "toolbar",
             "hint": I18n.tr("Position, appearance, island"),
-            "tone": "primary",
             "hubHeader": "BarHubHeader",
             "children": [
                 {
@@ -128,7 +124,6 @@ Singleton {
         {
             "id": "dankbar_widgets",
             "text": I18n.tr("Bar widgets"),
-            "tone": "primary",
             "icon": "widgets",
             "tabIndex": 22,
             "hubHeader": "WidgetsTab",
@@ -150,7 +145,6 @@ Singleton {
             "id": "dock",
             "text": I18n.tr("Dock"),
             "aliases": ["desktop", "dock_launcher"],
-            "tone": "primary",
             "icon": "dock_to_bottom",
             "hubHeader": "DockHubHeader",
             "hint": I18n.tr("Visibility, position, pinned apps, trash"),
@@ -189,7 +183,6 @@ Singleton {
         {
             "id": "launcher",
             "text": I18n.tr("Launcher"),
-            "tone": "primary",
             "icon": "grid_view",
             "tabIndex": 9,
             "hint": I18n.tr("Style, shortcuts, search, hidden apps")
@@ -197,7 +190,6 @@ Singleton {
         {
             "id": "dank_dash",
             "text": I18n.tr("Dashboard", "settings page name for the dank dash popout"),
-            "tone": "primary",
             "icon": "space_dashboard",
             "tabIndex": 43,
             "aliases": ["dashboards_osd"],
@@ -206,19 +198,17 @@ Singleton {
         {
             "id": "desktop_widgets",
             "text": I18n.tr("Desktop widgets"),
-            "tone": "primary",
             "icon": "widgets",
             "tabIndex": 27,
             "hint": I18n.tr("Clocks, system monitors, plugins")
         },
         {
-            "id": "separator_apps",
+            "id": "separator_2",
             "separator": true
         },
         {
             "id": "notifications",
             "text": I18n.tr("Notifications"),
-            "tone": "secondary",
             "icon": "notifications",
             "tabIndex": 17,
             "hubHeader": "NotificationsTab",
@@ -237,7 +227,6 @@ Singleton {
         {
             "id": "osd",
             "text": I18n.tr("On-screen displays"),
-            "tone": "secondary",
             "icon": "picture_in_picture",
             "tabIndex": 18,
             "hint": I18n.tr("Volume, brightness, caps lock, position")
@@ -246,7 +235,6 @@ Singleton {
             "id": "sound_media",
             "text": I18n.tr("Sound & media"),
             "icon": "volume_up",
-            "tone": "secondary",
             "children": [
                 {
                     "id": "audio",
@@ -273,10 +261,13 @@ Singleton {
             ]
         },
         {
+            "id": "separator_3",
+            "separator": true
+        },
+        {
             "id": "displays",
             "text": I18n.tr("Displays"),
             "icon": "monitor",
-            "tone": "secondary",
             "children": [
                 {
                     "id": "display_config",
@@ -302,14 +293,62 @@ Singleton {
             ]
         },
         {
-            "id": "separator_hardware",
-            "separator": true
+            "id": "input",
+            "text": I18n.tr("Input", "noun, settings page name for input devices"),
+            "icon": "keyboard",
+            "children": [
+                {
+                    "id": "keybinds",
+                    "text": I18n.tr("Keyboard shortcuts"),
+                    "icon": "keyboard_command_key",
+                    "tabIndex": 2,
+                    "shortcutsOnly": true,
+                    "hint": I18n.tr("Compositor and shell key bindings")
+                },
+                {
+                    "id": "keyboard",
+                    "text": I18n.tr("Keyboard", "settings page name"),
+                    "icon": "keyboard",
+                    "tabIndex": 45,
+                    "niriOnly": true,
+                    "hint": I18n.tr("Layouts, repeat rate, num lock")
+                },
+                {
+                    "id": "mouse_touchpad",
+                    "text": I18n.tr("Mouse & touchpad"),
+                    "icon": "mouse",
+                    "tabIndex": 44,
+                    "pointerCapable": true,
+                    "hint": I18n.tr("Speed, scrolling, tap to click")
+                }
+            ]
+        },
+        {
+            "id": "power_battery",
+            "text": I18n.tr("Power & battery"),
+            "icon": "power_settings_new",
+            "aliases": ["power_security"],
+            "children": [
+                {
+                    "id": "power_sleep",
+                    "text": I18n.tr("Power & sleep"),
+                    "icon": "power_settings_new",
+                    "tabIndex": 21,
+                    "hint": I18n.tr("Idle timeouts, power menu, custom actions")
+                },
+                {
+                    "id": "battery",
+                    "text": I18n.tr("Battery"),
+                    "icon": "battery_charging_full",
+                    "tabIndex": 42,
+                    "hint": I18n.tr("Charge limit, alerts, power profiles")
+                }
+            ]
         },
         {
             "id": "network",
             "text": I18n.tr("Network", "noun, settings page and widget title"),
             "icon": "wifi",
-            "tone": "error",
             "dmsOnly": true,
             "children": [
                 {
@@ -352,10 +391,70 @@ Singleton {
             ]
         },
         {
+            "id": "separator_4",
+            "separator": true
+        },
+        {
+            "id": "user_accounts",
+            "text": I18n.tr("Users & accounts", "settings sidebar category"),
+            "icon": "account_circle",
+            "hubHeader": "UserAccountsTab",
+            "tabIndex": 60,
+            "children": [
+                {
+                    "id": "users",
+                    "text": I18n.tr("Accounts", "settings page name for user accounts"),
+                    "icon": "manage_accounts",
+                    "tabIndex": 35,
+                    "hint": I18n.tr("Users", "hint under the accounts settings sidebar entry")
+                },
+                {
+                    "id": "user_create",
+                    "hidden": true,
+                    "text": I18n.tr("Create user"),
+                    "icon": "person_add",
+                    "tabIndex": 61
+                }
+            ]
+        },
+        {
+            "id": "security_accounts",
+            "text": I18n.tr("Security"),
+            "icon": "lock",
+            "children": [
+                {
+                    "id": "lock_screen",
+                    "text": I18n.tr("Lock screen"),
+                    "icon": "lock",
+                    "tabIndex": 11,
+                    "hint": I18n.tr("Layout, authentication, screensaver")
+                },
+                {
+                    "id": "greeter",
+                    "text": I18n.tr("Greeter", "noun, login screen settings page and greeter account badge"),
+                    "icon": "login",
+                    "tabIndex": 31,
+                    "greeterOnly": true,
+                    "hint": I18n.tr("Login screen appearance and authentication")
+                },
+                {
+                    "id": "greeter_auth",
+                    "hidden": true,
+                    "greeterOnly": true,
+                    "text": I18n.tr("Authentication"),
+                    "icon": "fingerprint",
+                    "tabIndex": 62
+                }
+            ]
+        },
+        {
+            "id": "separator_5",
+            "separator": true
+        },
+        {
             "id": "applications",
             "text": I18n.tr("Applications"),
             "icon": "apps",
-            "tone": "error",
             "children": [
                 {
                     "id": "default_apps",
@@ -392,124 +491,9 @@ Singleton {
             ]
         },
         {
-            "id": "input",
-            "text": I18n.tr("Input", "noun, settings page name for input devices"),
-            "icon": "keyboard",
-            "tone": "error",
-            "children": [
-                {
-                    "id": "keybinds",
-                    "text": I18n.tr("Keyboard shortcuts"),
-                    "icon": "keyboard_command_key",
-                    "tabIndex": 2,
-                    "shortcutsOnly": true,
-                    "hint": I18n.tr("Compositor and shell key bindings")
-                },
-                {
-                    "id": "keyboard",
-                    "text": I18n.tr("Keyboard", "settings page name"),
-                    "icon": "keyboard",
-                    "tabIndex": 45,
-                    "niriOnly": true,
-                    "hint": I18n.tr("Layouts, repeat rate, num lock")
-                },
-                {
-                    "id": "mouse_touchpad",
-                    "text": I18n.tr("Mouse & touchpad"),
-                    "icon": "mouse",
-                    "tabIndex": 44,
-                    "pointerCapable": true,
-                    "hint": I18n.tr("Speed, scrolling, tap to click")
-                }
-            ]
-        },
-        {
-            "id": "power_battery",
-            "text": I18n.tr("Power & battery"),
-            "icon": "power_settings_new",
-            "tone": "error",
-            "aliases": ["power_security"],
-            "children": [
-                {
-                    "id": "power_sleep",
-                    "text": I18n.tr("Power & sleep"),
-                    "icon": "power_settings_new",
-                    "tabIndex": 21,
-                    "hint": I18n.tr("Idle timeouts, power menu, custom actions")
-                },
-                {
-                    "id": "battery",
-                    "text": I18n.tr("Battery"),
-                    "icon": "battery_charging_full",
-                    "tabIndex": 42,
-                    "hint": I18n.tr("Charge limit, alerts, power profiles")
-                }
-            ]
-        },
-        {
-            "id": "separator_system",
-            "separator": true
-        },
-        {
-            "id": "user_accounts",
-            "text": I18n.tr("Users & accounts", "settings sidebar category"),
-            "icon": "account_circle",
-            "tone": "error",
-            "hubHeader": "UserAccountsTab",
-            "tabIndex": 60,
-            "children": [
-                {
-                    "id": "users",
-                    "text": I18n.tr("Accounts", "settings page name for user accounts"),
-                    "icon": "manage_accounts",
-                    "tabIndex": 35,
-                    "hint": I18n.tr("Users", "hint under the accounts settings sidebar entry")
-                },
-                {
-                    "id": "user_create",
-                    "hidden": true,
-                    "text": I18n.tr("Create user"),
-                    "icon": "person_add",
-                    "tabIndex": 61
-                }
-            ]
-        },
-        {
-            "id": "security_accounts",
-            "text": I18n.tr("Security"),
-            "icon": "lock",
-            "tone": "error",
-            "children": [
-                {
-                    "id": "lock_screen",
-                    "text": I18n.tr("Lock screen"),
-                    "icon": "lock",
-                    "tabIndex": 11,
-                    "hint": I18n.tr("Layout, authentication, screensaver")
-                },
-                {
-                    "id": "greeter",
-                    "text": I18n.tr("Greeter", "noun, login screen settings page and greeter account badge"),
-                    "icon": "login",
-                    "tabIndex": 31,
-                    "greeterOnly": true,
-                    "hint": I18n.tr("Login screen appearance and authentication")
-                },
-                {
-                    "id": "greeter_auth",
-                    "hidden": true,
-                    "greeterOnly": true,
-                    "text": I18n.tr("Authentication"),
-                    "icon": "fingerprint",
-                    "tabIndex": 62
-                }
-            ]
-        },
-        {
             "id": "date_time_region",
             "text": I18n.tr("Date, time & region"),
             "icon": "schedule",
-            "tone": "error",
             "children": [
                 {
                     "id": "time_weather",
@@ -538,7 +522,6 @@ Singleton {
             "id": "system",
             "text": I18n.tr("System & integrations"),
             "icon": "memory",
-            "tone": "error",
             "children": [
                 {
                     "id": "updater",
@@ -588,7 +571,6 @@ Singleton {
             "text": I18n.tr("Plugins"),
             "icon": "extension",
             "hint": I18n.tr("Browse, install, registries"),
-            "tone": "error",
             "tabIndex": 12,
             "hubHeader": "PluginsHubHeader",
             "children": [
@@ -603,11 +585,14 @@ Singleton {
             ]
         },
         {
+            "id": "separator_6",
+            "separator": true
+        },
+        {
             "id": "about",
             "text": I18n.tr("About", "settings page name"),
             "icon": "info",
             "hint": I18n.tr("Version, links, diagnostics"),
-            "tone": "error",
             "tabIndex": 13
         }
     ]
@@ -771,6 +756,25 @@ Singleton {
         if (!hub?.children)
             return [];
         return hub.children.filter(child => isVisible(child));
+    }
+
+    readonly property var groupAccents: ["purple", "blue", "green", "orange", "pink", "teal", "yellow", "red"]
+
+    function accentFor(pageId) {
+        const entry = page(pageId);
+        if (!entry)
+            return "";
+        const topId = entry.parentId || entry.id;
+        let group = 0;
+        for (const item of structure) {
+            if (item.separator) {
+                group++;
+                continue;
+            }
+            if (item.id === topId)
+                return groupAccents[group] ?? "";
+        }
+        return "";
     }
 
     function hubHint(entry) {

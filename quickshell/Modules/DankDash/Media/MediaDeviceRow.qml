@@ -39,7 +39,7 @@ SettingsRow {
         width: Theme.iconButtonSize
         height: width
         radius: Theme.cornerRadiusFull
-        color: root.selected ? Theme.onPrimary : Theme.surfaceContainerLow
+        color: root.selected ? Theme.onPrimary : Theme.chipSurface
 
         DankIcon {
             anchors.centerIn: parent
@@ -69,7 +69,6 @@ SettingsRow {
                 id: volumeSlider
                 Layout.fillWidth: true
                 size: "xs"
-                handleVariant: "touch"
                 insetIcon: ""
                 wheelInsideScrollable: false
                 volume: root.node?.audio?.volume ?? 0

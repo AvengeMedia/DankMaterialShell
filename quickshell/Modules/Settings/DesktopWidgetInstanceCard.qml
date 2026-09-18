@@ -320,7 +320,7 @@ SettingsReorderRow {
                     width: parent.width
                     height: ipcText.height + Theme.spacingS * 2
                     radius: Theme.cornerRadiusS
-                    color: Theme.surfaceHover
+                    color: Theme.chipSurface
 
                     Row {
                         x: Theme.spacingS

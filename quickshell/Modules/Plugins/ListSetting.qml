@@ -95,7 +95,7 @@ Column {
             width: parent.width
             height: 40
             radius: Theme.cornerRadius
-            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            color: Theme.chipSurface
             border.width: 0
 
             StyledText {

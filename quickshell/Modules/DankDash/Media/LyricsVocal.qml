@@ -20,6 +20,7 @@ Item {
     property int distance: 0
     property bool animationsEnabled: true
     property bool inViewport: false
+    property real leadFontSize: Theme.fontSizeXLarge
 
     readonly property bool current: synced && controller.sampleTime >= part.t && controller.sampleTime < part.e
     readonly property bool highlighted: synced && controller.sampleTime >= part.t && (current || distance === 0)
@@ -102,7 +103,7 @@ Item {
                     easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                 }
             }
-            font.pixelSize: root.part.background || !root.emphasize ? Theme.fontSizeLarge : Theme.fontSizeXLarge
+            font.pixelSize: root.part.background || !root.emphasize ? Math.round(root.leadFontSize * Theme.fontSizeLarge / Theme.fontSizeXLarge) : root.leadFontSize
             font.weight: root.synced && !root.part.background ? Theme.fontWeightBold : Theme.fontWeightMedium
             scale: root.textScale
             Behavior on scale {

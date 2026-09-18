@@ -10,7 +10,7 @@ Rectangle {
 
     height: Theme.listItemTwoLineHeight + Theme.spacingS
     radius: NotificationMetrics.menuRadius
-    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
     border.color: Theme.primary
     border.width: Theme.outlineWidthFocused
     opacity: showHints ? 1 : 0

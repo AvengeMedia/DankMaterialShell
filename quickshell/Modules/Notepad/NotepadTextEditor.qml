@@ -484,7 +484,7 @@ Column {
     StyledRect {
         width: parent.width
         height: parent.height - bottomControls.height - Theme.spacingM - (searchVisible ? searchBar.height + Theme.spacingM : 0)
-        color: Theme.withAlpha(Theme.surface, Theme.notepadTransparency)
+        color: Theme.withAlpha(Theme.cardSurface, Theme.notepadTransparency)
         border.color: Theme.outlineMedium
         border.width: 1
         radius: Theme.cornerRadius
@@ -719,7 +719,7 @@ Column {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: 36
-                    color: Theme.withAlpha(Theme.surface, Theme.notepadTransparency)
+                    color: Theme.withAlpha(Theme.cardSurface, Theme.notepadTransparency)
                     z: 2
 
                     Row {

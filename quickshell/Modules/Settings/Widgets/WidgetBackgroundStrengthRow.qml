@@ -9,6 +9,5 @@ SettingsSliderRow {
     value: Math.round(SettingsData.widgetBackgroundCustomStrength * 100)
     minimum: 0
     maximum: 100
-    unit: "%"
     onSliderValueChanged: newValue => SettingsData.set("widgetBackgroundCustomStrength", newValue / 100)
 }

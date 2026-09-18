@@ -508,7 +508,7 @@ Item {
                 LockNotificationCard {
                     width: parent.width
                     height: Theme.listItemHeight
-                    color: Theme.notificationFloatingSurfaceHigh
+                    color: Theme.notificationFloatingSurface
                     Accessible.name: countLabel.text
 
                     Row {
@@ -622,7 +622,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: LockMetrics.fieldHeight
                     radius: Theme.fullRadius(width, height)
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.cardSurface
                     border.width: passwordField.activeFocus ? Math.max(Theme.outlineWidth, Theme.focusRingWidth) : Theme.outlineWidth
                     border.color: passwordField.activeFocus ? Theme.focusRingColor : Theme.outlineVariant
                     Accessible.name: I18n.tr("Password")
@@ -1223,7 +1223,7 @@ Item {
                                     anchors.top: parent.top
                                     anchors.topMargin: -Theme.outlineWidth
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    color: Theme.surfaceContainerHigh
+                                    color: Theme.cardSurface
                                 }
 
                                 RotationAnimator on rotation {

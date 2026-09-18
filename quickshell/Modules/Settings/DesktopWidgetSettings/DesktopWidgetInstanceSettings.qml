@@ -38,7 +38,6 @@ Column {
         minimum: 0
         maximum: 100
         value: Math.round((root.cfg.transparency ?? 0.8) * 100)
-        unit: "%"
         onSliderValueChanged: newValue => root.updateConfig("transparency", newValue / 100)
     }
 
@@ -81,14 +80,14 @@ Column {
 
             DankButton {
                 text: I18n.tr("Reset Position")
-                backgroundColor: Theme.surfaceHover
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: SessionData.resetDesktopWidgetInstanceGeometry(root.instanceId, ["x", "y"])
             }
 
             DankButton {
                 text: I18n.tr("Reset Size")
-                backgroundColor: Theme.surfaceHover
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: SessionData.resetDesktopWidgetInstanceGeometry(root.instanceId, ["width", "height"])
             }

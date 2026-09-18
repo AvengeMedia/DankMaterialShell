@@ -14,6 +14,7 @@ PluginComponent {
         service: CupsService
     }
 
+    ccWidgetIsToggle: false
     ccWidgetIcon: "print"
     ccWidgetPrimaryText: I18n.tr("Printers")
     ccWidgetSecondaryText: {
@@ -84,7 +85,7 @@ PluginComponent {
                                 iconName: detailRoot.printerStopped ? "play_arrow" : "pause"
                                 iconSize: Theme.iconSizeSmall
                                 text: detailRoot.printerStopped ? I18n.tr("Resume") : I18n.tr("Pause")
-                                backgroundColor: Theme.surfaceContainerHighest
+                                backgroundColor: Theme.chipSurface
                                 textColor: Theme.surfaceText
                                 onClicked: {
                                     const selected = CupsService.getSelectedPrinter();
@@ -147,6 +148,16 @@ PluginComponent {
                     }
                 }
             }
+        }
+    }
+    ccExpandedContent: Component {
+        CcTileActions {
+            actions: CupsService.getPrintersNames().map(name => ({
+                        text: name,
+                        icon: "print",
+                        active: name === CupsService.getSelectedPrinter(),
+                        trigger: () => CupsService.setSelectedPrinter(name)
+                    }))
         }
     }
 }

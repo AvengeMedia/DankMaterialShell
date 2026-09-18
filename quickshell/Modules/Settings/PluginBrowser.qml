@@ -779,7 +779,7 @@ RegistryBrowserWindow {
                         horizontalPadding: 0
                         buttonHeight: Theme.buttonHeightXS
                         text: modelData
-                        backgroundColor: Theme.surfaceContainer
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.onSurfaceVariant
                         onClicked: root.scrollToLetter(modelData)
                     }
@@ -839,7 +839,7 @@ RegistryBrowserWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: I18n.tr("Retry", "retry failed action button")
                 iconName: "refresh"
-                backgroundColor: Theme.surfaceContainerHighest
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: root.refreshPlugins()
             }
@@ -957,12 +957,12 @@ RegistryBrowserWindow {
 
             Column {
                 id: detailColumn
-                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width)
+                width: parent.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.spacingL
 
                 Rectangle {
-                    width: parent.width
+                    width: Math.min(SettingsMetrics.contentMaxWidth, parent.width)
                     height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
                     radius: Theme.cornerRadiusM
                     color: Theme.floatingWindowNestedSurface

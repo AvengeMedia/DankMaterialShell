@@ -613,6 +613,31 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 26;
     }
 
+    if (currentVersion < 27) {
+        if (Array.isArray(settings.controlCenterWidgets)) {
+            settings.controlCenterWidgets = settings.controlCenterWidgets.map(widget => {
+                if (!widget || typeof widget !== "object")
+                    return widget;
+                const next = Object.assign({}, widget);
+                const width = Number(next.width);
+                delete next.width;
+                const cells = Number.isInteger(next.w) && next.w > 0 ? next.w : Number.isFinite(width) && width > 0 ? Math.max(1, Math.min(4, Math.round(width / 25))) : 2;
+                next.w = cells * 2;
+                if (next.h === undefined)
+                    next.h = 1;
+                return next;
+            });
+        }
+        const sheetWidth = Number(settings.controlCenterWidth);
+        delete settings.controlCenterWidth;
+        const columns = Number(settings.controlCenterColumns);
+        if (Number.isFinite(columns) && columns > 0)
+            settings.controlCenterColumns = Math.max(3, Math.round(columns)) * 2;
+        else if (Number.isFinite(sheetWidth) && sheetWidth > 0)
+            settings.controlCenterColumns = Math.max(3, Math.min(6, Math.round(sheetWidth / (550 / 4)))) * 2;
+        settings.configVersion = 27;
+    }
+
     return settings;
 }
 

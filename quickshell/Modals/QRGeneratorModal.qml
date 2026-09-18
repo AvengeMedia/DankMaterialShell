@@ -252,7 +252,7 @@ DankModal {
                     DankButton {
                         text: I18n.tr("Save")
                         iconName: "save"
-                        backgroundColor: Theme.surfaceContainer
+                        backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
                         onClicked: {
                             contentItem.saveBrowserLoader.active = true;

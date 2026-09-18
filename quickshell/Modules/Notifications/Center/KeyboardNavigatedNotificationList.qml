@@ -25,6 +25,7 @@ DankListView {
     property real swipingCardOffset: 0
     property real sessionContentHeight: 0
     property var transientSurfaceTracker: null
+    property bool nested: false
     readonly property real estimatedCollapsedCardHeight: NotificationMetrics.estimatedCardHeight
 
     Timer {
@@ -201,9 +202,8 @@ DankListView {
     }
 
     NotificationEmptyState {
+        parent: listView
         visible: listView.count === 0
-        y: Theme.spacingL
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 
     onCountChanged: listView.queueSessionContentHeightUpdate()
@@ -253,6 +253,7 @@ DankListView {
             width: parent.width
             x: delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
             notificationGroup: delegateRoot.notificationGroup
+            nested: listView.nested
             firstInList: index === 0
             lastInList: index === listView.count - 1
             keyboardNavigationActive: listView.keyboardActive && listView.focusAllowed

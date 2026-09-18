@@ -1941,6 +1941,39 @@ Item {
     }
 
     IpcHandler {
+        function toggle(name: string): string {
+            if (!CompositorService.isHyprland)
+                return "SCRATCHPAD_UNSUPPORTED_COMPOSITOR";
+            CompositorService.toggleSpecialWorkspace(name);
+            return "SCRATCHPAD_TOGGLED";
+        }
+
+        function move(name: string): string {
+            if (!CompositorService.isHyprland)
+                return "SCRATCHPAD_UNSUPPORTED_COMPOSITOR";
+            const active = ToplevelManager.activeToplevel;
+            if (!active)
+                return "SCRATCHPAD_NO_FOCUSED_WINDOW";
+            CompositorService.moveWindowToSpecial(active, name || "special");
+            return "SCRATCHPAD_MOVED";
+        }
+
+        function restore(): string {
+            if (!CompositorService.isHyprland)
+                return "SCRATCHPAD_UNSUPPORTED_COMPOSITOR";
+            const active = ToplevelManager.activeToplevel;
+            if (!active)
+                return "SCRATCHPAD_NO_FOCUSED_WINDOW";
+            if (!CompositorService.windowScratchpadName(active))
+                return "SCRATCHPAD_WINDOW_NOT_IN_SCRATCHPAD";
+            CompositorService.moveWindowOutOfSpecial(active);
+            return "SCRATCHPAD_RESTORED";
+        }
+
+        target: "scratchpad"
+    }
+
+    IpcHandler {
         function getFocusedWindow() {
             const active = ToplevelManager.activeToplevel;
             if (!active)

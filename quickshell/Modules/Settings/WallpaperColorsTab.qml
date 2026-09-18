@@ -8,6 +8,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/Format.js" as Format
+import "../../Common/ThemePalette.js" as ThemePalette
 
 Column {
     id: root
@@ -31,7 +32,15 @@ Column {
         SessionData.monitorCyclingSettings;
         return perMonitor ? SessionData.getMonitorCyclingSettings(selectedScreen).enabled : SessionData.wallpaperCyclingEnabled;
     }
-    readonly property string themeName: Theme.currentTheme === Theme.dynamic ? I18n.tr("Dynamic", "dynamic theme name") : (Theme.getThemeColors(Theme.currentThemeName).name ?? "")
+    readonly property var themePalette: ThemePalette.pick({
+        "primary": Theme.primary,
+        "secondary": Theme.secondary,
+        "tertiary": Theme.tertiary,
+        "primaryContainer": Theme.primaryContainer,
+        "info": Theme.info,
+        "error": Theme.error,
+        "warning": Theme.warning
+    })
     readonly property string colorModeStatus: {
         if (SettingsData.matugenSmartMode)
             return I18n.tr("Wallpaper");
@@ -97,9 +106,6 @@ Column {
             return;
         case "dark":
             SessionData.setWallpaperForMode(path, false);
-            return;
-        case "lock":
-            SettingsData.set("lockScreenWallpaperPath", path);
             return;
         }
         if (perMonitor) {
@@ -201,11 +207,12 @@ Column {
         }
 
         SettingsRow {
-            body: Row {
+            settingKey: "colorMode"
+            tags: ["light", "dark", "mode", "theme", "color", "palette"]
+            body: Flow {
                 id: thumbs
 
-                readonly property int count: (root.perMode ? 2 : 1) + 1
-                readonly property real thumbWidth: (width - spacing * (count - 1)) / count
+                readonly property real thumbWidth: (width - spacing) / 2
 
                 width: parent.width
                 spacing: Theme.spacingL
@@ -213,7 +220,6 @@ Column {
                 SettingsWallpaperThumb {
                     width: thumbs.thumbWidth
                     visible: !root.perMode
-                    label: I18n.tr("Desktop", "wallpaper thumbnail label, the desktop wallpaper")
                     path: root.currentWallpaper
                     canCycle: root.canCycleWallpaper
                     onBrowse: root.openBrowser("desktop")
@@ -257,15 +263,133 @@ Column {
                     onNext: root.cycleWallpaper(false)
                 }
 
-                SettingsWallpaperThumb {
-                    width: thumbs.thumbWidth
-                    label: I18n.tr("Lock screen")
-                    placeholderIcon: "lock"
-                    emptyText: I18n.tr("Use desktop wallpaper")
-                    allowColor: false
-                    path: SettingsData.lockScreenWallpaperPath
-                    onBrowse: root.openBrowser("lock")
-                    onClear: SettingsData.set("lockScreenWallpaperPath", "")
+                Item {
+                    id: quickPanel
+                    width: root.perMode ? thumbs.width : thumbs.thumbWidth
+                    height: root.perMode ? quickColumn.implicitHeight : thumbs.thumbWidth * SettingsMetrics.wallpaperThumbRatio
+
+                    Column {
+                        id: quickColumn
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Row {
+                            id: modeRow
+                            width: parent.width
+                            spacing: Theme.spacingS
+
+                            DankButtonGroup {
+                                width: parent.width - scheduleButton.width - parent.spacing
+                                fillWidth: true
+                                checkEnabled: false
+                                anchors.verticalCenter: parent.verticalCenter
+                                model: [
+                                    {
+                                        "text": I18n.tr("Light", "adjective, wallpaper thumbnail label for light mode"),
+                                        "icon": "light_mode"
+                                    },
+                                    {
+                                        "text": I18n.tr("Dark", "adjective, wallpaper thumbnail label for dark mode"),
+                                        "icon": "dark_mode"
+                                    }
+                                ]
+                                currentIndex: SessionData.isLightMode ? 0 : 1
+                                selectionMode: "single"
+                                onSelectionChanged: (index, selected) => {
+                                    if (!selected)
+                                        return;
+                                    const light = index === 0;
+                                    if (light === SessionData.isLightMode)
+                                        return;
+                                    Theme.screenTransition();
+                                    Theme.setLightMode(light);
+                                }
+                            }
+
+                            DankActionButton {
+                                id: scheduleButton
+                                iconName: "schedule"
+                                anchors.verticalCenter: parent.verticalCenter
+                                Accessible.name: I18n.tr("Dark mode")
+                                tooltipText: root.colorModeStatus
+                                onClicked: root.parentModal?.navigateTo("theme_schedule")
+                            }
+                        }
+
+                        Rectangle {
+                            id: themeTile
+                            width: parent.width
+                            height: Theme.listItemTwoLineHeight
+                            radius: Theme.cornerRadiusM
+                            color: Theme.foregroundColor(Theme.chipSurface, true)
+
+                            activeFocusOnTab: true
+                            Accessible.role: Accessible.Button
+                            Accessible.name: I18n.tr("Theme & colors")
+                            Accessible.description: Theme.currentThemeLabel
+                            Accessible.onPressAction: root.parentModal?.navigateTo("theme")
+                            Keys.onSpacePressed: root.parentModal?.navigateTo("theme")
+                            Keys.onReturnPressed: root.parentModal?.navigateTo("theme")
+
+                            FocusRing {}
+
+                            DankPaletteSwatch {
+                                id: themeSwatch
+                                width: Theme.avatarSize
+                                height: Theme.avatarSize
+                                anchors.left: parent.left
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
+                                primaryColor: root.themePalette.primary
+                                secondaryColor: root.themePalette.secondary
+                                tertiaryColor: root.themePalette.tertiary
+                            }
+
+                            Column {
+                                anchors.left: themeSwatch.right
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.right: themeChevron.left
+                                anchors.rightMargin: Theme.spacingS
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.spacingXXS
+
+                                StyledText {
+                                    width: parent.width
+                                    text: I18n.tr("Theme & colors")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Theme.fontWeightMedium
+                                    color: Theme.surfaceText
+                                    elide: Text.ElideRight
+                                }
+
+                                StyledText {
+                                    width: parent.width
+                                    text: Theme.currentThemeLabel
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            DankIcon {
+                                id: themeChevron
+                                name: "chevron_right"
+                                size: Theme.iconSize
+                                color: Theme.surfaceVariantText
+                                rotation: I18n.isRtl ? 180 : 0
+                                anchors.right: parent.right
+                                anchors.rightMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StateLayer {
+                                stateColor: Theme.surfaceText
+                                cornerRadius: themeTile.radius
+                                onClicked: root.parentModal?.navigateTo("theme")
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -314,18 +438,22 @@ Column {
             options: [
                 {
                     "value": "black",
+                    "previewColor": SettingsData.wallpaperBackgroundColorFor("black"),
                     "label": I18n.tr("Black", "wallpaper background color option")
                 },
                 {
                     "value": "white",
+                    "previewColor": SettingsData.wallpaperBackgroundColorFor("white"),
                     "label": I18n.tr("White", "wallpaper background color option")
                 },
                 {
                     "value": "primary",
+                    "previewColor": SettingsData.wallpaperBackgroundColorFor("primary"),
                     "label": I18n.tr("Primary")
                 },
                 {
                     "value": "surface",
+                    "previewColor": SettingsData.wallpaperBackgroundColorFor("surface"),
                     "label": I18n.tr("Surface Container")
                 },
                 {
@@ -476,6 +604,18 @@ Column {
             }
         }
 
+        SettingsNavRow {
+            tab: "wallpaper"
+            tags: ["lock", "screen", "background"]
+            iconName: "lock"
+            title: I18n.tr("Lock screen")
+            hint: SettingsData.lockScreenWallpaperPath ? SettingsData.lockScreenWallpaperPath.split("/").pop() : I18n.tr("Use desktop wallpaper")
+            onClicked: {
+                SettingsSearchService.navigateToSection("lockScreenWallpaperPath");
+                root.parentModal?.navigateTo("lock_screen");
+            }
+        }
+
         SettingsToggleRow {
             tab: "wallpaper"
             tags: ["blur", "overview", "niri"]
@@ -484,63 +624,6 @@ Column {
             text: I18n.tr("Blur on overview")
             checked: SettingsData.blurWallpaperOnOverview
             onToggled: checked => SettingsData.set("blurWallpaperOnOverview", checked)
-        }
-    }
-
-    SettingsCard {
-        tab: "theme"
-        tags: ["color", "palette", "theme", "appearance", "matugen", "dynamic"]
-        title: I18n.tr("Colors", "plural noun, theme settings card title")
-        settingKey: "themeColorsLink"
-
-        SettingsNavRow {
-            iconName: "format_paint"
-            title: I18n.tr("Theme & colors")
-            hint: root.themeName
-            onClicked: root.parentModal?.navigateTo("theme")
-
-            Row {
-                spacing: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
-
-                Repeater {
-                    model: [Theme.primary, Theme.secondary, Theme.tertiary]
-
-                    Rectangle {
-                        required property color modelData
-                        width: Theme.iconSizeSmall
-                        height: width
-                        radius: width / 2
-                        color: modelData
-                        border.width: Theme.outlineWidth
-                        border.color: Theme.outlineVariant
-                    }
-                }
-            }
-        }
-    }
-
-    SettingsCard {
-        tab: "theme"
-        tags: ["light", "dark", "mode", "appearance", "automatic", "schedule", "sunrise", "sunset"]
-        title: I18n.tr("Color mode")
-        settingKey: "colorMode"
-
-        SettingsSplitRow {
-            tab: "theme"
-            tags: ["light", "dark", "mode", "theme"]
-            settingKey: "isLightMode"
-            iconName: "dark_mode"
-            title: I18n.tr("Dark mode")
-            subtitle: root.colorModeStatus
-            checked: !SessionData.isLightMode
-            onNavigated: root.parentModal?.navigateTo("theme_schedule")
-            onToggled: toggled => {
-                if (toggled === !SessionData.isLightMode)
-                    return;
-                Theme.screenTransition();
-                Theme.setLightMode(!toggled);
-            }
         }
     }
 

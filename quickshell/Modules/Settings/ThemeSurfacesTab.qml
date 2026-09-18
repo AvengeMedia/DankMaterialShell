@@ -81,7 +81,6 @@ Column {
             value: Math.round(SettingsData.popupTransparency * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("popupTransparency", newValue / 100)
         }
 
@@ -111,7 +110,6 @@ Column {
             value: Math.round((SettingsData.foregroundLayerTransparency ?? 1.0) * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("foregroundLayerTransparency", newValue / 100)
         }
 
@@ -123,7 +121,6 @@ Column {
             value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
             minimum: 0
             maximum: 40
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
         }
 
@@ -212,7 +209,6 @@ Column {
             value: Math.round(Theme.floatingWindowTransparency * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("floatingWindowTransparency", newValue / 100)
         }
 
@@ -235,7 +231,6 @@ Column {
             value: Math.round(Theme.floatingWindowForegroundTransparency * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("floatingWindowForegroundTransparency", newValue / 100)
         }
 
@@ -290,7 +285,6 @@ Column {
                 value: Math.round(overrideRow.modelData.transparency * 100)
                 minimum: 0
                 maximum: 100
-                unit: "%"
                 modified: value !== 100
                 resetByKeys: false
                 onResetRequested: root.setOpacityOverride(overrideRow.modelData, {
@@ -426,7 +420,6 @@ Column {
             value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
             minimum: 0
             maximum: 100
-            unit: "%"
             onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
         }
     }
@@ -497,7 +490,7 @@ Column {
 
     SettingsCard {
         tab: "theme"
-        tags: ["control center", "tile", "button", "color", "accent"]
+        tags: ["button", "color", "accent"]
         title: I18n.tr("Colors")
         settingKey: "surfaceColors"
 
@@ -540,12 +533,19 @@ Column {
                 SettingsData.set("buttonColorMode", "primary");
             }
         }
+    }
+
+    SettingsCard {
+        tab: "theme"
+        tags: ["control center", "icon", "scale", "size", "tile"]
+        title: I18n.tr("Control Center", "Control Center")
+        settingKey: "controlCenterIcons"
 
         SettingsDropdownRow {
             tab: "theme"
             tags: ["control", "center", "tile", "button", "color", "active"]
             settingKey: "controlCenterTileColorMode"
-            text: I18n.tr("Control Center tile color")
+            text: I18n.tr("Tile color")
             options: [I18n.tr("Primary", "tile color option"), I18n.tr("Primary Container", "tile color option"), I18n.tr("Secondary", "tile color option"), I18n.tr("Surface Variant", "tile color option")]
             optionColorMap: ({
                     [I18n.tr("Primary", "tile color option")]: Theme.roleColor("primary"),
@@ -579,6 +579,20 @@ Column {
                 }
                 SettingsData.set("controlCenterTileColorMode", "primary");
             }
+        }
+
+        SettingsSliderRow {
+            tab: "theme"
+            tags: ["control", "center", "icon", "scale", "size", "tile", "header"]
+            settingKey: "controlCenterIconScale"
+            text: I18n.tr("Icon scale")
+            minimum: 50
+            maximum: 150
+            step: 5
+            unit: ""
+            decimals: 2
+            value: Math.round(SettingsData.controlCenterIconScale * 100)
+            onSliderValueChanged: value => SettingsData.set("controlCenterIconScale", value / 100)
         }
     }
 }

@@ -196,7 +196,7 @@ DankPopout {
                         buttonSize: Theme.buttonHeightXS
                         iconSize: Theme.iconSizeSmall
                         iconColor: Theme.surfaceText
-                        backgroundColor: Theme.foregroundColor(Theme.surfaceContainerHigh)
+                        backgroundColor: Theme.foregroundColor(Theme.chipSurface)
                         busy: SystemUpdateService.isChecking
                         enabled: !busy && !SystemUpdateService.isUpgrading
                         onClicked: SystemUpdateService.checkForUpdates()
@@ -383,7 +383,7 @@ DankPopout {
                     visible: updaterPanel.showIgnored
                     text: I18n.tr("Ignored (%1)").arg(updaterPanel.ignoredNames.length)
                     iconName: updaterPanel.ignoredExpanded ? "expand_less" : "expand_more"
-                    backgroundColor: Theme.surfaceContainerHigh
+                    backgroundColor: Theme.foregroundColor(Theme.chipSurface)
                     textColor: Theme.onSurface
                     maximumWidth: parent.width
                     wrapText: true

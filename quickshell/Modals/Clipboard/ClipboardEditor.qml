@@ -298,7 +298,7 @@ Item {
             height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - Theme.spacingM * 2)
             leftIconName: "edit"
             placeholderText: I18n.tr("Edit clipboard text")
-            backgroundColor: Theme.surfaceContainerHigh
+            backgroundColor: Theme.floatingWindowFieldColor
             normalBorderColor: Theme.outlineMedium
             focusedBorderColor: Theme.primary
             keyForwardTargets: [editorKeyHandler]
@@ -338,7 +338,7 @@ Item {
             DankButton {
                 id: cancelButton
                 text: I18n.tr("Cancel")
-                backgroundColor: Theme.surfaceContainerHigh
+                backgroundColor: Theme.chipSurface
                 textColor: Theme.surfaceText
                 onClicked: modal.mode = "history"
             }
@@ -375,7 +375,7 @@ Item {
 
             background: StyledRect {
                 radius: Theme.windowRadius
-                color: Theme.surfaceContainer
+                color: Theme.floatingWindowNestedSurface
                 border.color: Theme.outlineMedium
                 border.width: 1
             }
