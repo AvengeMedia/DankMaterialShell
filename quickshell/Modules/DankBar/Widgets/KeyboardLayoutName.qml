@@ -3,7 +3,7 @@ import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
-import "../../../DankCommon/Common/LayoutCodes.js" as LayoutCodes
+import "KeyboardLayoutLabels.js" as KeyboardLayoutLabels
 
 BasePill {
     id: root
@@ -11,12 +11,14 @@ BasePill {
     property var widgetData: null
     property bool compactMode: SettingsData.widgetOption("keyboard_layout_name", widgetData, "keyboardLayoutNameCompactMode")
     property bool showIcon: SettingsData.widgetOption("keyboard_layout_name", widgetData, "keyboardLayoutNameShowIcon")
+    readonly property var labelOverrides: SettingsData.widgetOption("keyboard_layout_name", widgetData, "keyboardLayoutNameLabelOverrides") ?? ({})
     readonly property var validVariants: ["US", "UK", "GB", "AZERTY", "QWERTY", "Dvorak", "Colemak", "Mac", "Intl", "International"]
     readonly property bool codesOnly: KeyboardLayoutService.namesAreXkbCodes
     readonly property string currentLayout: compactMode ? KeyboardLayoutService.compactLayout : KeyboardLayoutService.currentLayout
     readonly property var _allLayoutLabels: (compactMode || !codesOnly ? KeyboardLayoutService.layoutNames : []).map(n => displayLabel(n))
     readonly property string reserveLabel: widestLabel(_allLayoutLabels)
-    readonly property string verticalReserveLabel: widestLabel(_allLayoutLabels.map(n => LayoutCodes.layoutCode(n)))
+    readonly property var _allVerticalLabels: (compactMode || !codesOnly ? KeyboardLayoutService.layoutNames : []).map(n => verticalLabel(n))
+    readonly property string verticalReserveLabel: widestLabel(_allVerticalLabels)
 
     Component.onCompleted: KeyboardLayoutService.consumers++
     Component.onDestruction: KeyboardLayoutService.consumers--
@@ -31,20 +33,11 @@ BasePill {
     }
 
     function displayLabel(layoutName) {
-        if (!layoutName)
-            return "";
-        if (!compactMode || codesOnly)
-            return layoutName;
-        const match = layoutName.match(/^(\S+)(?:.*\(([^)]+)\))?/);
-        if (!match)
-            return LayoutCodes.layoutCode(layoutName);
-        const lang = match[1].toLowerCase();
-        const code = LayoutCodes.LANG_CODES[lang] || lang.substring(0, 2);
-        if (!match[2])
-            return code.toUpperCase();
-        const variant = match[2].trim();
-        const isValid = validVariants.some(v => variant.toUpperCase().includes(v.toUpperCase())) || variant.length <= 3;
-        return isValid ? code + "-" + variant : code.toUpperCase();
+        return KeyboardLayoutLabels.displayLabel(layoutName, compactMode, codesOnly, validVariants, labelOverrides);
+    }
+
+    function verticalLabel(layoutName) {
+        return KeyboardLayoutLabels.verticalLabel(layoutName, labelOverrides);
     }
 
     content: Component {
@@ -68,7 +61,7 @@ BasePill {
 
                 NumericText {
                     isMonospace: false
-                    text: LayoutCodes.layoutCode(root.currentLayout)
+                    text: root.verticalLabel(root.currentLayout)
                     reserveText: root.verticalReserveLabel
                     width: Math.ceil(Math.max(implicitWidth, reservedWidth))
                     horizontalAlignment: Text.AlignHCenter
