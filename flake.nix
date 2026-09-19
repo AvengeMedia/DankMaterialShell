@@ -111,7 +111,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-vnMPAzkpvFLRLdKLFsrKLXrlHsvtEb3x8U1haoVCOQI=";
+              vendorHash = "sha256-gc4/HwZVT1BjupJzFvHRnLwOFYLo5ZmOZY0G1W25Y7Q=";
 
               subPackages = [ "cmd/dms" ];
 
@@ -222,19 +222,23 @@
 
       nixosModules.default = self.nixosModules.dank-material-shell;
 
-      nixosModules.greeter = builtins.warn "dank-material-shell: the greeter moved to the dank-greeter repo; use `inputs.dank-greeter.nixosModules.default` and `programs.dms-greeter` (https://github.com/AvengeMedia/dank-greeter)" { };
+      nixosModules.greeter =
+        builtins.warn
+          "dank-material-shell: the greeter moved to the dank-greeter repo; use `inputs.dank-greeter.nixosModules.default` and `programs.dms-greeter` (https://github.com/AvengeMedia/dank-greeter)"
+          { };
 
       nixosModules.dankMaterialShell = builtins.warn "dank-material-shell: flake output `nixosModules.dankMaterialShell` has been renamed to `nixosModules.dank-material-shell`" self.nixosModules.dank-material-shell;
 
       devShells = forEachSystem (
         system: pkgs:
         let
-          devQmlPkgs = with pkgs;
-          [
-            quickshell
-            kdePackages.qtdeclarative
-          ]
-          ++ (qmlPkgs pkgs);
+          devQmlPkgs =
+            with pkgs;
+            [
+              quickshell
+              kdePackages.qtdeclarative
+            ]
+            ++ (qmlPkgs pkgs);
           # the surface fixtures run niri on winit/X11, which dlopens these
           niriForTests = pkgs.symlinkJoin {
             name = "niri-x11";
@@ -275,7 +279,11 @@
                 nil
               ]
               ++ devQmlPkgs
-              ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ niriForTests pkgs.xvfb pkgs.dbus ];
+              ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+                niriForTests
+                pkgs.xvfb
+                pkgs.dbus
+              ];
 
             shellHook = ''
               touch quickshell/.qmlls.ini 2>/dev/null
