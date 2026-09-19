@@ -262,7 +262,7 @@ PanelWindow {
     readonly property real _effectiveModalFarStartCcr: win._modalRadii.farStart
     readonly property real _effectiveModalFarEndCcr: win._modalRadii.farEnd
     readonly property real _effectiveModalFarExtent: Math.max(win._effectiveModalFarStartCcr, win._effectiveModalFarEndCcr)
-    readonly property color _surfaceColor: Theme.connectedSurfaceColor
+    readonly property color _surfaceColor: Theme.frameSurfaceColor
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
@@ -396,7 +396,7 @@ PanelWindow {
     }
 
     readonly property bool _blurSurfacesActive: BlurService.enabled && SettingsData.frameBlurEnabled && win._frameActive
-    readonly property int _blurCutoutCompensation: SettingsData.frameOpacity <= 0.2 ? 1 : 0
+    readonly property int _blurCutoutCompensation: Theme.frameSurfaceColor.a <= 0.2 ? 1 : 0
     readonly property int _blurCutoutLeft: Math.max(0, win.cutoutLeftInset - win._blurCutoutCompensation)
     readonly property int _blurCutoutTop: Math.max(0, win.cutoutTopInset - win._blurCutoutCompensation)
     readonly property int _blurCutoutRight: Math.min(win._windowRegionWidth, win._windowRegionWidth - win.cutoutRightInset + win._blurCutoutCompensation)

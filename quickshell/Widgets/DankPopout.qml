@@ -26,6 +26,7 @@ Item {
     property bool resizeMotion: false
     property bool resizing: false
     property bool surfaceFillsScreen: false
+    property real inputMargin: 0
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property bool hoverDismissEnabled: false

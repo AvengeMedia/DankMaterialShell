@@ -209,6 +209,23 @@ ShellRoot {
                 });
                 grid.commitSize();
                 check(SettingsData.controlCenterWidgets[1].w === 6 && SettingsData.controlCenterWidgets[1].h === 12, "width edits preserve the saved height on a smaller screen");
+                grid.previewSize(1, {
+                    w: 2.5
+                });
+                grid.commitSize();
+                grid.previewSize(1, {
+                    h: 1.5
+                });
+                grid.commitSize();
+                const half = grid.slotLayout.slots[1];
+                const cell = grid.cellWidth - CcMetrics.gridGap;
+                check(SettingsData.controlCenterWidgets[1].w === 2.5 && SettingsData.controlCenterWidgets[1].h === 1.5 && half.cols === 2.5 && half.rows === 1.5, "half steps are saved on both axes");
+                check(Math.abs(half.w - (cell * 2.5 + CcMetrics.gridGap * 1.5)) < 0.01 && Math.abs(half.h - (cell * 1.5 + CcMetrics.gridGap * 0.5)) < 0.01, "half spans pack at half pitch");
+                check(WidgetUtils.clampSize({
+                    id: "volumeSlider",
+                    w: 1.5,
+                    h: 1
+                }, 8, 1).w === 2, "sliders under two cells on both axes keep a usable track");
                 check(WidgetUtils.clampSize({
                     id: "volumeSlider",
                     w: 1,
@@ -230,6 +247,9 @@ ShellRoot {
                 sliderSlot.resizeRequested(grid.cellWidth - CcMetrics.gridGap, grid.cellWidth - CcMetrics.gridGap);
                 grid.commitSize();
                 check(SettingsData.controlCenterWidgets[0].w === 2 && SettingsData.controlCenterWidgets[0].h === 1, "shortening a slider retains a usable strip layout");
+                sliderSlot.resizeRequested(grid.cellWidth * 3.5 - CcMetrics.gridGap, grid.cellWidth - CcMetrics.gridGap);
+                grid.commitSize();
+                check(SettingsData.controlCenterWidgets[0].w === 3.5 && sliderSlot.tileItem.columns === 3.5, "resizing snaps to half columns");
                 grid.destroy();
                 wait(0);
                 const tile = tileComponent.createObject(scene);

@@ -1011,8 +1011,9 @@ Singleton {
     readonly property color connectedSurfaceColor: {
         if (typeof SettingsData === "undefined")
             return withAlpha(hostSurface, popupTransparency);
-        return isConnectedEffect ? withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : withAlpha(hostSurface, popupTransparency);
+        return isConnectedEffect ? frameSurfaceColor : withAlpha(hostSurface, popupTransparency);
     }
+    readonly property color frameSurfaceColor: withAlpha(hostSurface, typeof SettingsData === "undefined" ? popupTransparency : SettingsData.frameSurfaceOpacity)
     readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : windowRadius
     readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
     readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
@@ -1361,8 +1362,6 @@ Singleton {
     property real popupTransparency: {
         if (typeof SettingsData === "undefined")
             return 1.0;
-        if (isConnectedEffect)
-            return SettingsData.frameOpacity !== undefined ? SettingsData.frameOpacity : 1.0;
         return SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0;
     }
 
@@ -1778,8 +1777,14 @@ Singleton {
         // binary is a supported setup (DMS_SHELL_DIR / -c), and an older binary
         // exits with "unknown flag: --source-mode" rather than ignoring it, so
         // the default must not put the flag on the command line at all.
-        if (typeof SettingsData !== "undefined" && SettingsData.matugenSourceMode && SettingsData.matugenSourceMode !== "dominant") {
+        const seedColor = (typeof SettingsData !== "undefined" && !stockColors) ? SettingsData.matugenSeedColor : "";
+        if (seedColor) {
+            args.push("--seed-color", seedColor);
+        } else if (typeof SettingsData !== "undefined" && SettingsData.matugenSourceMode && SettingsData.matugenSourceMode !== "dominant") {
             args.push("--source-mode", SettingsData.matugenSourceMode);
+        }
+        if (typeof SettingsData !== "undefined" && !stockColors && SettingsData.matugenSpec === "2025") {
+            args.push("--spec", "2025");
         }
 
         if (typeof SettingsData !== "undefined") {

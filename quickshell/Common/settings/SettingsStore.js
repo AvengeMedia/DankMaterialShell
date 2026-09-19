@@ -219,7 +219,7 @@ function migrateToVersion(obj, targetVersion) {
         return null;
     }
 
-    if (currentVersion < 2) {
+    if (currentVersion < 2 && targetVersion >= 2) {
         console.info("Migrating settings from version", currentVersion, "to version 2");
 
         if (settings.barConfigs === undefined) {
@@ -278,13 +278,13 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 2;
     }
 
-    if (currentVersion < 3) {
+    if (currentVersion < 3 && targetVersion >= 3) {
         console.info("Migrating settings from version", currentVersion, "to version 3");
         console.info("Per-widget controlCenterButton config now supported via widgetData properties");
         settings.configVersion = 3;
     }
 
-    if (currentVersion < 4) {
+    if (currentVersion < 4 && targetVersion >= 4) {
         console.info("Migrating settings from version", currentVersion, "to version 4");
         console.info("Migrating desktop widgets to unified desktopWidgetInstances");
 
@@ -379,7 +379,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 4;
     }
 
-    if (currentVersion < 5) {
+    if (currentVersion < 5 && targetVersion >= 5) {
         console.info("Migrating settings from version", currentVersion, "to version 5");
         console.info("Moving sensitive data (weather location, coordinates) to session.json");
 
@@ -389,7 +389,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 5;
     }
 
-    if (currentVersion < 6) {
+    if (currentVersion < 6 && targetVersion >= 6) {
         console.info("Migrating settings from version", currentVersion, "to version 6");
 
         if (settings.barElevationEnabled === undefined) {
@@ -408,11 +408,11 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 6;
     }
 
-    if (currentVersion < 11) {
+    if (currentVersion < 11 && targetVersion >= 11) {
         settings.configVersion = 11;
     }
 
-    if (currentVersion < 12) {
+    if (currentVersion < 12 && targetVersion >= 12) {
         console.info("Migrating settings from version", currentVersion, "to version 12");
         if (settings.batteryNotificationType !== undefined) {
             settings.batteryChargeLimitNotificationType = settings.batteryNotificationType;
@@ -423,7 +423,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 12;
     }
 
-    if (currentVersion < 13) {
+    if (currentVersion < 13 && targetVersion >= 13) {
         console.info("Migrating settings from version", currentVersion, "to version 13");
         console.info("Moving device and network pins to cache.json");
 
@@ -434,7 +434,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 13;
     }
 
-    if (currentVersion < 14) {
+    if (currentVersion < 14 && targetVersion >= 14) {
         console.info("Migrating settings from version", currentVersion, "to version 14");
         console.info("Dropping keys that match defaults; settings.json now stores only changed values");
 
@@ -442,7 +442,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 14;
     }
 
-    if (currentVersion < 15) {
+    if (currentVersion < 15 && targetVersion >= 15) {
         console.info("Migrating settings from version", currentVersion, "to version 15");
         console.info("Moving machine-specific state to session.json and usage histories to cache.json");
 
@@ -461,7 +461,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 15;
     }
 
-    if (currentVersion < 16) {
+    if (currentVersion < 16 && targetVersion >= 16) {
         console.info("Migrating settings from version", currentVersion, "to version 16");
         console.info("Moving Niri overview close behavior to the window focus setting");
 
@@ -473,7 +473,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 16;
     }
 
-    if (currentVersion < 17) {
+    if (currentVersion < 17 && targetVersion >= 17) {
         console.info("Migrating settings from version", currentVersion, "to version 17");
         console.info("Converting batteryPillStyle to batteryStyle");
 
@@ -492,7 +492,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 17;
     }
 
-    if (currentVersion < 18) {
+    if (currentVersion < 18 && targetVersion >= 18) {
         console.info("Migrating settings from version", currentVersion, "to version 18");
         console.info("Moving the shell-wide Dank Island onto its bar config as a per-instance mode");
 
@@ -515,14 +515,14 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 18;
     }
 
-    if (currentVersion < 19) {
+    if (currentVersion < 19 && targetVersion >= 19) {
         console.info("Migrating settings from version", currentVersion, "to version 19");
         console.info("Moving global bar widget options onto each widget instance");
         migrateBarWidgetGlobals(settings);
         settings.configVersion = 19;
     }
 
-    if (currentVersion < 20) {
+    if (currentVersion < 20 && targetVersion >= 20) {
         console.info("Migrating settings from version", currentVersion, "to version 20");
         console.info("Marking bars and dock that already match the surface opacity as following the interface style");
         var surfaceOpacity = settings.popupTransparency ?? 1.0;
@@ -537,7 +537,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 20;
     }
 
-    if (currentVersion < 21) {
+    if (currentVersion < 21 && targetVersion >= 21) {
         console.info("Migrating settings from version", currentVersion, "to version 21");
         console.info("Dropping settings keys that no longer have a consumer");
         for (var i21 = 0; i21 < REMOVED_KEYS_V21.length; i21++)
@@ -545,7 +545,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 21;
     }
 
-    if (currentVersion < 22) {
+    if (currentVersion < 22 && targetVersion >= 22) {
         const moves = [["waveProgressEnabled", "waveProgress", true], ["mediaWallpaperEnabled", "albumArtBackdrop", true], ["mediaUseAlbumArtAccent", "albumArtAccent", true], ["appleMusicAnimatedArtEnabled", "animatedArt", false]];
         const options = Object.assign({}, settings.dashOptions ?? {});
         const media = Object.assign({}, options.media ?? {});
@@ -563,14 +563,14 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 22;
     }
 
-    if (currentVersion < 23) {
+    if (currentVersion < 23 && targetVersion >= 23) {
         if (settings.radiusStrength === undefined)
             settings.radiusStrength = strengthFromWindowRadius(settings.cornerRadius);
         delete settings.cornerRadius;
         settings.configVersion = 23;
     }
 
-    if (currentVersion < 24) {
+    if (currentVersion < 24 && targetVersion >= 24) {
         const removed = ["greeterFontFamily", "greeterLockDateFormat", "greeterWallpaperFillMode", "greeterWallpaperPath", "greeterShowWeather"];
         for (const key of removed)
             delete settings[key];
@@ -586,7 +586,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 24;
     }
 
-    if (currentVersion < 25) {
+    if (currentVersion < 25 && targetVersion >= 25) {
         const bars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
         for (const bar of bars) {
             if (!bar)
@@ -598,7 +598,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 25;
     }
 
-    if (currentVersion < 26) {
+    if (currentVersion < 26 && targetVersion >= 26) {
         const customSpeed = 4;
         const speedMoves = [["animationSpeed", "customAnimationDuration", "animationDuration", [0, 250, 500, 750], 500], ["popoutAnimationSpeed", "popoutCustomAnimationDuration", "popoutAnimationDuration", [0, 150, 300, 500], 150], ["modalAnimationSpeed", "modalCustomAnimationDuration", "modalAnimationDuration", [0, 150, 300, 500], 150], ["notificationAnimationSpeed", "notificationCustomAnimationDuration", "notificationAnimationDuration", [0, 200, 400, 600], 400]];
         for (const [speedKey, customKey, durationKey, presets, customDefault] of speedMoves) {
@@ -613,7 +613,7 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 26;
     }
 
-    if (currentVersion < 27) {
+    if (currentVersion < 27 && targetVersion >= 27) {
         if (Array.isArray(settings.controlCenterWidgets)) {
             settings.controlCenterWidgets = settings.controlCenterWidgets.map(widget => {
                 if (!widget || typeof widget !== "object")
@@ -636,6 +636,31 @@ function migrateToVersion(obj, targetVersion) {
         else if (Number.isFinite(sheetWidth) && sheetWidth > 0)
             settings.controlCenterColumns = Math.max(3, Math.min(6, Math.round(sheetWidth / (550 / 4)))) * 2;
         settings.configVersion = 27;
+    }
+
+    if (currentVersion < 28 && targetVersion >= 28) {
+        const surfaceOpacity = Number.isFinite(Number(settings.popupTransparency)) ? Number(settings.popupTransparency) : 1.0;
+        const bars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
+        const frameOpacity = Number(settings.frameOpacity);
+        const frameBar = bars.find(bc => bc && bc.enabled !== false && bc.island !== true);
+        if (frameBar && Number.isFinite(frameOpacity) && frameOpacity !== surfaceOpacity && frameBar.followInterfaceStyle !== false) {
+            frameBar.followInterfaceStyle = false;
+            frameBar.transparency = frameOpacity;
+        }
+        for (const bc of bars) {
+            if (!bc || bc.island !== true)
+                continue;
+            const islandOpacity = Number(bc.islandTransparency);
+            if (Number.isFinite(islandOpacity)) {
+                bc.transparency = islandOpacity;
+                bc.followInterfaceStyle = islandOpacity === surfaceOpacity;
+            }
+            delete bc.islandTransparency;
+            delete bc.islandCornerRadius;
+        }
+        delete settings.frameColor;
+        delete settings.frameOpacity;
+        settings.configVersion = 28;
     }
 
     return settings;

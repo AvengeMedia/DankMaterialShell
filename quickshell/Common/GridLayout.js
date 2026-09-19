@@ -1,7 +1,8 @@
-function packCells(cards, order, columns, isAvailable) {
+function packCells(cards, order, columns, isAvailable, step = 1) {
+    const steps = Math.round(columns / step);
     const cells = [];
     const heights = [];
-    for (let c = 0; c < columns; c++)
+    for (let c = 0; c < steps; c++)
         heights.push(0);
     let rows = 0;
 
@@ -15,11 +16,11 @@ function packCells(cards, order, columns, isAvailable) {
             continue;
         }
 
-        const w = Math.max(1, Math.min(columns, card.w || 1));
-        const h = Math.max(1, card.h || 1);
+        const w = Math.max(1, Math.min(steps, Math.round((card.w || 1) / step)));
+        const h = Math.max(1, Math.round((card.h || 1) / step));
         let bestX = 0;
         let bestY = Infinity;
-        for (let x = 0; x + w <= columns; x++) {
+        for (let x = 0; x + w <= steps; x++) {
             let y = 0;
             for (let c = x; c < x + w; c++)
                 y = Math.max(y, heights[c]);
@@ -32,21 +33,21 @@ function packCells(cards, order, columns, isAvailable) {
             heights[c] = bestY + h;
         rows = Math.max(rows, bestY + h);
         cells[sourceIndex] = {
-            "col": bestX,
-            "row": bestY,
-            "cols": w,
-            "rows": h
+            "col": bestX * step,
+            "row": bestY * step,
+            "cols": w * step,
+            "rows": h * step
         };
     }
 
     return {
         "cells": cells,
-        "rows": rows
+        "rows": rows * step
     };
 }
 
-function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable) {
-    const packed = packCells(cards, order, columns, isAvailable);
+function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1) {
+    const packed = packCells(cards, order, columns, isAvailable, step);
     const colW = (width - gap * (columns - 1)) / columns;
     const slots = packed.cells.map(cell => {
         if (!cell)
@@ -160,8 +161,8 @@ function crossGap(a, aSize, b, bSize) {
     return Math.max(0, b - (a + aSize), a - (b + bSize));
 }
 
-function dimension(value, minimum, maximum, fallback) {
+function dimension(value, minimum, maximum, fallback, step = 1) {
     const min = minimum ?? 1;
     const max = Math.max(min, maximum ?? fallback ?? min);
-    return Math.max(min, Math.min(max, Number.isInteger(value) ? value : (fallback ?? min)));
+    return Math.max(min, Math.min(max, typeof value === "number" && Number.isInteger(value / step) ? value : (fallback ?? min)));
 }

@@ -18,9 +18,9 @@ Item {
     property var matugenSchemePreviews: ({})
     property string matugenPreviewRequestKey: ""
     property string matugenPreviewLoadedKey: ""
-    readonly property string matugenPreviewSource: Theme.getMatugenColor("source_color", Theme.primary).toString()
-    readonly property string matugenPreviewImage: (Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : ""
-    readonly property string matugenPreviewKey: matugenPreviewSource + "|" + (SettingsData.matugenContrast ?? 0) + "|" + matugenPreviewImage
+    readonly property string matugenPreviewSource: SettingsData.matugenSeedColor || Theme.getMatugenColor("source_color", Theme.primary).toString()
+    readonly property string matugenPreviewImage: (!SettingsData.matugenSeedColor && Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : ""
+    readonly property string matugenPreviewKey: matugenPreviewSource + "|" + (SettingsData.matugenContrast ?? 0) + "|" + matugenPreviewImage + "|" + SettingsData.matugenSpec
     property bool matugenGenerating: false
     readonly property var currentPalette: ThemePalette.pick({
         "primary": Theme.primary,
@@ -67,6 +67,8 @@ Item {
         const args = [Proc.dmsBin, "matugen", "preview", "--source-color", matugenPreviewSource, "--contrast", String(SettingsData.matugenContrast ?? 0)];
         if (matugenPreviewImage)
             args.push("--image", matugenPreviewImage);
+        if (SettingsData.matugenSpec === "2025")
+            args.push("--spec", "2025");
         Proc.runCommand("", args, (output, exitCode) => {
             if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
                 return;
@@ -431,20 +433,28 @@ Item {
                         enabled: Theme.matugenAvailable
                         body: Item {
                             width: parent.width
-                            height: themeColorsTab.matugenPreviewsReady ? schemeGrid.implicitHeight : Theme.minimumTouchTargetSize
+                            // the grid keeps its height while previews regenerate so the page does not jump
+                            height: schemeGrid.implicitHeight
+
+                            SettingsSwatchGrid {
+                                id: schemeGrid
+                                options: themeColorsTab.matugenSchemeOptions
+                                currentValue: SettingsData.matugenScheme
+                                enabled: themeColorsTab.matugenPreviewsReady
+                                opacity: themeColorsTab.matugenPreviewsReady ? 1 : Theme.pendingOpacity
+                                onSelected: value => SettingsData.setMatugenScheme(value)
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                    }
+                                }
+                            }
 
                             DankSpinner {
                                 anchors.centerIn: parent
                                 running: !themeColorsTab.matugenPreviewsReady
                                 visible: running
-                            }
-
-                            SettingsSwatchGrid {
-                                id: schemeGrid
-                                visible: themeColorsTab.matugenPreviewsReady
-                                options: themeColorsTab.matugenSchemeOptions
-                                currentValue: SettingsData.matugenScheme
-                                onSelected: value => SettingsData.setMatugenScheme(value)
                             }
                         }
                     }
@@ -470,7 +480,7 @@ Item {
                         text: I18n.tr("Source color")
                         options: cachedSourceModes
                         currentValue: Theme.getSourceMode(SettingsData.matugenSourceMode).label
-                        enabled: Theme.matugenAvailable
+                        enabled: Theme.matugenAvailable && !SettingsData.matugenSeedColor
                         onValueChanged: value => {
                             for (var i = 0; i < Theme.availableSourceModes.length; i++) {
                                 var option = Theme.availableSourceModes[i];
@@ -482,7 +492,57 @@ Item {
                         }
                     }
 
+                    ColorDropdownRow {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+                        tab: "theme"
+                        tags: ["matugen", "seed", "pick", "eyedropper", "dynamic"]
+                        settingKey: "matugenSeedColor"
+                        text: I18n.tr("Derived color")
+                        enabled: Theme.matugenAvailable
+                        options: [
+                            {
+                                "value": "default",
+                                "previewColor": Theme.getMatugenColor("source_color", Theme.primary),
+                                "label": I18n.tr("From wallpaper", "matugen seed color option")
+                            },
+                            {
+                                "value": "custom",
+                                "label": I18n.tr("Custom")
+                            }
+                        ]
+                        currentMode: SettingsData.matugenSeedColor ? "custom" : "default"
+                        customColor: SettingsData.matugenSeedColor || Theme.getMatugenColor("source_color", Theme.primary)
+                        pickerTitle: I18n.tr("Seed color")
+                        onModeSelected: mode => {
+                            if (mode !== "custom") {
+                                SettingsData.setMatugenSeedColor("");
+                                return;
+                            }
+                            if (SettingsData.matugenSeedColor)
+                                return;
+                            SettingsData.setMatugenSeedColor(Theme.getMatugenColor("source_color", Theme.primary).toString());
+                        }
+                        onCustomColorSelected: selectedColor => SettingsData.setMatugenSeedColor(Theme.withAlpha(selectedColor, 1).toString())
+                    }
+
+                    SettingsButtonGroupRow {
+                        visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+                        tab: "theme"
+                        tags: ["matugen", "spec", "expressive", "vivid", "saturated", "bold", "dynamic"]
+                        settingKey: "matugenSpec"
+                        text: I18n.tr("Material palette")
+                        enabled: Theme.matugenAvailable
+                        model: [I18n.tr("Standard", "adjective, panel motion option and bar layout mode option"), I18n.tr("Expressive", "matugen color scheme option")]
+                        currentIndex: SettingsData.matugenSpec === "2025" ? 1 : 0
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            SettingsData.setMatugenSpec(index === 1 ? "2025" : "2021");
+                        }
+                    }
+
                     SettingsSliderRow {
+                        id: contrastRow
                         visible: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
                         tab: "theme"
                         tags: ["matugen", "contrast", "dynamic"]
@@ -492,7 +552,12 @@ Item {
                         minimum: -100
                         maximum: 100
                         enabled: Theme.matugenAvailable
-                        onSliderDragFinished: finalValue => SettingsData.setMatugenContrast(finalValue / 100)
+                        onSliderDragFinished: finalValue => {
+                            const clamped = SettingsData.matugenSpec === "2025" ? Math.max(0, finalValue) : finalValue;
+                            SettingsData.setMatugenContrast(clamped / 100);
+                            if (clamped !== finalValue)
+                                contrastRow.resync();
+                        }
                     }
 
                     Column {

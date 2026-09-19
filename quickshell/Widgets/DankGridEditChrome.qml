@@ -19,7 +19,6 @@ Item {
     property real cornerRadius: Theme.cornerRadiusXL
     property real buttonSize: Theme.iconSizeLarge
     property real iconSize: Theme.iconSizeSmall
-    property real edgeBandWidth: Theme.spacingL
     readonly property real touchTargetSize: Math.max(Theme.minimumTouchTargetSize, buttonSize)
     readonly property real contentInset: touchTargetSize / 2
     readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (horizontalResize ? 3 : 2)
@@ -114,13 +113,11 @@ Item {
     }
 
     readonly property real gripRadius: Math.max(0, Math.min(cornerRadius, width / 2 - contentInset, height / 2 - contentInset) - Theme.outlineWidthFocused / 2)
-    readonly property real handleOverhang: edgeResize || Math.min(width, height) - contentInset * 2 < touchTargetSize * 2 ? contentInset : Theme.spacingS / 2
+    property real handleOverhang: edgeResize || Math.min(width, height) - contentInset * 2 < touchTargetSize * 2 ? contentInset : Theme.spacingS / 2
     readonly property real gripInset: handleOverhang - Theme.spacingS / 2
 
     component ResizeBand: MouseArea {
         property int signX: 1
-        property bool lockX: false
-        property bool lockY: false
         property real startX: 0
         property real startY: 0
 
@@ -138,7 +135,7 @@ Item {
             if (!pressed)
                 return;
             const p = mapToItem(root, mouse.x, mouse.y);
-            root.resizeMoved(lockX ? startX : p.x - root.contentInset, lockY ? startY : p.y - root.contentInset);
+            root.resizeMoved(p.x - root.contentInset, p.y - root.contentInset);
         }
         onReleased: root.resizeEnded()
         onCanceled: root.resizeCanceled()
@@ -191,38 +188,6 @@ Item {
         active: root.edgeResize && root.visible
 
         sourceComponent: Item {
-            ResizeBand {
-                anchors.right: parent.right
-                anchors.rightMargin: root.contentInset - root.edgeBandWidth / 2
-                y: root.contentInset - root.edgeBandWidth / 2
-                width: root.edgeBandWidth
-                height: root.height - root.contentInset * 2 + root.edgeBandWidth
-                lockY: true
-                cursorShape: Qt.SizeHorCursor
-            }
-
-            ResizeBand {
-                anchors.left: parent.left
-                anchors.leftMargin: root.contentInset - root.edgeBandWidth / 2
-                y: root.contentInset - root.edgeBandWidth / 2
-                width: root.edgeBandWidth
-                height: root.height - root.contentInset * 2 + root.edgeBandWidth
-                signX: -1
-                lockY: true
-                cursorShape: Qt.SizeHorCursor
-            }
-
-            ResizeBand {
-                anchors.left: parent.left
-                anchors.leftMargin: root.contentInset - root.edgeBandWidth / 2
-                y: root.height - root.contentInset - root.edgeBandWidth / 2
-                width: root.width - root.contentInset * 2 + root.edgeBandWidth
-                height: root.edgeBandWidth
-                visible: !root.horizontalResize
-                lockX: true
-                cursorShape: Qt.SizeVerCursor
-            }
-
             Handle {
                 anchors.left: parent.left
                 anchors.leftMargin: root.contentInset - (root.horizontalResize ? width / 2 : root.handleOverhang)

@@ -392,7 +392,7 @@ Item {
     readonly property color _hostSurface: Theme.hostSurface
     readonly property string _barId: barConfig?.id ?? "default"
     property real _backgroundAlpha: SettingsData.barTransparency(barConfig)
-    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.withAlpha(SettingsData.effectiveFrameColor, SettingsData.frameOpacity) : Theme.withAlpha(_hostSurface, _backgroundAlpha)
+    readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.frameSurfaceColor : Theme.withAlpha(_hostSurface, _backgroundAlpha)
 
     function _updateBackgroundAlpha() {
         const live = SettingsData.barConfigs.find(c => c.id === _barId);
@@ -812,20 +812,11 @@ Item {
                 }
                 topBarCore.evaluateReveal();
             }
-            y: !barWindow.isVertical && !barWindow.isIsland ? (barPos === SettingsData.Position.Bottom ? parent.height - height : 0) : 0
-            x: barWindow.isVertical && !barWindow.isIsland ? (barPos === SettingsData.Position.Right ? parent.width - width : 0) : 0
-            height: !barWindow.isVertical ? (barWindow.isIsland ? parent.height : Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)) : undefined
-            width: barWindow.isVertical ? (barWindow.isIsland ? parent.width : Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr)) : undefined
-            anchors {
-                leftMargin: !barWindow.isVertical && !barWindow.isIsland ? barWindow.taskbarStartInset : 0
-                rightMargin: !barWindow.isVertical && !barWindow.isIsland ? barWindow.taskbarEndInset : 0
-                topMargin: barWindow.isVertical && !barWindow.isIsland ? barWindow.taskbarStartInset : 0
-                bottomMargin: barWindow.isVertical && !barWindow.isIsland ? barWindow.taskbarEndInset : 0
-                left: !barWindow.isVertical ? parent.left : (barPos === SettingsData.Position.Left ? parent.left : undefined)
-                right: !barWindow.isVertical ? parent.right : (barPos === SettingsData.Position.Right ? parent.right : undefined)
-                top: barWindow.isVertical ? parent.top : undefined
-                bottom: barWindow.isVertical ? parent.bottom : undefined
-            }
+            // Switching stretch anchors can leave stale dimensions after an orientation change
+            x: barWindow.isIsland ? 0 : !barWindow.isVertical ? barWindow.taskbarStartInset : barPos === SettingsData.Position.Right ? parent.width - width : 0
+            y: barWindow.isIsland ? 0 : barWindow.isVertical ? barWindow.taskbarStartInset : barPos === SettingsData.Position.Bottom ? parent.height - height : 0
+            width: barWindow.isIsland ? parent.width : barWindow.isVertical ? Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr) : Math.max(0, parent.width - barWindow.taskbarStartInset - barWindow.taskbarEndInset)
+            height: barWindow.isIsland ? parent.height : !barWindow.isVertical ? Theme.px(barWindow.effectiveBarThickness + barWindow.effectiveSpacing, barWindow._dpr) : Math.max(0, parent.height - barWindow.taskbarStartInset - barWindow.taskbarEndInset)
             readonly property bool inOverview: CompositorService.overviewActiveOnScreen(barWindow.screenName) && barWindow.effectiveOpenOnOverview
             hoverEnabled: topBarCore.autoHide && !inOverview && !topBarCore.popoutPinsReveal
             acceptedButtons: barWindow.clickThroughEnabled || barWindow.isIsland ? Qt.NoButton : Qt.RightButton

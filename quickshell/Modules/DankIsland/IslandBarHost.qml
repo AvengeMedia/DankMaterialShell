@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Modals.DankLauncherV2 as DankLauncher
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 import "../../Common/LayoutResolver.js" as Resolver
@@ -68,7 +69,6 @@ Item {
     readonly property int screenMargin: 200
     readonly property int referenceScreenWidth: 1920
     readonly property int referenceScreenHeight: 1080
-    readonly property int maxCornerRadius: 64
     readonly property int maxHoverDelay: 1000
     readonly property var springStiffnessRange: [100, 1200]
     readonly property var springDampingRange: [10, 100]
@@ -183,7 +183,8 @@ Item {
         alongOffset: Math.max(-root.maximumAlongOffset, Math.min(root.maximumAlongOffset, root.setting("islandAlongOffset")))
         outerGap: root.outerGap
         compactThickness: root.compactThickness
-        cornerRadius: Math.max(0, Math.min(root.maxCornerRadius, root.setting("islandCornerRadius")))
+        cornerRadius: Theme.windowRadius
+        pillRadius: BarMetrics.pillRadius(root.compactThickness, root.barConfig?.widgetStyle ?? "pills")
         homeCompactTight: root.setting("islandHomeCompactTight")
         homeStatusContent: SettingsData.islandHomeStatusContent(root.barConfig)
         homeClockDisplay: SettingsData.islandClockDisplay(root.barConfig)
@@ -252,7 +253,7 @@ Item {
         springMass: Math.max(root.springMassRange[0], Math.min(root.springMassRange[1], root.setting("islandSpringMass")))
         palette: root.setting("islandPalette")
         highContrast: root.setting("islandHighContrast")
-        transparency: root.setting("islandTransparency")
+        transparency: SettingsData.barTransparency(root.barConfig)
         onScrollWheel: wheel => root.scrollWheel(wheel)
     }
 

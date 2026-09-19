@@ -25,6 +25,14 @@ var LOCAL_SPEC = {
         def: 0,
         onChange: "regenSystemThemes"
     },
+    matugenSeedColor: {
+        def: "",
+        onChange: "regenSystemThemes"
+    },
+    matugenSpec: {
+        def: "2021",
+        onChange: "regenSystemThemes"
+    },
     runUserMatugenTemplates: {
         def: true,
         onChange: "regenSystemThemes"
@@ -1371,12 +1379,6 @@ var LOCAL_SPEC = {
     },
     frameRounding: {
         def: 23
-    },
-    frameColor: {
-        def: ""
-    },
-    frameOpacity: {
-        def: 1.0
     },
     frameScreenPreferences: {
         def: ["all"]

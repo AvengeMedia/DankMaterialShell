@@ -14,7 +14,7 @@ Item {
     required property real cutoutLeftInset
     required property real cutoutRightInset
     required property real cutoutRadius
-    property color borderColor: Qt.rgba(SettingsData.effectiveFrameColor.r, SettingsData.effectiveFrameColor.g, SettingsData.effectiveFrameColor.b, SettingsData.frameOpacity)
+    property color borderColor: Theme.frameSurfaceColor
 
     ShaderEffect {
         anchors.fill: parent

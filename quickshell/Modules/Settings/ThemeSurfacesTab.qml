@@ -8,7 +8,6 @@ Column {
     id: root
 
     property var parentModal: null
-    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
     readonly property bool followsSurfaces: SettingsData.floatingWindowSyncGlobal ?? true
     readonly property bool borderEnabled: SettingsData.blurBorderEnabled ?? true
     readonly property string windowRadiusKey: CompositorService.supportsLayoutConfig ? CompositorService.configKey + "LayoutRadiusOverride" : ""
@@ -30,7 +29,7 @@ Column {
     readonly property var opacityTargets: {
         SettingsData.barConfigs;
         SettingsData.dockConfigs;
-        const bars = SettingsData.barConfigs.filter(config => !SettingsData.isIslandBarConfig(config)).map(config => ({
+        const bars = SettingsData.barConfigs.map(config => ({
                     kind: "bar",
                     id: config.id,
                     name: config.name || config.id,
@@ -77,19 +76,10 @@ Column {
             tags: ["surface", "popup", "transparency", "opacity", "modal"]
             settingKey: "popupTransparency"
             text: I18n.tr("Opacity")
-            visible: !root.connectedFrameModeActive
             value: Math.round(SettingsData.popupTransparency * 100)
             minimum: 0
             maximum: 100
             onSliderValueChanged: newValue => SettingsData.set("popupTransparency", newValue / 100)
-        }
-
-        SettingsControlledBy {
-            visible: root.connectedFrameModeActive
-            parentModal: root.parentModal
-            section: "frameOpacity"
-            settingLabel: I18n.tr("Opacity")
-            reason: I18n.tr("Managed by Frame in Connected Mode")
         }
 
         SettingsToggleRow {
@@ -324,7 +314,7 @@ Column {
             tags: ["surface", "opacity", "transparency", modelData.kind, "override"]
             title: modelData.title
             settingKey: modelData.settingKey
-            visible: !root.connectedFrameModeActive && targets.length > 0
+            visible: targets.length > 0
 
             Repeater {
                 model: targetCard.activeTargets

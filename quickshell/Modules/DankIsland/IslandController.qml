@@ -37,6 +37,7 @@ QtObject {
     property string edge: "top"
     readonly property bool isVertical: edge === "left" || edge === "right"
     property real cornerRadius: 34
+    property real pillRadius: cornerRadius
     readonly property real edgeCornerRadius: Math.round(cornerRadius * 0.75)
     property real compactThickness: 38
     property string batteryStyle: "solid"
@@ -355,7 +356,7 @@ QtObject {
     }
 
     function pillTarget(alongSize, crossSize) {
-        const radius = Math.min(crossSize / 2, root.cornerRadius);
+        const radius = Math.min(crossSize / 2, root.pillRadius);
         return {
             "width": root.isVertical ? crossSize : alongSize,
             "height": root.isVertical ? alongSize : crossSize,

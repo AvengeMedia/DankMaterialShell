@@ -10,8 +10,8 @@ DankEditableGridSlot {
 
     readonly property var widgetData: JSON.parse(json)
     readonly property var sizeSpec: WidgetUtils.sizeSpec(widgetData.id || "", grid.columns, grid.maximumRows)
-    readonly property int cols: slot?.cols ?? 1
-    readonly property int rows: slot?.rows ?? 1
+    readonly property real cols: slot?.cols ?? 1
+    readonly property real rows: slot?.rows ?? 1
     readonly property bool compact: cols <= 2 && rows === 1
     readonly property var tileItem: tileLoader.item
 
@@ -22,10 +22,11 @@ DankEditableGridSlot {
     }
 
     onResizeRequested: (requestedWidth, requestedHeight) => {
-        let width = GridUtils.dimension(Math.round((requestedWidth + CcMetrics.gridGap) / grid.cellWidth), sizeSpec.minW, sizeSpec.maxW, sizeSpec.w);
-        let height = GridUtils.dimension(Math.round((requestedHeight + CcMetrics.gridGap) / grid.cellWidth), sizeSpec.minH, sizeSpec.maxH, sizeSpec.h);
+        const step = sizeSpec.step;
+        let width = GridUtils.dimension(Math.round((requestedWidth + CcMetrics.gridGap) / grid.cellWidth / step) * step, sizeSpec.minW, sizeSpec.maxW, sizeSpec.w, step);
+        let height = GridUtils.dimension(Math.round((requestedHeight + CcMetrics.gridGap) / grid.cellWidth / step) * step, sizeSpec.minH, sizeSpec.maxH, sizeSpec.h, step);
         const current = WidgetUtils.clampSize(widgetData, grid.columns, grid.maximumRows);
-        if (WidgetUtils.isSliderWidget(widgetData.id) && width === 1 && height === 1) {
+        if (WidgetUtils.isSliderWidget(widgetData.id) && width < 2 && height < 2) {
             if (width !== current.w && sizeSpec.maxH > 1)
                 height = 2;
             else

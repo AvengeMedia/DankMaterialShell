@@ -17,8 +17,8 @@ Item {
     property string title: ""
     property string subtitle: ""
     property bool active: false
-    property int columns: 4
-    property int rows: 1
+    property real columns: 4
+    property real rows: 1
     property bool compact: columns <= 2 && rows === 1
     property bool toggle: !opensPage
     property Component expandedContent: null

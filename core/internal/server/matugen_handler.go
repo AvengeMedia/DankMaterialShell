@@ -31,6 +31,8 @@ func handleMatugenQueue(conn *ipc.ConnWriter, req ipc.Request) {
 		SkipTemplates:       models.GetOr(req, "skipTemplates", ""),
 		Contrast:            models.GetOr(req, "contrast", 0.0),
 		SourceMode:          models.GetOr(req, "sourceMode", ""),
+		SeedColor:           models.GetOr(req, "seedColor", ""),
+		Spec:                models.GetOr(req, "spec", ""),
 	}
 
 	wait := models.GetOr(req, "wait", true)

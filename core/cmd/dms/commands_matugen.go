@@ -73,6 +73,8 @@ func init() {
 		cmd.Flags().String("skip-templates", "", "Comma-separated list of templates to skip")
 		cmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
 		cmd.Flags().String("source-mode", "", "Source color selection: dominant, colorful, darkness, lightness, saturation, less-saturation, value")
+		cmd.Flags().String("seed-color", "", "Hex color to build the palette from instead of extracting one from the wallpaper")
+		cmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default) or 2025 (Material 3 Expressive)")
 	}
 
 	matugenQueueCmd.Flags().Bool("wait", true, "Wait for completion")
@@ -80,6 +82,7 @@ func init() {
 	matugenPreviewCmd.Flags().String("source-color", "", "Source color used to generate previews")
 	matugenPreviewCmd.Flags().String("image", "", "Wallpaper image used to resolve the scheme-smart preview")
 	matugenPreviewCmd.Flags().Float64("contrast", 0, "Contrast value from -1 to 1 (0 = standard)")
+	matugenPreviewCmd.Flags().String("spec", "", "Material color spec: 2021 (matugen native, default) or 2025 (Material 3 Expressive)")
 	matugenQtengineCmd.Flags().String("config-dir", "", "User config directory")
 	matugenQtengineCmd.Flags().String("icon-theme", "", "Icon theme name")
 }
@@ -100,6 +103,8 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 	skipTemplates, _ := cmd.Flags().GetString("skip-templates")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
 	sourceMode, _ := cmd.Flags().GetString("source-mode")
+	seedColor, _ := cmd.Flags().GetString("seed-color")
+	spec, _ := cmd.Flags().GetString("spec")
 
 	return matugen.Options{
 		StateDir:            stateDir,
@@ -117,6 +122,8 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 		TerminalsAlwaysDark: terminalsAlwaysDark,
 		SkipTemplates:       skipTemplates,
 		SourceMode:          sourceMode,
+		SeedColor:           seedColor,
+		Spec:                spec,
 	}
 }
 
@@ -155,6 +162,8 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 			"skipTemplates":       opts.SkipTemplates,
 			"contrast":            opts.Contrast,
 			"sourceMode":          opts.SourceMode,
+			"seedColor":           opts.SeedColor,
+			"spec":                opts.Spec,
 			"wait":                wait,
 		},
 	}
@@ -228,7 +237,8 @@ func runMatugenPreview(cmd *cobra.Command, args []string) {
 	sourceColor, _ := cmd.Flags().GetString("source-color")
 	imagePath, _ := cmd.Flags().GetString("image")
 	contrast, _ := cmd.Flags().GetFloat64("contrast")
-	previews, err := matugen.PreviewSchemes(sourceColor, contrast, imagePath)
+	spec, _ := cmd.Flags().GetString("spec")
+	previews, err := matugen.PreviewSchemes(sourceColor, contrast, imagePath, spec)
 	if err != nil {
 		log.Fatalf("Failed to generate Matugen previews: %v", err)
 	}

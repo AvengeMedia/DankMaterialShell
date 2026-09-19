@@ -80,7 +80,7 @@ Item {
         id: layout
 
         anchors.centerIn: parent
-        columns: root.vertical ? 1 : 3
+        columns: root.vertical ? 1 : Math.max(1, layout.visibleChildren.length)
         spacing: root.vertical ? 0 : Theme.spacingS
 
         Loader {

@@ -178,12 +178,14 @@ const KNOWN_SET_CHAINS = [
     ["Services/SessionService.qml", "the i3 ipc compositors, no capability name yet"]
 ];
 
+const UNTRACKED_DIRECTORIES = new Set(["tests", "dms-plugins", "dms-plugins-external"]);
+
 function sourceFiles(dir) {
     const out = [];
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
         const full = `${dir}/${entry.name}`;
         if (entry.isDirectory()) {
-            if (entry.name !== "tests")
+            if (!UNTRACKED_DIRECTORIES.has(entry.name))
                 out.push(...sourceFiles(full));
             continue;
         }

@@ -1,9 +1,9 @@
 package apppicker
 
 import (
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/desktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
+	"github.com/AvengeMedia/dankgo/desktop"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
 

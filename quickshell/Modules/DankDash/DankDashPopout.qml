@@ -21,6 +21,8 @@ DankPopout {
     resizeMotion: true
     resizing: contentLoader.item?.panelResizing ?? false
     surfaceFillsScreen: editMode
+    inputMargin: editGutter * 2
+    hoverDismissSuspended: editMode
     onOpened: contentFocusTimer.restart()
 
     Timer {
@@ -62,7 +64,7 @@ DankPopout {
     readonly property int columnCap: DashMetrics.columnCapFor(screen?.width, SettingsData.showWeekNumber)
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
 
-    popupWidth: DashMetrics.widthFor(SettingsData.showWeekNumber, screen?.width, DashMetrics.panelColumnsFor(activeTabId)) + editGutter * 2
+    popupWidth: DashMetrics.widthFor(SettingsData.showWeekNumber, screen?.width, DashMetrics.panelColumnsFor(activeTabId))
     minimumSurfaceWidth: DashMetrics.widthFor(SettingsData.showWeekNumber, screen?.width, DashRegistry.widestPanelColumns)
     popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabMinHeight + DashMetrics.tabBarBlockHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
     triggerWidth: DashMetrics.triggerWidth
@@ -226,10 +228,9 @@ DankPopout {
             LayoutMirroring.childrenInherit: true
 
             implicitWidth: root.popupWidth
-            implicitHeight: headerRow.height + DashMetrics.contentGap + pages.implicitHeight + DashMetrics.contentPadding * 2 + root.editGutter
+            implicitHeight: headerRow.height + DashMetrics.contentGap + pages.implicitHeight + DashMetrics.contentPadding * 2
             readonly property bool ready: pages.ready
             focus: true
-            clip: width < Theme.px(implicitWidth, root.dpr) || height < Theme.px(implicitHeight, root.dpr)
 
             readonly property bool panelResizing: panelResizer.resizing
             readonly property bool cardResizing: pages.currentItem?.cardResizing ?? false
@@ -249,7 +250,6 @@ DankPopout {
             readonly property bool panelAtDefault: panelColumns === DashMetrics.defaultGridColumns && DashMetrics.panelFloorRowsFor(root.activeTabId) <= contentRows
             readonly property DankPanelResizer panelResizer: DankPanelResizer {
                 popout: root
-                gutter: root.editGutter
                 stepWidth: DashMetrics.preferredColumnWidth + DashMetrics.gridGap
                 widthFor: columns => DashMetrics.widthFor(SettingsData.showWeekNumber, root.screen?.width, columns)
                 currentStep: () => mainContainer.panelColumns
@@ -260,10 +260,10 @@ DankPopout {
                 minRows: mainContainer.contentRows
                 maxRows: Math.min(pages.rowBudget, DashMetrics.maximumGridRows)
                 onPreview: (columns, rows) => DashMetrics.panelPreview = {
-                    "id": root.activeTabId,
-                    "columns": columns,
-                    "rows": rows
-                }
+                        "id": root.activeTabId,
+                        "columns": columns,
+                        "rows": rows
+                    }
                 onCommitted: (columns, rows, columnsChanged, rowsChanged) => {
                     const values = {};
                     if (columnsChanged)
@@ -524,13 +524,13 @@ DankPopout {
                 id: panelChrome
 
                 anchors.fill: parent
-                anchors.margins: PopoutMetrics.panelChromeInset - contentInset
+                anchors.margins: -(contentInset + Theme.spacingS)
                 z: 2
                 visible: root.editMode
                 edgeResize: true
                 removable: false
-                edgeBandWidth: PopoutMetrics.panelResizeBand
-                cornerRadius: Math.max(0, Theme.windowRadius - PopoutMetrics.panelChromeInset)
+                cornerRadius: Theme.windowRadius + Theme.spacingS
+                handleOverhang: contentInset + Theme.spacingL
                 buttonSize: PopoutMetrics.chromeButtonSize
                 iconSize: PopoutMetrics.chromeIconSize
                 resizing: mainContainer.panelResizing || mainContainer.panelShifted
@@ -558,193 +558,200 @@ DankPopout {
             }
 
             Item {
-                id: contentColumn
+                id: contentClip
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.topMargin: DashMetrics.contentPadding
-                anchors.leftMargin: DashMetrics.contentPadding + root.editGutter
-                anchors.bottomMargin: DashMetrics.contentPadding + root.editGutter
-                width: root.popupWidth - (DashMetrics.contentPadding + root.editGutter) * 2
+                anchors.fill: parent
+                clip: mainContainer.width < Theme.px(mainContainer.implicitWidth, root.dpr) || mainContainer.height < Theme.px(mainContainer.implicitHeight, root.dpr)
 
                 Item {
-                    id: headerRow
+                    id: contentColumn
 
-                    readonly property real stripCenter: (tabBar.y + tabBar.height - Theme.dividerWidth - DashMetrics.contentPadding) / 2
-
-                    width: parent.width
-                    height: root.showTabs ? Math.max(DashMetrics.tabBarBlockHeight, tabBar.y + tabBar.height) : 0
-                    visible: root.showTabs
-
-                    Rectangle {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.leftMargin: -DashMetrics.contentPadding
-                        anchors.rightMargin: -DashMetrics.contentPadding
-                        y: tabBar.y + tabBar.height - height
-                        height: Theme.dividerWidth
-                        color: Theme.outlineVariant
-                        visible: tabBar.visible
-                    }
-
-                    DankTabBar {
-                        id: tabBar
-
-                        anchors.left: parent.left
-                        anchors.right: menuButton.left
-                        anchors.rightMargin: Theme.spacingS
-                        y: -DashMetrics.tabBarLift
-                        visible: !root.editMode && root.detailTabId === ""
-                        tabHeight: DashMetrics.tabHeight
-                        showDivider: false
-                        currentIndex: root.currentTabIndex
-                        spacing: Theme.spacingS
-                        equalWidthTabs: true
-                        enableArrowNavigation: false
-                        cycleOnTab: true
-                        nextFocusTarget: pages.focusTarget
-                        previousFocusTarget: pages.currentItem?.previousFocusTarget ?? pages.focusTarget
-                        model: DashRegistry.tabBarModel
-
-                        onTabClicked: function (index) {
-                            const id = root.orderedTabIds[index];
-                            if (id !== undefined)
-                                root.currentTabId = id;
-                        }
-                    }
-
-                    DashEditControls {
-                        id: editControls
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        y: Math.round(headerRow.stripCenter - height / 2)
-                        visible: root.editMode
-                        canAdd: (pages.currentItem?.addable?.length ?? 0) > 0
-                        hasWidgets: mainContainer.hasWidgets
-                        title: mainContainer.hasWidgets ? I18n.tr("Widgets") : (DashRegistry.entry(root.activeTabId)?.text ?? "")
-                        onAddRequested: anchor => pages.currentItem?.openAddMenu(anchor)
-                        onMenuRequested: anchor => headerMenu.openAt(anchor)
-                        onFinished: root.editMode = false
-                    }
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.topMargin: DashMetrics.contentPadding
+                    anchors.leftMargin: DashMetrics.contentPadding
+                    anchors.bottomMargin: DashMetrics.contentPadding
+                    width: root.popupWidth - DashMetrics.contentPadding * 2
 
                     Item {
-                        id: detailHeader
+                        id: headerRow
 
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        y: Math.round(headerRow.stripCenter - height / 2)
-                        height: DashMetrics.headerActionSize
-                        visible: root.detailTabId !== "" && !root.editMode
+                        readonly property real stripCenter: (tabBar.y + tabBar.height - Theme.dividerWidth - DashMetrics.contentPadding) / 2
+
+                        width: parent.width
+                        height: root.showTabs ? Math.max(DashMetrics.tabBarBlockHeight, tabBar.y + tabBar.height) : 0
+                        visible: root.showTabs
+
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: -DashMetrics.contentPadding
+                            anchors.rightMargin: -DashMetrics.contentPadding
+                            y: tabBar.y + tabBar.height - height
+                            height: Theme.dividerWidth
+                            color: Theme.outlineVariant
+                            visible: tabBar.visible
+                        }
+
+                        DankTabBar {
+                            id: tabBar
+
+                            anchors.left: parent.left
+                            anchors.right: menuButton.left
+                            anchors.rightMargin: Theme.spacingS
+                            y: -DashMetrics.tabBarLift
+                            visible: !root.editMode && root.detailTabId === ""
+                            tabHeight: DashMetrics.tabHeight
+                            showDivider: false
+                            currentIndex: root.currentTabIndex
+                            spacing: Theme.spacingS
+                            equalWidthTabs: true
+                            enableArrowNavigation: false
+                            cycleOnTab: true
+                            nextFocusTarget: pages.focusTarget
+                            previousFocusTarget: pages.currentItem?.previousFocusTarget ?? pages.focusTarget
+                            model: DashRegistry.tabBarModel
+
+                            onTabClicked: function (index) {
+                                const id = root.orderedTabIds[index];
+                                if (id !== undefined)
+                                    root.currentTabId = id;
+                            }
+                        }
+
+                        DashEditControls {
+                            id: editControls
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            y: Math.round(headerRow.stripCenter - height / 2)
+                            visible: root.editMode
+                            canAdd: (pages.currentItem?.addable?.length ?? 0) > 0
+                            hasWidgets: mainContainer.hasWidgets
+                            title: mainContainer.hasWidgets ? I18n.tr("Widgets") : (DashRegistry.entry(root.activeTabId)?.text ?? "")
+                            onAddRequested: anchor => pages.currentItem?.openAddMenu(anchor)
+                            onMenuRequested: anchor => headerMenu.openAt(anchor)
+                            onFinished: root.editMode = false
+                        }
+
+                        Item {
+                            id: detailHeader
+
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            y: Math.round(headerRow.stripCenter - height / 2)
+                            height: DashMetrics.headerActionSize
+                            visible: root.detailTabId !== "" && !root.editMode
+
+                            DankActionButton {
+                                id: backButton
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                buttonSize: DashMetrics.headerActionSize
+                                iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
+                                Accessible.name: I18n.tr("Back")
+                                KeyNavigation.tab: pages.focusTarget
+                                KeyNavigation.backtab: pages.focusTarget
+                                onClicked: root.closeDetail()
+                            }
+
+                            StyledText {
+                                anchors.left: backButton.right
+                                anchors.right: parent.right
+                                anchors.leftMargin: Theme.spacingS
+                                anchors.rightMargin: DashMetrics.headerActionSize + Theme.spacingS
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: root.detailEntry?.text ?? ""
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Theme.fontWeightMedium
+                                color: Theme.surfaceText
+                                elide: Text.ElideRight
+                            }
+                        }
 
                         DankActionButton {
-                            id: backButton
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            buttonSize: DashMetrics.headerActionSize
-                            iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
-                            Accessible.name: I18n.tr("Back")
-                            KeyNavigation.tab: pages.focusTarget
-                            KeyNavigation.backtab: pages.focusTarget
-                            onClicked: root.closeDetail()
-                        }
+                            id: menuButton
 
-                        StyledText {
-                            anchors.left: backButton.right
                             anchors.right: parent.right
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.rightMargin: DashMetrics.headerActionSize + Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: root.detailEntry?.text ?? ""
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                            elide: Text.ElideRight
+                            y: Math.round(headerRow.stripCenter - height / 2)
+                            buttonSize: DashMetrics.headerActionSize
+                            iconName: "more_vert"
+                            iconColor: headerMenu.open ? Theme.primary : Theme.onSurfaceVariant
+                            backgroundColor: headerMenu.open ? Theme.withAlpha(Theme.primary, Theme.stateLayerFocus) : "transparent"
+                            Accessible.name: I18n.tr("Options")
+                            visible: !root.editMode
+                            KeyNavigation.tab: pages.focusTarget
+                            KeyNavigation.backtab: root.detailTabId !== "" ? backButton : tabBar
+                            onClicked: headerMenu.openAt(menuButton)
                         }
                     }
 
-                    DankActionButton {
-                        id: menuButton
+                    DankFlickable {
+                        id: pages
 
-                        anchors.right: parent.right
-                        y: Math.round(headerRow.stripCenter - height / 2)
-                        buttonSize: DashMetrics.headerActionSize
-                        iconName: "more_vert"
-                        iconColor: headerMenu.open ? Theme.primary : Theme.onSurfaceVariant
-                        backgroundColor: headerMenu.open ? Theme.withAlpha(Theme.primary, Theme.stateLayerFocus) : "transparent"
-                        Accessible.name: I18n.tr("Options")
-                        visible: !root.editMode
-                        KeyNavigation.tab: pages.focusTarget
-                        KeyNavigation.backtab: root.detailTabId !== "" ? backButton : tabBar
-                        onClicked: headerMenu.openAt(menuButton)
-                    }
-                }
+                        property var currentHost: null
+                        property real settledHeight: DashMetrics.tabMinHeight
+                        readonly property var currentItem: currentHost?.item ?? null
+                        readonly property Item focusTarget: currentHost?.focusTarget ?? null
+                        readonly property bool currentSettled: !!currentHost && (!!currentHost.item || currentHost.failed)
+                        readonly property real currentHostImplicitHeight: currentHost?.implicitHeight ?? 0
+                        readonly property real targetHeight: currentSettled && currentHost.isCurrent ? DashMetrics.panelHeightFor(root.activeTabId, currentHostImplicitHeight) : -1
+                        readonly property real bodyHeight: Math.max(settledHeight, currentHostImplicitHeight)
+                        readonly property bool ready: targetHeight >= 0 && settledHeight === targetHeight
+                        readonly property real availableHeight: root.screen ? root.screen.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
+                        readonly property int rowBudget: DashMetrics.rowCapFor(availableHeight)
 
-                DankFlickable {
-                    id: pages
+                        x: -root.editGutter
+                        y: (headerRow.visible ? headerRow.height + DashMetrics.contentGap : 0) - root.editGutter
+                        width: parent.width + root.editGutter * 2
+                        height: Math.max(0, mainContainer.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2) + root.editGutter * 2
+                        implicitHeight: Math.min(settledHeight, Math.max(DashMetrics.gridRowUnit, availableHeight))
+                        contentWidth: width
+                        contentHeight: bodyHeight + root.editGutter * 2
+                        clip: contentHeight > height
 
-                    property var currentHost: null
-                    property real settledHeight: DashMetrics.tabMinHeight
-                    readonly property var currentItem: currentHost?.item ?? null
-                    readonly property Item focusTarget: currentHost?.focusTarget ?? null
-                    readonly property bool currentSettled: !!currentHost && (!!currentHost.item || currentHost.failed)
-                    readonly property real currentHostImplicitHeight: currentHost?.implicitHeight ?? 0
-                    readonly property real targetHeight: currentSettled && currentHost.isCurrent ? DashMetrics.panelHeightFor(root.activeTabId, currentHostImplicitHeight) : -1
-                    readonly property real bodyHeight: Math.max(settledHeight, currentHostImplicitHeight)
-                    readonly property bool ready: targetHeight >= 0 && settledHeight === targetHeight
-                    readonly property real availableHeight: root.screen ? root.screen.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
-                    readonly property int rowBudget: DashMetrics.rowCapFor(availableHeight)
-
-                    x: -root.editGutter
-                    y: (headerRow.visible ? headerRow.height + DashMetrics.contentGap : 0) - root.editGutter
-                    width: parent.width + root.editGutter * 2
-                    height: Math.max(0, mainContainer.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2) + root.editGutter
-                    implicitHeight: Math.min(settledHeight, Math.max(DashMetrics.gridRowUnit, availableHeight))
-                    contentWidth: width
-                    contentHeight: bodyHeight + root.editGutter * 2
-                    clip: contentHeight > height
-
-                    function updateContentHeight() {
-                        if (targetHeight < 0)
-                            return;
-                        settledHeight = targetHeight;
-                    }
-
-                    onTargetHeightChanged: Qt.callLater(updateContentHeight)
-
-                    Repeater {
-                        model: ScriptModel {
-                            values: DashRegistry.tabIds
+                        function updateContentHeight() {
+                            if (targetHeight < 0)
+                                return;
+                            settledHeight = targetHeight;
                         }
 
-                        DashTabHost {
-                            id: host
+                        onTargetHeightChanged: Qt.callLater(updateContentHeight)
 
-                            required property string modelData
-
-                            width: pages.width
-                            height: pages.height + Math.max(0, pages.bodyHeight - pages.implicitHeight)
-                            contentPadding: root.editGutter
-                            entry: DashRegistry.entry(modelData)
-                            dashHost: root
-                            rowBudget: pages.rowBudget
-                            keyForwardTarget: mainContainer
-                            contentViewport: pages
-                            isCurrent: root.activeTabId === modelData
-
-                            onIsCurrentChanged: {
-                                if (isCurrent)
-                                    pages.currentHost = host;
+                        Repeater {
+                            model: ScriptModel {
+                                values: DashRegistry.tabIds
                             }
 
-                            Component.onCompleted: {
-                                if (isCurrent)
-                                    pages.currentHost = host;
-                            }
+                            DashTabHost {
+                                id: host
 
-                            Component.onDestruction: {
-                                if (pages.currentHost === host)
-                                    pages.currentHost = null;
+                                required property string modelData
+
+                                width: pages.width
+                                height: pages.height + Math.max(0, pages.bodyHeight - pages.implicitHeight)
+                                contentPadding: root.editGutter
+                                entry: DashRegistry.entry(modelData)
+                                dashHost: root
+                                rowBudget: pages.rowBudget
+                                keyForwardTarget: mainContainer
+                                contentViewport: pages
+                                isCurrent: root.activeTabId === modelData
+
+                                onIsCurrentChanged: {
+                                    if (isCurrent)
+                                        pages.currentHost = host;
+                                }
+
+                                Component.onCompleted: {
+                                    if (isCurrent)
+                                        pages.currentHost = host;
+                                }
+
+                                Component.onDestruction: {
+                                    if (pages.currentHost === host)
+                                        pages.currentHost = null;
+                                }
                             }
                         }
                     }

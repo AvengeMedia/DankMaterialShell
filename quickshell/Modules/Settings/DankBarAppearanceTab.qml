@@ -52,35 +52,6 @@ Item {
                 }
             }
 
-            SettingsSliderRow {
-                settingKey: "islandTransparency"
-                tags: ["island", "appearance", "surface", "opacity", "transparency", "blur"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandTransparency"]
-                text: I18n.tr("Opacity", "island settings: island surface opacity slider")
-                minimum: 0
-                maximum: 100
-                step: 1
-                value: Math.round(bar.islandSetting("islandTransparency") * 100)
-                onSliderValueChanged: value => bar.apply("islandTransparency", value / 100)
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandCornerRadius"
-                tags: ["island", "appearance", "corner", "radius", "rounding", "pill", "expanded"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandCornerRadius"]
-                text: I18n.tr("Corner radius", "island settings: island corner radius slider")
-                unit: "px"
-                minimum: 0
-                maximum: 64
-                step: 1
-                value: bar.islandSetting("islandCornerRadius")
-                onSliderValueChanged: value => bar.apply("islandCornerRadius", value)
-            }
-
             SettingsToggleRow {
                 settingKey: "islandHighContrast"
                 tags: ["island", "appearance", "contrast", "accessibility", "outline"]

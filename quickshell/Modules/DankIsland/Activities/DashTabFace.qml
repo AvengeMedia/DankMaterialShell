@@ -206,7 +206,6 @@ FocusScope {
         visible: root.editMode
         edgeResize: true
         removable: false
-        edgeBandWidth: PopoutMetrics.panelResizeBand
         cornerRadius: Math.max(0, Theme.windowRadius - PopoutMetrics.panelChromeInset)
         buttonSize: PopoutMetrics.chromeButtonSize
         iconSize: PopoutMetrics.chromeIconSize

@@ -31,6 +31,7 @@ Item {
     property bool resizeMotion: popoutHandle.resizeMotion
     property bool resizing: popoutHandle.resizing
     property bool surfaceFillsScreen: popoutHandle.surfaceFillsScreen
+    property real inputMargin: popoutHandle.inputMargin
     readonly property bool _screenSurface: connected || surfaceFillsScreen
     property real triggerX: popoutHandle.triggerX
     property real triggerY: popoutHandle.triggerY
@@ -388,7 +389,11 @@ Item {
     on_ScreenSurfaceChanged: {
         if (!_screenSurface)
             _setAnimatedSurfaceEnvelope();
+        _surfaceSwitching = contentWindow.visible && Math.abs(contentWindow.width - (_screenSurface ? screenWidth : _surfaceW)) > 1;
     }
+    property bool _surfaceSwitching: false
+    readonly property real _contentWindowWidth: contentWindow.width
+    on_ContentWindowWidthChanged: _surfaceSwitching = false
     onResizingChanged: {
         if (!resizing)
             backgroundLayer.item?.surfaceMoved();
@@ -1327,10 +1332,10 @@ Item {
                     id: contentHoleRect
                     visible: false
                     color: "transparent"
-                    x: background.dismissRequired ? root.renderedAlignedX : 0
-                    y: background.dismissRequired ? root._surfaceBodyY : 0
-                    width: (background.dismissRequired && root.shouldBeVisible) ? root.renderedAlignedWidth : 0
-                    height: (background.dismissRequired && root.shouldBeVisible) ? root._surfaceBodyH : 0
+                    x: background.dismissRequired ? root.renderedAlignedX - root.inputMargin : 0
+                    y: background.dismissRequired ? root._surfaceBodyY - root.inputMargin : 0
+                    width: (background.dismissRequired && root.shouldBeVisible) ? root.renderedAlignedWidth + root.inputMargin * 2 : 0
+                    height: (background.dismissRequired && root.shouldBeVisible) ? root._surfaceBodyH + root.inputMargin * 2 : 0
                 }
 
                 MouseArea {
@@ -1428,10 +1433,10 @@ Item {
         Item {
             id: contentMaskRect
             visible: false
-            x: contentContainer.x - contentContainer.horizontalConnectorExtent
-            y: contentContainer.y - contentContainer.verticalConnectorExtent
-            width: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedWidth + contentContainer.horizontalConnectorExtent * 2 : 0
-            height: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2 : 0
+            x: contentContainer.x - contentContainer.horizontalConnectorExtent - root.inputMargin
+            y: contentContainer.y - contentContainer.verticalConnectorExtent - root.inputMargin
+            width: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedWidth + contentContainer.horizontalConnectorExtent * 2 + root.inputMargin * 2 : 0
+            height: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2 + root.inputMargin * 2 : 0
         }
 
         Loader {
@@ -1679,6 +1684,7 @@ Item {
             Item {
                 id: directionalClipMask
 
+                visible: !root._surfaceSwitching
                 readonly property bool shouldClip: Theme.isDirectionalEffect || root.usesConnectedSurfaceChrome
                 readonly property real clipOversize: 1000
                 readonly property real connectedClipAllowance: {

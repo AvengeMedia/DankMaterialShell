@@ -14,8 +14,8 @@ Item {
     property var host: null
     property bool live: true
     property bool interactive: true
-    property int columns: 4
-    property int rows: 1
+    property real columns: 4
+    property real rows: 1
     property bool compact: columns <= 2 && rows === 1
     property string iconName: ""
     property string iconLabel: ""

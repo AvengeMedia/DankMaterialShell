@@ -3677,30 +3677,6 @@
     "icon": "border_style"
   },
   {
-    "section": "islandCornerRadius",
-    "label": "Corner radius",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "corner",
-      "corners",
-      "expanded",
-      "island",
-      "panel",
-      "pill",
-      "radius",
-      "round",
-      "rounded",
-      "rounding",
-      "statusbar",
-      "taskbar",
-      "topbar"
-    ],
-    "parentLabel": "Bar"
-  },
-  {
     "section": "barCornerStyle",
     "label": "Corner style",
     "tabIndex": 6,
@@ -3921,26 +3897,6 @@
       "text",
       "topbar",
       "widget"
-    ],
-    "parentLabel": "Bar"
-  },
-  {
-    "section": "islandTransparency",
-    "label": "Opacity",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "blur",
-      "island",
-      "opacity",
-      "panel",
-      "statusbar",
-      "surface",
-      "taskbar",
-      "topbar",
-      "transparency"
     ],
     "parentLabel": "Bar"
   },
@@ -5091,6 +5047,73 @@
       "style",
       "theme",
       "tint",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
+  },
+  {
+    "section": "matugenSeedColor",
+    "label": "Derived color",
+    "tabIndex": 10,
+    "category": "Theme & colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "derived",
+      "desktop",
+      "dynamic",
+      "eyedropper",
+      "hue",
+      "image",
+      "look",
+      "matugen",
+      "palette",
+      "pick",
+      "picture",
+      "scheme",
+      "seed",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper"
+    ],
+    "parentLabel": "Wallpaper & colors"
+  },
+  {
+    "section": "matugenSpec",
+    "label": "Material palette",
+    "tabIndex": 10,
+    "category": "Theme & colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "bold",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "dynamic",
+      "expressive",
+      "hue",
+      "image",
+      "look",
+      "material",
+      "matugen",
+      "palette",
+      "picture",
+      "saturated",
+      "scheme",
+      "spec",
+      "style",
+      "theme",
+      "tint",
+      "vivid",
       "wallpaper"
     ],
     "parentLabel": "Wallpaper & colors"
@@ -9989,33 +10012,6 @@
     "conditionKey": "frameEnabled"
   },
   {
-    "section": "frameColor",
-    "label": "Color",
-    "tabIndex": 33,
-    "category": "Frame",
-    "keywords": [
-      "bar",
-      "border",
-      "color",
-      "colour",
-      "decoration",
-      "default",
-      "frame",
-      "hue",
-      "panel",
-      "primary",
-      "statusbar",
-      "surface",
-      "taskbar",
-      "theme",
-      "tint",
-      "topbar",
-      "window"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "frameEnabled"
-  },
-  {
     "section": "frameConnectedOptions",
     "label": "Connected",
     "tabIndex": 33,
@@ -10220,29 +10216,6 @@
     ],
     "parentLabel": "Bar",
     "conditionKey": "nativeOverviewCapable"
-  },
-  {
-    "section": "frameOpacity",
-    "label": "Surface opacity",
-    "tabIndex": 33,
-    "category": "Frame",
-    "keywords": [
-      "bar",
-      "border",
-      "decoration",
-      "frame",
-      "opacity",
-      "panel",
-      "popup",
-      "statusbar",
-      "surface",
-      "taskbar",
-      "topbar",
-      "transparency",
-      "window"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "frameEnabled"
   },
   {
     "section": "frameModeSelector",

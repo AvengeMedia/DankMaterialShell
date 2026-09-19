@@ -1,4 +1,5 @@
 .import qs.Common as Common
+.import qs.Modules.ControlCenter as ControlCenter
 .import "../../../Common/GridLayout.js" as GridLayout
 
 function isSliderWidget(id) {
@@ -12,17 +13,18 @@ function sizeSpec(id, columns, rows = Infinity) {
         "minW": 1,
         "maxW": columns,
         "minH": 1,
-        "maxH": rows
+        "maxH": rows,
+        "step": ControlCenter.CcMetrics.gridStep
     };
 }
 
 function clampSize(widget, columns, rows = Infinity) {
     const spec = sizeSpec(widget.id || "", columns, rows);
     const size = {
-        "w": GridLayout.dimension(widget.w, spec.minW, spec.maxW, spec.w),
-        "h": GridLayout.dimension(widget.h, spec.minH, spec.maxH, spec.h)
+        "w": GridLayout.dimension(widget.w, spec.minW, spec.maxW, spec.w, spec.step),
+        "h": GridLayout.dimension(widget.h, spec.minH, spec.maxH, spec.h, spec.step)
     };
-    if (!isSliderWidget(widget.id) || size.w > 1 || size.h > 1)
+    if (!isSliderWidget(widget.id) || size.w >= 2 || size.h >= 2)
         return size;
     if (rows > 1)
         return {

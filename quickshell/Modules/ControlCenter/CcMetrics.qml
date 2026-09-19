@@ -10,6 +10,7 @@ Singleton {
     readonly property int minimumColumns: 6
     readonly property real sheetPadding: PopoutMetrics.contentPadding
     readonly property real columnWidth: tileHeight
+    readonly property real gridStep: 0.5
     property int columnPreview: 0
     readonly property int gridColumns: columnPreview > 0 ? columnPreview : clampColumns(SettingsData.controlCenterColumns)
     readonly property real sheetWidth: sheetWidthFor(gridColumns)

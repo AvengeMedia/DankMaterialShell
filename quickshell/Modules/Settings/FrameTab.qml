@@ -102,16 +102,6 @@ Item {
             }
 
             SettingsSliderRow {
-                settingKey: "frameOpacity"
-                tags: ["frame", "border", "surface", "popup", "opacity", "transparency"]
-                text: I18n.tr("Surface opacity")
-                minimum: 0
-                maximum: 100
-                value: SettingsData.frameOpacity * 100
-                onSliderDragFinished: v => SettingsData.set("frameOpacity", v / 100)
-            }
-
-            SettingsSliderRow {
                 settingKey: "frameBarInsetPadding"
                 tags: ["frame", "bar", "edge", "inset", "padding", "corner", "end"]
                 text: I18n.tr("Bar inset padding")
@@ -161,101 +151,6 @@ Item {
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
                             width: parent.width - Theme.fontSizeMedium - Theme.spacingS
-                        }
-                    }
-                }
-            }
-
-            SettingsButtonGroupRow {
-                settingKey: "frameColor"
-                tags: ["frame", "border", "color", "theme", "primary", "surface", "default"]
-                text: I18n.tr("Color")
-                model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
-                buttonPadding: Theme.spacingS
-                minButtonWidth: 44
-                textSize: Theme.fontSizeSmall
-                currentIndex: {
-                    const fc = SettingsData.frameColor;
-                    if (!fc || fc === "default")
-                        return 0;
-                    switch (fc) {
-                    case "primary":
-                        return 1;
-                    case "surface":
-                        return 2;
-                    default:
-                        return 3;
-                    }
-                }
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    switch (index) {
-                    case 0:
-                        SettingsData.set("frameColor", "");
-                        break;
-                    case 1:
-                        SettingsData.set("frameColor", "primary");
-                        break;
-                    case 2:
-                        SettingsData.set("frameColor", "surface");
-                        break;
-                    case 3:
-                        const cur = SettingsData.frameColor;
-                        const isPreset = !cur || cur === "primary" || cur === "surface";
-                        if (isPreset)
-                            SettingsData.set("frameColor", "#2a2a2a");
-                        break;
-                    }
-                }
-            }
-
-            SettingsRow {
-                visible: {
-                    const fc = SettingsData.frameColor;
-                    return !!(fc && fc !== "primary" && fc !== "surface");
-                }
-                body: Item {
-
-                    width: parent.width
-                    height: customColorRow.height + Theme.spacingM * 2
-
-                    Row {
-                        id: customColorRow
-                        width: parent.width - Theme.spacingM * 2
-                        x: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingM
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: I18n.tr("Custom color")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                        }
-
-                        Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 32
-                            height: 32
-                            radius: Theme.cornerRadiusL
-                            color: SettingsData.effectiveFrameColor
-                            border.color: Theme.outline
-                            border.width: Theme.outlineWidth
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    PopoutService.colorPickerModal.selectedColor = SettingsData.effectiveFrameColor;
-                                    PopoutService.colorPickerModal.pickerTitle = I18n.tr("Frame Border Color");
-                                    PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
-                                        SettingsData.set("frameColor", color.toString());
-                                    };
-                                    PopoutService.colorPickerModal.show();
-                                }
-                            }
                         }
                     }
                 }

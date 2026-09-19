@@ -56,6 +56,7 @@ FocusScope {
 
         onEditModeChanged: root.controller.setEditing("controlcenter", editMode)
 
+        readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
         readonly property int gridColumnCap: root.controller.controlCenterColumnCap
         readonly property int gridColumns: root.controller.controlCenterColumns
         readonly property real availableHeight: root.controller.controlCenterMaxHeight - Theme.spacingXS - root.bottomInset

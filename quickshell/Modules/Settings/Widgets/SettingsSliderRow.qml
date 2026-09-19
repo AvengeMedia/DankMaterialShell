@@ -33,9 +33,13 @@ SettingsRow {
         sliderDragFinished(next);
     }
 
+    function resync() {
+        slider.value = Math.round(value);
+    }
+
     title: text
     subtitle: description
-    onValueChanged: slider.value = Math.round(value)
+    onValueChanged: resync()
 
     StyledText {
         text: root.minimumLabel

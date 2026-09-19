@@ -200,7 +200,7 @@ FocusScope {
     readonly property real animatedSurfaceRadius: Math.max(0, surfaceMotion.currentTopLeftRadius, surfaceMotion.currentTopRightRadius, surfaceMotion.currentBottomLeftRadius, surfaceMotion.currentBottomRightRadius)
     onAnimatedSurfaceRadiusChanged: dockChromeSync.schedule()
     readonly property real surfaceRadius: config.mode === "taskbar" ? (usesConnectedFrameChrome ? Theme.connectedSurfaceRadius : 0) : Theme.windowRadius
-    readonly property color surfaceColor: usesConnectedFrameChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
+    readonly property color surfaceColor: usesConnectedFrameChrome ? Theme.connectedSurfaceColor : Theme.withAlpha(Theme.hostSurface, backgroundTransparency)
     readonly property real surfaceTopLeftRadius: usesConnectedFrameChrome && (dock.config.position === SettingsData.Position.Top || dock.config.position === SettingsData.Position.Left) ? 0 : surfaceRadius
     readonly property real surfaceTopRightRadius: usesConnectedFrameChrome && (dock.config.position === SettingsData.Position.Top || dock.config.position === SettingsData.Position.Right) ? 0 : surfaceRadius
     readonly property real surfaceBottomLeftRadius: usesConnectedFrameChrome && (dock.config.position === SettingsData.Position.Bottom || dock.config.position === SettingsData.Position.Left) ? 0 : surfaceRadius

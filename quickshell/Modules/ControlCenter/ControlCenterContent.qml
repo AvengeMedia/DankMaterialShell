@@ -28,10 +28,10 @@ FocusScope {
     property var pageHistory: []
     readonly property bool panelResizing: panelResizer.resizing
     readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidthFor(gridColumns)
-    readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2 + Theme.spacingL * 2) - PopoutMetrics.editOverflow * 2 - Theme.spacingL * 2)
+    readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - CcMetrics.headerHeight - Theme.spacingS * 2 - editControls.height
-    readonly property real editGutter: host.editMode ? PopoutMetrics.editOverflow : 0
+    readonly property real editGutter: host.editGutter ?? 0
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.host
         gutter: root.editGutter
@@ -159,14 +159,13 @@ FocusScope {
         id: panelChrome
 
         anchors.fill: parent
-        anchors.margins: PopoutMetrics.panelChromeInset - contentInset
+        anchors.margins: -(contentInset + Theme.spacingS)
         z: 1
         visible: root.host.editMode
         edgeResize: true
         horizontalResize: true
         removable: false
-        edgeBandWidth: PopoutMetrics.panelResizeBand
-        cornerRadius: Math.max(0, Theme.windowRadius - PopoutMetrics.panelChromeInset)
+        cornerRadius: Theme.windowRadius + Theme.spacingS
         buttonSize: Theme.iconSize
         iconSize: PopoutMetrics.chromeIconSize
         resizing: root.panelResizing
@@ -205,7 +204,7 @@ FocusScope {
         id: contentFlickable
 
         anchors.fill: parent
-        clip: true
+        clip: contentHeight > height
         contentWidth: width
         contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding * 2)
         interactive: contentHeight > height

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/trash"
+	"github.com/AvengeMedia/dankgo/trash"
 	"github.com/spf13/cobra"
 )
 

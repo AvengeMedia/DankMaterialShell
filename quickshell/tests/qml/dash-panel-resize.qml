@@ -55,13 +55,11 @@ ShellRoot {
     }
 
     function columnGain() {
-        const gutter = PopoutMetrics.editOverflow * 2;
-        return edgeGain(root.popout, widthFor(DashMetrics.defaultGridColumns) + gutter, widthFor(DashMetrics.defaultGridColumns + 1) + gutter);
+        return edgeGain(root.popout, widthFor(DashMetrics.defaultGridColumns), widthFor(DashMetrics.defaultGridColumns + 1));
     }
 
     function ccGain() {
-        const gutter = PopoutMetrics.editOverflow * 2;
-        return edgeGain(root.cc, CcMetrics.sheetWidthFor(CcMetrics.defaultColumns) + gutter, CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1) + gutter);
+        return edgeGain(root.cc, CcMetrics.sheetWidthFor(CcMetrics.defaultColumns), CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1));
     }
 
     property real dragOriginX: 0
@@ -124,14 +122,14 @@ ShellRoot {
                 check(root.baseRows >= DashMetrics.minimumTabRows && DashMetrics.storedPanelRows("overview") === 0, "unset rows fit the cards: " + root.baseRows);
                 check(!root.popout.contentWindow.anchors.right, "surface hugs the body outside edit mode");
                 root.popout.editMode = true;
-                check(root.popout.popupWidth === widthFor(DashMetrics.defaultGridColumns) + PopoutMetrics.editOverflow * 2, "edit mode adds the handle gutter");
+                check(root.popout.popupWidth === widthFor(DashMetrics.defaultGridColumns), "edit mode keeps the panel width");
                 check(root.popout.contentWindow.anchors.right, "edit mode anchors the surface to both sides");
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, 2 * columnGain(), 0);
                 check(DashMetrics.panelPreview?.columns === 8, "preview snaps two columns wider: " + JSON.stringify(DashMetrics.panelPreview));
                 check(snapped(root.popout), "drag snaps the body");
                 check(c.panelColumns === 8 && DashMetrics.gridColumns === 8, "overview grid follows the preview");
-                check(root.popout.popupWidth === widthFor(8) + PopoutMetrics.editOverflow * 2, "popout width follows the preview");
+                check(root.popout.popupWidth === widthFor(8), "popout width follows the preview");
                 dragTo(root.popout, c, 2 * columnGain(), root.rowStep);
                 root.requestedRows = DashMetrics.panelPreview.rows;
                 check(root.requestedRows === root.baseRows + 1 && c.panelRows === root.requestedRows, "pill shows the requested rows: " + JSON.stringify([c.panelRows, root.requestedRows]));
@@ -144,7 +142,7 @@ ShellRoot {
                 check(SettingsData.dashOptions?.overview?.panelRows === root.requestedRows, "requested rows stored: " + JSON.stringify(SettingsData.dashOptions));
                 check(c.panelRows === root.requestedRows, "panel keeps the dragged rows after commit");
                 root.popout.editMode = false;
-                check(root.popout.popupWidth === widthFor(8), "gutter goes away with edit mode");
+                check(root.popout.popupWidth === widthFor(8), "width holds when edit mode ends");
                 check(!root.popout.contentWindow.anchors.right, "leaving edit mode releases the surface");
                 root.popout.requestTab("media");
                 check(root.popout.animationDuration <= 0 || root.popout.renderedAlignedX !== root.popout.alignedX, "tab switch glides the body");
@@ -159,7 +157,7 @@ ShellRoot {
                 check(DashMetrics.gridColumns === 8, "overview columns untouched by media preview");
                 c.panelResizer.end();
                 check(SettingsData.dashOptions?.media?.panelColumns === 5 && SettingsData.dashOptions?.media?.panelRows === undefined, "media columns stored without rows: " + JSON.stringify(SettingsData.dashOptions?.media));
-                check(root.popout.popupWidth === widthFor(5) + PopoutMetrics.editOverflow * 2, "media width committed");
+                check(root.popout.popupWidth === widthFor(5), "media width committed");
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, columnGain(), 0);
                 root.popout.editMode = false;
@@ -207,7 +205,7 @@ ShellRoot {
                     slot.resizeTo((targetW - cell.cols) * step, 0);
                     check(DashMetrics.panelPreview?.columns === base + 1 && DashMetrics.gridColumns === base + 1, "card dragged past the edge widens the panel: " + JSON.stringify([DashMetrics.panelPreview, cell, targetW]));
                     check(grid.sizePreview?.changes.w === targetW && grid.slotLayout.slots[index].col === cell.col, "card grows in place: " + JSON.stringify([grid.sizePreview, grid.slotLayout.slots[index], cell]));
-                    check(root.popout.popupWidth === widthFor(base + 1) + PopoutMetrics.editOverflow * 2, "popout follows the card-driven preview: " + root.popout.popupWidth);
+                    check(root.popout.popupWidth === widthFor(base + 1), "popout follows the card-driven preview: " + root.popout.popupWidth);
                     check(c.panelShifted && c.cardResizeColumns === base, "panel pill shows the card-driven column shift: " + JSON.stringify([c.panelShifted, c.panelColumns, c.cardResizeColumns]));
                     slot.finishResize();
                     check(!c.panelShifted, "panel pill hides after release");
@@ -310,13 +308,13 @@ ShellRoot {
                     check(root.cc.shouldBeVisible && ccContent, "control center open");
                     check(root.cc.popupWidth === CcMetrics.sheetWidthDefault, "control center default width");
                     root.cc.editMode = true;
-                    check(root.cc.popupWidth === CcMetrics.sheetWidthDefault + PopoutMetrics.editOverflow * 2, "control center edit mode adds the handle gutter");
+                    check(root.cc.popupWidth === CcMetrics.sheetWidthDefault, "control center edit mode keeps the sheet width");
                     check(root.cc.contentWindow.anchors.right, "control center edit mode anchors the surface to both sides");
                     beginDrag(root.cc, ccContent);
                     dragTo(root.cc, ccContent, 1.4 * ccGain(), 0);
                     check(CcMetrics.gridColumns === CcMetrics.defaultColumns + 1 && CcMetrics.sheetWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1), "control center preview snaps to a column: " + CcMetrics.sheetWidth);
                     check(snapped(root.cc), "control center drag snaps the body");
-                    check(root.cc.popupWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1) + PopoutMetrics.editOverflow * 2, "control center popout follows the preview");
+                    check(root.cc.popupWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1), "control center popout follows the preview");
                     ccContent.panelResizer.end();
                     check(SettingsData.controlCenterColumns === CcMetrics.defaultColumns + 1, "control center columns stored: " + SettingsData.controlCenterColumns);
                     check(CcMetrics.columnPreview === 0, "control center preview cleared");
