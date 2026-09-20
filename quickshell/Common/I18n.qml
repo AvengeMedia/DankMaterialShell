@@ -149,10 +149,13 @@ Singleton {
     }
 
     function _fallbackToEnglish() {
+        _resolvedLocale = "en";
         _selectedPath = "";
         translationsLoaded = false;
         translations = ({});
         log.warn("Falling back to built-in English strings");
+        if (commonDir.status === FolderListModel.Ready)
+            _pickCommonTranslation();
         localeApplied();
     }
 
