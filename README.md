@@ -200,6 +200,7 @@ For documentation contributions, see [DankLinux-Docs](https://github.com/AvengeM
 - [Ly-sec](http://github.com/ly-sec) - Wallpaper effects from [Noctalia](https://github.com/noctalia-dev/noctalia-shell)
 - [soramanew](https://github.com/soramanew) - [Caelestia](https://github.com/caelestia-dots/shell) inspiration
 - [end-4](https://github.com/end-4) - [dots-hyprland](https://github.com/end-4/dots-hyprland) inspiration
+- [Reverier-Xu](https://github.com/Reverier-Xu) - [Ori-fcitx5](https://github.com/Reverier-Xu/Ori-fcitx5) inspiration for Fcitx5 theme
 
 ## Star History
 
