@@ -1,12 +1,14 @@
 package matugen
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -142,7 +144,10 @@ func runPaletteEntry(e paletteEntry, imagePath string, mode ColorMode) string {
 		args = append(args, substituteTokens(a, imagePath, modeStr))
 	}
 
-	cmd := exec.Command(resolved, args...)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, resolved, args...)
+	cmd.WaitDelay = time.Second
 	cmd.Env = append(env, "DMS_PALETTE_OUT="+outputFile)
 
 	var raw []byte
