@@ -33,21 +33,7 @@ jobs:
         uses: cachix/install-nix-action@v31
 
       - name: Update vendorHash in flake.nix
-        run: |
-          set -euo pipefail
-          echo "Attempting nix build to get new vendorHash..."
-          if output=$(nix build .#dms-shell 2>&1); then
-            echo "Build succeeded, no hash update needed"
-            exit 0
-          fi
-          new_hash=$(echo "$output" | grep -oP "got:\s+\K\S+" | head -n1 || true)
-          [ -n "$new_hash" ] || { echo "Could not extract new vendorHash"; echo "$output"; exit 1; }
-          current_hash=$(grep -oP 'vendorHash = "\K[^"]+' flake.nix)
-          [ "$current_hash" = "$new_hash" ] && { echo "vendorHash already up to date"; exit 0; }
-          sed -i "s|vendorHash = \"$current_hash\"|vendorHash = \"$new_hash\"|" flake.nix
-          echo "Verifying build with new vendorHash..."
-          nix build .#dms-shell
-          echo "vendorHash updated successfully!"
+        run: scripts/update-vendor-hash.sh
 
       - name: Commit and push vendorHash update
         env:
