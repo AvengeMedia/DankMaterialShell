@@ -25,6 +25,66 @@ DankPopout {
     positioning: ""
     shouldBeVisible: false
 
+    property var matchingRule: null
+    readonly property bool hasMatchingRule: matchingRule !== null
+
+    function testPattern(pattern, value) {
+        if (!pattern)
+            return true;
+        try {
+            return new RegExp(pattern).test(value || "");
+        } catch (e) {
+            return pattern === (value || "");
+        }
+    }
+
+    function matchesCriteria(match, window) {
+        if (!match || (!match.appId && !match.title))
+            return false;
+        return testPattern(match.appId, window.appId) && testPattern(match.title, window.title);
+    }
+
+    function findMatchingDmsRule(rules, window) {
+        if (!rules || !window)
+            return null;
+        return rules.find(rule => {
+            if (!(rule.source || "").includes("dms/windowrules") || rule.id === "dms-floating-windows")
+                return false;
+            const matches = (rule.matches && rule.matches.length > 0) ? rule.matches : (rule.matchCriteria ? [rule.matchCriteria] : []);
+            return matches.some(m => matchesCriteria(m, window));
+        }) || null;
+    }
+
+    function checkMatchingRule() {
+        if (!shouldBeVisible || !currentWindow || !CompositorService.supportsWindowRules) {
+            matchingRule = null;
+            return;
+        }
+
+        const targetWin = currentWindow;
+        const compositor = CompositorService.compositor;
+        Proc.runCommand("focused-window-rules", [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
+            if (exitCode !== 0 || targetWin !== currentWindow)
+                return;
+            try {
+                const result = JSON.parse(output.trim());
+                matchingRule = findMatchingDmsRule(result.rules, currentWindow);
+            } catch (e) {
+                matchingRule = null;
+            }
+        });
+    }
+
+    onShouldBeVisibleChanged: {
+        if (shouldBeVisible)
+            checkMatchingRule();
+    }
+
+    onCurrentWindowChanged: {
+        if (shouldBeVisible)
+            checkMatchingRule();
+    }
+
     function copyValue(value) {
         if (!value)
             return;
@@ -40,14 +100,32 @@ DankPopout {
     }
 
     function addWindowRule() {
+        openWindowRule();
+    }
+
+    function openWindowRule() {
         if (!currentWindow || !PopoutService.windowRuleModalLoader)
             return;
+        const targetRule = root.matchingRule;
+        const targetWin = currentWindow;
         close();
-        PopoutService.windowRuleModalLoader.active = true;
-        Qt.callLater(() => {
-            if (PopoutService.windowRuleModalLoader.item)
-                PopoutService.windowRuleModalLoader.item.show(currentWindow);
-        });
+
+        const loader = PopoutService.windowRuleModalLoader;
+        loader.active = true;
+
+        const openModal = () => {
+            if (!loader.item)
+                return;
+            if (targetRule)
+                loader.item.showEdit(targetRule);
+            else
+                loader.item.show(targetWin);
+        };
+
+        if (loader.item)
+            openModal();
+        else
+            Qt.callLater(openModal);
     }
 
     onBackgroundClicked: close()
@@ -262,14 +340,14 @@ DankPopout {
                         spacing: Theme.spacingS
 
                         DankIcon {
-                            name: "rule"
+                            name: root.hasMatchingRule ? "edit" : "rule"
                             size: Theme.iconSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StyledText {
-                            text: I18n.tr("Add window rule")
+                            text: root.hasMatchingRule ? I18n.tr("Edit window rule") : I18n.tr("Add window rule")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.verticalCenter: parent.verticalCenter
@@ -278,7 +356,7 @@ DankPopout {
 
                     StateLayer {
                         cornerRadius: BarMetrics.menuItemRadius
-                        onClicked: root.addWindowRule()
+                        onClicked: root.openWindowRule()
                     }
                 }
 
