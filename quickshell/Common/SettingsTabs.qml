@@ -50,6 +50,14 @@ Singleton {
                     "icon": "apps",
                     "tabIndex": 50,
                     "hint": I18n.tr("GTK, Qt, portal, matugen templates")
+                },
+                {
+                    "id": "palette_inject",
+                    "advanced": true,
+                    "text": I18n.tr("Injected palettes"),
+                    "icon": "colorize",
+                    "tabIndex": 63,
+                    "hint": I18n.tr("External palette commands, namespaces")
                 }
             ]
         },

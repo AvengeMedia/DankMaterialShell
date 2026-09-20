@@ -209,6 +209,7 @@ FocusScope {
             "launcher": "LauncherTab.qml",
             "theme": "ThemeColorsTab.qml",
             "theme_apps": "ThemeAppsTab.qml",
+            "palette_inject": "PaletteInjectTab.qml",
             "lock_screen": "LockScreenTab.qml",
             "greeter": "GreeterTab.qml",
             "about": "AboutTab.qml",

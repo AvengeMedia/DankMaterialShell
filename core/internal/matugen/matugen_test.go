@@ -416,12 +416,12 @@ func TestBuildMatugenArgsDefaultPreservesExistingBehavior(t *testing.T) {
 func TestBuildImportData(t *testing.T) {
 	const dank16 = `{"color0":"#000000"}`
 
-	assert.Equal(t, `{"dank16": {"color0":"#000000"}}`, buildImportData(dank16, "", ""),
+	assert.Equal(t, `{"dank16": {"color0":"#000000"}}`, buildImportData(dank16, "", "", nil),
 		"no image must produce byte-identical import data to pre-feature behavior")
 	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/My Wallpaper.png"}`,
-		buildImportData(dank16, "/home/u/My Wallpaper.png", ""))
+		buildImportData(dank16, "/home/u/My Wallpaper.png", "", nil))
 	assert.Equal(t, `{"dank16": {"color0":"#000000"}, "image": "/home/u/a\"b\\c.png"}`,
-		buildImportData(dank16, `/home/u/a"b\c.png`, ""), "paths must be escaped, not interpolated raw")
+		buildImportData(dank16, `/home/u/a"b\c.png`, "", nil), "paths must be escaped, not interpolated raw")
 }
 
 // writeTestPNG encodes img as a PNG at path, failing the test on any error.
