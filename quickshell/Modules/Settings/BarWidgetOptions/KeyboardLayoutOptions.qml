@@ -61,16 +61,10 @@ Column {
         settingKey: "barWidgetKeyboardLayoutOverrides"
         tags: ["keyboard", "layout", "label", "override", "rename"]
         iconName: "translate"
-        title: I18n.tr("Label overrides")
+        title: I18n.tr("Label overrides", "card title, keyboard layout label override list")
 
         SettingsRow {
-            body: StyledText {
-                width: parent.width
-                text: I18n.tr("Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"", "explains the keyboard layout label override list")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                wrapMode: Text.WordWrap
-            }
+            subtitle: I18n.tr("Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"", "explains the keyboard layout label override list")
         }
 
         SettingsRow {
@@ -157,7 +151,7 @@ Column {
 
                 StyledText {
                     width: parent.width
-                    text: I18n.tr("No label overrides")
+                    text: I18n.tr("No label overrides", "empty state, keyboard layout label override list")
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceVariantText
                     horizontalAlignment: Text.AlignHCenter

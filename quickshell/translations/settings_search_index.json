@@ -8021,6 +8021,14 @@
     "optionFile": "MusicOptions.qml"
   },
   {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:4",
+    "label": "Add",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
+  },
+  {
     "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:9",
     "label": "Advanced",
     "tabIndex": 22,
@@ -8393,6 +8401,14 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:3",
+    "label": "Label overrides",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
+  },
+  {
     "section": "barWidgetOption:AppsDockOptions.qml:9",
     "label": "Launcher button",
     "tabIndex": 22,
@@ -8471,6 +8487,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:5",
+    "label": "No label overrides",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
     "section": "barWidgetOption:BatteryOptions.qml:2",
