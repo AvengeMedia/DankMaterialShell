@@ -61,6 +61,7 @@ DankPopout {
             return;
         }
 
+        matchingRule = null;
         const targetWin = currentWindow;
         const compositor = CompositorService.compositor;
         Proc.runCommand("focused-window-rules", [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
@@ -347,7 +348,7 @@ DankPopout {
                         }
 
                         StyledText {
-                            text: root.hasMatchingRule ? I18n.tr("Edit window rule") : I18n.tr("Add window rule")
+                            text: root.hasMatchingRule ? I18n.tr("Edit Window Rule") : I18n.tr("Add window rule")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.verticalCenter: parent.verticalCenter
