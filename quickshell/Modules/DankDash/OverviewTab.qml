@@ -35,8 +35,10 @@ FocusScope {
     signal navFocusRequested(bool backwards)
 
     onEditModeChanged: {
-        if (!editMode)
+        if (!editMode) {
             optionsSheet.dismiss();
+            addMenu.close();
+        }
     }
 
     function handleKeyEvent(event) {
