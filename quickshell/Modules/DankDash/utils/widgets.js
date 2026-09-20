@@ -12,26 +12,16 @@ function resolve(definitions, saved) {
         const spec = definitions.find(d => d.id === item.id);
         if (!spec)
             return item;
-        return {
+        const widget = {
             id: item.id,
             w: GridLayout.dimension(item.w, spec.minW, spec.maxW, spec.w),
             h: GridLayout.dimension(item.h, spec.minH, spec.maxH, spec.h),
             graphics: typeof item.graphics === "boolean" ? item.graphics : true
         };
+        if (Number.isFinite(item.col) && Number.isFinite(item.row)) {
+            widget.col = item.col;
+            widget.row = item.row;
+        }
+        return widget;
     });
-}
-
-function replace(items, index, changes) {
-    if (index < 0 || index >= items.length)
-        return items;
-    return items.map((item, i) => i === index ? Object.assign({}, item, changes) : item);
-}
-
-function move(items, index, delta) {
-    const target = index + delta;
-    if (index < 0 || index >= items.length || target < 0 || target >= items.length)
-        return items;
-    const result = items.slice();
-    result.splice(target, 0, result.splice(index, 1)[0]);
-    return result;
 }

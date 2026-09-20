@@ -144,16 +144,11 @@ Item {
         return overviewFocused ? toplevels.indexOf(overviewFocused) : -1;
     }
 
-    function cycleGroupedToplevels() {
-        const toplevels = getGroupedToplevels();
-        if (toplevels.length === 0)
+    function showContextMenu() {
+        if (!contextMenu)
             return;
-
-        const currentIndex = getActiveGroupedToplevelIndex(toplevels);
-        const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
-        if (restoreSpecialWorkspaceWindow(nextToplevel))
-            return;
-        CompositorService.activateToplevel(nextToplevel);
+        const shouldHidePin = appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms";
+        contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
     }
     function activate() {
         mouseArea.handleLeftClick();
@@ -312,7 +307,7 @@ Item {
                         CompositorService.toggleToplevel(groupedToplevel);
                     }
                 } else {
-                    cycleGroupedToplevels();
+                    root.showContextMenu();
                 }
                 break;
             }
@@ -380,10 +375,7 @@ Item {
                     break;
                 }
             } else if (mouse.button === Qt.RightButton) {
-                if (!contextMenu)
-                    return;
-                const shouldHidePin = appData.appId === "org.quickshell" || appData.appId === "com.danklinux.dms";
-                contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen, dockApps);
+                root.showContextMenu();
             }
         }
     }

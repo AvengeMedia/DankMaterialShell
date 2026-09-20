@@ -5,7 +5,6 @@ import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 
@@ -133,7 +132,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             CcEmptyState {
                 visible: !BrightnessService.brightnessAvailable || root.devices.length === 0
@@ -142,7 +141,7 @@ Item {
                 title: BrightnessService.brightnessAvailable ? I18n.tr("No brightness devices available") : I18n.tr("Brightness control not available")
             }
 
-            SettingsSectionLabel {
+            CcSectionLabel {
                 visible: root.showPins
                 text: root.getScreenPinKey() || I18n.tr("Unknown Monitor")
 

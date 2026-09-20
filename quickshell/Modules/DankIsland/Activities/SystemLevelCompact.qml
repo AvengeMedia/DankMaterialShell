@@ -107,7 +107,7 @@ Item {
                 anchors.bottom: parent.bottom
                 width: root.trackThickness
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.outline, Theme.popupTransparency)
+                color: Theme.withAlpha(Theme.outline, Theme.foregroundAlpha)
 
                 Rectangle {
                     anchors.left: parent.left

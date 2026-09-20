@@ -569,7 +569,7 @@ Card {
 
         width: parent ? parent.width : 0
         height: Math.max(DashMetrics.eventRowMinHeight, eventContent.implicitHeight + Theme.spacingS * 2)
-        radius: Theme.cornerRadiusM
+        radius: Theme.cornerRadiusS
         color: isDragging ? Theme.withAlpha(Theme.primary, Theme.stateLayerDrag) : Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
         z: isDragging ? 100 : visualIndex
         activeFocusOnTab: !!modelData && !isEditing && root.interactive

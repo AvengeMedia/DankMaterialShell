@@ -8,7 +8,6 @@ import qs.Modals.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.Network
-import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
@@ -292,7 +291,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             DankButtonGroup {
                 readonly property var labelsByType: ({
@@ -408,7 +407,7 @@ Item {
                 title: I18n.tr("Scanning...")
             }
 
-            SettingsSectionLabel {
+            CcSectionLabel {
                 text: I18n.tr("Available networks")
                 visible: root.wifiListVisible
             }

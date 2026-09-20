@@ -4,6 +4,7 @@ import qs.Modules.DankDash
 
 DankGridEditChrome {
     cornerRadius: DashMetrics.cardRadius
+    hitOverflow: DashMetrics.gridGap / 2
     buttonSize: PopoutMetrics.chromeButtonSize
     iconSize: PopoutMetrics.chromeIconSize
 }

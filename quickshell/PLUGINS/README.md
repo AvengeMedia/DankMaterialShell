@@ -1826,7 +1826,7 @@ The dash popout (`dms ipc call dash open`) is a set of entries. Each entry can h
 
 Only enabled plugins show up. A disabled plugin has no tab, no card, no row under Settings → Dashboard and no entry in the Add widget menu. Its saved placement is kept, so re-enabling it puts the card back where it was.
 
-A plugin tab is enabled in the tab bar as soon as the plugin loads. Users hide it under Settings → Dashboard → Tabs. Cards are never placed automatically: users add them from the dash (three-dot menu → Edit → Add widget). A plugin with both surfaces gets one interaction for free: clicking its card opens its tab, and a tab hidden from the bar opens as a detail page with a back button.
+A plugin tab is enabled in the tab bar as soon as the plugin loads. Users hide it under Settings → Dashboard → Tabs. Cards are never placed automatically: users add them from the dash (hover the selected page icon → click the pencil → Add widget). A plugin with both surfaces gets one interaction for free: clicking its card opens its tab, and a tab hidden from the bar opens as a detail page. It has a back button when enabled destinations exist; otherwise it opens standalone.
 
 Both surfaces load lazily. A tab is created when it becomes current and destroyed when the user switches away. Cards are created with the overview grid. The dash content stays alive after the popout closes, so gate timers, animations and service refs on `live`.
 
@@ -1887,7 +1887,7 @@ The `dash` block is optional. `icon` and `title` label the tab and fall back to 
 ]
 ```
 
-The dash shows these rows in an options sheet (the tune button on a card in edit mode, Options in a tab's three-dot menu) and Settings → Dashboard lists the same rows. The tab and the card read the resolved values as `options.<key>` and re-evaluate when a value changes. Values live in `settings.json` under `dashOptions.plugin_<pluginId>`, apart from `pluginData`, and only non-default values are stored. Reset clears the declared keys only. `widgets` is reserved for the `DashWidgetGrid` layout and is ignored as an option key.
+The dash shows these rows in an options sheet (the tune button on a card in edit mode, Options in a tab's edit-mode controls) and Settings → Dashboard lists the same rows. The tab and the card read the resolved values as `options.<key>` and re-evaluate when a value changes. Values live in `settings.json` under `dashOptions.plugin_<pluginId>`, apart from `pluginData`, and only non-default values are stored. Reset clears the declared keys only. `widgets` is reserved for the `DashWidgetGrid` layout and is ignored as an option key.
 
 `dash.options` only reach the dash surfaces. If a bar widget or daemon of the same plugin needs the value, use a `settings` component and `pluginData` instead.
 
@@ -1917,7 +1917,7 @@ Optional on the tab:
 - `focusTarget`: the item that receives focus when Down enters the tab content
 - `restoreFocus()`: called when the dash opens on the tab or returns focus to it. Focus your content here with `Qt.OtherFocusReason` so no focus ring is drawn
 - `blocksTabNavigation`: true while an editor or local control group needs native Tab traversal; false returns Tab to the dash navigation
-- `menuActions`: actions shown in the tab's three-dot menu before Edit and Options. Each action has `label`, `iconName`, `action`, and optional `visible` and `enabled`
+- `menuActions`: actions shown in the Actions menu while editing the tab. Each action has `label`, `iconName`, `action`, and optional `visible` and `enabled`
 - `signal tabRequested(string id)`: switch the dash to another tab (`"overview"`, `"media"`, `"wallpaper"`, `"weather"`, `"notifications"` or a `plugin_<id>`); a tab hidden from the bar opens as a detail page
 - `signal navFocusRequested`: return focus to the dash navigation
 

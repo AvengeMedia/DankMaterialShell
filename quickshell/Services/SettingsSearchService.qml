@@ -61,7 +61,7 @@ Singleton {
             "windowRulesCapable": () => CompositorService.supportsWindowRules,
             "layoutCapable": () => CompositorService.supportsLayoutConfig,
             "keybindsAvailable": () => KeybindsService.available,
-            "soundsAvailable": () => AudioService.soundsAvailable,
+            "soundsAvailable": () => !MultimediaService.unavailable,
             "cupsAvailable": () => CupsService.cupsAvailable,
             "networkAvailable": () => NetworkService.networkAvailable,
             "dmsConnected": () => DMSService.isConnected && DMSService.apiVersion >= 23,

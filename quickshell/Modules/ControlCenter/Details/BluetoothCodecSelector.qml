@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.Settings.Widgets
 import qs.Services
 
 CcSheetDialog {
@@ -120,7 +119,7 @@ CcSheetDialog {
         }
     }
 
-    SettingsSectionLabel {
+    CcSectionLabel {
         text: I18n.tr("Media")
         visible: root.splitSections && !root.isLoading
     }
@@ -135,7 +134,7 @@ CcSheetDialog {
         }
     }
 
-    SettingsSectionLabel {
+    CcSectionLabel {
         text: I18n.tr("Calls / Headset")
         visible: root.callCodecs.length > 0 && !root.isLoading
     }

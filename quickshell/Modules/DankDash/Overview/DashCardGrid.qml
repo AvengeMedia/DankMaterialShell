@@ -29,20 +29,20 @@ DankEditableGrid {
     signal editorRequested(var eventData, var initialDate)
 
     readonly property real columnWidth: (width - DashMetrics.gridGap * (DashMetrics.gridColumns - 1)) / DashMetrics.gridColumns
+    readonly property int usedColumns: slotLayout.slots.reduce((used, slot) => slot ? Math.max(used, slot.col + slot.cols) : used, 0)
     readonly property var addableEntries: DashRegistry.unplaced.map(entry => ({
                 "entry": entry,
                 "size": GridUtils.fitNewCard(sourceItems, DashMetrics.gridColumns, rowBudget, entry.id, DashRegistry.defaultSize(entry.id), DashRegistry.minSize(entry.id), DashRegistry.isCardAvailable)
             })).filter(candidate => candidate.size !== null)
 
     sourceItems: DashRegistry.placed
-    slotLayout: GridUtils.packCards(layoutItems, visualOrder, DashMetrics.gridColumns, width, DashMetrics.gridGap, DashMetrics.gridRowUnit, I18n.isRtl, DashRegistry.isCardAvailable)
+    slotLayout: GridUtils.packCards(layoutItems, placementOrder, DashMetrics.gridColumns, width, DashMetrics.gridGap, DashMetrics.gridRowUnit, I18n.isRtl, DashRegistry.isCardAvailable)
     minimumHeight: DashMetrics.tabMinHeight
     placeholderRadius: DashMetrics.cardRadius
 
-    onReorderCommitted: items => CardUtils.reorder(items)
-    onResizeCommitted: (index, changes) => {
+    onLayoutCommitted: items => {
         commitPanelPreview();
-        CardUtils.setSize(index, changes.w, changes.h);
+        CardUtils.setLayout(items);
     }
     onSizePreviewChanged: {
         if (!sizePreview)
@@ -85,7 +85,7 @@ DankEditableGrid {
     function fittedSize(index, w, h) {
         const card = sourceItems[index];
         const want = DashRegistry.clampSize(card.id, w, h);
-        const fitted = GridUtils.fitResize(sourceItems, visualOrder, DashMetrics.gridColumns, rowBudget, index, want, DashRegistry.minSize(card.id), DashRegistry.isCardAvailable);
+        const fitted = GridUtils.fitResize(pinnedItems, placementOrder, DashMetrics.gridColumns, rowBudget, index, want, DashRegistry.minSize(card.id), DashRegistry.isCardAvailable);
         return fitted ?? {
             "w": card.w,
             "h": card.h

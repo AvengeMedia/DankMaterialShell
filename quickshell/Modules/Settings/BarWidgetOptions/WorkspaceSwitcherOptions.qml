@@ -14,6 +14,7 @@ Column {
     property var page: null
 
     readonly property bool showApps: page.value("showWorkspaceApps")
+    readonly property var indicatorStyleValues: ["pills", "lines", "cards"]
 
     width: parent?.width ?? 0
     spacing: Theme.spacingL
@@ -21,6 +22,19 @@ Column {
     SettingsCard {
         title: I18n.tr("General")
         settingKey: "workspaceSettings"
+
+        SettingsButtonGroupRow {
+            resetStore: root.page
+            resetKeys: ["workspaceIndicatorStyle"]
+            tags: ["workspace", "style", "lines", "cards", "pills"]
+            text: I18n.tr("Style")
+            model: [I18n.tr("Pills", "workspace indicator style"), I18n.tr("Lines", "workspace indicator style"), I18n.tr("Cards", "workspace indicator style")]
+            currentIndex: Math.max(0, root.indicatorStyleValues.indexOf(root.page.value("workspaceIndicatorStyle")))
+            onSelectionChanged: (index, selected) => {
+                if (selected)
+                    root.page.set("workspaceIndicatorStyle", root.indicatorStyleValues[index]);
+            }
+        }
 
         SettingsToggleRow {
             resetStore: root.page

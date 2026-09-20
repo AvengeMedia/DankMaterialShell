@@ -323,8 +323,7 @@ Item {
             clickCatcher.item.present();
         contentWindow.visible = true;
         opened();
-        shouldHaveFocus = false;
-        Qt.callLater(() => shouldHaveFocus = Qt.binding(() => shouldBeVisible));
+        shouldHaveFocus = Qt.binding(() => shouldBeVisible);
     }
 
     on_SurfaceFrameReadyChanged: {

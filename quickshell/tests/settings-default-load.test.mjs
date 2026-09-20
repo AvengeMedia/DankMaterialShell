@@ -32,6 +32,14 @@ test("an empty settings file lands every persisted key on its spec default", () 
     assert.deepEqual(wrong, []);
 });
 
+test("a file without docks loads one disabled dock so the dock pages have something to configure", () => {
+    for (const json of [{}, { dockConfigs: [] }]) {
+        const docks = loaded(json).dockConfigs;
+        assert.equal(docks.length, 1);
+        assert.equal(docks[0].enabled, false);
+    }
+});
+
 test("runtime-only keys are never written by a load", () => {
     const root = loaded({});
     const touched = RUNTIME_ONLY.filter(key => key in root);

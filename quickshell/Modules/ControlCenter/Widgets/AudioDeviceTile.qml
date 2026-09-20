@@ -62,7 +62,7 @@ CcTile {
         if (!audio)
             return;
         const current = audio.volume * 100;
-        const step = wheelEvent.angleDelta.y > 0 ? CcMetrics.wheelVolumeStep : -CcMetrics.wheelVolumeStep;
+        const step = wheelEvent.angleDelta.y > 0 ? AudioService.wheelVolumeStep : -AudioService.wheelVolumeStep;
         audio.muted = false;
         audio.volume = Math.max(0, Math.min(maxVolume, current + step)) / 100;
         wheelEvent.accepted = true;

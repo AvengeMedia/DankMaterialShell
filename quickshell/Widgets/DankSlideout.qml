@@ -126,8 +126,8 @@ PanelWindow {
         item: Rectangle {
             x: root.slideFromLeft ? root.alignedEdgeGap : (root.width - slideContainer.width - root.alignedEdgeGap)
             y: root.alignedEdgeGap
-            width: slideContainer.width
-            height: root.height - root.alignedEdgeGap * 2
+            width: root.isVisible ? slideContainer.width : 0
+            height: root.isVisible ? root.height - root.alignedEdgeGap * 2 : 0
         }
     }
 

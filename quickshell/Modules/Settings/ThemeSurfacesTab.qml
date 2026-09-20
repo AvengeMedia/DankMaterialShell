@@ -134,10 +134,24 @@ Column {
             onClicked: root.parentModal?.navigateTo("compositor_layout")
         }
 
+        SettingsButtonGroupRow {
+            tab: "theme"
+            tags: ["corner", "radius", "rounded", "square", "fixed", "material", "shape"]
+            settingKey: "radiusMode"
+            text: I18n.tr("Corner style")
+            model: [I18n.tr("Material scale", "corner style: Material shape scale with a strength slider"), I18n.tr("Fixed", "corner style: one radius for every corner")]
+            currentIndex: SettingsData.radiusMode === "fixed" ? 1 : 0
+            onSelectionChanged: (index, selected) => {
+                if (selected)
+                    SettingsData.set("radiusMode", index === 1 ? "fixed" : "scale");
+            }
+        }
+
         SettingsSliderRow {
             tab: "theme"
-            tags: ["corner", "radius", "rounded", "square"]
+            tags: ["corner", "radius", "rounded", "square", "strength"]
             settingKey: "radiusStrength"
+            visible: SettingsData.radiusMode !== "fixed"
             text: I18n.tr("Radius strength", "global component corner rounding")
             description: I18n.tr("50 uses Material shapes. Lower values reduce rounding; higher values increase it.", "radius strength slider description")
             minimumLabel: I18n.tr("Square")
@@ -146,6 +160,20 @@ Column {
             maximum: 100
             unit: ""
             onSliderValueChanged: newValue => SettingsData.set("radiusStrength", newValue)
+        }
+
+        SettingsSliderRow {
+            tab: "theme"
+            tags: ["corner", "radius", "rounded", "square", "fixed"]
+            settingKey: "fixedRadius"
+            visible: SettingsData.radiusMode === "fixed"
+            text: I18n.tr("Corner radius")
+            minimumLabel: I18n.tr("Square")
+            value: SettingsData.fixedRadius
+            minimum: 0
+            maximum: 32
+            unit: "px"
+            onSliderValueChanged: newValue => SettingsData.set("fixedRadius", newValue)
         }
 
         SettingsSliderRow {

@@ -24,13 +24,13 @@ Item {
         const point = grid.mapFromItem(null, scenePosition.x, scenePosition.y);
         x = dragOrigin.x + point.x - dragOrigin.px;
         y = dragOrigin.y + point.y - dragOrigin.py;
-        grid.updateDragTarget(point.x, point.y);
+        grid.updateDragTarget(x, y);
     }
 
     function beginResize(px, py) {
         if (!slot || grid.interacting)
             return;
-        const point = mapToItem(grid, px, py);
+        const point = mapToItem(null, px, py);
         resizeOrigin = {
             "x": point.x,
             "y": point.y,
@@ -43,7 +43,7 @@ Item {
     function resizeTo(px, py) {
         if (!resizeOrigin || !grid.editMode)
             return;
-        const point = mapToItem(grid, px, py);
+        const point = mapToItem(null, px, py);
         const dx = (point.x - resizeOrigin.x) * (I18n.isRtl ? -1 : 1);
         resizeRequested(resizeOrigin.w + dx, resizeOrigin.h + point.y - resizeOrigin.y);
     }

@@ -81,7 +81,7 @@ FocusScope {
             viewport.contentY = Math.max(0, Math.min(point.y, bottom));
     }
 
-    implicitHeight: NotificationMetrics.centerMaxHeight
+    implicitHeight: DashMetrics.tabMinHeight
     enabled: interactive
     clip: true
     LayoutMirroring.enabled: I18n.isRtl
@@ -158,7 +158,7 @@ FocusScope {
             id: historyButton
             visible: SettingsData.notificationHistoryEnabled
             buttonSize: Theme.iconButtonSize
-            iconName: root.currentTab === 1 ? "notifications" : "history"
+            iconName: root.currentTab === 1 ? "inbox" : "history"
             backgroundColor: Theme.secondaryContainer
             iconColor: Theme.onSecondaryContainer
             tooltipText: root.currentTab === 1 ? I18n.tr("Current", "notification center tab") : I18n.tr("History", "notification center tab")

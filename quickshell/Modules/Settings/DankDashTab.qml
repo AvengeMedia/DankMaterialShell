@@ -52,8 +52,56 @@ FocusScope {
             headerActions: DankActionButton {
                 iconName: "refresh"
                 iconSize: Theme.iconSizeSmall
-                tooltipText: I18n.tr("Reset")
-                onClicked: SettingsData.resetDashTabs()
+                tooltipText: I18n.tr("Reset to default")
+                onClicked: {
+                    SettingsData.resetDashTabs();
+                    SettingsData.resetToDefault(["dashTabPosition", "dashTabsEvenlySpaced"]);
+                }
+            }
+
+            SettingsDropdownRow {
+                text: I18n.tr("Position")
+                readonly property var positions: [
+                    {
+                        value: "auto",
+                        text: I18n.tr("Auto")
+                    },
+                    {
+                        value: "left",
+                        text: I18n.tr("Left")
+                    },
+                    {
+                        value: "right",
+                        text: I18n.tr("Right")
+                    },
+                    {
+                        value: "bottom",
+                        text: I18n.tr("Bottom")
+                    },
+                    {
+                        value: "center",
+                        text: I18n.tr("Center")
+                    }
+                ]
+                settingKey: "dashTabPosition"
+                tab: "dank_dash"
+                tags: ["dashboard", "tabs", "position", "navigation"]
+                currentValue: (positions.find(option => option.value === SettingsData.dashTabPosition) ?? positions[0]).text
+                options: positions.map(option => option.text)
+                onValueChanged: value => {
+                    const option = positions.find(option => option.text === value);
+                    if (option)
+                        SettingsData.set("dashTabPosition", option.value);
+                }
+            }
+
+            SettingsToggleRow {
+                settingKey: "dashTabsEvenlySpaced"
+                tab: "dank_dash"
+                tags: ["dashboard", "tabs", "spacing", "navigation"]
+                text: I18n.tr("Evenly space tabs")
+                checked: SettingsData.dashTabsEvenlySpaced
+                onToggled: checked => SettingsData.set("dashTabsEvenlySpaced", checked)
             }
 
             SettingsReorderList {
@@ -70,25 +118,33 @@ FocusScope {
                     reorderList: tabList
 
                     readonly property bool available: modelData.available !== false
-                    readonly property bool locked: modelData.locked === true
 
                     iconName: modelData.icon
                     iconColor: available && modelData.enabled ? Theme.primary : Theme.onSurface_38
                     titleColor: available ? Theme.surfaceText : Theme.onSurface_38
                     title: modelData.text
                     subtitle: available ? modelData.description ?? "" : I18n.tr("Disabled")
-                    clickable: available && !locked
+                    clickable: available
                     onClicked: SettingsData.setDashTabEnabled(modelData.id, !modelData.enabled)
 
                     Row {
                         spacing: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
 
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "edit"
+                            tooltipText: I18n.tr("Edit")
+                            Accessible.description: tabRow.modelData.text
+                            enabled: tabRow.available
+                            onClicked: PopoutService.openDankDashEditor(tabRow.modelData.id, root.Window.window?.screen)
+                        }
+
                         DankToggle {
                             anchors.verticalCenter: parent.verticalCenter
                             hideText: true
                             checked: tabRow.modelData.enabled
-                            enabled: tabRow.available && !tabRow.locked
+                            enabled: tabRow.available
                             onToggled: checked => SettingsData.setDashTabEnabled(tabRow.modelData.id, checked)
                         }
                     }

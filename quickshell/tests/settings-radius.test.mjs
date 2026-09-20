@@ -7,7 +7,7 @@ const spec = store.SpecModule;
 
 test("legacy migration preserves explicit radii and defaults sparse settings to 50", () => {
     for (const version of [0, 13, 14, 18, 22]) {
-        for (const [radius, strength] of [[0, 0], [8, 25], [12, 38], [16, 50], [32, 80], [undefined, 50]]) {
+        for (const [radius, strength] of [[0, 0], [8, 25], [12, 38], [16, 50], [32, 100], [undefined, 50]]) {
             const original = { configVersion: version, cornerRadius: radius, niriLayoutRadiusOverride: 17 };
             const migrated = store.migrateToVersion(original, 26);
             assert.equal(migrated.radiusStrength, strength);

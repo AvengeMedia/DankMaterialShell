@@ -183,6 +183,7 @@ Item {
 
     width: isVerticalOrientation ? barThickness : visualWidth
     height: isVerticalOrientation ? visualHeight : barThickness
+    enabled: width > 0 && height > 0
 
     Item {
         id: visualContent

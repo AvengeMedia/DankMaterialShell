@@ -366,7 +366,7 @@ Item {
             tags: ["bar", "hover", "popout", "reveal", "widget", "delay"]
             iconName: "touch_app"
             title: I18n.tr("Hover popouts")
-            visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarIsIsland
+            visible: bar.selectedBarConfig?.enabled ?? false
             enabled: !(bar.selectedBarConfig?.clickThrough ?? false)
             opacity: (bar.selectedBarConfig?.clickThrough ?? false) ? 0.5 : 1.0
             checked: bar.selectedBarConfig?.hoverPopouts ?? false

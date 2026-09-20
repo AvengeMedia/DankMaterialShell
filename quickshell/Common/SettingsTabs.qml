@@ -720,7 +720,7 @@ Singleton {
             return false;
         if (entry.shortcutsOnly && !KeybindsService.available)
             return false;
-        if (entry.soundsOnly && !AudioService.soundsAvailable)
+        if (entry.soundsOnly && MultimediaService.unavailable)
             return false;
         if (entry.hyprlandNiriOnly && !CompositorService.isNiri && !CompositorService.isHyprland)
             return false;

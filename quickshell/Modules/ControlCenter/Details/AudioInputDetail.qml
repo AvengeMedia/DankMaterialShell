@@ -6,7 +6,6 @@ import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
@@ -41,7 +40,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             CcGroup {
                 AudioSliderRow {
@@ -50,7 +49,7 @@ Item {
                 }
             }
 
-            SettingsSectionLabel {
+            CcSectionLabel {
                 text: I18n.tr("Input devices")
             }
 

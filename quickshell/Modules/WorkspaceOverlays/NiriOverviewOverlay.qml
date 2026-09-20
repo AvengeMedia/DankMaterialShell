@@ -111,6 +111,7 @@ Scope {
                     readonly property real alignedX: spotlightContainer.x
                     readonly property real alignedY: spotlightContainer.y
                     readonly property real screenHeight: overlayWindow.screen?.height ?? 1080
+                    readonly property real frameBottomRadius: spotlightContainer.bottomRadius
                     function hide() {
                         if (niriOverviewScope.searchActive) {
                             niriOverviewScope.hideSpotlight();

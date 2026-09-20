@@ -38,7 +38,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             CcEmptyState {
                 visible: !DgopService.dgopAvailable || root.mounts.length === 0

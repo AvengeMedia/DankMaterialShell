@@ -3,6 +3,8 @@ import QtTest
 import Quickshell
 import qs.Common
 import qs.Widgets
+import qs.Modules.ControlCenter
+import qs.Modules.ControlCenter.Widgets
 import qs.DankCommon.Common as DC
 
 ShellRoot {
@@ -40,6 +42,13 @@ ShellRoot {
                         value: 50
                     }
 
+                    CcSliderRow {
+                        id: row
+                        width: parent.width
+                        height: CcMetrics.sliderRowHeight
+                        iconName: "volume_up"
+                    }
+
                     Item {
                         id: filler
                         width: 1
@@ -59,20 +68,23 @@ ShellRoot {
                 console.log("PASS " + label);
             }
 
-            function wheelOnSlider() {
-                const point = slider.mapToItem(scene, slider.width / 2, slider.height / 2);
+            function wheelOnSlider(target) {
+                const point = target.mapToItem(scene, target.width / 2, target.height / 2);
                 mouseWheel(scene, point.x, point.y, 0, 120);
                 wait(50);
             }
 
             function run() {
                 wait(300);
-                wheelOnSlider();
+                wheelOnSlider(slider);
                 check(slider.value === 51, "wheel steps a slider whose container does not scroll");
                 filler.height = 1000;
                 wait(50);
-                wheelOnSlider();
+                wheelOnSlider(slider);
                 check(slider.value === 51, "wheel leaves a slider alone once the container scrolls");
+                row.slider.value = 50;
+                wheelOnSlider(row.slider);
+                check(row.slider.value === 51, "control center slider rows keep the wheel inside a scrolling sheet");
                 console.log("FIXTURE_PASS slider wheel");
                 Qt.quit();
             }

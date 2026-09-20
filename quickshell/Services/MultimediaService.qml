@@ -9,6 +9,7 @@ Singleton {
     readonly property var log: Log.scoped("MultimediaService")
 
     readonly property bool available: probeLoader.status === Loader.Ready
+    readonly property bool unavailable: probeLoader.status === Loader.Error
     property bool probeRequested: false
 
     function ensureProbed() {

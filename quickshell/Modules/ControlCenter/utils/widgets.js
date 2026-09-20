@@ -73,24 +73,8 @@ function removeWidget(index) {
     Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
-function setWidgetSize(index, changes, columns, rows = Infinity) {
-    const widgets = Common.SettingsData.controlCenterWidgets.slice();
-    const widget = widgets[index];
-    if (!widget)
-        return;
-    const size = Object.assign({}, widget, clampSize(Object.assign({}, widget, changes), columns, rows));
-    if (changes.w === undefined)
-        size.w = widget.w;
-    if (changes.h === undefined)
-        size.h = widget.h;
-    if (size.w === widget.w && size.h === widget.h)
-        return;
-    widgets[index] = Object.assign({}, widget, size);
+function setLayout(widgets) {
     Common.SettingsData.set("controlCenterWidgets", widgets);
-}
-
-function reorderWidgets(newOrder) {
-    Common.SettingsData.set("controlCenterWidgets", newOrder);
 }
 
 function resetToDefault(columns) {

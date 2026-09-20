@@ -6,7 +6,6 @@ import Quickshell.Bluetooth
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
-import qs.Modules.Settings.Widgets
 import qs.Services
 import qs.Widgets
 import "../../../Common/QmlUtils.js" as QmlUtils
@@ -202,7 +201,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             CcGroup {
                 CcToggleRow {
@@ -216,7 +215,7 @@ Item {
                 }
             }
 
-            SettingsSectionLabel {
+            CcSectionLabel {
                 text: I18n.tr("Paired", "adjective, bluetooth paired devices section label and device status")
                 visible: pairedGroup.visible
             }
@@ -308,7 +307,7 @@ Item {
                 title: I18n.tr("Scanning...")
             }
 
-            SettingsSectionLabel {
+            CcSectionLabel {
                 text: I18n.tr("Available")
                 visible: availableGroup.visible
             }

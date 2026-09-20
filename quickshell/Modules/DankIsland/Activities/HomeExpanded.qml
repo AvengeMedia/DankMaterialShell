@@ -8,7 +8,7 @@ DashTabFace {
     id: root
 
     activityId: "home"
-    entryId: DashRegistry.fallbackId
+    entryId: DashRegistry.overviewId
     tabComponent: Component {
         OverviewTab {
             live: root.live

@@ -135,7 +135,7 @@ Singleton {
     }
 
     function findCommand(wallpaperDir) {
-        return ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" \\) 2>/dev/null | sort`];
+        return ["sh", "-c", `find -L "${wallpaperDir}" -maxdepth 1 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.bmp" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.jxl" -o -iname "*.avif" -o -iname "*.heif" -o -iname "*.exr" -o -iname "*.svg" \\) 2>/dev/null | sort`];
     }
 
     function monitorProcessFor(screenName) {
@@ -292,7 +292,7 @@ Singleton {
             if (wallpaperList.length > 1) {
                 do {
                     targetIndex = Math.floor(Math.random() * wallpaperList.length);
-                } while (targetIndex === currentIndex);
+                } while (targetIndex === currentIndex)
             } else {
                 targetIndex = 0;
             }

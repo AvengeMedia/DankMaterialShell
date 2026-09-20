@@ -10,4 +10,4 @@ What it shows:
 - `tone` and the card colors (`accentColor`, `contentColor`, `mutedColor`, `chipColor`), so the card follows the Surface, Primary, Secondary and Tertiary tones like the built-in cards.
 - `dash.options`: a choice for the period, a toggle for the time left and a choice for the tone. They show up in the card's options sheet in edit mode and under Settings → Dashboard.
 
-Add it from the dash: open the overview, click the three-dot menu, Edit, then Add widget.
+Add it from the dash: open the overview, hover the selected page icon, click the pencil, then Add widget.

@@ -1,10 +1,11 @@
 .pragma library
 .import "../../DankCommon/Common/settings/SharedSettingsSpec.js" as Shared
 .import "../../DankCommon/Common/settings/SpecUtil.js" as Util
+.import "DockConfig.js" as DockConfig
 
 var LOCAL_SPEC = {
     dockConfigs: {
-        def: []
+        def: [DockConfig.create("dock", "Dock")]
     },
     currentThemeCategory: {
         def: "generic"
@@ -601,6 +602,12 @@ var LOCAL_SPEC = {
     },
     keybindsFloatingWindow: {
         def: false
+    },
+    dashTabPosition: {
+        def: "auto"
+    },
+    dashTabsEvenlySpaced: {
+        def: true
     },
     dashTabs: {
         def: [

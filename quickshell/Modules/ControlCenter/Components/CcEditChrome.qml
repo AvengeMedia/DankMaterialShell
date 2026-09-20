@@ -12,6 +12,7 @@ DankGridEditChrome {
 
     hasOptions: widgetData.id === "diskUsage" || widgetData.id === "brightnessSlider" || widgetData.id === "idleInhibitor" || String(widgetData.id ?? "").startsWith("plugin_")
     buttonSize: Theme.iconSize
+    hitOverflow: CcMetrics.gridGap / 2
     iconSize: PopoutMetrics.chromeIconSize
 
     onOptionsRequested: anchor => root.configRequested(anchor)

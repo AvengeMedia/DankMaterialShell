@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -21,6 +22,7 @@ FocusScope {
     property bool showResultsWithoutQuery: false
     property bool suspendSearchUpdates: false
     property real maxResultsHeight: 0
+    property real resultsInset: LauncherMetrics.spotlightInset
 
     readonly property bool _hasQuery: root.showResultsWithoutQuery || searchInput.text.length > 0
     readonly property real _searchBarH: LauncherMetrics.pillHeight
@@ -29,9 +31,10 @@ FocusScope {
     readonly property real actionPanelHeight: actionPanel.height
     readonly property real _statusH: Theme.listItemTwoLineHeight + Theme.spacingXL
     readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.max(0, Math.min(LauncherMetrics.maxResultsHeight, (parentModal?.screenHeight ?? Theme.mediumBreakpoint) - (parentModal?.modalY ?? 0) - LauncherMetrics.pillHeight - actionPanel.height - Theme.spacingL))
-    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? resultsList.contentHeight + resultsList.bottomInset : _statusH
+    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? resultsInset + resultsList.contentHeight + resultsList.bottomInset : _statusH
     readonly property real _resultsH: _hasQuery ? Math.min(_resultsContentH, _maxResultsH) : 0
     readonly property int _resizeDuration: Theme.expressiveDurations.expressiveFastSpatial
+    readonly property real _frameClipRadius: Math.max(0, (parentModal?.frameBottomRadius ?? 0) - resultsInset)
 
     implicitHeight: _searchAreaH + resultsContainer.height + actionPanel.height
 
@@ -334,12 +337,16 @@ FocusScope {
         }
     }
 
-    Item {
+    ClippingRectangle {
         id: resultsContainer
         anchors.top: searchBarItem.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        clip: true
+        anchors.leftMargin: root.resultsInset
+        anchors.rightMargin: root.resultsInset
+        color: "transparent"
+        bottomLeftRadius: actionPanel.height > 0 ? 0 : root._frameClipRadius
+        bottomRightRadius: bottomLeftRadius
         height: root._resultsH
 
         Behavior on height {
@@ -357,6 +364,7 @@ FocusScope {
             keyForwardTargets: [searchKeyHandler]
             readonly property real bottomInset: Theme.spacingS
             anchors.fill: parent
+            anchors.topMargin: root.resultsInset
             controller: root.controller
 
             onItemRightClicked: (index, item, sceneX, sceneY) => {

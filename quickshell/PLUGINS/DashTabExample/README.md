@@ -9,7 +9,7 @@ What it shows:
 - The plugin state API (`loadPluginState` / `savePluginState`) for runtime data. Nothing goes into settings, so no permissions are needed.
 - `focusTarget` and `restoreFocus()`. Opening the tab focuses Start without a focus ring, so Space starts it right away.
 - `handleKeyEvent`: Space starts or pauses, L records a lap, R resets.
-- `menuActions`: Reset in the tab's three-dot menu.
+- `menuActions`: Reset in the tab's edit-mode controls.
 - `dash.options`: a toggle for hundredths and a number for how many laps to list, read as `options.hundredths` and `options.laps`.
 
 Open it with `dms ipc call dash open plugin_dashTabExample`.

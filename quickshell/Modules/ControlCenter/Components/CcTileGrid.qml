@@ -27,11 +27,16 @@ DankEditableGrid {
     readonly property CcTileSlot draggingSlot: tileRepeater.itemAt(draggingSourceIndex) as CcTileSlot
 
     sourceItems: (SettingsData.controlCenterWidgets || []).map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, Infinity)))
-    slotLayout: GridUtils.packCards(layoutItems.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows))), visualOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep)
+    slotLayout: GridUtils.packCards(layoutItems.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows))), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep)
     placeholderRadius: draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight)
 
-    onReorderCommitted: items => model.reorderWidgets(items)
-    onResizeCommitted: (index, changes) => model.setWidgetSize(index, changes)
+    onLayoutCommitted: items => model.setLayout(items)
+
+    function displayedItems() {
+        return GridUtils.placedItems(sourceItems.map(widget => Object.assign({}, widget, {
+                "w": WidgetUtils.clampSize(widget, columns).w
+            })), slotLayout.slots);
+    }
 
     Repeater {
         id: tileRepeater

@@ -7,6 +7,7 @@ var DEFAULTS = {
         size: 20
     },
     workspaceSwitcher: {
+        workspaceIndicatorStyle: "pills",
         showWorkspaceIndex: false,
         showWorkspaceName: false,
         showWorkspacePadding: false,

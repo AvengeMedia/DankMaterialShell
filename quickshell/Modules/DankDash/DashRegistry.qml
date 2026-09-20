@@ -10,7 +10,8 @@ Singleton {
     id: root
 
     readonly property string pluginPrefix: "plugin_"
-    readonly property string fallbackId: "overview"
+    readonly property string overviewId: "overview"
+    readonly property string defaultTabId: visibleTabIds[0] ?? ""
     readonly property string widgetsKey: "widgets"
 
     readonly property var toneChoices: [
@@ -69,10 +70,10 @@ Singleton {
         return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), "", toneChoices);
     }
 
-    function panelOptions() {
+    function panelOptions(tab) {
         return [Object.assign(number("panelColumns", I18n.tr("Panel width (columns)"), DashMetrics.defaultGridColumns, DashMetrics.minimumGridColumns, DashMetrics.maximumGridColumns), {
                 "settingsOnly": true
-            }), Object.assign(number("panelRows", I18n.tr("Panel height (rows)"), DashMetrics.minimumTabRows, DashMetrics.minimumTabRows, DashMetrics.maximumGridRows), {
+            }), Object.assign(number("panelRows", I18n.tr("Panel height (rows)"), DashMetrics.defaultRowsForTab(tab), DashMetrics.minimumTabRows, DashMetrics.maximumGridRows), {
                 "settingsOnly": true
             })];
     }
@@ -83,7 +84,6 @@ Singleton {
             "text": I18n.tr("Overview", "dashboard tab name"),
             "icon": "dashboard",
             "description": I18n.tr("Clock, calendar, system info and profile"),
-            "locked": true,
             "tab": {
                 "component": overviewTab
             }
@@ -95,7 +95,8 @@ Singleton {
             "description": I18n.tr("Now playing and media controls"),
             "tab": {
                 "component": mediaTab,
-                "async": true
+                "async": true,
+                "sizeToContent": true
             },
             "card": {
                 "component": mediaCard,
@@ -143,7 +144,8 @@ Singleton {
             "available": SettingsData.weatherEnabled,
             "tab": {
                 "component": weatherTab,
-                "async": true
+                "async": true,
+                "sizeToContent": true
             },
             "card": {
                 "component": weatherCard,
@@ -372,7 +374,6 @@ Singleton {
     }
 
     readonly property var entries: {
-        const panel = panelOptions();
         return builtins.map(e => e.card ? Object.assign({}, e, {
                 "card": Object.assign({
                     "text": e.text,
@@ -383,7 +384,7 @@ Singleton {
                     "maxH": DashMetrics.maximumCardRows
                 }, e.card)
             }) : e).concat(pluginEntries).map(e => e.tab ? Object.assign({}, e, {
-                "options": (e.options ?? []).concat(panel)
+                "options": (e.options ?? []).concat(panelOptions(e.tab))
             }) : e);
     }
 
@@ -397,7 +398,7 @@ Singleton {
                 continue;
             seen[tab.id] = true;
             result.push(Object.assign({
-                "enabled": tab.enabled || def.locked === true
+                "enabled": tab.enabled
             }, def));
         }
         for (const def of known) {
@@ -548,7 +549,7 @@ Singleton {
         const stored = storedOptions(id);
         if (!("panelColumns" in stored) && !("panelRows" in stored))
             return;
-        setPanelSize(id, DashMetrics.defaultGridColumns, DashMetrics.minimumTabRows);
+        setPanelSize(id, DashMetrics.defaultGridColumns, DashMetrics.defaultRowsFor(id));
     }
 
     function resetOptions(id) {
@@ -615,7 +616,7 @@ Singleton {
     }
 
     function indexId(index) {
-        return visibleTabIds[index] ?? fallbackId;
+        return visibleTabIds[index] ?? defaultTabId;
     }
 
     function resolveId(tab) {
@@ -623,13 +624,13 @@ Singleton {
             return indexId(tab);
         const raw = String(tab ?? "").trim();
         if (raw === "")
-            return fallbackId;
+            return defaultTabId;
         if (/^\d+$/.test(raw))
             return indexId(parseInt(raw));
         if (hasTab(raw))
             return raw;
         const lower = raw.toLowerCase();
-        return tabIds.find(id => id.toLowerCase() === lower) ?? fallbackId;
+        return tabIds.find(id => id.toLowerCase() === lower) ?? defaultTabId;
     }
 
     function indexOf(id) {

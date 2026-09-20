@@ -44,6 +44,11 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        MultimediaService.ensureProbed();
+        AudioService.refreshSoundThemes();
+    }
+
     SettingsPage {
         id: mainColumn
 
@@ -51,7 +56,7 @@ Item {
             tab: "sounds"
             tags: ["sound", "audio", "notification", "volume"]
             settingKey: "systemSounds"
-            visible: AudioService.soundsAvailable
+            visible: !MultimediaService.unavailable
 
             SettingsToggleRow {
                 tab: "sounds"
@@ -62,34 +67,23 @@ Item {
                 onToggled: checked => SettingsData.set("soundsEnabled", checked)
             }
 
-            SettingsToggleRow {
-                enabled: (SettingsData.soundsEnabled) && (AudioService.soundThemeSupported)
-                tab: "sounds"
-                tags: ["sound", "theme", "system", "gsettings"]
-                settingKey: "useSystemSoundTheme"
-                visible: AudioService.soundThemeSupported
-                text: I18n.tr("Use system theme")
-                checked: SettingsData.useSystemSoundTheme
-                onToggled: checked => SettingsData.set("useSystemSoundTheme", checked)
-            }
-
             SettingsDropdownRow {
+                readonly property string builtIn: I18n.tr("Built-in", "sound theme option, the sounds bundled with the shell")
+
+                enabled: SettingsData.soundsEnabled
+                visible: AudioService.soundThemeSupported
                 tab: "sounds"
-                tags: ["sound", "theme", "select"]
+                tags: ["sound", "theme", "system", "gsettings", "select"]
                 settingKey: "soundTheme"
-                enabled: ((SettingsData.soundsEnabled) && (SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0)) && (SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0)
-                text: I18n.tr("Theme")
-                options: AudioService.availableSoundThemes
-                currentValue: {
-                    const theme = AudioService.currentSoundTheme;
-                    if (theme && AudioService.availableSoundThemes.includes(theme))
-                        return theme;
-                    return AudioService.availableSoundThemes.length > 0 ? AudioService.availableSoundThemes[0] : "";
+                text: I18n.tr("Sound theme")
+                options: {
+                    const themes = AudioService.availableSoundThemes;
+                    const current = AudioService.currentSoundTheme;
+                    const unlisted = current && !themes.includes(current) ? [current] : [];
+                    return [builtIn].concat(unlisted, themes);
                 }
-                onValueChanged: value => {
-                    if (value && value !== AudioService.currentSoundTheme)
-                        AudioService.setSoundTheme(value);
-                }
+                currentValue: SettingsData.useSystemSoundTheme && AudioService.currentSoundTheme ? AudioService.currentSoundTheme : builtIn
+                onValueChanged: value => AudioService.selectSoundTheme(value === builtIn ? "" : value)
             }
 
             SettingsToggleRow {
@@ -149,7 +143,7 @@ Item {
             height: notAvailableText.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
             color: Theme.warningHover
-            visible: !AudioService.soundsAvailable
+            visible: MultimediaService.unavailable
 
             Row {
                 anchors.fill: parent

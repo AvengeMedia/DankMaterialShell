@@ -18,10 +18,9 @@ Singleton {
     readonly property real popoutWidthWide: popoutWidth + weekColumnWidth + Theme.spacingS
     readonly property real contentPadding: Theme.spacingM
     readonly property real contentGap: Theme.spacingM
-    readonly property real tabBarLift: contentPadding - Theme.tabIndicatorHeight
-    readonly property real tabHeight: Theme.buttonHeightM + tabBarLift
-    readonly property real tabBarBlockHeight: tabHeight - tabBarLift
-    readonly property real headerActionSize: Theme.iconButtonSize
+    readonly property real islandHeaderHeight: Theme.minimumTouchTargetSize
+    readonly property real islandHeaderInset: Theme.spacingXS
+    readonly property real islandChromeHeight: islandHeaderHeight + islandHeaderInset * 2 + contentPadding
     readonly property real spinnerSize: Theme.iconButtonSize
     readonly property real triggerWidth: CcMetrics.triggerWidth
     readonly property int transitionDuration: CcMetrics.transitionDuration
@@ -48,6 +47,7 @@ Singleton {
     readonly property int maximumGridRows: 8
     readonly property int maximumCardRows: 64
     readonly property int minimumTabRows: 4
+    readonly property int defaultTabRows: 5
     property var panelPreview: null
 
     function clampColumns(value) {
@@ -77,11 +77,29 @@ Singleton {
     function panelFloorRowsFor(id) {
         if (panelPreview?.id === id)
             return panelPreview.rows;
-        return storedPanelRows(id) || minimumTabRows;
+        return storedPanelRows(id) || defaultRowsFor(id);
+    }
+
+    function defaultRowsForTab(tab) {
+        return tab?.sizeToContent === true ? minimumTabRows : defaultTabRows;
+    }
+
+    function defaultRowsFor(id) {
+        return defaultRowsForTab(DashRegistry.entry(id)?.tab);
     }
 
     function panelRowsFor(id, contentHeight = 0) {
         return Math.max(panelFloorRowsFor(id), rowsForHeight(contentHeight));
+    }
+
+    function defaultPanelRows(id, contentRows) {
+        return Math.max(defaultRowsFor(id), contentRows);
+    }
+
+    function panelRowsToStore(id, rows, contentRows) {
+        if (rows < defaultRowsFor(id) || rows > defaultPanelRows(id, contentRows))
+            return rows;
+        return defaultRowsFor(id);
     }
 
     function panelHeightFor(id, contentHeight = 0) {
@@ -111,7 +129,8 @@ Singleton {
     readonly property int gridColumns: panelColumnsFor(overviewId)
     readonly property real gridRowUnit: 96
     readonly property real gridGap: Theme.spacingS
-    readonly property real tabMinHeight: minimumTabRows * gridRowUnit + (minimumTabRows - 1) * gridGap
+    readonly property real tabMinHeight: heightForRows(minimumTabRows)
+    readonly property real tabDefaultHeight: heightForRows(defaultTabRows)
     readonly property real cardRadius: Theme.cornerRadius
     readonly property real surfaceRadius: Theme.cornerRadiusXL
     readonly property real mutedAlpha: 0.72

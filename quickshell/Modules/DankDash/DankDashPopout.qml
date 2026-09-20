@@ -36,7 +36,7 @@ DankPopout {
 
     property bool dashVisible: false
     property var triggerScreen: null
-    property string currentTabId: DashRegistry.fallbackId
+    property string currentTabId: DashRegistry.defaultTabId
     property string detailTabId: ""
     property bool editMode: false
     property string overviewFocusId: CacheData.dashFocusCardId || "calendar"
@@ -46,31 +46,52 @@ DankPopout {
             contentLoader.item?.panelResizer.cancel();
         if (!shouldBeVisible)
             return;
-        Qt.callLater(() => {
-            if (editMode) {
-                contentLoader.item?.focusNavigation();
-                return;
-            }
-            contentLoader.item?.focusInitial();
-        });
+        Qt.callLater(() => contentLoader.item?.focusInitial());
     }
 
     readonly property string activeTabId: detailTabId !== "" ? detailTabId : currentTabId
     readonly property var detailEntry: detailTabId !== "" ? DashRegistry.entry(detailTabId) : null
     readonly property var orderedTabIds: DashRegistry.visibleTabIds
     readonly property int currentTabIndex: orderedTabIds.indexOf(currentTabId)
-    readonly property bool showTabs: orderedTabIds.length > 0 && currentTabIndex >= 0
+    readonly property bool showTabs: orderedTabIds.length > 1 && currentTabIndex >= 0 && detailTabId === ""
+    readonly property bool showBack: detailTabId !== "" && currentTabIndex >= 0
+    readonly property int navigationEdge: {
+        switch (SettingsData.dashTabPosition) {
+        case "left":
+            return SettingsData.Left;
+        case "right":
+            return SettingsData.Right;
+        case "bottom":
+            return SettingsData.Bottom;
+        case "center":
+            return SettingsData.Top;
+        }
+        switch (effectiveBarPosition % 4) {
+        case SettingsData.Left:
+            return SettingsData.Right;
+        case SettingsData.Right:
+            return SettingsData.Left;
+        default:
+            return effectiveBarPosition % 4;
+        }
+    }
+    readonly property bool verticalNavigation: showTabs && (navigationEdge === SettingsData.Left || navigationEdge === SettingsData.Right)
+    readonly property real navigationWidth: verticalNavigation ? Theme.navigationRailWidth + DashMetrics.contentGap : 0
 
-    readonly property int columnCap: DashMetrics.columnCapFor(screen?.width, SettingsData.showWeekNumber)
+    readonly property int columnCap: DashMetrics.columnCapFor(screen ? screen.width - navigationWidth : undefined, SettingsData.showWeekNumber)
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
 
-    popupWidth: DashMetrics.widthFor(SettingsData.showWeekNumber, screen?.width, DashMetrics.panelColumnsFor(activeTabId))
-    minimumSurfaceWidth: DashMetrics.widthFor(SettingsData.showWeekNumber, screen?.width, DashRegistry.widestPanelColumns)
-    popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabMinHeight + DashMetrics.tabBarBlockHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
+    popupWidth: panelWidthFor(DashMetrics.panelColumnsFor(activeTabId))
+    minimumSurfaceWidth: panelWidthFor(DashRegistry.widestPanelColumns)
+    popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabDefaultHeight + Theme.navigationHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
     triggerWidth: DashMetrics.triggerWidth
     screen: triggerScreen
 
     property bool __focusArmed: false
+
+    function panelWidthFor(columns) {
+        return DashMetrics.widthFor(SettingsData.showWeekNumber, screen ? screen.width - navigationWidth : undefined, columns) + navigationWidth;
+    }
 
     function requestTab(tab) {
         const id = DashRegistry.resolveId(tab);
@@ -84,10 +105,14 @@ DankPopout {
             return;
         }
         detailTabId = "";
-        currentTabId = DashRegistry.fallbackId;
+        currentTabId = DashRegistry.defaultTabId;
     }
 
     function closeDetail() {
+        if (!showBack) {
+            dashVisible = false;
+            return;
+        }
         detailTabId = "";
     }
 
@@ -102,23 +127,23 @@ DankPopout {
     }
 
     function focusContent(backwards) {
-        contentLoader.item?.focusInitial();
+        contentLoader.item?.focusNavigation(backwards);
     }
 
     onActiveTabIdChanged: {
         editMode = false;
         contentLoader.item?.dismissOptions();
         contentLoader.item?.resetScroll();
-        if (shouldBeVisible)
+        if (shouldBeVisible && !contentLoader.item?.navigationFocused)
             contentLoader.item?.focusInitial();
     }
 
-    readonly property var registryVisibleTabIds: DashRegistry.visibleTabIds
-    readonly property var registryTabIds: DashRegistry.tabIds
+    readonly property string registryVisibleTabIds: DashRegistry.visibleTabIds.join("\n")
+    readonly property string registryTabIds: DashRegistry.tabIds.join("\n")
 
     onRegistryVisibleTabIdsChanged: {
         if (!DashRegistry.isSelectable(currentTabId))
-            currentTabId = DashRegistry.fallbackId;
+            currentTabId = DashRegistry.defaultTabId;
     }
 
     onRegistryTabIdsChanged: {
@@ -228,8 +253,10 @@ DankPopout {
             LayoutMirroring.childrenInherit: true
 
             implicitWidth: root.popupWidth
-            implicitHeight: headerRow.height + DashMetrics.contentGap + pages.implicitHeight + DashMetrics.contentPadding * 2
+            implicitHeight: horizontalChromeHeight + pages.implicitHeight + DashMetrics.contentPadding * 2
+            readonly property real horizontalChromeHeight: root.verticalNavigation ? 0 : (root.showTabs ? tabBar.implicitHeight : Theme.minimumTouchTargetSize) + DashMetrics.contentGap
             readonly property bool ready: pages.ready
+            readonly property bool navigationFocused: tabBar.activeFocus
             focus: true
 
             readonly property bool panelResizing: panelResizer.resizing
@@ -243,18 +270,17 @@ DankPopout {
                 cardResizeColumns = panelColumns;
                 cardResizeRows = panelRows;
             }
-            readonly property bool hasWidgets: headerMenu.hasWidgets
             readonly property int panelColumns: DashMetrics.panelColumnsFor(root.activeTabId)
             readonly property int contentRows: DashMetrics.rowsForHeight(pages.currentHostImplicitHeight)
             readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(root.activeTabId), contentRows)
-            readonly property bool panelAtDefault: panelColumns === DashMetrics.defaultGridColumns && DashMetrics.panelFloorRowsFor(root.activeTabId) <= contentRows
+            readonly property bool panelAtDefault: panelColumns === DashMetrics.defaultGridColumns && panelRows === DashMetrics.defaultPanelRows(root.activeTabId, contentRows)
             readonly property DankPanelResizer panelResizer: DankPanelResizer {
                 popout: root
                 stepWidth: DashMetrics.preferredColumnWidth + DashMetrics.gridGap
-                widthFor: columns => DashMetrics.widthFor(SettingsData.showWeekNumber, root.screen?.width, columns)
+                widthFor: columns => root.panelWidthFor(columns)
                 currentStep: () => mainContainer.panelColumns
                 currentRows: () => mainContainer.panelRows
-                minStep: DashMetrics.minimumGridColumns
+                minStep: Math.max(DashMetrics.minimumGridColumns, pages.currentItem?.usedColumns ?? 0)
                 maxStep: root.columnCap
                 rowUnit: DashMetrics.gridRowUnit + DashMetrics.gridGap
                 minRows: mainContainer.contentRows
@@ -269,7 +295,7 @@ DankPopout {
                     if (columnsChanged)
                         values.panelColumns = columns;
                     if (rowsChanged)
-                        values.panelRows = rows > mainContainer.contentRows ? rows : DashMetrics.minimumTabRows;
+                        values.panelRows = DashMetrics.panelRowsToStore(root.activeTabId, rows, mainContainer.contentRows);
                     DashRegistry.setOptions(root.activeTabId, values);
                     DashMetrics.panelPreview = null;
                 }
@@ -277,7 +303,7 @@ DankPopout {
             }
 
             function headerFocusTargets() {
-                const targets = root.editMode ? editControls.focusTargets : [root.detailTabId !== "" ? backButton : tabBar, menuButton];
+                const targets = root.editMode ? pageActions.focusTargets : [backButton, tabBar, pageTitle.focusTarget];
                 return targets.filter(item => item.visible && item.enabled);
             }
 
@@ -288,12 +314,18 @@ DankPopout {
             }
 
             function focusInitial() {
-                for (const target of headerFocusTargets())
+                if (root.activeTabId === "") {
+                    emptySettings.forceActiveFocus(Qt.OtherFocusReason);
+                    return;
+                }
+                for (const target of [backButton, tabBar, pageTitle.focusTarget])
                     target.focus = false;
+                pageActions.clearFocus();
                 if (pages.currentHost)
                     pages.currentHost.focus = false;
                 mainContainer.forceActiveFocus(Qt.OtherFocusReason);
-                pages.currentItem?.restoreFocus?.();
+                if (!root.editMode)
+                    pages.currentItem?.restoreFocus?.();
             }
 
             function contentEntryFor(key) {
@@ -356,7 +388,7 @@ DankPopout {
 
             function dismissOptions() {
                 tabOptions.dismiss();
-                headerMenu.close();
+                pageActions.closeMenu();
             }
 
             Component.onCompleted: {
@@ -373,7 +405,7 @@ DankPopout {
             }
 
             Keys.onPressed: function (event) {
-                if (headerMenu.open)
+                if (pageActions.menuOpen)
                     return;
                 if (tabOptions.shown) {
                     if (event.key !== Qt.Key_Escape)
@@ -397,6 +429,11 @@ DankPopout {
                 }
 
                 if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                    if (root.editMode) {
+                        mainContainer.focusNavigation(event.key === Qt.Key_Backtab || !!(event.modifiers & Qt.ShiftModifier));
+                        event.accepted = true;
+                        return;
+                    }
                     if (current?.blocksTabNavigation)
                         return;
                     root.cycleTab(event.key === Qt.Key_Backtab || (event.modifiers & Qt.ShiftModifier) ? -1 : 1);
@@ -421,7 +458,7 @@ DankPopout {
 
             Shortcut {
                 sequence: "Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: {
                     root.cycleTab(1);
@@ -431,7 +468,7 @@ DankPopout {
 
             Shortcut {
                 sequence: "Shift+Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: {
                     root.cycleTab(-1);
@@ -441,7 +478,7 @@ DankPopout {
 
             Shortcut {
                 sequence: "Ctrl+Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen
                 context: Qt.WindowShortcut
                 onActivated: {
                     root.cycleTab(1);
@@ -451,7 +488,7 @@ DankPopout {
 
             Shortcut {
                 sequence: "Ctrl+Shift+Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen
                 context: Qt.WindowShortcut
                 onActivated: {
                     root.cycleTab(-1);
@@ -460,57 +497,64 @@ DankPopout {
             }
 
             Shortcut {
+                sequences: ["F2", "Ctrl+E"]
+                enabled: root.shouldBeVisible && root.activeTabId !== "" && !root.editMode && !tabOptions.shown && !pageActions.menuOpen && !pages.currentItem?.blocksTabNavigation
+                context: Qt.WindowShortcut
+                onActivated: root.editMode = true
+            }
+
+            Shortcut {
                 sequence: "F6"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: mainContainer.cycleRegion(false)
             }
 
             Shortcut {
                 sequence: "Shift+F6"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: mainContainer.cycleRegion(true)
             }
 
             Shortcut {
                 sequence: "Alt+Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.cycleCardFocus?.(false)
             }
 
             Shortcut {
                 sequence: "Alt+Shift+Tab"
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.cycleCardFocus?.(true)
             }
 
             Shortcut {
                 sequences: ["Alt+Left", "Alt+H"]
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.moveCardFocus?.("left")
             }
 
             Shortcut {
                 sequences: ["Alt+Right", "Alt+L"]
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.moveCardFocus?.("right")
             }
 
             Shortcut {
                 sequences: ["Alt+Up", "Alt+K"]
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.moveCardFocus?.("up")
             }
 
             Shortcut {
                 sequences: ["Alt+Down", "Alt+J"]
-                enabled: root.shouldBeVisible && !tabOptions.shown && !headerMenu.open && !root.editMode && !pages.currentItem?.blocksTabNavigation
+                enabled: root.shouldBeVisible && !tabOptions.shown && !pageActions.menuOpen && !root.editMode && !pages.currentItem?.blocksTabNavigation
                 context: Qt.WindowShortcut
                 onActivated: pages.currentItem?.moveCardFocus?.("down")
             }
@@ -527,10 +571,11 @@ DankPopout {
                 anchors.margins: -(contentInset + Theme.spacingS)
                 z: 2
                 visible: root.editMode
-                edgeResize: true
+                edgeResize: mainContainer.panelResizer.sideMovable(-1, mainContainer.panelColumns)
+                cornerResize: mainContainer.panelResizer.sideMovable(1, mainContainer.panelColumns)
                 removable: false
                 cornerRadius: Theme.windowRadius + Theme.spacingS
-                handleOverhang: contentInset + Theme.spacingL
+                handleOverhang: contentInset
                 buttonSize: PopoutMetrics.chromeButtonSize
                 iconSize: PopoutMetrics.chromeIconSize
                 resizing: mainContainer.panelResizing || mainContainer.panelShifted
@@ -540,21 +585,6 @@ DankPopout {
                 onResizeMoved: (px, py) => mainContainer.panelResizer.move(px, py)
                 onResizeEnded: mainContainer.panelResizer.end()
                 onResizeCanceled: mainContainer.panelResizer.cancel()
-            }
-
-            DashPageMenu {
-                id: headerMenu
-                entryId: root.activeTabId
-                tabItem: pages.currentItem
-                editMode: root.editMode
-                panelResizable: true
-                onEditRequested: root.editMode = true
-                onOptionsRequested: tabOptions.presentFor(root.activeTabId)
-                onSettingsRequested: {
-                    root.dashVisible = false;
-                    root.instantClose();
-                    PopoutService.openSettingsWithTab("dank_dash");
-                }
             }
 
             Item {
@@ -573,138 +603,100 @@ DankPopout {
                     anchors.leftMargin: DashMetrics.contentPadding
                     anchors.bottomMargin: DashMetrics.contentPadding
                     width: root.popupWidth - DashMetrics.contentPadding * 2
+                    LayoutMirroring.enabled: false
+                    LayoutMirroring.childrenInherit: true
 
                     Item {
                         id: headerRow
+                        enabled: !tabOptions.shown && !pageActions.menuOpen
 
-                        readonly property real stripCenter: (tabBar.y + tabBar.height - Theme.dividerWidth - DashMetrics.contentPadding) / 2
+                        x: root.verticalNavigation && root.navigationEdge === SettingsData.Right ? parent.width - width : 0
+                        y: !root.verticalNavigation && root.navigationEdge === SettingsData.Bottom ? parent.height - height : 0
+                        width: root.verticalNavigation ? Theme.navigationRailWidth : parent.width
+                        height: root.verticalNavigation ? parent.height : mainContainer.horizontalChromeHeight - DashMetrics.contentGap
 
-                        width: parent.width
-                        height: root.showTabs ? Math.max(DashMetrics.tabBarBlockHeight, tabBar.y + tabBar.height) : 0
-                        visible: root.showTabs
-
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.leftMargin: -DashMetrics.contentPadding
-                            anchors.rightMargin: -DashMetrics.contentPadding
-                            y: tabBar.y + tabBar.height - height
-                            height: Theme.dividerWidth
-                            color: Theme.outlineVariant
-                            visible: tabBar.visible
-                        }
-
-                        DankTabBar {
+                        DankNavigationBar {
                             id: tabBar
 
-                            anchors.left: parent.left
-                            anchors.right: menuButton.left
-                            anchors.rightMargin: Theme.spacingS
-                            y: -DashMetrics.tabBarLift
-                            visible: !root.editMode && root.detailTabId === ""
-                            tabHeight: DashMetrics.tabHeight
-                            showDivider: false
+                            width: parent.width
+                            height: parent.height
+                            editable: true
+                            evenlySpaced: SettingsData.dashTabsEvenlySpaced
+                            onEditRequested: root.editMode = true
+                            visible: root.showTabs && !root.editMode
+                            orientation: root.verticalNavigation ? Qt.Vertical : Qt.Horizontal
                             currentIndex: root.currentTabIndex
-                            spacing: Theme.spacingS
-                            equalWidthTabs: true
-                            enableArrowNavigation: false
-                            cycleOnTab: true
-                            nextFocusTarget: pages.focusTarget
+                            nextFocusTarget: pageActions.focusTargets[0] ?? pages.focusTarget
                             previousFocusTarget: pages.currentItem?.previousFocusTarget ?? pages.focusTarget
                             model: DashRegistry.tabBarModel
-
-                            onTabClicked: function (index) {
+                            onActivated: index => {
                                 const id = root.orderedTabIds[index];
                                 if (id !== undefined)
                                     root.currentTabId = id;
                             }
                         }
 
-                        DashEditControls {
-                            id: editControls
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            y: Math.round(headerRow.stripCenter - height / 2)
-                            visible: root.editMode
-                            canAdd: (pages.currentItem?.addable?.length ?? 0) > 0
-                            hasWidgets: mainContainer.hasWidgets
-                            title: mainContainer.hasWidgets ? I18n.tr("Widgets") : (DashRegistry.entry(root.activeTabId)?.text ?? "")
-                            onAddRequested: anchor => pages.currentItem?.openAddMenu(anchor)
-                            onMenuRequested: anchor => headerMenu.openAt(anchor)
-                            onFinished: root.editMode = false
-                        }
-
-                        Item {
-                            id: detailHeader
-
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            y: Math.round(headerRow.stripCenter - height / 2)
-                            height: DashMetrics.headerActionSize
-                            visible: root.detailTabId !== "" && !root.editMode
-
-                            DankActionButton {
-                                id: backButton
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                buttonSize: DashMetrics.headerActionSize
-                                iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
-                                Accessible.name: I18n.tr("Back")
-                                KeyNavigation.tab: pages.focusTarget
-                                KeyNavigation.backtab: pages.focusTarget
-                                onClicked: root.closeDetail()
-                            }
-
-                            StyledText {
-                                anchors.left: backButton.right
-                                anchors.right: parent.right
-                                anchors.leftMargin: Theme.spacingS
-                                anchors.rightMargin: DashMetrics.headerActionSize + Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: root.detailEntry?.text ?? ""
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Theme.fontWeightMedium
-                                color: Theme.surfaceText
-                                elide: Text.ElideRight
-                            }
-                        }
-
                         DankActionButton {
-                            id: menuButton
+                            id: backButton
+                            x: I18n.isRtl ? parent.width - width : 0
+                            anchors.verticalCenter: parent.verticalCenter
+                            buttonSize: Theme.buttonHeightS
+                            iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
+                            tooltipText: I18n.tr("Back")
+                            visible: root.showBack && !root.editMode
+                            onClicked: root.closeDetail()
+                        }
 
-                            anchors.right: parent.right
-                            y: Math.round(headerRow.stripCenter - height / 2)
-                            buttonSize: DashMetrics.headerActionSize
-                            iconName: "more_vert"
-                            iconColor: headerMenu.open ? Theme.primary : Theme.onSurfaceVariant
-                            backgroundColor: headerMenu.open ? Theme.withAlpha(Theme.primary, Theme.stateLayerFocus) : "transparent"
-                            Accessible.name: I18n.tr("Options")
-                            visible: !root.editMode
-                            KeyNavigation.tab: pages.focusTarget
-                            KeyNavigation.backtab: root.detailTabId !== "" ? backButton : tabBar
-                            onClicked: headerMenu.openAt(menuButton)
+                        DashPageTitle {
+                            id: pageTitle
+                            readonly property real backWidth: root.showBack ? backButton.width + Theme.spacingS : 0
+                            x: I18n.isRtl ? 0 : backWidth
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: Math.max(0, parent.width - backWidth)
+                            height: implicitHeight
+                            entryId: root.activeTabId
+                            visible: !root.showTabs && !root.editMode
+                            onEditRequested: root.editMode = true
+                        }
+
+                        DashPageActions {
+                            id: pageActions
+                            x: root.verticalNavigation ? 0 : (parent.width - width) / 2
+                            y: (parent.height - height) / 2
+                            width: Math.min(parent.width, implicitWidth)
+                            height: Math.min(parent.height, implicitHeight)
+                            visible: root.editMode
+                            vertical: root.verticalNavigation
+                            overlayParent: mainContainer
+                            entryId: root.activeTabId
+                            tabItem: pages.currentItem
+                            editMode: root.editMode
+                            panelResizable: true
+                            onOptionsRequested: tabOptions.presentFor(root.activeTabId)
+                            onFinished: root.editMode = false
                         }
                     }
 
                     DankFlickable {
                         id: pages
+                        enabled: !tabOptions.shown && !pageActions.menuOpen
 
                         property var currentHost: null
-                        property real settledHeight: DashMetrics.tabMinHeight
-                        readonly property var currentItem: currentHost?.item ?? null
-                        readonly property Item focusTarget: currentHost?.focusTarget ?? null
+                        property real settledHeight: DashMetrics.tabDefaultHeight
+                        readonly property var currentItem: root.activeTabId !== "" ? currentHost?.item ?? null : null
+                        readonly property Item focusTarget: root.activeTabId === "" ? emptySettings : currentHost?.focusTarget ?? null
                         readonly property bool currentSettled: !!currentHost && (!!currentHost.item || currentHost.failed)
                         readonly property real currentHostImplicitHeight: currentHost?.implicitHeight ?? 0
-                        readonly property real targetHeight: currentSettled && currentHost.isCurrent ? DashMetrics.panelHeightFor(root.activeTabId, currentHostImplicitHeight) : -1
-                        readonly property real bodyHeight: Math.max(settledHeight, currentHostImplicitHeight)
+                        readonly property real targetHeight: root.activeTabId === "" ? emptyContent.implicitHeight : currentSettled && currentHost.isCurrent ? DashMetrics.panelHeightFor(root.activeTabId, currentHostImplicitHeight) : -1
+                        readonly property real bodyHeight: root.activeTabId === "" ? emptyContent.implicitHeight : Math.max(settledHeight, currentHostImplicitHeight)
                         readonly property bool ready: targetHeight >= 0 && settledHeight === targetHeight
-                        readonly property real availableHeight: root.screen ? root.screen.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
+                        readonly property real availableHeight: root.screen ? root.screen.height - mainContainer.horizontalChromeHeight - DashMetrics.contentPadding * 2 - Theme.barHeight - Theme.spacingL * 2 : contentHeight
                         readonly property int rowBudget: DashMetrics.rowCapFor(availableHeight)
 
-                        x: -root.editGutter
-                        y: (headerRow.visible ? headerRow.height + DashMetrics.contentGap : 0) - root.editGutter
-                        width: parent.width + root.editGutter * 2
-                        height: Math.max(0, mainContainer.height - headerRow.height - DashMetrics.contentGap - DashMetrics.contentPadding * 2) + root.editGutter * 2
+                        x: (root.verticalNavigation && root.navigationEdge === SettingsData.Left ? root.navigationWidth : 0) - root.editGutter
+                        y: (!root.verticalNavigation && root.navigationEdge !== SettingsData.Bottom ? mainContainer.horizontalChromeHeight : 0) - root.editGutter
+                        width: parent.width - root.navigationWidth + root.editGutter * 2
+                        height: Math.max(0, mainContainer.height - mainContainer.horizontalChromeHeight - DashMetrics.contentPadding * 2) + root.editGutter * 2
                         implicitHeight: Math.min(settledHeight, Math.max(DashMetrics.gridRowUnit, availableHeight))
                         contentWidth: width
                         contentHeight: bodyHeight + root.editGutter * 2
@@ -717,6 +709,30 @@ DankPopout {
                         }
 
                         onTargetHeightChanged: Qt.callLater(updateContentHeight)
+
+                        Column {
+                            id: emptyContent
+                            width: parent.width
+                            spacing: Theme.spacingM
+                            visible: root.activeTabId === ""
+
+                            CcEmptyState {
+                                iconName: "dashboard"
+                                title: I18n.tr("No tabs enabled", "Dashboard empty state when all navigation tabs are hidden")
+                            }
+
+                            DankButton {
+                                id: emptySettings
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: I18n.tr("Settings")
+                                iconName: "settings"
+                                onClicked: {
+                                    root.dashVisible = false;
+                                    root.instantClose();
+                                    PopoutService.openSettingsWithTab("dank_dash");
+                                }
+                            }
+                        }
 
                         Repeater {
                             model: ScriptModel {
@@ -739,8 +755,12 @@ DankPopout {
                                 isCurrent: root.activeTabId === modelData
 
                                 onIsCurrentChanged: {
-                                    if (isCurrent)
+                                    if (isCurrent) {
                                         pages.currentHost = host;
+                                        return;
+                                    }
+                                    if (pages.currentHost === host)
+                                        pages.currentHost = null;
                                 }
 
                                 Component.onCompleted: {

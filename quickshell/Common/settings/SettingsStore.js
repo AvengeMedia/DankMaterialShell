@@ -159,6 +159,9 @@ function extractPins(obj) {
 function parse(root, jsonObj) {
     jsonObj = migrateToVersion(jsonObj || {}, root.settingsConfigVersion) || jsonObj || {};
     jsonObj.dockConfigs = DockConfig.normalize(jsonObj.dockConfigs);
+    // the dock pages configure whichever dock is selected, so an empty list leaves them blank
+    if (!jsonObj.dockConfigs.length)
+        delete jsonObj.dockConfigs;
     var SPEC = SpecModule.SPEC;
 
     if (!jsonObj)

@@ -16,12 +16,15 @@ Item {
     property bool removable: true
     property bool horizontalResize: false
     property bool edgeResize: false
+    property bool cornerResize: true
+    property real hitOverflow: -1
     property real cornerRadius: Theme.cornerRadiusXL
     property real buttonSize: Theme.iconSizeLarge
     property real iconSize: Theme.iconSizeSmall
     readonly property real touchTargetSize: Math.max(Theme.minimumTouchTargetSize, buttonSize)
     readonly property real contentInset: touchTargetSize / 2
     readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (horizontalResize ? 3 : 2)
+    readonly property rect hitBounds: Qt.rect(contentInset - hitOverflow, contentInset - hitOverflow, width - (contentInset - hitOverflow) * 2, height - (contentInset - hitOverflow) * 2)
 
     signal removeRequested
     signal optionsRequested(var anchor)
@@ -29,6 +32,17 @@ Item {
     signal resizeCanceled
     signal resizeMoved(real px, real py)
     signal resizeEnded
+
+    component HitMask: Item {
+        required property Item target
+        readonly property real insetX: Math.max(0, root.hitBounds.x - target.x)
+        readonly property real insetY: Math.max(0, root.hitBounds.y - target.y)
+
+        x: insetX
+        y: insetY
+        width: Math.max(0, Math.min(target.width, root.hitBounds.x + root.hitBounds.width - target.x) - insetX)
+        height: Math.max(0, Math.min(target.height, root.hitBounds.y + root.hitBounds.height - target.y) - insetY)
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -65,7 +79,13 @@ Item {
         tooltipText: I18n.tr("Remove")
         visible: root.removable
         enabled: !root.dragging && !root.resizing
+        containmentMask: root.hitOverflow < 0 ? null : removeMask
         onClicked: root.removeRequested()
+
+        HitMask {
+            id: removeMask
+            target: removeButton
+        }
         onPressAndHold: {
             if (root.hasOptions)
                 root.optionsRequested(removeButton);
@@ -91,7 +111,13 @@ Item {
         tooltipText: I18n.tr("Options")
         visible: root.showOptionsButton
         enabled: !root.dragging && !root.resizing
+        containmentMask: root.hitOverflow < 0 ? null : optionsMask
         onClicked: root.optionsRequested(optionsButton)
+
+        HitMask {
+            id: optionsMask
+            target: optionsButton
+        }
     }
 
     Rectangle {
@@ -174,6 +200,12 @@ Item {
             anchors.fill: parent
             signX: handleItem.signX
             cursorShape: root.horizontalResize ? Qt.SizeHorCursor : (handleItem.diagonalFlipped ? Qt.SizeBDiagCursor : Qt.SizeFDiagCursor)
+            containmentMask: root.hitOverflow < 0 ? null : handleMask
+
+            HitMask {
+                id: handleMask
+                target: handleItem
+            }
         }
     }
 
@@ -181,6 +213,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: root.contentInset - (root.horizontalResize ? width / 2 : root.handleOverhang)
         z: 1
+        visible: root.cornerResize
     }
 
     Loader {

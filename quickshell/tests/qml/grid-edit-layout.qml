@@ -24,9 +24,8 @@ ShellRoot {
             property bool mirrored: false
             width: 568
             editMode: true
-            slotLayout: GridUtils.packCards(layoutItems, visualOrder, 8, width, 8, 64, mirrored)
-            onReorderCommitted: items => sourceItems = items
-            onResizeCommitted: (index, changes) => sourceItems = sourceItems.map((item, i) => i === index ? Object.assign({}, item, changes) : item)
+            slotLayout: GridUtils.packCards(layoutItems, placementOrder, 8, width, 8, 64, mirrored)
+            onLayoutCommitted: items => sourceItems = items
 
             Repeater {
                 id: slots
@@ -102,8 +101,8 @@ ShellRoot {
                 editGrid.animationsEnabled = false;
                 editGrid.beginDrag(0);
                 const destination = slots.itemAt(1).slot;
-                editGrid.updateDragTarget(destination.x + destination.w / 2, destination.y + destination.h / 2);
                 const dragged = slots.itemAt(0);
+                editGrid.updateDragTarget(mirrored ? destination.x + destination.w - dragged.slot.w : destination.x, destination.y);
                 dragged.x = dragged.slot.x;
                 dragged.y = dragged.slot.y;
                 const before = Array.from({
@@ -120,9 +119,10 @@ ShellRoot {
                 editGrid.animationsEnabled = true;
                 editGrid.animateLayout = true;
                 editGrid.endDrag();
-                placed("committing a reorder");
+                placed("committing a move");
                 for (const entry of before)
-                    check(JSON.parse(entry.item.json).id === entry.id && entry.item.x === entry.x && entry.item.y === entry.y, "reorder preserves each tile and its preview position");
+                    check(JSON.parse(entry.item.json).id === entry.id && entry.item.x === entry.x && entry.item.y === entry.y, "move preserves each tile and its preview position");
+                check(editGrid.sourceItems[0].col === 2 && editGrid.sourceItems[1].row === 1 && editGrid.sourceItems[2].col === 4, "move lands on the cell and pushes only the collided tile ");
 
                 editGrid.animateLayout = true;
                 editGrid.sourceItems = editGrid.sourceItems.slice(1);

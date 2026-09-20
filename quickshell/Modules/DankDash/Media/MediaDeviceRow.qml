@@ -38,7 +38,7 @@ SettingsRow {
     leading: Rectangle {
         width: Theme.iconButtonSize
         height: width
-        radius: Theme.cornerRadiusFull
+        radius: Theme.fullRadius(width, height)
         color: root.selected ? Theme.onPrimary : Theme.chipSurface
 
         DankIcon {

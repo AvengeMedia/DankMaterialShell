@@ -201,25 +201,25 @@ ShellRoot {
                 grid.availableHeight = CcMetrics.gridRowUnit * 5 + CcMetrics.gridGap * 4;
                 check(grid.slotLayout.slots[0].rows <= 5, "tile height fits the available screen");
                 grid.beginDrag(0);
-                grid.visualOrder = [1, 0];
+                grid.updateDragTarget(0, grid.cellWidth);
                 grid.endDrag();
-                check(SettingsData.controlCenterWidgets[1].w === 10 && SettingsData.controlCenterWidgets[1].h === 12, "reordering on a smaller screen preserves saved spans");
-                grid.previewSize(1, {
+                check(SettingsData.controlCenterWidgets[0].w === 10 && SettingsData.controlCenterWidgets[0].h === 12 && SettingsData.controlCenterWidgets[0].row === 1 && SettingsData.controlCenterWidgets[1].row === grid.maximumRows + 1, "moving on a smaller screen preserves saved spans and pushes the collided tile " + JSON.stringify(SettingsData.controlCenterWidgets));
+                grid.previewSize(0, {
                     w: 6
                 });
                 grid.commitSize();
-                check(SettingsData.controlCenterWidgets[1].w === 6 && SettingsData.controlCenterWidgets[1].h === 12, "width edits preserve the saved height on a smaller screen");
-                grid.previewSize(1, {
+                check(SettingsData.controlCenterWidgets[0].w === 6 && SettingsData.controlCenterWidgets[0].h === 12, "width edits preserve the saved height on a smaller screen");
+                grid.previewSize(0, {
                     w: 2.5
                 });
                 grid.commitSize();
-                grid.previewSize(1, {
+                grid.previewSize(0, {
                     h: 1.5
                 });
                 grid.commitSize();
-                const half = grid.slotLayout.slots[1];
+                const half = grid.slotLayout.slots[0];
                 const cell = grid.cellWidth - CcMetrics.gridGap;
-                check(SettingsData.controlCenterWidgets[1].w === 2.5 && SettingsData.controlCenterWidgets[1].h === 1.5 && half.cols === 2.5 && half.rows === 1.5, "half steps are saved on both axes");
+                check(SettingsData.controlCenterWidgets[0].w === 2.5 && SettingsData.controlCenterWidgets[0].h === 1.5 && half.cols === 2.5 && half.rows === 1.5, "half steps are saved on both axes");
                 check(Math.abs(half.w - (cell * 2.5 + CcMetrics.gridGap * 1.5)) < 0.01 && Math.abs(half.h - (cell * 1.5 + CcMetrics.gridGap * 0.5)) < 0.01, "half spans pack at half pitch");
                 check(WidgetUtils.clampSize({
                     id: "volumeSlider",

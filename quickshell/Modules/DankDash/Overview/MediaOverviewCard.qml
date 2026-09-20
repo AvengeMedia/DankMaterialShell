@@ -26,12 +26,13 @@ Card {
     readonly property color accent: MediaAccentService.accent
     readonly property bool showSeekbar: options.seekbar !== false && !tiny
     readonly property bool circleArt: options.artStyle === "circle"
+    readonly property bool zurvan: options.playerStyle === "zurvan"
     readonly property bool inlineMetadata: compact && titleLabel.implicitHeight + artistLabel.implicitHeight + trackText.spacing > transport.y - Theme.spacingXS
     readonly property var playbackFocusTargets: [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
 
     entryId: "media"
     clickable: true
-    pad: compact ? Theme.spacingS : Theme.spacingM
+    pad: Theme.spacingM
 
     Keys.onShortcutOverride: event => {
         if (!root.interactive || event.key !== Qt.Key_F6)
@@ -161,6 +162,7 @@ Card {
             id: transport
 
             readonly property bool stacked: root.narrow && !root.tiny
+            readonly property bool centered: root.zurvan && !stacked && !root.tiny
             readonly property bool medium: !root.compact && width >= Theme.buttonHeightM * 4
             readonly property real buttonHeight: medium ? Theme.buttonHeightM : Theme.buttonHeightS
             readonly property real spacing: root.compact || stacked ? Theme.spacingXS : Theme.spacingS
@@ -172,7 +174,7 @@ Card {
 
             DankIconButton {
                 id: playButton
-                anchors.left: parent.left
+                x: transport.centered ? previousButton.width + transport.spacing : 0
                 anchors.top: parent.top
                 size: transport.medium ? "m" : "s"
                 width: {
@@ -196,11 +198,14 @@ Card {
 
             DankIconButton {
                 id: previousButton
-                anchors.left: transport.stacked ? parent.left : playButton.right
-                anchors.leftMargin: transport.stacked ? 0 : transport.spacing
+                x: transport.stacked || transport.centered ? 0 : playButton.width + transport.spacing
                 anchors.bottom: parent.bottom
                 size: transport.medium ? "m" : "s"
                 width: transport.stacked ? (parent.width - transport.spacing) / 2 : (parent.width - playButton.width - transport.spacing * 2) / 2
+                variant: root.zurvan ? "tonal" : "standard"
+                round: !root.zurvan
+                containerColor: MediaAccentService.accentSecondaryContainer
+                contentColor: root.zurvan ? MediaAccentService.onAccentSecondaryContainer : Theme.onSecondaryContainer
                 iconName: "skip_previous"
                 Accessible.name: I18n.tr("Previous")
                 enabled: !!root.activePlayer?.canGoPrevious || (!!root.activePlayer?.canSeek && root.activePlayer.position > 8)
@@ -214,6 +219,10 @@ Card {
                 anchors.bottom: parent.bottom
                 size: transport.medium ? "m" : "s"
                 width: previousButton.width
+                variant: previousButton.variant
+                round: previousButton.round
+                containerColor: previousButton.containerColor
+                contentColor: previousButton.contentColor
                 iconName: "skip_next"
                 Accessible.name: I18n.tr("Next")
                 enabled: !!root.activePlayer?.canGoNext

@@ -128,9 +128,11 @@ BasePill {
 
         DankIconButton {
             anchors.centerIn: parent
-            width: Theme.buttonHeightS
-            buttonSize: Theme.buttonHeightS
-            scale: parent.width / width
+            width: parent.width
+            height: parent.height
+            buttonSize: parent.width
+            iconSize: 14 * root.contentScale
+            radius: pressed ? Theme.cornerRadiusXS : (checked ? Theme.cornerRadiusFull : Theme.cornerRadiusS)
             variant: "filled"
             round: false
             checkable: true

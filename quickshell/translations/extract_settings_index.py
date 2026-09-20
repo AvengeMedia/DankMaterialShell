@@ -424,7 +424,7 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
                     condition_key = "isMango"
                 elif "KeybindsService.available" in visible_raw:
                     condition_key = "keybindsAvailable"
-                elif "AudioService.soundsAvailable" in visible_raw:
+                elif "MultimediaService.unavailable" in visible_raw:
                     condition_key = "soundsAvailable"
                 elif "CupsService.cupsAvailable" in visible_raw:
                     condition_key = "cupsAvailable"

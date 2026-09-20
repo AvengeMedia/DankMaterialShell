@@ -28,6 +28,7 @@ FocusScope {
     property var pageHistory: []
     readonly property bool panelResizing: panelResizer.resizing
     readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidthFor(gridColumns)
+    readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - CcMetrics.headerHeight - Theme.spacingS * 2 - editControls.height
@@ -42,8 +43,10 @@ FocusScope {
         maxStep: root.gridColumnCap
         onPreview: columns => CcMetrics.columnPreview = columns
         onCommitted: columns => {
+            const widgets = widgetGrid.displayedItems();
             SettingsData.set("controlCenterColumns", columns);
             CcMetrics.columnPreview = 0;
+            widgetModel.setLayout(widgets);
         }
         onCanceled: CcMetrics.columnPreview = 0
     }
@@ -185,6 +188,10 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
+        topLeftRadius: root.surfaceCornerRadii.x
+        topRightRadius: root.surfaceCornerRadii.y
+        bottomRightRadius: root.surfaceCornerRadii.z
+        bottomLeftRadius: root.surfaceCornerRadii.w
         color: Qt.rgba(0, 0, 0, Theme.scrimAlpha)
         opacity: root.host.powerMenuOpen ? 1 : 0
         visible: opacity > 0
@@ -325,6 +332,7 @@ FocusScope {
         z: CcMetrics.overlayZ
         active: false
         sourceComponent: BluetoothCodecSelector {
+            cornerRadii: root.surfaceCornerRadii
             onDismissed: Qt.callLater(root.releaseSheet, codecSelectorLoader)
         }
     }
@@ -336,6 +344,7 @@ FocusScope {
         z: CcMetrics.overlayZ
         active: false
         sourceComponent: AudioPortSelector {
+            cornerRadii: root.surfaceCornerRadii
             onDismissed: Qt.callLater(root.releaseSheet, portSelectorLoader)
         }
     }

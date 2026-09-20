@@ -221,6 +221,12 @@ func smartSchemePreview(fallback SchemePreview, sourceColor string, contrast flo
 		opts.Kind = "image"
 		opts.Value = imagePath
 	}
+	_, cleanup, err := stageImageSource(opts)
+	if err != nil {
+		log.Warnf("Smart scheme preview failed falling back to tonal-spot: %v", err)
+		return fallback
+	}
+	defer cleanup()
 	output, err := runMatugenDryRun(opts)
 	if err != nil {
 		log.Warnf("Smart scheme preview failed falling back to tonal-spot: %v", err)
@@ -353,6 +359,11 @@ func buildOnce(opts *Options) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	sourceImage, cleanup, err := stageImageSource(opts)
+	if err != nil {
+		return false, err
+	}
+	defer cleanup()
 	if err := resolveSmartMode(opts, flags); err != nil {
 		return false, err
 	}
@@ -380,7 +391,6 @@ func buildOnce(opts *Options) (bool, error) {
 	var primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight string
 	var dank16JSON string
 	var importArgs []string
-	var sourceImage string
 
 	// Colorful mode resolves the seed here, before matugen is invoked at all,
 	// by rewriting the source to the extracted hex. Both the dry-run and the
@@ -394,12 +404,6 @@ func buildOnce(opts *Options) (bool, error) {
 			return false, err
 		}
 		log.Infof("Seed color override: %s -> %s", opts.Value, seed)
-		if opts.Kind == "image" {
-			sourceImage = opts.Value
-			if abs, err := filepath.Abs(sourceImage); err == nil {
-				sourceImage = abs
-			}
-		}
 		opts.Kind = "hex"
 		opts.Value = seed
 		opts.SourceMode = SourceModeDominant
@@ -410,11 +414,6 @@ func buildOnce(opts *Options) (bool, error) {
 			log.Warnf("Colorful source extraction failed for %s, using matugen's own: %v", opts.Value, err)
 		} else {
 			log.Infof("Colorful source color: %s -> %s", opts.Value, seed)
-			// matugen resolves {{image}} to an absolute path, so match it.
-			sourceImage = opts.Value
-			if abs, err := filepath.Abs(sourceImage); err == nil {
-				sourceImage = abs
-			}
 			opts.Kind = "hex"
 			opts.Value = seed
 		}
@@ -851,6 +850,7 @@ var vscodeEditors = []vscodeEditor{
 	{"codium", ".vscode-oss"},
 	{"cursor", ".cursor"},
 	{"windsurf", ".windsurf"},
+	{"positron", ".positron"},
 	{"vscode-insiders", ".vscode-insiders"},
 }
 
