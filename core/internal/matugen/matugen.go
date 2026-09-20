@@ -850,6 +850,7 @@ var vscodeEditors = []vscodeEditor{
 	{"codium", ".vscode-oss"},
 	{"cursor", ".cursor"},
 	{"windsurf", ".windsurf"},
+	{"positron", ".positron"},
 	{"vscode-insiders", ".vscode-insiders"},
 }
 
