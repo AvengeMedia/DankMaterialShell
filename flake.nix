@@ -275,7 +275,7 @@
                 nil
               ]
               ++ devQmlPkgs
-              ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ niriForTests pkgs.xvfb pkgs.dbus ];
+              ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [ niriForTests pkgs.xvfb pkgs.dbus ];
 
             shellHook = ''
               touch quickshell/.qmlls.ini 2>/dev/null
