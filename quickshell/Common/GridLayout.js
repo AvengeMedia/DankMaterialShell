@@ -1,9 +1,7 @@
 function packCells(cards, order, columns, isAvailable, step = 1) {
     const steps = Math.round(columns / step);
     const cells = [];
-    const heights = [];
-    for (let c = 0; c < steps; c++)
-        heights.push(0);
+    const taken = [];
     let rows = 0;
 
     for (let p = 0; p < order.length; p++) {
@@ -18,23 +16,12 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
 
         const w = Math.max(1, Math.min(steps, Math.round((card.w || 1) / step)));
         const h = Math.max(1, Math.round((card.h || 1) / step));
-        let bestX = 0;
-        let bestY = Infinity;
-        for (let x = 0; x + w <= steps; x++) {
-            let y = 0;
-            for (let c = x; c < x + w; c++)
-                y = Math.max(y, heights[c]);
-            if (y >= bestY)
-                continue;
-            bestY = y;
-            bestX = x;
-        }
-        for (let c = bestX; c < bestX + w; c++)
-            heights[c] = bestY + h;
-        rows = Math.max(rows, bestY + h);
+        const cell = positioned(card) ? settle(taken, Math.max(0, Math.min(steps - w, Math.round(card.col / step))), Math.max(0, Math.round(card.row / step)), w, h) : firstFit(taken, steps, w, h);
+        taken.push(cell);
+        rows = Math.max(rows, cell.y + cell.h);
         cells[sourceIndex] = {
-            "col": bestX * step,
-            "row": bestY * step,
+            "col": cell.x * step,
+            "row": cell.y * step,
             "cols": w * step,
             "rows": h * step
         };
@@ -43,6 +30,46 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
     return {
         "cells": cells,
         "rows": rows * step
+    };
+}
+
+function positioned(card) {
+    return Number.isFinite(card.col) && Number.isFinite(card.row);
+}
+
+function overlaps(taken, x, y, w, h) {
+    return taken.some(cell => x < cell.x + cell.w && cell.x < x + w && y < cell.y + cell.h && cell.y < y + h);
+}
+
+function settle(taken, x, y, w, h) {
+    while (overlaps(taken, x, y, w, h))
+        y++;
+    return {
+        "x": x,
+        "y": y,
+        "w": w,
+        "h": h
+    };
+}
+
+function firstFit(taken, steps, w, h) {
+    const ceiling = taken.reduce((top, cell) => Math.max(top, cell.y + cell.h), 0);
+    for (let y = 0; y < ceiling; y++) {
+        for (let x = 0; x + w <= steps; x++) {
+            if (!overlaps(taken, x, y, w, h))
+                return {
+                    "x": x,
+                    "y": y,
+                    "w": w,
+                    "h": h
+                };
+        }
+    }
+    return {
+        "x": 0,
+        "y": ceiling,
+        "w": w,
+        "h": h
     };
 }
 
@@ -69,8 +96,32 @@ function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailab
     return {
         "slots": slots,
         "rows": packed.rows,
-        "totalHeight": packed.rows > 0 ? packed.rows * rowUnit + (packed.rows - 1) * gap : 0
+        "totalHeight": packed.rows > 0 ? packed.rows * rowUnit + (packed.rows - 1) * gap : 0,
+        "columns": columns,
+        "width": width,
+        "colW": colW,
+        "rowUnit": rowUnit,
+        "gap": gap,
+        "step": step,
+        "mirror": mirror
     };
+}
+
+function cellAt(layout, x, y, cols, rows) {
+    const px = layout.mirror ? layout.width - x - (cols * layout.colW + (cols - 1) * layout.gap) : x;
+    const col = Math.round(px / (layout.colW + layout.gap) / layout.step) * layout.step;
+    const row = Math.round(y / (layout.rowUnit + layout.gap) / layout.step) * layout.step;
+    return {
+        "col": Math.max(0, Math.min(layout.columns - cols, col)),
+        "row": Math.max(0, row)
+    };
+}
+
+function placedItems(items, slots) {
+    return items.map((item, i) => slots[i] ? Object.assign({}, item, {
+            "col": slots[i].col,
+            "row": slots[i].row
+        }) : item);
 }
 
 function rowLimit(cards, order, columns, rows, isAvailable) {

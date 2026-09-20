@@ -27,6 +27,14 @@ QtObject {
         return popout.alignedXFor(width) + (side > 0 ? width : 0);
     }
 
+    function sideMovable(signX, step) {
+        const side = (signX < 0 ? -1 : 1) * (I18n.isRtl ? -1 : 1);
+        const width = widthFor(step) + gutter * 2;
+        const x = popout.alignedXFor(width);
+        const grown = popout.alignedXFor(width + stepWidth);
+        return side > 0 ? grown + stepWidth !== x : grown !== x;
+    }
+
     function begin(px, py, signX) {
         if (_drag)
             return;

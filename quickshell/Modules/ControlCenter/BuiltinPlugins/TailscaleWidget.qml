@@ -86,7 +86,7 @@ PluginComponent {
                 Column {
                     id: detailColumn
                     width: parent.width
-                    spacing: Theme.spacingM
+                    spacing: CcMetrics.detailContentGap
 
                     CcEmptyState {
                         visible: !TailscaleService.available

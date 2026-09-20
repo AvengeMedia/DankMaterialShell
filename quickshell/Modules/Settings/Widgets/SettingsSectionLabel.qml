@@ -9,6 +9,8 @@ Item {
     property alias actions: actionsRow.data
     property bool collapsible: false
     property bool expanded: true
+    property real topGap: SettingsMetrics.sectionLabelTopGap
+    property real bottomGap: SettingsMetrics.sectionLabelBottomGap
 
     activeFocusOnTab: collapsible && enabled
     Accessible.role: collapsible ? Accessible.Button : Accessible.StaticText
@@ -39,7 +41,7 @@ Item {
     signal toggleRequested
 
     width: parent?.width ?? 0
-    height: Math.max(label.implicitHeight, actionsRow.implicitHeight, caret.height) + SettingsMetrics.sectionLabelTopGap + SettingsMetrics.sectionLabelBottomGap
+    height: Math.max(label.implicitHeight, actionsRow.implicitHeight, collapsible ? caret.height : 0) + topGap + bottomGap
 
     StyledText {
         id: label
@@ -47,7 +49,7 @@ Item {
         anchors.right: actionsRow.left
         anchors.rightMargin: Theme.spacingS
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: (SettingsMetrics.sectionLabelTopGap - SettingsMetrics.sectionLabelBottomGap) / 2
+        anchors.verticalCenterOffset: (root.topGap - root.bottomGap) / 2
         text: root.text
         font.pixelSize: Theme.fontSizeMedium
         font.weight: Theme.fontWeightMedium
@@ -90,8 +92,8 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.topMargin: SettingsMetrics.sectionLabelTopGap - Theme.spacingXS
-        anchors.bottomMargin: SettingsMetrics.sectionLabelBottomGap - Theme.spacingXS
+        anchors.topMargin: root.topGap - Theme.spacingXS
+        anchors.bottomMargin: root.bottomGap - Theme.spacingXS
         anchors.leftMargin: -Theme.spacingS
         anchors.rightMargin: -Theme.spacingS
         radius: Theme.cornerRadiusS

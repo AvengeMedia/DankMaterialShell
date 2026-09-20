@@ -133,11 +133,11 @@ Item {
         if (!monitoringActive)
             return [];
         var modules = ["system"];
-        if (showCpu || showCpuTemp || showCpuGraph)
+        if (showCpu)
             modules.push("cpu");
-        if (showMemory || showMemoryGraph)
+        if (showMemory)
             modules.push("memory");
-        if (showNetwork || showNetworkGraph)
+        if (showNetwork)
             modules.push("network");
         if (showDisk)
             modules.push("disk", "diskmounts");

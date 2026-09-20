@@ -53,7 +53,7 @@ CcSheetDialog {
 
     DankButton {
         anchors.right: parent.right
-        text: I18n.tr("Reset")
+        text: I18n.tr("Reset to default")
         iconName: "restart_alt"
         buttonHeight: Theme.buttonHeightXS
         backgroundColor: "transparent"

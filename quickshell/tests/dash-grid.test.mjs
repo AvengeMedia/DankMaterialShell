@@ -43,3 +43,26 @@ test("unavailable cards take no space", () => {
     assert.equal(grid.packCells(cards, order, 6, isAvailable).cells[2], null);
     assert.deepEqual(plain(grid.fitNewCard(cards, 6, 5, "user", { w: 3, h: 3 }, unit, isAvailable)), { w: 3, h: 3 });
 });
+
+test("positioned cards keep their cells and push only what they collide with", () => {
+    const board = [{ id: "a", w: 2, h: 1, col: 0, row: 0 }, { id: "b", w: 2, h: 1, col: 2, row: 0 }, { id: "c", w: 2, h: 1, col: 4, row: 2 }];
+    const packed = grid.packCells(board, [0, 1, 2], 6);
+    assert.deepEqual(plain(packed.cells.map(c => [c.col, c.row])), [[0, 0], [2, 0], [4, 2]]);
+    const grown = board.map((card, i) => i === 0 ? Object.assign({}, card, { w: 3 }) : card);
+    assert.deepEqual(plain(grid.packCells(grown, [0, 1, 2], 6).cells.map(c => [c.col, c.row])), [[0, 0], [2, 1], [4, 2]]);
+    assert.deepEqual(plain(grid.packCells(grown, [1, 0, 2], 6).cells.map(c => [c.col, c.row])), [[0, 1], [2, 0], [4, 2]]);
+});
+
+test("cards without a cell take the first free one and cells clamp to the columns", () => {
+    const board = [{ id: "a", w: 2, h: 2, col: 0, row: 0 }, { id: "b", w: 1, h: 1 }, { id: "c", w: 3, h: 1, col: 5, row: 0 }];
+    assert.deepEqual(plain(grid.packCells(board, [0, 1, 2], 6).cells.map(c => [c.col, c.row])), [[0, 0], [2, 0], [3, 0]]);
+    assert.deepEqual(plain(grid.packCells([{ id: "a", w: 1, h: 1, col: 0.5, row: 1.5 }], [0], 4, null, 0.5).cells[0]), { col: 0.5, row: 1.5, cols: 1, rows: 1 });
+});
+
+test("a dragged tile snaps to the cell under its corner", () => {
+    const layout = grid.packCards(cards, order, 6, 600, 0, 100, false);
+    assert.deepEqual(plain(grid.cellAt(layout, 240, 160, 2, 1)), { col: 2, row: 2 });
+    assert.deepEqual(plain(grid.cellAt(layout, 560, -30, 2, 1)), { col: 4, row: 0 });
+    assert.deepEqual(plain(grid.cellAt(grid.packCards(cards, order, 6, 600, 0, 100, true), 0, 0, 2, 1)), { col: 4, row: 0 });
+    assert.deepEqual(plain(grid.placedItems([{ id: "x" }, { id: "y" }], [null, { col: 1, row: 2 }])), [{ id: "x" }, { id: "y", col: 1, row: 2 }]);
+});

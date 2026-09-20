@@ -172,6 +172,13 @@ ShellRoot {
                 beginDrag(root.popout, c);
                 c.panelResizer.end();
                 check(!DashMetrics.panelPreview && SettingsData.dashOptions?.media === undefined, "release without movement stores nothing");
+                check(c.panelRows === DashMetrics.minimumTabRows && c.contentRows === DashMetrics.minimumTabRows && c.panelAtDefault, "media sizes to its content: " + JSON.stringify([c.panelRows, c.contentRows]));
+                beginDrag(root.popout, c);
+                dragTo(root.popout, c, 0, root.rowStep);
+                c.panelResizer.end();
+                check(SettingsData.dashOptions?.media?.panelRows === DashMetrics.minimumTabRows + 1 && c.panelRows === DashMetrics.minimumTabRows + 1 && !c.panelAtDefault, "one row above the content is stored for a content-sized tab: " + JSON.stringify([SettingsData.dashOptions?.media, c.panelRows]));
+                DashRegistry.resetPanelSize("media");
+                check(SettingsData.dashOptions?.media === undefined && c.panelRows === DashMetrics.minimumTabRows, "reset returns media to its content rows: " + c.panelRows);
                 root.popout.editMode = false;
                 DashRegistry.setPanelSize("overview", DashMetrics.defaultGridColumns, root.baseRows + 1);
                 root.popout.requestTab("overview");
@@ -220,6 +227,30 @@ ShellRoot {
                 }
                 {
                     const grid = findGrid(c);
+                    const savedCards = JSON.parse(JSON.stringify(DashRegistry.placed));
+                    SettingsData.set("dashCards", [
+                        {
+                            id: "clock",
+                            w: 2,
+                            h: 1,
+                            col: 0,
+                            row: 0
+                        },
+                        {
+                            id: "user",
+                            w: 2,
+                            h: 1,
+                            col: 2,
+                            row: 0
+                        },
+                        {
+                            id: "media",
+                            w: 3,
+                            h: 1,
+                            col: 0,
+                            row: 1
+                        }
+                    ]);
                     const slots = grid.slotLayout.slots;
                     const lastRow = Math.max(...slots.map(s => s.row));
                     const index = slots.findIndex(s => s.row === lastRow);
@@ -234,6 +265,7 @@ ShellRoot {
                     check(grid.slotLayout.slots.every((s, i) => i === index || (s.col === others[i][0] && s.row === others[i][1])), "no other card moves for a lone card: " + JSON.stringify(grid.slotLayout.slots.map(s => [s.col, s.row])));
                     slot.cancelResize();
                     check(!DashMetrics.panelPreview && SettingsData.dashOptions?.overview === undefined, "cancel leaves nothing stored");
+                    SettingsData.set("dashCards", savedCards);
                 }
                 root.popout.editMode = false;
                 root.popout.requestTab("wallpaper");
@@ -245,40 +277,45 @@ ShellRoot {
                 break;
             case 5:
                 root.wallHeight = root.popout.popupHeight;
-                check(c.contentRows === DashMetrics.rowsForHeight(DashMetrics.tabMinHeight + DashMetrics.wallpaperFooterHeight) && c.panelRows === c.contentRows, "wallpaper rows cover its content: " + JSON.stringify([c.contentRows, c.panelRows]));
-                check(DashMetrics.heightForRows(c.contentRows) > DashMetrics.tabMinHeight + DashMetrics.wallpaperFooterHeight, "wallpaper content sits between rows");
-                check(c.panelResizer.maxRows > c.contentRows, "screen leaves room for one more row: " + JSON.stringify([c.panelResizer.maxRows, c.contentRows]));
+                check(c.contentRows === DashMetrics.minimumTabRows && c.panelRows === DashMetrics.defaultTabRows, "wallpaper rests on the shared default rows: " + JSON.stringify([c.contentRows, c.panelRows]));
+                check(c.panelResizer.maxRows > c.panelRows, "screen leaves room for one more row: " + JSON.stringify([c.panelResizer.maxRows, c.panelRows]));
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, 0, root.rowStep);
-                check(DashMetrics.panelPreview?.rows === c.contentRows + 1, "wallpaper preview adds a row: " + JSON.stringify(DashMetrics.panelPreview));
+                check(DashMetrics.panelPreview?.rows === DashMetrics.defaultTabRows + 1, "wallpaper preview adds a row: " + JSON.stringify(DashMetrics.panelPreview));
                 break;
             case 6:
                 check(root.popout.popupHeight === root.wallHeight + root.rowStep, "one row of drag adds one row of height: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
                 dragTo(root.popout, c, 0, 0);
-                check(DashMetrics.panelPreview?.rows === c.contentRows, "dragging back lands on the content rows");
+                check(DashMetrics.panelPreview?.rows === DashMetrics.defaultTabRows, "dragging back lands on the default rows");
                 break;
             case 7:
-                check(root.popout.popupHeight === root.wallHeight, "the content-row preview matches the resting height: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
+                check(root.popout.popupHeight === root.wallHeight, "the default-row preview matches the resting height: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
                 c.panelResizer.end();
                 check(!DashMetrics.panelPreview && SettingsData.dashOptions?.wallpaper === undefined, "release on the start rows stores nothing");
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, 0, root.rowStep);
                 c.panelResizer.end();
-                check(SettingsData.dashOptions?.wallpaper?.panelRows === c.contentRows + 1, "wallpaper rows stored: " + JSON.stringify(SettingsData.dashOptions?.wallpaper));
+                check(SettingsData.dashOptions?.wallpaper?.panelRows === DashMetrics.defaultTabRows + 1, "wallpaper rows stored: " + JSON.stringify(SettingsData.dashOptions?.wallpaper));
                 break;
             case 8:
                 check(root.popout.popupHeight === root.wallHeight + root.rowStep, "committed rows keep the preview height: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, 0, -root.rowStep);
                 c.panelResizer.end();
-                check(SettingsData.dashOptions?.wallpaper === undefined, "dragging back to the content clears the stored rows");
+                check(SettingsData.dashOptions?.wallpaper === undefined, "dragging back to the default clears the stored rows");
+                beginDrag(root.popout, c);
+                dragTo(root.popout, c, 0, -root.rowStep);
+                c.panelResizer.end();
+                check(SettingsData.dashOptions?.wallpaper?.panelRows === DashMetrics.minimumTabRows && c.panelRows === DashMetrics.minimumTabRows, "wallpaper shrinks below the default down to its content: " + JSON.stringify([SettingsData.dashOptions?.wallpaper, c.panelRows]));
                 break;
             case 9:
-                check(root.popout.popupHeight === root.wallHeight, "cleared rows keep the row-aligned height: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
+                check(root.popout.popupHeight === root.wallHeight - root.rowStep, "stored rows below the default shrink the panel: " + JSON.stringify([root.popout.popupHeight, root.wallHeight]));
+                DashRegistry.resetPanelSize("wallpaper");
+                check(SettingsData.dashOptions?.wallpaper === undefined && c.panelRows === DashMetrics.defaultTabRows, "reset returns wallpaper to the default rows: " + c.panelRows);
                 root.popout.editMode = false;
                 break;
             case 10:
-                check(root.popout.popupHeight === root.wallHeightOut, "leaving edit mode keeps the height: " + JSON.stringify([root.popout.popupHeight, root.wallHeightOut]));
+                check(root.popout.popupHeight === root.wallHeightOut, "reset restores the default height outside edit mode: " + JSON.stringify([root.popout.popupHeight, root.wallHeightOut]));
                 SettingsData.weatherEnabled = true;
                 root.popout.requestTab("weather");
                 break;

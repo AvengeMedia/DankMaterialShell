@@ -397,12 +397,8 @@ QtObject {
         WidgetUtils.removeWidget(index);
     }
 
-    function setWidgetSize(index, changes) {
-        WidgetUtils.setWidgetSize(index, changes, columns, maximumRows);
-    }
-
-    function reorderWidgets(newOrder) {
-        WidgetUtils.reorderWidgets(newOrder);
+    function setLayout(widgets) {
+        WidgetUtils.setLayout(widgets);
     }
 
     function resetToDefault() {

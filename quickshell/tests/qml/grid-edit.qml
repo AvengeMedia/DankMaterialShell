@@ -167,7 +167,7 @@ ShellRoot {
                 else
                     mouseRelease(scene, end.x, end.y);
                 wait(400);
-                check(!grid.interacting, "reorder releases ownership");
+                check(!grid.interacting, "move releases ownership");
             }
 
             function cancelResize(grid) {
@@ -199,9 +199,9 @@ ShellRoot {
                 check(SettingsData.dashCards[0].w === 3 && SettingsData.dashCards[0].h === 3, "dashboard touch resize persists both axes");
                 reset();
                 reorder(ccGrid, false);
-                check(SettingsData.controlCenterWidgets[0].id === "diskUsage", "control center mouse reorder persists");
+                check(SettingsData.controlCenterWidgets[0].id === "darkMode" && SettingsData.controlCenterWidgets[0].col === 1 && SettingsData.controlCenterWidgets[1].row === 1, "control center mouse move lands on the cell and pushes the occupant down");
                 reorder(dashGrid, true);
-                check(SettingsData.dashCards[0].id === "user", "dashboard touch reorder persists");
+                check(SettingsData.dashCards[0].id === "clock" && SettingsData.dashCards[0].col === 3 && SettingsData.dashCards[0].row === 1 && SettingsData.dashCards[1].row === 3, "dashboard touch move lands on the cell and pushes the occupant down");
                 reset();
                 cancelResize(ccGrid);
                 cancelResize(dashGrid);

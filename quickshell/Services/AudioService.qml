@@ -813,18 +813,30 @@ EOFCONFIG
         }, 0);
     }
 
-    function setSoundTheme(themeName) {
-        if (!themeName || themeName === currentSoundTheme) {
+    function refreshSoundThemes() {
+        if (!soundThemeSupported)
+            return;
+        scanSoundThemes();
+    }
+
+    function selectSoundTheme(themeName) {
+        if (!themeName) {
+            SettingsData.set("useSystemSoundTheme", false);
             return;
         }
-
+        if (themeName === currentSoundTheme) {
+            SettingsData.set("useSystemSoundTheme", true);
+            return;
+        }
         Proc.runCommand("setSoundTheme", ["sh", "-c", GSettings.setCmd("org.gnome.desktop.sound", "theme-name", themeName)], (output, exitCode) => {
-            if (exitCode === 0) {
-                currentSoundTheme = themeName;
-                if (SettingsData.useSystemSoundTheme) {
-                    discoverSoundFiles(themeName);
-                }
+            if (exitCode !== 0)
+                return;
+            currentSoundTheme = themeName;
+            if (SettingsData.useSystemSoundTheme) {
+                discoverSoundFiles(themeName);
+                return;
             }
+            SettingsData.set("useSystemSoundTheme", true);
         }, 0);
     }
 

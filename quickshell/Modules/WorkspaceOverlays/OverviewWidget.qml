@@ -200,6 +200,7 @@ Item {
     property int monitorLabelZ: 2
     property int windowDraggingZ: 99999
     property real workspaceSpacing: 5
+    readonly property int workspaceBorderWidth: 2
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
@@ -328,7 +329,7 @@ Item {
                     height: cell?.height ?? 0
                     color: hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor
                     radius: Theme.cornerRadius
-                    border.width: 2
+                    border.width: root.workspaceBorderWidth
                     border.color: hoveredWhileDragging ? hoveredBorderColor : (shouldShowActiveIndicator ? root.activeBorderColor : Theme.withAlpha(root.activeBorderColor, 0))
 
                     StyledText {
@@ -412,20 +413,22 @@ Item {
                     overviewOpen: root.overviewOpen
                     readonly property int windowWorkspaceId: modelData?.workspace?.id ?? -1
                     readonly property var workspaceCell: root.cellForWorkspace(windowWorkspaceId)
-                    readonly property var workspaceBounds: root.getWorkspaceViewportBounds(windowWorkspaceId, workspaceCell.width, workspaceCell.height)
+                    readonly property real contentWidth: workspaceCell.width - root.workspaceBorderWidth * 2
+                    readonly property real contentHeight: workspaceCell.height - root.workspaceBorderWidth * 2
+                    readonly property var workspaceBounds: root.getWorkspaceViewportBounds(windowWorkspaceId, contentWidth, contentHeight)
 
                     toplevel: modelData
                     scale: root.scale
                     monitorDpr: root.dpr
-                    availableWorkspaceWidth: workspaceCell.width
-                    availableWorkspaceHeight: workspaceCell.height
+                    availableWorkspaceWidth: contentWidth
+                    availableWorkspaceHeight: contentHeight
                     contentOriginX: workspaceBounds.x
                     contentOriginY: workspaceBounds.y
                     contentScale: workspaceBounds.scale
                     widgetMonitorId: root.monitor.id
 
-                    xOffset: workspaceCell.x
-                    yOffset: workspaceCell.y
+                    xOffset: workspaceCell.x + root.workspaceBorderWidth
+                    yOffset: workspaceCell.y + root.workspaceBorderWidth
 
                     z: atInitPosition ? root.windowZ : root.windowDraggingZ
                     property bool atInitPosition: (initX == x && initY == y)

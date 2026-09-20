@@ -25,6 +25,7 @@ CcSliderRow {
     minimum: 0
     maximum: maxVolume
     valueOverride: volumePercent
+    wheelStep: AudioService.wheelVolumeStep
 
     onIconClicked: {
         if (!audio)

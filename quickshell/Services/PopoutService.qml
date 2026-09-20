@@ -264,6 +264,7 @@ Singleton {
 
     property bool _dankDashWantsOpen: false
     property bool _dankDashWantsToggle: false
+    property bool _dankDashWantsEdit: false
     property var _dankDashPendingTab: 0
     property real _dankDashPendingX: 0
     property real _dankDashPendingY: 0
@@ -282,6 +283,7 @@ Singleton {
     }
 
     function openDankDash(tab, x, y, width, section, screen) {
+        _dankDashWantsEdit = false;
         _dankDashPendingTab = tab || 0;
         if (dankDashPopout) {
             if (arguments.length >= 6)
@@ -299,11 +301,13 @@ Singleton {
     }
 
     function closeDankDash() {
+        _dankDashWantsEdit = false;
         if (dankDashPopout)
             dankDashPopout.dashVisible = false;
     }
 
     function toggleDankDash(tab, x, y, width, section, screen) {
+        _dankDashWantsEdit = false;
         _dankDashPendingTab = tab || 0;
         if (dankDashPopout) {
             if (arguments.length >= 6)
@@ -328,6 +332,11 @@ Singleton {
         if (!dankDashPopout)
             return;
 
+        if (_dankDashWantsEdit) {
+            _showDankDashEditor();
+            return;
+        }
+
         if (_dankDashHasPosition)
             setPosition(dankDashPopout, _dankDashPendingX, _dankDashPendingY, _dankDashPendingWidth, _dankDashPendingSection, _dankDashPendingScreen);
 
@@ -346,6 +355,34 @@ Singleton {
                 dankDashPopout.dashVisible = true;
             }
         }
+    }
+
+    function openDankDashEditor(tab, screen) {
+        const target = screen ?? Quickshell.screens.find(candidate => candidate.name === CompositorService.getFocusedScreenName()) ?? Quickshell.screens[0];
+        if (!target || (!dankDashPopout && !dankDashPopoutLoader))
+            return;
+        closeSettings();
+        _dankDashPendingTab = tab;
+        _dankDashPendingScreen = target;
+        _dankDashHasPosition = false;
+        _dankDashWantsOpen = false;
+        _dankDashWantsToggle = false;
+        _dankDashWantsEdit = true;
+        if (dankDashPopout) {
+            _showDankDashEditor();
+            return;
+        }
+        dankDashPopoutLoader.active = true;
+    }
+
+    function _showDankDashEditor() {
+        _dankDashWantsEdit = false;
+        const target = _dankDashPendingScreen;
+        const anchor = BarWidgetService.naturalPopoutAnchor(target, null, "center");
+        dankDashPopout.setTriggerPosition(anchor.trigger.x, anchor.trigger.y, anchor.trigger.width, anchor.section, target, anchor.position, anchor.thickness, anchor.spacing, anchor.config);
+        dankDashPopout.requestTab(_dankDashPendingTab);
+        dankDashPopout.editMode = true;
+        dankDashPopout.dashVisible = true;
     }
 
     function openBattery(x, y, width, section, screen) {

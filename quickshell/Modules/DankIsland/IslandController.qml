@@ -77,9 +77,8 @@ QtObject {
     readonly property int dashboardColumnCap: DashMetrics.columnCapFor(dashboardAvailableWidth - PopoutMetrics.editOverflow * 2, SettingsData.showWeekNumber)
     readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns) + PopoutMetrics.editOverflow * 2)
     property var dashboardContentHeights: ({})
-    readonly property real dashboardChromeHeight: Theme.buttonHeightXS + Theme.spacingXS * 2 + DashMetrics.contentPadding
-    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabMinHeight + dashboardChromeHeight, ...Object.values(dashboardContentHeights)))
-    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - dashboardChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
+    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + DashMetrics.islandChromeHeight, ...Object.values(dashboardContentHeights)))
+    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
     readonly property real mediaCompactMaxLength: 360
     property real notificationContentLength: 0
     readonly property real notificationCompactMinLength: isVertical ? compactFaceThickness : (compactDense ? 200 : 240)
@@ -113,7 +112,7 @@ QtObject {
     function dashEntryIdFor(activityId) {
         switch (activityId) {
         case "home":
-            return DashRegistry.fallbackId;
+            return DashRegistry.overviewId;
         case "notificationcenter":
             return "notifications";
         }
@@ -126,9 +125,8 @@ QtObject {
 
     function dashboardTargetFor(activityId) {
         const minimum = DashMetrics.panelHeightFor(dashEntryIdFor(activityId));
-        const height = Math.max(minimum + dashboardChromeHeight, dashboardContentHeights[activityId] ?? 0);
-        const gutter = editGutterFor(activityId);
-        return sheetTarget(dashboardWidthFor(activityId) + gutter * 2, Math.min(dashboardAvailableHeight, height + gutter));
+        const height = Math.max(minimum + DashMetrics.islandChromeHeight, dashboardContentHeights[activityId] ?? 0);
+        return sheetTarget(dashboardWidthFor(activityId) + editGutterFor(activityId) * 2, Math.min(dashboardAvailableHeight, height));
     }
 
     function setMediaContentLength(length) {
@@ -217,10 +215,14 @@ QtObject {
     }
 
     function setEditing(activityId, editing) {
-        if (editing)
+        if (editing) {
             editingActivity = activityId;
-        else if (editingActivity === activityId)
+            // Option sheets open child popups; a hover peek would collapse under them
+            hoverExpanded = false;
+            hoverCloseTimer.stop();
+        } else if (editingActivity === activityId) {
             editingActivity = "";
+        }
     }
 
     function editGutterFor(activityId) {

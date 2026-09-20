@@ -183,7 +183,9 @@ Singleton {
     property string controlCenterTileColorMode: Spec.SPEC.controlCenterTileColorMode.def
     property string buttonColorMode: Spec.SPEC.buttonColorMode.def
     property int radiusStrength: Spec.SPEC.radiusStrength.def
-    readonly property real cornerRadius: Shape.radius("m", Shape.scaleForStrength(radiusStrength))
+    property string radiusMode: Spec.SPEC.radiusMode.def
+    property int fixedRadius: Spec.SPEC.fixedRadius.def
+    readonly property real cornerRadius: Shape.radius("m", Shape.scaleForStrength(radiusStrength), radiusMode === "fixed" ? fixedRadius : -1)
     property int niriLayoutGapsOverride: Spec.SPEC.niriLayoutGapsOverride.def
     property int niriLayoutRadiusOverride: Spec.SPEC.niriLayoutRadiusOverride.def
     property int niriLayoutBorderSize: Spec.SPEC.niriLayoutBorderSize.def
@@ -462,6 +464,8 @@ Singleton {
             "enabled": false
         }
     ]
+    property string dashTabPosition: Spec.SPEC.dashTabPosition.def
+    property bool dashTabsEvenlySpaced: Spec.SPEC.dashTabsEvenlySpaced.def
     property var dashTabs: Spec.SPEC.dashTabs.def
     onDashTabsChanged: saveSettings()
 

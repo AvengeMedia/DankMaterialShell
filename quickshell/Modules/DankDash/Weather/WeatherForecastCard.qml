@@ -59,7 +59,7 @@ Rectangle {
     readonly property color muted: isCurrent ? Theme.withAlpha(Theme.onPrimaryContainer, DashMetrics.mutedAlpha) : Theme.onSurfaceVariant
 
     radius: Theme.cornerRadiusL
-    color: isCurrent ? Theme.withAlpha(Theme.primaryContainer, Theme.popupTransparency) : DashMetrics.chipColor
+    color: isCurrent ? Theme.foregroundColor(Theme.primaryContainer, false) : DashMetrics.chipColor
 
     Column {
         anchors.centerIn: parent

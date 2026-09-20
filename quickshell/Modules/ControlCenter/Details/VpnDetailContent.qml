@@ -5,6 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
+import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Services
 import qs.Widgets
@@ -92,7 +93,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        spacing: Theme.spacingM
+        spacing: CcMetrics.detailContentGap
 
         CcGroup {
             id: statusGroup

@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import "../Common/GridLayout.js" as GridUtils
 
 Item {
     id: root
@@ -15,28 +16,47 @@ Item {
     property real placeholderRadius: Theme.cornerRadiusXL
     property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
     property bool animateLayout: false
-    property var visualOrder: []
     property int draggingSourceIndex: -1
-    property var dragStartOrder: []
+    property var dragCell: null
     property var sizePreview: null
+    property var pinnedCells: null
     readonly property alias tileModel: tiles
     readonly property bool interacting: draggingSourceIndex >= 0 || sizePreview !== null
-    readonly property var layoutItems: sizePreview ? sourceItems.map((item, i) => i === sizePreview.index ? Object.assign({}, item, sizePreview.changes) : item) : sourceItems
+    readonly property int interactingIndex: draggingSourceIndex >= 0 ? draggingSourceIndex : (sizePreview?.index ?? -1)
+    readonly property var placementOrder: {
+        const order = sourceItems.map((item, i) => i);
+        if (interactingIndex < 0)
+            return order;
+        order.splice(interactingIndex, 1);
+        order.unshift(interactingIndex);
+        return order;
+    }
+    readonly property var pinnedItems: pinnedCells ? GridUtils.placedItems(sourceItems, pinnedCells) : sourceItems
+    readonly property var layoutItems: {
+        const changes = sizePreview?.changes ?? dragCell;
+        if (interactingIndex < 0 || !changes)
+            return pinnedItems;
+        return pinnedItems.map((item, i) => i === interactingIndex ? Object.assign({}, item, changes) : item);
+    }
 
-    signal reorderCommitted(var items)
-    signal resizeCommitted(int index, var changes)
+    signal layoutCommitted(var items)
 
     implicitHeight: Math.max(minimumHeight, slotLayout.totalHeight) + contentPadding * 2
     height: implicitHeight
 
-    function resetOrder() {
-        visualOrder = sourceItems.map((item, i) => i);
+    function pin() {
+        pinnedCells = slotLayout.slots.slice();
     }
 
     function cancelInteraction() {
         draggingSourceIndex = -1;
+        dragCell = null;
         sizePreview = null;
-        resetOrder();
+        pinnedCells = null;
+    }
+
+    function committedItems() {
+        return GridUtils.placedItems(layoutItems, slotLayout.slots);
     }
 
     function syncTiles() {
@@ -79,35 +99,28 @@ Item {
     function beginDrag(sourceIndex) {
         if (!editMode || interacting || !sourceItems[sourceIndex])
             return;
-        dragStartOrder = visualOrder.slice();
+        pin();
         draggingSourceIndex = sourceIndex;
     }
 
-    function updateDragTarget(px, py) {
-        if (draggingSourceIndex < 0)
+    function updateDragTarget(x, y) {
+        const slot = draggingSourceIndex >= 0 ? slotLayout.slots[draggingSourceIndex] : null;
+        if (!slot)
             return;
-        px -= contentPadding;
-        py -= contentPadding;
-        const position = visualOrder.findIndex(i => {
-            const slot = slotLayout.slots[i];
-            return slot && px >= slot.x && px < slot.x + slot.w && py >= slot.y && py < slot.y + slot.h;
-        });
-        const current = visualOrder.indexOf(draggingSourceIndex);
-        if (position < 0 || current < 0 || current === position)
+        const cell = GridUtils.cellAt(slotLayout, x - contentPadding, y - contentPadding, slot.cols, slot.rows);
+        if (dragCell && dragCell.col === cell.col && dragCell.row === cell.row)
             return;
-        const order = visualOrder.slice();
-        order.splice(current, 1);
-        order.splice(position, 0, draggingSourceIndex);
-        visualOrder = order;
+        dragCell = cell;
     }
 
     function endDrag() {
         if (draggingSourceIndex < 0)
             return;
-        draggingSourceIndex = -1;
-        if (visualOrder.every((value, i) => value === dragStartOrder[i]))
-            return;
-        reorderCommitted(visualOrder.map(i => sourceItems[i]));
+        const items = committedItems();
+        const moved = pinnedCells.some((cell, i) => cell && (cell.col !== items[i].col || cell.row !== items[i].row));
+        cancelInteraction();
+        if (moved)
+            layoutCommitted(items);
     }
 
     function previewSize(index, changes) {
@@ -115,6 +128,8 @@ Item {
             return;
         if (sizePreview?.index === index && JSON.stringify(sizePreview.changes) === JSON.stringify(changes))
             return;
+        if (!pinnedCells)
+            pin();
         sizePreview = {
             "index": index,
             "changes": changes
@@ -126,9 +141,16 @@ Item {
         if (!preview)
             return;
         const item = sourceItems[preview.index];
-        if (item && Object.keys(preview.changes).some(key => item[key] !== preview.changes[key]))
-            resizeCommitted(preview.index, preview.changes);
-        sizePreview = null;
+        const changed = item && Object.keys(preview.changes).some(key => item[key] !== preview.changes[key]);
+        const items = committedItems();
+        if (changed)
+            layoutCommitted(items);
+        cancelInteraction();
+    }
+
+    function commitChange(index, changes) {
+        previewSize(index, changes);
+        commitSize();
     }
 
     onSourceItemsChanged: syncTiles()

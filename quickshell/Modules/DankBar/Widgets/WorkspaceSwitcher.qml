@@ -20,15 +20,22 @@ BasePill {
     property string screenName: ""
     property var hyprlandOverviewLoader: null
     property var surfaceContext: null
-    readonly property bool segmented: surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
-    readonly property real compactRatio: 0.7
+    readonly property string indicatorStyle: root.opt("workspaceIndicatorStyle")
+    readonly property bool linesStyle: indicatorStyle === "lines"
+    readonly property bool cardsStyle: indicatorStyle === "cards"
+    readonly property bool segmented: !linesStyle && !cardsStyle && surfaceContext?.kind !== "dock" && BarMetrics.widgetStyle(barConfig) === "segments" && !noBackground
+    readonly property real compactRatio: cardsStyle ? 0.75 : 0.7
     readonly property real slimRatio: 0.5
-    readonly property real activeRatio: 1.05
+    readonly property real activeSlimRatio: 0.6
+    readonly property real activeRatio: linesStyle ? 1.6 : cardsStyle ? 0.9 : 1.05
     readonly property real activeIconRatio: 1.6
     readonly property real iconRatio: 1.2
+    readonly property real lineRatio: 0.12
+    readonly property real activeLineRatio: 0.2
     readonly property real overviewTintAlpha: 0.18
     readonly property real dragOpacity: 0.8
     readonly property real hoverFadeAlpha: 0.7
+    readonly property real cardWindowRatio: 0.45
 
     readonly property bool useAqueous: CompositorService.isAqueous && AqueousService.available && Quickshell.env("DMS_FORCE_EXTWS") !== "1"
 
@@ -602,11 +609,20 @@ BasePill {
                     return (root.opt("groupWorkspaceApps") && (!isActive || root.opt("groupActiveWorkspaceApps"))) ? groupedCount : wins.length;
                 }
 
-                readonly property real baseWidth: root.isVertical ? (root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * root.slimRatio) : (isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio))
-                readonly property real baseHeight: root.isVertical ? (isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio)) : (root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * root.slimRatio)
+                readonly property real lineThickness: Math.max(Theme.spacingXXS, root.widgetThickness * (isActive ? root.activeLineRatio : root.lineRatio))
+                readonly property real primaryBase: isActive ? Math.max(root.widgetThickness * root.activeRatio, root.appIconSize * root.activeIconRatio) : Math.max(root.widgetThickness * root.compactRatio, root.appIconSize * root.iconRatio)
+                readonly property real crossBase: root.opt("showWorkspaceApps") ? Math.max(widgetThickness * root.compactRatio, root.appIconSize + Theme.spacingXS * 2) : widgetThickness * (root.cardsStyle && isActive ? root.activeSlimRatio : root.slimRatio)
+                readonly property real baseWidth: root.isVertical ? (root.linesStyle ? lineThickness : crossBase) : primaryBase
+                readonly property real baseHeight: root.isVertical ? primaryBase : (root.linesStyle ? lineThickness : crossBase)
                 readonly property bool hasWorkspaceName: root.opt("showWorkspaceName") && record?.name && record.name !== ""
                 readonly property real contentImplicitWidth: appIconsLoader.item?.contentWidth ?? 0
                 readonly property real contentImplicitHeight: appIconsLoader.item?.contentHeight ?? 0
+
+                // lines can't hold content, so it sits beside the line as an M3 tab underline facing the screen
+                readonly property bool underline: root.linesStyle && contentImplicitWidth > 0 && contentImplicitHeight > 0
+                readonly property bool lineAfterContent: root.axis?.edge !== "bottom" && root.axis?.edge !== "right"
+                readonly property real underlineContentShift: underline ? (lineThickness + Theme.spacingXXS) / 2 * (lineAfterContent ? -1 : 1) : 0
+                readonly property real underlineLineShift: underline ? ((root.isVertical ? contentImplicitWidth : contentImplicitHeight) + Theme.spacingXXS) / 2 * (lineAfterContent ? 1 : -1) : 0
 
                 readonly property real iconsExtraWidth: {
                     if (!root.isVertical && root.opt("showWorkspaceApps") && stableIconCount > 0) {
@@ -624,13 +640,13 @@ BasePill {
                 }
 
                 readonly property real visualWidth: {
-                    if (contentImplicitWidth <= 0)
+                    if (contentImplicitWidth <= 0 || (underline && root.isVertical))
                         return baseWidth + iconsExtraWidth;
                     const padding = root.isVertical ? Theme.spacingXS : Theme.spacingS;
                     return Math.max(baseWidth + iconsExtraWidth, contentImplicitWidth + padding);
                 }
                 readonly property real visualHeight: {
-                    if (contentImplicitHeight <= 0)
+                    if (contentImplicitHeight <= 0 || (underline && !root.isVertical))
                         return baseHeight + iconsExtraHeight;
                     const padding = root.isVertical ? Theme.spacingS : Theme.spacingXS;
                     return Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight + padding);
@@ -867,6 +883,9 @@ BasePill {
                 width: root.isVertical ? root.widgetThickness : visualWidth
                 height: root.isVertical ? visualHeight : root.widgetThickness
 
+                readonly property real outlineWidth: dragHandler.dragging || isUrgent || isDropTarget ? Theme.outlineWidthFocused : 0
+                readonly property color outlineColor: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : Theme.withAlpha(Theme.primary, 0)))
+
                 Behavior on width {
                     enabled: !SettingsData.reduceMotion
                     NumberAnimation {
@@ -887,8 +906,8 @@ BasePill {
 
                 Rectangle {
                     id: focusedBorderRing
-                    x: root.isVertical ? (root.widgetThickness - width) / 2 : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2
+                    x: root.isVertical ? (root.widgetThickness - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2 + delegateRoot.underlineLineShift
                     width: {
                         const borderWidth = (delegateRoot.focusedBorderEnabledForMonitor && isActive && !isPlaceholder) ? delegateRoot.focusedBorderThicknessForMonitor : 0;
                         return delegateRoot.visualWidth + borderWidth * 2;
@@ -946,19 +965,30 @@ BasePill {
                     id: visualContent
                     width: delegateRoot.visualWidth
                     height: delegateRoot.visualHeight
-                    x: root.isVertical ? (root.widgetThickness - width) / 2 : (parent.width - width) / 2
-                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2
+                    x: root.isVertical ? (root.widgetThickness - width) / 2 + delegateRoot.underlineLineShift : (parent.width - width) / 2
+                    y: root.isVertical ? (parent.height - height) / 2 : (root.widgetThickness - height) / 2 + delegateRoot.underlineLineShift
                     thickness: Math.min(width, height)
                     style: BarMetrics.widgetStyle(root.barConfig)
                     vertical: root.isVertical
                     joinedStart: root.segmented && index > 0
                     joinedEnd: root.segmented && index < workspaceRepeater.count - 1
                     pressed: mouseArea.pressed
-                    color: delegateRoot.displayColor
+                    color: root.cardsStyle && !isActive ? "transparent" : delegateRoot.displayColor
+                    radiusOverride: root.cardsStyle ? Math.min(Theme.cornerRadiusXS, thickness / 2) : -1
                     opacity: dragHandler.dragging ? root.dragOpacity : 1.0
 
-                    border.width: dragHandler.dragging || isUrgent || isDropTarget ? Theme.outlineWidthFocused : 0
-                    border.color: dragHandler.dragging ? Theme.primary : (isUrgent ? urgentColor : (isDropTarget ? Theme.primary : Theme.withAlpha(Theme.primary, 0)))
+                    border.width: root.cardsStyle && !isActive ? Math.max(Theme.outlineWidth, delegateRoot.outlineWidth) : delegateRoot.outlineWidth
+                    border.color: delegateRoot.outlineWidth > 0 ? delegateRoot.outlineColor : delegateRoot.displayColor
+
+                    // an empty frame is an empty desktop; a window block marks it occupied
+                    Rectangle {
+                        anchors.centerIn: parent
+                        visible: root.cardsStyle && isOccupied && !isActive && !appIconsLoader.active
+                        width: Math.round(parent.width * root.cardWindowRatio)
+                        height: Math.round(parent.height * root.cardWindowRatio)
+                        radius: Math.min(Theme.cornerRadiusXXS, height / 2)
+                        color: delegateRoot.displayColor
+                    }
 
                     transform: Translate {
                         x: root.isVertical ? 0 : (dragHandler.dragging ? dragHandler.dragAxisOffset : 0)
@@ -1009,351 +1039,358 @@ BasePill {
                             easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                         }
                     }
+                }
 
-                    Loader {
-                        id: appIconsLoader
-                        anchors.fill: parent
-                        active: root.opt("showWorkspaceApps") || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
-                        sourceComponent: Item {
-                            id: contentRoot
-                            readonly property real contentWidth: contentRow.item?.implicitWidth ?? 0
-                            readonly property real contentHeight: contentRow.item?.implicitHeight ?? 0
-                            property alias iconsLayout: contentRow.item
+                Loader {
+                    id: appIconsLoader
+                    anchors.fill: parent
+                    active: root.opt("showWorkspaceApps") || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
+                    opacity: visualContent.opacity
+                    transform: Translate {
+                        x: root.isVertical ? 0 : (dragHandler.dragging ? dragHandler.dragAxisOffset : 0)
+                        y: root.isVertical ? (dragHandler.dragging ? dragHandler.dragAxisOffset : 0) : 0
+                    }
+                    sourceComponent: Item {
+                        id: contentRoot
+                        readonly property real contentWidth: contentRow.item?.implicitWidth ?? 0
+                        readonly property real contentHeight: contentRow.item?.implicitHeight ?? 0
+                        property alias iconsLayout: contentRow.item
 
-                            Loader {
-                                id: contentRow
-                                anchors.centerIn: parent
-                                sourceComponent: root.isVertical ? columnLayout : rowLayout
-                            }
+                        Loader {
+                            id: contentRow
+                            anchors.centerIn: parent
+                            anchors.horizontalCenterOffset: root.isVertical ? delegateRoot.underlineContentShift : 0
+                            anchors.verticalCenterOffset: root.isVertical ? 0 : delegateRoot.underlineContentShift
+                            sourceComponent: root.isVertical ? columnLayout : rowLayout
+                        }
 
-                            Component {
-                                id: rowLayout
-                                Row {
-                                    spacing: Theme.spacingXS
-                                    visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
+                        Component {
+                            id: rowLayout
+                            Row {
+                                spacing: Theme.spacingXS
+                                visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
 
-                                    Item {
-                                        visible: loadedHasIcon && loadedIconData?.type === "icon"
-                                        width: wsIcon.width
-                                        height: root.appIconSize
-
-                                        DankIcon {
-                                            id: wsIcon
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            name: loadedIconData?.value ?? ""
-                                            size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                            weight: (isActive && !isPlaceholder) ? 500 : 400
-                                        }
-                                    }
-
-                                    Item {
-                                        visible: loadedHasIcon && loadedIconData?.type === "text"
-                                        width: wsText.implicitWidth
-                                        height: root.appIconSize
-
-                                        StyledText {
-                                            id: wsText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: loadedIconData?.value ?? ""
-                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
-                                        }
-                                    }
-
-                                    Item {
-                                        visible: ((root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon) || (loadedHasIcon && root.opt("showWorkspaceName") && hasWorkspaceName)
-                                        width: wsIndexText.implicitWidth
-                                        height: root.appIconSize
-
-                                        StyledText {
-                                            id: wsIndexText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: loadedHasIcon ? (record?.name ?? "") : root.getWorkspaceIndex(record, index)
-                                            color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                            font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
-                                        }
-                                    }
-
-                                    Repeater {
-                                        model: ScriptModel {
-                                            values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
-                                        }
-                                        delegate: Item {
-                                            width: root.appIconSize
-                                            height: root.appIconSize
-                                            readonly property var windowId: modelData.windowId
-                                            readonly property string windowSession: modelData.windowSession || ""
-                                            readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
-                                            readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
-                                            readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
-
-                                            IconImage {
-                                                id: rowAppIcon
-                                                anchors.fill: parent
-                                                source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
-                                            }
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && rowAppIcon.status !== Image.Ready
-                                                color: Theme.chipSurface
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: appBorderColor
-                                                opacity: appOpacity
-
-                                                StyledText {
-                                                    anchors.centerIn: parent
-                                                    text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
-                                                    font.pixelSize: parent.width * 0.45
-                                                    color: appGlyphColor
-                                                    font.weight: Theme.fontWeightMedium
-                                                }
-                                            }
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !modelData.isQuickshell && modelData.isSteamApp && rowSteamIcon.status !== Image.Ready
-                                                color: Theme.chipSurface
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: appBorderColor
-                                                opacity: appOpacity
-
-                                                DankIcon {
-                                                    anchors.centerIn: parent
-                                                    size: parent.width * 0.7
-                                                    name: "sports_esports"
-                                                    color: appGlyphColor
-                                                }
-                                            }
-
-                                            IconImage {
-                                                anchors.fill: parent
-                                                source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isQuickshell
-                                                layer.enabled: true
-                                                layer.effect: MultiEffect {
-                                                    saturation: 0
-                                                    colorization: 1
-                                                    colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
-                                                }
-                                            }
-
-                                            IconImage {
-                                                id: rowSteamIcon
-                                                anchors.fill: parent
-                                                source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp && modelData.icon
-                                            }
-
-                                            DankIcon {
-                                                anchors.centerIn: parent
-                                                size: root.appIconSize
-                                                name: "sports_esports"
-                                                color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp && !modelData.icon
-                                            }
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
-                                                color: "transparent"
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: focusedBorderColor
-                                                z: 1
-                                            }
-
-                                            HoverHandler {
-                                                id: rowAppHover
-                                            }
-
-                                            Rectangle {
-                                                visible: modelData.count > 1 && !isActive
-                                                width: root.appIconSize * 0.67
-                                                height: root.appIconSize * 0.67
-                                                radius: root.appIconSize * 0.33
-                                                color: "black"
-                                                border.color: "white"
-                                                border.width: Theme.outlineWidth
-                                                anchors.right: parent.right
-                                                anchors.bottom: parent.bottom
-                                                z: 2
-
-                                                StyledText {
-                                                    anchors.centerIn: parent
-                                                    text: modelData.count
-                                                    font.pixelSize: root.appIconSize * 0.44
-                                                    color: "white"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Component {
-                                id: columnLayout
-                                Column {
-                                    spacing: Theme.spacingXS
-                                    visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
+                                Item {
+                                    visible: loadedHasIcon && loadedIconData?.type === "icon"
+                                    width: wsIcon.width
+                                    height: root.appIconSize
 
                                     DankIcon {
-                                        visible: loadedHasIcon && loadedIconData?.type === "icon"
-                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        id: wsIcon
+                                        anchors.verticalCenter: parent.verticalCenter
                                         name: loadedIconData?.value ?? ""
                                         size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         weight: (isActive && !isPlaceholder) ? 500 : 400
                                     }
+                                }
+
+                                Item {
+                                    visible: loadedHasIcon && loadedIconData?.type === "text"
+                                    width: wsText.implicitWidth
+                                    height: root.appIconSize
 
                                     StyledText {
-                                        visible: loadedHasIcon && loadedIconData?.type === "text"
-                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        id: wsText
+                                        anchors.verticalCenter: parent.verticalCenter
                                         text: loadedIconData?.value ?? ""
                                         color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
+                                }
+
+                                Item {
+                                    visible: ((root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon) || (loadedHasIcon && root.opt("showWorkspaceName") && hasWorkspaceName)
+                                    width: wsIndexText.implicitWidth
+                                    height: root.appIconSize
 
                                     StyledText {
-                                        visible: (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: root.getWorkspaceIndex(record, index)
+                                        id: wsIndexText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: loadedHasIcon ? (record?.name ?? "") : root.getWorkspaceIndex(record, index)
                                         color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
+                                }
 
-                                    Repeater {
-                                        model: ScriptModel {
-                                            values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
+                                Repeater {
+                                    model: ScriptModel {
+                                        values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
+                                    }
+                                    delegate: Item {
+                                        width: root.appIconSize
+                                        height: root.appIconSize
+                                        readonly property var windowId: modelData.windowId
+                                        readonly property string windowSession: modelData.windowSession || ""
+                                        readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
+                                        readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
+                                        readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
+                                        readonly property real appOpacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
+
+                                        IconImage {
+                                            id: rowAppIcon
+                                            anchors.fill: parent
+                                            source: modelData.icon || ""
+                                            opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
+                                            visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
                                         }
-                                        delegate: Item {
-                                            width: root.appIconSize
-                                            height: root.appIconSize
-                                            readonly property var windowId: modelData.windowId
-                                            readonly property string windowSession: modelData.windowSession || ""
-                                            readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
-                                            readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
-                                            readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
-                                            readonly property real appOpacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
 
-                                            IconImage {
-                                                id: colAppIcon
-                                                anchors.fill: parent
-                                                source: modelData.icon || ""
-                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: !modelData.isQuickshell && !modelData.isSteamApp && rowAppIcon.status !== Image.Ready
+                                            color: Theme.chipSurface
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: appBorderColor
+                                            opacity: appOpacity
+
+                                            StyledText {
+                                                anchors.centerIn: parent
+                                                text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
+                                                font.pixelSize: parent.width * 0.45
+                                                color: appGlyphColor
+                                                font.weight: Theme.fontWeightMedium
                                             }
+                                        }
 
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && colAppIcon.status !== Image.Ready
-                                                color: Theme.chipSurface
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: appBorderColor
-                                                opacity: appOpacity
-
-                                                StyledText {
-                                                    anchors.centerIn: parent
-                                                    text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
-                                                    font.pixelSize: parent.width * 0.45
-                                                    color: appGlyphColor
-                                                    font.weight: Theme.fontWeightMedium
-                                                }
-                                            }
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !modelData.isQuickshell && modelData.isSteamApp && colSteamIcon.status !== Image.Ready
-                                                color: Theme.chipSurface
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: appBorderColor
-                                                opacity: appOpacity
-
-                                                DankIcon {
-                                                    anchors.centerIn: parent
-                                                    size: parent.width * 0.7
-                                                    name: "sports_esports"
-                                                    color: appGlyphColor
-                                                }
-                                            }
-
-                                            IconImage {
-                                                anchors.fill: parent
-                                                source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isQuickshell
-                                                layer.enabled: true
-                                                layer.effect: MultiEffect {
-                                                    saturation: 0
-                                                    colorization: 1
-                                                    colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
-                                                }
-                                            }
-
-                                            IconImage {
-                                                id: colSteamIcon
-                                                anchors.fill: parent
-                                                source: modelData.icon
-                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp && modelData.icon
-                                            }
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: !modelData.isQuickshell && modelData.isSteamApp && rowSteamIcon.status !== Image.Ready
+                                            color: Theme.chipSurface
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: appBorderColor
+                                            opacity: appOpacity
 
                                             DankIcon {
                                                 anchors.centerIn: parent
-                                                size: root.appIconSize
+                                                size: parent.width * 0.7
                                                 name: "sports_esports"
-                                                color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp && !modelData.icon
+                                                color: appGlyphColor
                                             }
+                                        }
 
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
-                                                color: "transparent"
-                                                radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
-                                                border.width: Theme.outlineWidth
-                                                border.color: focusedBorderColor
-                                                z: 1
+                                        IconImage {
+                                            anchors.fill: parent
+                                            source: modelData.icon
+                                            opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isQuickshell
+                                            layer.enabled: true
+                                            layer.effect: MultiEffect {
+                                                saturation: 0
+                                                colorization: 1
+                                                colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
                                             }
+                                        }
 
-                                            HoverHandler {
-                                                id: colAppHover
+                                        IconImage {
+                                            id: rowSteamIcon
+                                            anchors.fill: parent
+                                            source: modelData.icon
+                                            opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isSteamApp && modelData.icon
+                                        }
+
+                                        DankIcon {
+                                            anchors.centerIn: parent
+                                            size: root.appIconSize
+                                            name: "sports_esports"
+                                            color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
+                                            opacity: modelData.active ? 1.0 : rowAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isSteamApp && !modelData.icon
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: (rowAppIcon.visible || rowSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
+                                            color: "transparent"
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: focusedBorderColor
+                                            z: 1
+                                        }
+
+                                        HoverHandler {
+                                            id: rowAppHover
+                                        }
+
+                                        Rectangle {
+                                            visible: modelData.count > 1 && !isActive
+                                            width: root.appIconSize * 0.67
+                                            height: root.appIconSize * 0.67
+                                            radius: root.appIconSize * 0.33
+                                            color: "black"
+                                            border.color: "white"
+                                            border.width: Theme.outlineWidth
+                                            anchors.right: parent.right
+                                            anchors.bottom: parent.bottom
+                                            z: 2
+
+                                            StyledText {
+                                                anchors.centerIn: parent
+                                                text: modelData.count
+                                                font.pixelSize: root.appIconSize * 0.44
+                                                color: "white"
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-                                            Rectangle {
-                                                visible: modelData.count > 1 && !isActive
-                                                width: root.appIconSize * 0.67
-                                                height: root.appIconSize * 0.67
-                                                radius: root.appIconSize * 0.33
-                                                color: "black"
-                                                border.color: "white"
-                                                border.width: Theme.outlineWidth
-                                                anchors.right: parent.right
-                                                anchors.bottom: parent.bottom
-                                                z: 2
+                        Component {
+                            id: columnLayout
+                            Column {
+                                spacing: Theme.spacingXS
+                                visible: loadedIcons.length > 0 || root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName") || loadedHasIcon
 
-                                                StyledText {
-                                                    anchors.centerIn: parent
-                                                    text: modelData.count
-                                                    font.pixelSize: root.appIconSize * 0.44
-                                                    color: "white"
-                                                }
+                                DankIcon {
+                                    visible: loadedHasIcon && loadedIconData?.type === "icon"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    name: loadedIconData?.value ?? ""
+                                    size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    weight: (isActive && !isPlaceholder) ? 500 : 400
+                                }
+
+                                StyledText {
+                                    visible: loadedHasIcon && loadedIconData?.type === "text"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: loadedIconData?.value ?? ""
+                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                    font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
+                                }
+
+                                StyledText {
+                                    visible: (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: root.getWorkspaceIndex(record, index)
+                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
+                                    font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
+                                }
+
+                                Repeater {
+                                    model: ScriptModel {
+                                        values: loadedIcons.slice(0, root.opt("maxWorkspaceIcons"))
+                                    }
+                                    delegate: Item {
+                                        width: root.appIconSize
+                                        height: root.appIconSize
+                                        readonly property var windowId: modelData.windowId
+                                        readonly property string windowSession: modelData.windowSession || ""
+                                        readonly property bool appHighlightActive: root.opt("workspaceActiveAppHighlightEnabled") && modelData.active
+                                        readonly property color appBorderColor: appHighlightActive ? focusedBorderColor : Theme.primarySelected
+                                        readonly property color appGlyphColor: appHighlightActive ? focusedBorderColor : Theme.primary
+                                        readonly property real appOpacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
+
+                                        IconImage {
+                                            id: colAppIcon
+                                            anchors.fill: parent
+                                            source: modelData.icon || ""
+                                            opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
+                                            visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: !modelData.isQuickshell && !modelData.isSteamApp && colAppIcon.status !== Image.Ready
+                                            color: Theme.chipSurface
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: appBorderColor
+                                            opacity: appOpacity
+
+                                            StyledText {
+                                                anchors.centerIn: parent
+                                                text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
+                                                font.pixelSize: parent.width * 0.45
+                                                color: appGlyphColor
+                                                font.weight: Theme.fontWeightMedium
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: !modelData.isQuickshell && modelData.isSteamApp && colSteamIcon.status !== Image.Ready
+                                            color: Theme.chipSurface
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: appBorderColor
+                                            opacity: appOpacity
+
+                                            DankIcon {
+                                                anchors.centerIn: parent
+                                                size: parent.width * 0.7
+                                                name: "sports_esports"
+                                                color: appGlyphColor
+                                            }
+                                        }
+
+                                        IconImage {
+                                            anchors.fill: parent
+                                            source: modelData.icon
+                                            opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isQuickshell
+                                            layer.enabled: true
+                                            layer.effect: MultiEffect {
+                                                saturation: 0
+                                                colorization: 1
+                                                colorizationColor: appHighlightActive ? focusedBorderColor : (isActive ? quickshellIconActiveColor : quickshellIconInactiveColor)
+                                            }
+                                        }
+
+                                        IconImage {
+                                            id: colSteamIcon
+                                            anchors.fill: parent
+                                            source: modelData.icon
+                                            opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isSteamApp && modelData.icon
+                                        }
+
+                                        DankIcon {
+                                            anchors.centerIn: parent
+                                            size: root.appIconSize
+                                            name: "sports_esports"
+                                            color: appHighlightActive ? focusedBorderColor : Theme.widgetTextColor
+                                            opacity: modelData.active ? 1.0 : colAppHover.hovered ? 0.8 : 0.6
+                                            visible: modelData.isSteamApp && !modelData.icon
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: (colAppIcon.visible || colSteamIcon.visible || modelData.isQuickshell) && appHighlightActive
+                                            color: "transparent"
+                                            radius: Math.min(Theme.cornerRadiusS, width / 2, height / 2)
+                                            border.width: Theme.outlineWidth
+                                            border.color: focusedBorderColor
+                                            z: 1
+                                        }
+
+                                        HoverHandler {
+                                            id: colAppHover
+                                        }
+
+                                        Rectangle {
+                                            visible: modelData.count > 1 && !isActive
+                                            width: root.appIconSize * 0.67
+                                            height: root.appIconSize * 0.67
+                                            radius: root.appIconSize * 0.33
+                                            color: "black"
+                                            border.color: "white"
+                                            border.width: Theme.outlineWidth
+                                            anchors.right: parent.right
+                                            anchors.bottom: parent.bottom
+                                            z: 2
+
+                                            StyledText {
+                                                anchors.centerIn: parent
+                                                text: modelData.count
+                                                font.pixelSize: root.appIconSize * 0.44
+                                                color: "white"
                                             }
                                         }
                                     }

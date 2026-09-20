@@ -27,6 +27,7 @@ Singleton {
     readonly property real screenMargin: Theme.launcherScreenMargin
     readonly property real spotlightWidth: Theme.launcherWidthWide
     readonly property real spotlightTopFraction: 0.33
+    readonly property real spotlightInset: Theme.spacingS
 
     function sizeWidth(size) {
         switch (size) {

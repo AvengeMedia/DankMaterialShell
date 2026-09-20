@@ -14,6 +14,7 @@ Item {
     property color statusColor: Theme.surfaceVariantText
     property bool shown: false
     property real panelWidth: CcMetrics.dialogWidth
+    property vector4d cornerRadii: Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     default property alias content: contentSlot.data
 
     signal dismissed
@@ -44,6 +45,10 @@ Item {
 
     Rectangle {
         anchors.fill: parent
+        topLeftRadius: root.cornerRadii.x
+        topRightRadius: root.cornerRadii.y
+        bottomRightRadius: root.cornerRadii.z
+        bottomLeftRadius: root.cornerRadii.w
         color: Qt.rgba(0, 0, 0, Theme.scrimAlpha)
         opacity: root.shown ? 1 : 0
 
@@ -189,7 +194,7 @@ Item {
                 Column {
                     id: contentSlot
                     width: parent.width
-                    spacing: Theme.spacingM
+                    spacing: CcMetrics.detailContentGap
                 }
             }
         }

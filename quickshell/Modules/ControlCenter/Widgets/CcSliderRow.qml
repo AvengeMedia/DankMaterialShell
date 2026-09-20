@@ -26,6 +26,7 @@ Item {
     property alias maximum: slider.maximum
     property alias unit: slider.unit
     property alias valueOverride: slider.valueOverride
+    property alias wheelStep: slider.wheelStep
     property bool sliderEnabled: true
     property alias isDragging: slider.isDragging
     readonly property bool tall: height >= CcMetrics.gridRowUnit * 2
@@ -47,6 +48,8 @@ Item {
         anchors.fill: parent
         radius: root.bodyRadius
         color: CcMetrics.tileInactiveColor
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         visible: root.tall
     }
 
@@ -61,7 +64,9 @@ Item {
             x: root.vertical ? (parent.width - width) / 2 : root.LayoutMirroring.enabled ? parent.width - width : 0
             y: root.vertical ? parent.height - height : root.tall ? 0 : (parent.height - height) / 2
             buttonSize: root.actionSize
-            backgroundColor: root.tall ? Theme.chipSurface : CcMetrics.tileInactiveColor
+            backgroundColor: CcMetrics.tileInactiveColor
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
             iconName: root.iconName
             iconSize: CcMetrics.iconBoxIconSize
             iconColor: CcMetrics.tileInactiveContent
@@ -116,6 +121,7 @@ Item {
                 rotation: root.vertical ? -90 : 0
                 LayoutMirroring.enabled: !root.vertical && I18n.isRtl
                 enabled: root.sliderEnabled && root.interactive
+                wheelInsideScrollable: true
                 size: {
                     if (!root.tall)
                         return "s";

@@ -21,7 +21,6 @@ DankModal {
 
     function show() {
         open();
-        shouldHaveFocus = true;
 
         Qt.callLater(function () {
             if (contentLoader.item) {

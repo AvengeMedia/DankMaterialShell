@@ -21,8 +21,14 @@ FocusScope {
     readonly property var tab: tabLoader.item
     readonly property real tabHeight: tab?.implicitHeight ?? 0
     readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
-    readonly property real chromeHeight: header.height + Theme.spacingXS * 2 + DashMetrics.contentPadding
+    readonly property real chromeHeight: header.anchors.topMargin + header.height + pages.anchors.topMargin + pages.anchors.bottomMargin
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
+    // Mirrors the popout: the frame sits panelChromeInset inside the sheet, the header sits contentPadding
+    // below it, and the cards keep clear of the corner grips by the gutter.
+    readonly property real editHeaderInset: PopoutMetrics.panelChromeInset + DashMetrics.contentPadding
+    readonly property real editBottomInset: PopoutMetrics.panelChromeInset + PopoutMetrics.editOverflow
+    // Card pills overhang their card by half their height; the header row needs the same clearance below as above.
+    readonly property real editHeaderGap: PopoutMetrics.chromeButtonSize / 2 + DashMetrics.contentPadding
     readonly property int panelColumns: DashMetrics.panelColumnsFor(entryId)
     readonly property int contentRows: DashMetrics.rowsForHeight(tabHeight)
     readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(entryId), contentRows)
@@ -58,7 +64,7 @@ FocusScope {
             if (columnsChanged)
                 values.panelColumns = columns;
             if (rowsChanged)
-                values.panelRows = rows > root.contentRows ? rows : DashMetrics.minimumTabRows;
+                values.panelRows = DashMetrics.panelRowsToStore(root.entryId, rows, root.contentRows);
             DashRegistry.setOptions(root.entryId, values);
             DashMetrics.panelPreview = null;
         }
@@ -68,16 +74,17 @@ FocusScope {
     clip: true
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
-    KeyNavigation.tab: root.tab?.focusTarget ?? null
+    KeyNavigation.tab: !root.editMode && !tabOptions.shown && !pageActions.menuOpen ? root.tab?.focusTarget ?? null : null
 
     function focusFace() {
+        pageActions.clearFocus();
         (root.tab?.focusTarget ?? root).forceActiveFocus();
         return true;
     }
 
     function focusHeader(backwards) {
-        const targets = root.editMode ? editControls.focusTargets : [menuButton];
-        targets[backwards ? targets.length - 1 : 0].forceActiveFocus();
+        const targets = root.editMode ? pageActions.focusTargets : [pageTitle.focusTarget];
+        targets[backwards ? targets.length - 1 : 0]?.forceActiveFocus(backwards ? Qt.BacktabFocusReason : Qt.TabFocusReason);
     }
 
     function reportHeight() {
@@ -90,7 +97,7 @@ FocusScope {
         if (live)
             return;
         editMode = false;
-        headerMenu.close();
+        pageActions.closeMenu();
         tabOptions.dismiss();
     }
     onEditModeChanged: {
@@ -100,13 +107,29 @@ FocusScope {
             return;
         }
         Qt.callLater(() => {
-            if (root.live && root.editMode)
-                root.focusHeader(false);
+            if (!root.live || !root.editMode)
+                return;
+            pageActions.clearFocus();
+            pageTitle.focusTarget.focus = false;
+            tabLoader.focus = false;
+            root.forceActiveFocus(Qt.OtherFocusReason);
         });
     }
 
     Keys.onPressed: event => {
+        if (tabOptions.shown || pageActions.menuOpen)
+            return;
+        if (root.editMode && (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)) {
+            root.focusHeader(event.key === Qt.Key_Backtab || !!(event.modifiers & Qt.ShiftModifier));
+            event.accepted = true;
+            return;
+        }
         if (root.tab?.handleKeyEvent?.(event) === true) {
+            event.accepted = true;
+            return;
+        }
+        if (!root.editMode && (event.key === Qt.Key_F2 || (event.key === Qt.Key_E && (event.modifiers & Qt.ControlModifier)))) {
+            root.editMode = true;
             event.accepted = true;
             return;
         }
@@ -119,38 +142,38 @@ FocusScope {
 
     Item {
         id: header
+        enabled: !tabOptions.shown && !pageActions.menuOpen
         anchors {
             top: parent.top
             left: parent.left
             right: parent.right
-            topMargin: Theme.spacingXS
+            topMargin: root.editMode ? root.editHeaderInset : DashMetrics.islandHeaderInset
             leftMargin: DashMetrics.contentPadding + root.editGutter
             rightMargin: DashMetrics.contentPadding + root.editGutter
         }
-        height: root.editMode ? editControls.height : Theme.buttonHeightXS
+        height: DashMetrics.islandHeaderHeight
 
-        DankActionButton {
-            id: menuButton
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            buttonSize: Theme.buttonHeightXS
-            iconName: "more_vert"
-            Accessible.name: I18n.tr("Options")
+        DashPageTitle {
+            id: pageTitle
+            anchors.fill: parent
+            entryId: root.entryId
             visible: !root.editMode
-            KeyNavigation.tab: root.tab?.focusTarget ?? null
-            KeyNavigation.backtab: root.tab?.previousFocusTarget ?? root.tab?.focusTarget ?? null
-            onClicked: headerMenu.openAt(menuButton)
+            onEditRequested: root.editMode = true
         }
 
-        DashEditControls {
-            id: editControls
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+        DashPageActions {
+            id: pageActions
             visible: root.editMode
-            canAdd: (root.tab?.addable?.length ?? 0) > 0
-            onAddRequested: anchor => root.tab?.openAddMenu(anchor)
-            onMenuRequested: anchor => headerMenu.openAt(anchor)
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: Math.min(parent.width, implicitWidth)
+            height: parent.height
+            overlayParent: root
+            entryId: root.entryId
+            tabItem: root.tab
+            editMode: root.editMode
+            panelResizable: true
+            onOptionsRequested: tabOptions.presentFor(root.entryId)
             onFinished: {
                 root.editMode = false;
                 root.focusFace();
@@ -160,15 +183,16 @@ FocusScope {
 
     DankFlickable {
         id: pages
+        enabled: !tabOptions.shown && !pageActions.menuOpen
         anchors {
             top: header.bottom
-            topMargin: Theme.spacingXS
+            topMargin: root.editMode ? root.editHeaderGap : DashMetrics.islandHeaderInset
             left: parent.left
             right: parent.right
             bottom: parent.bottom
             leftMargin: DashMetrics.contentPadding + root.editGutter
             rightMargin: DashMetrics.contentPadding + root.editGutter
-            bottomMargin: DashMetrics.contentPadding + root.editGutter
+            bottomMargin: root.editMode ? root.editBottomInset : DashMetrics.contentPadding
         }
         contentHeight: tabLoader.height
         clip: contentHeight > height
@@ -210,7 +234,7 @@ FocusScope {
         buttonSize: PopoutMetrics.chromeButtonSize
         iconSize: PopoutMetrics.chromeIconSize
         resizing: root.panelResizer.resizing
-        atDefault: root.panelColumns === DashMetrics.defaultGridColumns && DashMetrics.panelFloorRowsFor(root.entryId) <= root.contentRows
+        atDefault: root.panelColumns === DashMetrics.defaultGridColumns && root.panelRows === DashMetrics.defaultPanelRows(root.entryId, root.contentRows)
         sizeText: root.panelColumns + "×" + root.panelRows
         onResizeStarted: (px, py, signX) => root.panelResizer.begin(px, py, signX)
         onResizeMoved: (px, py) => root.panelResizer.move(px, py)
@@ -227,19 +251,6 @@ FocusScope {
     DashOptionsSheet {
         id: tabOptions
         onDismissed: root.focusFace()
-    }
-
-    DashPageMenu {
-        id: headerMenu
-        entryId: root.entryId
-        tabItem: root.tab
-        editMode: root.editMode
-        onEditRequested: root.editMode = true
-        onOptionsRequested: tabOptions.presentFor(root.entryId)
-        onSettingsRequested: {
-            root.controller.requestCollapse();
-            PopoutService.openSettingsWithTab("dank_dash");
-        }
     }
 
     Component.onDestruction: root.controller.setEditing(root.activityId, false)

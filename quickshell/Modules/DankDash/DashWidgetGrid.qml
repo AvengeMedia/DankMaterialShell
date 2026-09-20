@@ -101,7 +101,7 @@ Item {
     }
 
     function updateWidget(index, changes) {
-        save(WidgetUtils.resolve(definitions, WidgetUtils.replace(widgets, index, changes)));
+        grid.commitChange(index, changes);
     }
 
     function handleKeyEvent(event) {
@@ -122,9 +122,8 @@ Item {
         width: parent.width
         editMode: root.editMode
         sourceItems: root.widgets
-        slotLayout: GridUtils.packCards(layoutItems, visualOrder, root.columns, width, DashMetrics.gridGap, DashMetrics.gridRowUnit, I18n.isRtl, id => root.specFor(id) !== null)
-        onReorderCommitted: items => root.save(items)
-        onResizeCommitted: (index, changes) => root.updateWidget(index, changes)
+        slotLayout: GridUtils.packCards(layoutItems, placementOrder, root.columns, width, DashMetrics.gridGap, DashMetrics.gridRowUnit, I18n.isRtl, id => root.specFor(id) !== null)
+        onLayoutCommitted: items => root.save(WidgetUtils.resolve(root.definitions, items))
 
         function requestFocus(backwards) {
             const targets = root.focusTargets();
@@ -220,18 +219,23 @@ Item {
         readonly property int widgetIndex: root.widgets.findIndex(w => w.id === widgetId)
         readonly property var widget: root.widgets[widgetIndex] ?? {}
         readonly property var spec: root.specFor(widgetId)
+        readonly property int row: grid.slotLayout.slots[widgetIndex]?.row ?? 0
         items: [
             {
                 label: I18n.tr("Move up"),
                 iconName: "arrow_upward",
-                enabled: widgetIndex > 0,
-                action: () => root.save(WidgetUtils.move(root.widgets, widgetIndex, -1))
+                enabled: row > 0,
+                action: () => root.updateWidget(widgetIndex, {
+                        row: row - 1
+                    })
             },
             {
                 label: I18n.tr("Move down"),
                 iconName: "arrow_downward",
-                enabled: widgetIndex >= 0 && widgetIndex < root.widgets.length - 1,
-                action: () => root.save(WidgetUtils.move(root.widgets, widgetIndex, 1))
+                enabled: widgetIndex >= 0,
+                action: () => root.updateWidget(widgetIndex, {
+                        row: row + 1
+                    })
             },
             {
                 label: I18n.tr("Width", "noun, size label, also used in widget resize menu") + " +",

@@ -150,7 +150,7 @@ Item {
             browserTitle: I18n.tr("Select lock screen background image")
             browserType: "wallpaper"
             showHiddenFiles: true
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.svg"]
             onFileSelected: path => {
                 SettingsData.set("lockScreenWallpaperPath", path);
                 close();

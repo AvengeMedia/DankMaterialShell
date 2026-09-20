@@ -16,6 +16,10 @@ const metaTimeout = 10 * time.Second
 var util = gops.NewGopsUtil()
 
 func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
+	runLowPriority(func() { dispatch(conn, req) })
+}
+
+func dispatch(conn *ipc.ConnWriter, req ipc.Request) {
 	switch req.Method {
 	case "dgop.meta":
 		handleMeta(conn, req)

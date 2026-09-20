@@ -76,6 +76,7 @@ Column {
                 summary: dock.summaryFor(modelData)
                 selected: dock.selectedDockId === modelData.id
                 checked: modelData.enabled
+                deletable: SettingsData.dockConfigs.length > 1
                 confirmingDelete: root.confirmingRemoveId === modelData.id
                 onClicked: dock.selectedDockId = modelData.id
                 onToggled: checked => {

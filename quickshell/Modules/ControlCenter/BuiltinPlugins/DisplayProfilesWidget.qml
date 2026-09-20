@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.Plugins
 import qs.Modules.Settings.DisplayConfig
@@ -76,7 +77,7 @@ PluginComponent {
                 Column {
                     id: detailColumn
                     width: parent.width
-                    spacing: Theme.spacingM
+                    spacing: CcMetrics.detailContentGap
 
                     CcGroup {
                         CcToggleRow {

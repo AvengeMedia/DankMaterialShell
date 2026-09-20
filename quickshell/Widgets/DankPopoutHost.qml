@@ -777,7 +777,7 @@ Item {
     property real renderedAlignedHeight: alignedHeight
     // Snap rendered geometry while the entrance morph runs so it doesn't ride a second animation.
     readonly property bool _settlingToOpen: shouldBeVisible && (morph.running || travelSpring.running)
-    readonly property bool _geometryMotion: animationsEnabled && contentWindow.visible && shouldBeVisible && !_settlingToOpen && !resizing
+    readonly property bool _geometryMotion: animationsEnabled && !SettingsData.reduceMotion && resizeDuration > 0 && contentWindow.visible && shouldBeVisible && !_settlingToOpen && !resizing
     property real _bodyGlide: 1
     property bool _bodyBatch: false
     property real _bodyFromY: 0
@@ -1180,6 +1180,7 @@ Item {
     readonly property real alignedX: alignedXFor(popupWidth)
     readonly property real alignedY: Theme.snap(connected ? _connectedAlignedY() : _standaloneAlignedY(), dpr)
 
+    readonly property vector4d surfaceCornerRadii: chromeLoader.item?.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property real maskX: _dismissZone.x
     readonly property real maskY: _dismissZone.y
     readonly property real maskWidth: _dismissZone.width
@@ -1662,6 +1663,7 @@ Item {
             readonly property real surfaceTopRightRadius: root.usesConnectedSurfaceChrome && (contentContainer.barTop || contentContainer.barRight) ? 0 : surfaceRadius
             readonly property real surfaceBottomLeftRadius: root.usesConnectedSurfaceChrome && (contentContainer.barBottom || contentContainer.barLeft) ? 0 : surfaceRadius
             readonly property real surfaceBottomRightRadius: root.usesConnectedSurfaceChrome && (contentContainer.barBottom || contentContainer.barRight) ? 0 : surfaceRadius
+            readonly property vector4d surfaceCornerRadii: Qt.vector4d(surfaceTopLeftRadius, surfaceTopRightRadius, surfaceBottomRightRadius, surfaceBottomLeftRadius)
 
             WindowBlur {
                 id: popoutBlur

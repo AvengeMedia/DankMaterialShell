@@ -391,13 +391,8 @@ Item {
 
     readonly property color _hostSurface: Theme.hostSurface
     readonly property string _barId: barConfig?.id ?? "default"
-    property real _backgroundAlpha: SettingsData.barTransparency(barConfig)
+    readonly property real _backgroundAlpha: SettingsData.barTransparency(barConfig)
     readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.frameSurfaceColor : Theme.withAlpha(_hostSurface, _backgroundAlpha)
-
-    function _updateBackgroundAlpha() {
-        const live = SettingsData.barConfigs.find(c => c.id === _barId);
-        _backgroundAlpha = SettingsData.barTransparency(live ?? barConfig);
-    }
     readonly property real _dpr: CompositorService.getScreenScale(barWindow.screen)
 
     property string screenName: modelData.name
@@ -480,7 +475,6 @@ Item {
 
     Component.onCompleted: {
         updateGpuTempConfig();
-        _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
         _updateShouldHideForWindows();
     }
@@ -518,16 +512,8 @@ Item {
 
     onRootWindowBarConfigChanged: {
         updateGpuTempConfig();
-        _updateBackgroundAlpha();
         _updateHasMaximizedToplevel();
         _updateShouldHideForWindows();
-    }
-
-    Connections {
-        target: SettingsData
-        function onBarConfigsChanged() {
-            barWindow._updateBackgroundAlpha();
-        }
     }
 
     Connections {

@@ -860,7 +860,7 @@ Column {
             browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
             browserType: "wallpaper"
             showHiddenFiles: true
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr"]
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
             onFileSelected: path => {
                 root.applyBrowsedPath(path);
                 close();

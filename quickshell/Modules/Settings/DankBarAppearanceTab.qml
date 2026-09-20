@@ -78,19 +78,6 @@ Item {
                 }
             }
 
-            SettingsToggleRow {
-                settingKey: "barNoBackground"
-                tags: ["transparent", "background", "invisible"]
-                text: I18n.tr("Background")
-                visible: !bar.selectedBarFrameStyled && !bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["noBackground"]
-                checked: !(bar.selectedBarConfig?.noBackground ?? false)
-                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
-                        noBackground: !checked
-                    })
-            }
-
             SettingsControlledBy {
                 visible: !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop
                 target: "surfaces"
@@ -358,7 +345,6 @@ Item {
                 settingKey: "barWidgetStyle"
                 tags: ["widget", "style", "segments", "pills", "flat", "connected", "group"]
                 title: I18n.tr("Widget style")
-                visible: !bar.selectedBarFrameStyled
                 enabled: root.widgetBackgroundEnabled
                 resetStore: bar
                 resetKeys: ["widgetStyle"]
@@ -401,7 +387,6 @@ Item {
             }
 
             SettingsSliderRow {
-                visible: !bar.selectedBarFrameStyled
                 text: I18n.tr("Padding")
                 tags: ["widget", "padding", "spacing", "compact", "remove"]
                 resetStore: bar
@@ -412,6 +397,18 @@ Item {
                 unit: "px"
                 onSliderValueChanged: newValue => SettingsData.updateBarConfig(bar.selectedBarId, {
                         widgetPadding: newValue
+                    })
+            }
+
+            SettingsToggleRow {
+                settingKey: "barNoBackground"
+                tags: ["transparent", "background", "invisible"]
+                text: I18n.tr("Background")
+                resetStore: bar
+                resetKeys: ["noBackground"]
+                checked: !(bar.selectedBarConfig?.noBackground ?? false)
+                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        noBackground: !checked
                     })
             }
 

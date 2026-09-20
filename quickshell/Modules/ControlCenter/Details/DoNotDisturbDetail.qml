@@ -73,7 +73,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.spacingM
+            spacing: CcMetrics.detailContentGap
 
             CcGroup {
                 CcToggleRow {

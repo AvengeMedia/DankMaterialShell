@@ -55,12 +55,11 @@ Singleton {
     readonly property real tileTextGap: Theme.spacingM
     readonly property real headerActionSize: Theme.iconButtonSize * iconScale
     readonly property real headerActionIconSize: Theme.iconSize * iconScale
-    readonly property int wheelVolumeStep: 5
 
     readonly property real headerAvatarSize: 56
     readonly property real headerHeight: tileHeight
 
-    readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingL * 2
+    readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingM * 2
     readonly property real pageTitleSize: Theme.fontSizeXXLarge
     readonly property real detailHeightList: 350
     readonly property real detailHeightBrightness: 400
@@ -70,6 +69,9 @@ Singleton {
 
     readonly property real rowPaddingH: Theme.spacingL
     readonly property real rowPaddingV: Theme.spacingM
+    readonly property real detailContentGap: Theme.spacingS
+    readonly property real sectionLabelTopGap: Theme.spacingS
+    readonly property real sectionLabelBottomGap: Theme.spacingXS
     readonly property color rowColor: Theme.foregroundColor(Theme.cardSurface)
     readonly property int maxPins: 3
     readonly property real statusDotSize: 8
@@ -122,6 +124,9 @@ Singleton {
         case "battery":
         case "builtin_vpn":
         case "builtin_tailscale":
+        case "audioOutput":
+        case "audioInput":
+        case "diskUsage":
             return detailHeightList;
         default:
             return detailHeightDefault;

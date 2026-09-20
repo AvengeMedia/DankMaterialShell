@@ -24,6 +24,7 @@ FocusScope {
     readonly property Item focusTarget: grid
     readonly property Item previousFocusTarget: grid.lastFocusTarget
     readonly property var addable: grid.addableEntries
+    readonly property int usedColumns: grid.usedColumns
     readonly property bool cardResizing: grid.sizePreview !== null
     readonly property bool blocksTabNavigation: grid.blocksTabNavigation || detailSheet.shown || editorSheet.shown || optionsSheet.shown || addMenu.open
 
@@ -34,8 +35,10 @@ FocusScope {
     signal navFocusRequested(bool backwards)
 
     onEditModeChanged: {
-        if (!editMode)
+        if (!editMode) {
             optionsSheet.dismiss();
+            addMenu.close();
+        }
     }
 
     function handleKeyEvent(event) {
