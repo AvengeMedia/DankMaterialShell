@@ -557,7 +557,7 @@ func TestKittyConfigStructure(t *testing.T) {
 func TestKittyThemeConfigStructure(t *testing.T) {
 	assert.Contains(t, KittyThemeConfig, "foreground            #e0e2e8")
 	assert.Contains(t, KittyThemeConfig, "background            #101418")
-	assert.Contains(t, KittyThemeConfig, "cursor #e0e2e8")
+	assert.Contains(t, KittyThemeConfig, "cursor #9dcbfb")
 	assert.Contains(t, KittyThemeConfig, "color0   #101418")
 	assert.Contains(t, KittyThemeConfig, "color15   #ffffff")
 }
