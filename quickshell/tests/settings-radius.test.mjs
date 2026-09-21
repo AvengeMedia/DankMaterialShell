@@ -39,10 +39,10 @@ test("parse and sparse serialization use the same new default", () => {
     const root = { settingsConfigVersion: 25 };
     store.parse(root, {});
     assert.equal(root.radiusStrength, 50);
-    assert.equal("radiusStrength" in store.toJson(root), false);
+    assert.equal("radiusStrength" in store.toJson(root, new Set()), false);
     store.parse(root, { radiusStrength: 60 });
-    assert.equal(store.toJson(root).radiusStrength, 60);
-    assert.equal("cornerRadius" in store.toJson(root), false);
+    assert.equal(store.toJson(root, new Set()).radiusStrength, 60);
+    assert.equal("cornerRadius" in store.toJson(root, new Set()), false);
     store.parse(root, { radiusStrength: 200 });
     assert.equal(root.radiusStrength, 100);
     store.parse(root, { radiusStrength: "bad" });
