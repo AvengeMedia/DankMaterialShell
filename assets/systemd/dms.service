@@ -5,12 +5,14 @@ After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
-Type=dbus
-BusName=org.freedesktop.Notifications
+Type=notify
+NotifyAccess=main
+Environment=QS_DISABLE_CRASH_HANDLER=1
 ExecStart=/usr/bin/dms run --session
 ExecReload=/bin/kill -USR1 $MAINPID
 LimitNOFILE=16384:infinity
 Restart=on-failure
+RestartPreventExitStatus=CONFIG
 RestartForceExitStatus=TEMPFAIL
 SuccessExitStatus=TEMPFAIL
 RestartSec=1.23
