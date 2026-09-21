@@ -553,7 +553,7 @@ Singleton {
                     "text": I18n.tr("Multiplexers", "settings page name for terminal multiplexers like tmux"),
                     "icon": "terminal",
                     "tabIndex": 32,
-                    "hint": I18n.tr("tmux, zellij, and herdr sessions")
+                    "hint": I18n.tr("tmux, zellij, and herdr sessions", "settings page description for terminal multiplexer sessions; tmux, zellij, and herdr are product names")
                 },
                 {
                     "id": "printers",
