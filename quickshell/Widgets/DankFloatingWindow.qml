@@ -22,6 +22,7 @@ FloatingWindow {
         visible: root.contentVisible
     }
 
+    // No surfaceColor gate: compositor window rules can make this window translucent.
     WindowBlur {
         targetWindow: root
         blurEnabled: root.contentVisible && Theme.connectedSurfaceBlurEnabled

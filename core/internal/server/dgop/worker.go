@@ -3,6 +3,8 @@ package dgop
 import (
 	"runtime"
 	"sync"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/lowprio"
 )
 
 var (
@@ -26,7 +28,7 @@ func runLowPriority(job func()) {
 // Sampling must never preempt a foreground app, so it runs on one OS thread with lowered priority.
 func worker() {
 	runtime.LockOSThread()
-	lowerThreadPriority()
+	lowprio.LowerThreadPriority()
 	for job := range jobs {
 		job()
 	}

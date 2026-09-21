@@ -13,7 +13,7 @@ DankOSD {
     readonly property bool playing: player?.isPlaying ?? false
     readonly property var player: MprisController.activePlayer
 
-    osdWidth: useVertical ? Theme.osdHeight : Math.min(Theme.sliderHandleHeight * 7, screenWidth - Theme.spacingM * 2)
+    osdWidth: useVertical ? Theme.osdHeight : Math.min(Theme.osdMediaWidth, screenWidth - Theme.spacingM * 2)
     osdHeight: Theme.osdHeight
     surfaceColor: useVertical ? MediaAccentService.accent : Theme.hostSurface
     surfaceRadius: useVertical ? (contentLoader.item?.surfaceRadius ?? Theme.cornerRadiusM) : Theme.fullRadius(alignedWidth, alignedHeight)

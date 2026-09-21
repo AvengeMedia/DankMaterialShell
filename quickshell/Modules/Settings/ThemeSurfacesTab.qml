@@ -9,7 +9,7 @@ Column {
 
     property var parentModal: null
     readonly property bool followsSurfaces: SettingsData.floatingWindowSyncGlobal ?? true
-    readonly property bool borderEnabled: SettingsData.blurBorderEnabled ?? true
+    readonly property bool borderEnabled: SettingsData.blurBorderEnabled ?? false
     readonly property string windowRadiusKey: CompositorService.supportsLayoutConfig ? CompositorService.configKey + "LayoutRadiusOverride" : ""
 
     width: parent?.width ?? 0
@@ -84,6 +84,76 @@ Column {
 
         SettingsToggleRow {
             tab: "theme"
+            tags: ["surface", "popup", "modal", "border", "outline", "edge"]
+            settingKey: "blurBorderEnabled"
+            text: I18n.tr("Border")
+            checked: root.borderEnabled
+            onToggled: checked => SettingsData.set("blurBorderEnabled", checked)
+        }
+
+        SettingsDropdownRow {
+            tab: "theme"
+            tags: ["surface", "popup", "modal", "border", "outline", "edge", "color"]
+            settingKey: "blurBorderColor"
+            visible: root.borderEnabled
+            resetKeys: ["blurBorderColor", "blurBorderCustomColor"]
+            text: I18n.tr("Border color")
+            options: [I18n.tr("Outline", "surface border color"), I18n.tr("Primary", "surface border color"), I18n.tr("Secondary", "surface border color"), I18n.tr("Text Color", "surface border color"), I18n.tr("Custom", "surface border color")]
+            optionColorMap: ({
+                    [I18n.tr("Outline", "surface border color")]: Theme.outline,
+                    [I18n.tr("Primary", "surface border color")]: Theme.primary,
+                    [I18n.tr("Secondary", "surface border color")]: Theme.secondary,
+                    [I18n.tr("Text Color", "surface border color")]: Theme.surfaceText,
+                    [I18n.tr("Custom", "surface border color")]: SettingsData.blurBorderCustomColor ?? "#ffffff"
+                })
+            currentValue: {
+                switch (SettingsData.blurBorderColor) {
+                case "primary":
+                    return I18n.tr("Primary", "surface border color");
+                case "secondary":
+                    return I18n.tr("Secondary", "surface border color");
+                case "surfaceText":
+                    return I18n.tr("Text Color", "surface border color");
+                case "custom":
+                    return I18n.tr("Custom", "surface border color");
+                default:
+                    return I18n.tr("Outline", "surface border color");
+                }
+            }
+            onValueChanged: value => {
+                switch (value) {
+                case I18n.tr("Primary", "surface border color"):
+                    SettingsData.set("blurBorderColor", "primary");
+                    return;
+                case I18n.tr("Secondary", "surface border color"):
+                    SettingsData.set("blurBorderColor", "secondary");
+                    return;
+                case I18n.tr("Text Color", "surface border color"):
+                    SettingsData.set("blurBorderColor", "surfaceText");
+                    return;
+                case I18n.tr("Custom", "surface border color"):
+                    SettingsData.set("blurBorderColor", "custom");
+                    root.openSurfaceBorderColorPicker();
+                    return;
+                }
+                SettingsData.set("blurBorderColor", "outline");
+            }
+        }
+
+        SettingsSliderRow {
+            tab: "theme"
+            tags: ["surface", "popup", "modal", "border", "opacity"]
+            settingKey: "blurBorderOpacity"
+            visible: root.borderEnabled
+            text: I18n.tr("Border opacity")
+            value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
+            minimum: 0
+            maximum: 100
+            onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
+        }
+
+        SettingsToggleRow {
+            tab: "theme"
             tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
             settingKey: "blurForegroundLayers"
             text: I18n.tr("Foreground layers")
@@ -122,7 +192,14 @@ Column {
             description: BlurService.available ? "" : I18n.tr("Your compositor does not support background blur (ext-background-effect-v1)")
             checked: SettingsData.blurEnabled ?? false
             enabled: BlurService.available
-            onToggled: checked => SettingsData.set("blurEnabled", checked)
+            onToggled: checked => {
+                SettingsData.set("blurEnabled", checked);
+                if (!checked || SettingsData.blurBorderSeeded)
+                    return;
+                SettingsData.set("blurBorderSeeded", true);
+                SettingsData.set("blurBorderEnabled", true);
+                SettingsSearchService.navigateToSection("blurBorderEnabled");
+            }
         }
 
         SettingsNavRow {
@@ -370,75 +447,6 @@ Column {
                 model: targetCard.showHidden ? targetCard.hiddenTargets : []
                 delegate: opacityTargetRow
             }
-        }
-    }
-
-    SettingsToggleCard {
-        tab: "theme"
-        tags: ["surface", "popup", "modal", "border", "outline", "edge"]
-        settingKey: "blurBorderEnabled"
-        iconName: "border_style"
-        title: I18n.tr("Border")
-        checked: root.borderEnabled
-        onToggled: checked => SettingsData.set("blurBorderEnabled", checked)
-
-        SettingsDropdownRow {
-            tab: "theme"
-            tags: ["surface", "popup", "modal", "border", "outline", "edge", "color"]
-            settingKey: "blurBorderColor"
-            resetKeys: ["blurBorderColor", "blurBorderCustomColor"]
-            text: I18n.tr("Border color")
-            options: [I18n.tr("Outline", "surface border color"), I18n.tr("Primary", "surface border color"), I18n.tr("Secondary", "surface border color"), I18n.tr("Text Color", "surface border color"), I18n.tr("Custom", "surface border color")]
-            optionColorMap: ({
-                    [I18n.tr("Outline", "surface border color")]: Theme.outline,
-                    [I18n.tr("Primary", "surface border color")]: Theme.primary,
-                    [I18n.tr("Secondary", "surface border color")]: Theme.secondary,
-                    [I18n.tr("Text Color", "surface border color")]: Theme.surfaceText,
-                    [I18n.tr("Custom", "surface border color")]: SettingsData.blurBorderCustomColor ?? "#ffffff"
-                })
-            currentValue: {
-                switch (SettingsData.blurBorderColor) {
-                case "primary":
-                    return I18n.tr("Primary", "surface border color");
-                case "secondary":
-                    return I18n.tr("Secondary", "surface border color");
-                case "surfaceText":
-                    return I18n.tr("Text Color", "surface border color");
-                case "custom":
-                    return I18n.tr("Custom", "surface border color");
-                default:
-                    return I18n.tr("Outline", "surface border color");
-                }
-            }
-            onValueChanged: value => {
-                switch (value) {
-                case I18n.tr("Primary", "surface border color"):
-                    SettingsData.set("blurBorderColor", "primary");
-                    return;
-                case I18n.tr("Secondary", "surface border color"):
-                    SettingsData.set("blurBorderColor", "secondary");
-                    return;
-                case I18n.tr("Text Color", "surface border color"):
-                    SettingsData.set("blurBorderColor", "surfaceText");
-                    return;
-                case I18n.tr("Custom", "surface border color"):
-                    SettingsData.set("blurBorderColor", "custom");
-                    root.openSurfaceBorderColorPicker();
-                    return;
-                }
-                SettingsData.set("blurBorderColor", "outline");
-            }
-        }
-
-        SettingsSliderRow {
-            tab: "theme"
-            tags: ["surface", "popup", "modal", "border", "opacity"]
-            settingKey: "blurBorderOpacity"
-            text: I18n.tr("Border opacity")
-            value: Math.round((SettingsData.blurBorderOpacity ?? 0.35) * 100)
-            minimum: 0
-            maximum: 100
-            onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
         }
     }
 

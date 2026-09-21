@@ -55,7 +55,7 @@ PluginComponent {
                 model: root.displayedEmojis
                 StyledText {
                     text: modelData
-                    font.pixelSize: Theme.fontSizeLarge
+                    font.pixelSize: root.iconSize
                 }
             }
         }
@@ -70,7 +70,7 @@ PluginComponent {
                 model: root.displayedEmojis
                 StyledText {
                     text: modelData
-                    font.pixelSize: Theme.fontSizeMedium
+                    font.pixelSize: root.iconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }

@@ -25,7 +25,7 @@ Item {
     property alias modified: header.modified
 
     default property alias content: expandedContent.data
-    readonly property bool hasContent: expandedContent.visibleChildren.length > 0
+    readonly property bool hasContent: expandedContent.height > 0
     readonly property bool standalone: !(parent?.isSettingsGroupHost ?? false)
 
     signal toggled(bool checked)

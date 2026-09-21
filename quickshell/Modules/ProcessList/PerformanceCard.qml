@@ -20,6 +20,7 @@ Rectangle {
     property string extraInfo: ""
     property color extraInfoColor: Theme.surfaceVariantText
 
+    implicitHeight: compact ? cardContent.implicitHeight + Theme.spacingM * 2 : 0
     radius: Theme.cornerRadiusL
     color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(card))
 
@@ -148,21 +149,21 @@ Rectangle {
                 font.pixelSize: Theme.fontSizeSmall
                 font.family: SettingsData.monoFontFamily
                 color: card.extraInfoColor
-                visible: !card.compact && card.extraInfo.length > 0
+                visible: card.extraInfo.length > 0
             }
         }
 
         Item {
             Layout.fillHeight: true
+            visible: !card.compact
         }
 
         NumericText {
-            parent: card.compact ? cardHeader : cardContent
             isMonospace: false
-            Layout.maximumWidth: card.compact ? Math.max(0, card.width - Theme.spacingM * 2 - Theme.iconSize - Theme.spacingS * 3 - titleLabel.implicitWidth) : card.width - Theme.spacingM * 2
+            Layout.maximumWidth: card.width - Theme.spacingM * 2
             elide: Text.ElideRight
             text: card.value
-            font.pixelSize: card.compact ? Theme.fontSizeMedium : Theme.fontSizeXLarge
+            font.pixelSize: Theme.fontSizeXLarge
             font.family: SettingsData.monoFontFamily
             font.weight: Theme.fontWeightMedium
             color: Theme.surfaceText

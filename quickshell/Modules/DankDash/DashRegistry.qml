@@ -123,7 +123,8 @@ Singleton {
             "description": I18n.tr("Browse and set wallpapers"),
             "tab": {
                 "component": wallpaperTab,
-                "async": true
+                "async": true,
+                "sizeToContent": true
             },
             "options": [choice("layout", I18n.tr("Layout"), "grid", [
                     {

@@ -118,7 +118,7 @@ PluginComponent {
             DankIcon {
                 name: root.isEnabled ? "settings" : "settings_off"
                 color: root.isEnabled ? Theme.primary : Theme.surfaceVariantText
-                font.pixelSize: Theme.iconSize - 4
+                size: root.iconSize
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -128,7 +128,7 @@ PluginComponent {
                     return selected.substring(0, 1);
                 }
                 color: root.isEnabled ? Theme.primary : Theme.surfaceVariantText
-                font.pixelSize: Theme.fontSizeMedium
+                font.pixelSize: root.textSize
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

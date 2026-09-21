@@ -14,7 +14,6 @@ Column {
     id: root
 
     property var parentModal: null
-    property string browseTarget: "desktop"
     property var cachedIconThemes: SettingsData.availableIconThemes
     property var cachedCursorThemes: SettingsData.availableCursorThemes
 
@@ -27,7 +26,6 @@ Column {
     }
     readonly property bool hasWallpaper: currentWallpaper !== ""
     readonly property bool wallpaperIsImage: hasWallpaper && !currentWallpaper.startsWith("#")
-    readonly property bool canCycleWallpaper: wallpaperIsImage && !currentWallpaper.startsWith("we")
     readonly property bool cyclingEnabled: {
         SessionData.monitorCyclingSettings;
         return perMonitor ? SessionData.getMonitorCyclingSettings(selectedScreen).enabled : SessionData.wallpaperCyclingEnabled;
@@ -41,6 +39,51 @@ Column {
         "error": Theme.error,
         "warning": Theme.warning
     })
+    readonly property bool dynamicTheme: Theme.currentTheme === Theme.dynamic && Theme.currentThemeCategory !== "registry"
+    readonly property bool genericTheme: Theme.currentThemeCategory === "generic" && Theme.currentTheme !== Theme.dynamic && Theme.currentThemeName !== "custom"
+    readonly property var genericOptions: ["blue", "purple", "green", "orange", "red", "cyan", "pink", "amber", "coral", "monochrome"].map(name => {
+        const colors = Theme.getThemeColors(name);
+        const palette = ThemePalette.pick(colors) ?? {};
+        return {
+            "value": name,
+            "label": colors.name,
+            "primary": palette.primary ?? Theme.primary.toString(),
+            "secondary": palette.secondary,
+            "tertiary": palette.tertiary
+        };
+    })
+    readonly property string themesDir: Quickshell.env("HOME") + "/.config/DankMaterialShell/themes"
+    readonly property var installedRegistryThemes: DMSService.installedThemes
+    readonly property var registryOptions: {
+        const mode = Theme.isLightMode ? "light" : "dark";
+        return installedRegistryThemes.map(theme => {
+            const palette = ThemePalette.pick(theme.palette?.[mode] ?? theme.palette?.dark) ?? {};
+            return {
+                "value": theme.sourceDir || theme.id,
+                "label": theme.name,
+                "primary": palette.primary ?? Theme.primary.toString(),
+                "secondary": palette.secondary,
+                "tertiary": palette.tertiary
+            };
+        });
+    }
+    readonly property string activeRegistryTheme: {
+        if (Theme.currentThemeName !== "custom" || !SettingsData.customThemeFile)
+            return "";
+        for (const theme of installedRegistryThemes) {
+            if (SettingsData.customThemeFile.endsWith((theme.sourceDir || theme.id) + "/theme.json"))
+                return theme.sourceDir || theme.id;
+        }
+        return "";
+    }
+    readonly property bool registryGridShown: !dynamicTheme && !genericTheme && registryOptions.length > 0
+    readonly property bool registryPending: !dynamicTheme && !genericTheme && DMSService.dmsAvailable && !DMSService.installedThemesLoaded
+    readonly property string matugenPreviewKey: MatugenPreviewService.key
+    readonly property bool matugenAvailable: Theme.matugenAvailable
+    onMatugenPreviewKeyChanged: refreshPreviews()
+    onMatugenAvailableChanged: refreshPreviews()
+    onDynamicThemeChanged: refreshPreviews()
+    onVisibleChanged: refreshPreviews()
     readonly property string colorModeStatus: {
         if (SettingsData.matugenSmartMode)
             return I18n.tr("Wallpaper");
@@ -59,6 +102,14 @@ Column {
         WallpaperCyclingService.cyclingActive;
         SettingsData.detectAvailableIconThemes();
         SettingsData.detectAvailableCursorThemes();
+        refreshPreviews();
+        if (DMSService.dmsAvailable)
+            DMSService.listInstalledThemes();
+    }
+
+    function refreshPreviews() {
+        if (visible && dynamicTheme)
+            MatugenPreviewService.refresh();
     }
 
     function firstScreenName() {
@@ -92,22 +143,13 @@ Column {
         return I18n.tr("No displays");
     }
 
-    function openBrowser(target) {
-        browseTarget = target;
+    function openBrowser() {
         wallpaperBrowserLoader.active = true;
         if (wallpaperBrowserLoader.item)
             wallpaperBrowserLoader.item.open();
     }
 
-    function applyBrowsedPath(path) {
-        switch (browseTarget) {
-        case "light":
-            SessionData.setWallpaperForMode(path, true);
-            return;
-        case "dark":
-            SessionData.setWallpaperForMode(path, false);
-            return;
-        }
+    function applyWallpaper(path) {
         if (perMonitor) {
             SessionData.setMonitorWallpaper(selectedScreen, path);
             SessionData.setMonitorCyclingFolderPath(selectedScreen, "");
@@ -118,23 +160,26 @@ Column {
         SessionData.saveSettings();
     }
 
-    function pickColor(target, current, title) {
+    function pickColor() {
         const picker = PopoutService.colorPickerModal;
         if (!picker)
             return;
-        picker.selectedColor = current.startsWith("#") ? current : Theme.primary;
-        picker.pickerTitle = title;
+        picker.selectedColor = currentWallpaper.startsWith("#") ? currentWallpaper : Theme.primary;
+        picker.pickerTitle = I18n.tr("Choose Wallpaper Color", "wallpaper color picker title");
         picker.onColorSelectedCallback = function (color) {
-            root.browseTarget = target;
-            root.applyBrowsedPath(color.toString());
+            root.applyWallpaper(color.toString());
         };
         picker.show();
     }
 
-    function clearDesktopWallpaper() {
+    function clearWallpaper() {
         if (perMonitor) {
             SessionData.setMonitorWallpaper(selectedScreen, "");
             SessionData.setMonitorCyclingFolderPath(selectedScreen, "");
+            return;
+        }
+        if (perMode) {
+            SessionData.setWallpaperForMode("", SessionData.isLightMode);
             return;
         }
         if (Theme.currentTheme === Theme.dynamic)
@@ -142,24 +187,6 @@ Column {
         SessionData.clearWallpaper();
         SessionData.wallpaperCyclingFolderPath = "";
         SessionData.saveSettings();
-    }
-
-    function cycleWallpaper(previous) {
-        if (!canCycleWallpaper)
-            return;
-        if (perMonitor) {
-            if (previous) {
-                WallpaperCyclingService.cyclePrevForMonitor(selectedScreen);
-                return;
-            }
-            WallpaperCyclingService.cycleNextForMonitor(selectedScreen);
-            return;
-        }
-        if (previous) {
-            WallpaperCyclingService.cyclePrevManually();
-            return;
-        }
-        WallpaperCyclingService.cycleNextManually();
     }
 
     ConfigInclude {
@@ -191,10 +218,9 @@ Column {
 
     SettingsCard {
         tab: "wallpaper"
-        tags: ["background", "image", "picture", "light", "dark", "mode", "monitor", "display"]
-        title: I18n.tr("Wallpaper")
+        tags: ["background", "image", "picture", "light", "dark", "mode", "theme", "color", "palette"]
+        title: I18n.tr("Appearance")
         settingKey: "wallpaper"
-
         SettingsDropdownRow {
             tab: "wallpaper"
             tags: ["monitor", "display", "screen"]
@@ -210,189 +236,208 @@ Column {
             settingKey: "colorMode"
             tags: ["light", "dark", "mode", "theme", "color", "palette"]
             body: Flow {
-                id: thumbs
+                id: hero
 
-                readonly property real thumbWidth: (width - spacing) / 2
+                readonly property bool stacked: width < SettingsMetrics.wallpaperHeroStackWidth
+                readonly property real thumbWidth: stacked ? width : Math.round(width * SettingsMetrics.wallpaperHeroSplit)
 
                 width: parent.width
                 spacing: Theme.spacingL
 
                 SettingsWallpaperThumb {
-                    width: thumbs.thumbWidth
-                    visible: !root.perMode
+                    width: hero.thumbWidth
+                    height: {
+                        const natural = width * SettingsMetrics.wallpaperThumbRatio;
+                        if (hero.stacked)
+                            return natural;
+                        return root.registryPending ? Math.max(natural, side.implicitHeight) : side.implicitHeight;
+                    }
                     path: root.currentWallpaper
-                    canCycle: root.canCycleWallpaper
-                    onBrowse: root.openBrowser("desktop")
-                    onPickColor: root.pickColor("desktop", root.currentWallpaper, I18n.tr("Choose Wallpaper Color", "wallpaper color picker title"))
-                    onClear: root.clearDesktopWallpaper()
-                    onPrevious: root.cycleWallpaper(true)
-                    onNext: root.cycleWallpaper(false)
+                    onBrowse: root.openBrowser()
+                    onPickColor: root.pickColor()
+                    onClear: root.clearWallpaper()
                 }
 
-                SettingsWallpaperThumb {
-                    width: thumbs.thumbWidth
-                    visible: root.perMode
-                    label: I18n.tr("Light", "adjective, wallpaper thumbnail label for light mode")
-                    placeholderIcon: "light_mode"
-                    path: SessionData.wallpaperPathLight
-                    canCycle: SessionData.isLightMode && root.canCycleWallpaper
-                    onBrowse: root.openBrowser("light")
-                    onPickColor: root.pickColor("light", SessionData.wallpaperPathLight, I18n.tr("Choose Light Mode Color", "light mode wallpaper color picker title"))
-                    onClear: {
-                        root.browseTarget = "light";
-                        root.applyBrowsedPath("");
-                    }
-                    onPrevious: root.cycleWallpaper(true)
-                    onNext: root.cycleWallpaper(false)
-                }
+                Column {
+                    id: side
+                    width: hero.stacked ? hero.width : hero.width - hero.thumbWidth - hero.spacing
+                    spacing: Theme.spacingM
 
-                SettingsWallpaperThumb {
-                    width: thumbs.thumbWidth
-                    visible: root.perMode
-                    label: I18n.tr("Dark", "adjective, wallpaper thumbnail label for dark mode")
-                    placeholderIcon: "dark_mode"
-                    path: SessionData.wallpaperPathDark
-                    canCycle: !SessionData.isLightMode && root.canCycleWallpaper
-                    onBrowse: root.openBrowser("dark")
-                    onPickColor: root.pickColor("dark", SessionData.wallpaperPathDark, I18n.tr("Choose Dark Mode Color", "dark mode wallpaper color picker title"))
-                    onClear: {
-                        root.browseTarget = "dark";
-                        root.applyBrowsedPath("");
-                    }
-                    onPrevious: root.cycleWallpaper(true)
-                    onNext: root.cycleWallpaper(false)
-                }
-
-                Item {
-                    id: quickPanel
-                    width: root.perMode ? thumbs.width : thumbs.thumbWidth
-                    height: root.perMode ? quickColumn.implicitHeight : thumbs.thumbWidth * SettingsMetrics.wallpaperThumbRatio
-
-                    Column {
-                        id: quickColumn
+                    Row {
+                        id: modeRow
                         width: parent.width
-                        spacing: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
 
-                        Row {
-                            id: modeRow
-                            width: parent.width
-                            spacing: Theme.spacingS
-
-                            DankButtonGroup {
-                                width: parent.width - scheduleButton.width - parent.spacing
-                                fillWidth: true
-                                checkEnabled: false
-                                anchors.verticalCenter: parent.verticalCenter
-                                model: [
-                                    {
-                                        "text": I18n.tr("Light", "adjective, wallpaper thumbnail label for light mode"),
-                                        "icon": "light_mode"
-                                    },
-                                    {
-                                        "text": I18n.tr("Dark", "adjective, wallpaper thumbnail label for dark mode"),
-                                        "icon": "dark_mode"
-                                    }
-                                ]
-                                currentIndex: SessionData.isLightMode ? 0 : 1
-                                selectionMode: "single"
-                                onSelectionChanged: (index, selected) => {
-                                    if (!selected)
-                                        return;
-                                    const light = index === 0;
-                                    if (light === SessionData.isLightMode)
-                                        return;
-                                    Theme.screenTransition();
-                                    Theme.setLightMode(light);
+                        DankButtonGroup {
+                            width: parent.width - scheduleButton.width - parent.spacing
+                            fillWidth: true
+                            checkEnabled: false
+                            anchors.verticalCenter: parent.verticalCenter
+                            model: [
+                                {
+                                    "text": I18n.tr("Light", "adjective, wallpaper thumbnail label for light mode"),
+                                    "icon": "light_mode"
+                                },
+                                {
+                                    "text": I18n.tr("Dark", "adjective, wallpaper thumbnail label for dark mode"),
+                                    "icon": "dark_mode"
                                 }
-                            }
-
-                            DankActionButton {
-                                id: scheduleButton
-                                iconName: "schedule"
-                                anchors.verticalCenter: parent.verticalCenter
-                                Accessible.name: I18n.tr("Dark mode")
-                                tooltipText: root.colorModeStatus
-                                onClicked: root.parentModal?.navigateTo("theme_schedule")
+                            ]
+                            currentIndex: SessionData.isLightMode ? 0 : 1
+                            selectionMode: "single"
+                            onSelectionChanged: (index, selected) => {
+                                if (!selected)
+                                    return;
+                                const light = index === 0;
+                                if (light === SessionData.isLightMode)
+                                    return;
+                                Theme.screenTransition();
+                                Theme.setLightMode(light);
                             }
                         }
 
-                        Rectangle {
-                            id: themeTile
-                            width: parent.width
-                            height: Theme.listItemTwoLineHeight
-                            radius: Theme.cornerRadiusM
-                            color: Theme.foregroundColor(Theme.chipSurface, true)
+                        DankActionButton {
+                            id: scheduleButton
+                            iconName: "schedule"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Accessible.name: I18n.tr("Dark mode")
+                            tooltipText: root.colorModeStatus
+                            onClicked: root.parentModal?.navigateTo("theme_schedule")
+                        }
+                    }
 
-                            activeFocusOnTab: true
-                            Accessible.role: Accessible.Button
-                            Accessible.name: I18n.tr("Theme & colors")
-                            Accessible.description: Theme.currentThemeLabel
-                            Accessible.onPressAction: root.parentModal?.navigateTo("theme")
-                            Keys.onSpacePressed: root.parentModal?.navigateTo("theme")
-                            Keys.onReturnPressed: root.parentModal?.navigateTo("theme")
+                    SettingsSwatchGrid {
+                        width: parent.width
+                        visible: root.dynamicTheme
+                        compact: true
+                        options: MatugenPreviewService.schemeOptions
+                        currentValue: SettingsData.matugenScheme
+                        enabled: Theme.matugenAvailable && MatugenPreviewService.ready
+                        opacity: MatugenPreviewService.ready ? 1 : Theme.pendingOpacity
+                        onSelected: value => SettingsData.setMatugenScheme(value)
 
-                            FocusRing {}
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                            }
+                        }
+                    }
 
-                            DankPaletteSwatch {
-                                id: themeSwatch
-                                width: Theme.avatarSize
-                                height: Theme.avatarSize
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
-                                primaryColor: root.themePalette.primary
-                                secondaryColor: root.themePalette.secondary
-                                tertiaryColor: root.themePalette.tertiary
+                    SettingsSwatchGrid {
+                        width: parent.width
+                        visible: root.genericTheme
+                        compact: true
+                        options: root.genericOptions
+                        currentValue: root.genericTheme ? Theme.currentThemeName : ""
+                        onSelected: value => Theme.switchTheme(value)
+                    }
+
+                    SettingsSwatchGrid {
+                        width: parent.width
+                        visible: root.registryGridShown
+                        compact: true
+                        maxHeight: hero.stacked ? 0 : hero.thumbWidth * SettingsMetrics.wallpaperThumbRatio - modeRow.height - side.spacing
+                        options: root.registryOptions
+                        currentValue: root.activeRegistryTheme
+                        onSelected: value => {
+                            SettingsData.set("customThemeFile", root.themesDir + "/" + value + "/theme.json");
+                            Theme.switchTheme("custom", true, true);
+                        }
+                    }
+
+                    Rectangle {
+                        id: themeTile
+                        width: parent.width
+                        visible: !root.dynamicTheme && !root.genericTheme && !root.registryGridShown && !root.registryPending
+                        height: hero.stacked ? Theme.listItemTwoLineHeight : Math.max(Theme.listItemTwoLineHeight, hero.thumbWidth * SettingsMetrics.wallpaperThumbRatio - modeRow.height - side.spacing)
+                        radius: Theme.cornerRadiusM
+                        color: Theme.foregroundColor(Theme.chipSurface, true)
+
+                        activeFocusOnTab: visible
+                        Accessible.role: Accessible.Button
+                        Accessible.name: I18n.tr("Theme & colors")
+                        Accessible.description: Theme.currentThemeLabel
+                        Accessible.onPressAction: root.parentModal?.navigateTo("theme")
+                        Keys.onSpacePressed: root.parentModal?.navigateTo("theme")
+                        Keys.onReturnPressed: root.parentModal?.navigateTo("theme")
+
+                        FocusRing {}
+
+                        DankPaletteSwatch {
+                            id: themeSwatch
+                            width: Theme.avatarSize
+                            height: Theme.avatarSize
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            primaryColor: root.themePalette.primary
+                            secondaryColor: root.themePalette.secondary
+                            tertiaryColor: root.themePalette.tertiary
+                        }
+
+                        Column {
+                            anchors.left: themeSwatch.right
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.right: themeChevron.left
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingXXS
+
+                            StyledText {
+                                width: parent.width
+                                text: I18n.tr("Theme & colors")
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Theme.fontWeightMedium
+                                color: Theme.surfaceText
+                                elide: Text.ElideRight
                             }
 
-                            Column {
-                                anchors.left: themeSwatch.right
-                                anchors.leftMargin: Theme.spacingM
-                                anchors.right: themeChevron.left
-                                anchors.rightMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingXXS
-
-                                StyledText {
-                                    width: parent.width
-                                    text: I18n.tr("Theme & colors")
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Theme.fontWeightMedium
-                                    color: Theme.surfaceText
-                                    elide: Text.ElideRight
-                                }
-
-                                StyledText {
-                                    width: parent.width
-                                    text: Theme.currentThemeLabel
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    elide: Text.ElideRight
-                                }
-                            }
-
-                            DankIcon {
-                                id: themeChevron
-                                name: "chevron_right"
-                                size: Theme.iconSize
+                            StyledText {
+                                width: parent.width
+                                text: Theme.currentThemeLabel
+                                font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
-                                rotation: I18n.isRtl ? 180 : 0
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingM
-                                anchors.verticalCenter: parent.verticalCenter
+                                elide: Text.ElideRight
                             }
+                        }
 
-                            StateLayer {
-                                stateColor: Theme.surfaceText
-                                cornerRadius: themeTile.radius
-                                onClicked: root.parentModal?.navigateTo("theme")
-                            }
+                        DankIcon {
+                            id: themeChevron
+                            name: "chevron_right"
+                            size: Theme.iconSize
+                            color: Theme.surfaceVariantText
+                            rotation: I18n.isRtl ? 180 : 0
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StateLayer {
+                            stateColor: Theme.surfaceText
+                            cornerRadius: themeTile.radius
+                            onClicked: root.parentModal?.navigateTo("theme")
                         }
                     }
                 }
             }
         }
+
+        SettingsNavRow {
+            tab: "wallpaper"
+            tags: ["theme", "color", "palette", "matugen", "dynamic", "custom", "registry"]
+            settingKey: "themeNav"
+            iconName: "format_paint"
+            title: I18n.tr("Theme & colors")
+            hint: I18n.tr("Choose and install themes", "theme and colors row hint")
+            onClicked: root.parentModal?.navigateTo("theme")
+        }
+    }
+
+    SettingsCard {
+        tab: "wallpaper"
+        tags: ["background", "image", "picture", "fill", "cycling", "transition", "monitor", "display"]
+        title: I18n.tr("Wallpaper")
+        settingKey: "wallpaperOptions"
 
         SettingsDropdownRow {
             id: fillModeRow
@@ -860,9 +905,10 @@ Column {
             browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
             browserType: "wallpaper"
             showHiddenFiles: true
+            revealPath: root.currentWallpaper
             fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
             onFileSelected: path => {
-                root.applyBrowsedPath(path);
+                root.applyWallpaper(path);
                 close();
             }
         }

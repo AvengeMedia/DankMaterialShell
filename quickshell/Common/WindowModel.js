@@ -164,6 +164,8 @@ function mangoVisibleWindows(windows, output, screenName) {
     return windows.filter(win => {
         if (!win || win.monitor !== screenName || win.is_minimized)
             return false;
+        if (typeof win.is_visible === "boolean")
+            return win.is_visible;
         return active.size === 0 || (win.tags || []).some(t => active.has(t));
     });
 }

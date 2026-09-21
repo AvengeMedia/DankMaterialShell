@@ -20,7 +20,7 @@ DankPopout {
     resizeDuration: Theme.expressiveDurations.expressiveFastSpatial
     resizeMotion: true
     resizing: contentLoader.item?.panelResizing ?? false
-    surfaceFillsScreen: editMode
+    surfacePadding: PopoutMetrics.editOverflow * 2
     inputMargin: editGutter * 2
     hoverDismissSuspended: editMode
     onOpened: contentFocusTimer.restart()
@@ -82,7 +82,7 @@ DankPopout {
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
 
     popupWidth: panelWidthFor(DashMetrics.panelColumnsFor(activeTabId))
-    minimumSurfaceWidth: panelWidthFor(DashRegistry.widestPanelColumns)
+    minimumSurfaceWidth: panelWidthFor(editMode ? columnCap : DashRegistry.widestPanelColumns)
     popupHeight: contentLoader.item?.implicitHeight ?? (DashMetrics.tabDefaultHeight + Theme.navigationHeight + DashMetrics.contentGap + DashMetrics.contentPadding * 2)
     triggerWidth: DashMetrics.triggerWidth
     screen: triggerScreen
@@ -571,8 +571,8 @@ DankPopout {
                 anchors.margins: -(contentInset + Theme.spacingS)
                 z: 2
                 visible: root.editMode
-                edgeResize: mainContainer.panelResizer.sideMovable(-1, mainContainer.panelColumns)
-                cornerResize: mainContainer.panelResizer.sideMovable(1, mainContainer.panelColumns)
+                edgeResize: mainContainer.panelResizing || mainContainer.panelResizer.sideMovable(-1, mainContainer.panelColumns)
+                cornerResize: mainContainer.panelResizing || mainContainer.panelResizer.sideMovable(1, mainContainer.panelColumns)
                 removable: false
                 cornerRadius: Theme.windowRadius + Theme.spacingS
                 handleOverhang: contentInset

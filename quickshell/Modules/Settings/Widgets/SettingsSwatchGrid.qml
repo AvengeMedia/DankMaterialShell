@@ -10,17 +10,22 @@ Flow {
 
     property var options: []
     property string currentValue: ""
-    property real minTileWidth: SettingsMetrics.swatchTileMinWidth
+    property bool compact: false
+    property real maxHeight: 0
+    property real minTileWidth: compact ? Theme.minimumTouchTargetSize + Theme.spacingM : SettingsMetrics.swatchTileMinWidth
     signal selected(string value)
 
     readonly property int columns: Math.max(1, Math.floor((width + spacing) / (minTileWidth + spacing)))
     readonly property real tileWidth: Math.floor((width - spacing * (columns - 1)) / columns)
+    readonly property real compactTileHeight: Theme.minimumTouchTargetSize + Theme.spacingS * 2
+    readonly property int maxRows: maxHeight > 0 && compact ? Math.max(1, Math.floor((maxHeight + spacing) / (compactTileHeight + spacing))) : 0
+    readonly property var shownOptions: maxRows > 0 ? options.slice(0, columns * maxRows) : options
 
     width: parent?.width ?? 0
     spacing: Theme.spacingS
 
     Repeater {
-        model: root.options
+        model: root.shownOptions
 
         Rectangle {
             id: tile
@@ -29,7 +34,7 @@ Flow {
             readonly property bool isActive: root.currentValue === modelData.value
 
             width: root.tileWidth
-            height: swatch.height + label.implicitHeight + Theme.spacingS * 3
+            height: root.compact ? root.compactTileHeight : swatch.height + label.implicitHeight + Theme.spacingS * 3
             radius: Theme.cornerRadiusM
             color: Theme.floatingWindowNestedSurface
             border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
@@ -64,8 +69,15 @@ Flow {
                 tertiaryColor: tile.modelData.tertiary ?? tile.modelData.secondary ?? tile.modelData.primary
             }
 
+            DankTooltipHost {
+                text: root.compact ? tile.modelData.label : null
+                target: tile
+                hoverArea: tileMouse
+            }
+
             StyledText {
                 id: label
+                visible: !root.compact
                 anchors.top: swatch.bottom
                 anchors.topMargin: Theme.spacingS
                 anchors.left: parent.left
@@ -74,7 +86,7 @@ Flow {
                 anchors.rightMargin: Theme.spacingXS
                 text: tile.modelData.label
                 font.pixelSize: Theme.fontSizeSmall
-                font.weight: tile.isActive ? Theme.fontWeightMedium : Theme.fontWeightNormal
+                font.weight: tile.isActive ? Theme.fontWeightMedium : Theme.fontWeight
                 color: tile.isActive ? Theme.primary : Theme.surfaceText
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap

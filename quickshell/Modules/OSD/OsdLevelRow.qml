@@ -12,6 +12,7 @@ Item {
     property string endIconName: ""
     property string iconLabel: ""
     property bool iconInteractive: false
+    property bool tonalIcon: true
     property color iconColor: Theme.onSecondaryContainer
     property color iconBackgroundColor: Theme.secondaryContainer
     property color fillColor: Theme.primary
@@ -33,7 +34,7 @@ Item {
     readonly property real effectiveHorizontalPadding: horizontalPadding >= 0 ? horizontalPadding : Theme.spacingS
     readonly property bool mirrored: !vertical && I18n.isRtl
     readonly property real crossExtent: vertical ? width : height
-    readonly property real iconExtent: Math.min(vertical ? levelSlider.trackHeight : Theme.buttonHeightS, crossExtent - effectiveHorizontalPadding * 2)
+    readonly property real iconExtent: tonalIcon ? Math.min(vertical ? levelSlider.trackHeight : Theme.buttonHeightS, crossExtent - effectiveHorizontalPadding * 2) : Theme.iconSize
     readonly property real endPadding: showEndIcon ? Math.max(effectiveHorizontalPadding, (crossExtent - iconExtent) / 2) : effectiveHorizontalPadding
     readonly property real itemSpacing: vertical && showEndIcon ? Theme.spacingM : Theme.spacingS
     readonly property real valueExtent: showEndIcon ? iconExtent + itemSpacing : showValueColumn ? (vertical ? valueLabel.implicitHeight : valueLabel.reservedWidth) + itemSpacing : 0
@@ -57,6 +58,7 @@ Item {
         iconName: root.iconName
         iconColor: root.iconColor
         backgroundColor: root.iconBackgroundColor
+        tonal: root.tonalIcon
         label: root.iconLabel
         interactive: root.iconInteractive
         available: root.sliderEnabled

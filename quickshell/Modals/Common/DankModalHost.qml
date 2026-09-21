@@ -543,6 +543,7 @@ Item {
         WindowBlur {
             targetWindow: contentWindow
             blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
+            surfaceColor: root.effectiveBackgroundColor
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             readonly property real op: Math.max(0, Math.min(1, (morph.value - 0.06) * 2))
             readonly property real visibleScale: root.connected ? s : s * op

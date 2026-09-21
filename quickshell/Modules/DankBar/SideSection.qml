@@ -85,9 +85,11 @@ BarSection {
             readonly property var widgetItem: widgetLoader.item
             readonly property bool participates: visible && width > 0 && height > 0
 
+            readonly property bool itemShown: widgetLoader.item?.visible ?? false
+
             visible: widgetLoader.active && widgetLoader.widgetEnabled
-            width: root.isVertical ? root.width : (widgetLoader.item ? widgetLoader.item.width : 0)
-            height: widgetLoader.item ? widgetLoader.item.height : 0
+            width: !itemShown ? 0 : root.isVertical ? root.width : widgetLoader.item.width
+            height: itemShown ? widgetLoader.item.height : 0
             onXChanged: {
                 if (!root.isVertical)
                     root.refreshBlur();

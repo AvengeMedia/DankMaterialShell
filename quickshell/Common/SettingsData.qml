@@ -290,6 +290,8 @@ Singleton {
 
     property bool blurEnabled: Spec.SPEC.blurEnabled.def
     onBlurEnabledChanged: saveSettings()
+    property bool blurBorderSeeded: Spec.SPEC.blurBorderSeeded.def
+    onBlurBorderSeededChanged: saveSettings()
     property bool blurForegroundLayers: Spec.SPEC.blurForegroundLayers.def
     onBlurForegroundLayersChanged: saveSettings()
     property real foregroundLayerTransparency: Spec.SPEC.foregroundLayerTransparency.def

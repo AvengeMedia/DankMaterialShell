@@ -26,6 +26,7 @@ FocusScope {
         return total;
     }
     property var pageHistory: []
+    property var editSnapshot: null
     readonly property bool panelResizing: panelResizer.resizing
     readonly property real sheetContentWidth: host.sheetContentWidth ?? CcMetrics.sheetWidthFor(gridColumns)
     readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
@@ -125,9 +126,25 @@ FocusScope {
         configOverlayLoader.active = false;
     }
 
+    function cancelEdit() {
+        const snapshot = editSnapshot;
+        host.editMode = false;
+        if (!snapshot)
+            return;
+        if (JSON.stringify(SettingsData.controlCenterWidgets) !== snapshot.widgets)
+            SettingsData.set("controlCenterWidgets", JSON.parse(snapshot.widgets));
+        if (SettingsData.controlCenterColumns !== snapshot.columns)
+            SettingsData.set("controlCenterColumns", snapshot.columns);
+    }
+
     Keys.onEscapePressed: event => {
         if (configOverlayLoader.item?.visible) {
             configOverlayLoader.item.close();
+            event.accepted = true;
+            return;
+        }
+        if (host.editMode) {
+            host.editMode = false;
             event.accepted = true;
             return;
         }
@@ -151,10 +168,16 @@ FocusScope {
     }
 
     onEditModeChanged: {
-        if (editMode)
+        if (editMode) {
             host.collapseAll();
-        else
+            editSnapshot = {
+                "widgets": JSON.stringify(SettingsData.controlCenterWidgets),
+                "columns": SettingsData.controlCenterColumns
+            };
+        } else {
             panelResizer.cancel();
+            editSnapshot = null;
+        }
         forceActiveFocus();
     }
 
@@ -165,7 +188,8 @@ FocusScope {
         anchors.margins: -(contentInset + Theme.spacingS)
         z: 1
         visible: root.host.editMode
-        edgeResize: true
+        edgeResize: root.panelResizing || root.panelResizer.sideMovable(-1, root.gridColumns)
+        cornerResize: root.panelResizing || root.panelResizer.sideMovable(1, root.gridColumns)
         horizontalResize: true
         removable: false
         cornerRadius: Theme.windowRadius + Theme.spacingS
@@ -233,6 +257,7 @@ FocusScope {
                 tapToClose: root.host.headerTogglesClose ?? false
                 onHeaderTapped: root.host.close()
                 onEditModeToggled: root.host.editMode = !root.host.editMode
+                onEditCancelled: root.cancelEdit()
                 onPowerButtonClicked: {
                     const loader = root.host.powerMenuModalLoader;
                     if (!loader)

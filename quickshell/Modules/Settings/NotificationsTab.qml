@@ -103,6 +103,12 @@ Column {
         title: I18n.tr("Popups", "notification settings card title, popup notifications")
         settingKey: "notificationPopups"
 
+        headerActions: DankButton {
+            text: I18n.tr("Preview")
+            buttonHeight: Theme.buttonHeightXS
+            onClicked: NotificationService.sendTestNotifications()
+        }
+
         SettingsDropdownRow {
             settingKey: "notificationPopupPosition"
             tags: ["notification", "popup", "position", "screen", "location"]

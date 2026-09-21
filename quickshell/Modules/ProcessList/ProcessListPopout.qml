@@ -117,14 +117,18 @@ DankPopout {
                 anchors.margins: PopoutMetrics.contentPadding
                 spacing: PopoutMetrics.contentGap
 
+                ProcessSystemHeader {
+                    Layout.fillWidth: true
+                }
+
+                ProcessSummary {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                }
+
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: Theme.spacingM
-
-                    ProcessFilterChips {
-                        id: processFilterGroup
-                        Layout.preferredWidth: singleRowWidth
-                    }
 
                     DankSearchField {
                         id: searchField
@@ -137,63 +141,22 @@ DankPopout {
                         ignoreUpDownKeys: true
                         keyForwardTargets: [processListContent]
                     }
-                }
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Theme.spacingS
-
-                    SystemLogo {
-                        Layout.preferredWidth: Theme.iconSize
-                        Layout.preferredHeight: Theme.iconSize
-                        colorOverride: Theme.primary
-                    }
-
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: (DgopService.hostname || "localhost") + " · " + (DgopService.distribution || "Linux") + " · " + (DgopService.shortUptime || "--") + " · " + DgopService.processCount + " " + I18n.tr("procs", "short for processes")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.onSurfaceVariant
-                        elide: Text.ElideRight
-                    }
-
-                    Repeater {
-                        model: DgopService.availableGpus.filter(gpu => (SessionData.enabledGpuPciIds || []).includes(gpu.pciId) && gpu.temperature > 0)
-                        NumericText {
-                            required property var modelData
-                            text: I18n.tr("GPU") + " " + modelData.temperature.toFixed(0) + "°C"
-                            reserveText: I18n.tr("GPU") + " 100°C"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: modelData.temperature > 85 ? Theme.error : Theme.onSurfaceVariant
-                        }
+                    ProcessFilterChips {
+                        id: processFilterGroup
+                        Layout.preferredWidth: singleRowWidth
                     }
                 }
 
-                ProcessSummary {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: ProcessListMetrics.graphHeight
-                    Layout.maximumHeight: ProcessListMetrics.graphHeight
-                    Layout.fillHeight: false
-                }
-
-                Rectangle {
+                ProcessesView {
+                    id: processesView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    radius: Theme.cornerRadius
-                    color: Theme.nestedSurface
-                    clip: true
-
-                    ProcessesView {
-                        id: processesView
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingS
-
-                        active: processListPopout.shouldBeVisible
-                        searchText: processListPopout.searchText
-                        expandedPid: processListPopout.expandedPid
-                        contextMenu: processContextMenu
-                        onExpandedPidChanged: processListPopout.expandedPid = expandedPid
-                    }
+                    active: processListPopout.shouldBeVisible
+                    searchText: processListPopout.searchText
+                    expandedPid: processListPopout.expandedPid
+                    contextMenu: processContextMenu
+                    onExpandedPidChanged: processListPopout.expandedPid = expandedPid
                 }
             }
         }

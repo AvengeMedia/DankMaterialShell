@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 const shellyRepoFixture = `[{"Name":"linux","CurrentVersion":"2:6.18-1","NewVersion":"2:6.19-1","DownloadSize":1024,"Repository":"core"}]`
@@ -141,7 +143,11 @@ func TestShellyCheckFailures(t *testing.T) {
 	}
 	t.Run("cancellation", func(t *testing.T) {
 		dir, _ := fakeShelly(t)
-		writeUpdateExecutable(t, dir, "shelly", "exec /bin/sleep 30")
+		blocker := filepath.Join(dir, "blocker.fifo")
+		if err := unix.Mkfifo(blocker, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		writeUpdateExecutable(t, dir, "shelly", "read line < "+blocker)
 		ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 		defer cancel()
 		if _, err := (shellyBackend{}).CheckUpdates(ctx); !errors.Is(err, context.DeadlineExceeded) {

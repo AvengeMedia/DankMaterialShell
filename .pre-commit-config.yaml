@@ -30,6 +30,12 @@ repos:
         language: system
         files: ^core/.*\.(go|mod|sum)$
         pass_filenames: false
+      - id: nix-vendor-hash
+        name: update Nix vendor hash
+        entry: bash -c 'command -v nix >/dev/null 2>&1 || exit 0; scripts/update-vendor-hash.sh --stage'
+        language: system
+        files: ^core/go\.(mod|sum)$
+        pass_filenames: false
   - repo: local
     hooks:
       - id: settings-search-index

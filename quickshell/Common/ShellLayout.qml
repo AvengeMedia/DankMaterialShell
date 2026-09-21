@@ -22,7 +22,7 @@ Singleton {
     readonly property var layouts: screens.map(screen => Resolver.resolveScreen(SettingsData.barConfigs.map(config => ({
                     config,
                     barThickness: Theme.barThickness(config.innerPadding ?? 4, screen.scale),
-                    wingSize: config.gothCornersEnabled ? Math.max(0, config.gothCornerRadiusOverride ? config.gothCornerRadiusValue ?? 12 : Theme.windowRadius) : 0,
+                    wingSize: config.gothCornersEnabled && root.barSpansEdge(config) ? Math.max(0, config.gothCornerRadiusOverride ? config.gothCornerRadiusValue ?? 12 : Theme.windowRadius) : 0,
                     popupThickness: Theme.barThickness(Resolver.option(config, "innerPadding", root.primaryBar, 4), screen.scale),
                     islandThickness: Resolver.islandThickness(config, SettingsData.islandDefaults),
                     islandFloating: SettingsData.islandSetting(config, "islandFloating")
@@ -36,6 +36,10 @@ Singleton {
             frameBarSize: SettingsData.frameBarSize
         }))
     readonly property var islandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.kind === "island").map(instance => instance.key)), [])
+
+    function barSpansEdge(config) {
+        return (config?.barLengthMode ?? "full") === "full" && (config?.barLengthPadding ?? 0) <= 0;
+    }
 
     function forScreen(screen) {
         const name = typeof screen === "string" ? screen : screen?.name;
@@ -118,7 +122,7 @@ Singleton {
     function barBounds(screen, thickness, position, config) {
         const appearance = config ?? primaryBar;
         const radius = (appearance?.gothCornerRadiusOverride ?? false) ? (appearance?.gothCornerRadiusValue ?? 12) : Theme.windowRadius;
-        const wing = (appearance?.gothCornersEnabled ?? false) ? Math.max(0, radius) : 0;
+        const wing = (appearance?.gothCornersEnabled ?? false) && barSpansEdge(appearance) ? Math.max(0, radius) : 0;
         const edge = position === undefined ? (primaryBar?.position ?? 0) : position;
         return Resolver.barBounds(forScreen(screen), thickness, edge, config, primaryBar, SettingsData.connectedFrameModeActive, wing);
     }

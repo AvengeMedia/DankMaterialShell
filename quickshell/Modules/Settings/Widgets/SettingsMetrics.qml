@@ -7,8 +7,8 @@ import qs.Common
 Singleton {
     readonly property real sidebarWidth: 320
     readonly property real compactBreakpoint: 700
-    readonly property real contentMaxWidth: 640
-    readonly property real windowWidth: 1000
+    readonly property real contentMaxWidth: 720
+    readonly property real windowWidth: 1100
     readonly property real windowHeight: 940
     readonly property real windowMinWidth: 500
     readonly property real windowMinHeight: 400
@@ -29,6 +29,9 @@ Singleton {
     readonly property real buttonGroupCompactThreshold: 200
     readonly property real choiceCardPreviewRatio: 10 / 16
     readonly property real wallpaperThumbRatio: 10 / 16
+    readonly property int wallpaperThumbCache: 1024
+    readonly property real wallpaperHeroStackWidth: 440
+    readonly property real wallpaperHeroSplit: 0.55
     readonly property real disabledOpacity: 0.38
     readonly property real highlightBlend: 0.2
     readonly property real bannerTextMinWidth: 100

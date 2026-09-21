@@ -17,6 +17,7 @@ Item {
     signal powerButtonClicked
     signal lockRequested
     signal editModeToggled
+    signal editCancelled
     signal settingsButtonClicked
     signal headerTapped
 
@@ -93,7 +94,6 @@ Item {
 
     Row {
         id: actionButtonsRow
-        width: CcMetrics.headerActionSize * 4 + spacing * 3
         height: CcMetrics.headerActionSize
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
@@ -124,6 +124,16 @@ Item {
             iconColor: Theme.surfaceText
             Accessible.name: I18n.tr("Settings")
             onClicked: root.settingsButtonClicked()
+        }
+
+        DankActionButton {
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
+            iconName: "close"
+            iconColor: Theme.surfaceText
+            visible: root.editMode
+            Accessible.name: I18n.tr("Cancel")
+            onClicked: root.editCancelled()
         }
 
         DankActionButton {

@@ -80,6 +80,7 @@ Row {
 
             WindowBlur {
                 targetWindow: addWidgetWindow
+                surfaceColor: widgetLibraryPanel.color
                 blurX: widgetLibraryPanel.x
                 blurY: widgetLibraryPanel.y
                 blurWidth: addWidgetWindow.visible ? widgetLibraryPanel.width : 0

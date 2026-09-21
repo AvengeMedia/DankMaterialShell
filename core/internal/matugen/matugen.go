@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -97,6 +98,7 @@ var (
 	matugenIsV4           bool
 	matugenIsV42          bool
 	matugenSupportsPrefer bool
+	matugenVersionStr     string
 )
 
 type Options struct {
@@ -364,16 +366,11 @@ func buildOnce(opts *Options) (bool, error) {
 		return false, err
 	}
 	defer cleanup()
-	if err := resolveSmartMode(opts, flags); err != nil {
+	smartJSON, err := resolveSmartMode(opts, flags)
+	if err != nil {
 		return false, err
 	}
-
-	cfgFile, err := os.CreateTemp("", "matugen-config-*.toml")
-	if err != nil {
-		return false, fmt.Errorf("failed to create temp config: %w", err)
-	}
-	defer os.Remove(cfgFile.Name())
-	defer cfgFile.Close()
+	seeds := loadSeedCache(opts.StateDir)
 
 	tmpDir, err := os.MkdirTemp("", "matugen-templates-*")
 	if err != nil {
@@ -381,23 +378,12 @@ func buildOnce(opts *Options) (bool, error) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	if err := buildMergedConfig(opts, cfgFile, tmpDir); err != nil {
-		return false, fmt.Errorf("failed to build config: %w", err)
-	}
-	cfgFile.Close()
-
 	oldColors, _ := os.ReadFile(opts.ColorsOutput())
 
 	var primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight string
 	var dank16JSON string
-	var importArgs []string
+	var importArgs, args []string
 
-	// Colorful mode resolves the seed here, before matugen is invoked at all,
-	// by rewriting the source to the extracted hex. Both the dry-run and the
-	// real run below read opts.Kind/opts.Value, so one rewrite covers both and
-	// they cannot disagree about the seed. Extraction failure (a format
-	// image.Decode cannot read, an unreadable file) falls through to matugen's
-	// own extraction: this must never fail a theme build.
 	if opts.StockColors == "" && opts.SeedColor != "" {
 		seed, err := NormalizeHexColor(opts.SeedColor)
 		if err != nil {
@@ -410,7 +396,10 @@ func buildOnce(opts *Options) (bool, error) {
 	}
 
 	if opts.StockColors == "" && opts.Kind == "image" && opts.SourceMode == SourceModeColorful {
-		if seed, err := ExtractSourceColor(opts.Value); err != nil {
+		seed, err := seeds.resolve(sourceImage, opts.SourceMode, flags.version, func() (string, error) {
+			return ExtractSourceColor(opts.Value)
+		})
+		if err != nil {
 			log.Warnf("Colorful source extraction failed for %s, using matugen's own: %v", opts.Value, err)
 		} else {
 			log.Infof("Colorful source color: %s -> %s", opts.Value, seed)
@@ -440,14 +429,29 @@ func buildOnce(opts *Options) (bool, error) {
 		importArgs = []string{"--import-json-string", importData}
 
 		log.Info("Running matugen color hex with stock color overrides")
-		args := []string{"color", "hex", primaryDark, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name()}
-		args = appendContrastArg(args, opts.Contrast)
-		args = append(args, importArgs...)
-		if err := runMatugen(args, opts.SourceMode); err != nil {
-			return false, err
-		}
+		args = []string{"color", "hex", primaryDark, "-m", string(opts.Mode), "-t", opts.MatugenType}
 	} else {
 		log.Infof("Using dynamic theme from %s: %s", opts.Kind, opts.Value)
+
+		if opts.Kind == "image" {
+			seed, err := seeds.resolve(sourceImage, opts.SourceMode, flags.version, func() (string, error) {
+				if seed, err := matugenSeed(smartJSON); err == nil {
+					return seed, nil
+				}
+				output, err := runMatugenDryRun(opts)
+				if err != nil {
+					return "", err
+				}
+				return matugenSeed(output)
+			})
+			if err != nil {
+				log.Warnf("Seed resolution failed for %s, running matugen on the image: %v", sourceImage, err)
+			} else {
+				log.Infof("Seed color: %s -> %s", sourceImage, seed)
+				opts.Kind = "hex"
+				opts.Value = seed
+			}
+		}
 
 		matJSON, err := runMatugenDryRun(opts)
 		if err != nil {
@@ -493,34 +497,29 @@ func buildOnce(opts *Options) (bool, error) {
 		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)
-		var args []string
 		switch opts.Kind {
 		case "hex":
 			args = []string{"color", "hex", opts.Value}
 		default:
 			args = []string{opts.Kind, opts.Value}
 		}
-		args = append(args, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name())
-		args = appendContrastArg(args, opts.Contrast)
-		args = append(args, importArgs...)
-		if err := runMatugen(args, opts.SourceMode); err != nil {
-			return false, err
-		}
+		args = append(args, "-m", string(opts.Mode), "-t", opts.MatugenType)
 	}
+	args = appendContrastArg(args, opts.Contrast)
+	args = append(args, importArgs...)
 
-	newColors, err := os.ReadFile(opts.colorsStaging())
+	changed, err := renderColors(opts, args, tmpDir, oldColors)
 	if err != nil {
-		return false, fmt.Errorf("matugen did not produce colors output: %w", err)
+		return false, err
 	}
-	if bytes.Equal(oldColors, newColors) && len(oldColors) > 0 {
-		return false, nil
-	}
-	if err := os.Rename(opts.colorsStaging(), opts.ColorsOutput()); err != nil {
-		return false, fmt.Errorf("failed to commit colors output: %w", err)
-	}
-
 	if opts.ColorsOnly {
-		return true, nil
+		return changed, nil
+	}
+	if err := renderTemplates(opts, args, tmpDir); err != nil {
+		return false, err
+	}
+	if !changed {
+		return false, nil
 	}
 
 	if isDMSGTKActive(opts.ConfigDir) {
@@ -557,6 +556,50 @@ func buildOnce(opts *Options) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// The shell only needs dms-colors.json, so it is rendered and committed on its own before the template pass.
+func renderColors(opts *Options, args []string, tmpDir string, oldColors []byte) (bool, error) {
+	colorsOpts := *opts
+	colorsOpts.ColorsOnly = true
+	cfgPath, err := writeMergedConfig(&colorsOpts, tmpDir, "colors.toml")
+	if err != nil {
+		return false, err
+	}
+	if err := runMatugen(append(slices.Clone(args), "-c", cfgPath), opts.SourceMode); err != nil {
+		return false, err
+	}
+	newColors, err := os.ReadFile(opts.colorsStaging())
+	if err != nil {
+		return false, fmt.Errorf("matugen did not produce colors output: %w", err)
+	}
+	if bytes.Equal(oldColors, newColors) && len(oldColors) > 0 {
+		return false, nil
+	}
+	if err := os.Rename(opts.colorsStaging(), opts.ColorsOutput()); err != nil {
+		return false, fmt.Errorf("failed to commit colors output: %w", err)
+	}
+	return true, nil
+}
+
+func renderTemplates(opts *Options, args []string, tmpDir string) error {
+	cfgPath, err := writeMergedConfig(opts, tmpDir, "templates.toml")
+	if err != nil {
+		return err
+	}
+	return runMatugen(append(slices.Clone(args), "-c", cfgPath), opts.SourceMode)
+}
+
+func writeMergedConfig(opts *Options, tmpDir, name string) (string, error) {
+	cfgFile, err := os.Create(filepath.Join(tmpDir, name))
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp config: %w", err)
+	}
+	defer cfgFile.Close()
+	if err := buildMergedConfig(opts, cfgFile, tmpDir); err != nil {
+		return "", fmt.Errorf("failed to build config: %w", err)
+	}
+	return cfgFile.Name(), nil
 }
 
 func appendContrastArg(args []string, contrast float64) []string {
@@ -921,6 +964,7 @@ type matugenFlags struct {
 	isV4           bool
 	isV42          bool
 	supportsPrefer bool
+	version        string
 }
 
 func detectMatugenVersion() (matugenFlags, error) {
@@ -928,7 +972,7 @@ func detectMatugenVersion() (matugenFlags, error) {
 	defer matugenVersionMu.Unlock()
 
 	if matugenVersionOK {
-		return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer}, nil
+		return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer, matugenVersionStr}, nil
 	}
 
 	return detectMatugenVersionLocked()
@@ -985,6 +1029,7 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	// --prefer landed in 4.1; 4.0.x has --source-color-index but not --prefer,
 	// and clap aborts on an unknown argument rather than ignoring it.
 	matugenSupportsPrefer = major > 4 || (major == 4 && minor >= 1)
+	matugenVersionStr = versionStr
 	matugenVersionOK = true
 
 	if matugenSupportsCOE {
@@ -996,7 +1041,7 @@ func detectMatugenVersionLocked() (matugenFlags, error) {
 	if matugenIsV4 && !matugenSupportsPrefer {
 		log.Debugf("Matugen %s detected: --prefer unavailable, source modes fall back to the dominant color", versionStr)
 	}
-	return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer}, nil
+	return matugenFlags{matugenSupportsCOE, matugenIsV4, matugenIsV42, matugenSupportsPrefer, matugenVersionStr}, nil
 }
 
 func buildMatugenArgs(baseArgs []string, flags matugenFlags, sourceMode string) []string {
@@ -1157,31 +1202,39 @@ func extractTopLevelString(jsonStr, key string) string {
 	return ""
 }
 
-func resolveSmartMode(opts *Options, flags matugenFlags) error {
+func resolveSmartMode(opts *Options, flags matugenFlags) (string, error) {
 	if opts.MatugenType == "scheme-smart" && !flags.isV42 {
-		return fmt.Errorf("scheme-smart requires matugen 4.2+")
+		return "", fmt.Errorf("scheme-smart requires matugen 4.2+")
 	}
 	if opts.Mode != ColorModeSmart {
-		return nil
+		return "", nil
 	}
 	if !flags.isV42 {
-		return fmt.Errorf("smart mode requires matugen 4.2+")
+		return "", fmt.Errorf("smart mode requires matugen 4.2+")
 	}
 	if opts.Kind != "image" || opts.StockColors != "" {
 		opts.Mode = ColorModeDark
-		return nil
+		return "", nil
 	}
 	output, err := runMatugenDryRun(opts)
 	if err != nil {
-		return fmt.Errorf("smart mode resolution failed: %w", err)
+		return "", fmt.Errorf("smart mode resolution failed: %w", err)
 	}
 	resolved := extractTopLevelString(output, "mode")
 	if resolved != string(ColorModeLight) && resolved != string(ColorModeDark) {
-		return fmt.Errorf("smart mode resolution returned unexpected mode %q", resolved)
+		return "", fmt.Errorf("smart mode resolution returned unexpected mode %q", resolved)
 	}
 	log.Infof("Smart mode resolved to %s", resolved)
 	opts.Mode = ColorMode(resolved)
-	return nil
+	return output, nil
+}
+
+func matugenSeed(dryRunJSON string) (string, error) {
+	seed := extractMatugenColor(dryRunJSON, "source_color", "dark")
+	if seed == "" {
+		return "", fmt.Errorf("matugen output has no source_color")
+	}
+	return seed, nil
 }
 
 func extractNestedColor(jsonStr, colorName, variant string) string {

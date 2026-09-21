@@ -162,6 +162,7 @@ Scope {
 
                 WindowBlur {
                     targetWindow: overlayWindow
+                    surfaceColor: Theme.floatingWindowSurface
                     readonly property real s: Math.min(1, spotlightContainer.scale)
                     readonly property bool active: overlayWindow.shouldShowSpotlight && spotlightContainer.opacity > 0
                     blurX: spotlightContainer.x + spotlightContainer.width * (1 - s) * 0.5

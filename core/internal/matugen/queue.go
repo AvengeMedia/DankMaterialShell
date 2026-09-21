@@ -3,9 +3,11 @@ package matugen
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/lowprio"
 )
 
 type Result struct {
@@ -74,6 +76,8 @@ func (q *Queue) Submit(opts Options) <-chan Result {
 }
 
 func (q *Queue) runWorker() {
+	runtime.LockOSThread()
+	lowprio.LowerThreadPriority()
 	for {
 		q.mu.Lock()
 		job := q.current

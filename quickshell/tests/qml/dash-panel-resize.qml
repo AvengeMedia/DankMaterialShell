@@ -123,7 +123,7 @@ ShellRoot {
                 check(!root.popout.contentWindow.anchors.right, "surface hugs the body outside edit mode");
                 root.popout.editMode = true;
                 check(root.popout.popupWidth === widthFor(DashMetrics.defaultGridColumns), "edit mode keeps the panel width");
-                check(root.popout.contentWindow.anchors.right, "edit mode anchors the surface to both sides");
+                check(!root.popout.contentWindow.anchors.right && root.popout.contentWindow.implicitWidth >= widthFor(root.popout.columnCap) + PopoutMetrics.editOverflow * 4, "edit mode holds a bounded surface wide enough for the column cap plus handle padding");
                 beginDrag(root.popout, c);
                 dragTo(root.popout, c, 2 * columnGain(), 0);
                 check(DashMetrics.panelPreview?.columns === 8, "preview snaps two columns wider: " + JSON.stringify(DashMetrics.panelPreview));
@@ -328,7 +328,7 @@ ShellRoot {
                 check(root.popout.editMode, "weather edit mode");
                 root.closingHeight = c.height;
                 root.popout.dashVisible = false;
-                check(root.popout.editMode && root.popout.contentWindow.anchors.right, "edit mode and its surface hold while the close animation runs");
+                check(root.popout.editMode, "edit mode holds while closing");
                 DashRegistry.setPanelSize("weather", DashMetrics.defaultGridColumns, c.panelRows + 1);
                 interval = 150;
                 break;
@@ -346,7 +346,7 @@ ShellRoot {
                     check(root.cc.popupWidth === CcMetrics.sheetWidthDefault, "control center default width");
                     root.cc.editMode = true;
                     check(root.cc.popupWidth === CcMetrics.sheetWidthDefault, "control center edit mode keeps the sheet width");
-                    check(root.cc.contentWindow.anchors.right, "control center edit mode anchors the surface to both sides");
+                    check(!root.cc.contentWindow.anchors.right && root.cc.contentWindow.implicitWidth >= CcMetrics.sheetWidthFor(root.cc.gridColumnCap) + PopoutMetrics.editOverflow * 4, "control center edit mode holds a bounded surface wide enough for the column cap");
                     beginDrag(root.cc, ccContent);
                     dragTo(root.cc, ccContent, 1.4 * ccGain(), 0);
                     check(CcMetrics.gridColumns === CcMetrics.defaultColumns + 1 && CcMetrics.sheetWidth === CcMetrics.sheetWidthFor(CcMetrics.defaultColumns + 1), "control center preview snaps to a column: " + CcMetrics.sheetWidth);

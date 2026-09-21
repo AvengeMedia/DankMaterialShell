@@ -327,13 +327,14 @@ Item {
             }
 
             SettingsRow {
+                id: createRuleRow
                 visible: root.activeWindows.length > 0
                 title: I18n.tr("Create rule for:")
 
                 DankDropdown {
                     id: windowSelector
                     anchors.verticalCenter: parent.verticalCenter
-                    dropdownWidth: 400
+                    dropdownWidth: Math.min(400, createRuleRow.width - SettingsMetrics.rowPaddingH * 2)
                     compactMode: true
                     emptyText: I18n.tr("Select a window...")
                     options: root.activeWindows.map(w => {

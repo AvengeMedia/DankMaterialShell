@@ -6,6 +6,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import "../DankCommon/Common/Contrast.js" as Contrast
+import "../DankCommon/Common/Hct.js" as Hct
 
 Singleton {
     id: root
@@ -15,6 +16,8 @@ Singleton {
     readonly property var lyricsHues: _lyricsHues()
     readonly property var lyricsAccents: lyricsHues.map(color => _readableLyricColor(color))
     readonly property color lyricsGroupAccent: _readableLyricColor(_mixHues(lyricsHues[0], lyricsHues[1], lyricsHues[2]))
+    readonly property real lyricsChromaMin: 36
+    readonly property real lyricsContrast: 4.5
 
     readonly property color accentContainer: _container(Theme.primaryContainer, Theme.isLightMode ? 0.3 : 0.55, Theme.isLightMode ? 0.9 : 0.42, 1.25)
     readonly property color accentSecondaryContainer: _container(Theme.secondaryContainer, Theme.isLightMode ? 0.12 : 0.22, Theme.isLightMode ? 0.94 : 0.3, 1.08)
@@ -60,9 +63,11 @@ Singleton {
         if (!MediaOptions.albumArtAccent)
             return [Theme.primary, Theme.tertiary, Theme.secondary];
         const base = accent;
-        const hue = base.hsvSaturation < 0.18 || base.hsvHue < 0 ? Theme.tertiary.hsvHue : base.hsvHue;
+        const neutral = base.hsvSaturation < 0.18 || base.hsvHue < 0;
+        const hue = neutral ? Theme.tertiary.hsvHue : base.hsvHue;
         const saturation = Math.max(0.28, Math.min(0.6, base.hsvSaturation));
         const value = Math.max(0.78, base.hsvValue);
+        const lead = neutral ? Qt.hsva(hue, saturation, value, 1) : base;
         let companion = Qt.hsva((Math.max(0, hue) + 1 / 3) % 1, saturation, value, 1);
         let score = 0;
         for (const candidate of TrackArtService.artwork.colors) {
@@ -79,7 +84,7 @@ Singleton {
         const companionOffset = (companion.hsvHue - Math.max(0, hue) + 1) % 1;
         const thirdOffset = companionOffset > 0.5 ? companionOffset / 2 : (companionOffset + 1) / 2;
         const third = Qt.hsva((Math.max(0, hue) + thirdOffset) % 1, saturation, value, 1);
-        return [base, companion, third];
+        return [lead, companion, third];
     }
 
     function _mixHues(first, second, fallback) {
@@ -123,8 +128,21 @@ Singleton {
         return contrastTo(seed, light ? Theme.contrastDark : Theme.contrastLight, container, 4.5);
     }
 
+    // Blending toward onSurface desaturates into the onSurfaceVariant lyric text, so shift tone in HCT instead.
     function _readableLyricColor(color) {
-        return contrastTo(color, Theme.onSurface, Theme.surfaceContainerLowest, 4.5);
+        const background = Theme.surfaceContainerLowest;
+        const hct = Hct.toHct(color);
+        const chroma = Math.max(hct.chroma, lyricsChromaMin);
+        const backgroundTone = Hct.toHct(background).tone;
+        const light = Theme.isLightMode;
+        const limit = light ? Hct.darkerTone(backgroundTone, lyricsContrast) : Hct.lighterTone(backgroundTone, lyricsContrast);
+        let tone = limit < 0 ? hct.tone : light ? Math.min(hct.tone, limit) : Math.max(hct.tone, limit);
+        let result = Hct.fromHct(hct.hue, chroma, tone);
+        while (tone > 0 && tone < 100 && Contrast.ratio(result, background) < lyricsContrast) {
+            tone += light ? -1 : 1;
+            result = Hct.fromHct(hct.hue, chroma, tone);
+        }
+        return result;
     }
 
     function _pickAccent(colors) {

@@ -22,7 +22,7 @@ DankEditableGrid {
     signal configRequested(int index, var widgetData, var anchor)
     signal colorPickerRequested
 
-    readonly property real gridHeight: slotLayout.totalHeight
+    readonly property real gridHeight: layoutHeight
     readonly property real cellWidth: (width + CcMetrics.gridGap) / columns
     readonly property CcTileSlot draggingSlot: tileRepeater.itemAt(draggingSourceIndex) as CcTileSlot
 

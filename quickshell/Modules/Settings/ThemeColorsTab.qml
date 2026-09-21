@@ -15,83 +15,17 @@ Item {
     property var parentModal: null
     property string pendingExtractJson: ""
     property var cachedSourceModes: Theme.availableSourceModes.map(option => option.label)
-    property var matugenSchemePreviews: ({})
-    property string matugenPreviewRequestKey: ""
-    property string matugenPreviewLoadedKey: ""
-    readonly property string matugenPreviewSource: SettingsData.matugenSeedColor || Theme.getMatugenColor("source_color", Theme.primary).toString()
-    readonly property string matugenPreviewImage: (!SettingsData.matugenSeedColor && Theme.rawWallpaperPath && !Theme.rawWallpaperPath.startsWith("#")) ? Theme.rawWallpaperPath : ""
-    readonly property string matugenPreviewKey: matugenPreviewSource + "|" + (SettingsData.matugenContrast ?? 0) + "|" + matugenPreviewImage + "|" + SettingsData.matugenSpec
-    property bool matugenGenerating: false
-    readonly property var currentPalette: ThemePalette.pick({
-        "primary": Theme.primary,
-        "secondary": Theme.secondary,
-        "tertiary": Theme.tertiary,
-        "primaryContainer": Theme.primaryContainer,
-        "info": Theme.info,
-        "error": Theme.error,
-        "warning": Theme.warning
-    })
-    property bool matugenPreviewFailed: false
-    readonly property bool matugenPreviewsReady: !matugenGenerating && (matugenPreviewLoadedKey === matugenPreviewKey || matugenPreviewFailed || !Theme.matugenAvailable)
-    onMatugenPreviewKeyChanged: refreshMatugenSchemePreviews()
+    readonly property string matugenPreviewKey: MatugenPreviewService.key
+    readonly property bool matugenAvailable: Theme.matugenAvailable
+    onMatugenPreviewKeyChanged: MatugenPreviewService.refresh()
+    onMatugenAvailableChanged: MatugenPreviewService.refresh()
     property var installedRegistryThemes: []
-    readonly property var matugenSchemeOptions: {
-        const mode = SessionData.isLightMode ? "light" : "dark";
-        const options = [];
-        for (const option of Theme.availableMatugenSchemes) {
-            if (option.value === "scheme-smart" && !DMSService.matugenSmartSupported)
-                continue;
-            const colors = (matugenSchemePreviews[option.value] ?? matugenSchemePreviews["scheme-tonal-spot"])?.[mode];
-            // a dms binary older than the tri-color preview returns the primary hex as a plain string
-            const primary = typeof colors === "string" ? colors : (colors?.primary ?? Theme.primary.toString());
-            options.push({
-                "value": option.value,
-                "label": option.label,
-                "primary": primary,
-                "secondary": colors?.secondary ?? primary,
-                "tertiary": colors?.tertiary ?? primary
-            });
-        }
-        return options;
-    }
-
-    function refreshMatugenSchemePreviews() {
-        if (!Theme.matugenAvailable)
-            return;
-        const requestKey = matugenPreviewKey;
-        if (requestKey === matugenPreviewLoadedKey || requestKey === matugenPreviewRequestKey)
-            return;
-        matugenPreviewRequestKey = requestKey;
-        matugenPreviewFailed = false;
-
-        const args = [Proc.dmsBin, "matugen", "preview", "--source-color", matugenPreviewSource, "--contrast", String(SettingsData.matugenContrast ?? 0)];
-        if (matugenPreviewImage)
-            args.push("--image", matugenPreviewImage);
-        if (SettingsData.matugenSpec === "2025")
-            args.push("--spec", "2025");
-        Proc.runCommand("", args, (output, exitCode) => {
-            if (requestKey !== themeColorsTab.matugenPreviewRequestKey)
-                return;
-            themeColorsTab.matugenPreviewRequestKey = "";
-            if (exitCode !== 0) {
-                themeColorsTab.matugenPreviewFailed = true;
-                return;
-            }
-            try {
-                themeColorsTab.matugenSchemePreviews = JSON.parse(output.trim());
-                themeColorsTab.matugenPreviewLoadedKey = requestKey;
-            } catch (e) {
-                themeColorsTab.matugenPreviewFailed = true;
-            }
-        });
-    }
-
     Component.onCompleted: {
         if (DMSService.dmsAvailable)
             DMSService.listInstalledThemes();
         if (PopoutService.pendingThemeInstall)
             Qt.callLater(() => showThemeBrowser());
-        refreshMatugenSchemePreviews();
+        MatugenPreviewService.refresh();
     }
 
     Connections {
@@ -106,19 +40,6 @@ Item {
         function onPendingThemeInstallChanged() {
             if (PopoutService.pendingThemeInstall)
                 showThemeBrowser();
-        }
-    }
-
-    Connections {
-        target: Theme
-        function onMatugenAvailableChanged() {
-            themeColorsTab.refreshMatugenSchemePreviews();
-        }
-        function onThemeGenerationStarting() {
-            themeColorsTab.matugenGenerating = true;
-        }
-        function onMatugenCompleted() {
-            themeColorsTab.matugenGenerating = false;
         }
     }
 
@@ -244,73 +165,24 @@ Item {
                         }
                     }
 
-                    Item {
+                    SettingsSwatchGrid {
+                        readonly property bool genericTheme: Theme.currentThemeCategory === "generic" && Theme.currentTheme !== Theme.dynamic && Theme.currentThemeName !== "custom"
+
                         width: parent.width
-                        height: genericColorGrid.implicitHeight + Math.ceil(genericColorGrid.dotSize * 0.05)
-                        visible: Theme.currentThemeCategory === "generic" && Theme.currentTheme !== Theme.dynamic && Theme.currentThemeName !== "custom"
-
-                        Grid {
-                            id: genericColorGrid
-                            property var colorList: ["blue", "purple", "green", "orange", "red", "cyan", "pink", "amber", "coral", "monochrome"]
-                            property int dotSize: Theme.minimumTouchTargetSize
-                            columns: Math.ceil(colorList.length / 2)
-                            rowSpacing: Theme.spacingS
-                            columnSpacing: Theme.spacingS
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Repeater {
-                                model: genericColorGrid.colorList
-
-                                Rectangle {
-                                    required property string modelData
-                                    property string themeName: modelData
-                                    readonly property var colors: Theme.getThemeColors(themeName)
-                                    readonly property var palette: ThemePalette.pick(colors)
-                                    readonly property bool isActive: Theme.currentThemeName === themeName && Theme.currentTheme !== Theme.dynamic
-                                    width: genericColorGrid.dotSize
-                                    height: genericColorGrid.dotSize
-                                    radius: width / 2
-                                    color: "transparent"
-                                    scale: isActive ? 1.1 : 1
-
-                                    DankPaletteSwatch {
-                                        anchors.fill: parent
-                                        primaryColor: parent.palette.primary
-                                        secondaryColor: parent.palette.secondary
-                                        tertiaryColor: parent.palette.tertiary
-                                    }
-
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "check"
-                                        size: Theme.iconSizeMedium
-                                        color: Theme.isLightColor(parent.colors.primary) ? Theme.contrastDark : Theme.contrastLight
-                                        visible: parent.isActive
-                                    }
-
-                                    DankTooltipHost {
-                                        text: parent.colors.name
-                                        target: parent
-                                        hoverArea: mouseArea
-                                    }
-
-                                    MouseArea {
-                                        id: mouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: Theme.switchTheme(parent.themeName)
-                                    }
-
-                                    Behavior on scale {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                            easing.type: Theme.emphasizedEasing
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        visible: genericTheme
+                        options: ["blue", "purple", "green", "orange", "red", "cyan", "pink", "amber", "coral", "monochrome"].map(name => {
+                            const colors = Theme.getThemeColors(name);
+                            const palette = ThemePalette.pick(colors) ?? {};
+                            return {
+                                "value": name,
+                                "label": colors.name,
+                                "primary": palette.primary ?? Theme.primary.toString(),
+                                "secondary": palette.secondary,
+                                "tertiary": palette.tertiary
+                            };
+                        })
+                        currentValue: genericTheme ? Theme.currentThemeName : ""
+                        onSelected: value => Theme.switchTheme(value)
                     }
 
                     Row {
@@ -438,10 +310,10 @@ Item {
 
                             SettingsSwatchGrid {
                                 id: schemeGrid
-                                options: themeColorsTab.matugenSchemeOptions
+                                options: MatugenPreviewService.schemeOptions
                                 currentValue: SettingsData.matugenScheme
-                                enabled: themeColorsTab.matugenPreviewsReady
-                                opacity: themeColorsTab.matugenPreviewsReady ? 1 : Theme.pendingOpacity
+                                enabled: MatugenPreviewService.ready
+                                opacity: MatugenPreviewService.ready ? 1 : Theme.pendingOpacity
                                 onSelected: value => SettingsData.setMatugenScheme(value)
 
                                 Behavior on opacity {
@@ -453,7 +325,7 @@ Item {
 
                             DankSpinner {
                                 anchors.centerIn: parent
-                                running: !themeColorsTab.matugenPreviewsReady
+                                running: !MatugenPreviewService.ready
                                 visible: running
                             }
                         }

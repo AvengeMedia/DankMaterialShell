@@ -2,11 +2,16 @@ package utils
 
 import (
 	"bytes"
+	"cmp"
 	"errors"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strings"
 )
+
+var flatpakInstallationsDir = "/etc/flatpak/installations.d"
 
 func FlatpakInPath() bool {
 	_, err := exec.LookPath("flatpak")
@@ -17,10 +22,38 @@ func FlatpakExists(name string) bool {
 	if !FlatpakInPath() {
 		return false
 	}
+	for _, dir := range flatpakInstallations() {
+		if info, err := os.Stat(filepath.Join(dir, "app", name)); err == nil && info.IsDir() {
+			return true
+		}
+	}
+	return false
+}
 
-	cmd := exec.Command("flatpak", "info", name)
-	err := cmd.Run()
-	return err == nil
+func flatpakInstallations() []string {
+	dirs := []string{
+		cmp.Or(os.Getenv("FLATPAK_USER_DIR"), filepath.Join(XDGDataHome(), "flatpak")),
+		cmp.Or(os.Getenv("FLATPAK_SYSTEM_DIR"), "/var/lib/flatpak"),
+	}
+	entries, err := os.ReadDir(flatpakInstallationsDir)
+	if err != nil {
+		return dirs
+	}
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), ".conf") {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(flatpakInstallationsDir, entry.Name()))
+		if err != nil {
+			continue
+		}
+		for line := range strings.Lines(string(data)) {
+			if path, ok := strings.CutPrefix(strings.TrimSpace(line), "Path="); ok {
+				dirs = append(dirs, strings.TrimSpace(path))
+			}
+		}
+	}
+	return dirs
 }
 
 func FlatpakSearchBySubstring(substring string) bool {

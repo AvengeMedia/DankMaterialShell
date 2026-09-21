@@ -21,7 +21,7 @@ PluginComponent {
 
             StyledText {
                 text: "boregard"
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: root.textSize
                 color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
             }

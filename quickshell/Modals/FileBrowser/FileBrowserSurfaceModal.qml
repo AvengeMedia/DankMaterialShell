@@ -15,6 +15,7 @@ DankModal {
     property bool saveMode: false
     property bool folderMode: false
     property string defaultFileName: ""
+    property string revealPath: ""
     property var parentPopout: null
 
     signal fileSelected(string path)
@@ -59,6 +60,7 @@ DankModal {
         saveMode: fileBrowserSurfaceModal.saveMode
         folderMode: fileBrowserSurfaceModal.folderMode
         defaultFileName: fileBrowserSurfaceModal.defaultFileName
+        revealPath: fileBrowserSurfaceModal.revealPath
 
         Component.onCompleted: initialize()
 

@@ -174,6 +174,19 @@ test("hyprland: workspace membership against the focused workspace, pid from the
     assert.equal(specialWorkspaceName(hypr, null), "");
 });
 
+test("mango: compositor visibility covers global windows and overview without counting hidden clients", () => {
+    const windows = [
+        { id: 1, monitor: "DP-1", tags: [2], is_visible: true },
+        { id: 2, monitor: "DP-1", tags: [1], is_visible: false },
+        { id: 3, monitor: "DP-2", tags: [1], is_visible: true },
+        { id: 4, monitor: "DP-1", tags: [1], is_visible: true, is_minimized: true },
+        { id: 5, monitor: "DP-1", tags: [1] }
+    ];
+    const visible = activeTags => Array.from(model.mangoVisibleWindows(windows, { activeTags }, "DP-1"), win => win.id);
+    assert.deepEqual(visible([1]), [1, 5]);
+    assert.deepEqual(visible([0]), [1]);
+});
+
 test("mango: pid by window id, overlap and maximized only count visible windows on the output's active tags", () => {
     const m = fixture("mango");
     assert.equal(mangoPid(m.twoOutputs.windows, { mangoWindowId: 1 }), 201);

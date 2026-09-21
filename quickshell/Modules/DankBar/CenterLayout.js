@@ -14,7 +14,17 @@ function indexCenter(sizes, indices, offsets, spacing) {
     return offsets[visibleMiddle] - spacing / 2;
 }
 
-function resolve(sizes, length, spacing, mode) {
+function confine(start, totalSize, bounds) {
+    if (!bounds)
+        return start;
+    const min = bounds.min ?? -Infinity;
+    const max = bounds.max ?? Infinity;
+    if (max - min < totalSize)
+        return (min + max - totalSize) / 2;
+    return Math.min(Math.max(start, min), max - totalSize);
+}
+
+function resolve(sizes, length, spacing, mode, bounds) {
     const indices = [];
     const offsets = [];
     const positions = sizes.map(() => null);
@@ -30,11 +40,17 @@ function resolve(sizes, length, spacing, mode) {
     }
 
     if (indices.length === 0)
-        return { positions, totalSize: 0 };
+        return {
+            positions,
+            totalSize: 0
+        };
 
     const centerOffset = mode === "geometric" ? totalSize / 2 : indexCenter(sizes, indices, offsets, spacing);
-    const start = length / 2 - centerOffset;
+    const start = confine(length / 2 - centerOffset, totalSize, bounds);
     for (let i = 0; i < indices.length; i++)
         positions[indices[i]] = start + offsets[i];
-    return { positions, totalSize };
+    return {
+        positions,
+        totalSize
+    };
 }

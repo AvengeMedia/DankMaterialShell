@@ -41,6 +41,7 @@ DankFloatingWindow {
     property bool shouldHaveFocus: visible
     property bool allowFocusOverride: false
     property alias shouldBeVisible: settingsModal.visible
+    readonly property bool searchFocused: sidebar.searchFocused
     property bool isCompactMode: width < SettingsMetrics.compactBreakpoint
     property bool menuVisible: !isCompactMode
     property string keybindSearchQuery: ""
@@ -171,6 +172,7 @@ DankFloatingWindow {
 
     onVisibleChanged: {
         if (!visible) {
+            pageHistory = [];
             closingModal();
         } else if (!isCompactMode || menuVisible) {
             Qt.callLater(() => {

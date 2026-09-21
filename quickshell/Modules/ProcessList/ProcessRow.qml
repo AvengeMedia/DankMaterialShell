@@ -17,6 +17,8 @@ DankListItem {
 
     signal killRequested
 
+    surfaceColor: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
+
     height: root.rowHeight + (isExpanded ? details.implicitHeight + Theme.spacingM * 2 : 0)
     clip: true
     Accessible.name: command

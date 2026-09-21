@@ -23,6 +23,7 @@ Item {
     onSpacingChanged: root.scheduleLayout()
     onCustomPaddingHChanged: root.scheduleLayout()
     onCustomPaddingVChanged: root.scheduleLayout()
+    onVisibleChanged: root.scheduleLayout()
 
     function scheduleLayout() {
         layoutTimer.restart();
@@ -46,6 +47,8 @@ Item {
     }
 
     function layout() {
+        if (!visible)
+            return;
         const items = [];
         let cursor = 0;
         for (let i = 0; i < host.children.length; i++) {

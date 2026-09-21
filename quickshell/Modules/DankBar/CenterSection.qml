@@ -10,6 +10,9 @@ BarSection {
     property real totalSize: 0
     property real contentStart: 0
     property real contentSize: 0
+    readonly property var bounds: barContent?.centerBounds ?? null
+
+    onBoundsChanged: layoutTimer.restart()
 
     function updateLayout() {
         positionWidgets();
@@ -54,7 +57,7 @@ BarSection {
         }
         applyRoles(entries, participating);
 
-        const layout = CenterLayout.resolve(sizes, length, widgetSpacing, SettingsData.centeringMode);
+        const layout = CenterLayout.resolve(sizes, length, widgetSpacing, SettingsData.centeringMode, bounds);
         for (let index = 0; index < widgets.length; index++) {
             const widget = widgets[index];
             if (!widget)

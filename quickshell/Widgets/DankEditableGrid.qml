@@ -20,8 +20,10 @@ Item {
     property var dragCell: null
     property var sizePreview: null
     property var pinnedCells: null
+    property real heldHeight: 0
     readonly property alias tileModel: tiles
     readonly property bool interacting: draggingSourceIndex >= 0 || sizePreview !== null
+    readonly property real layoutHeight: interacting ? Math.max(heldHeight, slotLayout.totalHeight) : slotLayout.totalHeight
     readonly property int interactingIndex: draggingSourceIndex >= 0 ? draggingSourceIndex : (sizePreview?.index ?? -1)
     readonly property var placementOrder: {
         const order = sourceItems.map((item, i) => i);
@@ -41,11 +43,12 @@ Item {
 
     signal layoutCommitted(var items)
 
-    implicitHeight: Math.max(minimumHeight, slotLayout.totalHeight) + contentPadding * 2
+    implicitHeight: Math.max(minimumHeight, layoutHeight) + contentPadding * 2
     height: implicitHeight
 
     function pin() {
         pinnedCells = slotLayout.slots.slice();
+        heldHeight = slotLayout.totalHeight;
     }
 
     function cancelInteraction() {
@@ -53,6 +56,7 @@ Item {
         dragCell = null;
         sizePreview = null;
         pinnedCells = null;
+        heldHeight = 0;
     }
 
     function committedItems() {
@@ -154,6 +158,10 @@ Item {
     }
 
     onSourceItemsChanged: syncTiles()
+    onSlotLayoutChanged: {
+        if (interacting)
+            heldHeight = Math.max(heldHeight, slotLayout.totalHeight);
+    }
     Component.onCompleted: syncTiles()
     onEditModeChanged: {
         if (!editMode)

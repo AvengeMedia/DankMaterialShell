@@ -68,6 +68,7 @@ Variants {
         WindowBlur {
             targetWindow: dock
             blurEnabled: body.effectiveBlurEnabled && !body.usesConnectedFrameChrome
+            surfaceColor: body.surfaceColor
             blurX: body.blurX
             blurY: body.blurY
             blurWidth: body.blurWidth

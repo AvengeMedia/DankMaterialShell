@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import "../Common/GridLayout.js" as GridUtils
 
 QtObject {
     id: root
@@ -56,10 +57,7 @@ QtObject {
         if (!drag)
             return;
         const wanted = edgeFor(drag.step, drag.side) + px + popout.renderedAlignedX - drag.x;
-        const edge = edgeFor(drag.previewStep, drag.side);
-        const direction = (wanted - edge) * drag.side >= 0 ? 1 : -1;
-        const gain = Math.max(Math.abs(edgeFor(drag.previewStep + direction, drag.side) - edge), stepWidth / 2);
-        const step = Math.max(minStep, Math.min(maxStep, drag.previewStep + direction * Math.round(Math.abs(wanted - edge) / gain)));
+        const step = GridUtils.nearestStep(step => edgeFor(step, drag.side), drag.step, minStep, maxStep, wanted);
         const rows = rowUnit > 0 ? Math.max(minRows, Math.min(maxRows, drag.rows + Math.round((py + popout.renderedAlignedY - drag.y) / rowUnit))) : drag.rows;
         if (step === drag.previewStep && rows === drag.previewRows)
             return;

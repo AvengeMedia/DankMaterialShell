@@ -21,6 +21,7 @@ Item {
     signal pageRequested(string pageId)
 
     property bool searchActive: searchField.text.length > 0
+    property bool searchFocused: false
     property int searchSelectedIndex: 0
     property string keyboardHighlightId: ""
     readonly property var categoryStructure: SettingsTabs.structure
@@ -187,6 +188,7 @@ Item {
         anchors.topMargin: Theme.spacingM
         height: Theme.iconButtonSize + Theme.spacingM
         placeholderText: I18n.tr("Search settings", "settings search field placeholder")
+        onFocusStateChanged: hasFocus => root.searchFocused = hasFocus
         onTextChanged: {
             SettingsSearchService.search(text);
             root.searchSelectedIndex = 0;

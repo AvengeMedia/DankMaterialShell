@@ -66,7 +66,6 @@ hl.window_rule({ match = { class = "^(org\\.gnome\\.Calculator)$" }, float = tru
 hl.window_rule({ match = { class = "^(gnome-calculator)$" }, float = true })
 hl.window_rule({ match = { class = "^(galculator)$" }, float = true })
 hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true })
-hl.window_rule({ match = { class = "^(org\\.gnome\\.Nautilus)$" }, float = true })
 hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
 hl.window_rule({
 	match = { class = "^(steam)$", title = "^(notificationtoasts)" },

@@ -36,6 +36,7 @@ Item {
         anchors.fill: parent
         visible: !root.isVertical
         iconName: root.systemModel.iconName
+        tonalIcon: false
         iconInteractive: root.systemModel.volumeActivity
         iconLabel: root.systemModel.muted ? I18n.tr("Unmute") : I18n.tr("Mute")
         value: Math.round(root.systemModel.value)

@@ -1,6 +1,6 @@
 //go:build !linux
 
-package dgop
+package lowprio
 
 // Nice is per-process outside Linux, so lowering it here would slow the whole daemon.
-func lowerThreadPriority() {}
+func LowerThreadPriority() {}

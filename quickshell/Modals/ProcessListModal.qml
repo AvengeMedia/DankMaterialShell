@@ -89,7 +89,7 @@ DankFloatingWindow {
     onClosed: hide()
 
     onCurrentTabChanged: {
-        if (visible && currentTab === 0 && searchField.visible)
+        if (visible && currentTab === 0 && searchField.visible && !viewNavigation.activeFocus)
             searchField.forceActiveFocus();
     }
 
@@ -208,12 +208,13 @@ DankFloatingWindow {
                 onCloseRequested: processListModal.hide()
             }
 
-            DankTabBar {
+            DankNavigationBar {
+                id: viewNavigation
                 Layout.fillWidth: true
+                Layout.topMargin: Theme.spacingS
                 Layout.leftMargin: Theme.spacingL
                 Layout.rightMargin: Theme.spacingL
-                tabHeight: Theme.buttonHeightM
-                spacing: Theme.spacingS
+                nextFocusTarget: currentTab === 0 ? searchField : null
                 model: [
                     {
                         text: I18n.tr("Processes"),
@@ -233,7 +234,16 @@ DankFloatingWindow {
                     }
                 ]
                 currentIndex: processListModal.currentTab
-                onTabClicked: index => processListModal.currentTab = index
+                onActivated: index => processListModal.currentTab = index
+            }
+
+            ProcessSummary {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.leftMargin: Theme.spacingL
+                Layout.rightMargin: Theme.spacingL
+                Layout.topMargin: Theme.spacingS
+                visible: currentTab === 0
             }
 
             RowLayout {
@@ -253,23 +263,13 @@ DankFloatingWindow {
                     onTextChanged: processListModal.searchText = text
                     ignoreUpDownKeys: true
                     keyForwardTargets: [contentFocusScope]
+                    KeyNavigation.backtab: viewNavigation
                 }
 
                 ProcessFilterChips {
                     id: processFilterGroup
                     Layout.preferredWidth: singleRowWidth
                 }
-            }
-
-            ProcessSummary {
-                Layout.fillWidth: true
-                Layout.preferredHeight: ProcessListMetrics.graphHeight
-                Layout.maximumHeight: ProcessListMetrics.graphHeight
-                Layout.fillHeight: false
-                Layout.leftMargin: Theme.spacingL
-                Layout.rightMargin: Theme.spacingL
-                Layout.topMargin: Theme.spacingS
-                visible: currentTab === 0
             }
 
             Rectangle {
@@ -332,46 +332,6 @@ DankFloatingWindow {
                 color: "transparent"
 
                 Row {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingL
-
-                    Row {
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: I18n.tr("Processes", "process count label in footer") + ":"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-
-                        StyledText {
-                            text: DgopService.processCount.toString()
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    Row {
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: I18n.tr("Uptime", "uptime label in footer") + ":"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-
-                        StyledText {
-                            text: DgopService.shortUptime ? DgopService.shortUptime.slice(2) : "--"
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                        }
-                    }
-                }
-
-                Row {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingL
@@ -381,7 +341,7 @@ DankFloatingWindow {
 
                         DankIcon {
                             name: "swap_horiz"
-                            size: 14
+                            size: Theme.iconSizeSmall
                             color: Theme.info
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -399,7 +359,7 @@ DankFloatingWindow {
 
                         DankIcon {
                             name: "storage"
-                            size: 14
+                            size: Theme.iconSizeSmall
                             color: Theme.warning
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -417,7 +377,7 @@ DankFloatingWindow {
 
                         DankIcon {
                             name: "memory"
-                            size: 14
+                            size: Theme.iconSizeSmall
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -436,7 +396,7 @@ DankFloatingWindow {
 
                         DankIcon {
                             name: "sd_card"
-                            size: 14
+                            size: Theme.iconSizeSmall
                             color: Theme.secondary
                             anchors.verticalCenter: parent.verticalCenter
                         }

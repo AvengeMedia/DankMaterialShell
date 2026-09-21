@@ -302,6 +302,7 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: root
+        surfaceColor: contentRect.slideoutSurfaceColor
         blurX: root.slideoutBlurActive ? slideContainer.x + root.slideoutSlideSnapX : 0
         blurY: root.slideoutBlurActive ? slideContainer.y : 0
         blurWidth: root.slideoutBlurActive ? slideContainer.width : 0

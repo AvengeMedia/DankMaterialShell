@@ -35,6 +35,11 @@ type VariantsInfo struct {
 	Accents  []AccentInfo   `json:"accents,omitempty"`
 }
 
+type PaletteInfo struct {
+	Dark  map[string]string `json:"dark,omitempty"`
+	Light map[string]string `json:"light,omitempty"`
+}
+
 type ThemeInfo struct {
 	ID          string            `json:"id"`
 	Name        string            `json:"name"`
@@ -48,5 +53,6 @@ type ThemeInfo struct {
 	HasUpdate   bool              `json:"hasUpdate,omitempty"`
 	HasVariants bool              `json:"hasVariants,omitempty"`
 	Variants    *VariantsInfo     `json:"variants,omitempty"`
+	Palette     *PaletteInfo      `json:"palette,omitempty"`
 	WCAG        *themes.ThemeWCAG `json:"wcag,omitempty"`
 }

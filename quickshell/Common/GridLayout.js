@@ -212,6 +212,21 @@ function crossGap(a, aSize, b, bSize) {
     return Math.max(0, b - (a + aSize), a - (b + bSize));
 }
 
+function nearestStep(edgeFor, from, minStep, maxStep, wanted) {
+    const distance = step => Math.abs(edgeFor(step) - wanted);
+    let best = Math.max(minStep, Math.min(maxStep, from));
+    for (const direction of [1, -1]) {
+        for (let step = best + direction; step >= minStep && step <= maxStep; step += direction) {
+            const gap = distance(step);
+            if (gap > distance(best))
+                break;
+            if (gap < distance(best))
+                best = step;
+        }
+    }
+    return best;
+}
+
 function dimension(value, minimum, maximum, fallback, step = 1) {
     const min = minimum ?? 1;
     const max = Math.max(min, maximum ?? fallback ?? min);

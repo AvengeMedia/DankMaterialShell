@@ -5,4 +5,4 @@ output_path = 'CACHE_DIR/wal/dank-pywalfox.json'
 [templates.dmspywal]
 input_path = 'SHELL_DIR/matugen/templates/pywalfox-colors.json'
 output_path = 'CACHE_DIR/wal/colors.json'
-post_hook = 'sh -c "command -v pywalfox >/dev/null 2>&1 && pywalfox {{ mode }} && pywalfox update"'
+post_hook = 'sh -c "command -v pywalfox >/dev/null 2>&1 && (pywalfox {{ mode }} && pywalfox update) >/dev/null 2>&1 &"'

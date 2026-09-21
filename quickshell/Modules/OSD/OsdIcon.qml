@@ -13,6 +13,7 @@ Loader {
     property bool interactive: false
     property bool available: true
     readonly property bool hovered: item?.hovered ?? false
+    readonly property real glyphSize: Math.min(Theme.iconSize, width)
 
     signal clicked
 
@@ -26,7 +27,7 @@ Loader {
         DankActionButton {
             buttonSize: root.width
             iconName: root.iconName
-            iconSize: Theme.iconSize
+            iconSize: root.glyphSize
             iconColor: root.iconColor
             backgroundColor: !root.tonal ? "transparent" : enabled ? root.backgroundColor : Theme.onSurface_12
             Accessible.name: root.label
@@ -45,7 +46,7 @@ Loader {
             DankIcon {
                 anchors.centerIn: parent
                 name: root.iconName
-                size: Theme.iconSize
+                size: root.glyphSize
                 color: root.available ? root.iconColor : Theme.onSurface_38
             }
         }

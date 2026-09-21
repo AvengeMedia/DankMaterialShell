@@ -24,13 +24,14 @@ Singleton {
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
     readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
-    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen"].concat(_pinKeys, _historyKeys)
+    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen", "matugenPreviews"].concat(_pinKeys, _historyKeys)
 
     property string wallpaperLastPath: ""
     property string profileLastPath: ""
     property string pluginViewFilter: "enabled"
     property string dashFocusCardId: ""
     property bool mediaLyricsOpen: false
+    property var matugenPreviews: ({})
     property var pluginViewSort: ({
             by: "modified",
             descending: true
@@ -182,6 +183,7 @@ Singleton {
                 pluginViewFilter = ["all", "enabled", "disabled", "updates"].includes(cache.pluginViewFilter) ? cache.pluginViewFilter : "enabled";
                 dashFocusCardId = typeof cache.dashFocusCardId === "string" ? cache.dashFocusCardId : "";
                 mediaLyricsOpen = cache.mediaLyricsOpen === true;
+                matugenPreviews = typeof cache.matugenPreviews?.key === "string" ? cache.matugenPreviews : {};
                 const pluginSort = cache.pluginViewSort;
                 pluginViewSort = {
                     by: ["name", "author", "modified"].includes(pluginSort?.by) ? pluginSort.by : "modified",
@@ -248,6 +250,7 @@ Singleton {
             "pluginViewFilter": pluginViewFilter,
             "dashFocusCardId": dashFocusCardId,
             "mediaLyricsOpen": mediaLyricsOpen,
+            "matugenPreviews": matugenPreviews,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };

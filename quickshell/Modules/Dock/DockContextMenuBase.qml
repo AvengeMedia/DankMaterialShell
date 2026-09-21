@@ -74,6 +74,7 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: root
+        surfaceColor: menuContainer.color
         blurX: menuContainer.x
         blurY: menuContainer.y
         blurWidth: root.visible ? menuContainer.width : 0

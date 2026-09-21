@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import "../../../Common/QmlUtils.js" as QmlUtils
 
 Column {
     id: root
@@ -32,22 +31,9 @@ Column {
     width: parent?.width ?? 0
     spacing: 0
 
-    Component.onCompleted: {
-        if (!settingKey)
-            return;
-        const key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            const flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable, QmlUtils.findParentCollapsible(root.parent));
-        });
-    }
-
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey, root);
+    SettingsSearchRegistration {
+        target: root
+        settingKey: root.settingKey
     }
 
     SettingsSectionLabel {

@@ -118,6 +118,7 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: root
+        surfaceColor: Theme.withAlpha(root.surfaceColor, osdContainer.popupSurfaceAlpha)
         blurX: shadowBuffer
         blurY: shadowBuffer
         blurWidth: presented ? alignedWidth : 0

@@ -25,7 +25,7 @@ PluginComponent {
 
             StyledText {
                 text: root.customColor.toString()
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: root.textSize
                 color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -48,7 +48,7 @@ PluginComponent {
 
             StyledText {
                 text: root.customColor.toString()
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: root.textSize
                 color: Theme.surfaceText
                 anchors.horizontalCenter: parent.horizontalCenter
             }

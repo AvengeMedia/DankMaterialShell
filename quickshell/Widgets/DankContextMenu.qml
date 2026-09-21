@@ -198,6 +198,7 @@ Item {
 
         WindowBlur {
             targetWindow: menuWindow
+            surfaceColor: menuContainer.color
             blurX: root.blurActive ? menuContainer.x : 0
             blurY: root.blurActive ? menuContainer.y : 0
             blurWidth: root.blurActive ? menuContainer.width : 0

@@ -55,6 +55,39 @@ ShellRoot {
             }
         }
 
+        function heldHeight() {
+            editGrid.mirrored = false;
+            editGrid.animationsEnabled = false;
+            editGrid.sourceItems = [
+                {
+                    id: "a",
+                    w: 2,
+                    h: 1,
+                    col: 0,
+                    row: 0
+                },
+                {
+                    id: "b",
+                    w: 2,
+                    h: 1,
+                    col: 0,
+                    row: 1
+                }
+            ];
+            const twoRows = editGrid.implicitHeight;
+            const rowUnit = editGrid.slotLayout.rowUnit + editGrid.slotLayout.gap;
+            editGrid.beginDrag(1);
+            editGrid.updateDragTarget(slots.itemAt(0).slot.w + editGrid.slotLayout.gap, 0);
+            check(editGrid.slotLayout.rows === 1 && editGrid.implicitHeight === twoRows, "dragging the bottom tile up keeps the grid height");
+            editGrid.updateDragTarget(0, rowUnit * 2);
+            const threeRows = editGrid.implicitHeight;
+            check(threeRows === twoRows + rowUnit, "dragging below the last row grows the grid");
+            editGrid.updateDragTarget(0, rowUnit);
+            check(editGrid.implicitHeight === threeRows, "the grid never shrinks while a drag is in progress");
+            editGrid.endDrag();
+            check(editGrid.implicitHeight === twoRows, "releasing the drag settles to the committed layout");
+        }
+
         function run() {
             for (const mirrored of [false, true]) {
                 editGrid.animationsEnabled = false;
@@ -128,6 +161,7 @@ ShellRoot {
                 editGrid.sourceItems = editGrid.sourceItems.slice(1);
                 placed("removing a tile");
             }
+            heldHeight();
             if (failures.length > 0)
                 console.error("FIXTURE_FAIL", failures.join("; "));
             else

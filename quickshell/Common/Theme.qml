@@ -1264,10 +1264,10 @@ Singleton {
     readonly property real sliderTrackHeight: 16
     readonly property real sliderHandleWidth: 4
     readonly property real sliderHandleWidthPressed: 2
-    readonly property real sliderHandleHeight: 44
+    readonly property real sliderHandleHeight: 28
     readonly property real sliderHandleGap: 6
     readonly property real sliderTrackHeightS: 24
-    readonly property real sliderHandleHeightS: 44
+    readonly property real sliderHandleHeightS: 36
     readonly property real sliderTrackHeightM: 40
     readonly property real sliderHandleHeightM: 52
     readonly property real sliderTrackHeightL: 56
@@ -1314,7 +1314,10 @@ Singleton {
     readonly property real buttonMinWidth: 58
     readonly property real pressScale: 0.98
     readonly property real iconEnterScale: 0.6
-    readonly property real osdHeight: sliderHandleHeight + spacingS * 2
+    readonly property real osdHeight: 60
+    readonly property real osdLevelWidth: 264
+    readonly property real osdLevelVerticalHeight: 352
+    readonly property real osdMediaWidth: 308
     readonly property real dialogMaxWidth: 560
     readonly property real bottomSheetHandleWidth: 36
     readonly property real bottomSheetHandleHeight: 4
@@ -1650,12 +1653,12 @@ Singleton {
     function barTextSize(barThickness, fontScale, maximizeText) {
         const scale = barThickness / 48;
         const dankBarScale = fontScale !== undefined ? fontScale : 1.0;
-        const maxScale = (maximizeText ?? false) ? 1.5 : 1.0;
+        const maximized = maximizeText ?? false;
         if (scale <= 0.75)
-            return Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale);
+            return Math.round((maximized ? fontSizeMedium : fontSizeSmall * 0.9) * dankBarScale);
         if (scale >= 1.25)
-            return Math.round(fontSizeMedium * dankBarScale * maxScale);
-        return Math.round(fontSizeSmall * dankBarScale * maxScale);
+            return Math.round((maximized ? fontSizeXLarge : fontSizeMedium) * dankBarScale);
+        return Math.round((maximized ? fontSizeLarge : fontSizeSmall) * dankBarScale);
     }
 
     // !TODO: plugin API only (dms-plugins DankKDEConnect); fold into a parametrized BatteryService ladder and drop from Theme

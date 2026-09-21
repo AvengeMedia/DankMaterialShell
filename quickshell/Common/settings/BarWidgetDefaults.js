@@ -124,7 +124,8 @@ var DEFAULTS = {
     },
     keyboard_layout_name: {
         keyboardLayoutNameCompactMode: false,
-        keyboardLayoutNameShowIcon: false
+        keyboardLayoutNameShowIcon: false,
+        keyboardLayoutNameLabelOverrides: {}
     },
     cpuUsage: {
         minimumWidth: true

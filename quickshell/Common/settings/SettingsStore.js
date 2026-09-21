@@ -663,6 +663,9 @@ function migrateToVersion(obj, targetVersion) {
         }
         delete settings.frameColor;
         delete settings.frameOpacity;
+        if (settings.blurBorderEnabled === undefined)
+            settings.blurBorderEnabled = settings.blurEnabled === true;
+        settings.blurBorderSeeded = settings.blurEnabled === true;
         settings.configVersion = 28;
     }
 

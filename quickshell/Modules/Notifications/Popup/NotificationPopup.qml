@@ -16,6 +16,7 @@ PanelWindow {
 
     WindowBlur {
         targetWindow: win
+        surfaceColor: Theme.notificationFloatingSurface
         readonly property real s: Math.min(1, content.scale) * Math.max(0, content.opacity)
         readonly property real innerW: Math.max(0, content.width - content.cardInset * 2)
         readonly property real innerH: Math.max(0, content.height - content.cardInset * 2)

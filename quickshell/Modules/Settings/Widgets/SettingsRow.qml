@@ -5,7 +5,6 @@ import QtQuick.Templates as T
 import qs.Common
 import qs.Services
 import qs.Widgets
-import "../../../Common/QmlUtils.js" as QmlUtils
 
 T.Control {
     id: root
@@ -46,7 +45,7 @@ T.Control {
     property alias leading: leadingSlot.data
     property alias body: bodySlot.data
 
-    readonly property bool hasBody: bodySlot.visibleChildren.length > 0
+    readonly property bool hasBody: bodySlot.height > 0
     readonly property bool hasText: title !== "" || subtitle !== ""
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
     readonly property bool isFirstInGroup: _edge(true)
@@ -107,22 +106,9 @@ T.Control {
     height: implicitHeight
     implicitHeight: paddingV * 2 + headerLine.height + (hasBody ? bodySlot.height + (headerLine.height > 0 ? Theme.spacingM : 0) : 0)
 
-    Component.onCompleted: {
-        if (!settingKey)
-            return;
-        const key = settingKey;
-        Qt.callLater(() => {
-            if (!root.parent)
-                return;
-            const flickable = QmlUtils.findParentFlickable(root.parent);
-            if (flickable)
-                SettingsSearchService.registerCard(key, root, flickable, QmlUtils.findParentCollapsible(root.parent));
-        });
-    }
-
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey, root);
+    SettingsSearchRegistration {
+        target: root
+        settingKey: root.settingKey
     }
 
     Rectangle {
@@ -254,8 +240,8 @@ T.Control {
                 id: textColumn
                 anchors.left: leadingArea.visible ? leadingArea.right : parent.left
                 anchors.leftMargin: leadingArea.visible ? Theme.spacingL : 0
-                anchors.right: resetButton.visible ? resetButton.left : (trailingArea.visible ? trailingArea.left : parent.right)
-                anchors.rightMargin: resetButton.visible || trailingArea.visible ? SettingsMetrics.rowContentSpacing : 0
+                anchors.right: resetButton.active ? resetButton.left : (trailingArea.visible ? trailingArea.left : parent.right)
+                anchors.rightMargin: resetButton.active || trailingArea.visible ? SettingsMetrics.rowContentSpacing : 0
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXXS
                 opacity: root.enabled ? 1 : SettingsMetrics.disabledOpacity
@@ -284,20 +270,24 @@ T.Control {
                 }
             }
 
-            DankActionButton {
+            Loader {
                 id: resetButton
                 anchors.right: trailingArea.visible ? trailingArea.left : parent.right
                 anchors.rightMargin: trailingArea.visible ? Theme.spacingS : 0
                 anchors.verticalCenter: parent.verticalCenter
-                buttonSize: Theme.iconButtonSize
-                iconName: "restart_alt"
-                iconSize: Theme.iconSizeMedium
-                iconColor: Theme.surfaceVariantText
-                tooltipText: I18n.tr("Reset to default")
-                Accessible.name: I18n.tr("Reset to default")
-                visible: root.modified && root.resetInHeader
-                enabled: root.enabled
-                onClicked: root.resetRequested()
+                active: root.modified && root.resetInHeader
+                visible: active
+
+                sourceComponent: DankActionButton {
+                    buttonSize: Theme.iconButtonSize
+                    iconName: "restart_alt"
+                    iconSize: Theme.iconSizeMedium
+                    iconColor: Theme.surfaceVariantText
+                    tooltipText: I18n.tr("Reset to default")
+                    Accessible.name: I18n.tr("Reset to default")
+                    enabled: root.enabled
+                    onClicked: root.resetRequested()
+                }
             }
 
             Row {

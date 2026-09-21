@@ -66,3 +66,9 @@ test("a dragged tile snaps to the cell under its corner", () => {
     assert.deepEqual(plain(grid.cellAt(grid.packCards(cards, order, 6, 600, 0, 100, true), 0, 0, 2, 1)), { col: 4, row: 0 });
     assert.deepEqual(plain(grid.placedItems([{ id: "x" }, { id: "y" }], [null, { col: 1, row: 2 }])), [{ id: "x" }, { id: "y", col: 1, row: 2 }]);
 });
+
+test("panel step follows the pointer and holds on a pinned edge", () => {
+    const rightEdge = step => Math.min(1000, 500 + step * 36);
+    assert.equal(grid.nearestStep(rightEdge, 8, 6, 30, rightEdge(8) + 50), 9);
+    assert.equal(grid.nearestStep(rightEdge, 20, 6, 30, 1400), 20);
+});

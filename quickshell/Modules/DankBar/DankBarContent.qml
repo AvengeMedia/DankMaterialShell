@@ -20,6 +20,39 @@ Item {
     property var hoverSections: null
     property real leadingSectionOffset: 0
     property real trailingSectionOffset: 0
+    readonly property bool fitToWidgets: _hasBarWindow && (barWindow.fitToWidgets ?? false)
+    readonly property real sectionGap: (_barIsVertical ? vLeftSection : hLeftSection).widgetSpacing
+    readonly property real leadingImplicitSize: _barIsVertical ? vLeftSection.implicitHeight : hLeftSection.implicitWidth
+    readonly property real centerImplicitSize: _barIsVertical ? vCenterSection.implicitHeight : hCenterSection.implicitWidth
+    readonly property real trailingImplicitSize: _barIsVertical ? vRightSection.implicitHeight : hRightSection.implicitWidth
+    readonly property real fittedStartMargin: _barIsVertical ? _topMargin : _leftMargin
+    readonly property real fittedEndMargin: _barIsVertical ? _bottomMargin : _rightMargin
+    readonly property real fittedAvailableSize: fitToWidgets ? Math.max(1, barWindow.fittedAvailableLength - fittedStartMargin - fittedEndMargin) : 0
+    readonly property real fittedLeadingReach: leadingImplicitSize > 0 ? leadingImplicitSize + sectionGap : 0
+    readonly property real fittedTrailingReach: trailingImplicitSize > 0 ? trailingImplicitSize + sectionGap : 0
+    readonly property var fittedCenterSection: _barIsVertical ? vCenterSection : hCenterSection
+    readonly property real fittedCoreStart: {
+        if (!fitToWidgets)
+            return 0;
+        if (centerImplicitSize > 0)
+            return fittedCenterSection.contentStart;
+        const sides = leadingImplicitSize + trailingImplicitSize + (leadingImplicitSize > 0 && trailingImplicitSize > 0 ? sectionGap : 0);
+        return (barWindow.fittedAvailableLength - sides) / 2 + fittedLeadingReach;
+    }
+    readonly property real fittedCoreEnd: !fitToWidgets ? 0 : centerImplicitSize > 0 ? fittedCoreStart + fittedCenterSection.contentSize : fittedCoreStart - (leadingImplicitSize > 0 && trailingImplicitSize > 0 ? sectionGap : 0)
+    readonly property real fittedLeadingPad: fittedCoreStart - fittedLeadingReach - fittedStartMargin
+    readonly property var centerBounds: {
+        if (fitToWidgets)
+            return {
+                min: fittedLeadingReach + fittedStartMargin,
+                max: barWindow.fittedAvailableLength - fittedTrailingReach - fittedEndMargin
+            };
+        return {
+            min: fittedLeadingReach,
+            max: (_barIsVertical ? height : width) - fittedTrailingReach
+        };
+    }
+    readonly property real fittedTrailingPad: barWindow.fittedAvailableLength - fittedCoreEnd - fittedTrailingReach - fittedEndMargin
     readonly property var workspaceWidget: SettingsData.barWidgetEntry(barConfig, "workspaceSwitcher")
 
     function workspaceOption(key) {
@@ -228,7 +261,7 @@ Item {
         }
     }
 
-    readonly property int availableWidth: width
+    readonly property int availableWidth: fitToWidgets ? fittedAvailableSize : width
     readonly property int launcherButtonWidth: 40
     readonly property int workspaceSwitcherWidth: 120
     readonly property int focusedAppMaxWidth: 456
@@ -383,7 +416,7 @@ Item {
                 }
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? hCenterSection.x : parent.width / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, hCenterSection.x > 0 ? hCenterSection.x : parent.width / 3)
             }
 
             RightSection {
@@ -399,7 +432,7 @@ Item {
                 }
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, hCenterSection.x > 0 ? parent.width - (hCenterSection.x + hCenterSection.width) : parent.width / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, hCenterSection.x > 0 ? parent.width - (hCenterSection.x + hCenterSection.width) : parent.width / 3)
             }
 
             CenterSection {
@@ -407,13 +440,13 @@ Item {
                 objectName: "centerSection"
                 overrideAxisLayout: true
                 forceVerticalLayout: false
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                    horizontalCenter: parent.horizontalCenter
-                }
+                anchors.centerIn: topBarContent.fitToWidgets ? null : parent
+                anchors.verticalCenter: parent.verticalCenter
+                x: topBarContent.fitToWidgets ? -(barWindow.lengthPaddingStartPx + topBarContent._leftMargin) : 0
+                width: topBarContent.fitToWidgets ? barWindow.fittedAvailableLength : parent.width
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, hRightSection.x > 0 ? hRightSection.x - (hLeftSection.x + hLeftSection.width) : parent.width / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, hRightSection.x > 0 ? hRightSection.x - (hLeftSection.x + hLeftSection.width) : parent.width / 3)
             }
         }
 
@@ -436,7 +469,7 @@ Item {
                 }
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? vCenterSection.y : parent.height / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, vCenterSection.y > 0 ? vCenterSection.y : parent.height / 3)
             }
 
             CenterSection {
@@ -445,13 +478,13 @@ Item {
                 overrideAxisLayout: true
                 forceVerticalLayout: true
                 width: parent.width
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                    horizontalCenter: parent.horizontalCenter
-                }
+                height: topBarContent.fitToWidgets ? barWindow.fittedAvailableLength : parent.height
+                anchors.centerIn: topBarContent.fitToWidgets ? null : parent
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: topBarContent.fitToWidgets ? -(barWindow.lengthPaddingStartPx + topBarContent._topMargin) : 0
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, vRightSection.y > 0 ? vRightSection.y - (vLeftSection.y + vLeftSection.height) : parent.height / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, vRightSection.y > 0 ? vRightSection.y - (vLeftSection.y + vLeftSection.height) : parent.height / 3)
             }
 
             RightSection {
@@ -469,7 +502,7 @@ Item {
                 }
                 axis: barWindow.axis
                 barContent: topBarContent
-                sectionAvailablePrimarySize: Math.max(1, vCenterSection.y > 0 ? parent.height - (vCenterSection.y + vCenterSection.height) : parent.height / 3)
+                sectionAvailablePrimarySize: topBarContent.fitToWidgets ? topBarContent.fittedAvailableSize : Math.max(1, vCenterSection.y > 0 ? parent.height - (vCenterSection.y + vCenterSection.height) : parent.height / 3)
             }
         }
     }

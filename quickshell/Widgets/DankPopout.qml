@@ -25,7 +25,7 @@ Item {
     property int resizeDuration: animationDuration
     property bool resizeMotion: false
     property bool resizing: false
-    property bool surfaceFillsScreen: false
+    property real surfacePadding: 0
     property real inputMargin: 0
     property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false

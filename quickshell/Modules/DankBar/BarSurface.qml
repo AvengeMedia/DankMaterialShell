@@ -19,7 +19,10 @@ Item {
     readonly property bool isRight: barPos === SettingsData.Position.Right
     readonly property bool farEdge: isBottom || isRight
     readonly property bool edgeAttached: (barConfig?.attachToScreenEdge ?? false) && !frameShapesBar
+    readonly property bool alongWings: !(barWindow.spansEdge ?? true)
     readonly property real wing: gothEnabled ? barWindow._wingR : 0
+    readonly property real alongWing: alongWings ? wing : 0
+    readonly property real crossWing: alongWings ? 0 : wing
     readonly property real rt: {
         if (frameShapesBar)
             return SettingsData.frameRounding;
@@ -89,23 +92,38 @@ Item {
 
     readonly property real attachedRadius: edgeAttached || frameShapesBar ? 0 : rt
     readonly property real wingRootRadius: gothEnabled ? 0 : rt
+    readonly property real attachedCornerRadius: alongWings && gothEnabled ? 0 : attachedRadius
+    readonly property real freeCornerRadius: alongWings ? rt : wingRootRadius
     readonly property var shapeTarget: ({
-            width: Math.max(0, axis.isVertical ? width - wing : width),
-            height: Math.max(0, axis.isVertical ? height : height - wing),
+            width: Math.max(0, axis.isVertical ? width - crossWing : width - alongWing * 2),
+            height: Math.max(0, axis.isVertical ? height - alongWing * 2 : height - crossWing),
             offsetAlong: wing,
-            offsetCross: farEdge ? wing : 0,
-            topLeftRadius: isTop || isLeft ? attachedRadius : wingRootRadius,
-            topRightRadius: isTop || isRight ? attachedRadius : wingRootRadius,
-            bottomLeftRadius: isBottom || isLeft ? attachedRadius : wingRootRadius,
-            bottomRightRadius: isBottom || isRight ? attachedRadius : wingRootRadius
+            offsetCross: farEdge ? crossWing : 0,
+            topLeftRadius: isTop || isLeft ? attachedCornerRadius : freeCornerRadius,
+            topRightRadius: isTop || isRight ? attachedCornerRadius : freeCornerRadius,
+            bottomLeftRadius: isBottom || isLeft ? attachedCornerRadius : freeCornerRadius,
+            bottomRightRadius: isBottom || isRight ? attachedCornerRadius : freeCornerRadius
         })
 
     visible: !frameShapesBar
     anchors.fill: parent
-    anchors.leftMargin: -(gothEnabled && isRight ? barWindow._wingR : 0)
-    anchors.rightMargin: -(gothEnabled && isLeft ? barWindow._wingR : 0)
-    anchors.topMargin: -(gothEnabled && isBottom ? barWindow._wingR : 0)
-    anchors.bottomMargin: -(gothEnabled && isTop ? barWindow._wingR : 0)
+    anchors.leftMargin: -(axis.isVertical ? (isRight ? crossWing : 0) : alongWing)
+    anchors.rightMargin: -(axis.isVertical ? (isLeft ? crossWing : 0) : alongWing)
+    anchors.topMargin: -(axis.isVertical ? alongWing : (isBottom ? crossWing : 0))
+    anchors.bottomMargin: -(axis.isVertical ? alongWing : (isTop ? crossWing : 0))
+
+    function alongWingCorner(leading) {
+        switch (barPos) {
+        case SettingsData.Position.Bottom:
+            return leading ? "topLeft" : "topRight";
+        case SettingsData.Position.Left:
+            return leading ? "topRight" : "bottomRight";
+        case SettingsData.Position.Right:
+            return leading ? "topLeft" : "bottomLeft";
+        default:
+            return leading ? "bottomLeft" : "bottomRight";
+        }
+    }
 
     function applyTarget() {
         if (width <= 0 || height <= 0 || !visible) {
@@ -175,8 +193,8 @@ Item {
     MorphSurface {
         id: body
         motion: motion
-        x: root.axis.isVertical ? Math.max(0, motion.currentOffsetCross) : 0
-        y: root.axis.isVertical ? 0 : Math.max(0, motion.currentOffsetCross)
+        x: Math.max(0, root.axis.isVertical ? motion.currentOffsetCross : (root.alongWings ? motion.currentOffsetAlong : 0))
+        y: Math.max(0, root.axis.isVertical ? (root.alongWings ? motion.currentOffsetAlong : 0) : motion.currentOffsetCross)
         color: root.barWindow._bgColor
     }
 
@@ -185,9 +203,9 @@ Item {
         radius: Math.max(0, motion.currentOffsetAlong)
         color: root.barWindow._bgColor
         visible: root.gothEnabled && radius > 0
-        x: root.isLeft ? body.width : 0
-        y: root.isTop ? body.height : 0
-        corner: root.isTop ? "bottomRight" : root.isBottom ? "topRight" : root.isLeft ? "bottomRight" : "bottomLeft"
+        x: root.alongWings ? (root.axis.isVertical && root.isRight ? root.width - radius : 0) : (root.isLeft ? body.width : 0)
+        y: root.alongWings ? (!root.axis.isVertical && root.isBottom ? root.height - radius : 0) : (root.isTop ? body.height : 0)
+        corner: root.alongWings ? root.alongWingCorner(true) : root.isTop ? "bottomRight" : root.isBottom ? "topRight" : root.isLeft ? "bottomRight" : "bottomLeft"
     }
 
     GothCorner {
@@ -195,9 +213,9 @@ Item {
         radius: Math.max(0, motion.currentOffsetAlong)
         color: root.barWindow._bgColor
         visible: root.gothEnabled && radius > 0
-        x: root.axis.isVertical ? (root.isLeft ? body.width : 0) : root.width - radius
-        y: root.axis.isVertical ? root.height - radius : (root.isTop ? body.height : 0)
-        corner: root.isTop ? "bottomLeft" : root.isBottom ? "topLeft" : root.isLeft ? "topRight" : "topLeft"
+        x: root.axis.isVertical ? (root.alongWings ? (root.isRight ? root.width - radius : 0) : (root.isLeft ? body.width : 0)) : root.width - radius
+        y: root.axis.isVertical ? root.height - radius : (root.alongWings ? (root.isBottom ? root.height - radius : 0) : (root.isTop ? body.height : 0))
+        corner: root.alongWings ? root.alongWingCorner(false) : root.isTop ? "bottomLeft" : root.isBottom ? "topLeft" : root.isLeft ? "topRight" : "topLeft"
     }
 
     Rectangle {

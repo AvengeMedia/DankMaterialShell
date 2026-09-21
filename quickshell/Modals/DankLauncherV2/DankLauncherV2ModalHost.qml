@@ -907,6 +907,7 @@ Item {
             WindowBlur {
                 targetWindow: contentWindow
                 blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
+                surfaceColor: root.backgroundColor
                 readonly property real s: Math.min(1, contentContainer.scaleValue)
                 readonly property bool clipDriven: root._fluidMotionActive && !root.connectedFluidMotion
                 blurX: clipDriven ? (root._ccX + root.fluidBody.x) : root._ccX + root.alignedWidth * (1 - s) * 0.5 + Theme.snap(contentContainer.animX, root.dpr)
@@ -1185,6 +1186,7 @@ Item {
 
             WindowBlur {
                 targetWindow: contentWindow
+                surfaceColor: root.backgroundColor
                 readonly property real s: Math.min(1, modalContainer.publishedScale)
                 readonly property real op: Math.max(0, Math.min(1, (modalContainer.opacity - 0.06) * 2))
                 readonly property real visibleScale: s * op

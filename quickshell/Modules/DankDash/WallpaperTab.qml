@@ -515,6 +515,7 @@ Item {
             browserTitle: I18n.tr("Select Wallpaper Directory", "wallpaper directory file browser title")
             browserType: "wallpaper"
             showHiddenFiles: false
+            revealPath: root.getCurrentWallpaper()
             fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
             parentPopout: root.parentPopout
 

@@ -11,6 +11,7 @@ Item {
 
     required property var targetWindow
     property bool blurEnabled: Theme.connectedSurfaceBlurEnabled
+    property color surfaceColor: "transparent"
     property real blurX: 0
     property real blurY: 0
     property real blurWidth: 0
@@ -23,7 +24,7 @@ Item {
     property real clipWidth: blurWidth
     property real clipHeight: blurHeight
 
-    readonly property bool _active: blurEnabled && BlurService.enabled && !!targetWindow
+    readonly property bool _active: blurEnabled && surfaceColor.a < 1 && BlurService.enabled && !!targetWindow
 
     Region {
         id: blurRegion
@@ -84,7 +85,7 @@ Item {
     onClipHeightChanged: settleKickAction.restart()
 
     function _runSettleKick() {
-        if (!BlurService.compositorSupported || !targetWindow?.visible)
+        if (!_active || !targetWindow?.visible)
             return;
         kick();
         settleRepeatTimer.restart();
@@ -101,7 +102,7 @@ Item {
         interval: 96
         repeat: false
         onTriggered: {
-            if (!root.targetWindow?.visible)
+            if (!root._active || !root.targetWindow?.visible)
                 return;
             root.kick();
         }

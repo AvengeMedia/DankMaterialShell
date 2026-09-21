@@ -98,6 +98,19 @@ test("center placement preserves configured anchors, visible fallbacks and geome
     }
 });
 
+test("center placement yields to side sections without overlapping them", () => {
+    const layout = vm.createContext({});
+    vm.runInContext(read("Modules/DankBar/CenterLayout.js").replace(/^\.pragma.*$/m, ""), layout);
+    const cases = [
+        [{ min: 250 }, [250, 284, 368]],
+        [{ max: 300 }, [122, 156, 240]],
+        [{ min: 100, max: 200 }, [61, 95, 179]],
+        [{ min: 0, max: 600 }, [211, 245, 329]]
+    ];
+    for (const [bounds, positions] of cases)
+        assert.deepEqual(plain(layout.resolve([30, 80, 60], 600, 4, "geometric", bounds)), { positions, totalSize: 178 });
+});
+
 test("widget lookup preserves component aliases and plugin variant fallback", () => {
     const builtin = { clockComponent: {}, mediaComponent: {}, mediaActivityComponent: {}, networkComponent: {}, keyboardLayoutNameComponent: {}, appsDockComponent: {} };
     const plugins = { example: {}, "example:specific": {} };

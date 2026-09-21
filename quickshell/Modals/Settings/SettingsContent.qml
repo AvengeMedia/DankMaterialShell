@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import qs.Common
 import qs.Modules.Settings.Widgets
 import qs.Services
@@ -7,24 +8,15 @@ import qs.Widgets
 FocusScope {
     id: root
 
-    Connections {
-        target: root.parentModal
-        function onShouldBeVisibleChanged() {
-            if (root.parentModal.shouldBeVisible)
-                return;
-            widgetsLoader.loadedOnce = false;
-            windowRulesLoader.loadedOnce = false;
-        }
-    }
-
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
     property string currentPage: ""
     property var parentModal: null
-    property string _loadedPage: ""
-    property int _frontIndex: 0
 
+    readonly property bool sessionVisible: parentModal?.shouldBeVisible ?? false
+    readonly property list<string> pagePath: (parentModal?.pageHistory ?? []).concat([currentPage])
+    readonly property Item currentPageItem: pageStack.currentItem?.item ?? null
     readonly property var pageInfo: SettingsTabs.page(currentPage)
     readonly property bool isPluginPage: SettingsTabs.isPluginPage(currentPage)
     readonly property bool isHubPage: pageInfo?.kind === "hub"
@@ -32,42 +24,27 @@ FocusScope {
     readonly property bool menuHidden: isCompactMode && !(parentModal?.menuVisible ?? true)
     readonly property bool showBack: (parentModal?.canGoBack ?? false) || isPluginPage || menuHidden
     readonly property string pageTitle: (pageInfo?.titleFrom ? SettingsUiState[pageInfo.titleFrom] : "") || (pageInfo?.text ?? "")
-    readonly property real pageContentMaxWidth: (currentPage === "window_rules" ? windowRulesLoader.item?.contentMaxWidth : _front().item?.contentMaxWidth) ?? SettingsMetrics.contentMaxWidth
+    readonly property real pageContentMaxWidth: currentPageItem?.contentMaxWidth ?? SettingsMetrics.contentMaxWidth
     readonly property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 
     focus: true
 
     function _focusPage() {
         Qt.callLater(() => {
-            let loader = _front();
-            switch (currentPage) {
-            case "dankbar_widgets":
-                loader = widgetsLoader;
-                break;
-            case "window_rules":
-                loader = windowRulesLoader;
-                break;
-            }
-            if (!loader.item || !loader.visible)
+            if (!sessionVisible || !currentPageItem || parentModal?.searchFocused)
                 return;
-            loader.item.forceActiveFocus();
+            currentPageItem.forceActiveFocus();
         });
     }
 
-    function _front() {
-        return _frontIndex === 0 ? loaderA : loaderB;
-    }
-
-    function _back() {
-        return _frontIndex === 0 ? loaderB : loaderA;
-    }
-
     function _fileFor(page) {
+        if (pageFiles[page])
+            return pageFiles[page];
         if (SettingsTabs.isPluginPage(page))
             return "PluginSettingsPage.qml";
         if (SettingsTabs.page(page)?.kind === "hub")
             return "SettingsHubPage.qml";
-        return pageFiles[page] ?? "";
+        return "";
     }
 
     function _propertiesFor(page) {
@@ -76,7 +53,7 @@ FocusScope {
                 "parentModal": Qt.binding(() => root.parentModal),
                 "pluginId": SettingsTabs.pluginIdOf(page)
             };
-        if (SettingsTabs.page(page)?.kind === "hub")
+        if (!pageFiles[page] && SettingsTabs.page(page)?.kind === "hub")
             return {
                 "parentModal": Qt.binding(() => root.parentModal),
                 "hubId": page
@@ -89,144 +66,78 @@ FocusScope {
         return properties;
     }
 
-    function _direction(from, to) {
-        if (!from || !to)
-            return "switch";
-        if (SettingsTabs.parentOf(to) === from)
-            return "forward";
-        if (SettingsTabs.parentOf(from) === to)
-            return "back";
-        return "switch";
+    function _syncPages() {
+        if (!sessionVisible) {
+            pageStack.clear(StackView.Immediate);
+            return;
+        }
+        if (!currentPage)
+            return;
+        let shared = 0;
+        while (shared < Math.min(pageStack.depth, pagePath.length) && pageStack.get(shared).page === pagePath[shared])
+            shared++;
+        if (shared === pagePath.length) {
+            if (shared < pageStack.depth)
+                pageStack.pop(pageStack.get(shared - 1), animationsEnabled ? StackView.PopTransition : StackView.Immediate);
+            return;
+        }
+        const drillDown = animationsEnabled && shared > 0 && shared === pageStack.depth && shared === pagePath.length - 1;
+        let index = shared;
+        if (index < pageStack.depth)
+            pageStack.replace(pageStack.get(index), pageComponent, {
+                page: pagePath[index++]
+            }, StackView.Immediate);
+        for (; index < pagePath.length; index++)
+            pageStack.push(pageComponent, {
+                page: pagePath[index]
+            }, drillDown ? StackView.PushTransition : StackView.Immediate);
     }
 
-    function _showPage(page) {
-        if (page === _loadedPage)
-            return;
-        const outgoing = _front();
-        const incoming = _back();
-        _loadedPage = page;
-        incoming.stopMotion();
-        outgoing.stopMotion();
-        incoming.source = "";
-        incoming.page = page;
-        incoming.direction = _direction(outgoing.page, page);
-        _frontIndex = 1 - _frontIndex;
-        if (keepAlivePages[page]) {
-            outgoing.source = "";
-            return;
-        }
-        const file = _fileFor(page);
-        if (!file)
-            return;
-        incoming.setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), _propertiesFor(page));
-    }
+    onPagePathChanged: Qt.callLater(_syncPages)
+    onSessionVisibleChanged: Qt.callLater(_syncPages)
 
-    function _presentPage(incoming) {
-        if (_front() !== incoming)
-            return;
-        const outgoing = _back();
-        _focusPage();
-        if (!animationsEnabled || outgoing.source.toString() === "") {
-            incoming.z = 1;
-            outgoing.z = 0;
-            incoming.snap(0, 1);
-            outgoing.source = "";
-            return;
-        }
-        const offscreen = I18n.isRtl ? -width : width;
-        switch (incoming.direction) {
-        case "forward":
-            incoming.z = 1;
-            outgoing.z = 0;
-            incoming.slide(offscreen, 0, 1, 1);
-            outgoing.fade(1, 1);
-            break;
-        case "back":
-            incoming.z = 0;
-            outgoing.z = 1;
-            incoming.snap(0, 1);
-            outgoing.slide(0, offscreen, 1, 1);
-            break;
-        default:
-            incoming.z = 1;
-            outgoing.z = 0;
-            incoming.slide(0, 0, 0, 1);
-            outgoing.fade(1, 0);
-            break;
-        }
-    }
+    component Slide: Transition {
+        id: slide
 
-    onCurrentPageChanged: _showPage(currentPage)
-    Component.onCompleted: _showPage(currentPage)
-
-    component PageHost: Loader {
-        id: host
-
-        property string page: ""
-        property string direction: "switch"
-
-        function stopMotion() {
-            xAnim.stop();
-            fadeAnim.stop();
-            if (root._front() !== host)
-                source = "";
-        }
-
-        function unloadIfIdle() {
-            if (xAnim.running || fadeAnim.running || root._front() === host)
-                return;
-            source = "";
-        }
-
-        function snap(toX, toOpacity) {
-            x = toX;
-            opacity = toOpacity;
-        }
-
-        function slide(fromX, toX, fromOpacity, toOpacity) {
-            x = fromX;
-            opacity = fromOpacity;
-            xAnim.from = fromX;
-            xAnim.to = toX;
-            fadeAnim.from = fromOpacity;
-            fadeAnim.to = toOpacity;
-            xAnim.restart();
-            fadeAnim.restart();
-        }
-
-        function fade(fromOpacity, toOpacity) {
-            opacity = fromOpacity;
-            fadeAnim.from = fromOpacity;
-            fadeAnim.to = toOpacity;
-            fadeAnim.restart();
-        }
-
-        width: parent.width
-        height: parent.height
-        visible: status === Loader.Ready
-        enabled: root._front() === host && page === root.currentPage
-        focus: visible && enabled
-
-        onLoaded: root._presentPage(host)
+        property real fromX: 0
+        property real toX: 0
 
         NumberAnimation {
-            id: xAnim
-            target: host
             property: "x"
+            from: slide.fromX
+            to: slide.toX
             duration: SettingsMetrics.transitionDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.standard
-            onFinished: host.unloadIfIdle()
         }
+    }
 
-        NumberAnimation {
-            id: fadeAnim
-            target: host
-            property: "opacity"
-            duration: SettingsMetrics.fadeDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-            onFinished: host.unloadIfIdle()
+    Component {
+        id: pageComponent
+
+        Loader {
+            id: host
+
+            required property string page
+            readonly property bool pageActive: root.sessionVisible && pageStack.currentItem === host
+
+            enabled: pageActive
+            asynchronous: page === "dankbar_widgets" || page === "window_rules"
+
+            Component.onCompleted: {
+                const file = root._fileFor(page);
+                if (file)
+                    setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), root._propertiesFor(page));
+            }
+            onLoaded: {
+                if (item.pageActive !== undefined)
+                    item.pageActive = Qt.binding(() => host.pageActive);
+                root._focusPage();
+            }
+            onPageActiveChanged: {
+                if (pageActive)
+                    root._focusPage();
+            }
         }
     }
 
@@ -237,6 +148,8 @@ FocusScope {
             "time_weather": "TimeWeatherTab.qml",
             "weather": "WeatherSettingsTab.qml",
             "keybinds": "KeybindsTab.qml",
+            "dankbar_widgets": "WidgetsTab.qml",
+            "window_rules": "WindowRulesTab.qml",
             "dankbar_settings": "DankBarTab.qml",
             "dankbar_appearance": "DankBarAppearanceTab.qml",
             "bar_widget": "BarWidgetTab.qml",
@@ -287,12 +200,7 @@ FocusScope {
             "plugins_manage": "PluginsManageTab.qml"
         })
 
-    readonly property var pagesWithParentModal: ["display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "dank_island", "autostart", "compositor_layout"]
-
-    readonly property var keepAlivePages: ({
-            "dankbar_widgets": true,
-            "window_rules": true
-        })
+    readonly property var pagesWithParentModal: ["dankbar_widgets", "window_rules", "display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "dank_island", "autostart", "compositor_layout"]
 
     Column {
         anchors.fill: parent
@@ -343,103 +251,30 @@ FocusScope {
             }
         }
 
-        Item {
+        StackView {
             id: pageStack
             width: parent.width
             height: parent.height - pageHeader.height
             clip: true
 
-            PageHost {
-                id: loaderA
+            readonly property real slideOffscreen: I18n.isRtl ? -width : width
+
+            pushEnter: Slide {
+                fromX: pageStack.slideOffscreen
             }
-
-            PageHost {
-                id: loaderB
+            pushExit: Slide {
+                toX: -pageStack.slideOffscreen
             }
-
-            DankSpinner {
-                anchors.centerIn: parent
-                visible: root._front().status === Loader.Loading
+            popEnter: Slide {
+                fromX: -pageStack.slideOffscreen
             }
-
-            Loader {
-                id: widgetsLoader
-
-                property bool loadedOnce: false
-
-                anchors.fill: parent
-                active: (root.currentPage === "dankbar_widgets" || loadedOnce) && root.parentModal?.shouldBeVisible === true
-                opacity: root.currentPage === "dankbar_widgets" && status === Loader.Ready ? 1 : 0
-                visible: opacity > 0
-                focus: visible
-                asynchronous: true
-
-                Behavior on opacity {
-                    enabled: root.animationsEnabled
-                    NumberAnimation {
-                        duration: SettingsMetrics.fadeDuration
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-                    }
-                }
-
-                source: active ? Qt.resolvedUrl("../../Modules/Settings/WidgetsTab.qml") : ""
-
-                onLoaded: {
-                    item.parentModal = Qt.binding(() => root.parentModal);
-                    loadedOnce = true;
-                    if (visible && item)
-                        Qt.callLater(() => item.forceActiveFocus());
-                }
-                onVisibleChanged: {
-                    if (visible && item)
-                        Qt.callLater(() => item.forceActiveFocus());
-                }
+            popExit: Slide {
+                toX: pageStack.slideOffscreen
             }
 
             DankSpinner {
                 anchors.centerIn: parent
-                visible: root.currentPage === "dankbar_widgets" && widgetsLoader.status === Loader.Loading
-            }
-
-            Loader {
-                id: windowRulesLoader
-
-                property bool loadedOnce: false
-
-                anchors.fill: parent
-                active: (root.currentPage === "window_rules" || loadedOnce) && root.parentModal?.shouldBeVisible === true
-                opacity: root.currentPage === "window_rules" && status === Loader.Ready ? 1 : 0
-                visible: opacity > 0
-                focus: visible
-                asynchronous: true
-
-                Behavior on opacity {
-                    enabled: root.animationsEnabled
-                    NumberAnimation {
-                        duration: SettingsMetrics.fadeDuration
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-                    }
-                }
-
-                source: active ? Qt.resolvedUrl("../../Modules/Settings/WindowRulesTab.qml") : ""
-
-                onLoaded: {
-                    item.pageActive = Qt.binding(() => root.currentPage === "window_rules");
-                    loadedOnce = true;
-                    if (visible && item)
-                        Qt.callLater(() => item.forceActiveFocus());
-                }
-                onVisibleChanged: {
-                    if (visible && item)
-                        Qt.callLater(() => item.forceActiveFocus());
-                }
-            }
-
-            DankSpinner {
-                anchors.centerIn: parent
-                visible: root.currentPage === "window_rules" && windowRulesLoader.status === Loader.Loading
+                visible: pageStack.currentItem?.status === Loader.Loading
             }
         }
     }

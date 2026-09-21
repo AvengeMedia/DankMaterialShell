@@ -5,7 +5,6 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
-import "../../Common/QmlUtils.js" as QmlUtils
 
 Column {
     id: root
@@ -73,16 +72,9 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.groupedListGap
 
-    Component.onCompleted: {
-        if (!root.parent || !root.settingKey)
-            return;
-        const flickable = QmlUtils.findParentFlickable(root.parent);
-        if (flickable)
-            SettingsSearchService.registerCard(root.settingKey, root, flickable);
-    }
-    Component.onDestruction: {
-        if (settingKey)
-            SettingsSearchService.unregisterCard(settingKey);
+    SettingsSearchRegistration {
+        target: root
+        settingKey: root.settingKey
     }
 
     SettingsRow {

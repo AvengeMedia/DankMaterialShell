@@ -27,6 +27,7 @@ Singleton {
     property var registries: []
     property var availableThemes: []
     property var installedThemes: []
+    property bool installedThemesLoaded: false
     property bool isConnected: false
     readonly property bool isConnecting: requestSocket.connected && !requestSocket.linkUp
     property bool subscribeConnected: false
@@ -672,6 +673,7 @@ Singleton {
         sendRequest("themes.listInstalled", null, response => {
             if (response.result) {
                 installedThemes = response.result;
+                installedThemesLoaded = true;
                 installedThemesReceived(response.result);
             }
             if (callback) {

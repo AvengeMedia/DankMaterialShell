@@ -107,8 +107,10 @@ Singleton {
         connected: root.available
 
         onConnectionStateChanged: {
-            if (connected)
+            if (linkUp) {
                 send("watch all-monitors");
+                root.refreshLayouts();
+            }
         }
 
         parser: SplitParser {
@@ -122,7 +124,7 @@ Singleton {
         connected: root.available
 
         onConnectionStateChanged: {
-            if (connected)
+            if (linkUp)
                 send("watch all-clients");
         }
 
@@ -161,6 +163,10 @@ Singleton {
     property bool _dispatchConnectionUsed: false
 
     function dispatch(command, callback) {
+        request("dispatch " + command, callback);
+    }
+
+    function request(command, callback) {
         if (!root.available)
             return;
         _dispatchQueue.push({
@@ -175,7 +181,7 @@ Singleton {
             return;
         _dispatchConnectionUsed = true;
         _dispatchInFlight = _dispatchQueue.shift();
-        dispatchSocket.send("dispatch " + _dispatchInFlight.command);
+        dispatchSocket.send(_dispatchInFlight.command);
     }
 
     function _onDispatchReply(line) {
@@ -472,6 +478,7 @@ Singleton {
             }
             if (shouldShowToast)
                 ToastService.showInfo(I18n.tr("mango: config reloaded"), "", "", "mango-config");
+            root.refreshLayouts();
         });
     }
 
@@ -479,26 +486,48 @@ Singleton {
         dispatch("quit");
     }
 
-    // mango tag dispatches act on the focused monitor; tagIndex is 0-based
-    // (dwl model), mango `view`/`toggleview` take a 1-based tag number.
+    function dispatchOnOutput(outputName, command) {
+        if (!outputName || !getOutputState(outputName))
+            return;
+        // Always queue the focus: IPC snapshots can lag behind earlier commands.
+        dispatch("focusmon," + outputName);
+        dispatch(command);
+    }
+
+    // The dwl model is 0-based; Mango view/toggleview take a 1-based tag number.
     function switchToTag(outputName, tagIndex) {
-        dispatch("view," + (tagIndex + 1));
+        dispatchOnOutput(outputName, "view," + (tagIndex + 1));
     }
 
     function toggleTag(outputName, tagIndex) {
-        dispatch("toggleview," + (tagIndex + 1));
+        dispatchOnOutput(outputName, "toggleview," + (tagIndex + 1));
     }
 
-    // mango's tiling layouts are a fixed compiled-in set the IPC doesn't expose,
-    // so mirror it here in mango's layouts[] order (layout_index aligns). The
-    // parallel name list exists because `setlayout` dispatches by name, not index.
-    readonly property var layouts: ["T", "S", "G", "M", "K", "CT", "RT", "VS", "VT", "VG", "VK", "DW", "F", "VF"]
-    readonly property var _layoutNames: ["tile", "scroller", "grid", "monocle", "deck", "center_tile", "right_tile", "vertical_scroller", "vertical_tile", "vertical_grid", "vertical_deck", "dwindle", "fair", "vertical_fair"]
+    // Mango before 0.16.1 has no `get layouts`; retain its compiled-in order.
+    property var _availableLayouts: null
+    readonly property var layouts: _availableLayouts ? _availableLayouts.map(layout => layout.symbol) : ["T", "S", "G", "M", "K", "CT", "RT", "VS", "VT", "VG", "VK", "DW", "F", "VF"]
+    readonly property var _layoutNames: _availableLayouts ? _availableLayouts.map(layout => layout.name) : ["tile", "scroller", "grid", "monocle", "deck", "center_tile", "right_tile", "vertical_scroller", "vertical_tile", "vertical_grid", "vertical_deck", "dwindle", "fair", "vertical_fair"]
+
+    function refreshLayouts() {
+        request("get layouts", line => {
+            let data;
+            try {
+                data = JSON.parse(line);
+            } catch (e) {
+                return;
+            }
+            if (!Array.isArray(data?.layouts) || data.layouts.length === 0)
+                return;
+            if (!data.layouts.every(layout => typeof layout?.name === "string" && layout.name.length > 0 && typeof layout.symbol === "string"))
+                return;
+            root._availableLayouts = data.layouts;
+        });
+    }
 
     function setLayout(outputName, index) {
         const name = _layoutNames[index];
         if (name)
-            dispatch("setlayout," + name);
+            dispatchOnOutput(outputName, "setlayout," + name);
     }
 
     function cycleKeyboardLayout() {

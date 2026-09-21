@@ -8,7 +8,6 @@ PluginComponent {
 
     property var popoutService: null
     readonly property int count: pluginData.count ?? 0
-    readonly property real textSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
 
     pillClickAction: (x, y, width, section, screen) => popoutService?.toggleDankDash("plugin_" + pluginId, x, y, width, section, screen)
     pillRightClickAction: () => pluginService?.savePluginData(pluginId, "count", count + 1)

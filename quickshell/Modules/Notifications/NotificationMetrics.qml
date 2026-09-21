@@ -5,19 +5,20 @@ import Quickshell
 import qs.Common
 
 Singleton {
-    readonly property real cardPadding: SettingsData.notificationCompactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
-    readonly property real appIconSize: Theme.avatarSize
+    readonly property bool compact: SettingsData.notificationCompactMode
+    readonly property real cardPadding: compact ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
+    readonly property real appIconSize: compact ? Theme.buttonHeightXXS : Theme.avatarSize
     readonly property real appIconRadius: Theme.cornerRadiusM
-    readonly property real iconSpacing: Theme.spacingM
-    readonly property real thumbnailSize: Theme.buttonHeightM
+    readonly property real iconSpacing: compact ? Theme.spacingS : Theme.spacingM
+    readonly property real thumbnailSize: compact ? Theme.buttonHeightXS : Theme.buttonHeightM
     readonly property real imageMaxHeight: Theme.listItemHeight * 4
     readonly property real imageDecodeSize: popupWidth * 2
-    readonly property real actionHeight: Theme.buttonHeightS
+    readonly property real actionHeight: compact ? Theme.buttonHeightXS : Theme.buttonHeightS
     readonly property real actionPadding: Theme.spacingS
-    readonly property real controlSize: Theme.buttonHeightXS
+    readonly property real controlSize: compact ? Theme.buttonHeightXXS : Theme.buttonHeightXS
     readonly property real railHeight: Theme.spacingXS
     readonly property real railStopSize: railHeight
-    readonly property real contentSpacing: Theme.notificationContentSpacing
+    readonly property real contentSpacing: compact ? Theme.spacingXXS : Theme.notificationContentSpacing
     readonly property real popupRadius: Theme.windowRadius
     readonly property real menuRadius: Theme.cornerRadiusM
     readonly property real popupWidth: 400
@@ -36,7 +37,7 @@ Singleton {
     readonly property real swipeFadeStart: 0.75
     readonly property real adjacentSwipeInfluence: 0.1
     readonly property int expandedLimit: 10
-    readonly property int collapsedLines: SettingsData.notificationCompactMode ? 1 : 2
+    readonly property int collapsedLines: compact ? 1 : 2
     readonly property real summarySize: SettingsData.notificationSummaryFontSize || Theme.fontSizeMedium
     readonly property real bodySize: SettingsData.notificationBodyFontSize || Theme.fontSizeSmall
     readonly property real lineHeight: 1.2

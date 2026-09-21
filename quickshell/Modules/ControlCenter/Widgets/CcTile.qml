@@ -151,8 +151,6 @@ Item {
         anchors.fill: parent
         radius: root.bodyRadius
         color: root.bodyColor
-        border.width: root.bodyActive ? 0 : Theme.layerOutlineWidth
-        border.color: Theme.outlineMedium
 
         Behavior on color {
             enabled: CcMetrics.animationsEnabled && !SettingsData.reduceMotion
@@ -223,8 +221,6 @@ Item {
                 height: width
                 radius: root.hasIconBox ? root.iconBoxRadius : 0
                 color: root.hasIconBox ? root.iconBoxColor : "transparent"
-                border.width: root.hasIconBox && !root.active ? Theme.layerOutlineWidth : 0
-                border.color: Theme.outlineMedium
                 activeFocusOnTab: root.showExpand && root.toggle && root.acceptsInput
                 Accessible.role: root.toggle ? Accessible.CheckBox : Accessible.Button
                 Accessible.name: root.title

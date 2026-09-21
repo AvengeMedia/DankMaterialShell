@@ -480,6 +480,7 @@ PanelWindow {
     WindowBlur {
         targetWindow: root
         blurEnabled: root.presented
+        surfaceColor: toast.color
         blurX: toast.x
         blurY: toast.y
         blurWidth: root.presented ? toast.width : 0

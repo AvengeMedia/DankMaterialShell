@@ -7,6 +7,8 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var barLengthModes: ["full", "percent", "fit"]
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -286,9 +288,43 @@ Item {
                     })
             }
 
+            SettingsButtonGroupRow {
+                settingKey: "barLengthMode"
+                tags: ["bar", "width", "height", "length", "fit", "full", "custom", "percent", "compact", "widgets", "hug", "shrink"]
+                text: bar.selectedBarIsVertical ? I18n.tr("Height") : I18n.tr("Width")
+                visible: !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop
+                resetStore: bar
+                resetKeys: ["barLengthMode", "barLengthPercent"]
+                model: [I18n.tr("Full", "bar length option, the bar spans the whole edge"), I18n.tr("Custom", "bar length option, the bar spans a percentage of the edge"), I18n.tr("Fit", "bar length option, the bar spans only its widgets")]
+                currentIndex: Math.max(0, root.barLengthModes.indexOf(bar.selectedBarConfig?.barLengthMode ?? "full"))
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.updateBarConfig(bar.selectedBarId, {
+                        barLengthMode: root.barLengthModes[index] ?? "full"
+                    });
+                }
+            }
+
+            SettingsSliderRow {
+                settingKey: "barLengthPercent"
+                tags: ["bar", "width", "height", "length", "percent", "custom"]
+                visible: !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop && (bar.selectedBarConfig?.barLengthMode ?? "full") === "percent"
+                text: I18n.tr("Percentage")
+                resetStore: bar
+                resetKeys: ["barLengthPercent"]
+                unit: "%"
+                minimum: 10
+                maximum: 100
+                value: bar.selectedBarConfig?.barLengthPercent ?? 80
+                onSliderDragFinished: finalValue => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        barLengthPercent: finalValue
+                    })
+            }
+
             SettingsSliderRow {
                 settingKey: "barLengthPadding"
-                visible: !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop
+                visible: !bar.selectedBarFrameStyled && !bar.islandOwnsSelectedBarTop && (bar.selectedBarConfig?.barLengthMode ?? "full") === "full"
                 text: I18n.tr("Length padding")
                 tags: ["bar", "length", "padding", "size", "shorter", "ends"]
                 resetStore: bar

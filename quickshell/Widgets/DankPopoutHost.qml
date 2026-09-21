@@ -30,9 +30,7 @@ Item {
     property int resizeDuration: popoutHandle.resizeDuration
     property bool resizeMotion: popoutHandle.resizeMotion
     property bool resizing: popoutHandle.resizing
-    property bool surfaceFillsScreen: popoutHandle.surfaceFillsScreen
     property real inputMargin: popoutHandle.inputMargin
-    readonly property bool _screenSurface: connected || surfaceFillsScreen
     property real triggerX: popoutHandle.triggerX
     property real triggerY: popoutHandle.triggerY
     property real triggerWidth: popoutHandle.triggerWidth
@@ -386,10 +384,10 @@ Item {
         _retargetBody();
         _syncAlignedGeometry();
     }
-    on_ScreenSurfaceChanged: {
-        if (!_screenSurface)
+    onConnectedChanged: {
+        if (!connected)
             _setAnimatedSurfaceEnvelope();
-        _surfaceSwitching = contentWindow.visible && Math.abs(contentWindow.width - (_screenSurface ? screenWidth : _surfaceW)) > 1;
+        _surfaceSwitching = contentWindow.visible && Math.abs(contentWindow.width - (connected ? screenWidth : _surfaceW)) > 1;
     }
     property bool _surfaceSwitching: false
     readonly property real _contentWindowWidth: contentWindow.width
@@ -762,13 +760,13 @@ Item {
     readonly property real shadowFallbackOffset: Theme.spacingXS
     readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
     readonly property real shadowMotionPadding: directionalRevealActive ? 0 : Math.max(0, animationOffset)
-    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
+    readonly property real shadowBuffer: Theme.snap(Math.max(popoutHandle.surfacePadding, shadowRenderPadding + shadowMotionPadding), dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property real surfaceBodyWidth: Math.max(alignedWidth, Theme.px(Math.min(minimumSurfaceWidth, screenWidth), dpr))
     readonly property real surfaceBodyX: Theme.snap(_standaloneAlignedXFor(surfaceBodyWidth), dpr)
-    readonly property real _surfaceOriginX: _screenSurface ? 0 : _surfaceBodyX - shadowBuffer
-    readonly property real _surfaceOriginY: _screenSurface || fullHeightSurface ? 0 : _surfaceBodyY - shadowBuffer
+    readonly property real _surfaceOriginX: connected ? 0 : _surfaceBodyX - shadowBuffer
+    readonly property real _surfaceOriginY: connected || fullHeightSurface ? 0 : _surfaceBodyY - shadowBuffer
     readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
 
     readonly property real renderedAlignedX: alignedXFor(renderedAlignedWidth)
@@ -1390,8 +1388,8 @@ Item {
             dismissEnabled: root.hoverDismissEnabled
             dismissSuspended: root.hoverDismissSuspended
             surfaceVisible: root.shouldBeVisible
-            globalOffsetX: root._screenSurface ? 0 : root._surfaceMarginLeft
-            globalOffsetY: root._screenSurface || root.fullHeightSurface ? 0 : root._surfaceMarginTop
+            globalOffsetX: root.connected ? 0 : root._surfaceMarginLeft
+            globalOffsetY: root.connected || root.fullHeightSurface ? 0 : root._surfaceMarginTop
             onDismissRequested: root.closeFromHoverDismiss()
         }
 
@@ -1403,17 +1401,17 @@ Item {
         anchors {
             left: true
             top: true
-            right: root._screenSurface
-            bottom: root._screenSurface || root.fullHeightSurface
+            right: root.connected
+            bottom: root.connected || root.fullHeightSurface
         }
 
         WlrLayershell.margins {
-            left: root._screenSurface ? 0 : root._surfaceMarginLeft
-            top: root._screenSurface || root.fullHeightSurface ? 0 : root._surfaceMarginTop
+            left: root.connected ? 0 : root._surfaceMarginLeft
+            top: root.connected || root.fullHeightSurface ? 0 : root._surfaceMarginTop
         }
 
-        implicitWidth: root._screenSurface ? 0 : root._surfaceW
-        implicitHeight: root._screenSurface || root.fullHeightSurface ? 0 : root._surfaceH
+        implicitWidth: root.connected ? 0 : root._surfaceW
+        implicitHeight: root.connected || root.fullHeightSurface ? 0 : root._surfaceH
 
         mask: contentInputMask
 
@@ -1669,6 +1667,7 @@ Item {
                 id: popoutBlur
                 targetWindow: contentWindow
                 blurEnabled: Theme.connectedSurfaceBlurEnabled && !root.frameOwnsConnectedChrome
+                surfaceColor: chrome.surfaceColor
 
                 readonly property real s: Math.min(1, contentContainer.scaleValue)
                 readonly property bool trackBlurFromBarEdge: root.usesConnectedSurfaceChrome
@@ -1911,6 +1910,7 @@ Item {
             WindowBlur {
                 id: popoutBlur
                 targetWindow: contentWindow
+                surfaceColor: Theme.readableSurface
                 readonly property real s: Math.min(1, contentContainer.scaleValue)
                 readonly property real op: Math.max(0, Math.min(1, (morph.value - 0.08) * 1.6))
                 readonly property real visibleScale: s * op

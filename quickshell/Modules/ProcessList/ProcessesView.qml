@@ -5,8 +5,11 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-Item {
+DankCard {
     id: root
+
+    pad: Theme.spacingS
+    restRadius: Theme.cornerRadiusL
 
     property string searchText: ""
     property string expandedPid: ""
@@ -16,10 +19,6 @@ Item {
     property bool active: visible
     readonly property alias listView: processListView
     readonly property alias sortChips: sortChips
-    onActiveFocusChanged: {
-        if (activeFocus)
-            processListView.forceActiveFocus();
-    }
     onSelectedIndexChanged: {
         if (keyboardNavigationActive)
             selectionScroll.schedule();
@@ -278,7 +277,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Theme.groupedListGap
+        spacing: Theme.spacingS
 
         RowLayout {
             readonly property bool ascending: DgopService.sortAscending !== ["name", "pid"].includes(DgopService.currentSort)
@@ -286,14 +285,28 @@ Item {
             Layout.preferredHeight: ProcessListMetrics.headerHeight
             spacing: Theme.spacingS
 
-            DankFilterChips {
+            DankButtonGroup {
                 id: sortChips
                 Layout.fillWidth: true
                 readonly property var sortKeys: ["name", "cpu", "memory", "pid"]
                 model: [I18n.tr("Name"), I18n.tr("CPU"), I18n.tr("Memory"), I18n.tr("PID")]
                 currentIndex: sortKeys.indexOf(DgopService.currentSort)
-                chipPadding: Theme.spacingM
-                onSelectionChanged: index => DgopService.toggleSort(sortKeys[index])
+                size: "small"
+                fillWidth: true
+                selectedColor: Theme.secondaryContainer
+                selectedContentColor: Theme.onSecondaryContainer
+                unselectedColor: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
+                unselectedContentColor: Theme.onSurfaceVariant
+                KeyNavigation.tab: sortDirection
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        requestFocus(false);
+                }
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    DgopService.toggleSort(sortKeys[index]);
+                }
             }
 
             DankActionButton {
@@ -313,6 +326,7 @@ Item {
             reuseItems: true
             highlightSelection: root.keyboardNavigationActive && root.selectedIndex >= 0
             activeFocusOnTab: true
+            focus: true
             Keys.onPressed: event => root.handleKey(event)
             onActiveFocusChanged: {
                 if (activeFocus && root.selectedIndex < 0)

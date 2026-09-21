@@ -17,7 +17,7 @@ Singleton {
 
     // These settings predate non-blurred surface borders, so keep their keys for compatibility.
     readonly property color borderColor: {
-        if (!(SettingsData.blurBorderEnabled ?? true))
+        if (!(SettingsData.blurBorderEnabled ?? false))
             return "transparent";
         const opacity = SettingsData.blurBorderOpacity ?? 0.35;
         switch (SettingsData.blurBorderColor ?? "outline") {
@@ -33,7 +33,7 @@ Singleton {
             return Theme.withAlpha(Theme.outline, opacity);
         }
     }
-    readonly property int borderWidth: (SettingsData.blurBorderEnabled ?? true) ? 1 : 0
+    readonly property int borderWidth: (SettingsData.blurBorderEnabled ?? false) ? 1 : 0
 
     function hoverColor(baseColor, hoverAlpha) {
         if (!enabled)

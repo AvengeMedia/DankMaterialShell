@@ -12,7 +12,6 @@ Singleton {
     readonly property real memoryColumnWidth: Theme.fontSizeSmall * 8
     readonly property real pidColumnWidth: Theme.fontSizeSmall * 6
     readonly property real actionColumnWidth: Theme.iconButtonSize
-    readonly property real graphHeight: Theme.listItemHeight + Theme.spacingL
     readonly property real headerHeight: Theme.buttonHeightS
     readonly property real windowHeight: SettingsMetrics.windowHeight
     readonly property real menuWidth: 240

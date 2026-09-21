@@ -357,6 +357,9 @@ var LOCAL_SPEC = {
     blurEnabled: {
         def: false
     },
+    blurBorderSeeded: {
+        def: false
+    },
     blurForegroundLayers: {
         def: true
     },
@@ -1291,6 +1294,8 @@ var LOCAL_SPEC = {
                 innerPadding: 4,
                 barInsetPadding: -1,
                 barLengthPadding: 0,
+                barLengthMode: "full",
+                barLengthPercent: 80,
                 bottomGap: 0,
                 attachToScreenEdge: false,
                 followInterfaceStyle: true,

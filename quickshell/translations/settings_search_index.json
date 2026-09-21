@@ -106,6 +106,34 @@
     "icon": "palette"
   },
   {
+    "section": "wallpaper",
+    "label": "Appearance",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "dark",
+      "desktop",
+      "hue",
+      "image",
+      "light",
+      "mode",
+      "palette",
+      "picture",
+      "theme",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "schedule"
+  },
+  {
     "section": "_hub_applications",
     "label": "Applications",
     "tabIndex": -1,
@@ -414,8 +442,7 @@
       "style",
       "surface"
     ],
-    "page": "theme_surfaces",
-    "icon": "border_style"
+    "page": "theme_surfaces"
   },
   {
     "section": "blurBorderColor",
@@ -2107,6 +2134,37 @@
     "icon": "schedule"
   },
   {
+    "section": "themeNav",
+    "label": "Theme & colors",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "appearance",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "custom",
+      "desktop",
+      "dynamic",
+      "hue",
+      "image",
+      "look",
+      "matugen",
+      "palette",
+      "picture",
+      "registry",
+      "style",
+      "theme",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "format_paint"
+  },
+  {
     "section": "focusRingWidth",
     "label": "Thickness",
     "tabIndex": -1,
@@ -2243,7 +2301,7 @@
     "page": "personalization"
   },
   {
-    "section": "wallpaper",
+    "section": "wallpaperOptions",
     "label": "Wallpaper",
     "tabIndex": -1,
     "category": "Wallpaper & colors",
@@ -2253,21 +2311,21 @@
       "colors",
       "colour",
       "colours",
-      "dark",
+      "cycling",
       "desktop",
       "display",
+      "fill",
       "hue",
       "image",
-      "light",
-      "mode",
       "monitor",
       "palette",
       "picture",
       "tint",
+      "transition",
       "wallpaper"
     ],
     "page": "personalization",
-    "icon": "schedule"
+    "icon": "lock"
   },
   {
     "section": "windowRadius",
@@ -3821,6 +3879,32 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "barLengthMode",
+    "label": "Height",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "compact",
+      "custom",
+      "fit",
+      "full",
+      "height",
+      "hug",
+      "length",
+      "panel",
+      "percent",
+      "shrink",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "widgets",
+      "width"
+    ],
+    "parentLabel": "Bar"
+  },
+  {
     "section": "islandHighContrast",
     "label": "High contrast",
     "tabIndex": 6,
@@ -3955,6 +4039,27 @@
       "surface",
       "taskbar",
       "topbar"
+    ],
+    "parentLabel": "Bar"
+  },
+  {
+    "section": "barLengthPercent",
+    "label": "Percentage",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "custom",
+      "height",
+      "length",
+      "panel",
+      "percent",
+      "percentage",
+      "statusbar",
+      "taskbar",
+      "topbar",
+      "width"
     ],
     "parentLabel": "Bar"
   },
@@ -8037,6 +8142,14 @@
     "optionFile": "MusicOptions.qml"
   },
   {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:4",
+    "label": "Add",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
+  },
+  {
     "section": "barWidgetOption:WorkspaceSwitcherOptions.qml:10",
     "label": "Advanced",
     "tabIndex": 22,
@@ -8409,6 +8522,14 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:3",
+    "label": "Label overrides",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
+  },
+  {
     "section": "barWidgetOption:AppsDockOptions.qml:9",
     "label": "Launcher button",
     "tabIndex": 22,
@@ -8487,6 +8608,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "WorkspaceSwitcherOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:KeyboardLayoutOptions.qml:5",
+    "label": "No label overrides",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
     "section": "barWidgetOption:BatteryOptions.qml:2",

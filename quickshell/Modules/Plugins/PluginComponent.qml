@@ -83,6 +83,7 @@ Item {
 
     readonly property int iconSize: Theme.barIconSize(barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
     readonly property int iconSizeLarge: Theme.barIconSize(barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+    readonly property int textSize: Theme.barTextSize(barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
 
     Component.onCompleted: {
         loadPluginData();

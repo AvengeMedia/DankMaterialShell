@@ -33,8 +33,8 @@ DankOSD {
         resetHideTimer();
     }
 
-    osdWidth: isVerticalLayout ? Theme.osdHeight : Math.min(Theme.sliderHandleHeight * 6 + osdValueReserve, screenWidth - Theme.spacingM * 2)
-    osdHeight: isVerticalLayout ? Math.min(Theme.sliderHandleHeight * 8, screenHeight - Theme.spacingM * 2) : Theme.buttonHeightXS + Theme.spacingS * 2
+    osdWidth: isVerticalLayout ? Theme.osdHeight : Math.min(Theme.osdLevelWidth + osdValueReserve, screenWidth - Theme.spacingM * 2)
+    osdHeight: isVerticalLayout ? Math.min(Theme.osdLevelVerticalHeight, screenHeight - Theme.spacingM * 2) : Theme.buttonHeightS + Theme.spacingS * 2
     autoHideInterval: 3000
     enableMouseInteraction: true
 

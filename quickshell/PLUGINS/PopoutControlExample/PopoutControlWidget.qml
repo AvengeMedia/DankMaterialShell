@@ -57,14 +57,14 @@ PluginComponent {
             DankIcon {
                 name: "widgets"
                 color: Theme.primary
-                font.pixelSize: Theme.iconSize - 6
+                size: root.iconSize
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             StyledText {
                 text: popoutNames[selectedPopout] || "Popouts"
                 color: Theme.primary
-                font.pixelSize: Theme.fontSizeMedium
+                font.pixelSize: root.textSize
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -77,14 +77,14 @@ PluginComponent {
             DankIcon {
                 name: "widgets"
                 color: Theme.primary
-                font.pixelSize: Theme.iconSize - 6
+                size: root.iconSize
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             StyledText {
                 text: popoutNames[selectedPopout] || "Popouts"
                 color: Theme.primary
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: root.textSize
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
             }

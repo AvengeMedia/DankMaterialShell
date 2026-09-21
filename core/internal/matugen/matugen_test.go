@@ -1317,7 +1317,7 @@ func TestResolveSmartMode(t *testing.T) {
 				opts.MatugenType = "scheme-tonal-spot"
 			}
 
-			err := resolveSmartMode(opts, matugenFlags{isV42: tc.isV42})
+			_, err := resolveSmartMode(opts, matugenFlags{isV42: tc.isV42})
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 				return

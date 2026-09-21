@@ -143,14 +143,19 @@ Singleton {
         translationsLoaded = false;
         translations = ({});
         log.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
+        if (commonDir.status === FolderListModel.Ready)
+            _pickCommonTranslation();
         localeApplied();
     }
 
     function _fallbackToEnglish() {
+        _resolvedLocale = "en";
         _selectedPath = "";
         translationsLoaded = false;
         translations = ({});
         log.warn("Falling back to built-in English strings");
+        if (commonDir.status === FolderListModel.Ready)
+            _pickCommonTranslation();
         localeApplied();
     }
 
@@ -181,12 +186,17 @@ Singleton {
             if (name && name.endsWith(".json"))
                 present[name.slice(0, -5)] = true;
         }
-        for (let i = 0; i < _candidates.length; i++) {
-            if (!present[_candidates[i]])
+        const tag = _resolvedLocale || "en";
+        const candidates = [tag, tag.replace("_", "-"), tag.split(/[_-]/)[0]].filter(c => c && c !== "en");
+        for (let i = 0; i < candidates.length; i++) {
+            if (!present[candidates[i]])
                 continue;
-            _commonSelectedPath = commonTranslationsFolder + "/" + _candidates[i] + ".json";
+            _commonSelectedPath = commonTranslationsFolder + "/" + candidates[i] + ".json";
             return;
         }
+        _commonSelectedPath = "";
+        commonTranslations = ({});
+        commonTranslationsLoaded = false;
     }
 
     readonly property var _termIndexes: ({})

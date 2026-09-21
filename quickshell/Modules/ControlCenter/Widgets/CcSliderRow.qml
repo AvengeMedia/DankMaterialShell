@@ -48,8 +48,6 @@ Item {
         anchors.fill: parent
         radius: root.bodyRadius
         color: CcMetrics.tileInactiveColor
-        border.width: Theme.layerOutlineWidth
-        border.color: Theme.outlineMedium
         visible: root.tall
     }
 
@@ -65,8 +63,6 @@ Item {
             y: root.vertical ? parent.height - height : root.tall ? 0 : (parent.height - height) / 2
             buttonSize: root.actionSize
             backgroundColor: CcMetrics.tileInactiveColor
-            border.width: Theme.layerOutlineWidth
-            border.color: Theme.outlineMedium
             iconName: root.iconName
             iconSize: CcMetrics.iconBoxIconSize
             iconColor: CcMetrics.tileInactiveContent
