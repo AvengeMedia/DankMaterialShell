@@ -16,10 +16,11 @@ Singleton {
 
     property bool tmuxAvailable: false
     property bool zellijAvailable: false
-    readonly property bool currentMuxAvailable: muxType === "zellij" ? zellijAvailable : tmuxAvailable
+    property bool herdrAvailable: false
+    readonly property bool currentMuxAvailable: muxType === "herdr" ? herdrAvailable : muxType === "zellij" ? zellijAvailable : tmuxAvailable
 
     readonly property string muxType: SettingsData.muxType
-    readonly property string displayName: muxType === "zellij" ? "Zellij" : "Tmux"
+    readonly property string displayName: muxType === "herdr" ? "Herdr" : muxType === "zellij" ? "Zellij" : "Tmux"
 
     readonly property var terminalFlags: ({
             "ghostty": ["-e"],
@@ -63,9 +64,19 @@ Singleton {
         }
     }
 
+    Process {
+        id: herdrCheckProcess
+        command: ["sh", "-c", "command -v herdr"]
+        running: false
+        onExited: code => {
+            root.herdrAvailable = (code === 0);
+        }
+    }
+
     function checkAvailability() {
         tmuxCheckProcess.running = true;
         zellijCheckProcess.running = true;
+        herdrCheckProcess.running = true;
     }
 
     Component.onCompleted: checkAvailability()
@@ -79,6 +90,8 @@ Singleton {
                 try {
                     if (root.muxType === "zellij")
                         root._parseZellijSessions(text);
+                    else if (root.muxType === "herdr")
+                        root._parseHerdrSessions(text);
                     else
                         root._parseTmuxSessions(text);
                 } catch (e) {
@@ -118,6 +131,8 @@ Singleton {
 
         if (root.muxType === "zellij")
             listProcess.command = ["zellij", "list-sessions", "--no-formatting"];
+        else if (root.muxType === "herdr")
+            listProcess.command = ["herdr", "session", "list", "--json"];
         else
             listProcess.command = ["tmux", "list-sessions", "-F", "#{session_name}|#{session_windows}|#{session_attached}"];
 
@@ -194,11 +209,41 @@ Singleton {
         root.sessions = sessionList;
     }
 
+    function _parseHerdrSessions(output) {
+        var data = JSON.parse(output);
+        var entries = Array.isArray(data) ? data : data?.sessions ?? data?.result?.sessions;
+        var sessionList = [];
+        if (!Array.isArray(entries)) {
+            root.sessions = [];
+            return;
+        }
+
+        for (var i = 0; i < entries.length; i++) {
+            var session = entries[i];
+            var name = session?.name ?? session?.session ?? session?.id;
+            if (typeof name !== "string" && typeof name !== "number")
+                continue;
+            name = String(name);
+            if (!name || _isSessionExcluded(name))
+                continue;
+            var status = session.status ?? session.state;
+            sessionList.push({
+                name: name,
+                windows: "N/A",
+                attached: session.running === true || session.active === true || status === "running" || status === "active"
+            });
+        }
+
+        root.sessions = sessionList;
+    }
+
     function attachToSession(name) {
         if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
             Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name]);
         } else if (root.muxType === "zellij") {
             Quickshell.execDetached(_terminalPrefix().concat(["zellij", "attach", name]));
+        } else if (root.muxType === "herdr") {
+            Quickshell.execDetached(_terminalPrefix().concat(["herdr", "session", "attach", name]));
         } else {
             Quickshell.execDetached(_terminalPrefix().concat(["tmux", "attach", "-t", name]));
         }
@@ -209,15 +254,17 @@ Singleton {
             Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name]);
         } else if (root.muxType === "zellij") {
             Quickshell.execDetached(_terminalPrefix().concat(["zellij", "-s", name]));
+        } else if (root.muxType === "herdr") {
+            Quickshell.execDetached(_terminalPrefix().concat(["herdr", "--session", name]));
         } else {
             Quickshell.execDetached(_terminalPrefix().concat(["tmux", "new-session", "-s", name]));
         }
     }
 
-    readonly property bool supportsRename: muxType !== "zellij"
+    readonly property bool supportsRename: muxType === "tmux"
 
     function renameSession(oldName, newName) {
-        if (root.muxType === "zellij")
+        if (!root.supportsRename)
             return;
         Quickshell.execDetached(["tmux", "rename-session", "-t", oldName, newName]);
         Qt.callLater(refreshSessions);
@@ -226,6 +273,8 @@ Singleton {
     function killSession(name) {
         if (root.muxType === "zellij") {
             Quickshell.execDetached(["zellij", "kill-session", name]);
+        } else if (root.muxType === "herdr") {
+            Quickshell.execDetached(["herdr", "session", "stop", name]);
         } else {
             Quickshell.execDetached(["tmux", "kill-session", "-t", name]);
         }
