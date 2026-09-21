@@ -29,10 +29,12 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/systemd"
 	"github.com/AvengeMedia/dankgo/ipc"
+	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-var requestMux = newRequestMux()
+var requestMux = newRequestMux(nil)
 
 func RouteRequest(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request) {
 	requestMux.ServeIPC(ctx, conn, req, nil)
@@ -44,13 +46,24 @@ func requestHandler(handle func(*ipc.ConnWriter, ipc.Request)) ipc.Handler {
 	}
 }
 
-func newRequestMux() *ipc.Mux {
+func newRequestMux(readiness *systemd.Readiness) *ipc.Mux {
 	mux := ipc.NewMux()
 	mux.Handle("ping", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		models.Respond(conn, req.ID, "pong")
 	}))
 	mux.Handle("getServerInfo", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		models.Respond(conn, req.ID, getServerInfo())
+	}))
+	mux.Handle("shell.ready", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		pid, err := params.Int(req.Params, "pid")
+		if err != nil || pid <= 0 || uint64(pid) > uint64(^uint32(0)) {
+			models.RespondError(conn, req.ID, "invalid shell pid")
+			return
+		}
+		if readiness != nil {
+			readiness.ShellReady(uint32(pid))
+		}
+		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 	}))
 	mux.Handle("subscribe", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		handleSubscribe(ctx, conn, req)
