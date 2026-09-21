@@ -3,11 +3,12 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/MuxBackends.js" as MuxBackends
 
 Item {
     id: root
 
-    readonly property var muxTypeOptions: ["tmux", "zellij", "herdr"]
+    readonly property var muxTypeOptions: Object.keys(MuxBackends.BACKENDS)
 
     SettingsPage {
         id: mainColumn
