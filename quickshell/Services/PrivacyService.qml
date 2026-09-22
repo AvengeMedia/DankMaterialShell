@@ -38,7 +38,38 @@ Singleton {
         objects: Pipewire.nodes.values.filter(node => !node.isStream)
     }
 
+    // Browsers may capture through V4L2 without a PipeWire video stream.
+    property bool directCameraActive: false
+
+    Process {
+        id: cameraDeviceProbe
+        command: ["/bin/sh", "-c", "if command -v fuser >/dev/null 2>&1; then fuser -s /dev/video*; else exit 127; fi"]
+        running: false
+
+        onExited: exitCode => {
+            root.directCameraActive = exitCode === 0
+        }
+    }
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (!cameraDeviceProbe.running) {
+                cameraDeviceProbe.running = true
+            }
+        }
+    }
+
+    Component.onCompleted: cameraDeviceProbe.running = true
+
     readonly property bool cameraActive: {
+        if (directCameraActive) {
+            return true
+        }
+
         if (!Pipewire.ready || !Pipewire.nodes?.values) {
             return false
         }
