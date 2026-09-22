@@ -62,6 +62,9 @@ Singleton {
     readonly property int sourceVolumePercent: Math.round((source?.audio?.volume ?? 0) * 100)
     readonly property int wheelVolumeStep: SettingsData.audioWheelScrollAmount
 
+    property bool monoSettingSupported: false
+    property string monoSettingBackend: ""
+
     signal micMuteChanged
     signal micVolumeChanged
     signal audioOutputCycled(string deviceName, string deviceIcon)
@@ -131,6 +134,15 @@ Singleton {
         target: SettingsData
         function onAudioShowStreamDevicesChanged() {
             root.rebuildTypedNodeLists();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onAudioMonoChanged() {
+            if (root.monoSettingSupported) {
+                root.setMonoSetting(SettingsData.audioMono);
+            }
         }
     }
 
@@ -1253,6 +1265,78 @@ EOFCONFIG
         return root.sink.audio.muted ? "Audio muted" : "Audio unmuted";
     }
 
+    // Mono audio toggle
+    property bool _monoQueryInProgress: false
+
+    function queryMonoSetting(callback) {
+        if (root._monoQueryInProgress) {
+            return;
+        }
+        root._monoQueryInProgress = true;
+        // Try pactl first (PipeWire ≥1.4.10 /1.6.0)
+        Proc.runCommand("audio-query-mono", ["env", "LC_ALL=C", "pactl", "send-message", "/core", "pipewire-pulse:force-mono-output", ""], (output, exitCode) => {
+            if (exitCode === 0 && output) {
+                const trimmed = output.trim();
+                if (trimmed === "true" || trimmed === "false") {
+                    root.monoSettingSupported = true;
+                    root.monoSettingBackend = "pactl";
+                    root._monoQueryInProgress = false;
+                    callback(true, trimmed === "true");
+                    return;
+                }
+            }
+            // Fallback to wpctl settings
+            Proc.runCommand("audio-query-mono-wpctl", ["env", "LC_ALL=C", "wpctl", "settings", "node.features.audio.mono"], (output2, exitCode2) => {
+                if (exitCode2 === 0 && output2) {
+                    const m = output2.match(/\b(true|false)\b/);
+                    if (m) {
+                        root.monoSettingSupported = true;
+                        root.monoSettingBackend = "wpctl";
+                        root._monoQueryInProgress = false;
+                        callback(true, m[1] === "true");
+                        return;
+                    }
+                }
+                root.monoSettingSupported = false;
+                root.monoSettingBackend = "";
+                root._monoQueryInProgress = false;
+                callback(false, false);
+            });
+        }, 0);
+    }
+
+    // Re-apply the saved preference: the live PipeWire value is runtime-only and resets on restart
+    function applyMonoStartupPreference() {
+        if (!SettingsData._hasLoaded)
+            return;
+        queryMonoSetting((supported, currentValue) => {
+            if (supported && currentValue !== SettingsData.audioMono)
+                root.setMonoSetting(SettingsData.audioMono);
+        });
+    }
+
+    function setMonoSetting(enabled, callback) {
+        const boolStr = enabled ? "true" : "false";
+        const backend = root.monoSettingBackend;
+        if (backend === "pactl") {
+            Proc.runCommand("audio-set-mono", ["env", "LC_ALL=C", "pactl", "send-message", "/core", "pipewire-pulse:force-mono-output", boolStr], (output, exitCode) => {
+                const ok = exitCode === 0;
+                if (callback) {
+                    callback(ok, ok ? I18n.tr("Mono audio enabled") : (output || I18n.tr("Failed to set mono audio", "audio mono set failure message")));
+                }
+            }, 0);
+        } else if (backend === "wpctl") {
+            Proc.runCommand("audio-set-mono-wpctl", ["env", "LC_ALL=C", "wpctl", "settings", "node.features.audio.mono", boolStr], (output, exitCode) => {
+                const ok = exitCode === 0;
+                if (callback) {
+                    callback(ok, ok ? I18n.tr("Mono audio enabled") : (output || I18n.tr("Failed to set mono audio", "audio mono set failure message")));
+                }
+            }, 0);
+        } else if (callback) {
+            callback(false, I18n.tr("Mono audio not supported"));
+        }
+    }
+
     function setMicVolume(percentage) {
         if (!root.source?.audio) {
             return "No audio source available";
@@ -1340,6 +1424,29 @@ EOFCONFIG
             return root.toggleMicMute();
         }
 
+        function setmono(status: string): string {
+            const enabled = status === "true";
+            if (!root.monoSettingSupported) {
+                return I18n.tr("Mono audio not supported");
+            }
+            // Async: persist setting only on success
+            root.setMonoSetting(enabled, (ok, message) => {
+                if (ok) {
+                    SettingsData.set("audioMono", enabled);
+                }
+            });
+            return I18n.tr("Mono audio toggle sent");
+        }
+
+        function getmono(): string {
+            if (!root.monoSettingSupported) {
+                return I18n.tr("Mono audio not supported");
+            }
+            let result = I18n.tr("Mono Audio") + ":";
+            result += ` ${root.monoSettingBackend} ${SettingsData.audioMono ? I18n.tr("Enabled") : I18n.tr("Disabled")}`;
+            return result;
+        }
+
         function status(): string {
             let result = "Audio Status:\n";
 
@@ -1413,10 +1520,17 @@ EOFCONFIG
         checkSoundThemeSupport();
     }
 
+    readonly property bool settingsLoaded: SettingsData._hasLoaded
+    onSettingsLoadedChanged: {
+        if (settingsLoaded)
+            root.applyMonoStartupPreference();
+    }
+
     Component.onCompleted: {
         rebuildTypedNodeLists();
         loadDeviceAliases();
         if (SettingsData.soundsEnabled && SettingsData.useSystemSoundTheme)
             getCurrentSoundTheme();
+        root.applyMonoStartupPreference();
     }
 }

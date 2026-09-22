@@ -8,6 +8,8 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var log: Log.scoped("AudioTab")
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -118,6 +120,32 @@ Item {
 
     SettingsPage {
         id: mainColumn
+
+        SettingsCard {
+            tab: "audio"
+            tags: ["audio", "accessibility", "mono"]
+            title: I18n.tr("Mono Audio", "Audio settings: mono audio toggle")
+            settingKey: "audioMono"
+            iconName: "a11y"
+
+            SettingsToggleRow {
+                tab: "audio"
+                tags: ["audio", "mono"]
+                settingKey: "audioMono"
+                text: I18n.tr("Mono Audio")
+                description: I18n.tr("Mix all stereo content into a single channel", "Audio settings mono description")
+                enabled: AudioService.monoSettingSupported
+                checked: SettingsData.audioMono
+                onToggled: checked => {
+                    SettingsData.set("audioMono", checked);
+                    AudioService.setMonoSetting(checked, (ok, message) => {
+                        if (!ok) {
+                            SettingsData.set("audioMono", !checked);
+                        }
+                    });
+                }
+            }
+        }
 
         SettingsCard {
             tab: "audio"
