@@ -494,7 +494,6 @@ func buildOnce(opts *Options) (bool, error) {
 		}
 
 		injections := InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)
-		injections := InjectedPalettes(opts.ConfigDir, wallpaperPath, opts.Mode)
 
 		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode)
 		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors, injections)}
