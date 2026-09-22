@@ -66,7 +66,7 @@ Item {
                             required property int index
 
                             width: parent.width
-                            height: paletteColumn.implicitHeight + Theme.spacingM
+                            height: paletteColumn.implicitHeight + Theme.spacingM * 2
                             radius: Theme.cornerRadius
                             color: Theme.floatingWindowFieldColor
 
