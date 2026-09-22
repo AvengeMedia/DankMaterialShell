@@ -493,10 +493,7 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
-		wallpaperPath := sourceImage
-		if opts.Kind == "image" {
-			wallpaperPath = opts.Value
-		}
+		injections := InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)
 		injections := InjectedPalettes(opts.ConfigDir, wallpaperPath, opts.Mode)
 
 		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode)
