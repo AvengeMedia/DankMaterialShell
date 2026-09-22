@@ -39,11 +39,15 @@ BasePill {
     }
     function getTrayItemKey(item) {
         const id = item?.id || "";
-        const tooltipTitle = item?.tooltipTitle || "";
-        if (!tooltipTitle || tooltipTitle === id) {
+        if (!id)
+            return "";
+        if (root.trayItemCountForId(id) <= 1)
             return id;
-        }
-        return `${id}::${tooltipTitle}`;
+        const sameIdItems = root.allTrayItems.filter(other => (other?.id || "") === id);
+        const occurrenceIndex = sameIdItems.indexOf(item);
+        if (occurrenceIndex < 0)
+            return id;
+        return `${id}::${occurrenceIndex}`;
     }
 
     function trayItemCountForId(id) {
@@ -55,38 +59,11 @@ BasePill {
     function resolveOrderIndex(key, orderMap) {
         if (orderMap.has(key))
             return orderMap.get(key);
-        const id = key.includes("::") ? key.split("::")[0] : key;
-        if (root.trayItemCountForId(id) > 1)
-            return -1;
-        let fallbackIdx = -1;
-        for (const [savedKey, idx] of orderMap) {
-            if (savedKey === id || savedKey.startsWith(id + "::")) {
-                if (fallbackIdx >= 0)
-                    return -1;
-                fallbackIdx = idx;
-            }
-        }
-        return fallbackIdx;
-    }
-
-    function findSavedTrayKey(key, list) {
-        if (!list)
-            return null;
-        if (list.indexOf(key) !== -1)
-            return key;
-        const id = key.includes("::") ? key.split("::")[0] : key;
-        if (root.trayItemCountForId(id) > 1)
-            return null;
-        const matches = list.filter(saved => saved === id || saved.startsWith(id + "::"));
-        if (matches.length !== 1)
-            return null;
-        return matches[0];
+        return -1;
     }
 
     function isTrayIdHidden(key) {
-        if (SessionData.isHiddenTrayId(key))
-            return true;
-        return !!findSavedTrayKey(key, SessionData.hiddenTrayIds);
+        return SessionData.isHiddenTrayId(key);
     }
 
     function trayIconSourceFor(trayItem) {
@@ -324,9 +301,8 @@ BasePill {
         const itemKey = getTrayItemKey(item);
         if (!itemKey)
             return;
-        const savedKey = findSavedTrayKey(itemKey, SessionData.hiddenTrayIds);
-        if (savedKey) {
-            SessionData.showTrayId(savedKey);
+        if (SessionData.isHiddenTrayId(itemKey)) {
+            SessionData.showTrayId(itemKey);
             return;
         }
 
@@ -1357,8 +1333,7 @@ BasePill {
                                 if (root.isAutoOverflowTrayItem(trayMenuState.trayItem)) {
                                     root.promoteTrayItemToBar(trayMenuState.trayItem);
                                 } else if (root.isManualHiddenTrayItem(trayMenuState.trayItem)) {
-                                    const savedKey = root.findSavedTrayKey(itemKey, SessionData.hiddenTrayIds);
-                                    SessionData.showTrayId(savedKey || itemKey);
+                                    SessionData.showTrayId(itemKey);
                                 } else {
                                     SessionData.hideTrayId(itemKey);
                                 }
