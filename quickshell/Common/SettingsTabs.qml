@@ -56,7 +56,7 @@ Singleton {
                     "advanced": true,
                     "text": I18n.tr("Injected palettes"),
                     "icon": "colorize",
-                    "tabIndex": 63,
+                    "tabIndex": 64,
                     "hint": I18n.tr("External palette commands, namespaces")
                 }
             ]

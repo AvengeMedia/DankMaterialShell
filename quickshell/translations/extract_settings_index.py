@@ -146,6 +146,7 @@ TAB_INDEX_MAP = {
     "UserAccountsTab.qml": 60,
     "CreateUserTab.qml": 61,
     "GreeterAuthTab.qml": 62,
+    "PaletteInjectTab.qml": 64,
     "AutoStartTab.qml": 36,
     "BatteryTab.qml": 42,
     "MouseTouchpadTab.qml": 44,
