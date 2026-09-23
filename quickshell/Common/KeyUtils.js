@@ -343,3 +343,145 @@ function eventMatchesCombo(event, combo) {
         return false;
     return event.key === qtKeyFromName(keyName);
 }
+
+const KEY_GLYPH_MAP = {
+    "shift": "⇧",
+    "ctrl": "⌃",
+    "control": "⌃",
+    "alt": "⌥",
+    "mod": "⌘",
+    "super": "⌘",
+    "meta": "⌘",
+    "win": "⌘",
+    "return": "⏎",
+    "enter": "⏎",
+    "tab": "⇥",
+    "backspace": "⌫",
+    "space": "␣",
+    "escape": "Esc",
+    "esc": "Esc",
+    "up": "↑",
+    "down": "↓",
+    "left": "←",
+    "right": "→",
+    "page_up": "⇞",
+    "pageup": "⇞",
+    "page_down": "⇟",
+    "pagedown": "⇟",
+    "home": "Home",
+    "end": "End",
+    "delete": "Del",
+    "del": "Del",
+    "insert": "Ins",
+    "print": "PrtSc",
+    "printscreen": "PrtSc",
+    "prtscr": "PrtSc",
+    "prtsc": "PrtSc",
+    "sysrq": "PrtSc",
+    "plus": "+",
+    "minus": "-",
+    "equal": "=",
+    "slash": "/",
+    "backslash": "\\",
+    "bracketleft": "[",
+    "bracketright": "]",
+    "semicolon": ";",
+    "apostrophe": "'",
+    "comma": ",",
+    "period": ".",
+    "grave": "`",
+    "wheelscrolldown": "󰍽 ↓",
+    "wheelscrollup": "󰍽 ↑",
+    "wheelscrollleft": "󰍽 ←",
+    "wheelscrollright": "󰍽 →",
+    "mousescrolldown": "󰍽 ↓",
+    "mousescrollup": "󰍽 ↑",
+    "mouse_down": "󰍽 ↓",
+    "mouse_up": "󰍽 ↑",
+    "mouse_left": "󰍽 ←",
+    "mouse_right": "󰍽 →",
+    "scrolldown": "󰍽 ↓",
+    "scrollup": "󰍽 ↑",
+
+    // Audio & Volume
+    "xf86audioraisevolume": "󰕾 +",
+    "audioraisevolume": "󰕾 +",
+    "xf86audiolowervolume": "󰕾 -",
+    "audiolowervolume": "󰕾 -",
+    "xf86audiomute": "󰖁",
+    "audiomute": "󰖁",
+    "xf86audiomicmute": "󰍭",
+    "audiomicmute": "󰍭",
+
+    // Media Playback
+    "xf86audioplay": "󰐊",
+    "audioplay": "󰐊",
+    "xf86audiopause": "󰏤",
+    "audiopause": "󰏤",
+    "xf86audioplaypause": "󰐎",
+    "audioplaypause": "󰐎",
+    "xf86audionext": "󰒭",
+    "audionext": "󰒭",
+    "xf86audioprev": "󰒮",
+    "audioprev": "󰒮",
+    "xf86audiostop": "󰓛",
+    "audiostop": "󰓛",
+    "xf86audiorecord": "Rec",
+    "audiorecord": "Rec",
+    "xf86audiomedia": "Media",
+    "audiomedia": "Media",
+
+    // Display & Brightness
+    "xf86monbrightnessup": "󰃠 +",
+    "monbrightnessup": "󰃠 +",
+    "xf86monbrightnessdown": "󰃠 -",
+    "monbrightnessdown": "󰃠 -",
+    "xf86kbdbrightnessup": "󰌌 +",
+    "kbdbrightnessup": "󰌌 +",
+    "xf86kbdbrightnessdown": "󰌌 -",
+    "kbdbrightnessdown": "󰌌 -",
+
+    // Hardware & System
+    "xf86calculator": "Calc",
+    "xf86search": "Search",
+    "xf86mail": "Mail",
+    "xf86homepage": "Web",
+    "xf86explorer": "Files",
+    "xf86poweroff": "Power",
+    "xf86sleep": "Sleep",
+    "xf86wakeup": "Wake",
+    "xf86eject": "Eject",
+    "xf86launch0": "Launch 0",
+    "xf86launch1": "PrtSc",
+    "launch1": "PrtSc"
+};
+
+function formatKeyTokens(keyString) {
+    if (!keyString)
+        return [];
+    var str = keyString;
+    var plusEnds = false;
+    if (str.endsWith("++")) {
+        plusEnds = true;
+        str = str.slice(0, -2);
+    }
+    var parts = str.split("+");
+    var tokens = [];
+    for (var i = 0; i < parts.length; i++) {
+        var part = parts[i].trim();
+        if (!part)
+            continue;
+        var lower = part.toLowerCase();
+        if (KEY_GLYPH_MAP[lower] !== undefined) {
+            tokens.push(KEY_GLYPH_MAP[lower]);
+        } else if (part.length === 1) {
+            tokens.push(part.toUpperCase());
+        } else {
+            tokens.push(part);
+        }
+    }
+    if (plusEnds) {
+        tokens.push("+");
+    }
+    return tokens;
+}

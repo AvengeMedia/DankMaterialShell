@@ -227,7 +227,9 @@ const NIRI_ACTIONS = {
     ],
     "Alt-Tab": [
         { id: "next-window", label: "Next Window" },
-        { id: "previous-window", label: "Previous Window" }
+        { id: "previous-window", label: "Previous Window" },
+        { id: "next-window filter=\"app-id\"", label: "Next Window (Same Application)" },
+        { id: "previous-window filter=\"app-id\"", label: "Previous Window (Same Application)" }
     ]
 };
 
@@ -932,8 +934,16 @@ function getActionLabel(action, compositor) {
             return compAct.label;
         var base = action.split(" ")[0];
         compAct = findCompositorAction(compositor, base);
-        if (compAct)
+        if (compAct) {
+            var arg = action.slice(base.length).trim();
+            if (arg && compAct.label.includes("(by index)")) {
+                return compAct.label.replace("(by index)", arg).trim();
+            }
+            if (arg.includes("filter=") && arg.includes("app-id")) {
+                return compAct.label + " (Same Application)";
+            }
             return compAct.label;
+        }
     }
 
     if (action.startsWith("spawn sh -c "))

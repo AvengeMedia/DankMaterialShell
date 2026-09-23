@@ -29,6 +29,7 @@ DankModal {
 
     content: Component {
         KeybindsContent {
+            anchors.fill: parent
             showFloatingToggle: true
             floating: false
             onCloseRequested: overlay.close()

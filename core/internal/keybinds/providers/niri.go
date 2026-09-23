@@ -24,13 +24,15 @@ type niriActionPart struct {
 	quoted bool
 }
 
-var niriActionPropertyOrder = []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms"}
+var niriActionPropertyOrder = []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms", "filter", "scope"}
 var niriActionProperties = map[string]struct{}{
 	"focus":             {},
 	"show-pointer":      {},
 	"write-to-disk":     {},
 	"skip-confirmation": {},
 	"delay-ms":          {},
+	"filter":            {},
+	"scope":             {},
 }
 
 func NewNiriProvider(configDir string) *NiriProvider {

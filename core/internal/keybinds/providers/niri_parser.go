@@ -483,7 +483,7 @@ func (p *NiriParser) parseKeybindNode(node *document.Node, _ string) *NiriKeyBin
 			args = append(args, arg.ValueString())
 		}
 		if actionNode.Properties != nil {
-			for _, propName := range []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms"} {
+			for _, propName := range []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms", "filter", "scope"} {
 				if val, ok := actionNode.Properties.Get(propName); ok {
 					args = append(args, propName+"="+val.String())
 				}
