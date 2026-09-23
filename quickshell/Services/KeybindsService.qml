@@ -367,7 +367,12 @@ Singleton {
                 if (eqIdx !== -1) {
                     const key = part.slice(0, eqIdx);
                     const val = part.slice(eqIdx + 1).replace(/^["']|["']$/g, "");
-                    cmdParts.push("--" + key + "=" + val);
+                    if (key === "skip-confirmation") {
+                        if (val === "true")
+                            cmdParts.push("--skip-confirmation");
+                    } else {
+                        cmdParts.push("--" + key + "=" + val);
+                    }
                 } else {
                     cmdParts.push(part);
                 }
