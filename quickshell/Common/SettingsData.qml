@@ -1612,7 +1612,7 @@ Singleton {
             _legacyWeatherLocation = obj.weatherLocation;
         if (obj?.weatherCoordinates !== undefined)
             _legacyWeatherCoordinates = obj.weatherCoordinates;
-        if (obj.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
+        if (obj?.vpnLastConnected !== undefined && obj.vpnLastConnected !== "") {
             _legacyVpnLastConnected = obj.vpnLastConnected;
             SessionData.vpnLastConnected = _legacyVpnLastConnected;
             SessionData.saveSettings();
