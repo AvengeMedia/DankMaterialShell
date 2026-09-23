@@ -192,7 +192,16 @@ Singleton {
                         setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
                     }
                 }
-            } else if (currentTheme !== "custom") {
+            } else if (currentTheme === "custom") {
+                // The custom theme is read from a file, which finishes on its
+                // own schedule. If it got there first, its generate call was
+                // dropped by the matugenAvailable guard, so run it now. If it
+                // is still loading, loadCustomTheme() will call it, and by then
+                // matugenAvailable is set.
+                if (customThemeData) {
+                    generateSystemThemesFromCurrentTheme();
+                }
+            } else {
                 const darkTheme = StockThemes.getThemeByName(currentTheme, false);
                 const lightTheme = StockThemes.getThemeByName(currentTheme, true);
                 if (darkTheme && darkTheme.primary) {
