@@ -3341,8 +3341,8 @@ Singleton {
         if (file === defaultSettingsFile) {
             index = 0;
         } else {
-            index = _settingsFilesPaths.findIndex((path, index) => {
-                return path > filePath && index > 0;
+            index = _settingsFilesPaths.findIndex((path, i) => {
+                return path > filePath && i > 0;
             });
         }
         _settingsFiles.set(filePath, file);
