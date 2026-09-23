@@ -3476,7 +3476,7 @@ Singleton {
         property bool checked: false
         property bool exists: folder === dir
 
-        folder: dir
+        folder: isGreeterMode ? "" : dir
         showDirs: false
         nameFilters: ["*.json"]
         onStatusChanged: {
