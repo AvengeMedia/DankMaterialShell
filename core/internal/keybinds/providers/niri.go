@@ -468,7 +468,7 @@ func (n *NiriProvider) buildActionNode(action string) *document.Node {
 }
 
 func (n *NiriProvider) isNiriActionPropertyToken(part niriActionPart) bool {
-	if part.quoted || !strings.Contains(part.value, "=") {
+	if !strings.Contains(part.value, "=") {
 		return false
 	}
 	key, _, ok := strings.Cut(part.value, "=")

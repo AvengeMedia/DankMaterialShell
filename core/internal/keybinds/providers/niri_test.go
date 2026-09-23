@@ -711,3 +711,30 @@ func TestNiriGenerateWorkspaceBindsRoundTrip(t *testing.T) {
 		t.Error("set-column-width -10% not found after round-trip")
 	}
 }
+
+func TestNiriGenerateActionWithFilterAndScope(t *testing.T) {
+	provider := NewNiriProvider("")
+
+	binds := map[string]*overrideBind{
+		"Alt+grave": {
+			Key:         "Alt+grave",
+			Action:      `next-window filter="app-id"`,
+			Description: "Next Window (Same Application)",
+		},
+		"Alt+Tab": {
+			Key:         "Alt+Tab",
+			Action:      `next-window scope="output"`,
+			Description: "Next Window",
+		},
+	}
+
+	content := provider.generateBindsContent(binds)
+	expected := `binds {
+    Alt+Tab hotkey-overlay-title="Next Window" { next-window scope="output"; }
+    Alt+grave hotkey-overlay-title="Next Window (Same Application)" { next-window filter="app-id"; }
+}
+`
+	if content != expected {
+		t.Errorf("Content mismatch.\nGot:\n%s\nWant:\n%s", content, expected)
+	}
+}
