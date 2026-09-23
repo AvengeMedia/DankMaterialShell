@@ -160,6 +160,8 @@ DankModal {
                 height: bodyCol.implicitHeight + Theme.spacingM * 2
                 radius: Theme.cornerRadiusL
                 color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
 
                 Row {
                     anchors.fill: parent

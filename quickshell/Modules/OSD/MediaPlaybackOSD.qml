@@ -275,6 +275,7 @@ DankOSD {
                 DankActionButton {
                     buttonSize: Theme.buttonHeightXS
                     anchors.verticalCenter: parent.verticalCenter
+                    objectName: "previousTrack"
                     iconName: "skip_previous"
                     iconSize: Theme.iconSizeSmall
                     iconColor: Theme.onSurface
@@ -293,6 +294,7 @@ DankOSD {
                     round: false
                     checkable: true
                     checked: root.playing
+                    iconFilled: false
                     iconName: root._displayIcon
                     containerColor: MediaAccentService.accentContainer
                     contentColor: MediaAccentService.onAccentContainer
@@ -359,6 +361,7 @@ DankOSD {
             round: false
             checkable: true
             checked: root.playing
+            iconFilled: false
             backgroundColor: "transparent"
             iconColor: MediaAccentService.onAccent
             iconName: root._displayIcon

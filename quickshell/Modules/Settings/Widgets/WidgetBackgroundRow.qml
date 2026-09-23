@@ -6,6 +6,9 @@ ColorDropdownRow {
     id: root
 
     readonly property var widgetBackgroundOptions: [({
+                "value": "default",
+                "label": I18n.tr("Default", "widget background color option")
+            }), ({
                 "value": "sth",
                 "label": I18n.tr("Overlay", "widget background color option"),
                 "previewColor": Theme.blend(Theme.surfaceContainerHigh, Theme.surfaceText, 0.24)
@@ -37,6 +40,7 @@ ColorDropdownRow {
     resetKeys: ["widgetBackgroundColor", "widgetBackgroundCustomColor"]
     text: I18n.tr("Background")
     dropdownWidth: 220
+    defaultColor: Theme.cardSurface
     options: root.widgetBackgroundOptions
     currentMode: SettingsData.widgetBackgroundColor
     customColor: SettingsData.widgetBackgroundCustomColor || "#6750A4"

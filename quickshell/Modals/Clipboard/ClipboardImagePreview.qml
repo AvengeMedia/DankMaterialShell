@@ -83,8 +83,8 @@ ClippingRectangle {
         anchors.margins: Theme.spacingL
         radius: Theme.cornerRadiusL
         color: Theme.floatingWindowNestedSurface
-        border.color: Theme.outlineVariant
-        border.width: Theme.outlineWidth
+        border.color: Theme.outlineMedium
+        border.width: Theme.layerOutlineWidth
 
         MouseArea {
             anchors.fill: parent

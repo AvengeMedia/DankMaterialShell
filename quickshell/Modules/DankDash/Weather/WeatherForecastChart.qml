@@ -11,6 +11,8 @@ Rectangle {
 
     radius: Theme.cornerRadiusXL
     color: DashMetrics.cardColor
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 

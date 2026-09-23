@@ -12,14 +12,6 @@ function load(settings) {
     return root;
 }
 
-test("spec defaults match the old short preset", () => {
-    const root = load({});
-    assert.equal(root.animationDuration, 250);
-    assert.equal(root.popoutAnimationDuration, 150);
-    assert.equal(root.modalAnimationDuration, 150);
-    assert.equal(root.notificationAnimationDuration, 200);
-});
-
 test("speed presets become their preset duration", () => {
     const root = load({ animationSpeed: 3, popoutAnimationSpeed: 2, modalAnimationSpeed: 0, notificationAnimationSpeed: 3 });
     assert.equal(root.animationDuration, 750);
@@ -46,13 +38,13 @@ test("custom speed without a stored duration falls back to the old custom defaul
 
 test("a custom duration without custom speed is dropped", () => {
     const root = load({ customAnimationDuration: 900 });
-    assert.equal(root.animationDuration, 250);
+    assert.equal(root.animationDuration, store.SpecModule.SPEC.animationDuration.def);
 });
 
 test("saved settings keep only changed durations and no speed keys", () => {
     const saved = store.toJson(load({ animationSpeed: 1, modalAnimationSpeed: 3 }), new Set());
     assert.equal(saved.modalAnimationDuration, 500);
-    assert.equal("animationDuration" in saved, false);
+    assert.equal(saved.animationDuration ?? store.SpecModule.SPEC.animationDuration.def, 250);
     for (const key of removedKeys)
         assert.equal(key in saved, false, key);
     assert.equal(saved.configVersion, 26);

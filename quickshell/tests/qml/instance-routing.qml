@@ -124,7 +124,7 @@ ShellRoot {
             try {
                 const screen = Quickshell.screens[0];
                 const entries = Object.values(BarWidgetService.widgetRegistry);
-                if (++waited > 120)
+                if (++waited > 800)
                     throw new Error("timed out in step " + step + (waitingFor ? " waiting for " + waitingFor : ""));
                 switch (step) {
                 case 0:

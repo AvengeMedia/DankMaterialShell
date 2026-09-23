@@ -329,6 +329,8 @@ Item {
                         visible: delegateRoot.visible
                         opacity: delegateRoot.opacity
                         color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                        border.width: Theme.layerOutlineWidth
+                        border.color: Theme.outlineMedium
                         radius: Theme.groupedListInnerRadius
                         topLeftRadius: delegateRoot.modelData?.firstInGroup ? Theme.groupedListOuterRadius : radius
                         topRightRadius: topLeftRadius
@@ -417,6 +419,8 @@ Item {
                                     visible: delegateRoot.visible
                                     opacity: delegateRoot.opacity
                                     color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                                    border.width: Theme.layerOutlineWidth
+                                    border.color: Theme.outlineMedium
                                     radius: Theme.cornerRadiusL
                                 }
 

@@ -182,35 +182,6 @@ DankFloatingWindow {
     }
 
     Connections {
-        target: SettingsData
-
-        function onFrameEnabledChanged() {
-            if (!SettingsData.frameEnabled && settingsModal.currentPage === "frame")
-                settingsModal.setPage("dankbar");
-        }
-
-        function onIslandBarConfigsChanged() {
-            settingsModal.leaveIslandPageIfHidden();
-        }
-    }
-
-    function leaveIslandPageIfHidden() {
-        if (settingsModal.currentPage !== "dank_island")
-            return;
-        if (SettingsData.isIslandBarConfig(SettingsData.getBarConfig(SettingsUiState.selectedBarId)))
-            return;
-        settingsModal.setPage("dankbar");
-    }
-
-    Connections {
-        target: SettingsUiState
-
-        function onSelectedBarIdChanged() {
-            settingsModal.leaveIslandPageIfHidden();
-        }
-    }
-
-    Connections {
         target: PluginService
 
         function onPluginListUpdated() {
@@ -325,6 +296,8 @@ DankFloatingWindow {
                 width: parent.width
                 height: showBanner ? bannerContent.implicitHeight + Theme.spacingM * 2 : 0
                 color: Theme.floatingWindowNestedSurface
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
                 visible: showBanner
                 clip: true
 

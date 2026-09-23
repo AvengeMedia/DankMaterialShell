@@ -34,6 +34,7 @@ ShellRoot {
         DC.Log.backend = Log;
         DC.Host.session = SessionService;
         DC.Host.cache = CacheData;
+        void IconThemeService.ready;
         if (entrypoint.runGreeter)
             return;
         // Build the polkit agent here, outside incubation: first-touching it from a Connections target during DMSShell's async load crashed QQmlConnections::connectSignalsToMethods.

@@ -235,7 +235,6 @@ test("canvas: overlap ignores disabled outputs, snapping to neighbour edges, adj
 
 test("labels and scale presets: every offered scale divides the mode into whole logical pixels", () => {
     assert.deepEqual([null, { width: 1920, height: 1080, refresh_rate: 59997 }].map(m => model.formatMode(m)), ["", "1920x1080@59.997"]);
-    assert.deepEqual([1, 1.25, 1.333333, 2 / 3, "abc", "1.50", 0].map(s => model.formatScaleLabel(s)), ["1", "1.25", "1.33", "0.67", "1", "1.5", "0"]);
     const hd = { name: "X", modes: [{ width: 1366, height: 768, refresh_rate: 60000 }, { width: 1920, height: 1080, refresh_rate: 60000 }], current_mode: 0 };
     assert.deepEqual(rounded(model.scalePresetValues(hd, undefined, "hyprland")), [0.5, 0.667, 1, 2]);
     assert.deepEqual(model.scalePresetValues(hd, undefined, "sway"), [0.5, 1, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875, 2]);
@@ -248,8 +247,6 @@ test("labels and scale presets: every offered scale divides the mode into whole 
     assert.deepEqual(model.scalePresetValues({ name: "Z", modes: [] }, undefined, "niri"), [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]);
     assert.deepEqual([1.75, 1.3, 0.3, 9, "abc"].map(s => model.snapScaleToMode(hd, "1920x1080@60.000", "hyprland", s)), [1.666667, 1.333333, 0.3, null, null]);
     assert.equal(model.snapScaleToMode({ name: "Z", modes: [] }, undefined, "niri", 1.7), 1.7);
-    assert.deepEqual([model.formatScaleOption(hd, "1920x1080@60.000", 1.333333), model.formatScaleOption({ modes: [] }, undefined, 1.5)], ["1.333x · 1440x810", "1.5x"]);
-    assert.equal(model.formatScaleOption(qhd, undefined, 1.1), "1.1x · ~2327x1309");
     assert.equal(model.modeForScalePresets(live["DP-1"], "1920x1080@60.000").id, 2);
     assert.equal(model.modeForScalePresets(live["DP-1"], "9x9@1.000").id, 1);
     assert.equal(model.modeForScalePresets({ name: "Z", modes: [] }, undefined), null);

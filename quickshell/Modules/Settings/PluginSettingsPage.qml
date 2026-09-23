@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -225,80 +224,66 @@ FocusScope {
             }
         }
 
-        DankCollapsibleSection {
-            id: pluginDetails
-            width: parent.width
+        SettingsCard {
             title: I18n.tr("Plugin details", "plugin metadata and maintenance")
+            settingKey: "pluginDetails"
             visible: root.pluginData !== null
+            collapsible: true
+            expanded: false
 
-            SettingsCard {
-                Layout.fillWidth: true
-                visible: pluginDetails.expanded
-                settingKey: "pluginDetails"
+            SettingsRow {
+                title: [root.pluginData?.version, root.pluginData?.author].filter(Boolean).join(" · ")
+            }
+            SettingsRow {
+                subtitle: root.pluginData?.description || ""
+                visible: subtitle !== ""
+            }
 
-                SettingsRow {
-                    title: [root.pluginData?.version, root.pluginData?.author].filter(Boolean).join(" · ")
-                }
-                SettingsRow {
-                    subtitle: root.pluginData?.description || ""
-                    visible: subtitle !== ""
-                }
+            SettingsRow {
+                visible: root.permissions.length > 0
+                body: Flow {
+                    width: parent.width
+                    spacing: Theme.spacingXS
 
-                SettingsRow {
-                    visible: root.permissions.length > 0
-                    body: Flow {
-                        width: parent.width
-                        spacing: Theme.spacingXS
+                    Repeater {
+                        model: root.permissions
 
-                        Repeater {
-                            model: root.permissions
+                        DankBadge {
+                            required property string modelData
 
-                            Rectangle {
-                                required property string modelData
-
-                                height: Theme.iconSizeMedium
-                                width: permissionText.implicitWidth + Theme.spacingS * 2
-                                radius: Theme.fullRadius(width, height)
-                                color: Theme.withAlpha(Theme.primary, Theme.tonalTintAlpha)
-
-                                StyledText {
-                                    id: permissionText
-                                    anchors.centerIn: parent
-                                    text: parent.modelData
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.primary
-                                }
-                            }
+                            text: modelData
+                            color: Theme.primaryHover
+                            textColor: Theme.primary
                         }
                     }
                 }
+            }
 
-                SettingsRow {
-                    iconName: "download"
-                    title: I18n.tr("Update plugin")
-                    clickable: true
-                    visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate && !root.isSystemPlugin
-                    enabled: !root.operationPending
-                    onClicked: root.requestUpdate()
-                }
+            SettingsRow {
+                iconName: "download"
+                title: I18n.tr("Update plugin")
+                clickable: true
+                visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate && !root.isSystemPlugin
+                enabled: !root.operationPending
+                onClicked: root.requestUpdate()
+            }
 
-                SettingsRow {
-                    iconName: "refresh"
-                    title: I18n.tr("Reload plugin")
-                    clickable: true
-                    visible: root.isLoaded
-                    enabled: !root.isReloading && !root.operationPending
-                    onClicked: root.reload()
-                }
+            SettingsRow {
+                iconName: "refresh"
+                title: I18n.tr("Reload plugin")
+                clickable: true
+                visible: root.isLoaded
+                enabled: !root.isReloading && !root.operationPending
+                onClicked: root.reload()
+            }
 
-                SettingsRow {
-                    iconName: "delete"
-                    title: I18n.tr("Uninstall plugin")
-                    clickable: true
-                    visible: DMSService.dmsAvailable && !root.isSystemPlugin
-                    enabled: !root.operationPending
-                    onClicked: root.requestUninstall()
-                }
+            SettingsRow {
+                iconName: "delete"
+                title: I18n.tr("Uninstall plugin")
+                clickable: true
+                visible: DMSService.dmsAvailable && !root.isSystemPlugin
+                enabled: !root.operationPending
+                onClicked: root.requestUninstall()
             }
         }
     }

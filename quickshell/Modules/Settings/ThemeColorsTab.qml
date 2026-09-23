@@ -195,6 +195,8 @@ Item {
                             height: 90
                             radius: Theme.cornerRadius
                             color: Theme.floatingWindowNestedSurface
+                            border.width: Theme.layerOutlineWidth
+                            border.color: Theme.outlineMedium
 
                             ClippingRectangle {
                                 anchors.fill: parent
@@ -523,8 +525,8 @@ Item {
                                     height: themeGrid.cardHeight
                                     radius: Theme.cornerRadius
                                     color: Theme.floatingWindowNestedSurface
-                                    border.color: isActive ? Theme.primary : Theme.outline
-                                    border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
+                                    border.color: isActive ? Theme.primary : Theme.outlineMedium
+                                    border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
                                     scale: isActive ? 1.03 : 1
 
                                     Behavior on scale {

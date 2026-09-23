@@ -13,6 +13,8 @@ Column {
     property string confirmingRemoveId: ""
     property string editingBarId: ""
     property string renameDraft: ""
+    readonly property bool dotEnabled: SettingsData.dotBarConfig?.enabled ?? false
+    readonly property var barPages: ["dankbar_settings", "dankbar_appearance"].map(id => SettingsTabs.page(id)).filter(page => page)
 
     BarSelectionState {
         id: bar
@@ -36,7 +38,7 @@ Column {
 
     // A new bar shows up right away on every display, on an edge nothing else holds when there is one.
     function createNewBar() {
-        if (SettingsData.barConfigs.length >= 4)
+        if (SettingsData.edgeBarConfigCount >= 4)
             return;
         const defaultBar = SettingsData.getBarConfig("default");
         if (!defaultBar)
@@ -45,15 +47,16 @@ Column {
         const freeEdge = SettingsData.firstFreeEdge(newId, ["all"], [SettingsData.Position.Top, SettingsData.Position.Bottom, SettingsData.Position.Left, SettingsData.Position.Right]);
         const newBar = Object.assign(JSON.parse(JSON.stringify(defaultBar)), {
             id: newId,
-            name: "Bar " + (SettingsData.barConfigs.length + 1),
+            name: "Bar " + (SettingsData.edgeBarConfigCount + 1),
             enabled: true,
             position: freeEdge >= 0 ? freeEdge : (defaultBar.position ?? 0),
             screenPreferences: ["all"],
             showOnLastDisplay: true
         });
         delete newBar.island;
+        delete newBar.dot;
         SettingsData.addBarConfig(newBar);
-        bar.selectedBarId = newId;
+        bar.select(newId);
     }
 
     function canDeleteBar(config) {
@@ -67,7 +70,7 @@ Column {
         }
         confirmingRemoveId = "";
         SettingsData.deleteBarConfig(barId);
-        bar.selectedBarId = "default";
+        bar.select("default");
     }
 
     function canToggleBar(config) {
@@ -80,8 +83,12 @@ Column {
         });
     }
 
+    function barTitle(config) {
+        return config.name || I18n.tr("Bar %1", "numbered name for an unnamed bar, %1 is its position").arg(SettingsData.barConfigs.findIndex(candidate => candidate.id === config.id) + 1);
+    }
+
     function barSummary(config) {
-        const parts = [bar.positionLabel(config.position ?? SettingsData.Position.Top)];
+        const parts = SettingsData.islandFreePlacement(config) ? [I18n.tr("Floating", "bar summary: island can be dragged anywhere on the display")] : [bar.positionLabel(config.position ?? SettingsData.Position.Top)];
         const prefs = config.screenPreferences || ["all"];
         if (prefs.includes("all"))
             parts.push(I18n.tr("All displays"));
@@ -104,37 +111,43 @@ Column {
             text: I18n.tr("Add")
             iconName: "add"
             buttonHeight: Theme.buttonHeightXS
-            visible: SettingsData.barConfigs.length < 4
+            visible: SettingsData.edgeBarConfigCount < 4
             onClicked: root.createNewBar()
         }
 
         Repeater {
-            model: SettingsData.barConfigs
+            model: SettingsData.barConfigs.filter(config => !SettingsData.isDotBarConfig(config))
 
             delegate: SettingsInstanceRow {
                 required property var modelData
-                required property int index
 
-                title: modelData.name || I18n.tr("Bar %1", "numbered name for an unnamed bar, %1 is its position").arg(index + 1)
+                title: root.barTitle(modelData)
                 summary: root.barSummary(modelData)
                 selected: bar.selectedBarId === modelData.id
                 checked: modelData.enabled ?? false
                 toggleVisible: root.canToggleBar(modelData)
                 deletable: root.canDeleteBar(modelData)
                 confirmingDelete: root.confirmingRemoveId === modelData.id
-                onClicked: bar.selectedBarId = modelData.id
+                onClicked: bar.select(modelData.id)
                 onToggled: checked => {
-                    bar.selectedBarId = modelData.id;
+                    bar.select(modelData.id);
                     root.setBarEnabled(modelData.id, checked);
                 }
                 onDeleteRequested: root.deleteBar(modelData.id)
             }
         }
+    }
+
+    SettingsCard {
+        iconName: bar.selectedBarIsIsland ? "view_in_ar" : "toolbar"
+        title: bar.selectedBarName
+        settingKey: "barLayout"
+        tags: ["layout", "standard", "frame", "island", "mode", "bar", "name", "rename"]
+        visible: !!bar.selectedBarConfig
 
         SettingsRow {
             title: I18n.tr("Name")
             subtitle: root.editingBarId ? "" : bar.selectedBarName
-            visible: !!bar.selectedBarConfig
 
             DankActionButton {
                 iconName: root.editingBarId ? "check" : "edit"
@@ -175,14 +188,62 @@ Column {
                 }
             }
         }
+
+        SettingsRow {
+            title: I18n.tr("Layout", "noun, settings section title for arrangement options")
+
+            body: SettingsLayoutPicker {}
+        }
+
+        Repeater {
+            model: root.barPages
+
+            delegate: SettingsNavRow {
+                required property var modelData
+
+                iconName: modelData.icon
+                title: modelData.text
+                hint: modelData.hint ?? ""
+                onClicked: root.parentModal?.navigateTo(modelData.id)
+            }
+        }
     }
 
-    SettingsCard {
-        iconName: "toolbar"
-        title: I18n.tr("Layout", "noun, settings section title for arrangement options")
-        settingKey: "barLayout"
-        tags: ["layout", "standard", "frame", "island", "mode", "bar"]
+    SettingsRow {
+        id: dotRow
 
-        SettingsLayoutPicker {}
+        settingKey: "dotEnabled"
+        tags: ["dot", "dankdot", "companion", "floating", "island", "enable"]
+        iconName: "blur_on"
+        iconColor: root.dotEnabled ? Theme.primary : Theme.onSurfaceVariant
+        title: I18n.tr("Dot", "bar layout: free-floating dot that opens island activities")
+        subtitle: I18n.tr("A floating companion that works alongside any bar layout", "bar settings: what the dot is")
+        clickable: root.dotEnabled
+        onClicked: root.parentModal?.navigateTo("dankbar_dot")
+
+        DankIcon {
+            name: "chevron_right"
+            size: Theme.iconSize
+            color: Theme.onSurfaceVariant
+            rotation: I18n.isRtl ? 180 : 0
+            visible: root.dotEnabled
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Rectangle {
+            width: Theme.dividerWidth
+            height: SettingsMetrics.splitDividerHeight
+            color: Theme.outlineVariant
+            visible: root.dotEnabled
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        DankToggle {
+            hideText: true
+            text: dotRow.title
+            checked: root.dotEnabled
+            anchors.verticalCenter: parent.verticalCenter
+            onToggled: value => SettingsData.setDotEnabled(value, bar.selectedBarId)
+        }
     }
 }

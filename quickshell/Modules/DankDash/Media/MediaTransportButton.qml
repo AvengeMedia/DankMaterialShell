@@ -11,6 +11,7 @@ DankIconButton {
 
     required property var player
     required property string mediaAction
+    property bool keepNavigation: false
 
     readonly property var presentation: root.player.presentation
     readonly property var activePlayer: root.player.activePlayer
@@ -18,6 +19,7 @@ DankIconButton {
     readonly property bool repeatingTrack: root.presentation?.loopState === MprisLoopState.Track
 
     checkable: root.mediaAction === "shuffle" || root.mediaAction === "play" || root.mediaAction === "repeat"
+    iconFilled: false
 
     iconName: {
         switch (root.mediaAction) {
@@ -56,11 +58,11 @@ DankIconButton {
         case "shuffle":
             return !!root.presentation?.shuffle;
         case "previous":
-            return !!root.presentation?.previous;
+            return root.keepNavigation ? !!root.presentation : !!root.presentation?.previous;
         case "play":
             return !!root.presentation?.play;
         case "next":
-            return !!root.presentation?.next;
+            return root.keepNavigation ? !!root.presentation : !!root.presentation?.next;
         case "repeat":
             return !!root.presentation?.repeat;
         }
@@ -72,7 +74,7 @@ DankIconButton {
         case "shuffle":
             return !!root.activePlayer?.shuffleSupported && !!root.activePlayer?.canControl;
         case "previous":
-            return !!root.activePlayer?.canGoPrevious || !!root.activePlayer?.canSeek;
+            return !!root.activePlayer?.canGoPrevious || (!root.keepNavigation && !!root.activePlayer?.canSeek);
         case "play":
             return !!root.activePlayer?.canTogglePlaying;
         case "next":

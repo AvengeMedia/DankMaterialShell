@@ -16,6 +16,7 @@ Item {
     property real holdStartMs: 2000
     property real holdEndMs: 2000
     property real pxPerMs: 1 / 60
+    property int stepInterval: 60
     property real overscroll: 5
     property bool animateTextChange: false
     property bool loop: false
@@ -34,6 +35,7 @@ Item {
     property int scrollDirection: 1
     property real scrollHoldMs: holdStartMs
     property real textShift: 0
+    property real lastStepMs: 0
 
     function resetScroll() {
         scrollOffset = 0;
@@ -67,8 +69,11 @@ Item {
     }
 
     onScrollActiveChanged: {
-        if (!scrollActive)
+        if (!scrollActive) {
             resetScroll();
+            return;
+        }
+        lastStepMs = Date.now();
     }
 
     clip: true
@@ -86,10 +91,13 @@ Item {
         wrapMode: Text.NoWrap
         width: root.needsScrolling ? implicitWidth : Math.min(implicitWidth, root.width)
         elide: SettingsData.scrollTitleEnabled ? Text.ElideNone : Text.ElideRight
+        // Whole-pixel x plus NativeRendering's glyph snapping quantises the offset twice, which
+        // turns even motion into a 1px/2px stutter. Both go while the text is actually scrolling.
+        renderType: root.needsScrolling ? Text.QtRendering : resolvedRenderType
         x: {
             if (root.needsScrolling) {
                 const offset = Math.min(root.scrollOffset, root.maxScrollOffset);
-                return Math.round((root.rightToLeft ? root.width - width + offset : -offset) + root.textShift);
+                return (root.rightToLeft ? root.width - width + offset : -offset) + root.textShift;
             }
             switch (root.horizontalAlignment) {
             case Text.AlignHCenter:
@@ -120,6 +128,7 @@ Item {
             font: label.font
             color: label.color
             wrapMode: Text.NoWrap
+            renderType: Text.QtRendering
             Accessible.ignored: true
         }
     }
@@ -157,13 +166,16 @@ Item {
     // Timer stepping, not NumberAnimation: a running animation commits frames every vsync (#2863).
     // When cava frames are already driving renders, scroll steps ride those ticks instead (#2863).
     Timer {
-        interval: 60
+        interval: root.stepInterval
         repeat: true
         running: root.scrollActive
         onTriggered: {
+            const now = Date.now();
+            const elapsed = Math.min(now - root.lastStepMs, root.stepInterval * 4);
+            root.lastStepMs = now;
             if (cavaTickWatch.running)
                 return;
-            root.stepScroll(60);
+            root.stepScroll(elapsed);
         }
     }
 

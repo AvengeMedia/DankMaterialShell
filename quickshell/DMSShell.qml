@@ -253,7 +253,6 @@ Item {
         PolkitService.polkitAvailable;
         DisplayConfigState.hasOutputBackend;
         PortalService.systemColorScheme;
-        IconThemeService.revision;
         DesktopService.isSystemd;
         TrashService.count;
         WallpaperCyclingService.cyclingActive;
@@ -845,6 +844,11 @@ Item {
             onApplicationSelected: (app, filePath) => {
                 if (!app)
                     return;
+                const entry = SessionService.resolveDesktopId(app.appId);
+                if (entry) {
+                    SessionService.launchDesktopEntry(entry, false, [filePath]);
+                    return;
+                }
                 let cmd = app.exec || "";
                 const escapedPath = shellEscape(filePath);
                 const escapedUri = shellEscape("file://" + filePath);

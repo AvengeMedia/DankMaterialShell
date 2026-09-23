@@ -82,6 +82,45 @@ kernel.x86_64    6.14.3-1.fc41   updates`,
 			},
 		},
 		{
+			name: "skips the obsoleted packages listed under an upgrade",
+			input: `Upgrades
+example-lib.x86_64             2.0.0-1.fc44   updates
+example-app.noarch             3.1.0-1.fc44   updates
+
+Obsoleting packages
+example-app.noarch             3.1.0-1.fc44   updates
+    example-app-old.noarch     3.0.0-1.fc44   updates
+    example-helper.x86_64      1.4.0-1.fc44   updates`,
+			backendID: "dnf5",
+			installed: map[string]string{
+				"example-lib":     "1.9.0-1.fc44",
+				"example-app":     "3.0.0-1.fc44",
+				"example-app-old": "3.0.0-1.fc44",
+				"example-helper":  "1.4.0-1.fc44",
+			},
+			want: []Package{
+				{Name: "example-lib.x86_64", Repo: RepoSystem, Backend: "dnf5", FromVersion: "1.9.0-1.fc44", ToVersion: "2.0.0-1.fc44"},
+				{Name: "example-app.noarch", Repo: RepoSystem, Backend: "dnf5", FromVersion: "3.0.0-1.fc44", ToVersion: "3.1.0-1.fc44"},
+			},
+		},
+		{
+			name: "skips obsoleted packages in dnf4 output, which has no upgrades heading",
+			input: `example-lib.x86_64             2.0.0-1.fc41   updates
+Obsoleting Packages
+example-app.noarch             3.1.0-1.fc41   updates
+    example-app-old.noarch     3.0.0-1.fc41   @updates`,
+			backendID: "dnf",
+			installed: map[string]string{
+				"example-lib":     "1.9.0-1.fc41",
+				"example-app":     "3.0.0-1.fc41",
+				"example-app-old": "3.0.0-1.fc41",
+			},
+			want: []Package{
+				{Name: "example-lib.x86_64", Repo: RepoSystem, Backend: "dnf", FromVersion: "1.9.0-1.fc41", ToVersion: "2.0.0-1.fc41"},
+				{Name: "example-app.noarch", Repo: RepoSystem, Backend: "dnf", FromVersion: "3.0.0-1.fc41", ToVersion: "3.1.0-1.fc41"},
+			},
+		},
+		{
 			name: "skips dnf5 banner / column header lines",
 			input: `Updates available
 Last metadata expiration check: 0:01:23 ago on Tue Apr 29 14:00:00 2026.

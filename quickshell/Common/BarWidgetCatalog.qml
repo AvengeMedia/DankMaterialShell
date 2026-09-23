@@ -235,6 +235,7 @@ Singleton {
     ]
 
     readonly property var optionFiles: ({
+            "launcherButton": "LauncherButtonOptions.qml",
             "workspaceSwitcher": "WorkspaceSwitcherOptions.qml",
             "clock": "ClockOptions.qml",
             "music": "MusicOptions.qml",

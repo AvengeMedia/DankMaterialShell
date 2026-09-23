@@ -1,7 +1,9 @@
 import QtQuick
+import QtQuick.Shapes
 import qs.Common
 import qs.Services
 import qs.Modules.SurfaceWidgets
+import "BarOutline.js" as BarOutline
 
 Item {
     id: root
@@ -20,7 +22,19 @@ Item {
     readonly property bool farEdge: isBottom || isRight
     readonly property bool edgeAttached: (barConfig?.attachToScreenEdge ?? false) && !frameShapesBar
     readonly property bool alongWings: !(barWindow.spansEdge ?? true)
+    readonly property real crossSize: axis.isVertical ? (parent?.width ?? 0) : (parent?.height ?? 0)
+    readonly property real wingCrossCap: Math.max(0, crossSize - Math.min(rt, crossSize / 2))
     readonly property real wing: gothEnabled ? barWindow._wingR : 0
+    readonly property real wingAlong: Math.max(0, motion.currentOffsetAlong)
+    readonly property real wingCross: alongWings ? Math.min(wingAlong, wingCrossCap) : wingAlong
+    readonly property real windowLength: axis.isVertical ? barWindow.height : barWindow.width
+    readonly property string startSide: axis.isVertical ? "top" : "left"
+    readonly property string endSide: axis.isVertical ? "bottom" : "right"
+    readonly property var startNeighbour: alongWings ? null : ShellLayout.adjacentCover(barWindow.screen, startSide, barConfig, windowLength)
+    readonly property var endNeighbour: alongWings ? null : ShellLayout.adjacentCover(barWindow.screen, endSide, barConfig, windowLength)
+    readonly property real alongOrigin: axis.isVertical ? 0 : barWindow.effectiveSpacing
+    readonly property real startCover: coveredBy(startNeighbour)
+    readonly property real endCover: coveredBy(endNeighbour)
     readonly property real alongWing: alongWings ? wing : 0
     readonly property real crossWing: alongWings ? 0 : wing
     readonly property real rt: {
@@ -112,6 +126,12 @@ Item {
     anchors.topMargin: -(axis.isVertical ? alongWing : (isBottom ? crossWing : 0))
     anchors.bottomMargin: -(axis.isVertical ? alongWing : (isTop ? crossWing : 0))
 
+    function coveredBy(neighbour) {
+        if (!neighbour || neighbour.tucked)
+            return 0;
+        return Math.max(0, neighbour.reach - alongOrigin) + neighbour.wing;
+    }
+
     function alongWingCorner(leading) {
         switch (barPos) {
         case SettingsData.Position.Bottom:
@@ -200,42 +220,79 @@ Item {
 
     GothCorner {
         id: leadingWing
-        radius: Math.max(0, motion.currentOffsetAlong)
+        radius: root.wingAlong
+        radiusX: root.axis.isVertical ? root.wingCross : radius
+        radiusY: root.axis.isVertical ? radius : root.wingCross
         color: root.barWindow._bgColor
-        visible: root.gothEnabled && radius > 0
-        x: root.alongWings ? (root.axis.isVertical && root.isRight ? root.width - radius : 0) : (root.isLeft ? body.width : 0)
-        y: root.alongWings ? (!root.axis.isVertical && root.isBottom ? root.height - radius : 0) : (root.isTop ? body.height : 0)
+        visible: root.gothEnabled && radius > 0 && root.startCover <= 0
+        x: root.alongWings ? (root.axis.isVertical && root.isRight ? root.width - width : 0) : (root.isLeft ? body.width : 0)
+        y: root.alongWings ? (!root.axis.isVertical && root.isBottom ? root.height - height : 0) : (root.isTop ? body.height : 0)
         corner: root.alongWings ? root.alongWingCorner(true) : root.isTop ? "bottomRight" : root.isBottom ? "topRight" : root.isLeft ? "bottomRight" : "bottomLeft"
     }
 
     GothCorner {
         id: trailingWing
-        radius: Math.max(0, motion.currentOffsetAlong)
+        radius: root.wingAlong
+        radiusX: root.axis.isVertical ? root.wingCross : radius
+        radiusY: root.axis.isVertical ? radius : root.wingCross
         color: root.barWindow._bgColor
-        visible: root.gothEnabled && radius > 0
-        x: root.axis.isVertical ? (root.alongWings ? (root.isRight ? root.width - radius : 0) : (root.isLeft ? body.width : 0)) : root.width - radius
-        y: root.axis.isVertical ? root.height - radius : (root.alongWings ? (root.isBottom ? root.height - radius : 0) : (root.isTop ? body.height : 0))
+        visible: root.gothEnabled && radius > 0 && root.endCover <= 0
+        x: root.axis.isVertical ? (root.alongWings ? (root.isRight ? root.width - width : 0) : (root.isLeft ? body.width : 0)) : root.width - width
+        y: root.axis.isVertical ? root.height - height : (root.alongWings ? (root.isBottom ? root.height - height : 0) : (root.isTop ? body.height : 0))
         corner: root.alongWings ? root.alongWingCorner(false) : root.isTop ? "bottomLeft" : root.isBottom ? "topLeft" : root.isLeft ? "topRight" : "topLeft"
     }
 
-    Rectangle {
+    Loader {
         id: border
         readonly property real thickness: Theme.snap(Math.max(Theme.outlineWidth, barConfig?.borderThickness ?? Theme.outlineWidth), CompositorService.getScreenScale(root.barWindow.screen))
         readonly property string colorKey: barConfig?.borderColor || "surfaceText"
         readonly property color baseColor: colorKey === "surfaceText" ? Theme.surfaceText : colorKey === "primary" ? Theme.primary : Theme.secondary
         readonly property bool showFullBorder: (barConfig?.spacing ?? 4) > 0
+        readonly property string path: BarOutline.borderPath({
+            position: root.axis.edge,
+            width: root.width,
+            height: root.height,
+            body: {
+                x: body.x,
+                y: body.y,
+                width: body.width,
+                height: body.height
+            },
+            corners: {
+                topLeft: body.topLeftRadius,
+                topRight: body.topRightRadius,
+                bottomLeft: body.bottomLeftRadius,
+                bottomRight: body.bottomRightRadius
+            },
+            wing: root.gothEnabled ? leadingWing.radius : 0,
+            wingCross: root.gothEnabled ? root.wingCross : 0,
+            alongWings: root.alongWings,
+            inset: thickness / 2,
+            open: !showFullBorder,
+            coverStart: root.startCover,
+            coverStartWing: root.startNeighbour?.wing ?? 0,
+            coverEnd: root.endCover,
+            coverEndWing: root.endNeighbour?.wing ?? 0,
+            seamStart: root.startNeighbour?.tucked ?? false,
+            seamEnd: root.endNeighbour?.tucked ?? false
+        })
         z: 100
-        visible: barConfig?.borderEnabled ?? false
-        x: body.x - (!showFullBorder && root.isRight ? thickness : 0)
-        y: body.y - (!showFullBorder && root.isBottom ? thickness : 0)
-        width: body.width + (!showFullBorder && (root.isLeft || root.isRight) ? thickness : 0)
-        height: body.height + (!showFullBorder && (root.isTop || root.isBottom) ? thickness : 0)
-        topLeftRadius: body.topLeftRadius
-        topRightRadius: body.topRightRadius
-        bottomLeftRadius: body.bottomLeftRadius
-        bottomRightRadius: body.bottomRightRadius
-        color: "transparent"
-        border.width: thickness
-        border.color: Theme.withAlpha(baseColor, barConfig?.borderOpacity ?? 1.0)
+        anchors.fill: parent
+        active: barConfig?.borderEnabled ?? false
+        sourceComponent: Shape {
+            preferredRendererType: Shape.CurveRenderer
+
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: Theme.withAlpha(border.baseColor, barConfig?.borderOpacity ?? 1.0)
+                strokeWidth: border.thickness
+                joinStyle: ShapePath.RoundJoin
+                capStyle: ShapePath.FlatCap
+
+                PathSvg {
+                    path: border.path
+                }
+            }
+        }
     }
 }

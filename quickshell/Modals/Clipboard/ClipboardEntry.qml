@@ -56,6 +56,7 @@ DankListItem {
 
         DankActionButton {
             Keys.forwardTo: [root.modal.modalFocusScope]
+            objectName: "previewEntry"
             iconName: "preview"
             tooltipText: I18n.tr("Preview", "verb, clipboard entry action button tooltip", true)
             iconSize: Theme.iconSizeSmall

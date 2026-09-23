@@ -164,8 +164,8 @@ DankModal {
                     height: parent.height - 120
                     radius: Theme.cornerRadius
                     color: Theme.floatingWindowNestedSurface
-                    border.color: Theme.outlineStrong
-                    border.width: 1
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
                     clip: true
 
                     DankFlickable {

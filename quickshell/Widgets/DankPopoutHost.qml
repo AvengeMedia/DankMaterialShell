@@ -64,10 +64,14 @@ Item {
     property real _publishedBodyY: 0
     property real _publishedBodyW: 0
     property real _publishedBodyH: 0
-    property real _surfaceMarginLeft: 0
-    property real _surfaceMarginTop: 0
+    property real _surfaceX: 0
+    property real _surfaceY: 0
     property real _surfaceW: 0
     property real _surfaceH: 0
+    property bool _anchorEndX: false
+    property bool _anchorEndY: false
+    property var _pendingSurfaceX: null
+    property var _pendingSurfaceY: null
     property real _surfaceBodyX: 0
     property real _surfaceBodyY: 0
     property real _surfaceBodyW: 0
@@ -391,7 +395,12 @@ Item {
     }
     property bool _surfaceSwitching: false
     readonly property real _contentWindowWidth: contentWindow.width
-    on_ContentWindowWidthChanged: _surfaceSwitching = false
+    readonly property real _contentWindowHeight: contentWindow.height
+    on_ContentWindowWidthChanged: {
+        _surfaceSwitching = false;
+        _flushPendingSurface("x", false);
+    }
+    on_ContentWindowHeightChanged: _flushPendingSurface("y", false)
     onResizingChanged: {
         if (!resizing)
             backgroundLayer.item?.surfaceMoved();
@@ -417,6 +426,18 @@ Item {
         if (connected)
             return;
         _setAnimatedSurfaceEnvelope();
+    }
+
+    Timer {
+        id: surfaceStepTimerX
+        interval: 100
+        onTriggered: root._flushPendingSurface("x", true)
+    }
+
+    Timer {
+        id: surfaceStepTimerY
+        interval: 100
+        onTriggered: root._flushPendingSurface("y", true)
     }
 
     onSettingsConnectedFrameModeActiveChanged: {
@@ -507,6 +528,10 @@ Item {
 
         if (_openScreen !== null && _openScreen !== screen)
             contentWindow.visible = false;
+        if (!contentWindow.visible) {
+            _anchorEndX = surfaceBodyX + surfaceBodyWidth / 2 > screenWidth / 2;
+            _anchorEndY = !fullHeightSurface && alignedY + alignedHeight / 2 > screenHeight / 2;
+        }
         _lastOpenedScreen = screen;
         if (connected)
             PopoutManager.showPopout(popoutHandle);
@@ -765,8 +790,8 @@ Item {
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property real surfaceBodyWidth: Math.max(alignedWidth, Theme.px(Math.min(minimumSurfaceWidth, screenWidth), dpr))
     readonly property real surfaceBodyX: Theme.snap(_standaloneAlignedXFor(surfaceBodyWidth), dpr)
-    readonly property real _surfaceOriginX: connected ? 0 : _surfaceBodyX - shadowBuffer
-    readonly property real _surfaceOriginY: connected || fullHeightSurface ? 0 : _surfaceBodyY - shadowBuffer
+    readonly property real _surfaceOriginX: connected ? 0 : _surfaceX
+    readonly property real _surfaceOriginY: connected || fullHeightSurface ? 0 : _surfaceY
     readonly property var _geometrySpringParams: Theme.springPreset("default", root.animationDuration)
 
     readonly property real renderedAlignedX: alignedXFor(renderedAlignedWidth)
@@ -1040,12 +1065,60 @@ Item {
         _surfaceBodyY = newY;
         _surfaceBodyW = newW;
         _surfaceBodyH = newH;
-        _surfaceMarginLeft = _surfaceBodyX - shadowBuffer;
-        _surfaceMarginTop = _surfaceBodyY - shadowBuffer;
-        _surfaceW = _surfaceBodyW + shadowBuffer * 2;
-        _surfaceH = _surfaceBodyH + shadowBuffer * 2;
+        _requestSurfaceAxis("x", newX - shadowBuffer, newW + shadowBuffer * 2);
+        if (!fullHeightSurface)
+            _requestSurfaceAxis("y", newY - shadowBuffer, newH + shadowBuffer * 2);
         if (changed && !resizing && backgroundLayer.item)
             backgroundLayer.item.surfaceMoved();
+    }
+
+    // Compositors place the old buffer at the new origin until the configure round trip lands, and niri
+    // clamps sizes to the output. Anchoring the far edge lets the surface grow with its origin fixed, so
+    // the origin only moves once the buffer already spans the target; shrinks keep the body covered anyway.
+    function _requestSurfaceAxis(axis, start, size) {
+        const x = axis === "x";
+        const pendingProp = x ? "_pendingSurfaceX" : "_pendingSurfaceY";
+        const timer = x ? surfaceStepTimerX : surfaceStepTimerY;
+        root[pendingProp] = null;
+        timer.stop();
+        const currentStart = x ? _surfaceX : _surfaceY;
+        const actualSize = x ? contentWindow.width : contentWindow.height;
+        const growSize = (x ? _anchorEndX : _anchorEndY) ? size : Math.min(size, (x ? screenWidth : screenHeight) - currentStart);
+        if (!contentWindow.visible || start >= currentStart || growSize === actualSize) {
+            _applySurfaceAxis(axis, start, size);
+            return;
+        }
+        root[pendingProp] = {
+            "start": start,
+            "size": size
+        };
+        _applySurfaceAxis(axis, currentStart, size);
+        timer.restart();
+    }
+
+    function _applySurfaceAxis(axis, start, size) {
+        if (axis === "x") {
+            _surfaceX = start;
+            _surfaceW = size;
+            return;
+        }
+        _surfaceY = start;
+        _surfaceH = size;
+    }
+
+    function _flushPendingSurface(axis, timedOut) {
+        const x = axis === "x";
+        const pendingProp = x ? "_pendingSurfaceX" : "_pendingSurfaceY";
+        const pending = root[pendingProp];
+        if (!pending)
+            return;
+        const actualSize = x ? contentWindow.width : contentWindow.height;
+        const reachedEdge = (x ? _surfaceX : _surfaceY) + actualSize >= (x ? screenWidth : screenHeight);
+        if (!timedOut && pending.size !== actualSize && !reachedEdge)
+            return;
+        root[pendingProp] = null;
+        (x ? surfaceStepTimerX : surfaceStepTimerY).stop();
+        _applySurfaceAxis(axis, pending.start, pending.size);
     }
 
     function _setSettledSurfaceGeometry() {
@@ -1059,12 +1132,12 @@ Item {
             return;
         const currentX = renderedAlignedX;
         const currentRight = renderedAlignedX + renderedAlignedWidth;
-        const targetX = surfaceBodyX;
-        const targetRight = surfaceBodyX + surfaceBodyWidth;
-        const existingX = _surfaceBodyW > 0 ? _surfaceBodyX : currentX;
-        const existingRight = _surfaceBodyW > 0 ? _surfaceBodyX + _surfaceBodyW : currentRight;
-        const envelopeX = Math.min(currentX, targetX, existingX);
-        const envelopeWidth = Math.max(0, Math.max(currentRight, targetRight, existingRight) - envelopeX);
+        // Handlers run before sibling bindings settle, so derive the target from the inputs.
+        const targetWidth = Math.max(Theme.px(popupWidth, dpr), Theme.px(Math.min(minimumSurfaceWidth, screenWidth), dpr));
+        const targetX = Theme.snap(_standaloneAlignedXFor(targetWidth), dpr);
+        const targetRight = targetX + targetWidth;
+        const envelopeX = Math.min(currentX, targetX);
+        const envelopeWidth = Math.max(0, Math.max(currentRight, targetRight) - envelopeX);
         if (fullHeightSurface) {
             _setSurfaceGeometry(envelopeX, alignedY, envelopeWidth, alignedHeight);
             surfaceSettleTimer.restart();
@@ -1075,10 +1148,8 @@ Item {
         const currentBottom = renderedAlignedY + renderedAlignedHeight;
         const targetY = alignedY;
         const targetBottom = alignedY + alignedHeight;
-        const existingY = _surfaceBodyH > 0 ? _surfaceBodyY : currentY;
-        const existingBottom = _surfaceBodyH > 0 ? _surfaceBodyY + _surfaceBodyH : currentBottom;
-        const envelopeY = Math.min(currentY, targetY, existingY);
-        const envelopeBottom = Math.max(currentBottom, targetBottom, existingBottom);
+        const envelopeY = Math.min(currentY, targetY);
+        const envelopeBottom = Math.max(currentBottom, targetBottom);
         _setSurfaceGeometry(envelopeX, envelopeY, envelopeWidth, Math.max(0, envelopeBottom - envelopeY));
         surfaceSettleTimer.restart();
     }
@@ -1353,11 +1424,13 @@ Item {
         screen: root.surfaceScreen
         visible: false
         color: "transparent"
-        readonly property bool closeVisualActive: root.shouldBeVisible || root.isClosing
-
         onVisibleChanged: {
             if (!visible) {
                 root._surfaceFrameReady = false;
+                root._pendingSurfaceX = null;
+                root._pendingSurfaceY = null;
+                surfaceStepTimerX.stop();
+                surfaceStepTimerY.stop();
                 if (!root.shouldBeVisible)
                     root._contentRenderActive = false;
                 if (Qt.inputMethod) {
@@ -1388,8 +1461,8 @@ Item {
             dismissEnabled: root.hoverDismissEnabled
             dismissSuspended: root.hoverDismissSuspended
             surfaceVisible: root.shouldBeVisible
-            globalOffsetX: root.connected ? 0 : root._surfaceMarginLeft
-            globalOffsetY: root.connected || root.fullHeightSurface ? 0 : root._surfaceMarginTop
+            globalOffsetX: root._surfaceOriginX
+            globalOffsetY: root._surfaceOriginY
             onDismissRequested: root.closeFromHoverDismiss()
         }
 
@@ -1399,15 +1472,17 @@ Item {
         WlrLayershell.keyboardFocus: KeyboardFocus.keyboardFocus(root.shouldBeVisible && (root._keyboardReady || !root.connected), root.customKeyboardFocus)
 
         anchors {
-            left: true
-            top: true
-            right: root.connected
-            bottom: root.connected || root.fullHeightSurface
+            left: root.connected || !root._anchorEndX
+            top: root.connected || root.fullHeightSurface || !root._anchorEndY
+            right: root.connected || root._anchorEndX
+            bottom: root.connected || root.fullHeightSurface || root._anchorEndY
         }
 
         WlrLayershell.margins {
-            left: root.connected ? 0 : root._surfaceMarginLeft
-            top: root.connected || root.fullHeightSurface ? 0 : root._surfaceMarginTop
+            left: root.connected || root._anchorEndX ? 0 : root._surfaceX
+            top: root.connected || root.fullHeightSurface || root._anchorEndY ? 0 : root._surfaceY
+            right: !root.connected && root._anchorEndX ? root.screenWidth - root._surfaceX - root._surfaceW : 0
+            bottom: !root.connected && !root.fullHeightSurface && root._anchorEndY ? root.screenHeight - root._surfaceY - root._surfaceH : 0
         }
 
         implicitWidth: root.connected ? 0 : root._surfaceW
@@ -1429,13 +1504,14 @@ Item {
             height: root.maskHeight
         }
 
+        // Empty input region to avoid the animating surface taking pointer events
         Item {
             id: contentMaskRect
             visible: false
             x: contentContainer.x - contentContainer.horizontalConnectorExtent - root.inputMargin
             y: contentContainer.y - contentContainer.verticalConnectorExtent - root.inputMargin
-            width: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedWidth + contentContainer.horizontalConnectorExtent * 2 + root.inputMargin * 2 : 0
-            height: root.connected || contentWindow.closeVisualActive ? root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2 + root.inputMargin * 2 : 0
+            width: root.shouldBeVisible ? root.renderedAlignedWidth + contentContainer.horizontalConnectorExtent * 2 + root.inputMargin * 2 : 0
+            height: root.shouldBeVisible ? root.renderedAlignedHeight + contentContainer.verticalConnectorExtent * 2 + root.inputMargin * 2 : 0
         }
 
         Loader {

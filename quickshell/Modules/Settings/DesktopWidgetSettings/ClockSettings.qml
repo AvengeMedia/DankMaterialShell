@@ -34,19 +34,11 @@ DesktopWidgetInstanceSettings {
         }
     }
 
-    SettingsDivider {
-        visible: root.analog
-    }
-
     SettingsToggleRow {
         visible: root.analog
         text: I18n.tr("Show hour numbers")
         checked: root.cfg.showAnalogNumbers ?? false
         onToggled: checked => root.updateConfig("showAnalogNumbers", checked)
-    }
-
-    SettingsDivider {
-        visible: root.analog
     }
 
     SettingsToggleRow {
@@ -56,18 +48,12 @@ DesktopWidgetInstanceSettings {
         onToggled: checked => root.updateConfig("showAnalogSeconds", checked)
     }
 
-    SettingsDivider {
-        visible: !root.analog
-    }
-
     SettingsToggleRow {
         visible: !root.analog
         text: I18n.tr("Show seconds")
         checked: root.cfg.showDigitalSeconds ?? false
         onToggled: checked => root.updateConfig("showDigitalSeconds", checked)
     }
-
-    SettingsDivider {}
 
     SettingsToggleRow {
         text: I18n.tr("Show date")

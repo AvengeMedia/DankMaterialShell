@@ -36,6 +36,7 @@ Rectangle {
             sourceComponent: CachingImage {
                 imagePath: root.path
                 maxCacheSize: SettingsMetrics.wallpaperThumbCache
+                asynchronous: false
                 animate: false
             }
         }

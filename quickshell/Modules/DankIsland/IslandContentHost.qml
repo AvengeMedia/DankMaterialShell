@@ -22,6 +22,8 @@ Item {
     required property bool expanded
     required property bool pointerInside
     required property string activityId
+    property bool freeMode: false
+    property Component compactFaceOverride: null
     required property Component homeCompactComponent
     required property Component homeExpandedComponent
     required property Component mediaCompactComponent
@@ -157,16 +159,18 @@ Item {
     // Pinned to the compact target's own screen slot so the face holds still while the island morphs.
     component CompactFace: Loader {
         required property string activity
+        required property Component face
         readonly property var target: root.controller.compactTargetFor(activity)
         readonly property bool isVertical: root.controller.isVertical
         readonly property real alongPos: isVertical ? Math.round((root.hostHeight - target.height) / 2 + target.offsetAlong) - Math.round(root.islandY) : Math.round((root.hostWidth - target.width) / 2 + target.offsetAlong) - Math.round(root.islandX)
         readonly property real crossPos: isVertical ? Math.round((parent.width - width) / 2) : Math.round((parent.height - height) / 2)
 
-        x: isVertical ? crossPos : alongPos
-        y: isVertical ? alongPos : crossPos
+        x: root.freeMode ? Math.round((parent.width - width) / 2) : (isVertical ? crossPos : alongPos)
+        y: root.freeMode ? Math.round((parent.height - height) / 2) : (isVertical ? alongPos : crossPos)
         width: target.width
         height: target.height
         asynchronous: false
+        sourceComponent: root.compactFaceOverride && root.controller.usesDotFace(activity) ? root.compactFaceOverride : face
         visible: opacity > 0.001
         enabled: opacity >= 0.5
     }
@@ -184,7 +188,7 @@ Item {
     CompactFace {
         active: true
         activity: "home"
-        sourceComponent: root.homeCompactComponent
+        face: root.homeCompactComponent
         opacity: root.compactOpacity("home")
     }
 
@@ -201,7 +205,7 @@ Item {
     CompactFace {
         active: root.mediaSurfaceActive
         activity: "media"
-        sourceComponent: root.mediaCompactComponent
+        face: root.mediaCompactComponent
         opacity: root.compactOpacity("media")
     }
 
@@ -219,7 +223,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("launcher")
         activity: "launcher"
-        sourceComponent: root.launcherCompactComponent
+        face: root.launcherCompactComponent
         opacity: root.compactOpacity("launcher")
     }
 
@@ -244,7 +248,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("controlcenter")
         activity: "controlcenter"
-        sourceComponent: root.controlCenterCompactComponent
+        face: root.controlCenterCompactComponent
         opacity: root.compactOpacity("controlcenter")
     }
 
@@ -260,7 +264,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("wallpaper")
         activity: "wallpaper"
-        sourceComponent: root.wallpaperCompactComponent
+        face: root.wallpaperCompactComponent
         opacity: root.compactOpacity("wallpaper")
     }
 
@@ -277,7 +281,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("weather")
         activity: "weather"
-        sourceComponent: root.weatherCompactComponent
+        face: root.weatherCompactComponent
         opacity: root.compactOpacity("weather")
     }
 
@@ -294,7 +298,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("notificationcenter")
         activity: "notificationcenter"
-        sourceComponent: root.notificationCenterCompactComponent
+        face: root.notificationCenterCompactComponent
         opacity: root.compactOpacity("notificationcenter")
     }
 
@@ -311,7 +315,7 @@ Item {
     CompactFace {
         active: root.systemSurfaceActive
         activity: "volume"
-        sourceComponent: root.systemCompactComponent
+        face: root.systemCompactComponent
         opacity: Math.max(root.compactOpacity("volume"), root.compactOpacity("brightness"))
     }
 
@@ -326,7 +330,7 @@ Item {
     CompactFace {
         active: root.surfaceActive("notification")
         activity: "notification"
-        sourceComponent: root.notificationCompactComponent
+        face: root.notificationCompactComponent
         opacity: root.compactOpacity("notification")
     }
 

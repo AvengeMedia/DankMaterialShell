@@ -97,6 +97,7 @@ var (
 	miracleVersionRegex    = regexp.MustCompile(`miracle-wm v?(\d+\.\d+\.\d+)`)
 	scrollVersionRegex     = regexp.MustCompile(`scroll version (\d+\.\d+)`)
 	aqueousVersionRegex    = regexp.MustCompile(`(?i)aqueous v?(\d+\.\d+(?:\.\d+)?)`)
+	umbrielVersionRegex    = regexp.MustCompile(`umbriel (\d+\.\d+\.\d+)`)
 )
 
 var doctorCmd = &cobra.Command{
@@ -743,6 +744,7 @@ func checkWindowManagers() []checkResult {
 		{"Miracle WM", "miracle-wm", "--version", miracleVersionRegex, []string{"miracle-wm"}},
 		{"Scroll", "scroll", "--version", scrollVersionRegex, []string{"scroll"}},
 		{"Aqueous", "aqueous", "-version", aqueousVersionRegex, []string{"aqueous"}},
+		{"Umbriel", "umbriel", "--version", umbrielVersionRegex, []string{"umbriel"}},
 	}
 
 	var results []checkResult
@@ -775,7 +777,7 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{
 			catCompositor, "Compositor", statusError,
 			"No supported Wayland compositor found",
-			"Install Hyprland, niri, Sway, River, Wayfire, labwc, mangowc, miracle-wm, Scroll, or Aqueous",
+			"Install Hyprland, niri, Sway, River, Wayfire, labwc, mangowc, miracle-wm, Scroll, Aqueous, or Umbriel",
 			doctorDocsURL + "#compositor-checks",
 		})
 	}
@@ -848,6 +850,8 @@ func detectRunningWM() string {
 		return "MangoWC"
 	case os.Getenv("MIRACLESOCK") != "":
 		return "Miracle WM"
+	case os.Getenv("UMBRIEL_SOCKET") != "":
+		return "Umbriel"
 	case os.Getenv("XDG_CURRENT_DESKTOP") != "":
 		return os.Getenv("XDG_CURRENT_DESKTOP")
 	}

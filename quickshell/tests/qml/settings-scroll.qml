@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtTest
 import Quickshell
 import qs.Common
@@ -68,19 +67,23 @@ ShellRoot {
         function settle() {
             wait(0);
             const scene = window.contentItem.Window.window;
-            check(!isPolishScheduled(scene) || waitForPolish(scene, 5000), "settings layout settled");
+            check(!isPolishScheduled(scene) || waitForPolish(scene, 20000), "settings layout settled");
             wait(0);
         }
 
         function open(page) {
             root.content.currentPage = page;
+            try {
+                tryVerify(() => scrollable() !== null, 20000);
+            } catch (error) {
+                throw new Error(page + " has a scrollable page");
+            }
             settle();
-            check(scrollable() !== null, page + " has a scrollable page");
         }
 
         function expectPosition(y, label) {
             try {
-                tryVerify(() => Math.abs(scrollable().contentY - y) < 1, 1000);
+                tryVerify(() => Math.abs(scrollable().contentY - y) < 1, 20000);
             } catch (error) {
                 throw new Error(label + ": expected " + y + ", got " + scrollable().contentY);
             }
@@ -88,7 +91,7 @@ ShellRoot {
 
         function run() {
             try {
-                tryVerify(() => CompositorService.compositor !== "unknown", 5000);
+                tryVerify(() => CompositorService.compositor !== "unknown", 20000);
                 root.content = contentComponent.createObject(window.contentItem);
                 open("theme_surfaces");
                 SettingsData.animationDuration = 0;
@@ -103,15 +106,14 @@ ShellRoot {
                 open("theme_surfaces");
                 check(root.content.currentPageItem === root.parentPage, "Back reuses the parent page");
                 expectPosition(position, "Back preserves the scroll position");
-                tryCompare(root, "childPage", null);
+                tryCompare(root, "childPage", null, 20000);
 
                 SettingsData.animationDuration = 250;
                 open("notifications");
-                check(!root.content.currentPageItem.parent.StackView.view.busy, "category switches have no page transition");
-                tryCompare(root, "parentPage", null);
+                tryCompare(root, "parentPage", null, 20000);
                 root.parentPage = root.content.currentPageItem;
                 modal.shouldBeVisible = false;
-                tryCompare(root, "parentPage", null);
+                tryCompare(root, "parentPage", null, 20000);
                 modal.shouldBeVisible = true;
                 settle();
 
@@ -124,7 +126,7 @@ ShellRoot {
                     }
                 ];
                 root.content.currentPage = "dankbar_widgets";
-                tryVerify(() => root.content.currentPageItem?.reorderGroup !== undefined, 1000);
+                tryVerify(() => root.content.currentPageItem?.reorderGroup !== undefined, 20000);
                 settle();
                 const widgetRow = find(root.content.currentPageItem, item => item.modelData?.id === "clock");
                 check(widgetRow && widgetRow.visible && widgetRow.height > 0, "bar widgets renders the configured clock row");

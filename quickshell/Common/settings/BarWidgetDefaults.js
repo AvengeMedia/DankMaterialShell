@@ -6,6 +6,14 @@ var DEFAULTS = {
     spacer: {
         size: 20
     },
+    launcherButton: {
+        launcherLogoMode: "apps",
+        launcherLogoCustomPath: "",
+        launcherLogoColorOverride: "",
+        launcherLogoBrightness: 0.5,
+        launcherLogoContrast: 1,
+        launcherLogoSizeOffset: 0
+    },
     workspaceSwitcher: {
         workspaceIndicatorStyle: "pills",
         showWorkspaceIndex: false,
@@ -154,8 +162,9 @@ var DEFAULTS = {
     }
 };
 
-// entry key -> settings.json key that held the value before config version 18
+// entry key -> settings.json key that held the value before config version 19 (launcherButton: 29)
 var MIGRATED_GLOBALS = {
+    launcherButton: sameNames(["launcherLogoMode", "launcherLogoCustomPath", "launcherLogoColorOverride", "launcherLogoBrightness", "launcherLogoContrast", "launcherLogoSizeOffset"]),
     workspaceSwitcher: sameNames(["showWorkspaceIndex", "showWorkspaceName", "showWorkspacePadding", "workspacePaddingCount", "showWorkspaceApps", "workspaceDragReorder", "maxWorkspaceIcons", "workspaceAppIconSizeOffset", "groupWorkspaceApps", "groupActiveWorkspaceApps", "workspaceFollowFocus", "showOccupiedWorkspacesOnly", "reverseScrolling", "dwlShowAllTags", "workspaceActiveAppHighlightEnabled", "workspaceColorMode", "workspaceFocusedCustomColor", "workspaceOccupiedColorMode", "workspaceOccupiedCustomColor", "workspaceUnfocusedColorMode", "workspaceUnfocusedCustomColor", "workspaceUrgentColorMode", "workspaceUrgentCustomColor", "workspaceFocusedBorderEnabled", "workspaceFocusedBorderColor", "workspaceFocusedBorderCustomColor", "workspaceFocusedBorderThickness", "workspaceUnfocusedMonitorSeparateAppearance", "workspaceUnfocusedMonitorColorMode", "workspaceUnfocusedMonitorFocusedCustomColor", "workspaceUnfocusedMonitorOccupiedColorMode", "workspaceUnfocusedMonitorOccupiedCustomColor", "workspaceUnfocusedMonitorUnfocusedColorMode", "workspaceUnfocusedMonitorUnfocusedCustomColor", "workspaceUnfocusedMonitorUrgentColorMode", "workspaceUnfocusedMonitorUrgentCustomColor", "workspaceUnfocusedMonitorBorderEnabled", "workspaceUnfocusedMonitorBorderColor", "workspaceUnfocusedMonitorBorderCustomColor", "workspaceUnfocusedMonitorBorderThickness"]),
     clock: sameNames(["clockCompactMode"]),
     music: sameNames(["mediaSize", "mediaAdaptiveWidthEnabled", "audioScrollMode"]),
@@ -184,7 +193,10 @@ var MIGRATED_GLOBALS = {
     keyboard_layout_name: sameNames(["keyboardLayoutNameCompactMode", "keyboardLayoutNameShowIcon"])
 };
 
-var LEGACY_GLOBAL_DEFAULTS = { appsDockHideIndicators: false, appsDockIconSizePercentage: 100 };
+var LEGACY_GLOBAL_DEFAULTS = {
+    appsDockHideIndicators: false,
+    appsDockIconSizePercentage: 100
+};
 
 function sameNames(keys) {
     var map = {};

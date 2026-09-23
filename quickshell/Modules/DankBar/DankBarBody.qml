@@ -22,6 +22,8 @@ Item {
     readonly property bool barRevealed: inputMask.showing
 
     readonly property bool isIsland: barConfig?.island === true
+    // A free island's pill lives in IslandFreeHostWindow; this window only carries its satellites.
+    readonly property bool islandFree: isIsland && SettingsData.islandFreePlacement(barConfig)
     readonly property var islandHost: islandLoader.item
     readonly property real islandStripThickness: isIsland ? SettingsData.islandStripThickness(barConfig) : 0
     readonly property string islandSatellitePosition: isIsland ? SettingsData.islandSetting(barConfig, "islandSatellitePosition") : "edges"
@@ -29,6 +31,16 @@ Item {
     readonly property bool islandSatellitesHugIsland: isIsland && islandSatellitePosition === "island"
     readonly property real islandSatelliteGap: isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteGap") : 0
     readonly property bool islandSatelliteBackground: isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteBackground")
+    readonly property color islandSurfaceColor: {
+        if (islandHost)
+            return islandHost.surfaceColor;
+        if (!isIsland)
+            return Theme.hostSurface;
+        if (SettingsData.islandSetting(barConfig, "islandHighContrast"))
+            return Theme.surfaceContainerHighest;
+        const palette = SettingsData.islandSetting(barConfig, "islandPalette");
+        return palette === "bright" ? Theme.surfaceBright : palette === "dim" ? Theme.surfaceDim : _hostSurface;
+    }
     readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 4) + Theme.spacingXS, _dpr) : 0
     readonly property real islandChromeInset: islandSatelliteBackground ? islandChromePad : 0
     readonly property bool islandMotionRunning: islandHost?.motionRunning ?? false
@@ -49,8 +61,10 @@ Item {
     readonly property real contentAlongEnd: (isVertical ? barUnitInset.y + barUnitInset.height - topBarContent.anchors.bottomMargin : barUnitInset.x + barUnitInset.width - topBarContent.anchors.rightMargin)
     readonly property real leadingSectionSize: _leftSection ? (isVertical ? _leftSection.implicitHeight : _leftSection.implicitWidth) : 0
     readonly property real trailingSectionSize: _rightSection ? (isVertical ? _rightSection.implicitHeight : _rightSection.implicitWidth) : 0
-    readonly property real islandLeadingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, islandAlongStart - islandSatelliteGap - islandChromeInset - leadingSectionSize - contentAlongStart)
-    readonly property real islandTrailingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, contentAlongEnd - (islandAlongEnd + islandSatelliteGap + islandChromeInset + trailingSectionSize))
+    readonly property real freeSatelliteSeparation: leadingSectionSize > 0 && trailingSectionSize > 0 ? islandSatelliteGap + islandChromeInset * 2 : 0
+    readonly property real freeSatelliteStart: ((isVertical ? height : width) - leadingSectionSize - freeSatelliteSeparation - trailingSectionSize) / 2
+    readonly property real islandLeadingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, islandFree ? freeSatelliteStart - contentAlongStart : islandAlongStart - islandSatelliteGap - islandChromeInset - leadingSectionSize - contentAlongStart)
+    readonly property real islandTrailingOffset: !islandSatellitesHugIsland ? 0 : Math.max(0, contentAlongEnd - (islandFree ? freeSatelliteStart + leadingSectionSize + freeSatelliteSeparation + trailingSectionSize : islandAlongEnd + islandSatelliteGap + islandChromeInset + trailingSectionSize))
     readonly property var leadingSectionRect: sectionRect(_leftSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset)
     readonly property var trailingSectionRect: sectionRect(_rightSection, false, _revealProgress + islandLeadingOffset + islandTrailingOffset)
 
@@ -225,7 +239,7 @@ Item {
 
             Region {
                 intersection: Intersection.Subtract
-                radius: wingRegion.wing.radius
+                shape: RegionShape.Ellipse
                 x: wingRegion.x + wingRegion.wing.discRect.x
                 y: wingRegion.y + wingRegion.wing.discRect.y
                 width: wingRegion.wing.discRect.width
@@ -321,6 +335,8 @@ Item {
 
             if (hasBar && barBackground.gothEnabled && barWindow._wingR > 0) {
                 for (const wingItem of [barBackground.leadingWing, barBackground.trailingWing]) {
+                    if (!wingItem.visible)
+                        continue;
                     const wing = blurWingRegionComp.createObject(region, {
                         wing: wingItem
                     });
@@ -390,7 +406,7 @@ Item {
 
     readonly property bool isVertical: axis.isVertical
 
-    readonly property color _hostSurface: Theme.hostSurface
+    readonly property color _hostSurface: SettingsData.barSurfaceColor(barConfig)
     readonly property string _barId: barConfig?.id ?? "default"
     readonly property real _backgroundAlpha: SettingsData.barTransparency(barConfig)
     readonly property color _bgColor: (FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome) ? Theme.frameSurfaceColor : Theme.withAlpha(_hostSurface, _backgroundAlpha)
@@ -580,7 +596,7 @@ Item {
 
     readonly property bool reserveExclusiveWhenAutoHidden: FrameTransitionState.effectiveFrameEnabled && usesFrameBarChrome && !!barWindow.screen && SettingsData.isScreenInPreferences(barWindow.screen, SettingsData.frameScreenPreferences)
 
-    readonly property real surfaceExclusiveZone: isIsland ? ((islandHost?.floating ?? false) ? 0 : islandStripThickness) : (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
+    readonly property real surfaceExclusiveZone: isIsland ? ((islandFree || (islandHost?.floating ?? false)) ? 0 : islandStripThickness) : (!(barConfig?.visible ?? true) || (topBarCore.autoHide && !barWindow.reserveExclusiveWhenAutoHidden)) ? -1 : (barWindow.effectiveBarThickness + effectiveSpacing + (usesFrameBarChrome ? 0 : (barConfig?.bottomGap ?? 0)))
 
     readonly property alias inputMaskItem: inputMask
 
@@ -924,7 +940,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.hostSurface, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
                     }
 
                     SectionSurface {
@@ -940,7 +956,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandHost?.surfaceColor ?? Theme.hostSurface, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
                     }
 
                     MouseArea {
@@ -1000,7 +1016,7 @@ Item {
                 Loader {
                     id: islandLoader
                     anchors.fill: parent
-                    active: barWindow.isIsland
+                    active: barWindow.isIsland && !barWindow.islandFree
                     sourceComponent: IslandBarHost {
                         barConfig: barWindow.barConfig
                         screen: barWindow.screen

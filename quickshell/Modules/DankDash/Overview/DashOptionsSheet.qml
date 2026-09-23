@@ -47,6 +47,7 @@ CcSheetDialog {
         iconName: "settings"
         onClicked: {
             root.dismiss();
+            PopoutService.closeDankDash();
             PopoutService.openSettingsWithTab(root.entryId === "media" ? "media_player" : "weather");
         }
     }

@@ -16,14 +16,13 @@ Column {
     property bool showHeader: true
     property bool collapsed: false
     property var instances: []
-    property var expandedStates: ({})
 
     readonly property string sectionKey: groupId ? groupId : ""
     readonly property bool dragActive: reorderGroup.active
     readonly property bool isDropTarget: dragActive && reorderGroup.target === cardsList
 
     signal collapseToggled(string key)
-    signal expandedToggled(string instanceId, bool expanded)
+    signal configureRequested(string instanceId, string title)
     signal duplicateRequested(string instanceId)
     signal deleteRequested(string instanceId)
 
@@ -74,10 +73,9 @@ Column {
 
                 reorderList: cardsList
                 instanceData: modelData
-                isExpanded: section.expandedStates[instanceId] ?? false
                 opacity: dragging && cardsList.crossSectionActive ? 0 : 1
 
-                onExpandedToggled: expanded => section.expandedToggled(instanceId, expanded)
+                onConfigureRequested: section.configureRequested(instanceId, widgetName)
                 onDuplicateRequested: section.duplicateRequested(instanceId)
                 onDeleteRequested: section.deleteRequested(instanceId)
             }

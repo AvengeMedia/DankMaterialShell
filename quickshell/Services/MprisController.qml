@@ -367,13 +367,6 @@ Singleton {
             _persistIdentity(activePlayer.identity);
     }
 
-    function switchActivePlayer(player) {
-        const current = root.activePlayer;
-        if (current && current !== player && current.canPause)
-            current.pause();
-        setActivePlayer(player);
-    }
-
     function setActivePlayer(player: MprisPlayer): void {
         activePlayer = player;
         if (player)

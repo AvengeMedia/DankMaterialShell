@@ -119,13 +119,10 @@ Item {
                 clickable: true
                 onClicked: root.openShadowColorPicker()
 
-                Rectangle {
+                DankColorSwatch {
                     width: Theme.iconSizeMedium
                     height: width
-                    radius: width / 2
-                    color: SettingsData.m3ElevationCustomColor ?? "#000000"
-                    border.color: Theme.outline
-                    border.width: Theme.outlineWidth
+                    swatchColor: SettingsData.m3ElevationCustomColor ?? "#000000"
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -237,7 +234,7 @@ Item {
                 visible: shadowCard.bars.length > 1
                 options: shadowCard.bars.map(config => config.name || config.id)
                 currentValue: bar.selectedBarConfig?.name || bar.selectedBarConfig?.id || ""
-                onValueChanged: value => bar.selectedBarId = shadowCard.bars.find(config => (config.name || config.id) === value)?.id ?? bar.selectedBarId
+                onValueChanged: value => bar.select(shadowCard.bars.find(config => (config.name || config.id) === value)?.id ?? bar.selectedBarId)
             }
 
             SettingsToggleRow {

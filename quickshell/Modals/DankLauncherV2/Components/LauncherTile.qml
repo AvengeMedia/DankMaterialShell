@@ -54,6 +54,8 @@ Rectangle {
 
     radius: Theme.cornerRadiusL
     color: externalHighlight ? "transparent" : isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+    border.width: externalHighlight ? 0 : Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
 
     Rectangle {
         anchors.fill: parent
@@ -87,16 +89,6 @@ Rectangle {
             color: root.contentColor
             visible: root.item?.pinned === true
         }
-    }
-
-    DankKeycap {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.margins: Theme.spacingXS
-        text: "↵"
-        textColor: root.contentColor
-        visible: root.isSelected
-        z: 1
     }
 
     Loader {

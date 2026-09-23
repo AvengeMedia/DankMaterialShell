@@ -6,6 +6,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.DankDash
+import qs.Modules.DankDash.Media
 import "../../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
 
 Card {
@@ -25,8 +26,7 @@ Card {
     readonly property string artUrl: TrackArtService.resolvedArtUrl
     readonly property color accent: MediaAccentService.accent
     readonly property bool showSeekbar: options.seekbar !== false && !tiny
-    readonly property bool circleArt: options.artStyle === "circle"
-    readonly property bool zurvan: options.playerStyle === "zurvan"
+    readonly property bool bento: options.playerStyle === "bento"
     readonly property bool inlineMetadata: compact && titleLabel.implicitHeight + artistLabel.implicitHeight + trackText.spacing > transport.y - Theme.spacingXS
     readonly property var playbackFocusTargets: [playButton, previousButton, nextButton].concat(seekbar.canSeek ? [seekbar] : [])
 
@@ -92,15 +92,20 @@ Card {
         visible: !!root.activePlayer
         enabled: root.interactive
 
-        MediaArtwork {
+        MediaArtSurface {
             id: artwork
             anchors.right: parent.right
             anchors.top: parent.top
             width: root.showArtwork ? Math.max(0, Math.min(DashMetrics.overviewArtHero, parent.width / 3, seekBlock.y - Theme.spacingM)) : 0
             height: width
-            cornerRadius: root.circleArt ? width / 2 : DashMetrics.mediaArtRadius
-            artUrl: root.artUrl
+            artStyle: root.options.artStyle ?? "rounded"
             visible: root.showArtwork
+
+            MediaArtwork {
+                anchors.fill: parent
+                cornerRadius: 0
+                artUrl: root.artUrl
+            }
         }
 
         Column {
@@ -162,7 +167,7 @@ Card {
             id: transport
 
             readonly property bool stacked: root.narrow && !root.tiny
-            readonly property bool centered: root.zurvan && !stacked && !root.tiny
+            readonly property bool centered: root.bento && !stacked && !root.tiny
             readonly property bool medium: !root.compact && width >= Theme.buttonHeightM * 4
             readonly property real buttonHeight: medium ? Theme.buttonHeightM : Theme.buttonHeightS
             readonly property real spacing: root.compact || stacked ? Theme.spacingXS : Theme.spacingS
@@ -188,6 +193,8 @@ Card {
                 round: false
                 checkable: true
                 checked: root.playing
+                iconFilled: false
+                radius: Theme.buttonRadius(width, height, buttonSize, pressed, !root.bento && checked)
                 iconName: root.playing ? "pause" : "play_arrow"
                 Accessible.name: root.playing ? I18n.tr("Pause") : I18n.tr("Play")
                 enabled: !!root.activePlayer?.canTogglePlaying
@@ -202,10 +209,11 @@ Card {
                 anchors.bottom: parent.bottom
                 size: transport.medium ? "m" : "s"
                 width: transport.stacked ? (parent.width - transport.spacing) / 2 : (parent.width - playButton.width - transport.spacing * 2) / 2
-                variant: root.zurvan ? "tonal" : "standard"
-                round: !root.zurvan
+                variant: root.bento ? "tonal" : "standard"
+                round: !root.bento
+                radius: Theme.buttonRadius(width, height, buttonSize, pressed, round)
                 containerColor: MediaAccentService.accentSecondaryContainer
-                contentColor: root.zurvan ? MediaAccentService.onAccentSecondaryContainer : Theme.onSecondaryContainer
+                contentColor: root.bento ? MediaAccentService.onAccentSecondaryContainer : Theme.onSecondaryContainer
                 iconName: "skip_previous"
                 Accessible.name: I18n.tr("Previous")
                 enabled: !!root.activePlayer?.canGoPrevious || (!!root.activePlayer?.canSeek && root.activePlayer.position > 8)
@@ -221,6 +229,7 @@ Card {
                 width: previousButton.width
                 variant: previousButton.variant
                 round: previousButton.round
+                radius: Theme.buttonRadius(width, height, buttonSize, pressed, round)
                 containerColor: previousButton.containerColor
                 contentColor: previousButton.contentColor
                 iconName: "skip_next"

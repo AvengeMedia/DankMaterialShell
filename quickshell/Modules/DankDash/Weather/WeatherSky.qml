@@ -40,6 +40,8 @@ Rectangle {
     implicitHeight: DashMetrics.gridRowUnit * 2 + DashMetrics.gridGap
     radius: Theme.cornerRadiusXL
     color: DashMetrics.cardColor
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
 
     Row {
         anchors.left: parent.left

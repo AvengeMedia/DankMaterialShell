@@ -81,6 +81,12 @@ def format_js(qmlformat, file):
     return result.stdout
 
 
+def truncated(original, new_text):
+    """qmlls and qmlformat can succeed and still hand back an empty or gutted
+    document; writing that back destroys the file and stages the wreckage."""
+    return not new_text.strip() or len(new_text) < len(original) // 2
+
+
 def find_qmllint():
     for candidate in QMLLINT_CANDIDATES:
         path = candidate if "/" in candidate and Path(candidate).is_file() else shutil.which(candidate)
@@ -276,6 +282,10 @@ def format_js_files(qmlformat, root, files):
             skipped += 1
             print("skipped (qmlformat rejected the file)")
             continue
+        if truncated(original, new_text):
+            skipped += 1
+            print("skipped (qmlformat returned a truncated document)")
+            continue
         if new_text == original:
             print("unchanged")
             continue
@@ -377,6 +387,10 @@ def main():
             client.notify("textDocument/didClose", {"textDocument": {"uri": uri}})
 
             new_text = apply_edits(original, edits or [])
+            if truncated(original, new_text):
+                skipped += 1
+                print("skipped (qmlls returned a truncated document)")
+                continue
             if new_text == original:
                 print("unchanged")
                 continue

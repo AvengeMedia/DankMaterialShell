@@ -163,6 +163,8 @@ DankFloatingWindow {
                 height: indicatorHeight
                 radius: Theme.fullRadius(width, height)
                 color: Theme.floatingWindowNestedSurface
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
 
                 Row {
                     id: pageIndicatorRow
@@ -224,6 +226,8 @@ DankFloatingWindow {
             anchors.bottom: parent.bottom
             height: Math.round(Theme.fontSizeMedium * 4.5)
             color: Theme.floatingWindowNestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             Rectangle {
                 anchors.top: parent.top

@@ -151,7 +151,7 @@ DankBottomSheet {
                     subtitle: [modelData?.trackTitle, modelData?.trackArtist].filter(Boolean).join(" · ")
                     selected: modelData === root.player.activePlayer
                     onActivated: {
-                        MprisController.switchActivePlayer(modelData);
+                        MprisController.setActivePlayer(modelData);
                         root.player.panel = "";
                     }
                 }

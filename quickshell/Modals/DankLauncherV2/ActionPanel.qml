@@ -121,6 +121,8 @@ Rectangle {
     width: parent?.width ?? Theme.fieldDefaultWidth
     height: expanded && hasActions ? Theme.listItemHeight : 0
     color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
     radius: Theme.cornerRadius
 
     clip: true

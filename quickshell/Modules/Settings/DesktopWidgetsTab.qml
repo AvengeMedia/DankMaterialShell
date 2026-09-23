@@ -13,7 +13,6 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property var expandedStates: ({})
     property var groupCollapsedStates: ({})
     property var parentModal: null
     property string editingGroupId: ""
@@ -43,12 +42,10 @@ Item {
         groupCollapsedStates = states;
     }
 
-    function setExpanded(instanceId, expanded) {
-        if (expanded === (expandedStates[instanceId] ?? false))
-            return;
-        var states = Object.assign({}, expandedStates);
-        states[instanceId] = expanded;
-        expandedStates = states;
+    function configureWidget(instanceId, title) {
+        SettingsUiState.selectedDesktopWidgetId = instanceId;
+        SettingsUiState.selectedWidgetTitle = title;
+        parentModal?.navigateTo("desktop_widget");
     }
 
     function showWidgetBrowser() {
@@ -95,8 +92,7 @@ Item {
 
             SettingsRow {
                 body: Column {
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
+                    width: parent.width
                     spacing: Theme.spacingM
 
                     Row {
@@ -129,8 +125,7 @@ Item {
 
             SettingsRow {
                 body: Column {
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
+                    width: parent.width
                     spacing: Theme.spacingM
 
                     Row {
@@ -285,11 +280,10 @@ Item {
                 showHeader: true
                 collapsed: root.groupCollapsedStates[modelData.id] ?? false
                 instances: root.allInstances.filter(inst => inst.group === modelData.id)
-                expandedStates: root.expandedStates
                 visible: instances.length > 0 || root.dragActive
 
                 onCollapseToggled: key => root.toggleCollapsed(key)
-                onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
+                onConfigureRequested: (instanceId, title) => root.configureWidget(instanceId, title)
                 onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
                 onDeleteRequested: instanceId => {
                     SettingsData.removeDesktopWidgetInstance(instanceId);
@@ -315,11 +309,10 @@ Item {
             showHeader: root.allGroups.length > 0
             collapsed: root.groupCollapsedStates["_ungrouped"] ?? false
             instances: ungroupedInstances
-            expandedStates: root.expandedStates
             visible: ungroupedInstances.length > 0 || root.dragActive
 
             onCollapseToggled: key => root.toggleCollapsed(key)
-            onExpandedToggled: (instanceId, expanded) => root.setExpanded(instanceId, expanded)
+            onConfigureRequested: (instanceId, title) => root.configureWidget(instanceId, title)
             onDuplicateRequested: instanceId => SettingsData.duplicateDesktopWidgetInstance(instanceId)
             onDeleteRequested: instanceId => {
                 SettingsData.removeDesktopWidgetInstance(instanceId);
@@ -344,8 +337,7 @@ Item {
 
             SettingsRow {
                 body: Column {
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
+                    width: parent.width
                     spacing: Theme.spacingM
 
                     Row {

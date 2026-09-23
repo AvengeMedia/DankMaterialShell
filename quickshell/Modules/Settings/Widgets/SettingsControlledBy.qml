@@ -17,11 +17,9 @@ StyledRect {
     property string reason: ""
     property var parentModal: null
 
-    readonly property string resolvedTarget: target || (SettingsData.frameEnabled ? "frame" : "island")
+    readonly property string resolvedTarget: target || "frame"
     readonly property string iconName: {
         switch (resolvedTarget) {
-        case "island":
-            return "view_in_ar";
         case "surfaces":
             return "layers";
         case "shadows":
@@ -32,8 +30,6 @@ StyledRect {
     }
     readonly property string buttonText: {
         switch (resolvedTarget) {
-        case "island":
-            return I18n.tr("Open Island", "settings: button that opens the Dank Island tab");
         case "surfaces":
             return I18n.tr("Interface style");
         case "shadows":
@@ -44,14 +40,12 @@ StyledRect {
     }
     readonly property string tabName: {
         switch (resolvedTarget) {
-        case "island":
-            return "dank_island";
         case "surfaces":
             return "theme_surfaces";
         case "shadows":
             return "surface_shadows";
         default:
-            return "frame";
+            return section === "frameConnectedOptions" ? "dankbar_settings" : "dankbar_appearance";
         }
     }
 

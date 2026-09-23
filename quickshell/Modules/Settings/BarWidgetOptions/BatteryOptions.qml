@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modules.Settings.Widgets
 
 Column {
@@ -8,6 +9,14 @@ Column {
     property var page: null
 
     readonly property var styleValues: ["icon", "solid", "outline", "ring"]
+    readonly property var barConfig: {
+        SettingsData.barConfigs;
+        return SettingsData.getBarConfig(page?.barId ?? "");
+    }
+    readonly property var barStore: ({
+            "isDefault": keys => keys.every(key => (root.barConfig?.[key] ?? SettingsData.barConfigDefault(key)) === SettingsData.barConfigDefault(key)),
+            "resetToDefault": keys => SettingsData.updateBarConfig(root.page.barId, Object.fromEntries(keys.map(key => [key, SettingsData.barConfigDefault(key)])))
+        })
 
     width: parent?.width ?? 0
     spacing: Theme.spacingL
@@ -74,6 +83,24 @@ Column {
             onSelectionChanged: (index, selected) => {
                 if (selected)
                     root.page.set("batteryStyle", root.styleValues[index]);
+            }
+        }
+
+        SettingsButtonGroupRow {
+            settingKey: "batteryColorMode"
+            tags: ["battery", "color", "level", "theme", "icon", "meter", "indicator", "accent", "green", "red"]
+            text: I18n.tr("Battery")
+            visible: BatteryService.batteryAvailable && !(root.page?.dockHosted ?? false)
+            resetStore: root.barStore
+            resetKeys: ["batteryColorMode"]
+            model: [I18n.tr("Theme", "battery settings: theme accent indicator colors"), I18n.tr("Level", "battery settings: charge level indicator colors")]
+            currentIndex: (root.barConfig?.batteryColorMode ?? "theme") === "level" ? 1 : 0
+            onSelectionChanged: (index, selected) => {
+                if (!selected)
+                    return;
+                SettingsData.updateBarConfig(root.page.barId, {
+                    batteryColorMode: index === 1 ? "level" : "theme"
+                });
             }
         }
     }

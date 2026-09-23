@@ -117,6 +117,10 @@ func parseDnfList(text, backendID string, installed map[string]string) []Package
 	var pkgs []Package
 	seen := make(map[string]struct{})
 	for line := range strings.SplitSeq(text, "\n") {
+		// indented rows are packages being obsoleted, which are removals rather than upgrades
+		if strings.HasPrefix(line, " ") || strings.HasPrefix(line, "\t") {
+			continue
+		}
 		fields := strings.Fields(line)
 		if len(fields) < 2 {
 			continue

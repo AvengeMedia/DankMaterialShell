@@ -63,8 +63,32 @@ var LOCAL_SPEC = {
     dmsWindowsFloating: {
         def: true
     },
+    hostSurfaceColor: {
+        def: "default"
+    },
+    hostSurfaceCustomColor: {
+        def: "#6750A4"
+    },
+    cardSurfaceColor: {
+        def: "default"
+    },
+    cardSurfaceCustomColor: {
+        def: "#6750A4"
+    },
+    chipSurfaceColor: {
+        def: "default"
+    },
+    chipSurfaceCustomColor: {
+        def: "#6750A4"
+    },
+    chipSurfaceNestedColor: {
+        def: "default"
+    },
+    chipSurfaceNestedCustomColor: {
+        def: "#6750A4"
+    },
     widgetBackgroundColor: {
-        def: "sc"
+        def: "default"
     },
     widgetBackgroundCustomColor: {
         def: "#6750A4"
@@ -368,7 +392,7 @@ var LOCAL_SPEC = {
         coerce: Util.percentToUnit
     },
     blurLayerOutlineOpacity: {
-        def: 0.12,
+        def: 0,
         coerce: Util.percentToUnit
     },
     focusRingEnabled: {
@@ -720,27 +744,6 @@ var LOCAL_SPEC = {
     systemDefaultCursorTheme: {
         def: "",
         persist: false
-    },
-    launcherLogoMode: {
-        def: "apps"
-    },
-    launcherLogoCustomPath: {
-        def: ""
-    },
-    launcherLogoColorOverride: {
-        def: ""
-    },
-    launcherLogoColorInvertOnMode: {
-        def: false
-    },
-    launcherLogoBrightness: {
-        def: 0.5
-    },
-    launcherLogoContrast: {
-        def: 1
-    },
-    launcherLogoSizeOffset: {
-        def: 0
     },
     notepadUseMonospace: {
         def: true
@@ -1300,6 +1303,8 @@ var LOCAL_SPEC = {
                 attachToScreenEdge: false,
                 followInterfaceStyle: true,
                 transparency: 1.0,
+                surfaceColor: "default",
+                surfaceCustomColor: "#6750A4",
                 widgetTransparency: 1.0,
                 squareCorners: false,
                 noBackground: false,

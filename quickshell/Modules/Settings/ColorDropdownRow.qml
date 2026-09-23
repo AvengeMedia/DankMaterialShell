@@ -137,13 +137,10 @@ Column {
                 anchors.rightMargin: SettingsMetrics.rowPaddingH
                 spacing: Theme.spacingM
 
-                Rectangle {
+                DankColorSwatch {
                     width: Theme.avatarSize
                     height: Theme.avatarSize
-                    radius: width / 2
-                    color: root.customColor
-                    border.color: Theme.outline
-                    border.width: Theme.outlineWidth
+                    swatchColor: root.customColor
                     anchors.verticalCenter: parent.verticalCenter
 
                     DankIcon {

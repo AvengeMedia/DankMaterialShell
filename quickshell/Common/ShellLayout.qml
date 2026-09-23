@@ -25,7 +25,9 @@ Singleton {
                     wingSize: config.gothCornersEnabled && root.barSpansEdge(config) ? Math.max(0, config.gothCornerRadiusOverride ? config.gothCornerRadiusValue ?? 12 : Theme.windowRadius) : 0,
                     popupThickness: Theme.barThickness(Resolver.option(config, "innerPadding", root.primaryBar, 4), screen.scale),
                     islandThickness: Resolver.islandThickness(config, SettingsData.islandDefaults),
-                    islandFloating: SettingsData.islandSetting(config, "islandFloating")
+                    islandFloating: SettingsData.islandSetting(config, "islandFloating"),
+                    islandPlacement: SettingsData.islandFreePlacement(config) ? "free" : "edge",
+                    islandSatellites: SettingsData.islandSetting(config, "islandSatellitesEnabled")
                 })), screen, {
             screens: root.screens,
             displayNameMode: SettingsData.displayNameMode,
@@ -35,7 +37,8 @@ Singleton {
             frameThickness: SettingsData.frameThickness,
             frameBarSize: SettingsData.frameBarSize
         }))
-    readonly property var islandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.kind === "island").map(instance => instance.key)), [])
+    readonly property var islandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.kind === "island" && !instance.free).map(instance => instance.key)), [])
+    readonly property var freeIslandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.free).map(instance => instance.key)), [])
 
     function barSpansEdge(config) {
         return (config?.barLengthMode ?? "full") === "full" && (config?.barLengthPadding ?? 0) <= 0;
@@ -76,7 +79,7 @@ Singleton {
     }
 
     function hostedScreens(barId) {
-        return Quickshell.screens.filter(screen => forScreen(screen)?.instances.some(instance => instance.barId === barId && (instance.kind === "bar" || instance.kind === "island")));
+        return Quickshell.screens.filter(screen => forScreen(screen)?.instances.some(instance => instance.barId === barId && Resolver.hostsBarWindow(instance)));
     }
 
     function frameKeys(screen) {
@@ -113,6 +116,38 @@ Singleton {
     function dockAdjacentThickness(screen, side) {
         const layout = forScreen(screen);
         return (layout?.instances ?? []).filter(instance => instance.edge === side).reduce((sum, instance) => sum + instance.reservation, 0);
+    }
+
+    // non-manual layouts let the compositor stack exclusive zones, so the bar that was mapped later is the tucked one
+    function adjacentCover(screen, side, config, length) {
+        const layout = forScreen(screen);
+        const neighbour = adjacentBar(screen, side, config);
+        if (!layout || !neighbour)
+            return null;
+        const opposite = {
+            top: "bottom",
+            bottom: "top",
+            left: "right",
+            right: "left"
+        }[side];
+        const near = layout.edges[side].reservation;
+        const far = adjacentBar(screen, opposite, config) ? layout.edges[opposite].reservation : 0;
+        const deficit = (side === "top" || side === "bottom" ? layout.screen.height : layout.screen.width) - length;
+        const order = id => layout.instances.find(instance => instance.barId === id)?.configOrder ?? 0;
+        let tucked;
+        if (deficit >= near + far - 1)
+            tucked = true;
+        else if (deficit < near - 1)
+            tucked = false;
+        else if (Math.abs(near - far) > 1)
+            tucked = Math.abs(deficit - near) <= 1;
+        else
+            tucked = order(neighbour.config.id) < order(config?.id);
+        return {
+            reach: dockAdjacentThickness(screen, side),
+            wing: neighbour.wingSize ?? 0,
+            tucked
+        };
     }
 
     function adjacentInfo(screen, config) {

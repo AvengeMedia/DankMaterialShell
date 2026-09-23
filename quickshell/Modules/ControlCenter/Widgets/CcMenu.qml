@@ -134,6 +134,8 @@ Item {
         height: column.implicitHeight + Theme.spacingS * 2
         radius: Theme.windowRadius
         color: Theme.nestedSurface
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         opacity: root._open ? 1 : 0
         scale: root._open ? 1 : CcMetrics.popupEnterScale
         transformOrigin: I18n.isRtl ? Item.TopLeft : Item.TopRight

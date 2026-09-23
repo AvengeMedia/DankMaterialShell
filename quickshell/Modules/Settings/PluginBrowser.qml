@@ -966,8 +966,8 @@ RegistryBrowserWindow {
                     height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
                     radius: Theme.cornerRadiusM
                     color: Theme.floatingWindowNestedSurface
-                    border.color: Theme.outlineVariant
-                    border.width: Theme.outlineWidth
+                    border.color: Theme.outlineMedium
+                    border.width: Theme.layerOutlineWidth
 
                     ClippingRectangle {
                         anchors.fill: parent

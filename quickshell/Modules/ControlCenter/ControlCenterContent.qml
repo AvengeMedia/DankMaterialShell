@@ -280,35 +280,26 @@ FocusScope {
 
                 width: parent.width
                 height: root.bodyHeight
+                clip: detailPage.shownSection !== ""
 
                 CcTileGrid {
                     id: widgetGrid
                     columns: root.gridColumns
                     availableHeight: root.availableGridHeight
 
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    x: detailPage.gridOffset
+                    width: parent.width
                     anchors.top: parent.top
                     editMode: root.host.editMode
                     model: widgetModel
                     live: root.host.shouldBeVisible
                     screenName: root.host.triggerScreen?.name || ""
-                    opacity: root.pageOpen ? 0 : 1
-                    visible: opacity > 0
+                    visible: Math.abs(x) < width
                     enabled: !root.pageOpen
                     onExpandClicked: widgetData => root.openWidgetPage(widgetData)
                     onRemoveWidget: index => widgetModel.removeWidget(index)
                     onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
                     onColorPickerRequested: root.host.openColorPicker()
-
-                    Behavior on opacity {
-                        enabled: CcMetrics.animationsEnabled
-                        NumberAnimation {
-                            duration: CcMetrics.fadeDuration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-                        }
-                    }
                 }
 
                 CcDetailPage {

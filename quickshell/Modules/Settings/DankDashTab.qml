@@ -133,6 +133,7 @@ FocusScope {
 
                         DankActionButton {
                             anchors.verticalCenter: parent.verticalCenter
+                            objectName: "editDashTab"
                             iconName: "edit"
                             tooltipText: I18n.tr("Edit")
                             Accessible.description: tabRow.modelData.text

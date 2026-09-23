@@ -98,7 +98,7 @@ Item {
 
         if (spec.widgetItem) {
             const visual = spec.useCenterSection && widgetSection === "center" ? surfaceContext.centerSection : spec.visualItem;
-            surfaceContext.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth);
+            surfaceContext.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
         }
 
         if (typeof popout.prepareForTrigger === "function")

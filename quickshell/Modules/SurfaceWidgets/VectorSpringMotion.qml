@@ -49,8 +49,8 @@ QtObject {
         return targetWidth === target.width && targetHeight === target.height && targetOffsetAlong === target.offsetAlong && targetOffsetCross === target.offsetCross && targetTopLeftRadius === target.topLeftRadius && targetTopRightRadius === target.topRightRadius && targetBottomLeftRadius === target.bottomLeftRadius && targetBottomRightRadius === target.bottomRightRadius;
     }
 
-    function setTarget(target) {
-        if (matchesTarget(target))
+    function setTarget(target, seedVelocity) {
+        if (matchesTarget(target) && !seedVelocity)
             return;
         targetWidth = target.width;
         targetHeight = target.height;
@@ -60,6 +60,11 @@ QtObject {
         targetTopRightRadius = target.topRightRadius;
         targetBottomLeftRadius = target.bottomLeftRadius;
         targetBottomRightRadius = target.bottomRightRadius;
+
+        if (seedVelocity) {
+            velocityOffsetAlong = seedVelocity.offsetAlong ?? velocityOffsetAlong;
+            velocityOffsetCross = seedVelocity.offsetCross ?? velocityOffsetCross;
+        }
 
         if (reducedMotion) {
             settle();

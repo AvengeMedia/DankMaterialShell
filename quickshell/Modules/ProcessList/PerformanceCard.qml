@@ -23,6 +23,8 @@ Rectangle {
     implicitHeight: compact ? cardContent.implicitHeight + Theme.spacingM * 2 : 0
     radius: Theme.cornerRadiusL
     color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(card))
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
 
     Connections {
         target: DgopService

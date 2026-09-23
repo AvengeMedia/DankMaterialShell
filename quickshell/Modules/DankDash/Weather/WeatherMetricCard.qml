@@ -117,6 +117,8 @@ Rectangle {
 
     radius: graphics && reading.shape ? Theme.fullRadius(width, height) : Theme.cornerRadiusXL
     color: graphics && widgetId === "uv" ? "transparent" : DashMetrics.cardColor
+    border.width: graphics && widgetId === "uv" ? 0 : Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
     Accessible.role: Accessible.StaticText
     Accessible.name: reading.label + " " + (hasValue ? reading.value : I18n.tr("Not available")) + " " + (reading.detail ?? "")
     Accessible.description: graphicDescription

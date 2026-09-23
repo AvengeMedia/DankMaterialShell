@@ -1,7 +1,7 @@
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
-github.com/AvengeMedia/dankgo v1.6.3-0.20260918210430-d03946da44cd h1:8Pa1/uo973yP2TkjBeBEdVY20hwlCfwQMq5D3bFOf7U=
-github.com/AvengeMedia/dankgo v1.6.3-0.20260918210430-d03946da44cd/go.mod h1:H6yEdNZ+JJHpBSpvAEJVfXWKhIrttydVU3s2JLyTvQI=
+github.com/AvengeMedia/dankgo v1.6.3-0.20260922103155-c6cc9c3c32ba h1:Basmkwiyh8ZAOXpweOw/lu6mEV4mmZl0vK+WPhZPSqA=
+github.com/AvengeMedia/dankgo v1.6.3-0.20260922103155-c6cc9c3c32ba/go.mod h1:H6yEdNZ+JJHpBSpvAEJVfXWKhIrttydVU3s2JLyTvQI=
 github.com/AvengeMedia/dgop v1.6.3-0.20260920163359-59c7d81ae3b9 h1:ssoiAng7ng500BgtZa1riJH6kKudQVM8Uk9a9kF7mDA=
 github.com/AvengeMedia/dgop v1.6.3-0.20260920163359-59c7d81ae3b9/go.mod h1:8TFIP72NLxCbogF2hHU6sXj3RoTbHQW8beeCrisHs/Y=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=

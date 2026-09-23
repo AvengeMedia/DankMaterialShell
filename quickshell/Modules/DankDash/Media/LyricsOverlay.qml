@@ -219,11 +219,11 @@ FocusScope {
             anchors.topMargin: Theme.spacingM
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - Theme.spacingM * 2
-            text: root.unsynced ? I18n.tr("Unsynced", "Lyrics have no timestamps") : I18n.tr("Lyrics", "Media player lyrics button")
+            text: I18n.tr("Unsynced", "Lyrics have no timestamps")
             color: Theme.onSurfaceVariant
             font.pixelSize: Theme.fontSizeSmall
             horizontalAlignment: Text.AlignHCenter
-            visible: !root.compact
+            visible: root.unsynced && !root.compact
         }
 
         DankListView {
@@ -321,6 +321,7 @@ FocusScope {
 
         DankButton {
             id: followButton
+            objectName: "followPlayback"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: Theme.spacingM

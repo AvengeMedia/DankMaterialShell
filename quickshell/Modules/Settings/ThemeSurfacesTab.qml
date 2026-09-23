@@ -29,7 +29,7 @@ Column {
     readonly property var opacityTargets: {
         SettingsData.barConfigs;
         SettingsData.dockConfigs;
-        const bars = SettingsData.barConfigs.map(config => ({
+        const bars = SettingsData.barConfigs.filter(config => !SettingsData.isDotBarConfig(config)).map(config => ({
                     kind: "bar",
                     id: config.id,
                     name: config.name || config.id,
@@ -178,8 +178,9 @@ Column {
             tags: ["foreground", "layers", "outline", "border", "cards", "pills", "widgets", "notifications", "control center"]
             settingKey: "blurLayerOutlineOpacity"
             text: I18n.tr("Layer outline opacity")
-            value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0.12) * 100)
+            value: Math.round((SettingsData.blurLayerOutlineOpacity ?? 0) * 100)
             minimum: 0
+            minimumLabel: I18n.tr("Off")
             maximum: 40
             onSliderValueChanged: newValue => SettingsData.set("blurLayerOutlineOpacity", newValue / 100)
         }

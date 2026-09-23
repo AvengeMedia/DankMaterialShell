@@ -137,6 +137,7 @@ BasePill {
             round: false
             checkable: true
             checked: root._isPlaying
+            iconFilled: false
             iconName: root._isPlaying ? "pause" : "play_arrow"
             Accessible.name: root._isPlaying ? I18n.tr("Pause") : I18n.tr("Play")
             enabled: root.activePlayer?.canTogglePlaying ?? false

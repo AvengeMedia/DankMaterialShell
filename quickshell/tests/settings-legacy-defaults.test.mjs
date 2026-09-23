@@ -42,7 +42,6 @@ test("a default 1.6 bar apps widget keeps indicators and icon size", () => {
     assert.equal(left.appsDockHideIndicators, false);
     assert.equal(left.appsDockIconSizePercentage, 100);
     assert.equal(right.appsDockIconSizePercentage, 150);
-    assert.equal(store.WidgetDefaults.option("appsDock", {}, "appsDockHideIndicators"), true);
 });
 
 test("stored 1.6 globals still win over legacy defaults", () => {

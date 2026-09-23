@@ -279,7 +279,10 @@ Item {
             DankButton {
                 text: I18n.tr("Settings")
                 iconName: "settings"
-                onClicked: PopoutService.openSettingsWithTab("weather")
+                onClicked: {
+                    PopoutService.closeDankDash();
+                    PopoutService.openSettingsWithTab("weather");
+                }
             }
         }
     }

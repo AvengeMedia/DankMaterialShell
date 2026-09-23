@@ -578,8 +578,7 @@ Item {
             SettingsRow {
                 visible: SettingsData.lockScreenSecurityKeyShortcutEnabled && SettingsData.enableU2f && SettingsData.u2fMode === "or" && !root.lockU2fControlledByPrimary
                 body: Row {
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
+                    width: parent.width
                     spacing: Theme.spacingM
 
                     Column {

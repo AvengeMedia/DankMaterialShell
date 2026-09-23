@@ -3,7 +3,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 from pathlib import Path
 import shutil
-import signal
 import subprocess
 import sys
 import time
@@ -23,23 +22,11 @@ def qml_test_runner():
 
 def run(name, command):
     started = time.monotonic()
-    env = {key: value for key, value in os.environ.items() if not key.startswith("DMS_FIXTURE_")}
-    env["QT_QPA_PLATFORM"] = "offscreen"
     try:
-        process = subprocess.Popen(command, cwd=repo, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, start_new_session=True)
+        result = subprocess.run(command, cwd=repo, env=dict(os.environ, QT_QPA_PLATFORM="offscreen"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except OSError as error:
         return name, False, time.monotonic() - started, str(error)
-    try:
-        output, _ = process.communicate(timeout=120)
-        return name, process.returncode == 0, time.monotonic() - started, output
-    except subprocess.TimeoutExpired:
-        os.killpg(process.pid, signal.SIGTERM)
-        try:
-            output, _ = process.communicate(timeout=5)
-        except subprocess.TimeoutExpired:
-            os.killpg(process.pid, signal.SIGKILL)
-            output, _ = process.communicate()
-        return name, False, time.monotonic() - started, output + "\nSuite timed out"
+    return name, result.returncode == 0, time.monotonic() - started, result.stdout
 
 
 def main():
@@ -50,9 +37,10 @@ def main():
     if args.jobs < 1:
         parser.error("--jobs must be positive")
     selected = args.suites or ["widgets", "media", "qt", "logic"]
+    fixtures = sorted(str(path.relative_to(repo)) for path in (repo / "quickshell/tests/qml").glob("*.qml"))
     commands = {
-        "widgets": [sys.executable, "quickshell/tests/run-surface-fixture.py", "--suite", "quickshell/tests/qml/bar-content.qml", "quickshell/tests/qml/frame-bar-flip.qml", "quickshell/tests/qml/bar-fit.qml", "quickshell/tests/qml/instance-routing.qml", "quickshell/tests/qml/font-weights.qml", "quickshell/tests/qml/theme-selected-container.qml", "quickshell/tests/qml/theme-accents.qml", "quickshell/tests/qml/clipboard-preview.qml", "quickshell/tests/qml/launcher-plugin-instances.qml", "quickshell/tests/qml/island-launcher-focus.qml", "quickshell/tests/qml/workspace-switcher.qml", "quickshell/tests/qml/focused-app.qml", "quickshell/tests/qml/slider-wheel.qml", "quickshell/tests/qml/control-center-sizes.qml", "quickshell/tests/qml/dash-navigation.qml", "quickshell/tests/qml/grid-edit-layout.qml", "quickshell/tests/qml/settings-scroll.qml"],
-        "media": [sys.executable, "quickshell/tests/run-surface-fixture.py", "--suite", "quickshell/tests/qml/media-presentation.qml", "quickshell/tests/qml/media-playback.qml", "quickshell/tests/qml/media-artwork.qml", "quickshell/tests/qml/media-lyrics.qml", "--mpris", "--artwork"],
+        "widgets": [sys.executable, "quickshell/tests/run-surface-fixture.py", *(path for path in fixtures if not path.startswith("quickshell/tests/qml/media-"))],
+        "media": [sys.executable, "quickshell/tests/run-surface-fixture.py", "--mpris", "--artwork", *(path for path in fixtures if path.startswith("quickshell/tests/qml/media-"))],
         "logic": ["node", "--test", *sorted(str(path.relative_to(repo)) for path in (repo / "quickshell/tests").glob("*.test.mjs"))],
     }
     if "qt" in selected:
@@ -69,7 +57,7 @@ def main():
                 print(output, flush=True)
                 continue
             for line in output.splitlines():
-                if any(token in line for token in ["FIXTURE_", "Totals:", "# tests "]):
+                if name in ["widgets", "media"] or any(token in line for token in ["Totals:", "# tests "]):
                     print(line.strip(), flush=True)
     print(f"QML checks: {time.monotonic() - started:.2f}s", flush=True)
     return int(failed)

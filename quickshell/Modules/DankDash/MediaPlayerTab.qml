@@ -45,8 +45,21 @@ Item {
     }
     readonly property bool volumeAvailable: !!((activePlayer && activePlayer.volumeSupported && !__isChromeBrowser) || (AudioService.sink && AudioService.sink.audio))
     readonly property bool usePlayerVolume: activePlayer && activePlayer.volumeSupported && !__isChromeBrowser
-    readonly property real currentVolume: usePlayerVolume ? activePlayer.volume : (AudioService.sink?.audio?.volume ?? 0)
+    readonly property real reportedVolume: usePlayerVolume ? activePlayer.volume : (AudioService.sink?.audio?.volume ?? 0)
+    readonly property real currentVolume: pendingVolume >= 0 ? pendingVolume : reportedVolume
     readonly property real maxVolumePercent: usePlayerVolume ? 100 : AudioService.sinkMaxVolume
+
+    // MPRIS volume round-trips through the player, so successive steps would each read a stale
+    // activePlayer.volume and collapse into one. Drive them from the value we last asked for.
+    property real pendingVolume: -1
+
+    onReportedVolumeChanged: {
+        if (pendingVolume >= 0 && Math.abs(reportedVolume - pendingVolume) < 0.005)
+            clearPendingVolume();
+    }
+
+    onUsePlayerVolumeChanged: clearPendingVolume()
+    onActivePlayerChanged: clearPendingVolume()
 
     implicitWidth: DashMetrics.contentWidthFor(SettingsData.showWeekNumber, DashMetrics.panelColumnsFor(entryId))
     implicitHeight: mediaChrome.item?.implicitHeight ?? DashMetrics.tabMinHeight
@@ -91,6 +104,12 @@ Item {
             }
             root.lyricsOpener.forceActiveFocus(Qt.PopupFocusReason);
         }
+    }
+
+    Timer {
+        id: pendingVolumeTimer
+        interval: DashMetrics.mediaVolumeEchoTimeout
+        onTriggered: root.pendingVolume = -1
     }
 
     MediaPresentation {
@@ -155,12 +174,19 @@ Item {
         return AudioService.sinkVolumeIconName;
     }
 
+    function clearPendingVolume() {
+        pendingVolume = -1;
+        pendingVolumeTimer.stop();
+    }
+
     function setVolume(ratio) {
         if (!volumeAvailable)
             return;
         const clamped = Math.min(maxVolumePercent / 100, Math.max(0, ratio));
         SessionData.suppressOSDTemporarily();
         if (usePlayerVolume) {
+            pendingVolume = clamped;
+            pendingVolumeTimer.restart();
             activePlayer.volume = clamped;
             return;
         }
@@ -281,12 +307,12 @@ Item {
     Loader {
         id: mediaChrome
         anchors.fill: parent
-        sourceComponent: root.playerStyle === "material" ? materialChrome : zurvanChrome
+        sourceComponent: root.playerStyle === "material" ? materialChrome : bentoChrome
     }
 
     Component {
-        id: zurvanChrome
-        ZurvanChrome {
+        id: bentoChrome
+        BentoChrome {
             player: root
         }
     }

@@ -405,7 +405,7 @@ FocusScope {
         onTriggered: dock.startupRevealDone = true
     }
 
-    readonly property bool overviewReveal: dock.config.enabled && CompositorService.overviewActiveForScreen(dock._dockScreenName) && dock.config.openOnOverview
+    readonly property bool overviewReveal: dock.config.openOnOverview && CompositorService.overviewActiveForScreen(dock._dockScreenName)
     readonly property bool hoverOrActive: dockMouseArea.containsMouse || dock.interactionActive || contextMenuOpen || revealSticky
 
     onOverviewRevealChanged: {

@@ -27,7 +27,14 @@ Item {
     property string palette: "default"
     property bool highContrast: false
     property real transparency: 1
+    property color surfaceBase: Theme.hostSurface
     property string requestedWindow: ""
+    property bool freeMode: false
+    property bool anchorSnaps: false
+    property real anchorX: 0
+    property real anchorY: 0
+    property real freeMargin: 8
+    property Component compactFaceOverride: null
 
     readonly property color surfaceColor: {
         if (root.highContrast)
@@ -38,7 +45,7 @@ Item {
         case "dim":
             return Theme.surfaceDim;
         }
-        return Theme.hostSurface;
+        return root.surfaceBase;
     }
     readonly property bool popupStyled: root.controller.expanded
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
@@ -150,17 +157,51 @@ Item {
         return root.isVertical ? target.height : target.width;
     }
 
-    function applyTarget() {
+    // Free mode re-centres the target on the anchor and clamps it on screen, so the centre glides
+    // between the compact and expanded positions instead of pinning the top-left corner.
+    function clampFree(value, size, extent) {
+        const limit = extent - size - root.freeMargin;
+        if (limit <= root.freeMargin)
+            return Math.round((extent - size) / 2);
+        return Math.round(Math.max(root.freeMargin, Math.min(value, limit)));
+    }
+
+    function resolveTarget(target) {
+        if (!root.freeMode)
+            return target;
+        const x = root.clampFree(root.anchorX - target.width / 2, target.width, root.width);
+        const y = root.clampFree(root.anchorY - target.height / 2, target.height, root.height);
+        return Object.assign({}, target, {
+            "offsetAlong": root.isVertical ? y + target.height / 2 - root.height / 2 : x + target.width / 2 - root.width / 2,
+            "offsetCross": root.isVertical ? x : y
+        });
+    }
+
+    function applyTarget(seedVelocity) {
         if (controller.expanded)
             fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
         else
             fadeCompactCross = root.descriptorCross(controller.compactTarget);
         if (motion.running)
             root.unionMotionStartBounds();
-        motion.setTarget(controller.targetDescriptor);
+        motion.setTarget(root.resolveTarget(controller.targetDescriptor), seedVelocity);
         if (!motion.running)
             root.controller.releaseIdleVisuals();
     }
+
+    function syncAnchor() {
+        if (!root.freeMode)
+            return;
+        if (root.anchorSnaps) {
+            motion.snapTo(root.resolveTarget(controller.targetDescriptor));
+            return;
+        }
+        root.applyTarget();
+    }
+
+    onAnchorXChanged: root.syncAnchor()
+    onAnchorYChanged: root.syncAnchor()
+    onAlongExtentChanged: root.syncAnchor()
 
     function unionMotionStartBounds() {
         const b = root.motionStartBounds;
@@ -179,7 +220,7 @@ Item {
         trackedCrossExtent = crossExtent;
         fadeCompactCross = root.descriptorCross(controller.compactTarget);
         fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
-        motion.snapTo(controller.targetDescriptor);
+        motion.snapTo(root.resolveTarget(controller.targetDescriptor));
     }
 
     // On a far edge the cross coordinate is measured from the far side, so a host resize
@@ -187,6 +228,10 @@ Item {
     onCrossExtentChanged: {
         const delta = crossExtent - trackedCrossExtent;
         trackedCrossExtent = crossExtent;
+        if (root.freeMode) {
+            root.syncAnchor();
+            return;
+        }
         if (!farEdge || !motion.running || delta === 0)
             return;
         const b = motionStartBounds;
@@ -271,7 +316,10 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
             enabled: !root.controller.expanded || !root.controller.activityOwnsBlankClicks
-            onClicked: root.controller.requestToggle(true)
+            onClicked: {
+                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
+                root.controller.requestToggle(true);
+            }
             onWheel: wheel => {
                 if (root.controller.expanded) {
                     wheel.accepted = false;
@@ -286,6 +334,8 @@ Item {
             id: contentHost
 
             controller: root.controller
+            freeMode: root.freeMode
+            compactFaceOverride: root.compactFaceOverride
             islandX: root.currentVisualX
             islandY: root.currentVisualY
             hostWidth: root.width
@@ -342,7 +392,7 @@ Item {
         y: root.isVertical ? alongPos : crossPos
         width: root.isVertical ? edgeGap : span
         height: root.isVertical ? span : edgeGap
-        visible: edgeGap > 0 && span > 0
+        visible: !root.freeMode && edgeGap > 0 && span > 0
 
         HoverHandler {
             id: stripHover
@@ -353,7 +403,10 @@ Item {
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
-            onClicked: root.controller.requestToggle(true)
+            onClicked: {
+                SettingsData.recordBarInteraction(root.effectiveScreen, root.controller.barConfig?.id);
+                root.controller.requestToggle(true);
+            }
             onWheel: wheel => {
                 root.scrollWheel(wheel);
                 wheel.accepted = true;
@@ -403,20 +456,25 @@ Item {
         DestinationCompact {
             id: launcherFace
 
-            readonly property real logoSize: Math.max(12, Theme.iconSizeSmall + SettingsData.launcherLogoSizeOffset)
-            readonly property color logoColor: Theme.effectiveLogoColor !== "" ? Theme.effectiveLogoColor : Theme.surfaceText
+            readonly property var launcherEntry: SettingsData.barWidgetEntry(root.controller.barConfig, "launcherButton")
+
+            function opt(key) {
+                return SettingsData.widgetOption("launcherButton", launcherFace.launcherEntry, key);
+            }
 
             controller: root.controller
             activityId: "launcher"
             label: I18n.tr("Launcher", "island compact face: launcher label")
             leading: LauncherLogo {
-                mode: SettingsData.launcherLogoMode
-                size: launcherFace.logoSize
-                appsIconColor: launcherFace.logoColor
-                colorOverride: String(launcherFace.logoColor)
-                brightness: SettingsData.launcherLogoBrightness
-                contrast: SettingsData.launcherLogoContrast
-                customPath: SettingsData.launcherLogoCustomPath
+                id: faceLogo
+
+                mode: launcherFace.opt("launcherLogoMode")
+                size: Math.max(12, Theme.iconSizeSmall + launcherFace.opt("launcherLogoSizeOffset"))
+                appsIconColor: faceLogo.resolvedColor
+                colorOverride: launcherFace.opt("launcherLogoColorOverride") || "surface"
+                brightness: launcherFace.opt("launcherLogoBrightness")
+                contrast: launcherFace.opt("launcherLogoContrast")
+                customPath: launcherFace.opt("launcherLogoCustomPath")
                 fallbackToApps: true
             }
         }

@@ -23,6 +23,8 @@ Item {
             Layout.preferredHeight: 80
             radius: Theme.cornerRadius
             color: Theme.nestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             RowLayout {
                 anchors.fill: parent
@@ -100,6 +102,8 @@ Item {
             Layout.fillHeight: true
             radius: Theme.cornerRadius
             color: Theme.nestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             ColumnLayout {
                 anchors.fill: parent

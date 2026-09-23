@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Widgets
 import qs.Widgets
 import qs.Modules.DankDash
 
@@ -12,14 +11,12 @@ Item {
     property bool showLyrics: true
     property bool holdArt: false
 
-    readonly property real artRadius: root.player.options?.artStyle === "circle" ? width / 2 : DashMetrics.mediaArtRadius
+    readonly property real artRadius: surface.contentRadius
 
-    ClippingRectangle {
+    MediaArtSurface {
         id: surface
         anchors.fill: parent
-        radius: root.artRadius
-        color: "transparent"
-        antialiasing: true
+        artStyle: root.player.options?.artStyle ?? "rounded"
 
         MediaArtwork {
             id: art

@@ -34,7 +34,7 @@ test("widget normalization preserves metadata, defaults and positional occurrenc
 test("focus discovery keeps compositor names separate from first-screen fallback", () => {
     const source = read("Services/CompositorService.qml");
     const context = vm.createContext({
-        isAqueous: false, isHyprland: false, isNiri: false, isSway: false, isScroll: false, isMiracle: false, isMango: false,
+        isAqueous: false, isHyprland: false, isNiri: false, isSway: false, isScroll: false, isMiracle: false, isMango: false, isUmbriel: false,
         AqueousService: { available: true, focusedOutput: "second" }, Hyprland: { focusedMonitor: { name: "second" } },
         NiriService: { currentOutput: "second" }, I3: { workspaces: { values: [{ focused: true, monitor: { name: "second" } }] } },
         MangoService: { activeOutput: "second" }, Quickshell: { screens: [{ name: "first" }, { name: "second" }] }

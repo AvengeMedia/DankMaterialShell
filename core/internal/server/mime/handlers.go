@@ -57,7 +57,7 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request) {
 }
 
 func handleGetDefault(conn *ipc.ConnWriter, req ipc.Request) {
-	mimeType, err := mimeParam(req.Params, "mimeType")
+	mimeType, err := requestedMime(req.Params)
 	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
@@ -150,6 +150,21 @@ func handleQueryDefaults(conn *ipc.ConnWriter, req ipc.Request) {
 	models.Respond(conn, req.ID, queryResult{
 		Defaults: desktop.QueryDefaults(mimeTypes),
 	})
+}
+
+func requestedMime(p map[string]any) (string, error) {
+	if _, ok := p["mimeType"]; ok {
+		return mimeParam(p, "mimeType")
+	}
+	filePath, err := params.StringNonEmpty(p, "path")
+	if err != nil {
+		return "", fmt.Errorf("missing 'mimeType' or 'path' parameter")
+	}
+	mimeType := MimeTypeForPath(filePath)
+	if mimeType == "" {
+		return "", fmt.Errorf("no mime type matches %q", filePath)
+	}
+	return mimeType, nil
 }
 
 func mimeParam(p map[string]any, key string) (string, error) {

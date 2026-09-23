@@ -22,6 +22,8 @@ Item {
             Layout.preferredHeight: systemInfoColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
             color: Theme.nestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             ColumnLayout {
                 id: systemInfoColumn
@@ -95,6 +97,8 @@ Item {
             Layout.fillHeight: true
             radius: Theme.cornerRadius
             color: Theme.nestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             ColumnLayout {
                 anchors.fill: parent

@@ -194,18 +194,23 @@ Singleton {
     readonly property real mediaCardMargin: Theme.spacingL
     readonly property real mediaArtSize: 150
     readonly property real mediaArtSizeDash: 336
-    readonly property real mediaArtLowResRatio: 0.5
-    readonly property real mediaArtLowResScale: 0.85
     readonly property real mediaArtSizeMaterial: 200
     readonly property real mediaArtRadius: Theme.cornerRadiusXL
+    readonly property real mediaArtSoftRadiusRatio: 0.3
     readonly property real mediaArtPlaceholderIcon: Theme.buttonHeightM
     readonly property real mediaSeekbarHeight: 22
+    readonly property real mediaPlayWidthRatio: 1.5
+    readonly property real mediaPlayWidthStep: 0.75
+    readonly property real mediaTransportPressScale: 1.2
+    readonly property real mediaDeviceNameWidthRatio: 0.42
     readonly property real accentSelectedAlpha: 0.2
     readonly property real groupIdleAlpha: 0.1
     readonly property int mediaPositionPollInterval: 1000
+    readonly property int mediaVolumeEchoTimeout: 1500
     readonly property int mediaTransitionGraceInterval: 3000
     readonly property int mediaPlayerLossGraceInterval: 1500
     readonly property real mediaTextScrollSpeed: 40
+    readonly property int mediaTextScrollStep: 30
     readonly property int mediaLyricsRequestTimeout: 16000
     readonly property int mediaLyricsLoadingDelay: 300
     readonly property real mediaLyricsPositionTolerance: 0.05

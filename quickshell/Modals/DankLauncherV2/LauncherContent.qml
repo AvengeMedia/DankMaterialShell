@@ -330,6 +330,8 @@ FocusScope {
 
                 visible: !(root.parentModal?.frameOwnsConnectedChrome ?? false) && !Theme.blurLayersActive
                 color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
                 radius: Theme.windowRadius
             }
             DankFilterChips {
@@ -366,13 +368,6 @@ FocusScope {
                 StyledText {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "↑↓ " + I18n.tr("nav", "launcher footer hint after arrow keys, short for navigate")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.onSurfaceVariant
-                }
-
-                StyledText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "↵ " + I18n.tr("Open")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.onSurfaceVariant
                 }

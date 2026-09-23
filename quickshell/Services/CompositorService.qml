@@ -24,10 +24,11 @@ Singleton {
     property bool isMiracle: false
     property bool isLabwc: false
     property bool isAqueous: false
+    property bool isUmbriel: false
     property string compositor: "unknown"
     property bool compositorDetected: false
     property bool outputPowerAvailable: false
-    readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc
+    readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc && !isUmbriel
     onGenericPowerBackendChanged: probeOutputPower()
 
     function probeOutputPower() {
@@ -106,6 +107,7 @@ Singleton {
         case "sway":
         case "scroll":
         case "miracle":
+        case "umbriel":
             return true;
         default:
             return false;
@@ -132,7 +134,7 @@ Singleton {
     readonly property bool supportsCursorConfig: isNiri || isHyprland || isMango
     readonly property bool supportsDisplayConfig: isNiri || isHyprland || isMango || isAqueous
     readonly property bool supportsBarAutoHideReveal: isNiri || isHyprland || isMango
-    readonly property bool supportsWorkspaces: isNiri || isHyprland || isMango || isAqueous
+    readonly property bool supportsWorkspaces: isNiri || isHyprland || isMango || isAqueous || isUmbriel
     // compositors where a workspace that does not exist yet is still a valid switch target
     readonly property bool supportsPersistentWorkspaces: isHyprland || isMango || isSway || isScroll || isMiracle
     readonly property bool supportsWorkspaceUrgency: isKnownCompositor && !isLabwc
@@ -160,6 +162,8 @@ Singleton {
             return "Labwc";
         case "aqueous":
             return "Aqueous";
+        case "umbriel":
+            return "Umbriel";
         default:
             return "";
         }
@@ -175,6 +179,7 @@ Singleton {
         case "miracle":
         case "labwc":
         case "aqueous":
+        case "umbriel":
             return compositor;
         default:
             return "";
@@ -221,6 +226,23 @@ Singleton {
     Connections {
         target: root.isSway || root.isScroll || root.isMiracle ? I3.workspaces : null
         function onValuesChanged() {
+            root.workspaceStateChanged();
+        }
+    }
+
+    Binding {
+        target: UmbrielService
+        property: "active"
+        value: root.isUmbriel
+    }
+
+    Connections {
+        target: UmbrielService
+        enabled: root.isUmbriel
+        function onWorkspacesChanged() {
+            root.workspaceStateChanged();
+        }
+        function onWindowsChanged() {
             root.workspaceStateChanged();
         }
     }
@@ -372,6 +394,8 @@ Singleton {
         }
         if (isMango && MangoService.activeOutput)
             return MangoService.activeOutput;
+        if (isUmbriel)
+            return UmbrielService.focusedOutput;
 
         return "";
     }
@@ -1352,6 +1376,8 @@ Singleton {
             return "labwc";
         case "aqueous":
             return "aqueous";
+        case "umbriel":
+            return "umbriel";
         default:
             return "";
         }
@@ -1366,6 +1392,7 @@ Singleton {
         isMiracle = name === "miracle";
         isLabwc = name === "labwc";
         isAqueous = name === "aqueous";
+        isUmbriel = name === "umbriel";
         compositor = name;
         compositorDetected = true;
         if (isNiri)
@@ -1418,6 +1445,7 @@ Singleton {
     function _envDetectionCandidates() {
         const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "";
         const aqueousSocket = Quickshell.env("AQUEOUS_SOCKET") || "";
+        const umbrielSocket = Quickshell.env("UMBRIEL_SOCKET") || "";
         return [
             {
                 name: "aqueous",
@@ -1430,6 +1458,12 @@ Singleton {
                 present: !!mangoSignature,
                 test: ["test", "-S", mangoSignature],
                 detail: "MANGO_INSTANCE_SIGNATURE " + mangoSignature
+            },
+            {
+                name: "umbriel",
+                present: !!umbrielSocket,
+                test: ["test", "-S", umbrielSocket],
+                detail: "UMBRIEL_SOCKET " + umbrielSocket
             },
             {
                 name: "niri",
@@ -1508,6 +1542,8 @@ Singleton {
             Quickshell.execDetached(["dms", "dpms", "off"]);
             return;
         }
+        if (isUmbriel)
+            return UmbrielService.action("dpms-off");
         if (outputPowerAvailable) {
             setOutputPower(false);
             return;
@@ -1532,6 +1568,8 @@ Singleton {
             Quickshell.execDetached(["dms", "dpms", "on"]);
             return;
         }
+        if (isUmbriel)
+            return UmbrielService.action("dpms-on");
         if (outputPowerAvailable) {
             setOutputPower(true);
             return;
@@ -1666,6 +1704,8 @@ Singleton {
                 const name = _followedScreen(screenName, followFocus);
                 return WorkspaceModel.aqueousWorkspacesForScreen(_aqueousWorkspaceState(name), name, options.occupiedOnly, _workspaceRecords);
             }
+        case "umbriel":
+            return WorkspaceModel.umbrielWorkspacesForScreen(UmbrielService.workspaces, _followedScreen(screenName, followFocus), options.occupiedOnly, _workspaceRecords);
         default:
             return [];
         }
@@ -1685,6 +1725,8 @@ Singleton {
             return WorkspaceModel.i3CurrentKey(_i3WorkspaceState(), screenName, followFocus);
         case "aqueous":
             return WorkspaceModel.aqueousCurrentId(_aqueousWorkspaceState(_followedScreen(screenName, followFocus)));
+        case "umbriel":
+            return WorkspaceModel.umbrielCurrentId(UmbrielService.workspaces, _followedScreen(screenName, followFocus));
         default:
             return 1;
         }
@@ -1718,6 +1760,8 @@ Singleton {
             return WorkspaceModel.i3ActiveWorkspace(_i3WorkspaceState(), screenName);
         case "aqueous":
             return WorkspaceModel.aqueousActiveWorkspace(_aqueousWorkspaceState(screenName), screenName);
+        case "umbriel":
+            return WorkspaceModel.umbrielActiveWorkspace(UmbrielService.workspaces, screenName);
         default:
             return null;
         }
@@ -1739,6 +1783,8 @@ Singleton {
             return WorkspaceModel.i3WindowsOnWorkspace(sortedToplevels, record);
         case "aqueous":
             return WorkspaceModel.aqueousWindowsOnWorkspace(sortedToplevels, record);
+        case "umbriel":
+            return WorkspaceModel.umbrielWindowsOnWorkspace(UmbrielService.windows, record);
         default:
             return [];
         }
@@ -1753,6 +1799,7 @@ Singleton {
         case "hyprland":
             return WorkspaceModel.hyprlandWorkspaceOccupied(Array.from(Hyprland.toplevels?.values || []), record);
         case "mango":
+        case "umbriel":
             return record.occupied === true;
         case "aqueous":
             return AqueousService.available && WorkspaceModel.aqueousWorkspaceOccupied(AqueousService.toplevels, record);
@@ -1784,6 +1831,7 @@ Singleton {
         case "sway":
         case "scroll":
         case "miracle":
+        case "umbriel":
             return loadedUrgent;
         default:
             return record?.urgent === true;
@@ -1794,6 +1842,8 @@ Singleton {
         switch (compositor) {
         case "niri":
             return WorkspaceModel.niriWorkspaceUrgent(NiriService.windows, record);
+        case "umbriel":
+            return WorkspaceModel.umbrielWorkspaceUrgent(UmbrielService.windows, record);
         default:
             return record?.urgent ?? false;
         }
@@ -1833,6 +1883,9 @@ Singleton {
                 "id": record.id,
                 "aqueousSession": record.session
             });
+            return;
+        case "umbriel":
+            UmbrielService.action(`workspace-switch:${record.idx}/${record.output}`);
             return;
         }
     }
@@ -1875,6 +1928,12 @@ Singleton {
         case "aqueous":
             _scrollAqueousWorkspace(followFocus ? AqueousService.focusedOutput : screenName, direction);
             return;
+        case "umbriel":
+            {
+                const name = _followedScreen(screenName, followFocus);
+                stepWorkspace(WorkspaceModel.umbrielWorkspacesForScreen(UmbrielService.workspaces, name, false, _workspaceRecords), WorkspaceModel.umbrielCurrentId(UmbrielService.workspaces, name), direction);
+                return;
+            }
         }
     }
 
@@ -1951,6 +2010,9 @@ Singleton {
             return true;
         case "niri":
             NiriService.focusWindow(windowId);
+            return true;
+        case "umbriel":
+            UmbrielService.action("window-focus:" + windowId);
             return true;
         default:
             return false;

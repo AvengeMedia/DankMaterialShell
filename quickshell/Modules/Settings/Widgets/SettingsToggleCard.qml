@@ -19,6 +19,7 @@ Item {
     property string description: ""
     property string iconName: ""
     property bool checked: false
+    property bool userToggled: false
 
     property alias resetStore: header.resetStore
     property alias resetKeys: header.resetKeys
@@ -37,6 +38,8 @@ Item {
         anchors.fill: parent
         radius: Theme.groupedListOuterRadius
         color: SettingsMetrics.rowColor
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         visible: root.standalone
     }
 
@@ -58,21 +61,38 @@ Item {
             checked: root.checked
             enabled: root.enabled
             paintBackground: false
-            onToggled: value => root.toggled(value)
+            onToggled: value => {
+                root.userToggled = true;
+                root.toggled(value);
+            }
         }
 
         Item {
             width: parent.width
-            height: root.hasContent ? expandedContent.height + Theme.spacingM : 0
+            visible: root.checked || height > 0
+            height: root.checked && root.hasContent ? expandedContent.height : 0
+            clip: true
+
+            Behavior on height {
+                enabled: root.userToggled && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+                NumberAnimation {
+                    duration: SettingsMetrics.transitionDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+                    onRunningChanged: {
+                        if (!running)
+                            root.userToggled = false;
+                    }
+                }
+            }
 
             Column {
                 id: expandedContent
                 enabled: root.checked
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: SettingsMetrics.rowPaddingH
-                anchors.rightMargin: SettingsMetrics.rowPaddingH
-                spacing: Theme.spacingM
+                anchors.leftMargin: root.iconName !== "" ? Theme.iconSize + Theme.spacingL : 0
+                spacing: 0
             }
         }
     }

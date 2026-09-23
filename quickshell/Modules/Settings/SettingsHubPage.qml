@@ -15,6 +15,8 @@ FocusScope {
 
     readonly property var rows: SettingsTabs.hubMainRows(hubId)
     readonly property var moreRows: SettingsTabs.hubMoreRows(hubId)
+    readonly property real contentHeight: flickable.contentHeight
+    readonly property bool settling: headerLoader.status === Loader.Loading
 
     onHubIdChanged: flickable.contentY = 0
 
@@ -22,6 +24,8 @@ FocusScope {
         id: flickable
 
         Loader {
+            id: headerLoader
+
             width: parent.width
             source: root.headerFile ? Qt.resolvedUrl(root.headerFile + ".qml") : ""
             onLoaded: item.parentModal = Qt.binding(() => root.parentModal)

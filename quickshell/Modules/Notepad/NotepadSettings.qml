@@ -92,7 +92,7 @@ Item {
         radius: Theme.cornerRadius
         color: Theme.withAlpha(Theme.cardSurface, Theme.notepadTransparency)
         border.color: Theme.outlineMedium
-        border.width: 1
+        border.width: Theme.layerOutlineWidth
         z: 100
 
         Rectangle {

@@ -139,11 +139,15 @@ Singleton {
         }
     }
 
-    function _islandOwnsSharedTrigger(screen) {
-        const target = screen ?? dankIslandRouter?.focusedIslandScreen?.() ?? null;
-        if (dankIslandRouter?.hasHostForScreen?.(target) !== true)
-            return false;
-        return SettingsData.dankIslandIsSoleBarForScreen(target);
+    function _sharedTriggerIsland(screen) {
+        const target = screen ?? CompositorService.getFocusedScreen();
+        const config = target ? SettingsData.sharedTriggerIslandConfig(target) : null;
+        if (!config || dankIslandRouter?.hasHostForScreen?.(target, config.id) !== true)
+            return null;
+        return {
+            screen: target,
+            barId: config.id
+        };
     }
 
     readonly property bool islandControlCenterOpen: dankIslandRouter?.controlCenterOpen ?? false
@@ -151,11 +155,14 @@ Singleton {
     function routeToIsland(activityId, screen, shouldToggle, section, barId) {
         if (barId && dankIslandRouter?.hasHostForScreen(screen, barId) !== true)
             return false;
-        if (!barId && !_islandOwnsSharedTrigger(screen))
+        const shared = barId ? null : _sharedTriggerIsland(screen);
+        if (!barId && !shared)
             return false;
+        const targetScreen = shared?.screen ?? screen ?? null;
+        const targetBar = barId || shared.barId;
         if (shouldToggle === true)
-            return dankIslandRouter.toggleActivity(activityId, screen ?? null, section || "", barId) === true;
-        return dankIslandRouter.openActivity(activityId, screen ?? null, section || "", barId) === true;
+            return dankIslandRouter.toggleActivity(activityId, targetScreen, section || "", targetBar) === true;
+        return dankIslandRouter.openActivity(activityId, targetScreen, section || "", targetBar) === true;
     }
 
     function closeIslandActivity(activityId) {
@@ -701,7 +708,19 @@ Singleton {
             dankLauncherV2Modal.edgeHoverManaged = _dankLauncherV2EdgeHoverManaged;
     }
 
+    function _routeSharedLauncher(query, mode, toggle) {
+        const screen = CompositorService.getFocusedScreen();
+        if (!SettingsData.sharedShortcutsOverridden(screen))
+            return false;
+        const shared = _sharedTriggerIsland(screen);
+        if (!shared)
+            return false;
+        return toggle ? dankIslandRouter.toggleLauncher(query, mode, shared.screen, shared.barId) : dankIslandRouter.openLauncher(query, mode, shared.screen, shared.barId);
+    }
+
     function openDankLauncherV2(triggerUsesOverlayLayer, edgeHoverManaged) {
+        if (_routeSharedLauncher("", "", false))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         _setDankLauncherV2EdgeHoverManaged(edgeHoverManaged);
         if (dankLauncherV2Modal) {
@@ -714,6 +733,8 @@ Singleton {
     }
 
     function openDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        if (_routeSharedLauncher(query, "", false))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithQuery(query);
@@ -726,6 +747,8 @@ Singleton {
     }
 
     function openDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        if (_routeSharedLauncher("", mode, false))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.showWithMode(mode);
@@ -738,6 +761,7 @@ Singleton {
     }
 
     function closeDankLauncherV2() {
+        dankIslandRouter?.closeLauncher?.();
         dankLauncherV2Modal?.hide();
     }
 
@@ -749,6 +773,8 @@ Singleton {
     }
 
     function toggleDankLauncherV2(triggerUsesOverlayLayer) {
+        if (_routeSharedLauncher("", "", true))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggle();
@@ -760,6 +786,8 @@ Singleton {
     }
 
     function toggleDankLauncherV2WithMode(mode: string, triggerUsesOverlayLayer) {
+        if (_routeSharedLauncher("", mode, true))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithMode(mode);
@@ -772,6 +800,8 @@ Singleton {
     }
 
     function toggleDankLauncherV2WithQuery(query: string, triggerUsesOverlayLayer) {
+        if (_routeSharedLauncher(query, "", true))
+            return;
         _setDankLauncherV2TriggerUsesOverlayLayer(triggerUsesOverlayLayer);
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggleWithQuery(query);

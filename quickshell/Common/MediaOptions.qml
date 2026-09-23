@@ -12,14 +12,15 @@ Singleton {
             albumArtBackdrop: true,
             albumArtAccent: true,
             animatedArt: false,
-            lyrics: true
+            lyrics: true,
+            deviceName: true
         })
 
-    readonly property string defaultPlayerStyle: "zurvan"
+    readonly property string defaultPlayerStyle: "bento"
     readonly property var playerStyles: [
         {
-            "value": "zurvan",
-            "text": "Zurvan"
+            "value": "bento",
+            "text": "Bento"
         },
         {
             "value": "material",
@@ -28,7 +29,7 @@ Singleton {
     ]
 
     readonly property var titleFontDefaults: ({
-            zurvan: "Notable",
+            bento: "Notable",
             material: "ui"
         })
 

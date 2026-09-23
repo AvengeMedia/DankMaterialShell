@@ -532,7 +532,7 @@ DankModal {
                     radius: Theme.cornerRadius
                     color: Theme.floatingWindowNestedSurface
                     border.color: Theme.outlineMedium
-                    border.width: 1
+                    border.width: Theme.layerOutlineWidth
                     visible: root.showTargetData && root.targetData.length > 0
 
                     StyledText {

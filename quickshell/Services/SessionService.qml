@@ -293,11 +293,41 @@ Singleton {
         return env;
     }
 
-    function launchDesktopEntry(desktopEntry, useNvidia) {
+    function resolveDesktopId(desktopId) {
+        if (!desktopId)
+            return null;
+        const entry = DesktopEntries.heuristicLookup(desktopId);
+        if (entry || !desktopId.endsWith(".desktop"))
+            return entry;
+        return DesktopEntries.heuristicLookup(desktopId.slice(0, -8));
+    }
+
+    // xdg-open's generic opener ignores Terminal=true, so resolve the handler here and launch it ourselves
+    function openPath(path) {
+        if (!path)
+            return;
+        const fallback = () => Qt.openUrlExternally("file://" + path);
+        if (!DMSService.isConnected) {
+            fallback();
+            return;
+        }
+        DMSService.sendRequest("mime.getDefault", {
+            "path": path
+        }, response => {
+            const entry = resolveDesktopId(response?.result?.desktopId);
+            if (!entry) {
+                fallback();
+                return;
+            }
+            launchDesktopEntry(entry, false, [path]);
+        });
+    }
+
+    function launchDesktopEntry(desktopEntry, useNvidia, args) {
         if (!desktopEntry || !desktopEntry.command)
             return;
         CompositorService.closeNiriOverviewOnWindowFocus();
-        let cmd = desktopEntry.command;
+        let cmd = args?.length ? [...desktopEntry.command, ...args] : desktopEntry.command;
 
         const appId = desktopEntry.id || desktopEntry.execString || desktopEntry.exec || "";
         const override = SessionData.getAppOverride(appId);
@@ -420,6 +450,11 @@ Singleton {
 
             if (CompositorService.isLabwc) {
                 LabwcService.quit();
+                return;
+            }
+
+            if (CompositorService.isUmbriel) {
+                UmbrielService.action("session-quit:skip-confirmation");
                 return;
             }
 

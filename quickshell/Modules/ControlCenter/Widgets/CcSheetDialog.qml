@@ -82,6 +82,8 @@ Item {
         height: column.implicitHeight + Theme.spacingL * 2
         radius: Theme.windowRadius
         color: Theme.nestedSurface
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         opacity: root.shown ? 1 : 0
         scale: root.shown ? 1 : CcMetrics.popupEnterScale
 

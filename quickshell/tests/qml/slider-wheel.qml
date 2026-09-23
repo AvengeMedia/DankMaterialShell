@@ -69,17 +69,17 @@ ShellRoot {
             }
 
             function wheelOnSlider(target) {
+                wait(0);
+                const surface = scene.Window.window;
+                check(!isPolishScheduled(surface) || waitForPolish(surface, 20000), "layout settles");
                 const point = target.mapToItem(scene, target.width / 2, target.height / 2);
                 mouseWheel(scene, point.x, point.y, 0, 120);
-                wait(50);
             }
 
             function run() {
-                wait(300);
                 wheelOnSlider(slider);
                 check(slider.value === 51, "wheel steps a slider whose container does not scroll");
                 filler.height = 1000;
-                wait(50);
                 wheelOnSlider(slider);
                 check(slider.value === 51, "wheel leaves a slider alone once the container scrolls");
                 row.slider.value = 50;
@@ -91,7 +91,7 @@ ShellRoot {
         }
 
         Timer {
-            interval: 800
+            interval: 0
             running: true
             onTriggered: {
                 try {

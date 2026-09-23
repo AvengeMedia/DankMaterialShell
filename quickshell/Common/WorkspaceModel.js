@@ -247,11 +247,29 @@ function hyprlandSpecialWorkspaces(raw, screenName, followFocus, occupiedOnly) {
     const isVisible = normalized => perMonitor ? visible[screenName] === normalized : Object.values(visible).includes(normalized);
     const specials = raw.workspaces.filter(ws => hyprlandSpecial(ws) && (!perMonitor || ws.monitor?.name === screenName)).map(ws => {
         const name = ws.name ?? "";
-        return { id: ws.id, idx: null, name: hyprlandSpecialDisplayName(name), output: ws.monitor?.name ?? "", active: isVisible(name === "special" ? "special:special" : name), placeholder: false, urgent: ws.urgent === true, special: true };
+        return {
+            id: ws.id,
+            idx: null,
+            name: hyprlandSpecialDisplayName(name),
+            output: ws.monitor?.name ?? "",
+            active: isVisible(name === "special" ? "special:special" : name),
+            placeholder: false,
+            urgent: ws.urgent === true,
+            special: true
+        };
     }).filter(ws => !occupiedOnly || ws.active || toplevels.some(tl => hyprlandWorkspaceMatches(tl.workspace, ws))).sort((a, b) => a.name.localeCompare(b.name));
     // the default scratchpad is always offered so it can be opened before Hyprland has created it
     if (!specials.some(ws => ws.name === "special"))
-        specials.push({ id: null, idx: null, name: "special", output: screenName ?? "", active: isVisible("special:special"), placeholder: false, urgent: false, special: true });
+        specials.push({
+            id: null,
+            idx: null,
+            name: "special",
+            output: screenName ?? "",
+            active: isVisible("special:special"),
+            placeholder: false,
+            urgent: false,
+            special: true
+        });
     return specials;
 }
 
@@ -283,7 +301,15 @@ function hyprlandVisibleSpecial(raw, monitorName) {
         return null;
     // the overlay event can land before the workspace list refresh, so the tracked name is the OSD's key
     const ws = raw.workspaces.find(ws => hyprlandSpecial(ws) && (ws.name === "special" ? "special:special" : ws.name) === tracked);
-    return { id: ws?.id || tracked, idx: null, name: hyprlandSpecialDisplayName(tracked), output: monitorName, active: true, placeholder: false, special: true };
+    return {
+        id: ws?.id || tracked,
+        idx: null,
+        name: hyprlandSpecialDisplayName(tracked),
+        output: monitorName,
+        active: true,
+        placeholder: false,
+        special: true
+    };
 }
 
 function hyprlandActiveWorkspace(raw, screenName) {
@@ -561,4 +587,43 @@ function aqueousWindowsOnWorkspace(windows, workspace) {
 
 function aqueousWorkspaceOccupied(toplevels, workspace) {
     return toplevels.some(win => win.aqueousWorkspaceId === workspace.id);
+}
+
+function umbrielRecord(ws) {
+    return {
+        id: ws.id,
+        idx: ws.index,
+        name: ws.named === true ? ws.name : "",
+        output: ws.output ?? "",
+        active: ws.active === true,
+        placeholder: false,
+        occupied: ws.occupied === true
+    };
+}
+
+function umbrielCurrentId(workspaces, screenName) {
+    return workspaces.find(ws => ws.output === screenName && ws.active)?.id ?? "";
+}
+
+function umbrielWorkspacesForScreen(workspaces, screenName, occupiedOnly, cache) {
+    dropStale(cache, new Set(workspaces.map(ws => ws.id)));
+    const listed = workspaces.filter(ws => ws.output === screenName && (!occupiedOnly || ws.active || ws.occupied));
+    return listed.sort((a, b) => a.index - b.index).map(ws => reuse(cache, ws.id, umbrielRecord(ws)));
+}
+
+function umbrielActiveWorkspace(workspaces, screenName) {
+    const ws = workspaces.find(w => w.output === screenName && w.active);
+    return ws ? umbrielRecord(ws) : null;
+}
+
+function umbrielWindowsOnWorkspace(windows, workspace) {
+    return windows.filter(win => win.workspace === workspace.id).sort((a, b) => a.x - b.x || a.y - b.y || a.id.localeCompare(b.id)).map(win => ({
+                id: win.id,
+                app_id: win.app_id,
+                activated: win.active === true
+            }));
+}
+
+function umbrielWorkspaceUrgent(windows, workspace) {
+    return windows.some(win => win.workspace === workspace.id && win.urgent === true);
 }

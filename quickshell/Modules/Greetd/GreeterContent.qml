@@ -914,8 +914,8 @@ Item {
                         clip: true
                         radius: Theme.cornerRadius
                         color: Theme.withAlpha(Theme.cardSurface, 0.9)
-                        border.color: inputField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
-                        border.width: inputField.activeFocus ? 2 : 1
+                        border.color: inputField.activeFocus ? Theme.primary : Theme.outlineMedium
+                        border.width: inputField.activeFocus ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
 
                         GreeterUserPicker {
                             id: userPicker

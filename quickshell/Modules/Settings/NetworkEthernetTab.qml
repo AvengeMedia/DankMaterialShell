@@ -85,8 +85,8 @@ Item {
                                 height: isExpanded ? 56 + ethExpandedContent.height : 56
                                 radius: Theme.cornerRadius
                                 color: ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: isConnected ? Theme.outlineWidthFocused : 0
-                                border.color: Theme.primary
+                                border.width: isConnected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                                border.color: isConnected ? Theme.primary : Theme.outlineMedium
                                 clip: true
 
                                 Behavior on height {
@@ -381,8 +381,8 @@ Item {
                                 height: 48
                                 radius: Theme.cornerRadius
                                 color: wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: modelData.isActive ? Theme.outlineWidthFocused : 0
-                                border.color: Theme.primary
+                                border.width: modelData.isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                                border.color: modelData.isActive ? Theme.primary : Theme.outlineMedium
 
                                 Row {
                                     anchors.left: parent.left

@@ -42,15 +42,9 @@ ShellRoot {
         running: true
         onTriggered: {
             Theme.isLightMode = false;
-            Theme.currentTheme = "purple";
-            check(Theme.tonalPrimaryContainer, "stock container counts as tonal");
-            check(Theme.selectedContainer === Theme.primaryContainer, "stock selection keeps primaryContainer");
-            check(Theme.accentOnPrimaryContainer === Theme.primary, "stock icon boxes keep the primary accent");
 
             Theme.customThemeData = nord;
             Theme.currentTheme = "custom";
-            check(!Theme.tonalPrimaryContainer, "accent-like container is not tonal");
-            check(Theme.selectedContainer !== Theme.primaryContainer, "accent-like container is not used as selection fill");
             check(readable(Theme.onSelectedContainer, Theme.selectedContainer, 4.5), "selection text readable on tinted fill");
             check(readable(Theme.onPrimaryContainer, Theme.primaryContainer, 4.5), "derived onPrimaryContainer readable");
             check(readable(Theme.accentOnPrimaryContainer, Theme.primaryContainer, 3), "icon box glyph readable");

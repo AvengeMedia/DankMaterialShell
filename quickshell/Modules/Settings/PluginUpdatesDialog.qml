@@ -21,8 +21,8 @@ StyledRect {
     height: visible ? innerColumn.implicitHeight + Theme.spacingL * 2 : 0
     radius: Theme.cornerRadiusM
     color: Theme.floatingWindowNestedSurface
-    border.color: Theme.outlineVariant
-    border.width: Theme.outlineWidth
+    border.color: Theme.outlineMedium
+    border.width: Theme.layerOutlineWidth
     clip: true
 
     visible: false

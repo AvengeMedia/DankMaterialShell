@@ -33,7 +33,8 @@ Item {
             const items = [];
             for (let i = 0; i < count; i++) {
                 const body = itemAt(i)?.body;
-                if (body) items.push(body);
+                if (body)
+                    items.push(body);
             }
             return items;
         }
@@ -41,14 +42,16 @@ Item {
         readonly property bool anyInteraction: {
             revision;
             for (let i = 0; i < count; i++) {
-                if (itemAt(i)?.body?.interactionActive) return true;
+                if (itemAt(i)?.body?.interactionActive)
+                    return true;
             }
             return false;
         }
         readonly property bool anyEdit: {
             revision;
             for (let i = 0; i < count; i++) {
-                if (itemAt(i)?.body?.editMode) return true;
+                if (itemAt(i)?.body?.editMode)
+                    return true;
             }
             return false;
         }
@@ -66,7 +69,7 @@ Item {
             readonly property alias body: dockBody
 
             anchors.fill: parent
-            visible: slot.modelData.enabled
+            visible: slot.modelData.enabled || (slot.modelData.openOnOverview && CompositorService.isNiri)
 
             onVisibleChanged: dockRepeater.revision++
             Component.onCompleted: dockRepeater.revision++

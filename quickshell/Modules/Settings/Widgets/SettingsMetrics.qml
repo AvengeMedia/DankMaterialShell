@@ -19,6 +19,8 @@ Singleton {
     readonly property real rowPaddingH: 20
     readonly property real rowPaddingV: 16
     readonly property real rowContentSpacing: Theme.spacingL
+    readonly property real heroPadding: rowPaddingV
+    readonly property real heroLeadingSize: Theme.avatarSize
     readonly property real sectionLabelTopGap: Theme.spacingS
     readonly property real sectionLabelBottomGap: Theme.spacingM
     readonly property real navIconSize: Theme.avatarSize
@@ -30,8 +32,8 @@ Singleton {
     readonly property real choiceCardPreviewRatio: 10 / 16
     readonly property real wallpaperThumbRatio: 10 / 16
     readonly property int wallpaperThumbCache: 1024
-    readonly property real wallpaperHeroStackWidth: 440
-    readonly property real wallpaperHeroSplit: 0.55
+    readonly property real wallpaperHeroStackWidth: 640
+    readonly property real wallpaperHeroSplit: 0.5
     readonly property real disabledOpacity: 0.38
     readonly property real highlightBlend: 0.2
     readonly property real bannerTextMinWidth: 100
@@ -42,4 +44,6 @@ Singleton {
     readonly property color selectedRowColor: Theme.blend(rowColor, Theme.onSurface, Theme.stateLayerDrag)
     readonly property int transitionDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property int fadeDuration: Theme.expressiveDurations.expressiveEffects
+    readonly property int pageSettleFrames: 2
+    readonly property int pageSettleDeadline: 250
 }

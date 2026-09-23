@@ -65,6 +65,8 @@ LauncherTile {
             anchors.fill: parent
             radius: Theme.cornerRadiusM
             color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             ScreencopyView {
                 id: screencopyView

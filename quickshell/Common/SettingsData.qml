@@ -22,7 +22,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 28
+    readonly property int settingsConfigVersion: 29
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -176,6 +176,14 @@ Singleton {
     property bool floatingWindowForegroundLayers: Spec.SPEC.floatingWindowForegroundLayers.def
     property real floatingWindowForegroundTransparency: Spec.SPEC.floatingWindowForegroundTransparency.def
     property bool dmsWindowsFloating: Spec.SPEC.dmsWindowsFloating.def
+    property string hostSurfaceColor: Spec.SPEC.hostSurfaceColor.def
+    property string hostSurfaceCustomColor: Spec.SPEC.hostSurfaceCustomColor.def
+    property string cardSurfaceColor: Spec.SPEC.cardSurfaceColor.def
+    property string cardSurfaceCustomColor: Spec.SPEC.cardSurfaceCustomColor.def
+    property string chipSurfaceColor: Spec.SPEC.chipSurfaceColor.def
+    property string chipSurfaceCustomColor: Spec.SPEC.chipSurfaceCustomColor.def
+    property string chipSurfaceNestedColor: Spec.SPEC.chipSurfaceNestedColor.def
+    property string chipSurfaceNestedCustomColor: Spec.SPEC.chipSurfaceNestedCustomColor.def
     property string widgetBackgroundColor: Spec.SPEC.widgetBackgroundColor.def
     property string widgetBackgroundCustomColor: Spec.SPEC.widgetBackgroundCustomColor.def
     property real widgetBackgroundCustomStrength: Spec.SPEC.widgetBackgroundCustomStrength.def
@@ -378,9 +386,18 @@ Singleton {
         _reconcileConnectedFrameBarStyles();
     }
 
+    function _frameBarConfig() {
+        return barConfigs.find(bc => bc.enabled !== false && !isIslandBarConfig(bc));
+    }
+
     readonly property real frameSurfaceOpacity: {
         barConfigs;
-        return barTransparency(barConfigs.find(bc => bc.enabled !== false && !isIslandBarConfig(bc)));
+        return barTransparency(_frameBarConfig());
+    }
+
+    readonly property color frameSurfaceBase: {
+        barConfigs;
+        return barSurfaceColor(_frameBarConfig());
     }
 
     property string systemTrayIconTintMode: Spec.SPEC.systemTrayIconTintMode.def
@@ -586,14 +603,6 @@ Singleton {
     property var cursorSettings: Spec.SPEC.cursorSettings.def
     property var availableCursorThemes: Spec.SPEC.availableCursorThemes.def
     property string systemDefaultCursorTheme: Spec.SPEC.systemDefaultCursorTheme.def
-
-    property string launcherLogoMode: Spec.SPEC.launcherLogoMode.def
-    property string launcherLogoCustomPath: Spec.SPEC.launcherLogoCustomPath.def
-    property string launcherLogoColorOverride: Spec.SPEC.launcherLogoColorOverride.def
-    property bool launcherLogoColorInvertOnMode: Spec.SPEC.launcherLogoColorInvertOnMode.def
-    property real launcherLogoBrightness: Spec.SPEC.launcherLogoBrightness.def
-    property real launcherLogoContrast: Spec.SPEC.launcherLogoContrast.def
-    property int launcherLogoSizeOffset: Spec.SPEC.launcherLogoSizeOffset.def
 
     property string fontFamily: Spec.SPEC.fontFamily.def
     property string monoFontFamily: Spec.SPEC.monoFontFamily.def
@@ -816,11 +825,24 @@ Singleton {
     property bool notificationFocusedMonitor: Spec.SPEC.notificationFocusedMonitor.def
     readonly property var islandBarConfigs: {
         barConfigs;
-        return (barConfigs || []).filter(cfg => cfg && cfg.island === true);
+        return (barConfigs || []).filter(cfg => isIslandBarConfig(cfg));
     }
     readonly property bool dankIslandEnabled: islandBarConfigs.some(cfg => cfg.enabled ?? false)
+    // Session-only: which bar, island or dot last-used shared shortcuts follow on each screen.
+    property var lastUsedBarByScreen: ({})
+    // One slot per edge; a dot floats, so it never takes one.
+    readonly property int edgeBarConfigCount: (barConfigs || []).filter(cfg => cfg && !isDotBarConfig(cfg)).length
+    readonly property var dotBarConfig: (barConfigs || []).find(cfg => isDotBarConfig(cfg)) ?? null
     readonly property var islandDefaults: ({
             "islandFloating": false,
+            "islandPlacement": "edge",
+            "islandFreeSize": 48,
+            "islandFreeIcon": "blur_on",
+            "islandFreeEdgeMargin": 2,
+            "islandFreeIdleDelay": 2500,
+            "islandFreeIdleOpacity": 0.45,
+            "islandFreeIdleScale": 0.4,
+            "islandSharedRouting": "normal",
             "islandUseOverlayLayer": false,
             "islandReserveThickness": 40,
             "islandCompactThickness": 38,
@@ -1510,10 +1532,9 @@ Singleton {
         return DockConfig.create("", "");
     }
 
-    // Frame mode hosts bars inside the frame surface, which has nowhere to put an island.
+    // Frame mode hosts bars inside the frame surface, which has nowhere to put an edge island; a dot floats over it.
     function clearIslandBars() {
-        const islands = islandBarConfigs;
-        if (islands.length === 0)
+        if (!islandBarConfigs.some(cfg => !isDotBarConfig(cfg)))
             return;
         const configs = JSON.parse(JSON.stringify(barConfigs));
         for (const cfg of configs)
@@ -1578,7 +1599,7 @@ Singleton {
         Store.parse(root, obj);
 
         // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
-        if (frameEnabled && islandBarConfigs.length > 0)
+        if (frameEnabled)
             clearIslandBars();
 
         if (obj?.directionalAnimationMode === 3 && frameMode !== "connected")
@@ -2072,7 +2093,7 @@ Singleton {
 
     function taskbarInsetForEdge(screen, side) {
         const config = dockConfigForScreenEdge(screen, side);
-        if (!config || config.mode !== "taskbar")
+        if (!config?.enabled || config.mode !== "taskbar")
             return 0;
         const frameInset = !CompositorService.frameWindowVisibleForScreen(screen) ? 0 : !config.useOverlayLayer && CompositorService.usesConnectedFrameChromeForScreen(screen) ? frameEdgeReservation(screen, side) : frameThickness;
         return DockConfig.effectiveThickness(config) + frameInset;
@@ -2214,6 +2235,10 @@ Singleton {
         return config?.transparency ?? 1.0;
     }
 
+    function barSurfaceColor(config) {
+        return Theme.surfaceRoleColor(config?.surfaceColor, config?.surfaceCustomColor, Theme.hostSurface);
+    }
+
     function widgetOption(widgetType, data, key) {
         return WidgetDefaults.option(widgetType, data, key);
     }
@@ -2303,12 +2328,15 @@ Singleton {
         updateBarConfig(barId, patch);
     }
 
-    function setBarIsland(barId, on) {
+    function setBarIsland(barId, on, dot) {
         const config = getBarConfig(barId);
-        if (!config || (config.island === true) === (on === true))
+        const wantIsland = on === true && dot !== true;
+        const wantDot = on === true && dot === true;
+        if (!config || ((config.island === true) === wantIsland && (config.dot === true) === wantDot))
             return;
         const updates = {
-            island: on === true
+            island: wantIsland,
+            dot: wantDot
         };
         if (on === true) {
             if (!config.enabled)
@@ -2460,7 +2488,104 @@ Singleton {
     }
 
     function isIslandBarConfig(bc) {
-        return !!bc && bc.island === true;
+        return !!bc && (bc.island === true || bc.dot === true);
+    }
+
+    function isDotBarConfig(bc) {
+        return !!bc && bc.dot === true;
+    }
+
+    // The dot is a companion, not a layout: the first enable clones the base bar so it inherits its look.
+    function setDotEnabled(enabled, baseId) {
+        const existing = dotBarConfig;
+        if (existing) {
+            if ((existing.enabled ?? false) !== enabled)
+                updateBarConfig(existing.id, {
+                    enabled
+                });
+            return;
+        }
+        if (!enabled)
+            return;
+        const base = getBarConfig(baseId);
+        const source = base && !isDotBarConfig(base) ? base : getBarConfig("default");
+        if (!source)
+            return;
+        const config = Object.assign(JSON.parse(JSON.stringify(source)), {
+            id: "dot" + Date.now(),
+            name: I18n.tr("Dot", "bar layout: free-floating dot that opens island activities"),
+            enabled: true,
+            island: false,
+            dot: true,
+            screenPreferences: ["all"],
+            showOnLastDisplay: true,
+            followInterfaceStyle: false,
+            transparency: barTransparency(source)
+        });
+        // An inherited "always here" would make the base island and the dot fight by config order.
+        delete config.islandSharedRouting;
+        addBarConfig(config);
+    }
+
+    function islandFreePlacement(bc) {
+        return isDotBarConfig(bc) || (islandSetting(bc, "islandFloating") && islandSetting(bc, "islandPlacement") === "free");
+    }
+
+    function islandSharedRoutingMode(bc) {
+        const mode = bc?.islandSharedRouting;
+        return ["always", "last-used"].includes(mode) ? mode : "normal";
+    }
+
+    function sharedShortcutsFollowLastUsed(screen) {
+        return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) === "last-used");
+    }
+
+    function sharedShortcutsOverridden(screen) {
+        return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) !== "normal");
+    }
+
+    function recordBarInteraction(screen, barId) {
+        const name = screen?.name;
+        if (!name || !barId || lastUsedBarByScreen[name] === barId || !sharedShortcutsFollowLastUsed(screen))
+            return;
+        lastUsedBarByScreen = Object.assign({}, lastUsedBarByScreen, {
+            [name]: barId
+        });
+    }
+
+    function sharedTriggerIslandConfig(screen) {
+        const configs = activeIslandConfigsForScreen(screen);
+        if (sharedShortcutsFollowLastUsed(screen)) {
+            const lastId = lastUsedBarByScreen[screen?.name];
+            const lastIsland = configs.find(cfg => cfg.id === lastId);
+            if (lastIsland)
+                return lastIsland;
+        } else {
+            const fixed = configs.find(cfg => islandSharedRoutingMode(cfg) === "always");
+            if (fixed)
+                return fixed;
+        }
+        if (getActiveBarEdgesForScreen(screen).length > 0)
+            return null;
+        return configs.find(cfg => !isDotBarConfig(cfg)) ?? configs[0] ?? null;
+    }
+
+    // "Always here" is exclusive per screen, or config order would silently pick the winner.
+    function setIslandSharedRouting(barId, mode) {
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        const target = configs.find(cfg => cfg.id === barId);
+        if (!target)
+            return;
+        target.islandSharedRouting = mode;
+        if (mode === "always") {
+            const screens = Quickshell.screens.filter(screen => barConfigCoversScreen(target, screen));
+            for (const cfg of configs) {
+                if (cfg.id !== barId && isIslandBarConfig(cfg) && islandSharedRoutingMode(cfg) === "always" && screens.some(screen => barConfigCoversScreen(cfg, screen)))
+                    delete cfg.islandSharedRouting;
+            }
+        }
+        barConfigs = configs;
+        updateBarConfigs();
     }
 
     function activeIslandConfigsForScreen(screen) {
@@ -2485,10 +2610,6 @@ Singleton {
 
     function dankIslandEdgeOffset(screen, edge) {
         return ShellLayout.edge(screen, edge)?.islandThickness ?? 0;
-    }
-
-    function dankIslandIsSoleBarForScreen(screen) {
-        return dankIslandCoversScreen(screen) && getActiveBarEdgesForScreen(screen).length === 0;
     }
 
     function getActiveBarEdgesForScreen(screen) {

@@ -34,6 +34,8 @@ Item {
         return model?.getWidgetForId(parsed.base)?.text ?? "";
     }
     readonly property real offscreenX: I18n.isRtl ? -width : width
+    // The grid travels one body width ahead of the panel, so both slide together like a stack push.
+    readonly property real gridOffset: shownSection !== "" ? panel.x - offscreenX : 0
 
     visible: shownSection !== ""
 

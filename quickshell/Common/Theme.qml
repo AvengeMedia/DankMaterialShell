@@ -438,10 +438,10 @@ Singleton {
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest || surfaceContainerHigh
     property color surfaceBright: currentThemeData.surfaceBright || (isLightMode ? surface : surfaceContainerHighest)
     property color surfaceDim: currentThemeData.surfaceDim || (isLightMode ? surfaceContainer : background)
-    readonly property color hostSurface: surface
-    readonly property color cardSurface: surfaceContainer
-    readonly property color chipSurface: surfaceContainerHigh
-    readonly property color chipSurfaceNested: surfaceContainerHighest
+    readonly property color hostSurface: typeof SettingsData === "undefined" ? surface : surfaceRoleColor(SettingsData.hostSurfaceColor, SettingsData.hostSurfaceCustomColor, surface)
+    readonly property color cardSurface: typeof SettingsData === "undefined" ? surfaceContainer : surfaceRoleColor(SettingsData.cardSurfaceColor, SettingsData.cardSurfaceCustomColor, surfaceContainer)
+    readonly property color chipSurface: typeof SettingsData === "undefined" ? surfaceContainerHigh : surfaceRoleColor(SettingsData.chipSurfaceColor, SettingsData.chipSurfaceCustomColor, surfaceContainerHigh)
+    readonly property color chipSurfaceNested: typeof SettingsData === "undefined" ? surfaceContainerHighest : surfaceRoleColor(SettingsData.chipSurfaceNestedColor, SettingsData.chipSurfaceNestedCustomColor, surfaceContainerHighest)
     property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
     property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
     property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
@@ -587,7 +587,7 @@ Singleton {
     readonly property color notificationFloatingSurface: notificationForegroundLayers ? readableSurface : withAlpha(readableSurface, 0)
     readonly property color notificationFloatingSurfaceHigh: notificationForegroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
     readonly property color notificationNestedSurface: notificationFloatingSurfaceHigh
-    readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0.12 : (SettingsData.blurLayerOutlineOpacity ?? 0.12)))
+    readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0 : (SettingsData.blurLayerOutlineOpacity ?? 0)))
     readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
     readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
     readonly property real floatingWindowFieldAlpha: floatingWindowForegroundAlpha
@@ -600,6 +600,17 @@ Singleton {
     readonly property color floatingWindowFieldFocusedBorderColor: popupFieldFocusedBorderColor
     property color surfaceTextHover: withAlpha(surfaceText, 0.08)
     property color surfaceTextAlpha: withAlpha(surfaceText, 0.3)
+
+    function surfaceRoleColor(mode, customColor, fallback) {
+        switch (mode ?? "default") {
+        case "default":
+            return fallback;
+        case "custom":
+            return Qt.color(customColor);
+        default:
+            return roleColor(mode);
+        }
+    }
 
     function roleColor(mode) {
         switch (mode) {
@@ -1013,7 +1024,7 @@ Singleton {
             return withAlpha(hostSurface, popupTransparency);
         return isConnectedEffect ? frameSurfaceColor : withAlpha(hostSurface, popupTransparency);
     }
-    readonly property color frameSurfaceColor: withAlpha(hostSurface, typeof SettingsData === "undefined" ? popupTransparency : SettingsData.frameSurfaceOpacity)
+    readonly property color frameSurfaceColor: typeof SettingsData === "undefined" ? withAlpha(hostSurface, popupTransparency) : withAlpha(SettingsData.frameSurfaceBase, SettingsData.frameSurfaceOpacity)
     readonly property real connectedSurfaceRadius: isConnectedEffect ? connectedCornerRadius : windowRadius
     readonly property bool connectedSurfaceBlurEnabled: (typeof SettingsData === "undefined") ? true : (!isConnectedEffect || SettingsData.frameBlurEnabled)
     readonly property real effectScaleCollapsed: AnimVariants.effectScaleCollapsed
@@ -1567,7 +1578,7 @@ Singleton {
     property real notepadTransparency: SettingsData.notepadTransparencyOverride >= 0 ? SettingsData.notepadTransparencyOverride : floatingWindowTransparency
 
     property bool widgetBackgroundHasAlpha: {
-        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sc";
+        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "default";
         return colorMode === "sth" || colorMode === "custom";
     }
 
@@ -1585,8 +1596,10 @@ Singleton {
     readonly property real widgetBackgroundCustomStrength: Math.max(0, Math.min(1, typeof SettingsData !== "undefined" ? (SettingsData.widgetBackgroundCustomStrength ?? 0.4) : 0.4))
 
     property var widgetBaseBackgroundColor: {
-        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sc";
+        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "default";
         switch (colorMode) {
+        case "default":
+            return cardSurface;
         case "s":
             return surface;
         case "sc":
@@ -2235,61 +2248,6 @@ Singleton {
 
     function hairline(dpr) {
         return 1 / (dpr || 1);
-    }
-
-    function invertHex(hex) {
-        hex = hex.replace('#', '');
-
-        if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
-            return hex;
-        }
-
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
-
-        const invR = (255 - r).toString(16).padStart(2, '0');
-        const invG = (255 - g).toString(16).padStart(2, '0');
-        const invB = (255 - b).toString(16).padStart(2, '0');
-
-        return `#${invR}${invG}${invB}`;
-    }
-
-    property var baseLogoColor: {
-        if (typeof SettingsData === "undefined")
-            return "";
-        const colorOverride = SettingsData.launcherLogoColorOverride;
-        if (!colorOverride || colorOverride === "")
-            return "";
-        if (colorOverride === "primary")
-            return primary;
-        if (colorOverride === "surface")
-            return surfaceText;
-        return colorOverride;
-    }
-
-    property var effectiveLogoColor: {
-        if (typeof SettingsData === "undefined")
-            return "";
-
-        const colorOverride = SettingsData.launcherLogoColorOverride;
-        if (!colorOverride || colorOverride === "")
-            return "";
-
-        if (colorOverride === "primary")
-            return primary;
-        if (colorOverride === "surface")
-            return surfaceText;
-
-        if (!SettingsData.launcherLogoColorInvertOnMode) {
-            return colorOverride;
-        }
-
-        if (isLightMode) {
-            return invertHex(colorOverride);
-        }
-
-        return colorOverride;
     }
 
     Process {

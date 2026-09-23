@@ -54,7 +54,7 @@ Variants {
             right: body.editMode || (!body.isVertical ? true : (dock.config.position === SettingsData.Position.Right))
         }
 
-        visible: !!resolvedConfig?.enabled
+        visible: !!resolvedConfig && (resolvedConfig.enabled || (resolvedConfig.openOnOverview && CompositorService.isNiri))
         WlrLayershell.keyboardFocus: PopoutManager.screenshotActive ? WlrKeyboardFocus.None : body.editMode ? WlrKeyboardFocus.Exclusive : body.interactionActive ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
         implicitWidth: body.surfaceImplicitWidth

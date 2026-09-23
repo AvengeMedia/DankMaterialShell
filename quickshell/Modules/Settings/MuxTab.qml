@@ -3,24 +3,25 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Common/MuxBackends.js" as MuxBackends
 
 Item {
     id: root
 
-    readonly property var muxTypeOptions: ["tmux", "zellij"]
+    readonly property var muxTypeOptions: Object.keys(MuxBackends.BACKENDS)
 
     SettingsPage {
         id: mainColumn
 
         SettingsCard {
             tab: "mux"
-            tags: ["mux", "multiplexer", "tmux", "zellij", "type"]
+            tags: ["mux", "multiplexer", "tmux", "zellij", "herdr", "type"]
             title: I18n.tr("General")
             iconName: "terminal"
 
             SettingsDropdownRow {
                 tab: "mux"
-                tags: ["mux", "multiplexer", "tmux", "zellij", "type", "backend"]
+                tags: ["mux", "multiplexer", "tmux", "zellij", "herdr", "type", "backend"]
                 settingKey: "muxType"
                 text: I18n.tr("Type")
                 options: root.muxTypeOptions

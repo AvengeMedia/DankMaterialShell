@@ -5,42 +5,48 @@ Item {
     id: root
 
     property real radius: 0
+    property real radiusX: radius
+    property real radiusY: radius
     property color color: "transparent"
     property string corner: "topLeft"
 
-    readonly property real rotationAngle: {
+    readonly property rect discRect: {
+        const rx = radiusX;
+        const ry = radiusY;
         switch (corner) {
         case "topRight":
-            return 90;
+            return Qt.rect(0, -ry, rx * 2, ry * 2);
         case "bottomRight":
-            return 180;
+            return Qt.rect(0, 0, rx * 2, ry * 2);
         case "bottomLeft":
-            return 270;
+            return Qt.rect(-rx, 0, rx * 2, ry * 2);
         default:
-            return 0;
+            return Qt.rect(-rx, -ry, rx * 2, ry * 2);
         }
     }
-    readonly property rect discRect: {
-        const r = radius;
+    readonly property string path: {
+        const rx = radiusX;
+        const ry = radiusY;
+        if (rx <= 0 || ry <= 0)
+            return "";
         switch (corner) {
         case "topRight":
-            return Qt.rect(0, -r, r * 2, r * 2);
+            return `M 0 0 L 0 ${ry} L ${rx} ${ry} A ${rx} ${ry} 0 0 1 0 0 Z`;
         case "bottomRight":
-            return Qt.rect(0, 0, r * 2, r * 2);
+            return `M 0 ${ry} L 0 0 L ${rx} 0 A ${rx} ${ry} 0 0 0 0 ${ry} Z`;
         case "bottomLeft":
-            return Qt.rect(-r, 0, r * 2, r * 2);
+            return `M ${rx} ${ry} L ${rx} 0 L 0 0 A ${rx} ${ry} 0 0 1 ${rx} ${ry} Z`;
         default:
-            return Qt.rect(-r, -r, r * 2, r * 2);
+            return `M ${rx} 0 L ${rx} ${ry} L 0 ${ry} A ${rx} ${ry} 0 0 0 ${rx} 0 Z`;
         }
     }
 
-    width: Math.max(0, radius)
-    height: Math.max(0, radius)
-    visible: radius > 0
+    width: Math.max(0, radiusX)
+    height: Math.max(0, radiusY)
+    visible: radiusX > 0 && radiusY > 0
 
     Shape {
         anchors.fill: parent
-        rotation: root.rotationAngle
         preferredRendererType: Shape.CurveRenderer
 
         ShapePath {
@@ -49,7 +55,7 @@ Item {
             strokeWidth: 0
 
             PathSvg {
-                path: root.radius > 0 ? `M ${root.radius} 0 L ${root.radius} ${root.radius} L 0 ${root.radius} A ${root.radius} ${root.radius} 0 0 0 ${root.radius} 0 Z` : ""
+                path: root.path
             }
         }
     }

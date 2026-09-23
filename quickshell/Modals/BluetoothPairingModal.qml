@@ -220,6 +220,8 @@ DankModal {
                     height: 56
                     radius: Theme.cornerRadius
                     color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
                     visible: requestType === "confirm" || requestType === "display-passkey"
 
                     Column {

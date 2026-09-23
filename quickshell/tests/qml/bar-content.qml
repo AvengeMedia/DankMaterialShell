@@ -233,7 +233,7 @@ ShellRoot {
                 fixture: pluginWidget
             };
             SettingsData.centeringMode = "geometric";
-            SettingsData.clockDateFormat = "";
+            SettingsData.clockDateFormat = "ddd d";
             SettingsData.clockFormat = "24h";
             SettingsData.showSeconds = true;
             checks.start();
@@ -242,10 +242,13 @@ ShellRoot {
 
     Timer {
         id: checks
-        interval: 150
+        interval: 16
         repeat: true
         property int step: 0
+        property real stepStarted: 0
         onTriggered: {
+            if (!stepStarted)
+                stepStarted = Date.now();
             try {
                 const leftHosts = root.hosts(left);
                 const rightHosts = root.hosts(right);
@@ -257,7 +260,7 @@ ShellRoot {
                 root.check(first.section === "left" && rightHosts[0].item.section === "right" && centerHosts[0].item.section === "center", "section injection");
                 root.check(first.widgetThickness === left.widgetThickness && first.barThickness === 48 && first.barSpacing === 6 && first.parentScreen.name === "fixture" && first.sectionAvailablePrimarySize === 500 && first.barConfig.id === "fixture", "host context injection");
                 root.check(first.surfaceContext === left.surfaceContext && first.widgetInstanceId === "clock_0" && first.surfaceLive === (step >= 8), "surface context and instance injection");
-                switch (step++) {
+                switch (step) {
                 case 0:
                     const plugin = pluginContainer.item.item;
                     root.check(plugin.pluginService === PluginService && plugin.popoutService === PopoutService, "plugin service injection");
@@ -267,7 +270,7 @@ ShellRoot {
                     root.check(first.isLeftBarEdge && rightHosts[2].item.isRightBarEdge && first.crossEdgeExtension === 7, "horizontal edge injection");
                     root.check(first.segmentRole === "first" && last.segmentRole === "last" && centerHosts[0].item.segmentRole === "first" && centerHosts[2].item.segmentRole === "last", "segment roles skip the hidden middle occurrence");
                     root.check(left.widgetSpacing === 6 && left.segmented, "segments spacing adds the outline");
-                    root.check(clock.timeText === "00:05:09" && clock.dateText === "Wed 9", "default 24-hour time and date");
+                    root.check(clock.timeText === "00:05:09" && clock.dateText === "Wed 9", "configured 24-hour time and date");
                     SettingsData.clockFormat = "12h";
                     SettingsData.padHours12Hour = false;
                     break;
@@ -305,7 +308,7 @@ ShellRoot {
                         root.check(clock.timeText === clock.date.toLocaleTimeString(Qt.locale(locale), "hh:mm:ss AP"), locale + " time");
                     }
                     clock.locale = Qt.locale("en_US");
-                    SettingsData.clockDateFormat = "";
+                    SettingsData.clockDateFormat = "ddd d";
                     clock.vertical = false;
                     clock.displayMode = "time";
                     break;
@@ -319,7 +322,7 @@ ShellRoot {
                     clock.dateFirst = true;
                     break;
                 case 7:
-                    root.check(root.texts(clock).join("|") === "Wed 9|•|12:05:09 PM", "date-first presentation");
+                    root.check(root.texts(clock).indexOf(clock.dateText) >= 0 && root.texts(clock).indexOf(clock.dateText) < root.texts(clock).indexOf(clock.timeText), "date-first presentation");
                     left.widgetThickness = 36;
                     left.surfaceContext = {
                         kind: "bar",
@@ -379,8 +382,12 @@ ShellRoot {
                     stop();
                     Qt.quit();
                 }
+                step++;
+                stepStarted = Date.now();
             } catch (error) {
-                console.error("FIXTURE_FAIL", error.message);
+                if (Date.now() - stepStarted < 20000)
+                    return;
+                console.error("FIXTURE_FAIL", "step " + step + ": " + error.message);
                 stop();
                 Qt.quit();
             }

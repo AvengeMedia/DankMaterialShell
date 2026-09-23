@@ -23,6 +23,7 @@ const (
 	CompositorMiracle
 	CompositorMango
 	CompositorAqueous
+	CompositorUmbriel
 )
 
 var detectedCompositor Compositor = -1
@@ -39,6 +40,7 @@ func DetectCompositor() Compositor {
 	}{
 		{os.Getenv("AQUEOUS_SOCKET"), true, CompositorAqueous},
 		{os.Getenv("MANGO_INSTANCE_SIGNATURE"), true, CompositorMango},
+		{os.Getenv("UMBRIEL_SOCKET"), true, CompositorUmbriel},
 		{os.Getenv("NIRI_SOCKET"), true, CompositorNiri},
 		{os.Getenv("SCROLLSOCK"), true, CompositorScroll},
 		{os.Getenv("MIRACLESOCK"), true, CompositorMiracle},
@@ -362,6 +364,30 @@ func getNiriFocusedMonitor() string {
 	return ""
 }
 
+type umbrielWorkspace struct {
+	Output  string `json:"output"`
+	Focused bool   `json:"focused"`
+}
+
+func getUmbrielFocusedMonitor() string {
+	output, err := exec.Command("umbriel", "workspaces", "--json").Output()
+	if err != nil {
+		return ""
+	}
+
+	var workspaces []umbrielWorkspace
+	if err := json.Unmarshal(output, &workspaces); err != nil {
+		return ""
+	}
+
+	for _, ws := range workspaces {
+		if ws.Focused {
+			return ws.Output
+		}
+	}
+	return ""
+}
+
 func GetFocusedMonitor() string {
 	switch DetectCompositor() {
 	case CompositorAqueous:
@@ -379,6 +405,8 @@ func GetFocusedMonitor() string {
 		return getNiriFocusedMonitor()
 	case CompositorMango:
 		return getMangoFocusedMonitor()
+	case CompositorUmbriel:
+		return getUmbrielFocusedMonitor()
 	}
 	return ""
 }

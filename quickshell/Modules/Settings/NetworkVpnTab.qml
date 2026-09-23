@@ -231,8 +231,8 @@ Item {
                                 height: isExpanded ? 56 + vpnExpandedContent.height : 56
                                 radius: Theme.cornerRadius
                                 color: vpnRowArea.containsMouse ? Theme.primaryHoverLight : (isActive ? Theme.primaryPressed : Theme.floatingWindowNestedSurface)
-                                border.width: isActive ? Theme.outlineWidthFocused : 0
-                                border.color: Theme.primary
+                                border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                                border.color: isActive ? Theme.primary : Theme.outlineMedium
                                 opacity: DMSNetworkService.isBusy ? 0.6 : 1.0
                                 clip: true
 

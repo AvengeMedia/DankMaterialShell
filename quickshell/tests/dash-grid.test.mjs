@@ -10,7 +10,7 @@ const order = cards.map((card, i) => i);
 const unit = { w: 1, h: 1 };
 const plain = value => JSON.parse(JSON.stringify(value));
 
-test("default card set packs into exactly the default board", () => {
+test("card spans pack into rows without overlap", () => {
     assert.equal(grid.packCells(cards, order, 6).rows, 5);
     assert.deepEqual(plain(grid.packCards(cards, order, 6, 600, 0, 100, false).slots[4]), { x: 0, y: 400, w: 300, h: 100, col: 0, row: 4, cols: 3, rows: 1 });
 });

@@ -108,8 +108,8 @@ Item {
             anchors.centerIn: parent
             radius: Theme.windowRadius
             color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
-            border.color: Theme.outlineVariant
-            border.width: Theme.outlineWidth
+            border.color: Theme.outlineMedium
+            border.width: Theme.layerOutlineWidth
 
             MouseArea {
                 anchors.fill: parent

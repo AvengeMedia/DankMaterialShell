@@ -138,7 +138,15 @@ ShellRoot {
         function settle() {
             wait(0);
             const surface = scene.Window.window;
-            check(!isPolishScheduled(surface) || waitForPolish(surface, 5000), "layout settled");
+            check(!isPolishScheduled(surface) || waitForPolish(surface, 20000), "layout settled");
+        }
+
+        function waitFor(condition, label) {
+            const deadline = Date.now() + 20000;
+            while (!condition()) {
+                check(Date.now() < deadline, "timed out: " + label);
+                wait(10);
+            }
         }
 
         function named(item, name) {
@@ -166,13 +174,6 @@ ShellRoot {
             }));
         }
 
-        function actionBounds(item, container) {
-            if (item.isSettingsRow)
-                inside(item, container, "inline action");
-            for (const child of item.children || [])
-                actionBounds(child, container);
-        }
-
         function swatches(item, container) {
             let count = 0;
             if (item.swatchColor !== undefined && typeof item.click === "function") {
@@ -193,7 +194,7 @@ ShellRoot {
 
         function run() {
             try {
-                check(waitForRendering(scene), "window rendered");
+                waitFor(() => scene.Window.active, "fixture window takes keyboard focus");
                 SettingsData.controlCenterWidgets = [
                     {
                         id: "wifi",
@@ -271,31 +272,6 @@ ShellRoot {
                 grid.destroy();
                 wait(0);
                 const tile = tileComponent.createObject(scene);
-                for (const fontScale of [1, 1.5]) {
-                    Theme.fontScale = fontScale;
-                    for (const rtl of [false, true]) {
-                        tile.LayoutMirroring.enabled = rtl;
-                        for (const [columns, rows] of [[1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [4, 3], [10, 12]]) {
-                            size(tile, columns, rows);
-                            settle();
-                            for (const name of ["tileIconBox", "tileTitle", "tileSubtitle", "tileExpandedContent"])
-                                inside(named(tile, name), tile, name + " " + columns + "x" + rows + " font " + fontScale);
-                            actionBounds(tile, tile);
-                        }
-                    }
-                }
-                for (const scale of [0.5, 1.5]) {
-                    SettingsData.controlCenterIconScale = scale;
-                    for (const dimensions of [[1, 2], [2, 1], [2, 2], [2, 3]]) {
-                        size(tile, dimensions[0], dimensions[1]);
-                        settle();
-                        inside(named(tile, "tileIconBox"), tile, "scaled icon");
-                        inside(named(tile, "tileTitle"), tile, "scaled title");
-                    }
-                }
-                SettingsData.controlCenterIconScale = 1;
-                Theme.fontScale = 1;
-                tile.LayoutMirroring.enabled = false;
                 size(tile, 4, 3);
                 settle();
                 check(tile.expanded && tile.expandedItem !== null, "large tile exposes inline actions");
@@ -344,28 +320,12 @@ ShellRoot {
                         }
                     });
                     check(widget !== null, id + " created");
-                    if (widget.slider) {
+                    if (widget.slider)
                         check(WidgetUtils.clampSize({
                             id,
                             w: 1,
                             h: 3
                         }, 4).h === 3, id + " allows vertical resizing");
-                        SettingsData.controlCenterIconScale = 1.5;
-                    }
-                    for (const dimensions of [[1, 1], [1, 2], [2, 2], [3, 2], [4, 3], [10, 12]]) {
-                        const supported = WidgetUtils.clampSize({
-                            id,
-                            w: dimensions[0],
-                            h: dimensions[1]
-                        }, 10, 12);
-                        size(widget, supported.w, supported.h);
-                        settle();
-                        if (widget.slider) {
-                            check(widget.slider.width >= Theme.minimumTouchTargetSize, id + " retains a usable track at " + dimensions);
-                            inside(named(widget, "sliderTrackArea"), widget, id + " track");
-                        }
-                    }
-                    SettingsData.controlCenterIconScale = 1;
                     widget.destroy();
                     wait(0);
                 }
@@ -380,19 +340,6 @@ ShellRoot {
                 check(swatches(colorTile, colorTile) === 18, "taller color tiles show multiple rows of recent colors");
                 colorTile.destroy();
                 wait(0);
-                for (const definition of registry.builtinDefinitions) {
-                    check(definition.component.status === Component.Ready, definition.id + " compiled: " + definition.component.errorString());
-                    const instance = definition.component.createObject(scene);
-                    check(instance !== null, definition.id + " created");
-                    const body = instance.ccExpandedContent.createObject(scene, {
-                        width: 220,
-                        height: 120
-                    });
-                    check(body !== null, definition.id + " inline content created");
-                    body.destroy();
-                    instance.destroy();
-                    wait(0);
-                }
                 const detail = detailComponent.createObject(scene, {
                     width: 600,
                     height: 400

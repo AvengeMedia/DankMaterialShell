@@ -4,6 +4,7 @@ import QtQuick
 import qs.Common
 import qs.Modals.DankLauncherV2 as DankLauncher
 import qs.Modules.DankBar
+import qs.Modules.DankIsland.Activities
 import qs.Services
 import qs.Widgets
 import "../../Common/LayoutResolver.js" as Resolver
@@ -17,6 +18,11 @@ Item {
     required property string barId
     property real originOffsetX: 0
     property real originOffsetY: 0
+    property real anchorX: 0
+    property real anchorY: 0
+    property bool anchorSnaps: false
+    property real freeScale: 1
+    property real freeOpacity: 1
 
     readonly property alias islandController: controller
     readonly property alias surface: surface
@@ -38,6 +44,10 @@ Item {
     readonly property real surfaceOpacity: surface.surfaceOpacity
     readonly property bool inputSuspended: controller.inputSuspended
     readonly property bool expanded: controller.expanded
+    onExpandedChanged: {
+        if (root.dotMode && root.expanded && !controller.transientActive && root.setting("islandNotificationBadgeClearOnOpen"))
+            NotificationService.markNotificationsSeen();
+    }
 
     signal scrollWheel(var wheel)
 
@@ -46,11 +56,16 @@ Item {
     }
 
     readonly property var islandMetrics: Resolver.islandMetrics(root.barConfig, SettingsData.islandDefaults)
-    readonly property int compactThickness: root.islandMetrics.compact
+    readonly property bool freeMode: SettingsData.islandFreePlacement(root.barConfig)
+    readonly property bool dotMode: SettingsData.isDotBarConfig(root.barConfig)
+    readonly property real dotSize: Math.max(24, Math.min(160, root.setting("islandFreeSize")))
+    readonly property real freeMargin: Math.max(0, Math.min(64, root.setting("islandFreeEdgeMargin")))
+    readonly property int compactThickness: root.dotMode ? Math.max(24, Math.min(72, root.dotSize)) : root.islandMetrics.compact
     readonly property bool floating: root.setting("islandFloating")
-    readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(root.screen) || LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", root.setting("islandUseOverlayLayer"))
-    readonly property string edge: SettingsData.islandEdge(root.barConfig)
-    readonly property bool isVertical: SettingsData.islandVertical(root.barConfig)
+    readonly property bool usesOverlayLayer: root.dotMode || CompositorService.framePeerSurfacesUseOverlayForScreen(root.screen) || LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", root.setting("islandUseOverlayLayer"))
+    // A free island's position only picks the orientation; a dot is always a circle.
+    readonly property bool isVertical: !root.dotMode && SettingsData.islandVertical(root.barConfig)
+    readonly property string edge: root.freeMode ? (root.isVertical ? "left" : "top") : SettingsData.islandEdge(root.barConfig)
     readonly property bool farEdge: root.edge === "bottom" || root.edge === "right"
     readonly property int reservedStripThickness: root.islandMetrics.thickness
     readonly property real windowWidth: root.hostWindow?.width ?? 0
@@ -59,9 +74,9 @@ Item {
     readonly property real windowMarginRight: root.hostWindow?.margins?.right ?? 0
     readonly property real windowMarginTop: root.hostWindow?.margins?.top ?? 0
     readonly property real windowMarginBottom: root.hostWindow?.margins?.bottom ?? 0
-    readonly property int hostOriginX: (root.isVertical && root.farEdge ? Math.max(0, (root.screen?.width ?? 0) - root.windowWidth - root.windowMarginRight) : root.windowMarginLeft) + root.originOffsetX
-    readonly property int hostOriginY: (!root.isVertical && root.farEdge ? Math.max(0, (root.screen?.height ?? 0) - root.windowHeight - root.windowMarginBottom) : root.windowMarginTop) + root.originOffsetY
-    readonly property int outerGap: root.islandMetrics.gap
+    readonly property int hostOriginX: root.freeMode ? 0 : (root.isVertical && root.farEdge ? Math.max(0, (root.screen?.width ?? 0) - root.windowWidth - root.windowMarginRight) : root.windowMarginLeft) + root.originOffsetX
+    readonly property int hostOriginY: root.freeMode ? 0 : (!root.isVertical && root.farEdge ? Math.max(0, (root.screen?.height ?? 0) - root.windowHeight - root.windowMarginBottom) : root.windowMarginTop) + root.originOffsetY
+    readonly property int outerGap: root.freeMode ? 0 : root.islandMetrics.gap
     readonly property int destinationMinHeight: 560
     readonly property int destinationMaxHeightLimit: 680
     readonly property int activityMinWidth: 320
@@ -178,9 +193,12 @@ Item {
 
         barConfig: root.barConfig
         edge: root.edge
-        interactionMode: root.setting("islandInteractionMode") === "click" ? "click" : "hybrid"
+        freeMode: root.freeMode
+        dotMode: root.dotMode
+        dotSize: root.dotSize * root.freeScale
+        interactionMode: !root.freeMode && root.setting("islandInteractionMode") === "hybrid" ? "hybrid" : "click"
         inputSuspended: PopoutManager.screenshotActive
-        alongOffset: Math.max(-root.maximumAlongOffset, Math.min(root.maximumAlongOffset, root.setting("islandAlongOffset")))
+        alongOffset: root.freeMode ? 0 : Math.max(-root.maximumAlongOffset, Math.min(root.maximumAlongOffset, root.setting("islandAlongOffset")))
         outerGap: root.outerGap
         compactThickness: root.compactThickness
         cornerRadius: Theme.windowRadius
@@ -193,8 +211,8 @@ Item {
         batteryStyle: root.setting("islandBatteryStyle")
         mediaClockVisible: root.setting("islandMediaClockVisible")
         launcherCycleEnabled: SettingsData.launcherStyle === "island"
-        dashboardAvailableWidth: Math.max(0, (root.screen?.width ?? root.referenceScreenWidth) - root.windowMarginLeft - root.windowMarginRight - (root.isVertical ? root.outerGap : 0) - Theme.spacingL * 2)
-        dashboardAvailableHeight: Math.max(0, (root.screen?.height ?? root.referenceScreenHeight) - root.windowMarginTop - root.windowMarginBottom - (root.isVertical ? 0 : root.outerGap) - Theme.spacingL * 2)
+        dashboardAvailableWidth: Math.max(0, (root.screen?.width ?? root.referenceScreenWidth) - (root.freeMode ? 0 : root.windowMarginLeft + root.windowMarginRight) - (root.isVertical ? root.outerGap : 0) - Theme.spacingL * 2)
+        dashboardAvailableHeight: Math.max(0, (root.screen?.height ?? root.referenceScreenHeight) - (root.freeMode ? 0 : root.windowMarginTop + root.windowMarginBottom) - (root.isVertical ? 0 : root.outerGap) - Theme.spacingL * 2)
         controlCenterMaxHeight: dashboardAvailableHeight
         notificationExpandAllowed: root.setting("islandNotificationExpand")
         unreadNotificationCount: root.setting("islandNotificationBadgeClearOnOpen") ? NotificationService.unreadCount : NotificationService.notifications.length
@@ -247,6 +265,13 @@ Item {
         effectiveScreen: root.screen
         hostOriginX: root.hostOriginX
         hostOriginY: root.hostOriginY
+        freeMode: root.freeMode
+        anchorX: root.anchorX
+        anchorY: root.anchorY
+        anchorSnaps: root.anchorSnaps
+        freeMargin: root.freeMargin
+        compactFaceOverride: root.dotMode ? dotFaceComponent : null
+        opacity: root.freeOpacity
         reducedMotion: root.setting("islandReducedMotion") || SettingsData.reduceMotion || SettingsData.animationDuration <= 0
         springStiffness: Math.max(root.springStiffnessRange[0], Math.min(root.springStiffnessRange[1], root.setting("islandSpringStiffness")))
         springDamping: Math.max(root.springDampingRange[0], Math.min(root.springDampingRange[1], root.setting("islandSpringDamping")))
@@ -254,7 +279,24 @@ Item {
         palette: root.setting("islandPalette")
         highContrast: root.setting("islandHighContrast")
         transparency: SettingsData.barTransparency(root.barConfig)
+        surfaceBase: SettingsData.barSurfaceColor(root.barConfig)
         onScrollWheel: wheel => root.scrollWheel(wheel)
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: surface.reducedMotion ? 0 : Theme.mediumDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+    }
+
+    Component {
+        id: dotFaceComponent
+
+        DotCompact {
+            controller: controller
+            iconName: root.setting("islandFreeIcon")
+        }
     }
 
     FocusScope {

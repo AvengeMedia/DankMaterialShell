@@ -377,7 +377,7 @@ Item {
                 radius: Theme.windowRadius
                 color: Theme.floatingWindowNestedSurface
                 border.color: Theme.outlineMedium
-                border.width: 1
+                border.width: Theme.layerOutlineWidth
             }
 
             contentItem: Column {

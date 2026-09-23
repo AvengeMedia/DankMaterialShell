@@ -365,6 +365,8 @@ Column {
         visible: searchVisible
         opacity: searchVisible ? 1 : 0
         color: Theme.floatingWindowNestedSurface
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         radius: Theme.cornerRadius
 
         Behavior on opacity {
@@ -486,7 +488,7 @@ Column {
         height: parent.height - bottomControls.height - Theme.spacingM - (searchVisible ? searchBar.height + Theme.spacingM : 0)
         color: Theme.withAlpha(Theme.cardSurface, Theme.notepadTransparency)
         border.color: Theme.outlineMedium
-        border.width: 1
+        border.width: Theme.layerOutlineWidth
         radius: Theme.cornerRadius
 
         RowLayout {
@@ -720,6 +722,8 @@ Column {
                     anchors.right: parent.right
                     height: 36
                     color: Theme.withAlpha(Theme.cardSurface, Theme.notepadTransparency)
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
                     z: 2
 
                     Row {
@@ -930,7 +934,7 @@ Column {
                 radius: Theme.cornerRadius
                 color: Theme.floatingWindowNestedSurface
                 border.color: Theme.outlineMedium
-                border.width: 1
+                border.width: Theme.layerOutlineWidth
                 z: 10
 
                 Row {

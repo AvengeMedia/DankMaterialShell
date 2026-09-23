@@ -34,7 +34,16 @@ Item {
 
     signal dialogClosed
 
+    // Last-used routing already went through PopoutService, so a standard bar owns the launcher here.
+    function _lastUsedOwnsLauncher() {
+        return SettingsData.sharedShortcutsFollowLastUsed(CompositorService.getFocusedScreen());
+    }
+
     function _openIsland(query, mode) {
+        if (root._lastUsedOwnsLauncher()) {
+            usingFallback = true;
+            return false;
+        }
         const accepted = router?.openLauncher?.(query || "", mode || "") ?? false;
         if (accepted) {
             usingFallback = false;
@@ -70,6 +79,11 @@ Item {
 
     function toggle() {
         if (usingFallback && fallback.spotlightOpen) {
+            fallback.toggle();
+            return;
+        }
+        if (root._lastUsedOwnsLauncher()) {
+            usingFallback = true;
             fallback.toggle();
             return;
         }

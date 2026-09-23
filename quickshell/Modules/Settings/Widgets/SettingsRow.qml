@@ -24,6 +24,7 @@ T.Control {
     property string subtitle: ""
     property color subtitleColor: Theme.surfaceVariantText
     property string iconName: ""
+    property bool iconBox: false
     property bool clickable: false
     property bool showChevron: false
     property string trailingBadge: ""
@@ -52,7 +53,7 @@ T.Control {
     readonly property bool isLastInGroup: _edge(false)
     property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
     property real bottomRadius: isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
-    readonly property real minHeight: subtitle !== "" ? Theme.listItemTwoLineHeight : Theme.listItemHeight
+    property real minHeight: subtitle !== "" ? Theme.listItemTwoLineHeight : Theme.listItemHeight
 
     signal clicked
     signal resetRequested
@@ -85,8 +86,16 @@ T.Control {
     }
 
     function _edge(first) {
-        if (groupItem.parent?.isSettingsGroupHost)
-            return groupItem.parent.isEdge(groupItem, first);
+        const container = groupItem.parent;
+        if (container?.isSettingsGroupHost)
+            return container.isEdge(groupItem, first);
+        if (!_edgeInContainer(first))
+            return false;
+        const host = container?.parent;
+        return host?.isSettingsGroupHost ? host.isEdge(container, first) : true;
+    }
+
+    function _edgeInContainer(first) {
         const siblings = groupItem.parent?.visibleChildren;
         if (!siblings)
             return true;
@@ -115,6 +124,8 @@ T.Control {
         anchors.fill: parent
         visible: root.paintBackground
         color: root.isHighlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -198,8 +209,7 @@ T.Control {
         id: mainColumn
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: root.paddingV
+        anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: root.paddingH
         anchors.rightMargin: root.paddingH
         spacing: Theme.spacingM
@@ -226,13 +236,21 @@ T.Control {
                     visible: children.length > 0
                 }
 
-                DankIcon {
+                Rectangle {
                     id: leadingIcon
                     anchors.verticalCenter: parent.verticalCenter
-                    name: root.iconName
-                    size: Theme.iconSize
-                    color: root.iconColor
+                    width: root.iconBox ? SettingsMetrics.heroLeadingSize : Theme.iconSize
+                    height: width
+                    radius: Theme.fullRadius(width, height)
+                    color: root.iconBox ? Theme.withAlpha(root.iconColor, Theme.tonalTintAlpha) : "transparent"
                     visible: root.iconName !== ""
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: root.iconName
+                        size: root.iconBox ? Theme.iconSizeMedium : Theme.iconSize
+                        color: root.iconColor
+                    }
                 }
             }
 

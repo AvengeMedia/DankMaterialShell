@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "../Common/MuxBackends.js" as MuxBackends
 
 Singleton {
     id: root
@@ -13,13 +14,12 @@ Singleton {
 
     property var sessions: []
     property bool loading: false
-
-    property bool tmuxAvailable: false
-    property bool zellijAvailable: false
-    readonly property bool currentMuxAvailable: muxType === "zellij" ? zellijAvailable : tmuxAvailable
+    property bool currentMuxAvailable: false
 
     readonly property string muxType: SettingsData.muxType
-    readonly property string displayName: muxType === "zellij" ? "Zellij" : "Tmux"
+    readonly property var backend: MuxBackends.BACKENDS[muxType] ?? MuxBackends.BACKENDS.tmux
+    readonly property string displayName: backend.displayName
+    readonly property bool supportsRename: !!backend.rename
 
     readonly property var terminalFlags: ({
             "ghostty": ["-e"],
@@ -46,28 +46,24 @@ Singleton {
     }
 
     Process {
-        id: tmuxCheckProcess
-        command: ["sh", "-c", "command -v tmux"]
+        id: availabilityCheck
+        command: ["sh", "-c", "command -v " + root.backend.list[0]]
         running: false
         onExited: code => {
-            root.tmuxAvailable = (code === 0);
+            root.currentMuxAvailable = (code === 0);
         }
     }
 
-    Process {
-        id: zellijCheckProcess
-        command: ["sh", "-c", "command -v zellij"]
-        running: false
-        onExited: code => {
-            root.zellijAvailable = (code === 0);
-        }
-    }
-
+    // Restart so a backend switch mid-check never inherits the old binary's result
     function checkAvailability() {
-        tmuxCheckProcess.running = true;
-        zellijCheckProcess.running = true;
+        if (availabilityCheck.running)
+            availabilityCheck.running = false;
+        Qt.callLater(function () {
+            availabilityCheck.running = true;
+        });
     }
 
+    onBackendChanged: checkAvailability()
     Component.onCompleted: checkAvailability()
 
     Process {
@@ -77,10 +73,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    if (root.muxType === "zellij")
-                        root._parseZellijSessions(text);
-                    else
-                        root._parseTmuxSessions(text);
+                    root.sessions = root.backend.parse(text).filter(session => !root._isSessionExcluded(session.name));
                 } catch (e) {
                     log.error("Error parsing sessions:", e);
                     root.sessions = [];
@@ -116,119 +109,41 @@ Singleton {
         if (listProcess.running)
             listProcess.running = false;
 
-        if (root.muxType === "zellij")
-            listProcess.command = ["zellij", "list-sessions", "--no-formatting"];
-        else
-            listProcess.command = ["tmux", "list-sessions", "-F", "#{session_name}|#{session_windows}|#{session_attached}"];
-
+        listProcess.command = root.backend.list;
         Qt.callLater(function () {
             listProcess.running = true;
         });
     }
 
     function _isSessionExcluded(name) {
-        var filter = SettingsData.muxSessionFilter.trim();
-        if (filter.length === 0)
-            return false;
-        var parts = filter.split(",");
-        for (var i = 0; i < parts.length; i++) {
-            var pattern = parts[i].trim();
-            if (pattern.length === 0)
-                continue;
-            if (pattern.startsWith("/") && pattern.endsWith("/") && pattern.length > 2) {
-                try {
-                    var re = new RegExp(pattern.slice(1, -1));
-                    if (re.test(name))
-                        return true;
-                } catch (e) {}
-            } else {
-                if (name.toLowerCase() === pattern.toLowerCase())
-                    return true;
-            }
-        }
-        return false;
+        return MuxBackends.isSessionExcluded(name, SettingsData.muxSessionFilter);
     }
 
-    function _parseTmuxSessions(output) {
-        var sessionList = [];
-        var lines = output.trim().split('\n');
-
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (line.length === 0)
-                continue;
-            var parts = line.split('|');
-            if (parts.length >= 3 && !_isSessionExcluded(parts[0])) {
-                sessionList.push({
-                    name: parts[0],
-                    windows: parts[1],
-                    attached: parts[2] === "1"
-                });
-            }
+    function _runInTerminal(name, argv) {
+        if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
+            Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name]);
+            return;
         }
-
-        root.sessions = sessionList;
-    }
-
-    function _parseZellijSessions(output) {
-        var sessionList = [];
-        var lines = output.trim().split('\n');
-
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (line.length === 0)
-                continue;
-            var exited = line.includes("(EXITED");
-            var bracketIdx = line.indexOf(" [");
-            var name = (bracketIdx > 0 ? line.substring(0, bracketIdx) : line).trim();
-
-            if (!_isSessionExcluded(name)) {
-                sessionList.push({
-                    name: name,
-                    windows: "N/A",
-                    attached: !exited
-                });
-            }
-        }
-
-        root.sessions = sessionList;
+        Quickshell.execDetached(_terminalPrefix().concat(argv));
     }
 
     function attachToSession(name) {
-        if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
-            Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name]);
-        } else if (root.muxType === "zellij") {
-            Quickshell.execDetached(_terminalPrefix().concat(["zellij", "attach", name]));
-        } else {
-            Quickshell.execDetached(_terminalPrefix().concat(["tmux", "attach", "-t", name]));
-        }
+        _runInTerminal(name, root.backend.attach(name));
     }
 
     function createSession(name) {
-        if (SettingsData.muxUseCustomCommand && SettingsData.muxCustomCommand) {
-            Quickshell.execDetached([Paths.expandTilde(SettingsData.muxCustomCommand), name]);
-        } else if (root.muxType === "zellij") {
-            Quickshell.execDetached(_terminalPrefix().concat(["zellij", "-s", name]));
-        } else {
-            Quickshell.execDetached(_terminalPrefix().concat(["tmux", "new-session", "-s", name]));
-        }
+        _runInTerminal(name, root.backend.create(name));
     }
 
-    readonly property bool supportsRename: muxType !== "zellij"
-
     function renameSession(oldName, newName) {
-        if (root.muxType === "zellij")
+        if (!root.supportsRename)
             return;
-        Quickshell.execDetached(["tmux", "rename-session", "-t", oldName, newName]);
+        Quickshell.execDetached(root.backend.rename(oldName, newName));
         Qt.callLater(refreshSessions);
     }
 
     function killSession(name) {
-        if (root.muxType === "zellij") {
-            Quickshell.execDetached(["zellij", "kill-session", name]);
-        } else {
-            Quickshell.execDetached(["tmux", "kill-session", "-t", name]);
-        }
+        Quickshell.execDetached(root.backend.kill(name));
         Qt.callLater(refreshSessions);
     }
 }

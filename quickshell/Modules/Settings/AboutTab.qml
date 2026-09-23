@@ -20,6 +20,7 @@ Item {
     property bool isMango: CompositorService.isMango
     property bool isLabwc: CompositorService.isLabwc
     property bool isAqueous: CompositorService.isAqueous
+    property bool isUmbriel: CompositorService.isUmbriel
 
     property string compositorName: {
         if (isHyprland)
@@ -54,6 +55,8 @@ Item {
             return "/assets/labwc.png";
         if (isAqueous)
             return "/assets/aqueous.svg";
+        if (isUmbriel)
+            return "/assets/umbriel.svg";
         return "/assets/niri.svg";
     }
 
@@ -72,6 +75,8 @@ Item {
             return "https://labwc.github.io/";
         if (isAqueous)
             return "";
+        if (isUmbriel)
+            return "https://github.com/noctalia-dev/umbriel";
         return "https://github.com/niri-wm/niri";
     }
 
@@ -90,6 +95,8 @@ Item {
             return I18n.tr("LabWC website");
         if (isAqueous)
             return "Aqueous";
+        if (isUmbriel)
+            return "Umbriel";
         return I18n.tr("niri GitHub");
     }
 

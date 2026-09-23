@@ -8,7 +8,7 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 # Check for root privileges
-if [ "$(id -u)" == "0" ]; then
+if [ "$(id -u)" = "0" ]; then
     printf "%bError: This script must not be run as root%b\n" "$RED" "$NC"
     exit 1
 fi

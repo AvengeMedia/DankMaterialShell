@@ -254,6 +254,7 @@ Singleton {
     property var activeDisplayProfileModes: ({})
     property var desktopWidgetGridSettings: ({})
     property var desktopWidgetInstancePositions: ({})
+    property var islandFreePositions: ({})
     property var builtInPluginState: ({})
     property bool greeterSyncPending: false
     property var greeterSyncBaseline: ({})
@@ -568,6 +569,21 @@ Singleton {
             updated[instanceId] = {};
         updated[instanceId][screenKey] = Object.assign({}, updated[instanceId][screenKey] || {}, positionUpdates);
         desktopWidgetInstancePositions = updated;
+        saveSettings();
+    }
+
+    // Fractions of the screen so the anchor survives resolution and scale changes.
+    function setIslandFreePosition(key, x, y) {
+        const next = {
+            "x": Math.max(0, Math.min(1, x)),
+            "y": Math.max(0, Math.min(1, y))
+        };
+        const current = islandFreePositions[key];
+        if (current && current.x === next.x && current.y === next.y)
+            return;
+        const updated = Object.assign({}, islandFreePositions);
+        updated[key] = next;
+        islandFreePositions = updated;
         saveSettings();
     }
 

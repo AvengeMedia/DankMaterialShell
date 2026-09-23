@@ -39,7 +39,7 @@ Row {
         panelId: "volume"
         iconName: root.player.getVolumeIcon()
         enabled: root.player.volumeAvailable
-        tooltipText: I18n.tr("Volume") + ": " + Math.round(root.player.currentVolume * 100) + "%"
+        tooltipText: (root.player.usePlayerVolume ? I18n.tr("Media volume") : I18n.tr("Volume")) + ": " + Math.round(root.player.currentVolume * 100) + "%"
 
         MediaVolumeWheel {
             player: root.player
@@ -50,7 +50,7 @@ Row {
     GroupButton {
         id: devicesButton
         panelId: "devices"
-        tooltipText: I18n.tr("Devices", "Media player output device picker")
+        tooltipText: I18n.tr("Devices", "Media player output device picker") + ": " + AudioService.displayName(AudioService.sink)
         iconName: AudioService.sinkIcon(AudioService.sink)
 
         MediaSinkWheel {}

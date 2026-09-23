@@ -290,6 +290,8 @@ Item {
             anchors.rightMargin: Theme.spacingXL
             radius: Theme.cornerRadius
             color: Theme.floatingWindowNestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
             clip: true
 
             Column {

@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.DankDash
 import "../../../DankCommon/Common/FocusNavigation.js" as FocusNavigation
 
 RowLayout {
@@ -14,7 +15,8 @@ RowLayout {
     required property var presentation
 
     readonly property var focusTargets: [shuffleButton, previousButton, playButton, nextButton, repeatButton]
-    readonly property bool hasControls: !!presentation && (presentation.play || presentation.previous || presentation.next || presentation.shuffle || presentation.repeat)
+    readonly property bool hasControls: !!presentation
+    readonly property var pressSpring: Theme.springPreset("fast", Theme.expressiveDurations.expressiveFastSpatial)
 
     spacing: Theme.spacingS
     implicitHeight: Theme.buttonHeightM
@@ -38,7 +40,7 @@ RowLayout {
         id: playButton
         mediaAction: "play"
         size: "m"
-        Layout.preferredWidth: Theme.buttonHeightM + Theme.spacingS
+        weight: DashMetrics.mediaPlayWidthRatio + (Number(shuffleButton.visible) + Number(repeatButton.visible)) * DashMetrics.mediaPlayWidthStep
         variant: "filled"
         iconSize: Theme.iconSizeLarge
         containerColor: MediaAccentService.accentContainer
@@ -56,15 +58,32 @@ RowLayout {
     }
 
     component TransportButton: MediaTransportButton {
+        id: button
+
+        property real weight: 1
+        readonly property real targetWeight: weight * (pressed ? DashMetrics.mediaTransportPressScale : 1)
+
         player: root.player
+        keepNavigation: true
         Layout.fillWidth: true
-        Layout.preferredWidth: Theme.minimumTouchTargetSize
+        Layout.preferredWidth: Theme.minimumTouchTargetSize * widthSpring.value
         Layout.minimumWidth: Theme.iconSizeMedium + Theme.spacingXS * 2
         Layout.alignment: Qt.AlignVCenter
         round: false
-        buttonSize: size === "m" ? Theme.buttonHeightM : Theme.minimumTouchTargetSize
+        buttonSize: Theme.buttonHeightM
+        radius: Theme.buttonRadius(width, height, buttonSize, pressed, false)
         variant: "tonal"
         containerColor: checked ? MediaAccentService.accentContainer : MediaAccentService.accentSecondaryContainer
         contentColor: checked ? MediaAccentService.onAccentContainer : MediaAccentService.onAccentSecondaryContainer
+
+        onTargetWeightChanged: widthSpring.retarget(targetWeight)
+
+        SpringMotion {
+            id: widthSpring
+            enabled: root.visible && root.player.live && !Theme.springMotionDisabled
+            stiffness: root.pressSpring.stiffness
+            damping: root.pressSpring.damping
+            Component.onCompleted: snapTo(button.targetWeight)
+        }
     }
 }

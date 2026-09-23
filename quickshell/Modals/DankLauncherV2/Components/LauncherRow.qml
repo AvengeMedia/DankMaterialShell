@@ -162,13 +162,6 @@ DankListItem {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        DankKeycap {
-            text: "↵"
-            textColor: root.contentColor
-            visible: root.isSelected
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
         Image {
             width: LauncherMetrics.previewWidth
             height: LauncherMetrics.previewHeight

@@ -17,7 +17,32 @@ Item {
     readonly property bool controlCenterOpen: root.activityOpen("controlcenter")
 
     function hosts() {
-        return islandVariants.instances || [];
+        return (islandVariants.instances || []).concat(freeIslandVariants.instances || []);
+    }
+
+    function freeHostForScreen(screenName, kind) {
+        const requested = (screenName || "").trim() || CompositorService.getFocusedScreenName();
+        const instance = (ShellLayout.forScreen(requested)?.instances ?? []).find(instance => instance.free && root.matchesKind(instance, kind));
+        if (!instance)
+            return null;
+        return hosts().find(host => host?.free && host.screen?.name === requested && host.barId === instance.barId) ?? null;
+    }
+
+    function ipcMove(x, y, screen, kind) {
+        const host = root.freeHostForScreen(screen, kind);
+        if (!host)
+            return `${root.ipcTag(kind)}_NOT_FREE`;
+        if (!isFinite(x) || !isFinite(y))
+            return `${root.ipcTag(kind)}_INVALID_POSITION`;
+        host.moveTo(x, y);
+        return `${root.ipcTag(kind)}_MOVED: ${Math.round(host.anchorX)}\t${Math.round(host.anchorY)}\t${host.screen?.name ?? ""}`;
+    }
+
+    function ipcCenter(screen, kind) {
+        const host = root.freeHostForScreen(screen, kind);
+        if (!host)
+            return `${root.ipcTag(kind)}_NOT_FREE`;
+        return root.ipcMove(host.screenWidth / 2, host.screenHeight / 2, screen, kind);
     }
 
     function hostWithActivity(activityId) {
@@ -32,13 +57,17 @@ Item {
         return root.hostWithActivity(activityId) !== null;
     }
 
-    function hostForExactScreen(screen, barId) {
-        return screen ? hostForScreenName(screen.name, barId) : null;
+    function hostForExactScreen(screen, barId, kind) {
+        return screen ? hostForScreenName(screen.name, barId, kind) : null;
     }
 
-    function hostForScreenName(screenName, barId) {
+    function matchesKind(instance, kind) {
+        return !kind || (kind === "dot") === !!instance.dot;
+    }
+
+    function hostForScreenName(screenName, barId, kind) {
         const instances = ShellLayout.forScreen(screenName)?.instances ?? [];
-        const ordered = instances.filter(instance => instance.kind === "island" && (!barId || instance.barId === barId)).sort((a, b) => Number(["left", "right"].includes(a.edge)) - Number(["left", "right"].includes(b.edge)) || a.configOrder - b.configOrder);
+        const ordered = instances.filter(instance => instance.kind === "island" && (!barId || instance.barId === barId) && root.matchesKind(instance, kind)).sort((a, b) => Number(!!a.free) - Number(!!b.free) || Number(["left", "right"].includes(a.edge)) - Number(["left", "right"].includes(b.edge)) || a.configOrder - b.configOrder);
         for (const instance of ordered) {
             const host = hosts().find(host => host?.screen?.name === screenName && host.barId === instance.barId && host.islandController);
             if (host)
@@ -47,12 +76,12 @@ Item {
         return null;
     }
 
-    function focusedHost() {
-        const focused = hostForScreenName(CompositorService.getFocusedScreenName());
+    function focusedHost(kind) {
+        const focused = hostForScreenName(CompositorService.getFocusedScreenName(), "", kind);
         if (focused)
             return focused;
         for (const screen of Quickshell.screens) {
-            const host = hostForScreenName(screen.name);
+            const host = hostForScreenName(screen.name, "", kind);
             if (host)
                 return host;
         }
@@ -73,9 +102,13 @@ Item {
         return screen ? hostForExactScreen(screen, barId) : focusedHost();
     }
 
-    function hostForScreen(screenName, barId) {
+    function hostForScreen(screenName, barId, kind) {
         const requested = (screenName || "").trim();
-        return requested ? hostForScreenName(requested, barId) : barId ? null : focusedHost();
+        return requested ? hostForScreenName(requested, barId, kind) : barId ? null : focusedHost(kind);
+    }
+
+    function ipcTag(kind) {
+        return kind === "dot" ? "DANK_DOT" : "DANK_ISLAND";
     }
 
     function activityName(activity) {
@@ -146,70 +179,75 @@ Item {
         return true;
     }
 
-    function openLauncher(query, mode): bool {
-        const host = root.focusedHost();
+    function openLauncher(query, mode, screen, barId): bool {
+        const target = screen ?? CompositorService.getFocusedScreen();
+        const config = SettingsData.sharedTriggerIslandConfig(target);
+        const host = barId ? root.hostForExactScreen(target, barId) : config ? root.hostForExactScreen(target, config.id) : root.focusedHost();
         return host ? host.islandController.requestLauncher(query || "", mode || "", false) : false;
     }
 
-    function toggleLauncher(query, mode): bool {
-        if (root.closeActivity("launcher"))
+    function toggleLauncher(query, mode, screen, barId): bool {
+        const host = barId ? root.hostForExactScreen(screen, barId) : root.hostWithActivity("launcher");
+        if (host?.islandController.expanded && host.islandController.activeActivity === "launcher") {
+            host.islandController.requestCollapse();
             return true;
-        return root.openLauncher(query, mode);
+        }
+        return root.openLauncher(query, mode, screen, barId);
     }
 
     function closeLauncher(): bool {
         return root.closeActivity("launcher");
     }
 
-    function ipcOpen(activity, screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcOpen(activity, screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
-            return "DANK_ISLAND_UNAVAILABLE";
+            return `${root.ipcTag(kind)}_UNAVAILABLE`;
         const requested = root.activityName(activity);
         if (!root.openActivityOn(host, requested, ""))
-            return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
-        return `DANK_ISLAND_OPEN: ${requested}\t${host.screen?.name ?? ""}`;
+            return `${root.ipcTag(kind)}_ACTIVITY_UNAVAILABLE: ${requested}`;
+        return `${root.ipcTag(kind)}_OPEN: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcToggle(activity, screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcToggle(activity, screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
-            return "DANK_ISLAND_UNAVAILABLE";
+            return `${root.ipcTag(kind)}_UNAVAILABLE`;
         if (host.islandController.expanded && !host.islandController.notificationActive) {
             host.islandController.requestCollapse();
-            return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
+            return `${root.ipcTag(kind)}_CLOSED: ${host.screen?.name ?? ""}`;
         }
-        return ipcOpen(activity, screen, barId);
+        return ipcOpen(activity, screen, barId, kind);
     }
 
-    function ipcShow(activity, screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcShow(activity, screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
-            return "DANK_ISLAND_UNAVAILABLE";
+            return `${root.ipcTag(kind)}_UNAVAILABLE`;
         const requested = root.activityName(activity);
         if (!host.islandController.requestActivity(requested, false, false))
-            return `DANK_ISLAND_ACTIVITY_UNAVAILABLE: ${requested}`;
-        return `DANK_ISLAND_SHOW: ${requested}\t${host.screen?.name ?? ""}`;
+            return `${root.ipcTag(kind)}_ACTIVITY_UNAVAILABLE: ${requested}`;
+        return `${root.ipcTag(kind)}_SHOW: ${requested}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcClose(screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcClose(screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
-            return "DANK_ISLAND_UNAVAILABLE";
+            return `${root.ipcTag(kind)}_UNAVAILABLE`;
         host.islandController.requestCollapse();
-        return `DANK_ISLAND_CLOSED: ${host.screen?.name ?? ""}`;
+        return `${root.ipcTag(kind)}_CLOSED: ${host.screen?.name ?? ""}`;
     }
 
-    function ipcCycle(screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcCycle(screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
-            return "DANK_ISLAND_UNAVAILABLE";
+            return `${root.ipcTag(kind)}_UNAVAILABLE`;
         host.islandController.cycleActivity(1, host.islandController.expanded);
-        return `DANK_ISLAND_ACTIVITY: ${host.islandController.activeActivity}\t${host.screen?.name ?? ""}`;
+        return `${root.ipcTag(kind)}_ACTIVITY: ${host.islandController.activeActivity}\t${host.screen?.name ?? ""}`;
     }
 
-    function ipcStatus(screen, barId) {
-        const host = root.hostForScreen(screen, barId);
+    function ipcStatus(screen, barId, kind) {
+        const host = root.hostForScreen(screen, barId, kind);
         if (!host)
             return JSON.stringify({
                 "available": false,
@@ -230,7 +268,11 @@ Item {
             "notificationCenterAvailable": true,
             "launcherInputFocused": host.islandController.launcherInputFocused,
             "launcherResultCount": host.launcherResultCount,
-            "compactHeight": host.islandController.compactThickness
+            "compactHeight": host.islandController.compactThickness,
+            "free": !!host.free,
+            "idle": host.free ? host.idle : false,
+            "x": host.free ? Math.round(host.anchorX) : null,
+            "y": host.free ? Math.round(host.anchorY) : null
         });
     }
 
@@ -255,55 +297,69 @@ Item {
         }
     }
 
+    Variants {
+        id: freeIslandVariants
+
+        model: ShellLayout.freeIslandKeys
+
+        delegate: IslandFreeHostWindow {
+            required property var modelData
+
+            readonly property var identity: JSON.parse(modelData)
+            screen: ShellLayout.screenForName(identity[0])
+            barId: identity[1]
+        }
+    }
+
     IpcHandler {
         target: "island"
 
         function open(activity: string): string {
-            return root.ipcOpen(activity, "");
+            return root.ipcOpen(activity, "", "", "island");
         }
 
         function toggle(activity: string): string {
-            return root.ipcToggle(activity, "");
+            return root.ipcToggle(activity, "", "", "island");
         }
 
         function show(activity: string): string {
-            return root.ipcShow(activity, "");
+            return root.ipcShow(activity, "", "", "island");
         }
 
         function close(): string {
-            return root.ipcClose("");
+            return root.ipcClose("", "", "island");
         }
 
         function cycle(): string {
-            return root.ipcCycle("");
+            return root.ipcCycle("", "", "island");
         }
 
         function status(): string {
-            return root.ipcStatus("");
+            return root.ipcStatus("", "", "island");
         }
 
         function openOn(activity: string, screen: string): string {
-            return root.ipcOpen(activity, screen);
+            return root.ipcOpen(activity, screen, "", "island");
         }
 
         function toggleOn(activity: string, screen: string): string {
-            return root.ipcToggle(activity, screen);
+            return root.ipcToggle(activity, screen, "", "island");
         }
 
         function showOn(activity: string, screen: string): string {
-            return root.ipcShow(activity, screen);
+            return root.ipcShow(activity, screen, "", "island");
         }
 
         function closeOn(screen: string): string {
-            return root.ipcClose(screen);
+            return root.ipcClose(screen, "", "island");
         }
 
         function cycleOn(screen: string): string {
-            return root.ipcCycle(screen);
+            return root.ipcCycle(screen, "", "island");
         }
 
         function statusOn(screen: string): string {
-            return root.ipcStatus(screen);
+            return root.ipcStatus(screen, "", "island");
         }
 
         function openInstance(activity: string, screen: string, barId: string): string {
@@ -315,11 +371,111 @@ Item {
         }
 
         function notifications(): string {
-            return root.ipcToggle("notificationcenter", "");
+            return root.ipcToggle("notificationcenter", "", "", "island");
         }
 
         function notificationsOn(screen: string): string {
-            return root.ipcToggle("notificationcenter", screen);
+            return root.ipcToggle("notificationcenter", screen, "", "island");
+        }
+
+        function move(x: string, y: string): string {
+            return root.ipcMove(parseFloat(x), parseFloat(y), "", "island");
+        }
+
+        function moveOn(screen: string, x: string, y: string): string {
+            return root.ipcMove(parseFloat(x), parseFloat(y), screen, "island");
+        }
+
+        function center(): string {
+            return root.ipcCenter("", "island");
+        }
+
+        function centerOn(screen: string): string {
+            return root.ipcCenter(screen, "island");
+        }
+    }
+
+    IpcHandler {
+        target: "dot"
+
+        function open(activity: string): string {
+            return root.ipcOpen(activity, "", "", "dot");
+        }
+
+        function toggle(activity: string): string {
+            return root.ipcToggle(activity, "", "", "dot");
+        }
+
+        function show(activity: string): string {
+            return root.ipcShow(activity, "", "", "dot");
+        }
+
+        function close(): string {
+            return root.ipcClose("", "", "dot");
+        }
+
+        function cycle(): string {
+            return root.ipcCycle("", "", "dot");
+        }
+
+        function status(): string {
+            return root.ipcStatus("", "", "dot");
+        }
+
+        function notifications(): string {
+            return root.ipcToggle("notificationcenter", "", "", "dot");
+        }
+
+        function openOn(activity: string, screen: string): string {
+            return root.ipcOpen(activity, screen, "", "dot");
+        }
+
+        function toggleOn(activity: string, screen: string): string {
+            return root.ipcToggle(activity, screen, "", "dot");
+        }
+
+        function showOn(activity: string, screen: string): string {
+            return root.ipcShow(activity, screen, "", "dot");
+        }
+
+        function closeOn(screen: string): string {
+            return root.ipcClose(screen, "", "dot");
+        }
+
+        function cycleOn(screen: string): string {
+            return root.ipcCycle(screen, "", "dot");
+        }
+
+        function statusOn(screen: string): string {
+            return root.ipcStatus(screen, "", "dot");
+        }
+
+        function notificationsOn(screen: string): string {
+            return root.ipcToggle("notificationcenter", screen, "", "dot");
+        }
+
+        function openInstance(activity: string, screen: string, barId: string): string {
+            return root.ipcOpen(activity, screen, barId, "dot");
+        }
+
+        function toggleInstance(activity: string, screen: string, barId: string): string {
+            return root.ipcToggle(activity, screen, barId, "dot");
+        }
+
+        function move(x: string, y: string): string {
+            return root.ipcMove(parseFloat(x), parseFloat(y), "", "dot");
+        }
+
+        function moveOn(screen: string, x: string, y: string): string {
+            return root.ipcMove(parseFloat(x), parseFloat(y), screen, "dot");
+        }
+
+        function center(): string {
+            return root.ipcCenter("", "dot");
+        }
+
+        function centerOn(screen: string): string {
+            return root.ipcCenter(screen, "dot");
         }
     }
 }

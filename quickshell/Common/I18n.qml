@@ -139,13 +139,20 @@ Singleton {
 
     function useLocale(localeTag, fileUrl) {
         _resolvedLocale = localeTag || "en";
-        _selectedPath = fileUrl;
-        translationsLoaded = false;
-        translations = ({});
+        _selectTranslationFile(fileUrl);
         log.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
         if (commonDir.status === FolderListModel.Ready)
             _pickCommonTranslation();
         localeApplied();
+    }
+
+    function _selectTranslationFile(fileUrl) {
+        const previousPath = String(_selectedPath);
+        _selectedPath = fileUrl;
+        if (translationsLoaded && String(_selectedPath) === previousPath)
+            return;
+        translationsLoaded = false;
+        translations = ({});
     }
 
     function _fallbackToEnglish() {

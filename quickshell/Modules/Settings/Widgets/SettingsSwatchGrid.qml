@@ -37,7 +37,7 @@ Flow {
             height: root.compact ? root.compactTileHeight : swatch.height + label.implicitHeight + Theme.spacingS * 3
             radius: Theme.cornerRadiusM
             color: Theme.floatingWindowNestedSurface
-            border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
+            border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
             border.color: isActive ? Theme.primary : Theme.outlineMedium
 
             activeFocusOnTab: true

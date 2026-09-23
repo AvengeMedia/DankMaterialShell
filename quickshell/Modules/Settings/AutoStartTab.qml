@@ -11,8 +11,6 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property int contentMaxWidth: 550
-
     readonly property var log: Log.scoped("AutoStartTab")
     property var parentModal: null
     property var entries: []
@@ -371,7 +369,7 @@ Item {
         Column {
             id: mainColumn
             topPadding: Theme.spacingXS
-            width: Math.min(root.contentMaxWidth, parent.width - Theme.spacingL * 2)
+            width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
             visible: DesktopService.autostartAvailable

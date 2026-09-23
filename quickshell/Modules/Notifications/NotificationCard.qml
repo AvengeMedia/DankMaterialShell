@@ -74,6 +74,8 @@ Rectangle {
     bottomLeftRadius: lastInGroup ? outerRadius : radius
     bottomRightRadius: bottomLeftRadius
     color: surfaceColor
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
     clip: true
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true

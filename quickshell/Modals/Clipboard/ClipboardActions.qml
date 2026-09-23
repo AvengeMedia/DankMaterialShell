@@ -23,6 +23,7 @@ Row {
 
     DankActionButton {
         Keys.forwardTo: [actions.modal.modalFocusScope]
+        objectName: "keyboardHints"
         iconName: "info"
         buttonSize: Theme.buttonHeightXXS
         iconSize: Theme.iconSizeSmall

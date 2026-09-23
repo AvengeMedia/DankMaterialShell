@@ -201,6 +201,8 @@ Popup {
 
         background: Rectangle {
             color: Theme.nestedSurface
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
             radius: Theme.windowRadius
         }
 

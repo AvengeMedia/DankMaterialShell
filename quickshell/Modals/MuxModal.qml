@@ -327,6 +327,8 @@ DankModal {
                 height: 56
                 radius: Theme.cornerRadius
                 color: muxModal.selectedIndex === -1 ? Theme.selectedContainer : (newMouse.containsMouse ? Theme.foregroundColor(Theme.chipSurface, true) : Theme.floatingWindowNestedSurface)
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
 
                 RowLayout {
                     anchors.fill: parent
@@ -404,6 +406,8 @@ DankModal {
                                 height: 64
                                 radius: Theme.cornerRadius
                                 color: muxModal.selectedIndex === index ? Theme.selectedContainer : (sessionMouse.containsMouse ? Theme.cardSurface : Theme.withAlpha(Theme.cardSurface, 0))
+                                border.width: muxModal.selectedIndex === index || sessionMouse.containsMouse ? Theme.layerOutlineWidth : 0
+                                border.color: Theme.outlineMedium
 
                                 MouseArea {
                                     id: sessionMouse

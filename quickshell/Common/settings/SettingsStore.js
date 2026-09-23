@@ -669,6 +669,14 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 28;
     }
 
+    if (currentVersion < 29 && targetVersion >= 29) {
+        console.info("Migrating settings from version", currentVersion, "to version 29");
+        console.info("Moving launcher logo options onto each launcher button instance");
+        migrateBarWidgetGlobals(settings);
+        delete settings.launcherLogoColorInvertOnMode;
+        settings.configVersion = 29;
+    }
+
     return settings;
 }
 

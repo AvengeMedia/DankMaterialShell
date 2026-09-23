@@ -662,6 +662,8 @@ Item {
                             anchors.fill: parent
                             anchors.margins: Theme.spacingXS
                             color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
+                            border.width: Theme.layerOutlineWidth
+                            border.color: Theme.outlineMedium
                             radius: DashMetrics.wallpaperThumbRadius
 
                             ClippingRectangle {
@@ -953,6 +955,8 @@ Item {
         width: DashMetrics.pageJumpWidth
         height: jumpColumn.height + Theme.spacingM * 2
         color: Theme.nestedSurface
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         radius: Theme.cornerRadiusM
         visible: false
         z: DashMetrics.overlayZ + 1

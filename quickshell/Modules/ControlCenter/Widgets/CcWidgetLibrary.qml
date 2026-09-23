@@ -27,6 +27,8 @@ Rectangle {
     implicitHeight: CcMetrics.libraryPanelHeight
     radius: Theme.windowRadius
     color: Theme.nestedSurface
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
 
     MouseArea {
         anchors.fill: parent

@@ -27,8 +27,8 @@ DankCard {
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
     radius: Theme.cornerRadiusM
     color: Theme.floatingWindowNestedSurface
-    border.color: Theme.focusRingColor
-    border.width: selected ? Theme.focusRingWidth : 0
+    border.color: selected ? Theme.focusRingColor : Theme.outlineMedium
+    border.width: selected ? Theme.focusRingWidth : Theme.layerOutlineWidth
     pad: 0
     clickable: true
     Accessible.name: plugin.name || ""

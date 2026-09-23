@@ -69,6 +69,7 @@ Singleton {
             "greeterAvailable": () => GreeterService.available,
             "frameEnabled": () => SettingsData.frameEnabled,
             "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
+            "dotEnabled": () => SettingsData.dotBarConfig?.enabled ?? false,
             "cellularAvailable": () => (NetworkService.cellularDevices?.length ?? 0) > 0
         })
 

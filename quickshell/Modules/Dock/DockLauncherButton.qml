@@ -16,15 +16,6 @@ Item {
 
     readonly property string tooltipText: I18n.tr("Applications")
 
-    readonly property var effectiveLogoColor: {
-        const override = root.options.launcherLogoColorOverride;
-        if (override === "primary")
-            return Theme.primary;
-        if (override === "surface")
-            return Theme.surfaceText;
-        return override;
-    }
-
     function activate() {
         PopoutService.toggleDankLauncherV2();
     }
@@ -75,7 +66,7 @@ Item {
                 size: actualIconSize + root.options.launcherLogoSizeOffset
                 appsIconSize: actualIconSize - 4
                 appsIconColor: Theme.widgetIconColor
-                colorOverride: effectiveLogoColor
+                colorOverride: root.options.launcherLogoColorOverride
                 brightness: root.options.launcherLogoBrightness
                 contrast: root.options.launcherLogoContrast
                 customPath: root.options.launcherLogoCustomPath

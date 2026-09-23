@@ -142,7 +142,7 @@ Column {
         tags: ["dock", "layout", "placement", "position", "edge"]
 
         SettingsLayoutPicker {
-            dockPlacement: true
+            edgePlacement: true
             choices: [SettingsData.Position.Top, SettingsData.Position.Bottom, SettingsData.Position.Left, SettingsData.Position.Right].map(position => ({
                         key: String(position),
                         label: dock.positionLabel(position),

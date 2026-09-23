@@ -17,8 +17,8 @@ Rectangle {
     height: Math.round(Theme.fontSizeMedium * 5)
     radius: Theme.cornerRadius
     color: bgColor
-    border.width: selected ? 2 : 0
-    border.color: selected ? iconColor : Theme.withAlpha(iconColor, 0)
+    border.width: selected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+    border.color: selected ? iconColor : Theme.outlineMedium
     scale: mouseArea.pressed ? 0.97 : 1
 
     Behavior on scale {

@@ -91,3 +91,12 @@ test("drop target follows the leading edge so a wide unit can pass a narrow one 
     assert.equal(config.unitTarget(spans, "launcher", 480), "apps");
     assert.equal(config.unitTarget(spans, "launcher", 490), "trash");
 });
+
+test("a dock shown only in the overview resolves onto an edge no enabled dock holds", () => {
+    const screen = { name: "eDP-1" };
+    const overviewOnly = { ...config.create("dock", "Dock"), openOnOverview: true };
+    assert.equal(config.resolveEdge([overviewOnly], screen, [screen], "bottom"), overviewOnly);
+    assert.equal(config.resolveEdge([config.create("dock", "Dock")], screen, [screen], "bottom"), null);
+    const enabled = { ...config.create("second", "Second"), enabled: true };
+    assert.equal(config.resolveEdge([overviewOnly, enabled], screen, [screen], "bottom"), enabled);
+});

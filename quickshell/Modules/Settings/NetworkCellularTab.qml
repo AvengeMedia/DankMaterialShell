@@ -97,8 +97,8 @@ Item {
                                 height: 56
                                 radius: Theme.cornerRadius
                                 color: modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: isConnected ? Theme.outlineWidthFocused : 0
-                                border.color: Theme.primary
+                                border.width: isConnected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                                border.color: isConnected ? Theme.primary : Theme.outlineMedium
 
                                 Row {
                                     anchors.left: parent.left
@@ -232,8 +232,8 @@ Item {
                             height: 56
                             radius: Theme.cornerRadius
                             color: profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                            border.color: isActive ? Theme.primary : Theme.outlineLight
-                            border.width: isActive ? Theme.outlineWidthFocused : Theme.outlineWidth
+                            border.color: isActive ? Theme.primary : Theme.outlineMedium
+                            border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
 
                             Row {
                                 anchors.left: parent.left

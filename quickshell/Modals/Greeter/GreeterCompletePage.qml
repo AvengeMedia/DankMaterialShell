@@ -172,6 +172,8 @@ Item {
                     height: keybindsGrid.height + Theme.spacingM * 2
                     radius: Theme.cornerRadius
                     color: Theme.floatingWindowNestedSurface
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
 
                     readonly property bool useTwoColumns: width > 500
                     readonly property int columnCount: useTwoColumns ? 2 : 1
@@ -251,6 +253,8 @@ Item {
                 height: noKeybindsColumn.height + Theme.spacingM * 2
                 radius: Theme.cornerRadius
                 color: Theme.floatingWindowNestedSurface
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
                 visible: !root.hasKeybinds
 
                 Column {

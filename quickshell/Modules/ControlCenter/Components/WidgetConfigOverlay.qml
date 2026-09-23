@@ -79,6 +79,8 @@ Item {
         height: menu.implicitHeight + Theme.spacingS * 2
         radius: Theme.windowRadius
         color: Theme.nestedSurface
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
         x: Math.max(Theme.spacingS, Math.min(root.anchorX + root.anchorWidth - width, root.width - width - Theme.spacingS))
         y: root.anchorY - height - Theme.spacingS < Theme.spacingS ? root.anchorY + root.anchorHeight + Theme.spacingS : root.anchorY - height - Theme.spacingS
         opacity: root.visible ? 1 : 0

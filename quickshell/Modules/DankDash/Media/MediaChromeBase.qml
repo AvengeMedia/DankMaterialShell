@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Widgets
 import qs.Common
 import qs.Widgets
 import qs.Modules.DankDash
@@ -55,18 +54,21 @@ Item {
         return FocusNavigation.focusItem(buttonForPanel(panelId), false);
     }
 
-    ClippingRectangle {
+    // The backdrop clips itself to the corners, so the card needs no clip of its own.
+    Rectangle {
         anchors.fill: parent
         radius: root.backdropRadius
         color: root.surfaceColor
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
 
         Loader {
             anchors.fill: parent
-            z: -1
+            anchors.margins: Theme.layerOutlineWidth
             active: root.player.wallpaperEnabled && !!root.presentation
 
             sourceComponent: MediaArtBackdrop {
-                radius: root.backdropRadius
+                radius: root.backdropRadius - Theme.layerOutlineWidth
                 stableHeight: root.baseHeight
                 activePlayer: root.activePlayer
                 artUrl: root.artUrl
@@ -76,7 +78,7 @@ Item {
         Item {
             id: cardBody
             anchors.fill: parent
-            anchors.margins: root.padding
+            anchors.margins: root.padding + Theme.layerOutlineWidth
         }
     }
 

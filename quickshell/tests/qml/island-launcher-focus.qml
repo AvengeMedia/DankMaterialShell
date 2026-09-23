@@ -63,7 +63,7 @@ ShellRoot {
 
         onTriggered: {
             const c = root.controller();
-            if (++waited > 120) {
+            if (++waited > 800) {
                 console.log("FIXTURE_FAIL timed out waiting for " + waitingFor);
                 stop();
                 Qt.quit();

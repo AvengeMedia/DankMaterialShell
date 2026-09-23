@@ -39,6 +39,9 @@ QtObject {
     property real cornerRadius: 34
     property real pillRadius: cornerRadius
     readonly property real edgeCornerRadius: Math.round(cornerRadius * 0.75)
+    property bool freeMode: false
+    property bool dotMode: false
+    property real dotSize: 48
     property real compactThickness: 38
     property string batteryStyle: "solid"
     property bool mediaClockVisible: true
@@ -67,7 +70,7 @@ QtObject {
     readonly property real homeCompactFaceThickness: homeCompactTight ? Math.max(16, Math.min(32, compactThickness - 8)) : compactFaceThickness
 
     property int unreadNotificationCount: 0
-    readonly property bool homeNotificationBadge: SettingsData.islandHomeGroupEnabled(root.barConfig, "notifications") && unreadNotificationCount > 0
+    readonly property bool homeNotificationBadge: (root.dotMode || SettingsData.islandHomeGroupEnabled(root.barConfig, "notifications")) && unreadNotificationCount > 0
     readonly property bool homeWeatherEnabled: SettingsData.weatherEnabled && SettingsData.islandHomeGroupEnabled(root.barConfig, "weather")
     readonly property real homeSlotMargin: homeCompactTight ? Theme.spacingS : Theme.spacingM
     property real homeContentLength: 200
@@ -344,6 +347,8 @@ QtObject {
 
     // Corners touching the attached screen edge stay tighter than the ones facing the desktop.
     function sheetRadii() {
+        if (root.freeMode)
+            return [root.cornerRadius, root.cornerRadius, root.cornerRadius, root.cornerRadius];
         const near = root.edgeCornerRadius;
         const far = root.cornerRadius;
         switch (root.edge) {
@@ -385,6 +390,21 @@ QtObject {
         };
     }
 
+    readonly property var dotCompactTarget: ({
+            "width": root.dotSize,
+            "height": root.dotSize,
+            "offsetAlong": root.alongOffset,
+            "offsetCross": root.outerGap,
+            "topLeftRadius": root.dotSize / 2,
+            "topRightRadius": root.dotSize / 2,
+            "bottomLeftRadius": root.dotSize / 2,
+            "bottomRightRadius": root.dotSize / 2
+        })
+    readonly property var dotTransientActivities: ["notification", "volume", "brightness"]
+    // Transients keep their island pill so the dot can still show a notification or a level.
+    function usesDotFace(activityId) {
+        return root.dotMode && root.dotTransientActivities.indexOf(activityId) === -1;
+    }
     readonly property var homeCompactTarget: pillTarget(homeCompactLength, homeCompactFaceThickness)
     readonly property var mediaCompactTarget: pillTarget(mediaCompactLength, compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
@@ -405,6 +425,8 @@ QtObject {
     readonly property bool activityOwnsBlankClicks: blankClickOwners.indexOf(activeActivity) !== -1
     readonly property bool hoverExpandEnabled: root.interactionMode === "hybrid" && !root.systemActivityActive
     function compactTargetFor(activityId) {
+        if (root.usesDotFace(activityId))
+            return dotCompactTarget;
         switch (activityId) {
         case "notification":
             return notificationCompactTarget;

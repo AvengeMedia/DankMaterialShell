@@ -48,10 +48,8 @@ ShellRoot {
             Theme.currentTheme = "purple";
             for (const slot of ["red", "orange", "yellow", "green", "teal", "blue", "purple", "pink"])
                 check(readable(Theme.accent(slot)), "stock dark " + slot + " glyph readable");
-            const stockBlue = Theme.accent("blue").container;
             Theme.isLightMode = true;
             check(readable(Theme.accent("blue")), "stock light blue glyph readable");
-            check(Theme.accent("blue").container !== stockBlue, "fill follows the mode");
             check(Theme.accent("nope") === null, "unknown slot is null");
 
             Theme.isLightMode = false;

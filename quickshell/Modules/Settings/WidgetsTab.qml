@@ -715,6 +715,8 @@ Item {
                 width: parent.width
                 iconName: "view_in_ar"
                 title: I18n.tr("Home compact", "island settings: home face card title")
+                settingKey: "islandHomeLayout"
+                tags: ["island", "home", "compact", "layout", "groups", "order"]
                 visible: widgetsTab.dankIslandOwnsSelectedBarCenter
 
                 Loader {
@@ -726,6 +728,35 @@ Item {
                     sourceComponent: IslandHomeLayoutEditor {
                         settingKey: ""
                         barId: widgetsTab.selectedBarId
+                    }
+                }
+
+                SettingsRow {
+                    body: Flow {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        DankButton {
+                            text: I18n.tr("Launcher", "island settings: button to launcher tab")
+                            iconName: "grid_view"
+                            onClicked: {
+                                if (!widgetsTab.parentModal)
+                                    return;
+                                SettingsSearchService.navigateToSection("launcherStyle");
+                                widgetsTab.parentModal.navigateTo("launcher");
+                            }
+                        }
+
+                        DankButton {
+                            text: I18n.tr("Time & weather", "island settings: button to weather tab")
+                            iconName: "cloud"
+                            onClicked: {
+                                if (!widgetsTab.parentModal)
+                                    return;
+                                SettingsSearchService.navigateToSection("weatherEnabled");
+                                widgetsTab.parentModal.navigateTo("time_weather");
+                            }
+                        }
                     }
                 }
             }

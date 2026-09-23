@@ -244,6 +244,9 @@ var LOCAL_SPEC = {
     desktopWidgetInstancePositions: {
         def: {}
     },
+    islandFreePositions: {
+        def: {}
+    },
     builtInPluginState: {
         def: {}
     },

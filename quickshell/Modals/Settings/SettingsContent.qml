@@ -115,25 +115,63 @@ FocusScope {
     Component {
         id: pageComponent
 
-        Loader {
+        // StackView writes visible and opacity on the element it manages, so the presentation gate lives on the inner Loader
+        Item {
             id: host
 
             required property string page
             readonly property bool pageActive: root.sessionVisible && pageStack.currentItem === host
+            readonly property alias item: loader.item
+            readonly property int status: loader.status
+
+            property bool presented: false
 
             enabled: pageActive
-            asynchronous: page === "dankbar_widgets" || page === "window_rules"
 
-            Component.onCompleted: {
-                const file = root._fileFor(page);
-                if (file)
-                    setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), root._propertiesFor(page));
+            Loader {
+                id: loader
+
+                anchors.fill: parent
+                asynchronous: true
+                opacity: host.presented ? 1 : 0
+
+                Component.onCompleted: {
+                    const file = root._fileFor(host.page);
+                    if (file)
+                        setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), root._propertiesFor(host.page));
+                }
+                onLoaded: {
+                    if (item.pageActive !== undefined)
+                        item.pageActive = Qt.binding(() => host.pageActive);
+                    root._focusPage();
+                }
             }
-            onLoaded: {
-                if (item.pageActive !== undefined)
-                    item.pageActive = Qt.binding(() => host.pageActive);
-                root._focusPage();
+
+            FrameAnimation {
+                id: settleWatch
+
+                property real lastHeight: -1
+                property int stableFrames: 0
+
+                running: loader.status === Loader.Ready && !host.presented
+                onTriggered: {
+                    if (loader.item?.settling) {
+                        stableFrames = 0;
+                        return;
+                    }
+                    const h = loader.item?.contentHeight ?? loader.item?.height ?? 0;
+                    if (h === lastHeight)
+                        stableFrames++;
+                    else {
+                        lastHeight = h;
+                        stableFrames = 0;
+                    }
+                    if (stableFrames < SettingsMetrics.pageSettleFrames && elapsedTime * 1000 < SettingsMetrics.pageSettleDeadline)
+                        return;
+                    host.presented = true;
+                }
             }
+
             onPageActiveChanged: {
                 if (pageActive)
                     root._focusPage();
@@ -152,6 +190,7 @@ FocusScope {
             "window_rules": "WindowRulesTab.qml",
             "dankbar_settings": "DankBarTab.qml",
             "dankbar_appearance": "DankBarAppearanceTab.qml",
+            "dankbar_dot": "DankDotTab.qml",
             "bar_widget": "BarWidgetTab.qml",
             "compositor_layout": "CompositorLayoutTab.qml",
             "dock_general": "DockGeneralTab.qml",
@@ -184,11 +223,10 @@ FocusScope {
             "power_sleep": "PowerSleepTab.qml",
             "clipboard": "ClipboardTab.qml",
             "desktop_widgets": "DesktopWidgetsTab.qml",
+            "desktop_widget": "DesktopWidgetTab.qml",
             "audio": "AudioTab.qml",
             "locale": "LocaleTab.qml",
             "multiplexers": "MuxTab.qml",
-            "frame": "FrameTab.qml",
-            "dank_island": "DankIslandTab.qml",
             "users": "UsersTab.qml",
             "user_create": "CreateUserTab.qml",
             "greeter_auth": "GreeterAuthTab.qml",
@@ -200,7 +238,7 @@ FocusScope {
             "plugins_manage": "PluginsManageTab.qml"
         })
 
-    readonly property var pagesWithParentModal: ["dankbar_widgets", "window_rules", "display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "dank_island", "autostart", "compositor_layout"]
+    readonly property var pagesWithParentModal: ["dankbar_widgets", "window_rules", "display_config", "users", "time_weather", "weather", "lock_screen", "greeter", "dank_dash", "wallpaper_cycling", "theme_schedule", "surface_shadows", "keybinds", "dankbar_settings", "dankbar_appearance", "bar_widget", "dock_general", "dock_widgets", "dock_appearance", "dock_advanced", "launcher", "theme", "theme_apps", "media_player", "desktop_widgets", "autostart", "compositor_layout"]
 
     Column {
         anchors.fill: parent
@@ -216,9 +254,13 @@ FocusScope {
 
             Item {
                 id: backSlot
+
+                readonly property real glyphInset: (Theme.iconButtonSize - Theme.iconSize) / 2
+
                 anchors.left: parent.left
+                anchors.leftMargin: root.showBack ? -glyphInset : 0
                 anchors.verticalCenter: parent.verticalCenter
-                width: root.showBack ? Theme.iconButtonSize + Theme.spacingL : 0
+                width: root.showBack ? Theme.iconButtonSize + Theme.spacingM - glyphInset : 0
                 height: Theme.iconButtonSize
 
                 DankActionButton {
@@ -273,8 +315,26 @@ FocusScope {
             }
 
             DankSpinner {
+                id: pageSpinner
+
+                readonly property bool loading: pageStack.currentItem?.presented === false
+
                 anchors.centerIn: parent
-                visible: pageStack.currentItem?.status === Loader.Loading
+                visible: false
+                onLoadingChanged: {
+                    if (!loading) {
+                        spinnerDelay.stop();
+                        visible = false;
+                        return;
+                    }
+                    spinnerDelay.restart();
+                }
+
+                Timer {
+                    id: spinnerDelay
+                    interval: SettingsMetrics.pageSettleDeadline + SettingsMetrics.fadeDuration
+                    onTriggered: pageSpinner.visible = pageSpinner.loading
+                }
             }
         }
     }

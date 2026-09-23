@@ -14,26 +14,23 @@ Item {
     property bool highlighted: false
     property color slotColor: SettingsMetrics.rowColor
     property var slots: []
+    property bool layingOut: false
+    property bool layoutReady: false
 
     width: parent?.width ?? 0
     implicitHeight: 0
     height: implicitHeight
 
-    onWidthChanged: root.scheduleLayout()
-    onSpacingChanged: root.scheduleLayout()
-    onCustomPaddingHChanged: root.scheduleLayout()
-    onCustomPaddingVChanged: root.scheduleLayout()
-    onVisibleChanged: root.scheduleLayout()
-
-    function scheduleLayout() {
-        layoutTimer.restart();
+    onWidthChanged: root.layout()
+    onSpacingChanged: root.layout()
+    onCustomPaddingHChanged: root.layout()
+    onCustomPaddingVChanged: root.layout()
+    onVisibleChanged: root.layout()
+    Component.onCompleted: {
+        layoutReady = true;
+        layout();
     }
-
-    Timer {
-        id: layoutTimer
-        interval: 0
-        onTriggered: root.layout()
-    }
+    Component.onDestruction: layoutReady = false
 
     function isRowContainer(c) {
         const kids = c.visibleChildren;
@@ -47,10 +44,10 @@ Item {
     }
 
     function layout() {
-        if (!visible)
+        if (!layoutReady || !visible || layingOut)
             return;
+        layingOut = true;
         const items = [];
-        let cursor = 0;
         for (let i = 0; i < host.children.length; i++) {
             const c = host.children[i];
             if (!c.visible || (c.isSettingsRow !== true && typeof c.itemAt === "function"))
@@ -94,6 +91,7 @@ Item {
         }
         slots = next;
         implicitHeight = Math.max(0, y - spacing);
+        layingOut = false;
     }
 
     Repeater {
@@ -116,6 +114,8 @@ Item {
             bottomLeftRadius: last ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
             bottomRightRadius: last ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
             color: root.highlighted ? Theme.blend(root.slotColor, Theme.primary, SettingsMetrics.highlightBlend) : root.slotColor
+            border.width: Theme.layerOutlineWidth
+            border.color: Theme.outlineMedium
 
             Behavior on color {
                 enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
@@ -142,7 +142,7 @@ Item {
         anchors.right: parent.right
         height: root.implicitHeight
 
-        onChildrenChanged: root.scheduleLayout()
+        onChildrenChanged: root.layout()
     }
 
     Instantiator {
@@ -154,8 +154,8 @@ Item {
             readonly property bool childVisible: child?.visible ?? false
             readonly property real childHeight: child?.height ?? 0
 
-            onChildVisibleChanged: root.scheduleLayout()
-            onChildHeightChanged: root.scheduleLayout()
+            onChildVisibleChanged: root.layout()
+            onChildHeightChanged: root.layout()
         }
     }
 }

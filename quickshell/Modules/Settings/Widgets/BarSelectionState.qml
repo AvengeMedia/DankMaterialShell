@@ -6,27 +6,15 @@ import qs.Services
 Item {
     id: root
 
-    property string selectedBarId: SettingsUiState.selectedBarId
+    readonly property string selectedBarId: SettingsUiState.selectedBarId
 
-    onSelectedBarIdChanged: {
-        if (SettingsUiState.selectedBarId !== selectedBarId)
-            SettingsUiState.selectedBarId = selectedBarId;
+    function select(id) {
+        SettingsUiState.selectedBarId = id;
     }
 
-    Connections {
-        target: SettingsUiState
-
-        function onSelectedBarIdChanged() {
-            if (root.selectedBarId !== SettingsUiState.selectedBarId)
-                root.selectedBarId = SettingsUiState.selectedBarId;
-        }
-    }
-
-    property var selectedBarConfig: {
-        selectedBarId;
+    readonly property var selectedBarConfig: {
         SettingsData.barConfigs;
-        const index = SettingsData.barConfigs.findIndex(cfg => cfg.id === selectedBarId);
-        return index !== -1 ? SettingsData.barConfigs[index] : SettingsData.barConfigs[0];
+        return SettingsData.getBarConfig(selectedBarId) ?? SettingsData.barConfigs[0] ?? null;
     }
     readonly property string selectedBarName: {
         selectedBarId;

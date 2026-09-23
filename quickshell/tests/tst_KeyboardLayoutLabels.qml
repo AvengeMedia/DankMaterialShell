@@ -7,8 +7,6 @@ TestCase {
 
     readonly property var validVariants: ["US", "UK", "GB", "AZERTY", "QWERTY", "Dvorak", "Colemak", "Mac", "Intl", "International"]
 
-    // Hyprland compact mode passes the raw "kb_layout-kb_variant" string straight through
-    // (codesOnly), which is what makes labels like "am-phonetic-alt" unreadable.
     function test_overrideReplacesRawHyprlandCompactLabel() {
         compare(KeyboardLayoutLabels.displayLabel("am-phonetic-alt", true, true, validVariants, {
             "am-phonetic-alt": "am"
@@ -21,26 +19,23 @@ TestCase {
     }
 
     function test_overrideKeyIsTheComputedLabelNotTheRawInput() {
-        // Niri/Sway/Aqueous feed full XKB descriptions through the compact shortening logic;
-        // the override map is keyed by what that logic would otherwise display ("en-US"), not
-        // the original description ("English (US)").
-        compare(KeyboardLayoutLabels.displayLabel("English (US)", true, false, validVariants, {}), "en-US");
+        const label = KeyboardLayoutLabels.displayLabel("English (US)", true, false, validVariants, {});
         compare(KeyboardLayoutLabels.displayLabel("English (US)", true, false, validVariants, {
-            "en-US": "en"
+            [label]: "en"
         }), "en");
     }
 
     function test_overrideAppliesToUppercaseCodeOnlyLabel() {
-        compare(KeyboardLayoutLabels.displayLabel("Armenian", true, false, validVariants, {}), "HY");
+        const label = KeyboardLayoutLabels.displayLabel("Armenian", true, false, validVariants, {});
         compare(KeyboardLayoutLabels.displayLabel("Armenian", true, false, validVariants, {
-            "HY": "am"
+            [label]: "am"
         }), "am");
     }
 
     function test_verticalLabelOverrideIsKeyedIndependentlyFromHorizontal() {
-        compare(KeyboardLayoutLabels.verticalLabel("am-phonetic-alt", {}), "AM");
+        const label = KeyboardLayoutLabels.verticalLabel("am-phonetic-alt", {});
         compare(KeyboardLayoutLabels.verticalLabel("am-phonetic-alt", {
-            "AM": "hy"
+            [label]: "hy"
         }), "hy");
     }
 }

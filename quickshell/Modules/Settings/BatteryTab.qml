@@ -79,8 +79,7 @@ done
 
             SettingsRow {
                 body: Column {
-                    width: parent.width - Theme.spacingM * 2
-                    x: Theme.spacingM
+                    width: parent.width
                     spacing: Theme.spacingM
 
                     Row {

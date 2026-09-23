@@ -11,8 +11,6 @@ import qs.Widgets
 Item {
     id: keybindsTab
 
-    readonly property int contentMaxWidth: 650
-
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -472,7 +470,7 @@ Item {
             bottomPadding: Theme.spacingXL
 
             StyledRect {
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: headerSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -557,7 +555,7 @@ Item {
 
             StyledRect {
                 id: warningBox
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: warningSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -646,7 +644,7 @@ Item {
             }
 
             StyledRect {
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: categorySection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -727,7 +725,7 @@ Item {
             }
 
             SettingsGroup {
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: keybindsTab.hasEditDraft && (keybindsTab.reviewingEdit || keybindsTab.editError !== "" || keybindsTab.editDraft.operation !== "set")
 
@@ -788,7 +786,7 @@ Item {
             }
 
             StyledRect {
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: newBindSection.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -859,7 +857,7 @@ Item {
             }
 
             StyledRect {
-                width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                 height: bindsListHeader.implicitHeight + Theme.spacingL * 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 radius: Theme.cornerRadius
@@ -957,7 +955,7 @@ Item {
 
                         KeybindItem {
                             id: bindItem
-                            width: Math.min(keybindsTab.contentMaxWidth, parent.width - Theme.spacingL * 2)
+                            width: Math.min(SettingsMetrics.contentMaxWidth, parent.width - Theme.spacingL * 2)
                             anchors.horizontalCenter: parent.horizontalCenter
                             bindData: modelData
                             isExpanded: keybindsTab.expandedKey === modelData.action

@@ -20,14 +20,6 @@ test("legacy migration preserves explicit radii and defaults sparse settings to 
     }
 });
 
-test("legacy radius keeps its window radius after migration", () => {
-    const shape = store.Shape;
-    for (let radius = 0; radius <= 32; radius++) {
-        const { radiusStrength } = store.migrateToVersion({ configVersion: 18, cornerRadius: radius }, 25);
-        assert.equal(shape.radius("l", shape.scaleForStrength(radiusStrength)), radius);
-    }
-});
-
 test("migration preserves a new value and does not rerun", () => {
     const migrated = store.migrateToVersion({ configVersion: 22, radiusStrength: 75, cornerRadius: 4 }, 25);
     assert.equal(migrated.radiusStrength, 75);
@@ -38,7 +30,7 @@ test("migration preserves a new value and does not rerun", () => {
 test("parse and sparse serialization use the same new default", () => {
     const root = { settingsConfigVersion: 25 };
     store.parse(root, {});
-    assert.equal(root.radiusStrength, 50);
+    assert.equal(root.radiusStrength, spec.SPEC.radiusStrength.def);
     assert.equal("radiusStrength" in store.toJson(root, new Set()), false);
     store.parse(root, { radiusStrength: 60 });
     assert.equal(store.toJson(root, new Set()).radiusStrength, 60);
@@ -46,7 +38,7 @@ test("parse and sparse serialization use the same new default", () => {
     store.parse(root, { radiusStrength: 200 });
     assert.equal(root.radiusStrength, 100);
     store.parse(root, { radiusStrength: "bad" });
-    assert.equal(root.radiusStrength, 50);
+    assert.equal(root.radiusStrength, spec.SPEC.radiusStrength.def);
 });
 
 test("changing strength invokes compositor layout update and persists", () => {

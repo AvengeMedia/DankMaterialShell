@@ -140,8 +140,11 @@ exit "$dms_update_status"`
 	var argv []string
 	execFlag := "-e"
 	switch term {
-	case "kitty", "alacritty", "wezterm":
+	case "kitty", "alacritty":
 		argv = []string{term, "--class", appID, "-T", title}
+	case "wezterm":
+		argv = []string{term, "start", "--always-new-process", "--class", appID}
+		execFlag = "--"
 	case "foot":
 		argv = []string{term, "--app-id=" + appID, "--title=" + title}
 	case "ghostty":

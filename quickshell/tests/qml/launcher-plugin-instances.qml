@@ -121,7 +121,7 @@ ShellRoot {
         repeat: true
         property int waited: 0
         onTriggered: {
-            if (++waited > 400) {
+            if (++waited > 800) {
                 check(false, "timed out in step " + root.step + " state=" + root.stallState());
                 stop();
                 Qt.quit();

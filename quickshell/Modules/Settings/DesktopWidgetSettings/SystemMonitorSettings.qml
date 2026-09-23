@@ -3,19 +3,19 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Services
-import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 DesktopWidgetInstanceSettings {
     id: root
+
+    readonly property var gpus: DgopService.availableGpus ?? []
+    readonly property var gpuLabels: gpus.map(gpu => (gpu.driver ? gpu.driver.toUpperCase() + " " : "") + (gpu.displayName ?? ""))
 
     SettingsToggleRow {
         text: I18n.tr("Show header")
         checked: root.cfg.showHeader ?? true
         onToggled: checked => root.updateConfig("showHeader", checked)
     }
-
-    SettingsDivider {}
 
     SettingsButtonGroupRow {
         readonly property var intervals: [60, 300, 600, 1800]
@@ -30,16 +30,10 @@ DesktopWidgetInstanceSettings {
         }
     }
 
-    SettingsDivider {}
-
     SettingsToggleRow {
         text: I18n.tr("CPU")
         checked: root.cfg.showCpu ?? true
         onToggled: checked => root.updateConfig("showCpu", checked)
-    }
-
-    SettingsDivider {
-        visible: root.cfg.showCpu ?? true
     }
 
     SettingsToggleRow {
@@ -49,10 +43,6 @@ DesktopWidgetInstanceSettings {
         onToggled: checked => root.updateConfig("showCpuGraph", checked)
     }
 
-    SettingsDivider {
-        visible: root.cfg.showCpu ?? true
-    }
-
     SettingsToggleRow {
         enabled: root.cfg.showCpu ?? true
         text: I18n.tr("CPU temperature")
@@ -60,110 +50,30 @@ DesktopWidgetInstanceSettings {
         onToggled: checked => root.updateConfig("showCpuTemp", checked)
     }
 
-    SettingsDivider {}
-
     SettingsToggleRow {
         text: I18n.tr("GPU temperature")
         checked: root.cfg.showGpuTemp ?? false
         onToggled: checked => root.updateConfig("showGpuTemp", checked)
     }
 
-    SettingsDivider {
-        visible: (root.cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
-    }
-
-    Item {
-        width: parent.width
-        height: gpuSelectColumn.height + Theme.spacingM * 2
-        visible: (root.cfg.showGpuTemp ?? false) && DgopService.availableGpus.length > 0
-
-        Column {
-            id: gpuSelectColumn
-            width: parent.width - Theme.spacingM * 2
-            x: Theme.spacingM
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingS
-
-            StyledText {
-                text: I18n.tr("GPU", "graphics processor label in system monitor")
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-            }
-
-            Column {
-                width: parent.width
-                spacing: Theme.spacingXS
-
-                Repeater {
-                    model: DgopService.availableGpus
-
-                    Rectangle {
-                        required property var modelData
-
-                        readonly property bool isSelected: (root.cfg.gpuPciId ?? "") === modelData.pciId
-
-                        width: parent.width
-                        height: 44
-                        radius: Theme.cornerRadius
-                        color: isSelected ? Theme.primarySelected : Theme.chipSurface
-                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                        border.width: Theme.outlineWidthFocused
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingS
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "videocam"
-                                size: Theme.iconSizeSmall
-                                color: isSelected ? Theme.primary : Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Column {
-                                width: parent.width - Theme.iconSizeSmall - Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 0
-
-                                StyledText {
-                                    text: modelData.displayName || "Unknown GPU"
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    width: parent.width
-                                    elide: Text.ElideRight
-                                }
-
-                                StyledText {
-                                    text: modelData.driver || ""
-                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                    color: Theme.surfaceVariantText
-                                    visible: text !== ""
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.updateConfig("gpuPciId", modelData.pciId)
-                        }
-                    }
-                }
-            }
+    SettingsDropdownRow {
+        visible: root.cfg.showGpuTemp ?? false
+        text: I18n.tr("GPU")
+        options: root.gpuLabels
+        emptyText: I18n.tr("No GPU detected", "empty state when no graphics card is found")
+        currentValue: root.gpuLabels[root.gpus.findIndex(gpu => gpu.pciId === root.cfg.gpuPciId)] ?? ""
+        onValueChanged: value => {
+            const index = root.gpuLabels.indexOf(value);
+            if (index < 0)
+                return;
+            root.updateConfig("gpuPciId", root.gpus[index].pciId);
         }
     }
-
-    SettingsDivider {}
 
     SettingsToggleRow {
         text: I18n.tr("Memory")
         checked: root.cfg.showMemory ?? true
         onToggled: checked => root.updateConfig("showMemory", checked)
-    }
-
-    SettingsDivider {
-        visible: root.cfg.showMemory ?? true
     }
 
     SettingsToggleRow {
@@ -173,16 +83,10 @@ DesktopWidgetInstanceSettings {
         onToggled: checked => root.updateConfig("showMemoryGraph", checked)
     }
 
-    SettingsDivider {}
-
     SettingsToggleRow {
         text: I18n.tr("Network")
         checked: root.cfg.showNetwork ?? true
         onToggled: checked => root.updateConfig("showNetwork", checked)
-    }
-
-    SettingsDivider {
-        visible: root.cfg.showNetwork ?? true
     }
 
     SettingsToggleRow {
@@ -192,24 +96,16 @@ DesktopWidgetInstanceSettings {
         onToggled: checked => root.updateConfig("showNetworkGraph", checked)
     }
 
-    SettingsDivider {}
-
     SettingsToggleRow {
         text: I18n.tr("Disk")
         checked: root.cfg.showDisk ?? true
         onToggled: checked => root.updateConfig("showDisk", checked)
     }
 
-    SettingsDivider {}
-
     SettingsToggleRow {
         text: I18n.tr("Top processes")
         checked: root.cfg.showTopProcesses ?? false
         onToggled: checked => root.updateConfig("showTopProcesses", checked)
-    }
-
-    SettingsDivider {
-        visible: root.cfg.showTopProcesses ?? false
     }
 
     SettingsButtonGroupRow {
@@ -226,10 +122,6 @@ DesktopWidgetInstanceSettings {
         }
     }
 
-    SettingsDivider {
-        visible: root.cfg.showTopProcesses ?? false
-    }
-
     SettingsButtonGroupRow {
         visible: root.cfg.showTopProcesses ?? false
         text: I18n.tr("Sort by")
@@ -242,8 +134,6 @@ DesktopWidgetInstanceSettings {
             root.updateConfig("topProcessSortBy", index === 0 ? "cpu" : "memory");
         }
     }
-
-    SettingsDivider {}
 
     SettingsDropdownRow {
         text: I18n.tr("Layout")

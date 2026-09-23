@@ -623,8 +623,8 @@ Item {
                     Layout.preferredHeight: LockMetrics.fieldHeight
                     radius: Theme.fullRadius(width, height)
                     color: Theme.cardSurface
-                    border.width: passwordField.activeFocus ? Math.max(Theme.outlineWidth, Theme.focusRingWidth) : Theme.outlineWidth
-                    border.color: passwordField.activeFocus ? Theme.focusRingColor : Theme.outlineVariant
+                    border.width: passwordField.activeFocus ? Math.max(Theme.outlineWidth, Theme.focusRingWidth) : Theme.layerOutlineWidth
+                    border.color: passwordField.activeFocus ? Theme.focusRingColor : Theme.outlineMedium
                     Accessible.name: I18n.tr("Password")
                     visible: SettingsData.lockScreenShowPasswordField || root.passwordBuffer.length > 0
 

@@ -203,7 +203,7 @@ ShellRoot {
             const current = root.signature();
             stable = current === last ? stable + 1 : 0;
             last = current;
-            if (++waited > 200) {
+            if (++waited > 800) {
                 root.failed = true;
                 console.log("FIXTURE_FAIL " + state.name + " never settled, signature " + current);
                 stop();

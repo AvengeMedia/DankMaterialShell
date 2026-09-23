@@ -35,10 +35,13 @@ QtObject {
         return Qt.point(point.x + origin.x, point.y + origin.y);
     }
 
-    function popupAnchor(item, section, visual, width) {
+    function popupAnchor(item, section, visual, width, record = true) {
         const point = screenPoint(visual || item.visualContent || item, 0, visual && isVertical ? visual.height / 2 : 0);
         if (!point)
             return null;
+        // Every bar widget popout anchors here, so this is where last-used routing learns which bar was clicked.
+        if (kind === "bar" && record)
+            SettingsData.recordBarInteraction(screen, config?.id);
         const position = config?.position ?? 0;
         const spacing = config?.spacing ?? 4;
         const triggerWidth = width ?? (visual ? (isVertical ? visual.height : visual.width) : item.visualWidth ?? item.width);
@@ -53,8 +56,8 @@ QtObject {
         };
     }
 
-    function positionPopout(popout, item, section, visual, width) {
-        const anchor = popupAnchor(item, section, visual, width);
+    function positionPopout(popout, item, section, visual, width, record = true) {
+        const anchor = popupAnchor(item, section, visual, width, record);
         if (!anchor || !popout?.setTriggerPosition)
             return false;
         const trigger = anchor.trigger;

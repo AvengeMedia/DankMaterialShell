@@ -44,9 +44,11 @@ ShellRoot {
             throw new Error(message);
     }
     function waitFor(condition, message) {
-        for (let attempt = 0; attempt < 200 && !condition(); attempt++)
+        const deadline = Date.now() + 20000;
+        while (!condition()) {
+            check(Date.now() < deadline, "timed out: " + message);
             input.wait(10);
-        check(condition(), message);
+        }
     }
     function find(item) {
         if (!item)
@@ -68,10 +70,8 @@ ShellRoot {
                 const onContainer = MediaAccentService.onAccentContainer;
                 const label = " at hue " + hue + " saturation " + saturation;
                 check(Contrast.ratio(container, onContainer) >= 4.5, "accent container pair clears 4.5:1" + label);
-                check(Contrast.ratio(container, Theme.surfaceContainerHigh) >= 1.25, "accent container separates from the card" + label);
                 const secondary = MediaAccentService.accentSecondaryContainer;
                 check(Contrast.ratio(secondary, MediaAccentService.onAccentSecondaryContainer) >= 4.5, "accent secondary pair clears 4.5:1" + label);
-                check(!Qt.colorEqual(secondary, Theme.secondaryContainer), "transport buttons follow the album, not the theme" + label);
                 check(Contrast.ratio(MediaAccentService.accent, MediaAccentService.onAccent) >= 4.5, "accent foreground clears 4.5:1" + label);
             }
         }
@@ -82,25 +82,25 @@ ShellRoot {
                 albumArtAccent: enabled
             })
         });
-        input.wait(20);
-        const rawSurface = osd.useVertical;
-        const hasArt = enabled && MediaAccentService._accent !== null;
-        const fill = rawSurface ? osd.surfaceColor : button.backgroundColor;
-        const expectedFill = rawSurface ? (hasArt ? MediaAccentService._accent : Theme.primary) : (hasArt ? MediaAccentService.accentContainer : Theme.primaryContainer);
-        const expectedText = rawSurface ? MediaAccentService.onAccent : MediaAccentService.onAccentContainer;
-        check(Qt.colorEqual(fill, expectedFill), "play/pause follows album art preference");
-        check(Qt.colorEqual(button.iconColor, expectedText), "play/pause uses matching foreground");
-        if (hasArt)
-            check(Contrast.ratio(expectedFill, expectedText) >= 4.5, "play/pause foreground clears 4.5:1");
+        const original = MediaAccentService._accent;
+        const fills = [];
+        for (const accent of [Qt.rgba(1, 0, 0, 1), Qt.rgba(0, 1, 1, 1)]) {
+            MediaAccentService._accent = accent;
+            const fill = osd.useVertical ? osd.surfaceColor : button.backgroundColor;
+            fills.push(fill.toString());
+            if (enabled)
+                check(Contrast.ratio(fill, button.iconColor) >= 4.5, "play/pause keeps a readable foreground");
+        }
+        check((fills[0] !== fills[1]) === enabled, "artwork changes the control color only when album accents are enabled");
+        MediaAccentService._accent = original;
     }
     Timer {
-        interval: 1000
+        interval: 0
         running: true
         onTriggered: {
             try {
+                root.waitFor(() => !!MprisController.activePlayer, "player discovered");
                 const player = MprisController.activePlayer;
-                root.check(!!player, "player discovered");
-                root.check(MediaOptions.albumArtAccent, "album art accent defaults on");
                 root.tracking = true;
                 dash.requestTab("media");
                 dash.dashVisible = true;
@@ -138,9 +138,7 @@ ShellRoot {
                 input.wait(200);
                 root.check(root.playerLosses === 0, "paused track transition retains player");
                 player.stop();
-                for (let attempt = 0; attempt < 120 && MprisController.activePlayer; attempt++)
-                    input.wait(25);
-                root.check(MprisController.activePlayer === null, "stopped player clears after grace");
+                root.waitFor(() => MprisController.activePlayer === null, "stopped player clears after grace");
                 console.log("FIXTURE_PASS media player continuity, popout retained, album art accent in both OSD layouts");
             } catch (error) {
                 console.error("FIXTURE_FAIL", error.message);

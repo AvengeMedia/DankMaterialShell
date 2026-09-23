@@ -145,3 +145,61 @@ test("surface origins include native cross-edge exclusions without adding manual
     assert.equal(frameIsland.instances[0].rowOffset, 12);
     assert.equal(frameIsland.edges.top.reservation, 54);
 });
+
+test("an overview-only bar shares the row of a same-edge bar that retracts for the overview", () => {
+    const main = bar("main");
+    const standIn = bar("standin", 0, { visible: false, openOnOverview: true });
+    const always = bar("always", 0, { openOnOverview: true });
+    const offsets = layout => Object.fromEntries(layout.instances.map(instance => [instance.barId, instance.rowOffset]));
+    const shared = resolve([main, standIn]);
+    assert.deepEqual(offsets(shared), { main: 0, standin: 0 });
+    assert.equal(shared.instances.find(instance => instance.barId === "standin").margins.top, 0);
+    assert.equal(shared.edges.top.occupancy, 44);
+    assert.equal(shared.edges.top.reservation, 44);
+    assert.deepEqual(offsets(resolve([standIn, main])), { standin: 0, main: 0 });
+    assert.deepEqual(offsets(resolve([main, always, standIn])), { main: 0, always: 44, standin: 0 });
+    assert.deepEqual(offsets(resolve([always, standIn])), { always: 0, standin: 44 });
+    assert.deepEqual(offsets(resolve([main, standIn], { effectiveFrameEnabled: true })), { main: 0, standin: 48 });
+});
+
+test("free islands and dots keep their key but leave every band, reservation and shadow untouched", () => {
+    const configs = [bar("top"), bar("dot", 0, { dot: true }), bar("edge", 1, { island: true }), bar("free", 0, { island: true, islandFloating: true, islandPlacement: "free" })];
+    for (const options of [{}, { effectiveFrameEnabled: true }, { effectiveFrameEnabled: true, effectiveConnected: true }]) {
+        const layout = resolve(configs, options);
+        const dot = layout.instances.find(instance => instance.barId === "dot");
+        assert.deepEqual(plain({ ...dot, paintedBounds: undefined, margins: undefined }), { key: JSON.stringify(["DP-1", "dot"]), screenName: "DP-1", barId: "dot", configOrder: 1, edge: "", kind: "island", free: true, dot: true, satelliteEdge: "", row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0 });
+        assert.equal(layout.instances.find(instance => instance.barId === "free").dot, false);
+        assert.equal(layout.edges.top.island, null);
+        assert.equal(layout.edges.top.islandThickness, 0);
+        assert.equal(layout.edges.top.occupancy, resolve([configs[0]], options).edges.top.occupancy);
+        assert.equal(layout.edges.bottom.island.id, "edge");
+        assert.equal(layout.manualPlacement, false);
+        assert.equal(layout.islands.length, 3);
+    }
+    const layout = resolve(configs);
+    assert.deepEqual(plain(layout.instances.filter(instance => instance.free).map(instance => instance.barId)), ["dot", "free"]);
+    assert.equal(resolver.adjacentInfo(layout, configs[0], configs[0]).topBar, 0);
+});
+
+test("a free island keeps a bar window for its satellites on its edge without reserving or shadowing it", () => {
+    const top = bar("top");
+    const free = values => bar("free", 1, { island: true, islandFloating: true, islandPlacement: "free", ...values });
+    for (const options of [{}, { effectiveFrameEnabled: true }, { effectiveFrameEnabled: true, effectiveConnected: true }]) {
+        const baseline = resolve([top], options);
+        const layout = resolve([top, free({}), bar("dot", 1, { dot: true })], options);
+        const instance = layout.instances.find(instance => instance.barId === "free");
+        assert.equal(instance.satelliteEdge, "bottom");
+        assert.equal(instance.edge, "");
+        assert.equal(instance.reservation, 0);
+        assert.equal(instance.exclusiveZone, -1);
+        assert.equal(resolver.hostsBarWindow(instance), true);
+        assert.equal(resolver.hostsBarWindow(layout.instances.find(instance => instance.barId === "dot")), false);
+        assert.equal(layout.edges.bottom.island, null);
+        assert.equal(layout.edges.bottom.islandThickness, 0);
+        assert.deepEqual(plain(layout.edges), plain(resolve([top, bar("dot", 1, { dot: true })], options).edges));
+        assert.equal(layout.edges.top.occupancy, baseline.edges.top.occupancy);
+        assert.equal(layout.manualPlacement, false);
+        const off = resolve([top, free({ islandSatellitesEnabled: false })], options).instances.find(instance => instance.barId === "free");
+        assert.equal(resolver.hostsBarWindow(off), false);
+    }
+});

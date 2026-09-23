@@ -12,8 +12,6 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property int contentMaxWidth: 650
-
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -301,7 +299,6 @@ Item {
 
     SettingsPage {
         id: flickable
-        contentMaxWidth: root.contentMaxWidth
 
         SettingsCard {
             id: headerSection

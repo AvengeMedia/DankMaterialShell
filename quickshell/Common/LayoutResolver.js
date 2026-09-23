@@ -41,53 +41,100 @@ function islandMetrics(config, defaults) {
     const reserve = Math.max(24, Math.min(128, value("islandReserveThickness")));
     const compact = Math.max(24, Math.min(72, value("islandCompactThickness")));
     const gap = Math.max(0, Math.min(48, value("islandOuterGap")));
-    return { reserve, compact, gap, thickness: Math.max(reserve, gap + compact) };
+    return {
+        reserve,
+        compact,
+        gap,
+        thickness: Math.max(reserve, gap + compact)
+    };
 }
 
 function islandThickness(config, defaults) {
     return islandMetrics(config, defaults).thickness;
 }
 
+function isIsland(config) {
+    return config.island === true || config.dot === true;
+}
+
+function overviewStandInHost(input, selected) {
+    const config = input.config;
+    if (isIsland(config) || config.visible !== false || !config.openOnOverview)
+        return null;
+    return selected.find(other => !isIsland(other.config) && !other.config.openOnOverview) ?? null;
+}
+
 function resolveScreen(inputs, screen, options) {
     const assigned = inputs.filter(input => coversScreen(input.config, screen, options.screens, options.displayNameMode));
     const enabled = assigned.filter(input => input.config.enabled);
-    const islands = enabled.filter(input => input.config.island === true);
-    const bars = enabled.filter(input => input.config.island !== true);
+    const islands = enabled.filter(input => isIsland(input.config));
+    const bars = enabled.filter(input => !isIsland(input.config));
     const frameConfigured = screenMatches(screen, options.framePreferences, options.screens, options.displayNameMode);
     const frameStyled = options.effectiveFrameEnabled && frameConfigured;
     const frameHosted = options.effectiveConnected && frameStyled;
     const bands = {};
     const instances = [];
+    // Free islands and dots float anywhere on the screen, so they never join an edge band.
+    const isFree = input => input.config.dot === true || (isIsland(input.config) && (input.islandPlacement ?? input.config.islandPlacement) === "free");
+    for (const input of enabled.filter(isFree)) {
+        const dot = input.config.dot === true;
+        // A free island keeps its satellites in a bar window on its configured edge; that band never reserves or shadows.
+        const satellites = !dot && (input.islandSatellites ?? input.config.islandSatellitesEnabled ?? true);
+        instances.push({
+            key: JSON.stringify([screen.name, input.config.id]), screenName: screen.name,
+            barId: input.config.id, configOrder: inputs.indexOf(input), edge: "", kind: "island", free: true, dot,
+            satelliteEdge: satellites ? edgeName(input.config.position ?? 0) || "top" : "",
+            row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0,
+            paintedBounds: { x: 0, y: 0, width: 0, height: 0 }, margins: { top: 0, bottom: 0, left: 0, right: 0 }
+        });
+    }
     for (const edge of edges) {
-        const selected = enabled.filter(input => (edgeName(input.config.position ?? 0) || "top") === edge);
-        const active = selected.filter(input => input.config.island !== true);
+        const selected = enabled.filter(input => !isFree(input) && (edgeName(input.config.position ?? 0) || "top") === edge);
+        const active = selected.filter(input => !isIsland(input.config));
         const hosted = active.filter(input => !input.config.useOverlayLayer);
         let offset = 0;
         let reservation = 0;
-        for (const input of selected) {
+        const rowOffsets = new Map();
+        const place = (input, rowOffset) => {
             const config = input.config;
-            const kind = config.island === true ? "island" : frameHosted && !config.useOverlayLayer ? "frame" : "bar";
+            const kind = isIsland(config) ? "island" : frameHosted && !config.useOverlayLayer ? "frame" : "bar";
             const spacing = frameStyled || config.attachToScreenEdge ? 0 : config.spacing ?? 4;
             const thickness = kind === "island" ? input.islandThickness : frameStyled ? Math.round(Math.round(options.frameBarSize * (screen.scale || 1)) / (screen.scale || 1)) : input.barThickness + spacing + (config.bottomGap ?? 0);
             const paintedThickness = thickness + (kind !== "island" && !frameStyled ? input.wingSize ?? 0 : 0);
-            const reserves = kind === "island" ? !(input.islandFloating ?? config.islandFloating)
-                : config.visible !== false && (!config.autoHide || frameStyled);
-            const contribution = reserves ? Math.max(0, offset + thickness - reservation) : 0;
+            const reserves = kind === "island" ? !(input.islandFloating ?? config.islandFloating) : config.visible !== false && (!config.autoHide || frameStyled);
+            const contribution = reserves ? Math.max(0, rowOffset + thickness - reservation) : 0;
             instances.push({
-                key: JSON.stringify([screen.name, config.id]), screenName: screen.name,
-                barId: config.id, configOrder: inputs.indexOf(input), edge, kind,
-                row: selected.indexOf(input), rowThickness: paintedThickness, rowOffset: offset,
+                key: JSON.stringify([screen.name, config.id]),
+                screenName: screen.name,
+                barId: config.id,
+                configOrder: inputs.indexOf(input),
+                edge,
+                kind,
+                row: selected.indexOf(input),
+                rowThickness: paintedThickness,
+                rowOffset,
                 reservation: contribution
             });
-            offset += paintedThickness;
             reservation += contribution;
+            rowOffsets.set(input, rowOffset);
+            return paintedThickness;
+        };
+        const standIns = frameStyled ? [] : selected.filter(input => overviewStandInHost(input, selected));
+        for (const input of selected) {
+            if (standIns.includes(input))
+                continue;
+            offset += place(input, offset);
         }
-        const island = selected.find(input => input.config.island === true);
+        for (const input of standIns)
+            place(input, rowOffsets.get(overviewStandInHost(input, selected)));
+        const island = selected.find(input => isIsland(input.config));
         bands[edge] = {
             island: island?.config ?? null,
-            islandThickness: selected.filter(input => input.config.island === true).reduce((sum, input) => sum + input.islandThickness, 0),
-            bars: active.map(input => input.config), hostedBars: hosted.map(input => input.config),
-            occupancy: offset, reservation: Math.max(frameStyled ? options.frameThickness : 0, reservation),
+            islandThickness: selected.filter(input => isIsland(input.config)).reduce((sum, input) => sum + input.islandThickness, 0),
+            bars: active.map(input => input.config),
+            hostedBars: hosted.map(input => input.config),
+            occupancy: offset,
+            reservation: Math.max(frameStyled ? options.frameThickness : 0, reservation),
             frameReservation: active.length ? Math.max(options.frameThickness, offset) : options.frameThickness,
             frameExclusionEnabled: frameStyled && (!active.length || (frameHosted && !active.some(input => input.config.useOverlayLayer)))
         };
@@ -95,7 +142,7 @@ function resolveScreen(inputs, screen, options) {
     const manualPlacement = edges.some(edge => instances.filter(instance => instance.edge === edge).length > 1);
     if (!manualPlacement && frameStyled) {
         for (const instance of instances) {
-            if (instance.kind !== "island")
+            if (instance.kind !== "island" || instance.free)
                 continue;
             const band = bands[instance.edge];
             instance.rowOffset += options.frameThickness;
@@ -104,11 +151,18 @@ function resolveScreen(inputs, screen, options) {
         }
     }
     for (const instance of instances) {
+        if (instance.free)
+            continue;
         const band = bands[instance.edge];
         instance.exclusiveZone = manualPlacement || instance.kind === "frame" ? -1 : instance.reservation || -1;
         instance.exclusionSize = manualPlacement && !frameStyled && instance.row === 0 ? band.reservation : 0;
         instance.paintedBounds = rowBounds(screen, instance.edge, instance.rowOffset, instance.rowThickness, bands);
-        instance.margins = { top: 0, bottom: 0, left: 0, right: 0 };
+        instance.margins = {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
         if (!manualPlacement)
             continue;
         instance.margins[instance.edge] = instance.rowOffset;
@@ -122,7 +176,21 @@ function resolveScreen(inputs, screen, options) {
             bands[edge].frameExclusionEnabled = true;
     }
     instances.sort((a, b) => a.configOrder - b.configOrder);
-    return { screen, assigned, bars, islands, instances, edges: bands, frameConfigured, frameStyled, manualPlacement };
+    return {
+        screen,
+        assigned,
+        bars,
+        islands,
+        instances,
+        edges: bands,
+        frameConfigured,
+        frameStyled,
+        manualPlacement
+    };
+}
+
+function hostsBarWindow(instance) {
+    return instance.free ? !!instance.satelliteEdge : instance.kind === "bar" || instance.kind === "island";
 }
 
 function adjacentBar(layout, edge, config) {
@@ -133,7 +201,12 @@ function adjacentBar(layout, edge, config) {
 }
 
 function adjacentInfo(layout, config, defaults) {
-    const result = { topBar: 0, bottomBar: 0, leftBar: 0, rightBar: 0 };
+    const result = {
+        topBar: 0,
+        bottomBar: 0,
+        leftBar: 0,
+        rightBar: 0
+    };
     if (!layout || !config || config.autoHide)
         return result;
     for (const edge of edges) {
@@ -154,11 +227,19 @@ function adjacentInfo(layout, config, defaults) {
 }
 
 function barBounds(layout, thickness, position, config, defaults, connected, wingSize) {
-    const empty = { x: 0, y: 0, width: 0, height: 0, wingSize: 0 };
+    const empty = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        wingSize: 0
+    };
     if (!layout || !edgeName(position))
         return empty;
     const instance = layout.instances.find(instance => instance.barId === config?.id);
-    return Object.assign(rowBounds(layout.screen, edgeName(position), instance?.rowOffset ?? 0, thickness + wingSize, layout.edges), { wingSize });
+    return Object.assign(rowBounds(layout.screen, edgeName(position), instance?.rowOffset ?? 0, thickness + wingSize, layout.edges), {
+        wingSize
+    });
 }
 
 function rowBounds(screen, edge, offset, thickness, bands) {
@@ -168,7 +249,8 @@ function rowBounds(screen, edge, offset, thickness, bands) {
     return {
         x: horizontal ? 0 : edge === "right" ? screen.width - width - offset : offset,
         y: horizontal ? edge === "bottom" ? screen.height - height - offset : offset : bands.top.occupancy,
-        width, height
+        width,
+        height
     };
 }
 
@@ -184,7 +266,10 @@ function surfaceOrigin(layout, width, height, anchors, margins) {
         x += Math.min(Math.max(0, screen.width - width - left - right), layout.edges?.left?.reservation ?? 0);
     if (anchors.top && anchors.bottom)
         y += Math.min(Math.max(0, screen.height - height - top - bottom), layout.edges?.top?.reservation ?? 0);
-    return { x, y };
+    return {
+        x,
+        y
+    };
 }
 
 function popupTrigger(pos, screen, thickness, width, spacing, position, config, defaults, connected) {
@@ -194,13 +279,29 @@ function popupTrigger(pos, screen, thickness, width, spacing, position, config, 
     const offset = thickness + (connected ? 0 : spacing) + gap;
     switch (position) {
     case 2:
-        return { x: offset, y: pos.y, width };
+        return {
+            x: offset,
+            y: pos.y,
+            width
+        };
     case 3:
-        return { x: (screen?.width || 0) - offset, y: pos.y, width };
+        return {
+            x: (screen?.width || 0) - offset,
+            y: pos.y,
+            width
+        };
     case 1:
-        return { x: pos.x, y: (screen?.height || 0) - offset - bottomGap, width };
+        return {
+            x: pos.x,
+            y: (screen?.height || 0) - offset - bottomGap,
+            width
+        };
     default:
-        return { x: pos.x, y: offset + bottomGap, width };
+        return {
+            x: pos.x,
+            y: offset + bottomGap,
+            width
+        };
     }
 }
 
