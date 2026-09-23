@@ -84,6 +84,8 @@ pkgs.testers.runNixOSTest {
 
     machine.wait_for_unit("multi-user.target")
 
+    machine.succeed("test $(systemctl --machine=danklinux@ --user show dms.service --property=Type --value) = dbus")
+    machine.succeed("test $(systemctl --machine=danklinux@ --user show dms.service --property=BusName --value) = org.freedesktop.Notifications")
     machine.succeed("su -- danklinux -c 'command -v dms'")
     machine.succeed("su -- danklinux -c 'test -f ~/.config/DankMaterialShell/settings.json'")
     machine.succeed("su -- danklinux -c 'test -f ~/.config/DankMaterialShell/clsettings.json'")
