@@ -3193,6 +3193,7 @@ Singleton {
         property bool isLoading: false
         property bool hasLoaded: false
         property bool hasParseFailed: false
+        property bool hasSaveFailed: false
         property bool hasUnsavedChanges: false
         property bool isFileReadOnly: false
         property bool selfWrite: false
@@ -3308,9 +3309,9 @@ Singleton {
                 isReadOnly = _anySettingsFile(file => file.isFileReadOnly);
 
                 const fileName = filePath?.split("/").pop() || "unknown";
-                if (_failedSaveSettingsFiles.has(settingsFile)) {
+                if (hasSaveFailed) {
                     log.info(`Settings file '${fileName}' saved successfully after previous failures`)
-                    _failedSaveSettingsFiles.delete(settingsFile);
+                    hasSaveFailed = false;
                 }
             }
             onSaveFailed: (error) => {
@@ -3318,7 +3319,7 @@ Singleton {
                     isFileReadOnly = true;
                     isReadOnly = true;
                 }
-                _failedSaveSettingsFiles.add(settingsFile);
+                hasSaveFailed = true;
                 const fileName = filePath?.split("/").pop() || "unknown";
                 log.warn(`Failed to save ${fileName}, retrying...`)
                 settingsSaveFailRecovery.start();
@@ -3331,7 +3332,6 @@ Singleton {
 
     property var _settingsFiles: new Map()
     property var _settingsFilesPaths: ([])
-    property var _failedSaveSettingsFiles: new Set()
     function _registerSettingsFile(file) {
         const filePath = file.filePath;
         if (_settingsFiles.has(filePath)) {
@@ -3597,14 +3597,16 @@ Singleton {
         repeat: true
         running: false
         onTriggered: {
-            if (_failedSaveSettingsFiles.size === 0 || tries >= 15) {
+            if (_everySettingsFile(file => !file.hasSaveFailed) || tries >= 15) {
                 tries = 0;
                 stop();
                 return;
             }
             tries++;
-            for (const file of _failedSaveSettingsFiles) {
-                file.retrySaving();
+            for (const file of _settingsFiles.values()) {
+                if (file.hasSaveFailed) {
+                    file.retrySaving();
+                }
             }
         }
     }
