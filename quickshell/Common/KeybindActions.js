@@ -958,7 +958,7 @@ function getActionType(action) {
         return "compositor";
     if (isDmsAction(action))
         return "dms";
-    if (/^spawn \w+ -c /.test(action) || action.startsWith("spawn_shell "))
+    if (/^spawn \w+ -c /.test(action) || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh "))
         return "shell";
     if (action.startsWith("spawn "))
         return "spawn";
@@ -981,6 +981,8 @@ function isValidAction(action) {
         case "spawn sh -c ''":
         case "spawn_shell":
         case "spawn_shell ":
+        case "spawn-sh":
+        case "spawn-sh ":
             return false;
     }
     return true;
@@ -1037,6 +1039,12 @@ function parseShellCommand(action) {
     }
     if (action.startsWith("spawn_shell "))
         return action.slice(12);
+    if (action.startsWith("spawn-sh ")) {
+        var cmd = action.slice(9).trim();
+        if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'")))
+            cmd = cmd.slice(1, -1);
+        return cmd;
+    }
     return "";
 }
 

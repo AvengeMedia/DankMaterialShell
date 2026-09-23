@@ -325,7 +325,7 @@ Singleton {
     function canExecuteAction(action) {
         if (!action)
             return false;
-        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("exec "))
+        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh ") || action.startsWith("exec "))
             return true;
         const provider = currentProvider || cheatsheetProvider;
         if (provider === "niri") {
@@ -341,13 +341,17 @@ Singleton {
             return false;
         log.info("Executing keybind action:", action);
 
-        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("exec ")) {
+        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh ") || action.startsWith("exec ")) {
             let cmd = action;
             if (cmd.startsWith("spawn "))
                 cmd = cmd.slice(6).trim();
             else if (cmd.startsWith("spawn_shell "))
                 cmd = cmd.slice(12).trim();
-            else if (cmd.startsWith("exec "))
+            else if (cmd.startsWith("spawn-sh ")) {
+                cmd = cmd.slice(9).trim();
+                if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'")))
+                    cmd = cmd.slice(1, -1);
+            } else if (cmd.startsWith("exec "))
                 cmd = cmd.slice(5).trim();
 
             Quickshell.execDetached(["sh", "-c", cmd]);
