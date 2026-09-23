@@ -328,6 +328,11 @@ Singleton {
         if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("exec "))
             return true;
         const provider = currentProvider || cheatsheetProvider;
+        if (provider === "niri") {
+            const base = action.trim().split(/\s+/)[0];
+            if (base === "next-window" || base === "previous-window")
+                return false;
+        }
         return provider === "niri" || provider === "hyprland" || provider === "mangowc";
     }
 
@@ -351,7 +356,23 @@ Singleton {
 
         const provider = currentProvider || cheatsheetProvider;
         if (provider === "niri") {
-            Quickshell.execDetached(["sh", "-c", "niri msg action " + action]);
+            const parts = action.trim().split(/\s+/);
+            if (parts.length === 0 || parts[0] === "next-window" || parts[0] === "previous-window")
+                return false;
+
+            const cmdParts = [];
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                const eqIdx = part.indexOf("=");
+                if (eqIdx !== -1) {
+                    const key = part.slice(0, eqIdx);
+                    const val = part.slice(eqIdx + 1).replace(/^["']|["']$/g, "");
+                    cmdParts.push("--" + key + "=" + val);
+                } else {
+                    cmdParts.push(part);
+                }
+            }
+            Quickshell.execDetached(["sh", "-c", "niri msg action " + cmdParts.join(" ")]);
             return true;
         }
         if (provider === "hyprland") {
