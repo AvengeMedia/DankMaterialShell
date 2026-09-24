@@ -37,23 +37,23 @@ BasePill {
             return !hiddenTrayIds.includes(itemId.toLowerCase());
         });
     }
+    property var _trayKeyByItem: new Map()
     function getTrayItemKey(item) {
         const id = item?.id || "";
         if (!id)
             return "";
-        if (root.trayItemCountForId(id) <= 1)
-            return id;
-        const sameIdItems = root.allTrayItems.filter(other => (other?.id || "") === id);
-        const occurrenceIndex = sameIdItems.indexOf(item);
-        if (occurrenceIndex < 0)
-            return id;
-        return `${id}::${occurrenceIndex}`;
-    }
-
-    function trayItemCountForId(id) {
-        if (!id)
-            return 0;
-        return root.allTrayItems.filter(other => (other?.id || "") === id).length;
+        if (root._trayKeyByItem.has(item))
+            return root._trayKeyByItem.get(item);
+        let count = 0;
+        for (const live of root.allTrayItems) {
+            if ((live?.id || "") !== id || live === item)
+                continue;
+            if (root._trayKeyByItem.has(live))
+                count++;
+        }
+        const key = count === 0 ? id : `${id}::${count}`;
+        root._trayKeyByItem.set(item, key);
+        return key;
     }
 
     function resolveOrderIndex(key, orderMap) {
@@ -164,6 +164,13 @@ BasePill {
         target: SessionData
         function onTrayItemOrderChanged() {
             root._trayOrderTrigger++;
+        }
+    }
+
+    Connections {
+        target: SystemTray
+        function onItemUnregistered(item) {
+            root._trayKeyByItem.delete(item);
         }
     }
 
