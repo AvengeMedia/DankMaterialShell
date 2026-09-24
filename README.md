@@ -75,6 +75,8 @@ curl -fsSL https://install.danklinux.com | sh
 
 One command installs DMS and all dependencies on Arch, Fedora, Debian, Ubuntu, openSUSE, or Gentoo.
 
+**FreeBSD:** native support is included in-tree; see [distro/freebsd/README.md](distro/freebsd/README.md) for supported integrations and setup notes.
+
 **[Manual installation guide](https://danklinux.com/docs/dankmaterialshell/installation)**
 
 ## Features

@@ -20,7 +20,12 @@ Singleton {
 
     Component.onCompleted: {
         Paths.desktopIconResolver = name => resolveIconPath(name);
-        initSystemCheckProcess.running = true;
+        if (Qt.platform.os === "unix") {
+            root.isSystemd = false;
+            root.systemdAutostartTargetChecked = true;
+        } else {
+            initSystemCheckProcess.running = true;
+        }
     }
 
     Process {

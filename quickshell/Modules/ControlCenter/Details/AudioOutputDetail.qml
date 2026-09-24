@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
@@ -61,7 +60,7 @@ Item {
                     model: ScriptModel {
                         values: {
                             const hidden = SessionData.hiddenOutputDeviceNames ?? [];
-                            const nodes = Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
+                            const nodes = AudioService.allNodes.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
                             const pinnedList = root.pinnedOutputs;
                             return nodes.sort((a, b) => {
                                 const aPinned = pinnedList.indexOf(a.name);
@@ -146,7 +145,7 @@ Item {
                 Repeater {
                     id: playbackRepeater
                     model: ScriptModel {
-                        values: Pipewire.nodes.values.filter(node => node.audio && node.isSink && node.isStream)
+                        values: AudioService.pipewireNodes.filter(node => node.audio && node.isSink && node.isStream)
                     }
 
                     CcListRow {
@@ -162,9 +161,6 @@ Item {
                             playFeedback: true
                         }
 
-                        PwObjectTracker {
-                            objects: [streamRow.modelData]
-                        }
                     }
                 }
             }

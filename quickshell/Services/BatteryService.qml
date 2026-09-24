@@ -12,6 +12,98 @@ Singleton {
     property bool suppressSound: true
     property bool previousPluggedState: false
 
+    // FreeBSD native ACPI fallback. UPower exists in ports, but on some FreeBSD
+    // installations it exposes no usable laptop battery. Keep UPower as the
+    // preferred path when it works and fall back to acpiconf(8)/sysctl(8).
+    readonly property bool isBSD: Qt.platform.os === "unix"
+    property bool freebsdBatteryAvailable: false
+    property real freebsdBatteryLevel: 0
+    property bool freebsdIsCharging: false
+    property bool freebsdPluggedIn: true
+    property real freebsdChangeRate: 0
+    property real freebsdFullCapacityWh: 0
+    property real freebsdDesignCapacityWh: 0
+    property string freebsdBatteryState: ""
+
+    function parseFreeBsdCapacity(value, unit) {
+        const n = parseFloat(value || "0");
+        if (!isFinite(n) || n <= 0)
+            return 0;
+        return unit === "mWh" ? n / 1000 : 0;
+    }
+
+    function applyFreeBsdBatteryState(output) {
+        const text = output || "";
+        const blocks = text.split(/__DMS_BATTERY_\d+__\n?/).filter(b => /Remaining capacity:/i.test(b));
+        let weightedPct = 0;
+        let weight = 0;
+        let pctSum = 0;
+        let pctCount = 0;
+        let totalRateW = 0;
+        let fullWh = 0;
+        let designWh = 0;
+        let charging = false;
+        let state = "";
+
+        for (const block of blocks) {
+            const pctMatch = block.match(/Remaining capacity:\s*(\d+(?:\.\d+)?)%/i);
+            const stateMatch = block.match(/State:\s*([^\n\r]+)/i);
+            const rateMatch = block.match(/Present rate:\s*[^\n\r]*?\((\d+(?:\.\d+)?)\s*mW\)/i) || block.match(/Present rate:\s*(\d+(?:\.\d+)?)\s*mW/i);
+            const fullMatch = block.match(/Last full capacity:\s*(\d+(?:\.\d+)?)\s*(mWh|mAh)/i);
+            const designMatch = block.match(/Design capacity:\s*(\d+(?:\.\d+)?)\s*(mWh|mAh)/i);
+            const pct = pctMatch ? parseFloat(pctMatch[1]) : NaN;
+            const full = fullMatch ? root.parseFreeBsdCapacity(fullMatch[1], fullMatch[2]) : 0;
+            if (isFinite(pct)) {
+                pctSum += pct;
+                pctCount++;
+                if (full > 0) {
+                    weightedPct += pct * full;
+                    weight += full;
+                }
+            }
+            if (rateMatch)
+                totalRateW += parseFloat(rateMatch[1]) / 1000;
+            fullWh += full;
+            if (designMatch)
+                designWh += root.parseFreeBsdCapacity(designMatch[1], designMatch[2]);
+            if (stateMatch) {
+                const thisState = stateMatch[1].trim().toLowerCase();
+                if (!state)
+                    state = thisState;
+                if (thisState.includes("charging"))
+                    charging = true;
+            }
+        }
+
+        const acMatch = text.match(/__DMS_AC__:(\d+)/);
+        root.freebsdBatteryAvailable = blocks.length > 0;
+        root.freebsdBatteryLevel = blocks.length > 0 ? Math.max(0, Math.min(100, weight > 0 ? weightedPct / weight : (pctCount > 0 ? pctSum / pctCount : 0))) : 0;
+        root.freebsdIsCharging = charging;
+        root.freebsdPluggedIn = acMatch ? acMatch[1] === "1" : charging;
+        root.freebsdChangeRate = totalRateW;
+        root.freebsdFullCapacityWh = fullWh;
+        root.freebsdDesignCapacityWh = designWh;
+        root.freebsdBatteryState = state;
+    }
+
+    function refreshFreeBsdBattery() {
+        if (!root.isBSD)
+            return;
+        const script = 'units=$(sysctl -n hw.acpi.battery.units 2>/dev/null || echo 0); i=0; while [ "$i" -lt "$units" ]; do echo "__DMS_BATTERY_${i}__"; acpiconf -i "$i" 2>/dev/null; i=$((i+1)); done; printf "__DMS_AC__:"; sysctl -n hw.acpi.acline 2>/dev/null || echo 1';
+        Proc.runCommand("battery-freebsd-acpi", ["sh", "-c", script], (output, exitCode) => {
+            if (exitCode === 0)
+                root.applyFreeBsdBatteryState(output);
+        }, 0);
+    }
+
+    Timer {
+        interval: 15000
+        repeat: true
+        running: root.isBSD
+        triggeredOnStart: true
+        onTriggered: root.refreshFreeBsdBattery()
+    }
+
     Timer {
         id: startupTimer
         interval: 500
@@ -167,17 +259,19 @@ Singleton {
         return stateKnownBatteries[0] || readyBatteries[0] || batteries[0] || null;
     }
     // Whether at least one battery is available
-    readonly property bool batteryAvailable: batteries.length > 0
+    readonly property bool batteryAvailable: (isBSD && freebsdBatteryAvailable) || batteries.length > 0
     readonly property real batteryLevel: {
         if (!batteryAvailable)
             return 0;
+        if (isBSD && freebsdBatteryAvailable)
+            return freebsdBatteryLevel;
         const live = _liveChargePercent();
         return live > 0 ? live : _lastBatteryLevel;
     }
-    readonly property bool isCharging: _hasKnownChargingState ? _currentIsCharging : _lastIsCharging
+    readonly property bool isCharging: (isBSD && freebsdBatteryAvailable) ? freebsdIsCharging : (_hasKnownChargingState ? _currentIsCharging : _lastIsCharging)
 
     // Is the system plugged in (Is not running on battery)
-    readonly property bool isPluggedIn: !UPower.onBattery
+    readonly property bool isPluggedIn: (isBSD && freebsdBatteryAvailable) ? freebsdPluggedIn : !UPower.onBattery
     readonly property bool hasBatteryReading: batteryAvailable && batteryLevel > 0
     readonly property bool isLowBattery: hasBatteryReading && batteryLevel <= SettingsData.batteryLowThreshold
     readonly property bool isCriticalBattery: hasBatteryReading && batteryLevel <= SettingsData.batteryCriticalThreshold
@@ -339,6 +433,10 @@ Singleton {
     readonly property real changeRate: {
         if (!batteryAvailable)
             return 0;
+        if (isBSD && freebsdBatteryAvailable) {
+            _lastChangeRate = freebsdChangeRate;
+            return _lastChangeRate;
+        }
         if (usePreferred && preferredDeviceKnown) {
             _lastChangeRate = preferredDevice.changeRate;
             return _lastChangeRate;
@@ -411,6 +509,11 @@ Singleton {
     readonly property string batteryHealth: {
         if (!batteryAvailable)
             return "N/A";
+        if (isBSD && freebsdBatteryAvailable) {
+            if (freebsdDesignCapacityWh > 0 && freebsdFullCapacityWh > 0)
+                return `${Math.round(Math.min(100, freebsdFullCapacityWh * 100 / freebsdDesignCapacityWh))}%`;
+            return "N/A";
+        }
 
         if (usePreferred && preferredDeviceReady && preferredDevice.healthSupported)
             return `${Math.round(preferredDevice.healthPercentage)}%`;
@@ -426,6 +529,8 @@ Singleton {
     readonly property real batteryEnergy: {
         if (!batteryAvailable)
             return 0;
+        if (isBSD && freebsdBatteryAvailable && freebsdFullCapacityWh > 0)
+            return freebsdFullCapacityWh * freebsdBatteryLevel / 100;
         const live = _liveEnergy();
         return live > 0 ? live : _lastBatteryEnergy;
     }
@@ -438,6 +543,8 @@ Singleton {
     readonly property real batteryCapacity: {
         if (!batteryAvailable)
             return 0;
+        if (isBSD && freebsdBatteryAvailable)
+            return freebsdFullCapacityWh;
         const live = _liveCapacity();
         return live > 0 ? live : _lastBatteryCapacity;
     }
@@ -469,6 +576,11 @@ Singleton {
     readonly property string batteryStatus: {
         if (!batteryAvailable)
             return I18n.tr("No battery", "battery status");
+        if (isBSD && freebsdBatteryAvailable) {
+            if (isCharging)
+                return I18n.tr("Charging", "battery status");
+            return isPluggedIn ? I18n.tr("Plugged in", "battery status") : I18n.tr("Discharging", "battery status");
+        }
 
         if (stateKnownBatteries.length === 0) {
             if (isCharging)

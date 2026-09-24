@@ -24,7 +24,7 @@ Item {
     readonly property string thresholdFileList: "charge_control_limit_max charge_stop_threshold charge_control_end_threshold"
     readonly property int noThresholdExitCode: 2
 
-    property bool chargeLimitSupported: true
+    property bool chargeLimitSupported: Qt.platform.os === "linux"
 
     Process {
         id: thresholdProbe

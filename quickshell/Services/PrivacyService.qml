@@ -5,24 +5,23 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import qs.Services
 
 Singleton {
     id: root
 
     readonly property bool microphoneActive: {
-        if (!Pipewire.ready || !Pipewire.nodes?.values) {
+        if (!AudioService.pipewireReady) {
             return false
         }
 
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i]
+        for (let i = 0; i < AudioService.pipewireNodes.length; i++) {
+            const node = AudioService.pipewireNodes[i]
             if (!node) {
                 continue
             }
 
-            if ((node.type & PwNodeType.AudioInStream) === PwNodeType.AudioInStream) {
+            if (node.properties?.["media.class"] === "Stream/Input/Audio") {
                 if (!looksLikeSystemVirtualMic(node)) {
                     if (node.audio && node.audio.muted) {
                         return false
@@ -34,17 +33,14 @@ Singleton {
         return false
     }
 
-    PwObjectTracker {
-        objects: Pipewire.nodes.values.filter(node => !node.isStream)
-    }
 
     readonly property bool cameraActive: {
-        if (!Pipewire.ready || !Pipewire.nodes?.values) {
+        if (!AudioService.pipewireReady) {
             return false
         }
 
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i]
+        for (let i = 0; i < AudioService.pipewireNodes.length; i++) {
+            const node = AudioService.pipewireNodes[i]
             if (!node || !node.ready || node.properties?.["media.role"] === "Screen") {
                 continue
             }
@@ -63,17 +59,17 @@ Singleton {
             return true
         }
 
-        if (!Pipewire.ready || !Pipewire.nodes?.values) {
+        if (!AudioService.pipewireReady) {
             return false
         }
 
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i]
+        for (let i = 0; i < AudioService.pipewireNodes.length; i++) {
+            const node = AudioService.pipewireNodes[i]
             if (!node || !node.ready) {
                 continue
             }
 
-            if ((node.type & PwNodeType.VideoSource) === PwNodeType.VideoSource) {
+            if (node.properties?.["media.class"] === "Video/Source") {
                 if (looksLikeScreencast(node)) {
                     return true
                 }
@@ -137,17 +133,17 @@ Singleton {
             }
         }
 
-        if (!Pipewire.ready || !Pipewire.nodes?.values) {
+        if (!AudioService.pipewireReady) {
             return ids
         }
 
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            const node = Pipewire.nodes.values[i]
+        for (let i = 0; i < AudioService.pipewireNodes.length; i++) {
+            const node = AudioService.pipewireNodes[i]
             if (!node || !node.ready) {
                 continue
             }
 
-            const isVideoSource = (node.type & PwNodeType.VideoSource) === PwNodeType.VideoSource
+            const isVideoSource = node.properties?.["media.class"] === "Video/Source"
             const isVideoStream = node.properties && node.properties["media.class"] === "Stream/Output/Video"
             if ((isVideoSource || isVideoStream) && looksLikeScreencast(node)) {
                 ids.push("pw:" + node.id)
