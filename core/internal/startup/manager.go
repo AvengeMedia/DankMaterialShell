@@ -211,7 +211,7 @@ func (m *Manager) Remove(id string) error {
 	if index < 0 {
 		return ErrNotFound
 	}
-	if !records[index].entry.Removable {
+	if records[index].user == nil || records[index].system != nil {
 		return ErrProtected
 	}
 	if err := os.Remove(filepath.Join(m.userConfigDir, "autostart", name)); err != nil {

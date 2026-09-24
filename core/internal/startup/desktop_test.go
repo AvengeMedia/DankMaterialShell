@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,32 +50,39 @@ func TestListXDGUserAndSystemEntries(t *testing.T) {
 	require.Len(t, entries, 2)
 	assert.Equal(t, "System App", entries[0].Name)
 	assert.Equal(t, SourceXDG, entries[0].Source)
+	assert.False(t, entries[0].Removable)
 	assert.Equal(t, "User App", entries[1].Name)
-	assert.False(t, entries[1].Removable)
+	assert.True(t, entries[1].Removable)
 }
 
-func TestOnlyDMSCreatedXDGEntriesAreRemovable(t *testing.T) {
+func TestRemoveDMSCreatedXDGEntry(t *testing.T) {
 	manager, user, _, _ := testManager(t)
-	writeDesktop(t, user, "manual.desktop", desktopContent("Manual App", "", "/usr/bin/manual-app"))
 	created, err := manager.Add("Managed App", "/usr/bin/managed-app", "")
 	require.NoError(t, err)
+	path := filepath.Join(user, "autostart", strings.TrimPrefix(created.ID, "xdg:"))
+
+	require.NoError(t, manager.Remove(created.ID))
+	_, err = os.Stat(path)
+	assert.ErrorIs(t, err, os.ErrNotExist)
+}
+
+func TestRemoveManualUserOnlyXDGEntry(t *testing.T) {
+	manager, user, _, _ := testManager(t)
+	path := writeDesktop(t, user, "manual.desktop", desktopContent("Manual App", "", "/usr/bin/manual-app"))
 
 	entries, err := manager.List(context.Background())
 	require.NoError(t, err)
-	require.Len(t, entries, 2)
-	byID := make(map[string]Entry, len(entries))
-	for _, entry := range entries {
-		byID[entry.ID] = entry
-	}
-	assert.False(t, byID["xdg:manual.desktop"].Removable)
-	assert.True(t, byID[created.ID].Removable)
-	assert.ErrorIs(t, manager.Remove("xdg:manual.desktop"), ErrProtected)
+	require.Len(t, entries, 1)
+	assert.True(t, entries[0].Removable)
+	require.NoError(t, manager.Remove("xdg:manual.desktop"))
+	_, err = os.Stat(path)
+	assert.ErrorIs(t, err, os.ErrNotExist)
 }
 
 func TestListXDGUserOverrideTakesPrecedence(t *testing.T) {
 	manager, user, system, _ := testManager(t)
-	writeDesktop(t, system, "shared.desktop", desktopContent("System Name", "System comment", "/usr/bin/system-app"))
-	writeDesktop(t, user, "shared.desktop", desktopContent("User Name", "User comment", "/usr/bin/user-app"))
+	systemPath := writeDesktop(t, system, "shared.desktop", desktopContent("System Name", "System comment", "/usr/bin/system-app"))
+	userPath := writeDesktop(t, user, "shared.desktop", desktopContent("User Name", "User comment", "/usr/bin/user-app"))
 
 	entries, err := manager.List(context.Background())
 	require.NoError(t, err)
@@ -82,6 +90,9 @@ func TestListXDGUserOverrideTakesPrecedence(t *testing.T) {
 	assert.Equal(t, "User Name", entries[0].Name)
 	assert.Equal(t, "User comment", entries[0].Description)
 	assert.False(t, entries[0].Removable)
+	assert.ErrorIs(t, manager.Remove("xdg:shared.desktop"), ErrProtected)
+	assert.FileExists(t, userPath)
+	assert.FileExists(t, systemPath)
 }
 
 func TestListXDGHiddenOverrideUsesSystemMetadata(t *testing.T) {
@@ -214,8 +225,13 @@ func TestXGNOMEAutostartEnabledFalse(t *testing.T) {
 
 func TestRemoveRejectsSystemXDGEntry(t *testing.T) {
 	manager, _, system, _ := testManager(t)
-	writeDesktop(t, system, "system.desktop", desktopContent("System", "", "/usr/bin/system"))
+	path := writeDesktop(t, system, "system.desktop", desktopContent("System", "", "/usr/bin/system"))
+	entries, err := manager.List(context.Background())
+	require.NoError(t, err)
+	require.Len(t, entries, 1)
+	assert.False(t, entries[0].Removable)
 	assert.ErrorIs(t, manager.Remove("xdg:system.desktop"), ErrProtected)
+	assert.FileExists(t, path)
 }
 
 func TestSetEnabledRejectsUnknownSource(t *testing.T) {

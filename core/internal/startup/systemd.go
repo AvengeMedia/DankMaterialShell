@@ -79,51 +79,56 @@ func (commandSystemd) SetEnabled(ctx context.Context, name string, enabled bool)
 
 func parseSystemdShow(data []byte) []SystemdUnit {
 	var units []SystemdUnit
-	var current *SystemdUnit
+	unit := SystemdUnit{DefaultDependencies: true}
+	appendUnit := func() {
+		if unit.Name != "" {
+			units = append(units, unit)
+		}
+		unit = SystemdUnit{DefaultDependencies: true}
+	}
 	for line := range strings.SplitSeq(string(data), "\n") {
+		if strings.TrimSpace(line) == "" {
+			appendUnit()
+			continue
+		}
 		key, value, ok := strings.Cut(line, "=")
 		if !ok {
 			continue
 		}
-		if key == "Id" {
-			units = append(units, SystemdUnit{Name: value, DefaultDependencies: true})
-			current = &units[len(units)-1]
-			continue
-		}
-		if current == nil {
-			continue
-		}
 		switch key {
+		case "Id":
+			unit.Name = value
 		case "Description":
-			current.Description = value
+			unit.Description = value
 		case "LoadState":
-			current.LoadState = value
+			unit.LoadState = value
 		case "UnitFileState":
-			current.UnitFileState = value
+			unit.UnitFileState = value
 		case "FragmentPath":
-			current.FragmentPath = value
+			unit.FragmentPath = value
 		case "SourcePath":
-			current.SourcePath = value
+			unit.SourcePath = value
 		case "ExecStart":
-			current.ExecStart = value
+			unit.ExecStart = value
 		case "Before":
-			current.Before = strings.Fields(value)
+			unit.Before = strings.Fields(value)
 		case "Requires":
-			current.Requires = strings.Fields(value)
+			unit.Requires = strings.Fields(value)
 		case "Requisite":
-			current.Requisite = strings.Fields(value)
+			unit.Requisite = strings.Fields(value)
 		case "BindsTo":
-			current.BindsTo = strings.Fields(value)
+			unit.BindsTo = strings.Fields(value)
 		case "PartOf":
-			current.PartOf = strings.Fields(value)
+			unit.PartOf = strings.Fields(value)
 		case "RequiredBy":
-			current.RequiredBy = strings.Fields(value)
+			unit.RequiredBy = strings.Fields(value)
 		case "Transient":
-			current.Transient = value == "yes"
+			unit.Transient = value == "yes"
 		case "DefaultDependencies":
-			current.DefaultDependencies = value != "no"
+			unit.DefaultDependencies = value != "no"
 		}
 	}
+	appendUnit()
 	return units
 }
 

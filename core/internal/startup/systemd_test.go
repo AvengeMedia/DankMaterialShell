@@ -41,6 +41,50 @@ func applicationUnit(name, description, execStart string) SystemdUnit {
 	}
 }
 
+func TestParseSystemdShowRecords(t *testing.T) {
+	data := []byte("ExecStart={ path=/usr/bin/first ; argv[]=/usr/bin/first ; }\n" +
+		"Description=First application\n" +
+		"Id=first.service\n" +
+		"LoadState=loaded\n" +
+		"UnitFileState=enabled\n" +
+		"FragmentPath=/usr/lib/systemd/user/first.service\n" +
+		"SourcePath=/home/user/.config/systemd/user/first.service\n" +
+		"Before=shutdown.target graphical-session.target\n" +
+		"Requires=basic.target\n" +
+		"Requisite=session.target\n" +
+		"BindsTo=desktop.target\n" +
+		"PartOf=graphical-session.target\n" +
+		"RequiredBy=app.target\n" +
+		"Transient=yes\n" +
+		"DefaultDependencies=no\n\n" +
+		"\n" +
+		"ExecStart={ path=/usr/bin/incomplete ; }\n" +
+		"Description=Missing ID\n\n" +
+		"ExecStart={ path=/usr/bin/second ; argv[]=/usr/bin/second ; }\n" +
+		"Id=second.service\n" +
+		"Description=Second application\n\n" +
+		"ExecStart={ path=/usr/bin/last ; argv[]=/usr/bin/last ; }\n" +
+		"Description=Last application\n" +
+		"Id=last.service")
+
+	units := parseSystemdShow(data)
+	require.Len(t, units, 3)
+	assert.Equal(t, SystemdUnit{
+		Name: "first.service", Description: "First application", LoadState: "loaded", UnitFileState: "enabled",
+		FragmentPath: "/usr/lib/systemd/user/first.service", SourcePath: "/home/user/.config/systemd/user/first.service",
+		ExecStart: "{ path=/usr/bin/first ; argv[]=/usr/bin/first ; }",
+		Before:    []string{"shutdown.target", "graphical-session.target"}, Requires: []string{"basic.target"},
+		Requisite: []string{"session.target"}, BindsTo: []string{"desktop.target"},
+		PartOf: []string{"graphical-session.target"}, RequiredBy: []string{"app.target"},
+		Transient: true, DefaultDependencies: false,
+	}, units[0])
+	assert.Equal(t, "{ path=/usr/bin/second ; argv[]=/usr/bin/second ; }", units[1].ExecStart)
+	assert.True(t, units[1].DefaultDependencies)
+	assert.Equal(t, "last.service", units[2].Name)
+	assert.Equal(t, "Last application", units[2].Description)
+	assert.Equal(t, "{ path=/usr/bin/last ; argv[]=/usr/bin/last ; }", units[2].ExecStart)
+}
+
 func TestSystemdApplicationClassifierAllowsIdentifiableApps(t *testing.T) {
 	applications := []Application{
 		{ID: "com.docker.DockerDesktop.desktop", Name: "Docker Desktop", Exec: "/opt/docker-desktop/bin/docker-desktop", Icon: "docker-desktop"},

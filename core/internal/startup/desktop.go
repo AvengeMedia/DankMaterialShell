@@ -247,7 +247,7 @@ func (m *Manager) listXDG() ([]xdgRecord, error) {
 				Enabled:     desktopEnabled(keys),
 				Category:    CategoryApplication,
 				Mutable:     true,
-				Removable:   user != nil && system == nil && desktopBool(user.keys[managedOverrideKey]),
+				Removable:   user != nil && system == nil,
 			},
 		})
 	}
