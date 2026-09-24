@@ -38,20 +38,16 @@ BasePill {
         });
     }
     property var _trayKeyByItem: new Map()
+    property var _trayLastIndexById: new Map()
     function getTrayItemKey(item) {
         const id = item?.id || "";
         if (!id)
             return "";
         if (root._trayKeyByItem.has(item))
             return root._trayKeyByItem.get(item);
-        let count = 0;
-        for (const live of root.allTrayItems) {
-            if ((live?.id || "") !== id || live === item)
-                continue;
-            if (root._trayKeyByItem.has(live))
-                count++;
-        }
-        const key = count === 0 ? id : `${id}::${count}`;
+        const last = root._trayLastIndexById.get(id) || 0;
+        const key = last === 0 ? id : `${id}::${last}`;
+        root._trayLastIndexById.set(id, last + 1);
         root._trayKeyByItem.set(item, key);
         return key;
     }
