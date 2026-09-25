@@ -962,6 +962,25 @@ Item {
                 }
             }
         }
+
+        SettingsCard {
+            tab: "theme"
+            tags: ["matugen", "startup", "theming"]
+            title: I18n.tr("Startup Behavior", "settings card title")
+            settingKey: "themeStartupBehavior"
+            iconName: "power_settings_new"
+            visible: Theme.matugenAvailable
+
+            SettingsToggleRow {
+                tab: "theme"
+                tags: ["matugen", "startup", "generate"]
+                settingKey: "generateThemeAtStartup"
+                text: I18n.tr("Generate Theme at Startup", "toggle label")
+                description: I18n.tr("Regenerate matugen colors when DMS starts, even if nothing changed.", "toggle description")
+                checked: SettingsData.generateThemeAtStartup
+                onToggled: checked => SettingsData.set("generateThemeAtStartup", checked)
+            }
+        }
     }
 
     FileBrowserModal {

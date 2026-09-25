@@ -24,12 +24,13 @@ Singleton {
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
     readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
-    readonly property var _dataKeys: ["fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen", "matugenPreviews"].concat(_pinKeys, _historyKeys)
+    readonly property var _dataKeys: ["fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen", "matugenPreviews", "matugenAppliedKey"].concat(_pinKeys, _historyKeys)
 
     property string pluginViewFilter: "enabled"
     property string dashFocusCardId: ""
     property bool mediaLyricsOpen: false
     property var matugenPreviews: ({})
+    property string matugenAppliedKey: ""
     property var pluginViewSort: ({
             by: "modified",
             descending: true
@@ -131,6 +132,7 @@ Singleton {
                 dashFocusCardId = typeof cache.dashFocusCardId === "string" ? cache.dashFocusCardId : "";
                 mediaLyricsOpen = cache.mediaLyricsOpen === true;
                 matugenPreviews = typeof cache.matugenPreviews?.key === "string" ? cache.matugenPreviews : {};
+                matugenAppliedKey = typeof cache.matugenAppliedKey === "string" ? cache.matugenAppliedKey : "";
                 const pluginSort = cache.pluginViewSort;
                 pluginViewSort = {
                     by: ["name", "author", "modified"].includes(pluginSort?.by) ? pluginSort.by : "modified",
@@ -209,6 +211,7 @@ Singleton {
             "dashFocusCardId": dashFocusCardId,
             "mediaLyricsOpen": mediaLyricsOpen,
             "matugenPreviews": matugenPreviews,
+            "matugenAppliedKey": matugenAppliedKey,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };

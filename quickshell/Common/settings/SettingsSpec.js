@@ -42,6 +42,9 @@ var LOCAL_SPEC = {
         def: "",
         onChange: "regenSystemThemes"
     },
+    generateThemeAtStartup: {
+        def: true
+    },
     popupTransparency: {
         def: 1.0,
         coerce: Util.percentToUnit

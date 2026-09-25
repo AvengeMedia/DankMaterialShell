@@ -111,6 +111,7 @@ Singleton {
     property var _pendingGenerateParams: null
     property int _colorsRetryCount: 0
     property double _lastGenerateMs: 0
+    property string _matugenRunKey: ""
 
     property bool blurLayersActive: false
     property bool matugenToastSuppressed: false
@@ -161,46 +162,7 @@ Singleton {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
-            const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-
-            if (!matugenAvailable || isGreeterMode) {
-                return;
-            }
-
-            if (colorsFileLoadFailed && currentTheme === dynamic && rawWallpaperPath) {
-                log.info("Matugen now available, regenerating colors for dynamic theme");
-                const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-                const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
-                const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                if (rawWallpaperPath.startsWith("#")) {
-                    setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                } else {
-                    setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                }
-                return;
-            }
-
-            const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-            const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
-
-            if (currentTheme === dynamic) {
-                if (rawWallpaperPath) {
-                    const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                    if (rawWallpaperPath.startsWith("#")) {
-                        setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    } else {
-                        setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    }
-                }
-            } else if (currentTheme !== "custom") {
-                const darkTheme = StockThemes.getThemeByName(currentTheme, false);
-                const lightTheme = StockThemes.getThemeByName(currentTheme, true);
-                if (darkTheme && darkTheme.primary) {
-                    const stockColors = buildMatugenColorsFromTheme(darkTheme, lightTheme);
-                    const themeData = isLight ? lightTheme : darkTheme;
-                    setDesiredTheme("hex", themeData.primary, isLight, iconTheme, themeData.matugen_type, stockColors);
-                }
-            }
+            generateSystemThemesFromCurrentTheme();
         }, 0);
         if (typeof SessionData !== "undefined") {
             SessionData.isLightModeChanged.connect(root.onLightModeChanged);
@@ -1763,10 +1725,6 @@ Singleton {
             return;
         }
 
-        log.info("Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
-
-        themeGenerationStarting();
-
         const desired = {
             "kind": kind,
             "value": value,
@@ -1775,9 +1733,6 @@ Singleton {
             "matugenType": matugenType || "scheme-tonal-spot",
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
         };
-
-        log.debug("Starting matugen worker");
-        workerRunning = true;
 
         const args = ["dms", "matugen", "queue", "--state-dir", stateDir, "--shell-dir", shellDir, "--config-dir", configDir, "--kind", desired.kind, "--value", desired.value, "--mode", desired.mode, "--icon-theme", desired.iconTheme, "--matugen-type", desired.matugenType,];
 
@@ -1871,6 +1826,20 @@ Singleton {
             }
         }
 
+        const runKey = Qt.md5(JSON.stringify(args));
+        const skipUnchanged = !_matugenRunKey && !colorsFileLoadFailed && typeof SettingsData !== "undefined" && !SettingsData.generateThemeAtStartup;
+        if (skipUnchanged && runKey === CacheData.matugenAppliedKey) {
+            log.info("Theme inputs unchanged since the last run, skipping startup generation");
+            return;
+        }
+
+        log.info("Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
+        themeGenerationStarting();
+
+        log.debug("Starting matugen worker");
+        workerRunning = true;
+        _matugenRunKey = runKey;
+        _lastGenerateMs = Date.now();
         systemThemeGenerator.command = args;
         systemThemeGenerator.running = true;
     }
@@ -1880,7 +1849,6 @@ Singleton {
         if (!matugenAvailable || isGreeterMode)
             return;
 
-        _lastGenerateMs = Date.now();
         _pendingGenerateParams = true;
         _themeGenerateDebounce.restart();
     }
@@ -2286,6 +2254,10 @@ Singleton {
                 log.warn("Matugen worker failed with exit code:", exitCode);
                 root.matugenCompleted(currentMode, "error");
             }
+
+            const appliedKey = (exitCode === 0 || exitCode === 2) ? _matugenRunKey : "";
+            if (CacheData.matugenAppliedKey !== appliedKey)
+                CacheData.set("matugenAppliedKey", appliedKey);
 
             if (!pendingThemeRequest) {
                 if (SettingsData.matugenTemplateGtk)

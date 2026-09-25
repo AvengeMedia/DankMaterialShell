@@ -164,6 +164,7 @@ Singleton {
     property string currentThemeCategory: Spec.SPEC.currentThemeCategory.def
     property string customThemeFile: Spec.SPEC.customThemeFile.def
     property var registryThemeVariants: Spec.SPEC.registryThemeVariants.def
+    property bool generateThemeAtStartup: Spec.SPEC.generateThemeAtStartup.def
     property string matugenScheme: Spec.SPEC.matugenScheme.def
     property bool matugenSmartMode: Spec.SPEC.matugenSmartMode.def
     property string matugenSourceMode: Spec.SPEC.matugenSourceMode.def
