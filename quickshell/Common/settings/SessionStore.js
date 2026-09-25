@@ -83,5 +83,29 @@ function migrateToVersion(obj, targetVersion, settingsData) {
         session.configVersion = 4;
     }
 
+    if (currentVersion < 5) {
+        console.info("SessionData: Migrating session to version 5");
+        console.info("SessionData: Tray keys now use a stable id (or id::instance) instead of id::tooltipTitle");
+
+        function stripTrayKeys(list) {
+            if (!list || list.constructor !== Array) return list;
+            var out = [];
+            for (var i = 0; i < list.length; i++) {
+                var raw = list[i];
+                if (typeof raw !== "string") continue;
+                var key = raw.includes("::") ? raw.split("::")[0] : raw;
+                var hasDup = false;
+                for (var j = 0; j < out.length; j++) {
+                    if (out[j] === key) { hasDup = true; break; }
+                }
+                if (key && !hasDup) out.push(key);
+            }
+            return out;
+        }
+
+        if (session.hiddenTrayIds !== undefined) session.hiddenTrayIds = stripTrayKeys(session.hiddenTrayIds);
+        if (session.trayItemOrder !== undefined) session.trayItemOrder = stripTrayKeys(session.trayItemOrder);
+        session.configVersion = 5;
+    }
     return session;
 }

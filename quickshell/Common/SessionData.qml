@@ -14,7 +14,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SessionData")
 
-    readonly property int sessionConfigVersion: 4
+    readonly property int sessionConfigVersion: 5
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
