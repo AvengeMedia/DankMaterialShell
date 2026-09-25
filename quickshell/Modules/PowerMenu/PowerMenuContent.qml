@@ -264,8 +264,9 @@ FocusScope {
     }
 
     // The shortcut of each visible action is the key its hint shows. Ctrl combinations navigate.
+    // fromCharCode truncates to 16 bits, so special keys (0x01xxxxxx) must be rejected first.
     function actionForKey(event) {
-        if (event.modifiers & Qt.ControlModifier)
+        if (event.modifiers & Qt.ControlModifier || event.key > Qt.Key_Z)
             return "";
         const key = String.fromCharCode(event.key);
         if (!/^[A-Z0-9]$/.test(key))
