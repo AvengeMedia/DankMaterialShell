@@ -551,6 +551,11 @@ Singleton {
         }
     }
 
+    // Custom buttons added in settings, listed after the built-in actions.
+    // The list lines up index for index with the setting.
+    readonly property var customPowerActions: (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i)
+    readonly property var extraPowerActions: customPowerActions
+
     function isPowerActionSupported(action) {
         switch (action) {
         case "hibernate":
@@ -563,8 +568,9 @@ Singleton {
     }
 
     function executePowerAction(action) {
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+        const customIndex = customPowerActions.indexOf(action);
+        if (customIndex >= 0) {
+            const button = SettingsData.customPowerButtons[customIndex];
             if (!button?.command)
                 return false;
             Quickshell.execDetached(customActionCommand(button.command));
@@ -598,8 +604,9 @@ Singleton {
     }
 
     function getPowerActionData(action) {
-        if (action.startsWith("custom:")) {
-            const button = (SettingsData.customPowerButtons || [])[parseInt(action.slice(7), 10)];
+        const customIndex = customPowerActions.indexOf(action);
+        if (customIndex >= 0) {
+            const button = SettingsData.customPowerButtons[customIndex];
             return {
                 "icon": button?.icon || "terminal",
                 "label": button?.label || button?.command || "",
