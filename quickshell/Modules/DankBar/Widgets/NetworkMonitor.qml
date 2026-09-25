@@ -12,11 +12,12 @@ BasePill {
 
     readonly property bool hideWhenIdle: SettingsData.widgetOption("network_speed_monitor", widgetData, "hideWhenIdle")
     readonly property bool compactMode: SettingsData.widgetOption("network_speed_monitor", widgetData, "compactMode")
-    readonly property bool shouldHide: hideWhenIdle && Math.max(DgopService.networkRxRate, DgopService.networkTxRate) < 1024
+    readonly property bool shouldHide: hideWhenIdle && widgetData?.enabled !== false && Math.max(DgopService.networkRxRate, DgopService.networkTxRate) < 1024
     readonly property string reserveRate: compactMode ? "888 MB/s" : "88.8 MB/s"
 
     width: shouldHide ? 0 : (isVerticalOrientation ? barThickness : visualWidth)
     height: shouldHide ? 0 : (isVerticalOrientation ? visualHeight : barThickness)
+    visible: !shouldHide
     opacity: shouldHide ? 0 : 1
 
     Behavior on width {
@@ -59,7 +60,7 @@ BasePill {
     Ref {
         service: DgopService
         modules: ["network"]
-        active: root.visible && (root.enabled || root.shouldHide) && (root.Window.window?.visible ?? false)
+        active: (root.shouldHide || (root.visible && root.enabled)) && (root.Window.window?.visible ?? false)
     }
 
     content: Component {
