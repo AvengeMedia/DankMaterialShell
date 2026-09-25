@@ -252,6 +252,7 @@ Singleton {
             "memUsage": "SystemMonitorOptions.qml",
             "gpuTemp": "SystemMonitorOptions.qml",
             "diskUsage": "SystemMonitorOptions.qml",
+            "network_speed_monitor": "NetworkMonitorOptions.qml",
             "systemUpdate": "SystemUpdateOptions.qml"
         })
 
