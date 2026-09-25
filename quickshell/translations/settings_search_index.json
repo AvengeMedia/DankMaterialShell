@@ -9858,6 +9858,14 @@
     "optionFile": "KeyboardLayoutOptions.qml"
   },
   {
+    "section": "barWidgetOption:NetworkMonitorOptions.qml:2",
+    "label": "Compact mode",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "NetworkMonitorOptions.qml"
+  },
+  {
     "section": "barWidgetOption:RunningAppsOptions.qml:1",
     "label": "Compact mode",
     "tabIndex": 22,
@@ -10072,6 +10080,14 @@
     "keywords": [],
     "runtimeType": "barWidgetOption",
     "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:NetworkMonitorOptions.qml:1",
+    "label": "Hide when idle",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "NetworkMonitorOptions.qml"
   },
   {
     "section": "barWidgetOption:SystemUpdateOptions.qml:1",
