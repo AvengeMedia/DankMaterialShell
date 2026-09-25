@@ -3,6 +3,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
+import "../../Services/BootEntries.js" as BootEntries
 
 Item {
     id: root
@@ -268,6 +269,83 @@ Item {
                         SettingsData.set("powerMenuActions", checked ? others.concat([modelData.key]) : others);
                     }
                 }
+            }
+        }
+
+        SettingsCard {
+            width: parent.width
+            iconName: "restart_alt"
+            title: I18n.tr("Reboot to another OS", "settings card title, lists EFI boot entries the power menu can reboot into")
+            settingKey: "powerMenuBootEntries"
+            tags: ["power", "menu", "reboot", "boot", "efi", "uefi", "windows", "dual boot", "bootnext"]
+            // Saved entries stay listed wherever this config lands, so they can always be removed
+            visible: SettingsData.powerMenuBootEntries.length > 0 || (BootEntryService.status !== "unknown" && BootEntryService.status !== "noEfi")
+
+            Component.onCompleted: BootEntryService.refresh()
+
+            SettingsRow {
+                visible: BootEntryService.unavailableReason !== ""
+                title: BootEntryService.unavailableReason
+                titleColor: Theme.surfaceVariantText
+            }
+
+            SettingsRow {
+                id: bootEntryPicker
+
+                readonly property var options: BootEntries.pickerOptions(BootEntryService.entries, BootEntryService.currentId, SettingsData.powerMenuBootEntries)
+
+                visible: BootEntryService.status === "ready"
+                title: I18n.tr("Add entry", "settings row that adds an EFI boot entry to the power menu")
+
+                DankDropdown {
+                    id: bootEntryDropdown
+                    enabled: bootEntryPicker.options.length > 0
+                    Accessible.name: bootEntryPicker.title
+                    width: Math.min(dropdownWidth, bootEntryPicker.width - SettingsMetrics.rowPaddingH * 2)
+                    options: bootEntryPicker.options.map(option => option.name)
+                    emptyText: I18n.tr("Select", "verb, dropdown placeholder or option that opens a picker")
+                    onValueChanged: value => {
+                        const option = bootEntryPicker.options.find(option => option.name === value);
+                        currentValue = "";
+                        if (!option)
+                            return;
+                        SettingsData.set("powerMenuBootEntries", SettingsData.powerMenuBootEntries.concat([
+                            {
+                                id: option.id,
+                                label: option.label
+                            }
+                        ]));
+                    }
+                }
+            }
+
+            Repeater {
+                model: SettingsData.powerMenuBootEntries
+
+                delegate: SettingsRow {
+                    id: bootEntryRow
+
+                    required property var modelData
+                    required property int index
+
+                    title: modelData.label
+                    subtitle: "Boot" + modelData.id
+                    iconName: "restart_alt"
+
+                    DankActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "delete"
+                        iconColor: Theme.error
+                        Accessible.name: I18n.tr("Remove", "verb, button that removes an item from a list")
+                        onClicked: SettingsData.set("powerMenuBootEntries", SettingsData.powerMenuBootEntries.filter((entry, i) => i !== bootEntryRow.index))
+                    }
+                }
+            }
+
+            SettingsRow {
+                visible: BootEntryService.status === "ready" && !SettingsData.powerMenuBootEntries.length
+                title: I18n.tr("No items added yet", "empty list of saved EFI boot entries")
+                titleColor: Theme.surfaceVariantText
             }
         }
 

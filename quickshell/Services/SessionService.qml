@@ -551,10 +551,11 @@ Singleton {
         }
     }
 
-    // Custom buttons added in settings, listed after the built-in actions.
-    // The list lines up index for index with the setting.
+    // Actions added in settings, listed after the built-in ones: boot entries, then custom buttons.
+    // Each list lines up index for index with its setting.
+    readonly property var bootEntryActions: (SettingsData.powerMenuBootEntries || []).map(entry => "bootnext:" + entry.id)
     readonly property var customPowerActions: (SettingsData.customPowerButtons || []).map((button, i) => "custom:" + i)
-    readonly property var extraPowerActions: customPowerActions
+    readonly property var extraPowerActions: bootEntryActions.concat(customPowerActions)
 
     function isPowerActionSupported(action) {
         switch (action) {
@@ -574,6 +575,11 @@ Singleton {
             if (!button?.command)
                 return false;
             Quickshell.execDetached(customActionCommand(button.command));
+            return true;
+        }
+        const bootIndex = bootEntryActions.indexOf(action);
+        if (bootIndex >= 0) {
+            BootEntryService.rebootTo(SettingsData.powerMenuBootEntries[bootIndex]);
             return true;
         }
         switch (action) {
@@ -611,6 +617,15 @@ Singleton {
                 "icon": button?.icon || "terminal",
                 "label": button?.label || button?.command || "",
                 "key": ""
+            };
+        }
+        const bootIndex = bootEntryActions.indexOf(action);
+        if (bootIndex >= 0) {
+            // Boot entries take the digit keys in the order they were added
+            return {
+                "icon": "restart_alt",
+                "label": I18n.tr("Reboot to %1", "power menu action, %1 is a boot entry such as Windows Boot Manager").arg(SettingsData.powerMenuBootEntries[bootIndex].label),
+                "key": bootIndex < 9 ? String(bootIndex + 1) : ""
             };
         }
         switch (action) {
