@@ -18,10 +18,12 @@ const (
 	propertiesIface = "org.freedesktop.DBus.Properties"
 )
 
+// Sender-scoped: the system bus is shared process-wide, so unscoped rules wake
+// every other subsystem's signal channel too.
 var bluezMatchRules = [][]dbus.MatchOption{
-	{dbus.WithMatchInterface(propertiesIface), dbus.WithMatchMember("PropertiesChanged")},
-	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")},
-	{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesRemoved")},
+	{dbus.WithMatchSender(bluezService), dbus.WithMatchInterface(propertiesIface), dbus.WithMatchMember("PropertiesChanged")},
+	{dbus.WithMatchSender(bluezService), dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")},
+	{dbus.WithMatchSender(bluezService), dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesRemoved")},
 }
 
 func NewManager() (*Manager, error) {
