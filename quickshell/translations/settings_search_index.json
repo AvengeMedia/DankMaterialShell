@@ -11123,13 +11123,16 @@
       "mime",
       "office",
       "pdf",
+      "presentation",
       "program",
       "programs",
       "reader",
       "rules",
+      "spreadsheet",
       "terminal",
       "text",
-      "window"
+      "window",
+      "word"
     ],
     "parentLabel": "Applications",
     "icon": "edit_document"
@@ -11201,6 +11204,7 @@
       "app",
       "applications",
       "apps",
+      "archive",
       "browser",
       "default",
       "editor",
@@ -11215,7 +11219,8 @@
       "rules",
       "terminal",
       "utilities",
-      "window"
+      "window",
+      "zip"
     ],
     "parentLabel": "Applications",
     "icon": "terminal"
