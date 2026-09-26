@@ -69,6 +69,7 @@ ShellRoot {
         DC.I18n.backend = I18n;
     }
 
+    property bool configured: false
     Timer {
         interval: 0
         running: SettingsData._hasLoaded && SessionData._hasLoaded
@@ -85,6 +86,7 @@ ShellRoot {
                     rightWidgets: ["clock"]
                 }
             ];
+            root.configured = true;
         }
     }
 
@@ -96,7 +98,7 @@ ShellRoot {
 
         interval: 25
         repeat: true
-        running: SettingsData.barConfigs.length === 1
+        running: root.configured
 
         function finish(message) {
             running = false;
@@ -108,7 +110,8 @@ ShellRoot {
         }
 
         onTriggered: {
-            if (!widget || widget.width <= 0 || !widget.visible) {
+            const content = widget?.Window?.window?.contentItem;
+            if (!widget || widget.width <= 0 || !widget.visible || !content || content.width <= 100) {
                 if (++waited > 800)
                     finish("launcher button never appeared: widget=" + widget + " width=" + widget?.width + " visible=" + widget?.visible);
                 return;

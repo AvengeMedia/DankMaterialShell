@@ -45,24 +45,6 @@ ShellRoot {
         DC.Style.theme = Theme;
         DC.Style.settings = SettingsData;
         DC.I18n.backend = I18n;
-        SettingsData.frameEnabled = false;
-        SettingsData.launcherStyle = "island";
-        SettingsData.rememberLastQuery = false;
-        SettingsData.barConfigs = [
-            {
-                id: "island",
-                enabled: true,
-                visible: true,
-                position: 0,
-                island: true,
-                spacing: 4,
-                innerPadding: 4,
-                leftWidgets: [],
-                centerWidgets: [],
-                rightWidgets: [],
-                islandShowSatellites: false
-            }
-        ];
     }
 
     Timer {
@@ -89,37 +71,60 @@ ShellRoot {
             }
             switch (root.step) {
             case 0:
+                if (!SettingsData._hasLoaded)
+                    return;
+                SettingsData.frameEnabled = false;
+                SettingsData.launcherStyle = "island";
+                SettingsData.rememberLastQuery = false;
+                SettingsData.barConfigs = [
+                    {
+                        id: "island",
+                        enabled: true,
+                        visible: true,
+                        position: 0,
+                        island: true,
+                        spacing: 4,
+                        innerPadding: 4,
+                        leftWidgets: [],
+                        centerWidgets: [],
+                        rightWidgets: [],
+                        islandShowSatellites: false
+                    }
+                ];
+                advance("the island host to appear");
+                return;
+            case 1:
                 if (!c)
                     return;
                 c.requestLauncher("", "", false);
                 advance("cold open to expand and focus the search field");
                 return;
-            case 1:
+            case 2:
                 if (!c.expanded || !c.launcherInputFocused)
                     return;
                 root.check(c.activeActivity === "launcher", "cold open expands the launcher");
                 c.requestCollapse();
                 advance("collapse to drop search focus");
                 return;
-            case 2:
+            case 3:
                 if (c.launcherInputFocused)
                     return;
                 c.requestLauncher("", "", false);
                 advance("warm reopen to focus the search field");
                 return;
-            case 3:
+            case 4:
                 if (!c.launcherInputFocused)
                     return;
                 c.requestControlCenter("", false);
                 advance("control center to take over and release launcher focus");
                 return;
-            case 4:
+            case 5:
                 if (c.activeActivity !== "controlcenter" || c.launcherInputFocused)
                     return;
                 c.requestLauncher("", "", false);
                 advance("launcher to refocus after an activity switch");
                 return;
-            case 5:
+            case 6:
                 if (!c.launcherInputFocused)
                     return;
                 c.requestCollapse();

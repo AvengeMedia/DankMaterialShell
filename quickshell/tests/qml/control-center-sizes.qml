@@ -21,8 +21,26 @@ ShellRoot {
         DC.Style.theme = Theme;
         DC.Style.settings = SettingsData;
         DC.I18n.backend = I18n;
-        SettingsData.animationDuration = 0;
-        Qt.callLater(tester.run);
+    }
+
+    property bool ran: false
+    readonly property bool settingsReady: SettingsData._hasLoaded
+    onSettingsReadyChanged: {
+        if (!ran && settingsReady) {
+            SettingsData.animationDuration = 0;
+            ran = true;
+            settingsLoadTimeout.stop();
+            tester.run();
+        }
+    }
+    Timer {
+        id: settingsLoadTimeout
+        interval: 3000
+        running: !ran
+        onTriggered: {
+            console.error("FIXTURE_FAIL timed out waiting for SettingsData to load");
+            Qt.quit();
+        }
     }
 
     WidgetModel {
