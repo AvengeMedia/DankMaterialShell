@@ -344,30 +344,13 @@ function eventMatchesCombo(event, combo) {
     return event.key === qtKeyFromName(keyName);
 }
 
-const KEY_GLYPH_MAP = {
-    "shift": "⇧",
-    "ctrl": "⌃",
-    "control": "⌃",
-    "alt": "⌥",
-    "mod": "⌘",
-    "super": "⌘",
-    "meta": "⌘",
-    "win": "⌘",
-    "return": "⏎",
-    "enter": "⏎",
-    "tab": "⇥",
-    "backspace": "⌫",
-    "space": "␣",
+const KEY_GLYPH_MAP_COMMON = {
     "escape": "Esc",
     "esc": "Esc",
     "up": "↑",
     "down": "↓",
     "left": "←",
     "right": "→",
-    "page_up": "⇞",
-    "pageup": "⇞",
-    "page_down": "⇟",
-    "pagedown": "⇟",
     "home": "Home",
     "end": "End",
     "delete": "Del",
@@ -456,7 +439,51 @@ const KEY_GLYPH_MAP = {
     "launch1": "PrtSc"
 };
 
-function formatKeyTokens(keyString) {
+const MAC_MODIFIERS = {
+    "shift": "⇧",
+    "ctrl": "⌃",
+    "control": "⌃",
+    "alt": "⌥",
+    "mod": "⌘",
+    "super": "⌘",
+    "meta": "⌘",
+    "win": "⌘",
+    "return": "⏎",
+    "enter": "⏎",
+    "tab": "⇥",
+    "backspace": "⌫",
+    "space": "␣",
+    "page_up": "⇞",
+    "pageup": "⇞",
+    "page_down": "⇟",
+    "pagedown": "⇟"
+};
+
+const WIN_MODIFIERS = {
+    "shift": "Shift",
+    "ctrl": "Ctrl",
+    "control": "Ctrl",
+    "alt": "Alt",
+    "mod": "Mod",
+    "super": "Mod",
+    "meta": "Mod",
+    "win": "Mod",
+    "return": "Enter",
+    "enter": "Enter",
+    "tab": "Tab",
+    "backspace": "⌫",
+    "space": "Space",
+    "page_up": "PgUp",
+    "pageup": "PgUp",
+    "page_down": "PgDn",
+    "pagedown": "PgDn"
+};
+
+const KEY_GLYPH_MAP_MAC = Object.assign({}, KEY_GLYPH_MAP_COMMON, MAC_MODIFIERS);
+const KEY_GLYPH_MAP_WIN = Object.assign({}, KEY_GLYPH_MAP_COMMON, WIN_MODIFIERS);
+const KEY_GLYPH_MAP = KEY_GLYPH_MAP_WIN;
+
+function formatKeyTokens(keyString, style) {
     if (!keyString)
         return [];
     var str = keyString;
@@ -467,13 +494,14 @@ function formatKeyTokens(keyString) {
     }
     var parts = str.split("+");
     var tokens = [];
+    var map = style === "mac" ? KEY_GLYPH_MAP_MAC : KEY_GLYPH_MAP_WIN;
     for (var i = 0; i < parts.length; i++) {
         var part = parts[i].trim();
         if (!part)
             continue;
         var lower = part.toLowerCase();
-        if (KEY_GLYPH_MAP[lower] !== undefined) {
-            tokens.push(KEY_GLYPH_MAP[lower]);
+        if (map[lower] !== undefined) {
+            tokens.push(map[lower]);
         } else if (part.length === 1) {
             tokens.push(part.toUpperCase());
         } else {
