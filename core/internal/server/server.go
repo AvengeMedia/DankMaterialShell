@@ -33,12 +33,13 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/systemd"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 35
+const APIVersion = 36
 
 var CLIVersion = "dev"
 
@@ -385,28 +386,30 @@ func InitializeSysUpdateManager() error {
 	return nil
 }
 
-func routeHandler(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
-	routeRequestRecovered(ctx, conn, req)
+func routeHandler(mux *ipc.Mux) ipc.Handler {
+	return func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
+		routeRequestRecovered(ctx, conn, req, mux)
+	}
 }
 
 func subscribeHandler(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 	switch req.Method {
 	case "subscribe":
-		routeRequestRecovered(ctx, conn, req)
+		routeRequestRecovered(ctx, conn, req, requestMux)
 	default:
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))
 	}
 }
 
 // routeRequestRecovered keeps a panicking handler from taking down the whole daemon
-func routeRequestRecovered(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request) {
+func routeRequestRecovered(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, mux *ipc.Mux) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Errorf("RouteRequest panic recovered: method=%s panic=%v\n%s", req.Method, r, debug.Stack())
 			models.RespondError(conn, req.ID, "internal server error")
 		}
 	}()
-	RouteRequest(ctx, conn, req)
+	mux.ServeIPC(ctx, conn, req, nil)
 }
 
 func getCapabilities() Capabilities {
@@ -885,18 +888,23 @@ func cleanupManagers() {
 }
 
 type Server struct {
-	ipc *ipc.Server
+	ipc       *ipc.Server
+	readiness *systemd.Readiness
 }
 
 func New() *Server {
-	return &Server{ipc: ipc.NewServer(ipc.Config{
+	s := &Server{readiness: systemd.NewReadiness()}
+	s.ipc = ipc.NewServer(ipc.Config{
 		AppName:          appPaths.Name,
 		APIVersion:       APIVersion,
 		CapabilitiesFunc: func() []string { return getCapabilities().Capabilities },
 		MaxLineSize:      64 * 1024 * 1024, // large clipboard payloads
 		SubscribeHandler: subscribeHandler,
-	}, routeHandler)}
+	}, routeHandler(newRequestMux(s.readiness)))
+	return s
 }
+
+func (s *Server) WaitReady(ctx context.Context) error { return s.readiness.Wait(ctx) }
 
 func (s *Server) Listen() error { return s.ipc.Listen() }
 
