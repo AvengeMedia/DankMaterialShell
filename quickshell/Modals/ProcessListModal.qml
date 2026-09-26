@@ -286,7 +286,7 @@ DankFloatingWindow {
                 Loader {
                     id: processesTabLoader
                     anchors.fill: parent
-                    active: processListModal.visible && (currentTab === 0 || item !== null)
+                    active: processListModal.visible
                     visible: currentTab === 0
                     sourceComponent: ProcessesView {
                         searchText: processListModal.searchText
@@ -300,7 +300,7 @@ DankFloatingWindow {
                     id: performanceTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && (currentTab === 1 || item !== null)
+                    active: processListModal.visible
                     visible: currentTab === 1
                     sourceComponent: PerformanceView {}
                 }
@@ -309,7 +309,7 @@ DankFloatingWindow {
                     id: disksTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && (currentTab === 2 || item !== null)
+                    active: processListModal.visible
                     visible: currentTab === 2
                     sourceComponent: DisksView {}
                 }
@@ -318,7 +318,7 @@ DankFloatingWindow {
                     id: systemTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && (currentTab === 3 || item !== null)
+                    active: processListModal.visible
                     visible: currentTab === 3
                     sourceComponent: SystemView {}
                 }
