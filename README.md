@@ -134,7 +134,7 @@ dms plugins restore ~/plugins.lock.json
 - **Docs:** [danklinux.com/docs](https://danklinux.com/docs/)
 - **Theming:** [Application themes](https://danklinux.com/docs/dankmaterialshell/application-themes) | [Custom themes](https://danklinux.com/docs/dankmaterialshell/custom-themes)
 - **Plugins:** [Development guide](https://danklinux.com/docs/dankmaterialshell/plugins-overview)
-- **Support:** [Ko-fi](https://ko-fi.com/avengemediallc)
+- **Support:** [Ko-fi](https://ko-fi.com/danklinux)
 
 ## Dank Projects
 
