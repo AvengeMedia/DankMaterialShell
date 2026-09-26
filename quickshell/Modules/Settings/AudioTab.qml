@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -36,7 +35,7 @@ Item {
     }
 
     function updateDeviceList() {
-        const allNodes = Pipewire.nodes.values;
+        const allNodes = AudioService.allNodes;
 
         // Sort devices: active first, then alphabetically by name
         const sortDevices = (a, b) => {
@@ -78,8 +77,8 @@ Item {
     }
 
     Connections {
-        target: Pipewire.nodes
-        function onValuesChanged() {
+        target: AudioService
+        function onDeviceRevisionChanged() {
             root.updateDeviceList();
         }
     }

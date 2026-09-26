@@ -5,7 +5,6 @@ import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
 import "../Common/GSettings.js" as GSettings
@@ -14,8 +13,81 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("AudioService")
 
-    readonly property PwNode sink: Pipewire.defaultAudioSink
-    readonly property PwNode source: Pipewire.defaultAudioSource
+    // Keep PipeWire completely out of the FreeBSD process. Loading the
+    // Quickshell PipeWire service attempts a connection immediately, so it lives
+    // in PipewireAudioBackend.qml and is only instantiated after OS detection.
+    property bool audioBackendDetected: false
+    property bool freebsdAudio: false
+    property var nativeSinks: []
+    property var nativeSources: []
+    property var nativeSink: null
+    property var nativeSource: null
+    property bool nativeAudioSyncing: false
+    property var pendingFreeBsdVolumeWrites: ({})
+    property double lastFreeBsdLocalChangeMs: 0
+    property int deviceRevision: 0
+
+    readonly property var pipewireBackend: pipewireBackendLoader.item
+    readonly property bool pipewireReady: pipewireBackend?.ready ?? false
+    readonly property var pipewireNodes: pipewireBackend?.nodes ?? []
+    readonly property var allNodes: freebsdAudio ? nativeSinks.concat(nativeSources) : pipewireNodes
+    readonly property var sink: freebsdAudio ? nativeSink : (pipewireBackend?.defaultSink ?? null)
+    readonly property var source: freebsdAudio ? nativeSource : (pipewireBackend?.defaultSource ?? null)
+
+    Loader {
+        id: pipewireBackendLoader
+        active: root.audioBackendDetected && !root.freebsdAudio
+        source: active ? "PipewireAudioBackend.qml" : ""
+        onLoaded: {
+            root.rebuildTypedNodeLists();
+            root.deviceRevision++;
+        }
+    }
+
+    Connections {
+        target: pipewireBackendLoader.item
+        ignoreUnknownSignals: true
+        function onNodesUpdated() {
+            root.rebuildTypedNodeLists();
+            root.adoptPendingCardSink();
+            root.deviceRevision++;
+        }
+    }
+
+    Component {
+        id: freeBsdNodeComponent
+        QtObject {
+            id: deviceNode
+            property var service: null
+            property string name: ""
+            property string description: ""
+            property string nick: description
+            property string mixerDevice: ""
+            property string pcmName: ""
+            property int pcmUnit: -1
+            property string mixerControl: "vol"
+            property bool isSink: true
+            property bool isStream: false
+            property var properties: ({
+                "media.class": isSink ? "Audio/Sink" : "Audio/Source",
+                "device.api": "oss",
+                "device.name": pcmName,
+                "device.description": description
+            })
+            property QtObject audio: QtObject {
+                property real volume: 0.0
+                property bool muted: false
+                onVolumeChanged: {
+                    if (deviceNode.service?.freebsdAudio && !deviceNode.service.nativeAudioSyncing)
+                        deviceNode.service.queueFreeBsdMixerVolume(deviceNode, volume);
+                }
+                onMutedChanged: {
+                    if (deviceNode.service?.freebsdAudio && !deviceNode.service.nativeAudioSyncing)
+                        deviceNode.service.setFreeBsdMixerMute(deviceNode, muted);
+                }
+            }
+        }
+    }
 
     readonly property bool soundsAvailable: MultimediaService.available
     property bool playersRequested: false
@@ -40,6 +112,15 @@ Singleton {
         id: soundsLoader
         active: root.playersRequested && root.soundsAvailable
         source: "AudioSoundPlayers.qml"
+        onLoaded: {
+            item.volume = Qt.binding(() => root.notificationsVolume);
+            item.volumeChangeSource = Qt.binding(() => root.getSoundPath("audio-volume-change"));
+            item.powerPlugSource = Qt.binding(() => root.getSoundPath("power-plug"));
+            item.powerUnplugSource = Qt.binding(() => root.getSoundPath("power-unplug"));
+            item.normalNotificationSource = Qt.binding(() => root.getSoundPath("message"));
+            item.criticalNotificationSource = Qt.binding(() => root.getSoundPath("message-new-instant"));
+            item.loginSource = Qt.binding(() => root.getSoundPath("desktop-login"));
+        }
     }
 
     property var deviceAliases: ({})
@@ -52,6 +133,8 @@ Singleton {
     readonly property var switchableOutputPorts: root.collectSwitchableOutputPorts(root.cards, SessionData.hiddenOutputDeviceNames ?? [])
 
     readonly property int sinkMaxVolume: {
+        if (freebsdAudio)
+            return 100;
         const name = sink?.name ?? "";
         if (!name)
             return 100;
@@ -70,6 +153,8 @@ Singleton {
     signal wireplumberReloadCompleted(bool success)
 
     function getMaxVolumePercent(node) {
+        if (freebsdAudio)
+            return 100;
         if (!node?.name)
             return 100;
         return SessionData.deviceMaxVolumes[node.name] ?? 100;
@@ -97,17 +182,27 @@ Singleton {
     }
 
     function getAvailableSinks() {
+        if (freebsdAudio) {
+            const hidden = SessionData.hiddenOutputDeviceNames ?? [];
+            return nativeSinks.filter(node => !hidden.includes(node.name));
+        }
         const hidden = SessionData.hiddenOutputDeviceNames ?? [];
-        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && (SettingsData.audioShowStreamDevices || !node.isStream) && !hidden.includes(node.name));
+        return root.pipewireNodes.filter(node => node.audio && node.isSink && (SettingsData.audioShowStreamDevices || !node.isStream) && !hidden.includes(node.name));
     }
 
-    property list<PwNode> typedSinks: []
-    property list<PwNode> typedSources: []
+    property var typedSinks: []
+    property var typedSources: []
 
     function rebuildTypedNodeLists() {
+        if (freebsdAudio) {
+            typedSinks = nativeSinks.slice();
+            typedSources = nativeSources.slice();
+            deviceRevision++;
+            return;
+        }
         const newSinks = [];
         const newSources = [];
-        for (const node of Pipewire.nodes.values) {
+        for (const node of root.pipewireNodes) {
             if (!node?.audio || (node.isStream && !SettingsData.audioShowStreamDevices))
                 continue;
             if (node.isSink)
@@ -120,31 +215,27 @@ Singleton {
     }
 
     Connections {
-        target: Pipewire.nodes
-        function onValuesChanged() {
-            root.rebuildTypedNodeLists();
-            root.adoptPendingCardSink();
-        }
-    }
-
-    Connections {
         target: SettingsData
         function onAudioShowStreamDevicesChanged() {
             root.rebuildTypedNodeLists();
         }
     }
 
-    function setSink(node: PwNode): bool {
+    function setSink(node): bool {
         if (!node)
             return false;
-        Pipewire.preferredDefaultAudioSink = node;
+        if (freebsdAudio)
+            return setFreeBsdDefaultDevice(node);
+        root.pipewireBackend.setDefaultSink(node);
         return true;
     }
 
-    function setSource(node: PwNode): bool {
+    function setSource(node): bool {
         if (!node)
             return false;
-        Pipewire.preferredDefaultAudioSource = node;
+        if (freebsdAudio)
+            return setFreeBsdDefaultDevice(node);
+        root.pipewireBackend.setDefaultSource(node);
         return true;
     }
 
@@ -169,6 +260,11 @@ Singleton {
     }
 
     function refreshSinkPorts(callback) {
+        if (freebsdAudio) {
+            sinkPorts = ({});
+            if (callback) callback();
+            return;
+        }
         // ensure that parsed labels are in English
         Proc.runCommand("audio-list-sink-ports", ["env", "LC_ALL=C", "pactl", "list", "sinks"], (output, exitCode) => {
             if (exitCode === 0)
@@ -187,6 +283,10 @@ Singleton {
     }
 
     function setSinkPort(sinkName, portName, callback) {
+        if (freebsdAudio) {
+            if (callback) callback(false, I18n.tr("Port switching is not available with the FreeBSD native audio backend"));
+            return;
+        }
         Proc.runCommand("audio-set-sink-port", ["env", "LC_ALL=C", "pactl", "set-sink-port", sinkName, portName], (output, exitCode) => {
             const ok = exitCode === 0;
             if (callback)
@@ -269,6 +369,11 @@ Singleton {
     }
 
     function refreshCards(callback) {
+        if (freebsdAudio) {
+            cards = [];
+            if (callback) callback();
+            return;
+        }
         Proc.runCommand("audio-list-cards", ["env", "LC_ALL=C", "pactl", "list", "cards"], (output, exitCode) => {
             root.cards = exitCode === 0 ? root.parseCards(output) : [];
             if (callback)
@@ -416,6 +521,7 @@ Singleton {
         return profile.split("+").filter(part => part.startsWith("output:")).map(part => prefix + part.substring(7));
     }
 
+
     function collectSwitchableOutputPorts(cards, hiddenSinkNames) {
         const entries = [];
         for (const card of cards || []) {
@@ -456,9 +562,13 @@ Singleton {
     }
 
     function activateOutputPort(entry, callback) {
+        if (freebsdAudio) {
+            if (callback) callback(false, I18n.tr("Output profile switching is not available with the FreeBSD native audio backend"));
+            return;
+        }
         if (!entry?.cardName || !entry.profile)
             return;
-        const previousSinks = Pipewire.nodes.values.filter(n => n.isSink && sinkBelongsToCard(n, entry.cardName)).map(n => n.name);
+        const previousSinks = root.pipewireNodes.filter(n => n.isSink && sinkBelongsToCard(n, entry.cardName)).map(n => n.name);
         Proc.runCommand("audio-set-card-profile", ["env", "LC_ALL=C", "pactl", "set-card-profile", entry.cardName, entry.profile], (output, exitCode) => {
             const ok = exitCode === 0;
             if (ok) {
@@ -483,7 +593,7 @@ Singleton {
         const pending = pendingCardSwitch;
         if (!pending)
             return;
-        const node = Pipewire.nodes.values.find(n => n.isSink && sinkBelongsToCard(n, pending.cardName) && !pending.exclude.includes(n.name));
+        const node = root.pipewireNodes.find(n => n.isSink && sinkBelongsToCard(n, pending.cardName) && !pending.exclude.includes(n.name));
         if (!node)
             return;
         pendingCardSwitch = null;
@@ -581,6 +691,8 @@ Singleton {
     }
 
     function writeWireplumberConfig() {
+        if (freebsdAudio)
+            return;
         const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/wireplumber/wireplumber.conf.d";
         const configContent = generateWireplumberConfig();
 
@@ -693,6 +805,8 @@ EOFCONFIG
     }
 
     function reloadWireplumberConfig() {
+        if (freebsdAudio)
+            return;
         if (wireplumberReloading) {
             return;
         }
@@ -824,11 +938,21 @@ EOFCONFIG
         }, 0);
     }
 
-    function refreshSoundThemes() {
-        if (!soundThemeSupported)
+    function setSoundTheme(themeName) {
+        if (!themeName || themeName === currentSoundTheme) {
             return;
-        scanSoundThemes();
+        }
+
+        Proc.runCommand("setSoundTheme", ["sh", "-c", GSettings.setCmd("org.gnome.desktop.sound", "theme-name", themeName)], (output, exitCode) => {
+            if (exitCode === 0) {
+                currentSoundTheme = themeName;
+                if (SettingsData.useSystemSoundTheme) {
+                    discoverSoundFiles(themeName);
+                }
+            }
+        }, 0);
     }
+
 
     function selectSoundTheme(themeName) {
         if (!themeName) {
@@ -849,6 +973,13 @@ EOFCONFIG
             }
             SettingsData.set("useSystemSoundTheme", true);
         }, 0);
+    }
+
+
+    function refreshSoundThemes() {
+        if (!soundThemeSupported)
+            return;
+        scanSoundThemes();
     }
 
     function discoverSoundFiles(themeName) {
@@ -1063,6 +1194,7 @@ EOFCONFIG
         return audio.muted || audio.volume === 0;
     }
 
+
     function volumeIcon(volume, muted) {
         if (muted)
             return "volume_off";
@@ -1075,7 +1207,11 @@ EOFCONFIG
         const audio = node?.audio;
         if (!audio)
             return noDeviceIcon;
-        return volumeIcon(audio.volume, audio.muted);
+        if (audio.muted)
+            return "volume_off";
+        if (audio.volume === 0)
+            return "volume_mute";
+        return audio.volume <= 0.33 ? "volume_down" : "volume_up";
     }
 
     function sinkIcon(node) {
@@ -1232,8 +1368,227 @@ EOFCONFIG
         return "";
     }
 
-    PwObjectTracker {
-        objects: Pipewire.nodes.values.filter(node => node.audio && (SettingsData.audioShowStreamDevices || !node.isStream))
+
+    function detectAudioBackend() {
+        Proc.runCommand("audio-detect-os", ["uname", "-s"], (output, exitCode) => {
+            const osName = exitCode === 0 ? (output || "").trim() : "";
+            root.freebsdAudio = osName === "FreeBSD";
+            root.audioBackendDetected = true;
+
+            if (root.freebsdAudio) {
+                Proc.runCommand("audio-detect-freebsd-mixer", ["sh", "-c", "command -v mixer >/dev/null 2>&1"], (mixerOutput, mixerExitCode) => {
+                    if (mixerExitCode === 0)
+                        root.refreshFreeBsdDevices();
+                    else
+                        log.error("FreeBSD detected, but mixer(8) is unavailable");
+                }, 0);
+            } else {
+                Qt.callLater(root.rebuildTypedNodeLists);
+            }
+        }, 0);
+    }
+
+    function parseFreeBsdMixerDevices(output) {
+        const result = [];
+        const lines = (output || "").split("\n");
+        let current = null;
+
+        function finishCurrent() {
+            if (current)
+                result.push(current);
+        }
+
+        for (const raw of lines) {
+            const header = raw.match(/^pcm(\d+):mixer:\s*<(.+)>\s+on\s+(\S+)\s+\(([^)]+)\)(?:\s+\(default\))?\s*$/);
+            if (header) {
+                finishCurrent();
+                current = {
+                    pcmUnit: parseInt(header[1]),
+                    pcmName: "pcm" + header[1],
+                    mixerDevice: "/dev/mixer" + header[1],
+                    description: header[2],
+                    driver: header[3],
+                    modes: header[4].split("/"),
+                    isDefault: raw.includes("(default)"),
+                    controls: ({})
+                };
+                continue;
+            }
+            if (!current)
+                continue;
+            const control = raw.match(/^\s*([A-Za-z0-9_]+)\s*=\s*([0-9.]+)(?::([0-9.]+))?\s*(.*)$/);
+            if (!control)
+                continue;
+            const left = parseFloat(control[2]);
+            const right = control[3] ? parseFloat(control[3]) : left;
+            current.controls[control[1]] = {
+                volume: (left + right) / 2,
+                flags: control[4] || ""
+            };
+        }
+        finishCurrent();
+        return result;
+    }
+
+    function freeBsdInputControl(entry) {
+        const preferred = ["mic", "rec", "igain", "line"];
+        for (const name of preferred) {
+            if (entry.controls[name])
+                return name;
+        }
+        return "";
+    }
+
+    function syncFreeBsdNode(existingNodes, entry, isSink, control) {
+        const suffix = isSink ? "output" : "input";
+        const name = "freebsd-" + entry.pcmName + "-" + suffix;
+        let node = existingNodes.find(item => item?.name === name);
+        if (!node) {
+            node = freeBsdNodeComponent.createObject(root, {
+                service: root,
+                name: name,
+                description: entry.description,
+                mixerDevice: entry.mixerDevice,
+                pcmName: entry.pcmName,
+                pcmUnit: entry.pcmUnit,
+                mixerControl: control,
+                isSink: isSink
+            });
+        } else {
+            node.description = entry.description;
+            node.mixerControl = control;
+        }
+        const state = entry.controls[control];
+        if (state && !root.hasPendingFreeBsdWrite(node))
+            node.audio.volume = Math.max(0, Math.min(1, state.volume));
+        return node;
+    }
+
+    function applyFreeBsdDeviceList(output) {
+        const entries = parseFreeBsdMixerDevices(output);
+        const oldSinks = nativeSinks;
+        const oldSources = nativeSources;
+        const nextSinks = [];
+        const nextSources = [];
+        let defaultEntry = null;
+
+        nativeAudioSyncing = true;
+        for (const entry of entries) {
+            if (entry.isDefault)
+                defaultEntry = entry;
+            if (entry.modes.includes("play") && entry.controls.vol)
+                nextSinks.push(syncFreeBsdNode(oldSinks, entry, true, "vol"));
+            if (entry.modes.includes("rec")) {
+                const inputControl = freeBsdInputControl(entry);
+                if (inputControl)
+                    nextSources.push(syncFreeBsdNode(oldSources, entry, false, inputControl));
+            }
+        }
+        nativeAudioSyncing = false;
+
+        nativeSinks = nextSinks;
+        nativeSources = nextSources;
+        if (defaultEntry) {
+            nativeSink = nextSinks.find(n => n.pcmUnit === defaultEntry.pcmUnit) ?? nextSinks[0] ?? null;
+            nativeSource = nextSources.find(n => n.pcmUnit === defaultEntry.pcmUnit) ?? nextSources[0] ?? null;
+        } else {
+            nativeSink = nextSinks[0] ?? null;
+            nativeSource = nextSources[0] ?? null;
+        }
+        rebuildTypedNodeLists();
+        deviceRevision++;
+    }
+
+    function refreshFreeBsdDevices() {
+        if (!freebsdAudio)
+            return;
+        if (Date.now() - lastFreeBsdLocalChangeMs < 800)
+            return;
+        Proc.runCommand("audio-freebsd-devices", ["env", "LC_ALL=C", "mixer", "-a"], (output, exitCode) => {
+            if (exitCode === 0)
+                root.applyFreeBsdDeviceList(output);
+            else
+                log.error("Unable to enumerate FreeBSD audio devices:", output);
+        }, 0);
+    }
+
+    function hasPendingFreeBsdWrite(node) {
+        if (!node)
+            return false;
+        const key = node.mixerDevice + "|" + node.mixerControl;
+        return pendingFreeBsdVolumeWrites[key] !== undefined;
+    }
+
+    function queueFreeBsdMixerVolume(node, volume) {
+        if (!node)
+            return;
+        const percent = Math.max(0, Math.min(100, Math.round(volume * 100)));
+        const key = node.mixerDevice + "|" + node.mixerControl;
+        const writes = Object.assign({}, pendingFreeBsdVolumeWrites);
+        writes[key] = { node: node, percent: percent };
+        pendingFreeBsdVolumeWrites = writes;
+        lastFreeBsdLocalChangeMs = Date.now();
+        freeBsdVolumeWriteTimer.restart();
+    }
+
+    function flushFreeBsdVolumeWrites() {
+        const writes = pendingFreeBsdVolumeWrites;
+        pendingFreeBsdVolumeWrites = ({});
+        for (const key of Object.keys(writes)) {
+            const entry = writes[key];
+            const node = entry.node;
+            Proc.runCommand("audio-freebsd-volume-" + node.pcmName + "-" + node.mixerControl,
+                ["mixer", "-f", node.mixerDevice, node.mixerControl + ".volume=" + entry.percent + "%"],
+                (output, exitCode) => {
+                    if (exitCode !== 0)
+                        log.error("FreeBSD mixer volume update failed:", output);
+                }, 0);
+        }
+    }
+
+    function setFreeBsdMixerMute(node, muted) {
+        if (!node)
+            return;
+        lastFreeBsdLocalChangeMs = Date.now();
+        Proc.runCommand("audio-freebsd-mute-" + node.pcmName + "-" + node.mixerControl,
+            ["mixer", "-f", node.mixerDevice, node.mixerControl + ".mute=" + (muted ? "1" : "0")],
+            (output, exitCode) => {
+                if (exitCode !== 0)
+                    log.error("FreeBSD mixer mute update failed:", output);
+            }, 0);
+    }
+
+    function setFreeBsdDefaultDevice(node) {
+        if (!node || node.pcmUnit < 0)
+            return false;
+        lastFreeBsdLocalChangeMs = Date.now();
+        if (node.isSink)
+            nativeSink = node;
+        else
+            nativeSource = node;
+        // sound(4) has one default PCM unit. Keep both directions in sync when
+        // the selected card supports them.
+        const matchingSink = nativeSinks.find(n => n.pcmUnit === node.pcmUnit);
+        const matchingSource = nativeSources.find(n => n.pcmUnit === node.pcmUnit);
+        if (matchingSink)
+            nativeSink = matchingSink;
+        if (matchingSource)
+            nativeSource = matchingSource;
+        deviceRevision++;
+        Proc.runCommand("audio-freebsd-default-device", ["mixer", "-d", node.pcmName], (output, exitCode) => {
+            if (exitCode !== 0) {
+                log.error("Unable to set FreeBSD default audio device:", output);
+                root.refreshFreeBsdDevices();
+            }
+        }, 0);
+        return true;
+    }
+
+    Timer {
+        id: freeBsdVolumeWriteTimer
+        interval: 35
+        repeat: false
+        onTriggered: root.flushFreeBsdVolumeWrites()
     }
 
     function setVolume(percentage) {
@@ -1326,6 +1681,13 @@ EOFCONFIG
         root.source.audio.volume = newVolume / 100;
         micVolumeChanged();
         return `Microphone volume decreased to ${newVolume}%`;
+    }
+
+    Timer {
+        interval: 5000
+        repeat: true
+        running: root.freebsdAudio
+        onTriggered: root.refreshFreeBsdDevices()
     }
 
     IpcHandler {
@@ -1437,6 +1799,7 @@ EOFCONFIG
     }
 
     Component.onCompleted: {
+        detectAudioBackend();
         rebuildTypedNodeLists();
         loadDeviceAliases();
         if (SettingsData.soundsEnabled && SettingsData.useSystemSoundTheme)

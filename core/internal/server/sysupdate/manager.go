@@ -70,7 +70,7 @@ func NewManager() (*Manager, error) {
 		m.state.Error = &ErrorInfo{
 			Code:    ErrCodeNoBackend,
 			Message: "no supported package manager found",
-			Hint:    "install a supported package manager (pacman, dnf, apt, zypper) or flatpak",
+			Hint:    "install a supported package manager (pkg, pacman, dnf, apt, zypper) or flatpak",
 		}
 	}
 

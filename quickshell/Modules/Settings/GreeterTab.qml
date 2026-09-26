@@ -81,7 +81,7 @@ Item {
 
     Process {
         id: greetdEnabledCheckProcess
-        command: ["systemctl", "is-enabled", "greetd"]
+        command: ["sh", "-c", "if [ \"$(uname -s)\" = FreeBSD ]; then service -e 2>/dev/null | grep -Eq \"/greetd$\" && echo enabled || echo disabled; else systemctl is-enabled greetd 2>/dev/null; fi"]
         running: false
 
         stdout: StdioCollector {

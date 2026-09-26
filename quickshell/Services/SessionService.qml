@@ -123,7 +123,7 @@ Singleton {
     Process {
         id: detectHibernateProcess
         running: false
-        command: ["grep", "-q", "disk", "/sys/power/state"]
+        command: isBSD ? ["sh", "-c", "exit 1"] : ["grep", "-q", "disk", "/sys/power/state"]
 
         onExited: function (exitCode) {
             hibernateSupported = (exitCode === 0);
