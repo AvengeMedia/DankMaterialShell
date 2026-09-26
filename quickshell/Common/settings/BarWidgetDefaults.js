@@ -158,6 +158,10 @@ var DEFAULTS = {
         diskUsageMode: 0,
         showMountPath: true
     },
+    network_speed_monitor: {
+        hideWhenIdle: false,
+        compactMode: false
+    },
     systemUpdate: {
         hideWhenIdle: false
     }
