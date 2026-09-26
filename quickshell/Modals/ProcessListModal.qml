@@ -281,11 +281,12 @@ DankFloatingWindow {
                 radius: Theme.cornerRadius
                 color: "transparent"
                 clip: true
+                readonly property bool isFloatingWindowSurface: true
 
                 Loader {
                     id: processesTabLoader
                     anchors.fill: parent
-                    active: processListModal.visible && currentTab === 0
+                    active: processListModal.visible && (currentTab === 0 || item !== null)
                     visible: currentTab === 0
                     sourceComponent: ProcessesView {
                         searchText: processListModal.searchText
@@ -299,7 +300,7 @@ DankFloatingWindow {
                     id: performanceTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 1
+                    active: processListModal.visible && (currentTab === 1 || item !== null)
                     visible: currentTab === 1
                     sourceComponent: PerformanceView {}
                 }
@@ -308,7 +309,7 @@ DankFloatingWindow {
                     id: disksTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 2
+                    active: processListModal.visible && (currentTab === 2 || item !== null)
                     visible: currentTab === 2
                     sourceComponent: DisksView {}
                 }
@@ -317,7 +318,7 @@ DankFloatingWindow {
                     id: systemTabLoader
                     anchors.fill: parent
                     anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 3
+                    active: processListModal.visible && (currentTab === 3 || item !== null)
                     visible: currentTab === 3
                     sourceComponent: SystemView {}
                 }
