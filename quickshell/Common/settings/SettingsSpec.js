@@ -1238,6 +1238,9 @@ var LOCAL_SPEC = {
     customPowerButtons: {
         def: []
     },
+    powerMenuBootEntries: {
+        def: []
+    },
     updaterCheckOnStart: {
         def: false
     },

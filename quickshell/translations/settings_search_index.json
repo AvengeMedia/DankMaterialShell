@@ -9000,6 +9000,35 @@
     "icon": "tune"
   },
   {
+    "section": "powerMenuBootEntries",
+    "label": "Reboot to another OS",
+    "tabIndex": 21,
+    "category": "Power & sleep",
+    "keywords": [
+      "another",
+      "battery",
+      "boot",
+      "bootnext",
+      "charge",
+      "charging",
+      "dual boot",
+      "efi",
+      "energy",
+      "hibernate",
+      "menu",
+      "power",
+      "reboot",
+      "restart",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "uefi",
+      "windows"
+    ],
+    "parentLabel": "Power & battery",
+    "icon": "restart_alt"
+  },
+  {
     "section": "suspendBehavior",
     "label": "Suspend behavior",
     "tabIndex": 21,

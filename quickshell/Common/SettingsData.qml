@@ -1020,6 +1020,7 @@ Singleton {
     property string customPowerActionReboot: Spec.SPEC.customPowerActionReboot.def
     property string customPowerActionPowerOff: Spec.SPEC.customPowerActionPowerOff.def
     property var customPowerButtons: Spec.SPEC.customPowerButtons.def
+    property var powerMenuBootEntries: Spec.SPEC.powerMenuBootEntries.def
 
     property bool updaterCheckOnStart: Spec.SPEC.updaterCheckOnStart.def
     property bool updaterUseCustomCommand: Spec.SPEC.updaterUseCustomCommand.def
