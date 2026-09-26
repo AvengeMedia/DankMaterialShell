@@ -108,6 +108,9 @@ DankPopout {
                 id: modalAdapter
                 property bool spotlightOpen: appDrawerPopout.shouldBeVisible
                 property bool isClosing: appDrawerPopout.isClosing
+                readonly property var effectiveScreen: appDrawerPopout.screen
+                readonly property real alignedX: appDrawerPopout.renderedAlignedX
+                readonly property real alignedY: appDrawerPopout.renderedAlignedY
 
                 function hide() {
                     appDrawerPopout.close();
