@@ -124,7 +124,10 @@ PanelWindow {
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
     readonly property int _surfaceRevision: ConnectedModeState.surfaceRevisions[win._screenName] ?? 0
-    readonly property var _popoutDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "popout")
+    readonly property var _popoutDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "popout");
+    }
     component DockBlurRegion: Region {
         id: dockBlur
         required property var dockSurface
@@ -212,20 +215,29 @@ PanelWindow {
         }
     }
 
-    readonly property var _dockSurfaces: ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
-        const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
-        const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
-        const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
-        const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
-        return {
-            descriptor: descriptor,
-            body: body,
-            radius: radius,
-            connector: connector
-        };
-    })
-    readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
-    readonly property var _islandDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "island")
+    readonly property var _dockSurfaces: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
+            const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
+            const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
+            const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
+            const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
+            return {
+                descriptor: descriptor,
+                body: body,
+                radius: radius,
+                connector: connector
+            };
+        });
+    }
+    readonly property var _notifDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "notification");
+    }
+    readonly property var _islandDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "island");
+    }
     // The island body starts inside the bar band; only the part past the cutout is silhouette, and its fillets follow that clamped rect.
     readonly property var _islandSurface: {
         const descriptor = win._islandDescriptor;
@@ -242,7 +254,10 @@ PanelWindow {
             connector: SurfaceGeometry.connectorRadii(descriptor, body, win._ccr, radius, win._dpr, true).near
         };
     }
-    readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
+    readonly property var _modalDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "modal");
+    }
     readonly property bool _usesOverlayLayer: (win._modalDescriptor.presented && win._modalDescriptor.layer === "overlay") || (win._popoutDescriptor.presented && win._popoutDescriptor.layer === "overlay")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
@@ -375,6 +390,7 @@ PanelWindow {
 
     // Slots 0-3 hold popout, modal, notification and docks; the island's spring steps every frame, so it owns slot 4 alone.
     readonly property var _sdfSlots: {
+        win._surfaceRevision;
         const src = win._unifiedSurfaces();
         const out = [];
         for (let i = 0; i < 4; i++)
@@ -383,6 +399,7 @@ PanelWindow {
     }
 
     readonly property var _islandSdfSlot: {
+        win._surfaceRevision;
         const island = win._islandSurface;
         if (!island)
             return win._emptySdfSlot;
