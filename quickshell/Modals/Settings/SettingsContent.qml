@@ -17,6 +17,7 @@ FocusScope {
     readonly property bool sessionVisible: parentModal?.shouldBeVisible ?? false
     readonly property list<string> pagePath: (parentModal?.pageHistory ?? []).concat([currentPage])
     readonly property Item currentPageItem: pageStack.currentItem?.item ?? null
+    readonly property bool currentPageSettled: pageStack.currentItem?.settled ?? false
     readonly property var pageInfo: SettingsTabs.page(currentPage)
     readonly property bool isPluginPage: SettingsTabs.isPluginPage(currentPage)
     readonly property bool isHubPage: pageInfo?.kind === "hub"
@@ -82,15 +83,16 @@ FocusScope {
             return;
         }
         const drillDown = animationsEnabled && shared > 0 && shared === pageStack.depth && shared === pagePath.length - 1;
+        const deferred = parentModal?.visible ?? false;
         let index = shared;
         if (index < pageStack.depth)
             pageStack.replace(pageStack.get(index), pageComponent, {
                 page: pagePath[index++]
-            }, StackView.Immediate);
+            }, StackView.Immediate).load(deferred);
         for (; index < pagePath.length; index++)
             pageStack.push(pageComponent, {
                 page: pagePath[index]
-            }, drillDown ? StackView.PushTransition : StackView.Immediate);
+            }, drillDown ? StackView.PushTransition : StackView.Immediate).load(deferred);
     }
 
     onPagePathChanged: Qt.callLater(_syncPages)
@@ -123,23 +125,29 @@ FocusScope {
             readonly property bool pageActive: root.sessionVisible && pageStack.currentItem === host
             readonly property alias item: loader.item
             readonly property int status: loader.status
+            readonly property bool settled: !pending && loader.status !== Loader.Loading && (presented || loader.status !== Loader.Ready)
 
+            property bool pending: true
             property bool presented: false
 
             enabled: pageActive
+
+            function load(deferred) {
+                const file = root._fileFor(page);
+                if (file) {
+                    loader.asynchronous = deferred;
+                    presented = !deferred;
+                    loader.setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), root._propertiesFor(page));
+                }
+                pending = false;
+            }
 
             Loader {
                 id: loader
 
                 anchors.fill: parent
-                asynchronous: true
                 opacity: host.presented ? 1 : 0
 
-                Component.onCompleted: {
-                    const file = root._fileFor(host.page);
-                    if (file)
-                        setSource(Qt.resolvedUrl("../../Modules/Settings/" + file), root._propertiesFor(host.page));
-                }
                 onLoaded: {
                     if (item.pageActive !== undefined)
                         item.pageActive = Qt.binding(() => host.pageActive);

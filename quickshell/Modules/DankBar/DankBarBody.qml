@@ -41,6 +41,7 @@ Item {
         const palette = SettingsData.islandSetting(barConfig, "islandPalette");
         return palette === "bright" ? Theme.surfaceBright : palette === "dim" ? Theme.surfaceDim : _hostSurface;
     }
+    readonly property real islandSatelliteOpacity: isIsland ? SettingsData.islandSatelliteTransparency(barConfig) : 1
     readonly property real islandChromePad: isIsland ? Theme.snap((barConfig?.innerPadding ?? 4) + Theme.spacingXS, _dpr) : 0
     readonly property real islandChromeInset: islandSatelliteBackground ? islandChromePad : 0
     readonly property bool islandMotionRunning: islandHost?.motionRunning ?? false
@@ -261,6 +262,64 @@ Item {
     }
 
     Component {
+        id: blurSatelliteRegionComp
+
+        Region {
+            id: satelliteRegion
+
+            property Item surface
+
+            readonly property real sx: topBarMouseArea.x + barUnitInset.x + topBarSlide.x + surface.x
+            readonly property real sy: topBarMouseArea.y + barUnitInset.y + topBarSlide.y + surface.y
+            readonly property bool horizontal: !surface.isVertical
+            readonly property bool far: surface.crossFar
+            readonly property int startR: Math.round(surface.alongStartRadius)
+            readonly property int endR: Math.round(surface.alongEndRadius)
+
+            x: sx
+            y: sy
+            width: surface.width
+            height: surface.height
+            topLeftRadius: far ? startR : 0
+            topRightRadius: horizontal ? (far ? endR : 0) : (far ? 0 : startR)
+            bottomLeftRadius: horizontal ? (far ? 0 : startR) : (far ? endR : 0)
+            bottomRightRadius: far ? 0 : endR
+
+            Region {
+                x: satelliteRegion.sx + satelliteRegion.surface.startSweepRect.x
+                y: satelliteRegion.sy + satelliteRegion.surface.startSweepRect.y
+                width: satelliteRegion.surface.startSweepRect.width
+                height: satelliteRegion.surface.startSweepRect.height
+
+                Region {
+                    intersection: Intersection.Subtract
+                    shape: RegionShape.Ellipse
+                    x: satelliteRegion.sx + satelliteRegion.surface.startSweepDisc.x
+                    y: satelliteRegion.sy + satelliteRegion.surface.startSweepDisc.y
+                    width: satelliteRegion.surface.startSweepDisc.width
+                    height: satelliteRegion.surface.startSweepDisc.height
+                }
+            }
+
+            Region {
+                x: satelliteRegion.sx + satelliteRegion.surface.endSweepRect.x
+                y: satelliteRegion.sy + satelliteRegion.surface.endSweepRect.y
+                width: satelliteRegion.surface.endSweepRect.width
+                height: satelliteRegion.surface.endSweepRect.height
+
+                Region {
+                    intersection: Intersection.Subtract
+                    shape: RegionShape.Ellipse
+                    x: satelliteRegion.sx + satelliteRegion.surface.endSweepDisc.x
+                    y: satelliteRegion.sy + satelliteRegion.surface.endSweepDisc.y
+                    width: satelliteRegion.surface.endSweepDisc.width
+                    height: satelliteRegion.surface.endSweepDisc.height
+                }
+            }
+        }
+    }
+
+    Component {
         id: blurCornerRegionComp
 
         // The surface paints square corners at the attached edge and the wing roots (#2975); re-add what the body radius rounds off
@@ -289,6 +348,7 @@ Item {
 
         readonly property bool barHasTransparency: !barWindow.isIsland && barWindow._backgroundAlpha > 0 && barWindow._backgroundAlpha < 1
         readonly property bool islandTranslucent: barWindow.isIsland && !!barWindow.islandHost && barWindow.islandHost.surfaceOpacity > 0 && barWindow.islandHost.surfaceOpacity < 1
+        readonly property bool satelliteTranslucent: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && barWindow.islandSatelliteOpacity > 0 && barWindow.islandSatelliteOpacity < 1
 
         function rebuild() {
             teardown();
@@ -302,7 +362,7 @@ Item {
 
             const widgets = barWindow._blurWidgetItems.filter(w => w && w.visible && w.width > 0 && w.height > 0);
             const hasBar = barHasTransparency;
-            if (!hasBar && widgets.length === 0 && !islandTranslucent)
+            if (!hasBar && widgets.length === 0 && !islandTranslucent && !satelliteTranslucent)
                 return;
 
             const region = blurRegionComp.createObject(barWindow);
@@ -324,6 +384,15 @@ Item {
                 const islandSub = blurIslandRegionComp.createObject(region);
                 if (islandSub)
                     subRegions.push(islandSub);
+            }
+            if (satelliteTranslucent) {
+                for (const surface of [leadingSatelliteSurface, trailingSatelliteSurface]) {
+                    const sub = blurSatelliteRegionComp.createObject(region, {
+                        surface: surface
+                    });
+                    if (sub)
+                        subRegions.push(sub);
+                }
             }
             for (let i = 0; i < widgets.length; i++) {
                 const sub = blurSubRegionComp.createObject(region, {
@@ -373,6 +442,7 @@ Item {
 
         onBarHasTransparencyChanged: _blurRebuildTimer.restart()
         onIslandTranslucentChanged: _blurRebuildTimer.restart()
+        onSatelliteTranslucentChanged: _blurRebuildTimer.restart()
 
         readonly property bool blurServiceEnabled: BlurService.enabled
         readonly property bool frameEffectiveEnabled: FrameTransitionState.effectiveFrameEnabled
@@ -932,6 +1002,7 @@ Item {
                     }
 
                     SectionSurface {
+                        id: leadingSatelliteSurface
                         visible: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && alongSize > 0
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._leftSection?.y ?? 0) : topBarContent.x + (barWindow._leftSection?.x ?? 0)
                         alongSize: barWindow.leadingSectionSize
@@ -943,10 +1014,11 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
                     }
 
                     SectionSurface {
+                        id: trailingSatelliteSurface
                         visible: barWindow.islandSatelliteBackground && barWindow.islandSatellitesEnabled && alongSize > 0
                         trailing: true
                         alongPos: barWindow.isVertical ? topBarContent.y + (barWindow._rightSection?.y ?? 0) : topBarContent.x + (barWindow._rightSection?.x ?? 0)
@@ -959,7 +1031,7 @@ Item {
                         pad: barWindow.islandChromePad
                         sweep: barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteSwoopRadius") : 0
                         gothEnabled: barWindow.isIsland && SettingsData.islandSetting(barConfig, "islandSatelliteGothCorners")
-                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.isIsland ? SettingsData.islandSetting(barConfig, "islandSatelliteTransparency") : 1)
+                        fillColor: Theme.withAlpha(barWindow.islandSurfaceColor, barWindow.islandSatelliteOpacity)
                     }
 
                     MouseArea {

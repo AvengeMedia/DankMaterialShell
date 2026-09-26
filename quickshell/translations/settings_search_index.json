@@ -4856,7 +4856,7 @@
   },
   {
     "section": "islandSatelliteTransparency",
-    "label": "Opacity",
+    "label": "Override",
     "tabIndex": 6,
     "category": "Appearance",
     "keywords": [
@@ -4864,11 +4864,14 @@
       "background",
       "bar",
       "blur",
+      "interface",
       "island",
       "opacity",
+      "override",
       "panel",
       "satellite",
       "statusbar",
+      "style",
       "taskbar",
       "topbar",
       "transparency"

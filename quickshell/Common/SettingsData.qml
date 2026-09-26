@@ -871,6 +871,7 @@ Singleton {
             "islandSatelliteGap": 12,
             "islandSatelliteBackground": false,
             "islandSatelliteGothCorners": true,
+            "islandSatelliteFollowInterfaceStyle": true,
             "islandSatelliteTransparency": 1,
             "islandSatelliteSwoopRadius": 24,
             "islandReducedMotion": false,
@@ -882,6 +883,12 @@ Singleton {
     function islandSetting(bc, key) {
         const value = bc?.[key];
         return value === undefined || value === null ? islandDefaults[key] : value;
+    }
+
+    function islandSatelliteTransparency(bc) {
+        if (islandSetting(bc, "islandSatelliteFollowInterfaceStyle"))
+            return barTransparency(bc);
+        return islandSetting(bc, "islandSatelliteTransparency");
     }
 
     function islandLevelDisplay(bc, key) {

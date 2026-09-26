@@ -12,6 +12,7 @@ Singleton {
     readonly property real windowHeight: 940
     readonly property real windowMinWidth: 500
     readonly property real windowMinHeight: 400
+    readonly property real formDialogWidth: 640
     readonly property real pagePaddingH: 40
     readonly property real pagePaddingV: 32
     readonly property real scrollGutter: 32

@@ -54,6 +54,10 @@ Item {
         suggestedPPDs = [];
     }
 
+    Ref {
+        service: CupsService
+    }
+
     Connections {
         target: CupsService
         function onPpdsChanged() {

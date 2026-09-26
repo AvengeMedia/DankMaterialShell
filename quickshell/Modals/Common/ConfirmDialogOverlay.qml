@@ -38,14 +38,15 @@ Item {
         onConfirm = options.onConfirm || (() => {});
         onCancel = options.onCancel || (() => {});
         visible = true;
-        dialogContent.reset();
-        Qt.callLater(focusDialog);
+        dialogContent.keyboardNavigation = false;
+        dialogContent.selectedButton = 0;
+        focusDialog();
     }
 
     function focusDialog() {
         if (!visible)
             return;
-        dialogContent.focusSelection();
+        overlayFocusScope.forceActiveFocus();
     }
 
     function close() {

@@ -689,19 +689,34 @@ Item {
                 onSliderValueChanged: value => bar.apply("islandSatelliteSwoopRadius", value)
             }
 
-            SettingsSliderRow {
+            SettingsToggleRow {
+                id: satelliteOpacityRow
+
+                readonly property bool overridden: !bar.islandSetting("islandSatelliteFollowInterfaceStyle")
+
                 settingKey: "islandSatelliteTransparency"
-                tags: ["island", "satellite", "background", "opacity", "transparency", "blur"]
+                tags: ["island", "satellite", "background", "opacity", "transparency", "blur", "override", "interface", "style"]
                 resetStore: bar
-                resetKeys: ["islandSatelliteTransparency"]
-                text: I18n.tr("Opacity", "island settings: satellite background opacity slider")
-                minimum: 0
-                maximum: 100
-                step: 1
-                value: Math.round(bar.islandSetting("islandSatelliteTransparency") * 100)
+                resetKeys: ["islandSatelliteFollowInterfaceStyle", "islandSatelliteTransparency"]
+                resetByKeys: true
+                text: I18n.tr("Override", "verb, toggle to override the global setting for this item")
+                checked: overridden
                 visible: bar.islandSetting("islandSatellitesEnabled")
                 enabled: bar.islandSetting("islandSatelliteBackground")
-                onSliderValueChanged: value => bar.apply("islandSatelliteTransparency", value / 100)
+                onToggled: checked => bar.apply("islandSatelliteFollowInterfaceStyle", !checked)
+
+                body: SettingsSliderRow {
+                    width: parent.width
+                    text: I18n.tr("Opacity", "island settings: satellite background opacity slider")
+                    resetStore: bar
+                    resetKeys: ["islandSatelliteTransparency"]
+                    minimum: 0
+                    maximum: 100
+                    step: 1
+                    value: Math.round(SettingsData.islandSatelliteTransparency(bar.selectedBarConfig) * 100)
+                    enabled: bar.islandSetting("islandSatelliteBackground") && satelliteOpacityRow.overridden
+                    onSliderValueChanged: value => bar.apply("islandSatelliteTransparency", value / 100)
+                }
             }
 
             SettingsSliderRow {

@@ -40,7 +40,8 @@ DankFloatingWindow {
     readonly property bool canGoBack: pageHistory.length > 0 || (currentParentId !== "" && (isPluginPage || SettingsTabs.visibleLeaves(currentParentId).length > 1 || !!SettingsTabs.page(currentParentId)?.hubHeader))
     property bool shouldHaveFocus: visible
     property bool allowFocusOverride: false
-    property alias shouldBeVisible: settingsModal.visible
+    property bool shouldBeVisible: false
+    readonly property bool readyToMap: shouldBeVisible && content.currentPageSettled
     readonly property bool searchFocused: sidebar.searchFocused
     property bool isCompactMode: width < SettingsMetrics.compactBreakpoint
     property bool menuVisible: !isCompactMode
@@ -53,15 +54,19 @@ DankFloatingWindow {
             visible = false;
         }
         CompositorService.closeNiriOverviewOnWindowFocus();
-        visible = true;
+        shouldBeVisible = true;
+        if (readyToMap)
+            visible = true;
     }
 
     function hide() {
+        shouldBeVisible = false;
         visible = false;
     }
 
     function toggle() {
-        if (visible && backingWindowVisible) {
+        const shown = visible ? backingWindowVisible : shouldBeVisible;
+        if (shown) {
             hide();
             return;
         }
@@ -160,6 +165,11 @@ DankFloatingWindow {
 
     onClosed: hide()
 
+    onReadyToMapChanged: {
+        if (readyToMap)
+            visible = true;
+    }
+
     onIsCompactModeChanged: {
         if (!isCompactMode)
             menuVisible = true;
@@ -192,15 +202,6 @@ DankFloatingWindow {
             if (PluginService.availablePlugins[SettingsTabs.pluginIdOf(settingsModal.currentPage)])
                 return;
             settingsModal.setPage("plugins");
-        }
-    }
-
-    Loader {
-        active: settingsModal.visible
-        sourceComponent: Component {
-            Ref {
-                service: CupsService
-            }
         }
     }
 

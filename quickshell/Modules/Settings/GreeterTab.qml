@@ -37,6 +37,17 @@ Item {
     readonly property string greeterActionLabel: greeterAction === "activate" ? I18n.tr("Activate") : ""
     readonly property string greeterActionIcon: greeterAction === "activate" ? "login" : ""
     readonly property var greeterActionCommand: greeterAction === "activate" ? ["dms-greeter", "enable", "--terminal"] : []
+    readonly property string greeterStatusOutput: {
+        if (greeterStatusRunning)
+            return I18n.tr("Checking...", "greeter status loading");
+        if (greeterStatusText !== "")
+            return greeterStatusText;
+        if (embeddedGreeterOnly)
+            return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
+        if (!greeterBinaryExists && greeterEnabled)
+            return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
+        return "";
+    }
 
     onGreeterSyncStatusChanged: greeterStatusText = greeterSyncStatus
 
@@ -168,20 +179,49 @@ Item {
             settingKey: "greeterStatus"
 
             SettingsRow {
-                body: StyledText {
-                    text: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
+                subtitle: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.")
+
+                body: Flow {
                     width: parent.width
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignLeft
+                    spacing: Theme.spacingS
+                    layoutDirection: Qt.RightToLeft
+
+                    DankButton {
+                        text: I18n.tr("Sync", "verb, button that copies settings to the login greeter")
+                        iconName: "sync"
+                        busy: root.greeterSyncRunning
+                        enabled: root.greeterBinaryExists && !root.greeterSyncRunning && !root.greeterInstallActionRunning
+                        onClicked: GreeterService.sync()
+                    }
+
+                    DankButton {
+                        text: I18n.tr("Check status", "greeter settings button, runs dms-greeter status")
+                        iconName: "fact_check"
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        busy: root.greeterStatusRunning
+                        enabled: !root.greeterStatusRunning
+                        onClicked: root.runGreeterStatus()
+                    }
+
+                    DankButton {
+                        visible: root.greeterActionAvailable
+                        text: root.greeterActionLabel
+                        iconName: root.greeterActionIcon
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
+                        onClicked: root.promptGreeterActionConfirm()
+                    }
                 }
             }
 
             SettingsRow {
+                visible: root.greeterStatusOutput !== ""
+
                 body: Rectangle {
                     width: parent.width
-                    height: Math.min(180, statusTextArea.implicitHeight + Theme.spacingM * 2)
+                    height: statusTextArea.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
                     color: Theme.floatingWindowFieldColor
                     border.color: Theme.outlineMedium
@@ -189,56 +229,16 @@ Item {
 
                     StyledText {
                         id: statusTextArea
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
                         anchors.margins: Theme.spacingM
-                        text: {
-                            if (root.greeterStatusRunning)
-                                return I18n.tr("Checking...", "greeter status loading");
-                            if (root.greeterStatusText !== "")
-                                return root.greeterStatusText;
-                            if (root.embeddedGreeterOnly)
-                                return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
-                            if (!root.greeterBinaryExists && root.greeterEnabled)
-                                return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
-                            return I18n.tr("Click Refresh to check status.", "greeter status placeholder");
-                        }
+                        text: root.greeterStatusOutput
                         font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
+                        isMonospace: true
                         color: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText
                         wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
-            }
-
-            SettingsRow {
-                body: Flow {
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    DankButton {
-                        visible: root.greeterActionAvailable
-                        text: root.greeterActionLabel
-                        iconName: root.greeterActionIcon
-                        horizontalPadding: Theme.spacingL
-                        onClicked: root.promptGreeterActionConfirm()
-                        enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
-                    }
-
-                    DankButton {
-                        text: I18n.tr("Refresh")
-                        iconName: "refresh"
-                        horizontalPadding: Theme.spacingL
-                        onClicked: root.runGreeterStatus()
-                        enabled: !root.greeterStatusRunning
-                    }
-
-                    DankButton {
-                        text: I18n.tr("Sync", "verb, button that copies settings to the login greeter")
-                        iconName: "sync"
-                        horizontalPadding: Theme.spacingL
-                        onClicked: GreeterService.sync()
-                        enabled: root.greeterBinaryExists && !root.greeterSyncRunning && !root.greeterInstallActionRunning
+                        horizontalAlignment: Text.AlignLeft
                     }
                 }
             }
