@@ -97,7 +97,10 @@ PanelWindow {
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
     readonly property int _surfaceRevision: ConnectedModeState.surfaceRevisions[win._screenName] ?? 0
-    readonly property var _popoutDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "popout")
+    readonly property var _popoutDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "popout");
+    }
     component DockBlurRegion: Region {
         id: dockBlur
         required property var dockSurface
@@ -185,20 +188,29 @@ PanelWindow {
         }
     }
 
-    readonly property var _dockSurfaces: ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
-        const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
-        const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
-        const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
-        const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
-        return {
-            descriptor: descriptor,
-            body: body,
-            radius: radius,
-            connector: connector
-        };
-    })
-    readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
-    readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
+    readonly property var _dockSurfaces: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
+            const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
+            const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
+            const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
+            const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
+            return {
+                descriptor: descriptor,
+                body: body,
+                radius: radius,
+                connector: connector
+            };
+        });
+    }
+    readonly property var _notifDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "notification");
+    }
+    readonly property var _modalDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "modal");
+    }
     readonly property bool _usesOverlayLayer: (win._modalDescriptor.presented && win._modalDescriptor.layer === "overlay") || (win._popoutDescriptor.presented && win._popoutDescriptor.layer === "overlay")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
@@ -269,6 +281,7 @@ PanelWindow {
     readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && !win._disableLayer
     // Pack active connected surfaces into four fixed SDF slots (near edges clamp to cutout).
     readonly property var _sdfSlots: {
+        win._surfaceRevision;
         const T = win.cutoutTopInset;
         const L = win.cutoutLeftInset;
         const R = win.width - win.cutoutRightInset;

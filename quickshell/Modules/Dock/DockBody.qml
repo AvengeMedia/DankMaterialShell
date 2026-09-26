@@ -263,9 +263,10 @@ FocusScope {
     readonly property rect surfaceBounds: Qt.rect(_dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x, _dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y, dockBackground.width, dockBackground.height)
 
     function _syncDockChromeState() {
-        if (dockLease.dockId !== dock.config.id) {
+        const currentDockId = dock.config?.id ?? "";
+        if (dockLease.dockId !== currentDockId) {
             dockLease.release();
-            dockLease.dockId = dock.config.id;
+            dockLease.dockId = currentDockId;
         }
         const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXSpring.running || slideYSpring.running) && dock.hasApps;
         const phase = !presented ? "hidden" : ((!dock.reveal && (slideXSpring.running || slideYSpring.running)) ? "closing" : ((slideXSpring.running || slideYSpring.running) ? "opening" : "open"));
@@ -311,7 +312,7 @@ FocusScope {
 
     ConnectedSurfaceLease {
         id: dockLease
-        property string dockId: ""
+        property string dockId: dock.config?.id ?? ""
         property bool superseded: false
         claimPrefix: "dock"
         slot: ConnectedModeState.surfaceSlot("dock", dockId)
