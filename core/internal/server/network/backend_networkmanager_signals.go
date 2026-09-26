@@ -310,13 +310,17 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 		if len(sig.Body) >= 2 {
 			state, _ := sig.Body[0].(uint32)
 			reason, _ := sig.Body[1].(uint32)
-			b.handleVPNStateChange(state, reason)
+			b.handleVPNStateChangeAtPath(sig.Path, state, reason)
 		}
 		return
 	}
 
 	if sig.Name == dbusNMActiveConnInterface+".StateChanged" {
-		b.handleActiveConnectionStateChange()
+		state := uint32(0)
+		if len(sig.Body) > 0 {
+			state, _ = sig.Body[0].(uint32)
+		}
+		b.handleActiveConnectionStateChangeAtPath(sig.Path, state)
 		return
 	}
 
@@ -384,6 +388,9 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 }
 
 func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]dbus.Variant) {
+	if _, exists := changes["ActiveConnections"]; exists {
+		b.cleanupOpenConnectHelperAttempts()
+	}
 	var needsUpdate bool
 
 	for key := range changes {
@@ -427,6 +434,16 @@ func (b *NetworkManagerBackend) handleNetworkManagerChange(changes map[string]db
 }
 
 func (b *NetworkManagerBackend) handleActiveConnectionStateChange() {
+	b.handleActiveConnectionStateChangeAtPath("/", 0)
+}
+
+func (b *NetworkManagerBackend) handleActiveConnectionStateChangeAtPath(path dbus.ObjectPath, state uint32) {
+	switch state {
+	case 2:
+		b.finishOpenConnectHelperSuccess(path)
+	case 4:
+		b.clearOpenConnectHelperAttempt(path)
+	}
 	b.updateVPNConnectionState()
 	b.ListActiveVPN()
 	b.updateHotspotState()
@@ -435,7 +452,13 @@ func (b *NetworkManagerBackend) handleActiveConnectionStateChange() {
 	}
 }
 
-func (b *NetworkManagerBackend) handleVPNStateChange(state, reason uint32) {
+func (b *NetworkManagerBackend) handleVPNStateChangeAtPath(path dbus.ObjectPath, state, reason uint32) {
+	switch state {
+	case 5:
+		b.finishOpenConnectHelperSuccess(path)
+	case 6, 7:
+		b.clearOpenConnectHelperAttempt(path)
+	}
 	if state == nmVPNStateFailed {
 		b.stateMutex.Lock()
 		if uuid := b.state.ConnectingVPNUUID; uuid != "" {
