@@ -70,7 +70,7 @@ Singleton {
                 const thisState = stateMatch[1].trim().toLowerCase();
                 if (!state)
                     state = thisState;
-                if (thisState.includes("charging"))
+                if (thisState === "charging" || thisState.startsWith("charging"))
                     charging = true;
             }
         }
