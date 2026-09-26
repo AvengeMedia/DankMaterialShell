@@ -1544,9 +1544,8 @@ Singleton {
     }
 
     function _loadSettings() {
-        const isInitial = !_hasLoaded;
+        const isInitial = !_hasLoaded || _settingsStage === SettingsData.Stage.Partial;
         let unsavedChanges;
-
         let obj = _getSettingsObjectFromFiles();
         let loadedSettings = JSON.stringify(obj);
 
@@ -1619,6 +1618,9 @@ Singleton {
         }
 
         _hasLoaded = true;
+        if (!_parseError) {
+            _settingsStage = SettingsData.Stage.Ready;
+        }
 
         if (isInitial) {
             _mergeSessionState();
@@ -1634,7 +1636,7 @@ Singleton {
             }
         }
 
-        if (isInitial) {
+        if (isInitial && _settingsStage === SettingsData.Stage.Ready) {
             loadPluginSettings();
             Qt.callLater(() => _reconcileConnectedFrameBarStyles());
         }
@@ -3278,12 +3280,10 @@ Singleton {
                     Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse %1").arg(fileName), msg));
                 } finally {
                     isLoading = false;
-                    if (hasLoaded) {
-                        _tryCompleteLoading();
-                    }
                     if (hadParseFailed && !hasParseFailed) {
                         _parseError = _anySettingsFile(file => file.hasParseFailed);
                     }
+                    _tryCompleteLoading();
                     _loadSettingsOrStartIfReady();
                 }
             }
@@ -3298,9 +3298,7 @@ Singleton {
                     hasLoaded = true;
                 }
                 applyStoredTheme();
-                if (hasLoaded) {
-                    _tryCompleteLoading();
-                }
+                _tryCompleteLoading();
                 _loadSettingsOrStartIfReady();
             }
             onSaved: {
@@ -3327,7 +3325,7 @@ Singleton {
         }
     }
 
-    enum Stage { Discovering = 0, Loading = 1, Ready = 2 }
+    enum Stage { Discovering = 0, Loading = 1, Partial = 2, Ready = 3 }
     property int _settingsStage: SettingsData.Stage.Discovering
 
     property var _settingsFiles: new Map()
@@ -3376,17 +3374,17 @@ Singleton {
         if (_settingsStage !== SettingsData.Stage.Loading) {
             return;
         }
-        if (_everySettingsFile(file => file.hasLoaded)) {
-            _settingsStage = SettingsData.Stage.Ready;
+        if (_everySettingsFile(file => file.hasLoaded || file.hasParseFailed)) {
+            _settingsStage = _parseError ? SettingsData.Stage.Partial : SettingsData.Stage.Ready;
         }
     }
     function _loadSettingsOrStartIfReady() {
-        if (_settingsStage !== SettingsData.Stage.Ready || _anySettingsFile(file => file.isLoading)) {
+        if (_settingsStage < SettingsData.Stage.Partial || _anySettingsFile(file => file.isLoading)) {
             return;
         }
         let unsaved;
         _loading = true;
-        if (!_hasLoaded) {
+        if (!_hasLoaded || _settingsStage === SettingsData.Stage.Partial) {
             unsaved = _runStartSequence();
         } else {
             unsaved = _loadSettings();
