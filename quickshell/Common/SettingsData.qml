@@ -257,6 +257,7 @@ Singleton {
     property string calendarBackend: Spec.SPEC.calendarBackend.def
     property string defaultTaskCalendarId: Spec.SPEC.defaultTaskCalendarId.def
     property bool audioShowStreamDevices: Spec.SPEC.audioShowStreamDevices.def
+    property bool audioMono: Spec.SPEC.audioMono.def
     property string clockFormat: Spec.SPEC.clockFormat.def
     readonly property bool localeUses24Hour: {
         const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");

@@ -10702,6 +10702,31 @@
     "icon": "mic"
   },
   {
+    "section": "audioMono",
+    "label": "Mono Audio",
+    "tabIndex": 29,
+    "category": "Audio",
+    "keywords": [
+      "accessibility",
+      "audio",
+      "channel",
+      "content",
+      "headphones",
+      "media",
+      "microphone",
+      "mono",
+      "pipewire",
+      "single",
+      "sound",
+      "speaker",
+      "stereo",
+      "volume"
+    ],
+    "parentLabel": "Sound & media",
+    "icon": "a11y",
+    "description": "Mix all stereo content into a single channel"
+  },
+  {
     "section": "audioOutputDevices",
     "label": "Output devices",
     "tabIndex": 29,
