@@ -125,6 +125,58 @@ Item {
             NetworkService.scanWifi();
     }
 
+    function runBarClickAction(action, clickItem, clickX, clickY) {
+        switch (action) {
+        case "control-center":
+            if ((barConfig?.clickActionFollowMouse ?? false) && triggerControlCenterAt(clickItem, clickX, clickY))
+                return true;
+            triggerControlCenter();
+            return true;
+        case "spotlight":
+            PopoutService.toggleDankLauncherV2();
+            return true;
+        case "close-window":
+            ToplevelManager.activeToplevel?.close();
+            return true;
+        case "settings":
+            PopoutService.toggleSettings();
+            return true;
+        }
+        return false;
+    }
+
+    function handleEmptyBarClick(button, clickItem, clickX, clickY) {
+        if (button === Qt.MiddleButton)
+            return runBarClickAction(barConfig?.middleClickAction ?? "none", clickItem, clickX, clickY);
+        if (button === Qt.RightButton)
+            return runBarClickAction(barConfig?.rightClickAction ?? "none", clickItem, clickX, clickY);
+        return false;
+    }
+
+    function triggerControlCenterAt(clickItem, clickX, clickY) {
+        const loader = PopoutService.controlCenterLoader;
+        if (!loader)
+            return false;
+        loader.active = true;
+        if (!loader.item)
+            return false;
+        const popout = PopoutService.controlCenterPopout ?? loader.item;
+        const context = topBarContent.surfaceContext;
+        const point = context?.screenPoint(clickItem, clickX, clickY) ?? null;
+        if (popout?.setTriggerPosition && point) {
+            const thickness = context.thickness;
+            const spacing = barConfig?.spacing ?? 4;
+            const position = barConfig?.position ?? 0;
+            const trigger = SettingsData.getPopupTriggerPosition(point, screen, thickness, 1, spacing, position, barConfig);
+            popout.setTriggerPosition(trigger.x, trigger.y, trigger.width, "center", screen, position, thickness, spacing, barConfig, clickItem);
+        }
+        loader.item.triggerScreen = screen;
+        loader.item.toggle();
+        if (loader.item.shouldBeVisible && NetworkService.wifiEnabled)
+            NetworkService.scanWifi();
+        return true;
+    }
+
     function dashSectionItem(section) {
         const vertical = barWindow.isVertical;
         switch (section) {
@@ -963,10 +1015,15 @@ Item {
                     }
 
                     MouseArea {
+                        id: emptyBarClickArea
                         anchors.fill: parent
                         z: -2
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                        onClicked: PopoutManager.dismissAllForScreen(barWindow.screen?.name)
+                        onClicked: mouse => {
+                            if (barWindow.handleEmptyBarClick(mouse.button, emptyBarClickArea, mouse.x, mouse.y))
+                                return;
+                            PopoutManager.dismissAllForScreen(barWindow.screen?.name);
+                        }
                     }
 
                     BarScrollArea {

@@ -572,6 +572,89 @@ Item {
         }
 
         SettingsCard {
+            iconName: "mouse"
+            title: I18n.tr("Click actions")
+            settingKey: "barMouseClickAction"
+            tags: ["bar", "click", "middle", "right", "mouse", "control center", "launcher", "settings"]
+            visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarIsIsland
+
+            SettingsToggleRow {
+                text: I18n.tr("Follow mouse")
+                description: I18n.tr("Anchored popouts open at the cursor instead of their widget")
+                settingKey: "barClickActionFollowMouse"
+                tags: ["bar", "click", "mouse", "cursor", "position", "anchor", "popout"]
+                resetStore: bar
+                resetKeys: ["clickActionFollowMouse"]
+                checked: bar.selectedBarConfig?.clickActionFollowMouse ?? false
+                onToggled: checked => SettingsData.updateBarConfig(bar.selectedBarId, {
+                        clickActionFollowMouse: checked
+                    })
+            }
+
+            SettingsDropdownRow {
+                text: I18n.tr("Middle click")
+                description: I18n.tr("Choose what middle-clicking empty bar space does")
+                settingKey: "barMiddleClickAction"
+                tags: ["bar", "middle", "click", "mouse", "control center", "launcher", "settings", "close"]
+                resetStore: bar
+                resetKeys: ["middleClickAction"]
+                options: [I18n.tr("None", "bar click action"), I18n.tr("Toggle Control Center", "bar click action"), I18n.tr("Toggle Launcher", "bar click action"), I18n.tr("Close Active Window", "bar click action"), I18n.tr("Toggle Settings", "bar click action")]
+                dropdownWidth: Theme.smallBreakpoint / 2
+                currentValue: {
+                    switch (bar.selectedBarConfig?.middleClickAction ?? "none") {
+                    case "control-center":
+                        return options[1];
+                    case "spotlight":
+                        return options[2];
+                    case "close-window":
+                        return options[3];
+                    case "settings":
+                        return options[4];
+                    default:
+                        return options[0];
+                    }
+                }
+                onValueChanged: value => {
+                    const actions = ["none", "control-center", "spotlight", "close-window", "settings"];
+                    SettingsData.updateBarConfig(bar.selectedBarId, {
+                        middleClickAction: actions[options.indexOf(value)] ?? "none"
+                    });
+                }
+            }
+
+            SettingsDropdownRow {
+                text: I18n.tr("Right click")
+                description: I18n.tr("Choose what right-clicking empty bar space does")
+                settingKey: "barRightClickAction"
+                tags: ["bar", "right", "click", "mouse", "control center", "launcher", "settings", "close"]
+                resetStore: bar
+                resetKeys: ["rightClickAction"]
+                options: [I18n.tr("None", "bar click action"), I18n.tr("Toggle Control Center", "bar click action"), I18n.tr("Toggle Launcher", "bar click action"), I18n.tr("Close Active Window", "bar click action"), I18n.tr("Toggle Settings", "bar click action")]
+                dropdownWidth: Theme.smallBreakpoint / 2
+                currentValue: {
+                    switch (bar.selectedBarConfig?.rightClickAction ?? "none") {
+                    case "control-center":
+                        return options[1];
+                    case "spotlight":
+                        return options[2];
+                    case "close-window":
+                        return options[3];
+                    case "settings":
+                        return options[4];
+                    default:
+                        return options[0];
+                    }
+                }
+                onValueChanged: value => {
+                    const actions = ["none", "control-center", "spotlight", "close-window", "settings"];
+                    SettingsData.updateBarConfig(bar.selectedBarId, {
+                        rightClickAction: actions[options.indexOf(value)] ?? "none"
+                    });
+                }
+            }
+        }
+
+        SettingsCard {
             iconName: "border_outer"
             title: I18n.tr("Frame")
             settingKey: "frameEnabled"

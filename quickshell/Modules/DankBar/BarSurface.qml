@@ -171,10 +171,13 @@ Item {
     }
 
     MouseArea {
+        id: emptySurfaceClickArea
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         z: -999
-        onClicked: {
+        onClicked: mouse => {
+            if (root.barWindow.handleEmptyBarClick(mouse.button, emptySurfaceClickArea, mouse.x, mouse.y))
+                return;
             const activePopout = PopoutManager.getActivePopout(root.barWindow.screen);
             if (activePopout) {
                 if (activePopout.dashVisible !== undefined) {
