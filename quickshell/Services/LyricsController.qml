@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
 import qs.Modules.DankDash
@@ -9,24 +8,22 @@ import qs.Modules.DankDash
 QtObject {
     id: root
 
-    required property var player
+    property var track: null
+    property var player: null
+    property bool playing: false
+    property bool stopped: false
+    property real rate: 1
+    property bool settling: false
+    property string url: ""
+    property string embeddedText: ""
     property var backend: DMSService
     property bool enabled: false
 
-    readonly property var presentation: root.player.presentation
-    readonly property var activePlayer: root.player.activePlayer
-    readonly property string fileUrl: {
-        const url = activePlayer?.metadata?.["xesam:url"] ?? "";
-        return url.startsWith("file://") ? url : "";
-    }
-    readonly property string embeddedText: activePlayer?.metadata?.["xesam:asText"] ?? ""
-    readonly property string trackKey: presentation ? JSON.stringify([presentation.key, presentation.title, presentation.artist, presentation.album, fileUrl, MediaOptions.enabledLyricsProviders]) : ""
-    readonly property int duration: Math.round(presentation?.length ?? 0)
-    readonly property real position: activePlayer?.position ?? 0
-    readonly property int playbackState: activePlayer?.playbackState ?? MprisPlaybackState.Stopped
-    readonly property bool playing: playbackState === MprisPlaybackState.Playing
-    readonly property bool stopped: playbackState === MprisPlaybackState.Stopped
-    readonly property real rate: activePlayer?.rate ?? 1
+    readonly property bool available: DMSService.capabilities.includes("lyrics")
+    readonly property string fileUrl: url.startsWith("file://") ? url : ""
+    readonly property string trackKey: track ? JSON.stringify([track.key, track.title, track.artist, track.album, fileUrl, MediaOptions.enabledLyricsProviders]) : ""
+    readonly property int duration: Math.round(track?.length ?? 0)
+    readonly property real position: player?.position ?? 0
 
     property var lines: []
     property var plainLines: []
@@ -57,6 +54,7 @@ QtObject {
     property bool anchorPlaying: false
     property real anchorRate: 1
     property real positionWall: 0
+    property var memo: null
 
     onTrackKeyChanged: {
         cancel();
@@ -123,7 +121,7 @@ QtObject {
     function remember() {
         if (requestedKey === "" || (state !== "ready" && state !== "instrumental" && state !== "none"))
             return;
-        LyricsMemo.last = {
+        memo = {
             requestedKey,
             requestedDuration,
             requestedSong,
@@ -141,7 +139,7 @@ QtObject {
     }
 
     function recall() {
-        const last = LyricsMemo.last;
+        const last = memo;
         if (!last || last.requestedKey !== trackKey || requestedKey === trackKey)
             return;
         refreshPending = false;
@@ -151,7 +149,7 @@ QtObject {
     }
 
     function songTitle() {
-        return (presentation?.title ?? "").trim().toLowerCase();
+        return (track?.title ?? "").trim().toLowerCase();
     }
 
     function holdsSong() {
@@ -187,7 +185,7 @@ QtObject {
         if (!enabled)
             return;
         const refreshing = refreshPending && holdsSong();
-        if (root.player.presentationSettling) {
+        if (settling) {
             if (!refreshing)
                 state = "loading";
             requestDelay.restart();
@@ -199,7 +197,7 @@ QtObject {
         requestedKey = trackKey;
         requestedDuration = duration;
         requestedSong = songTitle();
-        const snapshot = presentation;
+        const snapshot = track;
         if (!snapshot || ((!snapshot.title || !snapshot.artist) && !fileUrl)) {
             if (!refreshing)
                 useEmbeddedText("none");
@@ -280,7 +278,7 @@ QtObject {
             const cues = part.w.slice().sort((a, b) => a.t - b.t);
             const last = cues[cues.length - 1];
             if (part.e <= part.t) {
-                const trackEnd = presentation?.length > part.t ? presentation.length : Infinity;
+                const trackEnd = track?.length > part.t ? track.length : Infinity;
                 part.e = last?.e > last?.t ? Math.max(...cues.map(word => word.e)) : next > part.t ? Math.min(next, trackEnd) : trackEnd;
             }
             if (last && part.e <= last.t)
@@ -381,7 +379,7 @@ QtObject {
 
     function reanchor(force = true) {
         anchorUpdate.stop();
-        const observed = activePlayer?.position ?? 0;
+        const observed = player?.position ?? 0;
         if (!force && anchorPlaying && Math.abs(observed - currentTime()) < DashMetrics.mediaLyricsPositionTolerance)
             return false;
         anchorPosition = observed;

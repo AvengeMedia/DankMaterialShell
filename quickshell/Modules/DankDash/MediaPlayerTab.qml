@@ -23,10 +23,8 @@ Item {
     property bool playerPaneOpen: true
     property Item lyricsFocusTarget: null
     property Item lyricsOpener: null
-    readonly property alias lyrics: lyricsController
     readonly property var presentation: mediaPresentation.current
     readonly property bool idle: !presentation
-    readonly property bool presentationSettling: mediaPresentation.settling
     property bool wallpaperEnabled: MediaOptions.albumArtBackdrop
     property string panel: ""
     property Item contentViewport: null
@@ -93,12 +91,6 @@ Item {
     onLyricsOpenChanged: {
         if (!lyricsOpen)
             lyricsFocusTimer.restart();
-    }
-
-    LyricsController {
-        id: lyricsController
-        player: root
-        enabled: root.lyricsOpen && root.live && root.lyricsEnabled && !root.idle
     }
 
     Timer {

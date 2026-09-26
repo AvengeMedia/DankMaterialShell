@@ -12,7 +12,7 @@ ShellRoot {
 
     property bool recordSeekIndices: false
     property var seekIndices: []
-    readonly property int lyricIndex: media.lyrics.activeIndex
+    readonly property int lyricIndex: LyricsService.controller.activeIndex
     onLyricIndexChanged: {
         if (recordSeekIndices)
             seekIndices.push(lyricIndex);
@@ -68,20 +68,16 @@ ShellRoot {
         DC.Style.theme = Theme;
         DC.Style.settings = SettingsData;
         DC.I18n.backend = I18n;
-        media.lyrics.backend = backend;
-        media.lyrics.player = lyricsPlayer;
+        LyricsService.controller.backend = backend;
+        LyricsService.activePlayer = source;
     }
 
     QtObject {
-        id: lyricsPlayer
-        property var presentation: media.presentation
-        property QtObject activePlayer: QtObject {
-            id: source
-            property real position: 0
-            property real rate: 1
-            property int playbackState: MprisPlaybackState.Playing
-            property var metadata: ({})
-        }
+        id: source
+        property real position: 0
+        property real rate: 1
+        property int playbackState: MprisPlaybackState.Playing
+        property var metadata: ({})
     }
 
     QtObject {
@@ -110,6 +106,21 @@ ShellRoot {
         }
     }
 
+    Component {
+        id: plainLyrics
+        LyricsController {
+            enabled: true
+            track: ({
+                    title: "Plugin song",
+                    artist: "Plugin artist",
+                    length: 60
+                })
+            player: QtObject {
+                property real position: 12
+            }
+        }
+    }
+
     TestCase {
         id: input
         when: false
@@ -130,14 +141,6 @@ ShellRoot {
                 anchors.fill: parent
                 live: true
             }
-        }
-    }
-
-    Component {
-        id: recreatedTab
-        MediaPlayerTab {
-            visible: false
-            live: false
         }
     }
 
@@ -167,7 +170,7 @@ ShellRoot {
 
     function seekPaused(position) {
         source.position = position;
-        waitFor(() => Math.abs(media.lyrics.sampleTime - position) < 0.01, "lyrics resync to " + position);
+        waitFor(() => Math.abs(LyricsService.controller.sampleTime - position) < 0.01, "lyrics resync to " + position);
     }
 
     function vocal(overlay, text) {
@@ -202,10 +205,10 @@ ShellRoot {
             root.recordSeekIndices = true;
             source.position = 30;
             source.position = 10;
-            waitFor(() => media.lyrics.activeIndex === 1, "seek lands on the second line");
+            waitFor(() => LyricsService.controller.activeIndex === 1, "seek lands on the second line");
             root.recordSeekIndices = false;
             check(root.seekIndices.length === 1 && root.seekIndices[0] === 1, "seek updates publish only the settled lyric line");
-            check(media.lyrics.lines.length === 5 && media.lyrics.lines[2].x.includes("backing vocal"), "same-time lyrics stay together");
+            check(LyricsService.controller.lines.length === 5 && LyricsService.controller.lines[2].x.includes("backing vocal"), "same-time lyrics stay together");
             waitFor(() => media.lyricsFocusTarget?.activeFocus, "lyrics receives keyboard focus");
             let overlay = media.lyricsFocusTarget;
             const line = find(overlay, item => item.text === root.longLine && item.truncated !== undefined);
@@ -217,24 +220,24 @@ ShellRoot {
             const settledCalls = backend.calls;
             MprisController.stableAlbum = "Late album";
             waitFor(() => backend.calls === settledCalls + 1, "a late album refreshes the lookup");
-            check(media.lyrics.state === "ready" && media.lyrics.tick.running, "the shown lyrics keep following during the refresh");
+            check(LyricsService.controller.state === "ready" && LyricsService.controller.tick.running, "the shown lyrics keep following during the refresh");
             backend.respond({
                 result: {
                     found: true,
                     synced: root.timed
                 }
             });
-            check(media.lyrics.tick.running, "an unchanged refresh keeps the timer running");
+            check(LyricsService.controller.tick.running, "an unchanged refresh keeps the timer running");
             source.playbackState = MprisPlaybackState.Stopped;
-            check(media.lyrics.activeIndex === 1, "stopped playback holds the lyric position");
+            check(LyricsService.controller.activeIndex === 1, "stopped playback holds the lyric position");
             source.playbackState = MprisPlaybackState.Playing;
             source.playbackState = MprisPlaybackState.Paused;
-            check(!media.lyrics.tick.running, "paused playback has no lyric timer");
+            check(!LyricsService.controller.tick.running, "paused playback has no lyric timer");
             source.playbackState = MprisPlaybackState.Playing;
-            check(media.lyrics.tick.running, "resuming schedules the next line");
+            check(LyricsService.controller.tick.running, "resuming schedules the next line");
             source.position = 9.5;
             source.playbackState = MprisPlaybackState.Paused;
-            check(Math.abs(media.lyrics.currentTime() - 9.5) < 0.05 && media.lyrics.activeIndex === 0 && !media.lyrics.tick.running, "pausing immediately after a seek retains the seek target");
+            check(Math.abs(LyricsService.controller.currentTime() - 9.5) < 0.05 && LyricsService.controller.activeIndex === 0 && !LyricsService.controller.tick.running, "pausing immediately after a seek retains the seek target");
             SettingsData.reduceMotion = false;
             seekPaused(30.3);
             const wordText = find(overlay, item => item.Accessible.name === root.wordLine && item.textFormat !== undefined);
@@ -248,18 +251,11 @@ ShellRoot {
             source.playbackState = MprisPlaybackState.Playing;
             media.lyricsOpen = false;
             waitFor(() => !media.lyricsFocusTarget, "closing releases the view");
-            check(!media.lyrics.tick.running, "closing stops scheduling");
+            check(!LyricsService.controller.tick.running, "closing stops scheduling");
             media.lyricsOpen = true;
             waitFor(() => !!media.lyricsFocusTarget, "reopened lyrics load");
-            check(backend.calls === settledCalls + 1 && media.lyrics.state === "ready", "reopening reuses loaded lyrics");
-            const recreated = recreatedTab.createObject(stage);
-            recreated.lyrics.backend = backend;
-            recreated.lyrics.player = lyricsPlayer;
-            recreated.lyricsOpen = true;
-            recreated.live = true;
-            check(recreated.lyrics.state === "ready" && !recreated.lyrics.pending && recreated.lyrics.lines.length === media.lyrics.lines.length && backend.calls === settledCalls + 1, "a recreated media tab shows the loaded lyrics without loading");
-            recreated.destroy();
-            media.lyrics.request();
+            check(backend.calls === settledCalls + 1 && LyricsService.controller.state === "ready", "reopening reuses loaded lyrics");
+            LyricsService.controller.request();
             const stale = backend.pending[backend.nextId];
             MprisController.stableTitle = "Next track";
             waitFor(() => backend.cancelled > 0, "track change cancels old response handler");
@@ -269,7 +265,7 @@ ShellRoot {
                     plain: "stale lyrics"
                 }
             });
-            check(media.lyrics.state !== "ready", "late response cannot populate a new track");
+            check(LyricsService.controller.state !== "ready", "late response cannot populate a new track");
             backend.respond({
                 result: {
                     found: true,
@@ -282,16 +278,16 @@ ShellRoot {
             input.keyClick(Qt.Key_End);
             const list = find(overlay, item => typeof item.positionViewAtEnd === "function");
             waitFor(() => list.contentY > 0, "plain lyrics scroll to the end");
-            check(!media.lyrics.synced, "plain lyrics are not synchronized");
+            check(!LyricsService.controller.synced, "plain lyrics are not synchronized");
             source.metadata = {
                 "xesam:asText": "Embedded text remains available offline"
             };
-            media.lyrics.request();
+            LyricsService.controller.request();
             backend.respond({
                 error: "offline"
             });
-            check(media.lyrics.state === "ready" && media.lyrics.plainLines[0] === source.metadata["xesam:asText"], "network errors fall back to embedded lyrics");
-            media.lyrics.request();
+            check(LyricsService.controller.state === "ready" && LyricsService.controller.plainLines[0] === source.metadata["xesam:asText"], "network errors fall back to embedded lyrics");
+            LyricsService.controller.request();
             const oldProviderReply = backend.pending[backend.nextId];
             const oldCalls = backend.calls;
             SettingsData.mediaLyricsProviders = [
@@ -315,7 +311,7 @@ ShellRoot {
                 }
             });
             waitFor(() => backend.calls === oldCalls + 1, "provider change requests again");
-            check(JSON.stringify(backend.lastParams.providers) === '["lrclib","lyricsplus"]' && media.lyrics.state === "loading", "priority changes discard pending results and request enabled providers in order");
+            check(JSON.stringify(backend.lastParams.providers) === '["lrclib","lyricsplus"]' && LyricsService.controller.state === "loading", "priority changes discard pending results and request enabled providers in order");
             SettingsData.mediaLyricsProviders = MediaOptions.lyricsProviders.map(provider => ({
                         id: provider.id,
                         enabled: false
@@ -327,10 +323,10 @@ ShellRoot {
                     found: false
                 }
             });
-            check(media.lyrics.state === "ready" && !media.lyrics.synced, "embedded lyrics remain available with all providers off");
+            check(LyricsService.controller.state === "ready" && !LyricsService.controller.synced, "embedded lyrics remain available with all providers off");
             source.playbackState = MprisPlaybackState.Paused;
             source.position = 13;
-            media.lyrics.request();
+            LyricsService.controller.request();
             backend.respond({
                 result: {
                     found: true,
@@ -436,7 +432,7 @@ ShellRoot {
                     ]
                 }
             });
-            waitFor(() => !!media.lyricsFocusTarget && media.lyrics.synced, "duet lyrics load");
+            waitFor(() => !!media.lyricsFocusTarget && LyricsService.controller.synced, "duet lyrics load");
             overlay = media.lyricsFocusTarget;
             overlay.snapToCurrent();
             const leadVocal = vocal(overlay, "Lead held");
@@ -444,9 +440,9 @@ ShellRoot {
             const replyVocal = vocal(overlay, "Reply");
             check(leadVocal.current && backingVocal.current && replyVocal.current, "both singers and backing vocals can be active together");
             check(Math.abs(leadVocal.wordProgress - 0.75) < 0.01 && Math.abs(backingVocal.wordProgress - 1 / 3) < 0.01 && Math.abs(replyVocal.wordProgress - 0.25) < 0.01, "each voice uses its own word duration");
-            check(media.lyrics.lines[1].parts.length === 2, "backing vocals remain grouped with their lead");
+            check(LyricsService.controller.lines[1].parts.length === 2, "backing vocals remain grouped with their lead");
             seekPaused(17);
-            check(leadVocal.current && !backingVocal.current && !replyVocal.current && media.lyrics.activeIndex === 2, "parts end independently without scrolling backwards");
+            check(leadVocal.current && !backingVocal.current && !replyVocal.current && LyricsService.controller.activeIndex === 2, "parts end independently without scrolling backwards");
             check(replyVocal.highlighted && replyVocal.wordProgress === 1, "completed words retain their highlight while the line stays in focus");
             seekPaused(22.5);
             const finishedLine = vocal(overlay, "After the duet");
@@ -467,8 +463,8 @@ ShellRoot {
             seekPaused(13);
             check(backingVocal.current && replyVocal.current && Math.abs(replyVocal.wordProgress - 0.25) < 0.01, "seeking back restores every overlapping part");
             MprisController._syncStableMeta();
-            media.lyrics.player = media;
-            media.lyrics.request();
+            LyricsService.activePlayer = media.activePlayer;
+            LyricsService.controller.request();
             backend.respond({
                 result: {
                     found: true,
@@ -478,15 +474,27 @@ ShellRoot {
             const seekbar = find(media, item => typeof item.seekTo === "function");
             for (const target of [31, 10.3, 20.2, 31.4]) {
                 seekbar.seekTo(target);
-                waitFor(() => media.activePlayer.position >= target - 0.05 && media.activePlayer.position < target + 5 && Math.abs(media.lyrics.currentTime() - media.activePlayer.position) < 0.05 && media.lyrics.activeIndex === media.lyrics.indexFor(target, media.lyrics.lines), "DMS seekbar resynchronizes against real MPRIS after seeking to " + target);
+                waitFor(() => media.activePlayer.position >= target - 0.05 && media.activePlayer.position < target + 5 && Math.abs(LyricsService.controller.currentTime() - media.activePlayer.position) < 0.05 && LyricsService.controller.activeIndex === LyricsService.controller.indexFor(target, LyricsService.controller.lines), "DMS seekbar resynchronizes against real MPRIS after seeking to " + target);
             }
             media.activePlayer.pause();
-            waitFor(() => !media.lyrics.playing, "real MPRIS pause reaches lyrics");
+            waitFor(() => !LyricsService.controller.playing, "real MPRIS pause reaches lyrics");
             seekbar.seekTo(30.3);
-            waitFor(() => Math.abs(media.lyrics.currentTime() - 30.3) < 0.01 && media.lyrics.wordTime === 30.25, "DMS seekbar updates the current word while paused");
+            waitFor(() => Math.abs(LyricsService.controller.currentTime() - 30.3) < 0.01 && LyricsService.controller.wordTime === 30.25, "DMS seekbar updates the current word while paused");
             media.activePlayer.play();
-            waitFor(() => media.lyrics.currentTime() > 30.35 && Math.abs(media.lyrics.currentTime() - media.activePlayer.position) < 0.05, "resuming continues from the seek target");
-            console.log("FIXTURE_PASS lyric lookup, seeking, word timing, overlapping vocals, stale replies and provider fallback");
+            waitFor(() => LyricsService.controller.currentTime() > 30.35 && Math.abs(LyricsService.controller.currentTime() - media.activePlayer.position) < 0.05, "resuming continues from the seek target");
+            const plain = plainLyrics.createObject(root, {
+                backend: backend
+            });
+            waitFor(() => backend.lastParams.title === "Plugin song", "a plain source requests its own track");
+            backend.respond({
+                result: {
+                    found: true,
+                    synced: root.timed
+                }
+            });
+            check(plain.activeIndex === 1, "a plain source follows its own position");
+            plain.destroy();
+            console.log("FIXTURE_PASS lyric lookup, seeking, word timing, overlapping vocals, stale replies, provider fallback and plain sources");
             Qt.quit();
         } catch (error) {
             console.error("FIXTURE_FAIL", error);

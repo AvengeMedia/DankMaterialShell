@@ -9,7 +9,9 @@ import qs.Modules.DankDash
 FocusScope {
     id: root
 
-    required property var player
+    property var player: null
+    property var lyrics: null
+    property bool smoothHighlight: root.player?.smoothLyrics ?? MediaOptions.defaults.smoothLyrics
     property real radius: DashMetrics.mediaInnerRadius
     property Item blurSource: null
     property Item backgroundParent: null
@@ -19,7 +21,7 @@ FocusScope {
     property Item followedItem: null
     property real followedY: 0
 
-    readonly property var controller: root.player.lyrics
+    readonly property var controller: root.lyrics ?? LyricsService.controller
     readonly property bool ready: controller.state === "ready"
     readonly property bool unsynced: ready && !controller.synced
     readonly property bool showFollow: ready && controller.synced && !following
@@ -81,8 +83,13 @@ FocusScope {
         transcript.contentY = Math.max(transcript.originY, Math.min(transcript.maximumContentY, transcript.contentY + shift));
     }
 
+    LyricsSubscription {
+        active: root.visible && !root.lyrics
+    }
+
     Binding {
         target: root.player
+        when: root.player !== null
         property: "lyricsFocusTarget"
         value: root
         restoreMode: Binding.RestoreBindingOrValue
@@ -317,7 +324,7 @@ FocusScope {
                             leadFontSize: root.leadFontSize
                             distance: lyric ? Math.abs(lyric.index - root.activeIndex) : 0
                             animationsEnabled: root.animationsEnabled
-                            smoothHighlight: root.player.smoothLyrics
+                            smoothHighlight: root.smoothHighlight
                             inViewport: {
                                 if (!lyric)
                                     return false;
