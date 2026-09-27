@@ -89,6 +89,7 @@ Singleton {
     property bool _pluginParseError: false
     property bool _hasLoaded: false
     property bool isReadOnly: false
+    property bool unsavedUserChanges: false
     property var pluginSettings: ({})
     property var builtInPluginSettings: Spec.SPEC.builtInPluginSettings.def
 
@@ -1549,47 +1550,45 @@ Singleton {
         let obj = _getSettingsObjectFromFiles();
         let loadedSettings = JSON.stringify(obj);
 
-        if (isInitial) {
-            const oldVersion = obj?.configVersion ?? 0;
-            const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
-            const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
-            const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
-            if (oldVersion < settingsConfigVersion) {
-                const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
-                if (migrated) {
-                    obj = migrated;
+        const oldVersion = obj?.configVersion ?? 0;
+        const legacyPins = oldVersion < 13 ? Store.extractPins(obj) : null;
+        const sessionPayload = oldVersion < 15 ? Store.extractSessionPayload(obj) : null;
+        const cachePayload = oldVersion < 15 ? Store.extractCachePayload(obj) : null;
+        let migrationRan = false;
+        if (oldVersion < settingsConfigVersion) {
+            const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
+            if (migrated) {
+                obj = migrated;
+                migrationRan = true;
+            }
+        }
+        if (legacyPins) {
+            Qt.callLater(() => CacheData.migratePins(legacyPins));
+        }
+        if (cachePayload) {
+            Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
+        }
+        if (sessionPayload) {
+            Qt.callLater(() => {
+                SessionData.importFromSettings(sessionPayload);
+                _mergeSessionState();
+            });
+        }
+        if (obj?.lockScreenActiveMonitor !== undefined) {
+            var oldVal = obj.lockScreenActiveMonitor;
+            if (oldVal && oldVal !== "all") {
+                if (!obj.screenPreferences) {
+                    obj.screenPreferences = {};
+                }
+                if (obj.screenPreferences.lockScreen === undefined) {
+                    obj.screenPreferences.lockScreen = [oldVal];
                 }
             }
-
-            if (legacyPins) {
-                Qt.callLater(() => CacheData.migratePins(legacyPins));
-            }
-            if (cachePayload) {
-                Qt.callLater(() => CacheData.migrateUsageHistories(cachePayload));
-            } if (sessionPayload) {
-                Qt.callLater(() => {
-                    SessionData.importFromSettings(sessionPayload);
-                    _mergeSessionState();
-                });
-            }
-
-            if (obj?.lockScreenActiveMonitor !== undefined) {
-                var oldVal = obj.lockScreenActiveMonitor;
-                if (oldVal && oldVal !== "all") {
-                    if (!obj.screenPreferences) {
-                        obj.screenPreferences = {};
-                    }
-                    if (obj.screenPreferences.lockScreen === undefined) {
-                        obj.screenPreferences.lockScreen = [oldVal];
-                    }
-                }
-                delete obj.lockScreenActiveMonitor;
-            }
-
-            if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
-                obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
-                delete obj.use24HourClock;
-            }
+            delete obj.lockScreenActiveMonitor;
+        }
+        if (obj?.use24HourClock !== undefined && obj?.clockFormat === undefined) {
+            obj.clockFormat = obj.use24HourClock ? "24h" : "12h";
+            delete obj.use24HourClock;
         }
 
         const prevFrameEnabled = frameEnabled;
@@ -1597,7 +1596,7 @@ Singleton {
         unsavedChanges = loadedSettings !== JSON.stringify(obj);
         Store.parse(root, obj);
 
-        // set() enforces this pair, but a hand-edited settings.json bypasses set() entirely.
+        // set() enforces this pair, but a hand-edited settings bypass set() entirely.
         if (frameEnabled)
             clearIslandBars();
 
@@ -1772,9 +1771,10 @@ Singleton {
     function saveSettings() {
         if (isGreeterMode || _loading || !_hasLoaded)
             return;
+        unsavedUserChanges = true;
         settingsSaveDebounce.restart();
     }
-    function _saveSettings() {
+    function _saveSettings(userChanges) {
         let reason = null;
         if (isGreeterMode) {
             reason = "running in greeter mode."
@@ -1792,8 +1792,9 @@ Singleton {
         for (const path in splitSettings) {
             const fileSettings = splitSettings[path];
             const file = _settingsFiles.get(path);
-            file.setSettings(fileSettings);
+            file.setSettings(fileSettings, userChanges);
         }
+        unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
     }
 
     function savePluginSettings() {
@@ -3196,25 +3197,26 @@ Singleton {
         property bool hasLoaded: false
         property bool hasParseFailed: false
         property bool hasSaveFailed: false
-        property bool hasUnsavedChanges: false
+        property bool fileUnsavedUserChanges: false
         property bool isFileReadOnly: false
         property bool selfWrite: false
-        function setSettings(newSettings) {
+        function setSettings(newSettings, userChanges) {
             const newSettingsJson = JSON.stringify(newSettings, null, 2);
-            if (JSON.stringify(settings, null, 2) !== newSettingsJson) {
-                settings = newSettings;
-                hasUnsavedChanges = true;
+            if (JSON.stringify(settings, null, 2) === newSettingsJson) {
+                return;
             }
-            if (hasUnsavedChanges) {
-                selfWrite = true;
-                settingsFileView.setText(newSettingsJson);
-            }
+
+            settings = newSettings;
+            fileUnsavedUserChanges = fileUnsavedUserChanges || userChanges;
+
+            selfWrite = true;
+            settingsFileView.setText(newSettingsJson);
         }
         function getSettings() {
             return Object.assign({}, settings);
         }
         function retrySaving() {
-            if (!hasUnsavedChanges) {
+            if (!fileUnsavedUserChanges) {
                 return;
             }
             // Quickshell only writes if the text has changed, but doesn't provide a way to force a write.
@@ -3251,18 +3253,14 @@ Singleton {
                 if (isGreeterMode) {
                     return;
                 }
-                if (hasUnsavedChanges) {
-                    const fileName = filePath?.split("/").pop() || "unknown";
-                    log.warn(`Aborting ${fileName} reload: there are unsaved changes which would've been lost.`)
-                    isLoading = false;
-                    _loading = _anySettingsFile(file => file.isLoading);
-                    settingsSaveFailRecovery.start();
-                    return;
-                }
                 isLoading = true;
                 _loading = true;
                 const hadParseFailed = hasParseFailed;
                 hasParseFailed = false;
+                fileUnsavedUserChanges = false;
+                if (unsavedUserChanges) {
+                    unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
+                }
                 const fileName = filePath?.split("/").pop();
                 try {
                     let txt = settingsFileView.text();
@@ -3302,13 +3300,17 @@ Singleton {
                 _loadSettingsOrStartIfReady();
             }
             onSaved: {
-                hasUnsavedChanges = false;
                 isFileReadOnly = false;
-                isReadOnly = _anySettingsFile(file => file.isFileReadOnly);
+                isReadOnly = isReadOnly ? _anySettingsFile(file => file.isFileReadOnly) : false;
+
+                fileUnsavedUserChanges = false;
+                if (unsavedUserChanges) {
+                    unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
+                }
 
                 const fileName = filePath?.split("/").pop() || "unknown";
                 if (hasSaveFailed) {
-                    log.info(`Settings file '${fileName}' saved successfully after previous failures`)
+                    log.info(`Settings file '${fileName}' saved successfully after previous failures`);
                     hasSaveFailed = false;
                 }
             }
@@ -3318,9 +3320,11 @@ Singleton {
                     isReadOnly = true;
                 }
                 hasSaveFailed = true;
-                const fileName = filePath?.split("/").pop() || "unknown";
-                log.warn(`Failed to save ${fileName}, retrying...`)
-                settingsSaveFailRecovery.start();
+                if (fileUnsavedUserChanges) {
+                    const fileName = filePath?.split("/").pop() || "unknown";
+                    log.warn(`Failed to save ${fileName}, retrying...`)
+                    settingsSaveFailRecovery.start();
+                }
             }
         }
     }
@@ -3391,7 +3395,7 @@ Singleton {
         }
         _loading = false;
         if (unsaved) {
-            _saveSettings();
+            _saveSettings(false);
         }
     }
     function _getSettingsObjectFromFiles() {
@@ -3595,7 +3599,10 @@ Singleton {
         repeat: true
         running: false
         onTriggered: {
-            if (_everySettingsFile(file => !file.hasSaveFailed) || tries >= 15) {
+            const success = _everySettingsFile(file => {
+                return !file.hasSaveFailed || !file.fileUnsavedUserChanges;
+            });
+            if (success || tries >= 15) {
                 tries = 0;
                 stop();
                 return;
@@ -3614,7 +3621,7 @@ Singleton {
         interval: 50
         repeat: false
         running: false
-        onTriggered: _saveSettings()
+        onTriggered: _saveSettings(true)
     }
 
     property bool pluginSettingsFileExists: false
