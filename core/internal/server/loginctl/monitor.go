@@ -34,6 +34,7 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 		m.state.LockedHint = false
 		m.stateMutex.Unlock()
 		m.notifySubscribers()
+		m.prelockedReady.Store(false)
 
 		// Cancel the lock timer if it's still running
 		m.lockTimerMu.Lock()
@@ -56,19 +57,30 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 			cycleID := m.sleepCycleID.Add(1)
 			m.inSleepCycle.Store(true)
 
-			if m.lockBeforeSuspend.Load() {
+			m.stateMutex.RLock()
+			alreadyLocked := m.state.Locked
+			m.stateMutex.RUnlock()
+
+			if m.lockBeforeSuspend.Load() && !alreadyLocked {
 				m.Lock()
 			}
 
-			readyCh := m.newLockerReadyCh()
-			go func(id uint64, ch <-chan struct{}) {
-				<-ch
-				if m.inSleepCycle.Load() && m.sleepCycleID.Load() == id {
-					m.releaseSleepInhibitor()
-				}
-			}(cycleID, readyCh)
+			// QML may lock and send lockerReady before the sleep command, so
+			// PrepareForSleep must not wait for a second ready.
+			if alreadyLocked || m.prelockedReady.Swap(false) {
+				m.releaseSleepInhibitor()
+			} else {
+				readyCh := m.newLockerReadyCh()
+				go func(id uint64, ch <-chan struct{}) {
+					<-ch
+					if m.inSleepCycle.Load() && m.sleepCycleID.Load() == id {
+						m.releaseSleepInhibitor()
+					}
+				}(cycleID, readyCh)
+			}
 		} else {
 			m.inSleepCycle.Store(false)
+			m.prelockedReady.Store(false)
 			m.signalLockerReady()
 			m.refreshSessionBinding()
 			m.acquireSleepInhibitor()
@@ -144,6 +156,9 @@ func (m *Manager) handlePropertiesChanged(sig *dbus.Signal) {
 				m.state.LockedHint = val
 				m.state.Locked = val
 				m.stateMutex.Unlock()
+				if !val {
+					m.prelockedReady.Store(false)
+				}
 				needsUpdate = true
 			}
 		}

@@ -116,19 +116,7 @@ func handleSetSleepInhibitorEnabled(conn *ipc.ConnWriter, req ipc.Request, manag
 }
 
 func handleLockerReady(conn *ipc.ConnWriter, req ipc.Request, manager *Manager) {
-	manager.lockTimerMu.Lock()
-	if manager.lockTimer != nil {
-		manager.lockTimer.Stop()
-		manager.lockTimer = nil
-	}
-	manager.lockTimerMu.Unlock()
-
-	id := manager.sleepCycleID.Load()
-	manager.releaseForCycle(id)
-
-	if manager.inSleepCycle.Load() {
-		manager.signalLockerReady()
-	}
+	manager.markLockerReady()
 	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "ok"})
 }
 

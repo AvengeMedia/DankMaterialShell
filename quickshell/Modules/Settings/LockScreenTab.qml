@@ -451,7 +451,7 @@ Item {
 
             SettingsToggleRow {
                 settingKey: "lockBeforeSuspend"
-                tags: ["lock", "screen", "suspend", "sleep", "automatic"]
+                tags: ["lock", "screen", "suspend", "hibernate", "sleep", "automatic"]
                 text: I18n.tr("Lock before suspend")
                 checked: SettingsData.lockBeforeSuspend
                 visible: SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration

@@ -1,11 +1,14 @@
 package loginctl
 
 import (
+	"os"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestManager_HandleDBusSignal_Lock(t *testing.T) {
@@ -115,6 +118,104 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 		defer manager.stateMutex.RUnlock()
 		assert.False(t, manager.state.PreparingForSleep)
 	})
+}
+
+func TestManager_PrepareForSleep_ReleasesWhenAlreadyLocked(t *testing.T) {
+	f, err := os.CreateTemp(t.TempDir(), "inhibit")
+	require.NoError(t, err)
+
+	manager := &Manager{
+		state: &SessionState{
+			Locked: true,
+		},
+		stateMutex:  sync.RWMutex{},
+		dirty:       make(chan struct{}, 1),
+		inhibitFile: f,
+	}
+	manager.lockBeforeSuspend.Store(true)
+
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
+		Body: []any{true},
+	})
+
+	manager.stateMutex.RLock()
+	assert.True(t, manager.state.PreparingForSleep)
+	manager.stateMutex.RUnlock()
+	assert.True(t, manager.inSleepCycle.Load())
+	assert.Nil(t, manager.inhibitFile)
+}
+
+func TestManager_PrepareForSleep_ReleasesWhenPrelockedReady(t *testing.T) {
+	f, err := os.CreateTemp(t.TempDir(), "inhibit")
+	require.NoError(t, err)
+
+	manager := &Manager{
+		state:       &SessionState{},
+		stateMutex:  sync.RWMutex{},
+		dirty:       make(chan struct{}, 1),
+		inhibitFile: f,
+	}
+	manager.lockBeforeSuspend.Store(true)
+	manager.prelockedReady.Store(true)
+
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
+		Body: []any{true},
+	})
+
+	assert.Nil(t, manager.inhibitFile)
+	assert.False(t, manager.prelockedReady.Load())
+}
+
+func TestManager_PrepareForSleep_KeepsInhibitorUntilLockerReady(t *testing.T) {
+	f, err := os.CreateTemp(t.TempDir(), "inhibit")
+	require.NoError(t, err)
+
+	manager := &Manager{
+		state:         &SessionState{},
+		stateMutex:    sync.RWMutex{},
+		dirty:         make(chan struct{}, 1),
+		inhibitFile:   f,
+		fallbackDelay: time.Hour,
+	}
+	manager.lockBeforeSuspend.Store(true)
+
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
+		Body: []any{true},
+	})
+
+	assert.Same(t, f, manager.inhibitFile)
+	assert.True(t, manager.inSleepCycle.Load())
+
+	manager.signalLockerReady()
+
+	require.Eventually(t, func() bool {
+		manager.inhibitMu.Lock()
+		defer manager.inhibitMu.Unlock()
+		return manager.inhibitFile == nil
+	}, time.Second, 5*time.Millisecond)
+}
+
+func TestManager_MarkLockerReady_ClearedOnUnlock(t *testing.T) {
+	manager := &Manager{
+		state: &SessionState{
+			Locked:     true,
+			LockedHint: true,
+		},
+		stateMutex: sync.RWMutex{},
+		dirty:      make(chan struct{}, 1),
+	}
+	manager.markLockerReady()
+	assert.True(t, manager.prelockedReady.Load())
+
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Session.Unlock",
+	})
+
+	assert.False(t, manager.prelockedReady.Load())
+	assert.False(t, manager.state.Locked)
 }
 
 func TestManager_HandlePropertiesChanged(t *testing.T) {

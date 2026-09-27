@@ -67,6 +67,7 @@ Singleton {
     property var lockComponent: null
     property bool monitorsOff: false
     property bool isShellLocked: false
+    property bool isSessionLockSecure: false
     property bool lockPowerOffRequested: false
 
     function reapplyDpmsIfNeeded() {

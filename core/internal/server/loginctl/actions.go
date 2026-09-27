@@ -89,6 +89,24 @@ func (m *Manager) SetLockBeforeSuspend(enabled bool) {
 	m.lockBeforeSuspend.Store(enabled)
 }
 
+func (m *Manager) markLockerReady() {
+	m.lockTimerMu.Lock()
+	if m.lockTimer != nil {
+		m.lockTimer.Stop()
+		m.lockTimer = nil
+	}
+	m.lockTimerMu.Unlock()
+
+	id := m.sleepCycleID.Load()
+	m.releaseForCycle(id)
+
+	if m.inSleepCycle.Load() {
+		m.signalLockerReady()
+		return
+	}
+	m.prelockedReady.Store(true)
+}
+
 func (m *Manager) SetSleepInhibitorEnabled(enabled bool) {
 	m.sleepInhibitorEnabled.Store(enabled)
 	if enabled {

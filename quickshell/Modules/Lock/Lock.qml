@@ -76,6 +76,7 @@ Scope {
 
     Component.onCompleted: {
         IdleService.lockComponent = this;
+        IdleService.isSessionLockSecure = sessionLock.secure;
         if (SettingsData.lockAtStartup && !freshGreeterLogin())
             lock();
     }
@@ -337,9 +338,11 @@ Scope {
         target: sessionLock
 
         function onSecureChanged() {
+            IdleService.isSessionLockSecure = sessionLock.secure;
             notifyLockedHint(sessionLock.secure);
             if (!sessionLock.secure)
                 return;
+            SessionService.onSessionLockSecured();
             IdleService.dismissFadeToLock();
             lockRetryAttempts = 0;
             pendingLock = false;
