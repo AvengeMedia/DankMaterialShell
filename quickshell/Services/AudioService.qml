@@ -31,8 +31,13 @@ Singleton {
     readonly property bool pipewireReady: pipewireBackend?.ready ?? false
     readonly property var pipewireNodes: pipewireBackend?.nodes ?? []
     readonly property var allNodes: freebsdAudio ? nativeSinks.concat(nativeSources) : pipewireNodes
-    readonly property var sink: freebsdAudio ? nativeSink : (pipewireBackend?.defaultSink ?? null)
-    readonly property var source: freebsdAudio ? nativeSource : (pipewireBackend?.defaultSource ?? null)
+	readonly property var sink: freebsdAudio ? nativeSink : (pipewireBackend?.defaultSink ?? null)
+	readonly property var source: freebsdAudio ? nativeSource : (pipewireBackend?.defaultSource ?? null)
+
+	function isPipewireVideoSource(node) {
+		return !freebsdAudio
+			&& (pipewireBackend?.isVideoSource(node) ?? false);
+	}
 
     Loader {
         id: pipewireBackendLoader
