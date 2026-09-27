@@ -21,6 +21,11 @@ Item {
         Pipewire.preferredDefaultAudioSource = node;
     }
 
+	function isVideoSource(node) {
+		return !!node
+			&& (node.type & PwNodeType.VideoSource) === PwNodeType.VideoSource;
+	}
+
     Connections {
         target: Pipewire.nodes
         function onValuesChanged() {
@@ -28,7 +33,9 @@ Item {
         }
     }
 
-    PwObjectTracker {
-        objects: Pipewire.nodes.values.filter(node => node.audio && (SettingsData.audioShowStreamDevices || !node.isStream))
-    }
+	PwObjectTracker {
+		objects: Pipewire.nodes.values.filter(node =>
+			node.audio || !node.isStream
+		)
+	}
 }
