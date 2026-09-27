@@ -3196,7 +3196,6 @@ Singleton {
         property bool isLoading: false
         property bool hasLoaded: false
         property bool hasParseFailed: false
-        property bool hasSaveFailed: false
         property bool fileUnsavedUserChanges: false
         property bool isFileReadOnly: false
         property bool selfWrite: false
@@ -3214,15 +3213,6 @@ Singleton {
         }
         function getSettings() {
             return Object.assign({}, settings);
-        }
-        function retrySaving() {
-            if (!fileUnsavedUserChanges) {
-                return;
-            }
-            // Quickshell only writes if the text has changed, but doesn't provide a way to force a write.
-            const json = JSON.stringify(settings, null, 2) + ((settingsSaveFailRecovery.tries % 2 === 1) ? " " : "");
-            selfWrite = true;
-            settingsFileView.setText(json);
         }
 
         property Timer timer: Timer {
@@ -3307,23 +3297,15 @@ Singleton {
                 if (unsavedUserChanges) {
                     unsavedUserChanges = _anySettingsFile(file => file.fileUnsavedUserChanges);
                 }
-
-                const fileName = filePath?.split("/").pop() || "unknown";
-                if (hasSaveFailed) {
-                    log.info(`Settings file '${fileName}' saved successfully after previous failures`);
-                    hasSaveFailed = false;
-                }
             }
             onSaveFailed: (error) => {
                 if (error === FileViewError.PermissionDenied) {
                     isFileReadOnly = true;
                     isReadOnly = true;
                 }
-                hasSaveFailed = true;
                 if (fileUnsavedUserChanges) {
                     const fileName = filePath?.split("/").pop() || "unknown";
-                    log.warn(`Failed to save ${fileName}, retrying...`)
-                    settingsSaveFailRecovery.start();
+                    log.warn(`Failed to save ${fileName}`);
                 }
             }
         }
@@ -3588,33 +3570,6 @@ Singleton {
         }
     }
 
-    Timer {
-        id: settingsSaveFailRecovery
-
-        property int tries: 0
-        interval: {
-            const delay = 2 ** (tries + 1);
-            return (delay > 60 ? 60 : delay) * 1000;
-        }
-        repeat: true
-        running: false
-        onTriggered: {
-            const success = _everySettingsFile(file => {
-                return !file.hasSaveFailed || !file.fileUnsavedUserChanges;
-            });
-            if (success || tries >= 15) {
-                tries = 0;
-                stop();
-                return;
-            }
-            tries++;
-            for (const file of _settingsFiles.values()) {
-                if (file.hasSaveFailed) {
-                    file.retrySaving();
-                }
-            }
-        }
-    }
 
     Timer {
         id: settingsSaveDebounce
