@@ -69,11 +69,11 @@ Singleton {
                 continue
             }
 
-            if (node.properties?.["media.class"] === "Video/Source") {
-                if (looksLikeScreencast(node)) {
-                    return true
-                }
-            }
+			if (AudioService.isPipewireVideoSource(node)) {
+				if (looksLikeScreencast(node)) {
+					return true
+				}
+			}
 
             if (node.properties && node.properties["media.class"] === "Stream/Output/Video") {
                 if (looksLikeScreencast(node)) {
