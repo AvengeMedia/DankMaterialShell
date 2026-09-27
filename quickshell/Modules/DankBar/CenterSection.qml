@@ -14,6 +14,15 @@ BarSection {
 
     onBoundsChanged: layoutTimer.restart()
 
+    function requestLayout() {
+        if (root.visible && (isVertical ? height : width) > 0) {
+            layoutTimer.stop();
+            root.updateLayout();
+        } else {
+            layoutTimer.restart();
+        }
+    }
+
     function updateLayout() {
         positionWidgets();
         updateContentExtent();
@@ -126,9 +135,9 @@ BarSection {
             readonly property real itemWidth: widgetLoader.item?.width ?? 0
             readonly property real itemHeight: widgetLoader.item?.height ?? 0
 
-            onItemVisibleChanged: layoutTimer.restart()
-            onItemWidthChanged: layoutTimer.restart()
-            onItemHeightChanged: layoutTimer.restart()
+            onItemVisibleChanged: root.requestLayout()
+            onItemWidthChanged: root.requestLayout()
+            onItemHeightChanged: root.requestLayout()
 
             SectionWidget {
                 id: widgetLoader
