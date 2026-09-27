@@ -117,7 +117,6 @@ Singleton {
 			root.refreshFreeBsdBattery();
 	}
 
-	Component.onCompleted: Qt.callLater(root.updateFreeBsdBatteryFallback)
 	onBatteriesChanged: root.updateFreeBsdBatteryFallback()
 
 	Timer {
