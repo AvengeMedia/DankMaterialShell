@@ -117,15 +117,6 @@ Singleton {
         id: soundsLoader
         active: root.playersRequested && root.soundsAvailable
         source: "AudioSoundPlayers.qml"
-        onLoaded: {
-            item.volume = Qt.binding(() => root.notificationsVolume);
-            item.volumeChangeSource = Qt.binding(() => root.getSoundPath("audio-volume-change"));
-            item.powerPlugSource = Qt.binding(() => root.getSoundPath("power-plug"));
-            item.powerUnplugSource = Qt.binding(() => root.getSoundPath("power-unplug"));
-            item.normalNotificationSource = Qt.binding(() => root.getSoundPath("message"));
-            item.criticalNotificationSource = Qt.binding(() => root.getSoundPath("message-new-instant"));
-            item.loginSource = Qt.binding(() => root.getSoundPath("desktop-login"));
-        }
     }
 
     property var deviceAliases: ({})
