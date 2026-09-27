@@ -226,6 +226,39 @@ function xkbKeyFromQtKey(qk, isKeypad, hasShift, scanCode) {
     return KEY_MAP[qk] || "";
 }
 
+function keyFromToken(token) {
+    const parts = String(token || "").split("+");
+    return parts[parts.length - 1];
+}
+
+// A compositor resolves a bind's keysym on the first level of the active layout,
+// so a keysym that lives only above it can never match: de:neo puts every
+// bracket on layer 4, which is how "Mod+bracketleft" gets stored and then never
+// fires (#3585). keymap is what `dms keybinds keymap` reports, and a key outside
+// its `named` vocabulary is one we could not name, so it counts as fine.
+function keysymUnreachable(key, keymap) {
+    if (!key || !keymap)
+        return false;
+    const vocabulary = keymap.named ?? [];
+    const byKeycode = keymap.keysyms ?? {};
+    if (vocabulary.length === 0)
+        return false;
+
+    const wanted = String(key).toLowerCase();
+    if (!vocabulary.some(name => String(name).toLowerCase() === wanted))
+        return false;
+
+    const keycodes = Object.keys(byKeycode);
+    for (let i = 0; i < keycodes.length; i++) {
+        const syms = byKeycode[keycodes[i]] ?? [];
+        for (let j = 0; j < syms.length; j++) {
+            if (String(syms[j]).toLowerCase() === wanted)
+                return false;
+        }
+    }
+    return true;
+}
+
 function modsFromEvent(mods) {
     var result = [];
     if (mods & 0x10000000)

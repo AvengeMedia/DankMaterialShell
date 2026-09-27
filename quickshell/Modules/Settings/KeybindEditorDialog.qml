@@ -45,6 +45,8 @@ DankDialog {
     readonly property string actionLabel: KeybindsService.getActionLabel(editAction) || I18n.tr("Select", "verb, dropdown placeholder or option that opens a picker") + "…"
     readonly property var configConflict: bindData.conflict || null
     readonly property var conflicts: editKey ? KeyUtils.getConflictingBinds(editKey, bindData.action, KeybindsService.getFlatBinds(), KeybindsService.modKey, KeybindsService.modSymbol) : []
+    readonly property string editKeysym: KeyUtils.keyFromToken(editKey)
+    readonly property bool keysymUnreachable: KeyUtils.keysymUnreachable(editKeysym, KeybindsService.firstLevelKeymap)
     readonly property bool canReset: !isNew && !readOnly && editingKey?.isOverride === true && editingKey?.hasDefault === true
     readonly property bool canSave: !readOnly && !saveBlocked && editKey !== "" && Actions.isValidAction(editAction)
     readonly property bool canSubmit: canSave && (isNew || hasChanges) && !busy
@@ -89,6 +91,9 @@ DankDialog {
     onAccepted: save()
 
     function present(bind, keyIndex, newBind, retained) {
+        // Needed to tell a key the layout cannot reach from one it can, and
+        // the layout may have changed since the editor was last open.
+        KeybindsService.loadFirstLevelKeymap();
         recording = false;
         bindData = bind;
         isNew = newBind;
@@ -860,6 +865,28 @@ DankDialog {
                         text: I18n.tr("Conflicts with: %1", "keybind warning, %1 is a list of conflicting bind descriptions").arg(root.conflicts.map(bind => bind.desc).join(", "))
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.primary
+                        wrapMode: Text.WordWrap
+                        horizontalAlignment: Text.AlignLeft
+                    }
+                }
+
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: root.keysymUnreachable
+
+                    DankIcon {
+                        id: unreachableIcon
+                        name: "warning"
+                        size: Theme.iconSizeSmall
+                        color: Theme.error
+                    }
+
+                    StyledText {
+                        width: parent.width - unreachableIcon.width - parent.spacing
+                        text: I18n.tr("Your keyboard layout puts %1 above the first level, so this bind will never fire. Pick a key the layout types without an extra layer.", "keybind warning, %1 is a key name such as bracketleft").arg(root.editKeysym)
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.error
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignLeft
                     }
