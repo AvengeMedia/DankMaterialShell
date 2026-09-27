@@ -144,7 +144,10 @@ func TestManager_PrepareForSleep_LockedHintKeepsInhibitor(t *testing.T) {
 	assert.True(t, manager.inSleepCycle.Load())
 
 	manager.markLockerReady()
-	assert.Nil(t, manager.inhibitFile)
+	manager.inhibitMu.Lock()
+	released := manager.inhibitFile
+	manager.inhibitMu.Unlock()
+	assert.Nil(t, released)
 }
 
 func TestManager_PrepareForSleep_PrelockedReadySurvivesAnotherSleep(t *testing.T) {
