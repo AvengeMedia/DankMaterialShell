@@ -135,7 +135,9 @@ Singleton {
         const context = entry.context;
         if (!context?.surface?.screen)
             return true;
-        if (!context.owner?.active || context.surface.config.enabled === false || context.surface.config.visible === false)
+        if (!context.owner?.active || context.surface.config.enabled === false)
+            return false;
+        if (context.surface.config.visible === false && !(context.surface.host?.barRevealed ?? context.surface.revealed))
             return false;
         if (context.kind === "dock")
             return SettingsData.dockConfigsForScreen(context.surface.screen).some(config => config.id === context.barId);
