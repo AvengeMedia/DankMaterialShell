@@ -120,7 +120,7 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 	})
 }
 
-func TestManager_PrepareForSleep_ReleasesWhenAlreadyLocked(t *testing.T) {
+func TestManager_PrepareForSleep_LockedHintKeepsInhibitor(t *testing.T) {
 	f, err := os.CreateTemp(t.TempDir(), "inhibit")
 	require.NoError(t, err)
 
@@ -128,9 +128,10 @@ func TestManager_PrepareForSleep_ReleasesWhenAlreadyLocked(t *testing.T) {
 		state: &SessionState{
 			Locked: true,
 		},
-		stateMutex:  sync.RWMutex{},
-		dirty:       make(chan struct{}, 1),
-		inhibitFile: f,
+		stateMutex:    sync.RWMutex{},
+		dirty:         make(chan struct{}, 1),
+		inhibitFile:   f,
+		fallbackDelay: time.Hour,
 	}
 	manager.lockBeforeSuspend.Store(true)
 
@@ -139,14 +140,14 @@ func TestManager_PrepareForSleep_ReleasesWhenAlreadyLocked(t *testing.T) {
 		Body: []any{true},
 	})
 
-	manager.stateMutex.RLock()
-	assert.True(t, manager.state.PreparingForSleep)
-	manager.stateMutex.RUnlock()
+	assert.Same(t, f, manager.inhibitFile)
 	assert.True(t, manager.inSleepCycle.Load())
+
+	manager.markLockerReady()
 	assert.Nil(t, manager.inhibitFile)
 }
 
-func TestManager_PrepareForSleep_ReleasesWhenPrelockedReady(t *testing.T) {
+func TestManager_PrepareForSleep_PrelockedReadySurvivesAnotherSleep(t *testing.T) {
 	f, err := os.CreateTemp(t.TempDir(), "inhibit")
 	require.NoError(t, err)
 
@@ -163,9 +164,24 @@ func TestManager_PrepareForSleep_ReleasesWhenPrelockedReady(t *testing.T) {
 		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
 		Body: []any{true},
 	})
-
 	assert.Nil(t, manager.inhibitFile)
-	assert.False(t, manager.prelockedReady.Load())
+	assert.True(t, manager.prelockedReady.Load())
+
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
+		Body: []any{false},
+	})
+	assert.True(t, manager.prelockedReady.Load())
+
+	f2, err := os.CreateTemp(t.TempDir(), "inhibit")
+	require.NoError(t, err)
+	manager.inhibitFile = f2
+	manager.handleDBusSignal(&dbus.Signal{
+		Name: "org.freedesktop.login1.Manager.PrepareForSleep",
+		Body: []any{true},
+	})
+	assert.Nil(t, manager.inhibitFile)
+	assert.True(t, manager.prelockedReady.Load())
 }
 
 func TestManager_PrepareForSleep_KeepsInhibitorUntilLockerReady(t *testing.T) {

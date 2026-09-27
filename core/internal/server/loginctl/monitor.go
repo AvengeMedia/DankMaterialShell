@@ -65,9 +65,9 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 				m.Lock()
 			}
 
-			// QML may lock and send lockerReady before the sleep command, so
-			// PrepareForSleep must not wait for a second ready.
-			if alreadyLocked || m.prelockedReady.Swap(false) {
+			// Locked is logind's Lock hint, before the surface is up.
+			// Only lockerReady may release early, and it stays set until unlock.
+			if m.prelockedReady.Load() {
 				m.releaseSleepInhibitor()
 			} else {
 				readyCh := m.newLockerReadyCh()
@@ -80,7 +80,6 @@ func (m *Manager) handleDBusSignal(sig *dbus.Signal) {
 			}
 		} else {
 			m.inSleepCycle.Store(false)
-			m.prelockedReady.Store(false)
 			m.signalLockerReady()
 			m.refreshSessionBinding()
 			m.acquireSleepInhibitor()
