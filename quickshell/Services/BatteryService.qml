@@ -17,6 +17,7 @@ Singleton {
     // preferred path when it works and fall back to acpiconf(8)/sysctl(8).
     readonly property bool isBSD: Qt.platform.os === "unix"
     property bool freebsdBatteryAvailable: false
+    property bool freebsdBatteryProbeComplete: false
     property real freebsdBatteryLevel: 0
     property bool freebsdIsCharging: false
     property bool freebsdPluggedIn: true
@@ -86,23 +87,48 @@ Singleton {
         root.freebsdBatteryState = state;
     }
 
-    function refreshFreeBsdBattery() {
-        if (!root.isBSD)
-            return;
-        const script = 'units=$(sysctl -n hw.acpi.battery.units 2>/dev/null || echo 0); i=0; while [ "$i" -lt "$units" ]; do echo "__DMS_BATTERY_${i}__"; acpiconf -i "$i" 2>/dev/null; i=$((i+1)); done; printf "__DMS_AC__:"; sysctl -n hw.acpi.acline 2>/dev/null || echo 1';
-        Proc.runCommand("battery-freebsd-acpi", ["sh", "-c", script], (output, exitCode) => {
-            if (exitCode === 0)
-                root.applyFreeBsdBatteryState(output);
-        }, 0);
-    }
+	function refreshFreeBsdBattery() {
+		if (!root.isBSD || root.batteries.length > 0)
+			return;
 
-    Timer {
-        interval: 15000
-        repeat: true
-        running: root.isBSD
-        triggeredOnStart: true
-        onTriggered: root.refreshFreeBsdBattery()
-    }
+		const script = 'units=$(sysctl -n hw.acpi.battery.units 2>/dev/null || echo 0); i=0; while [ "$i" -lt "$units" ]; do echo "__DMS_BATTERY_${i}__"; acpiconf -i "$i" 2>/dev/null; i=$((i+1)); done; printf "__DMS_AC__:"; sysctl -n hw.acpi.acline 2>/dev/null || echo 1';
+
+		Proc.runCommand("battery-freebsd-acpi", ["sh", "-c", script], (output, exitCode) => {
+			root.freebsdBatteryProbeComplete = true;
+
+			if (exitCode === 0)
+				root.applyFreeBsdBatteryState(output);
+			else
+				root.freebsdBatteryAvailable = false;
+		}, 0);
+	}
+
+	function updateFreeBsdBatteryFallback() {
+		if (!root.isBSD)
+			return;
+
+		if (root.batteries.length > 0) {
+			root.freebsdBatteryAvailable = false;
+			root.freebsdBatteryProbeComplete = false;
+			return;
+		}
+
+		if (!root.freebsdBatteryProbeComplete)
+			root.refreshFreeBsdBattery();
+	}
+
+	Component.onCompleted: Qt.callLater(root.updateFreeBsdBatteryFallback)
+	onBatteriesChanged: root.updateFreeBsdBatteryFallback()
+
+	Timer {
+		interval: 15000
+		repeat: true
+		running: root.isBSD
+			&& root.batteries.length === 0
+			&& root.freebsdBatteryAvailable
+
+		onTriggered: root.refreshFreeBsdBattery()
+	}
 
     Timer {
         id: startupTimer
