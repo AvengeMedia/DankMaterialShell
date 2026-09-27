@@ -327,6 +327,7 @@ Singleton {
     on_CurrentIsChargingChanged: _syncLastIsCharging()
 
     Component.onCompleted: {
+		Qt.callLater(root.updateFreeBsdBatteryFallback);
         _syncLastIsCharging();
         if (batteryLevel > 0)
             _lastBatteryLevel = batteryLevel;
