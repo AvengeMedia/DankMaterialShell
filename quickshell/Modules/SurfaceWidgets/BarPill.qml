@@ -34,7 +34,8 @@ Item {
     property real crossEdgeExtension: 0
     property string segmentRole: "solo"
     property real splitOffset: 0
-    readonly property color contentColor: Theme.widgetTextColor
+    readonly property color defaultContentColor: Theme.widgetTextColor
+    property color contentColor: defaultContentColor
     readonly property real dpr: parentScreen ? CompositorService.getScreenScale(parentScreen) : 1
     readonly property real horizontalPadding: Theme.snap((barConfig?.widgetPadding ?? 8) * (widgetThickness / 30), dpr)
     readonly property real contentThickness: widgetThickness - horizontalPadding * 2
@@ -80,7 +81,7 @@ Item {
             return Theme.withAlpha(Theme.primary, opacity);
         }
     }
-    readonly property color fillColor: {
+    readonly property color defaultFillColor: {
         if (noBackground)
             return "transparent";
         const transparency = SettingsData.barWidgetTransparency(barConfig);
@@ -89,6 +90,7 @@ Item {
             return Theme.blendAlpha(baseColor, transparency);
         return Theme.withAlpha(baseColor, transparency);
     }
+    property color fillColor: defaultFillColor
 
     property real topLeftRadius: cornerRadius(startJoined)
     property real topRightRadius: cornerRadius(isVerticalOrientation ? startJoined : endJoined)
