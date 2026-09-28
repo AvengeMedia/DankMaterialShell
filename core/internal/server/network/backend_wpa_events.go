@@ -92,6 +92,36 @@ func indexUnescapedQuote(s string) int {
 func (b *WpaSupplicantBackend) StartMonitoring(onStateChange func()) error {
 	b.onStateChange = onStateChange
 
+	// Ethernet is independent of wpa_supplicant. On FreeBSD an Ethernet-only
+	// machine (or a machine whose wlan clone is not configured yet) must still
+	// keep the network service alive and receive link/address updates.
+	if b.cmd == nil || b.ifname == "" {
+		b.sigWG.Add(1)
+
+		go func() {
+			defer b.sigWG.Done()
+
+			ticker := time.NewTicker(2 * time.Second)
+			defer ticker.Stop()
+
+			for {
+				select {
+				case <-b.stopChan:
+					return
+
+				case <-ticker.C:
+					b.updateEthernetState()
+
+					if b.onStateChange != nil {
+						b.onStateChange()
+					}
+				}
+			}
+		}()
+
+		return nil
+	}
+
 	monitor, err := newWpaCtrlConn(filepath.Join(b.ctrlDir, b.ifname))
 	if err != nil {
 		return fmt.Errorf("failed to open wpa_ctrl monitor socket: %w", err)
