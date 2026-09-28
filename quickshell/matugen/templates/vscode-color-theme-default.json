@@ -67,7 +67,7 @@
     "widget.shadow": "{{colors.background.default.hex}}80",
     "button.background": "{{colors.primary.default.hex}}",
     "button.foreground": "{{colors.on_primary.default.hex}}",
-    "button.hoverBackground": "{{colors.primary_container.default.hex}}",
+    "button.hoverBackground": "{{colors.primary_fixed.default.hex}}",
     "statusBar.background": "{{colors.background.default.hex}}",
     "statusBar.foreground": "{{colors.on_surface.default.hex}}",
     "statusBar.border": "{{colors.outline_variant.default.hex}}",

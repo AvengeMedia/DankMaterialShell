@@ -112,7 +112,7 @@
     "quickInputList.focusIconForeground": "{{colors.on_primary.light.hex}}",
     "button.background": "{{colors.primary.light.hex}}",
     "button.foreground": "{{colors.on_primary.light.hex}}",
-    "button.hoverBackground": "{{colors.primary_container.light.hex}}",
+    "button.hoverBackground": "{{colors.primary_fixed.light.hex}}",
     "badge.background": "{{colors.secondary.light.hex}}",
     "badge.foreground": "{{colors.on_secondary.light.hex}}",
     "panel.background": "{{colors.surface_container.light.hex}}",

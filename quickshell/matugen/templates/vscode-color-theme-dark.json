@@ -91,7 +91,7 @@
     //
     "button.background": "{{colors.primary.dark.hex}}",
     "button.foreground": "{{colors.on_primary.dark.hex}}",
-    "button.hoverBackground": "{{colors.primary_container.dark.hex}}",
+    "button.hoverBackground": "{{colors.primary_fixed.dark.hex}}",
     //
     // Status bar
     //
