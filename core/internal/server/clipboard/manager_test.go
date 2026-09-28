@@ -3,6 +3,8 @@ package clipboard
 import (
 	"bytes"
 	"encoding/json"
+	"image"
+	"image/png"
 	"net"
 	"os"
 	"path/filepath"
@@ -1072,4 +1074,105 @@ func TestStoreEntry_CorruptDBReturnsErrorNotPanic(t *testing.T) {
 			assert.Empty(t, m.GetHistory())
 		})
 	}
+}
+
+// The URI convention only holds if encode and decode are exact inverses for
+// the path shapes users actually have.
+func TestFileURIRoundTrip(t *testing.T) {
+	paths := []struct{ name, path string }{
+		{"space", "/home/user/My File.txt"},
+		{"literal percent-20", "/home/user/report%20final.fbx"},
+		{"hash", "/home/user/notes #1/draft.txt"},
+		{"cjk", "/home/user/文档/吉祥物 男女(2).fbx"},
+		{"bare percent", "/home/user/100%.done"},
+	}
+	for _, tc := range paths {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.path, pathFromFileURI(encodeFileURI(tc.path)))
+		})
+	}
+}
+
+// Oversized files are stored as a URI with no body. Storing that URI
+// unencoded makes EntryToFile decode a path that was never encoded, so a
+// literal "%20" in the name resolves to a different, missing file.
+func TestCopyFile_OversizedEntryRoundTrips(t *testing.T) {
+	names := []string{"report%20final.fbx", "My File #1.fbx", "吉祥物 男女(2).fbx"}
+	for _, name := range names {
+		t.Run(name, func(t *testing.T) {
+			m := newTestManagerWithDB(t)
+			m.config.MaxEntrySize = 8 // force the nil fileData branch
+
+			path := filepath.Join(t.TempDir(), name)
+			require.NoError(t, os.WriteFile(path, []byte("fbx-bytes-"+name), 0o644))
+
+			require.NoError(t, m.CopyFile(path))
+
+			history := m.GetHistory()
+			require.Len(t, history, 1)
+			require.Equal(t, "text/uri-list", history[0].MimeType)
+			// GetHistory only carries metadata; the stored body lives in GetEntry.
+			entry, err := m.GetEntry(history[0].ID)
+			require.NoError(t, err)
+			assert.Equal(t, path, m.EntryToFile(entry))
+		})
+	}
+}
+
+// CopyFile hands the image probe a URI the probe then decodes; it must be an
+// encoded one, or a name containing literal %20 probes the wrong path and the
+// copy silently downgrades to a plain uri-list entry.
+func TestCopyFile_EncodedImageNameStaysImage(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	path := filepath.Join(t.TempDir(), "抓拍%20name.png")
+	var buf bytes.Buffer
+	require.NoError(t, png.Encode(&buf, image.NewRGBA(image.Rect(0, 0, 4, 4))))
+	require.NoError(t, os.WriteFile(path, buf.Bytes(), 0o644))
+
+	require.NoError(t, m.CopyFile(path))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+	require.True(t, history[0].IsImage)
+	assert.Equal(t, "image/png", history[0].MimeType)
+}
+
+// The preview chain stats the path, so it must decode the encoded URIs
+// file managers hand us while keeping a literal "%20" in the name intact.
+func TestURIListPreview_DecodesEncodedURI(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	path := filepath.Join(t.TempDir(), "report%20final.fbx")
+	require.NoError(t, os.WriteFile(path, []byte("fbx-bytes"), 0o644))
+
+	preview, isImage := m.uriListPreview([]byte(encodeFileURI(path) + "\r\n"))
+	assert.Equal(t, "[[ file report%20final.fbx ]]", preview)
+	assert.False(t, isImage)
+}
+
+// History restore runs handleCopyEntry -> EntryToFile -> CopyFile; the exact
+// path must survive the whole chain, literal %20 included.
+func TestHandleCopyEntry_OversizedFileEntryRestoresExactPath(t *testing.T) {
+	m := newTestManagerWithDB(t)
+	m.config.MaxEntrySize = 8
+
+	path := filepath.Join(t.TempDir(), "report%20final.fbx")
+	require.NoError(t, os.WriteFile(path, []byte("0123456789abcdef"), 0o644))
+	require.NoError(t, m.CopyFile(path))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+
+	mc := newClipboardTestConn()
+	handleCopyEntry(ipc.NewConnWriter(mc), ipc.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(history[0].ID)},
+	}, m)
+
+	var resp ipc.Response[map[string]any]
+	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+	require.Empty(t, resp.Error)
+	require.NotNil(t, resp.Result)
+	assert.Equal(t, path, (*resp.Result)["filePath"])
 }
