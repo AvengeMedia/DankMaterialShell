@@ -861,6 +861,9 @@ var LOCAL_SPEC = {
     batteryCriticalThreshold: {
         def: 10
     },
+    batteryCriticalAnimation: {
+        def: true
+    },
     batteryNotifyCritical: {
         def: true
     },

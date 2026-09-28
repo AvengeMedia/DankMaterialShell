@@ -12777,6 +12777,34 @@
     "icon": "tune"
   },
   {
+    "section": "batteryCriticalAnimation",
+    "label": "Pulse animation",
+    "tabIndex": 42,
+    "category": "Battery",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "battery",
+      "blink",
+      "charge",
+      "charging",
+      "critical",
+      "hibernate",
+      "indicator",
+      "motion",
+      "power",
+      "pulse",
+      "reboot",
+      "restart",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "transition"
+    ],
+    "parentLabel": "Power & battery"
+  },
+  {
     "section": "batteryStatusCard",
     "label": "Status",
     "tabIndex": 42,

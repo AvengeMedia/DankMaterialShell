@@ -693,6 +693,7 @@ Singleton {
     property int batteryChargeLimit: Spec.SPEC.batteryChargeLimit.def
     property bool batteryNotifyChargeLimit: Spec.SPEC.batteryNotifyChargeLimit.def
     property int batteryCriticalThreshold: Spec.SPEC.batteryCriticalThreshold.def
+    property bool batteryCriticalAnimation: Spec.SPEC.batteryCriticalAnimation.def
     property bool batteryNotifyCritical: Spec.SPEC.batteryNotifyCritical.def
     property int batteryLowThreshold: Spec.SPEC.batteryLowThreshold.def
     property bool batteryNotifyLow: Spec.SPEC.batteryNotifyLow.def

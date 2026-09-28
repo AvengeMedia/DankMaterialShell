@@ -24,7 +24,7 @@ BasePill {
     readonly property bool showPowerCharging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerCharging")
     readonly property bool showPowerDischarging: SettingsData.widgetOption("battery", widgetData, "showBatteryPowerDischarging")
     readonly property bool showPower: BatteryService.isCharging ? showPowerCharging : showPowerDischarging
-    readonly property bool critical: BatteryService.isCriticalBattery && !BatteryService.isCharging
+    readonly property bool critical: SettingsData.batteryCriticalAnimation && BatteryService.isCriticalBattery && !BatteryService.isCharging
     property real criticalPulse: 0
     readonly property color criticalForeground: battery.mixColor(Theme.error, Theme.surface, criticalPulse)
 

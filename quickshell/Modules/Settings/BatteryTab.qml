@@ -361,6 +361,14 @@ done
             }
 
             SettingsToggleRow {
+                settingKey: "batteryCriticalAnimation"
+                tags: ["battery", "critical", "indicator", "animation", "pulse", "blink"]
+                text: I18n.tr("Pulse animation", "critical battery indicator animation toggle")
+                checked: SettingsData.batteryCriticalAnimation
+                onToggled: checked => SettingsData.set("batteryCriticalAnimation", checked)
+            }
+
+            SettingsToggleRow {
                 settingKey: "batteryNotifyCritical"
                 text: I18n.tr("Critical notification")
                 checked: SettingsData.batteryNotifyCritical
