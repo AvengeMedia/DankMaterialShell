@@ -3,6 +3,8 @@ package sysupdate
 import (
 	"context"
 	"regexp"
+	"errors"
+	"os/exec"
 	"strings"
 )
 
@@ -31,7 +33,10 @@ var pkgUpgradeLine = regexp.MustCompile(`^\s*([^:\s][^:]*):\s+(\S+)\s+->\s+(\S+)
 func (pkgBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
 	out, err := Capture(ctx, []string{"pkg", "upgrade", "-n", "-q"})
 	if err != nil {
-		return nil, err
+		exitErr, ok := errors.AsType[*exec.ExitError](err)
+		if !ok || exitErr.ExitCode() != 1 {
+			return nil, err
+		}
 	}
 	return parsePkgUpgradeDryRun(out), nil
 }
