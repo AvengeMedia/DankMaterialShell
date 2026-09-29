@@ -6,7 +6,10 @@
 let
   fakeDms = pkgs.writeShellScriptBin "dms" ''
     printf '%s\n' "$@" > /tmp/dms-service-args
-    exec ${pkgs.coreutils}/bin/sleep 300
+    if test -f /tmp/dms-readiness-timeout; then
+      exit 78
+    fi
+    exec ${pkgs.systemd}/bin/systemd-notify --ready --pid=self --exec \; -- ${pkgs.coreutils}/bin/sleep 300
   '';
 in
 pkgs.testers.runNixOSTest {
@@ -44,5 +47,16 @@ pkgs.testers.runNixOSTest {
     machine.wait_until_succeeds("test -f /tmp/dms-service-args")
     machine.succeed("grep -Fx run /tmp/dms-service-args")
     machine.succeed("grep -Fx -- --session /tmp/dms-service-args")
+
+    machine.succeed("systemctl --machine=danklinux@ --user stop dms.service")
+    machine.succeed("touch /tmp/dms-readiness-timeout")
+    machine.fail("systemctl --machine=danklinux@ --user start dms.service")
+    machine.wait_until_succeeds("systemctl --machine=danklinux@ --user is-failed dms.service")
+    assert machine.succeed("systemctl --machine=danklinux@ --user show dms.service -p ExecMainStatus --value").strip() == "78"
+    assert machine.succeed("systemctl --machine=danklinux@ --user show dms.service -p NRestarts --value").strip() == "0"
+
+    machine.succeed("rm /tmp/dms-readiness-timeout")
+    machine.succeed("systemctl --machine=danklinux@ --user start dms.service")
+    machine.wait_until_succeeds("systemctl --machine=danklinux@ --user is-active dms.service")
   '';
 }
