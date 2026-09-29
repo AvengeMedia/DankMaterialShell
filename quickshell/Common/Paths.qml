@@ -168,4 +168,37 @@ Singleton {
 
         return desktopEntry && desktopEntry.name ? desktopEntry.name : appId;
     }
+
+    function normalizeAppId(id: string): string {
+        return id ? String(id).toLowerCase().trim() : "";
+    }
+
+    function isAppIdMatch(id: string, target: string, desktopId: string): bool {
+        id = normalizeAppId(id);
+        desktopId = normalizeAppId(desktopId);
+        target = normalizeAppId(target);
+        if (!target)
+            return false;
+
+        // 1. Substring match
+        if (id.includes(target) || desktopId.includes(target)) {
+            return true;
+        }
+
+        // 2. Match reverse-DNS segments (e.g. app.zen_browser.zen -> zen)
+        if (target.indexOf(".") !== -1) {
+            const parts = target.split(".");
+            const lastPart = parts[parts.length - 1];
+            if (lastPart && (id.includes(lastPart) || desktopId.includes(lastPart))) {
+                return true;
+            }
+        }
+
+        // 3. Bidirectional match (longer excluded name contains shorter app id)
+        if (id.length >= 3 && target.includes(id)) {
+            return true;
+        }
+
+        return false;
+    }
 }
