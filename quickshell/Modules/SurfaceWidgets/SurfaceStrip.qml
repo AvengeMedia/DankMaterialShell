@@ -115,12 +115,9 @@ FocusScope {
             cancelDrag();
     }
     readonly property bool vertical: surfaceContext.isVertical
-    readonly property bool magnificationEnabled: (root.surfaceContext.config?.magnification || (root.surfaceContext.kind === "bar" && root.surfaceContext.config?.appsDockMagnification) || false) && !root.surfaceContext.editMode
-    readonly property string magnificationProfile: root.surfaceContext.config?.magnificationProfile ?? (root.surfaceContext.config?.appsDockMagnificationProfile ?? "parabolic")
-    readonly property real maxMagnification: {
-        const scaleVal = root.surfaceContext.config?.magnificationScale ?? (root.surfaceContext.config?.appsDockMagnificationScale ?? 130);
-        return Math.max(1.05, Math.min(2.0, scaleVal / 100));
-    }
+    readonly property bool magnificationEnabled: (root.surfaceContext.config?.magnification ?? false) && !root.surfaceContext.editMode
+    readonly property string magnificationProfile: root.surfaceContext.config?.magnificationProfile ?? "parabolic"
+    readonly property real maxMagnification: Math.max(1.05, Math.min(2.0, (root.surfaceContext.config?.magnificationScale ?? 130) / 100))
     readonly property real baseSlotSize: {
         const baseSize = root.vertical ? root.width : root.height;
         return baseSize > 0 ? baseSize : 42;

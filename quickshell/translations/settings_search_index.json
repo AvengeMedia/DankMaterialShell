@@ -9452,14 +9452,6 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:29",
-    "label": "Animation style",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
-  },
-  {
     "section": "barWidgetOption:SystemTrayOptions.qml:3",
     "label": "Auto overflow",
     "tabIndex": 22,
@@ -9908,7 +9900,7 @@
     "optionFile": "LauncherButtonOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:30",
+    "section": "barWidgetOption:AppsDockOptions.qml:27",
     "label": "Icon size",
     "tabIndex": 22,
     "keywords": [],
@@ -9990,22 +9982,6 @@
   {
     "section": "barWidgetOption:AppsDockOptions.qml:9",
     "label": "Launcher button",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:AppsDockOptions.qml:27",
-    "label": "Magnification on hover",
-    "tabIndex": 22,
-    "keywords": [],
-    "runtimeType": "barWidgetOption",
-    "optionFile": "AppsDockOptions.qml"
-  },
-  {
-    "section": "barWidgetOption:AppsDockOptions.qml:28",
-    "label": "Magnification scale",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -10380,7 +10356,7 @@
     "optionFile": "SystemUpdateOptions.qml"
   },
   {
-    "section": "barWidgetOption:AppsDockOptions.qml:31",
+    "section": "barWidgetOption:AppsDockOptions.qml:28",
     "label": "Spacing",
     "tabIndex": 22,
     "keywords": [],

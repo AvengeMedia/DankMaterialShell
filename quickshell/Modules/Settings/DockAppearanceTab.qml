@@ -83,7 +83,7 @@ Item {
             tags: ["dock", "zoom", "magnification", "hover", "scale", "fisheye"]
             resetStore: dock
             resetKeys: ["magnification"]
-            title: I18n.tr("Magnification")
+            title: I18n.tr("Magnification", "dock setting: enlarge icons near the cursor")
             checked: dock.config?.magnification ?? false
             onToggled: checked => dock.setOption("magnification", checked)
 
@@ -106,7 +106,7 @@ Item {
                 tags: ["dock", "zoom", "magnification", "animation", "profile", "style", "curve"]
                 resetStore: dock
                 resetKeys: ["magnificationProfile"]
-                text: I18n.tr("Animation style")
+                text: I18n.tr("Animation style", "dock setting: magnification curve profile")
                 currentValue: {
                     const profile = dock.config?.magnificationProfile ?? "parabolic";
                     switch (profile) {

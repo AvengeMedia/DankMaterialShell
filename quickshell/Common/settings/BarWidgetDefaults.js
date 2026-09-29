@@ -151,9 +151,6 @@ var DEFAULTS = {
         appsDockActiveColorMode: "primary",
         appsDockEnlargeOnHover: false,
         appsDockEnlargePercentage: 125,
-        appsDockMagnification: false,
-        appsDockMagnificationScale: 130,
-        appsDockMagnificationProfile: "parabolic",
         appsDockIconSizePercentage: 125,
         appsDockSpacing: 4
     },
@@ -235,7 +232,7 @@ var MIGRATED_GLOBALS = {
     music: sameNames(["mediaSize", "mediaAdaptiveWidthEnabled", "audioScrollMode"]),
     focusedWindow: sameNames(["focusedWindowCompactMode", "focusedWindowShowIcon", "focusedWindowSize"]),
     runningApps: sameNames(["runningAppsCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor"]),
-    appsDock: sameNames(["barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "runningAppsCompactMode", "runningAppsCurrentWorkspace", "appsDockHideIndicators", "appsDockColorizeActive", "appsDockActiveColorMode", "appsDockEnlargeOnHover", "appsDockEnlargePercentage", "appsDockMagnification", "appsDockMagnificationScale", "appsDockMagnificationProfile", "appsDockIconSizePercentage"]),
+    appsDock: sameNames(["barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge", "runningAppsCompactMode", "runningAppsCurrentWorkspace", "appsDockHideIndicators", "appsDockColorizeActive", "appsDockActiveColorMode", "appsDockEnlargeOnHover", "appsDockEnlargePercentage", "appsDockIconSizePercentage"]),
     systemTray: sameNames(["trayPopupSingleLine", "trayAutoOverflow", "trayMaxVisibleItems", "trayIconSpacing"]),
     battery: sameNames(["showBatteryPercent", "showBatteryPercentOnlyOnBattery", "showBatteryTime", "showBatteryTimeOnlyOnBattery", "showBatteryPowerCharging", "showBatteryPowerDischarging", "batteryStyle"]),
     controlCenterButton: {
