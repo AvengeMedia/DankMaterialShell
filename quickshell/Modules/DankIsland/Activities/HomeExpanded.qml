@@ -14,6 +14,7 @@ DashTabFace {
             live: root.live
             editMode: root.editMode
             rowBudget: root.controller.dashboardRowBudget
+            transientSurfaceTracker: root.controller.transientSurfaces
             onTabRequested: id => {
                 switch (id) {
                 case "media":

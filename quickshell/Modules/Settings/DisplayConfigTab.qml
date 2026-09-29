@@ -119,6 +119,7 @@ Item {
             SettingsToggleRow {
                 settingKey: "displayProfileAutoSelect"
                 text: I18n.tr("Auto")
+                description: I18n.tr("Applies the saved profile that matches the connected displays", "display profile auto select toggle description")
                 checked: SettingsData.displayProfileAutoSelect
                 onToggled: checked => {
                     SettingsData.displayProfileAutoSelect = checked;
@@ -163,7 +164,6 @@ Item {
                         tooltipText: I18n.tr("New profile")
                         iconName: "add"
                         text: ""
-                        buttonHeight: 40
                         horizontalPadding: Theme.spacingM
                         backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
@@ -179,7 +179,6 @@ Item {
                         tooltipText: I18n.tr("Edit monitors")
                         iconName: "edit"
                         text: ""
-                        buttonHeight: 40
                         horizontalPadding: Theme.spacingM
                         backgroundColor: Theme.chipSurface
                         textColor: Theme.surfaceText
@@ -192,7 +191,6 @@ Item {
                         Accessible.name: I18n.tr("Delete profile")
                         iconName: "delete"
                         text: ""
-                        buttonHeight: 40
                         horizontalPadding: Theme.spacingM
                         backgroundColor: Theme.chipSurface
                         textColor: Theme.error
@@ -407,29 +405,28 @@ Item {
             }
         }
 
-        SettingsCard {
-            width: parent.width
-            visible: DisplayConfigState.hasOutputBackend && DisplayConfigState.hasPendingChanges
-
-            SettingsRow {
-                DankButton {
-                    text: I18n.tr("Discard", "verb, button to discard pending changes")
-                    backgroundColor: "transparent"
-                    textColor: Theme.surfaceText
-                    onClicked: DisplayConfigState.discardChanges()
-                }
-
-                DankButton {
-                    text: I18n.tr("Apply changes")
-                    iconName: "check"
-                    onClicked: DisplayConfigState.applyChanges()
-                }
-            }
-        }
-
         NoBackendMessage {
             width: parent.width
             visible: !DisplayConfigState.hasOutputBackend
+        }
+
+        SettingsFabBar {
+            id: pendingChangesBar
+            shown: DisplayConfigState.hasOutputBackend && DisplayConfigState.hasPendingChanges
+
+            DankFab {
+                text: I18n.tr("Discard", "verb, button to discard pending changes")
+                iconName: "undo"
+                colorRole: "secondaryContainer"
+                onClicked: DisplayConfigState.discardChanges()
+            }
+
+            DankFab {
+                text: I18n.tr("Apply changes")
+                iconName: "check"
+                colorRole: "primary"
+                onClicked: DisplayConfigState.applyChanges()
+            }
         }
     }
 

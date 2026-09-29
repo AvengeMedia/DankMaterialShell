@@ -3,6 +3,7 @@ import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Column {
     id: root
@@ -268,6 +269,41 @@ Column {
                     text: "settings.json only stores what differs from the defaults, and machine-specific state moved to session.json"
                 }
             }
+        }
+    }
+
+    SettingsDivider {
+        visible: ChangelogService.release !== null
+    }
+
+    Column {
+        width: parent.width
+        visible: ChangelogService.release !== null
+        spacing: Theme.spacingS
+
+        Row {
+            spacing: Theme.spacingS
+
+            DankIcon {
+                name: "auto_awesome"
+                size: Theme.iconSizeSmall
+                color: Theme.primary
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                text: I18n.tr("What changed")
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Theme.fontWeightMedium
+                color: Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        ReleaseNotesCard {
+            width: parent.width
+            release: ChangelogService.release
+            showTitle: false
         }
     }
 }

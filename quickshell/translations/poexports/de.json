@@ -86,6 +86,9 @@
   "%1 hours": {
     "%1 hours": "%1 Stunden"
   },
+  "%1 is %2 and may use a lot of memory.": {
+    "%1 is %2 and may use a lot of memory.": ""
+  },
   "%1 is now included in config": {
     "%1 is now included in config": "%1 ist jetzt in der Konfiguration enthalten"
   },
@@ -196,6 +199,9 @@
   },
   "2.4 GHz": {
     "2.4 GHz": "2,4 GHz"
+  },
+  "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": {
+    "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder": ""
   },
   "3rd party": {
     "3rd party": "Drittanbieter"
@@ -368,6 +374,12 @@
   "Add, remove, reorder and configure": {
     "Add, remove, reorder and configure": "Hinzufügen, entfernen, umordnen und konfigurieren"
   },
+  "Added in front of every app launch command": {
+    "Added in front of every app launch command": ""
+  },
+  "Adds concave curves where the bar meets the screen edge": {
+    "Adds concave curves where the bar meets the screen edge": ""
+  },
   "Adds them to the %1 group so they can run dms-greeter sync --profile": {
     "Adds them to the %1 group so they can run dms-greeter sync --profile": "Fügt sie der Gruppe %1 hinzu, damit sie dms-greeter sync --profile ausführen können"
   },
@@ -433,6 +445,9 @@
   },
   "Already on that session": {
     "Already on that session": "Bereits in dieser Sitzung"
+  },
+  "Also runs the templates in your matugen config.toml": {
+    "Also runs the templates in your matugen config.toml": ""
   },
   "Alt + Shift": {
     "Alt + Shift": "Alt + Umschalt"
@@ -541,6 +556,9 @@
   },
   "Applies on the next greeter sync": {
     "Applies on the next greeter sync": "Gilt beim nächsten Greeter-Sync"
+  },
+  "Applies the saved profile that matches the connected displays": {
+    "Applies the saved profile that matches the connected displays": ""
   },
   "Apply": {
     "Apply": "Anwenden"
@@ -1367,6 +1385,12 @@
   "Clickfinger": {
     "Clickfinger": "Klickfinger"
   },
+  "Clicking a window in a special workspace opens that workspace": {
+    "Clicking a window in a special workspace opens that workspace": ""
+  },
+  "Clicks on empty bar space reach the windows below": {
+    "Clicks on empty bar space reach the windows below": ""
+  },
   "Clip": {
     "Clip": "Zuschneiden"
   },
@@ -1739,6 +1763,9 @@
   "Critical notification": {
     "Critical notification": "Kritische Benachrichtigung"
   },
+  "Critical notifications still pop up": {
+    "Critical notifications still pop up": ""
+  },
   "Critical threshold": {
     "Critical threshold": "Kritischer Schwellenwert"
   },
@@ -1826,6 +1853,9 @@
   "Custom blend": {
     "Custom blend": "Benutzerdefinierte Mischung"
   },
+  "Custom builds the palette from a color you pick": {
+    "Custom builds the palette from a color you pick": ""
+  },
   "Custom color": {
     "Custom color": "Benutzerdefinierte Farbe"
   },
@@ -1900,6 +1930,9 @@
   },
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "DMS Shell Aktionen (Launcher, Zwischenablage, etc.)"
+  },
+  "DMS stops drawing wallpapers on every display": {
+    "DMS stops drawing wallpapers on every display": ""
   },
   "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": {
     "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.": "DMS verwendet die Schriftfamilie, das Gewicht und die Skalierung. Exakter Schriftschnitt, Neigung, Breite und separat skalierte Balken können abweichen."
@@ -2348,6 +2381,9 @@
   "Drag to reorder": {
     "Drag to reorder": "Zum Neuordnen ziehen"
   },
+  "Dragged displays line up with neighboring edges without overlapping": {
+    "Dragged displays line up with neighboring edges without overlapping": ""
+  },
   "Driver": {
     "Driver": "Treiber"
   },
@@ -2359,6 +2395,9 @@
   },
   "Drop your override for %1 so the DMS default action re-applies?": {
     "Drop your override for %1 so the DMS default action re-applies?": "Ihre Überschreibung für %1 verwerfen, damit die DMS-Standardaktion wieder angewendet wird?"
+  },
+  "Drops bar gaps and rounding while a window is maximized": {
+    "Drops bar gaps and rounding while a window is maximized": ""
   },
   "Duplicate": {
     "Duplicate": "Duplizieren"
@@ -2650,6 +2689,9 @@
   },
   "Fade to lock screen": {
     "Fade to lock screen": "Zum Sperrbildschirm überblenden"
+  },
+  "Fades the screen out first. Input during the fade cancels it": {
+    "Fades the screen out first. Input during the fade cancels it": ""
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Fehler beim aktivieren der Konfiguration"
@@ -2996,6 +3038,9 @@
   "Fit": {
     "Fit": "Anpassen"
   },
+  "Fits the song title instead of keeping a fixed width": {
+    "Fits the song title instead of keeping a fixed width": ""
+  },
   "Fixed": {
     "Fixed": ""
   },
@@ -3194,6 +3239,9 @@
   "Frame xray": {
     "Frame xray": "Frame-Röntgen"
   },
+  "Frees the launcher when closed and rebuilds it on open": {
+    "Frees the launcher when closed and rebuilds it on open": ""
+  },
   "Freezing Drizzle": {
     "Freezing Drizzle": "Gefrierender Nieselregen"
   },
@@ -3269,6 +3317,12 @@
   "Gap": {
     "Gap": "Lücke"
   },
+  "Gap between the bar and its popouts follows edge spacing": {
+    "Gap between the bar and its popouts follows edge spacing": ""
+  },
+  "Gap between the bar ends and the outermost widgets": {
+    "Gap between the bar ends and the outermost widgets": ""
+  },
   "Gap size": {
     "Gap size": "Lückengröße"
   },
@@ -3280,6 +3334,9 @@
   },
   "General": {
     "General": "Allgemein"
+  },
+  "Generate Theme at Startup": {
+    "Generate Theme at Startup": ""
   },
   "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": {
     "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.": "Erstellen Sie Basis-Konfigurationen für GTK3/4, QT5/QT6 oder qtengine, um den DMS-Farben zu folgen (nur qt6ct benötigt qt6ct-kde). Nur einmal erforderlich.<br /><br />Es wird empfohlen, %1 vor der Anwendung von GTK-Themes zu konfigurieren."
@@ -3371,6 +3428,9 @@
   "Groups": {
     "Groups": "Gruppen"
   },
+  "Grows or shrinks the space windows keep clear": {
+    "Grows or shrinks the space windows keep clear": ""
+  },
   "H": {
     "H": "H"
   },
@@ -3422,6 +3482,9 @@
   "Hidden apps": {
     "Hidden apps": "Versteckte Apps"
   },
+  "Hidden icons expand in place instead of in a popup": {
+    "Hidden icons expand in place instead of in a popup": ""
+  },
   "Hidden until weather is enabled": {
     "Hidden until weather is enabled": "Ausgeblendet, bis Wetter aktiviert ist"
   },
@@ -3454,6 +3517,12 @@
   },
   "Hide when windows open": {
     "Hide when windows open": "Ausblenden, wenn Fenster offen sind"
+  },
+  "Hides even while a bar popout or menu is open": {
+    "Hides even while a bar popout or menu is open": ""
+  },
+  "Hides only while a window overlaps the dock": {
+    "Hides only while a window overlaps the dock": ""
   },
   "High": {
     "High": "Hoch"
@@ -3896,6 +3965,12 @@
   "Keeping Awake": {
     "Keeping Awake": "am wach halten"
   },
+  "Keeps the dock showing over fullscreen windows": {
+    "Keeps the dock showing over fullscreen windows": ""
+  },
+  "Keeps the widget above windows instead of below them": {
+    "Keeps the widget above windows instead of below them": ""
+  },
   "Kernel": {
     "Kernel": "Kernel"
   },
@@ -4058,6 +4133,9 @@
   "Least Saturated": {
     "Least Saturated": "Am wenigsten gesättigt"
   },
+  "Leaves the overview when DMS launches an app or focuses a window": {
+    "Leaves the overview when DMS launches an app or focuses a window": ""
+  },
   "Left": {
     "Left": "Links"
   },
@@ -4087,6 +4165,9 @@
   },
   "Light Snow Showers": {
     "Light Snow Showers": "Leichter Schneeschauer"
+  },
+  "Light and dark mode follow and set the system color scheme": {
+    "Light and dark mode follow and set the system color scheme": ""
   },
   "Light direction": {
     "Light direction": "Lichtrichtung"
@@ -4126,6 +4207,9 @@
   },
   "Listening from": {
     "Listening from": "Hört von"
+  },
+  "Lists workspaces from whichever display has focus": {
+    "Lists workspaces from whichever display has focus": ""
   },
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Lebendige Palette mit gesättigten Akzenten."
@@ -4709,6 +4793,9 @@
   "New notification": {
     "New notification": "Neue Benachrichtigung"
   },
+  "New notifications show as regular popups": {
+    "New notifications show as regular popups": ""
+  },
   "New profile": {
     "New profile": "Neues Profil"
   },
@@ -4927,6 +5014,9 @@
   },
   "No matching processes": {
     "No matching processes": "Keine passenden Prozesse"
+  },
+  "No media found.": {
+    "No media found.": ""
   },
   "No monitors": {
     "No monitors": "Keine Bildschirme"
@@ -5177,6 +5267,9 @@
   "Off": {
     "Off": "Aus"
   },
+  "Off keeps the bar hidden until turned back on or shown over IPC": {
+    "Off keeps the bar hidden until turned back on or shown over IPC": ""
+  },
   "Office": {
     "Office": "Büro"
   },
@@ -5263,6 +5356,9 @@
   },
   "Open in terminal": {
     "Open in terminal": "Terminal öffnen"
+  },
+  "Open large file?": {
+    "Open large file?": ""
   },
   "Open network": {
     "Open network": "Offenes Netzwerk"
@@ -5630,6 +5726,9 @@
   "Pointer": {
     "Pointer": "Zeiger"
   },
+  "Pointer at the launcher edge opens it, unless a bar or dock is there": {
+    "Pointer at the launcher edge opens it, unless a bar or dock is there": ""
+  },
   "Pointer speed": {
     "Pointer speed": "Zeigergeschwindigkeit"
   },
@@ -5642,6 +5741,9 @@
   "Popouts": {
     "Popouts": "Popouts"
   },
+  "Popouts and modals use the main animation duration": {
+    "Popouts and modals use the main animation duration": ""
+  },
   "Popular Plugins": {
     "Popular Plugins": "Beliebte Plugins"
   },
@@ -5653,6 +5755,9 @@
   },
   "Popups": {
     "Popups": "Popups"
+  },
+  "Popups hide the message until expanded": {
+    "Popups hide the message until expanded": ""
   },
   "Popups, do not disturb, rules": {
     "Popups, do not disturb, rules": "Popups, Nicht stören, Regeln"
@@ -5971,6 +6076,9 @@
   },
   "Refreshing...": {
     "Refreshing...": "Aktualisierung..."
+  },
+  "Regenerate matugen colors when DMS starts, even if nothing changed.": {
+    "Regenerate matugen colors when DMS starts, even if nothing changed.": ""
   },
   "Regex": {
     "Regex": "Regex"
@@ -6410,6 +6518,9 @@
   "Search": {
     "Search": "Suche"
   },
+  "Search also matches actions apps provide, like New Window": {
+    "Search also matches actions apps provide, like New Window": ""
+  },
   "Search applications...": {
     "Search applications...": "Anwendungen suchen..."
   },
@@ -6662,6 +6773,9 @@
   "Shortcuts (%1)": {
     "Shortcuts (%1)": "Tastenkombinationen (%1)"
   },
+  "Shortens the bar at both ends": {
+    "Shortens the bar at both ends": ""
+  },
   "Show": {
     "Show": "Anzeigen"
   },
@@ -6869,6 +6983,9 @@
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "Zeigt Arbeitsbereich und ermöglicht das Umschalten"
   },
+  "Shows only windows from the dock's own display": {
+    "Shows only windows from the dock's own display": ""
+  },
   "Shows when caps lock is active": {
     "Shows when caps lock is active": "Zeige wenn Festelltaste aktiv"
   },
@@ -7067,8 +7184,14 @@
   "Starting...": {
     "Starting...": "Wird gestartet..."
   },
+  "Startup Behavior": {
+    "Startup Behavior": ""
+  },
   "State": {
     "State": "Zustand"
+  },
+  "Stays visible while the workspace has no windows": {
+    "Stays visible while the workspace has no windows": ""
   },
   "Stop": {
     "Stop": "Stopp"
@@ -7171,6 +7294,9 @@
   },
   "Switch layout shortcut": {
     "Switch layout shortcut": "Tastenkombination für Layout-Wechsel"
+  },
+  "Switches to power saver at the low battery threshold": {
+    "Switches to power saver at the low battery threshold": ""
   },
   "Sync": {
     "Sync": "Sync"
@@ -7429,6 +7555,9 @@
   },
   "Theme & colors": {
     "Theme & colors": "Thema & Farben"
+  },
+  "Theme colors come from this display's wallpaper": {
+    "Theme colors come from this display's wallpaper": ""
   },
   "Theme extracted to: %1": {
     "Theme extracted to: %1": "Thema extrahiert nach: %1"
@@ -8165,6 +8294,9 @@
   "Which displays show the dock, popups, OSDs and wallpaper": {
     "Which displays show the dock, popups, OSDs and wallpaper": "Welche Bildschirme Dock, Popups, OSDs und Hintergrundbilder anzeigen"
   },
+  "Which wallpaper color the palette is built from": {
+    "Which wallpaper color the palette is built from": ""
+  },
   "White": {
     "White": "Weiß"
   },
@@ -8269,6 +8401,9 @@
   },
   "With Shelly, only Flatpak packages in the current update list can be ignored.": {
     "With Shelly, only Flatpak packages in the current update list can be ignored.": "Mit Shelly können nur Flatpak-Pakete in der aktuellen Update-Liste ignoriert werden."
+  },
+  "With background blur on, cards and tiles keep their own backing": {
+    "With background blur on, cards and tiles keep their own backing": ""
   },
   "Working...": {
     "Working...": "Wird ausgeführt..."

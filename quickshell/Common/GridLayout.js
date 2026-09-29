@@ -1,4 +1,4 @@
-function packCells(cards, order, columns, isAvailable, step = 1) {
+function packCells(cards, order, columns, isAvailable, step = 1, gravity = false) {
     const steps = Math.round(columns / step);
     const cells = [];
     const taken = [];
@@ -18,12 +18,21 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
         const h = Math.max(1, Math.round((card.h || 1) / step));
         const cell = positioned(card) ? settle(taken, Math.max(0, Math.min(steps - w, Math.round(card.col / step))), Math.max(0, Math.round(card.row / step)), w, h) : firstFit(taken, steps, w, h);
         taken.push(cell);
+        cells[sourceIndex] = cell;
+    }
+
+    if (gravity)
+        compact(taken);
+    for (let i = 0; i < cells.length; i++) {
+        const cell = cells[i];
+        if (!cell)
+            continue;
         rows = Math.max(rows, cell.y + cell.h);
-        cells[sourceIndex] = {
+        cells[i] = {
             "col": cell.x * step,
             "row": cell.y * step,
-            "cols": w * step,
-            "rows": h * step
+            "cols": cell.w * step,
+            "rows": cell.h * step
         };
     }
 
@@ -31,6 +40,16 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
         "cells": cells,
         "rows": rows * step
     };
+}
+
+// Saved positions only settle downward, so a shrink or removal above leaves a hole; gravity pulls everything up into it.
+function compact(taken) {
+    const ordered = taken.slice().sort((a, b) => a.y - b.y || a.x - b.x);
+    for (const cell of ordered) {
+        const others = taken.filter(other => other !== cell);
+        while (cell.y > 0 && !overlaps(others, cell.x, cell.y - 1, cell.w, cell.h))
+            cell.y--;
+    }
 }
 
 function positioned(card) {
@@ -73,8 +92,8 @@ function firstFit(taken, steps, w, h) {
     };
 }
 
-function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1) {
-    const packed = packCells(cards, order, columns, isAvailable, step);
+function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1, gravity = false) {
+    const packed = packCells(cards, order, columns, isAvailable, step, gravity);
     const colW = (width - gap * (columns - 1)) / columns;
     const slots = packed.cells.map(cell => {
         if (!cell)

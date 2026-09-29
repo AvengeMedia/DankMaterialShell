@@ -45,9 +45,9 @@ Item {
         return root.ipcMove(host.screenWidth / 2, host.screenHeight / 2, screen, kind);
     }
 
-    function hostWithActivity(activityId) {
+    function hostWithActivity(activityId, screenName) {
         for (const host of hosts()) {
-            if (host?.islandController?.activeActivity === activityId && host.islandController.expanded)
+            if (host?.islandController?.activeActivity === activityId && host.islandController.expanded && (!screenName || host.screen?.name === screenName))
                 return host;
         }
         return null;
@@ -67,7 +67,7 @@ Item {
 
     function hostForScreenName(screenName, barId, kind) {
         const instances = ShellLayout.forScreen(screenName)?.instances ?? [];
-        const ordered = instances.filter(instance => instance.kind === "island" && (!barId || instance.barId === barId) && root.matchesKind(instance, kind)).sort((a, b) => Number(!!a.free) - Number(!!b.free) || Number(["left", "right"].includes(a.edge)) - Number(["left", "right"].includes(b.edge)) || a.configOrder - b.configOrder);
+        const ordered = instances.filter(instance => instance.hostsIsland && (!barId || instance.barId === barId) && root.matchesKind(instance, kind)).sort((a, b) => Number(!!a.free) - Number(!!b.free) || Number(["left", "right"].includes(a.edge)) - Number(["left", "right"].includes(b.edge)) || a.configOrder - b.configOrder);
         for (const instance of ordered) {
             const host = hosts().find(host => host?.screen?.name === screenName && host.barId === instance.barId && host.islandController);
             if (host)
@@ -171,32 +171,33 @@ Item {
         return root.openActivity(activityId, screen, section, barId);
     }
 
+    // An IPC close takes down everything that shows the activity, on every monitor.
     function closeActivity(activityId): bool {
-        const host = root.hostWithActivity(activityId);
-        if (!host)
-            return false;
-        host.islandController.requestCollapse();
-        return true;
+        let closed = false;
+        for (const host of hosts()) {
+            if (host?.islandController?.activeActivity !== activityId || !host.islandController.expanded)
+                continue;
+            host.islandController.requestCollapse();
+            closed = true;
+        }
+        return closed;
     }
 
     function openLauncher(query, mode, screen, barId): bool {
         const target = screen ?? CompositorService.getFocusedScreen();
-        const config = SettingsData.sharedTriggerIslandConfig(target);
-        const host = barId ? root.hostForExactScreen(target, barId) : config ? root.hostForExactScreen(target, config.id) : root.focusedHost();
+        const config = barId ? null : SettingsData.islandLauncherHostConfig(target);
+        const host = barId ? root.hostForExactScreen(target, barId) : config ? root.hostForExactScreen(target, config.id) : null;
         return host ? host.islandController.requestLauncher(query || "", mode || "", false) : false;
     }
 
     function toggleLauncher(query, mode, screen, barId): bool {
-        const host = barId ? root.hostForExactScreen(screen, barId) : root.hostWithActivity("launcher");
+        const target = screen ?? CompositorService.getFocusedScreen();
+        const host = barId ? root.hostForExactScreen(target, barId) : root.hostWithActivity("launcher", target?.name);
         if (host?.islandController.expanded && host.islandController.activeActivity === "launcher") {
             host.islandController.requestCollapse();
             return true;
         }
         return root.openLauncher(query, mode, screen, barId);
-    }
-
-    function closeLauncher(): bool {
-        return root.closeActivity("launcher");
     }
 
     function ipcOpen(activity, screen, barId, kind) {

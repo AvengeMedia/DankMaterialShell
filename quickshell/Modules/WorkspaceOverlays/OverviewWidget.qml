@@ -51,7 +51,7 @@ Item {
         if (!workspaces || workspaces.length === 0)
             return [];
         try {
-            const ids = workspaces.map(ws => ws?.id).filter(id => id !== null && id !== undefined);
+            const ids = workspaces.map(ws => ws?.id).filter(id => id > 0);
             return ids.sort((a, b) => a - b);
         } catch (e) {
             return [];
@@ -65,7 +65,7 @@ Item {
             return [];
         try {
             const filtered = workspaces.filter(ws => ws?.monitor?.name === mon.name);
-            return filtered.map(ws => ws?.id).filter(id => id !== null && id !== undefined).sort((a, b) => a - b);
+            return filtered.map(ws => ws?.id).filter(id => id > 0).sort((a, b) => a - b);
         } catch (e) {
             return [];
         }

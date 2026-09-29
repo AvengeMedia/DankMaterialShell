@@ -23,9 +23,8 @@ Item {
     property bool playerPaneOpen: true
     property Item lyricsFocusTarget: null
     property Item lyricsOpener: null
-    readonly property alias lyrics: lyricsController
     readonly property var presentation: mediaPresentation.current
-    readonly property bool presentationSettling: mediaPresentation.settling
+    readonly property bool idle: !presentation
     property bool wallpaperEnabled: MediaOptions.albumArtBackdrop
     property string panel: ""
     property Item contentViewport: null
@@ -82,15 +81,16 @@ Item {
         playerPaneOpen = true;
     }
 
+    onIdleChanged: {
+        if (!idle)
+            return;
+        panel = "";
+        isSeeking = false;
+    }
+
     onLyricsOpenChanged: {
         if (!lyricsOpen)
             lyricsFocusTimer.restart();
-    }
-
-    LyricsController {
-        id: lyricsController
-        player: root
-        enabled: root.lyricsOpen && root.live && root.lyricsEnabled
     }
 
     Timer {
@@ -239,15 +239,11 @@ Item {
         if (event.key === Qt.Key_F6)
             return cycleFocus(!!(event.modifiers & Qt.ShiftModifier));
         if (event.key === Qt.Key_Escape) {
-            if (panel !== "") {
-                const panelId = panel;
-                panel = "";
-                mediaChrome.item?.focusPanelButton(panelId);
-                return true;
-            }
-            if (!lyricsOpen)
+            if (panel === "")
                 return false;
-            lyricsOpen = false;
+            const panelId = panel;
+            panel = "";
+            mediaChrome.item?.focusPanelButton(panelId);
             return true;
         }
         if (panel !== "")
@@ -308,7 +304,14 @@ Item {
     Loader {
         id: mediaChrome
         anchors.fill: parent
+        active: !root.idle
         sourceComponent: root.playerStyle === "material" ? materialChrome : bentoChrome
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.idle
+        sourceComponent: MediaEmptyState {}
     }
 
     Component {

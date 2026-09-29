@@ -52,21 +52,6 @@ Item {
         onTriggered: root.surfaceLingering = false
     }
 
-    Connections {
-        target: PluginService
-        enabled: !root.isBuiltin
-
-        function onPluginLoaded(loadedPluginId) {
-            if (loadedPluginId === root.pluginId)
-                contentLoader.reloadComponent();
-        }
-
-        function onPluginUnloaded(unloadedPluginId) {
-            if (unloadedPluginId === root.pluginId)
-                contentLoader.reloadComponent();
-        }
-    }
-
     readonly property string settingsKey: instanceId ? instanceId : pluginId
     readonly property bool isInstance: instanceId !== "" && instanceData !== null
 
@@ -312,11 +297,6 @@ Item {
                 to: 1
                 duration: Theme.mediumDuration
                 easing.type: Theme.standardEasing
-            }
-
-            function reloadComponent() {
-                active = false;
-                active = true;
             }
 
             function updateInstanceData() {

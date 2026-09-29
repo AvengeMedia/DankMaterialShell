@@ -5,6 +5,7 @@ import qs.Modules.DankDash
 Card {
     id: root
     property bool live: Window.window?.visible ?? false
+    property var transientSurfaceTracker: null
     readonly property bool opensTab: false
     focusTarget: panel
     activeFocusOnTab: interactive
@@ -23,5 +24,6 @@ Card {
         live: root.live
         interactive: root.interactive
         nested: true
+        transientSurfaceTracker: root.transientSurfaceTracker
     }
 }

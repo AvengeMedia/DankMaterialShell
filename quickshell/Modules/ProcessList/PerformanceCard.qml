@@ -20,9 +20,10 @@ Rectangle {
     property string extraInfo: ""
     property color extraInfoColor: Theme.surfaceVariantText
 
-    implicitHeight: compact ? cardContent.implicitHeight + Theme.spacingM * 2 : 0
+    implicitHeight: cardContent.implicitHeight + Theme.spacingM * 2
     radius: Theme.cornerRadiusL
-    color: Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(card))
+    property bool floatingWindow: (typeof root !== "undefined" && typeof root.isFloatingWindowSurface === "boolean") ? root.isFloatingWindowSurface : Theme.isFloatingWindow(card)
+    color: Theme.foregroundColor(Theme.cardSurface, floatingWindow)
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
 

@@ -193,9 +193,9 @@ Singleton {
         }
     }
 
-    function _sharedTriggerIsland(screen) {
+    function _sharedTriggerIsland(screen, activity) {
         const target = screen ?? CompositorService.getFocusedScreen();
-        const config = target ? SettingsData.sharedTriggerIslandConfig(target) : null;
+        const config = target ? SettingsData.sharedTriggerIslandConfig(target, activity) : null;
         if (!config || dankIslandRouter?.hasHostForScreen?.(target, config.id) !== true)
             return null;
         return {
@@ -209,7 +209,7 @@ Singleton {
     function routeToIsland(activityId, screen, shouldToggle, section, barId) {
         if (barId && dankIslandRouter?.hasHostForScreen(screen, barId) !== true)
             return false;
-        const shared = barId ? null : _sharedTriggerIsland(screen);
+        const shared = barId ? null : _sharedTriggerIsland(screen, activityId);
         if (!barId && !shared)
             return false;
         const targetScreen = shared?.screen ?? screen ?? null;
@@ -233,8 +233,7 @@ Singleton {
     }
 
     function closeControlCenter() {
-        if (closeIslandActivity("controlcenter"))
-            return;
+        closeIslandActivity("controlcenter");
         controlCenterPopout?.close();
     }
 
@@ -261,8 +260,7 @@ Singleton {
     }
 
     function closeNotificationCenter() {
-        if (closeIslandActivity("notificationcenter"))
-            return;
+        closeIslandActivity("notificationcenter");
         notificationCenterPopout?.close();
     }
 
@@ -764,9 +762,9 @@ Singleton {
 
     function _routeSharedLauncher(query, mode, toggle) {
         const screen = CompositorService.getFocusedScreen();
-        if (!SettingsData.sharedShortcutsOverridden(screen))
+        if (!SettingsData.sharedShortcutsOverridden(screen, "launcher"))
             return false;
-        const shared = _sharedTriggerIsland(screen);
+        const shared = _sharedTriggerIsland(screen, "launcher");
         if (!shared)
             return false;
         return toggle ? dankIslandRouter.toggleLauncher(query, mode, shared.screen, shared.barId) : dankIslandRouter.openLauncher(query, mode, shared.screen, shared.barId);
@@ -815,7 +813,7 @@ Singleton {
     }
 
     function closeDankLauncherV2() {
-        dankIslandRouter?.closeLauncher?.();
+        closeIslandActivity("launcher");
         dankLauncherV2Modal?.hide();
     }
 

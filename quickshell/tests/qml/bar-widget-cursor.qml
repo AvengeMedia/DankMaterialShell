@@ -107,14 +107,16 @@ ShellRoot {
             Qt.quit();
         }
 
+        // Before niri configures the bar its width is 0 and the clock's screen-edge hit area folds back over the launcher, so only an overlap that never clears fails.
         onTriggered: {
-            if (!widget || widget.width <= 0 || !widget.visible) {
-                if (++waited > 800)
-                    finish("launcher button never appeared: widget=" + widget + " width=" + widget?.width + " visible=" + widget?.visible);
+            const covering = widget && widget.width > 0 && widget.visible ? root.areasCovering(widget) : null;
+            if (covering && !covering.length) {
+                finish("");
                 return;
             }
-            const covering = root.areasCovering(widget);
-            finish(covering.length ? "MouseArea painted over the launcher button: " + covering : "");
+            if (++waited <= 800)
+                return;
+            finish(covering ? "MouseArea painted over the launcher button: " + covering : "launcher button never appeared: widget=" + widget + " width=" + widget?.width + " visible=" + widget?.visible);
         }
     }
 }

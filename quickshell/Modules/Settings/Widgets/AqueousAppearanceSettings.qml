@@ -197,28 +197,24 @@ SettingsCard {
         }
     }
 
-    SettingsRow {
-        visible: root.hasChanges
-        body: Row {
-            LayoutMirroring.enabled: false
-            width: parent.width
-            spacing: Theme.spacingS
-            layoutDirection: Qt.RightToLeft
+    SettingsFabBar {
+        shown: root.hasChanges
 
-            DankButton {
-                text: I18n.tr("Apply changes")
-                iconName: "check"
-                enabled: root.supported && !root.working
-                onClicked: root.apply(false)
-            }
+        DankFab {
+            text: I18n.tr("Discard")
+            iconName: "undo"
+            colorRole: "secondaryContainer"
+            enabled: !root.working
+            onClicked: root.changes = ({})
+        }
 
-            DankButton {
-                text: I18n.tr("Discard")
-                backgroundColor: "transparent"
-                textColor: Theme.surfaceText
-                enabled: !root.working
-                onClicked: root.changes = ({})
-            }
+        DankFab {
+            text: I18n.tr("Apply changes")
+            iconName: "check"
+            colorRole: "primary"
+            busy: root.working
+            enabled: root.supported && !root.working
+            onClicked: root.apply(false)
         }
     }
 }

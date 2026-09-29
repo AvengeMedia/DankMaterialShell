@@ -38,6 +38,8 @@ Item {
                 resetStore: dock
                 resetKeys: ["showOnFullscreen"]
                 text: I18n.tr("Over fullscreen")
+                description: I18n.tr("Keeps the dock showing over fullscreen windows", "dock over fullscreen toggle description")
+                enabled: dock.config?.useOverlayLayer ?? false
                 checked: dock.config?.showOnFullscreen ?? false
                 onToggled: checked => dock.setOption("showOnFullscreen", checked)
             }
@@ -59,6 +61,7 @@ Item {
                 resetStore: dock
                 resetKeys: ["bottomGap"]
                 text: I18n.tr("Exclusive zone offset")
+                description: I18n.tr("Grows or shrinks the space windows keep clear", "bar and dock exclusive zone offset slider description")
                 visible: dock.reservesSpace
                 value: dock.config?.bottomGap ?? 0
                 minimum: -100
@@ -82,6 +85,7 @@ Item {
                 resetStore: dock
                 resetKeys: ["isolateDisplays"]
                 text: I18n.tr("Isolate displays")
+                description: I18n.tr("Shows only windows from the dock's own display", "dock isolate displays toggle description")
                 checked: dock.config?.isolateDisplays ?? false
                 onToggled: checked => dock.setOption("isolateDisplays", checked)
             }
@@ -92,6 +96,7 @@ Item {
                 resetStore: dock
                 resetKeys: ["restoreSpecialWorkspaceOnClick"]
                 text: I18n.tr("Restore special workspace")
+                description: I18n.tr("Clicking a window in a special workspace opens that workspace", "dock restore special workspace toggle description")
                 visible: CompositorService.isHyprland
                 checked: dock.config?.restoreSpecialWorkspaceOnClick ?? false
                 onToggled: checked => dock.setOption("restoreSpecialWorkspaceOnClick", checked)

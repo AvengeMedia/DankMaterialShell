@@ -37,13 +37,33 @@ BasePill {
             return !hiddenTrayIds.includes(itemId.toLowerCase());
         });
     }
+    property var _trayKeyByItem: new Map()
     function getTrayItemKey(item) {
         const id = item?.id || "";
-        const tooltipTitle = item?.tooltipTitle || "";
-        if (!tooltipTitle || tooltipTitle === id) {
-            return id;
+        if (!id)
+            return "";
+        if (root._trayKeyByItem.has(item))
+            return root._trayKeyByItem.get(item);
+        const taken = new Set();
+        for (const live of root.allTrayItems) {
+            if (live !== item && (live?.id || "") === id && root._trayKeyByItem.has(live))
+                taken.add(root._trayKeyByItem.get(live));
         }
-        return `${id}::${tooltipTitle}`;
+        let key = id;
+        for (let n = 1; taken.has(key); n++)
+            key = `${id}::${n}`;
+        root._trayKeyByItem.set(item, key);
+        return key;
+    }
+
+    function resolveOrderIndex(key, orderMap) {
+        if (orderMap.has(key))
+            return orderMap.get(key);
+        return -1;
+    }
+
+    function isTrayIdHidden(key) {
+        return SessionData.isHiddenTrayId(key);
     }
 
     function trayIconSourceFor(trayItem) {
@@ -147,6 +167,13 @@ BasePill {
         }
     }
 
+    Connections {
+        target: SystemTray
+        function onItemUnregistered(item) {
+            root._trayKeyByItem.delete(item);
+        }
+    }
+
     function sortByPreferredOrder(items, trigger) {
         void trigger;
         const savedOrder = SessionData.trayItemOrder || [];
@@ -156,15 +183,17 @@ BasePill {
         return [...items].sort((a, b) => {
             const keyA = getTrayItemKey(a);
             const keyB = getTrayItemKey(b);
-            const orderA = orderMap.has(keyA) ? orderMap.get(keyA) : 10000 + items.indexOf(a);
-            const orderB = orderMap.has(keyB) ? orderMap.get(keyB) : 10000 + items.indexOf(b);
-            return orderA - orderB;
+            const orderA = resolveOrderIndex(keyA, orderMap);
+            const orderB = resolveOrderIndex(keyB, orderMap);
+            const posA = orderA >= 0 ? orderA : 10000 + items.indexOf(a);
+            const posB = orderB >= 0 ? orderB : 10000 + items.indexOf(b);
+            return posA - posB;
         });
     }
 
     readonly property var allSortedTrayItems: sortByPreferredOrder(allTrayItems, _trayOrderTrigger)
     readonly property var allSortedTrayItemKeys: allSortedTrayItems.map(item => getTrayItemKey(item))
-    readonly property var visibleSortedTrayItems: allSortedTrayItems.filter(item => !SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property var visibleSortedTrayItems: allSortedTrayItems.filter(item => !root.isTrayIdHidden(root.getTrayItemKey(item)))
     readonly property int automaticVisibleItemLimit: {
         if (!root.useAutomaticOverflow)
             return root.visibleSortedTrayItems.length;
@@ -187,7 +216,7 @@ BasePill {
                 item: item
             }))
     readonly property var autoOverflowBarItems: visibleSortedTrayItems.slice(automaticVisibleItemLimit)
-    readonly property var manualHiddenBarItems: allSortedTrayItems.filter(item => SessionData.isHiddenTrayId(root.getTrayItemKey(item)))
+    readonly property var manualHiddenBarItems: allSortedTrayItems.filter(item => root.isTrayIdHidden(root.getTrayItemKey(item)))
     readonly property var hiddenBarItemKeys: manualHiddenBarItems.concat(autoOverflowBarItems).map(item => root.getTrayItemKey(item))
     readonly property var hiddenBarItems: allSortedTrayItems.filter(item => hiddenBarItemKeys.indexOf(root.getTrayItemKey(item)) !== -1)
     readonly property string trayIconTintMode: {
@@ -295,7 +324,7 @@ BasePill {
     }
 
     function isManualHiddenTrayItem(item) {
-        return SessionData.isHiddenTrayId(getTrayItemKey(item));
+        return root.isTrayIdHidden(root.getTrayItemKey(item));
     }
 
     function isAutoOverflowTrayItem(item) {

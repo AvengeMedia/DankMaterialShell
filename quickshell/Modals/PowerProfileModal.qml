@@ -188,7 +188,7 @@ DankModal {
 
                             color: {
                                 if (isActive)
-                                    return Theme.primaryPressed;
+                                    return Theme.selectedContainer;
                                 if (isSelected)
                                     return Theme.primaryHoverLight;
                                 if (mouseArea.containsMouse)
@@ -196,8 +196,8 @@ DankModal {
                                 return Theme.floatingWindowNestedSurface;
                             }
 
-                            border.color: isActive ? Theme.primary : (isSelected ? Theme.withAlpha(Theme.primary, 0.5) : Theme.outlineMedium)
-                            border.width: (isActive || isSelected) ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                            border.color: isSelected ? Theme.focusRingColor : Theme.outlineMedium
+                            border.width: isSelected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
 
                             // Shortcut Key Badge on Top-Right Corner
                             Rectangle {
@@ -207,15 +207,13 @@ DankModal {
                                 width: 20
                                 height: 20
                                 radius: Theme.cornerRadiusXS
-                                color: isActive ? Theme.primaryPressed : Theme.chipSurface
-                                border.color: isActive ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
-                                border.width: isActive ? 1 : 0
+                                color: Theme.chipSurface
 
                                 StyledText {
                                     text: (index + 1).toString()
                                     font.pixelSize: Theme.fontSizeSmall
                                     font.weight: Theme.fontWeightMedium
-                                    color: isActive ? Theme.primary : Theme.surfaceTextMedium
+                                    color: isActive ? Theme.accentOnSelectedContainer : Theme.surfaceTextMedium
                                     anchors.centerIn: parent
                                 }
                             }
@@ -227,7 +225,7 @@ DankModal {
                                 DankIcon {
                                     name: Theme.getPowerProfileIcon(modelData)
                                     size: Theme.iconSize + 16
-                                    color: isActive ? Theme.primary : Theme.surfaceText
+                                    color: isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
                                     filled: isActive
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -235,7 +233,7 @@ DankModal {
                                 StyledText {
                                     text: Theme.getPowerProfileLabel(modelData)
                                     font.pixelSize: Theme.fontSizeMedium
-                                    color: isActive ? Theme.primary : Theme.surfaceText
+                                    color: isActive ? Theme.onSelectedContainer : Theme.surfaceText
                                     font.weight: Theme.fontWeightMedium
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }

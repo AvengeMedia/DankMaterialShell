@@ -86,7 +86,7 @@ FocusScope {
                     spacing: Theme.spacingXS
 
                     Repeater {
-                        model: keybindRow.modelData.keyCombos || (keybindRow.modelData.key ? [KeyUtils.formatKeyTokens(keybindRow.modelData.key)] : [])
+                        model: keybindRow.modelData.keyCombos || (keybindRow.modelData.key ? [KeyUtils.formatKeyTokens(keybindRow.modelData.key, KeybindsService.modKey, KeybindsService.modSymbol)] : [])
 
                         Row {
                             anchors.right: parent ? parent.right : undefined
@@ -365,7 +365,7 @@ FocusScope {
 
                 const label = content.getBindLabel(bind);
                 const labelLower = label.toLowerCase();
-                const keyTokens = KeyUtils.formatKeyTokens(bind.key);
+                const keyTokens = KeyUtils.formatKeyTokens(bind.key, KeybindsService.modKey, KeybindsService.modSymbol);
                 const tokenSig = keyTokens.join("+");
                 const keyLower = (bind.key || "").toLowerCase();
                 const descLower = (bind.desc || "").toLowerCase();

@@ -12,6 +12,7 @@ Singleton {
     readonly property real windowHeight: 940
     readonly property real windowMinWidth: 500
     readonly property real windowMinHeight: 400
+    readonly property real formDialogWidth: 640
     readonly property real pagePaddingH: 40
     readonly property real pagePaddingV: 32
     readonly property real scrollGutter: 32
@@ -39,9 +40,10 @@ Singleton {
     readonly property real bannerTextMinWidth: 100
     readonly property real fontMenuExtraWidth: 100
     readonly property real swatchTileMinWidth: 96
+    readonly property real emptyStateHeight: 100
     readonly property color rowColor: Theme.foregroundColor(Theme.cardSurface, true)
     readonly property color rowHighlightColor: Theme.withAlpha(Theme.primary, highlightBlend)
-    readonly property color selectedRowColor: Theme.blend(rowColor, Theme.onSurface, Theme.stateLayerDrag)
+    readonly property color selectedRowColor: Theme.selectedContainer
     readonly property int transitionDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property int fadeDuration: Theme.expressiveDurations.expressiveEffects
     readonly property int pageSettleFrames: 2

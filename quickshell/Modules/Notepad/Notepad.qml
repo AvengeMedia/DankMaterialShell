@@ -8,6 +8,7 @@ import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
+import "../../Common/Format.js" as Format
 
 Item {
     id: root
@@ -244,14 +245,43 @@ Item {
         }
     }
 
+    function confirmLargeFile(path, size, onOpen, onCancel) {
+        largeFileConfirmLoader.active = true;
+        const confirm = largeFileConfirmLoader.item;
+        if (!confirm)
+            return;
+        root.confirmationDialogOpen = true;
+        confirm.showWithOptions({
+            "title": I18n.tr("Open large file?", "notepad prompt before loading a file over the size limit"),
+            "message": I18n.tr("%1 is %2 and may use a lot of memory.", "notepad large file prompt, file name then size").arg(path.split('/').pop()).arg(Format.formatBytes(size)),
+            "confirmText": I18n.tr("Open"),
+            "onConfirm": () => {
+                root.confirmationDialogOpen = false;
+                NotepadStorageService.approveLargeFile(path);
+                onOpen();
+            },
+            "onCancel": () => {
+                root.confirmationDialogOpen = false;
+                onCancel();
+            }
+        });
+    }
+
     function performLoadFromFile(fileUrl) {
         const filePath = fileUrl.toString().replace(/^file:\/\//, '');
         const fileName = filePath.split('/').pop();
 
-        loadFileView.path = "";
-        loadFileView.path = filePath;
+        NotepadStorageService.readFileSize(filePath, size => {
+            if (NotepadStorageService.needsLargeFileConfirm(filePath, size)) {
+                root.confirmLargeFile(filePath, size, () => root.performLoadFromFile(fileUrl), () => {});
+                return;
+            }
 
-        if (loadFileView.waitForJob()) {
+            loadFileView.path = "";
+            loadFileView.path = filePath;
+
+            if (!loadFileView.waitForJob())
+                return;
             Qt.callLater(() => {
                 var content = loadFileView.text();
                 if (currentTab && content !== undefined && content !== null) {
@@ -274,7 +304,7 @@ Item {
                         NotepadStorageService.clearConflict();
                 }
             });
-        }
+        });
     }
 
     Item {
@@ -500,6 +530,14 @@ Item {
                 root.showConflictBanner(diskContent);
             }
 
+            onLargeFileConfirmRequested: (tab, size) => {
+                if (!root.surfaceVisible)
+                    return;
+                root.confirmLargeFile(tab.filePath, size, () => textEditor.loadCurrentTabContent(), () => {
+                    root.performCloseTab(NotepadStorageService.tabs.findIndex(t => t.id === tab.id));
+                });
+            }
+
             onAutoSaveRequested: root.autoSaveExternal()
         }
     }
@@ -640,6 +678,15 @@ Item {
             onDialogClosed: {
                 root.fileDialogOpen = false;
             }
+        }
+    }
+
+    LazyLoader {
+        id: largeFileConfirmLoader
+        active: false
+
+        ConfirmModal {
+            useOverlayLayer: true
         }
     }
 

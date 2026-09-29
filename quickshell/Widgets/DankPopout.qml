@@ -110,6 +110,8 @@ Item {
     readonly property real renderedAlignedY: impl.item ? (impl.item.renderedAlignedY ?? impl.item.alignedY) : 0
     readonly property real renderedAlignedWidth: impl.item ? (impl.item.renderedAlignedWidth ?? impl.item.alignedWidth) : 0
     readonly property real renderedAlignedHeight: impl.item ? (impl.item.renderedAlignedHeight ?? impl.item.alignedHeight) : 0
+    readonly property real maxBodyWidth: impl.item ? impl.item.maxBodyWidth : 0
+    readonly property real maxBodyHeight: impl.item ? impl.item.maxBodyHeight : 0
 
     function alignedXFor(width) {
         return impl.item?.alignedXFor(width) ?? 0;

@@ -272,6 +272,7 @@ Column {
             settingKey: "notificationDndAllowCritical"
             tags: ["notification", "dnd", "critical", "priority", "urgent", "bypass"]
             text: I18n.tr("Allow critical")
+            description: I18n.tr("Critical notifications still pop up", "do not disturb allow critical toggle description")
             checked: SettingsData.notificationDndAllowCritical
             onToggled: checked => SettingsData.set("notificationDndAllowCritical", checked)
         }
@@ -356,6 +357,7 @@ Column {
             settingKey: "notificationPopupPrivacyMode"
             tags: ["notification", "popup", "privacy", "body", "content", "hide"]
             text: I18n.tr("Privacy mode")
+            description: I18n.tr("Popups hide the message until expanded", "notification privacy mode toggle description")
             checked: SettingsData.notificationPopupPrivacyMode
             onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
         }

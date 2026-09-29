@@ -173,14 +173,41 @@ ShellRoot {
                         return;
                     root.check(!BarWidgetService.getWidgetInstance("fixture", root.target("z", "left", "fixture_0")), "deleted bar is ineligible");
                     root.check(Object.values(BarWidgetService.widgetRegistry).every(entry => entry.context.barId === "a"), "deleted hosts release registrations");
-                    for (const entry of Object.values(BarWidgetService.widgetRegistry).filter(entry => entry.widgetId === "fixture")) {
+                    const fixtures = Object.values(BarWidgetService.widgetRegistry).filter(entry => entry.widgetId === "fixture");
+                    for (const entry of fixtures) {
                         entry.item.triggerPopout();
                         root.check(root.lastAnchor.x > 0 && root.lastAnchor.x < screen.width / 2, "vertical plugin origin");
                     }
-                    SettingsData.barConfigs = [];
+                    for (const entry of fixtures)
+                        entry.item.setVisibilityOverride(false);
+                    const hiddenCalls = root.calls;
+                    root.check(BarWidgetService.triggerWidgetPopout("fixture") && root.calls === hiddenCalls + 1, "hidden plugin still opens");
+                    const shown = fixtures.find(entry => entry.context.section === "right").item;
+                    shown.setVisibilityOverride(true);
+                    root.check(BarWidgetService.getWidget("fixture") === shown, "shown duplicate wins over hidden ones");
+                    SettingsData.barConfigs = [Object.assign(root.config("a", 2, false), {
+                            leftWidgets: ["clock",
+                                {
+                                    id: "fixture",
+                                    enabled: false
+                                }
+                            ],
+                            centerWidgets: [],
+                            rightWidgets: []
+                        })];
                     advance();
                     break;
                 case 3:
+                    waitingFor = "only the enabled clock to register";
+                    if (entries.length !== 1 || entries[0].widgetId !== "clock")
+                        return;
+                    const disabledCalls = root.calls;
+                    root.check(BarWidgetService.ensureWidget("fixture"), "disabled widget loads on demand");
+                    root.check(BarWidgetService.triggerWidgetPopout("fixture") && root.calls === disabledCalls + 1, "disabled widget opens");
+                    SettingsData.barConfigs = [];
+                    advance();
+                    break;
+                case 4:
                     if (entries.length !== 0)
                         return;
                     root.check(Object.keys(BarWidgetService.widgetRegistry).length === 0, "all hosts released");

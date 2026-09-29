@@ -67,7 +67,7 @@
     "list.focusOutline": "{{colors.primary.dark.hex}}",
     "list.focusBackground": "{{colors.surface_container_high.dark.hex}}",
     "list.highlightForeground": "{{colors.primary.dark.hex}}",
-    "list.focusHighlightForeground": "{{colors.primary.dark.hex}}",
+    "list.focusHighlightForeground": "{{colors.on_primary.dark.hex}}",
     "list.errorForeground": "{{colors.error.dark.hex}}",
     "list.warningForeground": "{{colors.secondary.dark.hex}}",
     //
@@ -82,6 +82,9 @@
     "dropdown.border": "{{colors.outline_variant.dark.hex}}",
     "quickInput.background": "{{colors.surface_container_low.dark.hex}}",
     "quickInput.foreground": "{{colors.on_surface.dark.hex}}",
+    "quickInputList.focusBackground": "{{colors.primary.dark.hex}}",
+    "quickInputList.focusForeground": "{{colors.on_primary.dark.hex}}",
+    "quickInputList.focusIconForeground": "{{colors.on_primary.dark.hex}}",
     "widget.shadow": "{{colors.background.dark.hex}}80",
     //
     // Buttons

@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../Modules/DankBar/Widgets/KeyboardLayoutLabels.js" as KeyboardLayoutLabels
+import "../../Modules/DankBar/Widgets/KeyboardLayoutLabels.js" as KeyboardLayoutLabels
 
 TestCase {
     name: "KeyboardLayoutLabels"

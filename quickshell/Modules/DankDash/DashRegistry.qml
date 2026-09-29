@@ -488,9 +488,8 @@ Singleton {
         return optionSpecs(id).some(spec => spec.key in stored);
     }
 
-    function resolvedOptions(id) {
+    function resolvedOptions(id, stored = storedOptions(id)) {
         const out = {};
-        const stored = storedOptions(id);
         for (const spec of optionSpecs(id))
             out[spec.key] = optionValue(spec, stored[spec.key]);
         return out;

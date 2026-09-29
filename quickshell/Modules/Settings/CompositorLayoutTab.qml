@@ -216,6 +216,7 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 tags: ["niri", "overview", "window", "focus", "launch", "launcher", "dock", "settings"]
                 settingKey: "closeNiriOverviewOnWindowFocus"
                 text: I18n.tr("Close on window focus")
+                description: I18n.tr("Leaves the overview when DMS launches an app or focuses a window", "niri overview close on window focus toggle description")
                 checked: SettingsData.closeNiriOverviewOnWindowFocus
                 onToggled: checked => SettingsData.set("closeNiriOverviewOnWindowFocus", checked)
             }

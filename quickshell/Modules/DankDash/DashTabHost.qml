@@ -77,6 +77,8 @@ FocusScope {
             target.parentPopout = root.dashHost;
         if ("dashHost" in target)
             target.dashHost = root.dashHost;
+        if ("transientSurfaceTracker" in target)
+            target.transientSurfaceTracker = root.dashHost.transientSurfaceTracker;
         if ("targetScreen" in target)
             target.targetScreen = Qt.binding(() => root.dashHost.screen);
         if ("preferredFocusId" in target)

@@ -34,7 +34,28 @@ Item {
     property real anchorX: 0
     property real anchorY: 0
     property real freeMargin: 8
+    // Measured from the band centre, not the band start.
+    property real anchorAlong: 0
+    property real nearInset: 0
+    property real bandAlongStart: 0
+    property real bandAlongEnd: root.alongExtent
+    // Hosted: false while the bar window is still band sized, so the sheet never starts inside a window that clips it.
+    property bool hostReady: true
+    property bool targetPending: false
+    onHostReadyChanged: {
+        if (!root.hostReady || !root.targetPending)
+            return;
+        root.targetPending = false;
+        root.applyTarget();
+    }
     property Component compactFaceOverride: null
+    // "own" paints the palette; "band" wears the host bar's colour with join corners; "none" paints nothing and leaves the silhouette to the frame SDF.
+    property string chrome: "own"
+    property color bandColor: Theme.hostSurface
+    property bool compactBackground: false
+    property color compactBackgroundColor: "transparent"
+    readonly property bool embedded: root.chrome !== "own"
+    readonly property bool chromeless: root.chrome === "none"
 
     readonly property color surfaceColor: {
         if (root.highContrast)
@@ -49,7 +70,7 @@ Item {
     }
     readonly property bool popupStyled: root.controller.expanded
     readonly property real islandOpacity: Math.max(0, Math.min(1, root.transparency))
-    readonly property color effectiveSurfaceColor: root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
+    readonly property color effectiveSurfaceColor: root.embedded ? root.bandColor : root.highContrast ? Theme.surfaceContainerHighest : Theme.withAlpha(root.surfaceColor, root.islandOpacity)
     readonly property real surfaceOpacity: root.effectiveSurfaceColor.a
     readonly property real currentSurfaceRadius: Math.max(0, motion.currentTopLeftRadius, motion.currentBottomLeftRadius)
     readonly property color notificationAccentColor: {
@@ -118,7 +139,7 @@ Item {
 
         function screenXFor(width) {
             if (!root.isVertical)
-                return Math.round((root.alongExtent - width) / 2 + motion.targetOffsetAlong) + root.hostOriginX;
+                return Math.round((root.alongExtent - width) / 2 + (root.embedded ? root.clampAnchored(root.controller.alongOffset + root.anchorAlong, width) : motion.targetOffsetAlong)) + root.hostOriginX;
             const cross = Math.round(motion.targetOffsetCross);
             return (root.farEdge ? root.crossExtent - cross - width : cross) + root.hostOriginX;
         }
@@ -166,7 +187,24 @@ Item {
         return Math.round(Math.max(root.freeMargin, Math.min(value, limit)));
     }
 
+    // A compact face keeps its slot right up to the band edge; only a sheet that outgrows the slot keeps a margin.
+    function clampAnchored(offset, size) {
+        const margin = size > root.descriptorAlong(root.controller.compactTarget) ? Theme.spacingS : 0;
+        const centre = root.alongExtent / 2;
+        const low = root.bandAlongStart + margin + size / 2 - centre;
+        const high = root.bandAlongEnd - margin - size / 2 - centre;
+        return low > high ? (root.bandAlongStart + root.bandAlongEnd) / 2 - centre : Math.max(low, Math.min(offset, high));
+    }
+
     function resolveTarget(target) {
+        if (root.embedded && !root.freeMode) {
+            const inset = target.sheet ? root.nearInset : 0;
+            return Object.assign({}, target, {
+                "offsetAlong": root.clampAnchored(target.offsetAlong + root.anchorAlong, root.descriptorAlong(target)),
+                "width": target.width + (root.isVertical ? inset : 0),
+                "height": target.height + (root.isVertical ? 0 : inset)
+            });
+        }
         if (!root.freeMode)
             return target;
         const x = root.clampFree(root.anchorX - target.width / 2, target.width, root.width);
@@ -178,8 +216,11 @@ Item {
     }
 
     function applyTarget(seedVelocity) {
+        root.targetPending = controller.expanded && !root.hostReady;
+        if (root.targetPending)
+            return;
         if (controller.expanded)
-            fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
+            fadeExpandedCross = root.descriptorCross(root.resolveTarget(controller.expandedTarget));
         else
             fadeCompactCross = root.descriptorCross(controller.compactTarget);
         if (motion.running)
@@ -189,11 +230,14 @@ Item {
             root.controller.releaseIdleVisuals();
     }
 
+    // Neighbours re-layout without animation, so a settled collapsed pill snaps with them; a size change or an open sheet springs.
     function syncAnchor() {
-        if (!root.freeMode)
+        if (!root.freeMode && !root.embedded)
             return;
-        if (root.anchorSnaps) {
-            motion.snapTo(root.resolveTarget(controller.targetDescriptor));
+        const target = root.resolveTarget(controller.targetDescriptor);
+        const sameSize = target.width === motion.targetWidth && target.height === motion.targetHeight;
+        if (root.anchorSnaps || (root.embedded && !motion.running && !controller.expanded && sameSize)) {
+            motion.snapTo(target);
             return;
         }
         root.applyTarget();
@@ -201,7 +245,10 @@ Item {
 
     onAnchorXChanged: root.syncAnchor()
     onAnchorYChanged: root.syncAnchor()
+    onAnchorAlongChanged: root.syncAnchor()
     onAlongExtentChanged: root.syncAnchor()
+    onBandAlongStartChanged: root.syncAnchor()
+    onBandAlongEndChanged: root.syncAnchor()
 
     function unionMotionStartBounds() {
         const b = root.motionStartBounds;
@@ -219,7 +266,7 @@ Item {
     Component.onCompleted: {
         trackedCrossExtent = crossExtent;
         fadeCompactCross = root.descriptorCross(controller.compactTarget);
-        fadeExpandedCross = root.descriptorCross(controller.expandedTarget);
+        fadeExpandedCross = root.descriptorCross(root.resolveTarget(controller.expandedTarget));
         motion.snapTo(root.resolveTarget(controller.targetDescriptor));
     }
 
@@ -262,6 +309,9 @@ Item {
         mass: root.springMass
     }
 
+    // Host and surface are band-sized when embedded; the sheet grows past them after the pill was hovered at rest.
+    PointerOverflowMarker {}
+
     // Frozen start/target union so the Wayland mask is not rewritten every spring frame.
     Item {
         id: inputEnvelope
@@ -294,8 +344,9 @@ Item {
         y: root.currentVisualY
         width: root.currentVisualWidth
         height: root.currentVisualHeight
-        color: root.effectiveSurfaceColor
-        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : (root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0))
+        // Embedded, the band already paints the in-band strip; overhangFill draws the rest, so a translucent band never double-alphas.
+        color: root.embedded ? "transparent" : root.effectiveSurfaceColor
+        border.width: root.notificationAccentColor !== "transparent" ? 1.5 : root.embedded ? 0 : (root.highContrast ? 2 : (root.popupStyled ? BlurService.borderWidth : 0))
         border.color: root.notificationAccentColor !== "transparent" ? root.notificationAccentColor : (root.highContrast ? Theme.outlineStrong : (root.popupStyled ? BlurService.borderColor : "transparent"))
 
         Behavior on color {
@@ -310,6 +361,17 @@ Item {
                 duration: root.reducedMotion ? 0 : Theme.shortDuration
                 easing.type: Easing.OutCubic
             }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            visible: root.compactBackground && opacity > 0
+            opacity: 1 - root.morphProgress
+            color: root.compactBackgroundColor
+            topLeftRadius: parent.topLeftRadius
+            topRightRadius: parent.topRightRadius
+            bottomLeftRadius: parent.bottomLeftRadius
+            bottomRightRadius: parent.bottomRightRadius
         }
 
         MouseArea {
@@ -336,6 +398,8 @@ Item {
             controller: root.controller
             freeMode: root.freeMode
             compactFaceOverride: root.compactFaceOverride
+            resolveTarget: target => root.resolveTarget(target)
+            expandedInset: root.embedded && !root.freeMode ? root.nearInset : 0
             islandX: root.currentVisualX
             islandY: root.currentVisualY
             hostWidth: root.width
@@ -392,7 +456,7 @@ Item {
         y: root.isVertical ? alongPos : crossPos
         width: root.isVertical ? edgeGap : span
         height: root.isVertical ? span : edgeGap
-        visible: !root.freeMode && edgeGap > 0 && span > 0
+        visible: !root.freeMode && !root.embedded && edgeGap > 0 && span > 0
 
         HoverHandler {
             id: stripHover
@@ -410,6 +474,54 @@ Item {
             onWheel: wheel => {
                 root.scrollWheel(wheel);
                 wheel.accepted = true;
+            }
+        }
+    }
+
+    // crossExtent is the band here, so the overhang is how far the sheet has left the bar.
+    readonly property real embeddedOverhang: !root.embedded || root.chromeless ? 0 : Math.max(0, root.farEdge ? -(root.isVertical ? root.currentVisualX : root.currentVisualY) : (root.isVertical ? root.currentVisualX + root.currentVisualWidth : root.currentVisualY + root.currentVisualHeight) - root.crossExtent)
+    readonly property real embeddedJoinRadius: Math.min(Theme.connectedCornerRadius, root.embeddedOverhang)
+
+    // A Loader, not visible:, so islands and dots skip these per-frame motion bindings.
+    Loader {
+        active: root.embedded && !root.chromeless
+        z: island.z - 1
+        sourceComponent: Item {
+            id: overhangChrome
+            Item {
+                id: overhangClip
+
+                visible: root.embeddedOverhang > 0
+                clip: true
+                x: root.isVertical ? (root.farEdge ? -root.embeddedOverhang : root.crossExtent) : 0
+                y: root.isVertical ? 0 : (root.farEdge ? -root.embeddedOverhang : root.crossExtent)
+                width: root.isVertical ? root.embeddedOverhang : root.width
+                height: root.isVertical ? root.height : root.embeddedOverhang
+
+                MorphSurface {
+                    motion: root.surfaceMotion
+                    x: root.currentVisualX - overhangClip.x
+                    y: root.currentVisualY - overhangClip.y
+                    color: root.effectiveSurfaceColor
+                }
+            }
+
+            GothCorner {
+                visible: root.embeddedJoinRadius > 0
+                radius: root.embeddedJoinRadius
+                color: root.effectiveSurfaceColor
+                corner: root.isVertical ? (root.farEdge ? "topLeft" : "topRight") : (root.farEdge ? "topLeft" : "bottomLeft")
+                x: root.isVertical ? (root.farEdge ? -radius : root.crossExtent) : root.currentVisualX - radius
+                y: root.isVertical ? root.currentVisualY - radius : (root.farEdge ? -radius : root.crossExtent)
+            }
+
+            GothCorner {
+                visible: root.embeddedJoinRadius > 0
+                radius: root.embeddedJoinRadius
+                color: root.effectiveSurfaceColor
+                corner: root.isVertical ? (root.farEdge ? "bottomLeft" : "bottomRight") : (root.farEdge ? "topRight" : "bottomRight")
+                x: root.isVertical ? (root.farEdge ? -radius : root.crossExtent) : root.currentVisualX + root.currentVisualWidth
+                y: root.isVertical ? root.currentVisualY + root.currentVisualHeight : (root.farEdge ? -radius : root.crossExtent)
             }
         }
     }

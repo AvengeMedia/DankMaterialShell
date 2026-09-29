@@ -184,61 +184,15 @@ Item {
 
                     StyledText {
                         text: {
-                            if (!ShellVersionService.shellVersion && !DMSService.cliVersion)
-                                return "dms";
-
-                            let version = ShellVersionService.shellVersion || "";
-                            let cliVersion = DMSService.cliVersion || "";
-
-                            // Debian/Ubuntu/OpenSUSE git format: 1.0.3+git2264.c5c5ce84
-                            let match = version.match(/^([\d.]+)\+git(\d+)\./);
-                            if (match) {
-                                return `dms (git) v${match[1]}-${match[2]}`;
-                            }
-
-                            // Fedora COPR git format: 0.0.git.2267.d430cae9
-                            match = version.match(/^[\d.]+\.git\.(\d+)\./);
-                            if (match) {
-                                function extractBaseVersion(value) {
-                                    if (!value)
-                                        return "";
-                                    let baseMatch = value.match(/(\d+\.\d+\.\d+)/);
-                                    if (baseMatch)
-                                        return baseMatch[1];
-                                    baseMatch = value.match(/(\d+\.\d+)/);
-                                    if (baseMatch)
-                                        return baseMatch[1];
-                                    return "";
-                                }
-
-                                let baseVersion = extractBaseVersion(cliVersion);
-                                if (!baseVersion)
-                                    baseVersion = extractBaseVersion(ShellVersionService.semverVersion);
-                                if (baseVersion) {
-                                    return `dms (git) v${baseVersion}-${match[1]}`;
-                                }
-                                return `dms (git) v${match[1]}`;
-                            }
-
-                            // Stable release format: 1.0.3
-                            match = version.match(/^([\d.]+)$/);
-                            if (match) {
-                                return `dms v${match[1]}`;
-                            }
-
-                            if (!version && cliVersion) {
-                                match = cliVersion.match(/^([\d.]+)\+git(\d+)\./);
-                                if (match) {
-                                    return `dms (git) v${match[1]}-${match[2]}`;
-                                }
-                                match = cliVersion.match(/^([\d.]+)$/);
-                                if (match) {
-                                    return `dms v${match[1]}`;
-                                }
-                                return `dms ${cliVersion}`;
-                            }
-
-                            return `dms ${version}`;
+                            const running = SystemUpdateService.shellRunning;
+                            if (!SystemUpdateService.sysupdateAvailable || !running)
+                                return ShellVersionService.shellVersion ? `dms ${ShellVersionService.shellVersion}` : "dms";
+                            if (SystemUpdateService.shellChannel !== "git")
+                                return /^\d/.test(running) ? `dms v${running}` : `dms ${running}`;
+                            // COPR builds (0.0.git.N.hash) carry no base version; the VERSION file does.
+                            const base = running.startsWith("0.0.git") ? ShellVersionService.semverVersion : running.replace(/^v/, "").split("+")[0];
+                            const build = SystemUpdateService.shellGitBuild;
+                            return build > 0 ? `dms (git) v${base}-${build}` : `dms (git) ${running}`;
                         }
                         font.pixelSize: Theme.fontSizeXLarge
                         color: Theme.surfaceText
@@ -422,7 +376,6 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "info"
-            title: I18n.tr("About")
 
             SettingsRow {
                 body: StyledText {

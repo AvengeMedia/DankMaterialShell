@@ -24,8 +24,10 @@ Row {
     signal addWidget(string widgetId)
     signal resetToDefault
     signal clearAll
+    signal finishRequested
+    signal cancelRequested
 
-    readonly property real buttonWidth: (width - spacing * 2) / 3
+    readonly property real buttonWidth: (width - spacing * 4 - Theme.buttonHeightS * 2) / 3
 
     height: Theme.buttonHeightS
     spacing: Theme.spacingS
@@ -141,5 +143,23 @@ Row {
         backgroundColor: Theme.errorHover
         textColor: Theme.error
         onClicked: root.clearAll()
+    }
+
+    DankActionButton {
+        buttonSize: Theme.buttonHeightS
+        iconName: "close"
+        iconColor: Theme.onSecondaryContainer
+        backgroundColor: Theme.secondaryContainer
+        tooltipText: I18n.tr("Cancel")
+        onClicked: root.cancelRequested()
+    }
+
+    DankActionButton {
+        buttonSize: Theme.buttonHeightS
+        iconName: "check"
+        iconColor: Theme.primaryText
+        backgroundColor: Theme.primary
+        tooltipText: I18n.tr("Finish")
+        onClicked: root.finishRequested()
     }
 }

@@ -73,7 +73,7 @@ Rectangle {
     topRightRadius: topLeftRadius
     bottomLeftRadius: lastInGroup ? outerRadius : radius
     bottomRightRadius: bottomLeftRadius
-    color: surfaceColor
+    color: keyboardSelected ? Theme.selectedContainer : surfaceColor
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
     clip: true

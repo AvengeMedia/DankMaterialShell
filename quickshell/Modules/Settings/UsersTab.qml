@@ -186,13 +186,12 @@ Item {
             }
         }
 
-        SettingsCard {
-            SettingsNavRow {
-                settingKey: "createUser"
-                tags: ["user", "account", "create", "add"]
-                title: I18n.tr("Create user")
+        SettingsFabBar {
+            shown: PolkitService.polkitAvailable
+
+            DankFab {
+                text: I18n.tr("Add user")
                 iconName: "person_add"
-                enabled: PolkitService.polkitAvailable
                 onClicked: root.parentModal?.navigateTo("user_create")
             }
         }

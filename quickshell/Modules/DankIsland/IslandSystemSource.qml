@@ -10,6 +10,8 @@ QtObject {
     required property IslandController controller
 
     property string kind: "volume"
+    // Off: volume and brightness keep their OSDs and only the face's own controls open this activity.
+    property bool enabled: true
 
     readonly property bool volumeActivity: kind === "volume"
     readonly property bool available: volumeActivity ? !!AudioService.sink?.audio : BrightnessService.brightnessAvailable
@@ -25,7 +27,7 @@ QtObject {
     readonly property string iconName: volumeActivity ? AudioService.sinkVolumeIconName : BrightnessService.brightnessIconName(brightnessDevice, value)
 
     function show(activityKind) {
-        if (SessionData.suppressOSD)
+        if (!enabled || SessionData.suppressOSD)
             return;
         open(activityKind);
     }

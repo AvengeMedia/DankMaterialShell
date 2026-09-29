@@ -84,17 +84,10 @@ Item {
                                 width: parent.width
                                 height: isExpanded ? 56 + ethExpandedContent.height : 56
                                 radius: Theme.cornerRadius
-                                color: ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: isConnected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
-                                border.color: isConnected ? Theme.primary : Theme.outlineMedium
+                                color: isConnected ? Theme.selectedContainer : ethDeviceMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                                border.width: Theme.layerOutlineWidth
+                                border.color: Theme.outlineMedium
                                 clip: true
-
-                                Behavior on height {
-                                    NumberAnimation {
-                                        duration: 150
-                                        easing.type: Easing.OutQuad
-                                    }
-                                }
 
                                 Column {
                                     anchors.fill: parent
@@ -115,7 +108,7 @@ Item {
                                             DankIcon {
                                                 name: "lan"
                                                 size: 20
-                                                color: isConnected ? Theme.primary : Theme.surfaceText
+                                                color: isConnected ? Theme.accentOnSelectedContainer : Theme.surfaceText
                                                 anchors.verticalCenter: parent.verticalCenter
                                             }
 
@@ -127,7 +120,7 @@ Item {
                                                 StyledText {
                                                     text: modelData.name || I18n.tr("Unknown")
                                                     font.pixelSize: Theme.fontSizeMedium
-                                                    color: isConnected ? Theme.primary : Theme.surfaceText
+                                                    color: isConnected ? Theme.onSelectedContainer : Theme.surfaceText
                                                     font.weight: Theme.fontWeightMedium
                                                     elide: Text.ElideRight
                                                     width: parent.width
@@ -152,7 +145,7 @@ Item {
                                                             }
                                                         }
                                                         font.pixelSize: Theme.fontSizeSmall
-                                                        color: isConnected ? Theme.primary : Theme.surfaceVariantText
+                                                        color: isConnected ? Theme.onSelectedContainer : Theme.surfaceVariantText
                                                     }
 
                                                     StyledText {
@@ -380,9 +373,9 @@ Item {
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: modelData.isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
-                                border.color: modelData.isActive ? Theme.primary : Theme.outlineMedium
+                                color: modelData.isActive ? Theme.selectedContainer : wiredMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                                border.width: Theme.layerOutlineWidth
+                                border.color: Theme.outlineMedium
 
                                 Row {
                                     anchors.left: parent.left
@@ -393,7 +386,7 @@ Item {
                                     DankIcon {
                                         name: "lan"
                                         size: 20
-                                        color: modelData.isActive ? Theme.primary : Theme.surfaceText
+                                        color: modelData.isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
@@ -404,14 +397,14 @@ Item {
                                         StyledText {
                                             text: modelData.id || I18n.tr("Unknown")
                                             font.pixelSize: Theme.fontSizeMedium
-                                            color: modelData.isActive ? Theme.primary : Theme.surfaceText
+                                            color: modelData.isActive ? Theme.onSelectedContainer : Theme.surfaceText
                                             font.weight: Theme.fontWeightMedium
                                         }
 
                                         StyledText {
                                             text: modelData.isActive ? I18n.tr("Active") : ""
                                             font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.primary
+                                            color: Theme.onSelectedContainer
                                             visible: modelData.isActive
                                         }
                                     }

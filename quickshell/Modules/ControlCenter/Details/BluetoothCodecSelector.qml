@@ -109,7 +109,6 @@ CcSheetDialog {
         title: modelData.name
         subtitle: modelData.description
         active: modelData.name === root.currentCodec
-        showActiveCheck: true
         enabled: !root.isLoading
         clickable: !active
         onClicked: root.selectCodec(modelData.profile)

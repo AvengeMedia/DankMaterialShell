@@ -15,6 +15,8 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.spacingL
 
+    Component.onCompleted: CompositorService.refreshDmsWindowFloatingRule()
+
     ConfigInclude {
         id: windowRulesInclude
         includeKind: "windowrules"
@@ -22,7 +24,7 @@ Column {
         onFixed: {
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
-            CompositorService.applyDmsWindowFloatingRule();
+            CompositorService.seedDmsWindowFloatingRule();
         }
     }
 
@@ -157,6 +159,7 @@ Column {
             tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
             settingKey: "blurForegroundLayers"
             text: I18n.tr("Foreground layers")
+            description: I18n.tr("With background blur on, cards and tiles keep their own backing", "surface foreground layers toggle description")
             checked: SettingsData.blurForegroundLayers ?? true
             onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
         }
@@ -336,9 +339,10 @@ Column {
             settingKey: "dmsWindowsFloating"
             text: I18n.tr("Open floating")
             visible: windowRulesInclude.compositorSupported
-            checked: SettingsData.dmsWindowsFloating ?? true
+            checked: CompositorService.dmsWindowFloatingActive
+            modified: !checked
             onToggled: checked => {
-                SettingsData.set("dmsWindowsFloating", checked);
+                CompositorService.setDmsWindowFloatingRule(checked);
                 if (checked)
                     windowRulesInclude.check();
             }
@@ -346,7 +350,7 @@ Column {
 
         IncludeSetupBanner {
             include: windowRulesInclude
-            visibleCondition: windowRulesInclude.compositorSupported && (SettingsData.dmsWindowsFloating ?? true)
+            visibleCondition: windowRulesInclude.compositorSupported && CompositorService.dmsWindowFloatingActive
         }
     }
 

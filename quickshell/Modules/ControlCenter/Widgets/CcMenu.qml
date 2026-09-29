@@ -131,9 +131,9 @@ Item {
     Rectangle {
         id: panel
         width: CcMetrics.menuMinWidth
-        height: column.implicitHeight + Theme.spacingS * 2
+        height: root.visibleItems.length * Theme.menuItemHeight + Theme.spacingS * 2
         radius: Theme.windowRadius
-        color: Theme.nestedSurface
+        color: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
         border.width: Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
         opacity: root._open ? 1 : 0
@@ -166,7 +166,6 @@ Item {
         }
 
         Column {
-            id: column
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.margins: Theme.spacingS

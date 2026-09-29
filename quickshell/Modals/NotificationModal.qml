@@ -131,10 +131,9 @@ DankModal {
         }
 
         function close(): string {
-            if (PopoutService.closeIslandActivity("notificationcenter"))
-                return "NOTIFICATION_ISLAND_CLOSE_SUCCESS";
+            const islandClosed = PopoutService.closeIslandActivity("notificationcenter");
             notificationModal.hide();
-            return "NOTIFICATION_MODAL_CLOSE_SUCCESS";
+            return islandClosed ? "NOTIFICATION_ISLAND_CLOSE_SUCCESS" : "NOTIFICATION_MODAL_CLOSE_SUCCESS";
         }
 
         function toggle(): string {

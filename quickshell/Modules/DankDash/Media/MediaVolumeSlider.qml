@@ -27,7 +27,6 @@ DankSlider {
     minimum: 0
     maximum: Math.max(1, Math.round(maximumVolume))
     wheelStep: SettingsData.audioWheelScrollAmount
-    wheelInsideScrollable: true
     thumbOutlineColor: Theme.cardSurface
     fillColor: accent
     fillTextColor: accentText

@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix="dms-surface-test-") as temporary:
         if name.startswith(("DMS_", "QS_", "LC_", "XCURSOR_")):
             del env[name]
     shutil.copytree(repo / "quickshell/tests/fixtures/share", root / "share")
-    env.update(HOME=str(root / "home"), XDG_DATA_DIRS=str(root / "share"), XDG_CONFIG_DIRS=str(root / "xdg"), XDG_RUNTIME_DIR=str(root / "runtime"), LANG="C.UTF-8", LC_ALL="C.UTF-8", TZ="UTC")
+    env.update(HOME=str(root / "home"), XDG_DATA_DIRS=str(root / "share"), XDG_CONFIG_DIRS=str(root / "xdg"), XDG_RUNTIME_DIR=str(root / "runtime"), TMPDIR=str(root), LANG="C.UTF-8", LC_ALL="C.UTF-8", TZ="UTC")
     env.update({"XDG_" + name.upper() + "_HOME": str(root / name) for name in ["config", "state", "data", "cache"]})
     env.update(QT_QPA_PLATFORM="wayland", QT_LOGGING_RULES="qml.debug=true", LIBGL_ALWAYS_SOFTWARE="1", DMS_DISABLE_HOT_RELOAD="1", DMS_DISABLE_MATUGEN="1", DBUS_SESSION_BUS_ADDRESS="unix:path=" + str(root / "no-session-bus"), DBUS_SYSTEM_BUS_ADDRESS="unix:path=" + str(root / "no-system-bus"), PULSE_SERVER="unix:" + str(root / "no-pulse"), PIPEWIRE_REMOTE="no-pipewire")
     # glvnd loads the nvidia vendor first, which powers up a sleeping dGPU

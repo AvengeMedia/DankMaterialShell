@@ -24,6 +24,15 @@ var LOCAL_SPEC = {
     idleInhibitedUntil: {
         def: 0
     },
+    updaterNotifiedUnix: {
+        def: 0
+    },
+    updaterNotifiedCount: {
+        def: 0
+    },
+    changelogSeenVersion: {
+        def: ""
+    },
     terminalOverride: {
         def: ""
     },

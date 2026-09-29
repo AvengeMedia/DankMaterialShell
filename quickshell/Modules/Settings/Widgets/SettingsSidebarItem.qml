@@ -128,7 +128,7 @@ Rectangle {
             text: root.title
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
-            color: Theme.surfaceText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceText
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignLeft
         }
@@ -137,7 +137,7 @@ Rectangle {
             width: parent.width
             text: root.hint
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceVariantText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceVariantText
             wrapMode: Text.WordWrap
             maximumLineCount: 2
             elide: Text.ElideRight

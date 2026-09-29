@@ -69,6 +69,8 @@ Item {
                     modelData: host.targetScreen
                     rootWindow: slot.dankBarItem
                     barConfig: slot.slotBarConfig
+                    hostOffsetX: slot.x
+                    hostOffsetY: slot.y
                     leftWidgetsModel: slot.dankBarItem?.leftWidgetsModel ?? null
                     centerWidgetsModel: slot.dankBarItem?.centerWidgetsModel ?? null
                     rightWidgetsModel: slot.dankBarItem?.rightWidgetsModel ?? null

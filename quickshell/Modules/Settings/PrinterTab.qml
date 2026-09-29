@@ -54,6 +54,10 @@ Item {
         suggestedPPDs = [];
     }
 
+    Ref {
+        service: CupsService
+    }
+
     Connections {
         target: CupsService
         function onPpdsChanged() {
@@ -158,25 +162,18 @@ Item {
             width: parent.width
             iconName: "add_circle"
             title: I18n.tr("Add printer")
-            visible: CupsService.cupsAvailable
+            visible: CupsService.cupsAvailable && printerTab.showAddPrinter
 
             SettingsRow {
                 iconName: "add_circle"
                 title: I18n.tr("Configure a new printer")
 
                 DankActionButton {
-                    iconName: printerTab.showAddPrinter ? "expand_less" : "expand_more"
-                    Accessible.name: printerTab.showAddPrinter ? I18n.tr("Cancel") : I18n.tr("Add printer")
+                    iconName: "close"
+                    Accessible.name: I18n.tr("Cancel")
                     onClicked: {
-                        printerTab.showAddPrinter = !printerTab.showAddPrinter;
-                        if (printerTab.showAddPrinter) {
-                            if (CupsService.devices.length === 0) {
-                                CupsService.getDevices();
-                                CupsService.getPPDs();
-                            }
-                        } else {
-                            printerTab.resetAddPrinterForm();
-                        }
+                        printerTab.showAddPrinter = false;
+                        printerTab.resetAddPrinterForm();
                     }
                 }
             }
@@ -425,7 +422,7 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "print"
-            title: I18n.tr("Printers")
+            title: I18n.tr("Installed")
             visible: CupsService.cupsAvailable
 
             headerActions: [
@@ -778,6 +775,23 @@ Item {
                             });
                         }
                     }
+                }
+            }
+        }
+
+        SettingsFabBar {
+            shown: CupsService.cupsAvailable && !printerTab.showAddPrinter
+
+            DankFab {
+                text: I18n.tr("Add printer")
+                iconName: "add"
+                onClicked: {
+                    printerTab.showAddPrinter = true;
+                    if (CupsService.devices.length === 0) {
+                        CupsService.getDevices();
+                        CupsService.getPPDs();
+                    }
+                    mainColumn.contentY = 0;
                 }
             }
         }

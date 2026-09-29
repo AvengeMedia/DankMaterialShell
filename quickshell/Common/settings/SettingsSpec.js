@@ -42,6 +42,9 @@ var LOCAL_SPEC = {
         def: "",
         onChange: "regenSystemThemes"
     },
+    generateThemeAtStartup: {
+        def: true
+    },
     popupTransparency: {
         def: 1.0,
         coerce: Util.percentToUnit
@@ -60,8 +63,8 @@ var LOCAL_SPEC = {
         def: 1.0,
         coerce: Util.percentToUnit
     },
-    dmsWindowsFloating: {
-        def: true
+    dmsWindowsFloatingSeeded: {
+        def: []
     },
     hostSurfaceColor: {
         def: "default"
@@ -428,6 +431,18 @@ var LOCAL_SPEC = {
     controlCenterWidgets: {
         def: [
             {
+                id: "userCard",
+                enabled: true,
+                w: 6.5,
+                h: 1.5
+            },
+            {
+                id: "quickActions",
+                enabled: true,
+                w: 1.5,
+                h: 1.5
+            },
+            {
                 id: "volumeSlider",
                 enabled: true,
                 w: 4,
@@ -510,7 +525,15 @@ var LOCAL_SPEC = {
                 enabled: true
             },
             {
+                id: "kugou",
+                enabled: true
+            },
+            {
                 id: "lrclib",
+                enabled: true
+            },
+            {
+                id: "youtubemusic",
                 enabled: true
             }
         ]
@@ -623,6 +646,9 @@ var LOCAL_SPEC = {
     },
     launcherStyle: {
         def: "full"
+    },
+    avatarRing: {
+        def: "outline"
     },
     spotlightBarShowModeChips: {
         def: false
@@ -1227,6 +1253,9 @@ var LOCAL_SPEC = {
     customPowerButtons: {
         def: []
     },
+    powerMenuBootEntries: {
+        def: []
+    },
     updaterCheckOnStart: {
         def: false
     },
@@ -1240,7 +1269,17 @@ var LOCAL_SPEC = {
         def: ""
     },
     updaterIntervalSeconds: {
-        def: 1800
+        def: 86400
+    },
+    updaterNotify: {
+        def: false
+    },
+    updaterPauseOnBattery: {
+        def: false
+    },
+    // 0 = every time the count grows
+    updaterNotifyMinSeconds: {
+        def: 86400
     },
     updaterIncludeFlatpak: {
         def: true
@@ -1305,6 +1344,7 @@ var LOCAL_SPEC = {
                 transparency: 1.0,
                 surfaceColor: "default",
                 surfaceCustomColor: "#6750A4",
+                widgetFollowInterfaceStyle: true,
                 widgetTransparency: 1.0,
                 squareCorners: false,
                 noBackground: false,

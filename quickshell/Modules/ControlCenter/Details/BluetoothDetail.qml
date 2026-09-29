@@ -16,6 +16,8 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
+    property Item menuParent: root
+
     readonly property string title: I18n.tr("Bluetooth")
     readonly property var adapter: BluetoothService.adapter
     readonly property bool adapterEnabled: adapter?.enabled ?? false
@@ -255,7 +257,7 @@ Item {
                         iconColor: {
                             if (isConnecting)
                                 return Theme.warning;
-                            return isConnected ? Theme.primary : Theme.surfaceText;
+                            return contentColor;
                         }
                         active: isConnected
                         title: deviceName
@@ -360,6 +362,7 @@ Item {
 
     CcMenu {
         id: deviceMenu
+        parent: root.menuParent
     }
 
     Connections {

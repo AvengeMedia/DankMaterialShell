@@ -19,6 +19,7 @@ FocusScope {
     property int rowBudget: DashMetrics.minimumTabRows
     property int columnCap: DashMetrics.maximumGridColumns
     property string preferredFocusId: "calendar"
+    property var transientSurfaceTracker: null
 
     signal cardFocusChanged(string id)
     readonly property Item focusTarget: grid
@@ -88,6 +89,7 @@ FocusScope {
         columnCap: root.columnCap
         live: root.live
         preferredFocusId: root.preferredFocusId
+        transientSurfaceTracker: root.transientSurfaceTracker
         onCardFocusChanged: id => root.cardFocusChanged(id)
 
         onCardClicked: cardId => {
@@ -186,6 +188,7 @@ FocusScope {
             sourceComponent: CalendarEventEditor {
                 eventData: editorSheet.eventData
                 initialDate: editorSheet.initialDate
+                transientSurfaceTracker: root.transientSurfaceTracker
                 onSaved: editorSheet.dismiss()
                 onCloseRequested: editorSheet.dismiss()
             }

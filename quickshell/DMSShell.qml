@@ -40,19 +40,17 @@ Item {
 
     property bool osdSurfacesLoaded: false
     property int pendingOsdResumeReloads: 0
-    readonly property var dankIslandScreens: Quickshell.screens.filter(screen => SettingsData.dankIslandCoversScreen(screen))
     readonly property var notificationPopupScreens: {
         const screens = SettingsData.notificationFocusedMonitor ? Quickshell.screens : SettingsData.getFilteredScreens("notifications");
         if (!SettingsData.dankIslandEnabled)
             return screens;
         return screens.filter(screen => !SettingsData.dankIslandHandlesNotifications(screen));
     }
-    readonly property var legacySystemLevelOsdScreens: root.withoutDankIslandScreens(SettingsData.getFilteredScreens("osd"))
-
-    function withoutDankIslandScreens(screens) {
+    readonly property var legacySystemLevelOsdScreens: {
+        const screens = SettingsData.getFilteredScreens("osd");
         if (!SettingsData.dankIslandEnabled)
             return screens;
-        return screens.filter(screen => root.dankIslandScreens.indexOf(screen) === -1);
+        return screens.filter(screen => !SettingsData.dankIslandHandlesSystemOsd(screen));
     }
 
     function recreateOsdSurfaces() {
@@ -248,6 +246,8 @@ Item {
         osdStartupTimer.start();
         if (SettingsData.controlCenterWidgets.some(widget => widget.id === "diskUsage" && widget.enabled !== false))
             DgopService.initializeDiskMounts();
+        if (SettingsData.controlCenterWidgets.some(widget => widget.id === "userCard" && widget.enabled !== false && widget.uptime !== false))
+            DgopService.dgopAvailable;
 
         // These are dummy references just to trigger the singletons onCompleted to trigger
         PolkitService.polkitAvailable;
@@ -1341,11 +1341,6 @@ Item {
         sourceComponent: ChangelogModal {
             onChangelogDismissed: changelogLoader.active = false
             Component.onCompleted: show()
-        }
-
-        Component.onCompleted: {
-            if (ChangelogService.shouldShowChangelog)
-                active = true;
         }
 
         Connections {

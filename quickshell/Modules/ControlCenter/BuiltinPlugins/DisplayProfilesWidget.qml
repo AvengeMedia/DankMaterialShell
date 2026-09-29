@@ -106,7 +106,6 @@ PluginComponent {
                                 iconName: "monitor"
                                 title: modelData.name
                                 active: modelData.id === root.activeProfileId && !root.autoMode
-                                showActiveCheck: true
                                 enabled: !root.autoMode
                                 clickable: true
                                 onClicked: DisplayConfigState.activateProfile(modelData.id)

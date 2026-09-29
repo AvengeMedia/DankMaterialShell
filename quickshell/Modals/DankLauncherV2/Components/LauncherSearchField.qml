@@ -59,7 +59,6 @@ DankSearchField {
     font.pixelSize: Theme.fontSizeLarge
     backgroundColor: flat ? "transparent" : Theme.chipSurface
     normalBorderColor: flat ? "transparent" : Theme.outlineVariant
-    focusedBorderColor: flat ? "transparent" : Theme.focusRingColor
     leadingContent: pluginName ? pluginBadge : null
     rightAccessoryWidth: modeViewport.visible ? modeViewport.width + Theme.spacingS : 0
 

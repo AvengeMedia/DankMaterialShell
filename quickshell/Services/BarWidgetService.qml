@@ -10,6 +10,7 @@ Singleton {
     id: root
 
     property var widgetRegistry: ({})
+    property var onDemandWidgetIds: []
     property var dankBarRepeater: null
 
     property var frameHostedBars: ({})
@@ -121,12 +122,22 @@ Singleton {
     }
 
     function registrationActive(entry) {
-        if (!entry?.item || widgetRegistry[entry.key] !== entry || entry.item.effectiveVisible === false)
+        return registrationLive(entry) && entry.item.effectiveVisible !== false;
+    }
+
+    function registrationShown(entry) {
+        return registrationActive(entry) && entry.context?.owner?.widgetEnabled !== false;
+    }
+
+    function registrationLive(entry) {
+        if (!entry?.item || widgetRegistry[entry.key] !== entry)
             return false;
         const context = entry.context;
         if (!context?.surface?.screen)
             return true;
-        if (!context.owner?.active || context.surface.config.enabled === false || context.surface.config.visible === false)
+        if (!context.owner?.active || context.surface.config.enabled === false)
+            return false;
+        if (context.surface.config.visible === false && !(context.surface.host?.barRevealed ?? context.surface.revealed))
             return false;
         if (context.kind === "dock")
             return SettingsData.dockConfigsForScreen(context.surface.screen).some(config => config.id === context.barId);
@@ -135,7 +146,9 @@ Singleton {
 
     function resolveWidget(widgetId, target) {
         const configs = SettingsData.barConfigs.concat(SettingsData.dockConfigs ?? []).map(config => config.id);
-        return Registry.select(widgetRegistry, widgetId, target, configs, Quickshell.screens.map(screen => screen.name), registrationActive);
+        const screens = Quickshell.screens.map(screen => screen.name);
+        const select = eligible => Registry.select(widgetRegistry, widgetId, target, configs, screens, eligible);
+        return select(registrationShown) ?? select(registrationLive);
     }
 
     function getWidget(widgetId, screenName, instanceId) {
@@ -202,6 +215,12 @@ Singleton {
 
     function hasWidget(widgetId) {
         return getWidget(widgetId) !== null;
+    }
+
+    function ensureWidget(widgetId) {
+        if (!hasWidget(widgetId) && !onDemandWidgetIds.includes(widgetId))
+            onDemandWidgetIds = [...onDemandWidgetIds, widgetId];
+        return hasWidget(widgetId);
     }
 
     function triggerWidgetPopout(widgetId, target) {

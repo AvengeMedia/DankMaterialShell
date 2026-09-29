@@ -21,6 +21,7 @@ FocusScope {
     readonly property var tab: tabLoader.item
     readonly property real tabHeight: tab?.implicitHeight ?? 0
     readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
+    readonly property bool handleHeader: !root.editMode
     readonly property real chromeHeight: header.anchors.topMargin + header.height + pages.anchors.topMargin + pages.anchors.bottomMargin
     readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
     // Mirrors the popout: the frame sits panelChromeInset inside the sheet, the header sits contentPadding
@@ -88,7 +89,7 @@ FocusScope {
     }
 
     function focusHeader(backwards) {
-        const targets = root.editMode ? pageActions.focusTargets : [pageTitle.focusTarget];
+        const targets = root.editMode ? pageActions.focusTargets : [sheetHandle.focusTarget];
         targets[backwards ? targets.length - 1 : 0]?.forceActiveFocus(backwards ? Qt.BacktabFocusReason : Qt.TabFocusReason);
     }
 
@@ -115,7 +116,7 @@ FocusScope {
             if (!root.live || !root.editMode)
                 return;
             pageActions.clearFocus();
-            pageTitle.focusTarget.focus = false;
+            sheetHandle.focusTarget.focus = false;
             tabLoader.focus = false;
             root.forceActiveFocus(Qt.OtherFocusReason);
         });
@@ -152,17 +153,17 @@ FocusScope {
             top: parent.top
             left: parent.left
             right: parent.right
-            topMargin: root.editMode ? root.editHeaderInset : DashMetrics.islandHeaderInset
+            topMargin: root.editMode ? root.editHeaderInset : 0
             leftMargin: DashMetrics.contentPadding + root.editGutter
             rightMargin: DashMetrics.contentPadding + root.editGutter
         }
-        height: DashMetrics.islandHeaderHeight
+        height: root.handleHeader ? DashMetrics.islandHandleHeight : DashMetrics.editHeaderHeight
 
-        DashPageTitle {
-            id: pageTitle
+        DashSheetHandle {
+            id: sheetHandle
             anchors.fill: parent
-            entryId: root.entryId
-            visible: !root.editMode
+            visible: root.handleHeader
+            editable: root.entryId !== ""
             onEditRequested: root.editMode = true
         }
 
@@ -191,7 +192,7 @@ FocusScope {
         enabled: !tabOptions.shown && !pageActions.menuOpen
         anchors {
             top: header.bottom
-            topMargin: root.editMode ? root.editHeaderGap : DashMetrics.islandHeaderInset
+            topMargin: root.editMode ? root.editHeaderGap : 0
             left: parent.left
             right: parent.right
             bottom: parent.bottom

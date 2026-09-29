@@ -332,6 +332,7 @@ Item {
                 tags: ["animation", "sync", "popout", "modal", "global"]
                 settingKey: "syncComponentAnimationSpeeds"
                 text: I18n.tr("Sync popouts and modals")
+                description: I18n.tr("Popouts and modals use the main animation duration", "sync popout and modal animation toggle description")
                 checked: SettingsData.syncComponentAnimationSpeeds
                 onToggled: checked => SettingsData.set("syncComponentAnimationSpeeds", checked)
             }

@@ -86,35 +86,6 @@ Item {
         id: mainColumn
 
         SettingsCard {
-            settingKey: "desktopWidgetsManage"
-            tags: ["desktop", "widgets", "clock", "conky"]
-            width: parent.width
-
-            SettingsRow {
-                body: Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    Row {
-                        spacing: Theme.spacingM
-
-                        DankButton {
-                            text: I18n.tr("Add widget")
-                            iconName: "add"
-                            onClicked: root.showWidgetBrowser()
-                        }
-
-                        DankButton {
-                            text: I18n.tr("Browse plugins")
-                            iconName: "store"
-                            onClicked: root.showDesktopPluginBrowser()
-                        }
-                    }
-                }
-            }
-        }
-
-        SettingsCard {
             settingKey: "desktopWidgetGroups"
             tags: ["groups", "profiles", "layouts"]
             width: parent.width
@@ -467,6 +438,21 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            DankFab {
+                text: I18n.tr("Browse plugins")
+                iconName: "store"
+                colorRole: "secondaryContainer"
+                onClicked: root.showDesktopPluginBrowser()
+            }
+
+            DankFab {
+                text: I18n.tr("Add widget")
+                iconName: "add"
+                onClicked: root.showWidgetBrowser()
             }
         }
     }

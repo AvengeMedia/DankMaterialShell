@@ -64,10 +64,9 @@ Item {
                                 return Theme.error;
                             if (usage > CcMetrics.diskWarnPercent)
                                 return Theme.warning;
-                            return active ? Theme.primary : Theme.surfaceText;
+                            return contentColor;
                         }
                         active: modelData.mount === root.currentMountPath
-                        showActiveCheck: true
                         title: modelData.mount === "/" ? I18n.tr("Root Filesystem") : modelData.mount
                         subtitle: `${modelData.used || "?"} / ${modelData.size || "?"}` + (modelData.mount === "/" ? "" : " • " + modelData.mount)
                         trailingBadge: usage.toFixed(0) + "%"

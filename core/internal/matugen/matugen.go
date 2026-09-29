@@ -176,7 +176,7 @@ func PreviewSchemes(sourceColor string, contrast float64, imagePath, spec string
 
 	previews := make(map[string]SchemePreview, len(previewSchemeTypes)+1)
 	for _, schemeType := range previewSchemeTypes {
-		if spec == Spec2025 {
+		if spec == Spec2025 && SpecSupportsScheme(schemeType) {
 			colors, err := GenerateSpecColors(sourceColor, schemeType, contrast, ColorModeDark, Spec2025)
 			if err != nil {
 				return nil, fmt.Errorf("preview %s: %w", schemeType, err)

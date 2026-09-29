@@ -13,6 +13,7 @@ Item {
     readonly property bool resizing: grid.sizePreview?.index === index
     property var resizeOrigin: null
     property var dragOrigin: null
+    property Item passthrough: null
     readonly property bool interactionEnabled: resizeOrigin !== null || dragOrigin !== null || !grid.interacting
 
     signal resizeRequested(real requestedWidth, real requestedHeight)
@@ -77,6 +78,20 @@ Item {
     height: slot ? slot.h : 0
     z: dragging || resizing ? 1 : 0
 
+    QtObject {
+        id: passthroughMask
+
+        function contains(point: point): bool {
+            if (point.x < 0 || point.y < 0 || point.x >= root.width || point.y >= root.height)
+                return false;
+            const target = root.passthrough;
+            if (!target?.visible)
+                return true;
+            const local = root.mapToItem(target, point.x, point.y);
+            return local.x < 0 || local.y < 0 || local.x >= target.width || local.y >= target.height;
+        }
+    }
+
     Binding {
         target: root
         property: "x"
@@ -139,6 +154,7 @@ Item {
         hoverEnabled: enabled
         acceptedButtons: Qt.LeftButton
         cursorShape: root.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        containmentMask: root.passthrough ? passthroughMask : null
         onPressAndHold: root.pressAndHold()
         onWheel: wheel => wheel.accepted = true
     }

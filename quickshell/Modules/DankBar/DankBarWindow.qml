@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Modules.DankIsland
 import qs.Services
 import qs.Widgets
 
@@ -24,10 +25,6 @@ PanelWindow {
     readonly property var islandHost: body.islandHost
     readonly property var leadingSectionRect: body.leadingSectionRect
     readonly property var trailingSectionRect: body.trailingSectionRect
-
-    function processScrollWheel(wheel) {
-        body.processScrollWheel(wheel);
-    }
 
     property alias controlCenterButtonRef: body.controlCenterButtonRef
     property alias clockButtonRef: body.clockButtonRef
@@ -59,10 +56,11 @@ PanelWindow {
     }
 
     readonly property bool usesOverlayLayer: CompositorService.framePeerSurfacesUseOverlayForScreen(barWindow.screen) || (isIsland ? LayerShell.envUsesOverlay("DMS_DANKISLAND_LAYER", SettingsData.islandSetting(barConfig, "islandUseOverlayLayer")) : (barConfig?.useOverlayLayer ?? false))
-    readonly property var dBarLayer: LayerShell.fromEnv(isIsland ? "DMS_DANKISLAND_LAYER" : "DMS_DANKBAR_LAYER", barWindow.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
+    // A hosted sheet must paint over Top-layer surfaces on its edge until it has sprung back, the same as the frame does.
+    readonly property int dBarLayer: LayerShell.fromEnv(isIsland ? "DMS_DANKISLAND_LAYER" : "DMS_DANKBAR_LAYER", barWindow.usesOverlayLayer || (!isIsland && islandChrome.sheetOut) ? WlrLayer.Overlay : WlrLayer.Top)
 
     screen: modelData
-    readonly property var layoutInstance: ShellLayout.forConfig(screen, barConfig?.id)
+    readonly property var layoutInstance: body.layoutInstance
     readonly property bool manualPlacement: ShellLayout.forScreen(screen)?.manualPlacement ?? false
     margins.top: manualPlacement ? layoutInstance?.margins.top ?? 0 : 0
     margins.bottom: manualPlacement ? layoutInstance?.margins.bottom ?? 0 : 0
@@ -79,11 +77,13 @@ PanelWindow {
 
     WlrLayershell.layer: dBarLayer
     WlrLayershell.namespace: isIsland ? "dms:dankisland" : "dms:bar"
-    WlrLayershell.keyboardFocus: islandHost?.keyboardFocusPolicy ?? WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: islandChrome.keyboardFocusPolicy
 
-    DankFocusGrab {
-        windows: [barWindow]
-        wanted: barWindow.islandHost?.wantsFocusGrab ?? false
+    IslandHostChrome {
+        id: islandChrome
+
+        window: barWindow
+        host: barWindow.islandHost
     }
 
     anchors.top: !isVertical ? (barPos === SettingsData.Position.Top) : true
@@ -116,8 +116,14 @@ PanelWindow {
     mask: Region {
         item: body.clickThroughEnabled || (isIsland && !body.islandBandInteractive) ? null : body.inputMaskItem
 
+        // Item-bound: a mapToItem snapshot froze mid-churn on output reconnect, leaving the trailing
+        // section unclickable (#3594). barRevealed: same ancestor-transform caveat as the island regions.
         Region {
-            readonly property var r: barWindow.sectionMasked ? body.leadingSectionRect : {
+            item: barWindow.sectionMasked && body.barRevealed ? body._leftSection : null
+        }
+
+        Region {
+            readonly property var r: barWindow.sectionMasked ? body.centerSectionRect : {
                 "x": 0,
                 "y": 0,
                 "w": 0,
@@ -130,29 +136,7 @@ PanelWindow {
         }
 
         Region {
-            readonly property var r: barWindow.sectionMasked ? body.sectionRect(body._centerSection, true, body._revealProgress) : {
-                "x": 0,
-                "y": 0,
-                "w": 0,
-                "h": 0
-            }
-            x: r.x
-            y: r.y
-            width: r.w
-            height: r.h
-        }
-
-        Region {
-            readonly property var r: barWindow.sectionMasked ? body.trailingSectionRect : {
-                "x": 0,
-                "y": 0,
-                "w": 0,
-                "h": 0
-            }
-            x: r.x
-            y: r.y
-            width: r.w
-            height: r.h
+            item: barWindow.sectionMasked && body.barRevealed ? body._rightSection : null
         }
 
         Region {
@@ -163,12 +147,13 @@ PanelWindow {
             height: active ? body.inputMaskItem.height : 0
         }
 
+        // The slide transform lives on an ancestor, so a hidden bar's pill would otherwise keep its input hole in place.
         Region {
-            item: barWindow.islandHost && !barWindow.islandHost.inputSuspended ? barWindow.islandHost.inputMaskItem : null
+            item: body.barRevealed ? islandChrome.maskItem : null
         }
 
         Region {
-            item: barWindow.islandHost && !barWindow.islandHost.inputSuspended ? barWindow.islandHost.fittsStripItem : null
+            item: body.barRevealed ? islandChrome.fittsStripItem : null
         }
     }
 

@@ -142,20 +142,8 @@ Item {
             }
 
             CcSectionLabel {
-                visible: root.showPins
-                text: root.getScreenPinKey() || I18n.tr("Unknown Monitor")
-
-                actions: CcPinChip {
-                    readonly property bool pinnedHere: {
-                        CacheData.brightnessDevicePins;
-                        return root.isDevicePinnedToScreen(root.currentDeviceName);
-                    }
-
-                    iconOnly: false
-                    pinned: pinnedHere
-                    enabled: root.currentDeviceName.length > 0
-                    onToggled: root.togglePinForDevice(root.currentDeviceName)
-                }
+                visible: root.devices.length > 0
+                text: I18n.tr("Devices")
             }
 
             CcGroup {
@@ -164,12 +152,13 @@ Item {
                 Repeater {
                     model: root.devices
 
-                    CcListRow {
-                        id: deviceRow
+                    Column {
+                        id: deviceItem
 
                         required property var modelData
 
                         readonly property string deviceName: modelData.name || ""
+                        readonly property bool active: deviceName === root.currentDeviceName
                         readonly property real deviceBrightness: {
                             BrightnessService.brightnessVersion;
                             return BrightnessService.getDeviceBrightness(deviceName);
@@ -181,44 +170,43 @@ Item {
                         readonly property bool exponential: SessionData.getBrightnessExponential(deviceName)
                         readonly property real exponent: SessionData.getBrightnessExponent(deviceName)
 
-                        iconName: root.deviceIcon(modelData, deviceBrightness)
-                        active: deviceName === root.currentDeviceName
-                        showActiveCheck: true
-                        title: BrightnessService.deviceTitle(modelData)
-                        subtitle: deviceName + " • " + root.deviceClassLabel(modelData)
-                        trailingBadge: Math.round(deviceBrightness) + "%"
-                        clickable: true
-                        onClicked: root.selectDevice(deviceName)
+                        width: parent?.width ?? 0
+                        spacing: Theme.groupedListGap
 
-                        CcPinChip {
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: root.showPins
-                            pinned: deviceRow.pinnedHere
-                            onToggled: root.togglePinForDevice(deviceRow.deviceName)
+                        CcListRow {
+                            iconName: root.deviceIcon(deviceItem.modelData, deviceItem.deviceBrightness)
+                            active: deviceItem.active
+                            title: BrightnessService.deviceTitle(deviceItem.modelData)
+                            subtitle: [deviceItem.deviceName, root.deviceClassLabel(deviceItem.modelData), Math.round(deviceItem.deviceBrightness) + "%"].join(" • ")
+                            clickable: true
+                            onClicked: root.selectDevice(deviceItem.deviceName)
+
+                            CcPinChip {
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: root.showPins
+                                pinned: deviceItem.pinnedHere
+                                onToggled: root.togglePinForDevice(deviceItem.deviceName)
+                            }
                         }
 
-                        body: Row {
-                            width: parent.width
-                            spacing: Theme.spacingM
-                            visible: deviceRow.active
+                        CcToggleRow {
+                            visible: deviceItem.active
+                            text: I18n.tr("Exponential", "adjective, toggle for an exponential brightness curve per device")
+                            checked: deviceItem.exponential
+                            onToggled: checked => SessionData.setBrightnessExponential(deviceItem.deviceName, checked)
+                        }
 
-                            DankToggle {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - stepper.width - parent.spacing
-                                text: I18n.tr("Exponential", "adjective, toggle for an exponential brightness curve per device")
-                                checked: deviceRow.exponential
-                                onToggled: checked => SessionData.setBrightnessExponential(deviceRow.deviceName, checked)
-                            }
+                        CcListRow {
+                            visible: deviceItem.active && deviceItem.exponential
+                            title: I18n.tr("Curve")
 
                             DankNumberStepper {
-                                id: stepper
                                 anchors.verticalCenter: parent.verticalCenter
-                                visible: deviceRow.exponential
-                                text: deviceRow.exponent.toFixed(1)
-                                decrementEnabled: deviceRow.exponent > CcMetrics.brightnessExponentMin
-                                incrementEnabled: deviceRow.exponent < CcMetrics.brightnessExponentMax
-                                onDecrement: () => SessionData.setBrightnessExponent(deviceRow.deviceName, Math.max(CcMetrics.brightnessExponentMin, Math.round((deviceRow.exponent - CcMetrics.brightnessExponentStep) * 10) / 10))
-                                onIncrement: () => SessionData.setBrightnessExponent(deviceRow.deviceName, Math.min(CcMetrics.brightnessExponentMax, Math.round((deviceRow.exponent + CcMetrics.brightnessExponentStep) * 10) / 10))
+                                text: deviceItem.exponent.toFixed(1)
+                                decrementEnabled: deviceItem.exponent > CcMetrics.brightnessExponentMin
+                                incrementEnabled: deviceItem.exponent < CcMetrics.brightnessExponentMax
+                                onDecrement: () => SessionData.setBrightnessExponent(deviceItem.deviceName, Math.max(CcMetrics.brightnessExponentMin, Math.round((deviceItem.exponent - CcMetrics.brightnessExponentStep) * 10) / 10))
+                                onIncrement: () => SessionData.setBrightnessExponent(deviceItem.deviceName, Math.min(CcMetrics.brightnessExponentMax, Math.round((deviceItem.exponent + CcMetrics.brightnessExponentStep) * 10) / 10))
                             }
                         }
                     }

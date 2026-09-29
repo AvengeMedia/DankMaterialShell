@@ -60,6 +60,7 @@ Column {
     signal popoutRequested
     signal dockRequested
     signal conflictDetected(string diskContent)
+    signal largeFileConfirmRequested(var tab, real size)
     signal autoSaveRequested
 
     function hasUnsavedChanges() {
@@ -110,6 +111,14 @@ Column {
             loadedTabId = requestedTabId;
             contentLoaded = true;
             syncContentToPlugin();
+        }, size => {
+            if (requestId !== loadRequestId || !currentTab || currentTab.id !== requestedTabId)
+                return;
+            applyingShared = true;
+            lastSavedContent = "";
+            textArea.text = "";
+            applyingShared = false;
+            root.largeFileConfirmRequested(currentTab, size);
         });
     }
 
@@ -1071,7 +1080,7 @@ Column {
 
     FileView {
         id: externalWatch
-        path: (!root.externalWatchPaused && currentTab && !currentTab.isTemporary && currentTab.filePath) ? currentTab.filePath : ""
+        path: (!root.externalWatchPaused && currentTab && !currentTab.isTemporary && currentTab.filePath && root.loadedTabId === currentTab.id) ? currentTab.filePath : ""
         blockLoading: true
         preload: true
         watchChanges: true

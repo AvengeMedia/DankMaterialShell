@@ -41,6 +41,7 @@ Item {
     property int gridIndex: 0
     property Item keyForwardTarget: null
     property var parentPopout: null
+    property var transientSurfaceTracker: null
     property bool enableAnimation: false
     property string selectedFileName: ""
     property var targetScreen: null
@@ -813,6 +814,7 @@ Item {
                             showTrigger: false
                             popupAnchorItem: sortButton
                             focusReturnTarget: sortButton
+                            transientSurfaceTracker: root.transientSurfaceTracker
                             openUpwards: true
                             alignPopupRight: !I18n.isRtl
                             popupWidth: Math.min(root.width, Theme.smallBreakpoint / 2)

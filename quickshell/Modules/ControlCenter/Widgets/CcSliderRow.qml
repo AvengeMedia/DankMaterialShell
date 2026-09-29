@@ -70,6 +70,7 @@ Item {
             iconName: root.iconName
             iconSize: CcMetrics.iconBoxIconSize
             iconColor: CcMetrics.tileInactiveContent
+            visible: root.tall
             enabled: root.sliderEnabled && root.interactive
             tooltipText: root.iconTooltip
             Accessible.name: root.iconLabel
@@ -108,8 +109,7 @@ Item {
         Item {
             id: trackArea
             objectName: "sliderTrackArea"
-            anchors.left: root.tall ? parent.left : action.right
-            anchors.leftMargin: root.tall ? 0 : CcMetrics.gridGap
+            anchors.left: parent.left
             anchors.right: parent.right
             y: root.vertical ? (root.showNumber ? labels.height + Theme.spacingS : 0) : root.tall ? action.height + Theme.spacingM : 0
             height: Math.max(0, (root.vertical ? action.y - Theme.spacingS : parent.height) - y)
@@ -121,7 +121,6 @@ Item {
                 rotation: root.vertical ? -90 : 0
                 LayoutMirroring.enabled: !root.vertical && I18n.isRtl
                 enabled: root.sliderEnabled && root.interactive
-                wheelInsideScrollable: true
                 size: {
                     if (!root.tall)
                         return "s";
@@ -132,9 +131,33 @@ Item {
                         return "l";
                     return "m";
                 }
+                insetIcon: root.tall ? "" : root.iconName
+                insetIconPosition: "end"
+                insetIconClickable: true
+                insetIconTooltip: root.iconTooltip
+                insetIconLabel: root.iconLabel
                 Accessible.name: root.sliderLabel
                 showValue: !root.vertical
+                onInsetIconClicked: root.iconClicked()
                 onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
+
+                Binding on trackHeight {
+                    when: !root.tall
+                    value: CcMetrics.stripTrackHeight
+                    restoreMode: Binding.RestoreBinding
+                }
+
+                Binding on handleHeight {
+                    when: !root.tall
+                    value: CcMetrics.stripHandleHeight
+                    restoreMode: Binding.RestoreBinding
+                }
+
+                Binding on insetIconSize {
+                    when: !root.tall
+                    value: CcMetrics.stripIconSize
+                    restoreMode: Binding.RestoreBinding
+                }
             }
         }
     }

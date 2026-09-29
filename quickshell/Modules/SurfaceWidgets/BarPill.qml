@@ -83,11 +83,7 @@ Item {
     readonly property color fillColor: {
         if (noBackground)
             return "transparent";
-        const transparency = barConfig?.widgetTransparency ?? 1.0;
-        const baseColor = Theme.widgetBaseBackgroundColor;
-        if (Theme.widgetBackgroundHasAlpha)
-            return Theme.blendAlpha(baseColor, transparency);
-        return Theme.withAlpha(baseColor, transparency);
+        return BarMetrics.widgetFill(barConfig);
     }
 
     property real topLeftRadius: cornerRadius(startJoined)

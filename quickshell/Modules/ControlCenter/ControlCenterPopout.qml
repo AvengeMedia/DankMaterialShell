@@ -21,7 +21,7 @@ DankPopout {
     property string pendingSection: ""
     property var triggerScreen: null
     property bool editMode: false
-    readonly property int gridColumnCap: CcMetrics.columnCapFor((triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
+    readonly property int gridColumnCap: CcMetrics.columnCapFor(maxBodyWidth > 0 ? maxBodyWidth - PopoutMetrics.editOverflow * 2 : CcMetrics.sheetWidthDefault)
     readonly property int gridColumns: Math.min(CcMetrics.gridColumns, gridColumnCap)
     readonly property real sheetContentWidth: CcMetrics.sheetWidthFor(gridColumns)
     readonly property real availableHeight: _maxPopupHeight()
@@ -82,8 +82,9 @@ DankPopout {
     signal lockRequested
 
     function _maxPopupHeight() {
-        const screenHeight = triggerScreen?.height ?? CcMetrics.fallbackScreenHeight;
-        return screenHeight - CcMetrics.maxHeightInset;
+        if (maxBodyHeight <= 0)
+            return CcMetrics.fallbackScreenHeight - CcMetrics.maxHeightInset;
+        return maxBodyHeight - PopoutMetrics.editOverflow * 2;
     }
 
     function collapseAll() {
@@ -104,7 +105,7 @@ DankPopout {
     property bool anyModalOpen: credentialsPromptOpen || wifiPasswordModalOpen || polkitModalOpen || powerMenuOpen
 
     backgroundInteractive: !anyModalOpen
-    hoverDismissSuspended: editMode || anyModalOpen
+    hoverDismissSuspended: editMode || expandedSection !== "" || anyModalOpen
 
     onCredentialsPromptOpenChanged: {
         if (credentialsPromptOpen && shouldBeVisible)

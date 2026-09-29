@@ -15,7 +15,7 @@ import (
 
 	mocks_utils "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
-	matcolor "github.com/Nadim147c/material/v3/color"
+	matcolor "github.com/AvengeMedia/dankgo/material/color"
 	"github.com/stretchr/testify/assert"
 )
 

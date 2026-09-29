@@ -24,7 +24,7 @@ Singleton {
                     barThickness: Theme.barThickness(config.innerPadding ?? 4, screen.scale),
                     wingSize: config.gothCornersEnabled && root.barSpansEdge(config) ? Math.max(0, config.gothCornerRadiusOverride ? config.gothCornerRadiusValue ?? 12 : Theme.windowRadius) : 0,
                     popupThickness: Theme.barThickness(Resolver.option(config, "innerPadding", root.primaryBar, 4), screen.scale),
-                    islandThickness: Resolver.islandThickness(config, SettingsData.islandDefaults),
+                    islandThickness: Resolver.islandThickness(SettingsData.islandSettings(config), SettingsData.islandDefaultsFor(config)),
                     islandFloating: SettingsData.islandSetting(config, "islandFloating"),
                     islandPlacement: SettingsData.islandFreePlacement(config) ? "free" : "edge",
                     islandSatellites: SettingsData.islandSetting(config, "islandSatellitesEnabled")
@@ -37,7 +37,7 @@ Singleton {
             frameThickness: SettingsData.frameThickness,
             frameBarSize: SettingsData.frameBarSize
         }))
-    readonly property var islandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.kind === "island" && !instance.free).map(instance => instance.key)), [])
+    readonly property var islandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.hostsIsland && !instance.free).map(instance => instance.key)), [])
     readonly property var freeIslandKeys: layouts.reduce((keys, layout) => keys.concat(layout.instances.filter(instance => instance.free).map(instance => instance.key)), [])
 
     function barSpansEdge(config) {

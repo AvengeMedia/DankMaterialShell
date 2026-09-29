@@ -203,6 +203,13 @@
     "comment": "duration, plural, %1 is a number"
   },
   {
+    "term": "%1 is %2 and may use a lot of memory.",
+    "translation": "",
+    "context": "%1 is %2 and may use a lot of memory.",
+    "reference": "",
+    "comment": "notepad large file prompt, file name then size"
+  },
+  {
     "term": "%1 is now included in config",
     "translation": "",
     "context": "%1 is now included in config",
@@ -460,6 +467,13 @@
     "context": "2.4 GHz",
     "reference": "",
     "comment": "hotspot WiFi band option"
+  },
+  {
+    "term": "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder",
+    "translation": "",
+    "context": "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder",
+    "reference": "",
+    "comment": "material color spec year description"
   },
   {
     "term": "3rd party",
@@ -868,6 +882,20 @@
     "comment": ""
   },
   {
+    "term": "Added in front of every app launch command",
+    "translation": "",
+    "context": "Added in front of every app launch command",
+    "reference": "",
+    "comment": "launcher launch prefix field description"
+  },
+  {
+    "term": "Adds concave curves where the bar meets the screen edge",
+    "translation": "",
+    "context": "Adds concave curves where the bar meets the screen edge",
+    "reference": "",
+    "comment": "bar goth corners toggle description"
+  },
+  {
     "term": "Adds them to the %1 group so they can run dms-greeter sync --profile",
     "translation": "",
     "context": "Adds them to the %1 group so they can run dms-greeter sync --profile",
@@ -1020,6 +1048,13 @@
     "context": "Already on that session",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Also runs the templates in your matugen config.toml",
+    "translation": "",
+    "context": "Also runs the templates in your matugen config.toml",
+    "reference": "",
+    "comment": "run user matugen templates toggle description"
   },
   {
     "term": "Alt + Shift",
@@ -1272,6 +1307,13 @@
     "context": "Applies on the next greeter sync",
     "reference": "",
     "comment": "greeter auth setting description"
+  },
+  {
+    "term": "Applies the saved profile that matches the connected displays",
+    "translation": "",
+    "context": "Applies the saved profile that matches the connected displays",
+    "reference": "",
+    "comment": "display profile auto select toggle description"
   },
   {
     "term": "Apply",
@@ -2140,13 +2182,6 @@
     "context": "Behavior",
     "reference": "",
     "comment": "island settings: behavior card title"
-  },
-  {
-    "term": "Better Lyrics",
-    "translation": "",
-    "context": "Better Lyrics",
-    "reference": "",
-    "comment": "Lyrics provider name"
   },
   {
     "term": "Bind the %1 IPC action in your compositor config.",
@@ -3199,6 +3234,20 @@
     "comment": "Touchpad click method: click type is determined by finger count"
   },
   {
+    "term": "Clicking a window in a special workspace opens that workspace",
+    "translation": "",
+    "context": "Clicking a window in a special workspace opens that workspace",
+    "reference": "",
+    "comment": "dock restore special workspace toggle description"
+  },
+  {
+    "term": "Clicks on empty bar space reach the windows below",
+    "translation": "",
+    "context": "Clicks on empty bar space reach the windows below",
+    "reference": "",
+    "comment": "bar click through toggle description"
+  },
+  {
     "term": "Clip",
     "translation": "",
     "context": "Clip",
@@ -4053,6 +4102,13 @@
     "comment": ""
   },
   {
+    "term": "Critical notifications still pop up",
+    "translation": "",
+    "context": "Critical notifications still pop up",
+    "reference": "",
+    "comment": "do not disturb allow critical toggle description"
+  },
+  {
     "term": "Critical threshold",
     "translation": "",
     "context": "Critical threshold",
@@ -4256,6 +4312,13 @@
     "comment": ""
   },
   {
+    "term": "Custom builds the palette from a color you pick",
+    "translation": "",
+    "context": "Custom builds the palette from a color you pick",
+    "reference": "",
+    "comment": "matugen derived color dropdown description"
+  },
+  {
     "term": "Custom color",
     "translation": "",
     "context": "Custom color",
@@ -4429,6 +4492,13 @@
     "context": "DMS shell actions (launcher, clipboard, etc.)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "DMS stops drawing wallpapers on every display",
+    "translation": "",
+    "context": "DMS stops drawing wallpapers on every display",
+    "reference": "",
+    "comment": "use external wallpaper manager toggle description"
   },
   {
     "term": "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.",
@@ -5495,6 +5565,13 @@
     "comment": ""
   },
   {
+    "term": "Dragged displays line up with neighboring edges without overlapping",
+    "translation": "",
+    "context": "Dragged displays line up with neighboring edges without overlapping",
+    "reference": "",
+    "comment": "display arrangement snap toggle description"
+  },
+  {
     "term": "Driver",
     "translation": "",
     "context": "Driver",
@@ -5521,6 +5598,13 @@
     "context": "Drop your override for %1 so the DMS default action re-applies?",
     "reference": "",
     "comment": "reset shortcut confirmation, %1 is the key combination"
+  },
+  {
+    "term": "Drops bar gaps and rounding while a window is maximized",
+    "translation": "",
+    "context": "Drops bar gaps and rounding while a window is maximized",
+    "reference": "",
+    "comment": "bar maximize detection toggle description"
   },
   {
     "term": "Duplicate",
@@ -6200,6 +6284,13 @@
     "context": "Fade to lock screen",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Fades the screen out first. Input during the fade cancels it",
+    "translation": "",
+    "context": "Fades the screen out first. Input during the fade cancels it",
+    "reference": "",
+    "comment": "idle fade toggle description"
   },
   {
     "term": "Failed to activate configuration",
@@ -7007,6 +7098,13 @@
     "comment": "bar length option, the bar spans only its widgets | wallpaper fill mode"
   },
   {
+    "term": "Fits the song title instead of keeping a fixed width",
+    "translation": "",
+    "context": "Fits the song title instead of keeping a fixed width",
+    "reference": "",
+    "comment": "media widget adaptive width toggle description"
+  },
+  {
     "term": "Fixed",
     "translation": "",
     "context": "Fixed",
@@ -7462,6 +7560,13 @@
     "comment": ""
   },
   {
+    "term": "Frees the launcher when closed and rebuilds it on open",
+    "translation": "",
+    "context": "Frees the launcher when closed and rebuilds it on open",
+    "reference": "",
+    "comment": "launcher unload on close toggle description"
+  },
+  {
     "term": "Freezing Drizzle",
     "translation": "",
     "context": "Freezing Drizzle",
@@ -7637,6 +7742,20 @@
     "comment": "island settings: satellite to island gap slider"
   },
   {
+    "term": "Gap between the bar and its popouts follows edge spacing",
+    "translation": "",
+    "context": "Gap between the bar and its popouts follows edge spacing",
+    "reference": "",
+    "comment": "bar auto popup gaps toggle description"
+  },
+  {
+    "term": "Gap between the bar ends and the outermost widgets",
+    "translation": "",
+    "context": "Gap between the bar ends and the outermost widgets",
+    "reference": "",
+    "comment": "bar inset padding slider description"
+  },
+  {
     "term": "Gap size",
     "translation": "",
     "context": "Gap size",
@@ -7663,6 +7782,13 @@
     "context": "General",
     "reference": "",
     "comment": "adjective, settings page and section title for general options"
+  },
+  {
+    "term": "Generate Theme at Startup",
+    "translation": "",
+    "context": "Generate Theme at Startup",
+    "reference": "",
+    "comment": "toggle label"
   },
   {
     "term": "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
@@ -7875,6 +8001,13 @@
     "comment": "noun, card title for desktop widget groups"
   },
   {
+    "term": "Grows or shrinks the space windows keep clear",
+    "translation": "",
+    "context": "Grows or shrinks the space windows keep clear",
+    "reference": "",
+    "comment": "bar and dock exclusive zone offset slider description"
+  },
+  {
     "term": "H",
     "translation": "",
     "context": "H",
@@ -8001,6 +8134,13 @@
     "comment": ""
   },
   {
+    "term": "Hidden icons expand in place instead of in a popup",
+    "translation": "",
+    "context": "Hidden icons expand in place instead of in a popup",
+    "reference": "",
+    "comment": "system tray inline expansion toggle description"
+  },
+  {
     "term": "Hidden until weather is enabled",
     "translation": "",
     "context": "Hidden until weather is enabled",
@@ -8076,6 +8216,20 @@
     "context": "Hide when windows open",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Hides even while a bar popout or menu is open",
+    "translation": "",
+    "context": "Hides even while a bar popout or menu is open",
+    "reference": "",
+    "comment": "bar strict auto-hide toggle description"
+  },
+  {
+    "term": "Hides only while a window overlaps the dock",
+    "translation": "",
+    "context": "Hides only while a window overlaps the dock",
+    "reference": "",
+    "comment": "dock smart auto-hide toggle description"
   },
   {
     "term": "High",
@@ -9121,6 +9275,20 @@
     "comment": ""
   },
   {
+    "term": "Keeps the dock showing over fullscreen windows",
+    "translation": "",
+    "context": "Keeps the dock showing over fullscreen windows",
+    "reference": "",
+    "comment": "dock over fullscreen toggle description"
+  },
+  {
+    "term": "Keeps the widget above windows instead of below them",
+    "translation": "",
+    "context": "Keeps the widget above windows instead of below them",
+    "reference": "",
+    "comment": "desktop widget show on overlay toggle description"
+  },
+  {
     "term": "Kernel",
     "translation": "",
     "context": "Kernel",
@@ -9217,13 +9385,6 @@
     "context": "LED device",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "LRCLIB",
-    "translation": "",
-    "context": "LRCLIB",
-    "reference": "",
-    "comment": "Lyrics provider name"
   },
   {
     "term": "LabWC IRC channel",
@@ -9499,6 +9660,13 @@
     "comment": "matugen source color option"
   },
   {
+    "term": "Leaves the overview when DMS launches an app or focuses a window",
+    "translation": "",
+    "context": "Leaves the overview when DMS launches an app or focuses a window",
+    "reference": "",
+    "comment": "niri overview close on window focus toggle description"
+  },
+  {
     "term": "Left",
     "translation": "",
     "context": "Left",
@@ -9567,6 +9735,13 @@
     "context": "Light Snow Showers",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Light and dark mode follow and set the system color scheme",
+    "translation": "",
+    "context": "Light and dark mode follow and set the system color scheme",
+    "reference": "",
+    "comment": "sync with portal toggle description"
   },
   {
     "term": "Light direction",
@@ -9658,6 +9833,13 @@
     "context": "Listening from",
     "reference": "",
     "comment": "Label before the active media player"
+  },
+  {
+    "term": "Lists workspaces from whichever display has focus",
+    "translation": "",
+    "context": "Lists workspaces from whichever display has focus",
+    "reference": "",
+    "comment": "workspace switcher follow display focus toggle description"
   },
   {
     "term": "Lively palette with saturated accents.",
@@ -9903,13 +10085,6 @@
     "context": "Lyrics providers",
     "reference": "",
     "comment": "Lyrics source priority settings"
-  },
-  {
-    "term": "LyricsPlus",
-    "translation": "",
-    "context": "LyricsPlus",
-    "reference": "",
-    "comment": "Lyrics provider name"
   },
   {
     "term": "MIT License",
@@ -11039,6 +11214,13 @@
     "comment": ""
   },
   {
+    "term": "New notifications show as regular popups",
+    "translation": "",
+    "context": "New notifications show as regular popups",
+    "reference": "",
+    "comment": "island standard popups toggle description"
+  },
+  {
     "term": "New profile",
     "translation": "",
     "context": "New profile",
@@ -11548,6 +11730,13 @@
     "context": "No matching processes",
     "reference": "",
     "comment": "empty state in process list"
+  },
+  {
+    "term": "No media found.",
+    "translation": "",
+    "context": "No media found.",
+    "reference": "",
+    "comment": "Media player empty state when no player is running"
   },
   {
     "term": "No monitors",
@@ -12131,6 +12320,13 @@
     "comment": "bluetooth status"
   },
   {
+    "term": "Off keeps the bar hidden until turned back on or shown over IPC",
+    "translation": "",
+    "context": "Off keeps the bar hidden until turned back on or shown over IPC",
+    "reference": "",
+    "comment": "bar manual visibility toggle description"
+  },
+  {
     "term": "Office",
     "translation": "",
     "context": "Office",
@@ -12332,6 +12528,13 @@
     "context": "Open in terminal",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Open large file?",
+    "translation": "",
+    "context": "Open large file?",
+    "reference": "",
+    "comment": "notepad prompt before loading a file over the size limit"
   },
   {
     "term": "Open network",
@@ -13202,6 +13405,13 @@
     "comment": "noun, mouse cursor, keybind screenshot option to include it"
   },
   {
+    "term": "Pointer at the launcher edge opens it, unless a bar or dock is there",
+    "translation": "",
+    "context": "Pointer at the launcher edge opens it, unless a bar or dock is there",
+    "reference": "",
+    "comment": "frame launcher edge hover toggle description"
+  },
+  {
     "term": "Pointer speed",
     "translation": "",
     "context": "Pointer speed",
@@ -13230,6 +13440,13 @@
     "comment": "plural noun, shell popout panels, animation and shadow setting label"
   },
   {
+    "term": "Popouts and modals use the main animation duration",
+    "translation": "",
+    "context": "Popouts and modals use the main animation duration",
+    "reference": "",
+    "comment": "sync popout and modal animation toggle description"
+  },
+  {
     "term": "Popular Plugins",
     "translation": "",
     "context": "Popular Plugins",
@@ -13256,6 +13473,13 @@
     "context": "Popups",
     "reference": "",
     "comment": "notification settings card title, popup notifications"
+  },
+  {
+    "term": "Popups hide the message until expanded",
+    "translation": "",
+    "context": "Popups hide the message until expanded",
+    "reference": "",
+    "comment": "notification privacy mode toggle description"
   },
   {
     "term": "Popups, do not disturb, rules",
@@ -14026,6 +14250,13 @@
     "context": "Refreshing...",
     "reference": "",
     "comment": "status row while the user list reloads"
+  },
+  {
+    "term": "Regenerate matugen colors when DMS starts, even if nothing changed.",
+    "translation": "",
+    "context": "Regenerate matugen colors when DMS starts, even if nothing changed.",
+    "reference": "",
+    "comment": "toggle description"
   },
   {
     "term": "Regex",
@@ -15078,6 +15309,13 @@
     "comment": "launcher settings section title, noun | search field placeholder"
   },
   {
+    "term": "Search also matches actions apps provide, like New Window",
+    "translation": "",
+    "context": "Search also matches actions apps provide, like New Window",
+    "reference": "",
+    "comment": "launcher app actions search toggle description"
+  },
+  {
     "term": "Search applications...",
     "translation": "",
     "context": "Search applications...",
@@ -15286,6 +15524,13 @@
     "context": "Select Dock Launcher Logo",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Select File",
+    "translation": "",
+    "context": "Select File",
+    "reference": "",
+    "comment": "default file browser window title"
   },
   {
     "term": "Select ICC Profile",
@@ -15657,6 +15902,13 @@
     "context": "Shortcuts (%1)",
     "reference": "",
     "comment": "plural, keybind list heading, %1 is a count"
+  },
+  {
+    "term": "Shortens the bar at both ends",
+    "translation": "",
+    "context": "Shortens the bar at both ends",
+    "reference": "",
+    "comment": "bar length padding slider description"
   },
   {
     "term": "Show",
@@ -16135,6 +16387,13 @@
     "comment": ""
   },
   {
+    "term": "Shows only windows from the dock's own display",
+    "translation": "",
+    "context": "Shows only windows from the dock's own display",
+    "reference": "",
+    "comment": "dock isolate displays toggle description"
+  },
+  {
     "term": "Shows when caps lock is active",
     "translation": "",
     "context": "Shows when caps lock is active",
@@ -16604,6 +16863,13 @@
     "comment": "hotspot activation status"
   },
   {
+    "term": "Startup Behavior",
+    "translation": "",
+    "context": "Startup Behavior",
+    "reference": "",
+    "comment": "settings card title"
+  },
+  {
     "term": "State",
     "translation": "",
     "context": "State",
@@ -16616,6 +16882,13 @@
     "context": "Status",
     "reference": "",
     "comment": "noun, settings row or section title showing current state"
+  },
+  {
+    "term": "Stays visible while the workspace has no windows",
+    "translation": "",
+    "context": "Stays visible while the workspace has no windows",
+    "reference": "",
+    "comment": "bar hide when windows open toggle description"
   },
   {
     "term": "Stop",
@@ -16868,6 +17141,13 @@
     "context": "Switch layout shortcut",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Switches to power saver at the low battery threshold",
+    "translation": "",
+    "context": "Switches to power saver at the low battery threshold",
+    "reference": "",
+    "comment": "battery auto power saver toggle description"
   },
   {
     "term": "Sync",
@@ -17484,6 +17764,13 @@
     "context": "Theme & colors",
     "reference": "",
     "comment": "greeter settings link"
+  },
+  {
+    "term": "Theme colors come from this display's wallpaper",
+    "translation": "",
+    "context": "Theme colors come from this display's wallpaper",
+    "reference": "",
+    "comment": "matugen source display dropdown description"
   },
   {
     "term": "Theme extracted to: %1",
@@ -18226,13 +18513,6 @@
     "context": "Uninstalling: %1",
     "reference": "",
     "comment": "uninstallation progress"
-  },
-  {
-    "term": "Unison",
-    "translation": "",
-    "context": "Unison",
-    "reference": "",
-    "comment": "Lyrics provider name"
   },
   {
     "term": "Unknown",
@@ -19201,6 +19481,13 @@
     "comment": ""
   },
   {
+    "term": "Which wallpaper color the palette is built from",
+    "translation": "",
+    "context": "Which wallpaper color the palette is built from",
+    "reference": "",
+    "comment": "matugen source color dropdown description"
+  },
+  {
     "term": "White",
     "translation": "",
     "context": "White",
@@ -19444,6 +19731,13 @@
     "context": "With Shelly, only Flatpak packages in the current update list can be ignored.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "With background blur on, cards and tiles keep their own backing",
+    "translation": "",
+    "context": "With background blur on, cards and tiles keep their own backing",
+    "reference": "",
+    "comment": "surface foreground layers toggle description"
   },
   {
     "term": "Working...",

@@ -388,6 +388,7 @@ Column {
             settingKey: "matugenTargetMonitor"
             visible: root.perMonitor
             text: I18n.tr("Matugen source display")
+            description: I18n.tr("Theme colors come from this display's wallpaper", "matugen source display dropdown description")
             currentValue: {
                 if (!SettingsData.matugenTargetMonitor)
                     return root.displayNameForScreen(root.firstScreenName()) + " (" + I18n.tr("Default") + ")";
@@ -785,6 +786,7 @@ Column {
             tags: ["disable", "external", "management", "swww", "hyprpaper", "swaybg"]
             settingKey: "disableWallpapers"
             text: I18n.tr("Use external manager")
+            description: I18n.tr("DMS stops drawing wallpapers on every display", "use external wallpaper manager toggle description")
             checked: {
                 const prefs = SettingsData.screenPreferences?.wallpaper;
                 return Array.isArray(prefs) && prefs.length === 0;

@@ -794,7 +794,7 @@ Item {
     readonly property real shadowMotionPadding: directionalRevealActive ? 0 : Math.max(0, animationOffset)
     readonly property real shadowBuffer: Theme.snap(Math.max(popoutHandle.surfacePadding, shadowRenderPadding + shadowMotionPadding), dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
-    readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+    readonly property real alignedHeight: Theme.pxCeil(popupHeight, dpr)
     readonly property real surfaceBodyWidth: Math.max(alignedWidth, Theme.px(Math.min(minimumSurfaceWidth, screenWidth), dpr))
     readonly property real surfaceBodyX: Theme.snap(_standaloneAlignedXFor(surfaceBodyWidth), dpr)
     readonly property real _surfaceOriginX: connected ? 0 : _surfaceX
@@ -1256,6 +1256,54 @@ Item {
     readonly property real alignedX: alignedXFor(popupWidth)
     readonly property real alignedY: Theme.snap(connected ? _connectedAlignedY() : _standaloneAlignedY(), dpr)
 
+    function _maxBodyWidthFor(startGap, endGap, anchorX) {
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Left:
+            return screenWidth - anchorX - endGap;
+        case SettingsData.Position.Right:
+            return anchorX - startGap;
+        default:
+            return screenWidth - startGap - endGap;
+        }
+    }
+
+    function _maxBodyHeightFor(startGap, endGap, anchorY) {
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Top:
+            return screenHeight - anchorY - endGap;
+        case SettingsData.Position.Bottom:
+            return anchorY - startGap;
+        default:
+            return screenHeight - startGap - endGap;
+        }
+    }
+
+    readonly property real maxBodyWidth: {
+        if (connected) {
+            const popupGap = _popupGapValue();
+            const startGap = Math.max(_edgeGapFor("left", popupGap), adjacentBarClearance(adjacentBarInfo.leftBar));
+            const endGap = Math.max(_edgeGapFor("right", popupGap), adjacentBarClearance(adjacentBarInfo.rightBar));
+            return Math.max(0, _maxBodyWidthFor(startGap, endGap, usesConnectedSurfaceChrome ? connectedAnchorX : triggerX));
+        }
+        const popupGap = _standalonePopupGap();
+        const startGap = _edgeClearance("left", popupGap, Math.max(0, adjacentBarInfo.leftBar));
+        const endGap = _edgeClearance("right", popupGap, Math.max(0, adjacentBarInfo.rightBar));
+        return Math.max(0, _maxBodyWidthFor(startGap, endGap, triggerX));
+    }
+
+    readonly property real maxBodyHeight: {
+        if (connected) {
+            const popupGap = _popupGapValue();
+            const startGap = Math.max(_edgeGapFor("top", popupGap), adjacentBarClearance(adjacentBarInfo.topBar));
+            const endGap = Math.max(_edgeGapFor("bottom", popupGap), adjacentBarClearance(adjacentBarInfo.bottomBar));
+            return Math.max(0, _maxBodyHeightFor(startGap, endGap, usesConnectedSurfaceChrome ? connectedAnchorY : triggerY));
+        }
+        const popupGap = _standalonePopupGap();
+        const startGap = _edgeClearance("top", popupGap, Math.max(0, adjacentBarInfo.topBar));
+        const endGap = _edgeClearance("bottom", popupGap, Math.max(0, adjacentBarInfo.bottomBar));
+        return Math.max(0, _maxBodyHeightFor(startGap, endGap, triggerY));
+    }
+
     readonly property vector4d surfaceCornerRadii: chromeLoader.item?.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property real maskX: _dismissZone.x
     readonly property real maskY: _dismissZone.y
@@ -1421,6 +1469,20 @@ Item {
                     enabled: background.dismissRequired && root.shouldBeVisible && root.backgroundInteractive
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: root.backgroundClicked()
+                }
+
+                HoverHandler {
+                    enabled: root.hoverDismissEnabled && root.shouldBeVisible
+
+                    function notePointer() {
+                        if (!hovered)
+                            return;
+                        PopoutManager.updateHoverCursor(point.position.x, point.position.y);
+                        hoverDismissController.notePointerMoved();
+                    }
+
+                    onHoveredChanged: notePointer()
+                    onPointChanged: notePointer()
                 }
             }
         }
@@ -1772,12 +1834,13 @@ Item {
                 visible: !root._surfaceSwitching
                 readonly property bool shouldClip: Theme.isDirectionalEffect || root.usesConnectedSurfaceChrome
                 readonly property real clipOversize: 1000
+                // inputMargin is only non-zero while a grid is being edited; let its chrome cross the connected edge instead of clipping it.
                 readonly property real connectedClipAllowance: {
                     if (!root.usesConnectedSurfaceChrome)
                         return 0;
                     if (root.frameOwnsConnectedChrome)
-                        return 0;
-                    return -Theme.connectedCornerRadius;
+                        return root.inputMargin;
+                    return -Theme.connectedCornerRadius + root.inputMargin;
                 }
 
                 clip: shouldClip

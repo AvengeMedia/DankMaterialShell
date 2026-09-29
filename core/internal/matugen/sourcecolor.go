@@ -11,10 +11,10 @@ import (
 	"os"
 	"slices"
 
-	"github.com/Nadim147c/material/v3/color"
-	"github.com/Nadim147c/material/v3/dislike"
-	"github.com/Nadim147c/material/v3/num"
-	"github.com/Nadim147c/material/v3/quantizer"
+	"github.com/AvengeMedia/dankgo/material/color"
+	"github.com/AvengeMedia/dankgo/material/dislike"
+	"github.com/AvengeMedia/dankgo/material/num"
+	"github.com/AvengeMedia/dankgo/material/quantizer"
 	_ "golang.org/x/image/bmp"
 	xdraw "golang.org/x/image/draw"
 	_ "golang.org/x/image/tiff"
@@ -65,7 +65,6 @@ const (
 	sourceSampleMaxDim = 512
 	// Palette size, matching Caelestia's ImageQuantizeCelebi(image, 1, 128).
 	sourceMaxColors = 128
-	sourceMaxIters  = 10
 
 	// Scoring weights, ported from caelestia-cli's Score class.
 	scoreTargetChroma      = 48.0
@@ -97,7 +96,7 @@ func ExtractSourceColor(imagePath string) (string, error) {
 		return "", fmt.Errorf("no opaque pixels in %s", imagePath)
 	}
 
-	population := quantize(pixels, sourceMaxColors)
+	population := quantizer.QuantizeCelebi(pixels, sourceMaxColors)
 	seed, ok := scoreColors(population)
 	if !ok {
 		return "", fmt.Errorf("no usable color in %s", imagePath)
@@ -140,112 +139,14 @@ func samplePixels(path string) ([]color.ARGB, error) {
 	return pixels, nil
 }
 
-// quantize reduces the image to at most maxColors representative colors and the
-// pixel count behind each. This is Celebi's shape (Wu for the starting
-// clusters, weighted k-means to refine them) but with our own k-means loop:
-// material/v3's QuantizeCelebi returns after a single unconverged iteration and
-// its Lab.DistanceSquared is a dot product rather than a distance, so its
-// output collapses most of the image into one cluster: measured at 7,979,139 of
-// 8,292,604 pixels on a 3840x2160 image.
-func quantize(pixels []color.ARGB, maxColors int) map[color.ARGB]int {
-	counts := map[color.ARGB]int{}
-	for _, c := range pixels {
-		counts[c]++
-	}
-
-	// Sorted so cluster assignment and the float accumulation below are
-	// reproducible: identical wallpaper in, identical seed out.
-	unique := make([]color.ARGB, 0, len(counts))
-	for c := range counts {
-		unique = append(unique, c)
-	}
-	slices.Sort(unique)
-
-	points := make([]color.Lab, len(unique))
-	weights := make([]float64, len(unique))
-	for i, c := range unique {
-		points[i] = c.ToLab()
-		weights[i] = float64(counts[c])
-	}
-
-	clusters := make([]color.Lab, 0, maxColors)
-	for _, c := range quantizer.QuantizeWu(pixels, maxColors) {
-		clusters = append(clusters, c.ToLab())
-	}
-	if len(clusters) == 0 {
-		return nil
-	}
-
-	assigned := make([]int, len(points))
-	for i := range assigned {
-		assigned[i] = -1
-	}
-	sums := make([][3]float64, len(clusters))
-	clusterWeights := make([]float64, len(clusters))
-
-	for iteration := range sourceMaxIters {
-		moved := 0
-		for i, p := range points {
-			nearest, nearestDistance := 0, math.Inf(1)
-			for j, c := range clusters {
-				if d := labDistanceSquared(p, c); d < nearestDistance {
-					nearest, nearestDistance = j, d
-				}
-			}
-			if assigned[i] != nearest {
-				assigned[i] = nearest
-				moved++
-			}
-		}
-		if moved == 0 && iteration > 0 {
-			break
-		}
-
-		clear(sums)
-		clear(clusterWeights)
-		for i, p := range points {
-			j, w := assigned[i], weights[i]
-			clusterWeights[j] += w
-			sums[j][0] += p.L * w
-			sums[j][1] += p.A * w
-			sums[j][2] += p.B * w
-		}
-		for j := range clusters {
-			if clusterWeights[j] == 0 {
-				continue
-			}
-			clusters[j] = color.NewLab(
-				sums[j][0]/clusterWeights[j],
-				sums[j][1]/clusterWeights[j],
-				sums[j][2]/clusterWeights[j],
-			)
-		}
-	}
-
-	population := make(map[color.ARGB]int, len(clusters))
-	for j := range clusters {
-		if clusterWeights[j] == 0 {
-			continue
-		}
-		population[clusters[j].ToARGB()] += int(clusterWeights[j])
-	}
-	return population
-}
-
-func labDistanceSquared(a, b color.Lab) float64 {
-	dl, da, db := a.L-b.L, a.A-b.A, a.B-b.B
-	return dl*dl + da*da + db*db
-}
-
 // scoreColors ports caelestia-cli's Score.score. It differs from stock Material
 // scoring in two ways that matter: no filtering, and the descending cutoff loop
 // at the end, which walks the chroma/tone bar down until something clears it.
 // That bar is what pushes the pick toward a colorful, well-lit color instead of
 // whichever muted color covers the most pixels.
 func scoreColors(population map[color.ARGB]int) (color.Hct, bool) {
-	// Sorted for the same reason quantize sorts: the stable sort below and the
-	// cutoff scan both resolve ties by input order, and Go map iteration order
-	// is randomized.
+	// Sorted so the stable sort below and the cutoff scan resolve ties the same
+	// way every run; Go map iteration order is randomized.
 	keys := make([]color.ARGB, 0, len(population))
 	for argb := range population {
 		keys = append(keys, argb)

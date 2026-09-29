@@ -49,7 +49,6 @@ Item {
             usingFallback = false;
             return true;
         }
-        log.warn("No DankIsland is routed to the focused screen; falling back to Spotlight");
         usingFallback = true;
         return false;
     }
@@ -74,7 +73,7 @@ Item {
             fallback.hide();
             return;
         }
-        router?.closeLauncher?.();
+        PopoutService.closeIslandActivity("launcher");
     }
 
     function toggle() {
@@ -126,8 +125,8 @@ Item {
     DankLauncherV2ModalHost {
         id: fallback
 
-        connected: false
-        spotlight: true
+        connected: root.modalHandle?._resolvedConnected ?? false
+        spotlight: !connected
         modalHandle: root.modalHandle
         triggerUsesOverlayLayer: root.triggerUsesOverlayLayer
     }

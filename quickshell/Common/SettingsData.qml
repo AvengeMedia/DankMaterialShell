@@ -21,7 +21,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 29
+    readonly property int settingsConfigVersion: 34
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -164,6 +164,7 @@ Singleton {
     property string currentThemeCategory: Spec.SPEC.currentThemeCategory.def
     property string customThemeFile: Spec.SPEC.customThemeFile.def
     property var registryThemeVariants: Spec.SPEC.registryThemeVariants.def
+    property bool generateThemeAtStartup: Spec.SPEC.generateThemeAtStartup.def
     property string matugenScheme: Spec.SPEC.matugenScheme.def
     property bool matugenSmartMode: Spec.SPEC.matugenSmartMode.def
     property string matugenSourceMode: Spec.SPEC.matugenSourceMode.def
@@ -177,7 +178,7 @@ Singleton {
     property real floatingWindowTransparency: Spec.SPEC.floatingWindowTransparency.def
     property bool floatingWindowForegroundLayers: Spec.SPEC.floatingWindowForegroundLayers.def
     property real floatingWindowForegroundTransparency: Spec.SPEC.floatingWindowForegroundTransparency.def
-    property bool dmsWindowsFloating: Spec.SPEC.dmsWindowsFloating.def
+    property var dmsWindowsFloatingSeeded: Spec.SPEC.dmsWindowsFloatingSeeded.def
     property string hostSurfaceColor: Spec.SPEC.hostSurfaceColor.def
     property string hostSurfaceCustomColor: Spec.SPEC.hostSurfaceCustomColor.def
     property string cardSurfaceColor: Spec.SPEC.cardSurfaceColor.def
@@ -451,6 +452,7 @@ Singleton {
     property bool dankLauncherV2IncludeFoldersInAll: Spec.SPEC.dankLauncherV2IncludeFoldersInAll.def
     property bool launcherUseOverlayLayer: Spec.SPEC.launcherUseOverlayLayer.def
     property string launcherStyle: Spec.SPEC.launcherStyle.def
+    property string avatarRing: Spec.SPEC.avatarRing.def
     property bool spotlightBarShowModeChips: Spec.SPEC.spotlightBarShowModeChips.def
     property bool keybindsFloatingWindow: Spec.SPEC.keybindsFloatingWindow.def
     onKeybindsFloatingWindowChanged: saveSettings()
@@ -829,58 +831,106 @@ Singleton {
         barConfigs;
         return (barConfigs || []).filter(cfg => isIslandBarConfig(cfg));
     }
-    readonly property bool dankIslandEnabled: islandBarConfigs.some(cfg => cfg.enabled ?? false)
+    readonly property bool dankIslandEnabled: (barConfigs || []).some(cfg => (cfg.enabled ?? false) && hostsIsland(cfg))
     // Session-only: which bar, island or dot last-used shared shortcuts follow on each screen.
     property var lastUsedBarByScreen: ({})
     // One slot per edge; a dot floats, so it never takes one.
     readonly property int edgeBarConfigCount: (barConfigs || []).filter(cfg => cfg && !isDotBarConfig(cfg)).length
     readonly property var dotBarConfig: (barConfigs || []).find(cfg => isDotBarConfig(cfg)) ?? null
-    readonly property var islandDefaults: ({
-            "islandFloating": false,
-            "islandPlacement": "edge",
-            "islandFreeSize": 48,
-            "islandFreeIcon": "blur_on",
-            "islandFreeEdgeMargin": 2,
-            "islandFreeIdleDelay": 2500,
-            "islandFreeIdleOpacity": 0.45,
-            "islandFreeIdleScale": 0.4,
-            "islandSharedRouting": "normal",
-            "islandUseOverlayLayer": false,
-            "islandReserveThickness": 40,
-            "islandCompactThickness": 38,
-            "islandOuterGap": 4,
-            "islandAlongOffset": 0,
-            "islandInteractionMode": "hybrid",
-            "islandHoverOpenDelay": 150,
-            "islandHoverCloseDelay": 150,
-            "islandPalette": "default",
-            "islandHighContrast": false,
-            "islandMediaClockVisible": true,
-            "islandNotificationBadgeClearOnOpen": false,
-            "islandNotificationExpand": false,
-            "islandNotificationPopups": false,
-            "islandHomeCompactTight": false,
-            "islandHomeClockDisplay": "both",
-            "islandHomeVolumeDisplay": "both",
-            "islandHomeBrightnessDisplay": "both",
-            "islandHomeStatusContent": "battery",
-            "islandBatteryStyle": "solid",
-            "islandSatellitesEnabled": true,
-            "islandSatellitePosition": "edges",
-            "islandSatelliteGap": 12,
-            "islandSatelliteBackground": false,
-            "islandSatelliteGothCorners": true,
-            "islandSatelliteTransparency": 1,
-            "islandSatelliteSwoopRadius": 24,
-            "islandReducedMotion": false,
-            "islandSpringStiffness": 560,
-            "islandSpringDamping": 37,
-            "islandSpringMass": 1
-        })
+    readonly property var islandDefaults: WidgetDefaults.ISLAND_DEFAULTS
+    readonly property var islandWidgetDefaults: WidgetDefaults.DEFAULTS.island
+
+    function islandSettings(bc) {
+        if (!bc)
+            return {};
+        return isIslandBarConfig(bc) ? bc : (islandWidgetEntry(bc) ?? {});
+    }
+
+    function islandDefaultsFor(bc) {
+        return isIslandBarConfig(bc) ? islandDefaults : islandWidgetDefaults;
+    }
+
+    function _isIslandEntry(entry) {
+        return (typeof entry === "string" ? entry : entry?.id) === "island";
+    }
+
+    // A widget toggled off in the list is still placed, but it owns no screen.
+    function _islandWidgetLocation(cfg, enabledOnly) {
+        for (const sectionId of ["left", "center", "right"]) {
+            const list = cfg?.[sectionId + "Widgets"] ?? [];
+            const index = list.findIndex(entry => _isIslandEntry(entry));
+            if (index < 0)
+                continue;
+            if (enabledOnly && list[index]?.enabled === false)
+                return null;
+            return {
+                sectionId,
+                index
+            };
+        }
+        return null;
+    }
+
+    function islandWidgetSection(cfg) {
+        return _islandWidgetLocation(cfg, true)?.sectionId ?? "";
+    }
+
+    // Mutates cfg in place, so callers pass a clone; a bare string entry is upgraded to carry settings.
+    function _writableIslandSettings(cfg) {
+        if (isIslandBarConfig(cfg))
+            return cfg;
+        const location = _islandWidgetLocation(cfg);
+        if (!location)
+            return {};
+        const list = cfg[location.sectionId + "Widgets"];
+        if (typeof list[location.index] === "string")
+            list[location.index] = {
+                "id": "island",
+                "enabled": true
+            };
+        return list[location.index];
+    }
+
+    function setIslandSettings(barId, patch) {
+        const config = getBarConfig(barId);
+        if (!config)
+            return;
+        if ("islandRouteDash" in patch) {
+            patch = Object.assign({}, patch);
+            const settings = islandSettings(config);
+            for (const activity of islandDashActivities) {
+                const key = islandRouteKey(activity);
+                if (patch[key] === undefined && (settings[key] === undefined || settings[key] === null))
+                    patch[key] = islandSetting(config, key);
+            }
+        }
+        if (isIslandBarConfig(config)) {
+            updateBarConfig(barId, patch);
+            return;
+        }
+        const location = _islandWidgetLocation(config);
+        if (!location)
+            return;
+        updateBarWidget(barId, location.sectionId, location.index, patch);
+    }
 
     function islandSetting(bc, key) {
-        const value = bc?.[key];
-        return value === undefined || value === null ? islandDefaults[key] : value;
+        const value = islandSettings(bc)[key];
+        if (value !== undefined && value !== null)
+            return value;
+        switch (key) {
+        case "islandRouteMedia":
+        case "islandRouteWeather":
+        case "islandRouteWallpaper":
+            return islandSetting(bc, "islandRouteDash");
+        }
+        return islandDefaultsFor(bc)[key];
+    }
+
+    function islandSatelliteTransparency(bc) {
+        if (islandSetting(bc, "islandSatelliteFollowInterfaceStyle"))
+            return barTransparency(bc);
+        return islandSetting(bc, "islandSatelliteTransparency");
     }
 
     function islandLevelDisplay(bc, key) {
@@ -908,7 +958,7 @@ Singleton {
     }
 
     function islandStripThickness(bc) {
-        return LayoutResolver.islandThickness(bc, islandDefaults);
+        return LayoutResolver.islandThickness(islandSettings(bc), islandDefaultsFor(bc));
     }
     readonly property var _islandHomeGroupIds: ["media", "clock", "weather", "status", "volume", "brightness", "notifications"]
     readonly property var _islandHomeLayoutDefault: [
@@ -942,7 +992,8 @@ Singleton {
         }
     ]
     function getIslandHomeLayout(bc) {
-        const stored = Array.isArray(bc?.islandHomeLayout) ? bc.islandHomeLayout : [];
+        const layout = islandSettings(bc).islandHomeLayout;
+        const stored = Array.isArray(layout) ? layout : [];
         const result = [];
         const seen = {};
         for (const entry of stored) {
@@ -977,7 +1028,7 @@ Singleton {
             if (ids.indexOf(entry.id) < 0)
                 ordered.push(entry);
         }
-        updateBarConfig(barId, {
+        setIslandSettings(barId, {
             islandHomeLayout: ordered
         });
     }
@@ -985,7 +1036,7 @@ Singleton {
     function setIslandHomeGroupEnabled(barId, id, on) {
         if (id === "clock")
             return;
-        updateBarConfig(barId, {
+        setIslandSettings(barId, {
             islandHomeLayout: getIslandHomeLayout(getBarConfig(barId)).map(g => g.id === id ? {
                     "id": g.id,
                     "enabled": on
@@ -1019,12 +1070,16 @@ Singleton {
     property string customPowerActionReboot: Spec.SPEC.customPowerActionReboot.def
     property string customPowerActionPowerOff: Spec.SPEC.customPowerActionPowerOff.def
     property var customPowerButtons: Spec.SPEC.customPowerButtons.def
+    property var powerMenuBootEntries: Spec.SPEC.powerMenuBootEntries.def
 
     property bool updaterCheckOnStart: Spec.SPEC.updaterCheckOnStart.def
     property bool updaterUseCustomCommand: Spec.SPEC.updaterUseCustomCommand.def
     property string updaterCustomCommand: Spec.SPEC.updaterCustomCommand.def
     property string updaterTerminalAdditionalParams: Spec.SPEC.updaterTerminalAdditionalParams.def
     property int updaterIntervalSeconds: Spec.SPEC.updaterIntervalSeconds.def
+    property bool updaterNotify: Spec.SPEC.updaterNotify.def
+    property bool updaterPauseOnBattery: Spec.SPEC.updaterPauseOnBattery.def
+    property int updaterNotifyMinSeconds: Spec.SPEC.updaterNotifyMinSeconds.def
     property bool updaterIncludeFlatpak: Spec.SPEC.updaterIncludeFlatpak.def
     property bool updaterAllowAUR: Spec.SPEC.updaterAllowAUR.def
     property bool updaterReopenAfterUpgrade: Spec.SPEC.updaterReopenAfterUpgrade.def
@@ -1542,8 +1597,7 @@ Singleton {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         for (const cfg of configs)
             delete cfg.island;
-        barConfigs = configs;
-        updateBarConfigs();
+        _commitBarConfigs(configs);
     }
 
     function loadSettings() {
@@ -2211,6 +2265,12 @@ Singleton {
         return config?.transparency ?? 1.0;
     }
 
+    function barWidgetTransparency(config) {
+        if (config?.widgetFollowInterfaceStyle !== false)
+            return Theme.foregroundAlpha;
+        return config?.widgetTransparency ?? 1.0;
+    }
+
     function barSurfaceColor(config) {
         return Theme.surfaceRoleColor(config?.surfaceColor, config?.surfaceCustomColor, Theme.hostSurface);
     }
@@ -2261,6 +2321,16 @@ Singleton {
         }
         const listKey = sectionId + "Widgets";
         const list = (config[listKey] ?? []).slice();
+        if (widgetId === "island") {
+            if (isIslandBarConfig(config) || islandWidgetBlocked(config) || _islandWidgetLocation(config))
+                return -1;
+            const configs = JSON.parse(JSON.stringify(barConfigs));
+            const target = configs.find(cfg => cfg.id === barId);
+            list.push(entry);
+            target[listKey] = list;
+            _commitIslandOwner(configs, target);
+            return list.length - 1;
+        }
         list.push(entry);
         const patch = {};
         patch[listKey] = list;
@@ -2314,13 +2384,23 @@ Singleton {
             island: wantIsland,
             dot: wantDot
         };
-        if (on === true) {
-            if (!config.enabled)
-                updates.enabled = true;
-            if ((config.screenPreferences ?? []).length === 0)
-                updates.screenPreferences = ["all"];
+        const configs = JSON.parse(JSON.stringify(barConfigs));
+        const target = Object.assign(configs.find(cfg => cfg.id === barId), updates);
+        if (on !== true) {
+            _commitBarConfigs(configs);
+            return;
         }
-        updateBarConfig(barId, updates);
+        if (!config.enabled)
+            target.enabled = true;
+        // A hidden island would draw but leave routing, with no Visibility card and no `bar reveal` to bring it back.
+        if (config.visible === false)
+            target.visible = true;
+        if ((config.screenPreferences ?? []).length === 0)
+            target.screenPreferences = ["all"];
+        _stashIslandWidget(target);
+        if (wantIsland)
+            _evictIslandWidgets(configs, target);
+        _commitBarConfigs(configs);
     }
 
     function isBarIpcRevealed(barId) {
@@ -2369,8 +2449,7 @@ Singleton {
             setBarIpcReveal(barId, false);
 
         Object.assign(configs[index], updates);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
-        updateBarConfigs();
+        _commitIslandOwner(configs, configs[index]);
 
         if (positionChanged) {
             notificationPopupsInvalidated();
@@ -2467,6 +2546,96 @@ Singleton {
         return !!bc && (bc.island === true || bc.dot === true);
     }
 
+    function islandWidgetEntry(bc) {
+        const location = isIslandBarConfig(bc) ? null : _islandWidgetLocation(bc);
+        if (!location)
+            return null;
+        const entry = bc[location.sectionId + "Widgets"][location.index];
+        return typeof entry === "string" ? {
+            "id": entry
+        } : entry;
+    }
+
+    function hostsIsland(bc) {
+        return isIslandBarConfig(bc) || !!_islandWidgetLocation(bc, true);
+    }
+
+    function _sharesScreen(a, b) {
+        return Quickshell.screens.some(screen => barConfigCoversScreen(a, screen) && barConfigCoversScreen(b, screen));
+    }
+
+    function islandWidgetBlocked(bc) {
+        if (!bc)
+            return true;
+        return (barConfigs || []).some(cfg => cfg.id !== bc.id && cfg.island === true && cfg.enabled !== false && _sharesScreen(cfg, bc));
+    }
+
+    // Clones and dots drop the widget for good; an island-layout switch stashes it first.
+    function stripIslandWidget(cfg) {
+        delete cfg.islandWidgetStash;
+        _stripIslandEntries(cfg);
+    }
+
+    function _stripIslandEntries(cfg) {
+        for (const sectionId of ["left", "center", "right"]) {
+            const key = sectionId + "Widgets";
+            if (Array.isArray(cfg[key]))
+                cfg[key] = cfg[key].filter(entry => !_isIslandEntry(entry));
+        }
+    }
+
+    // An island-layout bar cannot host the widget, but switching back should not cost the user its placement and settings.
+    function _stashIslandWidget(cfg) {
+        const location = _islandWidgetLocation(cfg);
+        if (location)
+            cfg.islandWidgetStash = Object.assign({
+                "entry": cfg[location.sectionId + "Widgets"][location.index]
+            }, location);
+        _stripIslandEntries(cfg);
+    }
+
+    // A restore never evicts: while another island holds the screen the stash waits for a later commit to free it.
+    function _restoreIslandWidget(cfg, configs) {
+        const stash = cfg.islandWidgetStash;
+        if (!stash?.entry) {
+            delete cfg.islandWidgetStash;
+            return;
+        }
+        if (isIslandBarConfig(cfg) || _islandWidgetLocation(cfg) || _islandScreenTaken(configs, cfg))
+            return;
+        delete cfg.islandWidgetStash;
+        const key = stash.sectionId + "Widgets";
+        const list = Array.isArray(cfg[key]) ? cfg[key].slice() : [];
+        list.splice(Math.min(stash.index, list.length), 0, stash.entry);
+        cfg[key] = list;
+    }
+
+    function _islandScreenTaken(configs, bc) {
+        return configs.some(cfg => cfg.id !== bc.id && cfg.enabled !== false && (cfg.island === true || _islandWidgetLocation(cfg, true)) && _sharesScreen(cfg, bc));
+    }
+
+    function _evictIslandWidgets(configs, owner) {
+        for (const cfg of configs) {
+            if (cfg.id !== owner.id && cfg.enabled !== false && _islandWidgetLocation(cfg, true) && _sharesScreen(cfg, owner))
+                _stashIslandWidget(cfg);
+        }
+    }
+
+    // Island-relevant writes must go through here, or a freed screen never gets its stashed widget back.
+    function _commitBarConfigs(configs) {
+        for (const cfg of configs)
+            _restoreIslandWidget(cfg, configs);
+        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        updateBarConfigs();
+    }
+
+    // The bar just written wins its screens: enabling a bar or its island entry evicts the previous host.
+    function _commitIslandOwner(configs, cfg) {
+        if (cfg.enabled !== false && !isIslandBarConfig(cfg) && _islandWidgetLocation(cfg, true))
+            _evictIslandWidgets(configs, cfg);
+        _commitBarConfigs(configs);
+    }
+
     function isDotBarConfig(bc) {
         return !!bc && bc.dot === true;
     }
@@ -2500,24 +2669,64 @@ Singleton {
         });
         // An inherited "always here" would make the base island and the dot fight by config order.
         delete config.islandSharedRouting;
+        stripIslandWidget(config);
         addBarConfig(config);
     }
 
     function islandFreePlacement(bc) {
-        return isDotBarConfig(bc) || (islandSetting(bc, "islandFloating") && islandSetting(bc, "islandPlacement") === "free");
+        return isDotBarConfig(bc) || (isIslandBarConfig(bc) && islandSetting(bc, "islandFloating") && islandSetting(bc, "islandPlacement") === "free");
     }
 
+    // A hosted island shares its config id with the bar, so last-used cannot tell them apart and would degenerate into always.
     function islandSharedRoutingMode(bc) {
-        const mode = bc?.islandSharedRouting;
-        return ["always", "last-used"].includes(mode) ? mode : "normal";
+        const mode = islandSetting(bc, "islandSharedRouting");
+        if (mode === "always")
+            return mode;
+        return mode === "last-used" && isIslandBarConfig(bc) ? mode : "normal";
+    }
+
+    // Dashboard activities share an IPC close, but choose their destinations independently.
+    readonly property var islandDashActivities: ["home", "media", "weather", "wallpaper"]
+
+    function islandRouteKey(activity) {
+        switch (activity) {
+        case "controlcenter":
+            return "islandRouteControlCenter";
+        case "notificationcenter":
+            return "islandRouteNotificationCenter";
+        case "launcher":
+            return "islandRouteLauncher";
+        case "home":
+            return "islandRouteDash";
+        case "media":
+            return "islandRouteMedia";
+        case "weather":
+            return "islandRouteWeather";
+        case "wallpaper":
+            return "islandRouteWallpaper";
+        }
+        return "";
+    }
+
+    function islandActivityRoutingMode(bc, activity) {
+        const key = islandRouteKey(activity);
+        const override = key ? islandSetting(bc, key) : "follow";
+        if (override === "island")
+            return "always";
+        if (override === "bar")
+            return "never";
+        return islandSharedRoutingMode(bc);
     }
 
     function sharedShortcutsFollowLastUsed(screen) {
         return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) === "last-used");
     }
 
-    function sharedShortcutsOverridden(screen) {
-        return activeIslandConfigsForScreen(screen).some(cfg => islandSharedRoutingMode(cfg) !== "normal");
+    function sharedShortcutsOverridden(screen, activity) {
+        return activeIslandConfigsForScreen(screen).some(cfg => {
+            const mode = islandActivityRoutingMode(cfg, activity);
+            return mode === "always" || mode === "last-used";
+        });
     }
 
     function recordBarInteraction(screen, barId) {
@@ -2529,20 +2738,45 @@ Singleton {
         });
     }
 
-    function sharedTriggerIslandConfig(screen) {
-        const configs = activeIslandConfigsForScreen(screen);
-        if (sharedShortcutsFollowLastUsed(screen)) {
+    // A satellite carrying the activity's own widget is a standard destination on this screen, same as a bar.
+    function islandSatelliteHosts(cfg, activity) {
+        const widgetId = activity === "controlcenter" ? "controlCenterButton" : activity === "notificationcenter" ? "notificationButton" : "";
+        if (!widgetId || !isIslandBarConfig(cfg) || isDotBarConfig(cfg) || !islandSetting(cfg, "islandSatellitesEnabled"))
+            return false;
+        return ["leftWidgets", "centerWidgets", "rightWidgets"].some(key => (cfg[key] ?? []).some(entry => (typeof entry === "string" ? entry : entry?.id) === widgetId && (typeof entry === "string" || entry.enabled !== false)));
+    }
+
+    function sharedTriggerIslandConfig(screen, activity) {
+        const active = activeIslandConfigsForScreen(screen);
+        const configs = active.filter(cfg => islandActivityRoutingMode(cfg, activity) !== "never");
+        const key = islandRouteKey(activity);
+        const pinned = key ? configs.find(cfg => {
+            // Saved choices outrank defaults, including legacy dashboard-family pins.
+            const settings = islandSettings(cfg);
+            const override = settings[key] ?? (islandDashActivities.indexOf(activity) >= 0 ? settings.islandRouteDash : undefined);
+            return override === "island";
+        }) : null;
+        if (pinned)
+            return pinned;
+        if (configs.some(cfg => islandActivityRoutingMode(cfg, activity) === "last-used")) {
             const lastId = lastUsedBarByScreen[screen?.name];
             const lastIsland = configs.find(cfg => cfg.id === lastId);
             if (lastIsland)
                 return lastIsland;
         } else {
-            const fixed = configs.find(cfg => islandSharedRoutingMode(cfg) === "always");
+            const fixed = configs.find(cfg => islandActivityRoutingMode(cfg, activity) === "always");
             if (fixed)
                 return fixed;
         }
-        if (getActiveBarEdgesForScreen(screen).length > 0)
+        if (getActiveBarEdgesForScreen(screen).length > 0 || active.some(cfg => islandSatelliteHosts(cfg, activity)))
             return null;
+        return configs.find(cfg => !isDotBarConfig(cfg)) ?? configs[0] ?? null;
+    }
+    function islandLauncherHostConfig(screen) {
+        const config = sharedTriggerIslandConfig(screen, "launcher");
+        if (config || launcherStyle !== "island")
+            return config;
+        const configs = activeIslandConfigsForScreen(screen).filter(cfg => islandActivityRoutingMode(cfg, "launcher") !== "never");
         return configs.find(cfg => !isDotBarConfig(cfg)) ?? configs[0] ?? null;
     }
 
@@ -2550,34 +2784,33 @@ Singleton {
     function setIslandSharedRouting(barId, mode) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         const target = configs.find(cfg => cfg.id === barId);
-        if (!target)
+        if (!target || !(isIslandBarConfig(target) || _islandWidgetLocation(target)))
             return;
-        target.islandSharedRouting = mode;
+        _writableIslandSettings(target).islandSharedRouting = mode;
         if (mode === "always") {
-            const screens = Quickshell.screens.filter(screen => barConfigCoversScreen(target, screen));
             for (const cfg of configs) {
-                if (cfg.id !== barId && isIslandBarConfig(cfg) && islandSharedRoutingMode(cfg) === "always" && screens.some(screen => barConfigCoversScreen(cfg, screen)))
-                    delete cfg.islandSharedRouting;
+                if (cfg.id !== barId && hostsIsland(cfg) && islandSharedRoutingMode(cfg) === "always" && _sharesScreen(cfg, target))
+                    delete _writableIslandSettings(cfg).islandSharedRouting;
             }
         }
-        barConfigs = configs;
-        updateBarConfigs();
+        _commitBarConfigs(configs);
     }
 
+    // A hidden bar takes its island with it, so it must not keep swallowing popups and OSDs.
     function activeIslandConfigsForScreen(screen) {
-        return ShellLayout.islandConfigs(screen);
+        return ShellLayout.islandConfigs(screen).filter(cfg => cfg.visible !== false);
     }
 
     function islandConfigForEdge(screen, edge) {
         return ShellLayout.edge(screen, edge)?.island ?? null;
     }
 
-    function dankIslandCoversScreen(screen) {
-        return activeIslandConfigsForScreen(screen).length > 0;
-    }
-
     function dankIslandHandlesNotifications(screen) {
         return activeIslandConfigsForScreen(screen).some(cfg => !islandSetting(cfg, "islandNotificationPopups"));
+    }
+
+    function dankIslandHandlesSystemOsd(screen) {
+        return activeIslandConfigsForScreen(screen).some(cfg => islandSetting(cfg, "islandSystemOsd"));
     }
 
     function dankIslandOwnsEdge(screen, edge) {

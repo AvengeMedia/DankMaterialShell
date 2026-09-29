@@ -18,13 +18,15 @@ FocusScope {
 
     readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
     readonly property real gridHeight: widgetGrid.gridHeight
-    readonly property real bodyHeight: detailPage.shownSection !== "" ? Math.max(gridHeight, detailPage.preferredHeight) : gridHeight
     readonly property real targetImplicitHeight: {
-        let total = CcMetrics.sheetPadding * 2 + headerPane.height + Theme.spacingS + bodyHeight;
+        let total = CcMetrics.sheetPadding * 2 + gridHeight;
         if (host.editMode)
             total += Theme.spacingS + editControls.height;
-        return total;
+        if (detailPage.shownSection === "")
+            return total;
+        return Math.max(total, detailPage.topInset + detailPage.minimumHeight + CcMetrics.detailDialogInset);
     }
+    property Item detailReturnFocus: null
     property var pageHistory: []
     property var editSnapshot: null
     readonly property bool panelResizing: panelResizer.resizing
@@ -32,7 +34,7 @@ FocusScope {
     readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
-    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - CcMetrics.headerHeight - Theme.spacingS * 2 - editControls.height
+    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - Theme.spacingS - editControls.height
     readonly property real editGutter: host.editGutter ?? 0
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.host
@@ -60,6 +62,8 @@ FocusScope {
             return;
         if (host.expandedSection)
             pageHistory = pageHistory.concat([host.expandedSection]);
+        else if (detailPage.shownSection === "")
+            detailReturnFocus = root.Window.window?.activeFocusItem ?? null;
         host.expandedSection = section;
     }
 
@@ -143,13 +147,13 @@ FocusScope {
             event.accepted = true;
             return;
         }
-        if (host.editMode) {
-            host.editMode = false;
+        if (pageOpen) {
+            goBack();
             event.accepted = true;
             return;
         }
-        if (pageOpen) {
-            goBack();
+        if (host.editMode) {
+            host.editMode = false;
             event.accepted = true;
             return;
         }
@@ -164,7 +168,6 @@ FocusScope {
         if (expandedSection !== "")
             return;
         pageHistory = [];
-        forceActiveFocus();
     }
 
     onEditModeChanged: {
@@ -188,6 +191,7 @@ FocusScope {
         anchors.margins: -(contentInset + Theme.spacingS)
         z: 1
         visible: root.host.editMode
+        enabled: detailPage.shownSection === ""
         edgeResize: root.panelResizing || root.panelResizer.sideMovable(-1, root.gridColumns)
         cornerResize: root.panelResizing || root.panelResizer.sideMovable(1, root.gridColumns)
         horizontalResize: true
@@ -248,72 +252,46 @@ FocusScope {
             y: CcMetrics.sheetPadding
             spacing: Theme.spacingS
 
-            HeaderPane {
-                id: headerPane
-
-                width: parent.width
-                editMode: root.host.editMode
-                live: root.host.shouldBeVisible
-                tapToClose: root.host.headerTogglesClose ?? false
-                onHeaderTapped: root.host.close()
-                onEditModeToggled: root.host.editMode = !root.host.editMode
-                onEditCancelled: root.cancelEdit()
-                onPowerButtonClicked: {
-                    const loader = root.host.powerMenuModalLoader;
-                    if (!loader)
-                        return;
-                    loader.active = true;
-                    if (!loader.item)
-                        return;
-                    const bounds = Qt.rect(root.host.alignedX, root.host.alignedY, root.host.popupWidth, root.host.popupHeight);
-                    loader.item.openFromControlCenter(bounds, root.host.screen);
-                }
-                onLockRequested: {
-                    root.host.close();
-                    root.host.lockRequested();
-                }
-                onSettingsButtonClicked: root.host.openSettings()
-            }
-
             Item {
                 id: body
 
                 width: parent.width
-                height: root.bodyHeight
-                clip: detailPage.shownSection !== ""
+                height: root.gridHeight
+                opacity: CcMetrics.hideCoveredContent ? 1 - detailPage.opacity : 1
 
                 CcTileGrid {
                     id: widgetGrid
                     columns: root.gridColumns
                     availableHeight: root.availableGridHeight
 
-                    x: detailPage.gridOffset
                     width: parent.width
                     anchors.top: parent.top
                     editMode: root.host.editMode
                     model: widgetModel
-                    live: root.host.shouldBeVisible
+                    live: root.host.shouldBeVisible && detailPage.shownSection === ""
                     screenName: root.host.triggerScreen?.name || ""
-                    visible: Math.abs(x) < width
-                    enabled: !root.pageOpen
+                    tapToClose: root.host.headerTogglesClose ?? false
                     onExpandClicked: widgetData => root.openWidgetPage(widgetData)
                     onRemoveWidget: index => widgetModel.removeWidget(index)
                     onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
                     onColorPickerRequested: root.host.openColorPicker()
-                }
-
-                CcDetailPage {
-                    id: detailPage
-
-                    anchors.fill: parent
-                    section: root.host.expandedSection ?? ""
-                    model: widgetModel
-                    screenName: root.host.triggerScreen?.name || ""
-                    screenModel: root.host.triggerScreen?.model || ""
-                    onCodecSelectorRequested: device => root.showCodecSelector(device)
-                    onPortSelectorRequested: node => root.showPortSelector(node)
-                    onBackRequested: root.goBack()
-                    onCollapseRequested: root.host.collapseAll()
+                    onHeaderTapped: root.host.close()
+                    onEditRequested: root.host.editMode = !root.host.editMode
+                    onSettingsRequested: root.host.openSettings()
+                    onLockRequested: {
+                        root.host.close();
+                        root.host.lockRequested();
+                    }
+                    onPowerRequested: {
+                        const loader = root.host.powerMenuModalLoader;
+                        if (!loader)
+                            return;
+                        loader.active = true;
+                        if (!loader.item)
+                            return;
+                        const bounds = Qt.rect(root.host.alignedX, root.host.alignedY, root.host.popupWidth, root.host.popupHeight);
+                        loader.item.openFromControlCenter(bounds, root.host.screen);
+                    }
                 }
             }
 
@@ -337,7 +315,37 @@ FocusScope {
                 onAddWidget: widgetId => widgetModel.addWidget(widgetId)
                 onResetToDefault: () => widgetModel.resetToDefault()
                 onClearAll: () => widgetModel.clearAll()
+                onFinishRequested: root.host.editMode = false
+                onCancelRequested: root.cancelEdit()
             }
+        }
+    }
+
+    CcDetailPage {
+        id: detailPage
+
+        z: 1
+        anchors.fill: parent
+        section: root.host.expandedSection ?? ""
+        topInset: CcMetrics.sheetPadding
+        minimumContentHeight: Math.max(0, root.gridHeight - CcMetrics.pageHeaderHeight)
+        cornerRadii: root.surfaceCornerRadii
+        coverage: Math.max(codecSelectorLoader.item?.presence ?? 0, portSelectorLoader.item?.presence ?? 0)
+        model: widgetModel
+        screenName: root.host.triggerScreen?.name || ""
+        screenModel: root.host.triggerScreen?.model || ""
+        onCodecSelectorRequested: device => root.showCodecSelector(device)
+        onPortSelectorRequested: node => root.showPortSelector(node)
+        onBackRequested: root.goBack()
+        onCollapseRequested: root.host.collapseAll()
+        onDismissed: {
+            const target = root.detailReturnFocus;
+            root.detailReturnFocus = null;
+            if (target?.visible && target.enabled) {
+                target.forceActiveFocus();
+                return;
+            }
+            root.forceActiveFocus();
         }
     }
 
@@ -372,6 +380,7 @@ FocusScope {
         z: CcMetrics.overlayZ
         active: false
         sourceComponent: WidgetConfigOverlay {
+            backdrop: contentFlickable
             onVisibleChanged: {
                 if (visible)
                     return;

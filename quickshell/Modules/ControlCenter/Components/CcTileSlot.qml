@@ -9,11 +9,13 @@ DankEditableGridSlot {
     id: root
 
     readonly property var widgetData: JSON.parse(json)
-    readonly property var sizeSpec: WidgetUtils.sizeSpec(widgetData.id || "", grid.columns, grid.maximumRows)
+    readonly property var sizeSpec: WidgetUtils.sizeSpec(widgetData, grid.columns, grid.maximumRows)
     readonly property real cols: slot?.cols ?? 1
     readonly property real rows: slot?.rows ?? 1
     readonly property bool compact: cols <= 2 && rows === 1
     readonly property var tileItem: tileLoader.item
+
+    passthrough: tileItem?.passthrough ?? null
 
     onPressAndHold: {
         if (!editChrome.hasOptions)
@@ -31,6 +33,17 @@ DankEditableGridSlot {
                 height = 2;
             else
                 width = Math.min(2, sizeSpec.maxW);
+        }
+        if (widgetData.id === "quickActions") {
+            const count = WidgetUtils.enabledQuickActions(widgetData).length;
+            if (height !== current.h)
+                width = Math.max(width, CcMetrics.actionSpan(Math.ceil(count / CcMetrics.actionCapacity(height))));
+            const size = WidgetUtils.clampSize(Object.assign({}, widgetData, {
+                w: width,
+                h: height
+            }), grid.columns, grid.maximumRows);
+            width = size.w;
+            height = size.h;
         }
         const changes = {};
         if (width !== current.w)
@@ -122,6 +135,7 @@ DankEditableGridSlot {
         visible: root.grid.editMode
         enabled: root.interactionEnabled
         widgetData: root.widgetData
+        resizeEdgeWidth: root.widgetData.id === "quickActions" ? Theme.spacingL : -1
         dragging: root.dragging
         resizing: root.resizing
         cornerRadius: root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height)

@@ -13,6 +13,8 @@ FocusScope {
     property bool nested: false
     property string entryId: "notifications"
     property int currentTab: 0
+    property var transientSurfaceTracker: null
+    readonly property var surfaces: transientSurfaceTracker ?? localSurfaces
     readonly property bool hasNotifications: list.count > 0
     readonly property Item focusTarget: root
     property bool blocksTabNavigation: false
@@ -105,7 +107,7 @@ FocusScope {
     }
 
     TransientSurfaceTracker {
-        id: surfaces
+        id: localSurfaces
     }
 
     NotificationKeyboardController {
@@ -131,7 +133,7 @@ FocusScope {
         visible: root.currentTab === 0
         keyboardController: keyboard
         focusAllowed: root.activeFocus
-        transientSurfaceTracker: surfaces
+        transientSurfaceTracker: root.surfaces
         trackStableContentHeight: false
     }
 
@@ -198,7 +200,7 @@ FocusScope {
         popupAnchorItem: dndButton
         popupWidth: NotificationMetrics.menuWidth
         openUpwards: true
-        transientSurfaceTracker: surfaces
+        transientSurfaceTracker: root.surfaces
         options: [I18n.tr("Off")].concat(DndPresets.presetOptions.map(option => option.label))
         onValueChanged: value => {
             if (value === I18n.tr("Off")) {

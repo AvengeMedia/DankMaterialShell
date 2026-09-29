@@ -18,21 +18,9 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "colorize"
-            title: I18n.tr("Injected palettes")
             settingKey: "paletteInject"
             tags: ["palette", "matugen", "inject", "namespace", "command", "template", "color"]
             visible: Theme.matugenAvailable
-
-            headerActions: [
-                DankActionButton {
-                    buttonSize: 36
-                    iconName: "add"
-                    iconSize: 20
-                    Accessible.name: I18n.tr("Add")
-                    iconColor: Theme.primary
-                    onClicked: PaletteInjectService.addPalette()
-                }
-            ]
 
             SettingsRow {
                 body: Column {
@@ -180,6 +168,16 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            shown: Theme.matugenAvailable
+
+            DankFab {
+                text: I18n.tr("Add palette")
+                iconName: "add"
+                onClicked: PaletteInjectService.addPalette()
             }
         }
     }

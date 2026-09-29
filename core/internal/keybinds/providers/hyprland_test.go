@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 )
 
 func TestNewHyprlandProvider(t *testing.T) {
@@ -209,5 +211,24 @@ func TestDescriptionFallback(t *testing.T) {
 				t.Errorf("expected description %q not found in any bind", tt.wantDesc)
 			}
 		})
+	}
+}
+
+func TestHyprlandModKeyFromLuaMainMod(t *testing.T) {
+	tmpDir := t.TempDir()
+	content := `local mainMod = "ALT"
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kitty"))
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "hyprland.lua"), []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+
+	sheet, err := NewHyprlandProvider(tmpDir).GetCheatSheet()
+	if err != nil {
+		t.Fatalf("GetCheatSheet failed: %v", err)
+	}
+	want := keybinds.ModKey{Resolved: "Alt", Source: keybinds.ModSourceConfig}
+	if sheet.Mod != want {
+		t.Errorf("Mod = %+v, want %+v", sheet.Mod, want)
 	}
 }

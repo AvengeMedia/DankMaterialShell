@@ -274,12 +274,27 @@ Item {
     }
 
     function getWidgetsForPopup() {
+        const config = SettingsData.getBarConfig(selectedBarId);
         return baseWidgetDefinitions.filter(widget => {
             if (widget.warning && widget.warning.includes("Plugin is disabled"))
                 return false;
             if (widget.enabled === false)
                 return false;
-            return true;
+            return !(widget.single && SettingsData.barWidgetEntry(config, widget.id));
+        }).map(widget => {
+            if (widget.id !== "island")
+                return widget;
+            if (SettingsData.isIslandBarConfig(config))
+                return Object.assign({}, widget, {
+                    "disabled": true,
+                    "description": I18n.tr("This bar is the Island", "bar widget picker: island widget unavailable on an island-layout bar")
+                });
+            if (!SettingsData.islandWidgetBlocked(config))
+                return widget;
+            return Object.assign({}, widget, {
+                "disabled": true,
+                "description": I18n.tr("An Island bar already covers a display this bar is on", "bar widget picker: island widget blocked by an island-layout bar sharing a display")
+            });
         });
     }
 

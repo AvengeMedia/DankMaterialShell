@@ -21,13 +21,19 @@ DankEditableGrid {
     signal removeWidget(int index)
     signal configRequested(int index, var widgetData, var anchor)
     signal colorPickerRequested
+    signal lockRequested
+    signal powerRequested
+    signal settingsRequested
+    signal editRequested
+    signal headerTapped
+    property bool tapToClose: false
 
     readonly property real gridHeight: layoutHeight
     readonly property real cellWidth: (width + CcMetrics.gridGap) / columns
     readonly property CcTileSlot draggingSlot: tileRepeater.itemAt(draggingSourceIndex) as CcTileSlot
 
     sourceItems: (SettingsData.controlCenterWidgets || []).map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, Infinity)))
-    slotLayout: GridUtils.packCards(layoutItems.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows))), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep)
+    slotLayout: GridUtils.packCards(layoutItems.map(widget => Object.assign({}, widget, WidgetUtils.clampSize(widget, columns, maximumRows))), placementOrder, columns, width, CcMetrics.gridGap, cellWidth - CcMetrics.gridGap, I18n.isRtl, null, CcMetrics.gridStep, true)
     placeholderRadius: draggingSlot?.tileItem?.bodyRadius ?? Theme.fullRadius(width, CcMetrics.tileHeight)
 
     onLayoutCommitted: items => model.setLayout(items)

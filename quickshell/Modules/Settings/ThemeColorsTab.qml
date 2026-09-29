@@ -357,6 +357,7 @@ Item {
                 tags: ["matugen", "seed", "source", "wallpaper", "dynamic"]
                 settingKey: "matugenSourceMode"
                 text: I18n.tr("Source color")
+                description: I18n.tr("Which wallpaper color the palette is built from", "matugen source color dropdown description")
                 options: cachedSourceModes
                 currentValue: Theme.getSourceMode(SettingsData.matugenSourceMode).label
                 enabled: Theme.matugenAvailable && !SettingsData.matugenSeedColor
@@ -377,6 +378,7 @@ Item {
                 tags: ["matugen", "seed", "pick", "eyedropper", "dynamic"]
                 settingKey: "matugenSeedColor"
                 text: I18n.tr("Derived color")
+                description: I18n.tr("Custom builds the palette from a color you pick", "matugen derived color dropdown description")
                 enabled: Theme.matugenAvailable
                 options: [
                     {
@@ -410,8 +412,9 @@ Item {
                 tags: ["matugen", "spec", "expressive", "vivid", "saturated", "bold", "dynamic"]
                 settingKey: "matugenSpec"
                 text: I18n.tr("Material palette")
-                enabled: Theme.matugenAvailable
-                model: [I18n.tr("Standard", "adjective, panel motion option and bar layout mode option"), I18n.tr("Expressive", "matugen color scheme option")]
+                description: I18n.tr("2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder", "material color spec year description")
+                enabled: Theme.matugenAvailable && Theme.getMatugenScheme(SettingsData.matugenScheme).spec2025 === true
+                model: ["2021", "2025"]
                 currentIndex: SettingsData.matugenSpec === "2025" ? 1 : 0
                 onSelectionChanged: (index, selected) => {
                     if (!selected)
@@ -960,6 +963,25 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsCard {
+            tab: "theme"
+            tags: ["matugen", "startup", "theming"]
+            title: I18n.tr("Startup Behavior", "settings card title")
+            settingKey: "themeStartupBehavior"
+            iconName: "power_settings_new"
+            visible: Theme.matugenAvailable
+
+            SettingsToggleRow {
+                tab: "theme"
+                tags: ["matugen", "startup", "generate"]
+                settingKey: "generateThemeAtStartup"
+                text: I18n.tr("Generate Theme at Startup", "toggle label")
+                description: I18n.tr("Regenerate matugen colors when DMS starts, even if nothing changed.", "toggle description")
+                checked: SettingsData.generateThemeAtStartup
+                onToggled: checked => SettingsData.set("generateThemeAtStartup", checked)
             }
         }
     }

@@ -118,6 +118,9 @@ Singleton {
         if (modulesChanged)
             subscriptionGeneration++;
 
+        if (hasModule("system"))
+            updateUptime();
+
         if (modulesChanged || refCount === 1) {
             enabledModules = enabledModules.slice(); // Force property change
             moduleRefCounts = Object.assign({}, moduleRefCounts); // Force property change
@@ -292,9 +295,11 @@ Singleton {
     function initializeSystemMetadata() {
         if (!dgopAvailable)
             return;
-        DMSService.sendRequest("dgop.hardware", null, response => {
+        DMSService.sendRequest("dgop.meta", {
+            modules: ["hardware", "system"]
+        }, response => {
             if (!response.result) {
-                log.warn("dgop.hardware failed:", response.error || "empty result");
+                log.warn("Initial system metadata request failed:", response.error || "empty result");
                 return;
             }
             parseData(response.result);
@@ -540,16 +545,19 @@ Singleton {
             }
         }
 
+        if (data.system?.boottime) {
+            bootTime = data.system.boottime;
+            updateUptime();
+        }
+
         if (hasModule("system") && data.system) {
             const sys = data.system;
             loadAverage = sys.loadavg || "";
             processCount = sys.processes || 0;
             threadCount = sys.threads || 0;
-            bootTime = sys.boottime || "";
-            updateUptime();
         }
 
-        const hwData = data.hardware || (data.hostname || data.kernel || data.distro || data.arch) ? data : null;
+        const hwData = data.hardware || ((data.hostname || data.kernel || data.distro || data.arch) ? data : null);
         if (hwData) {
             hostname = hwData.hostname || "";
             kernelVersion = hwData.kernel || "";
@@ -689,8 +697,8 @@ Singleton {
         if (!dgopAvailable)
             return;
 
-        initializeGpuMetadata();
         initializeSystemMetadata();
+        initializeGpuMetadata();
         initializeDiskMounts();
 
         if (!sessionGpuIdsSeeded && SessionData.enabledGpuPciIds && SessionData.enabledGpuPciIds.length > 0) {

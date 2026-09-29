@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Services
 import "Scorer.js" as Scorer
@@ -150,19 +149,6 @@ Item {
         }
     }
 
-    Process {
-        id: copyProcess
-        running: false
-        onExited: pasteTimer.start()
-    }
-
-    Timer {
-        id: pasteTimer
-        interval: 200
-        repeat: false
-        onTriggered: ClipboardService.sendPasteKeystroke()
-    }
-
     function pasteSelected() {
         if (!selectedItem)
             return;
@@ -185,8 +171,7 @@ Item {
         const pasteArgs = AppSearchService.getPluginPasteArgs(pluginId, selectedItem.data);
         if (!pasteArgs)
             return;
-        copyProcess.command = pasteArgs;
-        copyProcess.running = true;
+        ClipboardService.pasteAfterCommand(pasteArgs);
         itemExecuted();
     }
 

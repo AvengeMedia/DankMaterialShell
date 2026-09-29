@@ -15,7 +15,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SessionData")
 
-    readonly property int sessionConfigVersion: 6
+readonly property int sessionConfigVersion: 7
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -43,6 +43,9 @@ Singleton {
     property bool idleInhibited: false
     property real idleInhibitedUntil: 0
     property string terminalOverride: ""
+    property int updaterNotifiedUnix: 0
+    property int updaterNotifiedCount: 0
+    property string changelogSeenVersion: ""
     property bool isSwitchingMode: false
     property bool suppressOSD: true
 

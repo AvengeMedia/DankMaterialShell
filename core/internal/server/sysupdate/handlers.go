@@ -12,7 +12,8 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		models.Respond(conn, req.ID, m.GetState())
 	case "sysupdate.refresh":
 		force := params.BoolOpt(req.Params, "force", false)
-		m.Refresh(RefreshOptions{Force: force})
+		background := params.BoolOpt(req.Params, "background", false)
+		m.Refresh(RefreshOptions{Force: force, Background: background})
 		models.Respond(conn, req.ID, m.GetState())
 	case "sysupdate.upgrade":
 		handleUpgrade(conn, req, m)
@@ -25,6 +26,9 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	case "sysupdate.release":
 		m.Release()
 		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
+	case "sysupdate.releases":
+		force := params.BoolOpt(req.Params, "force", false)
+		models.Respond(conn, req.ID, m.Releases(force))
 	case "sysupdate.setInterval":
 		seconds, err := params.Int(req.Params, "seconds")
 		if err != nil {

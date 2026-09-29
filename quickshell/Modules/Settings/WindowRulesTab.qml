@@ -184,6 +184,7 @@ Item {
             try {
                 const result = JSON.parse(output.trim());
                 const allRules = result.rules || [];
+                CompositorService.syncDmsWindowFloatingRule(allRules);
                 windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules"));
                 externalRules = allRules.filter(r => !(r.source || "").includes("dms/windowrules"));
                 windowRulesInclude.applyStatus(result.dmsStatus);
@@ -304,23 +305,9 @@ Item {
             id: headerSection
             width: parent.width
             iconName: "select_window"
-            title: I18n.tr("Window rules")
 
             SettingsRow {
                 subtitle: I18n.tr("Define rules for window behavior. Saves to %1", "window rules settings description, %1 is a config file name").arg(root.dmsRulesFileName)
-
-                DankActionButton {
-                    buttonSize: Theme.iconButtonSize
-                    circular: false
-                    iconName: "add"
-                    iconSize: Theme.iconSize
-                    iconColor: Theme.primary
-                    enabled: !root.readOnly
-                    opacity: enabled ? 1 : 0.5
-                    Accessible.name: I18n.tr("Add window rule")
-                    tooltipSide: "left"
-                    onClicked: root.openRuleModal()
-                }
             }
 
             SettingsRow {
@@ -649,6 +636,16 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            shown: !root.readOnly
+
+            DankFab {
+                text: I18n.tr("Add window rule")
+                iconName: "add"
+                onClicked: root.openRuleModal()
             }
         }
     }

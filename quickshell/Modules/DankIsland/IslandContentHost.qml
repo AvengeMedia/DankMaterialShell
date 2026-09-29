@@ -24,6 +24,10 @@ Item {
     required property string activityId
     property bool freeMode: false
     property Component compactFaceOverride: null
+    // Hosted islands fold the slot anchor into every target; the face must pin to the same resolved slot.
+    property var resolveTarget: target => target
+    // Embedded sheets grow by this on the near edge; the face keeps its content size below the fold.
+    property real expandedInset: 0
     required property Component homeCompactComponent
     required property Component homeExpandedComponent
     required property Component mediaCompactComponent
@@ -160,7 +164,7 @@ Item {
     component CompactFace: Loader {
         required property string activity
         required property Component face
-        readonly property var target: root.controller.compactTargetFor(activity)
+        readonly property var target: root.resolveTarget(root.controller.compactTargetFor(activity))
         readonly property bool isVertical: root.controller.isVertical
         readonly property real alongPos: isVertical ? Math.round((root.hostHeight - target.height) / 2 + target.offsetAlong) - Math.round(root.islandY) : Math.round((root.hostWidth - target.width) / 2 + target.offsetAlong) - Math.round(root.islandX)
         readonly property real crossPos: isVertical ? Math.round((parent.width - width) / 2) : Math.round((parent.height - height) / 2)
@@ -178,7 +182,10 @@ Item {
     component ExpandedFace: Loader {
         required property string activity
         readonly property var target: root.controller.expandedTargetFor(activity)
+        readonly property bool isVertical: root.controller.isVertical
 
+        x: isVertical && !root.controller.farEdge ? root.expandedInset : 0
+        y: !isVertical && !root.controller.farEdge ? root.expandedInset : 0
         width: target.width
         height: target.height
         visible: opacity > 0.001
@@ -213,7 +220,6 @@ Item {
         id: mediaExpandedLoader
 
         activity: "media"
-        height: Math.max(target.height, root.height)
         active: root.mediaSurfaceActive && (root.expanded || root.expandedFade > 0)
         asynchronous: false
         sourceComponent: root.mediaExpandedComponent

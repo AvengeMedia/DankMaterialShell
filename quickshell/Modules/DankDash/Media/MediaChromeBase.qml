@@ -22,8 +22,8 @@ Item {
 
     readonly property var activePlayer: root.player.activePlayer
     readonly property var presentation: root.player.presentation
-    readonly property string title: presentation ? (presentation.title || I18n.tr("Unknown Track")) : I18n.tr("No Active Players")
-    readonly property string artist: presentation ? (presentation.artist || I18n.tr("Unknown Artist")) : ""
+    readonly property string title: presentation?.title || I18n.tr("Unknown Track")
+    readonly property string artist: presentation?.artist || I18n.tr("Unknown Artist")
     readonly property string album: presentation?.album ?? ""
     readonly property string artUrl: presentation?.artUrl ?? ""
     readonly property real padding: DashMetrics.mediaCardMargin

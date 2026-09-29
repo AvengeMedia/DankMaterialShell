@@ -111,6 +111,7 @@ Singleton {
     property var _pendingGenerateParams: null
     property int _colorsRetryCount: 0
     property double _lastGenerateMs: 0
+    property string _matugenRunKey: ""
 
     property bool blurLayersActive: false
     property bool matugenToastSuppressed: false
@@ -161,46 +162,7 @@ Singleton {
         Quickshell.execDetached(["mkdir", "-p", stateDir]);
         Proc.runCommand("matugenCheck", ["sh", "-c", "command -v matugen"], (output, code) => {
             matugenAvailable = (code === 0) && !envDisableMatugen;
-            const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
-
-            if (!matugenAvailable || isGreeterMode) {
-                return;
-            }
-
-            if (colorsFileLoadFailed && currentTheme === dynamic && rawWallpaperPath) {
-                log.info("Matugen now available, regenerating colors for dynamic theme");
-                const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-                const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
-                const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                if (rawWallpaperPath.startsWith("#")) {
-                    setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                } else {
-                    setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                }
-                return;
-            }
-
-            const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
-            const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
-
-            if (currentTheme === dynamic) {
-                if (rawWallpaperPath) {
-                    const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-                    if (rawWallpaperPath.startsWith("#")) {
-                        setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    } else {
-                        setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-                    }
-                }
-            } else if (currentTheme !== "custom") {
-                const darkTheme = StockThemes.getThemeByName(currentTheme, false);
-                const lightTheme = StockThemes.getThemeByName(currentTheme, true);
-                if (darkTheme && darkTheme.primary) {
-                    const stockColors = buildMatugenColorsFromTheme(darkTheme, lightTheme);
-                    const themeData = isLight ? lightTheme : darkTheme;
-                    setDesiredTheme("hex", themeData.primary, isLight, iconTheme, themeData.matugen_type, stockColors);
-                }
-            }
+            generateSystemThemesFromCurrentTheme();
         }, 0);
         if (typeof SessionData !== "undefined") {
             SessionData.isLightModeChanged.connect(root.onLightModeChanged);
@@ -282,7 +244,7 @@ Singleton {
             "primaryContainer": getMatugenColorForMode(colorMode, "primary_container", "#1976d2"),
             "onPrimaryContainer": getMatugenColorForMode(colorMode, "on_primary_container"),
             "secondary": getMatugenColorForMode(colorMode, "secondary", "#8ab4f8"),
-            "secondaryContainer": getMatugenColorForMode(colorMode, "secondary_container", getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f")),
+            "secondaryContainer": getMatugenColorForMode(colorMode, "secondary_container"),
             "onSecondaryContainer": getMatugenColorForMode(colorMode, "on_secondary_container"),
             "tertiary": getMatugenColorForMode(colorMode, "tertiary", "#efb8c8"),
             "tertiaryContainer": getMatugenColorForMode(colorMode, "tertiary_container", getMatugenColorForMode(colorMode, "surface_container_high", "#292b2f")),
@@ -337,10 +299,12 @@ Singleton {
 
     readonly property var _matugenSchemeDefs: [({
                 "value": "scheme-tonal-spot",
+                "spec2025": true,
                 "label": I18n.tr("Tonal Spot", "matugen color scheme option"),
                 "description": I18n.tr("Balanced palette with focused accents (default).")
             }), ({
                 "value": "scheme-vibrant",
+                "spec2025": true,
                 "label": I18n.tr("Vibrant", "matugen color scheme option"),
                 "description": I18n.tr("Lively palette with saturated accents.")
             }), ({
@@ -349,6 +313,7 @@ Singleton {
                 "description": I18n.tr("Derives colors that closely match the underlying image.")
             }), ({
                 "value": "scheme-expressive",
+                "spec2025": true,
                 "label": I18n.tr("Expressive", "matugen color scheme option"),
                 "description": I18n.tr("Vibrant palette with playful saturation.")
             }), ({
@@ -365,6 +330,7 @@ Singleton {
                 "description": I18n.tr("Minimal palette built around a single hue.")
             }), ({
                 "value": "scheme-neutral",
+                "spec2025": true,
                 "label": I18n.tr("Neutral", "matugen color scheme option"),
                 "description": I18n.tr("Muted palette with subdued, calming tones.")
             }), ({
@@ -445,9 +411,11 @@ Singleton {
     property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
     property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
     property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
-    readonly property bool tonalPrimaryContainer: Contrast.isTonal(primaryContainer, surfaceText)
-    readonly property color selectedContainer: tonalPrimaryContainer ? primaryContainer : Contrast.tintedContainer(surfaceContainerHigh, primary, surfaceText)
-    readonly property color accentOnPrimaryContainer: Contrast.ratio(primary, primaryContainer) >= 3 ? primary : onPrimaryContainer
+    readonly property real selectedContainerTint: currentThemeData.selectedContainerTint ?? 0.2
+    readonly property bool themedSelectedContainer: !!currentThemeData.secondaryContainer && Contrast.isTonal(secondaryContainer, onSecondaryContainer) && Contrast.isTonal(secondaryContainer, surfaceText)
+    readonly property color selectedContainer: currentThemeData.selectedContainer || (themedSelectedContainer ? secondaryContainer : Contrast.subtleTint(surfaceContainerHigh, primary, surfaceText, selectedContainerTint))
+    readonly property color accentOnSelectedContainer: currentThemeData.accentOnSelectedContainer || (Contrast.ratio(primary, selectedContainer) >= 3 ? primary : onSelectedContainer)
+    readonly property color accentOnPrimaryContainer: currentThemeData.accentOnPrimaryContainer || (Contrast.ratio(primary, primaryContainer) >= 3 ? primary : onPrimaryContainer)
     readonly property var accents: Accents.derive(primary, isLightMode, currentThemeData.accents ?? null)
     property color inverseSurface: currentThemeData.inverseSurface || surfaceText
     property color inverseOnSurface: currentThemeData.inverseOnSurface || surface
@@ -515,7 +483,7 @@ Singleton {
         Binding {
             target: root
             property: "onSelectedContainer"
-            value: root.tonalPrimaryContainer ? root.onPrimaryContainer : root.surfaceText
+            value: root.currentThemeData.onSelectedContainer || (root.currentThemeData.selectedContainer ? Contrast.readableOn(root.selectedContainer, root.onContainerCandidates) : root.themedSelectedContainer ? root.onSecondaryContainer : root.surfaceText)
         }
     ]
     readonly property var onContainerCandidates: [surfaceText, surface, contrastLight, contrastDark]
@@ -611,6 +579,9 @@ Singleton {
             return roleColor(mode);
         }
     }
+
+    readonly property real avatarRingWidth: SettingsData.avatarRing === "none" ? 0 : outlineWidth
+    readonly property color avatarRingColor: SettingsData.avatarRing === "outline" ? surfaceVariant : roleColor(SettingsData.avatarRing)
 
     function roleColor(mode) {
         switch (mode) {
@@ -993,7 +964,10 @@ Singleton {
         "standardDecel": [0, 0, 0, 1, 1, 1],
         "expressiveFastSpatial": [0.42, 1.67, 0.21, 0.9, 1, 1],
         "expressiveDefaultSpatial": [0.38, 1.21, 0.22, 1, 1, 1],
-        "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
+        "expressiveSlowSpatial": [0.39, 1.29, 0.35, 0.98, 1, 1],
+        "expressiveFastEffects": [0.31, 0.94, 0.34, 1, 1, 1],
+        "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1],
+        "expressiveSlowEffects": [0.34, 0.88, 0.34, 1, 1, 1]
     }
 
     // Theme is the canonical access point for animation variant state. The
@@ -1048,7 +1022,10 @@ Singleton {
                 "extraLarge": 1000,
                 "expressiveFastSpatial": 350,
                 "expressiveDefaultSpatial": 500,
-                "expressiveEffects": 200
+                "expressiveSlowSpatial": 650,
+                "expressiveFastEffects": 150,
+                "expressiveEffects": 200,
+                "expressiveSlowEffects": 300
             };
         }
 
@@ -1060,7 +1037,10 @@ Singleton {
             "extraLarge": baseDuration * 2.0,
             "expressiveFastSpatial": baseDuration * 0.7,
             "expressiveDefaultSpatial": baseDuration,
-            "expressiveEffects": baseDuration * 0.4
+            "expressiveSlowSpatial": baseDuration * 1.3,
+            "expressiveFastEffects": baseDuration * 0.3,
+            "expressiveEffects": baseDuration * 0.4,
+            "expressiveSlowEffects": baseDuration * 0.6
         };
     }
 
@@ -1333,6 +1313,7 @@ Singleton {
     readonly property real bottomSheetHandleWidth: 36
     readonly property real bottomSheetHandleHeight: 4
     readonly property real popupEnterScale: 0.92
+    readonly property real fabEnterScale: 0.2
     readonly property real pendingOpacity: 0.6
     readonly property real spinnerStrokeWidth: 2
     readonly property real tabMinWidth: 64
@@ -1763,10 +1744,6 @@ Singleton {
             return;
         }
 
-        log.info("Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
-
-        themeGenerationStarting();
-
         const desired = {
             "kind": kind,
             "value": value,
@@ -1775,9 +1752,6 @@ Singleton {
             "matugenType": matugenType || "scheme-tonal-spot",
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
         };
-
-        log.debug("Starting matugen worker");
-        workerRunning = true;
 
         const args = ["dms", "matugen", "queue", "--state-dir", stateDir, "--shell-dir", shellDir, "--config-dir", configDir, "--kind", desired.kind, "--value", desired.value, "--mode", desired.mode, "--icon-theme", desired.iconTheme, "--matugen-type", desired.matugenType,];
 
@@ -1871,6 +1845,20 @@ Singleton {
             }
         }
 
+        const runKey = Qt.md5(JSON.stringify(args));
+        const skipUnchanged = !_matugenRunKey && !colorsFileLoadFailed && typeof SettingsData !== "undefined" && !SettingsData.generateThemeAtStartup;
+        if (skipUnchanged && runKey === CacheData.matugenAppliedKey) {
+            log.info("Theme inputs unchanged since the last run, skipping startup generation");
+            return;
+        }
+
+        log.info("Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
+        themeGenerationStarting();
+
+        log.debug("Starting matugen worker");
+        workerRunning = true;
+        _matugenRunKey = runKey;
+        _lastGenerateMs = Date.now();
         systemThemeGenerator.command = args;
         systemThemeGenerator.running = true;
     }
@@ -1880,7 +1868,6 @@ Singleton {
         if (!matugenAvailable || isGreeterMode)
             return;
 
-        _lastGenerateMs = Date.now();
         _pendingGenerateParams = true;
         _themeGenerateDebounce.restart();
     }
@@ -2238,6 +2225,12 @@ Singleton {
         return Math.round(value * s) / s;
     }
 
+    // the epsilon keeps a value already on the grid from gaining a pixel through float error
+    function pxCeil(value, dpr) {
+        const s = dpr || 1;
+        return Math.ceil(value * s - 0.001) / s;
+    }
+
     function barWidgetThickness(innerPadding, dpr) {
         return snapEven(Math.max(20, 26 + innerPadding * 0.6), dpr);
     }
@@ -2280,6 +2273,10 @@ Singleton {
                 log.warn("Matugen worker failed with exit code:", exitCode);
                 root.matugenCompleted(currentMode, "error");
             }
+
+            const appliedKey = (exitCode === 0 || exitCode === 2) ? _matugenRunKey : "";
+            if (CacheData.matugenAppliedKey !== appliedKey)
+                CacheData.set("matugenAppliedKey", appliedKey);
 
             if (!pendingThemeRequest) {
                 if (SettingsData.matugenTemplateGtk)

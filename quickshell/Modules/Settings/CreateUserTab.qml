@@ -62,7 +62,6 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "person_add"
-            title: I18n.tr("Create user")
             settingKey: "createUser"
             visible: PolkitService.polkitAvailable
 
@@ -179,7 +178,7 @@ Item {
                     spacing: Theme.spacingM
 
                     DankButton {
-                        text: root.operationPending ? I18n.tr("Working...", "create user button text while the operation runs") : I18n.tr("Create user")
+                        text: root.operationPending ? I18n.tr("Working...", "create user button text while the operation runs") : I18n.tr("Add user")
                         iconName: "person_add"
                         backgroundColor: Theme.primary
                         textColor: Theme.primaryText

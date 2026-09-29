@@ -18,9 +18,9 @@ Singleton {
     readonly property real popoutWidthWide: popoutWidth + weekColumnWidth + Theme.spacingS
     readonly property real contentPadding: Theme.spacingM
     readonly property real contentGap: Theme.spacingM
-    readonly property real islandHeaderHeight: Theme.minimumTouchTargetSize
-    readonly property real islandHeaderInset: Theme.spacingXS
-    readonly property real islandChromeHeight: islandHeaderHeight + islandHeaderInset * 2 + contentPadding
+    readonly property real editHeaderHeight: Theme.minimumTouchTargetSize
+    readonly property real islandHandleHeight: Theme.spacingXL
+    readonly property real islandHandleChromeHeight: islandHandleHeight + contentPadding
     readonly property real spinnerSize: Theme.iconButtonSize
     readonly property real triggerWidth: CcMetrics.triggerWidth
     readonly property int transitionDuration: CcMetrics.transitionDuration
@@ -140,10 +140,6 @@ Singleton {
 
     readonly property real avatarSize: Theme.buttonHeightM
     readonly property real avatarSizeHero: 72
-    readonly property real userBadgeSize: 26
-    readonly property real userBadgeOverhang: 0.2
-    readonly property real userBadgeIconSize: Theme.iconSizeSmall
-    readonly property real userChipHeight: 28
 
     readonly property int historyLength: 60
     readonly property real tileTrendRatio: 0.45

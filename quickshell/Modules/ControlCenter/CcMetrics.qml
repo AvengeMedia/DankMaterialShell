@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     readonly property real sheetWidthDefault: sheetWidthFor(defaultColumns)
@@ -42,6 +43,9 @@ Singleton {
     readonly property real gridRowUnit: tileHeight
     readonly property real expandedTileMinWidth: columnWidth * 3 + gridGap * 2
     readonly property real sliderRowHeight: Theme.minimumTouchTargetSize
+    readonly property real stripTrackHeight: 32
+    readonly property real stripHandleHeight: stripTrackHeight + Theme.sliderHandleGap * 2
+    readonly property real stripIconSize: Theme.iconSize
     readonly property real gridGap: Theme.spacingS
     readonly property real tilePaddingH: Theme.spacingL
     readonly property real iconScale: SettingsData.controlCenterIconScale
@@ -53,12 +57,23 @@ Singleton {
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
     readonly property real tileTextGap: Theme.spacingM
-    readonly property real headerActionSize: Theme.iconButtonSize * iconScale
-    readonly property real headerActionIconSize: Theme.iconSize * iconScale
+    readonly property real actionSize: Theme.minimumTouchTargetSize
+    readonly property real actionIconSize: Theme.iconSizeMedium
+    readonly property real actionGap: Theme.spacingXS
+    readonly property real headerHeight: actionSize * 2 + actionGap
 
-    readonly property real headerAvatarSize: 56
-    readonly property real headerHeight: tileHeight
+    function actionSpan(count) {
+        return Math.ceil((actionSize * count + actionGap * Math.max(0, count - 1) + gridGap) / (columnWidth + gridGap) / gridStep) * gridStep;
+    }
 
+    function actionCapacity(span) {
+        const size = span * (columnWidth + gridGap) - gridGap;
+        return Math.max(1, Math.floor((size + actionGap) / (actionSize + actionGap)));
+    }
+
+    readonly property real detailDialogInset: Theme.spacingL
+    readonly property real detailDialogPadding: Theme.spacingS
+    readonly property real detailMinContentHeight: Theme.listItemTwoLineHeight * 3
     readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingM * 2
     readonly property real pageTitleSize: Theme.fontSizeXXLarge
     readonly property real detailHeightList: 350
@@ -100,6 +115,9 @@ Singleton {
     readonly property real brightnessExponentStep: 0.1
     readonly property int overlayZ: 10000
     readonly property real popupEnterScale: 0.92
+    readonly property color dialogColor: Theme.foregroundColor(Theme.hostSurface)
+    readonly property int backdropBlurRadius: 32
+    readonly property bool hideCoveredContent: BlurService.enabled && Theme.connectedSurfaceBlurEnabled && dialogColor.a < 1
 
     readonly property color tileActiveColor: Theme.ccTileActiveBg
     readonly property color tileActiveContent: Theme.ccTileActiveText
@@ -108,7 +126,7 @@ Singleton {
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
 
-    readonly property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+    readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 
     function preferredDetailHeight(section, pluginHeight) {
         if (!section)

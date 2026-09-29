@@ -21,6 +21,7 @@ Column {
             resetStore: root.page
             resetKeys: ["trayUseInlineExpansion"]
             text: I18n.tr("Use inline expansion")
+            description: I18n.tr("Hidden icons expand in place instead of in a popup", "system tray inline expansion toggle description")
             checked: root.inlineExpansion
             onToggled: checked => root.page.set("trayUseInlineExpansion", checked)
         }

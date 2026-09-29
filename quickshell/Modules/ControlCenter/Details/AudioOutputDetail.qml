@@ -90,7 +90,6 @@ Item {
                         title: AudioService.displayName(modelData)
                         subtitle: active ? I18n.tr("Active") : I18n.tr("Available")
                         active: modelData === AudioService.sink
-                        showActiveCheck: true
                         clickable: true
                         onClicked: {
                             if (modelData?.name)

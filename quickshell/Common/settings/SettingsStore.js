@@ -15,6 +15,8 @@ var SESSION_BACKED_PLUGIN_IDS = ["dankNotepadModule"];
 var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClockTransparency", "desktopClockColorMode", "desktopClockCustomColor", "desktopClockShowDate", "desktopClockShowAnalogNumbers", "desktopClockShowAnalogSeconds", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorEnabled", "systemMonitorShowHeader", "systemMonitorTransparency", "systemMonitorColorMode", "systemMonitorCustomColor", "systemMonitorShowCpu", "systemMonitorShowCpuGraph", "systemMonitorShowCpuTemp", "systemMonitorShowGpuTemp", "systemMonitorGpuPciId", "systemMonitorShowMemory", "systemMonitorShowMemoryGraph", "systemMonitorShowNetwork", "systemMonitorShowNetworkGraph", "systemMonitorShowDisk", "systemMonitorShowTopProcesses", "systemMonitorTopProcessCount", "systemMonitorTopProcessSortBy", "systemMonitorGraphInterval", "systemMonitorLayoutMode", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants", "desktopWidgetPositions"];
 
 var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
+var CC_LEGACY_HEADER_IDS = ["userCard", "quickActions"];
+var CC_HEADER_OPTION_KEYS = ["hostname", "compositor", "uptime", "badge", "actions", "background", "powerAccent"];
 
 var REMOVED_KEYS_V21 = ["showBattery", "showCapsLockIndicator", "showClipboard", "showClock", "showControlCenterButton", "showCpuUsage", "showFocusedWindow", "showLauncherButton", "showMemUsage", "showMusic", "showNotificationButton", "showPrivacyButton", "showSystemTray", "showWeather", "showWorkspaceSwitcher", "hideBrightnessSlider", "updaterHideWidget", "workspaceScrolling", "appLauncherViewMode", "spotlightModalViewMode", "audioDeviceScrollVolumeEnabled", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants"];
 
@@ -678,7 +680,99 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 29;
     }
 
+    if (currentVersion < 30 && targetVersion >= 30) {
+        if (settings.dmsWindowsFloating === false)
+            settings.dmsWindowsFloatingSeeded = ["niri", "hyprland", "mango"];
+        delete settings.dmsWindowsFloating;
+        settings.configVersion = 30;
+    }
+
+    if (currentVersion < 31 && targetVersion >= 31) {
+        const glassLayers = settings.blurEnabled === true && settings.blurForegroundLayers === false;
+        const foregroundOpacity = Util.percentToUnit(settings.foregroundLayerTransparency) ?? 1.0;
+        const followedOpacity = glassLayers ? 0 : foregroundOpacity;
+        const bars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
+        for (const bc of bars) {
+            if (!bc || bc.widgetFollowInterfaceStyle !== undefined)
+                continue;
+            bc.widgetFollowInterfaceStyle = (bc.widgetTransparency ?? 1.0) === followedOpacity;
+        }
+        settings.configVersion = 31;
+    }
+
+    if (currentVersion < 33 && targetVersion >= 33) {
+        if (Array.isArray(settings.controlCenterWidgets))
+            settings.controlCenterWidgets = migrateControlCenterHeader(settings.controlCenterWidgets);
+        settings.configVersion = 33;
+    }
+
+    if (currentVersion < 34 && targetVersion >= 34) {
+        if (Array.isArray(settings.controlCenterWidgets))
+            settings.controlCenterWidgets = splitControlCenterHeader(settings.controlCenterWidgets, settings.controlCenterColumns ?? SpecModule.SPEC.controlCenterColumns.def);
+        settings.configVersion = 34;
+    }
+
     return settings;
+}
+
+function migrateControlCenterHeader(widgets) {
+    const rest = widgets.filter(widget => !CC_LEGACY_HEADER_IDS.includes(widget?.id));
+    if (rest.some(widget => widget?.id === "header"))
+        return rest;
+    const header = {
+        id: "header",
+        enabled: true,
+        w: 8,
+        h: 1
+    };
+    for (const legacy of widgets) {
+        if (!CC_LEGACY_HEADER_IDS.includes(legacy?.id))
+            continue;
+        for (const key of CC_HEADER_OPTION_KEYS) {
+            if (key in legacy)
+                header[key] = legacy[key];
+        }
+    }
+    return [header].concat(rest);
+}
+
+function splitControlCenterHeader(widgets, columns) {
+    const userDefaults = SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "userCard");
+    const actionDefaults = SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "quickActions");
+    const result = [];
+    for (const widget of widgets) {
+        if (widget?.id !== "header") {
+            result.push(widget);
+            continue;
+        }
+        const actions = Object.assign({}, actionDefaults);
+        const user = Object.assign({}, userDefaults, {
+            w: Math.max(1, Math.min(Number(widget.w) || columns, columns) - actions.w),
+            h: Math.max(userDefaults.h, Number(widget.h) || userDefaults.h)
+        });
+        for (const key of ["hostname", "compositor", "uptime", "badge", "background"]) {
+            if (key in widget)
+                user[key] = widget[key];
+        }
+        for (const key of ["actions", "powerAccent"]) {
+            if (key in widget)
+                actions[key] = widget[key];
+        }
+        if (Number.isFinite(widget.row)) {
+            user.row = widget.row;
+            actions.row = widget.row;
+        }
+        if (Number.isFinite(widget.col)) {
+            user.col = widget.col;
+            actions.col = widget.col + (widget.showUser === false ? 0 : user.w);
+        }
+        if (widget.showUser !== false)
+            result.push(user);
+        result.push(actions);
+    }
+    if (!result.some(widget => widget?.id === "quickActions"))
+        result.unshift(Object.assign({}, actionDefaults));
+    return result;
 }
 
 function migrateBarWidgetGlobals(settings) {

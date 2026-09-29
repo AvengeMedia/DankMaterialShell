@@ -115,29 +115,19 @@ Item {
             id: notificationRulesCard
             width: parent.width
             iconName: "rule_settings"
-            title: I18n.tr("Rules", "noun, notification rules settings section title")
+            title: I18n.tr("Notification rules")
             settingKey: "notificationRules"
             tags: ["notification", "rules", "mute", "ignore", "priority", "regex", "history"]
 
-            headerActions: [
-                DankActionButton {
-                    buttonSize: 36
-                    iconName: "restart_alt"
-                    tooltipText: I18n.tr("Reset to default")
-                    iconSize: 20
-                    visible: JSON.stringify(SettingsData.notificationRules) !== JSON.stringify(SettingsData.getDefaultNotificationRules())
-                    iconColor: Theme.surfaceVariantText
-                    onClicked: SettingsData.resetNotificationRules()
-                },
-                DankActionButton {
-                    buttonSize: 36
-                    iconName: "add"
-                    Accessible.name: I18n.tr("Add")
-                    iconSize: 20
-                    iconColor: Theme.primary
-                    onClicked: SettingsData.addNotificationRule()
-                }
-            ]
+            headerActions: DankActionButton {
+                buttonSize: 36
+                iconName: "restart_alt"
+                tooltipText: I18n.tr("Reset to default")
+                iconSize: 20
+                visible: JSON.stringify(SettingsData.notificationRules) !== JSON.stringify(SettingsData.getDefaultNotificationRules())
+                iconColor: Theme.surfaceVariantText
+                onClicked: SettingsData.resetNotificationRules()
+            }
 
             SettingsRow {
                 body: Column {
@@ -451,6 +441,14 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            DankFab {
+                text: I18n.tr("Add rule")
+                iconName: "add"
+                onClicked: SettingsData.addNotificationRule()
             }
         }
     }

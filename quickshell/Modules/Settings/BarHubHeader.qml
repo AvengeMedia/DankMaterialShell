@@ -55,6 +55,7 @@ Column {
         });
         delete newBar.island;
         delete newBar.dot;
+        SettingsData.stripIslandWidget(newBar);
         SettingsData.addBarConfig(newBar);
         bar.select(newId);
     }
@@ -94,7 +95,7 @@ Column {
             parts.push(I18n.tr("All displays"));
         else
             parts.push(prefs.length === 1 ? I18n.tr("%1 display", "singular, bar summary of assigned monitors, %1 is 1").arg(prefs.length) : I18n.tr("%1 displays", "plural, bar summary of assigned monitors, %1 is a count").arg(prefs.length));
-        if (SettingsData.isIslandBarConfig(config))
+        if (SettingsData.hostsIsland(config))
             parts.push(I18n.tr("Island"));
         return parts.join(" • ");
     }

@@ -81,7 +81,7 @@ Item {
             rotation: root.vertical ? -90 : 0
             LayoutMirroring.enabled: !root.vertical && I18n.isRtl
             size: root.sliderSize
-            insetIcon: root.insetIconName
+            insetIcon: root.vertical ? root.insetIconName : ""
             insetIconPosition: root.vertical ? "end" : "start"
             insetIconRotation: root.vertical ? 90 : 0
             minimum: root.minimum

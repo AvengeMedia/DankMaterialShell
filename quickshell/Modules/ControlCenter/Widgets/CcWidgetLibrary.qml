@@ -26,7 +26,7 @@ Rectangle {
     implicitWidth: CcMetrics.libraryPanelWidth
     implicitHeight: CcMetrics.libraryPanelHeight
     radius: Theme.windowRadius
-    color: Theme.nestedSurface
+    color: Theme.readableSurface
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
 

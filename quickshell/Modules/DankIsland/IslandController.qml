@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
+import qs.Modules.DankBar
 import qs.Modules.DankDash
 
 QtObject {
@@ -26,6 +27,14 @@ QtObject {
         if (launcherInputFocused)
             hoverExpanded = false;
     }
+    property var transientSurfaces: null
+    readonly property bool transientSurfacesActive: transientSurfaces?.active ?? false
+    onTransientSurfacesActiveChanged: {
+        if (!transientSurfacesActive)
+            return;
+        hoverExpanded = false;
+        hoverCloseTimer.stop();
+    }
     property string launcherPendingQuery: ""
     property string launcherPendingMode: ""
     property string controlCenterPendingSection: ""
@@ -36,11 +45,14 @@ QtObject {
     property var barConfig: null
     property string edge: "top"
     readonly property bool isVertical: edge === "left" || edge === "right"
+    readonly property bool farEdge: edge === "bottom" || edge === "right"
     property real cornerRadius: 34
     property real pillRadius: cornerRadius
     readonly property real edgeCornerRadius: Math.round(cornerRadius * 0.75)
     property bool freeMode: false
     property bool dotMode: false
+    // Hosted in a bar: the sheet is flush with the band, so its near corners stay square.
+    property bool embedded: false
     property real dotSize: 48
     property real compactThickness: 38
     property string batteryStyle: "solid"
@@ -64,7 +76,7 @@ QtObject {
     readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, destinationContentHeight("controlcenter")))
 
     readonly property bool compactDense: compactThickness < 40
-    readonly property real compactFaceThickness: compactThickness + (compactDense ? 2 : 4)
+    readonly property real compactFaceThickness: BarMetrics.compactFaceThickness(compactThickness)
     readonly property real compactIconSize: Math.max(14, Math.min(32, compactThickness - 8))
     property bool homeCompactTight: false
     readonly property real homeCompactFaceThickness: homeCompactTight ? Math.max(16, Math.min(32, compactThickness - 8)) : compactFaceThickness
@@ -80,8 +92,9 @@ QtObject {
     readonly property int dashboardColumnCap: DashMetrics.columnCapFor(dashboardAvailableWidth - PopoutMetrics.editOverflow * 2, SettingsData.showWeekNumber)
     readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns) + PopoutMetrics.editOverflow * 2)
     property var dashboardContentHeights: ({})
-    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + DashMetrics.islandChromeHeight, ...Object.values(dashboardContentHeights)))
-    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
+    readonly property real dashChromeHeight: DashMetrics.islandHandleChromeHeight
+    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + root.dashChromeHeight, ...Object.values(dashboardContentHeights)))
+    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - root.dashChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
     readonly property real mediaCompactMaxLength: 360
     property real notificationContentLength: 0
     readonly property real notificationCompactMinLength: isVertical ? compactFaceThickness : (compactDense ? 200 : 240)
@@ -128,7 +141,7 @@ QtObject {
 
     function dashboardTargetFor(activityId) {
         const minimum = DashMetrics.panelHeightFor(dashEntryIdFor(activityId));
-        const height = Math.max(minimum + DashMetrics.islandChromeHeight, dashboardContentHeights[activityId] ?? 0);
+        const height = Math.max(minimum + root.dashChromeHeight, dashboardContentHeights[activityId] ?? 0);
         return sheetTarget(dashboardWidthFor(activityId) + editGutterFor(activityId) * 2, Math.min(dashboardAvailableHeight, height));
     }
 
@@ -349,7 +362,7 @@ QtObject {
     function sheetRadii() {
         if (root.freeMode)
             return [root.cornerRadius, root.cornerRadius, root.cornerRadius, root.cornerRadius];
-        const near = root.edgeCornerRadius;
+        const near = root.embedded ? 0 : root.edgeCornerRadius;
         const far = root.cornerRadius;
         switch (root.edge) {
         case "bottom":
@@ -379,6 +392,7 @@ QtObject {
     function sheetTarget(width, height) {
         const radii = root.sheetRadii();
         return {
+            "sheet": true,
             "width": width,
             "height": height,
             "offsetAlong": root.alongOffset,

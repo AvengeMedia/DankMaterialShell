@@ -17,13 +17,17 @@ Item {
     property bool horizontalResize: false
     property bool edgeResize: false
     property bool cornerResize: true
+    property real resizeEdgeWidth: -1
     property real hitOverflow: -1
+    // A child of the tile that keeps its own input in edit mode; resize bands never claim points over it.
+    property Item passthrough: null
     property real cornerRadius: Theme.cornerRadiusXL
     property real buttonSize: Theme.iconSizeLarge
     property real iconSize: Theme.iconSizeSmall
     readonly property real touchTargetSize: Math.max(Theme.minimumTouchTargetSize, buttonSize)
     readonly property real contentInset: touchTargetSize / 2
-    readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (horizontalResize ? 3 : 2)
+    readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (1 + (removable ? 1 : 0) + (horizontalResize ? 1 : 0))
+    readonly property int chromeButtons: (removable ? 1 : 0) + (showOptionsButton ? 1 : 0)
     readonly property rect hitBounds: Qt.rect(contentInset - hitOverflow, contentInset - hitOverflow, width - (contentInset - hitOverflow) * 2, height - (contentInset - hitOverflow) * 2)
 
     signal removeRequested
@@ -56,13 +60,13 @@ Item {
     Rectangle {
         x: I18n.isRtl ? root.width - root.contentInset - width - (root.touchTargetSize - root.buttonSize) / 2 : root.contentInset + (root.touchTargetSize - root.buttonSize) / 2
         y: root.contentInset - height / 2
-        width: root.buttonSize + (root.showOptionsButton ? root.touchTargetSize : 0)
+        width: root.buttonSize + root.touchTargetSize * Math.max(0, root.chromeButtons - 1)
         height: root.buttonSize
         radius: Theme.fullRadius(width, height)
         color: Theme.chipSurface
         border.color: Theme.primary
         border.width: Theme.outlineWidth
-        visible: root.removable
+        visible: root.chromeButtons > 0
     }
 
     DankActionButton {
@@ -100,7 +104,9 @@ Item {
     DankActionButton {
         id: optionsButton
 
-        x: I18n.isRtl ? root.width - root.contentInset - root.touchTargetSize - width : root.contentInset + root.touchTargetSize
+        readonly property real slotOffset: root.removable ? root.touchTargetSize : 0
+
+        x: I18n.isRtl ? root.width - root.contentInset - slotOffset - width : root.contentInset + slotOffset
         y: 0
         width: root.touchTargetSize
         height: root.touchTargetSize
@@ -197,14 +203,36 @@ Item {
         }
 
         ResizeBand {
+            id: band
+
             anchors.fill: parent
             signX: handleItem.signX
             cursorShape: root.horizontalResize ? Qt.SizeHorCursor : (handleItem.diagonalFlipped ? Qt.SizeBDiagCursor : Qt.SizeFDiagCursor)
-            containmentMask: root.hitOverflow < 0 ? null : handleMask
+            containmentMask: root.hitOverflow < 0 && !root.passthrough ? null : bandMask
 
             HitMask {
                 id: handleMask
                 target: handleItem
+            }
+
+            QtObject {
+                id: bandMask
+
+                function contains(point: point): bool {
+                    if (root.hitOverflow >= 0 && (point.x < handleMask.x || point.y < handleMask.y || point.x >= handleMask.x + handleMask.width || point.y >= handleMask.y + handleMask.height))
+                        return false;
+                    if (root.resizeEdgeWidth >= 0 && !root.horizontalResize) {
+                        const local = band.mapToItem(root, point.x, point.y);
+                        const fromEdge = handleItem.diagonalFlipped ? local.x - root.contentInset : root.width - root.contentInset - local.x;
+                        if (fromEdge > root.resizeEdgeWidth && root.height - root.contentInset - local.y > root.resizeEdgeWidth)
+                            return false;
+                    }
+                    const target = root.passthrough;
+                    if (!target?.visible)
+                        return true;
+                    const local = band.mapToItem(target, point.x, point.y);
+                    return local.x < 0 || local.y < 0 || local.x >= target.width || local.y >= target.height;
+                }
             }
         }
     }

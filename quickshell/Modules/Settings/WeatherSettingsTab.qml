@@ -19,7 +19,7 @@ Item {
 
     SettingsPage {
         SettingsCard {
-            title: I18n.tr("Weather")
+            title: I18n.tr("General")
             tab: "weather"
             settingKey: "weather"
 

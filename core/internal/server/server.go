@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 35
+const APIVersion = 36
 
 var CLIVersion = "dev"
 
@@ -373,7 +373,7 @@ func InitializeNotifyActionsManager() error {
 }
 
 func InitializeSysUpdateManager() error {
-	manager, err := sysupdate.NewManager()
+	manager, err := sysupdate.NewManager(CLIVersion)
 	if err != nil {
 		log.Warnf("Failed to initialize sysupdate manager: %v", err)
 		return err

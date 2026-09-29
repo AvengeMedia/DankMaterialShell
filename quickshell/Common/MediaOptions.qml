@@ -44,19 +44,27 @@ Singleton {
     readonly property var lyricsProviderCatalog: [
         {
             id: "betterlyrics",
-            text: I18n.tr("Better Lyrics", "Lyrics provider name")
+            text: "Better Lyrics"
         },
         {
             id: "unison",
-            text: I18n.tr("Unison", "Lyrics provider name")
+            text: "Unison"
         },
         {
             id: "lyricsplus",
-            text: I18n.tr("LyricsPlus", "Lyrics provider name")
+            text: "LyricsPlus"
+        },
+        {
+            id: "kugou",
+            text: "KuGou"
         },
         {
             id: "lrclib",
-            text: I18n.tr("LRCLIB", "Lyrics provider name")
+            text: "LRCLIB"
+        },
+        {
+            id: "youtubemusic",
+            text: "YouTube Music"
         }
     ]
     readonly property var lyricsProviders: {

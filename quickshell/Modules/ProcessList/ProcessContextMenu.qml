@@ -200,7 +200,7 @@ Popup {
         onClosed: focusRestore.restart()
 
         background: Rectangle {
-            color: Theme.nestedSurface
+            color: Theme.isFloatingWindow(processContextMenu) ? Theme.floatingWindowSurface : Theme.readableSurface
             border.width: Theme.layerOutlineWidth
             border.color: Theme.outlineMedium
             radius: Theme.windowRadius
@@ -274,10 +274,10 @@ Popup {
     }
 
     contentItem: Rectangle {
-        color: Theme.nestedSurface
+        color: Theme.foregroundColor(Theme.chipSurfaceNested, Theme.isFloatingWindow(processContextMenu))
         radius: Theme.windowRadius
-        border.color: BlurService.borderColor
-        border.width: BlurService.borderWidth
+        border.color: Theme.outlineMedium
+        border.width: Theme.layerOutlineWidth
 
         Item {
             id: keyboardHandler

@@ -120,7 +120,12 @@ PanelWindow {
     readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
-    onIsVisibleChanged: slideSpring.retarget(isVisible ? 0 : (slideFromLeft ? -slideContainer.width : slideContainer.width))
+    onIsVisibleChanged: {
+        slideSpring.retarget(isVisible ? 0 : (slideFromLeft ? -slideContainer.width : slideContainer.width));
+        if (isVisible || slideSpring.running)
+            return;
+        mappedVisible = false;
+    }
 
     mask: Region {
         item: Rectangle {

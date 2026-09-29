@@ -15,6 +15,7 @@ DashTabFace {
             pagerCachePages: 0
             targetScreen: root.effectiveScreen
             parentPopout: hostContract
+            transientSurfaceTracker: root.controller.transientSurfaces
         }
     }
 

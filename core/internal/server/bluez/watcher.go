@@ -19,7 +19,7 @@ func WaitForAdapter() error {
 	conn.Signal(signals)
 	defer conn.RemoveSignal(signals)
 
-	adapterAdded := []dbus.MatchOption{dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")}
+	adapterAdded := []dbus.MatchOption{dbus.WithMatchSender(bluezService), dbus.WithMatchInterface(objectMgrIface), dbus.WithMatchMember("InterfacesAdded")}
 	if err := conn.AddMatchSignal(adapterAdded...); err != nil {
 		return err
 	}

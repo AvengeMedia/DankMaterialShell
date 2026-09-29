@@ -59,6 +59,14 @@ test("cards without a cell take the first free one and cells clamp to the column
     assert.deepEqual(plain(grid.packCells([{ id: "a", w: 1, h: 1, col: 0.5, row: 1.5 }], [0], 4, null, 0.5).cells[0]), { col: 0.5, row: 1.5, cols: 1, rows: 1 });
 });
 
+test("gravity pulls positioned cards up into holes without jumping over blockers", () => {
+    const board = [{ id: "a", w: 2, h: 1, col: 0, row: 0 }, { id: "b", w: 2, h: 1, col: 2, row: 0 }, { id: "c", w: 2, h: 1, col: 0, row: 2 }, { id: "d", w: 2, h: 1, col: 2, row: 3 }];
+    assert.deepEqual(plain(grid.packCells(board, [0, 1, 2, 3], 6).cells.map(c => [c.col, c.row])), [[0, 0], [2, 0], [0, 2], [2, 3]]);
+    assert.deepEqual(plain(grid.packCells(board, [0, 1, 2, 3], 6, null, 1, true).cells.map(c => [c.col, c.row])), [[0, 0], [2, 0], [0, 1], [2, 1]]);
+    const blocked = [{ id: "a", w: 2, h: 1, col: 0, row: 1 }, { id: "b", w: 2, h: 1, col: 0, row: 3 }];
+    assert.deepEqual(plain(grid.packCells(blocked, [1, 0], 6, null, 1, true).cells.map(c => [c.col, c.row])), [[0, 0], [0, 1]]);
+});
+
 test("a dragged tile snaps to the cell under its corner", () => {
     const layout = grid.packCards(cards, order, 6, 600, 0, 100, false);
     assert.deepEqual(plain(grid.cellAt(layout, 240, 160, 2, 1)), { col: 2, row: 2 });

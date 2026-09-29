@@ -16,14 +16,17 @@ import (
 )
 
 const (
-	defaultIntervalSeconds   = 30 * 60
-	minIntervalSeconds       = 5 * 60
-	recentLogCapacity        = 200
-	checkTimeout             = 5 * time.Minute
-	retryIntervalSeconds     = 5 * 60
-	upgradeTimeout           = 30 * time.Minute
-	postUpgradeCompleteDelay = 3 * time.Second
+	defaultIntervalSeconds = 24 * 60 * 60
+	minIntervalSeconds     = 5 * 60
+	startupGraceSeconds    = 2 * 60
+	recentLogCapacity      = 200
+	checkTimeout           = 5 * time.Minute
+	retryIntervalSeconds   = 5 * 60
+	upgradeTimeout         = 30 * time.Minute
 )
+
+// A var so tests can skip the linger.
+var postUpgradeCompleteDelay = 3 * time.Second
 
 type Manager struct {
 	mu          sync.RWMutex
@@ -41,23 +44,41 @@ type Manager struct {
 	wakeSched    chan struct{}
 
 	refreshSerial sync.Mutex
+	releasesMu    sync.Mutex
 
 	opMu     sync.Mutex
 	opCtx    context.Context
 	opCancel context.CancelFunc
 }
 
-func NewManager() (*Manager, error) {
+func NewManager(runningVersion string) (*Manager, error) {
 	m := &Manager{
 		notifyDirty: make(chan struct{}, 1),
 		stopChan:    make(chan struct{}),
 		wakeSched:   make(chan struct{}, 1),
 	}
+	persisted := loadPersisted()
+	if persisted.Packages == nil {
+		persisted.Packages = []Package{}
+	}
 	m.state = State{
 		Phase:           PhaseIdle,
 		IntervalSeconds: defaultIntervalSeconds,
 		Backends:        []BackendInfo{},
-		Packages:        []Package{},
+		Packages:        persisted.Packages,
+		Count:           len(persisted.Packages),
+		LastCheckUnix:   persisted.LastCheckUnix,
+		LastSuccessUnix: persisted.LastSuccessUnix,
+		Shell:           ShellInfo{InstallMethod: InstallUnknown, Channel: ChannelUnknown, Running: runningVersion},
+	}
+	if persisted.RebootBootID != "" && persisted.RebootBootID == bootID() {
+		m.state.Reboot = RebootInfo{Recommended: true, Packages: persisted.RebootPackages}
+	}
+	if feed, ok := LoadReleases(); ok {
+		m.state.ReleasesFetchedUnix = feed.FetchedAt
+		if feed.Latest != nil {
+			m.state.Shell.LatestVersion = feed.Latest.Version
+		}
 	}
 
 	id, pretty := readOSRelease()
@@ -70,7 +91,7 @@ func NewManager() (*Manager, error) {
 		m.state.Error = &ErrorInfo{
 			Code:    ErrCodeNoBackend,
 			Message: "no supported package manager found",
-			Hint:    "install a supported package manager (pkg, pacman, dnf, apt, zypper) or flatpak",
+			Hint:    "install a supported package manager (pacman, dnf, apt, zypper, xbps, pkg) or flatpak",
 		}
 	}
 
@@ -80,7 +101,46 @@ func NewManager() (*Manager, error) {
 	m.schedulerWG.Add(1)
 	go m.scheduler()
 
+	go m.probeShell()
+
 	return m, nil
+}
+
+// Off the startup path: the package-owner query can take a moment.
+func (m *Manager) probeShell() {
+	m.mu.RLock()
+	running := m.state.Shell.Running
+	m.mu.RUnlock()
+
+	info := ProbeShell(context.Background(), running)
+
+	feed, _ := LoadReleases()
+	m.mu.Lock()
+	info.LatestVersion = m.state.Shell.LatestVersion
+	info.UpdatePackage = findShellPackage(m.state.Packages, info.PackageName)
+	info.CommitsBehind = commitsBehind(info, feed.Master)
+	m.state.Shell = info
+	m.mu.Unlock()
+	m.markDirty()
+}
+
+func (m *Manager) Releases(force bool) ReleasesFeed {
+	feed, err := m.refreshReleases(context.Background(), force)
+	if err != nil {
+		log.Debugf("[sysupdate] releases feed: %v", err)
+	}
+	return feed
+}
+
+// Scheduled from the persisted last check so shell restarts (which re-send the interval) don't push a daily cadence out.
+func (m *Manager) nextCheckLocked() int64 {
+	now := time.Now().Unix()
+	interval := int64(m.state.IntervalSeconds)
+	// A failed last check keeps its short retry across restarts.
+	if m.state.LastSuccessUnix < m.state.LastCheckUnix {
+		interval = min(interval, retryIntervalSeconds)
+	}
+	return max(m.state.LastCheckUnix+interval, now+startupGraceSeconds)
 }
 
 func (m *Manager) GetState() State {
@@ -132,7 +192,7 @@ func (m *Manager) SetInterval(seconds int) {
 	}
 	m.mu.Lock()
 	m.state.IntervalSeconds = seconds
-	m.state.NextCheckUnix = time.Now().Unix() + int64(seconds)
+	m.state.NextCheckUnix = m.nextCheckLocked()
 	m.mu.Unlock()
 	m.wake()
 	m.markDirty()
@@ -151,7 +211,7 @@ func (m *Manager) Refresh(opts RefreshOptions) {
 		m.refreshSerial.Unlock()
 		return
 	}
-	m.runRefresh(context.Background(), true)
+	m.runRefresh(context.Background(), !opts.Background)
 }
 
 func (m *Manager) Upgrade(opts UpgradeOptions) error {
@@ -187,7 +247,7 @@ func (m *Manager) Acquire() {
 	atomic.AddInt32(&m.acquireCount, 1)
 	m.mu.Lock()
 	if m.state.NextCheckUnix == 0 {
-		m.state.NextCheckUnix = time.Now().Unix() + int64(m.state.IntervalSeconds)
+		m.state.NextCheckUnix = m.nextCheckLocked()
 	}
 	m.mu.Unlock()
 	m.wake()
@@ -247,16 +307,28 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	m.refreshSerial.Lock()
 	defer m.refreshSerial.Unlock()
 
-	if len(m.selection.All()) == 0 {
-		return
-	}
-
 	ctx, cancel := context.WithTimeout(parent, checkTimeout)
 	defer cancel()
 
+	// No package manager: still refresh the feed, and move the deadline or the scheduler spins.
+	if len(m.selection.All()) == 0 {
+		if _, err := m.refreshReleases(ctx, manual); err != nil {
+			log.Debugf("[sysupdate] releases feed: %v", err)
+		}
+		m.mu.Lock()
+		m.state.NextCheckUnix = time.Now().Unix() + int64(m.state.IntervalSeconds)
+		m.mu.Unlock()
+		m.wake()
+		m.markDirty()
+		return
+	}
+
 	m.mu.Lock()
 	if m.state.Phase == PhaseUpgrading {
+		// Same spin hazard mid-upgrade.
+		m.state.NextCheckUnix = time.Now().Unix() + retryIntervalSeconds
 		m.mu.Unlock()
+		m.wake()
 		return
 	}
 	m.state.Phase = PhaseRefreshing
@@ -280,9 +352,17 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 			results[i] = backendResult{pkgs: pkgs, err: err}
 		}(i, b)
 	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if _, err := m.refreshReleases(ctx, manual); err != nil {
+			log.Debugf("[sysupdate] releases feed: %v", err)
+		}
+	}()
 	wg.Wait()
 
 	now := time.Now().Unix()
+	replaced := binaryReplaced(dmsBinaryPath())
 	m.mu.Lock()
 	m.state.LastCheckUnix = now
 	prev := m.state.Packages
@@ -306,6 +386,10 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	m.state.Packages = next
 	m.state.Count = len(next)
 	m.state.NextCheckUnix = now + int64(m.state.IntervalSeconds)
+	m.state.Shell.UpdatePackage = findShellPackage(next, m.state.Shell.PackageName)
+	// An upgrade outside DMS changes the installed version only the probe knows.
+	reprobe := replaced && !m.state.Shell.RestartPending
+	m.state.Shell.RestartPending = replaced
 	switch {
 	case firstErr == nil:
 		m.state.Phase = PhaseIdle
@@ -320,7 +404,12 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 		m.state.NextCheckUnix = now + retry
 		log.Warnf("[sysupdate] background check failed, retrying in %ds: %v", retry, firstErr)
 	}
+	persist := m.persistedLocked()
 	m.mu.Unlock()
+	savePersisted(persist)
+	if reprobe {
+		go m.probeShell()
+	}
 	m.wake()
 	m.markDirty()
 }
@@ -389,7 +478,7 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		}
 	}
 
-	m.finishSuccessfulUpgrade(true)
+	m.finishSuccessfulUpgrade(true, opts.Targets)
 }
 
 func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
@@ -424,7 +513,10 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
 		return
 	}
 
-	m.finishSuccessfulUpgrade(false)
+	m.mu.RLock()
+	installed := append([]Package(nil), m.state.Packages...)
+	m.mu.RUnlock()
+	m.finishSuccessfulUpgrade(false, installed)
 	m.runRefresh(context.Background(), false)
 }
 
@@ -436,7 +528,7 @@ func (m *Manager) failCustomUpgrade(code ErrorCode, err error) {
 	m.markDirty()
 }
 
-func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {
+func (m *Manager) finishSuccessfulUpgrade(clearPackages bool, installed []Package) {
 	m.appendLog("Upgrade complete.")
 
 	timer := time.NewTimer(postUpgradeCompleteDelay)
@@ -455,9 +547,25 @@ func (m *Manager) finishSuccessfulUpgrade(clearPackages bool) {
 	if clearPackages {
 		m.state.Packages = m.state.Packages[:0]
 		m.state.Count = 0
+		m.state.Shell.UpdatePackage = nil
 	}
+	if names := rebootPackages(installed); len(names) > 0 {
+		m.state.Reboot = RebootInfo{Recommended: true, Packages: names}
+	}
+	persist := m.persistedLocked()
 	m.mu.Unlock()
+	savePersisted(persist)
 	m.markDirty()
+	go m.probeShell()
+}
+
+func (m *Manager) persistedLocked() persistedState {
+	p := persistedState{LastCheckUnix: m.state.LastCheckUnix, LastSuccessUnix: m.state.LastSuccessUnix, Packages: m.state.Packages}
+	if m.state.Reboot.Recommended {
+		p.RebootBootID = bootID()
+		p.RebootPackages = m.state.Reboot.Packages
+	}
+	return p
 }
 
 func dropIgnoredTargets(targets []Package, ignored []string) []Package {
@@ -553,9 +661,18 @@ func cloneState(s State) State {
 	out.Backends = append([]BackendInfo(nil), s.Backends...)
 	out.Packages = append([]Package(nil), s.Packages...)
 	out.RecentLog = append([]string(nil), s.RecentLog...)
+	out.Reboot.Packages = append([]string(nil), s.Reboot.Packages...)
 	if s.Error != nil {
 		errCopy := *s.Error
 		out.Error = &errCopy
+	}
+	if s.Shell.UpdatePackage != nil {
+		pkg := *s.Shell.UpdatePackage
+		out.Shell.UpdatePackage = &pkg
+	}
+	if s.Shell.CommitsBehind != nil {
+		n := *s.Shell.CommitsBehind
+		out.Shell.CommitsBehind = &n
 	}
 	return out
 }

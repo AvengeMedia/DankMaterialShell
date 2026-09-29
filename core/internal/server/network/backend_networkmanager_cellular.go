@@ -319,14 +319,18 @@ func (b *NetworkManagerBackend) updateAllCellularDevices() {
 			stateStr = "unmanaged"
 		}
 
+		modem, _ := b.modemForIface(name, len(cellularDevices))
+
 		devices = append(devices, CellularDevice{
-			Name:        name,
-			HwAddress:   info.hwAddress,
-			State:       stateStr,
-			Connected:   connected,
-			IP:          ip,
-			Driver:      driver,
-			Description: info.description,
+			Name:          name,
+			HwAddress:     info.hwAddress,
+			State:         stateStr,
+			Connected:     connected,
+			IP:            ip,
+			Driver:        driver,
+			Description:   info.description,
+			SignalQuality: modem.signalQuality,
+			AccessTech:    modem.accessTech,
 		})
 	}
 
