@@ -9,11 +9,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime/debug"
-	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/notify"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/qsipc"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/screenshot"
 	"github.com/spf13/cobra"
 )
@@ -246,7 +246,27 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	}
 	config.Quality = ssQuality
 
+	if mode == screenshot.ModeRegion || mode == screenshot.ModeScroll {
+		config.SnapTargets = fetchShellSnapTargets()
+	}
+
 	return config
+}
+
+func fetchShellSnapTargets() []screenshot.SnapTarget {
+	pid, ok := shellApp.SessionPID()
+	if !ok {
+		return nil
+	}
+	res, isVoid, err := qsipc.Call(qsipc.SocketPathForPID(pid), "screenshot", "getSurfaces", nil)
+	if err != nil || isVoid || res == "" {
+		return nil
+	}
+	var targets []screenshot.SnapTarget
+	if err := json.Unmarshal([]byte(res), &targets); err != nil {
+		return nil
+	}
+	return targets
 }
 
 // setPopoutScreenshotMode toggles the shell handshake so popouts drop their keyboard grab during region select.
@@ -256,18 +276,18 @@ func setPopoutScreenshotMode(begin bool) {
 	if begin {
 		fn = "begin"
 	}
-	cmdArgs := []string{"ipc"}
 	if pid, ok := shellApp.SessionPID(); ok {
-		cmdArgs = append(cmdArgs, "--pid", strconv.Itoa(pid))
-	} else {
-		if err := shellApp.ResolveConfig(nil, nil); err != nil {
-			return
-		}
-		if qsHasAnyDisplay() {
-			cmdArgs = append(cmdArgs, "--any-display")
-		}
-		cmdArgs = append(cmdArgs, "-p", shellApp.ConfigPath())
+		_, _, _ = qsipc.Call(qsipc.SocketPathForPID(pid), "screenshot", fn, nil)
+		return
 	}
+	cmdArgs := []string{"ipc"}
+	if err := shellApp.ResolveConfig(nil, nil); err != nil {
+		return
+	}
+	if qsHasAnyDisplay() {
+		cmdArgs = append(cmdArgs, "--any-display")
+	}
+	cmdArgs = append(cmdArgs, "-p", shellApp.ConfigPath())
 	cmdArgs = append(cmdArgs, "call", "screenshot", fn)
 	_ = exec.Command("qs", cmdArgs...).Start()
 }

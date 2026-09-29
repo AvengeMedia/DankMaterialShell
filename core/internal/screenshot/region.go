@@ -32,9 +32,10 @@ const (
 )
 
 type SelectionState struct {
-	hasSelection bool           // There's a selection to display (pre-loaded or user-drawn)
-	dragging     bool           // User is actively drawing a new selection
-	surface      *OutputSurface // Surface where selection was made
+	hasSelection  bool           // There's a selection to display (pre-loaded or user-drawn)
+	fromPreSelect bool           // hasSelection was set by applyPreSelection, not by user interaction
+	dragging      bool           // User is actively drawing a new selection
+	surface       *OutputSurface // Surface where selection was made
 	// Global logical coordinates. Keeping these independent of the active
 	// surface lets a drag continue across output boundaries.
 	anchorX  float64
@@ -161,6 +162,12 @@ type RegionSelector struct {
 	phase  selectorPhase
 	scroll *scrollSession
 
+	snapTargets   []SnapTarget
+	hoveredTarget *SnapTarget
+	clickedTarget *SnapTarget
+	dragStartX    float64
+	dragStartY    float64
+
 	running   bool
 	cancelled bool
 	result    Region
@@ -175,6 +182,7 @@ func NewRegionSelector(s *Screenshoter) *RegionSelector {
 		outputs:            make(map[uint32]*WaylandOutput),
 		preCapture:         make(map[*WaylandOutput]*PreCapture),
 		showCapturedCursor: s.config.Cursor == CursorOn,
+		snapTargets:        s.config.SnapTargets,
 	}
 }
 
@@ -983,6 +991,7 @@ func (r *RegionSelector) applyPreSelection(os *OutputSurface) {
 	y2 := float64(r.preSelect.Y-os.output.y+r.preSelect.Height)*scaleY - scaleY
 
 	r.selection.hasSelection = true
+	r.selection.fromPreSelect = true
 	r.selection.dragging = false
 	r.selection.surface = os
 	r.selection.anchorX = float64(os.output.x) + x1

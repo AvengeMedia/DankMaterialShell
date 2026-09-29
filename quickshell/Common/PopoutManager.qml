@@ -337,4 +337,73 @@ Singleton {
     function requestHoverPopout(popout, tabIndex, triggerSource) {
         _requestPopout(popout, tabIndex, triggerSource, true);
     }
+
+    function getActiveSurfaces() {
+        const results = [];
+
+        for (const screenName in currentPopoutsByScreen) {
+            const popout = currentPopoutsByScreen[screenName];
+            if (!popout || !popout.shouldBeVisible)
+                continue;
+
+            const host = popout.impl?.item ?? popout;
+            if (!host || !host.shouldBeVisible || host.isClosing)
+                continue;
+
+            const screen = host.surfaceScreen ?? popout.screen ?? null;
+            const sx = screen?.x ?? 0;
+            const sy = screen?.y ?? 0;
+            const px = host.renderedAlignedX;
+            const py = host.renderedAlignedY;
+            const pw = host.renderedAlignedWidth ?? popout.popupWidth ?? 0;
+            const ph = host.renderedAlignedHeight ?? popout.popupHeight ?? 0;
+
+            // Skip if origin is not yet laid out (undefined/null means not positioned).
+            if (px == null || py == null || pw <= 0 || ph <= 0)
+                continue;
+
+            results.push({
+                "name": popout.layerNamespace || "popout",
+                "type": "popout",
+                "x": Math.round(sx + px),
+                "y": Math.round(sy + py),
+                "width": Math.round(pw),
+                "height": Math.round(ph)
+            });
+        }
+
+        const modals = ModalManager.currentModalsByScreen || {};
+        for (const screenName in modals) {
+            const modal = modals[screenName];
+            if (!modal || !modal.shouldBeVisible)
+                continue;
+
+            const host = modal.impl?.item ?? modal;
+            if (!host || !host.shouldBeVisible || host.isClosing)
+                continue;
+
+            const screen = host.effectiveScreen ?? modal.targetScreen ?? null;
+            const sx = screen?.x ?? 0;
+            const sy = screen?.y ?? 0;
+            const mx = host.alignedX;
+            const my = host.alignedY;
+            const mw = host.alignedWidth ?? modal.modalWidth ?? 0;
+            const mh = host.alignedHeight ?? modal.modalHeight ?? 0;
+
+            // Skip if origin is not yet laid out.
+            if (mx == null || my == null || mw <= 0 || mh <= 0)
+                continue;
+
+            results.push({
+                "name": modal.layerNamespace || "modal",
+                "type": "modal",
+                "x": Math.round(sx + mx),
+                "y": Math.round(sy + my),
+                "width": Math.round(mw),
+                "height": Math.round(mh)
+            });
+        }
+
+        return results;
+    }
 }

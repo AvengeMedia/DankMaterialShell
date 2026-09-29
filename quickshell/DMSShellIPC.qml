@@ -325,6 +325,10 @@ Item {
             return "SCREENSHOT_MODE_OFF";
         }
 
+        function getSurfaces(): string {
+            return JSON.stringify(PopoutManager.getActiveSurfaces());
+        }
+
         target: "screenshot"
     }
 

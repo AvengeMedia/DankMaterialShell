@@ -53,6 +53,8 @@ func (r *RegionSelector) setupPointerHandlers() {
 		r.pointerY = e.SurfaceY
 		if r.selection.dragging {
 			r.updateSelectionCurrent(r.activeSurface, r.pointerX, r.pointerY)
+		} else {
+			r.updateHoverTarget(r.pointerX, r.pointerY)
 		}
 		r.refreshCursor()
 	})
@@ -74,7 +76,19 @@ func (r *RegionSelector) setupPointerHandlers() {
 			if r.ctrlHeld && r.selection.hasSelection {
 				r.refreshCursor()
 			}
+			r.updateHoverTarget(e.SurfaceX, e.SurfaceY)
 			return
+		}
+
+		if r.clickedTarget != nil && r.activeSurface.output != nil {
+			pointerX := e.SurfaceX + float64(r.activeSurface.output.x)
+			pointerY := e.SurfaceY + float64(r.activeSurface.output.y)
+			if math.Hypot(pointerX-r.dragStartX, pointerY-r.dragStartY) > 5 {
+				r.clickedTarget = nil
+				r.hoveredTarget = nil
+				r.selection.anchorX = r.dragStartX
+				r.selection.anchorY = r.dragStartY
+			}
 		}
 
 		r.updateSelectionCurrent(r.activeSurface, e.SurfaceX, e.SurfaceY)
@@ -105,6 +119,8 @@ func (r *RegionSelector) setupPointerHandlers() {
 			case 1: // pressed
 				pointerX := r.pointerX + float64(r.activeSurface.output.x)
 				pointerY := r.pointerY + float64(r.activeSurface.output.y)
+				r.dragStartX = pointerX
+				r.dragStartY = pointerY
 				if r.ctrlHeld && r.selection.hasSelection {
 					if handle := r.resizeHandleAt(pointerX, pointerY); handle != handleNone {
 						if r.beginSelectionResize(handle, pointerX, pointerY) {
@@ -119,10 +135,23 @@ func (r *RegionSelector) setupPointerHandlers() {
 					}
 				}
 
+				if (!r.selection.hasSelection || r.selection.fromPreSelect) && r.hoveredTarget != nil {
+					r.clickedTarget = r.hoveredTarget
+					r.selection.dragging = true
+					r.selection.fromPreSelect = false
+					r.selection.surface = r.activeSurface
+					r.selection.anchorX = pointerX
+					r.selection.anchorY = pointerY
+					r.selection.currentX = pointerX
+					r.selection.currentY = pointerY
+					break
+				}
+
 				r.preSelect = Region{}
 				r.movingSelection = false
 				r.resizingHandle = handleNone
 				r.selection.hasSelection = true
+				r.selection.fromPreSelect = false
 				r.selection.dragging = true
 				r.selection.surface = r.activeSurface
 				r.selection.anchorX = pointerX
@@ -134,10 +163,49 @@ func (r *RegionSelector) setupPointerHandlers() {
 					r.redrawSurface(os)
 				}
 			case 0: // released
+				if r.clickedTarget != nil {
+					t := r.clickedTarget
+					r.clickedTarget = nil
+					r.hoveredTarget = nil
+					r.preSelect = Region{}
+					r.selection = SelectionState{
+						hasSelection: true,
+						surface:      r.activeSurface,
+						anchorX:      t.X,
+						anchorY:      t.Y,
+						currentX:     t.X + t.Width,
+						currentY:     t.Y + t.Height,
+					}
+					r.refreshCursor()
+					for _, os := range r.surfaces {
+						r.redrawSurface(os)
+					}
+					if r.screenshoter != nil && r.screenshoter.config.NoConfirm {
+						r.finishSelection()
+					}
+					break
+				}
+
 				r.selection.dragging = false
 				r.movingSelection = false
 				r.resizingHandle = handleNone
 				r.refreshCursor()
+
+				// A degenerate (1×1 or smaller) selection resets state so the
+				// user can re-draw without relaunching the command.
+				if r.selection.hasSelection {
+					if _, _, _, w, h := r.selectionDeviceRect(); w <= 1 && h <= 1 {
+						r.preSelect = Region{}
+						r.selection = SelectionState{}
+						r.hoveredTarget = nil
+						r.clickedTarget = nil
+						for _, os := range r.surfaces {
+							r.redrawSurface(os)
+						}
+						break
+					}
+				}
+
 				for _, os := range r.surfaces {
 					r.redrawSurface(os)
 				}
@@ -150,6 +218,39 @@ func (r *RegionSelector) setupPointerHandlers() {
 			r.running = false
 		}
 	})
+}
+
+func (r *RegionSelector) updateHoverTarget(surfaceX, surfaceY float64) {
+	// Block hover snap only when the user has actively drawn/committed a selection.
+	// A preloaded selection (fromPreSelect) does not block hover snapping.
+	if (r.selection.hasSelection && !r.selection.fromPreSelect) || r.activeSurface == nil || r.activeSurface.output == nil {
+		if r.hoveredTarget != nil {
+			r.hoveredTarget = nil
+			for _, os := range r.surfaces {
+				r.redrawSurface(os)
+			}
+		}
+		return
+	}
+
+	gx := surfaceX + float64(r.activeSurface.output.x)
+	gy := surfaceY + float64(r.activeSurface.output.y)
+
+	var hit *SnapTarget
+	for i := len(r.snapTargets) - 1; i >= 0; i-- {
+		t := &r.snapTargets[i]
+		if gx >= t.X && gx < t.X+t.Width && gy >= t.Y && gy < t.Y+t.Height {
+			hit = t
+			break
+		}
+	}
+
+	if hit != r.hoveredTarget {
+		r.hoveredTarget = hit
+		for _, os := range r.surfaces {
+			r.redrawSurface(os)
+		}
+	}
 }
 
 func (r *RegionSelector) setupTouchHandlers() {
@@ -626,7 +727,20 @@ func (r *RegionSelector) handleKey(sym string, state uint32) {
 			r.redrawSurface(os)
 		}
 	case "Return", "space", "KP_Enter":
-		if r.selection.hasSelection {
+		if r.hoveredTarget != nil && r.activeSurface != nil && (!r.selection.hasSelection || r.selection.fromPreSelect) {
+			t := r.hoveredTarget
+			r.hoveredTarget = nil
+			r.preSelect = Region{}
+			r.selection = SelectionState{
+				hasSelection: true,
+				surface:      r.activeSurface,
+				anchorX:      t.X,
+				anchorY:      t.Y,
+				currentX:     t.X + t.Width,
+				currentY:     t.Y + t.Height,
+			}
+			r.finishSelection()
+		} else if r.selection.hasSelection {
 			r.finishSelection()
 		}
 	}
