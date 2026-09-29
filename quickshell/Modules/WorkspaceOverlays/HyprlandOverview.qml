@@ -11,6 +11,12 @@ Scope {
 
     property bool overviewOpen: false
 
+    Binding {
+        target: HyprlandService
+        property: "inOverview"
+        value: overviewScope.overviewOpen
+    }
+
     Loader {
         id: hyprlandLoader
         active: overviewScope.overviewOpen
