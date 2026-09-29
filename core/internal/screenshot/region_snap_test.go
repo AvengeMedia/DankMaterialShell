@@ -202,4 +202,3 @@ func TestSelectionRenderBoundsHoveredTarget(t *testing.T) {
 		t.Errorf("unexpected snapped label text: %q (want 420x580)", snappedBounds.labelText)
 	}
 }
-
