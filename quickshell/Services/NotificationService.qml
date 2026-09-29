@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs.Common
 import qs.Services
+import "../Common/Format.js" as Format
 import "../Common/markdown2html.js" as Markdown2Html
 
 Singleton {
@@ -455,6 +456,8 @@ Singleton {
             return false;
         if (rule.enabled === false)
             return false;
+        if (SettingsData.isNotificationRuleExpired(rule))
+            return false;
 
         const pattern = (rule.pattern || "").toString();
         if (!pattern.trim())
@@ -606,6 +609,42 @@ Singleton {
         onTriggered: {
             root.timeUpdateTick = !root.timeUpdateTick;
         }
+    }
+
+    // Date.now() inside a QML binding is not reactive, so anything counting
+    // down to a rule's expiresAt needs a ticking time source. Minute
+    // precision matches the countdown granularity, and the clock only runs
+    // while timed rules exist, so shells without them pay nothing.
+    SystemClock {
+        id: ruleExpiryClock
+        precision: SystemClock.Minutes
+        enabled: SettingsData.hasTimedNotificationRules
+    }
+
+    // Current time in ms for rule-expiry bindings. Reads 0 while the clock is
+    // off, which is safe: the clock is off exactly when no rule carries an
+    // expiry, so no binding can depend on the value moving.
+    readonly property double notificationRuleNowMs: ruleExpiryClock.enabled ? ruleExpiryClock.date.getTime() : 0
+
+    // Formatted remaining time for a rule's expiresAt, driven by the ticking
+    // clock above so bindings calling this refresh every minute. Single home
+    // for the translated duration strings; "" once the timestamp passes.
+    function formatRuleRemaining(expiresAt) {
+        return Format.formatRemaining(expiresAt - notificationRuleNowMs, "", I18n.tr("%1 min", "timed duration, %1 is a number of minutes"), I18n.tr("%1 h", "timed duration, %1 is a number of hours"), I18n.tr("%1 h %2 m", "timed duration, %1 is a number of hours, %2 is a number of minutes"));
+    }
+
+    // Sweeps expired timed mute rules (SettingsData.addMuteRuleForApp with
+    // expiresAt) out of the persisted rules list. Matching already ignores
+    // them; this keeps the stored list and the settings UI truthful. Runs
+    // only while timed rules exist, and fires on start so rules that expired
+    // while the shell was offline are swept at launch.
+    Timer {
+        id: expiredRuleSweeper
+        interval: 60000
+        repeat: true
+        running: SettingsData.hasTimedNotificationRules
+        triggeredOnStart: true
+        onTriggered: SettingsData.pruneExpiredNotificationRules()
     }
 
     Timer {
