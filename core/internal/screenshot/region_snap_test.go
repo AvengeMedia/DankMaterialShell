@@ -159,12 +159,11 @@ func TestSelectionRenderBoundsHoveredTarget(t *testing.T) {
 		t.Fatalf("expected selectionRenderBounds to return ok for hovered target")
 	}
 
-	if bounds.x != 1400 || bounds.y != 48 || bounds.w != 421 || bounds.h != 581 {
+	if bounds.x != 1400 || bounds.y != 48 || bounds.w != 420 || bounds.h != 580 {
 		t.Errorf("unexpected bounds: %+v", bounds)
 	}
 
-	// At scale 1x: w=x2-x1+1=421, h=581 — matches ext.width()/ext.height() from regular path.
-	if bounds.labelText != "[control center] 421x581" {
+	if bounds.labelText != "[control center] 420x580" {
 		t.Errorf("unexpected label text: %q", bounds.labelText)
 	}
 
@@ -175,7 +174,7 @@ func TestSelectionRenderBoundsHoveredTarget(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected selectionRenderBounds to return ok over preselection")
 	}
-	if bounds.x != 1400 || bounds.y != 48 {
+	if bounds.x != 1400 || bounds.y != 48 || bounds.w != 420 || bounds.h != 580 {
 		t.Errorf("unexpected bounds over preselection: %+v", bounds)
 	}
 
@@ -185,4 +184,22 @@ func TestSelectionRenderBoundsHoveredTarget(t *testing.T) {
 	if ok {
 		t.Fatalf("expected selectionRenderBounds to return !ok when user selection is active")
 	}
+
+	// Snapping to target must produce exact target dimensions without off-by-one.
+	r.hoveredTarget = nil
+	r.snapToTarget(target)
+	if !r.selection.hasSelection || r.selection.fromPreSelect {
+		t.Fatalf("expected committed selection from snapToTarget")
+	}
+	snappedBounds, ok := r.selectionRenderBounds(mockSurface)
+	if !ok {
+		t.Fatalf("expected selectionRenderBounds to return ok for snapped target")
+	}
+	if snappedBounds.x != 1400 || snappedBounds.y != 48 || snappedBounds.w != 420 || snappedBounds.h != 580 {
+		t.Errorf("unexpected snapped bounds: %+v (want 1400, 48, 420, 580)", snappedBounds)
+	}
+	if snappedBounds.labelText != "420x580" {
+		t.Errorf("unexpected snapped label text: %q (want 420x580)", snappedBounds.labelText)
+	}
 }
+

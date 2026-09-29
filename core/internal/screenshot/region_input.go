@@ -86,8 +86,13 @@ func (r *RegionSelector) setupPointerHandlers() {
 			if math.Hypot(pointerX-r.dragStartX, pointerY-r.dragStartY) > 5 {
 				r.clickedTarget = nil
 				r.hoveredTarget = nil
+				r.preSelect = Region{}
+				r.selection.hasSelection = true
 				r.selection.anchorX = r.dragStartX
 				r.selection.anchorY = r.dragStartY
+				for _, os := range r.surfaces {
+					r.redrawSurface(os)
+				}
 			}
 		}
 
@@ -167,15 +172,7 @@ func (r *RegionSelector) setupPointerHandlers() {
 					t := r.clickedTarget
 					r.clickedTarget = nil
 					r.hoveredTarget = nil
-					r.preSelect = Region{}
-					r.selection = SelectionState{
-						hasSelection: true,
-						surface:      r.activeSurface,
-						anchorX:      t.X,
-						anchorY:      t.Y,
-						currentX:     t.X + t.Width,
-						currentY:     t.Y + t.Height,
-					}
+					r.snapToTarget(t)
 					r.refreshCursor()
 					for _, os := range r.surfaces {
 						r.redrawSurface(os)
@@ -250,6 +247,24 @@ func (r *RegionSelector) updateHoverTarget(surfaceX, surfaceY float64) {
 		for _, os := range r.surfaces {
 			r.redrawSurface(os)
 		}
+	}
+}
+
+func (r *RegionSelector) snapToTarget(t *SnapTarget) {
+	r.preSelect = Region{}
+	os := r.activeSurface
+	devPxX, devPxY := 1.0, 1.0
+	if os != nil && os.screenBuf != nil && os.logicalW > 0 && os.logicalH > 0 {
+		devPxX = float64(os.logicalW) / float64(os.screenBuf.Width)
+		devPxY = float64(os.logicalH) / float64(os.screenBuf.Height)
+	}
+	r.selection = SelectionState{
+		hasSelection: true,
+		surface:      os,
+		anchorX:      t.X,
+		anchorY:      t.Y,
+		currentX:     t.X + t.Width - devPxX,
+		currentY:     t.Y + t.Height - devPxY,
 	}
 }
 
@@ -730,15 +745,7 @@ func (r *RegionSelector) handleKey(sym string, state uint32) {
 		if r.hoveredTarget != nil && r.activeSurface != nil && (!r.selection.hasSelection || r.selection.fromPreSelect) {
 			t := r.hoveredTarget
 			r.hoveredTarget = nil
-			r.preSelect = Region{}
-			r.selection = SelectionState{
-				hasSelection: true,
-				surface:      r.activeSurface,
-				anchorX:      t.X,
-				anchorY:      t.Y,
-				currentX:     t.X + t.Width,
-				currentY:     t.Y + t.Height,
-			}
+			r.snapToTarget(t)
 			r.finishSelection()
 		} else if r.selection.hasSelection {
 			r.finishSelection()

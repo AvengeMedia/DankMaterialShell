@@ -334,9 +334,12 @@ func (r *RegionSelector) selectionRenderBounds(os *OutputSurface) (selectionRend
 		}
 		x1 := clamp(int(math.Floor((minX-outputMinX)*scaleX)), 0, srcBuf.Width-1)
 		y1 := clamp(int(math.Floor((minY-outputMinY)*scaleY)), 0, srcBuf.Height-1)
-		x2 := clamp(int(math.Floor((maxX-outputMinX)*scaleX)), 0, srcBuf.Width-1)
-		y2 := clamp(int(math.Floor((maxY-outputMinY)*scaleY)), 0, srcBuf.Height-1)
-		w, h := x2-x1+1, y2-y1+1
+		w := int(math.Round(t.Width * scaleX))
+		h := int(math.Round(t.Height * scaleY))
+		x2 := clamp(x1+w-1, 0, srcBuf.Width-1)
+		y2 := clamp(y1+h-1, 0, srcBuf.Height-1)
+		w = x2 - x1 + 1
+		h = y2 - y1 + 1
 
 		labelText := fmt.Sprintf("[%s] %dx%d", t.DisplayName(), w, h)
 
