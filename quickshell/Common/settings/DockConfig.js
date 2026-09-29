@@ -1,6 +1,8 @@
 .pragma library
 
 var EDGES = ["top", "bottom", "left", "right"];
+var MAGNIFICATION_PROFILES = ["parabolic", "cosine", "gaussian"];
+var DEFAULT_MAGNIFICATION_PROFILE = "parabolic";
 
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -52,6 +54,9 @@ function create(id, name) {
         showTrash: false,
         trashFileManager: "default",
         trashCustomCommand: "",
+        magnification: false,
+        magnificationScale: 130,
+        magnificationProfile: DEFAULT_MAGNIFICATION_PROFILE,
         order: [],
         widgets: [
             {
@@ -104,6 +109,8 @@ function normalize(configs) {
             result[key] = bounded(result[key], 1, 0, 1);
         for (const key of ["maxVisibleApps", "maxVisibleRunningApps"])
             result[key] = Math.floor(bounded(result[key], 0, 0, 100));
+        result.magnificationScale = bounded(result.magnificationScale, defaults.magnificationScale, 105, 160);
+        result.magnificationProfile = MAGNIFICATION_PROFILES.includes(result.magnificationProfile) ? result.magnificationProfile : defaults.magnificationProfile;
         for (const key of Object.keys(defaults)) {
             if (typeof defaults[key] === "boolean")
                 result[key] = result[key] === true;
@@ -384,4 +391,26 @@ function indicatorLane(config) {
 // Thickness is derived, never set: content decides it and padding surrounds it.
 function effectiveThickness(config) {
     return config.iconSize + config.spacing * 2;
+}
+
+// Proximity magnification influence radius per profile curve.
+function magnificationRadius(baseSize, profile) {
+    const size = baseSize > 0 ? baseSize : 42;
+    if (profile === "parabolic")
+        return size * 1.8;
+    if (profile === "gaussian")
+        return size * 2.2;
+    return size * 2.5;
+}
+
+// Magnification scale decay factor (1.0 at dist=0, tapering to 0.0 at dist>=radius).
+function magnificationFactor(dist, radius, profile) {
+    if (dist >= radius)
+        return 0;
+    const u = dist / radius;
+    if (profile === "cosine")
+        return 0.5 * (1 + Math.cos(Math.PI * u));
+    if (profile === "gaussian")
+        return (Math.exp(-3 * u * u) - Math.exp(-3)) / (1 - Math.exp(-3));
+    return 1 - (u * u);
 }

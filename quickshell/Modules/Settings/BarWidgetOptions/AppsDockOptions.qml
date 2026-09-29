@@ -343,6 +343,58 @@ Column {
             onSliderValueChanged: newValue => root.page.set("appsDockEnlargePercentage", newValue)
         }
 
+        SettingsToggleRow {
+            resetStore: root.page
+            resetKeys: ["appsDockMagnification"]
+            text: I18n.tr("Magnification on hover")
+            checked: root.page.value("appsDockMagnification")
+            onToggled: checked => root.page.set("appsDockMagnification", checked)
+        }
+
+        SettingsSliderRow {
+            resetStore: root.page
+            resetKeys: ["appsDockMagnificationScale"]
+            text: I18n.tr("Magnification scale")
+            enabled: root.page.value("appsDockMagnification")
+            value: root.page.value("appsDockMagnificationScale")
+            minimum: 105
+            maximum: 160
+            step: 5
+            unit: "%"
+            onSliderValueChanged: newValue => root.page.set("appsDockMagnificationScale", newValue)
+        }
+
+        SettingsDropdownRow {
+            resetStore: root.page
+            resetKeys: ["appsDockMagnificationProfile"]
+            text: I18n.tr("Animation style")
+            enabled: root.page.value("appsDockMagnification")
+            currentValue: {
+                const profile = root.page.value("appsDockMagnificationProfile") ?? "parabolic";
+                switch (profile) {
+                case "cosine":
+                    return I18n.tr("Cosine", "magnification animation profile");
+                case "gaussian":
+                    return I18n.tr("Gaussian", "magnification animation profile");
+                default:
+                    return I18n.tr("Parabolic", "magnification animation profile");
+                }
+            }
+            options: [
+                I18n.tr("Parabolic", "magnification animation profile"),
+                I18n.tr("Cosine", "magnification animation profile"),
+                I18n.tr("Gaussian", "magnification animation profile")
+            ]
+            onValueChanged: value => {
+                if (value === I18n.tr("Cosine", "magnification animation profile"))
+                    root.page.set("appsDockMagnificationProfile", "cosine");
+                else if (value === I18n.tr("Gaussian", "magnification animation profile"))
+                    root.page.set("appsDockMagnificationProfile", "gaussian");
+                else
+                    root.page.set("appsDockMagnificationProfile", "parabolic");
+            }
+        }
+
         SettingsSliderRow {
             resetStore: root.page
             resetKeys: ["appsDockIconSizePercentage"]

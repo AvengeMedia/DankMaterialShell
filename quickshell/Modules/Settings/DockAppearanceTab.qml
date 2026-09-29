@@ -75,6 +75,65 @@ Item {
             }
         }
 
+        SettingsToggleCard {
+            width: parent.width
+            visible: dock.hasConfig
+            iconName: "zoom_in"
+            settingKey: "dockMagnification"
+            tags: ["dock", "zoom", "magnification", "hover", "scale", "fisheye"]
+            resetStore: dock
+            resetKeys: ["magnification"]
+            title: I18n.tr("Magnification")
+            checked: dock.config?.magnification ?? false
+            onToggled: checked => dock.setOption("magnification", checked)
+
+            SettingsSliderRow {
+                settingKey: "dockMagnificationScale"
+                tags: ["dock", "zoom", "magnification", "scale"]
+                resetStore: dock
+                resetKeys: ["magnificationScale"]
+                text: I18n.tr("Scale")
+                value: dock.config?.magnificationScale ?? 130
+                minimum: 105
+                maximum: 160
+                step: 5
+                unit: "%"
+                onSliderValueChanged: value => dock.setOption("magnificationScale", value)
+            }
+
+            SettingsDropdownRow {
+                settingKey: "dockMagnificationProfile"
+                tags: ["dock", "zoom", "magnification", "animation", "profile", "style", "curve"]
+                resetStore: dock
+                resetKeys: ["magnificationProfile"]
+                text: I18n.tr("Animation style")
+                currentValue: {
+                    const profile = dock.config?.magnificationProfile ?? "parabolic";
+                    switch (profile) {
+                    case "cosine":
+                        return I18n.tr("Cosine", "magnification animation profile");
+                    case "gaussian":
+                        return I18n.tr("Gaussian", "magnification animation profile");
+                    default:
+                        return I18n.tr("Parabolic", "magnification animation profile");
+                    }
+                }
+                options: [
+                    I18n.tr("Parabolic", "magnification animation profile"),
+                    I18n.tr("Cosine", "magnification animation profile"),
+                    I18n.tr("Gaussian", "magnification animation profile")
+                ]
+                onValueChanged: value => {
+                    if (value === I18n.tr("Cosine", "magnification animation profile"))
+                        dock.setOption("magnificationProfile", "cosine");
+                    else if (value === I18n.tr("Gaussian", "magnification animation profile"))
+                        dock.setOption("magnificationProfile", "gaussian");
+                    else
+                        dock.setOption("magnificationProfile", "parabolic");
+                }
+            }
+        }
+
         SettingsControlledBy {
             visible: dock.hasConfig && !dock.connectedFrameModeActive
             target: "surfaces"

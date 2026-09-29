@@ -115,6 +115,49 @@ FocusScope {
             cancelDrag();
     }
     readonly property bool vertical: surfaceContext.isVertical
+    readonly property bool magnificationEnabled: (root.surfaceContext.config?.magnification || (root.surfaceContext.kind === "bar" && root.surfaceContext.config?.appsDockMagnification) || false) && !root.surfaceContext.editMode
+    readonly property string magnificationProfile: root.surfaceContext.config?.magnificationProfile ?? (root.surfaceContext.config?.appsDockMagnificationProfile ?? "parabolic")
+    readonly property real maxMagnification: {
+        const scaleVal = root.surfaceContext.config?.magnificationScale ?? (root.surfaceContext.config?.appsDockMagnificationScale ?? 130);
+        return Math.max(1.05, Math.min(2.0, scaleVal / 100));
+    }
+    readonly property real baseSlotSize: {
+        const baseSize = root.vertical ? root.width : root.height;
+        return baseSize > 0 ? baseSize : 42;
+    }
+    readonly property real influenceRadius: DockConfig.magnificationRadius(baseSlotSize, magnificationProfile)
+    readonly property int itemTransformOrigin: {
+        const edge = root.surfaceContext.config?.position;
+        switch (edge) {
+        case SettingsData.Position.Top:
+            return Item.Top;
+        case SettingsData.Position.Bottom:
+            return Item.Bottom;
+        case SettingsData.Position.Left:
+            return Item.Left;
+        case SettingsData.Position.Right:
+            return Item.Right;
+        default:
+            return Item.Center;
+        }
+    }
+    readonly property real hoverCursorX: stripHoverHandler.point.position.x + scroll.contentX - (root.vertical ? root.crossOverflow : 0)
+    readonly property real hoverCursorY: stripHoverHandler.point.position.y + scroll.contentY - (root.vertical ? 0 : root.crossOverflow)
+    readonly property bool hoverActive: stripHoverHandler.hovered && !root.dragActive
+    property real magnificationProgress: 0.0
+    Binding {
+        target: root
+        property: "magnificationProgress"
+        value: (root.hoverActive && root.magnificationEnabled) ? 1.0 : 0.0
+        restoreMode: Binding.RestoreNone
+    }
+    Behavior on magnificationProgress {
+        enabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: root.hoverActive ? Theme.shorterDuration : Theme.shortDuration
+            easing.type: root.hoverActive ? Easing.OutCubic : Easing.InCubic
+        }
+    }
     readonly property var sizes: {
         layoutRevision;
         const sizes = [];
@@ -215,12 +258,18 @@ FocusScope {
         y: root.vertical ? 0 : -root.crossOverflow
         width: root.width + (root.vertical ? root.crossOverflow * 2 : 0)
         height: root.height + (root.vertical ? 0 : root.crossOverflow * 2)
-        clip: true
+        clip: root.contentLength > root.availableSize
         contentWidth: root.vertical ? width : root.contentLength
         contentHeight: root.vertical ? root.contentLength : height
         flickableDirection: root.vertical ? Flickable.VerticalFlick : Flickable.HorizontalFlick
         boundsBehavior: Flickable.StopAtBounds
         interactive: !root.dragActive && root.contentLength > root.availableSize
+
+        HoverHandler {
+            id: stripHoverHandler
+            enabled: root.magnificationEnabled
+        }
+
         Repeater {
             id: repeater
             model: ScriptModel {
@@ -239,7 +288,16 @@ FocusScope {
                 readonly property bool unitDragging: root.draggingUnit === unitId
                 readonly property bool animatesShift: root.dragActive && !dragging && !unitDragging && !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
                 readonly property real layoutPosition: unitDragging ? root.positionAt(index) + root.dragOffset : (root.previewPositions[index] ?? 0)
-                z: dragging || unitDragging ? 1 : 0
+                readonly property real targetScale: {
+                    if (!root.magnificationEnabled || root.magnificationProgress <= 0.001 || slot.flexible)
+                        return 1.0;
+                    const center = root.vertical ? (slot.y + slot.height / 2) : (slot.x + slot.width / 2);
+                    const cursor = root.vertical ? root.hoverCursorY : root.hoverCursorX;
+                    const dist = Math.abs(center - cursor);
+                    const factor = DockConfig.magnificationFactor(dist, root.influenceRadius, root.magnificationProfile);
+                    return 1.0 + (root.maxMagnification - 1.0) * factor * root.magnificationProgress;
+                }
+                z: dragging || unitDragging ? 100 : (targetScale > 1.01 ? Math.round(targetScale * 10) : 0)
 
                 Binding {
                     target: slot
@@ -316,39 +374,48 @@ FocusScope {
                         slot.widgetItem?.forceActiveFocus();
                     event.accepted = true;
                 }
-                Loader {
-                    id: appLoader
+                Item {
+                    id: visualContent
                     anchors.centerIn: parent
-                    active: slot.modelData.widgetId === "application" && root.applicationStrip !== null
-                    sourceComponent: ApplicationItem {
-                        strip: root.applicationStrip
-                        modelData: slot.modelData.appData
-                        index: slot.modelData.appIndex
-                    }
-                    onLoaded: updateLayout.schedule()
-                }
+                    width: parent.width
+                    height: parent.height
+                    scale: slot.targetScale
+                    transformOrigin: root.itemTransformOrigin
 
-                SurfaceWidgetHost {
-                    id: loader
-                    anchors.centerIn: parent
-                    surfaceContext: root.surfaceContext
-                    widgetId: slot.modelData.widgetId
-                    widgetData: slot.modelData
-                    spacerSize: slot.modelData.size ?? 20
-                    instanceId: slot.modelData.id
-                    occurrenceOrder: slot.index
-                    components: root.components
-                    axis: root.surfaceContext.axis
-                    isInColumn: root.vertical
-                    parentScreen: root.surfaceContext.screen
-                    barConfig: root.surfaceContext.config
-                    barThickness: root.surfaceContext.thickness
-                    widgetThickness: root.surfaceContext.widgetThickness
-                    barSpacing: root.spacing
-                    section: "center"
-                    sectionAvailablePrimarySize: root.availableSize
-                    blurBarWindow: root.surfaceContext.host
-                    onContentItemReady: updateLayout.schedule()
+                    Loader {
+                        id: appLoader
+                        anchors.centerIn: parent
+                        active: slot.modelData.widgetId === "application" && root.applicationStrip !== null
+                        sourceComponent: ApplicationItem {
+                            strip: root.applicationStrip
+                            modelData: slot.modelData.appData
+                            index: slot.modelData.appIndex
+                        }
+                        onLoaded: updateLayout.schedule()
+                    }
+
+                    SurfaceWidgetHost {
+                        id: loader
+                        anchors.centerIn: parent
+                        surfaceContext: root.surfaceContext
+                        widgetId: slot.modelData.widgetId
+                        widgetData: slot.modelData
+                        spacerSize: slot.modelData.size ?? 20
+                        instanceId: slot.modelData.id
+                        occurrenceOrder: slot.index
+                        components: root.components
+                        axis: root.surfaceContext.axis
+                        isInColumn: root.vertical
+                        parentScreen: root.surfaceContext.screen
+                        barConfig: root.surfaceContext.config
+                        barThickness: root.surfaceContext.thickness
+                        widgetThickness: root.surfaceContext.widgetThickness
+                        barSpacing: root.spacing
+                        section: "center"
+                        sectionAvailablePrimarySize: root.availableSize
+                        blurBarWindow: root.surfaceContext.host
+                        onContentItemReady: updateLayout.schedule()
+                    }
                 }
                 Rectangle {
                     anchors.fill: parent
