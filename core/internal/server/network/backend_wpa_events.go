@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"bufio"
+	"os/exec"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -30,6 +32,58 @@ type wpaEvent struct {
 	priority int
 	name     string
 	args     string
+}
+
+func (b *WpaSupplicantBackend) startEthernetMonitor() error {
+	cmd := exec.Command("/sbin/route", "-n", "monitor")
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to open route monitor output: %w", err)
+	}
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start route monitor: %w", err)
+	}
+
+	b.sigWG.Add(1)
+	go func() {
+		defer b.sigWG.Done()
+
+		done := make(chan struct{})
+		go func() {
+			select {
+			case <-b.stopChan:
+				_ = cmd.Process.Kill()
+			case <-done:
+			}
+		}()
+
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			b.updateEthernetState()
+			if b.onStateChange != nil {
+				b.onStateChange()
+			}
+
+			select {
+			case <-b.stopChan:
+				close(done)
+				_ = cmd.Wait()
+				return
+			default:
+			}
+		}
+
+		close(done)
+		if err := cmd.Wait(); err != nil {
+			select {
+			case <-b.stopChan:
+			default:
+				log.Warnf("FreeBSD route monitor stopped: %v", err)
+			}
+		}
+	}()
+
+	return nil
 }
 
 func parseWpaEventLine(line string) (wpaEvent, bool) {
@@ -93,33 +147,10 @@ func (b *WpaSupplicantBackend) StartMonitoring(onStateChange func()) error {
 	b.onStateChange = onStateChange
 
 	// Ethernet is independent of wpa_supplicant. On FreeBSD an Ethernet-only
-	// machine (or a machine whose wlan clone is not configured yet) must still
-	// keep the network service alive and receive link/address updates.
+	// machine (or a machine whose wlan clone is not configured yet) still needs
+	// link/address updates, but should not poll interfaces for the shell lifetime.
 	if b.cmd == nil || b.ifname == "" {
-		b.sigWG.Add(1)
-
-		go func() {
-			defer b.sigWG.Done()
-
-			ticker := time.NewTicker(2 * time.Second)
-			defer ticker.Stop()
-
-			for {
-				select {
-				case <-b.stopChan:
-					return
-
-				case <-ticker.C:
-					b.updateEthernetState()
-
-					if b.onStateChange != nil {
-						b.onStateChange()
-					}
-				}
-			}
-		}()
-
-		return nil
+		return b.startEthernetMonitor()
 	}
 
 	monitor, err := newWpaCtrlConn(filepath.Join(b.ctrlDir, b.ifname))
