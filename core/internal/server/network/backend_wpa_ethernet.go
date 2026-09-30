@@ -200,7 +200,6 @@ func (b *WpaSupplicantBackend) DisconnectEthernetDevice(device string) error {
 		return fmt.Errorf("no Ethernet device specified")
 	}
 
-	_ = runFreeBSDNetworkAdmin("/sbin/dhclient", "-r", device)
 
 	if err := runFreeBSDNetworkAdmin("/sbin/ifconfig", device, "down"); err != nil {
 		return fmt.Errorf("bring %s down: %w", device, err)
