@@ -146,6 +146,18 @@ Item {
         return overviewFocused ? toplevels.indexOf(overviewFocused) : -1;
     }
 
+    function cycleGroupedToplevels() {
+        const toplevels = getGroupedToplevels();
+        if (toplevels.length === 0)
+            return;
+
+        const currentIndex = getActiveGroupedToplevelIndex(toplevels);
+        const nextToplevel = toplevels[(currentIndex + 1) % toplevels.length];
+        if (restoreSpecialWorkspaceWindow(nextToplevel))
+            return;
+        CompositorService.activateToplevel(nextToplevel);
+    }
+
     function showContextMenu() {
         if (!contextMenu)
             return;
@@ -309,7 +321,7 @@ Item {
                         CompositorService.toggleToplevel(groupedToplevel);
                     }
                 } else {
-                    root.showContextMenu();
+                    root.cycleGroupedToplevels();
                 }
                 break;
             }
