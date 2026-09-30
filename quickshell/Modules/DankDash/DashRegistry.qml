@@ -5,6 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Modules.DankDash.Overview
+import "utils/options.js" as Options
 
 Singleton {
     id: root
@@ -66,8 +67,14 @@ Singleton {
         };
     }
 
-    function toneOption() {
-        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), "", toneChoices);
+    function toneOption(def = "") {
+        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), def, toneChoices);
+    }
+
+    function cardOnly(spec) {
+        return Object.assign(spec, {
+            "cardOnly": true
+        });
     }
 
     function panelOptions(tab) {
@@ -163,16 +170,7 @@ Singleton {
                 "minW": 1,
                 "minH": 1
             },
-            "options": [choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
-                    {
-                        "value": "chart",
-                        "text": I18n.tr("Chart", "noun, weather forecast display option")
-                    },
-                    {
-                        "value": "cards",
-                        "text": I18n.tr("Cards", "noun, weather forecast display option")
-                    }
-                ]), toggle("city", I18n.tr("Show city"), false), toggle("readings", I18n.tr("Show readings"), true)]
+            "options": [cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
         },
         {
             "id": "notifications",
@@ -437,6 +435,13 @@ Singleton {
     function pluginOption(pluginId, raw) {
         if (!raw || typeof raw.key !== "string" || raw.key === "" || raw.key === widgetsKey)
             return null;
+        const spec = pluginOptionSpec(pluginId, raw);
+        if (spec && raw.cardOnly === true)
+            return cardOnly(spec);
+        return spec;
+    }
+
+    function pluginOptionSpec(pluginId, raw) {
         const text = I18n.trFor(pluginId, raw.text ?? raw.key);
         switch (raw.type) {
         case "toggle":
@@ -467,12 +472,12 @@ Singleton {
         return entry(id)?.options ?? [];
     }
 
-    function sheetOptionSpecs(id) {
-        return optionSpecs(id).filter(spec => spec.settingsOnly !== true);
+    function sheetOptionSpecs(id, tabScope = false) {
+        return optionSpecs(id).filter(spec => spec.settingsOnly !== true && !(tabScope && spec.cardOnly === true));
     }
 
-    function hasOptions(id) {
-        return sheetOptionSpecs(id).length > 0;
+    function hasOptions(id, tabScope = false) {
+        return sheetOptionSpecs(id, tabScope).length > 0;
     }
 
     function storedOptions(id) {
@@ -496,17 +501,7 @@ Singleton {
     }
 
     function optionValue(spec, value) {
-        switch (spec.type) {
-        case "toggle":
-            return typeof value === "boolean" ? value : spec.def;
-        case "choice":
-            return spec.choices.some(c => c.value === value) ? value : spec.def;
-        case "number":
-            if (!Number.isFinite(value))
-                return spec.def;
-            return Math.max(spec.min, Math.min(spec.max, value));
-        }
-        return spec.def;
+        return Options.value(spec, value);
     }
 
     function option(id, key) {

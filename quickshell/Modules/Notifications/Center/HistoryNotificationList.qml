@@ -16,6 +16,7 @@ Item {
     property int selectedIndex: -1
     property bool showKeyboardHints: false
     property bool nested: false
+    property alias showScrollBar: historyListView.showScrollBar
 
     function getStartOfDay(date) {
         const d = new Date(date);

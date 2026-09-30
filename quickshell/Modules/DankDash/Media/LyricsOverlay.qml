@@ -235,6 +235,7 @@ FocusScope {
 
         DankListView {
             id: transcript
+            showScrollBar: false
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: heading.visible ? heading.bottom : parent.top

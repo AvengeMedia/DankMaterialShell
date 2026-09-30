@@ -69,9 +69,15 @@ func binaryReplaced(path string) bool {
 	return !os.SameFile(running, onDisk)
 }
 
+func unprobedShell(running string) ShellInfo {
+	info := ShellInfo{InstallMethod: InstallUnknown, Running: running, GitBuild: GitBuildCount(running)}
+	info.Channel = detectChannel(info, running)
+	return info
+}
+
 // Unowned binaries (manual copy, dev checkout) stay unknown: DMS only updates through packages.
 func ProbeShell(ctx context.Context, running string) ShellInfo {
-	info := ShellInfo{InstallMethod: InstallUnknown, Channel: ChannelUnknown, Running: running}
+	info := unprobedShell(running)
 	path := dmsBinaryPath()
 
 	if strings.HasPrefix(path, "/nix/store/") {
@@ -83,7 +89,6 @@ func ProbeShell(ctx context.Context, running string) ShellInfo {
 	}
 
 	info.Channel = detectChannel(info, running)
-	info.GitBuild = GitBuildCount(running)
 	info.RestartPending = binaryReplaced(path)
 	return info
 }

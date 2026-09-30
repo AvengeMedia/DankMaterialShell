@@ -8,10 +8,17 @@ CcTile {
     id: root
 
     readonly property bool available: BatteryService.batteryAvailable
+    readonly property bool profileMode: !available && PowerProfileWatcher.available
 
-    iconName: BatteryService.getBatteryIcon()
-    title: available ? I18n.tr("Battery") : I18n.tr("No battery")
+    iconName: profileMode ? Theme.getPowerProfileIcon(PowerProfileWatcher.currentProfile) : BatteryService.getBatteryIcon()
+    title: {
+        if (profileMode)
+            return I18n.tr("Power profile");
+        return available ? I18n.tr("Battery") : I18n.tr("No battery");
+    }
     subtitle: {
+        if (profileMode)
+            return Theme.getPowerProfileLabel(PowerProfileWatcher.currentProfile);
         if (!available)
             return I18n.tr("Not available");
         if (BatteryService.isCharging)
@@ -21,7 +28,8 @@ CcTile {
         return `${BatteryService.batteryLevel}%`;
     }
     active: available && (BatteryService.isCharging || BatteryService.isPluggedIn)
-    opensPage: true
+    opensPage: !profileMode
+    showExpand: profileMode
     tallContent: Component {
         Item {
             BatteryMeter {
@@ -35,7 +43,13 @@ CcTile {
         }
     }
 
-    onClicked: expandClicked()
+    onClicked: {
+        if (!profileMode) {
+            expandClicked();
+            return;
+        }
+        PowerProfileWatcher.cycleProfile();
+    }
     expandedContent: Component {
         CcTileActions {
             actions: PowerProfileWatcher.availableProfiles.map(profile => ({

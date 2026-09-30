@@ -728,6 +728,7 @@ Item {
                 title: root.searchQuery.trim() !== "" ? I18n.tr("No results found") : I18n.tr("No wallpapers")
 
                 DankButton {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: I18n.tr("Choose wallpaper folder")
                     visible: root.searchQuery.trim() === ""
                     onClicked: root.openFolderBrowser()

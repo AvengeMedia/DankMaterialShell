@@ -254,7 +254,7 @@ ShellRoot {
             check(!LyricsService.controller.tick.running, "closing stops scheduling");
             media.lyricsOpen = true;
             waitFor(() => !!media.lyricsFocusTarget, "reopened lyrics load");
-            check(backend.calls === settledCalls + 1 && LyricsService.controller.state === "ready", "reopening reuses loaded lyrics");
+            check(backend.calls === settledCalls + 2 && LyricsService.controller.state === "ready", "reopening reuses loaded lyrics");
             LyricsService.controller.request();
             const stale = backend.pending[backend.nextId];
             MprisController.stableTitle = "Next track";
@@ -283,6 +283,9 @@ ShellRoot {
                 "xesam:asText": "Embedded text remains available offline"
             };
             LyricsService.controller.request();
+            backend.respond({
+                error: "offline"
+            });
             backend.respond({
                 error: "offline"
             });

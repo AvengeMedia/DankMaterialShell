@@ -46,6 +46,8 @@ Item {
     required property Component notificationExpandedComponent
     required property Component notificationCenterCompactComponent
     required property Component notificationCenterExpandedComponent
+    required property Component clipboardCompactComponent
+    required property Component clipboardExpandedComponent
 
     readonly property real compactFade: root.fadeCompact(root.morphProgress)
     readonly property real expandedFade: root.fadeExpanded(root.morphProgress)
@@ -93,6 +95,7 @@ Item {
             "wallpaper": wallpaperExpandedLoader,
             "weather": weatherExpandedLoader,
             "notificationcenter": notificationCenterExpandedLoader,
+            "clipboard": clipboardExpandedLoader,
             "controlcenter": controlCenterExpandedLoader
         })
 
@@ -316,6 +319,23 @@ Item {
         asynchronous: true
         sourceComponent: root.notificationCenterExpandedComponent
         opacity: root.expandedOpacity("notificationcenter")
+    }
+
+    CompactFace {
+        active: root.surfaceActive("clipboard")
+        activity: "clipboard"
+        face: root.clipboardCompactComponent
+        opacity: root.compactOpacity("clipboard")
+    }
+
+    ExpandedFace {
+        id: clipboardExpandedLoader
+
+        activity: "clipboard"
+        active: root.controller.visualsRequested("clipboard")
+        asynchronous: true
+        sourceComponent: root.clipboardExpandedComponent
+        opacity: root.expandedOpacity("clipboard")
     }
 
     CompactFace {

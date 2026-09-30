@@ -31,6 +31,7 @@ Singleton {
     readonly property real splitDividerHeight: Theme.iconSize
     readonly property real buttonGroupCompactThreshold: 200
     readonly property real choiceCardPreviewRatio: 10 / 16
+    readonly property real positionPickerMaxWidth: 360
     readonly property real wallpaperThumbRatio: 10 / 16
     readonly property int wallpaperThumbCache: 1024
     readonly property real wallpaperHeroStackWidth: 640

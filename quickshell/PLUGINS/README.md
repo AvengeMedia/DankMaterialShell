@@ -722,7 +722,7 @@ QtObject {
 }
 ```
 
-A synchronous variant is supported too - declare `check()` with no argument and return the result directly. When the check fails the enable toggle reverts and the error is shown as a toast (the `details` are expandable, and any `http(s)` URL in them becomes a clickable link). Plugins without a `startupCheck` are unaffected. See `ExampleStartupCheck` for a complete plugin; the last error per plugin is available at `PluginService.pluginLoadErrors[pluginId]`.
+A synchronous variant is supported too - declare `check()` with no argument and return the result directly. When the check fails the enable toggle reverts and the error is shown as a toast (the `details` are expandable, and any `http(s)` URL in them becomes a clickable link). A check that fails to load, has no `check` function, or throws blocks activation the same way, with its error as the message. The check also runs again on reload. Plugins without a `startupCheck` are unaffected. See `ExampleStartupCheck` for a complete plugin; the last error per plugin is available at `PluginService.pluginLoadErrors[pluginId]`.
 
 ## Plugin Global Variables
 
@@ -1889,6 +1889,8 @@ The `dash` block is optional. `icon` and `title` label the tab and fall back to 
 
 The dash shows these rows in an options sheet (the tune button on a card in edit mode, Options in a tab's edit-mode controls) and Settings → Dashboard lists the same rows. The tab and the card read the resolved values as `options.<key>` and re-evaluate when a value changes. Values live in `settings.json` under `dashOptions.plugin_<pluginId>`, apart from `pluginData`, and only non-default values are stored. Reset clears the declared keys only. `widgets` is reserved for the `DashWidgetGrid` layout and is ignored as an option key.
 
+Set `"cardOnly": true` on an option that only the overview card reads. It stays on the card's sheet and in Settings, and the tab's sheet leaves it out.
+
 `dash.options` only reach the dash surfaces. If a bar widget or daemon of the same plugin needs the value, use a `settings` component and `pluginData` instead.
 
 ### Dash Tab Contract
@@ -1952,9 +1954,38 @@ DashTabComponent {
 }
 ```
 
-Import `qs.Modules.DankDash` for the grid. Each definition has a stable `id`, a translated `text`, an `icon`, a QML `component`, default `w`/`h` and optional `minW`/`minH`/`maxW`/`maxH`. The grid is 4 columns wide (2 when narrower than `Theme.smallBreakpoint`), independent of the overview column count. Set `enabled: false` to leave a widget in the Add menu initially. `graphics: true` exposes a per-widget Show graphics option.
+Import `qs.Modules.DankDash` for the grid. Each definition has a stable `id`, a translated `text`, an `icon`, a QML `component`, default `w`/`h` and optional `minW`/`minH`/`maxW`/`maxH`. The grid is 4 columns wide (2 when narrower than `Theme.smallBreakpoint`), independent of the overview column count. Set `enabled: false` to leave a widget in the Add menu initially.
 
-The grid saves order, size and graphics options in `dashOptions[entryId].widgets`. Missing definitions keep their saved placement. A saved empty list stays empty; Reset restores the current defaults. Widgets receive `widgetId`, `widgetOptions` and a bound `live` value if they declare those properties. The grid unloads widget content when `live` is false. Edit mode offers drag ordering, a resize handle, removal, and menu actions for keyboard ordering and sizing.
+A definition can carry `options`, a list of option specs in the same shape as `dash.options` (`toggle`, `choice`, `number`). Build them with `DashRegistry.toggle(key, text, def)`, `DashRegistry.choice(key, text, def, choices)`, `DashRegistry.number(key, text, def, min, max, step, unit)` or `DashRegistry.toneOption(def)` for the shared Tone choice. In edit mode a widget with options shows an options button that opens them in a sheet. Each widget instance stores its own values, and the widget reads them from `widgetOptions` by key. `id`, `w`, `h`, `col` and `row` are reserved keys.
+
+```qml
+definitions: [
+    {id: "counter", text: I18n.trFor("yourPlugin", "Counter"), icon: "counter_1", component: counter, w: 2, h: 2,
+     options: [DashRegistry.toneOption("primary"), DashRegistry.toggle("compact", I18n.trFor("yourPlugin", "Compact"), false)]}
+]
+```
+
+A widget that is not a `Card` can still follow a tone with `DankTone` from `qs.Widgets`. Set its `tone` and paint with `surfaceColor`, `contentColor`, `accentColor`, `onAccentColor`, `mutedColor` and `chipColor`. `tinted` is true for any tone but the surface one.
+
+```qml
+Rectangle {
+    property var widgetOptions: ({})
+
+    color: toneColors.surfaceColor
+
+    DankTone {
+        id: toneColors
+        tone: widgetOptions.tone ?? ""
+    }
+
+    StyledText {
+        text: "42"
+        color: toneColors.contentColor
+    }
+}
+```
+
+The grid saves order, size and option values in `dashOptions[entryId].widgets`. Missing definitions keep their saved placement. A saved empty list stays empty; Reset restores the current defaults. Widgets receive `widgetId`, `widgetOptions` and a bound `live` value if they declare those properties. The grid unloads widget content when `live` is false. Edit mode offers drag ordering, a resize handle, removal and the options button.
 
 ### Dash Card Contract
 

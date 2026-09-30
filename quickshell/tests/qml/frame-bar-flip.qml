@@ -7,17 +7,27 @@ import qs.DankCommon.Common as DC
 ShellRoot {
     id: root
 
-    readonly property var positions: [0, 2, 0, 3, 0, 2, 1, 3, 1, 0]
+    readonly property var positions: [0, 2, 1, 3, 0]
     property int step: 0
     readonly property int position: positions[step]
     readonly property bool vertical: position === SettingsData.Position.Left || position === SettingsData.Position.Right
-    property var barConfig: ({ id: "fixture", position, spacing: 0, innerPadding: 4 })
+    property var barConfig: ({
+            id: "fixture",
+            position,
+            spacing: 0,
+            innerPadding: 4
+        })
     property var hyprlandOverviewLoader: null
     property bool systemTrayMenuOpen: false
 
     ScriptModel {
         id: widgets
-        values: [{ widgetId: "clock", id: "clock_0" }]
+        values: [
+            {
+                widgetId: "clock",
+                id: "clock_0"
+            }
+        ]
     }
 
     FloatingWindow {

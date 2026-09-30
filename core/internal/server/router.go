@@ -221,13 +221,13 @@ func newRequestMux() *ipc.Mux {
 		notifyactions.HandleRequest(conn, req, notifyActionsManager)
 	}))
 
-	mux.HandlePrefix("sysupdate.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+	mux.HandlePrefix("sysupdate.", func(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, _ *ipc.Subscriber) {
 		if sysUpdateManager == nil {
 			models.RespondError(conn, req.ID, "sysupdate manager not initialized")
 			return
 		}
-		sysupdate.HandleRequest(conn, req, sysUpdateManager)
-	}))
+		sysupdate.HandleRequest(ctx, conn, req, sysUpdateManager)
+	})
 
 	mux.HandlePrefix("", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
 		models.RespondError(conn, req.ID, fmt.Sprintf("unknown method: %s", req.Method))

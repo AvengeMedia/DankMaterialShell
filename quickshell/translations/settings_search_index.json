@@ -552,7 +552,10 @@
     "category": "Interface style",
     "keywords": [
       "accent",
+      "across",
+      "badges",
       "button",
+      "cards",
       "color",
       "colors",
       "colour",
@@ -560,10 +563,13 @@
       "hue",
       "interface",
       "palette",
+      "shell",
       "style",
-      "tint"
+      "tint",
+      "tinted"
     ],
-    "page": "theme_surfaces"
+    "page": "theme_surfaces",
+    "description": "Tinted cards and badges across the shell"
   },
   {
     "section": "notificationCompactMode",
@@ -585,6 +591,31 @@
       "toast"
     ],
     "page": "notifications"
+  },
+  {
+    "section": "containerSaturation",
+    "label": "Container saturation",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "accent",
+      "across",
+      "badges",
+      "card",
+      "cards",
+      "color",
+      "container",
+      "interface",
+      "pastel",
+      "primary",
+      "saturation",
+      "shell",
+      "style",
+      "tint",
+      "tinted"
+    ],
+    "page": "theme_surfaces",
+    "description": "Tinted cards and badges across the shell"
   },
   {
     "section": "controlCenterIcons",
@@ -1497,6 +1528,28 @@
     "page": "notifications"
   },
   {
+    "section": "windowRadiusMatch",
+    "label": "Match corner style",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "compositor",
+      "corner",
+      "corners",
+      "follow",
+      "interface",
+      "link",
+      "match",
+      "radius",
+      "round",
+      "rounded",
+      "strength",
+      "style",
+      "window"
+    ],
+    "page": "theme_surfaces"
+  },
+  {
     "section": "matugenTargetMonitor",
     "label": "Matugen source display",
     "tabIndex": -1,
@@ -1931,6 +1984,23 @@
       "toast"
     ],
     "page": "notifications"
+  },
+  {
+    "section": "scrollbarsEnabled",
+    "label": "Scrollbars",
+    "tabIndex": -1,
+    "category": "Interface style",
+    "keywords": [
+      "interface",
+      "list",
+      "page",
+      "scroll",
+      "scrollbar",
+      "scrollbars",
+      "style"
+    ],
+    "page": "theme_surfaces",
+    "icon": "unfold_more"
   },
   {
     "section": "_hub_security_accounts",
@@ -2491,7 +2561,7 @@
       "tint",
       "wallpaper"
     ],
-    "icon": "palette"
+    "icon": "wallpaper"
   },
   {
     "section": "clockDateFormat",
@@ -3014,6 +3084,31 @@
     ],
     "parentLabel": "Bar",
     "description": "Clicks on empty bar space reach the windows below"
+  },
+  {
+    "section": "islandRouteClipboard",
+    "label": "Clipboard",
+    "tabIndex": 3,
+    "category": "General",
+    "keywords": [
+      "bar",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "general",
+      "history",
+      "ipc",
+      "island",
+      "panel",
+      "paste",
+      "routing",
+      "shortcuts",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "islandEnabled"
   },
   {
     "section": "islandRouteControlCenter",
@@ -3594,6 +3689,7 @@
     "category": "General",
     "keywords": [
       "bar",
+      "clipboard",
       "control center",
       "dashboard",
       "general",
@@ -6956,6 +7052,7 @@
     "keywords": [
       "automatic",
       "before",
+      "hibernate",
       "lock",
       "lockscreen",
       "login",
@@ -8701,18 +8798,23 @@
     "category": "Software updates",
     "keywords": [
       "alert",
+      "background",
+      "check",
+      "checks",
       "count",
       "grows",
       "integrations",
+      "interval",
       "new",
       "notification",
+      "notifies",
       "notify",
       "software",
       "system",
       "updates"
     ],
     "parentLabel": "System & integrations",
-    "description": "Only when the count grows."
+    "description": "Checks in the background at the check interval. Notifies only when the count grows."
   },
   {
     "section": "systemUpdater",
@@ -8720,11 +8822,15 @@
     "tabIndex": 20,
     "category": "Software updates",
     "keywords": [
+      "background",
+      "check",
+      "checks",
       "count",
       "frequency",
       "grows",
       "integrations",
       "interval",
+      "notifies",
       "options",
       "poll",
       "software",
@@ -8733,7 +8839,7 @@
     ],
     "parentLabel": "System & integrations",
     "icon": "tune",
-    "description": "Only when the count grows."
+    "description": "Checks in the background at the check interval. Notifies only when the count grows."
   },
   {
     "section": "systemUpdaterPauseOnBattery",
@@ -9530,8 +9636,16 @@
     "optionFile": "PrivacyOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:25",
+    "section": "barWidgetOption:IslandOptions.qml:26",
     "label": "Clear badge on open",
+    "tabIndex": 22,
+    "keywords": [],
+    "runtimeType": "barWidgetOption",
+    "optionFile": "IslandOptions.qml"
+  },
+  {
+    "section": "barWidgetOption:IslandOptions.qml:12",
+    "label": "Clipboard",
     "tabIndex": 22,
     "keywords": [],
     "runtimeType": "barWidgetOption",
@@ -9690,7 +9804,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:12",
+    "section": "barWidgetOption:IslandOptions.qml:13",
     "label": "Dashboard",
     "tabIndex": 22,
     "keywords": [],
@@ -9730,7 +9844,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:24",
+    "section": "barWidgetOption:IslandOptions.qml:25",
     "label": "Expand by default",
     "tabIndex": 22,
     "keywords": [],
@@ -9738,7 +9852,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:16",
+    "section": "barWidgetOption:IslandOptions.qml:17",
     "label": "Expansion mode",
     "tabIndex": 22,
     "keywords": [],
@@ -9810,7 +9924,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:19",
+    "section": "barWidgetOption:IslandOptions.qml:20",
     "label": "Hide delay",
     "tabIndex": 22,
     "keywords": [],
@@ -9842,7 +9956,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:17",
+    "section": "barWidgetOption:IslandOptions.qml:18",
     "label": "Hybrid peeks the current compact face on hover. Click pins a destination so it stays open",
     "tabIndex": 22,
     "keywords": [],
@@ -9922,7 +10036,7 @@
     "optionFile": "ControlCenterOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:20",
+    "section": "barWidgetOption:IslandOptions.qml:21",
     "label": "Keep clock with media",
     "tabIndex": 22,
     "keywords": [],
@@ -9986,7 +10100,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:13",
+    "section": "barWidgetOption:IslandOptions.qml:14",
     "label": "Media",
     "tabIndex": 22,
     "keywords": [],
@@ -10018,7 +10132,7 @@
     "optionFile": "WorkspaceSwitcherOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:26",
+    "section": "barWidgetOption:IslandOptions.qml:27",
     "label": "Motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10066,7 +10180,7 @@
     "optionFile": "ClockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:21",
+    "section": "barWidgetOption:IslandOptions.qml:22",
     "label": "Notifications",
     "tabIndex": 22,
     "keywords": [],
@@ -10082,7 +10196,7 @@
     "optionFile": "BatteryOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:18",
+    "section": "barWidgetOption:IslandOptions.qml:19",
     "label": "Open delay",
     "tabIndex": 22,
     "keywords": [],
@@ -10114,7 +10228,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:27",
+    "section": "barWidgetOption:IslandOptions.qml:28",
     "label": "Reduce motion",
     "tabIndex": 22,
     "keywords": [],
@@ -10330,7 +10444,7 @@
     "optionFile": "AppsDockOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:29",
+    "section": "barWidgetOption:IslandOptions.qml:30",
     "label": "Spring damping",
     "tabIndex": 22,
     "keywords": [],
@@ -10338,7 +10452,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:30",
+    "section": "barWidgetOption:IslandOptions.qml:31",
     "label": "Spring mass",
     "tabIndex": 22,
     "keywords": [],
@@ -10346,7 +10460,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:28",
+    "section": "barWidgetOption:IslandOptions.qml:29",
     "label": "Spring stiffness",
     "tabIndex": 22,
     "keywords": [],
@@ -10410,7 +10524,7 @@
     "optionFile": "SystemTrayOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:23",
+    "section": "barWidgetOption:IslandOptions.qml:24",
     "label": "Use standard OSDs",
     "tabIndex": 22,
     "keywords": [],
@@ -10418,7 +10532,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:22",
+    "section": "barWidgetOption:IslandOptions.qml:23",
     "label": "Use standard popups",
     "tabIndex": 22,
     "keywords": [],
@@ -10442,7 +10556,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:15",
+    "section": "barWidgetOption:IslandOptions.qml:16",
     "label": "Wallpapers",
     "tabIndex": 22,
     "keywords": [],
@@ -10450,7 +10564,7 @@
     "optionFile": "IslandOptions.qml"
   },
   {
-    "section": "barWidgetOption:IslandOptions.qml:14",
+    "section": "barWidgetOption:IslandOptions.qml:15",
     "label": "Weather",
     "tabIndex": 22,
     "keywords": [],
@@ -11194,6 +11308,31 @@
     "icon": "mic"
   },
   {
+    "section": "audioMono",
+    "label": "Mono Audio",
+    "tabIndex": 29,
+    "category": "Audio",
+    "keywords": [
+      "accessibility",
+      "audio",
+      "channel",
+      "content",
+      "headphones",
+      "media",
+      "microphone",
+      "mono",
+      "pipewire",
+      "single",
+      "sound",
+      "speaker",
+      "stereo",
+      "volume"
+    ],
+    "parentLabel": "Sound & media",
+    "icon": "a11y",
+    "description": "Mix all stereo content into a single channel"
+  },
+  {
     "section": "audioOutputDevices",
     "label": "Output devices",
     "tabIndex": 29,
@@ -11308,7 +11447,7 @@
       "wallpaper"
     ],
     "parentLabel": "Security",
-    "icon": "palette",
+    "icon": "wallpaper",
     "conditionKey": "greeterAvailable"
   },
   {
@@ -11615,13 +11754,16 @@
       "mime",
       "office",
       "pdf",
+      "presentation",
       "program",
       "programs",
       "reader",
       "rules",
+      "spreadsheet",
       "terminal",
       "text",
-      "window"
+      "window",
+      "word"
     ],
     "parentLabel": "Applications",
     "icon": "edit_document"
@@ -11693,6 +11835,7 @@
       "app",
       "applications",
       "apps",
+      "archive",
       "browser",
       "default",
       "editor",
@@ -11707,7 +11850,8 @@
       "rules",
       "terminal",
       "utilities",
-      "window"
+      "window",
+      "zip"
     ],
     "parentLabel": "Applications",
     "icon": "terminal"
@@ -15743,6 +15887,30 @@
     "icon": "widgets"
   },
   {
+    "section": "dockMagnificationProfile",
+    "label": "Animation style",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "appearance",
+      "curve",
+      "dock",
+      "launcher bar",
+      "magnification",
+      "motion",
+      "panel",
+      "profile",
+      "style",
+      "taskbar",
+      "transition",
+      "zoom"
+    ],
+    "parentLabel": "Dock"
+  },
+  {
     "section": "dockBorder",
     "label": "Border",
     "tabIndex": 58,
@@ -15797,6 +15965,26 @@
     "parentLabel": "Dock"
   },
   {
+    "section": "dockMagnification",
+    "label": "Magnification",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "dock",
+      "fisheye",
+      "hover",
+      "launcher bar",
+      "magnification",
+      "panel",
+      "scale",
+      "taskbar",
+      "zoom"
+    ],
+    "parentLabel": "Dock",
+    "icon": "zoom_in"
+  },
+  {
     "section": "dockMargin",
     "label": "Margin",
     "tabIndex": 58,
@@ -15826,6 +16014,23 @@
       "panel",
       "spacing",
       "taskbar"
+    ],
+    "parentLabel": "Dock"
+  },
+  {
+    "section": "dockMagnificationScale",
+    "label": "Scale",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "dock",
+      "launcher bar",
+      "magnification",
+      "panel",
+      "scale",
+      "taskbar",
+      "zoom"
     ],
     "parentLabel": "Dock"
   },
@@ -16414,6 +16619,31 @@
     "conditionKey": "dotEnabled"
   },
   {
+    "section": "dotRouteClipboard",
+    "label": "Clipboard",
+    "tabIndex": 65,
+    "category": "Dot",
+    "keywords": [
+      "bar",
+      "clipboard",
+      "cliphist",
+      "copy",
+      "dot",
+      "history",
+      "ipc",
+      "island",
+      "panel",
+      "paste",
+      "routing",
+      "shortcuts",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "dotEnabled"
+  },
+  {
     "section": "dotRouteControlCenter",
     "label": "Control Center",
     "tabIndex": 65,
@@ -16787,6 +17017,7 @@
     "category": "Dot",
     "keywords": [
       "bar",
+      "clipboard",
       "control center",
       "dashboard",
       "dot",

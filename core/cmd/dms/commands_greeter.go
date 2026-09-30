@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 	"github.com/spf13/cobra"
 )
 
@@ -54,9 +55,9 @@ func greeterPackageInstallHint() string {
 
 	switch config.Family {
 	case distros.FamilyDebian:
-		return "Install with 'sudo apt install dms-greeter' (requires DankLinux OBS repo — see https://danklinux.com/docs/dankgreeter/installation#debian)"
+		return "Install with 'sudo apt install dms-greeter' (requires DankLinux OBS repo — see " + site.Docs + "/dankgreeter/installation#debian)"
 	case distros.FamilySUSE:
-		return "Install with 'sudo zypper install dms-greeter' (requires DankLinux OBS repo — see https://danklinux.com/docs/dankgreeter/installation#opensuse)"
+		return "Install with 'sudo zypper install dms-greeter' (requires DankLinux OBS repo — see " + site.Docs + "/dankgreeter/installation#opensuse)"
 	case distros.FamilyUbuntu:
 		return "Install with 'sudo apt install dms-greeter' (requires ppa:avengemedia/danklinux: sudo add-apt-repository ppa:avengemedia/danklinux)"
 	case distros.FamilyFedora:
@@ -64,7 +65,7 @@ func greeterPackageInstallHint() string {
 	case distros.FamilyArch:
 		return "Install from AUR with 'paru -S greetd-dms-greeter-bin' or 'yay -S greetd-dms-greeter-bin'"
 	case distros.FamilyVoid:
-		return "Install with 'sudo xbps-install -S dms-greeter' (requires DMS XBPS repo: echo 'repository=https://void.danklinux.com/dms/current' | sudo tee /etc/xbps.d/dms.conf)"
+		return "Install with 'sudo xbps-install -S dms-greeter' (requires DMS XBPS repo: echo 'repository=" + distros.VoidDMSRepo + "' | sudo tee /etc/xbps.d/dms.conf)"
 	default:
 		return "Install the dms-greeter package for your distribution"
 	}

@@ -22,14 +22,10 @@ FocusScope {
     readonly property real tabHeight: tab?.implicitHeight ?? 0
     readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
     readonly property bool handleHeader: !root.editMode
-    readonly property real chromeHeight: header.anchors.topMargin + header.height + pages.anchors.topMargin + pages.anchors.bottomMargin
-    readonly property real editGutter: editMode ? PopoutMetrics.editOverflow : 0
-    // Mirrors the popout: the frame sits panelChromeInset inside the sheet, the header sits contentPadding
-    // below it, and the cards keep clear of the corner grips by the gutter.
     readonly property real editHeaderInset: PopoutMetrics.panelChromeInset + DashMetrics.contentPadding
     readonly property real editBottomInset: PopoutMetrics.panelChromeInset + PopoutMetrics.editOverflow
-    // Card pills overhang their card by half their height; the header row needs the same clearance below as above.
-    readonly property real editHeaderGap: PopoutMetrics.chromeButtonSize / 2 + DashMetrics.contentPadding
+    // Card pills overhang their card by half their height and must stay inside the pages clip.
+    readonly property real pillOverhang: editMode ? PopoutMetrics.chromeButtonSize / 2 : 0
     readonly property int panelColumns: DashMetrics.panelColumnsFor(entryId)
     readonly property int contentRows: DashMetrics.rowsForHeight(tabHeight)
     readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(entryId), contentRows)
@@ -45,7 +41,6 @@ FocusScope {
 
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.resizeHost
-        gutter: root.editGutter
         stepWidth: DashMetrics.preferredColumnWidth + DashMetrics.gridGap
         widthFor: columns => Math.min(root.controller.dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, columns))
         currentStep: () => root.panelColumns
@@ -94,11 +89,10 @@ FocusScope {
     }
 
     function reportHeight() {
-        root.controller.setDashboardContentHeight(root.activityId, root.contentHeight + root.chromeHeight);
+        root.controller.setDashboardContentHeight(root.activityId, root.contentHeight + DashMetrics.islandHandleChromeHeight);
     }
 
     onContentHeightChanged: reportHeight()
-    onChromeHeightChanged: reportHeight()
     onLiveChanged: {
         if (live)
             return;
@@ -154,8 +148,8 @@ FocusScope {
             left: parent.left
             right: parent.right
             topMargin: root.editMode ? root.editHeaderInset : 0
-            leftMargin: DashMetrics.contentPadding + root.editGutter
-            rightMargin: DashMetrics.contentPadding + root.editGutter
+            leftMargin: DashMetrics.contentPadding
+            rightMargin: DashMetrics.contentPadding
         }
         height: root.handleHeader ? DashMetrics.islandHandleHeight : DashMetrics.editHeaderHeight
 
@@ -174,7 +168,7 @@ FocusScope {
             anchors.verticalCenter: parent.verticalCenter
             width: Math.min(parent.width, implicitWidth)
             height: parent.height
-            overlayParent: root
+            transientSurfaceTracker: root.controller.transientSurfaces
             entryId: root.entryId
             tabItem: root.tab
             editMode: root.editMode
@@ -190,23 +184,25 @@ FocusScope {
     DankFlickable {
         id: pages
         enabled: !tabOptions.shown && !pageActions.menuOpen
+        showScrollBar: false
         anchors {
             top: header.bottom
-            topMargin: root.editMode ? root.editHeaderGap : 0
+            topMargin: root.editMode ? DashMetrics.contentPadding : 0
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            leftMargin: DashMetrics.contentPadding + root.editGutter
-            rightMargin: DashMetrics.contentPadding + root.editGutter
+            leftMargin: DashMetrics.contentPadding
+            rightMargin: DashMetrics.contentPadding
             bottomMargin: root.editMode ? root.editBottomInset : DashMetrics.contentPadding
         }
-        contentHeight: tabLoader.height
+        contentHeight: tabLoader.y + tabLoader.height
         clip: contentHeight > height
 
         Loader {
             id: tabLoader
+            y: root.pillOverhang
             width: pages.width
-            height: Math.max(pages.height, root.tabHeight)
+            height: Math.max(pages.height - y, root.tabHeight)
             active: root.contentStaged
             asynchronous: true
             visible: status === Loader.Ready
@@ -256,6 +252,8 @@ FocusScope {
 
     DashOptionsSheet {
         id: tabOptions
+        backdrop: pages
+        tabScope: true
         onDismissed: root.focusFace()
     }
 

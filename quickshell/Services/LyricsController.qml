@@ -203,26 +203,38 @@ QtObject {
                 useEmbeddedText("none");
             return;
         }
-        const token = serial;
         if (!refreshing)
             state = "loading";
-        requestId = backend.sendRequest("lyrics.get", {
+        lookup({
             "title": snapshot.title || "",
             "artist": snapshot.artist || "",
             "album": snapshot.album || "",
             "duration": requestedDuration,
             "fileUrl": fileUrl,
-            "allowNetwork": MediaOptions.enabledLyricsProviders.length > 0,
             "providers": MediaOptions.enabledLyricsProviders
-        }, response => root.receive(token, response, refreshing), DashMetrics.mediaLyricsRequestTimeout) ?? null;
+        }, false, refreshing);
     }
 
-    function receive(token, response, refreshing) {
+    function lookup(query, allowNetwork, refreshing) {
+        const token = serial;
+        const networkQuery = !allowNetwork && query.providers.length > 0 ? query : null;
+        const params = Object.assign({
+            "allowNetwork": allowNetwork
+        }, query);
+        requestId = backend.sendRequest("lyrics.get", params, response => root.receive(token, response, refreshing, networkQuery), DashMetrics.mediaLyricsRequestTimeout) ?? null;
+    }
+
+    function receive(token, response, refreshing, networkQuery) {
         if (token !== serial || !enabled)
             return;
         requestId = null;
         const result = response.error ? null : response.result;
         const found = !!result?.found && (result.instrumental || (result.synced ?? []).length > 0 || (result.plain ?? "").trim() !== "");
+        if (networkQuery) {
+            lookup(networkQuery, true, refreshing || found);
+            if (!found)
+                return;
+        }
         if (refreshing && !found)
             return;
         const resultKey = found ? JSON.stringify([result.instrumental === true, result.synced ?? [], result.voices ?? {}, result.plain ?? "", result.attribution ?? {}]) : "";

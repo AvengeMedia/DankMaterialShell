@@ -94,36 +94,41 @@ function firstFit(taken, steps, w, h) {
 
 function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1, gravity = false) {
     const packed = packCells(cards, order, columns, isAvailable, step, gravity);
-    const colW = (width - gap * (columns - 1)) / columns;
-    const slots = packed.cells.map(cell => {
-        if (!cell)
-            return null;
-        const px = cell.col * (colW + gap);
-        const pw = cell.cols * colW + (cell.cols - 1) * gap;
-        return {
-            "x": mirror ? width - px - pw : px,
-            "y": cell.row * (rowUnit + gap),
-            "w": pw,
-            "h": cell.rows * rowUnit + (cell.rows - 1) * gap,
-            "col": cell.col,
-            "row": cell.row,
-            "cols": cell.cols,
-            "rows": cell.rows
-        };
-    });
-
-    return {
-        "slots": slots,
+    const layout = {
+        "slots": [],
         "rows": packed.rows,
         "totalHeight": packed.rows > 0 ? packed.rows * rowUnit + (packed.rows - 1) * gap : 0,
         "columns": columns,
         "width": width,
-        "colW": colW,
+        "colW": (width - gap * (columns - 1)) / columns,
         "rowUnit": rowUnit,
         "gap": gap,
         "step": step,
         "mirror": mirror
     };
+    layout.slots = packed.cells.map(cell => cell ? Object.assign(slotRect(layout, cell.col, cell.row, cell.cols, cell.rows), cell) : null);
+    return layout;
+}
+
+function slotRect(layout, col, row, cols, rows) {
+    const px = col * (layout.colW + layout.gap);
+    const pw = cols * layout.colW + (cols - 1) * layout.gap;
+    return {
+        "x": layout.mirror ? layout.width - px - pw : px,
+        "y": row * (layout.rowUnit + layout.gap),
+        "w": pw,
+        "h": rows * layout.rowUnit + (rows - 1) * layout.gap
+    };
+}
+
+function cellOccupied(layout, col, row) {
+    const taken = layout.slots.filter(Boolean).map(slot => ({
+                "x": slot.col,
+                "y": slot.row,
+                "w": slot.cols,
+                "h": slot.rows
+            }));
+    return overlaps(taken, col, row, 1, 1);
 }
 
 function cellAt(layout, x, y, cols, rows) {

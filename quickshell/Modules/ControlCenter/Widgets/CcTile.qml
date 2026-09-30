@@ -20,21 +20,29 @@ Item {
     property real columns: 4
     property real rows: 1
     property bool compact: columns <= 2 && rows === 1
+    property bool small: false
+    readonly property real bodyInset: small ? Math.max(0, (Math.min(width, height) - CcMetrics.iconBoxSize) / 2) : 0
+    readonly property real bodyWidth: width - bodyInset * 2
+    readonly property real bodyHeight: height - bodyInset * 2
     property bool toggle: !opensPage
     property Component expandedContent: null
+    // Replaces the icon and labels inside the body; the chrome, focus and activation stay.
+    property Component bodyContent: null
     property real expandedMinimumHeight: Theme.listItemHeight
     readonly property Item expandedItem: expandedLoader.item
     readonly property bool expanded: expandedContent !== null && width >= CcMetrics.expandedTileMinWidth && height >= headerHeight + expandedMinimumHeight + tilePadding * 2 + Theme.spacingM
     readonly property real tilePadding: tall && !narrow ? Theme.spacingM : Theme.spacingS
-    readonly property real baseIconExtent: Math.min(Math.max(Theme.minimumTouchTargetSize, CcMetrics.iconBoxSize), height - tilePadding * 2, width - tilePadding * 2)
+    readonly property real baseIconExtent: Math.min(Math.max(Theme.minimumTouchTargetSize, CcMetrics.iconBoxSize), bodyHeight - tilePadding * 2, bodyWidth - tilePadding * 2)
     readonly property real iconExtent: stacked ? Math.max(0, Math.min(baseIconExtent, height - tilePadding * 2 - Theme.spacingS - titleLabel.implicitHeight)) : baseIconExtent
     readonly property real headerHeight: Math.max(baseIconExtent, Theme.fontSizeLarge + Theme.fontSizeMedium + Theme.spacingS)
     readonly property bool stacked: tall && !expanded && width <= height
     readonly property bool narrow: width < CcMetrics.expandedTileMinWidth
+    readonly property bool denseText: narrow || small
     readonly property real labelHeight: titleLabel.implicitHeight + (showSubtitle ? Theme.spacingXXS + subtitleLabel.implicitHeight : 0)
     readonly property bool showSubtitle: subtitle !== "" && (!stacked || height - tilePadding * 2 >= iconExtent + Theme.spacingS + titleLabel.implicitHeight + Theme.spacingXXS + subtitleLabel.implicitHeight)
     property bool showExpand: false
     property bool opensPage: false
+    property color restIconColor: CcMetrics.tileInactiveIcon
     property Component tallContent: null
     property bool interactive: true
     property bool iconBlinking: false
@@ -46,13 +54,14 @@ Item {
 
     readonly property bool tall: height >= CcMetrics.gridRowUnit * 2
     readonly property bool hasIconBox: (showExpand || opensPage || expanded) && !compact
+    readonly property bool showsActive: active && interactive
     readonly property real restRadius: {
-        if (active)
-            return Math.min(CcMetrics.tileActiveRadius, width / 2, height / 2);
-        return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(width, height);
+        if (showsActive)
+            return Math.min(CcMetrics.tileActiveRadius, bodyWidth / 2, bodyHeight / 2);
+        return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(bodyWidth, bodyHeight);
     }
-    readonly property bool acceptsInput: interactive && enabled
-    readonly property bool bodyActive: active && !hasIconBox
+    property bool acceptsInput: interactive && enabled
+    readonly property bool bodyActive: showsActive && !hasIconBox
     readonly property color bodyColor: {
         if (!enabled)
             return Theme.onSurface_12;
@@ -72,20 +81,20 @@ Item {
         if (!enabled)
             return Theme.onSurface_38;
         if (hasIconBox)
-            return active ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
-        return bodyActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveIcon;
+            return showsActive ? CcMetrics.tileActiveContent : CcMetrics.tileInactiveContent;
+        return bodyActive ? CcMetrics.tileActiveContent : root.restIconColor;
     }
     readonly property color iconBoxColor: {
         if (!enabled)
             return Theme.onSurface_12;
-        return active ? CcMetrics.tileActiveColor : CcMetrics.tileInactiveColor;
+        return showsActive ? CcMetrics.tileActiveColor : CcMetrics.iconBoxInactiveColor;
     }
 
-    property real bodyRadius: bodyLayer.pressed ? Math.min(Theme.cornerRadiusM, width / 2, height / 2) : restRadius
+    property real bodyRadius: bodyLayer.pressed ? Math.min(Theme.cornerRadiusM, bodyWidth / 2, bodyHeight / 2) : restRadius
     property real iconBoxRadius: {
         if (boxLayer.pressed)
             return Math.min(Theme.cornerRadiusS, CcMetrics.iconBoxSize / 2);
-        if (active)
+        if (showsActive)
             return Math.min(CcMetrics.iconBoxActiveRadius, CcMetrics.iconBoxSize / 2);
         return Theme.fullRadius(CcMetrics.iconBoxSize, CcMetrics.iconBoxSize);
     }
@@ -149,6 +158,7 @@ Item {
         id: body
 
         anchors.fill: parent
+        anchors.margins: root.bodyInset
         radius: root.bodyRadius
         color: root.bodyColor
         border.width: Theme.layerOutlineWidth
@@ -195,11 +205,11 @@ Item {
             id: compactIcon
             anchors.centerIn: parent
             name: root.iconName
-            size: CcMetrics.tileIconSize
+            size: root.small ? CcMetrics.iconBoxIconSize : CcMetrics.tileIconSize
             color: root.iconColor
-            filled: root.active
+            filled: root.showsActive
             rotation: root.iconRotation
-            visible: root.compact
+            visible: root.compact && root.bodyContent === null
 
             DankBlink {
                 target: compactIcon
@@ -207,11 +217,17 @@ Item {
             }
         }
 
+        Loader {
+            anchors.fill: parent
+            active: root.bodyContent !== null
+            sourceComponent: root.bodyContent
+        }
+
         Item {
             id: content
             anchors.fill: parent
             anchors.margins: root.tilePadding
-            visible: !root.compact
+            visible: !root.compact && root.bodyContent === null
 
             Rectangle {
                 id: iconBox
@@ -259,7 +275,7 @@ Item {
                     name: root.iconName
                     size: root.hasIconBox ? CcMetrics.iconBoxIconSize : CcMetrics.tileIconSize
                     color: root.iconColor
-                    filled: root.active
+                    filled: root.showsActive
                     rotation: root.iconRotation
 
                     DankBlink {
@@ -309,7 +325,7 @@ Item {
                     width: parent.width
                     text: root.title
                     color: root.contentColor
-                    font.pixelSize: root.narrow ? Theme.fontSizeMedium : Theme.fontSizeLarge
+                    font.pixelSize: root.denseText ? Theme.fontSizeMedium : Theme.fontSizeLarge
                     font.weight: Theme.fontWeightMedium
                     elide: Text.ElideRight
                     wrapMode: root.stacked ? Text.Wrap : Text.NoWrap
@@ -324,7 +340,7 @@ Item {
                     width: parent.width
                     text: root.subtitle
                     color: root.subtitleColor
-                    font.pixelSize: root.narrow ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                    font.pixelSize: root.denseText ? Theme.fontSizeSmall : Theme.fontSizeMedium
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap
                     horizontalAlignment: root.stacked && root.narrow ? Text.AlignHCenter : Text.AlignLeft

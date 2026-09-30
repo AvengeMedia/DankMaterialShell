@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
+	"strconv"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds/providers"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/wayland/keymap"
 	"github.com/spf13/cobra"
 )
 
@@ -66,6 +70,15 @@ var keybindsResetCmd = &cobra.Command{
 	Run:   runKeybindsEdit,
 }
 
+var keybindsKeymapCmd = &cobra.Command{
+	Use:   "keymap",
+	Short: "Report which keysym each physical key carries on the first level",
+	Long: "Print the keysyms the active keyboard layout puts on the first level of every physical key, keyed by xkb keycode.\n\n" +
+		"Compositors resolve bind keysyms at that level, so a keysym missing from this list cannot be bound however many modifiers are pressed. " +
+		"The keybind editor uses it to warn instead of storing a bind that never fires.",
+	Run: runKeybindsKeymap,
+}
+
 func init() {
 	keybindsCmd.PersistentFlags().String("expected-generation", "", "Configuration generation observed when editing Aqueous bindings")
 	for _, command := range []*cobra.Command{keybindsSetCmd, keybindsRemoveCmd, keybindsResetCmd} {
@@ -86,6 +99,7 @@ func init() {
 	keybindsCmd.AddCommand(keybindsSetCmd)
 	keybindsCmd.AddCommand(keybindsRemoveCmd)
 	keybindsCmd.AddCommand(keybindsResetCmd)
+	keybindsCmd.AddCommand(keybindsKeymapCmd)
 
 	keybinds.SetJSONProviderFactory(func(filePath string) (keybinds.Provider, error) {
 		return providers.NewJSONFileProvider(filePath)
@@ -161,6 +175,33 @@ func runKeybindsList(cmd *cobra.Command, _ []string) {
 	for _, name := range providerList {
 		fmt.Fprintf(os.Stdout, "  - %s\n", name)
 	}
+}
+
+// runKeybindsKeymap answers with empty fields rather than an error when there
+// is no Wayland seat to ask, so the caller can simply skip the check instead
+// of having to tell "unknown layout" apart from "nothing wrong".
+func runKeybindsKeymap(_ *cobra.Command, _ []string) {
+	keysyms := map[string][]string{}
+	named := []string{}
+
+	km, err := keymap.FromSeat()
+	if err != nil {
+		log.Warnf("Failed to read the seat keymap: %v", err)
+	} else {
+		for code, syms := range km.Level1ByXkbKeycode() {
+			keysyms[strconv.FormatUint(uint64(code), 10)] = syms
+		}
+		// The vocabulary the keysyms above are drawn from, so a caller can
+		// tell a keysym we could not name from one the layout is missing.
+		named = slices.Compact(slices.Sorted(maps.Values(keymap.KeysymNames)))
+	}
+
+	output, err := json.Marshal(map[string]any{"keysyms": keysyms, "named": named})
+	if err != nil {
+		log.Warnf("Failed to encode keymap: %v", err)
+		return
+	}
+	fmt.Fprintln(os.Stdout, string(output))
 }
 
 func makeProviderWithPath(name, path string) keybinds.Provider {

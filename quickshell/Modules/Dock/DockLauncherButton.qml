@@ -58,7 +58,7 @@ Item {
             anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
             width: actualIconSize
             height: actualIconSize
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             LauncherLogo {
                 anchors.centerIn: parent

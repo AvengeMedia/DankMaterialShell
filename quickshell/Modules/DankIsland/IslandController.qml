@@ -2,6 +2,8 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Modals.Clipboard
+import qs.Modals.DankLauncherV2.Components
 import qs.Modules.ControlCenter
 import qs.Modules.DankBar
 import qs.Modules.DankDash
@@ -72,7 +74,7 @@ QtObject {
     readonly property int controlCenterColumnCap: CcMetrics.columnCapFor(dashboardAvailableWidth - controlCenterSheetInset - PopoutMetrics.editOverflow * 2)
     readonly property int controlCenterColumns: Math.min(CcMetrics.gridColumns, controlCenterColumnCap)
     readonly property real controlCenterSheetWidth: CcMetrics.sheetWidthFor(controlCenterColumns)
-    readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset + PopoutMetrics.editOverflow * 2
+    readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset
     readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, destinationContentHeight("controlcenter")))
 
     readonly property bool compactDense: compactThickness < 40
@@ -90,7 +92,7 @@ QtObject {
     property real dashboardAvailableWidth: 1920
     property real dashboardAvailableHeight: 1080
     readonly property int dashboardColumnCap: DashMetrics.columnCapFor(dashboardAvailableWidth - PopoutMetrics.editOverflow * 2, SettingsData.showWeekNumber)
-    readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns) + PopoutMetrics.editOverflow * 2)
+    readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns))
     property var dashboardContentHeights: ({})
     readonly property real dashChromeHeight: DashMetrics.islandHandleChromeHeight
     readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + root.dashChromeHeight, ...Object.values(dashboardContentHeights)))
@@ -142,7 +144,7 @@ QtObject {
     function dashboardTargetFor(activityId) {
         const minimum = DashMetrics.panelHeightFor(dashEntryIdFor(activityId));
         const height = Math.max(minimum + root.dashChromeHeight, dashboardContentHeights[activityId] ?? 0);
-        return sheetTarget(dashboardWidthFor(activityId) + editGutterFor(activityId) * 2, Math.min(dashboardAvailableHeight, height));
+        return sheetTarget(dashboardWidthFor(activityId), Math.min(dashboardAvailableHeight, height));
     }
 
     function setMediaContentLength(length) {
@@ -152,8 +154,8 @@ QtObject {
         mediaContentLength = next;
     }
 
-    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
-    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter"]
+    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter", "clipboard"]
+    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard"]
     readonly property var destinationDefaults: ({
             "launcher": {
                 "contentLength": 160,
@@ -174,6 +176,10 @@ QtObject {
             "notificationcenter": {
                 "contentLength": 170,
                 "contentHeight": 320
+            },
+            "clipboard": {
+                "contentLength": 150,
+                "contentHeight": 0
             }
         })
     property var destinationState: root.freshDestinationState()
@@ -239,10 +245,6 @@ QtObject {
         } else if (editingActivity === activityId) {
             editingActivity = "";
         }
-    }
-
-    function editGutterFor(activityId) {
-        return editingActivity === activityId ? PopoutMetrics.editOverflow : 0;
     }
 
     function setDestinationContentHeight(activityId, height) {
@@ -330,6 +332,7 @@ QtObject {
             controlCenterPendingSection = "";
             return;
         case "wallpaper":
+        case "clipboard":
             keyboardYielded = false;
             return;
         }
@@ -423,13 +426,14 @@ QtObject {
     readonly property var mediaCompactTarget: pillTarget(mediaCompactLength, compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
     readonly property var mediaExpandedTarget: dashboardTargetFor("media")
-    readonly property var launcherExpandedTarget: sheetTarget(680, 560)
-    readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset + editGutterFor("controlcenter") * 2, controlCenterHeight)
+    readonly property var launcherExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)), Math.min(dashboardAvailableHeight, LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)))
+    readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(root.isVertical ? 240 : (SettingsData.osdAlwaysShowValue ? 330 : 282), compactFaceThickness)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
     readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinLength, Math.min(notificationCompactMaxLength, notificationContentLength))), compactFaceThickness)
     readonly property var notificationExpandedTarget: sheetTarget(520, 220)
     readonly property var notificationCenterExpandedTarget: dashboardTargetFor("notificationcenter")
+    readonly property var clipboardExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, ClipboardConstants.sizeWidth(SettingsData.clipboardSize)), Math.min(dashboardAvailableHeight, ClipboardConstants.sizeHeight(SettingsData.clipboardSize)))
 
     readonly property bool systemActivityActive: activeActivity === "volume" || activeActivity === "brightness"
     readonly property bool notificationActive: activeActivity === "notification"
@@ -471,6 +475,8 @@ QtObject {
             return controlCenterExpandedTarget;
         case "notificationcenter":
             return notificationCenterExpandedTarget;
+        case "clipboard":
+            return clipboardExpandedTarget;
         case "media":
             return mediaExpandedTarget;
         }
@@ -697,6 +703,12 @@ QtObject {
             return requestCollapse();
         root.consumeTransientNotification();
         return requestActivity("notificationcenter", true, true);
+    }
+
+    function requestClipboard(shouldToggle) {
+        if (shouldToggle === true && activeActivity === "clipboard" && expanded)
+            return requestCollapse();
+        return requestActivity("clipboard", true, true);
     }
 
     function cycleActivity(direction, shouldExpand) {

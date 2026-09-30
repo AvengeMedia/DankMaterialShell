@@ -9,6 +9,8 @@ import Quickshell.Widgets
 DankOSD {
     id: root
 
+    osdKind: "mediaPlayback"
+
     readonly property bool useVertical: isVerticalLayout
     readonly property bool playing: player?.isPlaying ?? false
     readonly property var player: MprisController.activePlayer

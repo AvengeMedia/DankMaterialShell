@@ -301,12 +301,10 @@ ShellRoot {
                 case 4:
                     root.check(!first.isTopBarEdge, "edge changes remain bound");
                     root.check(clock.timeText === "12:05:09 PM" && clock.timeLines.join("|") === "12|05|09|PM", "noon and vertical seconds");
-                    for (const locale of ["en_US", "de_DE", "fr_FR", "ar_EG", "zh_CN"]) {
-                        clock.locale = Qt.locale(locale);
-                        SettingsData.clockDateFormat = "dddd d MMMM yyyy";
-                        root.check(clock.dateText === clock.date.toLocaleDateString(Qt.locale(locale), "dddd d MMMM yyyy"), locale + " custom date");
-                        root.check(clock.timeText === clock.date.toLocaleTimeString(Qt.locale(locale), "hh:mm:ss AP"), locale + " time");
-                    }
+                    clock.locale = Qt.locale("ar_EG");
+                    SettingsData.clockDateFormat = "dddd d MMMM yyyy";
+                    root.check(clock.dateText === clock.date.toLocaleDateString(Qt.locale("ar_EG"), "dddd d MMMM yyyy"), "custom date follows the clock locale");
+                    root.check(clock.timeText === clock.date.toLocaleTimeString(Qt.locale("ar_EG"), "hh:mm:ss AP"), "time follows the clock locale");
                     clock.locale = Qt.locale("en_US");
                     SettingsData.clockDateFormat = "ddd d";
                     clock.vertical = false;

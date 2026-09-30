@@ -149,7 +149,8 @@
               "min": { "type": "number" },
               "max": { "type": "number" },
               "step": { "type": "number", "exclusiveMinimum": 0 },
-              "unit": { "type": "string" }
+              "unit": { "type": "string" },
+              "cardOnly": { "type": "boolean", "description": "Leave the option out of the tab's options sheet, for options that only the overview card reads" }
             },
             "additionalProperties": false
           }

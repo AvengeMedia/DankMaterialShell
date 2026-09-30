@@ -83,28 +83,26 @@ type ShellInfo struct {
 	GitBuild       int           `json:"gitBuild,omitempty"`
 	RestartPending bool          `json:"restartPending"`
 	UpdatePackage  *Package      `json:"updatePackage,omitempty"`
-	LatestVersion  string        `json:"latestVersion,omitempty"`
 	CommitsBehind  *int          `json:"commitsBehind,omitempty"`
 }
 
 type State struct {
-	Phase               Phase         `json:"phase"`
-	Distro              string        `json:"distro,omitempty"`
-	DistroPretty        string        `json:"distroPretty,omitempty"`
-	Backends            []BackendInfo `json:"backends"`
-	Packages            []Package     `json:"packages"`
-	Count               int           `json:"count"`
-	IntervalSeconds     int           `json:"intervalSeconds"`
-	LastCheckUnix       int64         `json:"lastCheckUnix,omitempty"`
-	LastSuccessUnix     int64         `json:"lastSuccessUnix,omitempty"`
-	NextCheckUnix       int64         `json:"nextCheckUnix,omitempty"`
-	OperationID         string        `json:"operationId,omitempty"`
-	OperationStarted    int64         `json:"operationStartedUnix,omitempty"`
-	RecentLog           []string      `json:"recentLog,omitempty"`
-	Error               *ErrorInfo    `json:"error,omitempty"`
-	Shell               ShellInfo     `json:"shell"`
-	Reboot              RebootInfo    `json:"reboot"`
-	ReleasesFetchedUnix int64         `json:"releasesFetchedUnix,omitempty"`
+	Phase            Phase         `json:"phase"`
+	Distro           string        `json:"distro,omitempty"`
+	DistroPretty     string        `json:"distroPretty,omitempty"`
+	Backends         []BackendInfo `json:"backends"`
+	Packages         []Package     `json:"packages"`
+	Count            int           `json:"count"`
+	IntervalSeconds  int           `json:"intervalSeconds"`
+	LastCheckUnix    int64         `json:"lastCheckUnix,omitempty"`
+	LastSuccessUnix  int64         `json:"lastSuccessUnix,omitempty"`
+	NextCheckUnix    int64         `json:"nextCheckUnix,omitempty"`
+	OperationID      string        `json:"operationId,omitempty"`
+	OperationStarted int64         `json:"operationStartedUnix,omitempty"`
+	RecentLog        []string      `json:"recentLog,omitempty"`
+	Error            *ErrorInfo    `json:"error,omitempty"`
+	Shell            ShellInfo     `json:"shell"`
+	Reboot           RebootInfo    `json:"reboot"`
 }
 
 type ReleaseCounts struct {
@@ -133,7 +131,7 @@ type MasterInfo struct {
 	Date        string `json:"date"`
 }
 
-// The api.danklinux.com /dms/releases document plus cache metadata.
+// The /dms/releases API document plus cache metadata.
 type ReleasesFeed struct {
 	FetchedAt int64       `json:"fetchedAt"`
 	ETag      string      `json:"etag,omitempty"`
@@ -157,6 +155,6 @@ type UpgradeOptions struct {
 
 type RefreshOptions struct {
 	Force bool
-	// Background checks (check-on-start) fail quietly and don't force the feed; manual ones surface errors.
+	// Background checks (check-on-start) fail quietly; manual ones surface errors.
 	Background bool
 }

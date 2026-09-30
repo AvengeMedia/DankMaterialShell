@@ -131,6 +131,7 @@ FocusScope {
         nested: root.nested
         anchors.bottomMargin: footer.height + Theme.spacingM
         visible: root.currentTab === 0
+        showScrollBar: false
         keyboardController: keyboard
         focusAllowed: root.activeFocus
         transientSurfaceTracker: root.surfaces
@@ -144,6 +145,7 @@ FocusScope {
         visible: active
         sourceComponent: HistoryNotificationList {
             focusAllowed: root.activeFocus
+            showScrollBar: false
             nested: root.nested
         }
     }

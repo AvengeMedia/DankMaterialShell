@@ -6,6 +6,8 @@ import qs.Widgets
 DankOSD {
     id: root
 
+    osdKind: "powerProfile"
+
     property int currentProfile: 0
     property string profileIcon: "settings"
 

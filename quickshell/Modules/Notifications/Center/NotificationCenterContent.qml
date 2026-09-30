@@ -103,6 +103,7 @@ Item {
                 id: notificationHeader
 
                 objectName: "notificationHeader"
+                historyView: historyList
                 transientSurfaceTracker: root.host.transientSurfaceTracker ?? null
                 onHeightChanged: root.cachedHeaderHeight = height
                 onSettingsRequested: {
@@ -144,6 +145,7 @@ Item {
         anchors.right: parent.right
         anchors.margins: PopoutMetrics.contentPadding
         showHints: notificationHeader.currentTab === 0 ? (root.externalKeyboardController?.showKeyboardHints ?? false) : historyList.showKeyboardHints
+        historyTab: notificationHeader.currentTab === 1
         z: 200
     }
 }

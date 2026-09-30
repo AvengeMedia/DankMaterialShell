@@ -12,6 +12,7 @@ Singleton {
     property int refCount: 0
     // `Ref { modules: ["releases"] }` also holds the feed document; a plain Ref only keeps the daemon polling.
     property int releasesRefCount: 0
+    readonly property bool pollWanted: refCount > 0 || SettingsData.updaterNotify
 
     function addRef(modules) {
         refCount++;
@@ -57,10 +58,8 @@ Singleton {
     property var _rawShellUpdate: null
     // From the filtered list, so an AUR-off/ignored dms package doesn't advertise.
     readonly property var shellUpdate: _rawShellUpdate ? (availableUpdates.find(p => p.name === _rawShellUpdate.name) ?? null) : null
-    property string shellLatestVersion: ""
     // -1 while unknown (stable channel or no feed yet)
     property int commitsBehind: -1
-    property int releasesFetchedUnix: 0
     property var releases: null
 
     readonly property int updateCount: availableUpdates.length
@@ -175,7 +174,10 @@ Singleton {
         distributionSupported = (backends.length > 0);
         recentLog = data.recentLog || [];
         intervalSeconds = data.intervalSeconds || 86400;
-        lastCheckUnix = data.lastCheckUnix || 0;
+        const checked = data.lastCheckUnix || 0;
+        const freshCheck = _stateSeeded && checked > lastCheckUnix;
+        _stateSeeded = true;
+        lastCheckUnix = checked;
         nextCheckUnix = data.nextCheckUnix || 0;
 
         const shell = data.shell || {};
@@ -190,14 +192,7 @@ Singleton {
         rebootRecommended = reboot.recommended === true;
         rebootPackages = reboot.packages || [];
         _rawShellUpdate = shell.updatePackage || null;
-        shellLatestVersion = shell.latestVersion || "";
         commitsBehind = typeof shell.commitsBehind === "number" ? shell.commitsBehind : -1;
-        const fetched = data.releasesFetchedUnix || 0;
-        if (fetched !== releasesFetchedUnix) {
-            releasesFetchedUnix = fetched;
-            if (releasesRefCount > 0)
-                loadReleases(false);
-        }
 
         const phase = data.phase || "idle";
         switch (phase) {
@@ -225,7 +220,8 @@ Singleton {
             errorCode = "";
             errorHint = "";
         }
-        _maybeNotify();
+        if (freshCheck)
+            _maybeNotify();
     }
 
     function _filterUpdates(pkgs) {
@@ -269,7 +265,6 @@ Singleton {
             "actionArgs": ["ipc", "call", "settings", "openWith", "updater"]
         }, resp => {
             root._notifyInFlight = false;
-            // A failed send retries on the next state push.
             if (!resp || resp.error)
                 return;
             SessionData.set("updaterNotifiedUnix", Math.floor(Date.now() / 1000));
@@ -278,6 +273,8 @@ Singleton {
     }
 
     property bool _notifyInFlight: false
+    // The first state after a connect is the persisted list, not a check that just ran.
+    property bool _stateSeeded: false
 
     function ignorePackage(name) {
         if (!name)
@@ -301,6 +298,8 @@ Singleton {
 
     function checkForUpdates() {
         DMSService.sysupdateRefresh(false, null);
+        if (releasesRefCount > 0)
+            loadReleases(true);
     }
 
     function loadReleases(force) {
@@ -341,7 +340,7 @@ Singleton {
     property bool _startupCheckDone: false
 
     function _maybeStartupCheck() {
-        if (refCount <= 0) {
+        if (!pollWanted) {
             _startupCheckDone = false;
             return;
         }
@@ -355,10 +354,10 @@ Singleton {
         Qt.callLater(() => DMSService.sysupdateRefresh(false, null, true));
     }
 
-    onRefCountChanged: {
-        if (refCount <= 0)
+    onPollWantedChanged: {
+        if (!pollWanted)
             _startupCheckDone = false;
-        _syncAcquire();
+        Qt.callLater(() => root._syncAcquire());
         Qt.callLater(() => root._maybeStartupCheck());
     }
     onReleasesRefCountChanged: {
@@ -367,7 +366,11 @@ Singleton {
         else if (releases === null)
             loadReleases(false);
     }
-    onSysupdateAvailableChanged: _syncAcquire()
+    onSysupdateAvailableChanged: {
+        _syncAcquire();
+        if (sysupdateAvailable && releasesRefCount > 0 && releases === null)
+            loadReleases(false);
+    }
 
     property bool _acquired: false
     // Releasing the ref parks the daemon scheduler; its deadline is kept, so checks resume on AC.
@@ -375,7 +378,7 @@ Singleton {
     onPausedOnBatteryChanged: _syncAcquire()
 
     function _syncAcquire() {
-        const want = refCount > 0 && sysupdateAvailable && !pausedOnBattery;
+        const want = pollWanted && sysupdateAvailable && !pausedOnBattery;
         if (want === _acquired) {
             return;
         }

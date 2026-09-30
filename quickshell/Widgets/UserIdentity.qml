@@ -33,13 +33,7 @@ Item {
         const prefix = I18n.tr("up", "uptime prefix, e.g. 'up 4h 2m'");
         return DgopService.shortUptime ? prefix + DgopService.shortUptime.slice(2) : prefix;
     }
-    readonly property string avatarSource: {
-        if (PortalService.profileImage === "")
-            return "";
-        if (PortalService.profileImage.startsWith("/"))
-            return "file://" + PortalService.profileImage;
-        return PortalService.profileImage;
-    }
+    readonly property string avatarSource: PortalService.profileImageUrl
 
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true

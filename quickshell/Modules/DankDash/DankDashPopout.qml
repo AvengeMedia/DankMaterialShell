@@ -562,6 +562,8 @@ DankPopout {
 
             DashOptionsSheet {
                 id: tabOptions
+                backdrop: contentColumn
+                tabScope: true
                 onDismissed: mainContainer.focusInitial()
             }
 
@@ -656,7 +658,7 @@ DankPopout {
                             height: Math.min(parent.height, implicitHeight)
                             visible: root.editMode
                             vertical: root.verticalNavigation
-                            overlayParent: mainContainer
+                            transientSurfaceTracker: root.transientSurfaceTracker
                             entryId: root.activeTabId
                             tabItem: pages.currentItem
                             editMode: root.editMode
@@ -669,6 +671,7 @@ DankPopout {
                     DankFlickable {
                         id: pages
                         enabled: !tabOptions.shown && !pageActions.menuOpen
+                        showScrollBar: false
 
                         property var currentHost: null
                         property real settledHeight: DashMetrics.tabDefaultHeight

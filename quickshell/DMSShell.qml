@@ -246,7 +246,7 @@ Item {
         osdStartupTimer.start();
         if (SettingsData.controlCenterWidgets.some(widget => widget.id === "diskUsage" && widget.enabled !== false))
             DgopService.initializeDiskMounts();
-        if (SettingsData.controlCenterWidgets.some(widget => widget.id === "userCard" && widget.enabled !== false && widget.uptime !== false))
+        if (SettingsData.controlCenterWidgets.some(widget => widget.id === "user" && widget.enabled !== false && widget.uptime !== false))
             DgopService.dgopAvailable;
 
         // These are dummy references just to trigger the singletons onCompleted to trigger

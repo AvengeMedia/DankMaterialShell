@@ -15,6 +15,8 @@ Item {
     height: 0
 
     property var menuItems: []
+    property Component customContent: null
+    property real customContentWidth: 0
     property string layerNamespace: "dms:context-menu"
     property real menuMargin: Theme.spacingS
     property real minMenuWidth: Theme.fieldDefaultWidth
@@ -41,9 +43,9 @@ Item {
         }
         return longest;
     }
-    readonly property real naturalMenuWidth: Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5)
+    readonly property real naturalMenuWidth: customContent ? Math.max(minMenuWidth, customContentWidth) : Math.max(minMenuWidth, menuTextMetrics.width + Theme.iconSize + Theme.spacingS * 5)
     readonly property real effectiveMenuWidth: Math.max(0, Math.min(maxMenuWidth, naturalMenuWidth))
-    readonly property real naturalMenuHeight: menuItemsHeight() + Theme.spacingS * 2
+    readonly property real naturalMenuHeight: (customContent ? customContentLoader.implicitHeight : menuItemsHeight()) + Theme.spacingS * 2
     readonly property real effectiveMenuHeight: Math.min(maxMenuHeight, naturalMenuHeight)
     readonly property bool menuScrolls: naturalMenuHeight > effectiveMenuHeight + 0.5
     readonly property int visibleItemCount: menuItems.filter(menuItem => menuItem.type === "item").length
@@ -113,6 +115,8 @@ Item {
     }
 
     function activate(menuItem) {
+        if (menuItem?.enabled === false)
+            return;
         if (typeof menuItem?.action === "function")
             menuItem.action();
         hide();
@@ -122,7 +126,11 @@ Item {
         if (visibleItemCount === 0)
             return;
         keyboardNavigation = true;
-        selectedMenuIndex = (selectedMenuIndex + 1) % visibleItemCount;
+        for (let step = 0; step < visibleItemCount; step++) {
+            selectedMenuIndex = (selectedMenuIndex + 1) % visibleItemCount;
+            if (menuItems[selectedDelegateIndex()]?.enabled !== false)
+                break;
+        }
         ensureSelectedVisible();
     }
 
@@ -130,7 +138,11 @@ Item {
         if (visibleItemCount === 0)
             return;
         keyboardNavigation = true;
-        selectedMenuIndex = (selectedMenuIndex - 1 + visibleItemCount) % visibleItemCount;
+        for (let step = 0; step < visibleItemCount; step++) {
+            selectedMenuIndex = (selectedMenuIndex - 1 + visibleItemCount) % visibleItemCount;
+            if (menuItems[selectedDelegateIndex()]?.enabled !== false)
+                break;
+        }
         ensureSelectedVisible();
     }
 
@@ -295,9 +307,17 @@ Item {
                         width: menuFlickable.width
                         spacing: Theme.groupedListGap
 
+                        Loader {
+                            id: customContentLoader
+                            width: menuColumn.width
+                            active: root.customContent !== null
+                            visible: active
+                            sourceComponent: root.customContent
+                        }
+
                         Repeater {
                             id: menuRepeater
-                            model: root.menuItems
+                            model: root.customContent ? [] : root.menuItems
 
                             Item {
                                 id: menuItemDelegate
@@ -322,7 +342,10 @@ Item {
                                     id: menuRow
                                     readonly property bool selected: root.keyboardNavigation && root.selectedMenuIndex === menuItemDelegate.itemIndex
                                     readonly property bool destructive: menuItemDelegate.modelData?.isDestructive ?? false
+                                    readonly property bool itemEnabled: menuItemDelegate.modelData?.enabled !== false
                                     readonly property color contentColor: {
+                                        if (!itemEnabled)
+                                            return Theme.onSurface_38;
                                         if (destructive)
                                             return Theme.error;
                                         return selected ? Theme.onSelectedContainer : Theme.onSurface;
@@ -331,6 +354,8 @@ Item {
                                     anchors.fill: parent
                                     radius: Theme.cornerRadiusS
                                     color: {
+                                        if (!itemEnabled)
+                                            return "transparent";
                                         if (destructive)
                                             return selected ? Theme.errorSelected : itemMouseArea.containsMouse ? Theme.errorHover : "transparent";
                                         return selected ? Theme.selectedContainer : itemMouseArea.pressed ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerPressed) : itemMouseArea.containsMouse ? Theme.withAlpha(Theme.onSurface, Theme.stateLayerHover) : "transparent";
@@ -371,6 +396,7 @@ Item {
                                     MouseArea {
                                         id: itemMouseArea
                                         anchors.fill: parent
+                                        enabled: menuRow.itemEnabled
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onEntered: {

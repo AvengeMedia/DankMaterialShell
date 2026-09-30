@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -52,6 +53,8 @@ Item {
     property int nowUnix: Math.floor(Date.now() / 1000)
 
     readonly property int packageListCap: 60
+    readonly property int logTailLines: 20
+    readonly property real logViewHeight: Theme.listItemHeight * 5
     readonly property bool upgradeRunsInTerminal: SystemUpdateService.useCustomCommand || (SystemUpdateService.backends || []).some(b => b.runsInTerminal === true)
     readonly property int systemCount: SystemUpdateService.systemUpdates.length
     readonly property int flatpakCount: SystemUpdateService.systemUpdates.filter(p => p.repo === "flatpak").length
@@ -169,10 +172,11 @@ Item {
             return I18n.tr("Failed: %1", "system update error status, %1 is the error message").arg(SystemUpdateService.errorMessage);
         case !SystemUpdateService.helperAvailable:
             return I18n.tr("No supported package manager found.");
-        case SystemUpdateService.shellUpdateAvailable: {
-            const shell = I18n.tr("DMS %1 available", "software updates hero, %1 is the new DMS version").arg(SystemUpdateService.shellUpdateVersion);
-            return root.systemCount > 0 ? shell + " · " + root.countText(root.systemCount) : shell;
-        }
+        case SystemUpdateService.shellUpdateAvailable:
+            {
+                const shell = I18n.tr("DMS %1 available", "software updates hero, %1 is the new DMS version").arg(SystemUpdateService.shellUpdateVersion);
+                return root.systemCount > 0 ? shell + " · " + root.countText(root.systemCount) : shell;
+            }
         case root.systemCount > 0:
             return checked ? root.countText(root.systemCount) + " · " + checked : root.countText(root.systemCount);
         default:
@@ -246,26 +250,31 @@ Item {
         DankCard {
             id: hero
             width: parent.width
-            height: heroColumn.implicitHeight + SettingsMetrics.heroPadding * 3
-            restRadius: Theme.cornerRadiusXL
-            color: Theme.surfaceContainerLow
+            height: heroColumn.implicitHeight + SettingsMetrics.pagePaddingV * 2
+            restRadius: Theme.groupedListOuterRadius
+            color: SettingsMetrics.rowColor
             pad: 0
-            clipContent: true
             showFocusRing: false
 
-            // The danklinux.com release banner, tinted to the accent.
-            Image {
+            // Clips the image only: text inside a ClippingRectangle is drawn from a texture and blurs at fractional scales.
+            ClippingRectangle {
                 anchors.fill: parent
-                source: "file://" + Theme.shellDir + "/assets/release-banner.svg"
-                fillMode: Image.Stretch
-                asynchronous: true
-                cache: false
-                sourceSize: Qt.size(width, height)
-                opacity: Theme.pendingOpacity
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    colorization: 1
-                    colorizationColor: Theme.primary
+                radius: hero.bodyRadius
+                color: "transparent"
+
+                Image {
+                    anchors.fill: parent
+                    source: "file://" + Theme.shellDir + "/assets/release-banner.svg"
+                    fillMode: Image.Stretch
+                    asynchronous: true
+                    cache: false
+                    sourceSize: Qt.size(width, height)
+                    opacity: Theme.pendingOpacity
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        colorization: 1
+                        colorizationColor: Theme.primary
+                    }
                 }
             }
 
@@ -283,16 +292,14 @@ Item {
                         id: heroBrand
                         text: "DMS"
                         font.pixelSize: Theme.fontSizeDisplayLarge
-                        font.weight: Theme.shiftedFontWeight(Font.ExtraBold)
-                        font.letterSpacing: -Theme.fontSizeDisplayLarge * 0.04
+                        font.weight: Theme.fontWeightBold
                         color: Theme.surfaceText
                     }
 
-                    // The blog's silver-to-accent version number.
-                    GradientText {
-                        anchors.verticalCenter: parent.verticalCenter
+                    StyledText {
                         text: root.displayVersion
                         font: heroBrand.font
+                        color: Theme.primary
                     }
                 }
 
@@ -301,8 +308,7 @@ Item {
                     visible: ShellVersionService.shellCodename !== ""
                     text: ShellVersionService.shellCodename.toUpperCase()
                     font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Theme.fontWeightBold
-                    font.letterSpacing: Theme.fontSizeMedium * 0.25
+                    font.weight: Theme.fontWeightMedium
                     color: Theme.primary
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
@@ -336,7 +342,7 @@ Item {
                         iconName: "refresh"
                         iconColor: Theme.surfaceText
                         backgroundColor: Theme.chipSurface
-                        tooltipText: I18n.tr("Check for updates")
+                        Accessible.name: I18n.tr("Check for updates")
                         onClicked: SystemUpdateService.checkForUpdates()
                     }
                 }
@@ -489,28 +495,33 @@ Item {
                 }
             }
 
-            Repeater {
-                model: root.packagesExpanded && !SystemUpdateService.isUpgrading ? SystemUpdateService.systemUpdates.slice(0, root.packageListCap) : []
+            Column {
+                width: parent?.width ?? 0
+                spacing: Theme.groupedListGap
 
-                delegate: SettingsRow {
-                    id: packageRow
-                    required property var modelData
+                Repeater {
+                    model: root.packagesExpanded && !SystemUpdateService.isUpgrading ? SystemUpdateService.systemUpdates.slice(0, root.packageListCap) : []
 
-                    title: modelData.name || ""
-                    subtitle: {
-                        const from = modelData.fromVersion || "";
-                        const to = modelData.toVersion || "";
-                        const version = from && to ? from + " → " + to : to || from;
-                        const repo = modelData.repo || "";
-                        return repo && version ? repo + " · " + version : repo || version;
-                    }
+                    delegate: SettingsRow {
+                        id: packageRow
+                        required property var modelData
 
-                    DankActionButton {
-                        anchors.verticalCenter: parent.verticalCenter
-                        iconName: "visibility_off"
-                        visible: SystemUpdateService.canIgnorePackage(packageRow.modelData)
-                        tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
-                        onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
+                        title: modelData.name || ""
+                        subtitle: {
+                            const from = modelData.fromVersion || "";
+                            const to = modelData.toVersion || "";
+                            const version = from && to ? from + " → " + to : to || from;
+                            const repo = modelData.repo || "";
+                            return repo && version ? repo + " · " + version : repo || version;
+                        }
+
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "visibility_off"
+                            visible: SystemUpdateService.canIgnorePackage(packageRow.modelData)
+                            tooltipText: I18n.tr("Ignore package", "tooltip, exclude a package from system updates")
+                            onClicked: SystemUpdateService.ignorePackage(packageRow.modelData.name)
+                        }
                     }
                 }
             }
@@ -523,19 +534,18 @@ Item {
 
             SettingsRow {
                 visible: SystemUpdateService.isUpgrading
-                body: DankFlickable {
-                    id: upgradeLog
+                body: Item {
+                    readonly property real lineHeight: logText.implicitHeight / Math.max(1, logText.lineCount)
+
                     width: parent.width
-                    height: Math.min(logText.implicitHeight, Theme.listItemHeight * 5)
-                    contentWidth: width
-                    contentHeight: logText.implicitHeight
+                    height: Math.min(logText.implicitHeight, Math.floor(root.logViewHeight / lineHeight) * lineHeight)
                     clip: true
-                    onContentHeightChanged: contentY = Math.max(0, contentHeight - height)
 
                     StyledText {
                         id: logText
-                        width: upgradeLog.width
-                        text: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : (SystemUpdateService.recentLog || []).join("\n")
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        text: root.upgradeRunsInTerminal ? I18n.tr("Running in terminal") : (SystemUpdateService.recentLog || []).slice(-root.logTailLines).join("\n")
                         font.family: Theme.monoFontFamily
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.onSurface
@@ -631,7 +641,7 @@ Item {
                 tags: ["notify", "notification", "alert"]
                 resetKeys: ["updaterNotify"]
                 text: I18n.tr("Notify me on new updates")
-                description: I18n.tr("Only when the count grows.")
+                description: I18n.tr("Checks in the background at the check interval. Notifies only when the count grows.")
                 checked: SettingsData.updaterNotify
                 onToggled: checked => SettingsData.set("updaterNotify", checked)
             }

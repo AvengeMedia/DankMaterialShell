@@ -163,6 +163,9 @@ Item {
             case "settings":
                 PopoutService.focusOrToggleSettings();
                 break;
+            case "accounts":
+                PopoutService.openSettingsWithTab("user_accounts");
+                break;
             case "colorPicker":
                 PopoutService.showColorPicker();
                 break;
@@ -427,6 +430,8 @@ Item {
             notificationExpandedComponent: expandedNotificationComponent
             notificationCenterCompactComponent: compactNotificationCenterComponent
             notificationCenterExpandedComponent: expandedNotificationCenterComponent
+            clipboardCompactComponent: compactClipboardComponent
+            clipboardExpandedComponent: expandedClipboardComponent
         }
 
         HoverHandler {
@@ -722,6 +727,29 @@ Item {
         NotificationCenterExpanded {
             controller: root.controller
             resizeGeometry: root.resizeGeometry
+        }
+    }
+
+    Component {
+        id: compactClipboardComponent
+
+        DestinationCompact {
+            controller: root.controller
+            activityId: "clipboard"
+            iconName: "content_paste"
+            label: I18n.tr("Clipboard")
+        }
+    }
+
+    Component {
+        id: expandedClipboardComponent
+
+        ClipboardExpanded {
+            controller: root.controller
+            transientSurfaceTracker: root.launcherTransientSurfaceTracker
+            effectiveScreen: root.effectiveScreen
+            alignedX: root.targetScreenX
+            alignedY: root.targetScreenY
         }
     }
 

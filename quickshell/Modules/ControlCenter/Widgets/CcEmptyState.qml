@@ -11,6 +11,7 @@ Item {
     property string subtitle: ""
     property bool spinning: false
     property color iconColor: Theme.surfaceVariantText
+    default property alias content: column.data
 
     width: parent?.width ?? 0
     implicitHeight: Math.max(CcMetrics.emptyStateMinHeight, column.implicitHeight + Theme.spacingL * 2)

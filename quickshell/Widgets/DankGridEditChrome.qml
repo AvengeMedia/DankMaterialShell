@@ -24,6 +24,7 @@ Item {
     property real cornerRadius: Theme.cornerRadiusXL
     property real buttonSize: Theme.iconSizeLarge
     property real iconSize: Theme.iconSizeSmall
+    readonly property real handleThickness: Theme.spacingM
     readonly property real touchTargetSize: Math.max(Theme.minimumTouchTargetSize, buttonSize)
     readonly property real contentInset: touchTargetSize / 2
     readonly property bool showOptionsButton: hasOptions && width - contentInset * 2 >= touchTargetSize * (1 + (removable ? 1 : 0) + (horizontalResize ? 1 : 0))
@@ -185,7 +186,7 @@ Item {
 
         Rectangle {
             anchors.centerIn: parent
-            width: Theme.spacingM
+            width: root.handleThickness
             height: root.buttonSize
             radius: Theme.fullRadius(width, height)
             color: Theme.primary
@@ -230,8 +231,7 @@ Item {
                     const target = root.passthrough;
                     if (!target?.visible)
                         return true;
-                    const local = band.mapToItem(target, point.x, point.y);
-                    return local.x < 0 || local.y < 0 || local.x >= target.width || local.y >= target.height;
+                    return !target.contains(band.mapToItem(target, point.x, point.y));
                 }
             }
         }

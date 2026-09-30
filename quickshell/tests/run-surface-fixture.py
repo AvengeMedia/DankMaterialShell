@@ -64,12 +64,12 @@ with tempfile.TemporaryDirectory(prefix="dms-surface-test-") as temporary:
     shutil.copytree(repo / "quickshell/tests/fixtures/share", root / "share")
     env.update(HOME=str(root / "home"), XDG_DATA_DIRS=str(root / "share"), XDG_CONFIG_DIRS=str(root / "xdg"), XDG_RUNTIME_DIR=str(root / "runtime"), TMPDIR=str(root), LANG="C.UTF-8", LC_ALL="C.UTF-8", TZ="UTC")
     env.update({"XDG_" + name.upper() + "_HOME": str(root / name) for name in ["config", "state", "data", "cache"]})
-    env.update(QT_QPA_PLATFORM="wayland", QT_LOGGING_RULES="qml.debug=true", LIBGL_ALWAYS_SOFTWARE="1", DMS_DISABLE_HOT_RELOAD="1", DMS_DISABLE_MATUGEN="1", DBUS_SESSION_BUS_ADDRESS="unix:path=" + str(root / "no-session-bus"), DBUS_SYSTEM_BUS_ADDRESS="unix:path=" + str(root / "no-system-bus"), PULSE_SERVER="unix:" + str(root / "no-pulse"), PIPEWIRE_REMOTE="no-pipewire")
+    env.update(QT_QPA_PLATFORM="wayland", QT_LOGGING_RULES="qml.debug=true", LIBGL_ALWAYS_SOFTWARE="1", LP_NUM_THREADS="0", DMS_DISABLE_HOT_RELOAD="1", DMS_DISABLE_MATUGEN="1", DBUS_SESSION_BUS_ADDRESS="unix:path=" + str(root / "no-session-bus"), DBUS_SYSTEM_BUS_ADDRESS="unix:path=" + str(root / "no-system-bus"), PULSE_SERVER="unix:" + str(root / "no-pulse"), PIPEWIRE_REMOTE="no-pipewire")
     # glvnd loads the nvidia vendor first, which powers up a sleeping dGPU
     mesa_vendor = mesa_egl_vendor()
     if mesa_vendor:
         env["__EGL_VENDOR_LIBRARY_FILENAMES"] = mesa_vendor
-    (root / "niri.kdl").write_text('prefer-no-csd\nhotkey-overlay { skip-at-startup; }\nlayout { gaps 0; border { off; }; focus-ring { off; }; default-column-width { proportion 1.0; }; }\n')
+    (root / "niri.kdl").write_text('prefer-no-csd\nanimations { off; }\nhotkey-overlay { skip-at-startup; }\nlayout { gaps 0; border { off; }; focus-ring { off; }; default-column-width { proportion 1.0; }; }\n')
     # a bus with service dirs activates gvfs and friends, whose fuse mounts break the temporary directory cleanup
     (root / "dbus.conf").write_text('<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">\n<busconfig><type>session</type><listen>unix:tmpdir=' + str(root) + '</listen><policy context="default"><allow send_destination="*" eavesdrop="true"/><allow eavesdrop="true"/><allow own="*"/></policy></busconfig>\n')
     xvfb = None
@@ -139,7 +139,7 @@ with tempfile.TemporaryDirectory(prefix="dms-surface-test-") as temporary:
                 if mpris:
                     start_dbus(fixture_env, processes)
                     processes.append(subprocess.Popen([sys.executable, str(repo / "quickshell/tests/fixtures/mpris_player.py")] + (["--artwork"] if "--artwork" in sys.argv else []), env=fixture_env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
-                result = subprocess.run(["qs", "-p", str(home / "qml")], env=fixture_env, capture_output=True, text=True, timeout=180)
+                result = subprocess.run(["qs", "-p", str(home / "qml")], env=fixture_env, capture_output=True, text=True, timeout=60)
                 output = result.stdout + result.stderr
                 failed = bool(result.returncode) or "FIXTURE_PASS" not in output or "FIXTURE_FAIL" in output
             except subprocess.TimeoutExpired as expired:

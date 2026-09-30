@@ -87,8 +87,7 @@ Item {
             const target = root.passthrough;
             if (!target?.visible)
                 return true;
-            const local = root.mapToItem(target, point.x, point.y);
-            return local.x < 0 || local.y < 0 || local.x >= target.width || local.y >= target.height;
+            return !target.contains(root.mapToItem(target, point.x, point.y));
         }
     }
 

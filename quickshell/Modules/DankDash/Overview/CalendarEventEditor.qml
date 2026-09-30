@@ -157,6 +157,7 @@ Column {
     DankFlickable {
         width: parent.width
         height: Math.min(DashMetrics.sheetFormHeight, form.implicitHeight)
+        showScrollBar: false
         contentWidth: width
         contentHeight: form.implicitHeight
         clip: true

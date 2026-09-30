@@ -24,22 +24,6 @@ DankModal {
         NotificationService.onOverlayOpen();
         open();
         modalKeyboardController.reset();
-        if (modalKeyboardController && notificationListRef) {
-            modalKeyboardController.listView = notificationListRef;
-            modalKeyboardController.rebuildFlatNavigation();
-
-            Qt.callLater(() => {
-                modalKeyboardController.keyboardNavigationActive = true;
-                modalKeyboardController.selectedFlatIndex = 0;
-                modalKeyboardController.updateSelectedIdFromIndex();
-                if (notificationListRef) {
-                    notificationListRef.keyboardActive = true;
-                    notificationListRef.currentIndex = 0;
-                }
-                modalKeyboardController.selectionVersion++;
-                modalKeyboardController.ensureVisible();
-            });
-        }
     }
 
     function hide() {
@@ -227,6 +211,7 @@ DankModal {
                     id: notificationHeader
                     modal: true
                     keyboardController: modalKeyboardController
+                    historyView: historyList
                     transientSurfaceTracker: notificationModal.transientSurfaceTracker
                     onCloseRequested: notificationModal.hide()
                     onCurrentTabChanged: notificationModal.currentTab = currentTab
@@ -270,6 +255,7 @@ DankModal {
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingL
                 showHints: notificationHeader.currentTab === 0 ? modalKeyboardController.showKeyboardHints : historyList.showKeyboardHints
+                historyTab: notificationHeader.currentTab === 1
             }
         }
     }

@@ -120,6 +120,7 @@ Item {
         case "wallpaper":
         case "weather":
         case "notificationcenter":
+        case "clipboard":
             return requested;
         case "control-center":
         case "cc":
@@ -149,6 +150,8 @@ Item {
             return host.islandController.requestWeather(false);
         case "notificationcenter":
             return host.islandController.requestNotificationCenter(false);
+        case "clipboard":
+            return host.islandController.requestClipboard(false);
         }
         return host.islandController.requestActivity(activityId, true, true);
     }
@@ -267,6 +270,7 @@ Item {
             "wallpaperAvailable": true,
             "weatherAvailable": true,
             "notificationCenterAvailable": true,
+            "clipboardAvailable": true,
             "launcherInputFocused": host.islandController.launcherInputFocused,
             "launcherResultCount": host.launcherResultCount,
             "compactHeight": host.islandController.compactThickness,

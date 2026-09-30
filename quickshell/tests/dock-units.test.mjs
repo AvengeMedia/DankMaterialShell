@@ -100,3 +100,25 @@ test("a dock shown only in the overview resolves onto an edge no enabled dock ho
     const enabled = { ...config.create("second", "Second"), enabled: true };
     assert.equal(config.resolveEdge([overviewOnly, enabled], screen, [screen], "bottom"), enabled);
 });
+
+test("magnification radius and falloff factor behave predictably per profile", () => {
+    assert.equal(config.magnificationRadius(40, "parabolic"), 40 * 1.8);
+    assert.equal(config.magnificationRadius(40, "gaussian"), 40 * 2.2);
+    assert.equal(config.magnificationRadius(40, "cosine"), 40 * 2.5);
+
+    // At dist 0, all profiles yield factor 1
+    assert.equal(config.magnificationFactor(0, 100, "parabolic"), 1);
+    assert.equal(config.magnificationFactor(0, 100, "cosine"), 1);
+    assert.equal(config.magnificationFactor(0, 100, "gaussian"), 1);
+
+    // At dist >= radius, all profiles yield factor 0
+    assert.equal(config.magnificationFactor(100, 100, "parabolic"), 0);
+    assert.equal(config.magnificationFactor(120, 100, "cosine"), 0);
+    assert.equal(config.magnificationFactor(100, 100, "gaussian"), 0);
+
+    // Monotonic decay between 0 and radius
+    const pMid = config.magnificationFactor(50, 100, "parabolic");
+    assert.equal(pMid, 0.75); // 1 - 0.5^2
+    const cMid = config.magnificationFactor(50, 100, "cosine");
+    assert.equal(Math.round(cMid * 1000), 500); // 0.5 * (1 + cos(pi/2)) = 0.5
+});

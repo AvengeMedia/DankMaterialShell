@@ -111,6 +111,7 @@ FocusScope {
 
     CcMenu {
         id: addMenu
+        transientSurfaceTracker: root.transientSurfaceTracker
 
         items: root.addable.map(candidate => ({
                     "label": candidate.entry.card.text,
@@ -121,11 +122,14 @@ FocusScope {
 
     DashOptionsSheet {
         id: optionsSheet
+        backdrop: grid
         onDismissed: root.navFocusRequested(false)
     }
 
     CcSheetDialog {
         id: detailSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
 
@@ -168,6 +172,8 @@ FocusScope {
 
     CcSheetDialog {
         id: editorSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
         property date initialDate: new Date()

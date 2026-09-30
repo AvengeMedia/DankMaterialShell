@@ -100,6 +100,12 @@ FocusScope {
         requestClose(false);
     }
 
+    function openSettings() {
+        const host = surfaceHost;
+        requestClose(false);
+        PopoutService.openSettingsWithTab("clipboard", host, () => host?.show());
+    }
+
     function pasteSelected() {
         const entry = selectedEntry();
         if (!entry)

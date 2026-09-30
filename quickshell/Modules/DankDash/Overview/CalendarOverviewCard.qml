@@ -383,6 +383,7 @@ Card {
 
             DankFlickable {
                 id: flickableArea
+                showScrollBar: false
                 width: parent.width
                 height: parent.height - taskInput.height - parent.spacing
                 clip: true

@@ -21,7 +21,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SettingsData")
 
-    readonly property int settingsConfigVersion: 34
+    readonly property int settingsConfigVersion: 36
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -193,6 +193,7 @@ Singleton {
     property string widgetColorMode: Spec.SPEC.widgetColorMode.def
     property string controlCenterTileColorMode: Spec.SPEC.controlCenterTileColorMode.def
     property string buttonColorMode: Spec.SPEC.buttonColorMode.def
+    property int containerSaturation: Spec.SPEC.containerSaturation.def
     property int radiusStrength: Spec.SPEC.radiusStrength.def
     property string radiusMode: Spec.SPEC.radiusMode.def
     property int fixedRadius: Spec.SPEC.fixedRadius.def
@@ -257,6 +258,7 @@ Singleton {
     property string calendarBackend: Spec.SPEC.calendarBackend.def
     property string defaultTaskCalendarId: Spec.SPEC.defaultTaskCalendarId.def
     property bool audioShowStreamDevices: Spec.SPEC.audioShowStreamDevices.def
+    property bool audioMono: Spec.SPEC.audioMono.def
     property string clockFormat: Spec.SPEC.clockFormat.def
     readonly property bool localeUses24Hour: {
         const fmt = Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "");
@@ -278,6 +280,8 @@ Singleton {
     onSpringBounceChanged: saveSettings()
     property bool enableRippleEffects: Spec.SPEC.enableRippleEffects.def
     onEnableRippleEffectsChanged: saveSettings()
+    property bool scrollbarsEnabled: Spec.SPEC.scrollbarsEnabled.def
+    onScrollbarsEnabledChanged: saveSettings()
     property int motionEffect: SettingsData.AnimationEffect.Standard
     onMotionEffectChanged: saveSettings()
     property bool m3ElevationEnabled: Spec.SPEC.m3ElevationEnabled.def
@@ -1046,6 +1050,7 @@ Singleton {
 
     property bool osdAlwaysShowValue: Spec.SPEC.osdAlwaysShowValue.def
     property int osdPosition: SettingsData.Position.BottomCenter
+    property var osdPositionOverrides: Spec.SPEC.osdPositionOverrides.def
     property bool osdVolumeEnabled: Spec.SPEC.osdVolumeEnabled.def
     property bool osdMediaVolumeEnabled: Spec.SPEC.osdMediaVolumeEnabled.def
     property bool osdMediaPlaybackEnabled: Spec.SPEC.osdMediaPlaybackEnabled.def
@@ -1580,6 +1585,41 @@ Singleton {
             if (key in Spec.SPEC)
                 Spec.set(root, key, null, saveSettings, _hooks);
         }
+    }
+
+    function osdPositionFor(kind) {
+        const override = osdPositionOverrides?.[kind];
+        return typeof override === "number" ? override : osdPosition;
+    }
+
+    function hasOsdPositionOverride(kind) {
+        return typeof osdPositionOverrides?.[kind] === "number";
+    }
+
+    function setOsdPosition(kind, position) {
+        if (!kind) {
+            set("osdPosition", position);
+            return;
+        }
+        if (position === osdPosition) {
+            resetOsdPosition(kind);
+            return;
+        }
+        set("osdPositionOverrides", Object.assign({}, osdPositionOverrides, {
+            [kind]: position
+        }));
+    }
+
+    function resetOsdPosition(kind) {
+        if (!kind) {
+            resetToDefault(["osdPosition"]);
+            return;
+        }
+        if (!hasOsdPositionOverride(kind))
+            return;
+        const next = Object.assign({}, osdPositionOverrides);
+        delete next[kind];
+        set("osdPositionOverrides", next);
     }
 
     function barConfigDefault(field) {
@@ -2704,6 +2744,8 @@ Singleton {
             return "islandRouteWeather";
         case "wallpaper":
             return "islandRouteWallpaper";
+        case "clipboard":
+            return "islandRouteClipboard";
         }
         return "";
     }
@@ -3125,8 +3167,7 @@ Singleton {
         saveSettings();
     }
 
-    property bool _pendingExpandNotificationRules: false
-    property int _pendingNotificationRuleIndex: -1
+    property var pendingNotificationRule: null
 
     function _newNotificationRule(overrides) {
         return Object.assign({
@@ -3140,27 +3181,20 @@ Singleton {
         }, overrides || {});
     }
 
-    function addNotificationRule() {
+    function addNotificationRule(ruleData) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        rules.push(_newNotificationRule());
+        rules.push(_newNotificationRule(ruleData));
         notificationRules = rules;
         saveSettings();
     }
 
-    function addNotificationRuleForNotification(appName, desktopEntry) {
-        var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        var pattern = desktopEntry || appName || "";
-        rules.push(_newNotificationRule(pattern ? {
+    function requestNotificationRuleForNotification(appName, desktopEntry) {
+        const pattern = desktopEntry || appName || "";
+        pendingNotificationRule = _newNotificationRule(pattern ? {
             field: desktopEntry ? "desktopEntry" : "appName",
             pattern: pattern,
             matchType: "exact"
-        } : {}));
-        notificationRules = rules;
-        saveSettings();
-        var index = rules.length - 1;
-        _pendingExpandNotificationRules = true;
-        _pendingNotificationRuleIndex = index;
-        return index;
+        } : {});
     }
 
     function _isMuteRule(rule) {

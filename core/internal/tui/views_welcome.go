@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -52,7 +53,7 @@ func unsupportedDistroMessage(info *distros.OSInfo) string {
 	case "debian":
 		return fmt.Sprintf("Debian %s is not supported.\n\nOnly Debian 13+ (Trixie) is supported.\n\nPlease upgrade to Debian 13 or later.", info.VersionID)
 	case "nixos":
-		return "See the NixOS documentation for installation instructions: https://danklinux.com/docs/dankmaterialshell/nixos."
+		return "See the NixOS documentation for installation instructions: " + site.Docs + "/dankmaterialshell/nixos."
 	default:
 		return fmt.Sprintf("%s is not supported.\nFeel free to request on https://github.com/AvengeMedia/DankMaterialShell", info.PrettyName)
 	}

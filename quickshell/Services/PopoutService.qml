@@ -723,11 +723,24 @@ Singleton {
     }
 
     function openClipboardHistory() {
+        if (routeToIsland("clipboard", null, false))
+            return;
         clipboardHistoryModal?.show();
     }
 
     function closeClipboardHistory() {
+        closeIslandActivity("clipboard");
         clipboardHistoryModal?.hide();
+    }
+
+    function toggleClipboardHistory() {
+        if (clipboardHistoryModal?.shouldBeVisible) {
+            clipboardHistoryModal.hide();
+            return;
+        }
+        if (routeToIsland("clipboard", null, true))
+            return;
+        clipboardHistoryModal?.toggle();
     }
 
     function unloadClipboardHistoryPopout() {

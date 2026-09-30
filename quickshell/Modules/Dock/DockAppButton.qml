@@ -435,7 +435,7 @@ Item {
             y: !root.isVertical && !root.indicatorAtFarEdge ? root.indicatorLane : 0
             width: parent.width - (root.isVertical ? root.indicatorLane : 0)
             height: parent.height - (root.isVertical ? 0 : root.indicatorLane)
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             AppIconRenderer {
                 id: coreIcon

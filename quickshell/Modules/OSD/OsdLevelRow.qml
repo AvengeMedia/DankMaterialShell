@@ -10,6 +10,8 @@ Item {
     property string iconName: "volume_up"
     property string insetIconName: ""
     property string endIconName: ""
+    property bool endIconInteractive: false
+    property string endIconLabel: ""
     property string iconLabel: ""
     property bool iconInteractive: false
     property bool tonalIcon: true
@@ -27,7 +29,9 @@ Item {
     property color thumbOutlineColor: Theme.hostSurface
     property real horizontalPadding: -1
 
-    readonly property bool containsMouse: levelSlider.containsMouse || icon.hovered
+    readonly property bool containsMouse: levelSlider.containsMouse || icon.hovered || endIcon.hovered
+    readonly property bool endIconHovered: endIcon.hovered
+    readonly property Item endIconItem: endIcon
     readonly property bool showValueColumn: SettingsData.osdAlwaysShowValue
     readonly property bool showEndIcon: endIconName.length > 0
     readonly property alias isDragging: levelSlider.isDragging
@@ -41,6 +45,7 @@ Item {
 
     signal sliderValueChanged(int newValue)
     signal iconClicked
+    signal endIconClicked
     signal hoverChanged(bool hovered)
 
     onContainsMouseChanged: root.hoverChanged(root.containsMouse)
@@ -126,12 +131,18 @@ Item {
             visible: root.showValueColumn
         }
 
-        DankIcon {
-            anchors.centerIn: parent
-            name: root.endIconName
-            size: Theme.iconSize
-            color: root.sliderEnabled ? root.fillColor : Theme.onSurface_38
+        OsdIcon {
+            id: endIcon
+
+            anchors.fill: parent
+            iconName: root.endIconName
+            iconColor: root.fillColor
+            tonal: false
+            label: root.endIconLabel
+            interactive: root.endIconInteractive
+            available: root.sliderEnabled
             visible: !root.showValueColumn
+            onClicked: root.endIconClicked()
         }
     }
 }

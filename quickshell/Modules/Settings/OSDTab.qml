@@ -6,6 +6,75 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property string positionScope: ""
+    readonly property var positionScopes: [
+        {
+            "value": "",
+            "label": I18n.tr("Default"),
+            "shown": true
+        },
+        {
+            "value": "volume",
+            "label": I18n.tr("Volume"),
+            "shown": SettingsData.osdVolumeEnabled
+        },
+        {
+            "value": "mediaVolume",
+            "label": I18n.tr("Media volume"),
+            "shown": SettingsData.osdMediaVolumeEnabled
+        },
+        {
+            "value": "mediaPlayback",
+            "label": I18n.tr("Media playback"),
+            "shown": SettingsData.osdMediaPlaybackEnabled
+        },
+        {
+            "value": "brightness",
+            "label": I18n.tr("Brightness"),
+            "shown": SettingsData.osdBrightnessEnabled
+        },
+        {
+            "value": "idleInhibitor",
+            "label": I18n.tr("Idle inhibitor", "feature that keeps the session from going idle"),
+            "shown": SettingsData.osdIdleInhibitorEnabled
+        },
+        {
+            "value": "mic",
+            "label": I18n.tr("Microphone"),
+            "shown": SettingsData.osdMicMuteEnabled || SettingsData.osdMicVolumeEnabled
+        },
+        {
+            "value": "capsLock",
+            "label": I18n.tr("Caps lock"),
+            "shown": SettingsData.osdCapsLockEnabled
+        },
+        {
+            "value": "powerProfile",
+            "label": I18n.tr("Power profile"),
+            "shown": SettingsData.osdPowerProfileEnabled
+        },
+        {
+            "value": "audioOutput",
+            "label": I18n.tr("Audio output switch"),
+            "shown": SettingsData.osdAudioOutputEnabled
+        },
+        {
+            "value": "workspace",
+            "label": I18n.tr("Workspace Switch", "toggle label for workspace change OSD"),
+            "shown": SettingsData.osdWorkspaceEnabled
+        }
+    ].filter(scope => scope.shown).map(scope => ({
+                "value": scope.value,
+                "label": scope.label,
+                "icon": SettingsData.hasOsdPositionOverride(scope.value) ? "pin_drop" : "",
+                "tooltip": SettingsData.hasOsdPositionOverride(scope.value) ? I18n.tr("Custom") : ""
+            }))
+
+    onPositionScopesChanged: {
+        if (!positionScopes.some(scope => scope.value === positionScope))
+            positionScope = "";
+    }
+
     SettingsPage {
         id: mainColumn
 
@@ -13,51 +82,37 @@ Item {
             width: parent.width
             settingKey: "osd"
 
-            SettingsDropdownRow {
+            SettingsRow {
+                id: positionRow
+
+                readonly property bool overridden: root.positionScope !== "" && SettingsData.hasOsdPositionOverride(root.positionScope)
+
                 settingKey: "osdPosition"
-                text: I18n.tr("Position")
-                currentValue: {
-                    switch (SettingsData.osdPosition) {
-                    case SettingsData.Position.Top:
-                        return I18n.tr("Top Right", "screen position option");
-                    case SettingsData.Position.Left:
-                        return I18n.tr("Top Left", "screen position option");
-                    case SettingsData.Position.TopCenter:
-                        return I18n.tr("Top Center", "screen position option");
-                    case SettingsData.Position.Right:
-                        return I18n.tr("Bottom Right", "screen position option");
-                    case SettingsData.Position.Bottom:
-                        return I18n.tr("Bottom Left", "screen position option");
-                    case SettingsData.Position.BottomCenter:
-                        return I18n.tr("Bottom Center", "screen position option");
-                    case SettingsData.Position.LeftCenter:
-                        return I18n.tr("Left Center", "screen position option");
-                    case SettingsData.Position.RightCenter:
-                        return I18n.tr("Right Center", "screen position option");
-                    default:
-                        return I18n.tr("Bottom Center", "screen position option");
-                    }
+                title: I18n.tr("Position")
+                subtitle: {
+                    const label = positionPicker.labelFor(SettingsData.osdPositionFor(root.positionScope));
+                    return root.positionScope !== "" && !overridden ? I18n.tr("Default") + " · " + label : label;
                 }
-                options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Left Center", "screen position option"), I18n.tr("Right Center", "screen position option")]
-                onValueChanged: value => {
-                    if (value === I18n.tr("Top Right", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.Top);
-                    } else if (value === I18n.tr("Top Left", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.Left);
-                    } else if (value === I18n.tr("Top Center", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.TopCenter);
-                    } else if (value === I18n.tr("Bottom Right", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.Right);
-                    } else if (value === I18n.tr("Bottom Left", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.Bottom);
-                    } else if (value === I18n.tr("Bottom Center", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.BottomCenter);
-                    } else if (value === I18n.tr("Left Center", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.LeftCenter);
-                    } else if (value === I18n.tr("Right Center", "screen position option")) {
-                        SettingsData.set("osdPosition", SettingsData.Position.RightCenter);
+                modified: root.positionScope === "" ? !SettingsData.isDefault(["osdPosition"]) : overridden
+                resetByKeys: false
+                onResetRequested: SettingsData.resetOsdPosition(root.positionScope)
+
+                body: [
+                    DankFilterChips {
+                        model: root.positionScopes
+                        Binding on currentIndex {
+                            value: Math.max(0, root.positionScopes.findIndex(scope => scope.value === root.positionScope))
+                            restoreMode: Binding.RestoreNone
+                        }
+                        showCounts: false
+                        onSelectionChanged: index => root.positionScope = root.positionScopes[index].value
+                    },
+                    SettingsScreenPositionPicker {
+                        id: positionPicker
+                        selected: SettingsData.osdPositionFor(root.positionScope)
+                        onPicked: position => SettingsData.setOsdPosition(root.positionScope, position)
                     }
-                }
+                ]
             }
 
             SettingsToggleRow {

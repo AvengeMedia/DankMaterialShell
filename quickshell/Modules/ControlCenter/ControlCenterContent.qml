@@ -2,11 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Modules.ControlCenter.Components
 import qs.Modules.ControlCenter.Models
 import qs.Modules.ControlCenter.Details
 import qs.Widgets
 import "./utils/sections.js" as Sections
+import "./utils/widgets.js" as WidgetUtils
 
 FocusScope {
     id: root
@@ -18,10 +20,21 @@ FocusScope {
 
     readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
     readonly property real gridHeight: widgetGrid.gridHeight
+    readonly property real chromeHeight: footer.occupied ? Theme.spacingS + footer.height : 0
+    readonly property bool widgetSheetOpen: widgetSheetLoader.item?.active ?? false
+    readonly property real coveredAmount: Math.max(detailPage.opacity, widgetSheetLoader.item?.progress ?? 0)
+    property bool widgetSheetRequested: false
+    property int toplevelRevision: 0
+    readonly property var runningToplevels: {
+        toplevelRevision;
+        const all = CompositorService.sortedToplevels ?? [];
+        const current = CompositorService.filterCurrentWorkspace(all, host.triggerScreen?.name) || [];
+        return current.concat(all.filter(toplevel => !current.includes(toplevel)));
+    }
+    readonly property string placedWidgetIds: WidgetUtils.placedIds(SettingsData.controlCenterWidgets).sort().join(",")
+    readonly property bool editPlaced: placedWidgetIds.split(",").includes("edit")
     readonly property real targetImplicitHeight: {
-        let total = CcMetrics.sheetPadding * 2 + gridHeight;
-        if (host.editMode)
-            total += Theme.spacingS + editControls.height;
+        const total = CcMetrics.sheetPadding * 2 + gridHeight + chromeHeight;
         if (detailPage.shownSection === "")
             return total;
         return Math.max(total, detailPage.topInset + detailPage.minimumHeight + CcMetrics.detailDialogInset);
@@ -34,11 +47,11 @@ FocusScope {
     readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
-    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - Theme.spacingS - editControls.height
-    readonly property real editGutter: host.editGutter ?? 0
+    // Always reserve the footer: the row cap stays the same in edit mode and cannot loop through the docked edit button.
+    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - Theme.spacingS - CcMetrics.footerHeight
+    readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.host
-        gutter: root.editGutter
         stepWidth: CcMetrics.columnWidth + CcMetrics.gridGap
         widthFor: columns => CcMetrics.sheetWidthFor(columns) + root.sheetContentWidth - CcMetrics.sheetWidthFor(root.gridColumns)
         currentStep: () => root.gridColumns
@@ -46,10 +59,8 @@ FocusScope {
         maxStep: root.gridColumnCap
         onPreview: columns => CcMetrics.columnPreview = columns
         onCommitted: columns => {
-            const widgets = widgetGrid.displayedItems();
             SettingsData.set("controlCenterColumns", columns);
             CcMetrics.columnPreview = 0;
-            widgetModel.setLayout(widgets);
         }
         onCanceled: CcMetrics.columnPreview = 0
     }
@@ -141,7 +152,32 @@ FocusScope {
             SettingsData.set("controlCenterColumns", snapshot.columns);
     }
 
+    function openWidgetSheet() {
+        const sheet = widgetSheetLoader.item;
+        if (!sheet) {
+            widgetSheetRequested = true;
+            return;
+        }
+        sheet.opened = true;
+    }
+
+    function closeWidgetSheet() {
+        if (!widgetSheetLoader.item)
+            return;
+        widgetSheetLoader.item.opened = false;
+    }
+
     Keys.onEscapePressed: event => {
+        if (footer.pendingAction !== "") {
+            footer.cancelConfirmation();
+            event.accepted = true;
+            return;
+        }
+        if (widgetSheetLoader.item?.opened) {
+            closeWidgetSheet();
+            event.accepted = true;
+            return;
+        }
         if (configOverlayLoader.item?.visible) {
             configOverlayLoader.item.close();
             event.accepted = true;
@@ -180,18 +216,30 @@ FocusScope {
         } else {
             panelResizer.cancel();
             editSnapshot = null;
+            widgetSheetRequested = false;
         }
-        forceActiveFocus();
+        if (!activeFocus)
+            forceActiveFocus();
     }
 
     DankGridEditChrome {
         id: panelChrome
 
+        readonly property real screenWidth: root.host.triggerScreen?.width ?? Infinity
+        readonly property real screenHeight: root.host.triggerScreen?.height ?? Infinity
+
+        function ringOffset(room) {
+            return Math.min(Theme.spacingS, room - handleThickness / 2 - Theme.outlineWidthFocused);
+        }
+
         anchors.fill: parent
-        anchors.margins: -(contentInset + Theme.spacingS)
+        anchors.leftMargin: -(contentInset + ringOffset(Math.min(root.host.alignedX, root.chromeRoom.x)))
+        anchors.rightMargin: -(contentInset + ringOffset(Math.min(screenWidth - root.host.alignedX - root.width, root.chromeRoom.z)))
+        anchors.topMargin: -(contentInset + ringOffset(Math.min(root.host.alignedY, root.chromeRoom.y)))
+        anchors.bottomMargin: -(contentInset + ringOffset(Math.min(screenHeight - root.host.alignedY - root.height, root.chromeRoom.w)))
         z: 1
         visible: root.host.editMode
-        enabled: detailPage.shownSection === ""
+        enabled: detailPage.shownSection === "" && !root.widgetSheetOpen
         edgeResize: root.panelResizing || root.panelResizer.sideMovable(-1, root.gridColumns)
         cornerResize: root.panelResizing || root.panelResizer.sideMovable(1, root.gridColumns)
         horizontalResize: true
@@ -238,17 +286,21 @@ FocusScope {
     DankFlickable {
         id: contentFlickable
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: footer.top
+        anchors.bottomMargin: footer.occupied ? Theme.spacingS : 0
         clip: contentHeight > height
         contentWidth: width
-        contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding * 2)
+        contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding)
         interactive: contentHeight > height
 
         Column {
             id: mainColumn
 
             width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
-            x: CcMetrics.sheetPadding + root.editGutter
+            x: CcMetrics.sheetPadding
             y: CcMetrics.sheetPadding
             spacing: Theme.spacingS
 
@@ -257,7 +309,7 @@ FocusScope {
 
                 width: parent.width
                 height: root.gridHeight
-                opacity: CcMetrics.hideCoveredContent ? 1 - detailPage.opacity : 1
+                opacity: CcMetrics.hideCoveredContent ? 1 - root.coveredAmount : 1
 
                 CcTileGrid {
                     id: widgetGrid
@@ -271,13 +323,16 @@ FocusScope {
                     live: root.host.shouldBeVisible && detailPage.shownSection === ""
                     screenName: root.host.triggerScreen?.name || ""
                     tapToClose: root.host.headerTogglesClose ?? false
+                    runningToplevels: root.runningToplevels
+                    dockEdit: !root.editPlaced && !root.host.editMode
                     onExpandClicked: widgetData => root.openWidgetPage(widgetData)
                     onRemoveWidget: index => widgetModel.removeWidget(index)
                     onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
                     onColorPickerRequested: root.host.openColorPicker()
-                    onHeaderTapped: root.host.close()
-                    onEditRequested: root.host.editMode = !root.host.editMode
+                    onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
+                    onAccountsRequested: root.host.openAccounts()
+                    onEditRequested: root.host.editMode = true
                     onLockRequested: {
                         root.host.close();
                         root.host.lockRequested();
@@ -294,31 +349,24 @@ FocusScope {
                     }
                 }
             }
-
-            EditControls {
-                id: editControls
-
-                width: parent.width
-                visible: root.host.editMode
-                popupScreen: root.host.screen
-                popoutX: root.host.alignedX
-                popoutY: root.host.alignedY
-                popoutWidth: root.host.alignedWidth
-                popoutHeight: root.host.alignedHeight
-                availableWidgets: {
-                    if (!root.host.editMode)
-                        return [];
-                    const existingIds = (SettingsData.controlCenterWidgets || []).map(w => w.id);
-                    const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets());
-                    return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id));
-                }
-                onAddWidget: widgetId => widgetModel.addWidget(widgetId)
-                onResetToDefault: () => widgetModel.resetToDefault()
-                onClearAll: () => widgetModel.clearAll()
-                onFinishRequested: root.host.editMode = false
-                onCancelRequested: root.cancelEdit()
-            }
         }
+    }
+
+    CcFooter {
+        id: footer
+
+        x: CcMetrics.sheetPadding
+        width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: CcMetrics.sheetPadding
+        editMode: root.host.editMode
+        showEdit: !root.editPlaced && widgetGrid.editDock === null
+        opacity: body.opacity
+        onAddWidgetRequested: root.openWidgetSheet()
+        onResetRequested: widgetModel.resetToDefault()
+        onClearRequested: widgetModel.clearAll()
+        onEditToggled: root.host.editMode = !root.host.editMode
+        onCancelRequested: root.cancelEdit()
     }
 
     CcDetailPage {
@@ -328,16 +376,18 @@ FocusScope {
         anchors.fill: parent
         section: root.host.expandedSection ?? ""
         topInset: CcMetrics.sheetPadding
-        minimumContentHeight: Math.max(0, root.gridHeight - CcMetrics.pageHeaderHeight)
         cornerRadii: root.surfaceCornerRadii
         coverage: Math.max(codecSelectorLoader.item?.presence ?? 0, portSelectorLoader.item?.presence ?? 0)
         model: widgetModel
         screenName: root.host.triggerScreen?.name || ""
         screenModel: root.host.triggerScreen?.model || ""
+        transientSurfaceTracker: root.host.transientSurfaceTracker
         onCodecSelectorRequested: device => root.showCodecSelector(device)
         onPortSelectorRequested: node => root.showPortSelector(node)
+        runningToplevels: root.runningToplevels
         onBackRequested: root.goBack()
         onCollapseRequested: root.host.collapseAll()
+        onCloseRequested: root.host.close()
         onDismissed: {
             const target = root.detailReturnFocus;
             root.detailReturnFocus = null;
@@ -373,14 +423,51 @@ FocusScope {
         }
     }
 
+    Connections {
+        target: CompositorService
+
+        function onToplevelsChanged() {
+            root.toplevelRevision++;
+        }
+    }
+
     Loader {
-        id: configOverlayLoader
+        id: widgetSheetLoader
 
         anchors.fill: parent
         z: CcMetrics.overlayZ
+        active: root.host.editMode
+        asynchronous: true
+        onLoaded: {
+            if (!root.widgetSheetRequested)
+                return;
+            root.widgetSheetRequested = false;
+            item.opened = true;
+        }
+        sourceComponent: CcWidgetSheet {
+            scrimRadii: root.surfaceCornerRadii
+            surfaceColor: CcMetrics.dialogColor
+            widgets: {
+                const existingIds = root.placedWidgetIds.split(",");
+                const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets());
+                return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id));
+            }
+            onDismissRequested: opened = false
+            onChosen: widgetId => {
+                widgetModel.addWidget(widgetId);
+                opened = false;
+            }
+        }
+    }
+
+    Loader {
+        id: configOverlayLoader
+
         active: false
         sourceComponent: WidgetConfigOverlay {
-            backdrop: contentFlickable
+            model: widgetModel
+            columns: root.gridColumns
+            transientSurfaceTracker: root.host.transientSurfaceTracker
             onVisibleChanged: {
                 if (visible)
                     return;

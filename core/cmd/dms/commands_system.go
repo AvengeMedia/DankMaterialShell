@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/lowprio"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/sysupdate"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/charmbracelet/lipgloss"
@@ -66,14 +68,19 @@ func init() {
 }
 
 func runSystemUpdate(cmd *cobra.Command, args []string) {
-	switch {
-	case sysUpdateIntervalS >= 0:
+	if sysUpdateIntervalS >= 0 {
 		runSystemUpdateSetInterval(sysUpdateIntervalS)
-	case sysUpdateCheck:
-		runSystemUpdateCheck()
-	default:
-		runSystemUpdateApply()
+		return
 	}
+
+	// Package managers started from this thread inherit its priority.
+	runtime.LockOSThread()
+	lowprio.LowerThreadPriority()
+	if sysUpdateCheck {
+		runSystemUpdateCheck()
+		return
+	}
+	runSystemUpdateApply()
 }
 
 func selectBackends(ctx context.Context) []sysupdate.Backend {

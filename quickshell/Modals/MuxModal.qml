@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Io
 import Quickshell
@@ -385,11 +384,13 @@ DankModal {
                 radius: Theme.cornerRadius
                 color: "transparent"
 
-                ScrollView {
+                DankFlickable {
                     anchors.fill: parent
                     clip: true
+                    contentHeight: sessionsColumn.height
 
                     Column {
+                        id: sessionsColumn
                         width: parent.width
                         spacing: Theme.spacingXS
 
@@ -557,73 +558,40 @@ DankModal {
                 }
             }
 
-            // Shortcuts bar
-            Row {
+            DankKeyHints {
                 id: shortcutsBar
+
                 width: parent.width
-                spacing: Theme.spacingM
-                bottomPadding: Theme.spacingS
-
-                Repeater {
-                    model: {
-                        var shortcuts = [
-                            {
-                                key: "↑↓",
-                                label: I18n.tr("Navigate", "verb, keyboard shortcut hint for arrow keys")
-                            },
-                            {
-                                key: "↵",
-                                label: I18n.tr("Attach", "verb, shortcut hint, attach to the selected multiplexer session")
-                            },
-                            {
-                                key: "^N",
-                                label: I18n.tr("New", "adjective, shortcut or button that creates a new session or note")
-                            },
-                            {
-                                key: "^D",
-                                label: I18n.tr("Kill")
-                            },
-                            {
-                                key: "Esc",
-                                label: I18n.tr("Close")
-                            }
-                        ];
-                        if (MuxService.supportsRename)
-                            shortcuts.splice(3, 0, {
-                                key: "^R",
-                                label: I18n.tr("Rename")
-                            });
-                        return shortcuts;
-                    }
-
-                    delegate: Row {
-                        required property var modelData
-                        spacing: Theme.spacingXS
-
-                        Rectangle {
-                            width: keyText.width + Theme.spacingS
-                            height: keyText.height + 4
-                            radius: Theme.cornerRadiusXS
-                            color: Theme.foregroundColor(Theme.chipSurface, Theme.isFloatingWindow(root))
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                id: keyText
-                                anchors.centerIn: parent
-                                text: modelData.key
-                                font.pixelSize: Theme.fontSizeSmall - 1
-                                font.weight: Theme.fontWeightMedium
-                                color: Theme.surfaceVariantText
-                            }
+                height: implicitHeight + Theme.spacingS
+                hints: {
+                    const shortcuts = [
+                        {
+                            keys: ["Up", "Down"],
+                            label: I18n.tr("Navigate", "verb, keyboard shortcut hint for arrow keys")
+                        },
+                        {
+                            keys: ["Return"],
+                            label: I18n.tr("Attach", "verb, shortcut hint, attach to the selected multiplexer session")
+                        },
+                        {
+                            keys: ["Ctrl+N"],
+                            label: I18n.tr("New", "adjective, shortcut or button that creates a new session or note")
+                        },
+                        {
+                            keys: ["Ctrl+D"],
+                            label: I18n.tr("Kill")
+                        },
+                        {
+                            keys: ["Escape"],
+                            label: I18n.tr("Close")
                         }
-
-                        StyledText {
-                            text: modelData.label
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+                    ];
+                    if (MuxService.supportsRename)
+                        shortcuts.splice(3, 0, {
+                            keys: ["Ctrl+R"],
+                            label: I18n.tr("Rename")
+                        });
+                    return shortcuts;
                 }
             }
         }

@@ -62,6 +62,7 @@ type Manager struct {
 	lockBeforeSuspend     atomic.Bool
 	inSleepCycle          atomic.Bool
 	sleepCycleID          atomic.Uint64
+	prelockedReady        atomic.Bool
 	lockerReadyChMu       sync.Mutex
 	lockerReadyCh         chan struct{}
 	lockTimerMu           sync.Mutex

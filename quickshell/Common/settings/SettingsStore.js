@@ -15,8 +15,9 @@ var SESSION_BACKED_PLUGIN_IDS = ["dankNotepadModule"];
 var STALE_WIDGET_KEYS = ["desktopClockEnabled", "desktopClockStyle", "desktopClockTransparency", "desktopClockColorMode", "desktopClockCustomColor", "desktopClockShowDate", "desktopClockShowAnalogNumbers", "desktopClockShowAnalogSeconds", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorEnabled", "systemMonitorShowHeader", "systemMonitorTransparency", "systemMonitorColorMode", "systemMonitorCustomColor", "systemMonitorShowCpu", "systemMonitorShowCpuGraph", "systemMonitorShowCpuTemp", "systemMonitorShowGpuTemp", "systemMonitorGpuPciId", "systemMonitorShowMemory", "systemMonitorShowMemoryGraph", "systemMonitorShowNetwork", "systemMonitorShowNetworkGraph", "systemMonitorShowDisk", "systemMonitorShowTopProcesses", "systemMonitorTopProcessCount", "systemMonitorTopProcessSortBy", "systemMonitorGraphInterval", "systemMonitorLayoutMode", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants", "desktopWidgetPositions"];
 
 var BAR_WIDGET_LIST_KEYS = ["leftWidgets", "centerWidgets", "rightWidgets"];
-var CC_LEGACY_HEADER_IDS = ["userCard", "quickActions"];
-var CC_HEADER_OPTION_KEYS = ["hostname", "compositor", "uptime", "badge", "actions", "background", "powerAccent"];
+var CC_HEADER_IDS = ["userCard", "quickActions", "header"];
+var CC_ACTION_TILE_IDS = ["settings", "lock", "power"];
+var CC_USER_KEYS = ["w", "h", "col", "row", "hostname", "compositor", "uptime", "badge", "background"];
 
 var REMOVED_KEYS_V21 = ["showBattery", "showCapsLockIndicator", "showClipboard", "showClock", "showControlCenterButton", "showCpuUsage", "showFocusedWindow", "showLauncherButton", "showMemUsage", "showMusic", "showNotificationButton", "showPrivacyButton", "showSystemTray", "showWeather", "showWorkspaceSwitcher", "hideBrightnessSlider", "updaterHideWidget", "workspaceScrolling", "appLauncherViewMode", "spotlightModalViewMode", "audioDeviceScrollVolumeEnabled", "desktopClockX", "desktopClockY", "desktopClockWidth", "desktopClockHeight", "desktopClockDisplayPreferences", "systemMonitorX", "systemMonitorY", "systemMonitorWidth", "systemMonitorHeight", "systemMonitorDisplayPreferences", "systemMonitorVariants"];
 
@@ -700,79 +701,57 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 31;
     }
 
-    if (currentVersion < 33 && targetVersion >= 33) {
+    if (currentVersion < 35 && targetVersion >= 35) {
         if (Array.isArray(settings.controlCenterWidgets))
-            settings.controlCenterWidgets = migrateControlCenterHeader(settings.controlCenterWidgets);
-        settings.configVersion = 33;
+            settings.controlCenterWidgets = migrateControlCenterHeader(settings.controlCenterWidgets, currentVersion < 33, settings.controlCenterColumns ?? 8);
+        settings.configVersion = 35;
     }
 
-    if (currentVersion < 34 && targetVersion >= 34) {
-        if (Array.isArray(settings.controlCenterWidgets))
-            settings.controlCenterWidgets = splitControlCenterHeader(settings.controlCenterWidgets, settings.controlCenterColumns ?? SpecModule.SPEC.controlCenterColumns.def);
-        settings.configVersion = 34;
+    if (currentVersion < 36 && targetVersion >= 36) {
+        // The footer's running-apps chip became a grid tile; layouts saved before then never mention it.
+        const widgets = settings.controlCenterWidgets;
+        if (Array.isArray(widgets) && !widgets.some(widget => widget?.id === "runningApps"))
+            settings.controlCenterWidgets = widgets.concat([{
+                        id: "runningApps",
+                        enabled: true,
+                        w: Math.max(1, (settings.controlCenterColumns ?? 8) - 1),
+                        h: 1,
+                        small: true
+                    }]);
+        settings.configVersion = 36;
     }
 
     return settings;
 }
 
-function migrateControlCenterHeader(widgets) {
-    const rest = widgets.filter(widget => !CC_LEGACY_HEADER_IDS.includes(widget?.id));
-    if (rest.some(widget => widget?.id === "header"))
-        return rest;
-    const header = {
-        id: "header",
+function migrateControlCenterHeader(widgets, fixedHeader, columns) {
+    const header = widgets.filter(widget => CC_HEADER_IDS.includes(widget?.id));
+    if (!fixedHeader && header.length === 0)
+        return widgets;
+    const rest = widgets.filter(widget => !CC_HEADER_IDS.includes(widget?.id));
+    const actions = header.find(widget => Array.isArray(widget?.actions))?.actions ?? [];
+    const wanted = id => !rest.some(widget => widget?.id === id) && actions.find(action => action?.id === id)?.enabled !== false;
+    const tiles = CC_ACTION_TILE_IDS.filter(wanted).map(id => ({
+                id: id,
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            }));
+    const identity = header.length === 0 ? {} : header.find(widget => widget.id === "userCard" || (widget.id === "header" && widget.showUser !== false));
+    if (!identity || rest.some(widget => widget?.id === "user"))
+        return tiles.concat(rest);
+    const user = {
+        id: "user",
         enabled: true,
-        w: 8,
+        w: Math.max(1, columns - tiles.length),
         h: 1
     };
-    for (const legacy of widgets) {
-        if (!CC_LEGACY_HEADER_IDS.includes(legacy?.id))
-            continue;
-        for (const key of CC_HEADER_OPTION_KEYS) {
-            if (key in legacy)
-                header[key] = legacy[key];
-        }
+    for (const key of CC_USER_KEYS) {
+        if (key in identity)
+            user[key] = identity[key];
     }
-    return [header].concat(rest);
-}
-
-function splitControlCenterHeader(widgets, columns) {
-    const userDefaults = SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "userCard");
-    const actionDefaults = SpecModule.SPEC.controlCenterWidgets.def.find(widget => widget.id === "quickActions");
-    const result = [];
-    for (const widget of widgets) {
-        if (widget?.id !== "header") {
-            result.push(widget);
-            continue;
-        }
-        const actions = Object.assign({}, actionDefaults);
-        const user = Object.assign({}, userDefaults, {
-            w: Math.max(1, Math.min(Number(widget.w) || columns, columns) - actions.w),
-            h: Math.max(userDefaults.h, Number(widget.h) || userDefaults.h)
-        });
-        for (const key of ["hostname", "compositor", "uptime", "badge", "background"]) {
-            if (key in widget)
-                user[key] = widget[key];
-        }
-        for (const key of ["actions", "powerAccent"]) {
-            if (key in widget)
-                actions[key] = widget[key];
-        }
-        if (Number.isFinite(widget.row)) {
-            user.row = widget.row;
-            actions.row = widget.row;
-        }
-        if (Number.isFinite(widget.col)) {
-            user.col = widget.col;
-            actions.col = widget.col + (widget.showUser === false ? 0 : user.w);
-        }
-        if (widget.showUser !== false)
-            result.push(user);
-        result.push(actions);
-    }
-    if (!result.some(widget => widget?.id === "quickActions"))
-        result.unshift(Object.assign({}, actionDefaults));
-    return result;
+    return [user].concat(tiles, rest);
 }
 
 function migrateBarWidgetGlobals(settings) {

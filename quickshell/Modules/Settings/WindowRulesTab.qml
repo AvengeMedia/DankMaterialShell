@@ -243,46 +243,62 @@ Item {
         });
     }
 
+    property bool editorOpen: false
+    property bool editorMounted: false
+    property var editorRequest: null
+
     function openRuleModal(window) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.show(window || null);
-        }
+        openEditor("new", window || null);
     }
 
     function editRule(rule) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showEdit(rule);
-        }
+        openEditor("edit", rule);
     }
 
     function copyRuleToDms(rule) {
+        openEditor("copy", rule);
+    }
+
+    function openEditor(mode, payload) {
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
         }
-        if (!PopoutService.windowRuleModalLoader)
+        if (editorOpen)
             return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showCopy(rule);
+        editorRequest = {
+            mode,
+            payload
+        };
+        editorOpen = true;
+        editorMounted = true;
+        if (editorLoader.item)
+            presentEditor();
+    }
+
+    function presentEditor() {
+        const request = editorRequest;
+        if (!request)
+            return;
+        switch (request.mode) {
+        case "edit":
+            editorLoader.item.showEdit(request.payload);
+            return;
+        case "copy":
+            editorLoader.item.showCopy(request.payload);
+            return;
+        default:
+            editorLoader.item.show(request.payload);
         }
+    }
+
+    function closeEditor() {
+        if (!editorOpen)
+            return;
+        editorOpen = false;
+        editorRequest = null;
+        if (editorLoader.item)
+            editorLoader.item.opened = false;
     }
 
     function showHyprlandReadOnlyWarning() {
@@ -646,6 +662,28 @@ Item {
                 text: I18n.tr("Add window rule")
                 iconName: "add"
                 onClicked: root.openRuleModal()
+            }
+        }
+    }
+
+    Loader {
+        id: editorLoader
+        parent: root.parentModal?.modalFocusScope ?? root
+        anchors.fill: parent
+        z: 100
+        active: root.editorMounted
+        onLoaded: root.presentEditor()
+
+        sourceComponent: WindowRuleEditorDialog {
+            supportingText: I18n.tr("Changes save to %1", "keybind editor dialog hint, %1 is the binds file path").arg(root.dmsRulesFileName)
+            onRejected: root.closeEditor()
+            onRuleSubmitted: {
+                root.loadWindowRules();
+                root.closeEditor();
+            }
+            onActiveChanged: {
+                if (!active && !root.editorOpen)
+                    root.editorMounted = false;
             }
         }
     }

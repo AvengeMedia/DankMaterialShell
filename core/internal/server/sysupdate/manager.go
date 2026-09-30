@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/lowprio"
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
@@ -40,8 +40,10 @@ type Manager struct {
 	notifierWG  sync.WaitGroup
 	schedulerWG sync.WaitGroup
 
-	acquireCount int32
-	wakeSched    chan struct{}
+	holdMu    sync.Mutex
+	holders   map[any]func() bool
+	probeOnce sync.Once
+	wakeSched chan struct{}
 
 	refreshSerial sync.Mutex
 	releasesMu    sync.Mutex
@@ -56,6 +58,7 @@ func NewManager(runningVersion string) (*Manager, error) {
 		notifyDirty: make(chan struct{}, 1),
 		stopChan:    make(chan struct{}),
 		wakeSched:   make(chan struct{}, 1),
+		holders:     make(map[any]func() bool),
 	}
 	persisted := loadPersisted()
 	if persisted.Packages == nil {
@@ -69,16 +72,10 @@ func NewManager(runningVersion string) (*Manager, error) {
 		Count:           len(persisted.Packages),
 		LastCheckUnix:   persisted.LastCheckUnix,
 		LastSuccessUnix: persisted.LastSuccessUnix,
-		Shell:           ShellInfo{InstallMethod: InstallUnknown, Channel: ChannelUnknown, Running: runningVersion},
+		Shell:           unprobedShell(runningVersion),
 	}
 	if persisted.RebootBootID != "" && persisted.RebootBootID == bootID() {
 		m.state.Reboot = RebootInfo{Recommended: true, Packages: persisted.RebootPackages}
-	}
-	if feed, ok := LoadReleases(); ok {
-		m.state.ReleasesFetchedUnix = feed.FetchedAt
-		if feed.Latest != nil {
-			m.state.Shell.LatestVersion = feed.Latest.Version
-		}
 	}
 
 	id, pretty := readOSRelease()
@@ -101,12 +98,9 @@ func NewManager(runningVersion string) (*Manager, error) {
 	m.schedulerWG.Add(1)
 	go m.scheduler()
 
-	go m.probeShell()
-
 	return m, nil
 }
 
-// Off the startup path: the package-owner query can take a moment.
 func (m *Manager) probeShell() {
 	m.mu.RLock()
 	running := m.state.Shell.Running
@@ -116,7 +110,6 @@ func (m *Manager) probeShell() {
 
 	feed, _ := LoadReleases()
 	m.mu.Lock()
-	info.LatestVersion = m.state.Shell.LatestVersion
 	info.UpdatePackage = findShellPackage(m.state.Packages, info.PackageName)
 	info.CommitsBehind = commitsBehind(info, feed.Master)
 	m.state.Shell = info
@@ -125,10 +118,14 @@ func (m *Manager) probeShell() {
 }
 
 func (m *Manager) Releases(force bool) ReleasesFeed {
-	feed, err := m.refreshReleases(context.Background(), force)
-	if err != nil {
-		log.Debugf("[sysupdate] releases feed: %v", err)
-	}
+	var feed ReleasesFeed
+	lowprio.Run(func() {
+		var err error
+		feed, err = m.refreshReleases(context.Background(), force)
+		if err != nil {
+			log.Debugf("[sysupdate] releases feed: %v", err)
+		}
+	})
 	return feed
 }
 
@@ -229,7 +226,7 @@ func (m *Manager) Upgrade(opts UpgradeOptions) error {
 	m.opCancel = cancel
 	m.opMu.Unlock()
 
-	go m.runUpgrade(ctx, opts)
+	lowprio.Go(func() { m.runUpgrade(ctx, opts) })
 	return nil
 }
 
@@ -243,8 +240,16 @@ func (m *Manager) Cancel() {
 	cancel()
 }
 
-func (m *Manager) Acquire() {
-	atomic.AddInt32(&m.acquireCount, 1)
+// A hold ends with its context, so a client that disconnects without releasing cannot leave the scheduler running.
+func (m *Manager) Acquire(ctx context.Context, holder any) {
+	m.holdMu.Lock()
+	if _, held := m.holders[holder]; !held {
+		m.holders[holder] = context.AfterFunc(ctx, func() { m.Release(holder) })
+	}
+	m.holdMu.Unlock()
+
+	m.probeOnce.Do(func() { lowprio.Go(m.probeShell) })
+
 	m.mu.Lock()
 	if m.state.NextCheckUnix == 0 {
 		m.state.NextCheckUnix = m.nextCheckLocked()
@@ -253,10 +258,20 @@ func (m *Manager) Acquire() {
 	m.wake()
 }
 
-func (m *Manager) Release() {
-	if atomic.AddInt32(&m.acquireCount, -1) < 0 {
-		atomic.StoreInt32(&m.acquireCount, 0)
+func (m *Manager) Release(holder any) {
+	m.holdMu.Lock()
+	stop, held := m.holders[holder]
+	delete(m.holders, holder)
+	m.holdMu.Unlock()
+	if held {
+		stop()
 	}
+}
+
+func (m *Manager) held() bool {
+	m.holdMu.Lock()
+	defer m.holdMu.Unlock()
+	return len(m.holders) > 0
 }
 
 func (m *Manager) wake() {
@@ -269,7 +284,7 @@ func (m *Manager) wake() {
 func (m *Manager) scheduler() {
 	defer m.schedulerWG.Done()
 	for {
-		if atomic.LoadInt32(&m.acquireCount) == 0 {
+		if !m.held() {
 			select {
 			case <-m.stopChan:
 				return
@@ -310,11 +325,8 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	ctx, cancel := context.WithTimeout(parent, checkTimeout)
 	defer cancel()
 
-	// No package manager: still refresh the feed, and move the deadline or the scheduler spins.
+	// Move the deadline or the scheduler spins.
 	if len(m.selection.All()) == 0 {
-		if _, err := m.refreshReleases(ctx, manual); err != nil {
-			log.Debugf("[sysupdate] releases feed: %v", err)
-		}
 		m.mu.Lock()
 		m.state.NextCheckUnix = time.Now().Unix() + int64(m.state.IntervalSeconds)
 		m.mu.Unlock()
@@ -346,19 +358,12 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	var wg sync.WaitGroup
 	for i, b := range backends {
 		wg.Add(1)
-		go func(i int, b Backend) {
+		lowprio.Go(func() {
 			defer wg.Done()
 			pkgs, err := b.CheckUpdates(ctx)
 			results[i] = backendResult{pkgs: pkgs, err: err}
-		}(i, b)
+		})
 	}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := m.refreshReleases(ctx, manual); err != nil {
-			log.Debugf("[sysupdate] releases feed: %v", err)
-		}
-	}()
 	wg.Wait()
 
 	now := time.Now().Unix()
@@ -408,7 +413,7 @@ func (m *Manager) runRefresh(parent context.Context, manual bool) {
 	m.mu.Unlock()
 	savePersisted(persist)
 	if reprobe {
-		go m.probeShell()
+		lowprio.Go(m.probeShell)
 	}
 	m.wake()
 	m.markDirty()
@@ -556,7 +561,7 @@ func (m *Manager) finishSuccessfulUpgrade(clearPackages bool, installed []Packag
 	m.mu.Unlock()
 	savePersisted(persist)
 	m.markDirty()
-	go m.probeShell()
+	lowprio.Go(m.probeShell)
 }
 
 func (m *Manager) persistedLocked() persistedState {

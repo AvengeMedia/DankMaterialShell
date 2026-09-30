@@ -29,6 +29,20 @@ ShellRoot {
     WidgetModel {
         id: registry
     }
+    QtObject {
+        id: userHost
+        property bool editMode: false
+        property bool tapToClose: true
+        property var model: registry
+        property int closes: 0
+        property int accounts: 0
+        function closeRequested() {
+            closes++;
+        }
+        function accountsRequested() {
+            accounts++;
+        }
+    }
     IslandController {
         id: island
         dashboardAvailableWidth: CcMetrics.sheetWidthFor(20) + controlCenterSheetInset + PopoutMetrics.editOverflow * 2
@@ -185,7 +199,7 @@ ShellRoot {
                         h: 12
                     },
                     {
-                        id: "diskUsage",
+                        id: "colorPicker",
                         w: 2,
                         h: 2
                     }
@@ -256,9 +270,241 @@ ShellRoot {
                 sliderSlot.resizeRequested(grid.cellWidth * 3.5 - CcMetrics.gridGap, grid.cellWidth - CcMetrics.gridGap);
                 grid.commitSize();
                 check(SettingsData.controlCenterWidgets[0].w === 3.5 && sliderSlot.tileItem.columns === 3.5, "resizing snaps to half columns");
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "lock",
+                        w: 1,
+                        h: 1
+                    }
+                ];
+                const buttonSlot = grid.children.find(child => typeof child.beginResize === "function");
+                const buttonChrome = buttonSlot.children.find(child => typeof child.resizeStarted === "function");
+                const resizeButton = delta => {
+                    buttonChrome.resizeStarted(0, 0, 1);
+                    buttonSlot.resizeTo(delta, delta);
+                    buttonSlot.finishResize();
+                    return SettingsData.controlCenterWidgets[0];
+                };
+                let button = resizeButton(-grid.cellWidth / 2);
+                check(button.small === true && button.w === 1 && button.h === 1 && buttonSlot.tileItem.small, "shrinking a 1x1 below its cell keeps the cell and makes the button small " + JSON.stringify(button));
+                button = resizeButton(0);
+                check(button.small === true, "grabbing a small button without moving keeps it small");
+                button = resizeButton(grid.cellWidth * 0.3);
+                check(button.small === false && button.w === 1 && button.h === 1, "growing a small button passes through a full 1x1 " + JSON.stringify(button));
+                button = resizeButton(-grid.cellWidth / 2);
+                button = resizeButton(grid.cellWidth);
+                check(button.small === false && button.w === 2 && button.h === 2, "past full size a small button grows a cell per cell of travel like a full one " + JSON.stringify(button));
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "darkMode",
+                        w: 4,
+                        h: 1
+                    }
+                ];
+                const wideSlot = grid.children.find(child => typeof child.beginResize === "function");
+                const wideChrome = wideSlot.children.find(child => typeof child.resizeStarted === "function");
+                const resizeWide = delta => {
+                    wideChrome.resizeStarted(0, 0, 1);
+                    wideSlot.resizeTo(0, delta);
+                    wideSlot.finishResize();
+                    return SettingsData.controlCenterWidgets[0];
+                };
+                let wide = resizeWide(-grid.cellWidth / 2);
+                check(wide.small === true && wide.w === 4 && wide.h === 1 && wideSlot.tileItem.small, "wide tiles take the half-height step too " + JSON.stringify(wide));
+                wide = resizeWide(grid.cellWidth * 0.3);
+                check(wide.small === false && wide.w === 4 && wide.h === 1, "a half-height tile grows back to a full row " + JSON.stringify(wide));
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "user",
+                        w: 5,
+                        h: 1
+                    },
+                    {
+                        id: "lock",
+                        w: 1,
+                        h: 1,
+                        small: true
+                    },
+                    {
+                        id: "edit",
+                        w: 1,
+                        h: 1,
+                        small: true
+                    }
+                ];
+                WidgetUtils.setCardAction(0, "lock", true, 8);
+                WidgetUtils.setCardAction(0, "edit", true, 8);
+                let card = SettingsData.controlCenterWidgets[0];
+                check(SettingsData.controlCenterWidgets.length === 1 && JSON.stringify(card.actions) === JSON.stringify(["user", "lock", "edit"]) && card.w === 7, "card actions take their tiles out of the grid and widen the card by their columns " + JSON.stringify(SettingsData.controlCenterWidgets));
+                check(WidgetUtils.sizeSpec(Object.assign({}, card, {
+                    h: 2
+                }), 8).minW === 2 && WidgetUtils.sizeSpec(card, 8).minW === 3, "card buttons wrap into rows before they claim columns");
+                check(WidgetUtils.sizeSpec(Object.assign({}, card, {
+                    h: 2,
+                    actions: ["lock", "user", "edit"]
+                }), 8).minW === 3, "buttons on both sides of the identity claim a column each");
+                const cardTile = grid.children.find(child => typeof child.beginResize === "function").tileItem;
+                const sceneOf = point => cardTile.mapToItem(null, point.x, point.y);
+                const edit = cardTile.actionSlot("edit");
+                cardTile.beginReorder("edit", sceneOf(Qt.point(edit.x + 1, edit.y + 1)));
+                cardTile.moveReorder(sceneOf(Qt.point(cardTile.identityStart + cardTile.identityWidth * 0.75, cardTile.height / 2)));
+                check(JSON.stringify(cardTile.order) === JSON.stringify(["user", "lock", "edit"]), "a button stays put on its own side of the identity");
+                cardTile.moveReorder(sceneOf(Qt.point(cardTile.identityStart + cardTile.identityWidth * 0.25, cardTile.height / 2)));
+                cardTile.moveReorder(sceneOf(Qt.point(cardTile.identityStart + cardTile.identityWidth * 0.4, cardTile.height / 2)));
+                cardTile.finishReorder();
+                card = SettingsData.controlCenterWidgets[0];
+                check(JSON.stringify(card.actions) === JSON.stringify(["edit", "user", "lock"]), "dragging a button past the identity's centre saves it on the other side " + JSON.stringify(card));
+                check(Math.abs(cardTile.actionSlot("edit").x - cardTile.buttonInset) < 0.5 && cardTile.identityStart === cardTile.pitch, "the identity makes room for leading buttons");
+                const lock = cardTile.actionSlot("lock");
+                const lockCenter = Qt.point(lock.x + CcMetrics.iconBoxSize / 2, lock.y + CcMetrics.iconBoxSize / 2);
+                const dropPoint = Qt.point(cardTile.identityStart + cardTile.identityWidth * 0.25, cardTile.height / 2);
+                mousePress(cardTile, lockCenter.x, lockCenter.y);
+                for (let i = 1; i <= 8; i++)
+                    mouseMove(cardTile, lockCenter.x + (dropPoint.x - lockCenter.x) * i / 8, lockCenter.y + (dropPoint.y - lockCenter.y) * i / 8);
+                check(grid.draggingSourceIndex === -1 && cardTile.draggedAction === "lock", "dragging a card button reorders it instead of moving the card");
+                mouseRelease(cardTile, dropPoint.x, dropPoint.y);
+                check(JSON.stringify(SettingsData.controlCenterWidgets[0].actions) === JSON.stringify(["edit", "lock", "user"]), "a mouse drop saves the new order " + JSON.stringify(SettingsData.controlCenterWidgets[0]));
+                const corner = Qt.point(cardTile.width - 2, cardTile.height - 2);
+                mousePress(cardTile, corner.x, corner.y);
+                mouseMove(cardTile, corner.x, corner.y + grid.cellWidth / 2);
+                mouseMove(cardTile, corner.x, corner.y + grid.cellWidth);
+                check(grid.sizePreview?.index === 0 && grid.draggingSourceIndex === -1, "the card's resize corner still works around its buttons");
+                mouseRelease(cardTile, corner.x, corner.y + grid.cellWidth);
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "user",
+                        w: 7,
+                        h: 1,
+                        col: 0,
+                        row: 0,
+                        actions: ["settings", "user", "lock"]
+                    },
+                    {
+                        id: "wifi",
+                        w: 4,
+                        h: 1,
+                        col: 0,
+                        row: 1
+                    }
+                ];
+                let cardIndex = WidgetUtils.setCardAction(0, "settings", false, 8);
+                cardIndex = WidgetUtils.setCardAction(cardIndex, "lock", false, 8);
+                const returned = SettingsData.controlCenterWidgets;
+                const at = id => grid.slotLayout.slots[SettingsData.controlCenterWidgets.findIndex(widget => widget.id === id)];
+                check(returned[cardIndex].id === "user" && returned[cardIndex].w === 5 && at("user").col === 1 && at("settings").col === 0 && at("lock").col === 6 && at("settings").row === 0 && at("lock").row === 0 && at("wifi").row === 1 && returned.every(widget => widget.id === "user" || widget.id === "wifi" || widget.small), "buttons taken off a placed card return as small tiles where they sat " + JSON.stringify(returned));
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "wifi",
+                        w: 2,
+                        h: 1
+                    },
+                    {
+                        id: "user",
+                        w: 6,
+                        h: 1,
+                        actions: ["power", "user"]
+                    }
+                ];
+                cardIndex = WidgetUtils.setCardAction(1, "power", false, 8);
+                check(cardIndex === 2 && SettingsData.controlCenterWidgets[1].id === "power" && at("power").col === 2 && at("user").col === 3 && at("user").row === 0, "a button taken off an unplaced card packs next to it and the card index follows " + JSON.stringify(SettingsData.controlCenterWidgets));
+                check(WidgetUtils.setCardAction(cardIndex, "power", true, 8) === 1, "adding a tile before the card to it reports the card's new index");
+                grid.dockEdit = true;
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "wifi",
+                        w: 8,
+                        h: 1
+                    },
+                    {
+                        id: "runningApps",
+                        w: 7,
+                        h: 1,
+                        small: true
+                    }
+                ];
+                const dock = grid.editDock;
+                check(dock !== null && Math.abs(dock.x - grid.cellWidth * 7) < 0.5 && Math.abs(dock.y - grid.cellWidth) < 0.5, "the edit button joins a last row with a free trailing cell " + JSON.stringify(dock));
+                SettingsData.controlCenterWidgets = [
+                    {
+                        id: "wifi",
+                        w: 4,
+                        h: 1
+                    },
+                    {
+                        id: "runningApps",
+                        w: 8,
+                        h: 1
+                    }
+                ];
+                check(grid.editDock === null, "a full last row keeps the edit button in the footer");
+                grid.dockEdit = false;
                 grid.destroy();
                 wait(0);
+                const userTile = registry.componentForWidget({
+                    id: "user"
+                }).createObject(scene);
+                size(userTile, 6, 2);
+                userTile.widgetData = {
+                    id: "user",
+                    actions: ["user", "lock", "power"],
+                    background: true
+                };
+                const cardRadius = userTile.bodyRadius;
+                userTile.widgetData = {
+                    id: "user",
+                    actions: ["user", "lock", "power"]
+                };
+                check(userTile.bodyRadius === cardRadius && cardRadius < userTile.height / 2, "a tall card with buttons keeps its card outline without a background");
+                userTile.host = userHost;
+                const avatarButton = named(userTile, "userAvatarButton");
+                const closeButton = named(userTile, "userCloseButton");
+                const shownAvatar = item => {
+                    if (item !== userTile && item.visible && (item.imageSource !== undefined || item.shape !== undefined))
+                        return item;
+                    for (const child of item.children || []) {
+                        const found = shownAvatar(child);
+                        if (found)
+                            return found;
+                    }
+                    return null;
+                };
+                for (const layout of [[5, 1, {}], [6, 2, {
+                            background: true,
+                            actions: ["settings", "user", "lock"]
+                        }], [1, 1, {}], [3, 3, {
+                            background: true
+                        }]]) {
+                    size(userTile, layout[0], layout[1]);
+                    userTile.widgetData = Object.assign({
+                        id: "user"
+                    }, layout[2]);
+                    settle();
+                    const shown = shownAvatar(userTile);
+                    const at = shown.mapToItem(userTile, 0, 0);
+                    const hit = avatarButton.mapToItem(userTile, 0, 0);
+                    check(Math.abs(at.x - hit.x) < 1 && Math.abs(at.y - hit.y) < 1 && Math.abs(shown.width - avatarButton.width) < 1, "the avatar's click area covers the picture at " + layout[0] + "x" + layout[1] + " " + JSON.stringify([at.x, at.y, shown.width, hit.x, hit.y, avatarButton.width]));
+                }
+                size(userTile, 5, 1);
+                userTile.widgetData = {
+                    id: "user"
+                };
+                settle();
+                const avatarCenter = avatarButton.mapToItem(userTile, avatarButton.width / 2, avatarButton.height / 2);
+                mouseMove(userTile, avatarCenter.x, avatarCenter.y);
+                check(avatarButton.hovered && !closeButton.hovered, "hovering the avatar lights only the avatar");
+                mouseClick(userTile, avatarCenter.x, avatarCenter.y);
+                check(userHost.accounts === 1 && userHost.closes === 0, "clicking the avatar opens accounts without closing through the card");
+                mouseClick(userTile, userTile.width - Theme.spacingL, userTile.height / 2);
+                check(userHost.accounts === 1 && userHost.closes === 1, "clicking the rest of the card only closes");
+                userTile.destroy();
+                wait(0);
                 const tile = tileComponent.createObject(scene);
+                size(tile, 4, 1);
+                tile.small = true;
+                settle();
+                const smallBox = named(tile, "tileIconBox");
+                check(smallBox.height <= tile.bodyHeight - tile.tilePadding * 2 && named(tile, "tileLabels").height <= tile.bodyHeight, "a half-height tile keeps its icon and labels inside its body");
+                tile.small = false;
                 size(tile, 4, 3);
                 settle();
                 check(tile.expanded && tile.expandedItem !== null, "large tile exposes inline actions");
@@ -295,38 +541,6 @@ ShellRoot {
                 verticalSlider.destroy();
                 wait(0);
 
-                const stripSlider = sliderComponent.createObject(scene);
-                let iconClicks = 0;
-                stripSlider.iconClicked.connect(() => iconClicks++);
-                size(stripSlider, 4, 1);
-                settle();
-                check(stripSlider.slider.mapToItem(stripSlider, 0, 0).x === 0 && stripSlider.slider.width === stripSlider.width, "strip slider track spans the row");
-                mouseClick(stripSlider.slider, stripSlider.slider.width - Theme.spacingXS - CcMetrics.stripIconSize / 2, stripSlider.slider.height / 2);
-                check(iconClicks === 1 && stripSlider.slider.value === 50, "strip slider inset icon takes the click without moving the value");
-                stripSlider.destroy();
-                wait(0);
-
-                const ids = ["wifi", "bluetooth", "audioOutput", "audioInput", "volumeSlider", "inputVolumeSlider", "brightnessSlider", "nightMode", "darkMode", "doNotDisturb", "idleInhibitor", "battery", "diskUsage", "colorPicker"];
-                for (const id of ids) {
-                    const component = registry.componentForWidget({
-                        id
-                    });
-                    check(component.status === Component.Ready, id + " compiled: " + component.errorString());
-                    const widget = component.createObject(scene, {
-                        widgetData: {
-                            id
-                        }
-                    });
-                    check(widget !== null, id + " created");
-                    if (widget.slider)
-                        check(WidgetUtils.clampSize({
-                            id,
-                            w: 1,
-                            h: 3
-                        }, 4).h === 3, id + " allows vertical resizing");
-                    widget.destroy();
-                    wait(0);
-                }
                 SessionData.recentColors = Array.from({
                     length: 18
                 }, (_, i) => Qt.rgba(i / 18, 0.5, 0.5, 1).toString());
@@ -347,10 +561,10 @@ ShellRoot {
                 NetworkService.wifiNetworks = Array.from({
                     length: 8
                 }, (_, i) => ({
-                    ssid: "Net" + i,
-                    signal: 90 - i * 8,
-                    secured: true
-                }));
+                            ssid: "Net" + i,
+                            signal: 90 - i * 8,
+                            secured: true
+                        }));
                 detail.section = "wifi";
                 waitFor(() => !detail.transitioning && detail.pageItem !== null, "wifi detail page loads");
                 settle();

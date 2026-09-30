@@ -14,7 +14,7 @@ Singleton {
         {
             "id": "personalization",
             "text": I18n.tr("Wallpaper & colors"),
-            "icon": "palette",
+            "icon": "wallpaper",
             "tabIndex": 0,
             "hubHeader": "WallpaperColorsTab",
             "aliases": ["wallpaper", "theme_cursor_icons"],

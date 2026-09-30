@@ -10,8 +10,8 @@ Column {
 
     readonly property real logoSize: Math.round(Theme.iconSize * 2.8)
     readonly property real badgeHeight: Math.round(Theme.fontSizeSmall * 1.7)
-    readonly property string releaseNotesUrl: "https://danklinux.com/blog/v1-6-release"
-    readonly property string screenshotDocsUrl: "https://danklinux.com/docs/dankmaterialshell/cli-screenshot"
+    readonly property string releaseNotesUrl: Site.web + "/blog/v1-6-release"
+    readonly property string screenshotDocsUrl: Site.docs + "/dankmaterialshell/cli-screenshot"
 
     topPadding: Theme.spacingL
     spacing: Theme.spacingL

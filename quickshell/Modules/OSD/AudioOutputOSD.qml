@@ -6,6 +6,8 @@ import qs.Widgets
 DankOSD {
     id: root
 
+    osdKind: "audioOutput"
+
     property string deviceName: ""
     property string deviceIcon: "speaker"
 

@@ -14,7 +14,6 @@ Singleton {
     readonly property real gridStep: 0.5
     property int columnPreview: 0
     readonly property int gridColumns: columnPreview > 0 ? columnPreview : clampColumns(SettingsData.controlCenterColumns)
-    readonly property real sheetWidth: sheetWidthFor(gridColumns)
 
     function clampColumns(value) {
         const columns = Math.round(Number(value));
@@ -45,9 +44,7 @@ Singleton {
     readonly property real sliderRowHeight: Theme.minimumTouchTargetSize
     readonly property real stripTrackHeight: 32
     readonly property real stripHandleHeight: stripTrackHeight + Theme.sliderHandleGap * 2
-    readonly property real stripIconSize: Theme.iconSize
     readonly property real gridGap: Theme.spacingS
-    readonly property real tilePaddingH: Theme.spacingL
     readonly property real iconScale: SettingsData.controlCenterIconScale
     readonly property real tileIconSize: Theme.iconSizeLarge * iconScale
     readonly property real iconBoxSize: Theme.minimumTouchTargetSize * iconScale
@@ -57,23 +54,20 @@ Singleton {
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
     readonly property real tileTextGap: Theme.spacingM
-    readonly property real actionSize: Theme.minimumTouchTargetSize
-    readonly property real actionIconSize: Theme.iconSizeMedium
-    readonly property real actionGap: Theme.spacingXS
-    readonly property real headerHeight: actionSize * 2 + actionGap
-
-    function actionSpan(count) {
-        return Math.ceil((actionSize * count + actionGap * Math.max(0, count - 1) + gridGap) / (columnWidth + gridGap) / gridStep) * gridStep;
-    }
-
-    function actionCapacity(span) {
-        const size = span * (columnWidth + gridGap) - gridGap;
-        return Math.max(1, Math.floor((size + actionGap) / (actionSize + actionGap)));
-    }
+    readonly property real footerHeight: iconBoxSize
+    readonly property real footerGap: Theme.spacingM
+    readonly property real runningAppsIconSize: Theme.iconSize * iconScale
+    readonly property int runningAppsMaxIcons: 3
+    // Small tile body height as a fraction of a row; the resize corner snaps to the nearer of this and a full row.
+    readonly property real smallRowFraction: 0.5
+    readonly property real shapeButtonSize: Theme.iconSize
 
     readonly property real detailDialogInset: Theme.spacingL
     readonly property real detailDialogPadding: Theme.spacingS
     readonly property real detailMinContentHeight: Theme.listItemTwoLineHeight * 3
+    readonly property real headerActionSize: Theme.buttonHeightXS
+    readonly property real headerActionIconSize: Theme.iconSizeMedium
+    readonly property real headerEdgeInset: rowPaddingH - (headerActionSize - headerActionIconSize) / 2
     readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingM * 2
     readonly property real pageTitleSize: Theme.fontSizeXXLarge
     readonly property real detailHeightList: 350
@@ -98,6 +92,8 @@ Singleton {
     readonly property real dialogWidth: 320
     readonly property real libraryPanelWidth: 400
     readonly property real libraryPanelHeight: 400
+    readonly property real widgetSheetHeightRatio: 0.85
+    readonly property real previewSize: 76
     readonly property real configMenuWidth: 260
     readonly property real vpnPopoutListHeight: 200
     readonly property real headerDropdownWidth: 120
@@ -116,15 +112,19 @@ Singleton {
     readonly property int overlayZ: 10000
     readonly property real popupEnterScale: 0.92
     readonly property color dialogColor: Theme.foregroundColor(Theme.hostSurface)
-    readonly property int backdropBlurRadius: 32
     readonly property bool hideCoveredContent: BlurService.enabled && Theme.connectedSurfaceBlurEnabled && dialogColor.a < 1
 
     readonly property color tileActiveColor: Theme.ccTileActiveBg
     readonly property color tileActiveContent: Theme.ccTileActiveText
     readonly property color tileInactiveColor: Theme.ccPillInactiveBg
+    readonly property color iconBoxInactiveColor: Theme.ccIconBoxInactiveBg
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
+
+    function actionIconColor(id) {
+        return id === "power" ? Theme.error : tileInactiveIcon;
+    }
 
     readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 
@@ -145,6 +145,7 @@ Singleton {
         case "audioOutput":
         case "audioInput":
         case "diskUsage":
+        case "runningApps":
             return detailHeightList;
         default:
             return detailHeightDefault;

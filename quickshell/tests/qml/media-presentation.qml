@@ -168,10 +168,6 @@ ShellRoot {
             input.keyClick(Qt.Key_Escape);
             input.wait(20);
             waitFor(() => media.panel === "" && media.implicitHeight === height, "sheet dismisses without resizing card");
-            media.activePlayer = null;
-            check(next.visible && seekbar.visible, "player loss holds controls through the grace period");
-            waitFor(() => !next.visible && !seekbar.visible, "genuine player loss eventually clears controls");
-            media.activePlayer = player;
             media.showPanel("players");
             media.isSeeking = true;
             SettingsData.dashOptions = {

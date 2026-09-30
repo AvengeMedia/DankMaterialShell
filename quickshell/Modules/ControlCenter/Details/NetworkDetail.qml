@@ -15,10 +15,12 @@ import "../../../Common/QmlUtils.js" as QmlUtils
 Item {
     id: root
 
+    implicitHeight: pageList.contentHeight
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property Item menuParent: root
+    property var transientSurfaceTracker: null
 
     readonly property string title: I18n.tr("Network")
 
@@ -95,8 +97,8 @@ Item {
         DankRefreshButton {
             Accessible.name: I18n.tr("Scan")
             anchors.verticalCenter: parent.verticalCenter
-            buttonSize: Theme.iconButtonSize
-            iconSize: Theme.iconSize
+            buttonSize: CcMetrics.headerActionSize
+            iconSize: CcMetrics.headerActionIconSize
             iconColor: Theme.surfaceText
             visible: root.wifiMode && NetworkService.wifiEnabled && !NetworkService.wifiToggling
             busy: NetworkService.isScanning
@@ -653,12 +655,12 @@ Item {
 
     CcMenu {
         id: wifiMenu
-        parent: root.menuParent
+        transientSurfaceTracker: root.transientSurfaceTracker
     }
 
     CcMenu {
         id: wiredMenu
-        parent: root.menuParent
+        transientSurfaceTracker: root.transientSurfaceTracker
     }
 
     Loader {

@@ -410,7 +410,7 @@ func routeRequestRecovered(ctx context.Context, conn *ipc.ConnWriter, req ipc.Re
 }
 
 func getCapabilities() Capabilities {
-	caps := []string{"plugins", "dgop", "lyrics"}
+	caps := []string{"plugins", "dgop", "lyrics", "lyrics.plugins"}
 
 	if networkManager != nil {
 		caps = append(caps, "network")

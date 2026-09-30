@@ -219,24 +219,24 @@ Item {
 
                         DankButton {
                             id: docsButton
-                            tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Docs") + " - danklinux.com/docs" : "danklinux.com/docs"
+                            tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Docs") + " - " + Site.domain + "/docs" : Site.domain + "/docs"
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
                             iconName: "menu_book"
                             iconSize: 18
                             backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
-                            onClicked: Qt.openUrlExternally("https://danklinux.com/docs")
+                            onClicked: Qt.openUrlExternally(Site.docs)
                         }
 
                         DankButton {
                             id: pluginsButton
-                            tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Plugins") + " - plugins.danklinux.com" : "plugins.danklinux.com"
+                            tooltipText: resourceButtonsRow.compactMode ? I18n.tr("Plugins") + " - plugins." + Site.domain : "plugins." + Site.domain
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
                             iconName: "extension"
                             iconSize: 18
                             backgroundColor: Theme.chipSurface
                             textColor: Theme.surfaceText
-                            onClicked: Qt.openUrlExternally("https://plugins.danklinux.com")
+                            onClicked: Qt.openUrlExternally(Site.plugins)
                         }
 
                         DankButton {

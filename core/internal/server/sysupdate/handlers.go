@@ -1,12 +1,14 @@
 package sysupdate
 
 import (
+	"context"
+
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/dankgo/ipc"
 	"github.com/AvengeMedia/dankgo/ipc/params"
 )
 
-func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
+func HandleRequest(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 	switch req.Method {
 	case "sysupdate.getState":
 		models.Respond(conn, req.ID, m.GetState())
@@ -21,10 +23,10 @@ func HandleRequest(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		m.Cancel()
 		models.Respond(conn, req.ID, m.GetState())
 	case "sysupdate.acquire":
-		m.Acquire()
+		m.Acquire(ctx, conn)
 		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 	case "sysupdate.release":
-		m.Release()
+		m.Release(conn)
 		models.Respond(conn, req.ID, models.SuccessResult{Success: true})
 	case "sysupdate.releases":
 		force := params.BoolOpt(req.Params, "force", false)

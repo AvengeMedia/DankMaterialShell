@@ -109,6 +109,9 @@ var LOCAL_SPEC = {
     buttonColorMode: {
         def: "primary"
     },
+    containerSaturation: {
+        def: 100
+    },
     niriLayoutGapsOverride: {
         def: -1,
         onChange: "updateCompositorLayout"
@@ -336,6 +339,9 @@ var LOCAL_SPEC = {
     audioShowStreamDevices: {
         def: false
     },
+    audioMono: {
+        def: false
+    },
     windSpeedUnit: {
         def: "kmh"
     },
@@ -431,25 +437,40 @@ var LOCAL_SPEC = {
     controlCenterWidgets: {
         def: [
             {
-                id: "userCard",
+                id: "user",
                 enabled: true,
-                w: 6.5,
-                h: 1.5
+                w: 5,
+                h: 1
             },
             {
-                id: "quickActions",
+                id: "settings",
                 enabled: true,
-                w: 1.5,
-                h: 1.5
+                w: 1,
+                h: 1,
+                small: true
             },
             {
-                id: "volumeSlider",
+                id: "lock",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "power",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "brightnessSlider",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "brightnessSlider",
+                id: "volumeSlider",
                 enabled: true,
                 w: 4,
                 h: 1
@@ -479,16 +500,47 @@ var LOCAL_SPEC = {
                 h: 1
             },
             {
+                id: "darkMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
                 id: "nightMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "doNotDisturb",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "idleInhibitor",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "battery",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "darkMode",
+                id: "diskUsage",
                 enabled: true,
                 w: 4,
                 h: 1
+            },
+            {
+                id: "runningApps",
+                enabled: true,
+                w: 7,
+                h: 1,
+                small: true
             }
         ]
     },
@@ -1198,6 +1250,9 @@ var LOCAL_SPEC = {
     },
     osdPosition: {
         def: 5
+    },
+    osdPositionOverrides: {
+        def: {}
     },
     osdVolumeEnabled: {
         def: true

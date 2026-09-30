@@ -181,9 +181,10 @@ FocusScope {
                     DashOptionRow {
                         required property int index
 
-                        entryId: optionCard.modelData
                         spec: optionCard.options[index] ?? ({})
-                        settingKey: "dashOptions:" + entryId + ":" + spec.key
+                        value: DashRegistry.option(optionCard.modelData, spec.key)
+                        settingKey: "dashOptions:" + optionCard.modelData + ":" + spec.key
+                        onCommitted: next => DashRegistry.setOption(optionCard.modelData, spec.key, next)
                     }
                 }
             }

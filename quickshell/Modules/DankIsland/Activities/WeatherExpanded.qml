@@ -11,6 +11,7 @@ DashTabFace {
         WeatherTab {
             live: root.live
             editMode: root.editMode
+            transientSurfaceTracker: root.controller.transientSurfaces
         }
     }
 

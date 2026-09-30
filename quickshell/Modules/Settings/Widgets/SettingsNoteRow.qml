@@ -2,7 +2,6 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 
-// Tinted callout inside a card: a warning or hint that applies to the rows around it.
 SettingsRow {
     id: root
 

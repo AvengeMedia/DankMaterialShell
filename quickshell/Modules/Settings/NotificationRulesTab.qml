@@ -7,6 +7,12 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    property var parentModal: null
+    property bool editorOpen: false
+    property bool editorMounted: false
+    property var editorRequest: null
+    readonly property bool hasPendingRule: SettingsData.pendingNotificationRule !== null
+
     function indexedRules(predicate) {
         return (SettingsData.notificationRules || []).map((rule, index) => ({
                     rule: rule,
@@ -19,7 +25,7 @@ Item {
     readonly property var notificationRuleFieldOptions: [
         {
             value: "appName",
-            label: I18n.tr("App names", "notification rule match field option")
+            label: I18n.tr("App name", "notification rule match field option")
         },
         {
             value: "desktopEntry",
@@ -100,12 +106,61 @@ Item {
         return fallback;
     }
 
-    function getRuleOptionValue(options, label, fallback) {
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].label === label)
-                return options[i].value;
-        }
-        return fallback;
+    function matchSummary(rule) {
+        return [getRuleOptionLabel(notificationRuleFieldOptions, rule.field, notificationRuleFieldOptions[0].label), getRuleOptionLabel(notificationRuleMatchTypeOptions, rule.matchType, notificationRuleMatchTypeOptions[0].label)].join(" · ");
+    }
+
+    function outcomeBadges(rule) {
+        const badges = [];
+        if ((rule.action || "default") !== "default")
+            badges.push(getRuleOptionLabel(notificationRuleActionOptions, rule.action, rule.action));
+        if ((rule.urgency || "default") !== "default")
+            badges.push(getRuleOptionLabel(notificationRuleUrgencyOptions, rule.urgency, rule.urgency));
+        if (rule.bypassDnd === true)
+            badges.push(I18n.tr("Allow in Do Not Disturb"));
+        return badges;
+    }
+
+    onHasPendingRuleChanged: {
+        // clearing the draft inside this handler is a binding loop on hasPendingRule
+        if (hasPendingRule)
+            Qt.callLater(openPendingRule);
+    }
+
+    function openPendingRule() {
+        const draft = SettingsData.pendingNotificationRule;
+        if (!draft)
+            return;
+        SettingsData.pendingNotificationRule = null;
+        openEditor(-1, draft);
+    }
+
+    function openEditor(index, rule) {
+        if (editorOpen)
+            return;
+        editorRequest = {
+            index,
+            rule
+        };
+        editorOpen = true;
+        editorMounted = true;
+        if (editorLoader.item)
+            presentEditor();
+    }
+
+    function presentEditor() {
+        if (!editorRequest)
+            return;
+        editorLoader.item.show(editorRequest.index, editorRequest.rule);
+    }
+
+    function closeEditor() {
+        if (!editorOpen)
+            return;
+        editorOpen = false;
+        editorRequest = null;
+        if (editorLoader.item)
+            editorLoader.item.opened = false;
     }
 
     SettingsPage {
@@ -130,221 +185,59 @@ Item {
             }
 
             SettingsRow {
-                body: Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+                subtitle: I18n.tr("Mute, ignore and priority rules per app")
+            }
 
-                    StyledText {
-                        text: I18n.tr("The Default action only overrides priority")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
-                        bottomPadding: Theme.spacingS
+            Repeater {
+                model: SettingsData.notificationRules
+
+                delegate: SettingsRow {
+                    id: ruleRow
+
+                    required property var modelData
+                    required property int index
+                    readonly property var badges: root.outcomeBadges(modelData)
+
+                    title: modelData.pattern || I18n.tr("Rule %1", "notification rule heading, %1 is the rule number").arg(index + 1)
+                    titleColor: modelData.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
+                    subtitle: root.matchSummary(modelData)
+
+                    DankToggle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        hideText: true
+                        text: ruleRow.title
+                        checked: ruleRow.modelData.enabled !== false
+                        onToggled: checked => SettingsData.updateNotificationRuleField(ruleRow.index, "enabled", checked)
                     }
 
-                    Repeater {
-                        model: SettingsData.notificationRules
+                    DankActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "edit"
+                        Accessible.name: I18n.tr("Edit rule")
+                        onClicked: root.openEditor(ruleRow.index, ruleRow.modelData)
+                    }
 
-                        delegate: Rectangle {
-                            id: ruleItem
-                            width: parent.width
-                            height: ruleColumn.implicitHeight + Theme.spacingM
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
+                    DankActionButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "delete"
+                        iconColor: Theme.error
+                        Accessible.name: I18n.tr("Delete rule")
+                        onClicked: SettingsData.removeNotificationRule(ruleRow.index)
+                    }
 
-                            Column {
-                                id: ruleColumn
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingS
+                    body: Flow {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        visible: ruleRow.badges.length > 0
 
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
+                        Repeater {
+                            model: ruleRow.badges
 
-                                    StyledText {
-                                        id: ruleLabel
-                                        text: I18n.tr("Rule %1", "notification rule heading, %1 is the rule number").arg(index + 1)
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Item {
-                                        width: Math.max(0, parent.width - ruleLabel.implicitWidth - enableToggle.width - deleteBtn.width - Theme.spacingS * 3)
-                                        height: 1
-                                    }
-
-                                    DankToggle {
-                                        id: enableToggle
-                                        width: 40
-                                        height: 24
-                                        hideText: true
-                                        checked: modelData.enabled !== false
-                                        onToggled: checked => SettingsData.updateNotificationRuleField(index, "enabled", checked)
-                                    }
-
-                                    Item {
-                                        id: deleteBtn
-                                        Accessible.role: Accessible.Button
-                                        Accessible.name: I18n.tr("Remove")
-                                        width: 28
-                                        height: 28
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                        }
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: "delete"
-                                            size: 18
-                                            color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: deleteArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: SettingsData.removeNotificationRule(index)
-                                        }
-                                    }
-                                }
-
-                                Column {
-                                    width: parent.width
-                                    spacing: Theme.spacingXXS
-
-                                    DankTextField {
-                                        outlined: true
-                                        leftIconName: "filter_list"
-                                        labelText: I18n.tr("Pattern")
-                                        width: parent.width
-                                        text: modelData.pattern || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        onEditingFinished: SettingsData.updateNotificationRuleField(index, "pattern", text)
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Field", "notification rule dropdown label, which notification field to match")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 165
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleFieldOptions, modelData.field, root.notificationRuleFieldOptions[0].label)
-                                            options: root.notificationRuleFieldOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "field", root.getRuleOptionValue(root.notificationRuleFieldOptions, value, "appName"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Type")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleMatchTypeOptions, modelData.matchType, root.notificationRuleMatchTypeOptions[0].label)
-                                            options: root.notificationRuleMatchTypeOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "matchType", root.getRuleOptionValue(root.notificationRuleMatchTypeOptions, value, "contains"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Action", "noun, dropdown label for what a notification rule or keybind does")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 170
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleActionOptions, modelData.action, root.notificationRuleActionOptions[0].label)
-                                            options: root.notificationRuleActionOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "action", root.getRuleOptionValue(root.notificationRuleActionOptions, value, "default"))
-                                        }
-                                    }
-
-                                    Column {
-                                        width: (parent.width - Theme.spacingS * 3) / 4
-                                        spacing: Theme.spacingXXS
-
-                                        StyledText {
-                                            text: I18n.tr("Priority", "notification rule dropdown label, urgency assigned to matches")
-                                            font.pixelSize: Theme.fontSizeSmall - 1
-                                            color: Theme.surfaceVariantText
-                                        }
-
-                                        DankDropdown {
-                                            width: parent.width
-                                            compactMode: true
-                                            dropdownWidth: parent.width
-                                            popupWidth: 165
-                                            currentValue: root.getRuleOptionLabel(root.notificationRuleUrgencyOptions, modelData.urgency, root.notificationRuleUrgencyOptions[0].label)
-                                            options: root.notificationRuleUrgencyOptions.map(o => o.label)
-                                            onValueChanged: value => SettingsData.updateNotificationRuleField(index, "urgency", root.getRuleOptionValue(root.notificationRuleUrgencyOptions, value, "default"))
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-
-                                    StyledText {
-                                        id: bypassDndLabel
-                                        text: I18n.tr("Allow in Do Not Disturb")
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        color: Theme.surfaceVariantText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Item {
-                                        width: Math.max(0, parent.width - bypassDndLabel.implicitWidth - bypassDndToggle.width - Theme.spacingS * 2)
-                                        height: 1
-                                    }
-
-                                    DankToggle {
-                                        id: bypassDndToggle
-                                        width: 40
-                                        height: 24
-                                        hideText: true
-                                        checked: modelData.bypassDnd === true
-                                        onToggled: checked => SettingsData.updateNotificationRuleField(index, "bypassDnd", checked)
-                                    }
-                                }
+                            delegate: DankBadge {
+                                required property string modelData
+                                text: modelData
+                                color: Theme.primaryContainer
+                                textColor: Theme.onPrimaryContainer
                             }
                         }
                     }
@@ -448,7 +341,29 @@ Item {
             DankFab {
                 text: I18n.tr("Add rule")
                 iconName: "add"
-                onClicked: SettingsData.addNotificationRule()
+                onClicked: root.openEditor(-1, null)
+            }
+        }
+    }
+
+    Loader {
+        id: editorLoader
+        parent: root.parentModal?.modalFocusScope ?? root
+        anchors.fill: parent
+        z: 100
+        active: root.editorMounted
+        onLoaded: root.presentEditor()
+
+        sourceComponent: NotificationRuleEditorDialog {
+            fieldOptions: root.notificationRuleFieldOptions
+            matchTypeOptions: root.notificationRuleMatchTypeOptions
+            actionOptions: root.notificationRuleActionOptions
+            urgencyOptions: root.notificationRuleUrgencyOptions
+            onRejected: root.closeEditor()
+            onRuleSubmitted: root.closeEditor()
+            onActiveChanged: {
+                if (!active && !root.editorOpen)
+                    root.editorMounted = false;
             }
         }
     }

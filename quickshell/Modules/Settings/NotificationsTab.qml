@@ -12,14 +12,6 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.spacingL
 
-    Component.onCompleted: {
-        if (!SettingsData._pendingExpandNotificationRules)
-            return;
-        SettingsData._pendingExpandNotificationRules = false;
-        SettingsData._pendingNotificationRuleIndex = -1;
-        Qt.callLater(() => root.parentModal?.navigateTo("notification_rules"));
-    }
-
     function indexedRules(predicate) {
         return (SettingsData.notificationRules || []).map((rule, index) => ({
                     rule: rule,

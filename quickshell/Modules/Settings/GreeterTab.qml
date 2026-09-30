@@ -265,7 +265,7 @@ Item {
 
             SettingsNavRow {
                 title: I18n.tr("Wallpaper & colors")
-                iconName: "palette"
+                iconName: "wallpaper"
                 onClicked: root.parentModal?.navigateTo("personalization")
             }
 
@@ -334,7 +334,7 @@ Item {
 
             SettingsRow {
                 body: StyledText {
-                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"https://danklinux.com/docs/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
+                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"" + Site.docs + "/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
                     textFormat: Text.RichText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText

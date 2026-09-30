@@ -191,6 +191,7 @@ Item {
                     widgetItem: clipboardWidget,
                     section: root.getWidgetSection(parent) || "right",
                     triggerSource: "clipboard",
+                    islandActivity: "clipboard",
                     mode: mode || "click",
                     prepare: popout => {
                         if (initialTab)

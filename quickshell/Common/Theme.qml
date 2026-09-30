@@ -7,6 +7,7 @@ import "../DankCommon/Common/Shape.js" as Shape
 import "../DankCommon/Common/Surface.js" as Surface
 import "../DankCommon/Common/Contrast.js" as Contrast
 import "../DankCommon/Common/Accents.js" as Accents
+import "../DankCommon/Common/Tonal.js" as Tonal
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -408,7 +409,9 @@ Singleton {
     readonly property color cardSurface: typeof SettingsData === "undefined" ? surfaceContainer : surfaceRoleColor(SettingsData.cardSurfaceColor, SettingsData.cardSurfaceCustomColor, surfaceContainer)
     readonly property color chipSurface: typeof SettingsData === "undefined" ? surfaceContainerHigh : surfaceRoleColor(SettingsData.chipSurfaceColor, SettingsData.chipSurfaceCustomColor, surfaceContainerHigh)
     readonly property color chipSurfaceNested: typeof SettingsData === "undefined" ? surfaceContainerHighest : surfaceRoleColor(SettingsData.chipSurfaceNestedColor, SettingsData.chipSurfaceNestedCustomColor, surfaceContainerHighest)
-    property color primaryContainer: currentThemeData.primaryContainer || blend(surfaceContainerHigh, primary, 0.45)
+    readonly property real containerSaturation: typeof SettingsData === "undefined" ? 1 : SettingsData.containerSaturation / 100
+    readonly property real containerTint: (currentThemeData.containerTint ?? Tonal.defaultTint(surfaceContainer)) * containerSaturation
+    property color primaryContainer: currentThemeData.softPrimaryContainer || Tonal.softContainer(primary, surfaceContainer, containerTint)
     property color secondaryContainer: currentThemeData.secondaryContainer || blend(surfaceContainerHigh, secondary, 0.35)
     property color tertiaryContainer: currentThemeData.tertiaryContainer || blend(surfaceContainerHigh, tertiary, 0.35)
     readonly property real selectedContainerTint: currentThemeData.selectedContainerTint ?? 0.2
@@ -468,7 +471,14 @@ Singleton {
         Binding {
             target: root
             property: "onPrimaryContainer"
-            value: root.currentThemeData.onPrimaryContainer || root.currentThemeData.primaryContainerText || Contrast.readableOn(root.primaryContainer, root.onContainerCandidates)
+            value: {
+                const explicit = root.currentThemeData.onPrimaryContainer || root.currentThemeData.primaryContainerText;
+                if (!explicit)
+                    return Contrast.readableOn(root.primaryContainer, root.onContainerCandidates);
+                if (root.currentThemeData.softPrimaryContainer)
+                    return explicit;
+                return Contrast.readableOn(root.primaryContainer, [Qt.color(explicit)].concat(root.onContainerCandidates));
+            }
         },
         Binding {
             target: root
@@ -654,6 +664,7 @@ Singleton {
     }
 
     readonly property color ccPillInactiveBg: transparentBlurLayers ? withAlpha(cardSurface, 0.08) : nestedSurface
+    readonly property color ccIconBoxInactiveBg: transparentBlurLayers ? withAlpha(chipSurfaceNested, 0.16) : foregroundColor(chipSurfaceNested)
 
     readonly property color ccTileActiveText: {
         switch (SettingsData.controlCenterTileColorMode) {
@@ -1347,6 +1358,9 @@ Singleton {
     readonly property real textEditHeight: Math.round(fontSizeMedium * 8)
     readonly property real tooltipMaxWidth: 500
     readonly property int tooltipDelay: 400
+    readonly property real scrollbarThickness: 6
+    readonly property real scrollbarGap: spacingXS
+    readonly property int scrollbarHideDelay: 1200
     readonly property real menuMaxHeight: 400
     readonly property real clockFaceSize: 250
     readonly property real clockOuterRingRatio: 0.34

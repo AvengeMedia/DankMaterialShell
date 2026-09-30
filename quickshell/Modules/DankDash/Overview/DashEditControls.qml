@@ -101,6 +101,7 @@ Item {
     DankFlickable {
         id: viewport
         anchors.fill: parent
+        showScrollBar: false
         contentWidth: root.vertical ? width : Math.max(width, actions.implicitWidth)
         contentHeight: root.vertical ? actions.implicitHeight : height
         flickableDirection: root.vertical ? Flickable.VerticalFlick : Flickable.HorizontalFlick

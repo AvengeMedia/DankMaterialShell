@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import "DankCommon/Common/Contrast.js" as Contrast
+import "DankCommon/Common/Hct.js" as Hct
 
 ShellRoot {
     id: root
@@ -49,11 +50,19 @@ ShellRoot {
             check(readable(Theme.surfaceText, Theme.selectedContainer, 4.5), "surface text readable on the selected fill");
             check(readable(Theme.accentOnSelectedContainer, Theme.selectedContainer, 3), "selected icon readable");
             check(Contrast.ratio(Theme.selectedContainer, Theme.surfaceContainerHigh) > 1.05, "selected fill differs from the row surface");
+            check(readable(Theme.surfaceText, Theme.primaryContainer, 4.5), "painted container is derived from primary, not the theme accent");
             check(readable(Theme.onPrimaryContainer, Theme.primaryContainer, 4.5), "derived onPrimaryContainer readable");
             check(readable(Theme.accentOnPrimaryContainer, Theme.primaryContainer, 3), "icon box glyph readable");
             check(readable(Theme.onSecondaryContainer, Theme.secondaryContainer, 4.5), "derived onSecondaryContainer readable");
 
             Theme.customThemeData = Object.assign({}, nord, {
+                "containerTint": 0
+            });
+            check(Math.abs(Hct.toHct(Theme.primaryContainer).chroma - Hct.toHct(Theme.surfaceContainer).chroma) <= 2, "theme containerTint sets the accent share of the derived container");
+
+            Theme.customThemeData = Object.assign({}, nord, {
+                "softPrimaryContainer": "#5e81ac",
+                "onPrimaryContainer": "#2e3440",
                 "selectedContainer": "#5e81ac",
                 "onSelectedContainer": "#eceff4",
                 "accentOnSelectedContainer": "#a3be8c",
@@ -61,6 +70,7 @@ ShellRoot {
             });
             check(Theme.selectedContainer.toString() === "#5e81ac" && Theme.onSelectedContainer.toString() === "#eceff4", "explicit selection colors are not derived over");
             check(Theme.accentOnSelectedContainer.toString() === "#a3be8c" && Theme.accentOnPrimaryContainer.toString() === "#bf616a", "explicit accent colors are not derived over");
+            check(Theme.primaryContainer.toString() === "#5e81ac" && Theme.onPrimaryContainer.toString() === "#2e3440", "explicit container colors are not derived over");
             console.log(root.failed ? "FIXTURE_FAIL see above" : "FIXTURE_PASS");
             Qt.quit();
         }

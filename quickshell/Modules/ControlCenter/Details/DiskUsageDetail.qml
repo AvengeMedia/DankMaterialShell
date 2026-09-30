@@ -10,6 +10,8 @@ import qs.Widgets
 Item {
     id: root
 
+    implicitHeight: column.height
+
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 

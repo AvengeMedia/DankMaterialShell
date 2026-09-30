@@ -36,6 +36,11 @@ DankPopout {
         close();
     }
 
+    function openAccounts() {
+        requestedWindow = "accounts";
+        close();
+    }
+
     function openColorPicker() {
         if (!colorPickerModal)
             return;
@@ -64,6 +69,9 @@ DankPopout {
             switch (requested) {
             case "settings":
                 PopoutService.focusOrToggleSettings();
+                break;
+            case "accounts":
+                PopoutService.openSettingsWithTab("user_accounts");
                 break;
             case "colorPicker":
                 root.colorPickerModal?.show();

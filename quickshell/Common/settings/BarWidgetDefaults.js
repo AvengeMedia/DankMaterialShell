@@ -16,6 +16,7 @@ var ISLAND_DEFAULTS = {
     islandRouteLauncher: "follow",
     islandRouteControlCenter: "follow",
     islandRouteNotificationCenter: "follow",
+    islandRouteClipboard: "follow",
     islandRouteDash: "island",
     islandRouteMedia: "island",
     islandRouteWeather: "island",

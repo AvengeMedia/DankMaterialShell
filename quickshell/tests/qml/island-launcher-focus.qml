@@ -46,6 +46,7 @@ ShellRoot {
         DC.Style.settings = SettingsData;
         DC.I18n.backend = I18n;
         SettingsData.frameEnabled = false;
+        SettingsData.reduceMotion = true;
         SettingsData.launcherStyle = "island";
         SettingsData.rememberLastQuery = false;
         SettingsData.barConfigs = [

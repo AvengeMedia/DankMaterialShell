@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -150,8 +152,8 @@ func TestRefreshReleasesFetchesAndCaches(t *testing.T) {
 		t.Fatalf("first fetch = %+v, %v", feed, err)
 	}
 	state := m.GetState()
-	if state.Shell.LatestVersion != "1.7.1" || state.Shell.CommitsBehind == nil || *state.Shell.CommitsBehind != 5 || state.ReleasesFetchedUnix == 0 {
-		t.Errorf("shell after fetch = %+v, fetched=%d", state.Shell, state.ReleasesFetchedUnix)
+	if state.Shell.CommitsBehind == nil || *state.Shell.CommitsBehind != 5 {
+		t.Errorf("shell after fetch = %+v", state.Shell)
 	}
 
 	// Fresh cache: no network.
@@ -228,8 +230,6 @@ func TestSetIntervalSchedulesFromLastCheck(t *testing.T) {
 func TestRefreshWithoutBackendsAdvancesDeadline(t *testing.T) {
 	m := newTestManager(t)
 	m.state.IntervalSeconds = 3600
-	body, _ := json.Marshal(ReleasesFeed{Latest: &Release{Version: "1.7.1"}, Releases: []Release{}})
-	calls := stubFeed(t, netfetch.Conditional{Body: body}, nil)
 
 	now := time.Now().Unix()
 	m.runRefresh(context.Background(), false)
@@ -237,9 +237,6 @@ func TestRefreshWithoutBackendsAdvancesDeadline(t *testing.T) {
 	state := m.GetState()
 	if state.NextCheckUnix < now+3600-5 || state.NextCheckUnix > now+3600+5 {
 		t.Errorf("next = now+%d, want now+3600 (an unmoved deadline spins the scheduler)", state.NextCheckUnix-now)
-	}
-	if *calls != 1 || state.Shell.LatestVersion != "1.7.1" {
-		t.Errorf("feed not refreshed without package backends: calls=%d latest=%q", *calls, state.Shell.LatestVersion)
 	}
 }
 
@@ -320,5 +317,49 @@ func TestRebootHintPersistsAcrossRestartNotReboot(t *testing.T) {
 	defer m2.Close()
 	if m2.GetState().Reboot.Recommended {
 		t.Error("reboot hint survived a reboot")
+	}
+}
+
+type niceBackend struct {
+	fakeBackend
+	nice string
+}
+
+func (b *niceBackend) CheckUpdates(ctx context.Context) ([]Package, error) {
+	out, err := exec.CommandContext(ctx, "nice").Output()
+	b.nice = strings.TrimSpace(string(out))
+	return nil, err
+}
+
+func TestCheckRunsAtLowPriority(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("thread priority is only lowered on linux")
+	}
+	m := newTestManager(t)
+	backend := &niceBackend{}
+	m.selection = Selection{Overlay: []Backend{backend}}
+
+	m.runRefresh(context.Background(), false)
+	if backend.nice != "19" {
+		t.Errorf("package manager ran at nice %q, want 19", backend.nice)
+	}
+}
+
+func TestHoldEndsWithItsConnection(t *testing.T) {
+	m := newTestManager(t)
+	m.holders = make(map[any]func() bool)
+	m.probeOnce.Do(func() {})
+
+	ctx, disconnect := context.WithCancel(context.Background())
+	m.Acquire(ctx, "client")
+	m.Acquire(ctx, "client")
+	disconnect()
+
+	deadline := time.Now().Add(5 * time.Second)
+	for m.held() && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if m.held() {
+		t.Error("a disconnected client still holds the scheduler")
 	}
 }

@@ -91,7 +91,7 @@
     //
     "button.background": "{{colors.primary.dark.hex}}",
     "button.foreground": "{{colors.on_primary.dark.hex}}",
-    "button.hoverBackground": "{{colors.primary_container.dark.hex}}",
+    "button.hoverBackground": "{{colors.primary_fixed.dark.hex}}",
     //
     // Status bar
     //
@@ -161,9 +161,10 @@
     "editorHoverWidget.border": "{{colors.outline.dark.hex}}",
     "editorSuggestWidget.background": "{{colors.surface_container.dark.hex}}",
     "editorSuggestWidget.foreground": "{{colors.on_surface.dark.hex}}",
-    "editorSuggestWidget.selectedBackground": "{{colors.surface_container_high.dark.hex}}",
-    "editorSuggestWidget.selectedForeground": "{{colors.on_surface.dark.hex}}",
+    "editorSuggestWidget.selectedBackground": "{{colors.primary.dark.hex}}",
+    "editorSuggestWidget.selectedForeground": "{{colors.on_primary.dark.hex}}",
     "editorSuggestWidget.highlightForeground": "{{colors.primary.dark.hex}}",
+    "editorSuggestWidget.focusHighlightForeground": "{{colors.on_primary.dark.hex}}",
     //
     // Scrollbar
     //

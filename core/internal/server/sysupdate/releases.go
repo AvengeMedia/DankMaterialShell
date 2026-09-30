@@ -9,13 +9,13 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/netfetch"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 const (
-	releasesURL     = "https://api.danklinux.com/dms/releases"
-	releasesTimeout = 10 * time.Second
-	// Checks may run every 15 min; the feed changes a few times a month and runs ~20 KB.
+	releasesURL      = site.API + "/dms/releases"
+	releasesTimeout  = 10 * time.Second
 	releasesMinAge   = time.Hour
 	releasesMaxBytes = 1 << 20
 )
@@ -67,7 +67,7 @@ func writeFileAtomic(path string, data []byte) error {
 	return os.Rename(tmp, path)
 }
 
-// Serialized so a manual check and a page open don't fetch twice.
+// Serialized so overlapping requests don't fetch twice.
 func (m *Manager) refreshReleases(ctx context.Context, force bool) (ReleasesFeed, error) {
 	m.releasesMu.Lock()
 	defer m.releasesMu.Unlock()
@@ -109,10 +109,6 @@ func (m *Manager) refreshReleases(ctx context.Context, force bool) (ReleasesFeed
 
 func (m *Manager) applyReleases(feed ReleasesFeed) {
 	m.mu.Lock()
-	m.state.ReleasesFetchedUnix = feed.FetchedAt
-	if feed.Latest != nil {
-		m.state.Shell.LatestVersion = feed.Latest.Version
-	}
 	m.state.Shell.CommitsBehind = commitsBehind(m.state.Shell, feed.Master)
 	m.mu.Unlock()
 	m.markDirty()

@@ -92,10 +92,10 @@ T.Control {
         const container = groupItem.parent;
         if (container?.isSettingsGroupHost)
             return container.isEdge(groupItem, first);
-        if (!_edgeInContainer(first))
-            return false;
         const host = container?.parent;
-        return host?.isSettingsGroupHost ? host.isEdge(container, first) : true;
+        if (!host?.isSettingsGroupHost)
+            return true;
+        return host.isEdge(container, first) && _edgeInContainer(first);
     }
 
     function _edgeInContainer(first) {
