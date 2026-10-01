@@ -597,12 +597,14 @@ Singleton {
             return null;
         const profile = parts[2];
         const info = codecInfoFromDescription(parts[3]);
-        // A codec the vocabulary does not name stays selectable under its profile.
+        // Keep an unrecognized codec selectable without showing a bare profile ID as its name.
         const label = info ? "" : codecLabelFromProfile(profile);
         if (!info && label === "")
             return null;
+        const unknown = !info && label === profile;
         return {
-            "name": info ? info.name : label,
+            "name": info ? info.name : (unknown ? I18n.tr("Unknown") : label),
+            "unknown": unknown,
             "profile": profile,
             "index": Number(parts[1]),
             "codec": info ? info.codec : "",
@@ -660,16 +662,21 @@ Singleton {
 
         whenCodecBackendReady(() => {
             if (root.wpexecAvailable) {
-                root.queryCardProfiles(device, (codecs, current) => {
+                root.queryCardProfiles(device, (codecs, current, currentIndex) => {
                     if (current) {
                         root.updateDeviceCodec(device.address, current);
                         return;
                     }
-                    if (!root.dbusBridgeAvailable)
+                    const fallback = currentIndex >= 0 ? I18n.tr("Unknown") : "";
+                    if (!root.dbusBridgeAvailable) {
+                        if (fallback)
+                            root.updateDeviceCodec(device.address, fallback);
                         return;
+                    }
                     root.queryBluezCodecState(device, (bluezCodecs, bluezCurrent) => {
-                        if (bluezCurrent)
-                            root.updateDeviceCodec(device.address, bluezCurrent);
+                        const resolved = bluezCurrent === "VENDOR" && fallback ? fallback : (bluezCurrent || fallback);
+                        if (resolved)
+                            root.updateDeviceCodec(device.address, resolved);
                     });
                 });
                 return;
@@ -700,13 +707,15 @@ Singleton {
                 return;
             }
 
-            root.queryCardProfiles(device, (codecs, current) => {
-                if (codecs.length > 0 || !root.dbusBridgeAvailable) {
-                    callback(codecs, current);
+            root.queryCardProfiles(device, (codecs, current, currentIndex) => {
+                const fallback = current || (currentIndex >= 0 ? I18n.tr("Unknown") : "");
+                if (!root.dbusBridgeAvailable || (codecs.length > 0 && (current || currentIndex < 0))) {
+                    callback(codecs, fallback, currentIndex);
                     return;
                 }
                 root.queryBluezCodecState(device, (bluezCodecs, bluezCurrent) => {
-                    callback(bluezCodecs, bluezCurrent || current);
+                    const resolved = bluezCurrent === "VENDOR" && currentIndex >= 0 ? fallback : (bluezCurrent || fallback);
+                    callback(codecs.length > 0 ? codecs : bluezCodecs, resolved, codecs.length > 0 ? currentIndex : -1);
                 });
             });
         });
@@ -755,6 +764,7 @@ Singleton {
         codecListProcess.callback = callback;
         codecListProcess.availableCodecs = [];
         codecListProcess.detectedCodec = "";
+        codecListProcess.currentIndex = -1;
         codecListProcess.command = ["wpexec", cardProfileScript, JSON.stringify({
                 "mode": "list",
                 "device": cardName
@@ -782,6 +792,7 @@ Singleton {
         property string cardName: ""
         property var callback: null
         property string detectedCodec: ""
+        property int currentIndex: -1
         property var availableCodecs: []
 
         command: ["wpexec", root.cardProfileScript, "{}"]
@@ -792,8 +803,11 @@ Singleton {
                 const entry = root.parseCodecLine(data);
                 if (!entry)
                     return;
-                if (entry.current)
-                    codecListProcess.detectedCodec = entry.name;
+                if (entry.current) {
+                    codecListProcess.currentIndex = entry.index;
+                    if (!entry.unknown)
+                        codecListProcess.detectedCodec = entry.name;
+                }
                 if (!codecListProcess.availableCodecs.some(c => c.index === entry.index)) {
                     const next = codecListProcess.availableCodecs.slice();
                     next.push({
@@ -812,8 +826,9 @@ Singleton {
 
         onExited: function (exitCode) {
             if (callback)
-                callback(exitCode === 0 ? availableCodecs : [], exitCode === 0 ? detectedCodec : "");
+                callback(exitCode === 0 ? availableCodecs : [], exitCode === 0 ? detectedCodec : "", exitCode === 0 ? currentIndex : -1);
             detectedCodec = "";
+            currentIndex = -1;
             availableCodecs = [];
             callback = null;
         }

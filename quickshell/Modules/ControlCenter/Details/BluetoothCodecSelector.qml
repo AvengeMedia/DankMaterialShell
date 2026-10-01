@@ -11,6 +11,7 @@ CcSheetDialog {
     property var device: null
     property var availableCodecs: []
     property string currentCodec: ""
+    property int currentIndex: -1
     property bool isLoading: false
     property string statusMessage: ""
     property bool statusIsError: false
@@ -41,6 +42,7 @@ CcSheetDialog {
         isLoading = true;
         availableCodecs = [];
         currentCodec = "";
+        currentIndex = -1;
         statusMessage = "";
         statusIsError = false;
         queryCodecs();
@@ -54,11 +56,12 @@ CcSheetDialog {
         }
         const capturedDevice = device;
         const capturedAddress = device.address;
-        BluetoothService.getAvailableCodecs(capturedDevice, (codecs, current) => {
+        BluetoothService.getAvailableCodecs(capturedDevice, (codecs, current, index) => {
             if (!root.deviceValid || root.device?.address !== capturedAddress)
                 return;
             availableCodecs = codecs;
             currentCodec = current;
+            currentIndex = index ?? -1;
             isLoading = false;
             if (BluetoothService.wpexecChecked && !BluetoothService.wpexecAvailable && !BluetoothService.dbusBridgeAvailable) {
                 statusMessage = I18n.tr("Codec switching is unavailable. WirePlumber wpexec was not found.", "bluetooth codec selector error, wpexec is a program name");
@@ -105,7 +108,7 @@ CcSheetDialog {
 
         title: modelData.name
         subtitle: modelData.description
-        active: modelData.name === root.currentCodec
+        active: root.currentIndex >= 0 ? modelData.index === root.currentIndex : modelData.name === root.currentCodec
         enabled: !root.isLoading
         clickable: !active
         onClicked: root.selectCodec(modelData)

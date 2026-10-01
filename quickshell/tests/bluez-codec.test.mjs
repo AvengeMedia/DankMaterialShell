@@ -25,7 +25,7 @@ function methods(names) {
         const end = serviceSource.indexOf("\n    }", start) + 6;
         return serviceSource.slice(start, end);
     });
-    const context = vm.createContext({});
+    const context = vm.createContext({ I18n: { tr: text => text } });
     vm.runInContext(bodies.join("\n"), context);
     return context;
 }
@@ -215,8 +215,112 @@ test("a CODEC line carries the profile index and the codec read from the descrip
     assert.equal(unknown.codec, "");
     assert.equal(unknown.description, "Unknown codec");
     const bareUnknown = context.parseCodecLine("CODEC\t3\ta2dp-sink\t高保真回放 (A2DP 信宿, 编码 未知编解码器)\t1");
-    assert.equal(bareUnknown.name, "a2dp-sink");
+    assert.equal(bareUnknown.name, "Unknown");
+    assert.equal(bareUnknown.profile, "a2dp-sink");
+    assert.equal(bareUnknown.codec, "");
     assert.equal(bareUnknown.current, true);
+    assert.equal(bareUnknown.unknown, true);
+    assert.equal(entry.unknown, false);
+    const headsetUnknown = context.parseCodecLine("CODEC\t4\theadset-head-unit\tHeadset (HSP/HFP)\t0");
+    assert.equal(headsetUnknown.name, "Unknown");
+    assert.equal(headsetUnknown.profile, "headset-head-unit");
+});
+
+test("an active unknown profile cannot claim a codec name before BlueZ lookup", () => {
+    const context = methods(["codecMap", "codecAliases", "codecInfoFromDescription", "codecLabelFromProfile", "getCodecInfo", "parseCodecLine", "codecCategory"]);
+    const process = serviceSource.split("        id: codecListProcess")[1].split("    Process {")[0];
+    const handlerSource = process.match(/onRead: (data => \{[\s\S]*?\n            \})\n        \}\n\n        onExited/)?.[1];
+    assert.ok(handlerSource, "codecListProcess onRead handler moved");
+    const state = { detectedCodec: "", currentIndex: -1, availableCodecs: [] };
+    context.root = context;
+    context.codecListProcess = state;
+    const onRead = vm.runInContext(handlerSource, context);
+    onRead("CODEC\t3\ta2dp-sink\t高保真回放 (A2DP 信宿, 编码 未知编解码器)\t1");
+    assert.equal(state.detectedCodec, "");
+    assert.equal(state.currentIndex, 3);
+    assert.equal(state.availableCodecs[0].name, "Unknown");
+    assert.equal(state.availableCodecs[0].profile, "a2dp-sink");
+    onRead("CODEC\t4\theadset-head-unit\tHeadset (HSP/HFP)\t0");
+    assert.equal(state.availableCodecs[1].name, "Unknown");
+    assert.notEqual(state.availableCodecs[0].index, state.availableCodecs[1].index);
+    const exitSource = process.match(/onExited: (function \(exitCode\) \{[\s\S]*?\n        \})\n    \}/)?.[1];
+    assert.ok(exitSource, "codecListProcess onExited handler moved");
+    state.callback = (codecs, current, currentIndex) => {
+        assert.equal(codecs.length, 2);
+        assert.equal(current, "");
+        assert.equal(currentIndex, 3);
+    };
+    Object.assign(context, state);
+    vm.runInContext(`(${exitSource})`, context)(0);
+    assert.equal(context.currentIndex, -1);
+});
+
+test("an unknown active PipeWire profile preserves choices but defers current codec to BlueZ", () => {
+    const context = methods(["refreshDeviceCodec", "getAvailableCodecs"]);
+    const device = { connected: true, address: "AA:BB" };
+    const pipewire = [{ name: "Unknown", profile: "a2dp-sink", index: 3 }];
+    const bluez = [{ name: "LHDC v5" }];
+    let bluezQueries = 0;
+    const updates = [];
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = {
+        wpexecAvailable: true,
+        dbusBridgeAvailable: true,
+        queryCardProfiles: (_device, callback) => callback(pipewire, "", 3),
+        queryBluezCodecState: (_device, callback) => { bluezQueries++; callback(bluez, "LHDC v5"); },
+        updateDeviceCodec: (_address, name) => updates.push(name)
+    };
+    context.refreshDeviceCodec(device);
+    assert.deepEqual(updates, ["LHDC v5"]);
+    context.getAvailableCodecs(device, (codecs, current, currentIndex) => {
+        assert.equal(codecs, pipewire);
+        assert.equal(current, "LHDC v5");
+        assert.equal(currentIndex, 3);
+    });
+    assert.equal(bluezQueries, 2);
+
+    context.root.queryBluezCodecState = (_device, callback) => callback([], "");
+    context.refreshDeviceCodec(device);
+    assert.deepEqual(updates, ["LHDC v5", "Unknown"]);
+    context.getAvailableCodecs(device, (codecs, current, currentIndex) => {
+        assert.equal(codecs, pipewire);
+        assert.equal(current, "Unknown");
+        assert.equal(currentIndex, 3);
+    });
+    context.root.queryBluezCodecState = (_device, callback) => callback([], "VENDOR");
+    context.refreshDeviceCodec(device);
+    assert.equal(updates.at(-1), "Unknown");
+    context.getAvailableCodecs(device, (codecs, current) => {
+        assert.equal(codecs, pipewire);
+        assert.equal(current, "Unknown");
+    });
+    context.root.dbusBridgeAvailable = false;
+    context.getAvailableCodecs(device, (codecs, current) => {
+        assert.equal(codecs, pipewire);
+        assert.equal(current, "Unknown");
+    });
+});
+
+test("known PipeWire codec does not query BlueZ again", () => {
+    const context = methods(["refreshDeviceCodec", "getAvailableCodecs"]);
+    const device = { connected: true, address: "AA:BB" };
+    const pipewire = [{ name: "LHDC v5", index: 3 }];
+    const updates = [];
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = {
+        wpexecAvailable: true, dbusBridgeAvailable: true,
+        queryCardProfiles: (_device, callback) => callback(pipewire, "LHDC v5", 3),
+        queryBluezCodecState: () => assert.fail("known current codec should not query BlueZ"),
+        updateDeviceCodec: (_address, name) => updates.push(name)
+    };
+    context.refreshDeviceCodec(device);
+    assert.deepEqual(updates, ["LHDC v5"]);
+    context.getAvailableCodecs(device, (codecs, current) => {
+        assert.equal(codecs, pipewire);
+        assert.equal(current, "LHDC v5");
+    });
 });
 
 test("vendor codecs are read from the BlueZ configuration bytes", () => {
