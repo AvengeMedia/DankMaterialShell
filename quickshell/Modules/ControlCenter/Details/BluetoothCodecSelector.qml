@@ -78,6 +78,7 @@ CcSheetDialog {
             return;
         const capturedDevice = device;
         const capturedAddress = device.address;
+        BluetoothService.invalidateCodecQuery(capturedAddress);
         BluetoothService.updateDeviceCodec(capturedAddress, selectedCodec.name);
         codecSelected(capturedAddress, selectedCodec.name);
         isLoading = true;
@@ -86,6 +87,7 @@ CcSheetDialog {
                 return;
             isLoading = false;
             if (!success) {
+                BluetoothService.refreshDeviceCodec(capturedDevice);
                 ToastService.showToast(message, ToastService.levelError);
                 return;
             }

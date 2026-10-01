@@ -256,7 +256,7 @@ test("an active unknown profile cannot claim a codec name before BlueZ lookup", 
 });
 
 test("an unknown active PipeWire profile preserves choices but defers current codec to BlueZ", () => {
-    const context = methods(["refreshDeviceCodec", "getAvailableCodecs"]);
+    const context = methods(["refreshDeviceCodec", "getAvailableCodecs", "invalidateCodecQuery", "codecQueryIsCurrent"]);
     const device = { connected: true, address: "AA:BB" };
     const pipewire = [{ name: "Unknown", profile: "a2dp-sink", index: 3 }];
     const bluez = [{ name: "LHDC v5" }];
@@ -265,6 +265,10 @@ test("an unknown active PipeWire profile preserves choices but defers current co
     context.isAudioDevice = () => true;
     context.whenCodecBackendReady = callback => callback();
     context.root = {
+        invalidateCodecQuery: context.invalidateCodecQuery,
+        codecQueryIsCurrent: context.codecQueryIsCurrent,
+        codecQueryVersions: {},
+        adapter: { devices: { values: [device] } },
         wpexecAvailable: true,
         dbusBridgeAvailable: true,
         queryCardProfiles: (_device, callback) => callback(pipewire, "", 3),
@@ -302,14 +306,118 @@ test("an unknown active PipeWire profile preserves choices but defers current co
     });
 });
 
+test("a late BlueZ lookup cannot undo a successful codec switch", () => {
+    const context = methods(["refreshDeviceCodec", "invalidateCodecQuery", "updateDeviceCodec", "codecQueryIsCurrent"]);
+    const device = { connected: true, address: "AA:BB" };
+    const updates = [];
+    let reply;
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = context;
+    context.wpexecAvailable = true;
+    context.dbusBridgeAvailable = true;
+    context.adapter = { devices: { values: [device] } };
+    context.codecQueryVersions = {};
+    context.deviceCodecs = {};
+    context.queryCardProfiles = (_device, callback) => callback([], "", 3);
+    context.queryBluezCodecState = (_device, callback) => { reply = callback; };
+    context.updateDeviceCodec = (_address, name) => updates.push(name);
+
+    context.refreshDeviceCodec(device);
+    assert.equal(typeof reply, "function");
+    // The selector invalidates its pending lookup when switching starts.
+    context.invalidateCodecQuery(device.address);
+    context.updateDeviceCodec(device.address, "AAC");
+    reply([], "LDAC");
+    assert.deepEqual(updates, ["AAC"]);
+});
+
+test("only the newest refresh for a device can publish a codec", () => {
+    const context = methods(["refreshDeviceCodec", "invalidateCodecQuery", "codecQueryIsCurrent"]);
+    const device = { connected: true, address: "AA:BB" };
+    const other = { connected: true, address: "CC:DD" };
+    const replies = new Map();
+    const updates = [];
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = context;
+    context.wpexecAvailable = true;
+    context.dbusBridgeAvailable = true;
+    context.adapter = { devices: { values: [device, other] } };
+    context.codecQueryVersions = {};
+    context.queryCardProfiles = (_device, callback) => callback([], "", 3);
+    context.queryBluezCodecState = (target, callback) => {
+        const callbacks = replies.get(target.address) || [];
+        callbacks.push(callback);
+        replies.set(target.address, callbacks);
+    };
+    context.updateDeviceCodec = (address, name) => updates.push([address, name]);
+
+    context.refreshDeviceCodec(device);
+    context.refreshDeviceCodec(other);
+    context.refreshDeviceCodec(device);
+    replies.get(device.address)[0]([], "LDAC");
+    replies.get(other.address)[0]([], "SBC");
+    replies.get(device.address)[1]([], "AAC");
+    assert.deepEqual(updates, [["CC:DD", "SBC"], ["AA:BB", "AAC"]]);
+});
+
+test("a replaced adapter cannot receive a late BlueZ codec", () => {
+    const context = methods(["refreshDeviceCodec", "invalidateCodecQuery", "codecQueryIsCurrent"]);
+    const device = { connected: true, address: "AA:BB" };
+    const updates = [];
+    let reply;
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = context;
+    context.wpexecAvailable = true;
+    context.dbusBridgeAvailable = true;
+    context.adapter = { dbusPath: "/adapter/old", devices: { values: [device] } };
+    context.codecQueryVersions = {};
+    context.queryCardProfiles = (_device, callback) => callback([], "", 3);
+    context.queryBluezCodecState = (_device, callback) => { reply = callback; };
+    context.updateDeviceCodec = (_address, name) => updates.push(name);
+
+    context.refreshDeviceCodec(device);
+    context.adapter = { dbusPath: "/adapter/new", devices: { values: [device] } };
+    reply([], "LDAC");
+    assert.deepEqual(updates, []);
+});
+
+test("a disconnected device cannot receive a late BlueZ codec", () => {
+    const context = methods(["refreshDeviceCodec", "invalidateCodecQuery", "codecQueryIsCurrent"]);
+    const device = { connected: true, address: "AA:BB" };
+    let reply;
+    const updates = [];
+    context.isAudioDevice = () => true;
+    context.whenCodecBackendReady = callback => callback();
+    context.root = context;
+    context.wpexecAvailable = true;
+    context.dbusBridgeAvailable = true;
+    context.adapter = { devices: { values: [device] } };
+    context.codecQueryVersions = {};
+    context.queryCardProfiles = (_device, callback) => callback([], "", 3);
+    context.queryBluezCodecState = (_device, callback) => { reply = callback; };
+    context.updateDeviceCodec = (_address, name) => updates.push(name);
+
+    context.refreshDeviceCodec(device);
+    device.connected = false;
+    reply([], "LDAC");
+    assert.deepEqual(updates, []);
+});
+
 test("known PipeWire codec does not query BlueZ again", () => {
-    const context = methods(["refreshDeviceCodec", "getAvailableCodecs"]);
+    const context = methods(["refreshDeviceCodec", "getAvailableCodecs", "invalidateCodecQuery", "codecQueryIsCurrent"]);
     const device = { connected: true, address: "AA:BB" };
     const pipewire = [{ name: "LHDC v5", index: 3 }];
     const updates = [];
     context.isAudioDevice = () => true;
     context.whenCodecBackendReady = callback => callback();
     context.root = {
+        invalidateCodecQuery: context.invalidateCodecQuery,
+        codecQueryIsCurrent: context.codecQueryIsCurrent,
+        codecQueryVersions: {},
+        adapter: { devices: { values: [device] } },
         wpexecAvailable: true, dbusBridgeAvailable: true,
         queryCardProfiles: (_device, callback) => callback(pipewire, "LHDC v5", 3),
         queryBluezCodecState: () => assert.fail("known current codec should not query BlueZ"),

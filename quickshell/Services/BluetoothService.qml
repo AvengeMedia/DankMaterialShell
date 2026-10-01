@@ -615,6 +615,19 @@ Singleton {
     }
 
     property var deviceCodecs: ({})
+    property var codecQueryVersions: ({})
+
+    function invalidateCodecQuery(deviceAddress) {
+        if (!deviceAddress)
+            return;
+        const next = Object.assign({}, root.codecQueryVersions);
+        next[deviceAddress] = (next[deviceAddress] || 0) + 1;
+        root.codecQueryVersions = next;
+    }
+
+    function codecQueryIsCurrent(device, version, originatingAdapter) {
+        return device?.connected && root.adapter === originatingAdapter && originatingAdapter?.devices?.values?.includes(device) && root.codecQueryVersions[device.address] === version;
+    }
 
     function updateDeviceCodec(deviceAddress, codec) {
         if (!deviceAddress || !codec)
@@ -656,13 +669,20 @@ Singleton {
     }
 
     function refreshDeviceCodec(device) {
-        if (!device || !device.connected || !isAudioDevice(device)) {
+        if (!device || !device.connected || !isAudioDevice(device))
             return;
-        }
 
+        root.invalidateCodecQuery(device.address);
+        const version = root.codecQueryVersions[device.address];
+        const originatingAdapter = root.adapter;
+        const stillCurrent = () => root.codecQueryIsCurrent(device, version, originatingAdapter);
         whenCodecBackendReady(() => {
+            if (!stillCurrent())
+                return;
             if (root.wpexecAvailable) {
                 root.queryCardProfiles(device, (codecs, current, currentIndex) => {
+                    if (!stillCurrent())
+                        return;
                     if (current) {
                         root.updateDeviceCodec(device.address, current);
                         return;
@@ -674,6 +694,8 @@ Singleton {
                         return;
                     }
                     root.queryBluezCodecState(device, (bluezCodecs, bluezCurrent) => {
+                        if (!stillCurrent())
+                            return;
                         const resolved = bluezCurrent === "VENDOR" && fallback ? fallback : (bluezCurrent || fallback);
                         if (resolved)
                             root.updateDeviceCodec(device.address, resolved);
@@ -685,7 +707,7 @@ Singleton {
             if (!root.dbusBridgeAvailable)
                 return;
             root.queryBluezCodecState(device, (codecs, current) => {
-                if (current)
+                if (stillCurrent() && current)
                     root.updateDeviceCodec(device.address, current);
             });
         });
@@ -861,8 +883,10 @@ Singleton {
 
         onExited: function (exitCode) {
             const success = exitCode === 0 && sawOk;
-            if (success && deviceAddress && expectedCodec)
+            if (success && deviceAddress && expectedCodec) {
+                root.invalidateCodecQuery(deviceAddress);
                 root.updateDeviceCodec(deviceAddress, expectedCodec);
+            }
 
             if (callback)
                 callback(success, success ? I18n.tr("Codec switched successfully") : I18n.tr("Failed to switch codec"));
