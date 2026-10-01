@@ -1177,7 +1177,17 @@ func execDryRun(opts *Options, flags matugenFlags) (string, error) {
 		}
 		return "", fmt.Errorf("matugen %v failed (v4=%v): %w", baseArgs, flags.isV4, err)
 	}
-	return strings.ReplaceAll(string(output), "\n", ""), nil
+	clean := string(output)
+	// Some matugen builds print a warning line to stdout (e.g. scheme-smart
+	// falling back to defaults for a non-image source) ahead of the JSON
+	// payload. The pretty-printed JSON always opens with a line containing
+	// only '{', so drop anything before that
+	if !strings.HasPrefix(clean, "{") {
+		if idx := strings.Index(clean, "\n{\n"); idx != -1 {
+			clean = clean[idx+1:]
+		}
+	}
+	return strings.ReplaceAll(clean, "\n", ""), nil
 }
 
 func extractMatugenColor(jsonStr, colorName, variant string) string {
