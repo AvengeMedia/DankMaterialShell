@@ -96,6 +96,11 @@ type DDCBackend struct {
 	debounceTimers  map[string]*time.Timer
 	debouncePending map[string]ddcPendingSet
 	debounceWg      sync.WaitGroup
+
+	ioMutex   sync.Mutex
+	onReread  func()
+	stop      chan struct{}
+	closeOnce sync.Once
 }
 
 type ddcPendingSet struct {
@@ -108,6 +113,7 @@ type ddcDevice struct {
 	addr           int
 	id             string
 	name           string
+	adapter        string
 	max            int
 	lastBrightness int
 }
