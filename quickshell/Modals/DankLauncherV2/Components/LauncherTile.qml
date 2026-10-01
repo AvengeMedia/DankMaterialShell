@@ -56,6 +56,7 @@ Rectangle {
     color: externalHighlight ? "transparent" : isSelected ? Theme.selectedContainer : Theme.foregroundColor(Theme.cardSurface, Theme.isFloatingWindow(root))
     border.width: externalHighlight ? 0 : Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
+    opacity: (root.item?.type === "dmenu" && root.item?.data?.nonSelectable) ? 0.5 : 1.0
 
     Rectangle {
         anchors.fill: parent
@@ -89,6 +90,13 @@ Rectangle {
             color: root.contentColor
             visible: root.item?.pinned === true
         }
+
+        DankIcon {  // dmenu --multi-select checkbox
+            name: root.item?.data?.checked ? "check_box" : "check_box_outline_blank"
+            size: Theme.iconSizeSmall
+            color: root.item?.data?.checked ? Theme.primary : root.contentColor
+            visible: root.item?.type === "dmenu" && root.controller?.dmenuMultiSelect === true
+        }
     }
 
     Loader {
@@ -101,7 +109,7 @@ Rectangle {
                 width: parent.width - Theme.spacingL * 2
 
                 AppIconRenderer {
-                    visible: true
+                    visible: !(root.item?.type === "dmenu" && root.item?.data?.nonSelectable && !root.item?.icon)
                     fallbackRadius: Theme.fullRadius(width, height)
                     fallbackBackgroundColor: Theme.primaryContainer
                     fallbackTextColor: Theme.onPrimaryContainer

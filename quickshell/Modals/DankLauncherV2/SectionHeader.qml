@@ -61,16 +61,41 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.spacingS
 
+            readonly property bool _iconVisible: root.section?.iconVisible ?? true
+            readonly property string _iconType: root.section?.iconType ?? "material"
+            readonly property bool _iconSpaceReserved: root.hasAppCategories || _iconVisible
+
             DankIcon {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: root.hasAppCategories || (labelContent._iconVisible && labelContent._iconType !== "image")
                 name: root.hasAppCategories ? AppSearchService.getCategoryIcon(root.categoryLabel) : (root.section?.icon ?? "folder")
                 size: Theme.iconSizeSmall
                 color: Theme.primary
             }
 
+            Loader {
+                id: imageIconLoader
+                anchors.verticalCenter: parent.verticalCenter
+                active: !root.hasAppCategories && labelContent._iconVisible && labelContent._iconType === "image"
+                visible: active
+                width: active ? Theme.iconSizeSmall : 0
+                height: Theme.iconSizeSmall
+                sourceComponent: AppIconRenderer {
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                    iconValue: root.section?.icon ?? ""
+                    iconSize: Theme.iconSizeSmall
+                    iconColor: Theme.primary
+                    fallbackRadius: Theme.fullRadius(Theme.iconSizeSmall, Theme.iconSizeSmall)
+                    fallbackBackgroundColor: Theme.primaryContainer
+                    fallbackTextColor: Theme.onPrimaryContainer
+                    fallbackText: (root.section?.title ?? "").charAt(0).toUpperCase() || "?"
+                }
+            }
+
             StyledText {
                 anchors.verticalCenter: parent.verticalCenter
-                width: Math.min(implicitWidth, labelArea.width - Theme.iconSizeSmall - Theme.spacingS - (chevron.visible ? chevron.width + Theme.spacingS : 0))
+                width: Math.min(implicitWidth, labelArea.width - (labelContent._iconSpaceReserved ? Theme.iconSizeSmall + Theme.spacingS : 0) - (chevron.visible ? chevron.width + Theme.spacingS : 0))
                 text: root.hasAppCategories ? root.categoryLabel : (root.section?.title ?? "")
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Theme.fontWeightMedium

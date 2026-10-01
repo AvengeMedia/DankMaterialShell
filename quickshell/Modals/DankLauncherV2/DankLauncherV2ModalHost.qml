@@ -97,10 +97,12 @@ Item {
         "error": true
     })
 
-    readonly property int baseWidth: LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)
-    readonly property int baseHeight: LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)
+    readonly property string _dmenuSizeOverride: (spotlightContent?.controller?.searchMode === "dmenu") ? (spotlightContent.controller.dmenuSize || "") : ""
+
+    readonly property int baseWidth: LauncherMetrics.sizeWidth(_dmenuSizeOverride || SettingsData.dankLauncherV2Size)
+    readonly property int baseHeight: LauncherMetrics.sizeHeight(_dmenuSizeOverride || SettingsData.dankLauncherV2Size)
     readonly property real _contentImplicitH: launcherContentLoader.item?.implicitHeight ?? LauncherMetrics.pillHeight
-    readonly property int modalWidth: Math.min(spotlight ? LauncherMetrics.spotlightWidth : baseWidth, screenWidth - LauncherMetrics.screenMargin)
+    readonly property int modalWidth: Math.min(spotlight ? (_dmenuSizeOverride ? LauncherMetrics.sizeWidth(_dmenuSizeOverride) : LauncherMetrics.spotlightWidth) : baseWidth, screenWidth - LauncherMetrics.screenMargin)
     readonly property int modalHeight: spotlight ? _contentImplicitH : Math.min(baseHeight, screenHeight - LauncherMetrics.screenMargin)
 
     readonly property string preferredConnectedBarSide: SettingsData.frameLauncherEmergeSide
@@ -446,7 +448,7 @@ Item {
         contentVisible = true;
         launcherContentLoader.active = true;
 
-        if (spotlightContent) {
+        if (spotlightContent && _pendingInitialize) {
             _initializeAndShow(_pendingQuery, _pendingMode);
             _pendingInitialize = false;
         }
@@ -574,6 +576,13 @@ Item {
 
     function showWithQuery(query) {
         _openCommon(query, "");
+    }
+
+    function attemptUserCancel() {
+        const controller = spotlightContent?.controller;
+        if (controller && controller.searchMode === "dmenu" && controller.dmenuOnlyMatch)
+            return;
+        hide();
     }
 
     function hide() {
@@ -786,7 +795,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     enabled: root.spotlightOpen
-                    onClicked: root.hide()
+                    onClicked: root.attemptUserCancel()
                 }
             }
         }
@@ -950,7 +959,7 @@ Item {
                 anchors.fill: dismissArea
                 enabled: root.spotlightOpen
                 z: -2
-                onClicked: root.hide()
+                onClicked: root.attemptUserCancel()
             }
 
             Item {
@@ -1217,7 +1226,7 @@ Item {
                 anchors.fill: parent
                 enabled: root.useSingleWindow && root.spotlightOpen
                 z: -2
-                onClicked: root.hide()
+                onClicked: root.attemptUserCancel()
             }
 
             Rectangle {

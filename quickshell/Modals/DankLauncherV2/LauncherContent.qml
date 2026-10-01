@@ -115,6 +115,15 @@ FocusScope {
             return;
         }
 
+        if (controller.searchMode === "dmenu") {
+            var kbN = controller.matchDmenuKeybind(event);
+            if (kbN > 0) {
+                controller.acceptDmenuViaKeybind(kbN);
+                event.accepted = true;
+                return;
+            }
+        }
+
         var hasCtrl = event.modifiers & Qt.ControlModifier;
         var hasAlt = event.modifiers & Qt.AltModifier;
         event.accepted = true;
@@ -127,8 +136,10 @@ FocusScope {
             }
             if (controller.clearPluginFilter())
                 return;
-            if (root.parentModal)
-                root.parentModal.hide();
+            if (root.parentModal?.attemptUserCancel)
+                root.parentModal.attemptUserCancel();
+            else
+                root.parentModal?.hide();
             return;
         case Qt.Key_Backspace:
             if (searchField.text.length === 0) {
@@ -232,7 +243,10 @@ FocusScope {
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (event.modifiers & Qt.ShiftModifier) {
-                controller.pasteSelected();
+                if (controller.searchMode === "dmenu" && controller.dmenuMultiSelect)
+                    controller.toggleDmenuMultiSelectHighlighted();
+                else
+                    controller.pasteSelected();
                 return;
             }
             if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
@@ -294,7 +308,7 @@ FocusScope {
             id: footerBar
             readonly property bool _connectedBottomEmerge: (root.parentModal?.frameOwnsConnectedChrome ?? false) && (root.parentModal?.resolvedConnectedBarSide === "bottom")
             readonly property bool _connectedArcAtFooter: _connectedBottomEmerge && !(root.parentModal?.launcherArcExtenderActive ?? false)
-            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
+            readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter && controller.searchMode !== "dmenu"
             readonly property int edgeInset: root.parentModal?.paintedBorderWidth ?? Theme.outlineWidth
             readonly property var modes: [
                 {
@@ -393,16 +407,20 @@ FocusScope {
 
             LauncherSearchField {
                 id: searchField
-                pluginName: controller.activePluginName
-                pluginIcon: controller.activePluginId ? controller.getPluginMetadata(controller.activePluginId).icon : ""
+                readonly property bool _isDmenu: controller.searchMode === "dmenu"
+                pluginName: _isDmenu ? controller.dmenuPrompt : controller.activePluginName
+                pluginIcon: _isDmenu ? controller.dmenuIcon : (controller.activePluginId ? controller.getPluginMetadata(controller.activePluginId).icon : "")
+                pluginIconVisible: _isDmenu ? !!controller.dmenuIcon : true
                 width: parent.width
                 textColor: Theme.onSurface
                 font.pixelSize: Theme.fontSizeLarge
                 enabled: root.parentModal ? (root.parentModal.spotlightOpen || root.parentModal.isClosing) : true
-                placeholderText: I18n.tr("Search", "search field placeholder") + "…"
+                placeholderText: _isDmenu ? controller.dmenuPlaceholder : (I18n.tr("Search", "search field placeholder") + "…")
+                echoMode: (_isDmenu && controller.dmenuPassword) ? TextInput.Password : TextInput.Normal
                 ignoreUpDownKeys: true
                 ignoreTabKeys: true
                 keyForwardTargets: [root]
+                shortcutOverrideFilter: event => _isDmenu && controller.matchDmenuKeybind(event) > 0
 
                 onTextChanged: {
                     controller.setSearchQuery(text);
@@ -412,13 +430,24 @@ FocusScope {
                 }
 
                 Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Escape) {
-                        if (root.parentModal) {
-                            root.parentModal.hide();
+                    if (controller.searchMode === "dmenu") {
+                        var kbN = controller.matchDmenuKeybind(event);
+                        if (kbN > 0) {
+                            controller.acceptDmenuViaKeybind(kbN);
+                            event.accepted = true;
+                            return;
                         }
+                    }
+                    if (event.key === Qt.Key_Escape) {
+                        if (root.parentModal?.attemptUserCancel)
+                            root.parentModal.attemptUserCancel();
+                        else
+                            root.parentModal?.hide();
                         event.accepted = true;
                     } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
-                        if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
+                        if (controller.searchMode === "dmenu" && controller.dmenuMultiSelect && (event.modifiers & Qt.ShiftModifier)) {
+                            controller.toggleDmenuMultiSelectHighlighted();
+                        } else if (actionPanel.expanded && actionPanel.selectedActionIndex > 0) {
                             actionPanel.executeSelectedAction();
                         } else {
                             controller.executeSelected();
@@ -430,10 +459,34 @@ FocusScope {
         }
 
         Item {
+            id: mesgRow
+            readonly property bool _visible: !contentHolder.inverted && controller.searchMode === "dmenu" && controller.dmenuMesg.length > 0
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            anchors.top: searchRow.bottom
+            height: _visible ? mesgText.implicitHeight + Theme.spacingS * 2 : 0
+            visible: _visible
+
+            StyledText {
+                id: mesgText
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.topMargin: Theme.spacingS
+                text: controller.dmenuMesg
+                wrapMode: Text.WordWrap
+                color: Theme.onSurfaceVariant
+                font.pixelSize: Theme.fontSizeSmall
+            }
+        }
+
+        Item {
             id: contentStack
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: contentHolder.inverted ? footerBar.bottom : searchRow.bottom
+            anchors.top: contentHolder.inverted ? footerBar.bottom : mesgRow.bottom
             anchors.bottom: contentHolder.inverted ? searchRow.top : footerBar.top
             anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
