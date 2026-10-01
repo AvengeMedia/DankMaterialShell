@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Io
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Common
@@ -130,25 +129,11 @@ DankModal {
             id: saveBrowser
 
             browserTitle: I18n.tr("Save QR Code")
-            browserType: "default"
-            fileExtensions: ["*.png"]
-            allowStacking: true
-            saveMode: true
-            defaultFileName: "qrcode.png"
-            onFileSelected: path => {
-                const cleanPath = decodeURI(path.toString().replace(/^file:\/\//, ''));
-                copyQrCodeProcess.exec(["cp", "-f", root.normalQrCodePath, cleanPath]);
-            }
-
-            Process {
-                id: copyQrCodeProcess
-
-                stdout: StdioCollector {
-                    onStreamFinished: {
-                        saveBrowser.close();
-                    }
-                }
-            }
+            bucket: "qrcode"
+            filters: ["*.png"]
+            mode: "save"
+            defaultName: "qrcode.png"
+            onAccepted: paths => Quickshell.execDetached(["cp", "-f", root.normalQrCodePath, paths[0]])
         }
     }
 

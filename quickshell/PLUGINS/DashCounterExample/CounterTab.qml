@@ -51,7 +51,8 @@ DashTabComponent {
                 minW: 2,
                 minH: 2,
                 maxW: 4,
-                maxH: 3
+                maxH: 3,
+                options: [DashRegistry.toneOption("primary")]
             },
             {
                 id: "reset",
@@ -74,7 +75,10 @@ DashTabComponent {
 
         Card {
             id: counterCard
-            tone: "primary"
+
+            property var widgetOptions: ({})
+
+            tone: widgetOptions.tone ?? "primary"
 
             Column {
                 anchors.centerIn: parent

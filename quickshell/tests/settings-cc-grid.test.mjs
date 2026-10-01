@@ -25,3 +25,8 @@ test("sparse settings migrate without inventing grid keys", () => {
     assert.equal(sparse.controlCenterColumns, undefined);
     assert.equal(sparse.controlCenterWidgets, undefined);
 });
+
+test("header entries become a user row and lock, power and settings tiles", () => {
+    const released = store.migrateToVersion({ configVersion: 18, controlCenterWidgets: [{ id: "wifi", width: 50 }] }, 35);
+    assert.deepEqual(JSON.parse(JSON.stringify(released.controlCenterWidgets.map(w => [w.id, w.w, w.h, !!w.footer]))), [["user", 5, 1, false], ["settings", 1, 1, false], ["lock", 1, 1, false], ["power", 1, 1, false], ["wifi", 4, 1, false], ["runningApps", 4, 1, true]]);
+});

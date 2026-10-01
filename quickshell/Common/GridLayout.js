@@ -1,4 +1,4 @@
-function packCells(cards, order, columns, isAvailable, step = 1) {
+function packCells(cards, order, columns, isAvailable, step = 1, gravity = false) {
     const steps = Math.round(columns / step);
     const cells = [];
     const taken = [];
@@ -18,12 +18,21 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
         const h = Math.max(1, Math.round((card.h || 1) / step));
         const cell = positioned(card) ? settle(taken, Math.max(0, Math.min(steps - w, Math.round(card.col / step))), Math.max(0, Math.round(card.row / step)), w, h) : firstFit(taken, steps, w, h);
         taken.push(cell);
+        cells[sourceIndex] = cell;
+    }
+
+    if (gravity)
+        compact(taken);
+    for (let i = 0; i < cells.length; i++) {
+        const cell = cells[i];
+        if (!cell)
+            continue;
         rows = Math.max(rows, cell.y + cell.h);
-        cells[sourceIndex] = {
+        cells[i] = {
             "col": cell.x * step,
             "row": cell.y * step,
-            "cols": w * step,
-            "rows": h * step
+            "cols": cell.w * step,
+            "rows": cell.h * step
         };
     }
 
@@ -31,6 +40,16 @@ function packCells(cards, order, columns, isAvailable, step = 1) {
         "cells": cells,
         "rows": rows * step
     };
+}
+
+// Saved positions only settle downward, so a shrink or removal above leaves a hole; gravity pulls everything up into it.
+function compact(taken) {
+    const ordered = taken.slice().sort((a, b) => a.y - b.y || a.x - b.x);
+    for (const cell of ordered) {
+        const others = taken.filter(other => other !== cell);
+        while (cell.y > 0 && !overlaps(others, cell.x, cell.y - 1, cell.w, cell.h))
+            cell.y--;
+    }
 }
 
 function positioned(card) {
@@ -73,37 +92,32 @@ function firstFit(taken, steps, w, h) {
     };
 }
 
-function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1) {
-    const packed = packCells(cards, order, columns, isAvailable, step);
-    const colW = (width - gap * (columns - 1)) / columns;
-    const slots = packed.cells.map(cell => {
-        if (!cell)
-            return null;
-        const px = cell.col * (colW + gap);
-        const pw = cell.cols * colW + (cell.cols - 1) * gap;
-        return {
-            "x": mirror ? width - px - pw : px,
-            "y": cell.row * (rowUnit + gap),
-            "w": pw,
-            "h": cell.rows * rowUnit + (cell.rows - 1) * gap,
-            "col": cell.col,
-            "row": cell.row,
-            "cols": cell.cols,
-            "rows": cell.rows
-        };
-    });
-
-    return {
-        "slots": slots,
+function packCards(cards, order, columns, width, gap, rowUnit, mirror, isAvailable, step = 1, gravity = false) {
+    const packed = packCells(cards, order, columns, isAvailable, step, gravity);
+    const layout = {
+        "slots": [],
         "rows": packed.rows,
         "totalHeight": packed.rows > 0 ? packed.rows * rowUnit + (packed.rows - 1) * gap : 0,
         "columns": columns,
         "width": width,
-        "colW": colW,
+        "colW": (width - gap * (columns - 1)) / columns,
         "rowUnit": rowUnit,
         "gap": gap,
         "step": step,
         "mirror": mirror
+    };
+    layout.slots = packed.cells.map(cell => cell ? Object.assign(slotRect(layout, cell.col, cell.row, cell.cols, cell.rows), cell) : null);
+    return layout;
+}
+
+function slotRect(layout, col, row, cols, rows) {
+    const px = col * (layout.colW + layout.gap);
+    const pw = cols * layout.colW + (cols - 1) * layout.gap;
+    return {
+        "x": layout.mirror ? layout.width - px - pw : px,
+        "y": row * (layout.rowUnit + layout.gap),
+        "w": pw,
+        "h": rows * layout.rowUnit + (rows - 1) * layout.gap
     };
 }
 
@@ -115,6 +129,37 @@ function cellAt(layout, x, y, cols, rows) {
         "col": Math.max(0, Math.min(layout.columns - cols, col)),
         "row": Math.max(0, row)
     };
+}
+
+// With gravity, a tile dropped onto the one below it gets lifted straight back into the hole it left, so a tile
+// fully covering exactly one other that fits where it came from trades places with it instead.
+function swapInto(items, cells, index, target) {
+    const origin = cells[index];
+    if (!origin || !target)
+        return items;
+    const box = cell => ({
+                "x": cell.col,
+                "y": cell.row,
+                "w": cell.cols,
+                "h": cell.rows
+            });
+    const moved = {
+        "x": target.col,
+        "y": target.row,
+        "w": origin.cols,
+        "h": origin.rows
+    };
+    if (overlaps([box(origin)], moved.x, moved.y, moved.w, moved.h))
+        return items;
+    const hits = cells.reduce((found, cell, i) => i !== index && cell && overlaps([box(cell)], moved.x, moved.y, moved.w, moved.h) ? found.concat([i]) : found, []);
+    const other = hits.length === 1 ? cells[hits[0]] : null;
+    const covered = other && other.col >= moved.x && other.row >= moved.y && other.col + other.cols <= moved.x + moved.w && other.row + other.rows <= moved.y + moved.h;
+    if (!covered || other.cols > origin.cols || other.rows > origin.rows)
+        return items;
+    return items.map((item, i) => i === hits[0] ? Object.assign({}, item, {
+            "col": origin.col,
+            "row": origin.row
+        }) : item);
 }
 
 function placedItems(items, slots) {

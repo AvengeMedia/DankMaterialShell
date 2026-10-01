@@ -23,7 +23,7 @@ ClippingRectangle {
         case "slanted":
             return 0;
         }
-        return DashMetrics.mediaArtRadius;
+        return DashMetrics.mediaInnerRadius;
     }
     color: "transparent"
     antialiasing: true

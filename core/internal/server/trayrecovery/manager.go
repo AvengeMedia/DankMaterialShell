@@ -10,7 +10,10 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-const resumeDelay = 3 * time.Second
+const (
+	resumeDelay    = 3 * time.Second
+	firstBootDelay = 15 * time.Second
+)
 
 type Manager struct {
 	conn     *dbus.Conn
@@ -35,7 +38,7 @@ func NewManager() (*Manager, error) {
 	// sleeping.  This avoids duplicate registrations on normal boot where apps
 	// are still starting up and will register their own tray icons shortly.
 	if timeSuspended() > 5*time.Second {
-		go m.scheduleRecovery()
+		go m.scheduleRecovery(resumeDelay)
 	}
 
 	return m, nil
@@ -64,7 +67,7 @@ func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
 				}
 				if wasSleeping {
 					wasSleeping = false
-					go m.scheduleRecovery()
+					go m.scheduleRecovery(resumeDelay)
 				}
 			}
 		}
@@ -107,18 +110,23 @@ func (m *Manager) WatchWatcherOwner() {
 				}
 				if !hadOwner {
 					hadOwner = true
+					// First boot: autostart apps (e.g. KeePassXC) may have tried
+					// to register their SNI item before the watcher existed and
+					// never retry. A one-time delayed scan picks those up.
+					log.Info("TrayRecoveryService: StatusNotifierWatcher appeared for the first time, scheduling boot scan")
+					go m.scheduleRecovery(firstBootDelay)
 					continue
 				}
 				log.Info("TrayRecoveryService: StatusNotifierWatcher changed hands, scheduling rescan")
-				go m.scheduleRecovery()
+				go m.scheduleRecovery(resumeDelay)
 			}
 		}
 	})
 }
 
-func (m *Manager) scheduleRecovery() {
+func (m *Manager) scheduleRecovery(delay time.Duration) {
 	select {
-	case <-time.After(resumeDelay):
+	case <-time.After(delay):
 		m.recoverTrayItems()
 	case <-m.stopChan:
 	}

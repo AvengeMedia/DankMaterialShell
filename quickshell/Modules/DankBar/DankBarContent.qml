@@ -42,14 +42,11 @@ Item {
     readonly property real fittedCoreEnd: !fitToWidgets ? 0 : centerImplicitSize > 0 ? fittedCoreStart + fittedCenterSection.contentSize : fittedCoreStart - (leadingImplicitSize > 0 && trailingImplicitSize > 0 ? sectionGap : 0)
     readonly property real fittedLeadingPad: fittedCoreStart - fittedLeadingReach - fittedStartMargin
     readonly property var centerBounds: {
-        if (fitToWidgets)
-            return {
-                min: fittedLeadingReach + fittedStartMargin,
-                max: barWindow.fittedAvailableLength - fittedTrailingReach - fittedEndMargin
-            };
+        if (!fitToWidgets)
+            return null;
         return {
-            min: fittedLeadingReach,
-            max: (_barIsVertical ? height : width) - fittedTrailingReach
+            min: fittedLeadingReach + fittedStartMargin,
+            max: barWindow.fittedAvailableLength - fittedTrailingReach - fittedEndMargin
         };
     }
     readonly property real fittedTrailingPad: barWindow.fittedAvailableLength - fittedCoreEnd - fittedTrailingReach - fittedEndMargin
@@ -371,6 +368,7 @@ Item {
         surfaceContext: widgetContext
         spacingTight: topBarContent.spacingTight
         overlapping: topBarContent.overlapping
+        leadingSectionLimit: topBarContent.fitToWidgets || topBarContent._barIsVertical || hCenterSection.contentSize <= 0 ? Infinity : hCenterSection.x + hCenterSection.contentStart - topBarContent.sectionGap - hLeftSection.x
     }
     readonly property var allComponents: widgetFactory.componentMap
     readonly property var componentMap: widgetFactory.componentMap

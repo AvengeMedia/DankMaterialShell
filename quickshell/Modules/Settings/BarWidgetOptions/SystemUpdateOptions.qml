@@ -20,5 +20,12 @@ Column {
             checked: root.page.value("hideWhenIdle")
             onToggled: checked => root.page.set("hideWhenIdle", checked)
         }
+
+        SettingsNavRow {
+            iconName: "system_update_alt"
+            title: I18n.tr("Software updates")
+            hint: I18n.tr("DMS and system updates")
+            onClicked: root.page.parentModal?.navigateTo("updater")
+        }
     }
 }

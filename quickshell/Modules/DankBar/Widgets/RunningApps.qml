@@ -74,20 +74,7 @@ BasePill {
     readonly property bool _currentWorkspace: SettingsData.widgetOption("runningApps", widgetData, "runningAppsCurrentWorkspace")
     readonly property bool _currentMonitor: SettingsData.widgetOption("runningApps", widgetData, "runningAppsCurrentMonitor")
     readonly property bool _groupByApp: SettingsData.widgetOption("runningApps", widgetData, "runningAppsGroupByApp")
-    readonly property string windowModelKey: {
-        if (_groupByApp)
-            return "appId";
-        switch (CompositorService.compositor) {
-        case "aqueous":
-            return AqueousService.available ? "aqueousKey" : "address";
-        case "niri":
-            return "niriWindowId";
-        case "mango":
-            return "mangoWindowId";
-        default:
-            return "address";
-        }
-    }
+    readonly property string windowModelKey: _groupByApp ? "appId" : CompositorService.toplevelKey
 
     readonly property var sortedToplevels: {
         _toplevelsUpdateTrigger;

@@ -74,11 +74,10 @@ Item {
         active: false
         sourceComponent: FileBrowserSurfaceModal {
             browserTitle: I18n.tr("Import VPN")
-            browserType: "vpn"
-            fileExtensions: VPNService.getFileFilter()
+            bucket: "vpn"
+            filters: VPNService.getFileFilter()
             parentPopout: root.parentPopout
-
-            onFileSelected: path => VPNService.importVpn(path.replace("file://", ""))
+            onAccepted: paths => VPNService.importVpn(paths[0])
         }
     }
 

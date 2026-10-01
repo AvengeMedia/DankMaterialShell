@@ -36,8 +36,26 @@ Rectangle {
     readonly property color glyphColor: accentPair?.onContainer ?? Theme.primary
     property bool isFirstInGroup: true
     property bool isLastInGroup: true
-    readonly property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
-    readonly property real bottomRadius: isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+    property real topRadius: active || isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+    property real bottomRadius: active || isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
+
+    Behavior on topRadius {
+        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+        }
+    }
+
+    Behavior on bottomRadius {
+        enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+        NumberAnimation {
+            duration: Theme.expressiveDurations.expressiveFastSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+        }
+    }
 
     width: parent?.width ?? 0
     height: Math.max(SettingsMetrics.navItemMinHeight, textColumn.implicitHeight + Theme.spacingS * 2)
@@ -128,7 +146,7 @@ Rectangle {
             text: root.title
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Theme.fontWeightMedium
-            color: Theme.surfaceText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceText
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignLeft
         }
@@ -137,7 +155,7 @@ Rectangle {
             width: parent.width
             text: root.hint
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceVariantText
+            color: root.active ? Theme.onSelectedContainer : Theme.surfaceVariantText
             wrapMode: Text.WordWrap
             maximumLineCount: 2
             elide: Text.ElideRight

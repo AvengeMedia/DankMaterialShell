@@ -492,7 +492,7 @@ Item {
 
                 StyledRect {
                     width: parent.width
-                    implicitHeight: shortcutsHeader.height + (root.shortcutsExpanded ? shortcutsColumn.implicitHeight + Theme.spacingM : 0)
+                    implicitHeight: shortcutsHeader.height + (shortcutsLoader.item ? shortcutsLoader.height + Theme.spacingM : 0)
                     radius: Theme.cornerRadius
                     color: root.shortcutsExpanded ? Theme.chipSurface : Theme.withAlpha(Theme.chipSurface, 0)
                     border.color: root.shortcutsExpanded ? Theme.primary : Theme.outlineMedium
@@ -531,30 +531,48 @@ Item {
                         }
                     }
 
-                    Column {
-                        id: shortcutsColumn
-                        visible: root.shortcutsExpanded
+                    Loader {
+                        id: shortcutsLoader
+                        active: root.shortcutsExpanded
                         width: parent.width - Theme.spacingL * 2
                         anchors.top: shortcutsHeader.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: Theme.spacingXXS
 
-                        StyledText {
-                            width: parent.width
-                            text: I18n.tr("Ctrl+S: Save • Ctrl+O: Open • Ctrl+N: New • Ctrl+F: Find")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            wrapMode: Text.WordWrap
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-
-                        StyledText {
-                            width: parent.width
-                            text: I18n.tr("Ctrl+A: Select All • Ctrl+P: Preview • Enter/Shift+Enter: Find Next/Previous • Esc: Close")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            wrapMode: Text.WordWrap
-                            horizontalAlignment: Text.AlignHCenter
+                        sourceComponent: DankKeyHints {
+                            hints: [
+                                {
+                                    keys: ["Ctrl+S"],
+                                    label: I18n.tr("Save")
+                                },
+                                {
+                                    keys: ["Ctrl+O"],
+                                    label: I18n.tr("Open")
+                                },
+                                {
+                                    keys: ["Ctrl+N"],
+                                    label: I18n.tr("New", "adjective, shortcut or button that creates a new session or note")
+                                },
+                                {
+                                    keys: ["Ctrl+F"],
+                                    label: I18n.tr("Search", "search field placeholder")
+                                },
+                                {
+                                    keys: ["Return"],
+                                    label: I18n.tr("Next")
+                                },
+                                {
+                                    keys: ["Shift+Return"],
+                                    label: I18n.tr("Previous")
+                                },
+                                {
+                                    keys: ["Ctrl+P"],
+                                    label: I18n.tr("Preview", "verb, clipboard entry action button tooltip", true)
+                                },
+                                {
+                                    keys: ["Escape"],
+                                    label: I18n.tr("Close")
+                                }
+                            ]
                         }
                     }
                 }

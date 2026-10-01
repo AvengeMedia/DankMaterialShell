@@ -32,7 +32,7 @@ Item {
     readonly property string endSide: axis.isVertical ? "bottom" : "right"
     readonly property var startNeighbour: alongWings ? null : ShellLayout.adjacentCover(barWindow.screen, startSide, barConfig, windowLength)
     readonly property var endNeighbour: alongWings ? null : ShellLayout.adjacentCover(barWindow.screen, endSide, barConfig, windowLength)
-    readonly property real alongOrigin: axis.isVertical ? 0 : barWindow.effectiveSpacing
+    readonly property real alongOrigin: axis.isVertical ? 0 : barWindow.renderedSpacing
     readonly property real startCover: coveredBy(startNeighbour)
     readonly property real endCover: coveredBy(endNeighbour)
     readonly property real alongWing: alongWings ? wing : 0

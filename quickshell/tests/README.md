@@ -8,6 +8,7 @@ The `qml-tests` pre-commit hook runs the same checks when shell code, tests or t
 prek run qml-tests --all-files
 python3 quickshell/tests/run-qml.py logic
 python3 quickshell/tests/run-qml.py qt
+python3 quickshell/tests/run-qml.py lock
 python3 quickshell/tests/run-qml.py widgets
 python3 quickshell/tests/run-qml.py media
 ```

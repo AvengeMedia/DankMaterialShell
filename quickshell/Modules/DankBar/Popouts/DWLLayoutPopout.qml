@@ -193,7 +193,7 @@ DankPopout {
                                 DankIcon {
                                     name: root.getLayoutIcon(layoutRow.modelData)
                                     size: Theme.iconSizeMedium
-                                    color: layoutRow.isActive ? Theme.primary : layoutRow.contentColor
+                                    color: layoutRow.contentColor
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -204,7 +204,7 @@ DankPopout {
                                     StyledText {
                                         text: root.getLayoutName(layoutRow.modelData)
                                         font.pixelSize: Theme.fontSizeMedium
-                                        color: layoutRow.isActive ? Theme.primary : layoutRow.contentColor
+                                        color: layoutRow.contentColor
                                         font.weight: layoutRow.isActive ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
 

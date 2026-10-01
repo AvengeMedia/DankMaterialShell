@@ -44,6 +44,8 @@ DankFloatingWindow {
     }
 
     function submitAndClose() {
+        if (!root.visible)
+            return;
         if (aqueousWorkspace || CompositorService.isAqueous) {
             if (!aqueousWorkspace || renaming)
                 return;

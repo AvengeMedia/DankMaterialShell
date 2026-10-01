@@ -92,11 +92,14 @@ DankFloatingWindow {
                 spacing: Theme.spacingM
 
                 DankButton {
-                    text: I18n.tr("Open in Browser")
-                    iconName: "open_in_new"
+                    text: I18n.tr("Release notes")
+                    iconName: "auto_awesome"
                     backgroundColor: Theme.chipSurface
                     textColor: Theme.surfaceText
-                    onClicked: Qt.openUrlExternally("https://danklinux.com/blog/v1-6-release")
+                    onClicked: {
+                        root.dismiss();
+                        PopoutService.openSettingsWithTab("updater_changelog");
+                    }
                 }
 
                 DankButton {

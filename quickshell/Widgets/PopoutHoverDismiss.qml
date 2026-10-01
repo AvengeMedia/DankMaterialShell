@@ -12,6 +12,8 @@ Item {
 
     property int graceInterval: 150
     property bool bodyHovered: false
+    // A closed transient surface leaves bodyHovered stale; sway sends no enter until the pointer moves.
+    property bool pointerUnknown: false
     property real globalOffsetX: 0
     property real globalOffsetY: 0
 
@@ -19,12 +21,14 @@ Item {
 
     function cancelPending() {
         graceTimer.stop();
+        pointerUnknown = false;
         hoverTracker.cancelPending();
     }
 
     function updateBodyHover(over) {
         bodyHovered = over;
         if (over) {
+            pointerUnknown = false;
             graceTimer.stop();
         } else if (dismissEnabled && !dismissSuspended && surfaceVisible) {
             graceTimer.restart();
@@ -35,15 +39,26 @@ Item {
         PopoutManager.updateHoverCursor(sceneX + globalOffsetX, sceneY + globalOffsetY);
     }
 
+    function notePointerMoved() {
+        if (pointerUnknown)
+            Qt.callLater(root.resolveUnknownPointer);
+    }
+
+    function resolveUnknownPointer() {
+        if (!pointerUnknown || bodyHovered)
+            return;
+        pointerUnknown = false;
+        if (dismissEnabled && !dismissSuspended && surfaceVisible)
+            graceTimer.restart();
+    }
+
     onDismissEnabledChanged: {
         if (!dismissEnabled)
             cancelPending();
     }
     onDismissSuspendedChanged: {
-        if (dismissSuspended)
-            graceTimer.stop();
-        else if (dismissEnabled && surfaceVisible && !bodyHovered)
-            graceTimer.restart();
+        graceTimer.stop();
+        pointerUnknown = !dismissSuspended && dismissEnabled && surfaceVisible && !bodyHovered;
     }
     onSurfaceVisibleChanged: {
         if (!surfaceVisible)
@@ -70,6 +85,13 @@ Item {
             return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
         }
         onDismissRequested: root.dismissRequested()
-        onHoverMoved: (gx, gy) => root.updateCursor(gx, gy)
+        onHoveredChanged: {
+            if (hovered)
+                root.notePointerMoved();
+        }
+        onHoverMoved: (gx, gy) => {
+            root.updateCursor(gx, gy);
+            root.notePointerMoved();
+        }
     }
 }

@@ -68,7 +68,9 @@ Variants {
             property int _freezeWaitFrames: 0
 
             readonly property var backingWindow: Window.window
-            readonly property bool renderActive: !source || liveActive || _freezeWaitFrames > 0
+            readonly property bool showsBackdrop: !source || isColorSource || loadFailed
+            readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
+            readonly property bool renderActive: backdropBusy || liveActive || _freezeWaitFrames > 0
             property int _settleFrames: 3
 
             readonly property int maxTextureSize: 8192
@@ -241,13 +243,13 @@ Variants {
             readonly property bool idleShellLocked: IdleService.isShellLocked
 
             onThemePrimaryChanged: {
-                if (!isColorSource && !loadFailed)
+                if (!showsBackdrop)
                     return;
                 invalidate();
             }
 
             onThemeBackgroundChanged: {
-                if (!isColorSource && !loadFailed)
+                if (!showsBackdrop)
                     return;
                 invalidate();
             }
@@ -273,8 +275,9 @@ Variants {
             }
 
             Loader {
+                id: backdropLoader
                 anchors.fill: parent
-                active: !root.source || root.isColorSource || root.loadFailed
+                active: root.showsBackdrop
                 asynchronous: true
 
                 sourceComponent: DankBackdrop {

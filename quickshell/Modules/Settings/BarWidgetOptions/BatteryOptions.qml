@@ -15,7 +15,13 @@ Column {
     }
     readonly property var barStore: ({
             "isDefault": keys => keys.every(key => (root.barConfig?.[key] ?? SettingsData.barConfigDefault(key)) === SettingsData.barConfigDefault(key)),
-            "resetToDefault": keys => SettingsData.updateBarConfig(root.page.barId, Object.fromEntries(keys.map(key => [key, SettingsData.barConfigDefault(key)])))
+            "resetToDefault": keys => {
+                // QV4 has no Object.fromEntries.
+                const patch = {};
+                for (const key of keys)
+                    patch[key] = SettingsData.barConfigDefault(key);
+                SettingsData.updateBarConfig(root.page.barId, patch);
+            }
         })
 
     width: parent?.width ?? 0

@@ -192,6 +192,7 @@ Item {
                 tags: ["portal", "sync", "dark", "mode", "xdg"]
                 settingKey: "syncModeWithPortal"
                 text: I18n.tr("Sync with portal")
+                description: I18n.tr("Light and dark mode follow and set the system color scheme", "sync with portal toggle description")
                 checked: SettingsData.syncModeWithPortal
                 onToggled: checked => SettingsData.set("syncModeWithPortal", checked)
             }
@@ -221,6 +222,7 @@ Item {
                 tags: ["matugen", "user", "templates"]
                 settingKey: "runUserMatugenTemplates"
                 text: I18n.tr("Run user templates")
+                description: I18n.tr("Also runs the templates in your matugen config.toml", "run user matugen templates toggle description")
                 checked: SettingsData.runUserMatugenTemplates
                 onToggled: checked => SettingsData.set("runUserMatugenTemplates", checked)
             }

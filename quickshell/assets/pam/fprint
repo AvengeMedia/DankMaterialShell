@@ -1,6 +1,9 @@
 #%PAM-1.0
 
-auth    required    pam_fprintd.so  max-tries=5
+# timeout bounds how long a stuck fprintd session can hold the reader.
+# Modules/Lock/Pam.qml mirrors the value in sessionTimeoutMs to tell an expiry
+# apart from a device fault; change both together.
+auth    required    pam_fprintd.so  max-tries=1 timeout=90
 account required    pam_permit.so
 password required   pam_deny.so
 session required    pam_permit.so

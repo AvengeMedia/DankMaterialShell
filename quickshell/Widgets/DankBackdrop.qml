@@ -8,6 +8,7 @@ Item {
     anchors.fill: parent
 
     property string screenName: ""
+    readonly property bool ready: logo.status !== Image.Loading
     property bool isColorWallpaper: {
         var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
         return currentWallpaper && currentWallpaper.startsWith("#");
@@ -39,6 +40,7 @@ Item {
     }
 
     Image {
+        id: logo
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.leftMargin: Theme.spacingXL * 2

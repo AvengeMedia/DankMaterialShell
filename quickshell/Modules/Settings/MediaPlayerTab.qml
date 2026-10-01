@@ -138,7 +138,7 @@ Item {
         SettingsCard {
             title: I18n.tr("Lyrics providers", "Lyrics source priority settings")
             settingKey: "mediaLyricsProviders"
-            tags: ["lyrics", "provider", "priority", "order", "source", "lrclib", "better lyrics", "unison", "lyricsplus"]
+            tags: ["lyrics", "provider", "priority", "order", "source", "lrclib", "better lyrics", "unison", "lyricsplus", "kugou", "youtube music"]
 
             headerActions: DankActionButton {
                 iconName: "restart_alt"

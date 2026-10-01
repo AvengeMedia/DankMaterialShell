@@ -140,7 +140,7 @@ Column {
                                 id: tabRect
                                 anchors.fill: parent
                                 radius: Theme.cornerRadius
-                                color: isActive ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryPressed, 0)
+                                color: isActive ? Theme.selectedContainer : isHovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryPressed, 0)
                                 border.width: isActive || dragging ? 0 : 1
                                 border.color: dragging ? Theme.primary : Theme.outlineMedium
                                 clip: true
@@ -164,7 +164,7 @@ Column {
                                             return prefix + (modelData.title || "Untitled");
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: isActive ? Theme.primary : Theme.surfaceText
+                                        color: isActive ? Theme.onSelectedContainer : Theme.surfaceText
                                         font.weight: Theme.fontWeightMedium
                                         elide: Text.ElideMiddle
                                         maximumLineCount: 1
@@ -221,9 +221,9 @@ Column {
                                     }
 
                                     Rectangle {
+                                        id: tabCloseButton
                                         Accessible.role: Accessible.Button
                                         Accessible.name: I18n.tr("Close")
-                                        id: tabCloseButton
                                         width: 20
                                         height: 20
                                         radius: Theme.cornerRadius

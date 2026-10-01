@@ -176,6 +176,33 @@ test("updated startup checks still prevent activation on failure", () => {
     context.forceRescanPlugin("fixture");
     pending.shift()();
     assert.equal(context.isPluginLoaded("fixture"), true);
+    files.set("file:///plugins/fixture/Check.qml", {
+        check: () => "dependency removed",
+        destroy() {}
+    });
+    context.reloadPlugin("fixture");
+    assert.equal(context.isPluginLoaded("fixture"), false);
+    assert.equal(failures.at(-1), "dependency removed");
+});
+
+test("startup checks that cannot run prevent activation", () => {
+    const { context, files, pending, manifest, failures } = service();
+    const createComponent = context.Qt.createComponent;
+    context.Qt.createComponent = url => url.startsWith("file:///plugins/fixture/Broken.qml") ? { status: 3, errorString: () => "module missing" } : createComponent(url);
+    const cases = [
+        ["./Broken.qml", null, "module missing"],
+        ["./Check.qml", { destroy() {} }, "startupCheck has no check function"],
+        ["./Check.qml", { check() { throw new Error("sync throw"); }, destroy() {} }, "sync throw"],
+        ["./Check.qml", { check(done) { throw new Error("async throw"); }, destroy() {} }, "async throw"]
+    ];
+    for (const [path, probe, error] of cases) {
+        manifest.startupCheck = path;
+        files.set("file:///plugins/fixture/Check.qml", probe);
+        context.forceRescanPlugin("fixture");
+        pending.shift()();
+        assert.equal(context.isPluginLoaded("fixture"), false, error);
+        assert.equal(failures.at(-1), error);
+    }
 });
 
 test("composite updates refresh every surface without creating daemons synchronously", () => {

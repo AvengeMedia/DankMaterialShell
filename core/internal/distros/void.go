@@ -10,11 +10,12 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/privesc"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 )
 
 const (
-	VoidDMSRepo       = "https://void.danklinux.com/dms/current"
-	VoidDankLinuxRepo = "https://void.danklinux.com/danklinux/current"
+	VoidDMSRepo       = site.VoidRepo + "/dms/current"
+	VoidDankLinuxRepo = site.VoidRepo + "/danklinux/current"
 	VoidHyprlandRepo  = "https://mirror.black-hole.dev/x86_64"
 
 	voidRunitSvDir      = "/etc/sv"

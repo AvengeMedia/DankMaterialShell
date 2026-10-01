@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -25,17 +26,25 @@ type ColorsFile struct {
 	Colors ColorScheme `json:"colors"`
 }
 
-var cachedStyle *OverlayStyle
+var (
+	styleOnce   sync.Once
+	cachedStyle OverlayStyle
+)
+
+// keeps the dconf spawn off the first paint
+func PrefetchOverlayStyle() {
+	go LoadOverlayStyle()
+}
 
 func LoadOverlayStyle() OverlayStyle {
-	if cachedStyle != nil {
-		return *cachedStyle
-	}
+	styleOnce.Do(func() { cachedStyle = loadOverlayStyle() })
+	return cachedStyle
+}
 
+func loadOverlayStyle() OverlayStyle {
 	style := DefaultOverlayStyle
 	colors := loadColorsFile()
 	if colors == nil {
-		cachedStyle = &style
 		return style
 	}
 
@@ -54,7 +63,6 @@ func LoadOverlayStyle() OverlayStyle {
 		style.AccentR, style.AccentG, style.AccentB = accent[0], accent[1], accent[2]
 	}
 
-	cachedStyle = &style
 	return style
 }
 

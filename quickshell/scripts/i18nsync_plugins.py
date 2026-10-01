@@ -3,6 +3,7 @@
 import sys
 import json
 import subprocess
+import time
 from pathlib import Path
 
 from i18nsync import (
@@ -25,7 +26,6 @@ from extract_translations import extract_plugin_strings, create_plugin_poeditor_
 PLUGIN_REGISTRY_REPO = "https://github.com/AvengeMedia/dms-plugin-registry.git"
 EXTERNAL_PLUGINS_DIR = REPO_ROOT / "dms-plugins-external"
 REGISTRY_DIR = EXTERNAL_PLUGINS_DIR / ".registry"
-PLUGIN_CHECKOUT_DIRS = [OFFICIAL_PLUGINS_DIR, EXTERNAL_PLUGINS_DIR]
 SYNC_STATE = REPO_ROOT / ".git" / "i18n_plugins_sync_state.json"
 
 PLUGIN_PR_BRANCH = "i18n/poeditor-sync"
@@ -34,7 +34,7 @@ PLUGIN_PR_TITLE = "i18n: sync translations from POEditor"
 DELETE_BATCH = 100
 
 def i18n_registry_plugins():
-    plugins = []
+    plugins = {}
     for entry_file in sorted((REGISTRY_DIR / 'plugins').glob('*.json')):
         with open(entry_file) as f:
             entry = json.load(f)
@@ -42,30 +42,36 @@ def i18n_registry_plugins():
             continue
         if not entry.get('id') or not entry.get('repo'):
             error(f"Registry entry {entry_file.name} has i18n set but no id or repo")
-        plugins.append((entry['id'], entry['repo']))
+        plugins[entry['id']] = entry
     return plugins
 
 def update_plugin_checkouts():
     clone_or_update(OFFICIAL_PLUGINS_REPO, OFFICIAL_PLUGINS_DIR)
     clone_or_update(PLUGIN_REGISTRY_REPO, REGISTRY_DIR)
     plugins = i18n_registry_plugins()
-    for plugin_id, repo in plugins:
-        clone_or_update(repo, EXTERNAL_PLUGINS_DIR / plugin_id)
-    approved = {plugin_id for plugin_id, _ in plugins}
+    for plugin_id, entry in plugins.items():
+        clone_or_update(entry['repo'], EXTERNAL_PLUGINS_DIR / plugin_id)
     for child in EXTERNAL_PLUGINS_DIR.iterdir():
-        if child.is_dir() and not child.name.startswith('.') and child.name not in approved:
+        if child.is_dir() and not child.name.startswith('.') and child.name not in plugins:
             warn(f"dms-plugins-external/{child.name} is not flagged i18n in the registry but its terms still get uploaded; remove it if it was unapproved")
     success(f"Plugin checkouts current: official + {len(plugins)} registry plugins")
 
-def plugin_checkouts():
-    checkouts = []
-    for base in PLUGIN_CHECKOUT_DIRS:
-        if not base.is_dir():
+def checkout_candidates():
+    if OFFICIAL_PLUGINS_DIR.is_dir():
+        yield from sorted(OFFICIAL_PLUGINS_DIR.iterdir())
+    if not EXTERNAL_PLUGINS_DIR.is_dir():
+        return
+    paths = {plugin_id: entry.get('path') or '' for plugin_id, entry in i18n_registry_plugins().items()}
+    for child in sorted(EXTERNAL_PLUGINS_DIR.iterdir()):
+        if child.name.startswith('.'):
             continue
-        for child in sorted(base.iterdir()):
-            if child.is_dir() and not child.name.startswith('.') and (child / 'plugin.json').is_file():
-                checkouts.append(child)
-    return checkouts
+        yield child / paths.get(child.name, '')
+
+def plugin_checkouts():
+    return [
+        path for path in checkout_candidates()
+        if not path.name.startswith('.') and (path / 'plugin.json').is_file()
+    ]
 
 def manifest_id(checkout):
     with open(checkout / 'plugin.json') as f:
@@ -147,7 +153,7 @@ def pending_plugin_prs():
         files = pending_translation_files(checkout)
         if not files:
             continue
-        if checkout.parent == EXTERNAL_PLUGINS_DIR:
+        if checkout.is_relative_to(EXTERNAL_PLUGINS_DIR):
             external.append((checkout, files))
         else:
             official.append((checkout, files))
@@ -162,6 +168,25 @@ def plugin_pr_body(files):
         "so existing translations are preserved rather than overwritten.\n"
     )
 
+def user_fork(slug, login):
+    forks = gh(['api', '--paginate', f'repos/{slug}/forks', '-q', f'.[] | select(.owner.login == "{login}") | .full_name'])
+    if forks:
+        return forks.splitlines()[0]
+    info(f"Forking {slug}")
+    return gh(['api', '-X', 'POST', f'repos/{slug}/forks', '-q', '.full_name'])
+
+def push_to_fork(checkout, fork):
+    # a fresh fork is created asynchronously and can reject pushes briefly
+    for _ in range(5):
+        pushed = subprocess.run(
+            ['git', 'push', '--quiet', '--force', f'git@github.com:{fork}.git', PLUGIN_PR_BRANCH],
+            cwd=checkout, capture_output=True, text=True
+        )
+        if pushed.returncode == 0:
+            return None
+        time.sleep(5)
+    return pushed.stderr.strip()
+
 def open_plugin_pr(checkout, files):
     slug = repo_slug(checkout)
     if not slug:
@@ -169,10 +194,7 @@ def open_plugin_pr(checkout, files):
         return
 
     login = gh(['api', 'user', '-q', '.login'])
-    fork = f"{login}/{slug.split('/', 1)[1]}"
-    if gh(['repo', 'view', fork, '--json', 'name'], required=False) is None:
-        info(f"Forking {slug} -> {fork}")
-        gh(['repo', 'fork', slug, '--clone=false', '--remote=false'])
+    fork = user_fork(slug, login)
 
     base = default_branch(checkout)
     git(['checkout', '--quiet', '-B', PLUGIN_PR_BRANCH], checkout)
@@ -187,12 +209,15 @@ def open_plugin_pr(checkout, files):
         warn(f"{checkout.name}: nothing to commit, skipping PR")
         return
 
-    git(['push', '--quiet', '--force', f'git@github.com:{fork}.git', PLUGIN_PR_BRANCH], checkout)
+    push_error = push_to_fork(checkout, fork)
     git(['checkout', '--quiet', base], checkout)
+    if push_error:
+        warn(f"{checkout.name}: push to {fork} failed, re-run sync to retry:\n{push_error}")
+        return
 
     existing = gh([
-        'pr', 'list', '--repo', slug, '--head', f'{login}:{PLUGIN_PR_BRANCH}',
-        '--state', 'open', '--json', 'url', '-q', '.[0].url'
+        'pr', 'list', '--repo', slug, '--head', PLUGIN_PR_BRANCH, '--state', 'open',
+        '--json', 'url,headRepositoryOwner', '-q', f'.[] | select(.headRepositoryOwner.login == "{login}") | .url'
     ], required=False)
     if existing:
         success(f"{checkout.name}: updated {existing}")
@@ -219,7 +244,7 @@ def report_pending_prs(open_prs):
 
 def checkout_translations(checkout, filename):
     result = subprocess.run(
-        ['git', 'show', f'HEAD:translations/{filename}'],
+        ['git', 'show', f'HEAD:./translations/{filename}'],
         cwd=checkout, capture_output=True, text=True
     )
     if result.returncode != 0:

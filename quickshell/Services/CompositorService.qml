@@ -130,6 +130,8 @@ Singleton {
 
     readonly property bool isKnownCompositor: configKey !== ""
     readonly property bool supportsWindowRules: isNiri || isHyprland || isMango
+    readonly property string dmsFloatingRuleId: "dms-floating-windows"
+    property bool dmsWindowFloatingActive: false
     readonly property bool supportsLayoutConfig: isNiri || isHyprland || isMango
     readonly property bool supportsCursorConfig: isNiri || isHyprland || isMango
     readonly property bool supportsDisplayConfig: isNiri || isHyprland || isMango || isAqueous
@@ -209,6 +211,8 @@ Singleton {
             root.workspaceStateChanged();
         }
         function onWindowsChanged() {
+            if (NiriService.titleOnlyWindowsUpdate)
+                return;
             root.workspaceStateChanged();
         }
         function onCurrentOutputChanged() {
@@ -311,6 +315,11 @@ Singleton {
         }, 0, 3000);
     }
 
+    // wlr-output reports wl_fixed (1/256 steps), surfaces render at fractional-scale-v1 N/120
+    function fractionalScale(fixedScale) {
+        return Math.round(fixedScale * 120) / 120;
+    }
+
     function getScreenScale(screen) {
         if (!screen)
             return 1;
@@ -321,12 +330,12 @@ Singleton {
 
         const randrScale = randrScales[screen.name];
         if (randrScale !== undefined && randrScale > 0)
-            return Math.round(randrScale * 20) / 20;
+            return fractionalScale(randrScale);
 
         if (WlrOutputService.wlrOutputAvailable && screen) {
             const wlrOutput = WlrOutputService.getOutput(screen.name);
             if (wlrOutput?.enabled && wlrOutput.scale !== undefined && wlrOutput.scale > 0) {
-                return Math.round(wlrOutput.scale * 20) / 20;
+                return fractionalScale(wlrOutput.scale);
             }
         }
 
@@ -779,6 +788,57 @@ Singleton {
         if (isHyprland)
             return filterHyprlandCurrentWorkspaceSafe(toplevels, screen);
         return toplevels;
+    }
+
+    readonly property string toplevelKey: {
+        switch (compositor) {
+        case "aqueous":
+            return AqueousService.available ? "aqueousKey" : "address";
+        case "niri":
+            return "niriWindowId";
+        case "mango":
+            return "mangoWindowId";
+        default:
+            return "address";
+        }
+    }
+
+    function toplevelPlacement(toplevel) {
+        if (!toplevel)
+            return {
+                "workspace": "",
+                "output": ""
+            };
+        if (isAqueous && AqueousService.available) {
+            const workspace = AqueousService.workspaces.find(w => w.id === toplevel.aqueousWorkspaceId);
+            return {
+                "workspace": String(workspace?.name || workspace?.number || ""),
+                "output": AqueousService.outputs.find(o => o.id === toplevel.aqueousOutputId)?.name ?? ""
+            };
+        }
+        if (useNiriSorting) {
+            const workspace = NiriService.allWorkspaces.find(w => w.id === toplevel.niriWorkspaceId);
+            return {
+                "workspace": String(workspace?.name || workspace?.idx || ""),
+                "output": workspace?.output ?? ""
+            };
+        }
+        if (useMangoSorting)
+            return {
+                "workspace": (toplevel.mangoTags || []).join(", "),
+                "output": toplevel.mangoMonitor ?? ""
+            };
+        if (isHyprland) {
+            const workspace = WindowModel.hyprlandToplevelFor(Array.from(Hyprland.toplevels?.values || []), toplevel)?.workspace;
+            return {
+                "workspace": workspace?.name ?? "",
+                "output": workspace?.monitor?.name ?? ""
+            };
+        }
+        return {
+            "workspace": "",
+            "output": toplevel.screens?.[0]?.name ?? ""
+        };
     }
 
     function fullscreenToplevelOnScreen(screenOrName) {
@@ -1397,26 +1457,43 @@ Singleton {
         compositorDetected = true;
         if (isNiri)
             NiriService.generateNiriBlurrule();
-        Qt.callLater(applyDmsWindowFloatingRule);
+        Qt.callLater(seedDmsWindowFloatingRule);
     }
 
-    function applyDmsWindowFloatingRule() {
-        if (!compositorDetected || (!isNiri && !isHyprland && !isMango))
+    function seedDmsWindowFloatingRule() {
+        if (!supportsWindowRules)
             return;
-        const floating = typeof SettingsData === "undefined" || (SettingsData.dmsWindowsFloating ?? true);
-        if (!floating) {
-            Proc.runCommand("dms-windowrule-float-remove", [Proc.dmsBin, "config", "windowrules", "remove", compositor, "dms-floating-windows"], (output, exitCode) => {
-                if (exitCode !== 0) {
-                    log.warn("failed to remove DMS floating window rule", exitCode, output);
-                    return;
-                }
-                if (isMango)
-                    MangoService.reloadConfig();
-            });
+        if (SettingsData.dmsWindowsFloatingSeeded.includes(compositor)) {
+            refreshDmsWindowFloatingRule();
             return;
         }
+        const seeded = compositor;
+        setDmsWindowFloatingRule(true, () => SettingsData.set("dmsWindowsFloatingSeeded", SettingsData.dmsWindowsFloatingSeeded.concat([seeded])));
+    }
+
+    function refreshDmsWindowFloatingRule() {
+        if (!supportsWindowRules)
+            return;
+        Proc.runCommand("dms-windowrule-float-list", [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
+            if (exitCode !== 0)
+                return;
+            try {
+                syncDmsWindowFloatingRule(JSON.parse(output.trim()).rules || []);
+            } catch (e) {
+                log.warn("failed to parse window rules", e);
+            }
+        });
+    }
+
+    function syncDmsWindowFloatingRule(rules) {
+        dmsWindowFloatingActive = rules.some(rule => rule.id === dmsFloatingRuleId && rule.enabled !== false && rule.actions?.openFloating === true);
+    }
+
+    function setDmsWindowFloatingRule(enabled, onDone) {
+        if (!supportsWindowRules)
+            return;
         const ruleJson = JSON.stringify({
-            "id": "dms-floating-windows",
+            "id": dmsFloatingRuleId,
             "name": "DMS Floating Windows",
             "enabled": true,
             "matchCriteria": {
@@ -1426,15 +1503,18 @@ Singleton {
                 "openFloating": true
             }
         });
-        Proc.runCommand("dms-windowrule-float-add", [Proc.dmsBin, "config", "windowrules", "add", compositor, ruleJson], (output, exitCode) => {
+        const args = enabled ? ["add", compositor, ruleJson] : ["remove", compositor, dmsFloatingRuleId];
+        Proc.runCommand("dms-windowrule-float", [Proc.dmsBin, "config", "windowrules", ...args], (output, exitCode) => {
             if (exitCode !== 0) {
-                log.warn("failed to add DMS floating window rule", exitCode, output);
+                log.warn("failed to update DMS floating window rule", exitCode, output);
                 return;
             }
+            dmsWindowFloatingActive = enabled;
             if (isNiri)
                 NiriService.validate();
             if (isMango)
                 MangoService.reloadConfig();
+            onDone?.();
         });
     }
 
@@ -2063,10 +2143,6 @@ Singleton {
                 MangoService.generateCursorConfig();
                 return;
             }
-        }
-
-        function onDmsWindowsFloatingChanged() {
-            root.applyDmsWindowFloatingRule();
         }
     }
 }

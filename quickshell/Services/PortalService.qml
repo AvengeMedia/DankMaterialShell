@@ -15,6 +15,11 @@ Singleton {
     property bool accountsServiceAvailable: false
     property string systemProfileImage: ""
     property string profileImage: ""
+    readonly property string profileImageUrl: {
+        if (!profileImage.startsWith("/"))
+            return profileImage;
+        return "file://" + profileImage.split("/").map(part => encodeURIComponent(part)).join("/");
+    }
     property bool settingsPortalAvailable: false
     property int systemColorScheme: 0
     property bool colorSchemeInitialized: false

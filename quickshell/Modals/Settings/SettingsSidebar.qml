@@ -180,13 +180,25 @@ Item {
 
     DankSearchField {
         id: searchField
+
+        property real sideInset: root.searchActive ? Theme.spacingS : Theme.spacingL
+
+        Behavior on sideInset {
+            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveFastSpatial
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+            }
+        }
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        anchors.topMargin: Theme.spacingM
-        height: Theme.iconButtonSize + Theme.spacingM
+        anchors.leftMargin: sideInset
+        anchors.rightMargin: sideInset
+        anchors.topMargin: SettingsMetrics.searchBarGap
+        height: SettingsMetrics.searchBarHeight
         placeholderText: I18n.tr("Search settings", "settings search field placeholder")
         onFocusStateChanged: hasFocus => root.searchFocused = hasFocus
         onTextChanged: {
@@ -262,7 +274,7 @@ Item {
         anchors.right: parent.right
         anchors.top: searchField.bottom
         anchors.bottom: parent.bottom
-        anchors.topMargin: SettingsMetrics.sidebarGroupGap
+        anchors.topMargin: SettingsMetrics.searchBarGap
         clip: true
         contentHeight: sidebarColumn.height
 

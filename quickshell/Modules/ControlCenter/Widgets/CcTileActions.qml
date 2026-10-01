@@ -31,7 +31,6 @@ CcTileContent {
                 iconName: modelData.icon || ""
                 active: modelData.active ?? false
                 enabled: modelData.enabled !== false
-                showActiveCheck: true
                 clickable: true
                 paddingH: Theme.spacingM
                 onClicked: modelData.trigger()

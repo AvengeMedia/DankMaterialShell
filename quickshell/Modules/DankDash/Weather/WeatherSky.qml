@@ -10,6 +10,7 @@ Rectangle {
 
     property bool live: Window.window?.visible ?? false
     property bool moon: false
+    property var widgetOptions: ({})
     property var currentDate: new Date()
     readonly property var sunTimes: live && !moon ? WeatherService.getSunTimes(currentDate) : null
     readonly property var moonTrack: live && moon ? WeatherService.getMoonTrack(currentDate) : null
@@ -39,9 +40,14 @@ Rectangle {
 
     implicitHeight: DashMetrics.gridRowUnit * 2 + DashMetrics.gridGap
     radius: Theme.cornerRadiusXL
-    color: DashMetrics.cardColor
+    color: toneColors.surfaceColor
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
+
+    DankTone {
+        id: toneColors
+        tone: root.widgetOptions.tone ?? ""
+    }
 
     Row {
         anchors.left: parent.left
@@ -52,7 +58,7 @@ Rectangle {
         DankIcon {
             name: root.moon ? "dark_mode" : "light_mode"
             size: Theme.iconSize
-            color: Theme.onSurface
+            color: toneColors.contentColor
         }
 
         StyledText {
@@ -60,7 +66,7 @@ Rectangle {
             text: root.moon ? I18n.tr("Moon", "Weather moon position widget title") : I18n.tr("Sun", "Weather daylight widget title")
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Theme.fontWeightMedium
-            color: Theme.onSurface
+            color: toneColors.contentColor
         }
     }
 
@@ -83,7 +89,7 @@ Rectangle {
             preferredRendererType: Shape.CurveRenderer
 
             ShapePath {
-                fillColor: Theme.withAlpha(Theme.primary, Theme.stateLayerDrag)
+                fillColor: Theme.withAlpha(toneColors.accentColor, Theme.stateLayerDrag)
                 strokeColor: "transparent"
                 strokeWidth: 0
                 startX: 0
@@ -115,7 +121,7 @@ Rectangle {
             width: Theme.iconSize
             height: width
             shape: "sunny"
-            color: Theme.primary
+            color: toneColors.accentColor
             visible: !root.moon && root.hasSunTimes && root.currentDate.getTime() >= root.sunriseTime && root.currentDate.getTime() <= root.sunsetTime
         }
 
@@ -128,7 +134,7 @@ Rectangle {
             insetTop: 0
             insetBottom: 0
             lineWidth: Theme.outlineWidth
-            lineColor: Theme.primary
+            lineColor: toneColors.accentColor
             fillOpacity: Theme.stateLayerDrag
         }
 
@@ -138,7 +144,7 @@ Rectangle {
             y: arc.height * (1 - (root.moonTrack?.altitude ?? 0)) / 2 - height / 2
             name: WeatherService.getMoonPhase(root.currentDate)
             size: Theme.iconSize
-            color: Theme.primary
+            color: toneColors.accentColor
             visible: root.moon && root.moonTrack !== null
         }
     }
@@ -157,14 +163,14 @@ Rectangle {
             StyledText {
                 width: parent.width
                 text: root.moon ? I18n.tr("Moonrise", "Weather moonrise time") : I18n.tr("Sunrise")
-                color: Theme.onSurfaceVariant
+                color: toneColors.mutedColor
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
             }
             StyledText {
                 width: parent.width
                 text: root.riseText
-                color: Theme.onSurface
+                color: toneColors.contentColor
                 font.pixelSize: Theme.fontSizeMedium
                 fontSizeMode: Text.HorizontalFit
                 minimumPixelSize: Theme.fontSizeSmall
@@ -178,7 +184,7 @@ Rectangle {
             StyledText {
                 width: parent.width
                 text: root.moon ? I18n.tr("Moonset", "Weather moonset time") : I18n.tr("Sunset")
-                color: Theme.onSurfaceVariant
+                color: toneColors.mutedColor
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignRight
@@ -186,7 +192,7 @@ Rectangle {
             StyledText {
                 width: parent.width
                 text: root.setText
-                color: Theme.onSurface
+                color: toneColors.contentColor
                 font.pixelSize: Theme.fontSizeMedium
                 fontSizeMode: Text.HorizontalFit
                 minimumPixelSize: Theme.fontSizeSmall

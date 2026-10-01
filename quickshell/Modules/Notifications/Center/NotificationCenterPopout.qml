@@ -232,11 +232,18 @@ DankPopout {
                 }
             }
 
-            NotificationCenterContent {
-                id: body
-
+            Item {
                 anchors.fill: parent
-                host: popoutHost
+                anchors.bottomMargin: PopoutMetrics.contentPadding
+                clip: notificationContent.height < body.height
+
+                NotificationCenterContent {
+                    id: body
+
+                    width: parent.width
+                    height: Math.max(notificationContent.height, root.alignedHeight)
+                    host: popoutHost
+                }
             }
         }
     }

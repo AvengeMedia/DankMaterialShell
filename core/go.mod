@@ -4,7 +4,6 @@ go 1.26.5
 
 require (
 	github.com/AvengeMedia/dgop v1.6.3-0.20260920163359-59c7d81ae3b9
-	github.com/Nadim147c/material/v3 v3.1.1
 	github.com/Wifx/gonetworkmanager/v2 v2.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/charmbracelet/bubbles v1.0.0
@@ -26,7 +25,7 @@ require (
 	github.com/yuin/goldmark v1.8.4
 	go.etcd.io/bbolt v1.5.0
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745
-	golang.org/x/image v0.44.0
+	golang.org/x/image v0.46.0
 	tailscale.com v1.102.0
 )
 
@@ -83,7 +82,7 @@ require (
 )
 
 require (
-	github.com/AvengeMedia/dankgo v1.6.3-0.20260922103155-c6cc9c3c32ba
+	github.com/AvengeMedia/dankgo v1.6.3-0.20260930202437-c5a872ad72bd
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect

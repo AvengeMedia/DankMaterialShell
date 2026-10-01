@@ -139,7 +139,9 @@ Variants {
             property int _freezeWaitFrames: 0
             readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentSource !== ""
             readonly property var backingWindow: Window.window
-            readonly property bool renderActive: !source || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
+            readonly property bool showsBackdrop: !source || isColorSource || currentWallpaper.status === Image.Error
+            readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
+            readonly property bool renderActive: backdropBusy || effectActive || overviewBlurActive || pendingWallpaper !== "" || _deferredSource !== "" || changePending || _freezeWaitFrames > 0 || frameAnim.running || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading
             property int _settleFrames: 3
 
             function invalidate() {
@@ -271,13 +273,13 @@ Variants {
             readonly property color themeBackground: Theme.background
 
             onThemePrimaryChanged: {
-                if (!isColorSource && currentWallpaper.status !== Image.Error)
+                if (!showsBackdrop)
                     return;
                 invalidate();
             }
 
             onThemeBackgroundChanged: {
-                if (!isColorSource && currentWallpaper.status !== Image.Error)
+                if (!showsBackdrop)
                     return;
                 invalidate();
             }
@@ -712,8 +714,9 @@ Variants {
             }
 
             Loader {
+                id: backdropLoader
                 anchors.fill: parent
-                active: !root.source || root.isColorSource || currentWallpaper.status === Image.Error
+                active: root.showsBackdrop
                 asynchronous: true
 
                 sourceComponent: DankBackdrop {

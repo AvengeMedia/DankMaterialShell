@@ -21,8 +21,7 @@ DankListView {
     property bool trackStableContentHeight: true
     property bool trackSessionContentHeight: false
     property bool listInitialized: false
-    property int swipingCardIndex: -1
-    property real swipingCardOffset: 0
+    property real swipeBleed: 0
     property real sessionContentHeight: 0
     property var transientSurfaceTracker: null
     property bool nested: false
@@ -171,6 +170,8 @@ DankListView {
     }
 
     clip: true
+    leftMargin: swipeBleed
+    rightMargin: swipeBleed
     model: ScriptModel {
         values: NotificationService.groupedNotifications.map(group => group.key)
     }
@@ -206,6 +207,10 @@ DankListView {
         visible: listView.count === 0
     }
 
+    NotificationSwipeGroup {
+        id: swipeGroup
+    }
+
     onCountChanged: listView.queueSessionContentHeightUpdate()
 
     onModelChanged: {
@@ -216,21 +221,12 @@ DankListView {
         ensureVisibleTimer.restart();
     }
 
-    delegate: Item {
+    delegate: NotificationSwipeRow {
         id: delegateRoot
         required property string modelData
-        required property int index
 
         readonly property var notificationGroup: NotificationService.groupedNotifications.find(group => group.key === modelData)
         readonly property bool isExpanded: NotificationService.expandedGroups[modelData] || false
-        property real swipeOffset: 0
-        property bool isDismissing: false
-        readonly property real dismissThreshold: width * NotificationMetrics.swipeThreshold
-
-        readonly property bool isAdjacentToSwipe: listView.count >= 2 && listView.swipingCardIndex !== -1 && (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
-        readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? listView.swipingCardOffset * NotificationMetrics.adjacentSwipeInfluence : 0
-        readonly property real swipeFadeStartOffset: width * NotificationMetrics.swipeFadeStart
-        readonly property real swipeFadeDistance: Math.max(1, width - swipeFadeStartOffset)
         readonly property real nonAnimHeight: notificationCard.targetHeight
 
         readonly property bool isCardAnimating: notificationCard.isAnimating
@@ -244,14 +240,20 @@ DankListView {
             }
         }
 
-        width: ListView.view.width
+        group: swipeGroup
+        bleed: listView.swipeBleed
+        width: ListView.view.width - listView.swipeBleed * 2
         height: notificationCard.height
-        clip: true
+        onDismissed: NotificationService.dismissGroup(modelData)
 
         Center.NotificationCard {
             id: notificationCard
             width: parent.width
-            x: delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
+            x: delegateRoot.offset
+            topRoundness: delegateRoot.topRoundness
+            bottomRoundness: delegateRoot.bottomRoundness
+            contentOpacity: delegateRoot.contentOpacity
+            swipeBleed: listView.swipeBleed
             notificationGroup: delegateRoot.notificationGroup
             nested: listView.nested
             firstInList: index === 0
@@ -259,13 +261,6 @@ DankListView {
             keyboardNavigationActive: listView.keyboardActive && listView.focusAllowed
             animateExpansion: listView.cardAnimateExpansion && listView.listInitialized
             transientSurfaceTracker: listView.transientSurfaceTracker
-            opacity: {
-                const swipeAmount = Math.abs(delegateRoot.swipeOffset);
-                if (swipeAmount <= delegateRoot.swipeFadeStartOffset)
-                    return 1;
-                const fadeProgress = (swipeAmount - delegateRoot.swipeFadeStartOffset) / delegateRoot.swipeFadeDistance;
-                return Math.max(0, 1 - fadeProgress);
-            }
             onIsAnimatingChanged: {
                 if (!listView.trackStableContentHeight)
                     return;
@@ -302,65 +297,6 @@ DankListView {
                 const selection = keyboardController.getCurrentSelection();
                 return (selection.type === "notification" && selection.groupIndex === index) ? selection.notificationIndex : -1;
             }
-
-            Behavior on x {
-                enabled: NotificationMetrics.animationsEnabled && !swipeDragHandler.active && !delegateRoot.isDismissing && (listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe) && listView.listInitialized
-                NumberAnimation {
-                    duration: Theme.notificationExitDuration
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: NotificationMetrics.heightCurve
-                }
-            }
-
-            Behavior on opacity {
-                enabled: NotificationMetrics.animationsEnabled && listView.listInitialized
-                NumberAnimation {
-                    duration: listView.listInitialized ? Theme.notificationExitDuration : 0
-                }
-            }
-        }
-
-        DragHandler {
-            id: swipeDragHandler
-            target: null
-            yAxis.enabled: false
-            xAxis.enabled: true
-
-            onActiveChanged: {
-                if (active) {
-                    listView.swipingCardIndex = index;
-                    return;
-                }
-                listView.swipingCardIndex = -1;
-                listView.swipingCardOffset = 0;
-                if (delegateRoot.isDismissing)
-                    return;
-                if (Math.abs(delegateRoot.swipeOffset) > delegateRoot.dismissThreshold) {
-                    delegateRoot.isDismissing = true;
-                    swipeDismissAnim.to = delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width;
-                    swipeDismissAnim.start();
-                } else {
-                    delegateRoot.swipeOffset = 0;
-                }
-            }
-
-            onTranslationChanged: {
-                if (delegateRoot.isDismissing)
-                    return;
-                delegateRoot.swipeOffset = translation.x;
-                listView.swipingCardOffset = translation.x;
-            }
-        }
-
-        NumberAnimation {
-            id: swipeDismissAnim
-            target: delegateRoot
-            property: "swipeOffset"
-            to: 0
-            duration: NotificationMetrics.animationsEnabled ? Theme.notificationExitDuration : 0
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: NotificationMetrics.dismissCurve
-            onFinished: NotificationService.dismissGroup(delegateRoot.modelData)
         }
     }
 

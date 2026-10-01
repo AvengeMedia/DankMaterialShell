@@ -111,7 +111,7 @@ Item {
     }
 
     function load() {
-        const file = BarWidgetCatalog.optionsFile(widgetType);
+        const file = root.dockHosted && BarWidgetCatalog.get(widgetType)?.barOnly ? "" : BarWidgetCatalog.optionsFile(widgetType);
         if (!file) {
             optionsLoader.source = "";
             return;

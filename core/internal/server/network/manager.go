@@ -442,6 +442,13 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		if oldDev.IP != newDev.IP {
 			return true
 		}
+		if oldDev.AccessTech != newDev.AccessTech {
+			return true
+		}
+		if oldDev.SignalQuality != newDev.SignalQuality &&
+			signalChangeSignificant(uint8(oldDev.SignalQuality), uint8(newDev.SignalQuality)) {
+			return true
+		}
 	}
 
 	// Check VPN profiles count

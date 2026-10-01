@@ -39,6 +39,7 @@ Item {
     property bool fullHeightSurface: false
     property real minimumSurfaceWidth: 0
     property bool _primeContent: false
+    property bool _warmContent: false
 
     property real storedBarThickness: Theme.barThickness(SettingsData.getPrimaryBarConfig()?.innerPadding ?? 4, 1)
     property real storedBarSpacing: 4
@@ -109,6 +110,8 @@ Item {
     readonly property real renderedAlignedY: impl.item ? (impl.item.renderedAlignedY ?? impl.item.alignedY) : 0
     readonly property real renderedAlignedWidth: impl.item ? (impl.item.renderedAlignedWidth ?? impl.item.alignedWidth) : 0
     readonly property real renderedAlignedHeight: impl.item ? (impl.item.renderedAlignedHeight ?? impl.item.alignedHeight) : 0
+    readonly property real maxBodyWidth: impl.item ? impl.item.maxBodyWidth : 0
+    readonly property real maxBodyHeight: impl.item ? impl.item.maxBodyHeight : 0
 
     function alignedXFor(width) {
         return impl.item?.alignedXFor(width) ?? 0;
@@ -399,6 +402,8 @@ Item {
             root.shouldBeVisible = false;
         if (root._primeContent)
             it.primeContent();
+        if (root._warmContent)
+            it.warmContent();
         if (_pendingOpen)
             _pendingOpenTimer.restart();
     }
@@ -413,6 +418,12 @@ Item {
         _primeContent = false;
         if (impl.item)
             impl.item.clearPrimedContent();
+    }
+
+    function warmContent() {
+        _warmContent = true;
+        if (impl.item)
+            impl.item.warmContent();
     }
 
     onShouldBeVisibleChanged: {

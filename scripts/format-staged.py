@@ -254,7 +254,8 @@ def apply_edits(text, edits):
 
 
 def start_client(qmlls, root):
-    client = LspClient([qmlls])
+    # quickshell's .qmlls.ini buildDir symlinks back into the tree, and qmlls then formats aliased files to nothing
+    client = LspClient([qmlls, "--ignore-settings"])
     client.request("initialize", {
         "processId": os.getpid(),
         "rootUri": root.as_uri(),

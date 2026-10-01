@@ -50,6 +50,13 @@ Item {
             width: root.clipEnabled ? root.clipWidth : root.blurWidth
             height: root.clipEnabled ? root.clipHeight : root.blurHeight
         }
+
+        // Hyprland blurs the whole surface when the region lies entirely outside it
+        Region {
+            intersection: Intersection.Intersect
+            width: root.targetWindow?.width ?? 0
+            height: root.targetWindow?.height ?? 0
+        }
     }
 
     function _apply() {

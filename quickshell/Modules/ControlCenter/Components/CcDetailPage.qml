@@ -7,7 +7,7 @@ import qs.Modules.ControlCenter.Details
 import qs.Widgets
 import "../utils/sections.js" as Sections
 
-Item {
+FocusScope {
     id: root
 
     LayoutMirroring.enabled: I18n.isRtl
@@ -17,15 +17,31 @@ Item {
     property var model: null
     property string screenName: ""
     property string screenModel: ""
+    property var transientSurfaceTracker: null
+    property real topInset: 0
+    property vector4d cornerRadii: Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
+    property real coverage: 0
+    property var runningToplevels: []
 
+    signal dismissed
     signal backRequested
     signal collapseRequested
+    signal closeRequested
     signal codecSelectorRequested(var device)
     signal portSelectorRequested(var node)
 
     property string shownSection: ""
+    property bool enterPending: false
+    readonly property bool animationsEnabled: CcMetrics.animationsEnabled && !SettingsData.reduceMotion
+    readonly property bool transitioning: enterPending || enterAnimation.running
     readonly property var pageItem: pageLoader.item
-    readonly property real preferredHeight: CcMetrics.pageHeaderHeight + CcMetrics.preferredDetailHeight(shownSection, pageItem?.preferredHeight ?? 0)
+    readonly property real pageHeight: (pageItem?.implicitHeight ?? 0) > 0 ? pageItem.implicitHeight : CcMetrics.preferredDetailHeight(shownSection, pageItem?.preferredHeight ?? 0)
+    readonly property real contentHeight: pageHeight
+    readonly property real chromeHeight: header.height + CcMetrics.detailDialogPadding * 2
+    readonly property real maximumHeight: height - topInset - CcMetrics.detailDialogInset
+    // plugin detail content may not scroll itself, so the panel grows to fit it
+    readonly property bool pageScrollsItself: !shownSection.startsWith("plugin_")
+    readonly property real minimumHeight: chromeHeight + (pageScrollsItself ? Math.min(contentHeight, CcMetrics.detailMinContentHeight) : pageHeight)
     readonly property string title: {
         const own = pageItem?.title ?? "";
         if (own)
@@ -33,11 +49,47 @@ Item {
         const parsed = Sections.parse(shownSection);
         return model?.getWidgetForId(parsed.base)?.text ?? "";
     }
-    readonly property real offscreenX: I18n.isRtl ? -width : width
-    // The grid travels one body width ahead of the panel, so both slide together like a stack push.
-    readonly property real gridOffset: shownSection !== "" ? panel.x - offscreenX : 0
-
     visible: shownSection !== ""
+    opacity: 0
+    layer.enabled: enterPending || enterAnimation.running || exitAnimation.running
+    layer.smooth: true
+    Accessible.role: Accessible.Dialog
+    Accessible.name: title
+
+    function finishClose() {
+        if (section !== "")
+            return;
+        pageLoader.sourceComponent = null;
+        shownSection = "";
+        dismissed();
+    }
+
+    function containsItem(item) {
+        for (let ancestor = item; ancestor; ancestor = ancestor.parent) {
+            if (ancestor === root)
+                return true;
+        }
+        return false;
+    }
+
+    function moveFocus(backwards) {
+        const current = root.Window.window?.activeFocusItem ?? root;
+        const next = current.nextItemInFocusChain(!backwards);
+        const target = root.containsItem(next) ? next : backwards ? closeButton : root.nextItemInFocusChain(true);
+        (root.containsItem(target) ? target : closeButton).forceActiveFocus(backwards ? Qt.BacktabFocusReason : Qt.TabFocusReason);
+    }
+
+    Shortcut {
+        sequence: "Tab"
+        enabled: root.section !== "" && root.activeFocus
+        onActivated: root.moveFocus(false)
+    }
+
+    Shortcut {
+        sequences: ["Backtab", "Shift+Tab"]
+        enabled: root.section !== "" && root.activeFocus
+        onActivated: root.moveFocus(true)
+    }
 
     function dismissTransient() {
         const item = pageItem;
@@ -68,6 +120,8 @@ Item {
             return diskUsageComponent;
         case "brightnessSlider":
             return brightnessComponent;
+        case "runningApps":
+            return runningAppsComponent;
         }
         if (sectionId.startsWith("builtin_") || sectionId.startsWith("plugin_"))
             return pluginComponent;
@@ -75,108 +129,195 @@ Item {
     }
 
     onSectionChanged: {
+        enterPending = false;
+        enterAnimation.stop();
+        exitAnimation.stop();
         if (section === "") {
-            slideOut.start();
+            if (!animationsEnabled) {
+                root.opacity = 0;
+                finishClose();
+                return;
+            }
+            exitBlocker.forceActiveFocus();
+            exitAnimation.start();
             return;
         }
-        slideOut.stop();
+        const opening = shownSection === "";
+        enterPending = opening && animationsEnabled;
+        root.opacity = enterPending ? 0 : 1;
+        dialogSurface.entryScale = enterPending ? CcMetrics.popupEnterScale : 1;
         shownSection = section;
         pageLoader.sourceComponent = _componentFor(section);
-        if (!CcMetrics.animationsEnabled) {
-            panel.x = 0;
-            return;
+        (pageItem ?? root).forceActiveFocus();
+    }
+
+    Connections {
+        target: root.Window.window
+        enabled: root.enterPending
+
+        function onFrameSwapped() {
+            root.enterPending = false;
+            enterAnimation.start();
         }
-        panel.x = offscreenX;
-        slideIn.start();
+    }
+
+    ParallelAnimation {
+        id: enterAnimation
+
+        NumberAnimation {
+            target: root
+            property: "opacity"
+            to: 1
+            duration: CcMetrics.fadeDuration
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+        }
+        NumberAnimation {
+            target: dialogSurface
+            property: "entryScale"
+            to: 1
+            duration: Theme.expressiveDurations.expressiveDefaultSpatial
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+        }
     }
 
     NumberAnimation {
-        id: slideIn
-        target: panel
-        property: "x"
+        id: exitAnimation
+        target: root
+        property: "opacity"
         to: 0
-        duration: CcMetrics.transitionDuration
+        duration: CcMetrics.fadeDuration
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: Theme.expressiveCurves.standard
+        easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
+        onFinished: root.finishClose()
     }
 
-    NumberAnimation {
-        id: slideOut
-        target: panel
-        property: "x"
-        to: root.offscreenX
-        duration: CcMetrics.animationsEnabled ? CcMetrics.transitionDuration : 0
-        easing.type: Easing.BezierSpline
-        easing.bezierCurve: Theme.expressiveCurves.standard
-        onFinished: {
+    Rectangle {
+        anchors.fill: parent
+        topLeftRadius: root.cornerRadii.x
+        topRightRadius: root.cornerRadii.y
+        bottomRightRadius: root.cornerRadii.z
+        bottomLeftRadius: root.cornerRadii.w
+        color: Theme.scrimColor
+        opacity: Theme.scrimAlpha
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.AllButtons
+        onClicked: {
             if (root.section !== "")
-                return;
-            pageLoader.sourceComponent = null;
-            root.shownSection = "";
+                root.backRequested();
         }
+        onWheel: wheel => wheel.accepted = true
     }
 
-    Item {
-        id: panel
-        width: root.width
-        height: root.height
-        x: root.offscreenX
+    Rectangle {
+        id: dialogSurface
+
+        x: CcMetrics.detailDialogInset
+        y: root.topInset + Math.max(0, (root.maximumHeight - height) / 2)
+        width: Math.max(0, root.width - CcMetrics.detailDialogInset * 2)
+        height: Math.max(0, Math.min(root.chromeHeight + root.contentHeight, root.maximumHeight))
+        radius: Theme.cornerRadiusXL
+
+        Behavior on height {
+            enabled: root.animationsEnabled && !root.transitioning && root.section !== ""
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveFastSpatial
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.standard
+            }
+        }
+        color: CcMetrics.dialogColor
+        border.width: Theme.layerOutlineWidth
+        border.color: Theme.outlineMedium
+        property real entryScale: 1
+        scale: Math.min(1, entryScale)
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+        }
 
         Item {
-            id: header
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            height: CcMetrics.pageHeaderHeight
+            id: panel
 
-            DankActionButton {
-                id: backButton
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                buttonSize: Theme.iconButtonSize
-                iconSize: Theme.iconSize
-                iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
-                iconColor: Theme.surfaceText
-                Accessible.name: I18n.tr("Back")
-                onClicked: root.backRequested()
-            }
-
-            StyledText {
-                anchors.left: backButton.right
-                anchors.leftMargin: Theme.spacingS
-                anchors.right: headerSlot.left
-                anchors.rightMargin: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.title
-                font.pixelSize: CcMetrics.pageTitleSize
-                color: Theme.surfaceText
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignLeft
-            }
+            anchors.fill: parent
+            anchors.margins: CcMetrics.detailDialogPadding
+            opacity: CcMetrics.hideCoveredContent ? 1 - root.coverage : 1
 
             Item {
-                id: headerSlot
+                id: header
+                anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                width: childrenRect.width
-                height: parent.height
-            }
-        }
+                anchors.top: parent.top
+                height: CcMetrics.pageHeaderHeight
 
-        Loader {
-            id: pageLoader
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: header.bottom
-            anchors.bottom: parent.bottom
-            active: root.shownSection !== ""
-            onLoaded: {
-                const actions = item.headerActions ?? null;
-                if (actions)
-                    actions.parent = headerSlot;
-                item.forceActiveFocus();
+                StyledText {
+                    anchors.left: parent.left
+                    anchors.leftMargin: CcMetrics.rowPaddingH
+                    anchors.right: headerSlot.left
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.title
+                    font.pixelSize: CcMetrics.pageTitleSize
+                    color: Theme.surfaceText
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                Item {
+                    id: headerSlot
+                    anchors.right: closeButton.left
+                    anchors.rightMargin: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: childrenRect.width
+                    height: childrenRect.height
+                }
+
+                DankActionButton {
+                    id: closeButton
+                    anchors.right: parent.right
+                    anchors.rightMargin: CcMetrics.headerEdgeInset
+                    anchors.verticalCenter: parent.verticalCenter
+                    buttonSize: CcMetrics.headerActionSize
+                    iconName: "close"
+                    iconSize: CcMetrics.headerActionIconSize
+                    iconColor: Theme.surfaceText
+                    Accessible.name: I18n.tr("Close")
+                    onClicked: root.backRequested()
+                }
+            }
+
+            Loader {
+                id: pageLoader
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: header.bottom
+                anchors.bottom: parent.bottom
+                active: root.shownSection !== ""
+                onLoaded: {
+                    const actions = item.headerActions ?? null;
+                    if (actions)
+                        actions.parent = headerSlot;
+                }
             }
         }
+    }
+
+    MouseArea {
+        id: exitBlocker
+
+        anchors.fill: parent
+        visible: root.section === ""
+        hoverEnabled: true
+        acceptedButtons: Qt.AllButtons
+        onWheel: wheel => wheel.accepted = true
+        Keys.onPressed: event => event.accepted = true
+        Keys.onReleased: event => event.accepted = true
     }
 
     Connections {
@@ -207,16 +348,25 @@ Item {
         function onDismissRequested() {
             root.backRequested();
         }
+
+        function onCloseRequested() {
+            root.closeRequested();
+        }
     }
 
     Component {
         id: networkComponent
-        NetworkDetail {}
+        NetworkDetail {
+            transientSurfaceTracker: root.transientSurfaceTracker
+            transitioning: root.transitioning
+        }
     }
 
     Component {
         id: bluetoothComponent
-        BluetoothDetail {}
+        BluetoothDetail {
+            transientSurfaceTracker: root.transientSurfaceTracker
+        }
     }
 
     Component {
@@ -260,6 +410,13 @@ Item {
             instanceId: widgetEntry?.instanceId || ""
             screenName: root.screenName
             screenModel: root.screenModel
+        }
+    }
+
+    Component {
+        id: runningAppsComponent
+        RunningAppsDetail {
+            toplevels: root.runningToplevels
         }
     }
 

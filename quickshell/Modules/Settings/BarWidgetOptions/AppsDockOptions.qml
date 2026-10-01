@@ -45,9 +45,9 @@ Column {
         id: logoFileBrowser
 
         browserTitle: I18n.tr("Select Dock Launcher Logo")
-        browserType: "generic"
-        filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
-        onFileSelected: path => root.apps.set("launcherLogoCustomPath", path.replace("file://", ""))
+        bucket: "logo"
+        filters: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
+        onAccepted: paths => root.apps.set("launcherLogoCustomPath", paths[0])
     }
 
     SettingsCard {

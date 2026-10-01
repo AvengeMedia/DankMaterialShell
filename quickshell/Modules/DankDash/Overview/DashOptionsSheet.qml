@@ -10,9 +10,10 @@ CcSheetDialog {
     id: root
 
     property string entryId: ""
+    property bool tabScope: false
 
     readonly property var entry: DashRegistry.entry(entryId)
-    readonly property var specs: DashRegistry.sheetOptionSpecs(entryId)
+    readonly property var specs: DashRegistry.sheetOptionSpecs(entryId, tabScope)
 
     function presentFor(id) {
         entryId = id;
@@ -23,6 +24,7 @@ CcSheetDialog {
     iconName: entry?.icon ?? "tune"
     title: entry?.text ?? ""
     subtitle: I18n.tr("Options")
+    showScrollBar: false
 
     SettingsGroup {
         width: parent.width
@@ -34,8 +36,9 @@ CcSheetDialog {
             DashOptionRow {
                 required property var modelData
 
-                entryId: root.entryId
                 spec: modelData
+                value: DashRegistry.option(root.entryId, modelData.key)
+                onCommitted: next => DashRegistry.setOption(root.entryId, modelData.key, next)
             }
         }
     }

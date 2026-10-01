@@ -167,7 +167,7 @@ test("free islands and dots keep their key but leave every band, reservation and
     for (const options of [{}, { effectiveFrameEnabled: true }, { effectiveFrameEnabled: true, effectiveConnected: true }]) {
         const layout = resolve(configs, options);
         const dot = layout.instances.find(instance => instance.barId === "dot");
-        assert.deepEqual(plain({ ...dot, paintedBounds: undefined, margins: undefined }), { key: JSON.stringify(["DP-1", "dot"]), screenName: "DP-1", barId: "dot", configOrder: 1, edge: "", kind: "island", free: true, dot: true, satelliteEdge: "", row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0 });
+        assert.deepEqual(plain({ ...dot, paintedBounds: undefined, margins: undefined }), { key: JSON.stringify(["DP-1", "dot"]), screenName: "DP-1", barId: "dot", configOrder: 1, edge: "", kind: "island", free: true, dot: true, hostsIsland: true, satelliteEdge: "", row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0 });
         assert.equal(layout.instances.find(instance => instance.barId === "free").dot, false);
         assert.equal(layout.edges.top.island, null);
         assert.equal(layout.edges.top.islandThickness, 0);
@@ -202,4 +202,34 @@ test("a free island keeps a bar window for its satellites on its edge without re
         const off = resolve([top, free({ islandSatellitesEnabled: false })], options).instances.find(instance => instance.barId === "free");
         assert.equal(resolver.hostsBarWindow(off), false);
     }
+});
+
+test("a bar hosting the island widget keeps its band and joins the islands without owning an edge", () => {
+    const strip = value => JSON.parse(JSON.stringify(value, (key, entry) => key === "hostsIsland" || key === "centerWidgets" ? undefined : entry));
+    const hosted = (id, position = 0, values = {}) => bar(id, position, { centerWidgets: ["clock", { id: "island", enabled: true }], ...values });
+    for (const options of [{}, { effectiveFrameEnabled: true }, { effectiveFrameEnabled: true, effectiveConnected: true }]) {
+        const baseline = resolve([bar("main"), bar("side", 2)], options);
+        const layout = resolve([hosted("main"), bar("side", 2)], options);
+        assert.deepEqual(strip(layout.instances), strip(baseline.instances));
+        assert.deepEqual(strip(layout.edges), strip(baseline.edges));
+        const main = layout.instances.find(instance => instance.barId === "main");
+        assert.equal(main.hostsIsland, true);
+        assert.equal(main.kind, options.effectiveConnected ? "frame" : "bar");
+        assert.equal(layout.instances.find(instance => instance.barId === "side").hostsIsland, false);
+        assert.deepEqual(plain(layout.islands.map(input => input.config.id)), ["main"]);
+        assert.equal(layout.edges.top.island, null);
+        assert.equal(layout.edges.top.islandThickness, 0);
+        assert.deepEqual(plain(layout.bars.map(input => input.config.id)), ["main", "side"]);
+    }
+    for (const list of ["leftWidgets", "rightWidgets"])
+        assert.equal(resolve([bar("main", 0, { [list]: ["island"] })]).instances[0].hostsIsland, true, list + " hosts the island too");
+    assert.equal(resolve([bar("main", 0, { centerWidgets: [{ id: "island", enabled: false }] })]).instances[0].hostsIsland, false, "a disabled island widget hosts nothing");
+    const two = resolve([hosted("first"), hosted("second", 1), bar("dot", 0, { dot: true })]);
+    assert.deepEqual(plain(two.instances.map(instance => [instance.barId, instance.hostsIsland])), [["first", true], ["second", false], ["dot", true]]);
+    assert.deepEqual(plain(two.islands.map(input => input.config.id)), ["dot", "first"]);
+    const bypassed = resolve([hosted("host"), bar("island", 1, { island: true })]);
+    assert.deepEqual(plain(bypassed.instances.map(instance => [instance.barId, instance.hostsIsland])), [["host", false], ["island", true]], "an island-layout bar on the screen wins over a hosted island");
+    const overlay = resolve([hosted("overlay", 0, { useOverlayLayer: true })], { effectiveFrameEnabled: true, effectiveConnected: true });
+    assert.equal(overlay.instances[0].kind, "bar");
+    assert.equal(overlay.instances[0].hostsIsland, true);
 });

@@ -12,6 +12,7 @@ Column {
 
     property var eventData: null
     property date initialDate: new Date()
+    property var transientSurfaceTracker: null
 
     signal saved
     signal closeRequested
@@ -156,6 +157,7 @@ Column {
     DankFlickable {
         width: parent.width
         height: Math.min(DashMetrics.sheetFormHeight, form.implicitHeight)
+        showScrollBar: false
         contentWidth: width
         contentHeight: form.implicitHeight
         clip: true
@@ -240,6 +242,7 @@ Column {
             DankDropdown {
                 width: parent.width
                 text: I18n.tr("Calendar")
+                transientSurfaceTracker: root.transientSurfaceTracker
                 options: root._cals.map(c => c.name)
                 currentValue: root._calendarName(root.fCalendarId)
                 onValueChanged: value => {
@@ -255,6 +258,7 @@ Column {
             DankDropdown {
                 width: parent.width
                 text: I18n.tr("Reminder", "noun, calendar event reminder time dropdown label")
+                transientSurfaceTracker: root.transientSurfaceTracker
                 options: root._remLabels
                 currentValue: root._remLabels[Math.max(0, root._remMins.indexOf(root.fReminder))]
                 onValueChanged: value => {

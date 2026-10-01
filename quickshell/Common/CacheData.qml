@@ -24,14 +24,14 @@ Singleton {
 
     readonly property var _pinKeys: ["brightnessDevicePins", "wifiNetworkPins", "bluetoothDevicePins", "audioInputDevicePins", "audioOutputDevicePins"]
     readonly property var _historyKeys: ["browserUsageHistory", "filePickerUsageHistory"]
-    readonly property var _dataKeys: ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "mediaLyricsOpen", "matugenPreviews"].concat(_pinKeys, _historyKeys)
+    readonly property var _dataKeys: ["fileBrowserSettings", "processFilterTypes", "pluginViewSort", "pluginViewFilter", "dashFocusCardId", "controlCenterCollapsedCategories", "mediaLyricsOpen", "matugenPreviews", "matugenAppliedKey"].concat(_pinKeys, _historyKeys)
 
-    property string wallpaperLastPath: ""
-    property string profileLastPath: ""
     property string pluginViewFilter: "enabled"
     property string dashFocusCardId: ""
+    property var controlCenterCollapsedCategories: []
     property bool mediaLyricsOpen: false
     property var matugenPreviews: ({})
+    property string matugenAppliedKey: ""
     property var pluginViewSort: ({
             by: "modified",
             descending: true
@@ -47,56 +47,7 @@ Singleton {
     property var audioInputDevicePins: ({})
     property var audioOutputDevicePins: ({})
 
-    property var fileBrowserSettings: ({
-            "wallpaper": {
-                "lastPath": "",
-                "viewMode": "grid",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            },
-            "profile": {
-                "lastPath": "",
-                "viewMode": "grid",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            },
-            "notepad_save": {
-                "lastPath": "",
-                "viewMode": "list",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            },
-            "notepad_load": {
-                "lastPath": "",
-                "viewMode": "list",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            },
-            "generic": {
-                "lastPath": "",
-                "viewMode": "list",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            },
-            "default": {
-                "lastPath": "",
-                "viewMode": "list",
-                "sortBy": "name",
-                "sortAscending": true,
-                "iconSizeIndex": 1,
-                "showSidebar": true
-            }
-        })
+    property var fileBrowserSettings: ({})
 
     Component.onCompleted: {
         if (isGreeterMode)
@@ -178,12 +129,12 @@ Singleton {
                 const cache = JSON.parse(content);
                 _loadedCacheVersion = cache.configVersion || 0;
 
-                wallpaperLastPath = cache.wallpaperLastPath !== undefined ? cache.wallpaperLastPath : "";
-                profileLastPath = cache.profileLastPath !== undefined ? cache.profileLastPath : "";
                 pluginViewFilter = ["all", "enabled", "disabled", "updates"].includes(cache.pluginViewFilter) ? cache.pluginViewFilter : "enabled";
                 dashFocusCardId = typeof cache.dashFocusCardId === "string" ? cache.dashFocusCardId : "";
+                controlCenterCollapsedCategories = Array.isArray(cache.controlCenterCollapsedCategories) ? cache.controlCenterCollapsedCategories.filter(id => typeof id === "string") : [];
                 mediaLyricsOpen = cache.mediaLyricsOpen === true;
                 matugenPreviews = typeof cache.matugenPreviews?.key === "string" ? cache.matugenPreviews : {};
+                matugenAppliedKey = typeof cache.matugenAppliedKey === "string" ? cache.matugenAppliedKey : "";
                 const pluginSort = cache.pluginViewSort;
                 pluginViewSort = {
                     by: ["name", "author", "modified"].includes(pluginSort?.by) ? pluginSort.by : "modified",
@@ -221,6 +172,7 @@ Singleton {
                         }
                     };
                 }
+                fileBrowserSettings = withLegacyLastPaths(fileBrowserSettings, cache);
 
                 for (const key of _pinKeys.concat(_historyKeys)) {
                     root[key] = cache[key] !== undefined ? cache[key] : {};
@@ -239,18 +191,30 @@ Singleton {
         }
     }
 
+    function withLegacyLastPaths(settings, legacy) {
+        const merged = Object.assign({}, settings);
+        for (const [bucket, lastPath] of [["wallpaper", legacy.wallpaperLastPath], ["profile", legacy.profileLastPath]]) {
+            if (!lastPath || merged[bucket]?.lastPath)
+                continue;
+            merged[bucket] = Object.assign({}, merged[bucket], {
+                "lastPath": lastPath
+            });
+        }
+        return merged;
+    }
+
     function saveCache() {
         if (_loading)
             return;
         const data = {
-            "wallpaperLastPath": wallpaperLastPath,
-            "profileLastPath": profileLastPath,
             "processFilterTypes": processFilterTypes,
             "pluginViewSort": pluginViewSort,
             "pluginViewFilter": pluginViewFilter,
             "dashFocusCardId": dashFocusCardId,
+            "controlCenterCollapsedCategories": controlCenterCollapsedCategories,
             "mediaLyricsOpen": mediaLyricsOpen,
             "matugenPreviews": matugenPreviews,
+            "matugenAppliedKey": matugenAppliedKey,
             "fileBrowserSettings": fileBrowserSettings,
             "configVersion": cacheConfigVersion
         };

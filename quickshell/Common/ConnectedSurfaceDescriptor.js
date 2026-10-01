@@ -5,7 +5,8 @@ var VALID_KINDS = {
     "modal": true,
     "launcher": true,
     "dock": true,
-    "notification": true
+    "notification": true,
+    "island": true
 };
 
 var VALID_PHASES = {
@@ -32,7 +33,7 @@ function _kind(value, fallback) {
 }
 
 function _defaultBarSide(kind) {
-    return kind === "popout" || kind === "notification" ? "top" : "bottom";
+    return kind === "popout" || kind === "notification" || kind === "island" ? "top" : "bottom";
 }
 
 function _barSide(value, fallback) {

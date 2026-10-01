@@ -73,24 +73,25 @@ ShellRoot {
             case 0:
                 if (!SettingsData._hasLoaded)
                     return;
-                SettingsData.frameEnabled = false;
-                SettingsData.launcherStyle = "island";
-                SettingsData.rememberLastQuery = false;
-                SettingsData.barConfigs = [
-                    {
-                        id: "island",
-                        enabled: true,
-                        visible: true,
-                        position: 0,
-                        island: true,
-                        spacing: 4,
-                        innerPadding: 4,
-                        leftWidgets: [],
-                        centerWidgets: [],
-                        rightWidgets: [],
-                        islandShowSatellites: false
-                    }
-                ];
+                    SettingsData.frameEnabled = false;
+                    SettingsData.reduceMotion = true;
+                    SettingsData.launcherStyle = "island";
+                    SettingsData.rememberLastQuery = false;
+                    SettingsData.barConfigs = [
+                        {
+                            id: "island",
+                            enabled: true,
+                            visible: true,
+                            position: 0,
+                            island: true,
+                            spacing: 4,
+                            innerPadding: 4,
+                            leftWidgets: [],
+                            centerWidgets: [],
+                            rightWidgets: [],
+                            islandShowSatellites: false
+                        }
+                    ];
                 advance("the island host to appear");
                 return;
             case 1:

@@ -390,6 +390,7 @@ done
             SettingsToggleRow {
                 settingKey: "batteryAutoPowerSaver"
                 text: I18n.tr("Auto power saver")
+                description: I18n.tr("Switches to power saver at the low battery threshold", "battery auto power saver toggle description")
                 checked: SettingsData.batteryAutoPowerSaver
                 onToggled: checked => SettingsData.set("batteryAutoPowerSaver", checked)
             }

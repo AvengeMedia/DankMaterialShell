@@ -24,7 +24,6 @@ Item {
     property alias slider: slider
     property alias minimum: slider.minimum
     property alias maximum: slider.maximum
-    property alias unit: slider.unit
     property alias valueOverride: slider.valueOverride
     property alias wheelStep: slider.wheelStep
     property bool sliderEnabled: true
@@ -64,14 +63,14 @@ Item {
             x: root.vertical ? (parent.width - width) / 2 : root.LayoutMirroring.enabled ? parent.width - width : 0
             y: root.vertical ? parent.height - height : root.tall ? 0 : (parent.height - height) / 2
             buttonSize: root.actionSize
-            backgroundColor: CcMetrics.tileInactiveColor
+            backgroundColor: root.tall ? CcMetrics.iconBoxInactiveColor : CcMetrics.tileInactiveColor
             border.width: Theme.layerOutlineWidth
             border.color: Theme.outlineMedium
             iconName: root.iconName
             iconSize: CcMetrics.iconBoxIconSize
             iconColor: CcMetrics.tileInactiveContent
             enabled: root.sliderEnabled && root.interactive
-            tooltipText: root.iconTooltip
+            tooltipText: root.iconTooltip || root.iconLabel
             Accessible.name: root.iconLabel
             onClicked: root.iconClicked()
         }
@@ -108,8 +107,8 @@ Item {
         Item {
             id: trackArea
             objectName: "sliderTrackArea"
-            anchors.left: root.tall ? parent.left : action.right
-            anchors.leftMargin: root.tall ? 0 : CcMetrics.gridGap
+            anchors.left: parent.left
+            anchors.leftMargin: root.tall ? 0 : action.width + Theme.spacingS
             anchors.right: parent.right
             y: root.vertical ? (root.showNumber ? labels.height + Theme.spacingS : 0) : root.tall ? action.height + Theme.spacingM : 0
             height: Math.max(0, (root.vertical ? action.y - Theme.spacingS : parent.height) - y)
@@ -121,7 +120,6 @@ Item {
                 rotation: root.vertical ? -90 : 0
                 LayoutMirroring.enabled: !root.vertical && I18n.isRtl
                 enabled: root.sliderEnabled && root.interactive
-                wheelInsideScrollable: true
                 size: {
                     if (!root.tall)
                         return "s";
@@ -135,6 +133,18 @@ Item {
                 Accessible.name: root.sliderLabel
                 showValue: !root.vertical
                 onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
+
+                Binding on trackHeight {
+                    when: !root.tall
+                    value: CcMetrics.stripTrackHeight
+                    restoreMode: Binding.RestoreBinding
+                }
+
+                Binding on handleHeight {
+                    when: !root.tall
+                    value: CcMetrics.stripHandleHeight
+                    restoreMode: Binding.RestoreBinding
+                }
             }
         }
     }

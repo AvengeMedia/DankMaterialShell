@@ -30,6 +30,9 @@ Rectangle {
     property real outerRadius: Theme.groupedListOuterRadius
     property bool firstInGroup: true
     property bool lastInGroup: true
+    property real topRoundness: 0
+    property real bottomRoundness: 0
+    property real contentOpacity: 1
     readonly property bool hasMoreText: bodyText.truncated || summaryText.truncated
     readonly property bool hasBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
     readonly property string appIcon: NotificationService.notificationAppIcon(notificationData?.appIcon || "", notificationData?.desktopEntry || "")
@@ -69,11 +72,11 @@ Rectangle {
     implicitHeight: targetHeight
     height: targetHeight
     radius: Theme.groupedListInnerRadius
-    topLeftRadius: firstInGroup ? outerRadius : radius
+    topLeftRadius: radius + (outerRadius - radius) * (firstInGroup ? 1 : topRoundness)
     topRightRadius: topLeftRadius
-    bottomLeftRadius: lastInGroup ? outerRadius : radius
+    bottomLeftRadius: radius + (outerRadius - radius) * (lastInGroup ? 1 : bottomRoundness)
     bottomRightRadius: bottomLeftRadius
-    color: surfaceColor
+    color: keyboardSelected ? Theme.selectedContainer : surfaceColor
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
     clip: true
@@ -127,6 +130,7 @@ Rectangle {
         height: parent.height - NotificationMetrics.cardPadding * 2
         radius: Theme.fullRadius(width, height)
         color: Theme.primary
+        opacity: root.contentOpacity
         visible: root.notificationData?.urgency === NotificationUrgency.Critical
     }
 
@@ -151,6 +155,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: NotificationMetrics.cardPadding
         y: NotificationMetrics.cardPadding
+        opacity: root.contentOpacity
 
         Image {
             id: appImage
@@ -184,6 +189,7 @@ Rectangle {
         anchors.rightMargin: NotificationMetrics.cardPadding
         y: NotificationMetrics.cardPadding
         spacing: NotificationMetrics.contentSpacing
+        opacity: root.contentOpacity
 
         Item {
             width: parent.width

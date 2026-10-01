@@ -6,13 +6,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Nadim147c/material/v3/color"
-	"github.com/Nadim147c/material/v3/dynamic"
+	"github.com/AvengeMedia/dankgo/material/color"
+	"github.com/AvengeMedia/dankgo/material/dynamic"
 )
 
 // Palette spec versions. Spec2021 is matugen's own output and the historical
-// default. Spec2025 is the Material 3 Expressive color spec, which matugen 4.x
-// cannot produce: the palette is generated in-process and handed to matugen
+// default. Spec2025 is material-color-utilities' 2025 color spec, which matugen
+// 4.x cannot produce: the palette is generated in-process and handed to matugen
 // through --import-json-string, the same override path stock themes use.
 const (
 	Spec2021 = "2021"
@@ -43,12 +43,17 @@ var schemeVariants = map[string]dynamic.Variant{
 	"scheme-rainbow":     dynamic.VariantRainbow,
 }
 
-// SpecSupportsScheme reports whether the in-process generator can build the
-// scheme. scheme-smart is chosen by matugen at run time and is not exposed in
-// its output, so it stays on matugen's native palette.
+// SpecSupportsScheme reports whether the 2025 spec changes the scheme.
+// material-color-utilities only defines it for these variants and falls back to
+// 2021 for the rest, which matugen already produces. scheme-smart is chosen by
+// matugen at run time and is not exposed in its output.
 func SpecSupportsScheme(schemeType string) bool {
-	_, ok := schemeVariants[schemeType]
-	return ok
+	switch schemeVariants[schemeType] {
+	case dynamic.VariantTonalSpot, dynamic.VariantVibrant, dynamic.VariantExpressive, dynamic.VariantNeutral:
+		return true
+	default:
+		return false
+	}
 }
 
 // GenerateSpecColors builds the full Material color map for a seed under the
@@ -74,8 +79,6 @@ func GenerateSpecColors(seedHex, schemeType string, contrast float64, defaultMod
 	if err != nil {
 		return "", err
 	}
-	// Colors.Map() in material/v3 v3.1.1 is backed by a field nothing fills,
-	// so the roles are read off the scheme directly.
 	generate := func(dark bool) map[string]string {
 		scheme := dynamic.NewDynamicScheme(seedArgb.ToHct(), variant, contrast, dark, dynamic.PlatformPhone, specVersion)
 		roles := scheme.ToColorMap()

@@ -120,7 +120,12 @@ PanelWindow {
     readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
-    onIsVisibleChanged: slideSpring.retarget(isVisible ? 0 : (slideFromLeft ? -slideContainer.width : slideContainer.width))
+    onIsVisibleChanged: {
+        slideSpring.retarget(isVisible ? 0 : (slideFromLeft ? -slideContainer.width : slideContainer.width));
+        if (isVisible || slideSpring.running)
+            return;
+        mappedVisible = false;
+    }
 
     mask: Region {
         item: Rectangle {
@@ -186,10 +191,7 @@ PanelWindow {
 
         Item {
             id: contentRect
-            layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-            layer.smooth: false
-            layer.textureSize: Qt.size(0, 0)
-            opacity: 1
+            clip: true
 
             readonly property color slideoutSurfaceColor: {
                 if (root.customTransparency >= 0)
@@ -221,80 +223,89 @@ PanelWindow {
                 border.width: Theme.isConnectedEffect ? 0 : BlurService.borderWidth
             }
 
-            Column {
-                id: headerColumn
+            Item {
+                id: contentBody
                 anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingM
-                visible: root.title !== ""
+                anchors.bottom: parent.bottom
+                anchors.right: root.slideFromLeft ? undefined : parent.right
+                anchors.left: root.slideFromLeft ? parent.left : undefined
+                width: root.alignedWidth
 
-                Row {
-                    width: parent.width
-                    height: 32
-
-                    Column {
-                        width: parent.width - buttonRow.width
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        StyledText {
-                            text: root.title
-                            font.pixelSize: Theme.fontSizeLarge
-                            color: Theme.surfaceText
-                            font.weight: Theme.fontWeightMedium
-                        }
-                    }
+                Column {
+                    id: headerColumn
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+                    visible: root.title !== ""
 
                     Row {
-                        id: buttonRow
-                        spacing: Theme.spacingXS
+                        width: parent.width
+                        height: 32
 
-                        DankActionButton {
-                            id: expandButton
-                            iconName: root.expandedWidth ? "unfold_less" : "unfold_more"
-                            tooltipText: root.expandedWidth ? I18n.tr("Collapse") : I18n.tr("Expand")
-                            iconSize: Theme.iconSize - 4
-                            iconColor: Theme.surfaceText
-                            visible: root.expandable
-                            onClicked: root.expandedWidth = !root.expandedWidth
+                        Column {
+                            width: parent.width - buttonRow.width
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
 
-                            transform: Rotation {
-                                angle: 90
-                                origin.x: expandButton.width / 2
-                                origin.y: expandButton.height / 2
+                            StyledText {
+                                text: root.title
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.surfaceText
+                                font.weight: Theme.fontWeightMedium
                             }
                         }
 
-                        DankActionButton {
-                            id: closeButton
-                            iconName: "close"
-                            Accessible.name: I18n.tr("Close")
-                            iconSize: Theme.iconSize - 4
-                            iconColor: Theme.surfaceText
-                            onClicked: root.hide()
+                        Row {
+                            id: buttonRow
+                            spacing: Theme.spacingXS
+
+                            DankActionButton {
+                                id: expandButton
+                                iconName: root.expandedWidth ? "unfold_less" : "unfold_more"
+                                tooltipText: root.expandedWidth ? I18n.tr("Collapse") : I18n.tr("Expand")
+                                iconSize: Theme.iconSize - 4
+                                iconColor: Theme.surfaceText
+                                visible: root.expandable
+                                onClicked: root.expandedWidth = !root.expandedWidth
+
+                                transform: Rotation {
+                                    angle: 90
+                                    origin.x: expandButton.width / 2
+                                    origin.y: expandButton.height / 2
+                                }
+                            }
+
+                            DankActionButton {
+                                id: closeButton
+                                iconName: "close"
+                                Accessible.name: I18n.tr("Close")
+                                iconSize: Theme.iconSize - 4
+                                iconColor: Theme.surfaceText
+                                onClicked: root.hide()
+                            }
                         }
                     }
                 }
-            }
 
-            Item {
-                id: contentContainer
-                anchors.top: root.title !== "" ? headerColumn.bottom : parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.topMargin: root.title !== "" ? 0 : Theme.spacingL
-                anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL
-                anchors.bottomMargin: Theme.spacingL
+                Item {
+                    id: contentContainer
+                    anchors.top: root.title !== "" ? headerColumn.bottom : parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.topMargin: root.title !== "" ? 0 : Theme.spacingL
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.rightMargin: Theme.spacingL
+                    anchors.bottomMargin: Theme.spacingL
 
-                Loader {
-                    id: contentLoader
-                    anchors.fill: parent
-                    active: root.contentRequested
-                    sourceComponent: root.content
+                    Loader {
+                        id: contentLoader
+                        anchors.fill: parent
+                        active: root.contentRequested
+                        sourceComponent: root.content
+                    }
                 }
             }
         }

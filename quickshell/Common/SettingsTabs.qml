@@ -14,7 +14,7 @@ Singleton {
         {
             "id": "personalization",
             "text": I18n.tr("Wallpaper & colors"),
-            "icon": "palette",
+            "icon": "wallpaper",
             "tabIndex": 0,
             "hubHeader": "WallpaperColorsTab",
             "aliases": ["wallpaper", "theme_cursor_icons"],
@@ -50,6 +50,14 @@ Singleton {
                     "icon": "apps",
                     "tabIndex": 50,
                     "hint": I18n.tr("GTK, Qt, portal, matugen templates")
+                },
+                {
+                    "id": "palette_inject",
+                    "advanced": true,
+                    "text": I18n.tr("Injected palettes"),
+                    "icon": "colorize",
+                    "tabIndex": 64,
+                    "hint": I18n.tr("External palette commands, namespaces")
                 }
             ]
         },
@@ -420,7 +428,7 @@ Singleton {
                 {
                     "id": "user_create",
                     "hidden": true,
-                    "text": I18n.tr("Create user"),
+                    "text": I18n.tr("Add user"),
                     "icon": "person_add",
                     "tabIndex": 61
                 }
@@ -534,11 +542,18 @@ Singleton {
             "children": [
                 {
                     "id": "updater",
-                    "text": I18n.tr("System updater"),
-                    "icon": "refresh",
+                    "text": I18n.tr("Software updates"),
+                    "icon": "system_update_alt",
                     "tabIndex": 20,
-                    "updaterOnly": true,
-                    "hint": I18n.tr("Check interval, ignored packages, custom command")
+                    "hint": I18n.tr("DMS and system updates")
+                },
+                {
+                    "id": "updater_changelog",
+                    "hidden": true,
+                    "text": I18n.tr("Release notes"),
+                    "icon": "auto_awesome",
+                    "tabIndex": 66,
+                    "hint": I18n.tr("Summary, highlights, links")
                 },
                 {
                     "id": "clipboard",
@@ -743,8 +758,6 @@ Singleton {
             return false;
         if (entry.clipboardOnly && (!DMSService.isConnected || DMSService.apiVersion < 23))
             return false;
-        if (entry.updaterOnly && !SystemUpdateService.sysupdateAvailable)
-            return false;
         if (entry.greeterOnly && !GreeterService.available)
             return false;
         if (entry.autostartOnly && !DesktopService.autostartAvailable)
@@ -783,7 +796,7 @@ Singleton {
     }
 
     function hubHint(entry) {
-        return entry.hint || visibleLeaves(entry.id).map(child => child.text).join(", ");
+        return entry.hint || visibleLeaves(entry.id).filter(child => entry.hubHeader || !child.hidden).map(child => child.text).join(", ");
     }
 
     function hubMainRows(hubId) {

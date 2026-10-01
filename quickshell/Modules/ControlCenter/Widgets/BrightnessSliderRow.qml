@@ -49,7 +49,6 @@ CcSliderRow {
     sliderEnabled: BrightnessService.brightnessAvailable && targetDeviceName.length > 0
     minimum: BrightnessService.brightnessMinimum(targetDevice)
     maximum: BrightnessService.brightnessMaximum(targetDevice)
-    unit: BrightnessService.brightnessUnit(targetDevice)
 
     onIconClicked: expandClicked()
 

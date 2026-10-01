@@ -76,6 +76,8 @@ Item {
             return I18n.tr("Too many attempts - locked out");
         if (root.pamState === "fail")
             return I18n.tr("Incorrect password - try again");
+        if (pam.fprint.status === "disabled")
+            return "";
         if (pam.fprintState === "error")
             return I18n.tr("Fingerprint error");
         if (pam.fprintState === "max")
@@ -598,6 +600,8 @@ Item {
 
                 DankCircularImage {
                     Layout.preferredWidth: LockMetrics.avatarSize
+                    ringWidth: Theme.avatarRingWidth
+                    ringColor: Theme.avatarRingColor
                     Layout.preferredHeight: LockMetrics.fieldHeight
                     imageSource: {
                         if (PortalService.profileImage === "")
@@ -615,6 +619,7 @@ Item {
 
                     property bool showPassword: false
                     property real errorOffset: 0
+                    readonly property bool focusRingShown: passwordField.activeFocus && Theme.focusRingWidth > 0
                     transform: Translate {
                         x: Math.max(-LockMetrics.shakeDistance, Math.min(LockMetrics.shakeDistance, passwordBox.errorOffset))
                     }
@@ -623,8 +628,8 @@ Item {
                     Layout.preferredHeight: LockMetrics.fieldHeight
                     radius: Theme.fullRadius(width, height)
                     color: Theme.cardSurface
-                    border.width: passwordField.activeFocus ? Math.max(Theme.outlineWidth, Theme.focusRingWidth) : Theme.layerOutlineWidth
-                    border.color: passwordField.activeFocus ? Theme.focusRingColor : Theme.outlineMedium
+                    border.width: focusRingShown ? Math.max(Theme.outlineWidth, Theme.focusRingWidth) : Theme.layerOutlineWidth
+                    border.color: focusRingShown ? Theme.focusRingColor : Theme.outlineMedium
                     Accessible.name: I18n.tr("Password")
                     visible: SettingsData.lockScreenShowPasswordField || root.passwordBuffer.length > 0
 
@@ -643,10 +648,15 @@ Item {
                             name: {
                                 if (pam.u2fPending)
                                     return "passkey";
-                                if (pam.fprint.tries >= SettingsData.maxFprintTries)
+                                switch (pam.fprint.status) {
+                                case "max":
+                                case "stopped":
                                     return "fingerprint_off";
-                                if (pam.fprint.active || pam.fprint.retrying)
+                                case "active":
                                     return "fingerprint";
+                                case "retrying":
+                                    return "hourglass_empty";
+                                }
                                 if (pam.u2f.active)
                                     return "passkey";
                                 return "lock";
@@ -792,6 +802,8 @@ Item {
                             if (demoMode) {
                                 return;
                             }
+
+                            root.pam.retryFprintOnActivity();
 
                             if (root.unlocking) {
                                 event.accepted = true;

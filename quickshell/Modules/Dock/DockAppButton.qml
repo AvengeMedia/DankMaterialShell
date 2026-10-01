@@ -30,6 +30,8 @@ Item {
     property real actualIconSize: 40
     property real indicatorLane: 0
     readonly property bool indicatorAtFarEdge: root.options.position === SettingsData.Position.Bottom || root.options.position === SettingsData.Position.Right
+    readonly property bool indicatorInPadding: !(root.dockApps?.barHosted ?? false)
+    readonly property real indicatorThickness: indicatorInPadding ? root.options.spacing : indicatorLane
     property bool shouldShowIndicator: {
         if (root.options.hideIndicators)
             return false;
@@ -433,7 +435,7 @@ Item {
             y: !root.isVertical && !root.indicatorAtFarEdge ? root.indicatorLane : 0
             width: parent.width - (root.isVertical ? root.indicatorLane : 0)
             height: parent.height - (root.isVertical ? 0 : root.indicatorLane)
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             AppIconRenderer {
                 id: coreIcon
@@ -522,10 +524,17 @@ Item {
         Item {
             id: indicatorSlot
 
-            x: root.isVertical && root.indicatorAtFarEdge ? parent.width - width : 0
-            y: !root.isVertical && root.indicatorAtFarEdge ? parent.height - height : 0
-            width: root.isVertical ? root.indicatorLane : parent.width
-            height: root.isVertical ? parent.height : root.indicatorLane
+            readonly property real cellSize: root.isVertical ? parent.width : parent.height
+            readonly property real crossStart: {
+                if (root.indicatorAtFarEdge)
+                    return root.indicatorInPadding ? cellSize : cellSize - root.indicatorThickness;
+                return root.indicatorInPadding ? -root.indicatorThickness : 0;
+            }
+
+            x: root.isVertical ? crossStart : 0
+            y: root.isVertical ? 0 : crossStart
+            width: root.isVertical ? root.indicatorThickness : parent.width
+            height: root.isVertical ? parent.height : root.indicatorThickness
 
             Loader {
                 anchors.centerIn: parent

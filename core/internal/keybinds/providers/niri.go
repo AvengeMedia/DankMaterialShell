@@ -1,13 +1,17 @@
 package providers
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 	"github.com/sblinch/kdl-go/document"
@@ -24,13 +28,15 @@ type niriActionPart struct {
 	quoted bool
 }
 
-var niriActionPropertyOrder = []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms"}
+var niriActionPropertyOrder = []string{"focus", "show-pointer", "write-to-disk", "skip-confirmation", "delay-ms", "filter", "scope"}
 var niriActionProperties = map[string]struct{}{
 	"focus":             {},
 	"show-pointer":      {},
 	"write-to-disk":     {},
 	"skip-confirmation": {},
 	"delay-ms":          {},
+	"filter":            {},
+	"scope":             {},
 }
 
 func NewNiriProvider(configDir string) *NiriProvider {
@@ -69,10 +75,10 @@ func (n *NiriProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	sheet := &keybinds.CheatSheet{
 		Title:            "Niri Keybinds",
 		Provider:         n.Name(),
-		ModKey:           result.ModKey,
 		Binds:            categorizedBinds,
 		DMSBindsIncluded: result.DMSBindsIncluded,
 	}
+	sheet.SetMod(niriModKey(result, niriNested()))
 
 	if result.DMSStatus != nil {
 		sheet.DMSStatus = keybinds.DMSBindsStatusFrom(*result.DMSStatus)
@@ -214,6 +220,63 @@ func (n *NiriProvider) formatKey(kb *NiriKeyBinding) string {
 	parts = append(parts, kb.Mods...)
 	parts = append(parts, kb.Key)
 	return strings.Join(parts, "+")
+}
+
+func (n *NiriProvider) ModKey() keybinds.ModKey {
+	result, err := ParseNiriKeys(n.configDir)
+	if err != nil {
+		return keybinds.DefaultModKey()
+	}
+	return niriModKey(result, niriNested())
+}
+
+// Mirrors niri's Backend::mod_key: nested (winit) sessions use mod-key-nested,
+// falling back to Alt, or to Super when mod-key itself is Alt.
+func niriModKey(result *NiriParseResult, nested bool) keybinds.ModKey {
+	if !nested {
+		return keybinds.ConfiguredModKey("Mod", result.ModKey)
+	}
+	if result.ModKeyNested != "" {
+		return keybinds.ConfiguredModKey("Mod", result.ModKeyNested)
+	}
+	resolved := "Alt"
+	if keybinds.CanonicalModifier(result.ModKey) == "Alt" {
+		resolved = "Super"
+	}
+	return keybinds.ModKey{Symbol: "Mod", Resolved: resolved, Source: keybinds.ModSourceRuntime}
+}
+
+var niriNested = detectNiriNested
+
+// The winit backend exposes a single output named "winit"; niri has no IPC query for its backend.
+func detectNiriNested() bool {
+	socket := os.Getenv("NIRI_SOCKET")
+	if socket == "" {
+		return false
+	}
+	conn, err := net.DialTimeout("unix", socket, time.Second)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+	_ = conn.SetDeadline(time.Now().Add(time.Second))
+	if _, err := conn.Write([]byte("\"Outputs\"\n")); err != nil {
+		return false
+	}
+	line, err := bufio.NewReader(conn).ReadBytes('\n')
+	if err != nil {
+		return false
+	}
+	var reply struct {
+		Ok struct {
+			Outputs map[string]json.RawMessage `json:"Outputs"`
+		} `json:"Ok"`
+	}
+	if err := json.Unmarshal(line, &reply); err != nil {
+		return false
+	}
+	_, nested := reply.Ok.Outputs["winit"]
+	return nested
 }
 
 func (n *NiriProvider) GetOverridePath() string {
@@ -466,7 +529,7 @@ func (n *NiriProvider) buildActionNode(action string) *document.Node {
 }
 
 func (n *NiriProvider) isNiriActionPropertyToken(part niriActionPart) bool {
-	if part.quoted || !strings.Contains(part.value, "=") {
+	if !strings.Contains(part.value, "=") {
 		return false
 	}
 	key, _, ok := strings.Cut(part.value, "=")

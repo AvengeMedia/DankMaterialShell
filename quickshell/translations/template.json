@@ -203,6 +203,13 @@
     "comment": "duration, plural, %1 is a number"
   },
   {
+    "term": "%1 is %2 and may use a lot of memory.",
+    "translation": "",
+    "context": "%1 is %2 and may use a lot of memory.",
+    "reference": "",
+    "comment": "notepad large file prompt, file name then size"
+  },
+  {
     "term": "%1 is now included in config",
     "translation": "",
     "context": "%1 is now included in config",
@@ -462,6 +469,13 @@
     "comment": "hotspot WiFi band option"
   },
   {
+    "term": "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder",
+    "translation": "",
+    "context": "2025 has darker surfaces in dark mode. Tonal Spot and Neutral get softer, Vibrant and Expressive get bolder",
+    "reference": "",
+    "comment": "material color spec year description"
+  },
+  {
     "term": "3rd party",
     "translation": "",
     "context": "3rd party",
@@ -481,6 +495,13 @@
     "context": "50 uses Material shapes. Lower values reduce rounding; higher values increase it.",
     "reference": "",
     "comment": "radius strength slider description"
+  },
+  {
+    "term": "A floating companion that works alongside any bar layout",
+    "translation": "",
+    "context": "A floating companion that works alongside any bar layout",
+    "reference": "",
+    "comment": "bar settings: what the dot is"
   },
   {
     "term": "A hidden field appears as soon as a key is pressed",
@@ -627,7 +648,7 @@
     "translation": "",
     "context": "Actions",
     "reference": "",
-    "comment": "noun, launcher footer hint after the tab key, also section label"
+    "comment": "Dashboard page actions supplied by a plugin or built-in page | noun, launcher footer hint after the tab key, also section label"
   },
   {
     "term": "Activate",
@@ -861,6 +882,20 @@
     "comment": ""
   },
   {
+    "term": "Added in front of every app launch command",
+    "translation": "",
+    "context": "Added in front of every app launch command",
+    "reference": "",
+    "comment": "launcher launch prefix field description"
+  },
+  {
+    "term": "Adds concave curves where the bar meets the screen edge",
+    "translation": "",
+    "context": "Adds concave curves where the bar meets the screen edge",
+    "reference": "",
+    "comment": "bar goth corners toggle description"
+  },
+  {
     "term": "Adds them to the %1 group so they can run dms-greeter sync --profile",
     "translation": "",
     "context": "Adds them to the %1 group so they can run dms-greeter sync --profile",
@@ -1015,6 +1050,13 @@
     "comment": ""
   },
   {
+    "term": "Also runs the templates in your matugen config.toml",
+    "translation": "",
+    "context": "Also runs the templates in your matugen config.toml",
+    "reference": "",
+    "comment": "run user matugen templates toggle description"
+  },
+  {
     "term": "Alt + Shift",
     "translation": "",
     "context": "Alt + Shift",
@@ -1027,6 +1069,13 @@
     "context": "Alternative (OR)",
     "reference": "",
     "comment": "U2F mode option: key works as standalone unlock method"
+  },
+  {
+    "term": "Always here",
+    "translation": "",
+    "context": "Always here",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Always on icons",
@@ -1260,6 +1309,13 @@
     "comment": "greeter auth setting description"
   },
   {
+    "term": "Applies the saved profile that matches the connected displays",
+    "translation": "",
+    "context": "Applies the saved profile that matches the connected displays",
+    "reference": "",
+    "comment": "display profile auto select toggle description"
+  },
+  {
     "term": "Apply",
     "translation": "",
     "context": "Apply",
@@ -1398,6 +1454,13 @@
     "context": "Are you sure you want to kill session \"%1\"?",
     "reference": "",
     "comment": "kill session confirmation, %1 is the session name"
+  },
+  {
+    "term": "Arguments",
+    "translation": "",
+    "context": "Arguments",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Arrangement",
@@ -2030,13 +2093,6 @@
     "comment": ""
   },
   {
-    "term": "Bar surface and spacing",
-    "translation": "",
-    "context": "Bar surface and spacing",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Bar visibility",
     "translation": "",
     "context": "Bar visibility",
@@ -2126,13 +2182,6 @@
     "context": "Behavior",
     "reference": "",
     "comment": "island settings: behavior card title"
-  },
-  {
-    "term": "Better Lyrics",
-    "translation": "",
-    "context": "Better Lyrics",
-    "reference": "",
-    "comment": "Lyrics provider name"
   },
   {
     "term": "Bind the %1 IPC action in your compositor config.",
@@ -2331,13 +2380,6 @@
     "comment": ""
   },
   {
-    "term": "Border, connected mode, arcs",
-    "translation": "",
-    "context": "Border, connected mode, arcs",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Both",
     "translation": "",
     "context": "Both",
@@ -2476,6 +2518,20 @@
     "context": "Browser, terminal, file manager, media",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Built-in",
+    "translation": "",
+    "context": "Built-in",
+    "reference": "",
+    "comment": "badge on launcher plugins that ship with DMS | sound theme option, the sounds bundled with the shell"
+  },
+  {
+    "term": "Built-in apps",
+    "translation": "",
+    "context": "Built-in apps",
+    "reference": "",
+    "comment": "launcher settings card, DMS tools listed with the installed apps"
   },
   {
     "term": "Built-in plugins",
@@ -2713,7 +2769,7 @@
     "translation": "",
     "context": "Cards",
     "reference": "",
-    "comment": "noun, weather forecast display option"
+    "comment": "noun, weather forecast display option | workspace indicator style"
   },
   {
     "term": "Carousel",
@@ -2926,11 +2982,11 @@
     "comment": "greeter status loading"
   },
   {
-    "term": "Choose Dark Mode Color",
+    "term": "Chip",
     "translation": "",
-    "context": "Choose Dark Mode Color",
+    "context": "Chip",
     "reference": "",
-    "comment": "dark mode wallpaper color picker title"
+    "comment": "surface role"
   },
   {
     "term": "Choose Launcher Logo Color",
@@ -2938,13 +2994,6 @@
     "context": "Choose Launcher Logo Color",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Choose Light Mode Color",
-    "translation": "",
-    "context": "Choose Light Mode Color",
-    "reference": "",
-    "comment": "light mode wallpaper color picker title"
   },
   {
     "term": "Choose Wallpaper Color",
@@ -3164,6 +3213,13 @@
     "comment": ""
   },
   {
+    "term": "Click to run",
+    "translation": "",
+    "context": "Click to run",
+    "reference": "",
+    "comment": "cheatsheet action tooltip suffix"
+  },
+  {
     "term": "Click to select a custom theme JSON file",
     "translation": "",
     "context": "Click to select a custom theme JSON file",
@@ -3176,6 +3232,20 @@
     "context": "Clickfinger",
     "reference": "",
     "comment": "Touchpad click method: click type is determined by finger count"
+  },
+  {
+    "term": "Clicking a window in a special workspace opens that workspace",
+    "translation": "",
+    "context": "Clicking a window in a special workspace opens that workspace",
+    "reference": "",
+    "comment": "dock restore special workspace toggle description"
+  },
+  {
+    "term": "Clicks on empty bar space reach the windows below",
+    "translation": "",
+    "context": "Clicks on empty bar space reach the windows below",
+    "reference": "",
+    "comment": "bar click through toggle description"
   },
   {
     "term": "Clip",
@@ -3360,13 +3430,6 @@
     "comment": ""
   },
   {
-    "term": "Color mode",
-    "translation": "",
-    "context": "Color mode",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Color override",
     "translation": "",
     "context": "Color override",
@@ -3413,7 +3476,7 @@
     "translation": "",
     "context": "Colors",
     "reference": "",
-    "comment": "plural noun, theme settings card title"
+    "comment": ""
   },
   {
     "term": "Colors from wallpaper",
@@ -3738,13 +3801,6 @@
     "comment": ""
   },
   {
-    "term": "Connected displays",
-    "translation": "",
-    "context": "Connected displays",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Connected to %1",
     "translation": "",
     "context": "Connected to %1",
@@ -3819,14 +3875,7 @@
     "translation": "",
     "context": "Control Center",
     "reference": "",
-    "comment": "greeter feature card title | island compact face: control center label | island settings: battery or control center slot row | island settings: status group content row"
-  },
-  {
-    "term": "Control Center tile color",
-    "translation": "",
-    "context": "Control Center tile color",
-    "reference": "",
-    "comment": ""
+    "comment": "Control Center | greeter feature card title | island compact face: control center label | island settings: battery or control center slot row | island settings: status group content row"
   },
   {
     "term": "Control currently playing media",
@@ -3924,7 +3973,7 @@
     "translation": "",
     "context": "Corner radius",
     "reference": "",
-    "comment": "island settings: island corner radius slider"
+    "comment": ""
   },
   {
     "term": "Corner style",
@@ -4051,6 +4100,13 @@
     "context": "Critical notification",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Critical notifications still pop up",
+    "translation": "",
+    "context": "Critical notifications still pop up",
+    "reference": "",
+    "comment": "do not disturb allow critical toggle description"
   },
   {
     "term": "Critical threshold",
@@ -4239,7 +4295,7 @@
     "translation": "",
     "context": "Custom",
     "reference": "",
-    "comment": "custom PAM authentication source option | date format option | dropdown option that opens a custom value input | shadow color option | surface border color | theme category option | widget background color option | workspace color option"
+    "comment": "bar length option, the bar spans a percentage of the edge | custom PAM authentication source option | date format option | dropdown option that opens a custom value input | shadow color option | surface border color | surface color option | theme category option | widget background color option | workspace color option"
   },
   {
     "term": "Custom / None",
@@ -4254,6 +4310,13 @@
     "context": "Custom blend",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Custom builds the palette from a color you pick",
+    "translation": "",
+    "context": "Custom builds the palette from a color you pick",
+    "reference": "",
+    "comment": "matugen derived color dropdown description"
   },
   {
     "term": "Custom color",
@@ -4289,6 +4352,13 @@
     "context": "Custom interval in minutes (minimum 5)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Custom label",
+    "translation": "",
+    "context": "Custom label",
+    "reference": "",
+    "comment": "keyboard layout override, the replacement label"
   },
   {
     "term": "Custom location",
@@ -4424,6 +4494,13 @@
     "comment": ""
   },
   {
+    "term": "DMS stops drawing wallpapers on every display",
+    "translation": "",
+    "context": "DMS stops drawing wallpapers on every display",
+    "reference": "",
+    "comment": "use external wallpaper manager toggle description"
+  },
+  {
     "term": "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.",
     "translation": "",
     "context": "DMS uses the font family, weight and scale. Exact face, slant, width and separately scaled bars may differ.",
@@ -4448,13 +4525,6 @@
     "term": "Daily",
     "translation": "",
     "context": "adverb, wallpaper changes every day at a set time",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Dank Island instance",
-    "translation": "",
-    "context": "Dank Island instance",
     "reference": "",
     "comment": ""
   },
@@ -4638,7 +4708,7 @@
     "translation": "",
     "context": "Default",
     "reference": "",
-    "comment": "Default | island settings: default surface tone | notification rule action option | notification rule urgency option | widget style option | workspace color option"
+    "comment": "Default | island settings: default surface tone | notification rule action option | notification rule urgency option | surface color option | widget background color option | widget style option | workspace color option"
   },
   {
     "term": "Default (Black)",
@@ -4816,6 +4886,13 @@
     "comment": "noun, panel motion effect option"
   },
   {
+    "term": "Derived color",
+    "translation": "",
+    "context": "Derived color",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Derives colors that closely match the underlying image.",
     "translation": "",
     "context": "Derives colors that closely match the underlying image.",
@@ -4835,13 +4912,6 @@
     "context": "Description",
     "reference": "",
     "comment": "noun, text field label"
-  },
-  {
-    "term": "Desktop",
-    "translation": "",
-    "context": "Desktop",
-    "reference": "",
-    "comment": "wallpaper thumbnail label, the desktop wallpaper"
   },
   {
     "term": "Desktop Clock",
@@ -5285,6 +5355,13 @@
     "comment": ""
   },
   {
+    "term": "Displayed label",
+    "translation": "",
+    "context": "Displayed label",
+    "reference": "",
+    "comment": "keyboard layout override, the label currently shown"
+  },
+  {
     "term": "Displays",
     "translation": "",
     "context": "Displays",
@@ -5369,6 +5446,13 @@
     "comment": ""
   },
   {
+    "term": "Docked",
+    "translation": "",
+    "context": "Docked",
+    "reference": "",
+    "comment": "island settings: island reserves its edge strip"
+  },
+  {
     "term": "Docks",
     "translation": "",
     "context": "Docks",
@@ -5425,6 +5509,20 @@
     "comment": ""
   },
   {
+    "term": "Dot",
+    "translation": "",
+    "context": "Dot",
+    "reference": "",
+    "comment": "bar layout: free-floating dot that opens island activities"
+  },
+  {
+    "term": "Down",
+    "translation": "",
+    "context": "Down",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Drag a widget by its handle here to reorder it or drop it into another group",
     "translation": "",
     "context": "Drag a widget by its handle here to reorder it or drop it into another group",
@@ -5453,11 +5551,25 @@
     "comment": ""
   },
   {
+    "term": "Drag to move, click to open activities",
+    "translation": "",
+    "context": "Drag to move, click to open activities",
+    "reference": "",
+    "comment": "island settings: free placement hint"
+  },
+  {
     "term": "Drag to reorder",
     "translation": "",
     "context": "Drag to reorder",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Dragged displays line up with neighboring edges without overlapping",
+    "translation": "",
+    "context": "Dragged displays line up with neighboring edges without overlapping",
+    "reference": "",
+    "comment": "display arrangement snap toggle description"
   },
   {
     "term": "Driver",
@@ -5486,6 +5598,13 @@
     "context": "Drop your override for %1 so the DMS default action re-applies?",
     "reference": "",
     "comment": "reset shortcut confirmation, %1 is the key combination"
+  },
+  {
+    "term": "Drops bar gaps and rounding while a window is maximized",
+    "translation": "",
+    "context": "Drops bar gaps and rounding while a window is maximized",
+    "reference": "",
+    "comment": "bar maximize detection toggle description"
   },
   {
     "term": "Duplicate",
@@ -5521,6 +5640,13 @@
     "context": "Dusk (Nautical Twilight)",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Dwindle",
+    "translation": "",
+    "context": "Dwindle",
+    "reference": "",
+    "comment": "Hyprland tiling layout name"
   },
   {
     "term": "Dynamic",
@@ -5591,6 +5717,13 @@
     "context": "Edge hover reveal",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Edge margin",
+    "translation": "",
+    "context": "Edge margin",
+    "reference": "",
+    "comment": "island settings: gap kept from the display edge"
   },
   {
     "term": "Edge spacing",
@@ -5703,6 +5836,13 @@
     "context": "Empty Trash (%1)",
     "reference": "",
     "comment": "verb, dock trash menu action, %1 is the item count"
+  },
+  {
+    "term": "Empty placeholders fill the switcher up to the count",
+    "translation": "",
+    "context": "Empty placeholders fill the switcher up to the count",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Enable Wi-Fi before starting the hotspot.",
@@ -5950,6 +6090,13 @@
     "comment": "network status"
   },
   {
+    "term": "Evenly space tabs",
+    "translation": "",
+    "context": "Evenly space tabs",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Event title",
     "translation": "",
     "context": "Event title",
@@ -6090,6 +6237,13 @@
     "comment": "greeter feature card description"
   },
   {
+    "term": "External palette commands, namespaces",
+    "translation": "",
+    "context": "External palette commands, namespaces",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Extra Arguments",
     "translation": "",
     "context": "Extra Arguments",
@@ -6130,6 +6284,13 @@
     "context": "Fade to lock screen",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Fades the screen out first. Input during the fade cancels it",
+    "translation": "",
+    "context": "Fades the screen out first. Input during the fade cancels it",
+    "reference": "",
+    "comment": "idle fade toggle description"
   },
   {
     "term": "Failed to activate configuration",
@@ -6797,6 +6958,13 @@
     "comment": ""
   },
   {
+    "term": "File the command writes; leave empty to read stdout",
+    "translation": "",
+    "context": "File the command writes; leave empty to read stdout",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Files",
     "translation": "",
     "context": "Files",
@@ -6927,7 +7095,21 @@
     "translation": "",
     "context": "Fit",
     "reference": "",
-    "comment": "wallpaper fill mode"
+    "comment": "bar length option, the bar spans only its widgets | wallpaper fill mode"
+  },
+  {
+    "term": "Fits the song title instead of keeping a fixed width",
+    "translation": "",
+    "context": "Fits the song title instead of keeping a fixed width",
+    "reference": "",
+    "comment": "media widget adaptive width toggle description"
+  },
+  {
+    "term": "Fixed",
+    "translation": "",
+    "context": "Fixed",
+    "reference": "",
+    "comment": "corner style: one radius for every corner"
   },
   {
     "term": "Flags",
@@ -6976,7 +7158,7 @@
     "translation": "",
     "context": "Float",
     "reference": "",
-    "comment": "island settings: float toggle"
+    "comment": ""
   },
   {
     "term": "Float X",
@@ -7004,7 +7186,7 @@
     "translation": "",
     "context": "Floating",
     "reference": "",
-    "comment": "adjective, window rule match condition for floating windows"
+    "comment": "adjective, window rule match condition for floating windows | bar summary: island can be dragged anywhere on the display | island settings: island can be dragged anywhere on the display"
   },
   {
     "term": "Floating Position",
@@ -7168,6 +7350,13 @@
     "comment": ""
   },
   {
+    "term": "Follow mouse",
+    "translation": "",
+    "context": "Follow mouse",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Follow playback",
     "translation": "",
     "context": "Follow playback",
@@ -7248,6 +7437,13 @@
     "term": "Force padding",
     "translation": "",
     "context": "Force padding",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Force split",
+    "translation": "",
+    "context": "Force split",
     "reference": "",
     "comment": ""
   },
@@ -7347,7 +7543,7 @@
     "translation": "",
     "context": "Frame",
     "reference": "",
-    "comment": "noun, screen frame feature, settings page and layout option"
+    "comment": ""
   },
   {
     "term": "Frame Blur follows Background Blur in Theme & Colors",
@@ -7357,18 +7553,18 @@
     "comment": ""
   },
   {
-    "term": "Frame Border Color",
-    "translation": "",
-    "context": "Frame Border Color",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Frame xray",
     "translation": "",
     "context": "Frame xray",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Frees the launcher when closed and rebuilds it on open",
+    "translation": "",
+    "context": "Frees the launcher when closed and rebuilds it on open",
+    "reference": "",
+    "comment": "launcher unload on close toggle description"
   },
   {
     "term": "Freezing Drizzle",
@@ -7392,6 +7588,13 @@
     "comment": "Weather wind origin, followed by a cardinal direction"
   },
   {
+    "term": "From wallpaper",
+    "translation": "",
+    "context": "From wallpaper",
+    "reference": "",
+    "comment": "matugen seed color option"
+  },
+  {
     "term": "Fruit Salad",
     "translation": "",
     "context": "Fruit Salad",
@@ -7403,7 +7606,7 @@
     "translation": "",
     "context": "Full",
     "reference": "",
-    "comment": "adjective, full size launcher style option"
+    "comment": "adjective, full size launcher style option | bar length option, the bar spans the whole edge"
   },
   {
     "term": "Full content",
@@ -7441,6 +7644,13 @@
     "comment": ""
   },
   {
+    "term": "Fullscreen single column",
+    "translation": "",
+    "context": "Fullscreen single column",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Fully Charged",
     "translation": "",
     "context": "Fully Charged",
@@ -7452,7 +7662,7 @@
     "translation": "",
     "context": "GPU",
     "reference": "",
-    "comment": "graphics processor label in system monitor"
+    "comment": ""
   },
   {
     "term": "GPU Monitoring",
@@ -7532,6 +7742,20 @@
     "comment": "island settings: satellite to island gap slider"
   },
   {
+    "term": "Gap between the bar and its popouts follows edge spacing",
+    "translation": "",
+    "context": "Gap between the bar and its popouts follows edge spacing",
+    "reference": "",
+    "comment": "bar auto popup gaps toggle description"
+  },
+  {
+    "term": "Gap between the bar ends and the outermost widgets",
+    "translation": "",
+    "context": "Gap between the bar ends and the outermost widgets",
+    "reference": "",
+    "comment": "bar inset padding slider description"
+  },
+  {
     "term": "Gap size",
     "translation": "",
     "context": "Gap size",
@@ -7558,6 +7782,13 @@
     "context": "General",
     "reference": "",
     "comment": "adjective, settings page and section title for general options"
+  },
+  {
+    "term": "Generate Theme at Startup",
+    "translation": "",
+    "context": "Generate Theme at Startup",
+    "reference": "",
+    "comment": "toggle label"
   },
   {
     "term": "Generate baseline GTK3/4, QT5/QT6, or qtengine configurations to follow DMS colors (only qt6ct requires qt6ct-kde). Only needed once.<br /><br />It is recommended to configure %1 prior to applying GTK themes.",
@@ -7770,6 +8001,13 @@
     "comment": "noun, card title for desktop widget groups"
   },
   {
+    "term": "Grows or shrinks the space windows keep clear",
+    "translation": "",
+    "context": "Grows or shrinks the space windows keep clear",
+    "reference": "",
+    "comment": "bar and dock exclusive zone offset slider description"
+  },
+  {
     "term": "H",
     "translation": "",
     "context": "H",
@@ -7896,6 +8134,13 @@
     "comment": ""
   },
   {
+    "term": "Hidden icons expand in place instead of in a popup",
+    "translation": "",
+    "context": "Hidden icons expand in place instead of in a popup",
+    "reference": "",
+    "comment": "system tray inline expansion toggle description"
+  },
+  {
     "term": "Hidden until weather is enabled",
     "translation": "",
     "context": "Hidden until weather is enabled",
@@ -7971,6 +8216,20 @@
     "context": "Hide when windows open",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Hides even while a bar popout or menu is open",
+    "translation": "",
+    "context": "Hides even while a bar popout or menu is open",
+    "reference": "",
+    "comment": "bar strict auto-hide toggle description"
+  },
+  {
+    "term": "Hides only while a window overlaps the dock",
+    "translation": "",
+    "context": "Hides only while a window overlaps the dock",
+    "reference": "",
+    "comment": "dock smart auto-hide toggle description"
   },
   {
     "term": "High",
@@ -8092,18 +8351,11 @@
     "comment": "island settings: home face card title"
   },
   {
-    "term": "Home layout, notifications, satellites",
-    "translation": "",
-    "context": "Home layout, notifications, satellites",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Horizontal",
     "translation": "",
     "context": "Horizontal",
     "reference": "",
-    "comment": "lock screen clock style option"
+    "comment": "island settings: free island orientation | lock screen clock style option"
   },
   {
     "term": "Horizontal offset",
@@ -8393,11 +8645,32 @@
     "comment": ""
   },
   {
+    "term": "Idle delay",
+    "translation": "",
+    "context": "Idle delay",
+    "reference": "",
+    "comment": "island settings: time before the dot fades, 0 disables idling"
+  },
+  {
     "term": "Idle inhibitor",
     "translation": "",
     "context": "Idle inhibitor",
     "reference": "",
     "comment": "feature that keeps the session from going idle"
+  },
+  {
+    "term": "Idle opacity",
+    "translation": "",
+    "context": "Idle opacity",
+    "reference": "",
+    "comment": "island settings: dot opacity while idle"
+  },
+  {
+    "term": "Idle size",
+    "translation": "",
+    "context": "Idle size",
+    "reference": "",
+    "comment": "island settings: how far the dot shrinks while idle"
   },
   {
     "term": "Idle timeouts, power menu, custom actions",
@@ -8610,13 +8883,6 @@
     "comment": ""
   },
   {
-    "term": "Individual bar configuration",
-    "translation": "",
-    "context": "Individual bar configuration",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Info",
     "translation": "",
     "context": "Info",
@@ -8657,6 +8923,13 @@
     "context": "Initialised",
     "reference": "",
     "comment": "adjective, hyprland window rule match condition"
+  },
+  {
+    "term": "Injected palettes",
+    "translation": "",
+    "context": "Injected palettes",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Inline",
@@ -8922,12 +9195,19 @@
     "translation": "",
     "context": "Island",
     "reference": "",
-    "comment": "noun, dank island feature, settings page and layout option"
+    "comment": ""
   },
   {
     "term": "Isolate displays",
     "translation": "",
     "context": "Isolate displays",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "JSON output path",
+    "translation": "",
+    "context": "JSON output path",
     "reference": "",
     "comment": ""
   },
@@ -8993,6 +9273,20 @@
     "context": "Keeping Awake",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Keeps the dock showing over fullscreen windows",
+    "translation": "",
+    "context": "Keeps the dock showing over fullscreen windows",
+    "reference": "",
+    "comment": "dock over fullscreen toggle description"
+  },
+  {
+    "term": "Keeps the widget above windows instead of below them",
+    "translation": "",
+    "context": "Keeps the widget above windows instead of below them",
+    "reference": "",
+    "comment": "desktop widget show on overlay toggle description"
   },
   {
     "term": "Kernel",
@@ -9093,13 +9387,6 @@
     "comment": ""
   },
   {
-    "term": "LRCLIB",
-    "translation": "",
-    "context": "LRCLIB",
-    "reference": "",
-    "comment": "Lyrics provider name"
-  },
-  {
     "term": "LabWC IRC channel",
     "translation": "",
     "context": "LabWC IRC channel",
@@ -9112,6 +9399,13 @@
     "context": "LabWC website",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Label overrides",
+    "translation": "",
+    "context": "Label overrides",
+    "reference": "",
+    "comment": "card title, keyboard layout label override list"
   },
   {
     "term": "Language",
@@ -9219,6 +9513,13 @@
     "comment": "plugin directory modification time"
   },
   {
+    "term": "Last used on this screen",
+    "translation": "",
+    "context": "Last used on this screen",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Latitude",
     "translation": "",
     "context": "Latitude",
@@ -9324,6 +9625,13 @@
     "comment": ""
   },
   {
+    "term": "Layout, position, appearance",
+    "translation": "",
+    "context": "Layout, position, appearance",
+    "reference": "",
+    "comment": "settings hub hint for the bar pages"
+  },
+  {
     "term": "Layouts",
     "translation": "",
     "context": "Layouts",
@@ -9350,6 +9658,13 @@
     "context": "Least Saturated",
     "reference": "",
     "comment": "matugen source color option"
+  },
+  {
+    "term": "Leaves the overview when DMS launches an app or focuses a window",
+    "translation": "",
+    "context": "Leaves the overview when DMS launches an app or focuses a window",
+    "reference": "",
+    "comment": "niri overview close on window focus toggle description"
   },
   {
     "term": "Left",
@@ -9422,6 +9737,13 @@
     "comment": ""
   },
   {
+    "term": "Light and dark mode follow and set the system color scheme",
+    "translation": "",
+    "context": "Light and dark mode follow and set the system color scheme",
+    "reference": "",
+    "comment": "sync with portal toggle description"
+  },
+  {
     "term": "Light direction",
     "translation": "",
     "context": "Light direction",
@@ -9485,6 +9807,13 @@
     "comment": "singular, notepad status bar line count, %1 is 1"
   },
   {
+    "term": "Lines",
+    "translation": "",
+    "context": "Lines",
+    "reference": "",
+    "comment": "workspace indicator style"
+  },
+  {
     "term": "Lines: %1",
     "translation": "",
     "context": "Lines: %1",
@@ -9504,6 +9833,13 @@
     "context": "Listening from",
     "reference": "",
     "comment": "Label before the active media player"
+  },
+  {
+    "term": "Lists workspaces from whichever display has focus",
+    "translation": "",
+    "context": "Lists workspaces from whichever display has focus",
+    "reference": "",
+    "comment": "workspace switcher follow display focus toggle description"
   },
   {
     "term": "Lively palette with saturated accents.",
@@ -9751,13 +10087,6 @@
     "comment": "Lyrics source priority settings"
   },
   {
-    "term": "LyricsPlus",
-    "translation": "",
-    "context": "LyricsPlus",
-    "reference": "",
-    "comment": "Lyrics provider name"
-  },
-  {
     "term": "MIT License",
     "translation": "",
     "context": "MIT License",
@@ -9784,13 +10113,6 @@
     "context": "Manage Registries",
     "reference": "",
     "comment": "plugin registry management"
-  },
-  {
-    "term": "Managed by Frame",
-    "translation": "",
-    "context": "Managed by Frame",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Managed by Frame in Connected Mode",
@@ -9919,6 +10241,27 @@
     "comment": ""
   },
   {
+    "term": "Master",
+    "translation": "",
+    "context": "Master",
+    "reference": "",
+    "comment": "Hyprland tiling layout name"
+  },
+  {
+    "term": "Master position",
+    "translation": "",
+    "context": "Master position",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Master size",
+    "translation": "",
+    "context": "Master size",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Match (%1)",
     "translation": "",
     "context": "Match (%1)",
@@ -9959,6 +10302,20 @@
     "context": "Material colors generated from wallpaper",
     "reference": "",
     "comment": "dynamic theme description"
+  },
+  {
+    "term": "Material palette",
+    "translation": "",
+    "context": "Material palette",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Material scale",
+    "translation": "",
+    "context": "Material scale",
+    "reference": "",
+    "comment": "corner style: Material shape scale with a strength slider"
   },
   {
     "term": "Matugen Missing",
@@ -10304,6 +10661,13 @@
     "comment": "verb, action minimizing a window"
   },
   {
+    "term": "Minimum workspaces",
+    "translation": "",
+    "context": "Minimum workspaces",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Mirror display",
     "translation": "",
     "context": "Mirror display",
@@ -10500,6 +10864,27 @@
     "comment": ""
   },
   {
+    "term": "Move out of scratchpad",
+    "translation": "",
+    "context": "Move out of scratchpad",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Move to scratchpad",
+    "translation": "",
+    "context": "Move to scratchpad",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Move to scratchpad: %1",
+    "translation": "",
+    "context": "Move to scratchpad: %1",
+    "reference": "",
+    "comment": "%1 is the named special workspace"
+  },
+  {
     "term": "Move up",
     "translation": "",
     "context": "Move up",
@@ -10647,6 +11032,13 @@
     "comment": ""
   },
   {
+    "term": "Named workspaces and scratchpads",
+    "translation": "",
+    "context": "Named workspaces and scratchpads",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Names",
     "translation": "",
     "context": "Names",
@@ -10680,6 +11072,13 @@
     "context": "Near island",
     "reference": "",
     "comment": "island settings: satellites hug the island"
+  },
+  {
+    "term": "Nested chip",
+    "translation": "",
+    "context": "Nested chip",
+    "reference": "",
+    "comment": "surface role"
   },
   {
     "term": "Network",
@@ -10815,6 +11214,13 @@
     "comment": ""
   },
   {
+    "term": "New notifications show as regular popups",
+    "translation": "",
+    "context": "New notifications show as regular popups",
+    "reference": "",
+    "comment": "island standard popups toggle description"
+  },
+  {
     "term": "New profile",
     "translation": "",
     "context": "New profile",
@@ -10832,6 +11238,20 @@
     "term": "New tab",
     "translation": "",
     "context": "New tab",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "New windows",
+    "translation": "",
+    "context": "New windows",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "New windows on top of the stack",
+    "translation": "",
+    "context": "New windows on top of the stack",
     "reference": "",
     "comment": ""
   },
@@ -11270,6 +11690,13 @@
     "comment": ""
   },
   {
+    "term": "No label overrides",
+    "translation": "",
+    "context": "No label overrides",
+    "reference": "",
+    "comment": "empty state, keyboard layout label override list"
+  },
+  {
     "term": "No launcher plugins installed.",
     "translation": "",
     "context": "No launcher plugins installed.",
@@ -11303,6 +11730,13 @@
     "context": "No matching processes",
     "reference": "",
     "comment": "empty state in process list"
+  },
+  {
+    "term": "No media found.",
+    "translation": "",
+    "context": "No media found.",
+    "reference": "",
+    "comment": "Media player empty state when no player is running"
   },
   {
     "term": "No monitors",
@@ -11343,6 +11777,13 @@
     "term": "No packages ignored. Add one here or hover an update in the popout and click the hide button.",
     "translation": "",
     "context": "No packages ignored. Add one here or hover an update in the popout and click the hide button.",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "No palettes configured. Use + to add one.",
+    "translation": "",
+    "context": "No palettes configured. Use + to add one.",
     "reference": "",
     "comment": ""
   },
@@ -11492,6 +11933,13 @@
     "context": "No supported package manager found.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "No tabs enabled",
+    "translation": "",
+    "context": "No tabs enabled",
+    "reference": "",
+    "comment": "Dashboard empty state when all navigation tabs are hidden"
   },
   {
     "term": "No themes found",
@@ -11662,6 +12110,13 @@
     "comment": "notification rule urgency option"
   },
   {
+    "term": "Normal routing",
+    "translation": "",
+    "context": "Normal routing",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Not available",
     "translation": "",
     "context": "Not available",
@@ -11760,13 +12215,6 @@
     "comment": "media scroll wheel option"
   },
   {
-    "term": "Nothing to see here",
-    "translation": "",
-    "context": "Nothing to see here",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Notification",
     "translation": "",
     "context": "Notification",
@@ -11779,6 +12227,13 @@
     "context": "Notification Center",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Notification badge",
+    "translation": "",
+    "context": "Notification badge",
+    "reference": "",
+    "comment": "clock widget option: unread notification count next to the time"
   },
   {
     "term": "Notification popups",
@@ -11863,6 +12318,13 @@
     "context": "Off",
     "reference": "",
     "comment": "bluetooth status"
+  },
+  {
+    "term": "Off keeps the bar hidden until turned back on or shown over IPC",
+    "translation": "",
+    "context": "Off keeps the bar hidden until turned back on or shown over IPC",
+    "reference": "",
+    "comment": "bar manual visibility toggle description"
   },
   {
     "term": "Office",
@@ -11960,7 +12422,7 @@
     "translation": "",
     "context": "Opacity",
     "reference": "",
-    "comment": "island settings: island surface opacity slider | island settings: satellite background opacity slider"
+    "comment": "island settings: satellite background opacity slider"
   },
   {
     "term": "Opacity, borders, blur, shadows, corners",
@@ -12003,13 +12465,6 @@
     "context": "Open From",
     "reference": "",
     "comment": ""
-  },
-  {
-    "term": "Open Island",
-    "translation": "",
-    "context": "Open Island",
-    "reference": "",
-    "comment": "settings: button that opens the Dank Island tab"
   },
   {
     "term": "Open Notepad File",
@@ -12073,6 +12528,13 @@
     "context": "Open in terminal",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Open large file?",
+    "translation": "",
+    "context": "Open large file?",
+    "reference": "",
+    "comment": "notepad prompt before loading a file over the size limit"
   },
   {
     "term": "Open network",
@@ -12149,7 +12611,7 @@
     "translation": "",
     "context": "Options",
     "reference": "",
-    "comment": "noun, menu entry or button that opens item options"
+    "comment": ""
   },
   {
     "term": "Options of one widget instance",
@@ -12164,6 +12626,13 @@
     "context": "Order",
     "reference": "",
     "comment": "noun, clock widget option for time and date order"
+  },
+  {
+    "term": "Orientation",
+    "translation": "",
+    "context": "Orientation",
+    "reference": "",
+    "comment": "island settings: horizontal or vertical row for a free island"
   },
   {
     "term": "Original: %1",
@@ -12289,7 +12758,7 @@
     "translation": "",
     "context": "Overlay",
     "reference": "",
-    "comment": "widget background color option"
+    "comment": "island settings: island floats over windows along its edge without reserving space | widget background color option"
   },
   {
     "term": "Overridden by config",
@@ -12451,6 +12920,20 @@
     "context": "Palette",
     "reference": "",
     "comment": "island settings: surface tone choice"
+  },
+  {
+    "term": "Palette %1",
+    "translation": "",
+    "context": "Palette %1",
+    "reference": "",
+    "comment": "palette heading, %1 is the palette number"
+  },
+  {
+    "term": "Palette name",
+    "translation": "",
+    "context": "Palette name",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Panel height (rows)",
@@ -12688,7 +13171,7 @@
     "translation": "",
     "context": "Pills",
     "reference": "",
-    "comment": "bar widget style option"
+    "comment": "bar widget style option | workspace indicator style"
   },
   {
     "term": "Pin",
@@ -12731,6 +13214,13 @@
     "context": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Placement",
+    "translation": "",
+    "context": "Placement",
+    "reference": "",
+    "comment": "island settings: docked, overlay or floating placement row"
   },
   {
     "term": "Play",
@@ -12915,6 +13405,13 @@
     "comment": "noun, mouse cursor, keybind screenshot option to include it"
   },
   {
+    "term": "Pointer at the launcher edge opens it, unless a bar or dock is there",
+    "translation": "",
+    "context": "Pointer at the launcher edge opens it, unless a bar or dock is there",
+    "reference": "",
+    "comment": "frame launcher edge hover toggle description"
+  },
+  {
     "term": "Pointer speed",
     "translation": "",
     "context": "Pointer speed",
@@ -12943,6 +13440,13 @@
     "comment": "plural noun, shell popout panels, animation and shadow setting label"
   },
   {
+    "term": "Popouts and modals use the main animation duration",
+    "translation": "",
+    "context": "Popouts and modals use the main animation duration",
+    "reference": "",
+    "comment": "sync popout and modal animation toggle description"
+  },
+  {
     "term": "Popular Plugins",
     "translation": "",
     "context": "Popular Plugins",
@@ -12969,6 +13473,13 @@
     "context": "Popups",
     "reference": "",
     "comment": "notification settings card title, popup notifications"
+  },
+  {
+    "term": "Popups hide the message until expanded",
+    "translation": "",
+    "context": "Popups hide the message until expanded",
+    "reference": "",
+    "comment": "notification privacy mode toggle description"
   },
   {
     "term": "Popups, do not disturb, rules",
@@ -13018,13 +13529,6 @@
     "context": "Position",
     "reference": "",
     "comment": "island settings: position card title"
-  },
-  {
-    "term": "Position, appearance, island",
-    "translation": "",
-    "context": "Position, appearance, island",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "Position, displays, auto-hide, behavior",
@@ -13167,6 +13671,13 @@
     "comment": "noun, which network connection type is preferred"
   },
   {
+    "term": "Preserve split",
+    "translation": "",
+    "context": "Preserve split",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Preset widths (%)",
     "translation": "",
     "context": "Preset widths (%)",
@@ -13283,7 +13794,7 @@
     "translation": "",
     "context": "Primary Container",
     "reference": "",
-    "comment": "button color option | tile color option | widget background color option | workspace color option"
+    "comment": "button color option | surface color option | tile color option | widget background color option | workspace color option"
   },
   {
     "term": "Print Server Management",
@@ -13402,7 +13913,7 @@
     "translation": "",
     "context": "Processes",
     "reference": "",
-    "comment": "process count label in footer"
+    "comment": ""
   },
   {
     "term": "Processing",
@@ -13741,6 +14252,13 @@
     "comment": "status row while the user list reloads"
   },
   {
+    "term": "Regenerate matugen colors when DMS starts, even if nothing changed.",
+    "translation": "",
+    "context": "Regenerate matugen colors when DMS starts, even if nothing changed.",
+    "reference": "",
+    "comment": "toggle description"
+  },
+  {
     "term": "Regex",
     "translation": "",
     "context": "Regex",
@@ -14005,6 +14523,13 @@
     "context": "Repeat rate",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"",
+    "translation": "",
+    "context": "Replace a displayed layout label with custom text, e.g. \"am-phonetic-alt\" → \"am\"",
+    "reference": "",
+    "comment": "explains the keyboard layout label override list"
   },
   {
     "term": "Replacement",
@@ -14350,6 +14875,13 @@
     "comment": "Description of how Bluetooth headset media buttons select a player"
   },
   {
+    "term": "Routes launcher, dash, control center and notification shortcuts",
+    "translation": "",
+    "context": "Routes launcher, dash, control center and notification shortcuts",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Rows",
     "translation": "",
     "context": "Rows",
@@ -14423,6 +14955,13 @@
     "term": "Run a shell command (e.g., notify-send)",
     "translation": "",
     "context": "Run a shell command (e.g., notify-send)",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.",
+    "translation": "",
+    "context": "Run an external command on each wallpaper change and merge its JSON palette into matugen under a namespace, so templates can use e.g. {{name.color0}}. The command receives the wallpaper as {image} / $DMS_WALLPAPER and the mode as {mode} / $DMS_MODE.",
     "reference": "",
     "comment": ""
   },
@@ -14760,7 +15299,7 @@
     "translation": "",
     "context": "Scrolling",
     "reference": "",
-    "comment": "window tiling layout name in layout picker"
+    "comment": "Hyprland tiling layout name | window tiling layout name in layout picker"
   },
   {
     "term": "Search",
@@ -14768,6 +15307,13 @@
     "context": "Search",
     "reference": "",
     "comment": "launcher settings section title, noun | search field placeholder"
+  },
+  {
+    "term": "Search also matches actions apps provide, like New Window",
+    "translation": "",
+    "context": "Search also matches actions apps provide, like New Window",
+    "reference": "",
+    "comment": "launcher app actions search toggle description"
   },
   {
     "term": "Search applications...",
@@ -14782,6 +15328,13 @@
     "context": "Search devices...",
     "reference": "",
     "comment": "Tailscale device search placeholder"
+  },
+  {
+    "term": "Search keybinds...",
+    "translation": "",
+    "context": "Search keybinds...",
+    "reference": "",
+    "comment": "keybinds cheatsheet search placeholder"
   },
   {
     "term": "Search plugins...",
@@ -14851,7 +15404,7 @@
     "translation": "",
     "context": "Secondary Container",
     "reference": "",
-    "comment": "widget background color option | workspace color option"
+    "comment": "surface color option | widget background color option | workspace color option"
   },
   {
     "term": "Sections",
@@ -14931,6 +15484,13 @@
     "comment": "security key setting status"
   },
   {
+    "term": "Seed color",
+    "translation": "",
+    "context": "Seed color",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Segments",
     "translation": "",
     "context": "Segments",
@@ -14964,6 +15524,13 @@
     "context": "Select Dock Launcher Logo",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Select File",
+    "translation": "",
+    "context": "Select File",
+    "reference": "",
+    "comment": "default file browser window title"
   },
   {
     "term": "Select ICC Profile",
@@ -15032,13 +15599,6 @@
     "term": "Select an image file...",
     "translation": "",
     "context": "Select an image file...",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Select background image",
-    "translation": "",
-    "context": "Select background image",
     "reference": "",
     "comment": ""
   },
@@ -15288,6 +15848,13 @@
     "comment": ""
   },
   {
+    "term": "Shared shortcuts",
+    "translation": "",
+    "context": "Shared shortcuts",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Shell",
     "translation": "",
     "context": "Shell",
@@ -15335,6 +15902,13 @@
     "context": "Shortcuts (%1)",
     "reference": "",
     "comment": "plural, keybind list heading, %1 is a count"
+  },
+  {
+    "term": "Shortens the bar at both ends",
+    "translation": "",
+    "context": "Shortens the bar at both ends",
+    "reference": "",
+    "comment": "bar length padding slider description"
   },
   {
     "term": "Show",
@@ -15433,6 +16007,13 @@
     "context": "Show device",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Show device name",
+    "translation": "",
+    "context": "Show device name",
+    "reference": "",
+    "comment": "Media player option that puts the audio output device name on its button"
   },
   {
     "term": "Show discharge rate",
@@ -15575,13 +16156,6 @@
     "comment": ""
   },
   {
-    "term": "Show on displays",
-    "translation": "",
-    "context": "Show on displays",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Show on last display",
     "translation": "",
     "context": "Show on last display",
@@ -15683,6 +16257,13 @@
     "term": "Show restart DMS",
     "translation": "",
     "context": "Show restart DMS",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show scratchpads",
+    "translation": "",
+    "context": "Show scratchpads",
     "reference": "",
     "comment": ""
   },
@@ -15806,6 +16387,13 @@
     "comment": ""
   },
   {
+    "term": "Shows only windows from the dock's own display",
+    "translation": "",
+    "context": "Shows only windows from the dock's own display",
+    "reference": "",
+    "comment": "dock isolate displays toggle description"
+  },
+  {
     "term": "Shows when caps lock is active",
     "translation": "",
     "context": "Shows when caps lock is active",
@@ -15918,6 +16506,13 @@
     "comment": ""
   },
   {
+    "term": "Slanted",
+    "translation": "",
+    "context": "Slanted",
+    "reference": "",
+    "comment": "Album artwork shape"
+  },
+  {
     "term": "Slideout",
     "translation": "",
     "context": "Slideout",
@@ -15946,6 +16541,13 @@
     "comment": ""
   },
   {
+    "term": "Smart split",
+    "translation": "",
+    "context": "Smart split",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Smartcard Authentication",
     "translation": "",
     "context": "Smartcard Authentication",
@@ -15958,6 +16560,13 @@
     "context": "Smooth",
     "reference": "",
     "comment": "adjective, spring animation option with no bounce"
+  },
+  {
+    "term": "Smooth lyrics highlight",
+    "translation": "",
+    "context": "Smooth lyrics highlight",
+    "reference": "",
+    "comment": "Media player option that fills each sung word gradually instead of highlighting it at once"
   },
   {
     "term": "Snap",
@@ -15979,6 +16588,13 @@
     "context": "Soft reboot",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Soft square",
+    "translation": "",
+    "context": "Soft square",
+    "reference": "",
+    "comment": "Album artwork shape"
   },
   {
     "term": "Solid",
@@ -16023,6 +16639,13 @@
     "comment": ""
   },
   {
+    "term": "Sound theme",
+    "translation": "",
+    "context": "Sound theme",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Sounds",
     "translation": "",
     "context": "Sounds",
@@ -16051,6 +16674,13 @@
     "comment": ""
   },
   {
+    "term": "Space-separated; {image} and {mode} are substituted",
+    "translation": "",
+    "context": "Space-separated; {image} and {mode} are substituted",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Spacer",
     "translation": "",
     "context": "Spacer",
@@ -16072,6 +16702,13 @@
     "comment": ""
   },
   {
+    "term": "Special workspaces appear last; click to show or hide",
+    "translation": "",
+    "context": "Special workspaces appear last; click to show or hide",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Speed",
     "translation": "",
     "context": "Speed",
@@ -16082,6 +16719,20 @@
     "term": "Speed, scrolling, tap to click",
     "translation": "",
     "context": "Speed, scrolling, tap to click",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Split direction follows the cursor position in the window",
+    "translation": "",
+    "context": "Split direction follows the cursor position in the window",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Split direction stays fixed when the container resizes",
+    "translation": "",
+    "context": "Split direction stays fixed when the container resizes",
     "reference": "",
     "comment": ""
   },
@@ -16149,6 +16800,13 @@
     "comment": "bar corner style option"
   },
   {
+    "term": "Stack",
+    "translation": "",
+    "context": "Stack",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Stacked",
     "translation": "",
     "context": "Stacked",
@@ -16205,6 +16863,13 @@
     "comment": "hotspot activation status"
   },
   {
+    "term": "Startup Behavior",
+    "translation": "",
+    "context": "Startup Behavior",
+    "reference": "",
+    "comment": "settings card title"
+  },
+  {
     "term": "State",
     "translation": "",
     "context": "State",
@@ -16217,6 +16882,13 @@
     "context": "Status",
     "reference": "",
     "comment": "noun, settings row or section title showing current state"
+  },
+  {
+    "term": "Stays visible while the workspace has no windows",
+    "translation": "",
+    "context": "Stays visible while the workspace has no windows",
+    "reference": "",
+    "comment": "bar hide when windows open toggle description"
   },
   {
     "term": "Stop",
@@ -16349,7 +17021,7 @@
     "translation": "",
     "context": "Surface",
     "reference": "",
-    "comment": "color option | shadow color option | widget background color option | workspace color option"
+    "comment": "color option | shadow color option | surface color option | widget background color option | workspace color option"
   },
   {
     "term": "Surface Border Color",
@@ -16363,21 +17035,21 @@
     "translation": "",
     "context": "Surface Container",
     "reference": "",
-    "comment": "widget background color option | workspace color option"
+    "comment": "surface color option | widget background color option | workspace color option"
   },
   {
     "term": "Surface High",
     "translation": "",
     "context": "Surface High",
     "reference": "",
-    "comment": "widget background color option | workspace color option"
+    "comment": "surface color option | widget background color option | workspace color option"
   },
   {
     "term": "Surface Highest",
     "translation": "",
     "context": "Surface Highest",
     "reference": "",
-    "comment": "workspace color option"
+    "comment": "surface color option | workspace color option"
   },
   {
     "term": "Surface Text",
@@ -16436,6 +17108,13 @@
     "comment": ""
   },
   {
+    "term": "Swap",
+    "translation": "",
+    "context": "Swap",
+    "reference": "",
+    "comment": "swap memory label in system monitor"
+  },
+  {
     "term": "Sway website",
     "translation": "",
     "context": "Sway website",
@@ -16462,6 +17141,13 @@
     "context": "Switch layout shortcut",
     "reference": "",
     "comment": ""
+  },
+  {
+    "term": "Switches to power saver at the low battery threshold",
+    "translation": "",
+    "context": "Switches to power saver at the low battery threshold",
+    "reference": "",
+    "comment": "battery auto power saver toggle description"
   },
   {
     "term": "Sync",
@@ -16839,7 +17525,7 @@
     "translation": "",
     "context": "Tertiary Container",
     "reference": "",
-    "comment": "widget background color option | workspace color option"
+    "comment": "surface color option | widget background color option | workspace color option"
   },
   {
     "term": "Test connection",
@@ -17080,6 +17766,13 @@
     "comment": "greeter settings link"
   },
   {
+    "term": "Theme colors come from this display's wallpaper",
+    "translation": "",
+    "context": "Theme colors come from this display's wallpaper",
+    "reference": "",
+    "comment": "matugen source display dropdown description"
+  },
+  {
     "term": "Theme extracted to: %1",
     "translation": "",
     "context": "Theme extracted to: %1",
@@ -17262,6 +17955,13 @@
     "comment": "wallpaper fill mode"
   },
   {
+    "term": "Tile color",
+    "translation": "",
+    "context": "Tile color",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Tiled",
     "translation": "",
     "context": "Tiled",
@@ -17281,6 +17981,13 @@
     "context": "Tiling",
     "reference": "",
     "comment": "window tiling layout name in layout picker"
+  },
+  {
+    "term": "Tiling layout",
+    "translation": "",
+    "context": "Tiling layout",
+    "reference": "",
+    "comment": ""
   },
   {
     "term": "Time",
@@ -17808,13 +18515,6 @@
     "comment": "uninstallation progress"
   },
   {
-    "term": "Unison",
-    "translation": "",
-    "context": "Unison",
-    "reference": "",
-    "comment": "Lyrics provider name"
-  },
-  {
     "term": "Unknown",
     "translation": "",
     "context": "Unknown",
@@ -18018,6 +18718,13 @@
     "comment": "Title for VPN server certificate trust confirmation"
   },
   {
+    "term": "Up",
+    "translation": "",
+    "context": "Up",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Up to date",
     "translation": "",
     "context": "Up to date",
@@ -18099,7 +18806,7 @@
     "translation": "",
     "context": "Uptime",
     "reference": "",
-    "comment": "uptime label in footer"
+    "comment": ""
   },
   {
     "term": "Urgent",
@@ -18133,13 +18840,6 @@
     "term": "Use Monospace Font",
     "translation": "",
     "context": "Use Monospace Font",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
-    "translation": "",
-    "context": "Use a custom image for the lock screen, or leave empty to use your desktop wallpaper.",
     "reference": "",
     "comment": ""
   },
@@ -18219,13 +18919,6 @@
     "context": "Use system PAM authentication",
     "reference": "",
     "comment": "system PAM policy toggle"
-  },
-  {
-    "term": "Use system theme",
-    "translation": "",
-    "context": "Use system theme",
-    "reference": "",
-    "comment": ""
   },
   {
     "term": "User",
@@ -18463,7 +19156,7 @@
     "translation": "",
     "context": "Vertical",
     "reference": "",
-    "comment": "lock screen clock style option"
+    "comment": "island settings: free island orientation | lock screen clock style option"
   },
   {
     "term": "Vertical Deck",
@@ -18788,6 +19481,13 @@
     "comment": ""
   },
   {
+    "term": "Which wallpaper color the palette is built from",
+    "translation": "",
+    "context": "Which wallpaper color the palette is built from",
+    "reference": "",
+    "comment": "matugen source color dropdown description"
+  },
+  {
     "term": "White",
     "translation": "",
     "context": "White",
@@ -18939,7 +19639,7 @@
     "translation": "",
     "context": "Widgets",
     "reference": "",
-    "comment": "noun, title of widget edit controls and settings card"
+    "comment": ""
   },
   {
     "term": "Widgets, layout, style",
@@ -19033,6 +19733,13 @@
     "comment": ""
   },
   {
+    "term": "With background blur on, cards and tiles keep their own backing",
+    "translation": "",
+    "context": "With background blur on, cards and tiles keep their own backing",
+    "reference": "",
+    "comment": "surface foreground layers toggle description"
+  },
+  {
     "term": "Working...",
     "translation": "",
     "context": "Working...",
@@ -19068,6 +19775,13 @@
     "comment": "toggle label for workspace change OSD"
   },
   {
+    "term": "Workspace count",
+    "translation": "",
+    "context": "Workspace count",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Workspace name",
     "translation": "",
     "context": "Workspace name",
@@ -19078,6 +19792,13 @@
     "term": "Workspace switcher",
     "translation": "",
     "context": "Workspace switcher",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Workspaces up to the count are always shown and can be opened",
+    "translation": "",
+    "context": "Workspaces up to the count are always shown and can be opened",
     "reference": "",
     "comment": ""
   },
@@ -19192,6 +19913,13 @@
     "context": "You're All Set!",
     "reference": "",
     "comment": "greeter completion page title"
+  },
+  {
+    "term": "You're all caught up",
+    "translation": "",
+    "context": "You're all caught up",
+    "reference": "",
+    "comment": "notification center empty state, no notifications left to read"
   },
   {
     "term": "Your compositor does not support background blur (ext-background-effect-v1)",
@@ -19635,11 +20363,11 @@
     "comment": ""
   },
   {
-    "term": "tmux and zellij sessions",
+    "term": "tmux, zellij, and herdr sessions",
     "translation": "",
-    "context": "tmux and zellij sessions",
+    "context": "tmux, zellij, and herdr sessions",
     "reference": "",
-    "comment": ""
+    "comment": "settings page description for terminal multiplexer sessions; tmux, zellij, and herdr are product names"
   },
   {
     "term": "unmaintained",

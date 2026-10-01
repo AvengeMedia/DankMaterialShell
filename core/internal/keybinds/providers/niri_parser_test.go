@@ -811,6 +811,7 @@ func TestNiriParseActionWithProperties(t *testing.T) {
     Mod+Shift+1 hotkey-overlay-title="Move to Workspace 1" { move-column-to-workspace 1 focus=false; }
     Mod+Shift+2 hotkey-overlay-title="Move to Workspace 2" { move-column-to-workspace 2 focus=false; }
     Alt+Tab { next-window scope="output"; }
+    Alt+grave { next-window filter="app-id"; }
 }
 `
 	if err := os.WriteFile(configFile, []byte(content), 0o644); err != nil {
@@ -822,8 +823,8 @@ func TestNiriParseActionWithProperties(t *testing.T) {
 		t.Fatalf("ParseNiriKeys failed: %v", err)
 	}
 
-	if len(result.Section.Keybinds) != 3 {
-		t.Errorf("Expected 3 keybinds, got %d", len(result.Section.Keybinds))
+	if len(result.Section.Keybinds) != 4 {
+		t.Errorf("Expected 4 keybinds, got %d", len(result.Section.Keybinds))
 	}
 
 	for _, kb := range result.Section.Keybinds {
@@ -849,8 +850,16 @@ func TestNiriParseActionWithProperties(t *testing.T) {
 				t.Errorf("move-column-to-workspace missing focus=false arg")
 			}
 		case "next-window":
-			if kb.Key != "Tab" {
-				t.Errorf("next-window key = %q, want 'Tab'", kb.Key)
+			if kb.Key == "Tab" {
+				if len(kb.Args) != 1 || kb.Args[0] != "scope=\"output\"" {
+					t.Errorf("next-window Tab args = %v, want [scope=\"output\"]", kb.Args)
+				}
+			} else if kb.Key == "grave" {
+				if len(kb.Args) != 1 || kb.Args[0] != "filter=\"app-id\"" {
+					t.Errorf("next-window grave args = %v, want [filter=\"app-id\"]", kb.Args)
+				}
+			} else {
+				t.Errorf("unexpected next-window key: %q", kb.Key)
 			}
 		}
 	}

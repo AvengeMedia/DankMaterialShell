@@ -4,7 +4,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
+import qs.Modules.DankIsland
 import qs.Services
+import qs.Widgets
 import "../../Common/ConnectorGeometry.js" as ConnectorGeometry
 import "../../Common/ConnectedSurfaceGeometry.js" as SurfaceGeometry
 
@@ -22,9 +24,31 @@ PanelWindow {
 
     WlrLayershell.namespace: "dms:frame"
     readonly property bool _dockEditActive: frameDockHostLoader.item?.editActive ?? false
-    WlrLayershell.layer: win._usesOverlayLayer || win._dockEditActive ? WlrLayer.Overlay : WlrLayer.Top
-    WlrLayershell.keyboardFocus: win._dockEditActive ? WlrKeyboardFocus.Exclusive : frameDockHostLoader.item?.interactionActive ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // The frame, not the bar, supplies this island's focus, grab and input mask.
+    readonly property Item _islandHost: {
+        const bars = BarWidgetService.frameHostedBars[win._screenName] ?? {};
+        for (const id in bars) {
+            const host = bars[id]?.islandHost ?? null;
+            if (host)
+                return host;
+        }
+        return null;
+    }
+    readonly property alias islandChrome: islandChrome
+    readonly property bool _islandSheetOut: islandChrome.sheetOut
+    // A hosted sheet never re-layers the frame: everything it must cover is drawn inside this window (loader z), and a
+    // Top→Overlay→Top round trip re-stacks the frame above its own popout windows, painting their blur in front.
+    readonly property int dBarLayer: win._usesOverlayLayer || win._dockEditActive ? WlrLayer.Overlay : WlrLayer.Top
+    WlrLayershell.layer: win.dBarLayer
+    WlrLayershell.keyboardFocus: win._dockEditActive ? WlrKeyboardFocus.Exclusive : islandChrome.keyboardFocusPolicy !== WlrKeyboardFocus.None ? islandChrome.keyboardFocusPolicy : frameDockHostLoader.item?.interactionActive ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+    IslandHostChrome {
+        id: islandChrome
+
+        window: win
+        host: win._islandHost
+    }
 
     anchors {
         top: true
@@ -84,6 +108,9 @@ PanelWindow {
         Region {
             item: frameDockHostLoader.item?.dockMaskItems[3] ?? null
         }
+        Region {
+            item: islandChrome.maskItem
+        }
     }
 
     readonly property var barEdges: {
@@ -97,7 +124,10 @@ PanelWindow {
     readonly property int _windowRegionHeight: win._regionInt(win.height)
     readonly property string _screenName: win.targetScreen ? win.targetScreen.name : ""
     readonly property int _surfaceRevision: ConnectedModeState.surfaceRevisions[win._screenName] ?? 0
-    readonly property var _popoutDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "popout")
+    readonly property var _popoutDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "popout");
+    }
     component DockBlurRegion: Region {
         id: dockBlur
         required property var dockSurface
@@ -185,20 +215,49 @@ PanelWindow {
         }
     }
 
-    readonly property var _dockSurfaces: ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
-        const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
+    readonly property var _dockSurfaces: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptorsOfKind(win._screenName, "dock").map(descriptor => {
+            const body = SurfaceGeometry.translatedBodyRect(descriptor, win._dpr);
+            const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
+            const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
+            const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
+            return {
+                descriptor: descriptor,
+                body: body,
+                radius: radius,
+                connector: connector
+            };
+        });
+    }
+    readonly property var _notifDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "notification");
+    }
+    readonly property var _islandDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "island");
+    }
+    // The island body starts inside the bar band; only the part past the cutout is silhouette, and its fillets follow that clamped rect.
+    readonly property var _islandSurface: {
+        const descriptor = win._islandDescriptor;
+        if (!win._connectedActive || !descriptor.visible)
+            return null;
+        const body = win._clampNear(descriptor.barSide, SurfaceGeometry.bodyRect(descriptor, win._dpr));
+        if (body.width < 1 || body.height < 1)
+            return null;
         const radius = Math.max(0, Math.min(descriptor.surfaceRadius >= 0 ? descriptor.surfaceRadius : win._surfaceRadius, body.width / 2, body.height / 2));
-        const thickness = SurfaceGeometry.isVertical(descriptor.barSide) ? body.width : body.height;
-        const connector = Math.max(0, Math.min(win._ccr, radius, thickness - radius - win._seamOverlap));
         return {
             descriptor: descriptor,
             body: body,
             radius: radius,
-            connector: connector
+            connector: SurfaceGeometry.connectorRadii(descriptor, body, win._ccr, radius, win._dpr, true).near
         };
-    })
-    readonly property var _notifDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "notification")
-    readonly property var _modalDescriptor: ConnectedModeState.surfaceDescriptor(win._screenName, "modal")
+    }
+    readonly property var _modalDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "modal");
+    }
     readonly property bool _usesOverlayLayer: (win._modalDescriptor.presented && win._modalDescriptor.layer === "overlay") || (win._popoutDescriptor.presented && win._popoutDescriptor.layer === "overlay")
 
     readonly property bool _connectedActive: CompositorService.usesConnectedFrameChromeForScreen(win.targetScreen)
@@ -267,78 +326,95 @@ PanelWindow {
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
     readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && !win._disableLayer
-    // Pack active connected surfaces into four fixed SDF slots (near edges clamp to cutout).
-    readonly property var _sdfSlots: {
-        const T = win.cutoutTopInset;
-        const L = win.cutoutLeftInset;
-        const R = win.width - win.cutoutRightInset;
-        const B = win.height - win.cutoutBottomInset;
-        const clampNear = function (side, b) {
-            const r = {
-                "x": b.x,
-                "y": b.y,
-                "width": b.width,
-                "height": b.height
-            };
-            if (side === "top") {
-                r.height = Math.max(0, b.y + b.height - T);
-                r.y = T;
-            } else if (side === "bottom") {
-                r.height = Math.max(0, B - b.y);
-            } else if (side === "left") {
-                r.width = Math.max(0, b.x + b.width - L);
-                r.x = L;
-            } else if (side === "right") {
-                r.width = Math.max(0, R - b.x);
-            }
-            return r;
+    function _clampNear(side, b) {
+        const r = {
+            "x": b.x,
+            "y": b.y,
+            "width": b.width,
+            "height": b.height
         };
+        if (side === "top") {
+            r.height = Math.max(0, b.y + b.height - win.cutoutTopInset);
+            r.y = win.cutoutTopInset;
+        } else if (side === "bottom") {
+            r.height = Math.max(0, win.height - win.cutoutBottomInset - b.y);
+        } else if (side === "left") {
+            r.width = Math.max(0, b.x + b.width - win.cutoutLeftInset);
+            r.x = win.cutoutLeftInset;
+        } else if (side === "right") {
+            r.width = Math.max(0, win.width - win.cutoutRightInset - b.x);
+        }
+        return r;
+    }
+
+    function _sdfSlot(s) {
+        const b = win._clampNear(s.side, s.body);
+        const active = b.width >= 1 && b.height >= 1 ? 1 : 0;
+        const sc = s.radii.startCr, ec = s.radii.endCr;
+        const extent = (s.side === "top" || s.side === "bottom") ? b.height : b.width;
+        const fc = Math.min(s.radii.farCr, extent);
+        const omitS = s.radii.farStartCr > 0;
+        const omitE = s.radii.farEndCr > 0;
+        const bodyR = s.radii.surfaceRadius;
+        const nearS = omitS ? bodyR : 0, nearE = omitE ? bodyR : 0;
+        const farS = omitS ? 0 : bodyR, farE = omitE ? 0 : bodyR;
+        const kS = omitS ? fc : sc, kE = omitE ? fc : ec;
+        let ks, cr;
+        if (s.side === "top") {
+            ks = [kS, kE, fc, fc];
+            cr = [nearS, nearE, farE, farS];
+        } else if (s.side === "bottom") {
+            ks = [fc, fc, kE, kS];
+            cr = [farS, farE, nearE, nearS];
+        } else if (s.side === "left") {
+            ks = [kS, fc, fc, kE];
+            cr = [nearS, farS, farE, nearE];
+        } else {
+            ks = [fc, kS, kE, fc];
+            cr = [farS, nearS, nearE, farE];
+        }
+        return {
+            "rect": Qt.vector4d(b.x, b.y, b.width, b.height),
+            "corner": Qt.vector4d(cr[0], cr[1], cr[2], cr[3]),
+            "k": Qt.vector4d(ks[0], ks[1], ks[2], ks[3]),
+            "param": Qt.vector4d(active, 0, 0, 0)
+        };
+    }
+
+    readonly property var _emptySdfSlot: ({
+            "rect": Qt.vector4d(0, 0, 0, 0),
+            "corner": Qt.vector4d(0, 0, 0, 0),
+            "k": Qt.vector4d(0, 0, 0, 0),
+            "param": Qt.vector4d(0, 0, 0, 0)
+        })
+
+    // Slots 0-3 hold popout, modal, notification and docks; the island's spring steps every frame, so it owns slot 4 alone.
+    readonly property var _sdfSlots: {
+        win._surfaceRevision;
         const src = win._unifiedSurfaces();
         const out = [];
-        for (let i = 0; i < 4; i++) {
-            if (i < src.length) {
-                const s = src[i];
-                const b = clampNear(s.side, s.body);
-                const active = b.width > 0 && b.height > 0 ? 1 : 0;
-                const sc = s.radii.startCr, ec = s.radii.endCr;
-                const extent = (s.side === "top" || s.side === "bottom") ? b.height : b.width;
-                const fc = Math.min(s.radii.farCr, extent);
-                const omitS = s.radii.farStartCr > 0;
-                const omitE = s.radii.farEndCr > 0;
-                const bodyR = s.radii.surfaceRadius;
-                const nearS = omitS ? bodyR : 0, nearE = omitE ? bodyR : 0;
-                const farS = omitS ? 0 : bodyR, farE = omitE ? 0 : bodyR;
-                const kS = omitS ? fc : sc, kE = omitE ? fc : ec;
-                let ks, cr;
-                if (s.side === "top") {
-                    ks = [kS, kE, fc, fc];
-                    cr = [nearS, nearE, farE, farS];
-                } else if (s.side === "bottom") {
-                    ks = [fc, fc, kE, kS];
-                    cr = [farS, farE, nearE, nearS];
-                } else if (s.side === "left") {
-                    ks = [kS, fc, fc, kE];
-                    cr = [nearS, farS, farE, nearE];
-                } else {
-                    ks = [fc, kS, kE, fc];
-                    cr = [farS, nearS, nearE, farE];
-                }
-                out.push({
-                    "rect": Qt.vector4d(b.x, b.y, b.width, b.height),
-                    "corner": Qt.vector4d(cr[0], cr[1], cr[2], cr[3]),
-                    "k": Qt.vector4d(ks[0], ks[1], ks[2], ks[3]),
-                    "param": Qt.vector4d(active, 0, 0, 0)
-                });
-            } else {
-                out.push({
-                    "rect": Qt.vector4d(0, 0, 0, 0),
-                    "corner": Qt.vector4d(0, 0, 0, 0),
-                    "k": Qt.vector4d(0, 0, 0, 0),
-                    "param": Qt.vector4d(0, 0, 0, 0)
-                });
-            }
-        }
+        for (let i = 0; i < 4; i++)
+            out.push(i < src.length ? win._sdfSlot(src[i]) : win._emptySdfSlot);
         return out;
+    }
+
+    readonly property var _islandSdfSlot: {
+        win._surfaceRevision;
+        const island = win._islandSurface;
+        if (!island)
+            return win._emptySdfSlot;
+        return win._sdfSlot({
+            "side": island.descriptor.barSide,
+            "body": island.body,
+            "radii": {
+                "farCr": 0,
+                "startCr": island.connector,
+                "endCr": island.connector,
+                "farStartCr": 0,
+                "farEndCr": 0,
+                "surfaceRadius": island.radius
+            }
+        });
     }
     function _regionInt(value) {
         return Math.max(0, Math.round(Theme.px(value, win._dpr)));
@@ -607,6 +683,9 @@ PanelWindow {
         }
         DockBlurRegion {
             dockSurface: win._dockSurfaces[3] ?? null
+        }
+        DockBlurRegion {
+            dockSurface: win._islandSurface
         }
 
         Region {
@@ -1252,11 +1331,16 @@ PanelWindow {
         property vector4d chromeCorner3: win._sdfSlots[3].corner
         property vector4d chromeK3: win._sdfSlots[3].k
         property vector4d chromeParam3: win._sdfSlots[3].param
+        property vector4d chromeRect4: win._islandSdfSlot.rect
+        property vector4d chromeCorner4: win._islandSdfSlot.corner
+        property vector4d chromeK4: win._islandSdfSlot.k
+        property vector4d chromeParam4: win._islandSdfSlot.param
     }
 
     Loader {
         anchors.fill: parent
-        z: 1
+        // A hosted sheet paints over a dock on its edge until it has sprung back.
+        z: win._islandSheetOut ? 2 : 1
         active: win._connectedActive
         sourceComponent: FrameBarHost {
             frameWindow: win

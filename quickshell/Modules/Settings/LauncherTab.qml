@@ -78,18 +78,18 @@ Item {
             }
 
             SettingsButtonGroupRow {
+                readonly property bool islandOffered: SettingsData.dankIslandEnabled || SettingsData.launcherStyle === "island"
+
                 visible: !SettingsData.connectedFrameModeActive
                 settingKey: "launcherStyleSelector"
                 tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
                 resetKeys: ["launcherStyle"]
                 text: I18n.tr("Opens", "verb, row label, which launcher style the shortcut opens")
-                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar"), I18n.tr("Island")]
-                currentIndex: SettingsData.launcherStyle === "island" ? 2 : SettingsData.launcherStyle === "spotlight" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    SettingsData.set("launcherStyle", index === 2 ? "island" : index === 1 ? "spotlight" : "full");
-                }
+                model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar")].concat(islandOffered ? [I18n.tr("Island")] : [])
+                values: ["full", "spotlight"].concat(islandOffered ? ["island"] : [])
+                value: SettingsData.launcherStyle
+                fallbackValue: "full"
+                onValueSelected: value => SettingsData.set("launcherStyle", value)
             }
 
             SettingsRow {
@@ -253,6 +253,7 @@ Item {
                 settingKey: "searchAppActions"
                 tags: ["launcher", "search", "actions", "shortcuts", "desktop"]
                 text: I18n.tr("App actions")
+                description: I18n.tr("Search also matches actions apps provide, like New Window", "launcher app actions search toggle description")
                 checked: SessionData.searchAppActions
                 onToggled: checked => SessionData.setSearchAppActions(checked)
             }
@@ -483,7 +484,6 @@ Item {
             settingKey: "pluginVisibility"
 
             property var allLauncherPlugins: {
-                SettingsData.launcherPluginVisibility;
                 SettingsData.launcherPluginOrder;
                 SettingsData.dankLauncherV2IncludeFilesInAll;
                 SettingsData.dankLauncherV2IncludeFoldersInAll;
@@ -693,6 +693,7 @@ Item {
                 settingKey: "launchPrefix"
                 tags: ["launcher", "prefix", "uwsm", "command", "launch"]
                 text: I18n.tr("Launch prefix")
+                description: I18n.tr("Added in front of every app launch command", "launcher launch prefix field description")
                 leftIconName: "terminal"
                 placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
                 value: SettingsData.launchPrefix
@@ -841,6 +842,7 @@ Item {
                 settingKey: "dankLauncherV2UnloadOnClose"
                 tags: ["launcher", "unload", "close", "memory", "vram"]
                 text: I18n.tr("Unload on close")
+                description: I18n.tr("Frees the launcher when closed and rebuilds it on open", "launcher unload on close toggle description")
                 checked: SettingsData.dankLauncherV2UnloadOnClose
                 onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
             }

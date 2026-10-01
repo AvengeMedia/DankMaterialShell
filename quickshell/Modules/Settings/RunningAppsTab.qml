@@ -16,21 +16,13 @@ Item {
             settingKey: "appIdSubstitutions"
             tags: ["app", "icon", "substitution", "replacement", "pattern", "window", "class", "regex"]
 
-            headerActions: [
-                DankActionButton {
-                    iconName: "restart_alt"
-                    tooltipText: I18n.tr("Reset to default")
-                    visible: JSON.stringify(SettingsData.appIdSubstitutions) !== JSON.stringify(SettingsData.getDefaultAppIdSubstitutions())
-                    iconColor: Theme.surfaceVariantText
-                    onClicked: SettingsData.resetAppIdSubstitutions()
-                },
-                DankActionButton {
-                    iconName: "add"
-                    Accessible.name: I18n.tr("Add")
-                    iconColor: Theme.primary
-                    onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
-                }
-            ]
+            headerActions: DankActionButton {
+                iconName: "restart_alt"
+                tooltipText: I18n.tr("Reset to default")
+                visible: JSON.stringify(SettingsData.appIdSubstitutions) !== JSON.stringify(SettingsData.getDefaultAppIdSubstitutions())
+                iconColor: Theme.surfaceVariantText
+                onClicked: SettingsData.resetAppIdSubstitutions()
+            }
 
             SettingsRow {
                 subtitle: I18n.tr("Map window class names to icon names for proper icon display")
@@ -76,6 +68,14 @@ Item {
                         onValueChanged: value => SettingsData.updateAppIdSubstitution(substitutionGroup.index, substitutionGroup.modelData.pattern, substitutionGroup.modelData.replacement, value)
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            DankFab {
+                text: I18n.tr("Add substitution")
+                iconName: "add"
+                onClicked: SettingsData.addAppIdSubstitution("", "", "exact")
             }
         }
     }

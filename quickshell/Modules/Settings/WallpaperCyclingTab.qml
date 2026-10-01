@@ -257,13 +257,10 @@ Item {
         FileBrowserModal {
             parentModal: root.parentModal
             browserTitle: I18n.tr("Choose wallpaper folder", "wallpaper folder file browser title")
-            browserType: "wallpaper"
-            folderMode: true
+            bucket: "wallpaper"
+            mode: "openFolder"
             showHiddenFiles: true
-            onFileSelected: path => {
-                WallpaperCyclingService.cycleFromFolder(root.perMonitor ? root.selectedScreen : "", path);
-                close();
-            }
+            onAccepted: paths => WallpaperCyclingService.cycleFromFolder(root.perMonitor ? root.selectedScreen : "", paths[0])
         }
     }
 }

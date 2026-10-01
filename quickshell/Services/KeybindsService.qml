@@ -47,6 +47,7 @@ Singleton {
     property bool fixing: false
     property string lastError: ""
     property string modKey: "Super"
+    property string modSymbol: ""
     property bool dmsBindsIncluded: true
 
     property var dmsStatus: ({
@@ -61,6 +62,11 @@ Singleton {
             "configFormat": "",
             "readOnly": false
         })
+
+    // What the active layout puts on the first level of every physical key,
+    // plus the keysym vocabulary that answer is drawn from. See
+    // `dms keybinds keymap`. Empty until something asks for it.
+    property var firstLevelKeymap: ({})
 
     property var _rawData: null
     property var keybinds: ({})
@@ -156,6 +162,27 @@ Singleton {
                 return;
             log.warn("Cheatsheet load failed with code:", exitCode);
             root.cheatsheetLoading = false;
+        }
+    }
+
+    Process {
+        id: keymapProcess
+        running: false
+        command: ["dms", "keybinds", "keymap"]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.firstLevelKeymap = JSON.parse(text);
+                } catch (e) {
+                    log.warn("Failed to parse keymap:", e);
+                }
+            }
+        }
+
+        onExited: exitCode => {
+            if (exitCode !== 0)
+                log.warn("Keymap load failed with code:", exitCode);
         }
     }
 
@@ -320,6 +347,89 @@ Singleton {
         cheatsheetLoading = true;
         cheatsheetProcess.command = ["dms", "keybinds", "show", target];
         cheatsheetProcess.running = true;
+    }
+
+    function canExecuteAction(action) {
+        if (!action)
+            return false;
+        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh ") || action.startsWith("exec "))
+            return true;
+        const provider = currentProvider || cheatsheetProvider;
+        if (provider === "niri") {
+            const base = action.trim().split(/\s+/)[0];
+            if (base === "next-window" || base === "previous-window")
+                return false;
+        }
+        return provider === "niri" || provider === "hyprland" || provider === "mangowc";
+    }
+
+    function executeAction(action) {
+        if (!action)
+            return false;
+        log.info("Executing keybind action:", action);
+
+        if (action.startsWith("spawn ") || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh ") || action.startsWith("exec ")) {
+            let cmd = action;
+            if (cmd.startsWith("spawn "))
+                cmd = cmd.slice(6).trim();
+            else if (cmd.startsWith("spawn_shell "))
+                cmd = cmd.slice(12).trim();
+            else if (cmd.startsWith("spawn-sh ")) {
+                cmd = cmd.slice(9).trim();
+                if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'")))
+                    cmd = cmd.slice(1, -1);
+            } else if (cmd.startsWith("exec "))
+                cmd = cmd.slice(5).trim();
+
+            Quickshell.execDetached(["sh", "-c", cmd]);
+            return true;
+        }
+
+        const provider = currentProvider || cheatsheetProvider;
+        if (provider === "niri") {
+            const parts = action.trim().split(/\s+/);
+            if (parts.length === 0 || parts[0] === "next-window" || parts[0] === "previous-window")
+                return false;
+
+            const cmdParts = [];
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                const eqIdx = part.indexOf("=");
+                if (eqIdx !== -1) {
+                    const key = part.slice(0, eqIdx);
+                    const val = part.slice(eqIdx + 1).replace(/^["']|["']$/g, "");
+                    if (key === "skip-confirmation") {
+                        if (val === "true")
+                            cmdParts.push("--skip-confirmation");
+                    } else {
+                        cmdParts.push("--" + key + "=" + val);
+                    }
+                } else {
+                    cmdParts.push(part);
+                }
+            }
+            Quickshell.execDetached(["sh", "-c", "niri msg action " + cmdParts.join(" ")]);
+            return true;
+        }
+        if (provider === "hyprland") {
+            Quickshell.execDetached(["sh", "-c", "hyprctl dispatch " + action]);
+            return true;
+        }
+        if (provider === "mangowc") {
+            const mmsgParams = action.trim().split(/\s+/).join(",");
+            Quickshell.execDetached(["sh", "-c", "mmsg -d " + mmsgParams]);
+            return true;
+        }
+
+        return false;
+    }
+
+    // Cheap enough to re-read every time the editor opens, and the layout may
+    // have changed since the last look.
+    function loadFirstLevelKeymap() {
+        if (keymapProcess.running)
+            return;
+        keymapProcess.running = true;
     }
 
     function loadBinds(showLoading) {
@@ -632,7 +742,8 @@ Singleton {
 
     function _processData() {
         keybinds = _rawData || {};
-        modKey = currentProvider === "niri" ? (_rawData?.modKey || "Super") : "Super";
+        modKey = _rawData?.mod?.resolved || _rawData?.modKey || "Super";
+        modSymbol = _rawData?.mod?.symbol || "";
         dmsBindsIncluded = _rawData?.dmsBindsIncluded ?? true;
         const status = _rawData?.dmsStatus;
         if (status) {

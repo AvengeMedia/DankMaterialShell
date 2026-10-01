@@ -184,6 +184,7 @@ Item {
             try {
                 const result = JSON.parse(output.trim());
                 const allRules = result.rules || [];
+                CompositorService.syncDmsWindowFloatingRule(allRules);
                 windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules"));
                 externalRules = allRules.filter(r => !(r.source || "").includes("dms/windowrules"));
                 windowRulesInclude.applyStatus(result.dmsStatus);
@@ -242,46 +243,62 @@ Item {
         });
     }
 
+    property bool editorOpen: false
+    property bool editorMounted: false
+    property var editorRequest: null
+
     function openRuleModal(window) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.show(window || null);
-        }
+        openEditor("new", window || null);
     }
 
     function editRule(rule) {
-        if (readOnly) {
-            showHyprlandReadOnlyWarning();
-            return;
-        }
-        if (!PopoutService.windowRuleModalLoader)
-            return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showEdit(rule);
-        }
+        openEditor("edit", rule);
     }
 
     function copyRuleToDms(rule) {
+        openEditor("copy", rule);
+    }
+
+    function openEditor(mode, payload) {
         if (readOnly) {
             showHyprlandReadOnlyWarning();
             return;
         }
-        if (!PopoutService.windowRuleModalLoader)
+        if (editorOpen)
             return;
-        PopoutService.windowRuleModalLoader.active = true;
-        if (PopoutService.windowRuleModalLoader.item) {
-            PopoutService.windowRuleModalLoader.item.onRuleSubmitted.connect(loadWindowRules);
-            PopoutService.windowRuleModalLoader.item.showCopy(rule);
+        editorRequest = {
+            mode,
+            payload
+        };
+        editorOpen = true;
+        editorMounted = true;
+        if (editorLoader.item)
+            presentEditor();
+    }
+
+    function presentEditor() {
+        const request = editorRequest;
+        if (!request)
+            return;
+        switch (request.mode) {
+        case "edit":
+            editorLoader.item.showEdit(request.payload);
+            return;
+        case "copy":
+            editorLoader.item.showCopy(request.payload);
+            return;
+        default:
+            editorLoader.item.show(request.payload);
         }
+    }
+
+    function closeEditor() {
+        if (!editorOpen)
+            return;
+        editorOpen = false;
+        editorRequest = null;
+        if (editorLoader.item)
+            editorLoader.item.opened = false;
     }
 
     function showHyprlandReadOnlyWarning() {
@@ -304,23 +321,9 @@ Item {
             id: headerSection
             width: parent.width
             iconName: "select_window"
-            title: I18n.tr("Window rules")
 
             SettingsRow {
                 subtitle: I18n.tr("Define rules for window behavior. Saves to %1", "window rules settings description, %1 is a config file name").arg(root.dmsRulesFileName)
-
-                DankActionButton {
-                    buttonSize: Theme.iconButtonSize
-                    circular: false
-                    iconName: "add"
-                    iconSize: Theme.iconSize
-                    iconColor: Theme.primary
-                    enabled: !root.readOnly
-                    opacity: enabled ? 1 : 0.5
-                    Accessible.name: I18n.tr("Add window rule")
-                    tooltipSide: "left"
-                    onClicked: root.openRuleModal()
-                }
             }
 
             SettingsRow {
@@ -649,6 +652,38 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        SettingsFabBar {
+            shown: !root.readOnly
+
+            DankFab {
+                text: I18n.tr("Add window rule")
+                iconName: "add"
+                onClicked: root.openRuleModal()
+            }
+        }
+    }
+
+    Loader {
+        id: editorLoader
+        parent: root.parentModal?.modalFocusScope ?? root
+        anchors.fill: parent
+        z: 100
+        active: root.editorMounted
+        onLoaded: root.presentEditor()
+
+        sourceComponent: WindowRuleEditorDialog {
+            supportingText: I18n.tr("Changes save to %1", "keybind editor dialog hint, %1 is the binds file path").arg(root.dmsRulesFileName)
+            onRejected: root.closeEditor()
+            onRuleSubmitted: {
+                root.loadWindowRules();
+                root.closeEditor();
+            }
+            onActiveChanged: {
+                if (!active && !root.editorOpen)
+                    root.editorMounted = false;
             }
         }
     }

@@ -25,9 +25,9 @@ Column {
         id: logoFileBrowser
 
         browserTitle: I18n.tr("Select Launcher Logo")
-        browserType: "generic"
-        filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
-        onFileSelected: path => root.page.set("launcherLogoCustomPath", path.replace("file://", ""))
+        bucket: "logo"
+        filters: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
+        onAccepted: paths => root.page.set("launcherLogoCustomPath", paths[0])
     }
 
     SettingsCard {

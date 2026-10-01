@@ -42,6 +42,9 @@ var LOCAL_SPEC = {
         def: "",
         onChange: "regenSystemThemes"
     },
+    generateThemeAtStartup: {
+        def: true
+    },
     popupTransparency: {
         def: 1.0,
         coerce: Util.percentToUnit
@@ -60,8 +63,8 @@ var LOCAL_SPEC = {
         def: 1.0,
         coerce: Util.percentToUnit
     },
-    dmsWindowsFloating: {
-        def: true
+    dmsWindowsFloatingSeeded: {
+        def: []
     },
     hostSurfaceColor: {
         def: "default"
@@ -105,6 +108,9 @@ var LOCAL_SPEC = {
     },
     buttonColorMode: {
         def: "primary"
+    },
+    containerSaturation: {
+        def: 100
     },
     niriLayoutGapsOverride: {
         def: -1,
@@ -333,6 +339,9 @@ var LOCAL_SPEC = {
     audioShowStreamDevices: {
         def: false
     },
+    audioMono: {
+        def: false
+    },
     windSpeedUnit: {
         def: "kmh"
     },
@@ -425,16 +434,46 @@ var LOCAL_SPEC = {
     controlCenterIconScale: {
         def: 1.0
     },
+    controlCenterFooterPosition: {
+        def: "bottom"
+    },
     controlCenterWidgets: {
         def: [
             {
-                id: "volumeSlider",
+                id: "user",
+                enabled: true,
+                w: 5,
+                h: 1
+            },
+            {
+                id: "settings",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "lock",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "power",
+                enabled: true,
+                w: 1,
+                h: 1,
+                small: true
+            },
+            {
+                id: "brightnessSlider",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "brightnessSlider",
+                id: "volumeSlider",
                 enabled: true,
                 w: 4,
                 h: 1
@@ -464,16 +503,47 @@ var LOCAL_SPEC = {
                 h: 1
             },
             {
+                id: "darkMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
                 id: "nightMode",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "doNotDisturb",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "idleInhibitor",
+                enabled: true,
+                w: 2,
+                h: 1
+            },
+            {
+                id: "battery",
                 enabled: true,
                 w: 4,
                 h: 1
             },
             {
-                id: "darkMode",
+                id: "diskUsage",
                 enabled: true,
                 w: 4,
                 h: 1
+            },
+            {
+                id: "runningApps",
+                enabled: true,
+                w: 4,
+                h: 1,
+                footer: true
             }
         ]
     },
@@ -510,7 +580,15 @@ var LOCAL_SPEC = {
                 enabled: true
             },
             {
+                id: "kugou",
+                enabled: true
+            },
+            {
                 id: "lrclib",
+                enabled: true
+            },
+            {
+                id: "youtubemusic",
                 enabled: true
             }
         ]
@@ -623,6 +701,9 @@ var LOCAL_SPEC = {
     },
     launcherStyle: {
         def: "full"
+    },
+    avatarRing: {
+        def: "outline"
     },
     spotlightBarShowModeChips: {
         def: false
@@ -1173,6 +1254,9 @@ var LOCAL_SPEC = {
     osdPosition: {
         def: 5
     },
+    osdPositionOverrides: {
+        def: {}
+    },
     osdVolumeEnabled: {
         def: true
     },
@@ -1227,6 +1311,9 @@ var LOCAL_SPEC = {
     customPowerButtons: {
         def: []
     },
+    powerMenuBootEntries: {
+        def: []
+    },
     updaterCheckOnStart: {
         def: false
     },
@@ -1240,7 +1327,17 @@ var LOCAL_SPEC = {
         def: ""
     },
     updaterIntervalSeconds: {
-        def: 1800
+        def: 86400
+    },
+    updaterNotify: {
+        def: false
+    },
+    updaterPauseOnBattery: {
+        def: false
+    },
+    // 0 = every time the count grows
+    updaterNotifyMinSeconds: {
+        def: 86400
     },
     updaterIncludeFlatpak: {
         def: true
@@ -1305,6 +1402,7 @@ var LOCAL_SPEC = {
                 transparency: 1.0,
                 surfaceColor: "default",
                 surfaceCustomColor: "#6750A4",
+                widgetFollowInterfaceStyle: true,
                 widgetTransparency: 1.0,
                 squareCorners: false,
                 noBackground: false,

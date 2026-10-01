@@ -5,6 +5,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from extract_translations import STR_DQ, STR_SQ, decode_string_literal
+
 ABBREVIATIONS = {
     "on-screen displays": ["osd"],
     "on-screen display": ["osd"],
@@ -129,7 +131,8 @@ TAB_INDEX_MAP = {
     "NotificationRulesTab.qml": 55,
     "OSDTab.qml": 18,
     "RunningAppsTab.qml": 19,
-    "SystemUpdaterTab.qml": 20,
+    "SoftwareUpdatesTab.qml": 20,
+    "ChangelogTab.qml": 66,
     "PowerSleepTab.qml": 21,
     "ClipboardTab.qml": 23,
     "DisplayConfigTab.qml": 24,
@@ -146,6 +149,7 @@ TAB_INDEX_MAP = {
     "UserAccountsTab.qml": 60,
     "CreateUserTab.qml": 61,
     "GreeterAuthTab.qml": 62,
+    "PaletteInjectTab.qml": 64,
     "AutoStartTab.qml": 36,
     "BatteryTab.qml": 42,
     "MouseTouchpadTab.qml": 44,
@@ -234,24 +238,31 @@ STOPWORDS = {
 }
 
 
+def alias_keywords(text):
+    aliases = set()
+    for term in sorted(ABBREVIATIONS, key=len, reverse=True):
+        pattern = rf"\b{re.escape(term)}(?:e?s)?\b"
+        if not re.search(pattern, text):
+            continue
+        aliases.update(ABBREVIATIONS[term])
+        if " " in term or "-" in term:
+            text = re.sub(pattern, " ", text)
+    return aliases
+
+
 def enrich_keywords(label, description, category, existing_tags, parent_label=None):
     keywords = set(existing_tags)
 
     label_lower = label.lower()
-    label_words = re.split(r"[\s\-_&/]+", label_lower)
+    label_words = re.split(r"[\s\-_&/\"]+", label_lower)
     keywords.update(w for w in label_words if len(w) > 2)
-
-    for term, aliases in ABBREVIATIONS.items():
-        if term in label_lower:
-            keywords.update(aliases)
+    keywords.update(alias_keywords(label_lower))
 
     if description:
         desc_lower = description.lower()
         desc_words = re.split(r"[\s\-_&/,.]+", desc_lower)
         keywords.update(w for w in desc_words if len(w) > 3 and w.isalpha())
-        for term, aliases in ABBREVIATIONS.items():
-            if term in desc_lower:
-                keywords.update(aliases)
+        keywords.update(alias_keywords(desc_lower))
 
     for name in (category, parent_label):
         if not name:
@@ -259,21 +270,17 @@ def enrich_keywords(label, description, category, existing_tags, parent_label=No
         keywords.update(CATEGORY_KEYWORDS.get(name, []))
         name_lower = name.lower()
         keywords.update(w for w in re.split(r"[\s\-_&/]+", name_lower) if len(w) > 2)
-        for term, aliases in ABBREVIATIONS.items():
-            if term in name_lower:
-                keywords.update(aliases)
+        keywords.update(alias_keywords(name_lower))
 
     keywords = {k for k in keywords if k not in STOPWORDS and len(k) > 1}
     return sorted(keywords)
 
 
 def extract_i18n_string(value):
-    match = re.search(r'I18n\.tr\(["\']([^"\']+)["\']', value)
-    if match:
-        return match.group(1)
-    match = re.search(r'^["\']([^"\']+)["\']$', value.strip())
-    if match:
-        return match.group(1)
+    for literal, quote in ((STR_DQ, '"'), (STR_SQ, "'")):
+        match = re.search(rf"I18n\.tr\(\s*{literal}", value) or re.fullmatch(literal, value.strip())
+        if match and match.group(1):
+            return decode_string_literal(match.group(1), quote)
     return None
 
 
@@ -312,12 +319,32 @@ def extract_property(block, prop_name):
     return None
 
 
+def own_scope(block):
+    """The block with every nested component body removed, so a card without a title does not borrow one from its rows."""
+    depth = 0
+    kept = []
+    for char in block:
+        if char == "{":
+            depth += 1
+            if depth <= 1:
+                kept.append(char)
+            continue
+        if char == "}":
+            depth -= 1
+            if depth <= 0:
+                kept.append(char)
+            continue
+        if depth <= 1:
+            kept.append(char)
+    return "".join(kept)
+
+
 def load_wrapper_components(root_dir):
     widgets_dir = Path(root_dir) / "Modules" / "Settings" / "Widgets"
     wrappers = {}
 
     for qml_file in sorted(widgets_dir.glob("*.qml")):
-        if qml_file.stem in SEARCHABLE_COMPONENTS:
+        if qml_file.stem in SEARCHABLE_COMPONENTS or SHARED_CARD_NAME.fullmatch(qml_file.stem):
             continue
 
         with open(qml_file, "r", encoding="utf-8") as f:
@@ -333,6 +360,40 @@ def load_wrapper_components(root_dir):
         }
 
     return wrappers
+
+
+SHARED_CARD_NAME = re.compile(r"Island\w+Card")
+SHARED_CARD_PATTERN = re.compile(r"\b(Island\w+Card)\s*\{")
+SHARED_CARD_ROW_PATTERN = re.compile(r"\b(?:Settings\w*Row|Loader)\s*\{")
+
+
+def strip_hidden_rows(card_content, hosted, docked, dot):
+    """Drop rows the instance hides for good: `visible: !root.hosted` on a hosted page, `visible: root.docked` on an undocked one, `visible: !root.dot` on the dot."""
+    result = card_content
+    for match in reversed(list(SHARED_CARD_ROW_PATTERN.finditer(card_content))):
+        block = parse_component_block(card_content, match.start(), "")
+        visible = extract_property(block, "visible") or ""
+        if (hosted and "!root.hosted" in visible) or (not docked and "root.docked" in visible) or (dot and "!root.dot" in visible):
+            result = result[: match.start()] + result[match.start() + len(block):]
+    return result
+
+
+def inline_shared_cards(root_dir, content):
+    """Append each shared island card a page instantiates, with its settingKeys rewritten to the page's keyPrefix."""
+    widgets_dir = Path(root_dir) / "Modules" / "Settings" / "Widgets"
+    for match in SHARED_CARD_PATTERN.finditer(content):
+        card_file = widgets_dir / f"{match.group(1)}.qml"
+        if not card_file.exists():
+            continue
+        instance = parse_component_block(content, match.start(), match.group(1))
+        prefix_match = re.search(r'keyPrefix:\s*"(\w+)"', instance)
+        prefix = prefix_match.group(1) if prefix_match else "island"
+        hosted = "hosted: true" in instance
+        docked = "docked: false" not in instance
+        dot = "dot: true" in instance
+        card = strip_hidden_rows(card_file.read_text(encoding="utf-8"), hosted, docked, dot)
+        content += "\n" + card.replace('settingKey: root.keyPrefix + "', f'settingKey: "{prefix}')
+    return content
 
 
 def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
@@ -355,18 +416,22 @@ def find_settings_components(content, filename, wrappers, tab_meta, hub_meta):
             if setting_key:
                 setting_key = setting_key.strip("\"'")
 
-            if not setting_key:
+            if not setting_key or not re.fullmatch(r"\w+", setting_key):
                 continue
 
             tab_index = file_tab_index
 
-            title_raw = extract_property(block, "title") or defaults.get("title")
-            text_raw = extract_property(block, "text") or defaults.get("text")
+            own = own_scope(block)
+            title_raw = extract_property(own, "title") or defaults.get("title")
+            text_raw = extract_property(own, "text") or defaults.get("text")
             label = None
             if title_raw:
                 label = extract_i18n_string(title_raw)
             if not label and text_raw:
                 label = extract_i18n_string(text_raw)
+            if not label and component == "SettingsCard":
+                page_label = hub_meta.get(file_page) if file_page else tab_meta.get(file_tab_index, TAB_META_DEFAULT)
+                label = page_label[0]
 
             if not label:
                 continue
@@ -524,9 +589,11 @@ def parse_structure_entry(block, parent=None):
         own = block[: children_match.start()] + block[end + 1 :]
 
     tab_index_match = re.search(r'"tabIndex"\s*:\s*(\d+)', own)
+    label = i18n_prop(own, "text")
     entry = {
         "id": string_prop(own, "id"),
-        "label": i18n_prop(own, "text"),
+        "label": label,
+        "runtimeLabel": label is None and re.search(r'"text"\s*:', own) is not None,
         "icon": string_prop(own, "icon"),
         "tabIndex": int(tab_index_match.group(1)) if tab_index_match else None,
         "hint": i18n_prop(own, "hint"),
@@ -596,6 +663,8 @@ def generate_hub_entries(hubs):
             "keywords": sorted(k for k in keywords if k not in STOPWORDS),
             "icon": hub["icon"],
         }
+        if hub["hint"]:
+            entry["description"] = hub["hint"]
         if hub["conditionKey"]:
             entry["conditionKey"] = hub["conditionKey"]
         entries.append(entry)
@@ -612,8 +681,8 @@ def generate_tab_entries(leaves, settings_entries):
 
     entries = []
     for leaf in leaves:
-        base_label = leaf["label"]
-        if not base_label:
+        base_label = leaf["label"] or ""
+        if leaf["children"] or not (base_label or leaf["runtimeLabel"]):
             continue
         label = (
             f"{leaf['parentLabel']}: {base_label}"
@@ -638,6 +707,8 @@ def generate_tab_entries(leaves, settings_entries):
             entry["description"] = leaf["hint"]
         if leaf["conditionKey"]:
             entry["conditionKey"] = leaf["conditionKey"]
+        if leaf["runtimeLabel"]:
+            entry["runtimeType"] = "pageLabel"
         entries.append(entry)
 
     return entries
@@ -654,7 +725,7 @@ def extract_settings_index(root_dir, tab_meta, hub_meta):
             continue
 
         with open(qml_file, "r", encoding="utf-8") as f:
-            content = f.read()
+            content = inline_shared_cards(root_dir, f.read())
 
         entries = find_settings_components(content, qml_file.name, wrappers, tab_meta, hub_meta)
         for entry in entries:
@@ -722,7 +793,7 @@ def extract_bar_widget_option_labels(root_dir):
     entries = []
     for qml_file in sorted(options_dir.glob("*Options.qml")):
         labels = []
-        for label in OPTION_LABEL_PATTERN.findall(qml_file.read_text(encoding="utf-8")):
+        for label in OPTION_LABEL_PATTERN.findall(inline_shared_cards(root_dir, qml_file.read_text(encoding="utf-8"))):
             if not label or label in labels:
                 continue
             labels.append(label)

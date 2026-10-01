@@ -20,6 +20,7 @@ DankCard {
     property real previewHeight: Math.round((width - Theme.spacingS * 2) * SettingsMetrics.choiceCardPreviewRatio)
     readonly property int infoHeight: Theme.iconButtonSize + Theme.fontSizeSmall * 4 + Theme.spacingS
     readonly property bool compatible: PluginService.checkPluginCompatibility(plugin.requires_dms)
+    readonly property bool focusRingShown: selected && Theme.focusRingWidth > 0
 
     signal installRequested
     signal uninstallRequested
@@ -27,8 +28,8 @@ DankCard {
     implicitHeight: previewHeight + infoHeight + Theme.spacingS * 2 + Theme.spacingM
     radius: Theme.cornerRadiusM
     color: Theme.floatingWindowNestedSurface
-    border.color: selected ? Theme.focusRingColor : Theme.outlineMedium
-    border.width: selected ? Theme.focusRingWidth : Theme.layerOutlineWidth
+    border.color: focusRingShown ? Theme.focusRingColor : Theme.outlineMedium
+    border.width: focusRingShown ? Theme.focusRingWidth : Theme.layerOutlineWidth
     pad: 0
     clickable: true
     Accessible.name: plugin.name || ""

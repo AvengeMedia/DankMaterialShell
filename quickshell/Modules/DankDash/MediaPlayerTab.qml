@@ -18,13 +18,13 @@ Item {
     readonly property var options: DashRegistry.resolvedOptions(entryId)
     readonly property string playerStyle: options?.playerStyle ?? MediaOptions.defaultPlayerStyle
     readonly property bool lyricsEnabled: (options?.lyrics ?? MediaOptions.defaults.lyrics) && DMSService.capabilities.includes("lyrics")
+    readonly property bool smoothLyrics: options?.smoothLyrics ?? MediaOptions.defaults.smoothLyrics
     property bool lyricsOpen: false
     property bool playerPaneOpen: true
     property Item lyricsFocusTarget: null
     property Item lyricsOpener: null
-    readonly property alias lyrics: lyricsController
     readonly property var presentation: mediaPresentation.current
-    readonly property bool presentationSettling: mediaPresentation.settling
+    readonly property bool idle: !presentation
     property bool wallpaperEnabled: MediaOptions.albumArtBackdrop
     property string panel: ""
     property Item contentViewport: null
@@ -81,15 +81,16 @@ Item {
         playerPaneOpen = true;
     }
 
+    onIdleChanged: {
+        if (!idle)
+            return;
+        panel = "";
+        isSeeking = false;
+    }
+
     onLyricsOpenChanged: {
         if (!lyricsOpen)
             lyricsFocusTimer.restart();
-    }
-
-    LyricsController {
-        id: lyricsController
-        player: root
-        enabled: root.lyricsOpen && root.live && root.lyricsEnabled
     }
 
     Timer {
@@ -99,10 +100,10 @@ Item {
             if (!root.live || !root.lyricsOpener?.visible || !root.lyricsOpener.enabled)
                 return;
             if (typeof root.lyricsOpener.requestFocus === "function") {
-                root.lyricsOpener.requestFocus(false);
+                root.lyricsOpener.requestFocus(false, Qt.OtherFocusReason);
                 return;
             }
-            root.lyricsOpener.forceActiveFocus(Qt.PopupFocusReason);
+            root.lyricsOpener.forceActiveFocus(Qt.OtherFocusReason);
         }
     }
 
@@ -238,15 +239,11 @@ Item {
         if (event.key === Qt.Key_F6)
             return cycleFocus(!!(event.modifiers & Qt.ShiftModifier));
         if (event.key === Qt.Key_Escape) {
-            if (panel !== "") {
-                const panelId = panel;
-                panel = "";
-                mediaChrome.item?.focusPanelButton(panelId);
-                return true;
-            }
-            if (!lyricsOpen)
+            if (panel === "")
                 return false;
-            lyricsOpen = false;
+            const panelId = panel;
+            panel = "";
+            mediaChrome.item?.focusPanelButton(panelId);
             return true;
         }
         if (panel !== "")
@@ -307,7 +304,14 @@ Item {
     Loader {
         id: mediaChrome
         anchors.fill: parent
+        active: !root.idle
         sourceComponent: root.playerStyle === "material" ? materialChrome : bentoChrome
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.idle
+        sourceComponent: MediaEmptyState {}
     }
 
     Component {

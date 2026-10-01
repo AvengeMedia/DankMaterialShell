@@ -96,9 +96,9 @@ Item {
                                 width: parent.width
                                 height: 56
                                 radius: Theme.cornerRadius
-                                color: modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                                border.width: isConnected ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
-                                border.color: isConnected ? Theme.primary : Theme.outlineMedium
+                                color: isConnected ? Theme.selectedContainer : modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                                border.width: Theme.layerOutlineWidth
+                                border.color: Theme.outlineMedium
 
                                 Row {
                                     anchors.left: parent.left
@@ -111,7 +111,7 @@ Item {
                                     DankIcon {
                                         name: "network_cell"
                                         size: 20
-                                        color: modemDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                                        color: modemDelegate.isConnected ? Theme.accentOnSelectedContainer : Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
@@ -123,7 +123,7 @@ Item {
                                         StyledText {
                                             text: modelData.name || I18n.tr("Unknown")
                                             font.pixelSize: Theme.fontSizeMedium
-                                            color: modemDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                                            color: modemDelegate.isConnected ? Theme.onSelectedContainer : Theme.surfaceText
                                             font.weight: Theme.fontWeightMedium
                                             elide: Text.ElideRight
                                             width: parent.width
@@ -231,9 +231,9 @@ Item {
                             width: parent.width
                             height: 56
                             radius: Theme.cornerRadius
-                            color: profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
-                            border.color: isActive ? Theme.primary : Theme.outlineMedium
-                            border.width: isActive ? Theme.outlineWidthFocused : Theme.layerOutlineWidth
+                            color: isActive ? Theme.selectedContainer : profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                            border.color: Theme.outlineMedium
+                            border.width: Theme.layerOutlineWidth
 
                             Row {
                                 anchors.left: parent.left
@@ -246,7 +246,7 @@ Item {
                                 DankIcon {
                                     name: "sim_card"
                                     size: 20
-                                    color: profileDelegate.isActive ? Theme.primary : Theme.surfaceText
+                                    color: profileDelegate.isActive ? Theme.accentOnSelectedContainer : Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -258,7 +258,7 @@ Item {
                                     StyledText {
                                         text: modelData.id || I18n.tr("Unknown")
                                         font.pixelSize: Theme.fontSizeMedium
-                                        color: profileDelegate.isActive ? Theme.primary : Theme.surfaceText
+                                        color: profileDelegate.isActive ? Theme.onSelectedContainer : Theme.surfaceText
                                         font.weight: Theme.fontWeightMedium
                                         elide: Text.ElideRight
                                         width: parent.width

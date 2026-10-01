@@ -255,8 +255,8 @@ Item {
 
     Column {
         anchors.fill: parent
-        anchors.margins: Theme.spacingM
-        spacing: Theme.spacingM
+        anchors.margins: PopoutMetrics.contentPadding
+        spacing: PopoutMetrics.contentGap
 
         Item {
             id: editorHeader
@@ -295,7 +295,7 @@ Item {
         DankTextEdit {
             id: editField
             width: parent.width
-            height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - Theme.spacingM * 2)
+            height: Math.max(Theme.fontSizeMedium * 8, parent.height - editorHeader.height - editorActions.height - PopoutMetrics.contentGap * 2)
             leftIconName: "edit"
             placeholderText: I18n.tr("Edit clipboard text")
             backgroundColor: Theme.floatingWindowFieldColor

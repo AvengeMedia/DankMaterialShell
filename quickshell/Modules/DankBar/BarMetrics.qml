@@ -41,4 +41,30 @@ Singleton {
     function widgetStyle(barConfig) {
         return barConfig?.widgetStyle ?? "pills";
     }
+
+    // islandBandFit is the inverse of compactFaceThickness; both read these.
+    readonly property real islandFaceBloomSmall: 2
+    readonly property real islandFaceBloomLarge: 4
+    readonly property real islandLargeFaceCompact: 40
+    readonly property real islandMinFace: 16
+    readonly property real islandMinBandFace: 20
+
+    function widgetFill(barConfig) {
+        const transparency = SettingsData.barWidgetTransparency(barConfig);
+        return Theme.widgetBackgroundHasAlpha ? Theme.blendAlpha(Theme.widgetBaseBackgroundColor, transparency) : Theme.withAlpha(Theme.widgetBaseBackgroundColor, transparency);
+    }
+
+    function compactFaceThickness(compact) {
+        return compact + (compact < islandLargeFaceCompact ? islandFaceBloomSmall : islandFaceBloomLarge);
+    }
+
+    function islandBandFit(bandThickness, gap) {
+        const fittedGap = Math.max(1, Math.min(gap, Math.floor((bandThickness - islandMinBandFace) / 2)));
+        const face = Math.max(islandMinFace, Math.round(bandThickness) - fittedGap * 2);
+        const large = face - islandFaceBloomLarge;
+        return {
+            "gap": fittedGap,
+            "compact": large >= islandLargeFaceCompact ? large : Math.min(islandLargeFaceCompact - 1, face - islandFaceBloomSmall)
+        };
+    }
 }

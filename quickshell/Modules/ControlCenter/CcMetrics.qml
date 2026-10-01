@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     readonly property real sheetWidthDefault: sheetWidthFor(defaultColumns)
@@ -13,7 +14,6 @@ Singleton {
     readonly property real gridStep: 0.5
     property int columnPreview: 0
     readonly property int gridColumns: columnPreview > 0 ? columnPreview : clampColumns(SettingsData.controlCenterColumns)
-    readonly property real sheetWidth: sheetWidthFor(gridColumns)
 
     function clampColumns(value) {
         const columns = Math.round(Number(value));
@@ -42,8 +42,9 @@ Singleton {
     readonly property real gridRowUnit: tileHeight
     readonly property real expandedTileMinWidth: columnWidth * 3 + gridGap * 2
     readonly property real sliderRowHeight: Theme.minimumTouchTargetSize
+    readonly property real stripTrackHeight: 32
+    readonly property real stripHandleHeight: stripTrackHeight + Theme.sliderHandleGap * 2
     readonly property real gridGap: Theme.spacingS
-    readonly property real tilePaddingH: Theme.spacingL
     readonly property real iconScale: SettingsData.controlCenterIconScale
     readonly property real tileIconSize: Theme.iconSizeLarge * iconScale
     readonly property real iconBoxSize: Theme.minimumTouchTargetSize * iconScale
@@ -53,12 +54,19 @@ Singleton {
     readonly property real iconBoxIconSize: Theme.iconSize * iconScale
     readonly property real tallMeterThickness: 28
     readonly property real tileTextGap: Theme.spacingM
-    readonly property real headerActionSize: Theme.iconButtonSize * iconScale
-    readonly property real headerActionIconSize: Theme.iconSize * iconScale
+    readonly property real footerHeight: iconBoxSize
+    readonly property real footerGap: Theme.spacingS
+    readonly property real runningAppsIconSize: Theme.iconSize * iconScale
+    // The resize corner counts a small tile as this many rows and snaps to the nearer of this and a full row.
+    readonly property real smallRowFraction: 0.5
+    readonly property real shapeButtonSize: Theme.iconSize
 
-    readonly property real headerAvatarSize: 56
-    readonly property real headerHeight: tileHeight
-
+    readonly property real detailDialogInset: Theme.spacingL
+    readonly property real detailDialogPadding: Theme.spacingS
+    readonly property real detailMinContentHeight: Theme.listItemTwoLineHeight * 3
+    readonly property real headerActionSize: Theme.buttonHeightXS
+    readonly property real headerActionIconSize: Theme.iconSizeMedium
+    readonly property real headerEdgeInset: rowPaddingH - (headerActionSize - headerActionIconSize) / 2
     readonly property real pageHeaderHeight: Theme.fontSizeXXLarge + Theme.spacingM * 2
     readonly property real pageTitleSize: Theme.fontSizeXXLarge
     readonly property real detailHeightList: 350
@@ -83,6 +91,8 @@ Singleton {
     readonly property real dialogWidth: 320
     readonly property real libraryPanelWidth: 400
     readonly property real libraryPanelHeight: 400
+    readonly property real widgetSheetHeightRatio: 0.85
+    readonly property real previewSize: 76
     readonly property real configMenuWidth: 260
     readonly property real vpnPopoutListHeight: 200
     readonly property real headerDropdownWidth: 120
@@ -100,15 +110,18 @@ Singleton {
     readonly property real brightnessExponentStep: 0.1
     readonly property int overlayZ: 10000
     readonly property real popupEnterScale: 0.92
+    readonly property color dialogColor: Theme.foregroundColor(Theme.hostSurface)
+    readonly property bool hideCoveredContent: BlurService.enabled && Theme.connectedSurfaceBlurEnabled && dialogColor.a < 1
 
     readonly property color tileActiveColor: Theme.ccTileActiveBg
     readonly property color tileActiveContent: Theme.ccTileActiveText
     readonly property color tileInactiveColor: Theme.ccPillInactiveBg
+    readonly property color iconBoxInactiveColor: Theme.ccIconBoxInactiveBg
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
 
-    readonly property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+    readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 
     function preferredDetailHeight(section, pluginHeight) {
         if (!section)
@@ -127,6 +140,7 @@ Singleton {
         case "audioOutput":
         case "audioInput":
         case "diskUsage":
+        case "runningApps":
             return detailHeightList;
         default:
             return detailHeightDefault;

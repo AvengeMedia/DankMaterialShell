@@ -52,6 +52,8 @@ DankEditableGridSlot {
             return;
         if ("entryId" in item)
             item.entryId = root.cardId;
+        if ("transientSurfaceTracker" in item)
+            item.transientSurfaceTracker = Qt.binding(() => root.grid.transientSurfaceTracker);
         if (!root.entry?.isPlugin)
             return;
         if ("pluginId" in item)

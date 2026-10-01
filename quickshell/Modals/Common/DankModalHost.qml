@@ -404,6 +404,7 @@ Item {
                 return;
             root.isClosing = false;
             contentWindow.visible = false;
+            morph.snapTo(0);
             root._fluidMotionActive = false;
             root.dialogClosed();
         }
@@ -760,8 +761,8 @@ Item {
                     enabled: root.animationsEnabled
                     onValueChanged: root._kickBlurCommitUnlessConnected()
                     reducedMotion: root.animationDuration <= 0
-                    positionEpsilon: 0.001
-                    velocityEpsilon: 0.001
+                    positionEpsilon: Math.max(0.001, 0.25 / root.dpr / modalContainer.morphTravelPx)
+                    velocityEpsilon: positionEpsilon * damping / Math.max(0.001, 2 * mass)
                     stiffness: Theme.springPreset("default", root.animationDuration).stiffness
                     damping: Theme.springPreset("default", root.animationDuration).damping
 
@@ -781,6 +782,7 @@ Item {
                     root._syncModalAnim();
                 }
                 readonly property real scaleValue: root._fluidMotionActive ? 1 : root.animationScaleCollapsed + (1.0 - root.animationScaleCollapsed) * morph.value
+                readonly property real morphTravelPx: Math.max(1, Math.abs(offsetX), Math.abs(root.frozenMotionOffsetX), Math.abs(offsetY), Math.abs(root.frozenMotionOffsetY), (1 - root.animationScaleCollapsed) * Math.max(root.alignedWidth, root.alignedHeight), root._fluidMotionActive ? Math.max(root.alignedWidth, root.alignedHeight) : 0)
 
                 SurfaceContentClip {
                     id: contentClip

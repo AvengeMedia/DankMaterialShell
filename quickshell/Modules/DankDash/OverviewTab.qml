@@ -19,6 +19,7 @@ FocusScope {
     property int rowBudget: DashMetrics.minimumTabRows
     property int columnCap: DashMetrics.maximumGridColumns
     property string preferredFocusId: "calendar"
+    property var transientSurfaceTracker: null
 
     signal cardFocusChanged(string id)
     readonly property Item focusTarget: grid
@@ -88,6 +89,7 @@ FocusScope {
         columnCap: root.columnCap
         live: root.live
         preferredFocusId: root.preferredFocusId
+        transientSurfaceTracker: root.transientSurfaceTracker
         onCardFocusChanged: id => root.cardFocusChanged(id)
 
         onCardClicked: cardId => {
@@ -109,6 +111,7 @@ FocusScope {
 
     CcMenu {
         id: addMenu
+        transientSurfaceTracker: root.transientSurfaceTracker
 
         items: root.addable.map(candidate => ({
                     "label": candidate.entry.card.text,
@@ -119,11 +122,14 @@ FocusScope {
 
     DashOptionsSheet {
         id: optionsSheet
+        backdrop: grid
         onDismissed: root.navFocusRequested(false)
     }
 
     CcSheetDialog {
         id: detailSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
 
@@ -166,6 +172,8 @@ FocusScope {
 
     CcSheetDialog {
         id: editorSheet
+        backdrop: grid
+        showScrollBar: false
 
         property var eventData: null
         property date initialDate: new Date()
@@ -186,6 +194,7 @@ FocusScope {
             sourceComponent: CalendarEventEditor {
                 eventData: editorSheet.eventData
                 initialDate: editorSheet.initialDate
+                transientSurfaceTracker: root.transientSurfaceTracker
                 onSaved: editorSheet.dismiss()
                 onCloseRequested: editorSheet.dismiss()
             }

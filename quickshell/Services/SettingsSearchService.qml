@@ -48,6 +48,14 @@ Singleton {
         }
     }
 
+    Connections {
+        target: SettingsTabs
+
+        function onPageMapChanged() {
+            root._refreshTranslatedCache();
+        }
+    }
+
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
             "pointerCapable": () => CompositorService.supportsPointerConfig,
@@ -70,7 +78,7 @@ Singleton {
             "frameEnabled": () => SettingsData.frameEnabled,
             "islandEnabled": () => SettingsData.islandBarConfigs.length > 0,
             "dotEnabled": () => SettingsData.dotBarConfig?.enabled ?? false,
-            "cellularAvailable": () => (NetworkService.cellularDevices?.length ?? 0) > 0
+            "cellularAvailable": () => NetworkService.cellularAvailable
         })
 
     property var pluginSettingLabels: ({})
@@ -299,9 +307,20 @@ Singleton {
         return condFn();
     }
 
+    function _itemLabel(item) {
+        switch (item.runtimeType) {
+        case "plugin":
+            return item.label;
+        case "pageLabel":
+            return SettingsTabs.page(SettingsTabs.pageForTabIndex(item.tabIndex))?.text ?? "";
+        default:
+            return I18n.tr(item.label);
+        }
+    }
+
     function translateItem(item) {
         const isRuntimePlugin = item.runtimeType === "plugin";
-        const label = isRuntimePlugin ? item.label : I18n.tr(item.label);
+        const label = _itemLabel(item);
         const description = isRuntimePlugin ? (item.description || "") : I18n.tr(item.description || "");
         const category = I18n.tr(item.category);
         return {
@@ -341,7 +360,8 @@ Singleton {
                 runtimeType: t.runtimeType,
                 runtimeId: t.runtimeId,
                 page: t.page,
-                isTab: String(t.section).startsWith("_tab_"),
+                level: _entryLevel(t.section),
+                order: i,
                 labelSearch: labelLower,
                 categorySearch: categoryLower,
                 descriptionSearch: descriptionLower,
@@ -433,17 +453,81 @@ Singleton {
         return out;
     }
 
-    function _bestFieldScore(fields, queryLower, exactScore, prefixScore, includesScore) {
+    readonly property var labelScores: ({
+            "exact": 10000,
+            "plural": 9500,
+            "prefix": 5000,
+            "wordStart": 3000,
+            "includes": 1000
+        })
+    readonly property var squashScores: ({
+            "exact": 9000,
+            "plural": 8500,
+            "prefix": 4500,
+            "wordStart": 900,
+            "includes": 900
+        })
+    // V4 regex has no \p{} classes, so word breaks are whitespace and punctuation ranges.
+    readonly property var wordBreak: /[\s!-\/:-@\[-`{-~\u2000-\u206f\u3000-\u303f]/
+
+    function _entryLevel(section) {
+        const id = String(section);
+        if (id.startsWith("_hub_"))
+            return 2;
+        if (id.startsWith("_tab_"))
+            return 1;
+        return 0;
+    }
+
+    function _singular(value) {
+        if (value.length <= 3 || !value.endsWith("s") || value.endsWith("ss"))
+            return value;
+        return value.slice(0, -1);
+    }
+
+    function _startsWord(field, query) {
+        for (var at = field.indexOf(query, 1); at > 0; at = field.indexOf(query, at + 1)) {
+            if (wordBreak.test(field[at - 1]))
+                return true;
+        }
+        return false;
+    }
+
+    function _labelScore(labels, query, scores) {
         var score = 0;
-        for (var i = 0; i < fields.length; i++) {
-            var field = fields[i];
-            if (field === queryLower) {
-                score = Math.max(score, exactScore);
-            } else if (field.startsWith(queryLower)) {
-                score = Math.max(score, prefixScore);
-            } else if (field.includes(queryLower)) {
-                score = Math.max(score, includesScore);
-            }
+        for (var i = 0; i < labels.length; i++) {
+            var label = labels[i];
+            if (label === query)
+                return scores.exact;
+            if (_singular(label) === _singular(query))
+                score = Math.max(score, scores.plural);
+            else if (label.startsWith(query))
+                score = Math.max(score, scores.prefix);
+            else if (_startsWord(label, query))
+                score = Math.max(score, scores.wordStart);
+            else if (label.includes(query))
+                score = Math.max(score, scores.includes);
+        }
+        return score;
+    }
+
+    function _keywordScore(entry, query, querySquash) {
+        var score = 0;
+        for (const keyword of entry.keywords) {
+            if (keyword === query)
+                return 900;
+            if (keyword.startsWith(query))
+                score = Math.max(score, 800);
+            else if (keyword.includes(query))
+                score = Math.max(score, 400);
+        }
+        if (!querySquash)
+            return score;
+        for (const keyword of entry.keywordsSquash) {
+            if (keyword === querySquash)
+                return Math.max(score, 850);
+            if (keyword.startsWith(querySquash))
+                score = Math.max(score, 750);
         }
         return score;
     }
@@ -465,10 +549,10 @@ Singleton {
     }
 
     function _searchEntries(text, maxResults) {
-        if (!text)
+        var queryLower = (text || "").toLowerCase().trim();
+        if (!queryLower)
             return [];
 
-        var queryLower = text.toLowerCase().trim();
         var querySquash = _squash(queryLower);
         var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
         var scored = [];
@@ -480,46 +564,15 @@ Singleton {
             if (!checkCondition(entry))
                 continue;
 
-            var labelScore = _bestFieldScore(entry.labelSearch, queryLower, 10000, 5000, 1000);
+            var labelScore = _labelScore(entry.labelSearch, queryLower, labelScores);
             if (querySquash)
-                labelScore = Math.max(labelScore, _bestFieldScore(entry.labelSquash, querySquash, 9000, 4500, 900));
+                labelScore = Math.max(labelScore, _labelScore(entry.labelSquash, querySquash, squashScores));
 
-            var score = labelScore;
-            score = Math.max(score, _bestFieldScore(entry.categorySearch, queryLower, 500, 500, 500));
-            score = Math.max(score, _bestFieldScore(entry.descriptionSearch, queryLower, 250, 250, 250));
-            if (querySquash) {
-                score = Math.max(score, _bestFieldScore(entry.categorySquash, querySquash, 500, 500, 500));
-                score = Math.max(score, _bestFieldScore(entry.descriptionSquash, querySquash, 250, 250, 250));
-            }
-
-            if (score === 0) {
-                var keywords = entry.keywords;
-                for (var k = 0; k < keywords.length; k++) {
-                    var keyword = keywords[k];
-                    if (keyword === queryLower) {
-                        score = 900;
-                        break;
-                    }
-                    if (keyword.startsWith(queryLower)) {
-                        score = Math.max(score, 800);
-                    } else if (keyword.includes(queryLower) && score < 400) {
-                        score = 400;
-                    }
-                }
-            }
-
-            if (score === 0 && querySquash) {
-                var keywordsSquash = entry.keywordsSquash;
-                for (var ks = 0; ks < keywordsSquash.length; ks++) {
-                    if (keywordsSquash[ks] === querySquash) {
-                        score = Math.max(score, 850);
-                        break;
-                    }
-                    if (keywordsSquash[ks].startsWith(querySquash)) {
-                        score = Math.max(score, 750);
-                    }
-                }
-            }
+            var score = Math.max(labelScore, _keywordScore(entry, queryLower, querySquash));
+            if (_fieldsContainWord(entry.categorySearch, queryLower) || (querySquash && _fieldsContainWord(entry.categorySquash, querySquash)))
+                score = Math.max(score, 500);
+            if (_fieldsContainWord(entry.descriptionSearch, queryLower) || (querySquash && _fieldsContainWord(entry.descriptionSquash, querySquash)))
+                score = Math.max(score, 250);
 
             if (score === 0 && queryWords.length > 1) {
                 var allMatch = true;
@@ -551,23 +604,27 @@ Singleton {
                 scored.push({
                     item: entry,
                     score: score,
-                    labelScore: labelScore
+                    labelTier: labelScore >= labelScores.wordStart ? 2 : labelScore > 0 ? 1 : 0
                 });
             }
         }
 
         scored.sort((a, b) => {
+            if (b.labelTier !== a.labelTier)
+                return b.labelTier - a.labelTier;
+            if (a.labelTier > 0 && b.item.level !== a.item.level)
+                return b.item.level - a.item.level;
             if (b.score !== a.score)
                 return b.score - a.score;
+            if (b.item.level !== a.item.level)
+                return b.item.level - a.item.level;
             const aRuntime = !!a.item.runtimeType;
             const bRuntime = !!b.item.runtimeType;
             if (aRuntime !== bRuntime)
                 return aRuntime ? 1 : -1;
-            if (b.labelScore !== a.labelScore)
-                return b.labelScore - a.labelScore;
-            if (a.item.isTab !== b.item.isTab)
-                return a.item.isTab ? 1 : -1;
-            return a.item.label.length - b.item.label.length;
+            if (a.item.label.length !== b.item.label.length)
+                return a.item.label.length - b.item.label.length;
+            return a.item.order - b.item.order;
         });
         return scored.slice(0, limit).map(s => s.item);
     }

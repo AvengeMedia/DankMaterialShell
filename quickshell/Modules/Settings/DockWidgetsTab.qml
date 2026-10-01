@@ -84,7 +84,7 @@ Item {
 
     readonly property var widgetChoices: {
         catalogRevision;
-        return BarWidgetCatalog.widgets.concat(PluginService.getAllPluginVariants().filter(variant => variant.loaded).map(variant => ({
+        return BarWidgetCatalog.widgets.filter(widget => !widget.barOnly).concat(PluginService.getAllPluginVariants().filter(variant => variant.loaded).map(variant => ({
                     id: variant.fullId,
                     text: variant.name,
                     icon: variant.icon
@@ -148,7 +148,6 @@ Item {
             width: parent.width
             visible: dock.hasConfig
             iconName: "widgets"
-            title: I18n.tr("Apps & widgets")
             settingKey: "dockWidgets"
             tags: ["dock", "widgets", "apps", "add", "remove", "order"]
 
@@ -235,15 +234,6 @@ Item {
                     }
                 }
             }
-
-            SettingsNavRow {
-                title: I18n.tr("Add widget")
-                iconName: "add"
-                onClicked: {
-                    picker.widgets = root.widgetChoices.filter(widget => widget.id !== "appsDock" || !dock.config.widgets.some(item => item.widgetId === "appsDock"));
-                    picker.show();
-                }
-            }
         }
 
         Loader {
@@ -252,6 +242,19 @@ Item {
             visible: active
             sourceComponent: AppsDockOptions {
                 page: root
+            }
+        }
+
+        SettingsFabBar {
+            shown: dock.hasConfig
+
+            DankFab {
+                text: I18n.tr("Add widget")
+                iconName: "add"
+                onClicked: {
+                    picker.widgets = root.widgetChoices.filter(widget => widget.id !== "appsDock" || !dock.config.widgets.some(item => item.widgetId === "appsDock"));
+                    picker.show();
+                }
             }
         }
     }

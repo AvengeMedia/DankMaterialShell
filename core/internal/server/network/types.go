@@ -75,6 +75,9 @@ type CellularDevice struct {
 	IP          string `json:"ip,omitempty"`
 	Driver      string `json:"driver,omitempty"`
 	Description string `json:"description,omitempty"`
+	// SignalQuality is a 0-100 percentage from ModemManager, 0 when unknown.
+	SignalQuality uint32 `json:"signalQuality"`
+	AccessTech    string `json:"accessTech,omitempty"`
 }
 
 type VPNProfile struct {

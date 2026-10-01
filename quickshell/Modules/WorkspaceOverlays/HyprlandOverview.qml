@@ -25,6 +25,12 @@ Scope {
                 required property var modelData
                 readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.screen)
                 property bool monitorIsFocused: (Hyprland.focusedMonitor?.id == monitor?.id)
+                property bool grabArmed: false
+
+                function rearmGrab() {
+                    grabArmed = false;
+                    grabArmed = true;
+                }
 
                 screen: modelData
                 visible: overviewScope.overviewOpen
@@ -53,58 +59,20 @@ Scope {
                 HyprlandFocusGrab {
                     id: grab
                     windows: overviewLoader.item?.windowMenuWindow ? [root, overviewLoader.item.windowMenuWindow] : [root]
-                    active: false
-                    property bool hasBeenActivated: false
-                    onActiveChanged: {
-                        if (active) {
-                            hasBeenActivated = true;
-                        }
-                    }
-                    onCleared: () => {
-                        if (hasBeenActivated && overviewScope.overviewOpen) {
-                            overviewScope.overviewOpen = false;
-                        }
-                    }
+                    active: root.grabArmed && root.monitorIsFocused && !PopoutManager.screenshotActive
+                    onCleared: overviewScope.overviewOpen = false
                 }
 
-                Connections {
-                    target: overviewScope
-                    function onOverviewOpenChanged() {
-                        if (overviewScope.overviewOpen) {
-                            grab.hasBeenActivated = false;
-                            if (CompositorService.useHyprlandFocusGrab)
-                                delayedGrabTimer.start();
-                        } else {
-                            delayedGrabTimer.stop();
-                            grab.active = false;
-                            grab.hasBeenActivated = false;
-                        }
-                    }
-                }
-
-                Connections {
-                    target: root
-                    function onMonitorIsFocusedChanged() {
-                        if (!CompositorService.useHyprlandFocusGrab)
-                            return;
-                        if (overviewScope.overviewOpen && root.monitorIsFocused && !grab.active) {
-                            grab.hasBeenActivated = false;
-                            grab.active = true;
-                        } else if (overviewScope.overviewOpen && !root.monitorIsFocused && grab.active) {
-                            grab.active = false;
-                        }
-                    }
+                Component.onCompleted: {
+                    if (CompositorService.useHyprlandFocusGrab)
+                        delayedGrabTimer.start();
                 }
 
                 Timer {
                     id: delayedGrabTimer
                     interval: 150
                     repeat: false
-                    onTriggered: {
-                        if (CompositorService.useHyprlandFocusGrab && overviewScope.overviewOpen && root.monitorIsFocused) {
-                            grab.active = true;
-                        }
-                    }
+                    onTriggered: root.grabArmed = true
                 }
 
                 Timer {
@@ -271,13 +239,22 @@ Scope {
                             Qt.callLater(() => focusScope.forceActiveFocus());
                         }
                     }
+
+                    readonly property bool windowActive: Window.active
+
+                    // Hyprland nulls keyboard focus when the workspace has no window to focus, without ending the grab
+                    onWindowActiveChanged: {
+                        if (windowActive || !grab.active || !overviewScope.overviewOpen)
+                            return;
+                        root.rearmGrab();
+                    }
                 }
 
                 onVisibleChanged: {
                     if (visible && overviewScope.overviewOpen) {
                         Qt.callLater(() => focusScope.forceActiveFocus());
                     } else if (!visible) {
-                        grab.active = false;
+                        root.grabArmed = false;
                     }
                 }
 
@@ -290,7 +267,7 @@ Scope {
                             Qt.callLater(() => focusScope.forceActiveFocus());
                         } else {
                             closeTimer.restart();
-                            grab.active = false;
+                            root.grabArmed = false;
                         }
                     }
                 }

@@ -103,6 +103,7 @@ Item {
                 resetKeys: ["smartAutoHide"]
                 tags: ["dock", "smart", "autohide", "windows", "overlap", "intelligent", "floating"]
                 text: I18n.tr("Smart auto-hide")
+                description: I18n.tr("Hides only while a window overlaps the dock", "dock smart auto-hide toggle description")
                 visible: CompositorService.supportsSmartDock
                 checked: dock.config?.smartAutoHide ?? false
                 onToggled: checked => {

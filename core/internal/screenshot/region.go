@@ -32,9 +32,10 @@ const (
 )
 
 type SelectionState struct {
-	hasSelection bool           // There's a selection to display (pre-loaded or user-drawn)
-	dragging     bool           // User is actively drawing a new selection
-	surface      *OutputSurface // Surface where selection was made
+	hasSelection  bool           // There's a selection to display (pre-loaded or user-drawn)
+	fromPreSelect bool           // hasSelection was set by applyPreSelection, not by user interaction
+	dragging      bool           // User is actively drawing a new selection
+	surface       *OutputSurface // Surface where selection was made
 	// Global logical coordinates. Keeping these independent of the active
 	// surface lets a drag continue across output boundaries.
 	anchorX  float64
@@ -82,8 +83,11 @@ type OutputSurface struct {
 	yInverted         bool
 
 	// Triple-buffered render slots
-	slots      [3]*RenderSlot
-	slotsReady bool
+	slots        [3]*RenderSlot
+	slotsReady   bool
+	slotFormat   uint32
+	slotPrefault sync.WaitGroup
+	captured     bool
 
 	shown           *overlay
 	framePending    bool
@@ -96,6 +100,9 @@ type PreCapture struct {
 	screenBufNoCursor *ShmBuffer
 	format            uint32
 	yInverted         bool
+	width             int
+	height            int
+	stride            int
 }
 
 type RegionSelector struct {
@@ -155,6 +162,12 @@ type RegionSelector struct {
 	phase  selectorPhase
 	scroll *scrollSession
 
+	snapTargets   []SnapTarget
+	hoveredTarget *SnapTarget
+	clickedTarget *SnapTarget
+	dragStartX    float64
+	dragStartY    float64
+
 	running   bool
 	cancelled bool
 	result    Region
@@ -169,6 +182,7 @@ func NewRegionSelector(s *Screenshoter) *RegionSelector {
 		outputs:            make(map[uint32]*WaylandOutput),
 		preCapture:         make(map[*WaylandOutput]*PreCapture),
 		showCapturedCursor: s.config.Cursor == CursorOn,
+		snapTargets:        s.config.SnapTargets,
 	}
 }
 
@@ -211,10 +225,7 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 		return nil, false, fmt.Errorf("roundtrip after protocol check: %w", err)
 	}
 
-	if err := r.preCaptureAllOutputs(); err != nil {
-		return nil, false, fmt.Errorf("pre-capture: %w", err)
-	}
-
+	// unmapped until their first buffer, so the configure round trip overlaps the captures
 	if err := r.createSurfaces(); err != nil {
 		return nil, false, fmt.Errorf("create surfaces: %w", err)
 	}
@@ -223,6 +234,16 @@ func (r *RegionSelector) Run() (*CaptureResult, bool, error) {
 
 	if err := r.roundtrip(); err != nil {
 		return nil, false, fmt.Errorf("roundtrip after surfaces: %w", err)
+	}
+
+	if err := r.preCaptureAllOutputs(); err != nil {
+		return nil, false, fmt.Errorf("pre-capture: %w", err)
+	}
+
+	for _, os := range r.surfaces {
+		if os.configured && !os.captured {
+			r.captureForSurface(os)
+		}
 	}
 
 	r.running = true
@@ -512,6 +533,13 @@ func (r *RegionSelector) preCaptureOutput(output *WaylandOutput, pc *PreCapture,
 		if int(e.Stride) < int(e.Width)*bpp {
 			log.Error("invalid stride from compositor", "stride", e.Stride, "width", e.Width, "bpp", bpp)
 			return
+		}
+		if pc.width == 0 {
+			pc.width, pc.height, pc.stride = int(e.Width), int(e.Height), int(e.Stride)
+			pc.format = uint32(capturedFormat.To8Bit())
+			if bpp == 4 && output.transform == TransformNormal {
+				r.prepareSlots(output, pc)
+			}
 		}
 		buf, err := CreateShmBuffer(int(e.Width), int(e.Height), int(e.Stride))
 		if err != nil {
@@ -835,25 +863,61 @@ func (r *RegionSelector) captureForSurface(os *OutputSurface) {
 	os.screenBufNoCursor = pc.screenBufNoCursor
 	os.screenFormat = pc.format
 	os.yInverted = pc.yInverted
+	if os.screenBuf == nil {
+		return
+	}
+	os.captured = true
 
-	if os.logicalW > 0 && os.screenBuf != nil {
+	if os.logicalW > 0 {
 		os.output.fractionalScale = float64(os.screenBuf.Width) / float64(os.logicalW)
 	}
 
-	r.initRenderBuffer(os)
+	r.ensureSlots(os, os.screenBuf.Width, os.screenBuf.Height, os.screenBuf.Stride, os.screenFormat)
 	r.applyPreSelection(os)
 	r.redrawSurface(os)
 }
 
-func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
-	if os.screenBuf == nil {
+// prefaulted while the copy is in flight so the first paint does not stall on page faults
+func (r *RegionSelector) prepareSlots(output *WaylandOutput, pc *PreCapture) {
+	for _, os := range r.surfaces {
+		if os.output == output && os.configured {
+			r.ensureSlots(os, pc.width, pc.height, pc.stride, pc.format)
+		}
+	}
+}
+
+func (r *RegionSelector) releaseSlots(os *OutputSurface) {
+	os.slotPrefault.Wait()
+	os.slotsReady = false
+	for i, slot := range os.slots {
+		if slot == nil {
+			continue
+		}
+		slot.wlBuf.Destroy()
+		slot.pool.Destroy()
+		slot.shm.Close()
+		os.slots[i] = nil
+	}
+}
+
+func prefault(buf *ShmBuffer) {
+	data := buf.Data()
+	for i := 0; i < len(data); i += 4096 {
+		data[i] = 0
+	}
+}
+
+func (r *RegionSelector) ensureSlots(os *OutputSurface, width, height, stride int, format uint32) {
+	if first := os.slots[0]; os.slotsReady && first != nil && first.shm.Width == width && first.shm.Height == height && first.shm.Stride == stride && os.slotFormat == format {
 		return
 	}
+	r.releaseSlots(os)
+	os.slotFormat = format
 
 	for i := range 3 {
 		slot := &RenderSlot{}
 
-		buf, err := CreateShmBuffer(os.screenBuf.Width, os.screenBuf.Height, os.screenBuf.Stride)
+		buf, err := CreateShmBuffer(width, height, stride)
 		if err != nil {
 			log.Error("create render slot buffer failed", "err", err)
 			return
@@ -870,7 +934,7 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 
 		// niri latches surface opacity from the first buffer's format
 		// (observed), so slots are ARGB from the start with A=255 when opaque
-		wlBuf, err := pool.CreateBuffer(0, int32(buf.Width), int32(buf.Height), int32(buf.Stride), alphaFormat(os.screenFormat))
+		wlBuf, err := pool.CreateBuffer(0, int32(buf.Width), int32(buf.Height), int32(buf.Stride), alphaFormat(format))
 		if err != nil {
 			log.Error("create render slot wl_buffer failed", "err", err)
 			pool.Destroy()
@@ -890,6 +954,13 @@ func (r *RegionSelector) initRenderBuffer(os *OutputSurface) {
 		os.slots[i] = slot
 	}
 	os.slotsReady = true
+	os.slotPrefault.Add(1)
+	go func() {
+		defer os.slotPrefault.Done()
+		for _, slot := range os.slots {
+			prefault(slot.shm)
+		}
+	}()
 }
 
 func (os *OutputSurface) acquireFreeSlot() *RenderSlot {
@@ -920,6 +991,7 @@ func (r *RegionSelector) applyPreSelection(os *OutputSurface) {
 	y2 := float64(r.preSelect.Y-os.output.y+r.preSelect.Height)*scaleY - scaleY
 
 	r.selection.hasSelection = true
+	r.selection.fromPreSelect = true
 	r.selection.dragging = false
 	r.selection.surface = os
 	r.selection.anchorX = float64(os.output.x) + x1
@@ -956,6 +1028,7 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		return
 	}
 	os.redrawQueued = false
+	os.slotPrefault.Wait()
 
 	fullDamage := true
 	var damage []dirtyRect
@@ -971,8 +1044,7 @@ func (r *RegionSelector) renderSurface(os *OutputSurface) {
 		shift := r.shiftHeld && r.selection.hasSelection
 		switch {
 		case !slot.cacheValid(srcBuf, r.selection.dragging, r.showCapturedCursor, r.phase, handles, shift):
-			slot.shm.CopyFrom(srcBuf)
-			r.dimBackground(slot.shm)
+			paintDimmedFrame(slot.shm, srcBuf)
 			effectiveScale := 1.0
 			if os.output != nil {
 				effectiveScale = os.output.effectiveScale()

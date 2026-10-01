@@ -14,6 +14,7 @@ Item {
     readonly property string _barScreenName: surfaceContext.screen?.name ?? ""
     property bool spacingTight: false
     property bool overlapping: false
+    property real leadingSectionLimit: Infinity
     function getWidgetSection(item) {
         for (let current = item; current; current = current.parent) {
             if (typeof current.section === "string")
@@ -39,6 +40,7 @@ Item {
             return false;
         spec.registration = BarWidgetService.registrationForItem(spec.widgetItem);
         surfaceContext.ensureVisible(spec.widgetItem);
+        // A bar widget always opens its own popout where it was clicked; routing is for shortcuts, IPC and the dock.
         if (surfaceContext.kind === "dock" && !surfaceContext.inlineExpansion && spec.islandActivity && PopoutService.routeToIsland(spec.islandActivity, surfaceContext.screen, spec.mode !== "hover", spec.section || ""))
             return true;
         if (!spec.loader)
@@ -97,7 +99,9 @@ Item {
             popout.triggerScreen = surfaceContext.screen;
 
         if (spec.widgetItem) {
-            const visual = spec.useCenterSection && widgetSection === "center" ? surfaceContext.centerSection : spec.visualItem;
+            // A section the island sits in is not an anchor: the popout would open under the island.
+            const centred = spec.useCenterSection && widgetSection === "center" && !(surfaceContext.host?.hostsIsland && SettingsData.islandWidgetSection(surfaceContext.config) === "center");
+            const visual = centred ? surfaceContext.centerSection : spec.visualItem;
             surfaceContext.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
         }
 
@@ -157,7 +161,8 @@ Item {
             notepadButtonComponent,
             colorPickerComponent,
             systemUpdateComponent,
-            powerMenuButtonComponent
+            powerMenuButtonComponent,
+            islandComponent
         });
 
         let pluginMap = PluginService.getWidgetComponents();
@@ -186,6 +191,7 @@ Item {
                     widgetItem: clipboardWidget,
                     section: root.getWidgetSection(parent) || "right",
                     triggerSource: "clipboard",
+                    islandActivity: "clipboard",
                     mode: mode || "click",
                     prepare: popout => {
                         if (initialTab)
@@ -322,7 +328,12 @@ Item {
         FocusedApp {
             id: focusedWindowWidget
             axis: surfaceContext.axis
-            availableWidth: focusedWindowWidget.maxWidth
+            availableWidth: {
+                const container = focusedWindowWidget.parent?.parent;
+                if (!container || !isFinite(root.leadingSectionLimit) || root.getWidgetSection(focusedWindowWidget) !== "left")
+                    return focusedWindowWidget.maxWidth;
+                return Math.max(0, root.leadingSectionLimit - container.x);
+            }
             widgetThickness: surfaceContext.widgetThickness
             barThickness: surfaceContext.thickness
             barSpacing: barConfig?.spacing ?? 4
@@ -808,6 +819,32 @@ Item {
                     mode: "click",
                     setTriggerScreen: true
                 });
+            }
+        }
+    }
+
+    // Reserves the compact face's along-axis room; the morph surface is the bar's island overlay, anchored to this slot.
+    Component {
+        id: islandComponent
+
+        Item {
+            id: islandSlot
+
+            readonly property Item body: surfaceContext.kind === "bar" ? surfaceContext.host : null
+            readonly property real alongSize: body?.islandHost?.compactTargetSize ?? 0
+
+            width: surfaceContext.isVertical ? surfaceContext.widgetThickness : alongSize
+            height: surfaceContext.isVertical ? alongSize : surfaceContext.widgetThickness
+            implicitWidth: width
+            implicitHeight: height
+
+            Component.onCompleted: {
+                if (body)
+                    body.islandSlot = islandSlot;
+            }
+            Component.onDestruction: {
+                if (body && body.islandSlot === islandSlot)
+                    body.islandSlot = null;
             }
         }
     }

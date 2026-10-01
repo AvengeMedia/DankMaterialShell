@@ -43,8 +43,8 @@ QtObject {
     function trigger(action) {
         switch (action) {
         case "rules":
-            SettingsData.addNotificationRuleForNotification(appName, desktopEntry);
-            PopoutService.openSettingsWithTab("notifications");
+            SettingsData.requestNotificationRuleForNotification(appName, desktopEntry);
+            PopoutService.openSettingsWithTab("notification_rules");
             return;
         case "mute":
             if (isMuted) {

@@ -1,6 +1,7 @@
 package network
 
 import (
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/Wifx/gonetworkmanager/v2"
 	"github.com/godbus/dbus/v5"
 )
@@ -160,6 +161,26 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		}
 	}
 
+	// ModemManager is optional: without it cellular still works, just without
+	// radio metrics, so match failures are not fatal.
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusMMPath)),
+		dbus.WithMatchInterface(dbusPropsInterface),
+		dbus.WithMatchMember("PropertiesChanged"),
+	); err != nil {
+		log.Warnf("Failed to watch ModemManager properties: %v", err)
+	}
+
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusMMPath)),
+		dbus.WithMatchInterface(dbusObjectManagerInterface),
+	); err != nil {
+		log.Warnf("Failed to watch ModemManager objects: %v", err)
+	}
+
+	b.refreshModems()
+	b.updateAllCellularDevices()
+
 	b.sigWG.Go(func() {
 		for {
 			select {
@@ -250,6 +271,16 @@ func (b *NetworkManagerBackend) stopSignalPump() {
 		)
 	}
 
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchPathNamespace(dbus.ObjectPath(dbusMMPath)),
+		dbus.WithMatchInterface(dbusPropsInterface),
+		dbus.WithMatchMember("PropertiesChanged"),
+	)
+	b.dbusConn.RemoveMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusMMPath)),
+		dbus.WithMatchInterface(dbusObjectManagerInterface),
+	)
+
 	if b.signals != nil {
 		b.dbusConn.RemoveSignal(b.signals)
 		close(b.signals)
@@ -307,6 +338,16 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 		return
 	}
 
+	if sig.Name == dbusObjectManagerInterface+".InterfacesAdded" ||
+		sig.Name == dbusObjectManagerInterface+".InterfacesRemoved" {
+		// BlueZ and UDisks watch ObjectManager unscoped on the same shared bus,
+		// so their signals land here too.
+		if sig.Path == dbus.ObjectPath(dbusMMPath) {
+			b.handleModemObjectsChange()
+		}
+		return
+	}
+
 	if len(sig.Body) < 2 {
 		return
 	}
@@ -336,6 +377,9 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 
 	case dbusNMAccessPointInterface:
 		b.handleAccessPointChange(changes)
+
+	case dbusMMModemInterface:
+		b.handleModemChange(sig.Path, changes)
 	}
 }
 

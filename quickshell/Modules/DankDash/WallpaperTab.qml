@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Modals.FileBrowser
+import qs.DankCommon.FileBrowser as FB
 import qs.Widgets
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.DankDash
@@ -36,16 +37,20 @@ Item {
     readonly property Item focusTarget: wallpaperView
     readonly property var focusTargets: [wallpaperView, previousPageButton, pageButton, nextPageButton, sortButton, folderButton, searchExpanded ? wallpaperSearchField : searchToggleButton, collapseSearchButton]
     readonly property Item previousFocusTarget: searchExpanded ? collapseSearchButton : searchToggleButton
-    readonly property bool blocksTabNavigation: sortMenu.visible || pageJumpPopup.visible || !!wallpaperBrowserLoader.item?.shouldBeVisible
+    readonly property bool blocksTabNavigation: sortMenu.menuVisible || pageJumpPopup.visible || !!wallpaperBrowserLoader.item?.shouldBeVisible
     property int gridIndex: 0
     property Item keyForwardTarget: null
     property var parentPopout: null
+    property var transientSurfaceTracker: null
     property bool enableAnimation: false
     property string selectedFileName: ""
     property var targetScreen: null
     property string targetScreenName: targetScreen ? targetScreen.name : ""
-    property string sortBy: "name"
-    property bool sortAscending: true
+    readonly property var wallpaperBrowserSettings: FB.FileBrowserSettings.load("wallpaper")
+    readonly property string sortKey: wallpaperBrowserSettings.sortKey
+    readonly property bool sortDescending: wallpaperBrowserSettings.sortDesc
+    readonly property var sortKeys: ["name", "size", "mtime", "type"]
+    readonly property var sortOptions: [I18n.tr("Name"), I18n.tr("Size"), I18n.tr("Modified"), I18n.tr("Type")]
     property int gridRevision: 0
     property int pagerCachePages: 1
 
@@ -170,30 +175,19 @@ Item {
             keyForwardTarget.forceActiveFocus();
     }
 
-    onSortByChanged: refreshAfterSort()
-    onSortAscendingChanged: refreshAfterSort()
+    onSortKeyChanged: refreshAfterSort()
+    onSortDescendingChanged: refreshAfterSort()
     onSearchQueryChanged: {
         currentPage = 0;
         gridIndex = 0;
         searchDebounce.restart();
     }
 
-    function loadSort() {
-        const s = CacheData.fileBrowserSettings["wallpaper"];
-        if (s) {
-            sortBy = s.sortBy || "name";
-            sortAscending = s.sortAscending !== undefined ? s.sortAscending : true;
-        }
-    }
-
-    function persistSort() {
-        let settings = CacheData.fileBrowserSettings;
-        if (!settings["wallpaper"])
-            settings["wallpaper"] = {};
-        settings["wallpaper"].sortBy = sortBy;
-        settings["wallpaper"].sortAscending = sortAscending;
-        CacheData.fileBrowserSettings = settings;
-        CacheData.saveCache();
+    function setSort(key, descending) {
+        FB.FileBrowserSettings.save("wallpaper", {
+            "sortKey": key,
+            "sortDesc": descending
+        });
     }
 
     function getCurrentWallpaper() {
@@ -236,14 +230,7 @@ Item {
             setInitialSelection();
     }
 
-    Component.onCompleted: {
-        loadSort();
-        loadWallpaperDirectory();
-    }
-
-    readonly property var cacheFileBrowserSettings: CacheData.fileBrowserSettings
-
-    onCacheFileBrowserSettingsChanged: loadSort()
+    Component.onCompleted: loadWallpaperDirectory()
 
     onActiveChanged: {
         if (active && visible)
@@ -275,12 +262,29 @@ Item {
     }
 
     function closeOverlays() {
-        if (sortMenu.visible || pageJumpPopup.visible) {
-            sortMenu.visible = false;
+        if (sortMenu.menuVisible || pageJumpPopup.visible) {
+            sortMenu.closeDropdownMenu();
             pageJumpPopup.visible = false;
             return true;
         }
         return false;
+    }
+
+    function openSortMenu() {
+        const index = Math.max(0, sortKeys.indexOf(sortKey));
+        sortMenu.currentValue = sortOptions[index];
+        sortMenu.openDropdownMenu();
+    }
+
+    function chooseSort(value) {
+        const index = sortMenu.options.indexOf(value);
+        if (index < 0)
+            return;
+        if (index < sortKeys.length) {
+            setSort(sortKeys[index], sortDescending);
+            return;
+        }
+        setSort(sortKey, index === sortKeys.length + 1);
     }
 
     function handleKeyEvent(event) {
@@ -416,7 +420,7 @@ Item {
         const currentWallpaper = getCurrentWallpaper();
 
         if (!currentWallpaper || currentWallpaper.startsWith("#")) {
-            wallpaperDir = CacheData.wallpaperLastPath || "";
+            wallpaperDir = wallpaperBrowserSettings.lastPath;
             return;
         }
 
@@ -469,10 +473,10 @@ Item {
         showFiles: true
         showDirs: false
         sortField: {
-            switch (root.sortBy) {
+            switch (root.sortKey) {
             case "size":
                 return FolderListModel.Size;
-            case "modified":
+            case "mtime":
                 return FolderListModel.Time;
             case "type":
                 return FolderListModel.Type;
@@ -480,7 +484,7 @@ Item {
                 return FolderListModel.Name;
             }
         }
-        sortReversed: !root.sortAscending
+        sortReversed: root.sortDescending
         folder: wallpaperDir ? "file://" + wallpaperDir.split('/').map(s => encodeURIComponent(s)).join('/') : ""
     }
 
@@ -513,23 +517,13 @@ Item {
 
         sourceComponent: FileBrowserSurfaceModal {
             browserTitle: I18n.tr("Select Wallpaper Directory", "wallpaper directory file browser title")
-            browserType: "wallpaper"
-            showHiddenFiles: false
-            revealPath: root.getCurrentWallpaper()
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
+            bucket: "wallpaper"
+            startPath: root.getCurrentWallpaper()
+            filters: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
             parentPopout: root.parentPopout
-
-            onFileSelected: path => {
-                const cleanPath = path.replace(/^file:\/\//, '');
-                root.setCurrentWallpaper(cleanPath);
-
-                const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/'));
-                if (dirPath) {
-                    root.wallpaperDir = dirPath;
-                    CacheData.wallpaperLastPath = dirPath;
-                    CacheData.saveCache();
-                }
-                close();
+            onAccepted: paths => {
+                root.setCurrentWallpaper(paths[0]);
+                root.wallpaperDir = paths[0].substring(0, paths[0].lastIndexOf('/'));
             }
         }
     }
@@ -734,6 +728,7 @@ Item {
                 title: root.searchQuery.trim() !== "" ? I18n.tr("No results found") : I18n.tr("No wallpapers")
 
                 DankButton {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: I18n.tr("Choose wallpaper folder")
                     visible: root.searchQuery.trim() === ""
                     onClicked: root.openFolderBrowser()
@@ -775,7 +770,7 @@ Item {
                         onClicked: {
                             if (root.totalPages <= 1)
                                 return;
-                            sortMenu.visible = false;
+                            sortMenu.closeDropdownMenu();
                             pageJumpPopup.visible = !pageJumpPopup.visible;
                         }
                     }
@@ -800,9 +795,33 @@ Item {
                         iconName: "filter_list"
                         enabled: wallpaperFolderModel.count > 0
                         tooltipText: I18n.tr("Sort wallpapers")
+                        Accessible.description: [root.sortOptions[Math.max(0, root.sortKeys.indexOf(root.sortKey))], root.sortDescending ? I18n.tr("Descending") : I18n.tr("Ascending")].join(" · ")
                         onClicked: {
                             pageJumpPopup.visible = false;
-                            sortMenu.visible = !sortMenu.visible;
+                            if (sortMenu.menuVisible) {
+                                sortMenu.closeDropdownMenu();
+                                return;
+                            }
+                            root.openSortMenu();
+                        }
+                        Keys.onDownPressed: event => {
+                            root.openSortMenu();
+                            event.accepted = true;
+                        }
+
+                        DankDropdown {
+                            id: sortMenu
+
+                            showTrigger: false
+                            popupAnchorItem: sortButton
+                            focusReturnTarget: sortButton
+                            transientSurfaceTracker: root.transientSurfaceTracker
+                            openUpwards: true
+                            alignPopupRight: !I18n.isRtl
+                            popupWidth: Math.min(root.width, Theme.smallBreakpoint / 2)
+                            options: root.sortOptions.concat([I18n.tr("Ascending"), I18n.tr("Descending")])
+                            optionIcons: ["sort_by_alpha", "straighten", "history", "category", root.sortDescending ? "arrow_upward" : "check", root.sortDescending ? "check" : "arrow_downward"]
+                            onValueChanged: value => root.chooseSort(value)
                         }
                     }
 
@@ -900,42 +919,9 @@ Item {
     MouseArea {
         anchors.fill: parent
         z: DashMetrics.overlayZ - 1
-        visible: sortMenu.visible || pageJumpPopup.visible
+        visible: pageJumpPopup.visible
         enabled: visible
         onClicked: root.closeOverlays()
-    }
-
-    BackdropBlur {
-        visible: sortMenu.visible
-        z: DashMetrics.overlayZ
-        width: sortMenu.width
-        height: sortMenu.height
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.rightMargin: Theme.spacingM
-        anchors.bottomMargin: DashMetrics.wallpaperOverlayBottomMargin
-        radius: Theme.cornerRadiusM
-        sourceItem: contentColumn
-    }
-
-    FileBrowserSortMenu {
-        id: sortMenu
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.rightMargin: Theme.spacingM
-        anchors.bottomMargin: DashMetrics.wallpaperOverlayBottomMargin
-        z: DashMetrics.overlayZ + 1
-        surfaceColor: Theme.nestedSurface
-        sortBy: root.sortBy
-        sortAscending: root.sortAscending
-        onSortBySelected: value => {
-            root.sortBy = value;
-            root.persistSort();
-        }
-        onSortOrderSelected: ascending => {
-            root.sortAscending = ascending;
-            root.persistSort();
-        }
     }
 
     BackdropBlur {

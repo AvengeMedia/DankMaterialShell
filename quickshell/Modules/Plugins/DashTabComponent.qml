@@ -9,6 +9,7 @@ Item {
     property var pluginService: null
     property var popoutService: null
     property var dashHost: null
+    property var transientSurfaceTracker: null
     property string entryId: ""
     property Item focusTarget: null
     property bool editMode: false
@@ -30,6 +31,13 @@ Item {
     Component.onCompleted: loadPluginData()
     onPluginServiceChanged: loadPluginData()
     onPluginIdChanged: loadPluginData()
+
+    Binding {
+        target: root.widgetGrid
+        property: "transientSurfaceTracker"
+        value: root.transientSurfaceTracker
+        when: root.widgetGrid !== null
+    }
 
     Connections {
         target: root.pluginService

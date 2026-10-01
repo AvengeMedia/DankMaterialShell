@@ -43,6 +43,16 @@ Item {
         return true;
     }
 
+    function sameSlots(a, b) {
+        if (a.length !== b.length)
+            return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i].item !== b[i].item || a[i].y !== b[i].y || a[i].height !== b[i].height || a[i].transparent !== b[i].transparent)
+                return false;
+        }
+        return true;
+    }
+
     function layout() {
         if (!layoutReady || !visible || layingOut)
             return;
@@ -89,7 +99,8 @@ Item {
             });
             y += h + spacing;
         }
-        slots = next;
+        if (!sameSlots(slots, next))
+            slots = next;
         implicitHeight = Math.max(0, y - spacing);
         layingOut = false;
     }

@@ -141,7 +141,8 @@ Item {
             }
 
             SettingsRow {
-                title: {
+                title: I18n.tr("Wi-Fi")
+                subtitle: {
                     if (NetworkService.wifiToggling)
                         return I18n.tr("Toggling...", "wifi status while the radio is switching on or off");
                     if (!NetworkService.wifiEnabled)
@@ -149,25 +150,6 @@ Item {
                     if (NetworkService.wifiConnected)
                         return NetworkService.currentWifiSSID;
                     return I18n.tr("Not connected");
-                }
-                titleColor: NetworkService.wifiConnected ? Theme.primary : Theme.surfaceVariantText
-
-                DankActionButton {
-                    iconName: "wifi_find"
-                    tooltipText: I18n.tr("Connect to Hidden Network")
-                    buttonSize: 32
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: NetworkService.backend === "networkmanager" && NetworkService.wifiEnabled && !NetworkService.wifiToggling
-                    onClicked: PopoutService.showHiddenNetworkModal()
-                }
-
-                DankRefreshButton {
-                    Accessible.name: I18n.tr("Scan")
-                    buttonSize: 32
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
-                    busy: NetworkService.isScanning
-                    onClicked: NetworkService.scanWifi()
                 }
 
                 DankToggle {
@@ -227,15 +209,71 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
+        }
 
-            SettingsRow {
-                visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
-                title: I18n.tr("Available networks")
-                trailingBadge: String(NetworkService.wifiNetworks?.length ?? 0)
+        SettingsCard {
+            id: availableWifiCard
+
+            readonly property var sortedNetworks: {
+                const ssid = NetworkService.currentWifiSSID;
+                const networks = NetworkService.wifiNetworks || [];
+                const pinnedList = root.getPinnedWifiNetworks();
+
+                let sorted = [...networks];
+                sorted.sort((a, b) => {
+                    const aPinnedIndex = pinnedList.indexOf(a.ssid);
+                    const bPinnedIndex = pinnedList.indexOf(b.ssid);
+                    if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
+                        if (aPinnedIndex === -1)
+                            return 1;
+                        if (bPinnedIndex === -1)
+                            return -1;
+                        return aPinnedIndex - bPinnedIndex;
+                    }
+                    if (a.ssid === ssid)
+                        return -1;
+                    if (b.ssid === ssid)
+                        return 1;
+                    const aKnown = !!a.saved && (a.signal || 0) > 0;
+                    const bKnown = !!b.saved && (b.signal || 0) > 0;
+                    if (aKnown !== bKnown)
+                        return aKnown ? -1 : 1;
+                    return b.signal - a.signal;
+                });
+                return sorted;
             }
 
+            width: parent.width
+            title: I18n.tr("Available networks")
+            iconName: "wifi"
+            settingKey: "networkAvailableWifi"
+            tags: ["wifi", "wi-fi", "wireless", "network", "scan", "hidden", "connect"]
+            visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
+
+            headerActions: [
+                StyledText {
+                    text: availableWifiCard.sortedNetworks.length
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    anchors.verticalCenter: parent.verticalCenter
+                },
+                DankActionButton {
+                    iconName: "wifi_find"
+                    tooltipText: I18n.tr("Connect to Hidden Network")
+                    buttonSize: Theme.buttonHeightXS
+                    visible: NetworkService.backend === "networkmanager"
+                    onClicked: PopoutService.showHiddenNetworkModal()
+                },
+                DankRefreshButton {
+                    tooltipText: I18n.tr("Scan")
+                    buttonSize: Theme.buttonHeightXS
+                    busy: NetworkService.isScanning
+                    onClicked: NetworkService.scanWifi()
+                }
+            ]
+
             SettingsRow {
-                visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling && NetworkService.isScanning && (NetworkService.wifiNetworks?.length ?? 0) === 0
+                visible: NetworkService.isScanning && (NetworkService.wifiNetworks?.length ?? 0) === 0
                 body: Column {
                     width: parent.width
                     spacing: Theme.spacingS
@@ -277,30 +315,7 @@ Item {
             }
 
             Repeater {
-                model: {
-                    const ssid = NetworkService.currentWifiSSID;
-                    const networks = NetworkService.wifiNetworks || [];
-                    const pinnedList = root.getPinnedWifiNetworks();
-
-                    let sorted = [...networks];
-                    sorted.sort((a, b) => {
-                        const aPinnedIndex = pinnedList.indexOf(a.ssid);
-                        const bPinnedIndex = pinnedList.indexOf(b.ssid);
-                        if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
-                            if (aPinnedIndex === -1)
-                                return 1;
-                            if (bPinnedIndex === -1)
-                                return -1;
-                            return aPinnedIndex - bPinnedIndex;
-                        }
-                        if (a.ssid === ssid)
-                            return -1;
-                        if (b.ssid === ssid)
-                            return 1;
-                        return b.signal - a.signal;
-                    });
-                    return sorted;
-                }
+                model: availableWifiCard.sortedNetworks
 
                 delegate: Column {
                     id: wifiNetworkDelegate
@@ -314,11 +329,10 @@ Item {
 
                     width: parent?.width ?? 0
                     spacing: Theme.groupedListGap
-                    visible: NetworkService.wifiEnabled && !NetworkService.wifiToggling
-
                     SettingsRow {
+                        id: wifiNetworkRow
                         title: wifiNetworkDelegate.modelData.ssid || I18n.tr("Unknown")
-                        titleColor: wifiNetworkDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                        active: wifiNetworkDelegate.isConnected
                         subtitle: {
                             const parts = [wifiNetworkDelegate.isConnecting ? I18n.tr("Connecting...") : (wifiNetworkDelegate.isConnected ? I18n.tr("Connected") : (wifiNetworkDelegate.modelData.secured ? I18n.tr("Secured", "adjective, wifi network requires a password, opposite of open") : I18n.tr("Open", "network security type", true)))];
                             if (wifiNetworkDelegate.modelData.saved)
@@ -328,7 +342,7 @@ Item {
                             parts.push(wifiNetworkDelegate.modelData.signal + "%");
                             return parts.join(" • ");
                         }
-                        subtitleColor: wifiNetworkDelegate.isConnecting ? Theme.warning : (wifiNetworkDelegate.isConnected ? Theme.primary : Theme.surfaceVariantText)
+                        subtitleColor: wifiNetworkDelegate.isConnecting ? Theme.warning : supportingContentColor
                         clickable: !NetworkService.isWifiConnecting || wifiNetworkDelegate.isConnected
                         onClicked: {
                             WifiConnectionActions.connectToNetwork(wifiNetworkDelegate.modelData, {
@@ -357,7 +371,7 @@ Item {
                                     return "wifi_1_bar";
                                 }
                                 size: Theme.iconSizeMedium
-                                color: wifiNetworkDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                                color: wifiNetworkRow.contentColor
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         ]
@@ -566,8 +580,9 @@ Item {
                     spacing: Theme.groupedListGap
 
                     SettingsRow {
+                        id: savedWifiRow
                         title: savedWifiDelegate.modelData.ssid || I18n.tr("Unknown")
-                        titleColor: savedWifiDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                        active: savedWifiDelegate.isConnected
                         subtitle: {
                             if (savedWifiDelegate.isConnecting)
                                 return I18n.tr("Connecting...");
@@ -577,7 +592,7 @@ Item {
                                 parts.push(I18n.tr("Hidden"));
                             return parts.join(" • ");
                         }
-                        subtitleColor: savedWifiDelegate.isConnecting ? Theme.warning : (savedWifiDelegate.isConnected ? Theme.primary : Theme.surfaceVariantText)
+                        subtitleColor: savedWifiDelegate.isConnecting ? Theme.warning : supportingContentColor
                         clickable: !savedWifiDelegate.isOutOfRange && (!NetworkService.isWifiConnecting || savedWifiDelegate.isConnected)
                         onClicked: {
                             if (savedWifiDelegate.isOutOfRange)
@@ -611,7 +626,7 @@ Item {
                                     return "wifi_1_bar";
                                 }
                                 size: Theme.iconSizeMedium
-                                color: savedWifiDelegate.isConnected ? Theme.primary : Theme.surfaceText
+                                color: savedWifiRow.contentColor
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         ]

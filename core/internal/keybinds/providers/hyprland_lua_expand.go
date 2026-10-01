@@ -33,7 +33,13 @@ type luaForHeader struct {
 }
 
 func expandLuaConfigLines(lines []string) []string {
-	return expandLuaBlock(lines, luaVarEnv{})
+	lines, _ = expandLuaConfigLinesEnv(lines)
+	return lines
+}
+
+func expandLuaConfigLinesEnv(lines []string) ([]string, luaVarEnv) {
+	env := luaVarEnv{}
+	return expandLuaBlock(lines, env), env
 }
 
 func expandLuaBlock(lines []string, env luaVarEnv) []string {

@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -13,6 +14,7 @@ Singleton {
             albumArtAccent: true,
             animatedArt: false,
             lyrics: true,
+            smoothLyrics: true,
             deviceName: true
         })
 
@@ -40,24 +42,49 @@ Singleton {
     readonly property bool albumArtAccent: stored.albumArtAccent ?? defaults.albumArtAccent
     readonly property bool animatedArt: stored.animatedArt ?? defaults.animatedArt
 
-    readonly property var lyricsProviderCatalog: [
+    readonly property var builtinLyricsProviders: [
         {
             id: "betterlyrics",
-            text: I18n.tr("Better Lyrics", "Lyrics provider name")
+            text: "Better Lyrics"
         },
         {
             id: "unison",
-            text: I18n.tr("Unison", "Lyrics provider name")
+            text: "Unison"
         },
         {
             id: "lyricsplus",
-            text: I18n.tr("LyricsPlus", "Lyrics provider name")
+            text: "LyricsPlus"
+        },
+        {
+            id: "kugou",
+            text: "KuGou"
         },
         {
             id: "lrclib",
-            text: I18n.tr("LRCLIB", "Lyrics provider name")
+            text: "LRCLIB"
+        },
+        {
+            id: "youtubemusic",
+            text: "YouTube Music"
         }
     ]
+    readonly property var pluginLyricsProviders: {
+        if (!DMSService.capabilities.includes("lyrics.plugins"))
+            return [];
+        const loaded = PluginService.loadedPlugins;
+        const providers = [];
+        for (const pluginId in loaded) {
+            const plugin = loaded[pluginId];
+            if (!plugin.lyrics?.command)
+                continue;
+            providers.push({
+                id: "plugin_" + pluginId,
+                text: I18n.trFor(pluginId, plugin.lyrics.name ?? plugin.name)
+            });
+        }
+        return providers;
+    }
+    readonly property var lyricsProviderCatalog: builtinLyricsProviders.concat(pluginLyricsProviders)
     readonly property var lyricsProviders: {
         const saved = Array.isArray(SettingsData.mediaLyricsProviders) ? SettingsData.mediaLyricsProviders : [];
         const rows = [];

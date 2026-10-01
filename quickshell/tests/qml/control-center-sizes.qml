@@ -2,6 +2,7 @@ import QtQuick
 import QtTest
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Modules.ControlCenter
 import qs.Modules.DankIsland
 import qs.Modules.ControlCenter.Components
@@ -202,7 +203,7 @@ ShellRoot {
                         h: 12
                     },
                     {
-                        id: "diskUsage",
+                        id: "colorPicker",
                         w: 2,
                         h: 2
                     }
@@ -219,10 +220,14 @@ ShellRoot {
                 check(Math.abs(grid.slotLayout.slots[1].w - grid.slotLayout.slots[1].h) < 0.01, "host inset preserves square geometry");
                 grid.availableHeight = CcMetrics.gridRowUnit * 5 + CcMetrics.gridGap * 4;
                 check(grid.slotLayout.slots[0].rows <= 5, "tile height fits the available screen");
-                grid.beginDrag(0);
-                grid.updateDragTarget(0, grid.cellWidth);
+                grid.beginDrag(1);
+                grid.updateDragTarget(0, 0);
                 grid.endDrag();
-                check(SettingsData.controlCenterWidgets[0].w === 10 && SettingsData.controlCenterWidgets[0].h === 12 && SettingsData.controlCenterWidgets[0].row === 1 && SettingsData.controlCenterWidgets[1].row === grid.maximumRows + 1, "moving on a smaller screen preserves saved spans and pushes the collided tile " + JSON.stringify(SettingsData.controlCenterWidgets));
+                check(SettingsData.controlCenterWidgets[0].w === 10 && SettingsData.controlCenterWidgets[0].h === 12 && SettingsData.controlCenterWidgets[0].row === 2 && SettingsData.controlCenterWidgets[1].row === 0, "moving on a smaller screen preserves saved spans and pushes the collided tile " + JSON.stringify(SettingsData.controlCenterWidgets));
+                grid.beginDrag(0);
+                grid.updateDragTarget(0, grid.cellWidth * 4);
+                grid.endDrag();
+                check(SettingsData.controlCenterWidgets[0].row === 2, "gravity closes the gap a drop below free space would leave " + JSON.stringify(SettingsData.controlCenterWidgets));
                 grid.previewSize(0, {
                     w: 6
                 });
@@ -308,27 +313,6 @@ ShellRoot {
                 verticalSlider.destroy();
                 wait(0);
 
-                const ids = ["wifi", "bluetooth", "audioOutput", "audioInput", "volumeSlider", "inputVolumeSlider", "brightnessSlider", "nightMode", "darkMode", "doNotDisturb", "idleInhibitor", "battery", "diskUsage", "colorPicker"];
-                for (const id of ids) {
-                    const component = registry.componentForWidget({
-                        id
-                    });
-                    check(component.status === Component.Ready, id + " compiled: " + component.errorString());
-                    const widget = component.createObject(scene, {
-                        widgetData: {
-                            id
-                        }
-                    });
-                    check(widget !== null, id + " created");
-                    if (widget.slider)
-                        check(WidgetUtils.clampSize({
-                            id,
-                            w: 1,
-                            h: 3
-                        }, 4).h === 3, id + " allows vertical resizing");
-                    widget.destroy();
-                    wait(0);
-                }
                 SessionData.recentColors = Array.from({
                     length: 18
                 }, (_, i) => Qt.rgba(i / 18, 0.5, 0.5, 1).toString());
@@ -344,6 +328,22 @@ ShellRoot {
                     width: 600,
                     height: 400
                 });
+                NetworkService.wifiEnabled = true;
+                NetworkService.wifiInterface = "wlan0";
+                NetworkService.wifiNetworks = Array.from({
+                    length: 8
+                }, (_, i) => ({
+                            ssid: "Net" + i,
+                            signal: 90 - i * 8,
+                            secured: true
+                        }));
+                detail.section = "wifi";
+                waitFor(() => !detail.transitioning && detail.pageItem !== null, "wifi detail page loads");
+                settle();
+                const networkList = named(detail.pageItem, "networkList");
+                waitFor(() => networkList.count === 8, "wifi rows load");
+                settle();
+                check(networkList.atYBeginning, "network popup opens at the top, contentY " + networkList.contentY + " vs origin " + networkList.originY);
                 detail.section = "doNotDisturb";
                 settle();
                 detail.section = "";

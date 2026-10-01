@@ -22,16 +22,12 @@ Item {
 
     property string greeterStatusText: ""
     property bool greeterStatusRunning: false
-    property bool greeterSyncRunning: false
+    readonly property bool greeterSyncRunning: GreeterService.syncing
+    readonly property string greeterSyncStatus: GreeterService.syncStatus
     property bool greeterInstallActionRunning: false
     property string greeterStatusStdout: ""
     property string greeterStatusStderr: ""
-    property string greeterSyncStdout: ""
-    property string greeterSyncStderr: ""
-    property string greeterSudoProbeStderr: ""
-    property string greeterTerminalFallbackStderr: ""
-    property bool greeterTerminalFallbackFromPrecheck: false
-    property bool greeterBinaryExists: false
+    readonly property bool greeterBinaryExists: GreeterService.binaryExists
     property bool greeterEnabled: false
     property bool embeddedGreeterConfigured: false
     readonly property bool embeddedGreeterOnly: embeddedGreeterConfigured && !greeterBinaryExists
@@ -41,10 +37,23 @@ Item {
     readonly property string greeterActionLabel: greeterAction === "activate" ? I18n.tr("Activate") : ""
     readonly property string greeterActionIcon: greeterAction === "activate" ? "login" : ""
     readonly property var greeterActionCommand: greeterAction === "activate" ? ["dms-greeter", "enable", "--terminal"] : []
+    readonly property string greeterStatusOutput: {
+        if (greeterStatusRunning)
+            return I18n.tr("Checking...", "greeter status loading");
+        if (greeterStatusText !== "")
+            return greeterStatusText;
+        if (embeddedGreeterOnly)
+            return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
+        if (!greeterBinaryExists && greeterEnabled)
+            return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
+        return "";
+    }
+
+    onGreeterSyncStatusChanged: greeterStatusText = greeterSyncStatus
 
     function checkGreeterInstallState() {
         greetdEnabledCheckProcess.running = true;
-        greeterBinaryCheckProcess.running = true;
+        GreeterService.refresh();
         embeddedGreeterCheckProcess.running = true;
     }
 
@@ -77,27 +86,6 @@ Item {
         });
     }
 
-    function runGreeterSync() {
-        if (!greeterBinaryExists)
-            return;
-        greeterSyncStdout = "";
-        greeterSyncStderr = "";
-        greeterSudoProbeStderr = "";
-        greeterTerminalFallbackStderr = "";
-        greeterTerminalFallbackFromPrecheck = false;
-        greeterStatusText = I18n.tr("Checking whether sudo authentication is needed...");
-        greeterSyncRunning = true;
-        greeterSudoProbeProcess.running = true;
-    }
-
-    function launchGreeterSyncTerminalFallback(fromPrecheck, statusText) {
-        greeterTerminalFallbackFromPrecheck = fromPrecheck;
-        if (statusText && statusText !== "")
-            greeterStatusText = statusText;
-        greeterTerminalFallbackStderr = "";
-        greeterTerminalFallbackProcess.running = true;
-    }
-
     Component.onCompleted: {
         Qt.callLater(checkGreeterInstallState);
     }
@@ -109,16 +97,6 @@ Item {
 
         stdout: StdioCollector {
             onStreamFinished: root.greeterEnabled = text.trim() === "enabled"
-        }
-    }
-
-    Process {
-        id: greeterBinaryCheckProcess
-        command: ["sh", "-c", "command -v dms-greeter >/dev/null 2>&1"]
-        running: false
-
-        onExited: exitCode => {
-            root.greeterBinaryExists = (exitCode === 0);
         }
     }
 
@@ -167,91 +145,11 @@ Item {
         }
     }
 
-    Process {
-        id: greeterSyncProcess
-        command: ["dms-greeter", "sync", "--yes"]
-        running: false
+    Connections {
+        target: GreeterService
 
-        stdout: StdioCollector {
-            onStreamFinished: root.greeterSyncStdout = text || ""
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: root.greeterSyncStderr = text || ""
-        }
-
-        onExited: exitCode => {
-            root.greeterSyncRunning = false;
-            const out = (root.greeterSyncStdout || "").trim();
-            const err = (root.greeterSyncStderr || "").trim();
+        function onSyncFinished() {
             root.checkGreeterInstallState();
-            if (exitCode !== 0) {
-                var failure = I18n.tr("Sync failed in background mode. Trying terminal mode so you can authenticate interactively.") + " (exit " + exitCode + ")";
-                if (out !== "")
-                    failure = failure + "\n\n" + out;
-                if (err !== "")
-                    failure = failure + "\n\nstderr:\n" + err;
-                root.greeterStatusText = failure;
-                root.launchGreeterSyncTerminalFallback(false, "");
-                return;
-            }
-            var success = I18n.tr("Sync completed successfully.");
-            if (out !== "")
-                success = success + "\n\n" + out;
-            if (err !== "")
-                success = success + "\n\nstderr:\n" + err;
-            root.greeterStatusText = success;
-            SettingsData.clearGreeterSyncPending();
-            ToastService.showInfo(I18n.tr("Greeter sync complete"));
-        }
-    }
-
-    Process {
-        id: greeterSudoProbeProcess
-        command: ["sudo", "-n", "true"]
-        running: false
-
-        stderr: StdioCollector {
-            onStreamFinished: root.greeterSudoProbeStderr = text || ""
-        }
-
-        onExited: exitCode => {
-            const err = (root.greeterSudoProbeStderr || "").trim();
-            if (exitCode === 0) {
-                root.greeterStatusText = I18n.tr("Running greeter sync...");
-                greeterSyncProcess.running = true;
-                return;
-            }
-
-            var authNeeded = I18n.tr("Sync needs sudo authentication. Opening terminal so you can use password or fingerprint.");
-            if (err !== "")
-                authNeeded = authNeeded + "\n\n" + err;
-            root.launchGreeterSyncTerminalFallback(true, authNeeded);
-        }
-    }
-
-    Process {
-        id: greeterTerminalFallbackProcess
-        command: ["dms-greeter", "sync", "--terminal", "--yes"]
-        running: false
-
-        stderr: StdioCollector {
-            onStreamFinished: root.greeterTerminalFallbackStderr = text || ""
-        }
-
-        onExited: exitCode => {
-            root.greeterSyncRunning = false;
-            if (exitCode === 0) {
-                var launched = root.greeterTerminalFallbackFromPrecheck ? I18n.tr("Terminal opened. Complete authentication there; it will close automatically when done.") : I18n.tr("Terminal fallback opened. Complete authentication there; it will close automatically when done.");
-                root.greeterStatusText = root.greeterStatusText ? root.greeterStatusText + "\n\n" + launched : launched;
-                SettingsData.clearGreeterSyncPending();
-                return;
-            }
-            var fallback = I18n.tr("Terminal fallback failed. Install one of the supported terminal emulators or run 'dms-greeter sync' manually.") + " (exit " + exitCode + ")";
-            const err = (root.greeterTerminalFallbackStderr || "").trim();
-            if (err !== "")
-                fallback = fallback + "\n\nstderr:\n" + err;
-            root.greeterStatusText = root.greeterStatusText ? root.greeterStatusText + "\n\n" + fallback : fallback;
         }
     }
 
@@ -281,20 +179,49 @@ Item {
             settingKey: "greeterStatus"
 
             SettingsRow {
-                body: StyledText {
-                    text: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
+                subtitle: I18n.tr("Sync applies your theme and settings to the login screen. Shared users should run dms-greeter sync --profile instead of a primary user sync.")
+
+                body: Flow {
                     width: parent.width
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignLeft
+                    spacing: Theme.spacingS
+                    layoutDirection: Qt.RightToLeft
+
+                    DankButton {
+                        text: I18n.tr("Sync", "verb, button that copies settings to the login greeter")
+                        iconName: "sync"
+                        busy: root.greeterSyncRunning
+                        enabled: root.greeterBinaryExists && !root.greeterSyncRunning && !root.greeterInstallActionRunning
+                        onClicked: GreeterService.sync()
+                    }
+
+                    DankButton {
+                        text: I18n.tr("Check status", "greeter settings button, runs dms-greeter status")
+                        iconName: "fact_check"
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        busy: root.greeterStatusRunning
+                        enabled: !root.greeterStatusRunning
+                        onClicked: root.runGreeterStatus()
+                    }
+
+                    DankButton {
+                        visible: root.greeterActionAvailable
+                        text: root.greeterActionLabel
+                        iconName: root.greeterActionIcon
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
+                        onClicked: root.promptGreeterActionConfirm()
+                    }
                 }
             }
 
             SettingsRow {
+                visible: root.greeterStatusOutput !== ""
+
                 body: Rectangle {
                     width: parent.width
-                    height: Math.min(180, statusTextArea.implicitHeight + Theme.spacingM * 2)
+                    height: statusTextArea.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
                     color: Theme.floatingWindowFieldColor
                     border.color: Theme.outlineMedium
@@ -302,56 +229,16 @@ Item {
 
                     StyledText {
                         id: statusTextArea
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
                         anchors.margins: Theme.spacingM
-                        text: {
-                            if (root.greeterStatusRunning)
-                                return I18n.tr("Checking...", "greeter status loading");
-                            if (root.greeterStatusText !== "")
-                                return root.greeterStatusText;
-                            if (root.embeddedGreeterOnly)
-                                return I18n.tr("The greeter bundled with DMS is active (archinstall setup). It keeps working as is, but syncing theme and settings needs the standalone greeter. Install greetd-dms-greeter-bin from the AUR, then run Sync to migrate the login screen.", "embedded greeter status");
-                            if (!root.greeterBinaryExists && root.greeterEnabled)
-                                return I18n.tr("dms-greeter is not installed. Install the dms-greeter package to manage the greeter.", "greeter status placeholder");
-                            return I18n.tr("Click Refresh to check status.", "greeter status placeholder");
-                        }
+                        text: root.greeterStatusOutput
                         font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
+                        isMonospace: true
                         color: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText
                         wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
-            }
-
-            SettingsRow {
-                body: Flow {
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    DankButton {
-                        visible: root.greeterActionAvailable
-                        text: root.greeterActionLabel
-                        iconName: root.greeterActionIcon
-                        horizontalPadding: Theme.spacingL
-                        onClicked: root.promptGreeterActionConfirm()
-                        enabled: !root.greeterInstallActionRunning && !root.greeterSyncRunning
-                    }
-
-                    DankButton {
-                        text: I18n.tr("Refresh")
-                        iconName: "refresh"
-                        horizontalPadding: Theme.spacingL
-                        onClicked: root.runGreeterStatus()
-                        enabled: !root.greeterStatusRunning
-                    }
-
-                    DankButton {
-                        text: I18n.tr("Sync", "verb, button that copies settings to the login greeter")
-                        iconName: "sync"
-                        horizontalPadding: Theme.spacingL
-                        onClicked: root.runGreeterSync()
-                        enabled: root.greeterBinaryExists && !root.greeterSyncRunning && !root.greeterInstallActionRunning
+                        horizontalAlignment: Text.AlignLeft
                     }
                 }
             }
@@ -378,7 +265,7 @@ Item {
 
             SettingsNavRow {
                 title: I18n.tr("Wallpaper & colors")
-                iconName: "palette"
+                iconName: "wallpaper"
                 onClicked: root.parentModal?.navigateTo("personalization")
             }
 
@@ -447,7 +334,7 @@ Item {
 
             SettingsRow {
                 body: StyledText {
-                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"https://danklinux.com/docs/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
+                    text: I18n.tr("Installation and PAM setup are documented in the ") + "<a href=\"" + Site.docs + "/dankgreeter/installation\" style=\"text-decoration:none; color:" + Theme.primary + ";\">DankGreeter docs.</a> "
                     textFormat: Text.RichText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
@@ -466,89 +353,9 @@ Item {
                 }
             }
         }
-    }
 
-    Rectangle {
-        id: syncPendingPill
-
-        readonly property bool shown: SessionData.greeterSyncPending && root.greeterBinaryExists
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: shown ? Theme.spacingL : Theme.spacingXS
-        width: pillRow.implicitWidth + Theme.spacingL * 2
-        height: 44
-        radius: Theme.fullRadius(width, height)
-        color: Theme.primary
-        opacity: shown ? 1 : 0
-        visible: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
-        Behavior on anchors.bottomMargin {
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.AllButtons
-            cursorShape: !root.greeterSyncRunning && !root.greeterInstallActionRunning ? Qt.PointingHandCursor : Qt.ArrowCursor
-            onClicked: mouse => {
-                if (mouse.button === Qt.LeftButton && !root.greeterSyncRunning && !root.greeterInstallActionRunning)
-                    root.runGreeterSync();
-            }
-        }
-
-        Row {
-            id: pillRow
-            anchors.centerIn: parent
-            spacing: Theme.spacingS
-
-            DankIcon {
-                id: syncPillIcon
-                name: "sync"
-                size: Theme.iconSizeMedium
-                color: Theme.primaryText
-                anchors.verticalCenter: parent.verticalCenter
-
-                RotationAnimation on rotation {
-                    running: root.visible && root.greeterSyncRunning && syncPendingPill.shown
-                    from: 0
-                    to: 360
-                    duration: 1000
-                    loops: Animation.Infinite
-                    onRunningChanged: {
-                        if (!running)
-                            syncPillIcon.rotation = 0;
-                    }
-                }
-            }
-
-            StyledText {
-                text: root.greeterSyncRunning ? I18n.tr("Syncing...", "greeter settings status while sync is running") : I18n.tr("Sync to apply")
-                color: Theme.primaryText
-                font.pixelSize: Theme.fontSizeMedium
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            DankActionButton {
-                iconName: "close"
-                Accessible.name: I18n.tr("Dismiss")
-                iconSize: Theme.iconSizeSmall
-                iconColor: Theme.primaryText
-                buttonSize: 28
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: SettingsData.revertGreeterSyncPending()
-            }
+        GreeterSyncFabBar {
+            blocked: root.greeterInstallActionRunning
         }
     }
 }

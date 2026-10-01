@@ -404,3 +404,31 @@ func TestManager_GetState_ThreadSafe(t *testing.T) {
 		}
 	}
 }
+
+func TestStateChangedMeaningfully_CellularDeviceFields(t *testing.T) {
+	device := func(mutate func(d *CellularDevice)) []CellularDevice {
+		d := CellularDevice{Name: "cdc-wdm0", State: "disconnected", SignalQuality: 60, AccessTech: "lte"}
+		if mutate != nil {
+			mutate(&d)
+		}
+		return []CellularDevice{d}
+	}
+
+	tests := []struct {
+		name    string
+		mutate  func(d *CellularDevice)
+		changed bool
+	}{
+		{name: "accessTech", mutate: func(d *CellularDevice) { d.AccessTech = "5gnr" }, changed: true},
+		{name: "signal", mutate: func(d *CellularDevice) { d.SignalQuality = 80 }, changed: true},
+		{name: "signal jitter is ignored", mutate: func(d *CellularDevice) { d.SignalQuality = 63 }, changed: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			old := NetworkState{CellularDevices: device(nil)}
+			new := NetworkState{CellularDevices: device(tt.mutate)}
+			assert.Equal(t, tt.changed, stateChangedMeaningfully(&old, &new))
+		})
+	}
+}

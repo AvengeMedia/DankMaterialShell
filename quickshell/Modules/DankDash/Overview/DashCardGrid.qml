@@ -16,6 +16,7 @@ DankEditableGrid {
     property int columnCap: DashMetrics.maximumGridColumns
     property bool panelPreviewing: false
     property string preferredFocusId: "calendar"
+    property var transientSurfaceTracker: null
     property string pendingFocusId: ""
     property int pendingFocusReason: Qt.OtherFocusReason
     property Item flashSlot: null

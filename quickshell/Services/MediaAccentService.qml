@@ -18,6 +18,12 @@ Singleton {
     readonly property color lyricsGroupAccent: _readableLyricColor(_mixHues(lyricsHues[0], lyricsHues[1], lyricsHues[2]))
     readonly property real lyricsChromaMin: 36
     readonly property real lyricsContrast: 4.5
+    readonly property real lyricsTintMax: 0.8
+    readonly property color lyricsTint: Theme.withAlpha(Theme.cardSurface, Math.min(Theme.cardSurface.a * Theme.foregroundAlpha, lyricsTintMax))
+    readonly property var lyricsBackgrounds: {
+        const surface = Theme.withAlpha(Theme.cardSurface, 1);
+        return [surface].concat(TrackArtService.artwork.colors.map(art => Theme.blend(Theme.withAlpha(art, 1), surface, lyricsTint.a)));
+    }
 
     readonly property color accentContainer: _container(Theme.primaryContainer, Theme.isLightMode ? 0.3 : 0.55, Theme.isLightMode ? 0.9 : 0.42, 1.25)
     readonly property color accentSecondaryContainer: _container(Theme.secondaryContainer, Theme.isLightMode ? 0.12 : 0.22, Theme.isLightMode ? 0.94 : 0.3, 1.08)
@@ -130,15 +136,15 @@ Singleton {
 
     // Blending toward onSurface desaturates into the onSurfaceVariant lyric text, so shift tone in HCT instead.
     function _readableLyricColor(color) {
-        const background = Theme.surfaceContainerLowest;
+        const backgrounds = lyricsBackgrounds;
         const hct = Hct.toHct(color);
         const chroma = Math.max(hct.chroma, lyricsChromaMin);
-        const backgroundTone = Hct.toHct(background).tone;
+        const backgroundTone = Hct.toHct(backgrounds[0]).tone;
         const light = Theme.isLightMode;
         const limit = light ? Hct.darkerTone(backgroundTone, lyricsContrast) : Hct.lighterTone(backgroundTone, lyricsContrast);
         let tone = limit < 0 ? hct.tone : light ? Math.min(hct.tone, limit) : Math.max(hct.tone, limit);
         let result = Hct.fromHct(hct.hue, chroma, tone);
-        while (tone > 0 && tone < 100 && Contrast.ratio(result, background) < lyricsContrast) {
+        while (tone > 0 && tone < 100 && backgrounds.some(background => Contrast.ratio(result, background) < lyricsContrast)) {
             tone += light ? -1 : 1;
             result = Hct.fromHct(hct.hue, chroma, tone);
         }

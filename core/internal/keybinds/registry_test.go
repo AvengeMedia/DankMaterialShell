@@ -14,6 +14,10 @@ func (m *mockProvider) Name() string {
 	return m.name
 }
 
+func (m *mockProvider) ModKey() ModKey {
+	return DefaultModKey()
+}
+
 func (m *mockProvider) GetCheatSheet() (*CheatSheet, error) {
 	if m.err != nil {
 		return nil, m.err

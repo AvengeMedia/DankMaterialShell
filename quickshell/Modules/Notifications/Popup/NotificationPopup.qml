@@ -654,13 +654,12 @@ PanelWindow {
             z: 100
         }
 
-        ClippingRectangle {
-            id: backgroundContainer
-            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurface
+        Rectangle {
+            id: cardSurface
             anchors.fill: parent
             anchors.margins: content.cardInset
-            clip: true
+            radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
+            color: Theme.notificationFloatingSurface
 
             HoverHandler {
                 id: cardHoverHandler
@@ -677,64 +676,72 @@ PanelWindow {
                 }
             }
 
-            DankFlickable {
-                anchors.fill: parent
-                anchors.bottomMargin: win.timeoutRailClearance
-                contentHeight: notificationCard.targetHeight
-                clip: true
+            ClippingRectangle {
+                width: parent.width
+                height: Math.max(0, win.targetAlignedHeight - content.cardInset * 2)
+                radius: cardSurface.radius
+                color: "transparent"
 
-                NotificationCard {
-                    id: notificationCard
-                    surfaceColor: Theme.notificationFloatingSurface
-                    chipColor: Theme.chipSurface
-                    width: parent.width
-                    notificationData: win.notificationData
-                    descriptionExpanded: win.descriptionExpanded
-                    privacyMode: SettingsData.notificationPopupPrivacyMode
-                    bodyInvokesAction: win.bodyClickInvokesAction
-                    persistImage: true
-                    showClose: true
-                    dismissText: I18n.tr("Clear")
-                    animateHeight: false
-                    outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-                    color: Theme.notificationFloatingSurface
-                    onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
-                    onCloseRequested: win.dismissPopupReliably()
-                    onDismissRequested: {
-                        if (win.notificationData && !win.exiting)
-                            NotificationService.permanentlyDismissNotification(win.notificationData);
-                    }
-                    onActionRequested: action => {
-                        if (!action?.invoke || win.exiting)
-                            return;
-                        action.invoke();
-                        win.dismissPopupReliably();
-                    }
-                    onBodyClicked: {
-                        if (!win.notificationData || win.exiting)
-                            return;
-                        if (win.bodyClickInvokesAction) {
-                            win.invokeDefaultAction();
-                            return;
+                DankFlickable {
+                    anchors.fill: parent
+                    anchors.bottomMargin: win.timeoutRailClearance
+                    contentHeight: notificationCard.targetHeight
+                    clip: true
+
+                    NotificationCard {
+                        id: notificationCard
+                        surfaceColor: Theme.notificationFloatingSurface
+                        chipColor: Theme.chipSurface
+                        width: parent.width
+                        height: win.inlineHeightAnimating ? Math.min(targetHeight, cardSurface.height - win.timeoutRailClearance) : targetHeight
+                        notificationData: win.notificationData
+                        descriptionExpanded: win.descriptionExpanded
+                        privacyMode: SettingsData.notificationPopupPrivacyMode
+                        bodyInvokesAction: win.bodyClickInvokesAction
+                        persistImage: true
+                        showClose: true
+                        dismissText: I18n.tr("Clear")
+                        animateHeight: false
+                        outerRadius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
+                        color: Theme.notificationFloatingSurface
+                        onExpandRequested: win.descriptionExpanded = !win.descriptionExpanded
+                        onCloseRequested: win.dismissPopupReliably()
+                        onDismissRequested: {
+                            if (win.notificationData && !win.exiting)
+                                NotificationService.permanentlyDismissNotification(win.notificationData);
                         }
-                        if (canExpand) {
-                            win.descriptionExpanded = !win.descriptionExpanded;
-                            return;
+                        onActionRequested: action => {
+                            if (!action?.invoke || win.exiting)
+                                return;
+                            action.invoke();
+                            win.dismissPopupReliably();
                         }
-                        if (win.notificationData.actions?.length > 0) {
-                            win.notificationData.actions[0].invoke();
-                            NotificationService.dismissNotification(win.notificationData);
-                            return;
+                        onBodyClicked: {
+                            if (!win.notificationData || win.exiting)
+                                return;
+                            if (win.bodyClickInvokesAction) {
+                                win.invokeDefaultAction();
+                                return;
+                            }
+                            if (canExpand) {
+                                win.descriptionExpanded = !win.descriptionExpanded;
+                                return;
+                            }
+                            if (win.notificationData.actions?.length > 0) {
+                                win.notificationData.actions[0].invoke();
+                                NotificationService.dismissNotification(win.notificationData);
+                                return;
+                            }
+                            win.dismissPopupReliably();
                         }
-                        win.dismissPopupReliably();
-                    }
-                    onContextMenuRequested: (x, y) => {
-                        popupContextMenuLoader.active = true;
-                        const menu = popupContextMenuLoader.item;
-                        if (!menu)
-                            return;
-                        const point = mapToItem(null, x, y);
-                        menu.showAt(win.margins.left + point.x, win.margins.top + point.y, win.screen);
+                        onContextMenuRequested: (x, y) => {
+                            popupContextMenuLoader.active = true;
+                            const menu = popupContextMenuLoader.item;
+                            if (!menu)
+                                return;
+                            const point = mapToItem(null, x, y);
+                            menu.showAt(win.margins.left + point.x, win.margins.top + point.y, win.screen);
+                        }
                     }
                 }
             }

@@ -40,7 +40,8 @@ DankFloatingWindow {
     readonly property bool canGoBack: pageHistory.length > 0 || (currentParentId !== "" && (isPluginPage || SettingsTabs.visibleLeaves(currentParentId).length > 1 || !!SettingsTabs.page(currentParentId)?.hubHeader))
     property bool shouldHaveFocus: visible
     property bool allowFocusOverride: false
-    property alias shouldBeVisible: settingsModal.visible
+    property bool shouldBeVisible: false
+    readonly property bool readyToMap: shouldBeVisible && content.currentPageSettled
     readonly property bool searchFocused: sidebar.searchFocused
     property bool isCompactMode: width < SettingsMetrics.compactBreakpoint
     property bool menuVisible: !isCompactMode
@@ -53,15 +54,19 @@ DankFloatingWindow {
             visible = false;
         }
         CompositorService.closeNiriOverviewOnWindowFocus();
-        visible = true;
+        shouldBeVisible = true;
+        if (readyToMap)
+            visible = true;
     }
 
     function hide() {
+        shouldBeVisible = false;
         visible = false;
     }
 
     function toggle() {
-        if (visible && backingWindowVisible) {
+        const shown = visible ? backingWindowVisible : shouldBeVisible;
+        if (shown) {
             hide();
             return;
         }
@@ -160,6 +165,11 @@ DankFloatingWindow {
 
     onClosed: hide()
 
+    onReadyToMapChanged: {
+        if (readyToMap)
+            visible = true;
+    }
+
     onIsCompactModeChanged: {
         if (!isCompactMode)
             menuVisible = true;
@@ -195,15 +205,6 @@ DankFloatingWindow {
         }
     }
 
-    Loader {
-        active: settingsModal.visible
-        sourceComponent: Component {
-            Ref {
-                service: CupsService
-            }
-        }
-    }
-
     LazyLoader {
         id: profileBrowserLoader
         active: false
@@ -214,13 +215,10 @@ DankFloatingWindow {
             allowStacking: true
             parentModal: settingsModal
             browserTitle: I18n.tr("Select Profile Image", "profile image file browser title")
-            browserType: "profile"
+            bucket: "profile"
             showHiddenFiles: true
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
-            onFileSelected: path => {
-                PortalService.setProfileImage(path);
-                close();
-            }
+            filters: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
+            onAccepted: paths => PortalService.setProfileImage(paths[0])
             onDialogClosed: () => {
                 allowStacking = true;
                 Qt.callLater(() => profileBrowserLoader.active = false);
@@ -238,14 +236,13 @@ DankFloatingWindow {
             allowStacking: true
             parentModal: settingsModal
             browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
-            browserType: "wallpaper"
+            bucket: "wallpaper"
             showHiddenFiles: true
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
-            onFileSelected: path => {
-                SessionData.setWallpaper(path);
+            filters: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
+            onAccepted: paths => {
+                SessionData.setWallpaper(paths[0]);
                 SessionData.wallpaperCyclingFolderPath = "";
                 SessionData.saveSettings();
-                close();
             }
             onDialogClosed: () => {
                 allowStacking = true;

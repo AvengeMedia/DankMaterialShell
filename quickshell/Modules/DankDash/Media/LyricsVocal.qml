@@ -19,6 +19,7 @@ Item {
     property bool following: true
     property int distance: 0
     property bool animationsEnabled: true
+    property bool smoothHighlight: true
     property bool inViewport: false
     property real leadFontSize: Theme.fontSizeXLarge
 
@@ -30,7 +31,8 @@ Item {
     readonly property int reach: lead ? 0 : Math.max(1, distance)
     readonly property real textScale: reach === 0 || !emphasize ? 1 : reach === 1 ? (Theme.fontSizeMedium + Theme.fontSizeLarge) / (Theme.fontSizeXLarge * 2) : Theme.fontSizeSmall / Theme.fontSizeXLarge
     readonly property int wordRevision: highlighted ? controller.wordRevision : -1
-    readonly property bool animateWords: current && timedWords && animationsEnabled && controller.enabled && controller.playing && visible && inViewport
+    readonly property bool sweep: smoothHighlight && animationsEnabled
+    readonly property bool animateWords: current && timedWords && sweep && controller.enabled && controller.playing && visible && inViewport
     readonly property int alignment: part.side === 0 ? Text.AlignHCenter : (part.side < 0) !== I18n.isRtl ? Text.AlignLeft : Text.AlignRight
     property real wordStart: -1
     property real wordProgress: 1
@@ -39,12 +41,17 @@ Item {
     opacity: reach === 0 || !emphasize ? 1 : reach === 1 ? DashMetrics.lyricsNearOpacity : reach === 2 ? DashMetrics.lyricsFarOpacity : 0
     onWordRevisionChanged: updateWordProgress()
     onAnimateWordsChanged: updateWordProgress()
+    onSweepChanged: updateWordProgress()
 
     function highlightedText(activeOnly) {
         return part.w.map(word => {
-            const sung = highlighted && (activeOnly ? word.t === wordStart : word.t < wordStart);
-            const color = sung ? accent : activeOnly ? "transparent" : Theme.onSurfaceVariant;
-            return '<font color="' + color + '">' + Format.escapeHtml(word.x).replace(/\n/g, "<br>") + '</font>';
+            const active = highlighted && word.t === wordStart;
+            const text = Format.escapeHtml(word.x).replace(/\n/g, "<br>");
+            if (activeOnly)
+                return active ? text : '<font color="transparent">' + text + '</font>';
+            const sung = highlighted && word.t < wordStart;
+            const color = sung || (active && !sweep) ? accent : active ? "transparent" : Theme.onSurfaceVariant;
+            return '<font color="' + color + '">' + text + '</font>';
         }).join("");
     }
 
@@ -58,7 +65,7 @@ Item {
         const at = controller.currentTime();
         const timing = controller.wordTiming(part, at);
         wordStart = timing.t;
-        wordProgress = animationsEnabled && timing.e > timing.t ? Math.max(0, Math.min(1, (at - timing.t) / (timing.e - timing.t))) : 1;
+        wordProgress = sweep && timing.e > timing.t ? Math.max(0, Math.min(1, (at - timing.t) / (timing.e - timing.t))) : 1;
         if (!animateWords || controller.rate <= 0 || timing.e <= at || wordProgress >= 1)
             return;
         wordMotion.from = wordProgress;
@@ -96,7 +103,7 @@ Item {
             Accessible.description: root.part.voiceName || ""
             color: root.highlighted ? root.accent : Theme.onSurfaceVariant
             Behavior on color {
-                enabled: root.animationsEnabled
+                enabled: root.sweep
                 ColorAnimation {
                     duration: Theme.expressiveDurations.expressiveEffects
                     easing.type: Easing.BezierSpline
@@ -122,19 +129,16 @@ Item {
 
             StyledText {
                 anchors.fill: parent
-                visible: root.highlighted && root.timedWords
+                visible: root.highlighted && root.timedWords && root.sweep
                 text: root.timedWords ? root.highlightedText(true) : ""
                 textFormat: Text.StyledText
                 Accessible.ignored: true
                 font: line.font
-                opacity: root.wordProgress
+                color: Qt.tint(Theme.onSurfaceVariant, Theme.withAlpha(root.accent, root.wordProgress))
                 lineHeight: line.lineHeight
                 horizontalAlignment: line.horizontalAlignment
                 wrapMode: line.wrapMode
                 elide: Text.ElideNone
-                Behavior on opacity {
-                    enabled: false
-                }
             }
         }
     }

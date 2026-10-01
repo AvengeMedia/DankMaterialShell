@@ -176,7 +176,7 @@ func PreviewSchemes(sourceColor string, contrast float64, imagePath, spec string
 
 	previews := make(map[string]SchemePreview, len(previewSchemeTypes)+1)
 	for _, schemeType := range previewSchemeTypes {
-		if spec == Spec2025 {
+		if spec == Spec2025 && SpecSupportsScheme(schemeType) {
 			colors, err := GenerateSpecColors(sourceColor, schemeType, contrast, ColorModeDark, Spec2025)
 			if err != nil {
 				return nil, fmt.Errorf("preview %s: %w", schemeType, err)
@@ -493,8 +493,10 @@ func buildOnce(opts *Options) (bool, error) {
 			primaryLight = primaryDark
 		}
 
+		injections := InjectedPalettes(opts.ConfigDir, sourceImage, opts.Mode)
+
 		dank16JSON = generateDank16Variants(primaryDark, primaryLight, surfaceDark, surfaceLight, containerDark, containerLight, opts.Mode)
-		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors)}
+		importArgs = []string{"--import-json-string", buildImportData(dank16JSON, sourceImage, specColors, injections)}
 
 		log.Infof("Running matugen %s with dank16 injection", opts.Kind)
 		switch opts.Kind {
@@ -613,7 +615,9 @@ func appendContrastArg(args []string, contrast float64) []string {
 // set only when the source was rewritten from a wallpaper to a hex color, where
 // matugen leaves {{image}} unset and templates using it would render "Null".
 // colors, when set, is a full role map that replaces matugen's own palette.
-func buildImportData(dank16JSON, image, colors string) string {
+// Each injection is exposed under its own namespace (e.g. {{mypalette.color0}}),
+// skipping any name already emitted so the object stays valid.
+func buildImportData(dank16JSON, image, colors string, injections []paletteInjection) string {
 	fields := []string{fmt.Sprintf(`"dank16": %s`, dank16JSON)}
 	if image != "" {
 		path, _ := json.Marshal(image)
@@ -621,6 +625,15 @@ func buildImportData(dank16JSON, image, colors string) string {
 	}
 	if colors != "" {
 		fields = append(fields, fmt.Sprintf(`"colors": %s`, colors))
+	}
+	seen := map[string]bool{"dank16": true, "image": true, "colors": true}
+	for _, inj := range injections {
+		if inj.Namespace == "" || inj.JSON == "" || seen[inj.Namespace] {
+			continue
+		}
+		seen[inj.Namespace] = true
+		nsKey, _ := json.Marshal(inj.Namespace)
+		fields = append(fields, fmt.Sprintf(`%s: %s`, nsKey, inj.JSON))
 	}
 	return "{" + strings.Join(fields, ", ") + "}"
 }

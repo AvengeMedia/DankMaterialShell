@@ -49,7 +49,7 @@ Singleton {
     property var sinkPorts: ({})
     property var cards: []
     property var pendingCardSwitch: null
-    readonly property var switchableOutputPorts: root.collectSwitchableOutputPorts(root.cards)
+    readonly property var switchableOutputPorts: root.collectSwitchableOutputPorts(root.cards, SessionData.hiddenOutputDeviceNames ?? [])
 
     readonly property int sinkMaxVolume: {
         const name = sink?.name ?? "";
@@ -61,6 +61,9 @@ Singleton {
     readonly property int sinkVolumePercent: Math.min(sinkMaxVolume, Math.round((sink?.audio?.volume ?? 0) * 100))
     readonly property int sourceVolumePercent: Math.round((source?.audio?.volume ?? 0) * 100)
     readonly property int wheelVolumeStep: SettingsData.audioWheelScrollAmount
+
+    property bool monoSettingSupported: false
+    property string monoSettingBackend: ""
 
     signal micMuteChanged
     signal micVolumeChanged
@@ -131,6 +134,15 @@ Singleton {
         target: SettingsData
         function onAudioShowStreamDevicesChanged() {
             root.rebuildTypedNodeLists();
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onAudioMonoChanged() {
+            if (root.monoSettingSupported) {
+                root.setMonoSetting(SettingsData.audioMono);
+            }
         }
     }
 
@@ -409,7 +421,14 @@ Singleton {
         return candidates[0];
     }
 
-    function collectSwitchableOutputPorts(cards) {
+    function profileSinkNames(cardName, profile) {
+        if (!cardName.startsWith("alsa_card."))
+            return [];
+        const prefix = "alsa_output." + cardName.substring(10) + ".";
+        return profile.split("+").filter(part => part.startsWith("output:")).map(part => prefix + part.substring(7));
+    }
+
+    function collectSwitchableOutputPorts(cards, hiddenSinkNames) {
         const entries = [];
         for (const card of cards || []) {
             if (!card.activeProfile || card.activeProfile === "pro-audio")
@@ -417,8 +436,12 @@ Singleton {
             for (const port of card.ports) {
                 if (port.availability === "no" || port.profiles.includes(card.activeProfile))
                     continue;
+                if (port.profiles.some(name => name.startsWith("input:")))
+                    continue;
                 const profile = bestOutputProfile(card, port);
                 if (!profile)
+                    continue;
+                if (profileSinkNames(card.name, profile).some(name => hiddenSinkNames.includes(name)))
                     continue;
                 const product = port.props["device.product.name"] || "";
                 entries.push({
@@ -1265,6 +1288,78 @@ EOFCONFIG
         return root.sink.audio.muted ? "Audio muted" : "Audio unmuted";
     }
 
+    // Mono audio toggle
+    property bool _monoQueryInProgress: false
+
+    function queryMonoSetting(callback) {
+        if (root._monoQueryInProgress) {
+            return;
+        }
+        root._monoQueryInProgress = true;
+        // Try pactl first (PipeWire ≥1.4.10 /1.6.0)
+        Proc.runCommand("audio-query-mono", ["env", "LC_ALL=C", "pactl", "send-message", "/core", "pipewire-pulse:force-mono-output", ""], (output, exitCode) => {
+            if (exitCode === 0 && output) {
+                const trimmed = output.trim();
+                if (trimmed === "true" || trimmed === "false") {
+                    root.monoSettingSupported = true;
+                    root.monoSettingBackend = "pactl";
+                    root._monoQueryInProgress = false;
+                    callback(true, trimmed === "true");
+                    return;
+                }
+            }
+            // Fallback to wpctl settings
+            Proc.runCommand("audio-query-mono-wpctl", ["env", "LC_ALL=C", "wpctl", "settings", "node.features.audio.mono"], (output2, exitCode2) => {
+                if (exitCode2 === 0 && output2) {
+                    const m = output2.match(/\b(true|false)\b/);
+                    if (m) {
+                        root.monoSettingSupported = true;
+                        root.monoSettingBackend = "wpctl";
+                        root._monoQueryInProgress = false;
+                        callback(true, m[1] === "true");
+                        return;
+                    }
+                }
+                root.monoSettingSupported = false;
+                root.monoSettingBackend = "";
+                root._monoQueryInProgress = false;
+                callback(false, false);
+            });
+        }, 0);
+    }
+
+    // Re-apply the saved preference: the live PipeWire value is runtime-only and resets on restart
+    function applyMonoStartupPreference() {
+        if (!SettingsData._hasLoaded)
+            return;
+        queryMonoSetting((supported, currentValue) => {
+            if (supported && currentValue !== SettingsData.audioMono)
+                root.setMonoSetting(SettingsData.audioMono);
+        });
+    }
+
+    function setMonoSetting(enabled, callback) {
+        const boolStr = enabled ? "true" : "false";
+        const backend = root.monoSettingBackend;
+        if (backend === "pactl") {
+            Proc.runCommand("audio-set-mono", ["env", "LC_ALL=C", "pactl", "send-message", "/core", "pipewire-pulse:force-mono-output", boolStr], (output, exitCode) => {
+                const ok = exitCode === 0;
+                if (callback) {
+                    callback(ok, ok ? "Mono audio enabled" : (output || "Failed to set mono audio"));
+                }
+            }, 0);
+        } else if (backend === "wpctl") {
+            Proc.runCommand("audio-set-mono-wpctl", ["env", "LC_ALL=C", "wpctl", "settings", "node.features.audio.mono", boolStr], (output, exitCode) => {
+                const ok = exitCode === 0;
+                if (callback) {
+                    callback(ok, ok ? "Mono audio enabled" : (output || "Failed to set mono audio"));
+                }
+            }, 0);
+        } else if (callback) {
+            callback(false, "Mono audio not supported");
+        }
+    }
+
     function setMicVolume(percentage) {
         if (!root.source?.audio) {
             return "No audio source available";
@@ -1352,6 +1447,27 @@ EOFCONFIG
             return root.toggleMicMute();
         }
 
+        function setmono(status: string): string {
+            const enabled = status === "true";
+            if (!root.monoSettingSupported) {
+                return "Mono audio not supported";
+            }
+            // Async: persist setting only on success
+            root.setMonoSetting(enabled, (ok, message) => {
+                if (ok) {
+                    SettingsData.set("audioMono", enabled);
+                }
+            });
+            return "Mono audio toggle sent";
+        }
+
+        function getmono(): string {
+            if (!root.monoSettingSupported) {
+                return "Mono audio not supported";
+            }
+            return `Mono Audio: ${root.monoSettingBackend} ${SettingsData.audioMono ? "enabled" : "disabled"}`;
+        }
+
         function status(): string {
             let result = "Audio Status:\n";
 
@@ -1425,10 +1541,17 @@ EOFCONFIG
         checkSoundThemeSupport();
     }
 
+    readonly property bool settingsLoaded: SettingsData._hasLoaded
+    onSettingsLoadedChanged: {
+        if (settingsLoaded)
+            root.applyMonoStartupPreference();
+    }
+
     Component.onCompleted: {
         rebuildTypedNodeLists();
         loadDeviceAliases();
         if (SettingsData.soundsEnabled && SettingsData.useSystemSoundTheme)
             getCurrentSoundTheme();
+        root.applyMonoStartupPreference();
     }
 }

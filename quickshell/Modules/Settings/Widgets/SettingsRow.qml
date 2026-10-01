@@ -22,19 +22,22 @@ T.Control {
     property string title: ""
     property bool singleLineTitle: false
     property string subtitle: ""
-    property color subtitleColor: Theme.surfaceVariantText
+    property color subtitleColor: supportingContentColor
     property string iconName: ""
     property bool iconBox: false
     property bool clickable: false
     property bool showChevron: false
     property string trailingBadge: ""
-    property color trailingBadgeColor: Theme.surfaceVariantText
+    property color trailingBadgeColor: supportingContentColor
     property bool paintBackground: !(parent?.isSettingsGroupHost ?? false)
     property real paddingH: SettingsMetrics.rowPaddingH
     property real paddingV: SettingsMetrics.rowPaddingV
     property color rowColor: SettingsMetrics.rowColor
-    property color iconColor: Theme.primary
-    property color titleColor: Theme.surfaceText
+    property bool active: false
+    readonly property color contentColor: active ? Theme.onSelectedContainer : Theme.surfaceText
+    readonly property color supportingContentColor: active ? Theme.onSelectedContainer : Theme.surfaceVariantText
+    property color iconColor: active ? Theme.accentOnSelectedContainer : Theme.primary
+    property color titleColor: contentColor
 
     property var resetStore: SettingsData
     property var resetKeys: settingKey !== "" && resetStore === SettingsData && SettingsData.hasSetting(settingKey) ? [settingKey] : []
@@ -89,10 +92,10 @@ T.Control {
         const container = groupItem.parent;
         if (container?.isSettingsGroupHost)
             return container.isEdge(groupItem, first);
-        if (!_edgeInContainer(first))
-            return false;
         const host = container?.parent;
-        return host?.isSettingsGroupHost ? host.isEdge(container, first) : true;
+        if (!host?.isSettingsGroupHost)
+            return true;
+        return host.isEdge(container, first) && _edgeInContainer(first);
     }
 
     function _edgeInContainer(first) {
@@ -123,7 +126,7 @@ T.Control {
     Rectangle {
         anchors.fill: parent
         visible: root.paintBackground
-        color: root.isHighlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
+        color: root.active ? Theme.selectedContainer : root.isHighlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
         border.width: Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
         topLeftRadius: root.topRadius
@@ -134,8 +137,8 @@ T.Control {
 
     Rectangle {
         anchors.fill: parent
-        visible: !root.paintBackground && root.isHighlighted
-        color: SettingsMetrics.rowHighlightColor
+        visible: !root.paintBackground && (root.active || root.isHighlighted)
+        color: root.active ? Theme.selectedContainer : SettingsMetrics.rowHighlightColor
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -146,7 +149,7 @@ T.Control {
         id: stateLayer
         anchors.fill: parent
         visible: root.clickable
-        color: Theme.surfaceText
+        color: root.contentColor
         opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : (clickControl.hovered ? Theme.stateLayerHover : 0))
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
@@ -166,7 +169,7 @@ T.Control {
     DankRipple {
         id: ripple
         visible: root.clickable
-        rippleColor: Theme.surfaceText
+        rippleColor: root.contentColor
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -332,7 +335,7 @@ T.Control {
                 DankIcon {
                     name: "chevron_right"
                     size: Theme.iconSize
-                    color: Theme.surfaceVariantText
+                    color: root.supportingContentColor
                     rotation: I18n.isRtl ? 180 : 0
                     visible: root.showChevron
                     anchors.verticalCenter: parent.verticalCenter

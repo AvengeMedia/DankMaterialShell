@@ -148,10 +148,10 @@ FocusScope {
             controller.selectPrevious();
             return;
         case Qt.Key_PageDown:
-            controller.selectPageDown(8);
+            controller.selectPageDown(resultsList.pageRows);
             return;
         case Qt.Key_PageUp:
-            controller.selectPageUp(8);
+            controller.selectPageUp(resultsList.pageRows);
             return;
         case Qt.Key_Right:
             if (controller.getCurrentSectionViewMode() !== "list") {
@@ -342,7 +342,7 @@ FocusScope {
                 width: implicitWidth
                 height: chipHeight
                 flow: Flow.TopToBottom
-                chipHeight: LauncherMetrics.footerChipHeight
+                chipHeight: LauncherMetrics.modeChipHeight
                 chipPadding: Theme.spacingS
                 showCheck: false
                 activeFocusOnTab: false
@@ -394,6 +394,7 @@ FocusScope {
             LauncherSearchField {
                 id: searchField
                 pluginName: controller.activePluginName
+                pluginIcon: controller.activePluginId ? controller.getPluginMetadata(controller.activePluginId).icon : ""
                 width: parent.width
                 textColor: Theme.onSurface
                 font.pixelSize: Theme.fontSizeLarge
@@ -436,9 +437,9 @@ FocusScope {
             anchors.bottom: contentHolder.inverted ? searchRow.top : footerBar.top
             anchors.leftMargin: Theme.spacingM
             anchors.rightMargin: Theme.spacingM
-            anchors.topMargin: contentHolder.inverted && !footerBar.showFooter ? Theme.spacingM : (contentHolder.inverted || categoryRow.visible || fileFilterRow.visible ? contentStack.gap : 0)
+            anchors.topMargin: contentHolder.inverted && !footerBar.showFooter ? Theme.spacingM : contentStack.gap
             anchors.bottomMargin: 0
-            readonly property real gap: controller.searchMode === "files" ? Theme.spacingS : Theme.spacingXS
+            readonly property real gap: LauncherMetrics.resultsGap
             clip: false
 
             Row {
@@ -468,6 +469,7 @@ FocusScope {
                     visible: categoryRow.showPluginCategories
                     width: Math.min(Theme.fieldDefaultWidth, parent.width)
                     compactMode: true
+                    triggerRadius: Theme.fullRadius(width, triggerHeight)
                     dropdownWidth: Theme.fieldDefaultWidth
                     popupWidth: Theme.fieldDefaultWidth + Theme.spacingXL * 2
                     maxPopupHeight: Theme.menuMaxHeight
@@ -535,6 +537,7 @@ FocusScope {
                         Layout.minimumWidth: 0
                         visible: DSearchService.supportsTypeFilter
                         triggerHeight: fileFilterContent.height
+                        triggerRadius: Theme.fullRadius(width, triggerHeight)
                         compactMode: true
                         dropdownWidth: width
                         maxPopupHeight: Theme.menuMaxHeight
@@ -573,6 +576,7 @@ FocusScope {
                         Layout.preferredWidth: 1
                         Layout.minimumWidth: 0
                         triggerHeight: fileFilterContent.height
+                        triggerRadius: Theme.fullRadius(width, triggerHeight)
                         compactMode: true
                         dropdownWidth: width
                         maxPopupHeight: Theme.menuMaxHeight
@@ -609,6 +613,7 @@ FocusScope {
                         Layout.preferredWidth: 1
                         Layout.minimumWidth: 0
                         Layout.preferredHeight: fileFilterContent.height
+                        cornerRadius: Theme.fullRadius(width, height)
                         backgroundColor: Theme.floatingWindowFieldColor
                         placeholderText: I18n.tr("ext", "launcher file search placeholder, short for file extension")
                         font.pixelSize: Theme.fontSizeMedium

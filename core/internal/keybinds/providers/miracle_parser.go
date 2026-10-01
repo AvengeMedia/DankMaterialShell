@@ -107,10 +107,6 @@ func ParseMiracleConfig(configPath string) (*MiracleConfig, error) {
 		return nil, err
 	}
 
-	if config.ActionKey == "" {
-		config.ActionKey = "meta"
-	}
-
 	return &config, nil
 }
 

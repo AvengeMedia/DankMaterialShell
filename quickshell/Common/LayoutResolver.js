@@ -57,6 +57,16 @@ function isIsland(config) {
     return config.island === true || config.dot === true;
 }
 
+// First island entry across the sections, the same one SettingsData.islandWidgetEntry reads.
+function hostsIslandWidget(config) {
+    for (const key of ["leftWidgets", "centerWidgets", "rightWidgets"]) {
+        const entry = (config?.[key] ?? []).find(entry => (typeof entry === "string" ? entry : entry?.id) === "island");
+        if (entry !== undefined)
+            return typeof entry === "string" || entry.enabled !== false;
+    }
+    return false;
+}
+
 function overviewStandInHost(input, selected) {
     const config = input.config;
     if (isIsland(config) || config.visible !== false || !config.openOnOverview)
@@ -67,8 +77,10 @@ function overviewStandInHost(input, selected) {
 function resolveScreen(inputs, screen, options) {
     const assigned = inputs.filter(input => coversScreen(input.config, screen, options.screens, options.displayNameMode));
     const enabled = assigned.filter(input => input.config.enabled);
-    const islands = enabled.filter(input => isIsland(input.config));
     const bars = enabled.filter(input => !isIsland(input.config));
+    // One island surface per screen: an island-layout bar owns it, else the first bar hosting the island widget.
+    const hostOwner = enabled.some(input => input.config.island === true) ? null : bars.find(input => hostsIslandWidget(input.config)) ?? null;
+    const islands = enabled.filter(input => isIsland(input.config)).concat(hostOwner ? [hostOwner] : []);
     const frameConfigured = screenMatches(screen, options.framePreferences, options.screens, options.displayNameMode);
     const frameStyled = options.effectiveFrameEnabled && frameConfigured;
     const frameHosted = options.effectiveConnected && frameStyled;
@@ -82,7 +94,7 @@ function resolveScreen(inputs, screen, options) {
         const satellites = !dot && (input.islandSatellites ?? input.config.islandSatellitesEnabled ?? true);
         instances.push({
             key: JSON.stringify([screen.name, input.config.id]), screenName: screen.name,
-            barId: input.config.id, configOrder: inputs.indexOf(input), edge: "", kind: "island", free: true, dot,
+            barId: input.config.id, configOrder: inputs.indexOf(input), edge: "", kind: "island", free: true, dot, hostsIsland: true,
             satelliteEdge: satellites ? edgeName(input.config.position ?? 0) || "top" : "",
             row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0,
             paintedBounds: { x: 0, y: 0, width: 0, height: 0 }, margins: { top: 0, bottom: 0, left: 0, right: 0 }
@@ -110,6 +122,7 @@ function resolveScreen(inputs, screen, options) {
                 configOrder: inputs.indexOf(input),
                 edge,
                 kind,
+                hostsIsland: kind === "island" || input === hostOwner,
                 row: selected.indexOf(input),
                 rowThickness: paintedThickness,
                 rowOffset,

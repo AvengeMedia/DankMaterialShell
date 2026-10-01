@@ -388,6 +388,7 @@ Column {
             settingKey: "matugenTargetMonitor"
             visible: root.perMonitor
             text: I18n.tr("Matugen source display")
+            description: I18n.tr("Theme colors come from this display's wallpaper", "matugen source display dropdown description")
             currentValue: {
                 if (!SettingsData.matugenTargetMonitor)
                     return root.displayNameForScreen(root.firstScreenName()) + " (" + I18n.tr("Default") + ")";
@@ -785,6 +786,7 @@ Column {
             tags: ["disable", "external", "management", "swww", "hyprpaper", "swaybg"]
             settingKey: "disableWallpapers"
             text: I18n.tr("Use external manager")
+            description: I18n.tr("DMS stops drawing wallpapers on every display", "use external wallpaper manager toggle description")
             checked: {
                 const prefs = SettingsData.screenPreferences?.wallpaper;
                 return Array.isArray(prefs) && prefs.length === 0;
@@ -815,14 +817,11 @@ Column {
         FileBrowserModal {
             parentModal: root.parentModal
             browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
-            browserType: "wallpaper"
+            bucket: "wallpaper"
             showHiddenFiles: true
-            revealPath: root.currentWallpaper
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
-            onFileSelected: path => {
-                root.applyWallpaper(path);
-                close();
-            }
+            startPath: root.currentWallpaper
+            filters: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif", "*.exr", "*.svg"]
+            onAccepted: paths => root.applyWallpaper(paths[0])
         }
     }
 }

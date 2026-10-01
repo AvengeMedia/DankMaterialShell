@@ -25,6 +25,7 @@ Column {
             resetStore: root.page
             resetKeys: ["clockDateOrder"]
             text: I18n.tr("Order", "noun, clock widget option for time and date order")
+            enabled: !root.page.value("clockCompactMode")
             model: [I18n.tr("Time first"), I18n.tr("Date first")]
             currentIndex: root.page.value("clockDateOrder") === "dateFirst" ? 1 : 0
             onSelectionChanged: (index, selected) => {
@@ -32,6 +33,14 @@ Column {
                     return;
                 root.page.set("clockDateOrder", index === 1 ? "dateFirst" : "timeFirst");
             }
+        }
+
+        SettingsToggleRow {
+            resetStore: root.page
+            resetKeys: ["clockNotificationBadge"]
+            text: I18n.tr("Notification badge", "clock widget option: unread notification count next to the time")
+            checked: root.page.value("clockNotificationBadge")
+            onToggled: checked => root.page.set("clockNotificationBadge", checked)
         }
 
         SettingsNavRow {

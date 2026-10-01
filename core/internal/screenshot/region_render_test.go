@@ -83,8 +83,7 @@ func newFrameBuffer(t testing.TB, r *RegionSelector, os *OutputSurface) *ShmBuff
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { buf.Close() })
-	buf.CopyFrom(os.screenBuf)
-	r.dimBackground(buf)
+	paintDimmedFrame(buf, os.screenBuf)
 	return buf
 }
 

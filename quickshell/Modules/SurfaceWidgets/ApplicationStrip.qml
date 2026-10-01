@@ -103,7 +103,7 @@ Item {
     property int overflowItemCount: 0
 
     readonly property real targetSize: barHosted ? iconSize * (options.iconSizePercentage ?? 100) / 100 : iconSize
-    readonly property real indicatorLane: root.options.hideIndicators ? 0 : DockConfig.indicatorLane(root.options)
+    readonly property real indicatorLane: root.barHosted && !root.options.hideIndicators ? DockConfig.indicatorLane(root.options) : 0
     readonly property real crossSize: {
         const needed = root.targetSize + root.indicatorLane;
         if (!root.barHosted)

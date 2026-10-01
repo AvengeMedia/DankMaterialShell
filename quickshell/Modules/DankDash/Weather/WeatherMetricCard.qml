@@ -112,16 +112,22 @@ Rectangle {
         }
         return "";
     }
-    readonly property color foreground: Theme.onSurface
+    readonly property color foreground: toneColors.contentColor
+    readonly property color accent: toneColors.accentColor
     readonly property bool leadingContent: widgetId === "humidity" || widgetId === "precipitation"
 
     radius: graphics && reading.shape ? Theme.fullRadius(width, height) : Theme.cornerRadiusXL
-    color: graphics && widgetId === "uv" ? "transparent" : DashMetrics.cardColor
+    color: graphics && widgetId === "uv" ? "transparent" : toneColors.surfaceColor
     border.width: graphics && widgetId === "uv" ? 0 : Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
     Accessible.role: Accessible.StaticText
     Accessible.name: reading.label + " " + (hasValue ? reading.value : I18n.tr("Not available")) + " " + (reading.detail ?? "")
     Accessible.description: graphicDescription
+
+    DankTone {
+        id: toneColors
+        tone: root.widgetOptions.tone ?? ""
+    }
 
     StateLayer {
         anchors.fill: parent
@@ -139,8 +145,8 @@ Rectangle {
         width: artworkSize * aspectRatio
         height: artworkSize
         shape: root.reading.shape ?? "square"
-        color: root.widgetId === "uv" ? DashMetrics.cardColor : Theme.withAlpha(Theme.primary, Theme.stateLayerDrag)
-        trackColor: Theme.withAlpha(Theme.primary, Theme.stateLayerHover)
+        color: root.widgetId === "uv" ? toneColors.surfaceColor : Theme.withAlpha(root.accent, Theme.stateLayerDrag)
+        trackColor: Theme.withAlpha(root.accent, Theme.stateLayerHover)
         fillProgress: root.shapeLevel
         visible: root.graphics && !!root.reading.shape && root.widgetId !== "pressure"
         rotation: Theme.shapeScale > 0 && root.widgetId === "wind" && root.weather.windDirection != null ? (root.weather.windDirection + 180) % 360 : 0
@@ -154,7 +160,7 @@ Rectangle {
         ShapePath {
             strokeWidth: 0
             strokeColor: "transparent"
-            fillColor: Theme.withAlpha(Theme.primary, Theme.stateLayerDrag)
+            fillColor: Theme.withAlpha(root.accent, Theme.stateLayerDrag)
             PathSvg {
                 path: Visuals.levelPath(root.width, root.height, root.radius, (root.reading.level ?? 0) / 100, Theme.spacingS)
             }
@@ -178,7 +184,7 @@ Rectangle {
             readonly property real inset: Theme.spacingS + thickness / 2
 
             ShapePath {
-                strokeColor: Theme.withAlpha(Theme.primary, Theme.stateLayerHover)
+                strokeColor: Theme.withAlpha(root.accent, Theme.stateLayerHover)
                 strokeWidth: gauge.thickness
                 capStyle: Theme.shapeScale > 0 ? ShapePath.RoundCap : ShapePath.FlatCap
                 fillColor: "transparent"
@@ -188,7 +194,7 @@ Rectangle {
             }
 
             ShapePath {
-                strokeColor: root.hasValue && root.shapeLevel > 0 ? Theme.primary : "transparent"
+                strokeColor: root.hasValue && root.shapeLevel > 0 ? root.accent : "transparent"
                 strokeWidth: gauge.thickness
                 capStyle: Theme.shapeScale > 0 ? ShapePath.RoundCap : ShapePath.FlatCap
                 fillColor: "transparent"
@@ -291,7 +297,7 @@ Rectangle {
                 width: Math.max(Theme.iconButtonSize, dewValue.implicitWidth + Theme.spacingM)
                 height: Theme.iconButtonSize
                 radius: Theme.fullRadius(width, height)
-                color: Theme.primaryContainer
+                color: toneColors.tinted ? toneColors.contentColor : Theme.primaryContainer
 
                 StyledText {
                     id: dewValue
@@ -300,7 +306,7 @@ Rectangle {
                     text: WeatherService.formatTemp(root.weather.dewPoint) ?? "--"
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Theme.fontWeightMedium
-                    color: Theme.onPrimaryContainer
+                    color: toneColors.tinted ? toneColors.containerColor : Theme.onPrimaryContainer
                 }
             }
 

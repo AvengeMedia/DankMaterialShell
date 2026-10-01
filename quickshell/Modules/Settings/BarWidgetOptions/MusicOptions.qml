@@ -32,6 +32,7 @@ Column {
             resetStore: root.page
             resetKeys: ["mediaAdaptiveWidthEnabled"]
             text: I18n.tr("Adaptive width")
+            description: I18n.tr("Fits the song title instead of keeping a fixed width", "media widget adaptive width toggle description")
             checked: root.page.value("mediaAdaptiveWidthEnabled")
             onToggled: checked => root.page.set("mediaAdaptiveWidthEnabled", checked)
         }

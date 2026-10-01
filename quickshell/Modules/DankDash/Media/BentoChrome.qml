@@ -81,7 +81,9 @@ MediaChromeBase {
                 width: viewToggle.width + Theme.spacingXS * 2
                 height: viewToggle.height + Theme.spacingXS * 2
                 radius: Theme.fullRadius(width, height)
-                color: Theme.chipSurface
+                color: DashMetrics.chipColor
+                border.width: Theme.layerOutlineWidth
+                border.color: Theme.outlineMedium
                 visible: root.player.lyricsEnabled
                 opacity: revealed ? 1 : 0
 
@@ -144,7 +146,9 @@ MediaChromeBase {
                     width: artTransportRow.width + Theme.spacingM * 2
                     height: Theme.buttonHeightM + Theme.spacingXS * 2
                     radius: Theme.fullRadius(width, height)
-                    color: Theme.withAlpha(Theme.surfaceContainerLowest, DashMetrics.mediaArtOverlayAlpha)
+                    color: DashMetrics.chipColor
+                    border.width: Theme.layerOutlineWidth
+                    border.color: Theme.outlineMedium
                     opacity: artHover.hovered || focusWithin ? 1 : 0
 
                     Behavior on opacity {
@@ -216,7 +220,6 @@ MediaChromeBase {
 
             sourceComponent: LyricsOverlay {
                 player: root.player
-                radius: DashMetrics.surfaceRadius
             }
         }
 
@@ -230,7 +233,7 @@ MediaChromeBase {
             Rectangle {
                 width: parent.width
                 height: metadata.implicitHeight + Theme.spacingS * 2
-                radius: Theme.cornerRadiusL
+                radius: DashMetrics.mediaInnerRadius
                 color: DashMetrics.cardColor
                 border.width: Theme.layerOutlineWidth
                 border.color: Theme.outlineMedium
@@ -299,7 +302,7 @@ MediaChromeBase {
             Rectangle {
                 width: parent.width
                 height: playback.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadiusL
+                radius: DashMetrics.mediaInnerRadius
                 color: DashMetrics.cardColor
                 border.width: Theme.layerOutlineWidth
                 border.color: Theme.outlineMedium

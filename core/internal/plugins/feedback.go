@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 )
 
-const feedbackURL = "https://api.danklinux.com/plugins"
+const feedbackURL = site.API + "/plugins"
 
 type Feedback struct {
 	Upvotes  int

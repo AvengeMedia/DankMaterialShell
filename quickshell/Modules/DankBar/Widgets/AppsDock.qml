@@ -42,6 +42,9 @@ BasePill {
             activeColorMode: appOption("appsDockActiveColorMode", "primary"),
             enlargeOnHover: appOption("appsDockEnlargeOnHover", false),
             enlargePercentage: appOption("appsDockEnlargePercentage", 125),
+            magnification: dockHosted && (surfaceContext?.config?.magnification ?? false),
+            magnificationScale: dockHosted ? (surfaceContext?.config?.magnificationScale ?? 130) : 130,
+            magnificationProfile: dockHosted ? (surfaceContext?.config?.magnificationProfile ?? "parabolic") : "parabolic",
             iconSizePercentage: appOption("appsDockIconSizePercentage", 100)
         });
     }

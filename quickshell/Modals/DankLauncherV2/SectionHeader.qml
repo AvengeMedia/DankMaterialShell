@@ -22,6 +22,23 @@ Item {
     property Item focusReturnTarget: null
     property var transientSurfaceTracker: null
     readonly property bool hasAppCategories: section?.id === "apps" && (controller?.appCategories?.length ?? 0) > 0
+    readonly property var viewModes: [
+        {
+            mode: "list",
+            icon: "view_list",
+            label: I18n.tr("List", "noun, list view mode option")
+        },
+        {
+            mode: "grid",
+            icon: "grid_view",
+            label: I18n.tr("Grid", "noun, grid view mode and layout option")
+        },
+        {
+            mode: "tile",
+            icon: "view_module",
+            label: I18n.tr("Tile")
+        }
+    ]
 
     signal viewModeToggled
 
@@ -29,95 +46,95 @@ Item {
     height: LauncherMetrics.sectionHeight
     clip: true
 
-    Row {
+    readonly property string categoryLabel: controller?.appCategory || (controller?.appCategories?.[0] ?? "")
+
+    Item {
+        id: labelArea
         anchors.left: parent.left
         anchors.right: controls.left
-        anchors.leftMargin: root.hasAppCategories ? 0 : Theme.spacingS
+        anchors.leftMargin: LauncherMetrics.headerInset
         anchors.rightMargin: Theme.spacingS
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingS
+        height: parent.height
+
+        Row {
+            id: labelContent
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.spacingS
+
+            DankIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: root.hasAppCategories ? AppSearchService.getCategoryIcon(root.categoryLabel) : (root.section?.icon ?? "folder")
+                size: Theme.iconSizeSmall
+                color: Theme.primary
+            }
+
+            StyledText {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.min(implicitWidth, labelArea.width - Theme.iconSizeSmall - Theme.spacingS - (chevron.visible ? chevron.width + Theme.spacingS : 0))
+                text: root.hasAppCategories ? root.categoryLabel : (root.section?.title ?? "")
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Theme.fontWeightMedium
+                color: Theme.primary
+                elide: Text.ElideRight
+            }
+
+            DankIcon {
+                id: chevron
+                visible: root.hasAppCategories
+                anchors.verticalCenter: parent.verticalCenter
+                name: "arrow_drop_down"
+                size: Theme.iconSizeSmall
+                color: Theme.primary
+            }
+        }
+
+        MouseArea {
+            anchors.fill: labelContent
+            enabled: root.hasAppCategories
+            cursorShape: Qt.PointingHandCursor
+            onClicked: categoryDropdown.item?.openDropdownMenu()
+        }
 
         Loader {
+            id: categoryDropdown
             active: root.hasAppCategories
-            visible: active
-            width: Math.min(Theme.fieldDefaultWidth, parent.width)
-            height: LauncherMetrics.sectionHeight
             sourceComponent: DankDropdown {
+                showTrigger: false
                 focusPolicy: Qt.NoFocus
-                triggerHeight: Theme.buttonHeightXS
-                dropdownWidth: width
+                popupWidth: Math.min(Theme.fieldDefaultWidth, root.width)
                 compactMode: true
                 options: root.controller?.appCategories ?? []
                 optionIcons: options.map(category => AppSearchService.getCategoryIcon(category))
-                currentValue: root.controller?.appCategory || options[0] || ""
+                currentValue: root.categoryLabel
                 openUpwards: root.popupAbove
-                popupAnchorItem: root.popupAboveItem
+                popupAnchorItem: root.popupAbove ? root.popupAboveItem : labelContent
                 focusReturnTarget: root.focusReturnTarget
                 transientSurfaceTracker: root.transientSurfaceTracker
                 maxPopupHeight: LauncherMetrics.maxVisibleRows * Theme.menuItemHeight
                 onValueChanged: value => root.controller?.setAppCategory(value)
             }
         }
-
-        DankIcon {
-            visible: !root.hasAppCategories
-            anchors.verticalCenter: parent.verticalCenter
-            name: root.section?.icon ?? "folder"
-            size: Theme.iconSizeSmall
-            color: Theme.primary
-        }
-
-        StyledText {
-            visible: !root.hasAppCategories
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, parent.width - Theme.iconSizeSmall - Theme.spacingS)
-            text: root.section?.title ?? ""
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Theme.fontWeightMedium
-            color: Theme.primary
-            elide: Text.ElideRight
-        }
     }
 
     Row {
         id: controls
         anchors.right: parent.right
-        anchors.rightMargin: Theme.spacingXS
+        anchors.rightMargin: 0
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.groupedListGap
 
-        Repeater {
-            model: root.canChangeViewMode && !root.section?.collapsed ? [
-                {
-                    mode: "list",
-                    icon: "view_list",
-                    label: I18n.tr("List", "noun, list view mode option")
-                },
-                {
-                    mode: "grid",
-                    icon: "grid_view",
-                    label: I18n.tr("Grid", "noun, grid view mode and layout option")
-                },
-                {
-                    mode: "tile",
-                    icon: "view_module",
-                    label: I18n.tr("Tile")
-                }
-            ] : []
-
-            DankActionButton {
-                required property var modelData
-                focusPolicy: Qt.NoFocus
-                iconName: modelData.icon
-                tooltipText: modelData.label
-                iconSize: Theme.iconSizeSmall
-                backgroundColor: root.viewMode === modelData.mode ? Theme.secondaryContainer : "transparent"
-                iconColor: root.viewMode === modelData.mode ? Theme.onSecondaryContainer : Theme.onSurfaceVariant
-                onClicked: {
-                    if (!root.controller || !root.section || root.viewMode === modelData.mode)
-                        return;
-                    root.controller.setSectionViewMode(root.section.id, modelData.mode);
-                }
+        DankActionButton {
+            readonly property var current: root.viewModes.find(entry => entry.mode === root.viewMode) ?? root.viewModes[0]
+            focusPolicy: Qt.NoFocus
+            visible: root.canChangeViewMode && !root.section?.collapsed
+            iconName: current.icon
+            tooltipText: current.label
+            iconSize: Theme.iconSizeSmall
+            onClicked: {
+                if (!root.controller || !root.section)
+                    return;
+                const index = root.viewModes.indexOf(current);
+                root.controller.setSectionViewMode(root.section.id, root.viewModes[(index + 1) % root.viewModes.length].mode);
             }
         }
 

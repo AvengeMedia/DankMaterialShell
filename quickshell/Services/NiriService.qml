@@ -24,6 +24,7 @@ Singleton {
 
     property var outputs: ({})
     property var windows: []
+    property bool titleOnlyWindowsUpdate: false
     property var displayScales: ({})
     property var lastFocusedWindowId: null
 
@@ -585,19 +586,36 @@ Singleton {
         windows = windows.filter(w => w.id !== data.id);
     }
 
+    function differsOnlyInTitle(previous, next) {
+        if (previous.title === next.title)
+            return false;
+        const keys = new Set([...Object.keys(previous), ...Object.keys(next)]);
+        for (const key of keys) {
+            if (key !== "title" && JSON.stringify(previous[key]) !== JSON.stringify(next[key]))
+                return false;
+        }
+        return true;
+    }
+
     function handleWindowOpenedOrChanged(data) {
         if (!data.window)
             return;
         const window = data.window;
         const existingIndex = windows.findIndex(w => w.id === window.id);
-
-        if (existingIndex >= 0) {
-            const updatedWindows = [...windows];
-            updatedWindows[existingIndex] = window;
-            windows = sortWindowsByLayout(updatedWindows);
-        } else {
+        if (existingIndex < 0) {
             windows = sortWindowsByLayout([...windows, window]);
+            return;
         }
+
+        const updatedWindows = [...windows];
+        updatedWindows[existingIndex] = window;
+        if (!differsOnlyInTitle(windows[existingIndex], window)) {
+            windows = sortWindowsByLayout(updatedWindows);
+            return;
+        }
+        titleOnlyWindowsUpdate = true;
+        windows = updatedWindows;
+        titleOnlyWindowsUpdate = false;
     }
 
     function handleWindowLayoutsChanged(data) {

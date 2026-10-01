@@ -13,6 +13,8 @@ Singleton {
     readonly property var log: Log.scoped("NotepadStorageService")
 
     property int refCount: 0
+    readonly property int largeFileBytes: 5 * 1024 * 1024
+    property var approvedLargeFiles: ({})
 
     readonly property string baseDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericStateLocation) + "/DankMaterialShell")
     readonly property string filesDir: baseDir + "/notepad-files"
@@ -160,7 +162,7 @@ Singleton {
         return null;
     }
 
-    function loadTabContent(tabIndex, callback) {
+    function loadTabContent(tabIndex, callback, onLargeFile) {
         if (tabIndex < 0 || tabIndex >= tabs.length) {
             callback("");
             return;
@@ -172,12 +174,12 @@ Singleton {
 
         if (tabsBeingCreated[tab.id]) {
             Qt.callLater(() => {
-                loadTabContent(tabIndex, callback);
+                loadTabContent(tabIndex, callback, onLargeFile);
             });
             return;
         }
 
-        Proc.runCommand("", ["test", "-f", fullPath], (output, exitCode) => {
+        readFileSize(fullPath, size => {
             var currentTab = root.getTabById(requestTabId);
             var currentPath = currentTab ? (currentTab.isTemporary ? baseDir + "/" + currentTab.filePath : currentTab.filePath) : "";
 
@@ -186,16 +188,36 @@ Singleton {
                 return;
             }
 
-            if (exitCode === 0) {
-                tabFileLoaderComponent.createObject(root, {
-                    path: fullPath,
-                    callback: callback
-                });
-            } else {
+            if (size < 0) {
                 log.warn("Tab file does not exist:", fullPath);
                 callback("");
+                return;
             }
+
+            if (!currentTab.isTemporary && root.needsLargeFileConfirm(fullPath, size)) {
+                onLargeFile(size);
+                return;
+            }
+
+            tabFileLoaderComponent.createObject(root, {
+                path: fullPath,
+                callback: callback
+            });
         });
+    }
+
+    function readFileSize(path, callback) {
+        Proc.runCommand("", ["sh", "-c", "test -f \"$1\" && wc -c < \"$1\"", "sh", path], (output, exitCode) => {
+            callback(exitCode === 0 ? parseInt(output) : -1);
+        });
+    }
+
+    function needsLargeFileConfirm(path, size) {
+        return size > largeFileBytes && !approvedLargeFiles[path];
+    }
+
+    function approveLargeFile(path) {
+        approvedLargeFiles[path] = true;
     }
 
     function saveTabContent(tabIndex, content) {

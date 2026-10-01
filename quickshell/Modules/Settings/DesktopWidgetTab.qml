@@ -119,6 +119,7 @@ Item {
 
             SettingsToggleRow {
                 text: I18n.tr("Show on overlay")
+                description: I18n.tr("Keeps the widget above windows instead of below them", "desktop widget show on overlay toggle description")
                 checked: root.cfg.showOnOverlay ?? false
                 onToggled: checked => root.updateConfig("showOnOverlay", checked)
             }

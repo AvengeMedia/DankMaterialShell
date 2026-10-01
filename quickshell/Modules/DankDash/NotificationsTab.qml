@@ -13,6 +13,9 @@ FocusScope {
     property bool nested: false
     property string entryId: "notifications"
     property int currentTab: 0
+    property var transientSurfaceTracker: null
+    property real swipeBleed: 0
+    readonly property var surfaces: transientSurfaceTracker ?? localSurfaces
     readonly property bool hasNotifications: list.count > 0
     readonly property Item focusTarget: root
     property bool blocksTabNavigation: false
@@ -83,7 +86,6 @@ FocusScope {
 
     implicitHeight: DashMetrics.tabMinHeight
     enabled: interactive
-    clip: true
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
@@ -105,7 +107,7 @@ FocusScope {
     }
 
     TransientSurfaceTracker {
-        id: surfaces
+        id: localSurfaces
     }
 
     NotificationKeyboardController {
@@ -126,23 +128,30 @@ FocusScope {
     KeyboardNavigatedNotificationList {
         id: list
         anchors.fill: parent
+        anchors.leftMargin: -root.swipeBleed
+        anchors.rightMargin: -root.swipeBleed
         nested: root.nested
         anchors.bottomMargin: footer.height + Theme.spacingM
+        swipeBleed: root.swipeBleed
         visible: root.currentTab === 0
+        showScrollBar: false
         keyboardController: keyboard
         focusAllowed: root.activeFocus
-        transientSurfaceTracker: surfaces
+        transientSurfaceTracker: root.surfaces
         trackStableContentHeight: false
     }
 
     Loader {
         id: historyLoader
-        anchors.fill: list
+        anchors.fill: parent
+        anchors.bottomMargin: footer.height + Theme.spacingM
         active: root.currentTab === 1
         visible: active
         sourceComponent: HistoryNotificationList {
             focusAllowed: root.activeFocus
+            showScrollBar: false
             nested: root.nested
+            swipeBleed: root.swipeBleed
         }
     }
 
@@ -198,7 +207,7 @@ FocusScope {
         popupAnchorItem: dndButton
         popupWidth: NotificationMetrics.menuWidth
         openUpwards: true
-        transientSurfaceTracker: surfaces
+        transientSurfaceTracker: root.surfaces
         options: [I18n.tr("Off")].concat(DndPresets.presetOptions.map(option => option.label))
         onValueChanged: value => {
             if (value === I18n.tr("Off")) {

@@ -309,7 +309,8 @@ BasePill {
 
                         ScrollingText {
                             id: mediaText
-                            anchors.fill: parent
+                            width: contentRoot.measuredTextWidth
+                            height: parent.height
                             text: textContainer.displayText
                             color: root.contentColor
                             font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)

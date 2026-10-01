@@ -11,6 +11,7 @@ DashTabFace {
     tabComponent: Component {
         NotificationsTab {
             live: root.live
+            transientSurfaceTracker: root.controller.transientSurfaces
         }
     }
 

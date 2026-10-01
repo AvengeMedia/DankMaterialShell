@@ -54,7 +54,8 @@ DankPopout {
     readonly property var orderedTabIds: DashRegistry.visibleTabIds
     readonly property int currentTabIndex: orderedTabIds.indexOf(currentTabId)
     readonly property bool showTabs: orderedTabIds.length > 1 && currentTabIndex >= 0 && detailTabId === ""
-    readonly property bool showBack: detailTabId !== "" && currentTabIndex >= 0
+    readonly property bool canReturn: detailTabId !== "" && currentTabIndex >= 0
+    readonly property bool showHeader: detailTabId === "" || editMode
     readonly property int navigationEdge: {
         switch (SettingsData.dashTabPosition) {
         case "left":
@@ -109,7 +110,7 @@ DankPopout {
     }
 
     function closeDetail() {
-        if (!showBack) {
+        if (!canReturn) {
             dashVisible = false;
             return;
         }
@@ -254,7 +255,7 @@ DankPopout {
 
             implicitWidth: root.popupWidth
             implicitHeight: horizontalChromeHeight + pages.implicitHeight + DashMetrics.contentPadding * 2
-            readonly property real horizontalChromeHeight: root.verticalNavigation ? 0 : (root.showTabs ? tabBar.implicitHeight : Theme.minimumTouchTargetSize) + DashMetrics.contentGap
+            readonly property real horizontalChromeHeight: root.verticalNavigation || !root.showHeader ? 0 : (root.showTabs ? tabBar.implicitHeight : Theme.minimumTouchTargetSize) + DashMetrics.contentGap
             readonly property bool ready: pages.ready
             readonly property bool navigationFocused: tabBar.activeFocus
             focus: true
@@ -303,7 +304,7 @@ DankPopout {
             }
 
             function headerFocusTargets() {
-                const targets = root.editMode ? pageActions.focusTargets : [backButton, tabBar, pageTitle.focusTarget];
+                const targets = root.editMode ? pageActions.focusTargets : [tabBar, pageTitle.focusTarget];
                 return targets.filter(item => item.visible && item.enabled);
             }
 
@@ -318,7 +319,7 @@ DankPopout {
                     emptySettings.forceActiveFocus(Qt.OtherFocusReason);
                     return;
                 }
-                for (const target of [backButton, tabBar, pageTitle.focusTarget])
+                for (const target of [tabBar, pageTitle.focusTarget])
                     target.focus = false;
                 pageActions.clearFocus();
                 if (pages.currentHost)
@@ -561,6 +562,8 @@ DankPopout {
 
             DashOptionsSheet {
                 id: tabOptions
+                backdrop: contentColumn
+                tabScope: true
                 onDismissed: mainContainer.focusInitial()
             }
 
@@ -608,6 +611,7 @@ DankPopout {
 
                     Item {
                         id: headerRow
+                        visible: root.showHeader
                         enabled: !tabOptions.shown && !pageActions.menuOpen
 
                         x: root.verticalNavigation && root.navigationEdge === SettingsData.Right ? parent.width - width : 0
@@ -636,23 +640,10 @@ DankPopout {
                             }
                         }
 
-                        DankActionButton {
-                            id: backButton
-                            x: I18n.isRtl ? parent.width - width : 0
-                            anchors.verticalCenter: parent.verticalCenter
-                            buttonSize: Theme.buttonHeightS
-                            iconName: I18n.isRtl ? "arrow_forward" : "arrow_back"
-                            tooltipText: I18n.tr("Back")
-                            visible: root.showBack && !root.editMode
-                            onClicked: root.closeDetail()
-                        }
-
                         DashPageTitle {
                             id: pageTitle
-                            readonly property real backWidth: root.showBack ? backButton.width + Theme.spacingS : 0
-                            x: I18n.isRtl ? 0 : backWidth
                             anchors.verticalCenter: parent.verticalCenter
-                            width: Math.max(0, parent.width - backWidth)
+                            width: parent.width
                             height: implicitHeight
                             entryId: root.activeTabId
                             visible: !root.showTabs && !root.editMode
@@ -667,7 +658,7 @@ DankPopout {
                             height: Math.min(parent.height, implicitHeight)
                             visible: root.editMode
                             vertical: root.verticalNavigation
-                            overlayParent: mainContainer
+                            transientSurfaceTracker: root.transientSurfaceTracker
                             entryId: root.activeTabId
                             tabItem: pages.currentItem
                             editMode: root.editMode
@@ -680,6 +671,7 @@ DankPopout {
                     DankFlickable {
                         id: pages
                         enabled: !tabOptions.shown && !pageActions.menuOpen
+                        showScrollBar: false
 
                         property var currentHost: null
                         property real settledHeight: DashMetrics.tabDefaultHeight

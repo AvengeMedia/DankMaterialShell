@@ -15,6 +15,8 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.spacingL
 
+    Component.onCompleted: CompositorService.refreshDmsWindowFloatingRule()
+
     ConfigInclude {
         id: windowRulesInclude
         includeKind: "windowrules"
@@ -22,7 +24,7 @@ Column {
         onFixed: {
             if (CompositorService.isMango)
                 MangoService.reloadConfig();
-            CompositorService.applyDmsWindowFloatingRule();
+            CompositorService.seedDmsWindowFloatingRule();
         }
     }
 
@@ -157,6 +159,7 @@ Column {
             tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
             settingKey: "blurForegroundLayers"
             text: I18n.tr("Foreground layers")
+            description: I18n.tr("With background blur on, cards and tiles keep their own backing", "surface foreground layers toggle description")
             checked: SettingsData.blurForegroundLayers ?? true
             onToggled: checked => SettingsData.set("blurForegroundLayers", checked)
         }
@@ -254,13 +257,25 @@ Column {
             onSliderValueChanged: newValue => SettingsData.set("fixedRadius", newValue)
         }
 
+        SettingsToggleRow {
+            tab: "theme"
+            tags: ["window", "corner", "radius", "match", "follow", "link", "strength", "compositor"]
+            settingKey: "windowRadiusMatch"
+            text: I18n.tr("Match corner style", "toggle: window radius follows the corner style setting")
+            visible: root.windowRadiusKey !== ""
+            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
+            checked: Theme.compositorRadiusOverride < 0
+            onToggled: checked => SettingsData.set(root.windowRadiusKey, checked ? -1 : Math.round(Theme.windowRadius))
+        }
+
         SettingsSliderRow {
             tab: "theme"
             tags: ["window", "corner", "radius", "rounded", "popout", "menu", "modal", "compositor", "niri", "hyprland", "mango"]
             settingKey: "windowRadius"
             text: I18n.tr("Window radius")
             visible: root.windowRadiusKey !== ""
-            resetKeys: root.windowRadiusKey !== "" ? [root.windowRadiusKey] : []
+            enabled: Theme.compositorRadiusOverride >= 0
+            resetKeys: []
             value: Theme.windowRadius
             minimum: 0
             maximum: 64
@@ -336,9 +351,10 @@ Column {
             settingKey: "dmsWindowsFloating"
             text: I18n.tr("Open floating")
             visible: windowRulesInclude.compositorSupported
-            checked: SettingsData.dmsWindowsFloating ?? true
+            checked: CompositorService.dmsWindowFloatingActive
+            modified: !checked
             onToggled: checked => {
-                SettingsData.set("dmsWindowsFloating", checked);
+                CompositorService.setDmsWindowFloatingRule(checked);
                 if (checked)
                     windowRulesInclude.check();
             }
@@ -346,7 +362,7 @@ Column {
 
         IncludeSetupBanner {
             include: windowRulesInclude
-            visibleCondition: windowRulesInclude.compositorSupported && (SettingsData.dmsWindowsFloating ?? true)
+            visibleCondition: windowRulesInclude.compositorSupported && CompositorService.dmsWindowFloatingActive
         }
     }
 
@@ -515,6 +531,16 @@ Column {
         }
     }
 
+    SettingsToggleCard {
+        tab: "theme"
+        tags: ["scroll", "scrollbar", "scrollbars", "list", "page"]
+        settingKey: "scrollbarsEnabled"
+        iconName: "unfold_more"
+        title: I18n.tr("Scrollbars")
+        checked: SettingsData.scrollbarsEnabled
+        onToggled: checked => SettingsData.set("scrollbarsEnabled", checked)
+    }
+
     SettingsCard {
         tab: "theme"
         tags: ["button", "color", "accent"]
@@ -559,6 +585,19 @@ Column {
                 }
                 SettingsData.set("buttonColorMode", "primary");
             }
+        }
+
+        SettingsSliderRow {
+            tab: "theme"
+            tags: ["container", "accent", "color", "saturation", "tint", "pastel", "primary", "card"]
+            settingKey: "containerSaturation"
+            text: I18n.tr("Container saturation", "theme setting, saturation of tinted accent containers")
+            description: I18n.tr("Tinted cards and badges across the shell", "container saturation setting description")
+            value: SettingsData.containerSaturation
+            minimum: 0
+            maximum: 200
+            step: 5
+            onSliderValueChanged: newValue => SettingsData.set("containerSaturation", newValue)
         }
     }
 

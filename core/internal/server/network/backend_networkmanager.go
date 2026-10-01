@@ -72,6 +72,10 @@ type NetworkManagerBackend struct {
 	// into other backend methods.
 	devMutex sync.RWMutex
 
+	// modems holds ModemManager radio metrics keyed by modem object path.
+	modems     map[dbus.ObjectPath]modemInfo
+	modemMutex sync.RWMutex
+
 	dbusConn *dbus.Conn
 	signals  chan *dbus.Signal
 	sigWG    sync.WaitGroup

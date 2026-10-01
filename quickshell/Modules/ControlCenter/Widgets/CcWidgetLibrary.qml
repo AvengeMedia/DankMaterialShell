@@ -2,17 +2,13 @@ import QtQuick
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Widgets
+import "../utils/widgets.js" as WidgetUtils
 
 Rectangle {
     id: root
 
     property var widgets: []
-    readonly property var matches: {
-        const query = searchField.text.trim().toLowerCase();
-        if (!query)
-            return widgets;
-        return widgets.filter(widget => [widget.text, widget.description, widget.id].some(value => (value || "").toLowerCase().includes(query)));
-    }
+    readonly property var matches: WidgetUtils.filterWidgets(widgets, searchField.text)
 
     signal chosen(string widgetId)
     signal dismissed
@@ -26,7 +22,7 @@ Rectangle {
     implicitWidth: CcMetrics.libraryPanelWidth
     implicitHeight: CcMetrics.libraryPanelHeight
     radius: Theme.windowRadius
-    color: Theme.nestedSurface
+    color: Theme.readableSurface
     border.width: Theme.layerOutlineWidth
     border.color: Theme.outlineMedium
 

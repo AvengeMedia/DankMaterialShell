@@ -379,16 +379,6 @@ Column {
             spacing: Theme.spacingS
 
             DankButton {
-                text: I18n.tr("Browse")
-                iconName: "store"
-                backgroundColor: Theme.primary
-                textColor: Theme.onPrimary
-                maximumWidth: parent.width
-                wrapText: true
-                enabled: DMSService.dmsAvailable
-                onClicked: root.showPluginBrowser()
-            }
-            DankButton {
                 text: root.pluginsWithUpdates.length ? I18n.tr("Update All") + " (" + root.pluginsWithUpdates.length + ")" : I18n.tr("Check for updates")
                 iconName: root.pluginsWithUpdates.length ? "download" : "refresh"
                 busy: root.checkingUpdates || pluginUpdatesDialogItem.isUpdating
@@ -787,6 +777,16 @@ Column {
                     }
                 }
             }
+        }
+    }
+
+    SettingsFabBar {
+        shown: root.plugins.length > 0 && DMSService.dmsAvailable
+
+        DankFab {
+            text: I18n.tr("Browse")
+            iconName: "store"
+            onClicked: root.showPluginBrowser()
         }
     }
 }

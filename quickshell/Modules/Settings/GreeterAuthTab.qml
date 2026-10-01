@@ -65,7 +65,6 @@ Item {
         SettingsCard {
             width: parent.width
             iconName: "fingerprint"
-            title: I18n.tr("Authentication")
             settingKey: "greeterAuth"
 
             SettingsToggleRow {
@@ -99,5 +98,7 @@ Item {
                 onToggled: checked => SettingsData.set("greeterEnableU2f", checked)
             }
         }
+
+        GreeterSyncFabBar {}
     }
 }

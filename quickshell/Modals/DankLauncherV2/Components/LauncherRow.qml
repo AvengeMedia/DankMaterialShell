@@ -227,7 +227,7 @@ DankListItem {
         }
 
         Rectangle {
-            visible: !!root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse"
+            visible: !!root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse" && (!root.controller?.activePluginName || (root.item.badgeLabel ?? "").length > 0)
             width: typeBadge.implicitWidth + Theme.spacingS * 2
             height: Theme.iconSizeMedium
             radius: Theme.fullRadius(width, height)

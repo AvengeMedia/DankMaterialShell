@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Shapes
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -70,13 +69,12 @@ FocusScope {
     property var expansionOwner: null
     readonly property string chromeOwnerId: dockLease.claimId
     readonly property real expansionExtent: expansionOwner ? Math.min(320, (isVertical ? screen.width : screen.height) / 2) : 0
-    readonly property real contentThickness: DockConfig.contentThickness(config)
     readonly property real effectiveBarThickness: DockConfig.effectiveThickness(config)
     readonly property real widgetThickness: config.iconSize
     // Bar widgets size off bar metrics, so hand them the bar thickness matching the dock icon size.
     readonly property var widgetConfig: Object.assign({}, config, {
-        fontScale: (config.iconSize / 40) * Theme.fontSizeMedium / Theme.barTextSize(contentThickness),
-        iconScale: config.iconSize * 1.6 / contentThickness
+        fontScale: (config.iconSize / 40) * Theme.fontSizeMedium / Theme.barTextSize(widgetThickness),
+        iconScale: 1.6
     })
     property alias axis: dockAxis
     property var clockButtonRef: null
@@ -127,7 +125,7 @@ FocusScope {
         kind: "dock"
         host: dock
         config: dock.widgetConfig
-        thickness: dock.contentThickness
+        thickness: dock.widgetThickness
     }
     SurfaceWidgetFactory {
         id: widgetFactory
@@ -145,7 +143,7 @@ FocusScope {
             barConfig: dock.config
             parentScreen: dock.screen
             axis: dock.axis
-            barThickness: dock.contentThickness
+            barThickness: dock.widgetThickness
             widgetThickness: dock.widgetThickness
             renderItems: false
             mixedStrip: widgetStrip
@@ -265,9 +263,10 @@ FocusScope {
     readonly property rect surfaceBounds: Qt.rect(_dockWindowOriginX() + dockBackground.x + dockContainer.x + dockMouseArea.x + dockCore.x + dockSlide.x, _dockWindowOriginY() + dockBackground.y + dockContainer.y + dockMouseArea.y + dockCore.y + dockSlide.y, dockBackground.width, dockBackground.height)
 
     function _syncDockChromeState() {
-        if (dockLease.dockId !== dock.config.id) {
+        const currentDockId = dock.config?.id ?? "";
+        if (dockLease.dockId !== currentDockId) {
             dockLease.release();
-            dockLease.dockId = dock.config.id;
+            dockLease.dockId = currentDockId;
         }
         const presented = dock.geometryReady && (hostWindow?.visible ?? true) && (dock.reveal || slideXSpring.running || slideYSpring.running) && dock.hasApps;
         const phase = !presented ? "hidden" : ((!dock.reveal && (slideXSpring.running || slideYSpring.running)) ? "closing" : ((slideXSpring.running || slideYSpring.running) ? "opening" : "open"));
@@ -313,7 +312,7 @@ FocusScope {
 
     ConnectedSurfaceLease {
         id: dockLease
-        property string dockId: ""
+        property string dockId: dock.config?.id ?? ""
         property bool superseded: false
         claimPrefix: "dock"
         slot: ConnectedModeState.surfaceSlot("dock", dockId)
@@ -506,6 +505,7 @@ FocusScope {
     }
 
     property real animationHeadroom: Math.ceil(dock.config.iconSize * 0.35)
+    readonly property real stripOverflow: animationHeadroom + dock.config.spacing
 
     readonly property real surfaceImplicitWidth: isVertical ? (Theme.px(dockGeometry.surfaceThickness + dock.config.iconSize * 0.3, _dpr) + animationHeadroom) : 0
     readonly property real surfaceImplicitHeight: !isVertical ? (Theme.px(dockGeometry.surfaceThickness + dock.config.iconSize * 0.3, _dpr) + animationHeadroom) : 0
@@ -776,8 +776,6 @@ FocusScope {
                     width: implicitWidth
                     height: implicitHeight
 
-                    // Avoid an offscreen texture seam where the connected dock meets the frame.
-                    layer.enabled: !usesConnectedFrameChrome
                     clip: false
 
                     MorphSurface {
@@ -825,22 +823,17 @@ FocusScope {
                     }
                 }
 
-                Shape {
-                    id: dockBorderShape
+                Rectangle {
+                    readonly property real borderThickness: Math.max(1, dock.borderThickness)
                     x: dockBackground.x - borderThickness
                     y: dockBackground.y - borderThickness
                     width: dockBackground.width + borderThickness * 2
                     height: dockBackground.height + borderThickness * 2
                     visible: dock.config.borderEnabled && dock.hasApps && !usesConnectedFrameChrome
-                    preferredRendererType: Shape.CurveRenderer
-
-                    readonly property real borderThickness: Math.max(1, dock.borderThickness)
-                    readonly property real i: borderThickness / 2
-                    readonly property real cr: dock.surfaceRadius
-                    readonly property real w: dockBackground.width
-                    readonly property real h: dockBackground.height
-
-                    readonly property color borderColor: {
+                    radius: dock.surfaceRadius + borderThickness
+                    color: "transparent"
+                    border.width: borderThickness
+                    border.color: {
                         const opacity = dock.config.borderOpacity;
                         switch (dock.config.borderColor) {
                         case "secondary":
@@ -851,40 +844,6 @@ FocusScope {
                             return Theme.withAlpha(Theme.surfaceText, opacity);
                         }
                     }
-
-                    ShapePath {
-                        fillColor: "transparent"
-                        strokeColor: dockBorderShape.borderColor
-                        strokeWidth: dockBorderShape.borderThickness
-                        joinStyle: ShapePath.RoundJoin
-                        capStyle: ShapePath.FlatCap
-
-                        PathSvg {
-                            path: {
-                                const bt = dockBorderShape.borderThickness;
-                                const i = dockBorderShape.i;
-                                const cr = dockBorderShape.cr + bt - i;
-                                const w = dockBorderShape.w;
-                                const h = dockBorderShape.h;
-
-                                let d = `M ${i + cr} ${i}`;
-                                d += ` L ${i + w + 2 * (bt - i) - cr} ${i}`;
-                                if (cr > 0)
-                                    d += ` A ${cr} ${cr} 0 0 1 ${i + w + 2 * (bt - i)} ${i + cr}`;
-                                d += ` L ${i + w + 2 * (bt - i)} ${i + h + 2 * (bt - i) - cr}`;
-                                if (cr > 0)
-                                    d += ` A ${cr} ${cr} 0 0 1 ${i + w + 2 * (bt - i) - cr} ${i + h + 2 * (bt - i)}`;
-                                d += ` L ${i + cr} ${i + h + 2 * (bt - i)}`;
-                                if (cr > 0)
-                                    d += ` A ${cr} ${cr} 0 0 1 ${i} ${i + h + 2 * (bt - i) - cr}`;
-                                d += ` L ${i} ${i + cr}`;
-                                if (cr > 0)
-                                    d += ` A ${cr} ${cr} 0 0 1 ${i + cr} ${i}`;
-                                d += " Z";
-                                return d;
-                            }
-                        }
-                    }
                 }
 
                 SurfaceStrip {
@@ -892,8 +851,8 @@ FocusScope {
                     spacing: dock.config.itemSpacing ?? Theme.spacingS
                     x: dockBackground.x + (dock.isVertical && dock.config.position === SettingsData.Position.Right ? dock.expansionExtent : 0) + dock.config.spacing
                     y: dockBackground.y + (!dock.isVertical && dock.config.position === SettingsData.Position.Bottom ? dock.expansionExtent : 0) + dock.config.spacing
-                    width: dock.isVertical ? dock.contentThickness : Math.max(0, dockBackground.width - dock.config.spacing * 2)
-                    height: dock.isVertical ? Math.max(0, dockBackground.height - dock.config.spacing * 2) : dock.contentThickness
+                    width: dock.isVertical ? dock.widgetThickness : Math.max(0, dockBackground.width - dock.config.spacing * 2)
+                    height: dock.isVertical ? Math.max(0, dockBackground.height - dock.config.spacing * 2) : dock.widgetThickness
                     surfaceContext: widgetContext
                     components: widgetFactory.componentMap
                     applicationStrip: appProvider.item?.stripItem ?? null
@@ -950,7 +909,7 @@ FocusScope {
                     text: variant.name,
                     icon: variant.icon
                 }));
-        return BarWidgetCatalog.widgets.concat(plugins).filter(widget => widget.id !== "appsDock" || !hasApps);
+        return BarWidgetCatalog.widgets.concat(plugins).filter(widget => !widget.barOnly && (widget.id !== "appsDock" || !hasApps));
     }
 
     MouseArea {

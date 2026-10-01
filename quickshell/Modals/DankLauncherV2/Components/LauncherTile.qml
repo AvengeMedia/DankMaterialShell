@@ -123,6 +123,8 @@ Rectangle {
 
                 StyledText {
                     width: parent.width
+                    height: LauncherMetrics.tileLabelBlockHeight
+                    verticalAlignment: Text.AlignTop
                     text: root.item?._hName ?? root.item?.name ?? ""
                     textFormat: root.item?._hRich ? Text.RichText : Text.PlainText
                     font.pixelSize: Theme.fontSizeSmall

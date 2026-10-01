@@ -107,7 +107,7 @@ PanelWindow {
     exclusiveZone: -1
     WlrLayershell.namespace: "dms:dankisland"
     WlrLayershell.layer: LayerShell.fromEnv("DMS_DANKISLAND_LAYER", body.usesOverlayLayer ? WlrLayer.Overlay : WlrLayer.Top)
-    WlrLayershell.keyboardFocus: body.keyboardFocusPolicy
+    WlrLayershell.keyboardFocus: islandChrome.keyboardFocusPolicy
     BackgroundEffect.blurRegion: root.blurWanted && BlurService.enabled && BlurService.available && body.surfaceOpacity > 0 && body.surfaceOpacity < 1 ? surfaceBlurRegion : null
 
     Region {
@@ -137,9 +137,12 @@ PanelWindow {
     }
     Component.onDestruction: KeyboardFocus.unregisterBarWindow(root)
 
-    DankFocusGrab {
-        windows: [root, dismissWindow]
-        wanted: body.wantsFocusGrab
+    IslandHostChrome {
+        id: islandChrome
+
+        window: root
+        extraWindows: [dismissWindow]
+        host: body
     }
 
     Timer {

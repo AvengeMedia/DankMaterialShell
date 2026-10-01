@@ -48,7 +48,7 @@ DankPopout {
         if (!rules || !window)
             return null;
         return rules.find(rule => {
-            if (!(rule.source || "").includes("dms/windowrules") || rule.id === "dms-floating-windows")
+            if (!(rule.source || "").includes("dms/windowrules") || rule.id === CompositorService.dmsFloatingRuleId)
                 return false;
             const matches = (rule.matches && rule.matches.length > 0) ? rule.matches : (rule.matchCriteria ? [rule.matchCriteria] : []);
             return matches.some(m => matchesCriteria(m, window));

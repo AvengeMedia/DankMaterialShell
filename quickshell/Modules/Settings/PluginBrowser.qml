@@ -846,7 +846,9 @@ RegistryBrowserWindow {
         }
     ]
 
-    overlay: Rectangle {
+    overlayActive: detailPluginId !== ""
+
+    overlay: Item {
         id: detailPane
 
         property var plugin: ({})
@@ -859,23 +861,7 @@ RegistryBrowserWindow {
             plugin = livePlugin;
         }
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: 0
-        anchors.bottom: parent.bottom
-        z: 10
-        color: Theme.floatingWindowSurface
-        opacity: root.detailPluginId !== "" ? 1 : 0
-        visible: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.expressiveDurations.expressiveEffects
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
-            }
-        }
+        anchors.fill: parent
 
         Connections {
             target: root

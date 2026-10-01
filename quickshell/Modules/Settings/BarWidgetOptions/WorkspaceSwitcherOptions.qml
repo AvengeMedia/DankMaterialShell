@@ -169,6 +169,7 @@ Column {
             resetStore: root.page
             resetKeys: ["workspaceFollowFocus"]
             text: I18n.tr("Follow display focus")
+            description: I18n.tr("Lists workspaces from whichever display has focus", "workspace switcher follow display focus toggle description")
             visible: CompositorService.supportsWorkspaceFollowFocus
             checked: root.page.value("workspaceFollowFocus")
             onToggled: checked => root.page.set("workspaceFollowFocus", checked)

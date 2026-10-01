@@ -71,7 +71,7 @@ Item {
             anchors.verticalCenterOffset: root.isVertical ? 0 : root.laneOffset
             width: actualIconSize - 4
             height: actualIconSize - 4
-            scale: root.options.enlargeOnHover && root.isHovered ? (root.options.enlargePercentage ?? 125) / 100 : 1
+            scale: !root.options?.magnification && root.options?.enlargeOnHover && root.isHovered ? (root.options?.enlargePercentage ?? 125) / 100 : 1
 
             readonly property string iconPath: Paths.resolveIconPath(TrashService.isEmpty ? "user-trash" : "user-trash-full")
 

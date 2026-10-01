@@ -16,17 +16,10 @@ Item {
         id: bar
     }
 
-    readonly property var interactionModeValues: ["click", "hybrid"]
-    readonly property var routingValues: ["normal", "always", "last-used"]
     readonly property bool selectedIslandEnabled: bar.selectedBarIsIsland && (bar.selectedBarConfig?.enabled ?? false)
     readonly property bool selectedIslandFree: bar.selectedBarIsIsland && SettingsData.islandFreePlacement(bar.selectedBarConfig)
     readonly property bool selectedIslandDocked: bar.selectedBarIsIsland && !selectedIslandFree
     readonly property int placementIndex: !bar.islandSetting("islandFloating") ? 0 : (bar.islandSetting("islandPlacement") === "free" ? 2 : 1)
-
-    function valueIndex(values, value, fallback) {
-        const index = values.indexOf(value);
-        return index >= 0 ? index : Math.max(0, values.indexOf(fallback));
-    }
 
     function setBarScreenPreferences(barId, prefs) {
         SettingsData.updateBarConfig(barId, {
@@ -212,7 +205,7 @@ Item {
             title: I18n.tr("Visibility", "settings card title for bar or dock show and hide behavior")
             settingKey: "barVisibility"
             collapsible: true
-            expanded: true
+            expanded: false
             visible: (bar.selectedBarConfig?.enabled ?? false) && !bar.selectedBarIsIsland
 
             SettingsRow {
@@ -259,6 +252,7 @@ Item {
                 visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandOwnsSelectedBarTop
                 tags: ["autohide", "strict", "popout"]
                 text: I18n.tr("Strict auto-hide", "Dank bar setting: hide the bar when the pointer leaves even if a menu or bar popover is still open")
+                description: I18n.tr("Hides even while a bar popout or menu is open", "bar strict auto-hide toggle description")
                 resetStore: bar
                 resetKeys: ["autoHideStrict"]
                 checked: bar.selectedBarConfig?.autoHideStrict ?? false
@@ -275,6 +269,7 @@ Item {
                 tags: ["hide", "windows", "empty", "workspace"]
                 visible: (bar.selectedBarConfig?.autoHide ?? false) && !bar.islandOwnsSelectedBarTop && CompositorService.supportsBarAutoHideReveal
                 text: I18n.tr("Hide when windows open")
+                description: I18n.tr("Stays visible while the workspace has no windows", "bar hide when windows open toggle description")
                 resetStore: bar
                 resetKeys: ["showOnWindowsOpen"]
                 checked: bar.selectedBarConfig?.showOnWindowsOpen ?? false
@@ -301,6 +296,7 @@ Item {
                 tags: ["manual", "show", "hide", "ipc", "toggle"]
                 visible: !bar.islandOwnsSelectedBarTop
                 text: I18n.tr("Manual show/hide")
+                description: I18n.tr("Off keeps the bar hidden until turned back on or shown over IPC", "bar manual visibility toggle description")
                 resetStore: bar
                 resetKeys: ["visible"]
                 checked: bar.selectedBarConfig?.visible ?? true
@@ -313,128 +309,99 @@ Item {
             }
         }
 
-        SettingsCard {
-            iconName: "touch_app"
-            title: I18n.tr("Behavior", "island settings: behavior card title")
-            settingKey: "islandInteraction"
-            tags: ["island", "interaction", "click", "hybrid", "expand", "hover", "delay", "routing", "shortcuts"]
+        IslandBehaviorCard {
+            store: bar.islandStore
+            docked: dankBarTab.selectedIslandDocked
             visible: dankBarTab.selectedIslandEnabled
+        }
 
-            SettingsDropdownRow {
-                settingKey: "islandSharedRouting"
-                tags: ["island", "routing", "launcher", "dash", "control center", "ipc", "last used"]
-                resetStore: bar
-                resetKeys: ["islandSharedRouting"]
-                text: I18n.tr("Shared shortcuts")
-                description: I18n.tr("Routes launcher, dash, control center and notification shortcuts")
-                options: [I18n.tr("Normal routing"), I18n.tr("Always here"), I18n.tr("Last used on this screen")]
-                dropdownWidth: Theme.smallBreakpoint / 2
-                currentValue: options[dankBarTab.valueIndex(dankBarTab.routingValues, SettingsData.islandSharedRoutingMode(bar.selectedBarConfig), "normal")]
-                onValueChanged: value => SettingsData.setIslandSharedRouting(bar.selectedBarId, dankBarTab.routingValues[options.indexOf(value)] ?? "normal")
-            }
-
-            SettingsButtonGroupRow {
-                settingKey: "islandInteractionMode"
-                tags: ["island", "interaction", "click", "hybrid", "expand"]
-                visible: dankBarTab.selectedIslandDocked
-                resetStore: bar
-                resetKeys: ["islandInteractionMode"]
-                text: I18n.tr("Expansion mode", "island settings: click or hover expansion row")
-                model: [I18n.tr("Click", "island settings: click expansion mode"), I18n.tr("Hybrid", "island settings: hover plus click expansion mode")]
-                currentIndex: dankBarTab.valueIndex(dankBarTab.interactionModeValues, bar.islandSetting("islandInteractionMode"), "hybrid")
-                onSelectionChanged: (index, selected) => {
-                    if (selected)
-                        bar.apply("islandInteractionMode", dankBarTab.interactionModeValues[index] ?? "hybrid");
-                }
-            }
-
-            SettingsRow {
-                visible: dankBarTab.selectedIslandDocked && bar.islandSetting("islandInteractionMode") !== "click"
-                body: StyledText {
-                    width: parent.width
-                    text: I18n.tr("Hybrid peeks the current compact face on hover. Click pins a destination so it stays open", "island settings: hybrid mode hint")
-                    color: Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
-                    wrapMode: Text.WordWrap
-                }
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandHoverOpenDelay"
-                tags: ["island", "interaction", "hover", "open", "delay"]
-                resetStore: bar
-                resetKeys: ["islandHoverOpenDelay"]
-                text: I18n.tr("Open delay", "island settings: hover open delay slider")
-                unit: "ms"
-                minimum: 0
-                maximum: 1000
-                step: 10
-                value: bar.islandSetting("islandHoverOpenDelay")
-                visible: dankBarTab.selectedIslandDocked && bar.islandSetting("islandInteractionMode") !== "click"
-                onSliderValueChanged: value => bar.apply("islandHoverOpenDelay", value)
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandHoverCloseDelay"
-                tags: ["island", "interaction", "hover", "close", "delay"]
-                resetStore: bar
-                resetKeys: ["islandHoverCloseDelay"]
-                text: I18n.tr("Hide delay", "island settings: hover hide delay slider")
-                unit: "ms"
-                minimum: 0
-                maximum: 1000
-                step: 10
-                value: bar.islandSetting("islandHoverCloseDelay")
-                visible: dankBarTab.selectedIslandDocked && bar.islandSetting("islandInteractionMode") !== "click"
-                onSliderValueChanged: value => bar.apply("islandHoverCloseDelay", value)
-            }
-
-            SettingsToggleRow {
-                settingKey: "islandMediaClockVisible"
-                tags: ["island", "media", "clock", "compact", "time"]
-                resetStore: bar
-                resetKeys: ["islandMediaClockVisible"]
-                text: I18n.tr("Keep clock with media", "island settings: clock in media face toggle")
-                checked: bar.islandSetting("islandMediaClockVisible")
-                onToggled: checked => bar.apply("islandMediaClockVisible", checked)
-            }
+        IslandNotificationsCard {
+            store: bar.islandStore
+            visible: dankBarTab.selectedIslandEnabled
         }
 
         SettingsCard {
-            iconName: "notifications"
-            title: I18n.tr("Notifications", "island settings: notifications card title")
-            settingKey: "islandNotifications"
-            visible: dankBarTab.selectedIslandEnabled
+            iconName: "border_outer"
+            title: I18n.tr("Frame")
+            settingKey: "frameEnabled"
+            tags: ["frame", "mode", "bar", "overview", "connected", "separate", "displays"]
+            visible: SettingsData.frameEnabled
 
-            SettingsToggleRow {
-                settingKey: "islandNotificationPopups"
-                tags: ["island", "notifications", "popup", "standard", "bar", "stack", "arrival"]
-                resetStore: bar
-                resetKeys: ["islandNotificationPopups"]
-                text: I18n.tr("Use standard popups", "island settings: show arriving notifications as stacked popups instead of in the island")
-                checked: bar.islandSetting("islandNotificationPopups")
-                onToggled: checked => bar.apply("islandNotificationPopups", checked)
+            SettingsButtonGroupRow {
+                settingKey: "frameModeSelector"
+                tags: ["frame", "mode", "connected", "separate", "popout", "flush", "float"]
+                resetKeys: ["frameMode"]
+                text: I18n.tr("Surfaces")
+                model: [I18n.tr("Separate", "adjective, frame surfaces mode option, opposite of connected"), I18n.tr("Connected")]
+                currentIndex: SettingsData.frameMode === "connected" ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    switch (index) {
+                    case 1:
+                        SettingsData.set("frameMode", "connected");
+                        break;
+                    default:
+                        SettingsData.set("frameMode", "separate");
+                        break;
+                    }
+                }
             }
 
             SettingsToggleRow {
-                settingKey: "islandNotificationExpand"
-                tags: ["island", "notifications", "expand", "arrival", "size"]
-                resetStore: bar
-                resetKeys: ["islandNotificationExpand"]
-                text: I18n.tr("Expand by default", "island settings: expanded notification toggle")
-                checked: bar.islandSetting("islandNotificationExpand")
-                onToggled: checked => bar.apply("islandNotificationExpand", checked)
+                settingKey: "frameShowOnOverview"
+                tags: ["frame", "overview", "show", "hide", "niri"]
+                text: I18n.tr("Show on overview")
+                visible: CompositorService.supportsNativeOverview
+                checked: SettingsData.frameShowOnOverview
+                onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
             }
 
             SettingsToggleRow {
-                settingKey: "islandNotificationBadgeClearOnOpen"
-                tags: ["island", "home", "notifications", "badge", "unread", "clear", "dismiss", "open"]
-                resetStore: bar
-                resetKeys: ["islandNotificationBadgeClearOnOpen"]
-                text: I18n.tr("Clear badge on open", "island settings: clear the notification badge when the center opens")
-                checked: bar.islandSetting("islandNotificationBadgeClearOnOpen")
-                enabled: SettingsData.islandHomeGroupEnabled(bar.selectedBarConfig, "notifications")
-                onToggled: checked => bar.apply("islandNotificationBadgeClearOnOpen", checked)
+                settingKey: "frameCloseGaps"
+                tags: ["frame", "connected", "gap", "edge", "curves", "arcs", "expose", "popout", "notification"]
+                visible: SettingsData.frameMode === "connected"
+                text: I18n.tr("Expose the arcs")
+                checked: !SettingsData.frameCloseGaps
+                onToggled: checked => SettingsData.set("frameCloseGaps", !checked)
+            }
+
+            SettingsButtonGroupRow {
+                settingKey: "frameLauncherEmergeSide"
+                tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]
+                visible: SettingsData.frameMode === "connected"
+                text: I18n.tr("Launcher emerge side")
+                model: [I18n.tr("Bottom"), I18n.tr("Top")]
+                currentIndex: SettingsData.frameLauncherEmergeSide === "top" ? 1 : 0
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
+                }
+            }
+
+            SettingsToggleRow {
+                settingKey: "frameLauncherArcExtender"
+                tags: ["frame", "connected", "launcher", "arc", "extender", "center"]
+                visible: SettingsData.frameMode === "connected"
+                text: I18n.tr("Arc extender")
+                checked: SettingsData.frameLauncherArcExtender
+                onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
+            }
+
+            SettingsToggleRow {
+                settingKey: "frameLauncherEdgeHover"
+                tags: ["frame", "connected", "launcher", "hover", "edge", "reveal"]
+                visible: SettingsData.frameMode === "connected"
+                text: I18n.tr("Edge hover reveal")
+                description: I18n.tr("Pointer at the launcher edge opens it, unless a bar or dock is there", "frame launcher edge hover toggle description")
+                checked: SettingsData.frameLauncherEdgeHover
+                onToggled: checked => SettingsData.set("frameLauncherEdgeHover", checked)
+            }
+
+            SettingsDisplayPicker {
+                displayPreferences: SettingsData.frameScreenPreferences
+                onPreferencesChanged: prefs => SettingsData.set("frameScreenPreferences", prefs)
             }
         }
 
@@ -568,90 +535,6 @@ Item {
         }
 
         SettingsCard {
-            iconName: "border_outer"
-            title: I18n.tr("Frame")
-            settingKey: "frameEnabled"
-            tags: ["frame", "mode", "bar", "overview", "connected", "separate", "displays"]
-            visible: SettingsData.frameEnabled
-
-            SettingsButtonGroupRow {
-                settingKey: "frameModeSelector"
-                tags: ["frame", "mode", "connected", "separate", "popout", "flush", "float"]
-                resetKeys: ["frameMode"]
-                text: I18n.tr("Surfaces")
-                model: [I18n.tr("Separate", "adjective, frame surfaces mode option, opposite of connected"), I18n.tr("Connected")]
-                currentIndex: SettingsData.frameMode === "connected" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    switch (index) {
-                    case 1:
-                        SettingsData.set("frameMode", "connected");
-                        break;
-                    default:
-                        SettingsData.set("frameMode", "separate");
-                        break;
-                    }
-                }
-            }
-
-            SettingsToggleRow {
-                settingKey: "frameShowOnOverview"
-                tags: ["frame", "overview", "show", "hide", "niri"]
-                text: I18n.tr("Show on overview")
-                visible: CompositorService.supportsNativeOverview
-                checked: SettingsData.frameShowOnOverview
-                onToggled: checked => SettingsData.set("frameShowOnOverview", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "frameCloseGaps"
-                tags: ["frame", "connected", "gap", "edge", "curves", "arcs", "expose", "popout", "notification"]
-                visible: SettingsData.frameMode === "connected"
-                text: I18n.tr("Expose the arcs")
-                checked: !SettingsData.frameCloseGaps
-                onToggled: checked => SettingsData.set("frameCloseGaps", !checked)
-            }
-
-            SettingsButtonGroupRow {
-                settingKey: "frameLauncherEmergeSide"
-                tags: ["frame", "connected", "launcher", "modal", "emerge", "direction", "bottom", "top"]
-                visible: SettingsData.frameMode === "connected"
-                text: I18n.tr("Launcher emerge side")
-                model: [I18n.tr("Bottom"), I18n.tr("Top")]
-                currentIndex: SettingsData.frameLauncherEmergeSide === "top" ? 1 : 0
-                onSelectionChanged: (index, selected) => {
-                    if (!selected)
-                        return;
-                    SettingsData.set("frameLauncherEmergeSide", index === 1 ? "top" : "bottom");
-                }
-            }
-
-            SettingsToggleRow {
-                settingKey: "frameLauncherArcExtender"
-                tags: ["frame", "connected", "launcher", "arc", "extender", "center"]
-                visible: SettingsData.frameMode === "connected"
-                text: I18n.tr("Arc extender")
-                checked: SettingsData.frameLauncherArcExtender
-                onToggled: checked => SettingsData.set("frameLauncherArcExtender", checked)
-            }
-
-            SettingsToggleRow {
-                settingKey: "frameLauncherEdgeHover"
-                tags: ["frame", "connected", "launcher", "hover", "edge", "reveal"]
-                visible: SettingsData.frameMode === "connected"
-                text: I18n.tr("Edge hover reveal")
-                checked: SettingsData.frameLauncherEdgeHover
-                onToggled: checked => SettingsData.set("frameLauncherEdgeHover", checked)
-            }
-
-            SettingsDisplayPicker {
-                displayPreferences: SettingsData.frameScreenPreferences
-                onPreferencesChanged: prefs => SettingsData.set("frameScreenPreferences", prefs)
-            }
-        }
-
-        SettingsCard {
             iconName: "tune"
             title: I18n.tr("Advanced")
             settingKey: "barAdvanced"
@@ -667,6 +550,7 @@ Item {
                 tags: ["clickthrough", "click", "through", "mouse", "input", "mask", "passthrough"]
                 visible: !bar.islandOwnsSelectedBarTop
                 text: I18n.tr("Click through")
+                description: I18n.tr("Clicks on empty bar space reach the windows below", "bar click through toggle description")
                 checked: bar.selectedBarConfig?.clickThrough ?? false
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         clickThrough: toggled
@@ -707,6 +591,7 @@ Item {
                 tags: ["maximize", "gaps", "border", "fullscreen"]
                 visible: CompositorService.supportsBarAutoHideReveal
                 text: I18n.tr("Maximize detection")
+                description: I18n.tr("Drops bar gaps and rounding while a window is maximized", "bar maximize detection toggle description")
                 checked: bar.selectedBarConfig?.maximizeDetection ?? true
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         maximizeDetection: toggled
@@ -718,6 +603,7 @@ Item {
                 tags: ["exclusive", "zone", "reserved", "offset"]
                 visible: !bar.islandOwnsSelectedBarTop && !bar.selectedBarFrameStyled
                 text: I18n.tr("Exclusive zone offset")
+                description: I18n.tr("Grows or shrinks the space windows keep clear", "bar and dock exclusive zone offset slider description")
                 resetStore: bar
                 resetKeys: ["bottomGap"]
                 value: bar.selectedBarConfig?.bottomGap ?? 0
@@ -731,6 +617,7 @@ Item {
 
             SettingsToggleRow {
                 text: I18n.tr("Auto popup gaps")
+                description: I18n.tr("Gap between the bar and its popouts follows edge spacing", "bar auto popup gaps toggle description")
                 tags: ["popup", "gaps", "auto"]
                 visible: !bar.selectedBarFrameStyled
                 resetStore: bar
@@ -755,66 +642,11 @@ Item {
                         popupGapsManual: finalValue
                     })
             }
+        }
 
-            SettingsToggleRow {
-                settingKey: "islandReducedMotion"
-                tags: ["island", "motion", "animation", "reduce", "accessibility", "spring"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandReducedMotion"]
-                text: I18n.tr("Reduce motion")
-                checked: bar.islandSetting("islandReducedMotion")
-                onToggled: checked => bar.apply("islandReducedMotion", checked)
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandSpringStiffness"
-                tags: ["island", "motion", "spring", "stiffness", "animation"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandSpringStiffness"]
-                text: I18n.tr("Spring stiffness", "island settings: spring stiffness slider")
-                unit: ""
-                minimum: 100
-                maximum: 1200
-                step: 10
-                value: Math.round(bar.islandSetting("islandSpringStiffness"))
-                enabled: !bar.islandSetting("islandReducedMotion")
-                onSliderValueChanged: value => bar.apply("islandSpringStiffness", value)
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandSpringDamping"
-                tags: ["island", "motion", "spring", "damping", "bounce", "animation"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandSpringDamping"]
-                text: I18n.tr("Spring damping", "island settings: spring damping slider")
-                unit: ""
-                minimum: 10
-                maximum: 100
-                step: 1
-                value: Math.round(bar.islandSetting("islandSpringDamping"))
-                enabled: !bar.islandSetting("islandReducedMotion")
-                onSliderValueChanged: value => bar.apply("islandSpringDamping", value)
-            }
-
-            SettingsSliderRow {
-                settingKey: "islandSpringMass"
-                tags: ["island", "motion", "spring", "mass", "inertia", "animation"]
-                visible: bar.selectedBarIsIsland
-                resetStore: bar
-                resetKeys: ["islandSpringMass"]
-                text: I18n.tr("Spring mass", "island settings: spring mass slider")
-                minimum: 25
-                maximum: 300
-                step: 5
-                unit: ""
-                decimals: 2
-                value: Math.round(bar.islandSetting("islandSpringMass") * 100)
-                enabled: !bar.islandSetting("islandReducedMotion")
-                onSliderValueChanged: value => bar.apply("islandSpringMass", value / 100)
-            }
+        IslandMotionCard {
+            store: bar.islandStore
+            visible: dankBarTab.selectedIslandEnabled
         }
     }
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/clipboard"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/colorpicker"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/site"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,7 @@ var colorCmd = &cobra.Command{
 This is the screen eyedropper CLI. To open the in-shell color modal, use:
   dms ipc call color-picker toggle
 
-See: https://danklinux.com/docs/dankmaterialshell/keybinds-ipc`,
+See: ` + site.Docs + "/dankmaterialshell/keybinds-ipc",
 }
 
 var colorPickCmd = &cobra.Command{

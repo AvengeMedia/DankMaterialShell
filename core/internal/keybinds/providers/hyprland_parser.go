@@ -60,6 +60,7 @@ type HyprlandParser struct {
 	defaultDMSKeys map[string]bool // keys present in dms/binds.{lua,conf}
 	configFormat   string
 	readOnly       bool
+	mainMod        string
 }
 
 func NewHyprlandParser(configDir string) *HyprlandParser {
@@ -306,6 +307,7 @@ type HyprlandParseResult struct {
 	DMSStatus          *configfrag.Status
 	ConflictingConfigs map[string]*HyprlandKeyBinding
 	DefaultDMSKeys     map[string]bool // keys with a DMS default in binds.{lua,conf}
+	MainMod            string          // value of the mainMod Lua variable when the config defines one
 }
 
 var hyprlandBindsMessages = configfrag.Messages{
@@ -583,7 +585,10 @@ func (p *HyprlandParser) parseLuaLines(content string, baseDir, absPath, section
 	p.currentSource = absPath
 	p.fileUnbinds = make(map[string]bool)
 
-	lines := expandLuaConfigLines(strings.Split(content, "\n"))
+	lines, env := expandLuaConfigLinesEnv(strings.Split(content, "\n"))
+	if p.mainMod == "" {
+		p.mainMod = env["mainMod"]
+	}
 	boundInFile := make(map[string]bool)
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -810,6 +815,7 @@ func ParseHyprlandKeysWithDMS(path string) (*HyprlandParseResult, error) {
 		DMSStatus:          parser.buildDMSStatus(),
 		ConflictingConfigs: parser.conflictingConfigs,
 		DefaultDMSKeys:     parser.defaultDMSKeys,
+		MainMod:            parser.mainMod,
 	}, nil
 }
 

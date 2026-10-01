@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 )
 
 func TestNiriProviderGetCheatSheet(t *testing.T) {
@@ -27,6 +29,8 @@ binds {
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
+	niriNested = func() bool { return false }
+	t.Cleanup(func() { niriNested = detectNiriNested })
 	provider := NewNiriProvider(tmpDir)
 	cheatSheet, err := provider.GetCheatSheet()
 	if err != nil {
@@ -709,5 +713,75 @@ func TestNiriGenerateWorkspaceBindsRoundTrip(t *testing.T) {
 	}
 	if !foundSetWidth {
 		t.Error("set-column-width -10% not found after round-trip")
+	}
+}
+
+func TestNiriGenerateActionWithFilterAndScope(t *testing.T) {
+	provider := NewNiriProvider("")
+
+	binds := map[string]*overrideBind{
+		"Alt+grave": {
+			Key:         "Alt+grave",
+			Action:      `next-window filter="app-id"`,
+			Description: "Next Window (Same Application)",
+		},
+		"Alt+Tab": {
+			Key:         "Alt+Tab",
+			Action:      `next-window scope="output"`,
+			Description: "Next Window",
+		},
+	}
+
+	content := provider.generateBindsContent(binds)
+	expected := `binds {
+    Alt+Tab hotkey-overlay-title="Next Window" { next-window scope="output"; }
+    Alt+grave hotkey-overlay-title="Next Window (Same Application)" { next-window filter="app-id"; }
+}
+`
+	if content != expected {
+		t.Errorf("Content mismatch.\nGot:\n%s\nWant:\n%s", content, expected)
+	}
+}
+
+func TestNiriModKeyFollowsBackend(t *testing.T) {
+	tests := []struct {
+		name         string
+		modKey       string
+		modKeyNested string
+		nested       bool
+		want         keybinds.ModKey
+	}{
+		{"tty default", "", "", false, keybinds.ModKey{Symbol: "Mod", Resolved: "Super", Source: keybinds.ModSourceDefault}},
+		{"tty configured", "Alt", "", false, keybinds.ModKey{Symbol: "Mod", Resolved: "Alt", Source: keybinds.ModSourceConfig}},
+		{"nested default", "", "", true, keybinds.ModKey{Symbol: "Mod", Resolved: "Alt", Source: keybinds.ModSourceRuntime}},
+		{"nested swaps when mod-key is alt", "Alt", "", true, keybinds.ModKey{Symbol: "Mod", Resolved: "Super", Source: keybinds.ModSourceRuntime}},
+		{"nested configured", "Alt", "Super", true, keybinds.ModKey{Symbol: "Mod", Resolved: "Super", Source: keybinds.ModSourceConfig}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := niriModKey(&NiriParseResult{ModKey: tt.modKey, ModKeyNested: tt.modKeyNested}, tt.nested)
+			if got != tt.want {
+				t.Errorf("niriModKey() = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNiriParseModKeyNested(t *testing.T) {
+	tmpDir := t.TempDir()
+	config := `input {
+    mod-key "Alt"
+    mod-key-nested "Super"
+}
+`
+	if err := os.WriteFile(filepath.Join(tmpDir, "config.kdl"), []byte(config), 0o644); err != nil {
+		t.Fatalf("Failed to write test config: %v", err)
+	}
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed: %v", err)
+	}
+	if result.ModKeyNested != "Super" {
+		t.Errorf("ModKeyNested = %q, want %q", result.ModKeyNested, "Super")
 	}
 }

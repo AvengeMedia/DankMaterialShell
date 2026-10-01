@@ -30,8 +30,8 @@ FocusScope {
     readonly property alias searchAreaHeight: root._searchAreaH
     readonly property real actionPanelHeight: actionPanel.height
     readonly property real _statusH: Theme.listItemTwoLineHeight + Theme.spacingXL
-    readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.max(0, Math.min(LauncherMetrics.maxResultsHeight, (parentModal?.screenHeight ?? Theme.mediumBreakpoint) - (parentModal?.modalY ?? 0) - LauncherMetrics.pillHeight - actionPanel.height - Theme.spacingL))
-    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? resultsInset + resultsList.contentHeight + resultsList.bottomInset : _statusH
+    readonly property real _maxResultsH: root.maxResultsHeight > 0 ? root.maxResultsHeight : Math.max(0, Math.min(LauncherMetrics.maxResultsHeight + resultsInset + resultsList.bottomInset, (parentModal?.screenHeight ?? Theme.mediumBreakpoint) - (parentModal?.modalY ?? 0) - LauncherMetrics.pillHeight - actionPanel.height - Theme.spacingL))
+    readonly property real _resultsContentH: resultsList.contentHeight > 0 ? LauncherMetrics.resultsGap + resultsList.contentHeight + resultsList.bottomInset : _statusH
     readonly property real _resultsH: _hasQuery ? Math.min(_resultsContentH, _maxResultsH) : 0
     readonly property int _resizeDuration: Theme.expressiveDurations.expressiveFastSpatial
     readonly property real _frameClipRadius: Math.max(0, (parentModal?.frameBottomRadius ?? 0) - resultsInset)
@@ -137,11 +137,11 @@ FocusScope {
             event.accepted = true;
             return;
         case Qt.Key_PageDown:
-            root.controller.selectPageDown(7);
+            root.controller.selectPageDown(resultsList.pageRows);
             event.accepted = true;
             return;
         case Qt.Key_PageUp:
-            root.controller.selectPageUp(7);
+            root.controller.selectPageUp(resultsList.pageRows);
             event.accepted = true;
             return;
         case Qt.Key_J:
@@ -308,11 +308,12 @@ FocusScope {
         LauncherSearchField {
             id: searchInput
             pluginName: root.controller.activePluginName
+            pluginIcon: root.controller.activePluginId ? root.controller.getPluginMetadata(root.controller.activePluginId).icon : ""
             anchors.fill: parent
-            categories: root._categoryModel
-            categoryIndex: categories.findIndex(category => root._isCategorySelected(category))
-            showCategories: SettingsData.spotlightBarShowModeChips || root._hasQuery
-            onCategorySelected: index => root._selectCategory(index)
+            mode: root.controller.searchMode
+            showModes: SettingsData.spotlightBarShowModeChips || root._hasQuery
+            flat: true
+            onModeSelected: mode => root._selectMode(mode)
             placeholderText: I18n.tr("Spotlight Search")
             hidePlaceholderOnFocus: false
             ignoreUpDownKeys: true
@@ -335,6 +336,16 @@ FocusScope {
                 Keys.onPressed: event => root._handleKey(event)
             }
         }
+    }
+
+    Rectangle {
+        anchors.top: searchBarItem.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Theme.outlineWidth
+        z: 1
+        color: Theme.outlineVariant
+        visible: root._hasQuery && !(Theme.focusRingWidth > 0 && searchInput.getActiveFocus())
     }
 
     ClippingRectangle {
@@ -364,8 +375,10 @@ FocusScope {
             keyForwardTargets: [searchKeyHandler]
             readonly property real bottomInset: Theme.spacingS
             anchors.fill: parent
-            anchors.topMargin: root.resultsInset
+            anchors.topMargin: LauncherMetrics.resultsGap
             controller: root.controller
+            showEmptyState: root._hasQuery
+            transientSurfaceTracker: root.transientSurfaceTracker
 
             onItemRightClicked: (index, item, sceneX, sceneY) => {
                 root._showContextMenu(item, sceneX, sceneY, false);
@@ -382,46 +395,14 @@ FocusScope {
         controller: root.controller
     }
 
-    readonly property var _categoryModel: [
-        {
-            "label": I18n.tr("All"),
-            "mode": "all"
-        },
-        {
-            "label": I18n.tr("Apps"),
-            "mode": "apps"
-        },
-        {
-            "label": I18n.tr("Files"),
-            "mode": "files"
-        },
-        {
-            "label": I18n.tr("Plugins"),
-            "mode": "plugins"
-        }
-    ]
-
-    function _isCategorySelected(cat) {
-        return root.controller.searchMode === cat.mode;
-    }
-
     function _cycleCategory(reverse) {
-        let idx = 0;
-        for (let i = 0; i < _categoryModel.length; i++) {
-            if (_isCategorySelected(_categoryModel[i])) {
-                idx = i;
-                break;
-            }
-        }
-        idx = reverse ? (idx - 1 + _categoryModel.length) % _categoryModel.length : (idx + 1) % _categoryModel.length;
-        _selectCategory(idx);
+        const modes = searchInput.modes;
+        const idx = (searchInput.modeIndex + (reverse ? modes.length - 1 : 1)) % modes.length;
+        _selectMode(modes[idx].mode);
     }
 
-    function _selectCategory(index) {
-        const cat = _categoryModel[index];
-        if (!cat)
-            return;
-        root.controller.setMode(cat.mode, false);
+    function _selectMode(mode) {
+        root.controller.setMode(mode, false);
         if (root._hasQuery)
             root.controller.setSearchQuery(searchInput.text);
         root._focusSearch();

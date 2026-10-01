@@ -227,7 +227,9 @@ const NIRI_ACTIONS = {
     ],
     "Alt-Tab": [
         { id: "next-window", label: "Next Window" },
-        { id: "previous-window", label: "Previous Window" }
+        { id: "previous-window", label: "Previous Window" },
+        { id: "next-window filter=\"app-id\"", label: "Next Window (Same Application)" },
+        { id: "previous-window filter=\"app-id\"", label: "Previous Window (Same Application)" }
     ]
 };
 
@@ -932,8 +934,16 @@ function getActionLabel(action, compositor) {
             return compAct.label;
         var base = action.split(" ")[0];
         compAct = findCompositorAction(compositor, base);
-        if (compAct)
+        if (compAct) {
+            var arg = action.slice(base.length).trim();
+            if (arg && compAct.label.includes("(by index)")) {
+                return compAct.label.replace("(by index)", arg).trim();
+            }
+            if (arg.includes("filter=") && arg.includes("app-id")) {
+                return compAct.label + " (Same Application)";
+            }
             return compAct.label;
+        }
     }
 
     if (action.startsWith("spawn sh -c "))
@@ -948,7 +958,7 @@ function getActionType(action) {
         return "compositor";
     if (isDmsAction(action))
         return "dms";
-    if (/^spawn \w+ -c /.test(action) || action.startsWith("spawn_shell "))
+    if (/^spawn \w+ -c /.test(action) || action.startsWith("spawn_shell ") || action.startsWith("spawn-sh "))
         return "shell";
     if (action.startsWith("spawn "))
         return "spawn";
@@ -971,6 +981,8 @@ function isValidAction(action) {
         case "spawn sh -c ''":
         case "spawn_shell":
         case "spawn_shell ":
+        case "spawn-sh":
+        case "spawn-sh ":
             return false;
     }
     return true;
@@ -1027,6 +1039,12 @@ function parseShellCommand(action) {
     }
     if (action.startsWith("spawn_shell "))
         return action.slice(12);
+    if (action.startsWith("spawn-sh ")) {
+        var cmd = action.slice(9).trim();
+        if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'")))
+            cmd = cmd.slice(1, -1);
+        return cmd;
+    }
     return "";
 }
 

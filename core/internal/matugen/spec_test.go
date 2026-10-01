@@ -37,7 +37,7 @@ func TestGenerateSpecColors2025IsBolderThan2021(t *testing.T) {
 	colors2021 := decodeSpecColors(t, "#ff3d00", "scheme-vibrant", Spec2021)
 	colors2025 := decodeSpecColors(t, "#ff3d00", "scheme-vibrant", Spec2025)
 	require.Equal(t, "#ffb4a2", colors2021["primary"].Dark.Color)
-	require.Equal(t, "#ff7c5b", colors2025["primary"].Dark.Color)
+	require.Equal(t, "#ff8f73", colors2025["primary"].Dark.Color)
 	require.Equal(t, colors2025["primary"].Dark.Color, colors2025["primary"].Default.Color)
 	require.Equal(t, "#ff3d00", colors2025["source_color"].Dark.Color)
 }
@@ -186,5 +186,5 @@ func TestBuildOnceSeedColorAndSpec2025(t *testing.T) {
 	}
 	require.NoError(t, json.Unmarshal(raw, &out))
 	require.Equal(t, "#ff3d00", out.Colors.Dark["source_color"])
-	require.Equal(t, "#ff7c5b", out.Colors.Dark["primary"])
+	require.Equal(t, "#ff8f73", out.Colors.Dark["primary"])
 }

@@ -45,6 +45,9 @@ QtObject {
     property real velocityBottomLeftRadius: 0
     property real velocityBottomRightRadius: 0
 
+    // One per integration step, so consumers copy the body once instead of binding to eight currents.
+    signal stepped()
+
     function matchesTarget(target) {
         return targetWidth === target.width && targetHeight === target.height && targetOffsetAlong === target.offsetAlong && targetOffsetCross === target.offsetCross && targetTopLeftRadius === target.topLeftRadius && targetTopRightRadius === target.topRightRadius && targetBottomLeftRadius === target.bottomLeftRadius && targetBottomRightRadius === target.bottomRightRadius;
     }
@@ -103,6 +106,7 @@ QtObject {
         velocityBottomLeftRadius = 0;
         velocityBottomRightRadius = 0;
         running = false;
+        stepped();
     }
 
     function isSettled() {
@@ -130,6 +134,7 @@ QtObject {
         velocityBottomLeftRadius = 0;
         velocityBottomRightRadius = 0;
         running = false;
+        stepped();
     }
 
     function advance(rawFrameTime) {
@@ -166,6 +171,8 @@ QtObject {
 
         if (isSettled())
             settle();
+        else
+            stepped();
     }
 
     onEnabledChanged: {

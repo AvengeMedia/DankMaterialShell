@@ -8,6 +8,8 @@ import "../../Common/Format.js" as Format
 Item {
     id: root
 
+    readonly property bool isFloatingWindowSurface: true
+
     Ref {
         service: DgopService
         modules: ["cpu", "memory", "network", "disk", "diskmounts", "system"]
@@ -20,7 +22,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: (root.height - Theme.spacingM * 2) / 2
+            Layout.fillHeight: true
             spacing: Theme.spacingM
 
             PerformanceCard {
@@ -56,7 +58,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: (root.height - Theme.spacingM * 2) / 2
+            Layout.fillHeight: true
             spacing: Theme.spacingM
 
             PerformanceCard {

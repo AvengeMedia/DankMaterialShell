@@ -38,7 +38,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 35
+const APIVersion = 36
 
 var CLIVersion = "dev"
 
@@ -373,7 +373,7 @@ func InitializeNotifyActionsManager() error {
 }
 
 func InitializeSysUpdateManager() error {
-	manager, err := sysupdate.NewManager()
+	manager, err := sysupdate.NewManager(CLIVersion)
 	if err != nil {
 		log.Warnf("Failed to initialize sysupdate manager: %v", err)
 		return err
@@ -410,7 +410,7 @@ func routeRequestRecovered(ctx context.Context, conn *ipc.ConnWriter, req ipc.Re
 }
 
 func getCapabilities() Capabilities {
-	caps := []string{"plugins", "dgop", "lyrics"}
+	caps := []string{"plugins", "dgop", "lyrics", "lyrics.plugins"}
 
 	if networkManager != nil {
 		caps = append(caps, "network")
@@ -478,6 +478,10 @@ func getCapabilities() Capabilities {
 
 	if sysUpdateManager != nil {
 		caps = append(caps, "sysupdate")
+	}
+
+	if filesService != nil {
+		caps = append(caps, "files")
 	}
 
 	return Capabilities{Capabilities: caps}
@@ -735,6 +739,14 @@ func handleSubscribe(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request)
 		}, mgr.GetState)
 	}
 
+	if shouldSubscribe("files") && filesService != nil {
+		id := clientID + "-files"
+		source := filesEvents.Subscribe(id)
+		forwardSubscription(&wg, eventChan, stopChan, "files", source, func() {
+			filesEvents.Unsubscribe(id)
+		}, nil)
+	}
+
 	if shouldSubscribe("dbus") && dbusManager != nil {
 		mgr := dbusManager
 		events := mgr.SubscribeSignals(dbusClient)
@@ -866,6 +878,9 @@ func cleanupManagers() {
 	}
 	if tailscaleManager != nil {
 		tailscaleManager.Close()
+	}
+	if filesService != nil {
+		filesService.Close()
 	}
 }
 
@@ -1240,6 +1255,8 @@ func (s *Server) Serve(printDocs bool) error {
 	if err := InitializeAppPickerManager(); err != nil {
 		log.Debugf("AppPicker manager unavailable: %v", err)
 	}
+
+	InitializeFilesService()
 
 	if err := InitializeWlrOutputManager(); err != nil {
 		log.Debugf("WlrOutput manager unavailable: %v", err)

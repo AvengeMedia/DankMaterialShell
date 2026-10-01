@@ -10,6 +10,21 @@ Singleton {
     id: root
 
     property int refCount: 0
+    // `Ref { modules: ["releases"] }` also holds the feed document; a plain Ref only keeps the daemon polling.
+    property int releasesRefCount: 0
+    readonly property bool pollWanted: refCount > 0 || SettingsData.updaterNotify
+
+    function addRef(modules) {
+        refCount++;
+        if (modules.includes("releases"))
+            releasesRefCount++;
+    }
+
+    function removeRef(modules) {
+        refCount = Math.max(0, refCount - 1);
+        if (modules.includes("releases"))
+            releasesRefCount = Math.max(0, releasesRefCount - 1);
+    }
 
     property bool sysupdateAvailable: false
 
@@ -27,11 +42,39 @@ Singleton {
     property string pkgManager: ""
     property bool distributionSupported: false
     property var recentLog: []
-    property int intervalSeconds: 1800
+    property int intervalSeconds: 86400
     property int lastCheckUnix: 0
     property int nextCheckUnix: 0
 
+    property string shellInstallMethod: "unknown"
+    property string shellPackageName: ""
+    property string shellChannel: "unknown"
+    property string shellRunning: ""
+    property string shellInstalled: ""
+    property int shellGitBuild: 0
+    property bool restartPending: false
+    property bool rebootRecommended: false
+    property var rebootPackages: []
+    property var _rawShellUpdate: null
+    // From the filtered list, so an AUR-off/ignored dms package doesn't advertise.
+    readonly property var shellUpdate: _rawShellUpdate ? (availableUpdates.find(p => p.name === _rawShellUpdate.name) ?? null) : null
+    // -1 while unknown (stable channel or no feed yet)
+    property int commitsBehind: -1
+    property var releases: null
+
     readonly property int updateCount: availableUpdates.length
+    readonly property var systemUpdates: availableUpdates.filter(p => !shellUpdate || p.name !== shellUpdate.name)
+    // The feed never flips this: DMS only updates through the package manager.
+    readonly property bool shellUpdateAvailable: shellUpdate !== null
+    readonly property string shellUpdateVersion: shellUpdate?.toVersion || ""
+    // Notes follow the version the repo offers (or the running one), never the feed's newest tag.
+    readonly property string notesVersion: (shellUpdateVersion || shellRunning).replace(/^v/, "")
+    readonly property var notesRelease: {
+        const list = releases?.releases ?? [];
+        const mm = notesVersion.match(/^\d+\.\d+/)?.[0] ?? "";
+        return list.find(r => r.version === notesVersion) ?? list.find(r => mm !== "" && (r.version === mm || r.version.startsWith(mm + "."))) ?? null;
+    }
+    readonly property bool shellManagedExternally: shellInstallMethod === "nix"
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
     readonly property bool useCustomCommand: SettingsData.updaterUseCustomCommand && (SettingsData.updaterCustomCommand || "").trim().length > 0
 
@@ -98,9 +141,7 @@ Singleton {
         if (has && !sysupdateAvailable) {
             sysupdateAvailable = true;
             requestState();
-            // The daemon always starts at defaultIntervalSeconds (30 min) and
-            // has no persistence of its own, so re-apply the saved interval
-            // on every fresh connection (daemon (re)start).
+            // The daemon persists its last check but not the interval; re-apply it on every fresh connection.
             setInterval(SettingsData.updaterIntervalSeconds);
         } else if (!has) {
             sysupdateAvailable = false;
@@ -132,9 +173,26 @@ Singleton {
         distributionPretty = data.distroPretty || "";
         distributionSupported = (backends.length > 0);
         recentLog = data.recentLog || [];
-        intervalSeconds = data.intervalSeconds || 1800;
-        lastCheckUnix = data.lastCheckUnix || 0;
+        intervalSeconds = data.intervalSeconds || 86400;
+        const checked = data.lastCheckUnix || 0;
+        const freshCheck = _stateSeeded && checked > lastCheckUnix;
+        _stateSeeded = true;
+        lastCheckUnix = checked;
         nextCheckUnix = data.nextCheckUnix || 0;
+
+        const shell = data.shell || {};
+        shellInstallMethod = shell.installMethod || "unknown";
+        shellPackageName = shell.packageName || "";
+        shellChannel = shell.channel || "unknown";
+        shellRunning = shell.running || "";
+        shellInstalled = shell.installed || "";
+        shellGitBuild = shell.gitBuild || 0;
+        restartPending = shell.restartPending === true;
+        const reboot = data.reboot || {};
+        rebootRecommended = reboot.recommended === true;
+        rebootPackages = reboot.packages || [];
+        _rawShellUpdate = shell.updatePackage || null;
+        commitsBehind = typeof shell.commitsBehind === "number" ? shell.commitsBehind : -1;
 
         const phase = data.phase || "idle";
         switch (phase) {
@@ -162,6 +220,8 @@ Singleton {
             errorCode = "";
             errorHint = "";
         }
+        if (freshCheck)
+            _maybeNotify();
     }
 
     function _filterUpdates(pkgs) {
@@ -178,6 +238,43 @@ Singleton {
     function _refilter() {
         availableUpdates = _filterUpdates(_rawUpdates);
     }
+
+    // Only when the count grows past the last announcement.
+    function _maybeNotify() {
+        if (!SettingsData.updaterNotify || isChecking || isUpgrading)
+            return;
+        if (updateCount === 0) {
+            if (SessionData.updaterNotifiedCount !== 0)
+                SessionData.set("updaterNotifiedCount", 0);
+            return;
+        }
+        if (updateCount <= SessionData.updaterNotifiedCount)
+            return;
+        const now = Math.floor(Date.now() / 1000);
+        if (now - SessionData.updaterNotifiedUnix < SettingsData.updaterNotifyMinSeconds)
+            return;
+        if (_notifyInFlight)
+            return;
+        _notifyInFlight = true;
+        const count = updateCount;
+        DMSService.notifySend({
+            "summary": count === 1 ? I18n.tr("%1 update", "singular, %1 is 1, available system update count").arg(count) : I18n.tr("%1 updates", "plural, %1 is a count of available system updates").arg(count),
+            "body": I18n.tr("Software updates are ready to install."),
+            "icon": "system-software-update",
+            "actionLabel": I18n.tr("Settings"),
+            "actionArgs": ["ipc", "call", "settings", "openWith", "updater"]
+        }, resp => {
+            root._notifyInFlight = false;
+            if (!resp || resp.error)
+                return;
+            SessionData.set("updaterNotifiedUnix", Math.floor(Date.now() / 1000));
+            SessionData.set("updaterNotifiedCount", count);
+        });
+    }
+
+    property bool _notifyInFlight: false
+    // The first state after a connect is the persisted list, not a check that just ran.
+    property bool _stateSeeded: false
 
     function ignorePackage(name) {
         if (!name)
@@ -201,6 +298,22 @@ Singleton {
 
     function checkForUpdates() {
         DMSService.sysupdateRefresh(false, null);
+        if (releasesRefCount > 0)
+            loadReleases(true);
+    }
+
+    function loadReleases(force) {
+        if (!DMSService.isConnected || !sysupdateAvailable)
+            return;
+        DMSService.sysupdateReleases(force, resp => {
+            // A late reply must not repopulate a feed the last Ref already dropped.
+            if (root.releasesRefCount > 0 && resp && resp.result)
+                root.releases = resp.result;
+        });
+    }
+
+    function restartShell() {
+        Quickshell.execDetached(["dms", "restart"]);
     }
 
     function runUpdates(opts) {
@@ -227,7 +340,7 @@ Singleton {
     property bool _startupCheckDone: false
 
     function _maybeStartupCheck() {
-        if (refCount <= 0) {
+        if (!pollWanted) {
             _startupCheckDone = false;
             return;
         }
@@ -238,21 +351,34 @@ Singleton {
         if (!DMSService.isConnected || !sysupdateAvailable)
             return;
         _startupCheckDone = true;
-        Qt.callLater(() => root.checkForUpdates());
+        Qt.callLater(() => DMSService.sysupdateRefresh(false, null, true));
     }
 
-    onRefCountChanged: {
-        if (refCount <= 0)
+    onPollWantedChanged: {
+        if (!pollWanted)
             _startupCheckDone = false;
-        _syncAcquire();
+        Qt.callLater(() => root._syncAcquire());
         Qt.callLater(() => root._maybeStartupCheck());
     }
-    onSysupdateAvailableChanged: _syncAcquire()
+    onReleasesRefCountChanged: {
+        if (releasesRefCount <= 0)
+            releases = null;
+        else if (releases === null)
+            loadReleases(false);
+    }
+    onSysupdateAvailableChanged: {
+        _syncAcquire();
+        if (sysupdateAvailable && releasesRefCount > 0 && releases === null)
+            loadReleases(false);
+    }
 
     property bool _acquired: false
+    // Releasing the ref parks the daemon scheduler; its deadline is kept, so checks resume on AC.
+    readonly property bool pausedOnBattery: SettingsData.updaterPauseOnBattery && BatteryService.batteryAvailable && !BatteryService.isPluggedIn
+    onPausedOnBatteryChanged: _syncAcquire()
 
     function _syncAcquire() {
-        const want = refCount > 0 && sysupdateAvailable;
+        const want = pollWanted && sysupdateAvailable && !pausedOnBattery;
         if (want === _acquired) {
             return;
         }

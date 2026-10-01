@@ -73,18 +73,64 @@ Singleton {
     // Deferred unload: keep popouts warm while the session is active and reclaim them on lock/monitors-off.
     property var _pendingUnloads: ({})
 
+    property var _rewarmKeys: []
+
     Connections {
         target: SessionService
         function onSessionLocked() {
             root._flushPendingUnloads();
+        }
+        function onSessionUnlocked() {
+            root._scheduleRewarm();
         }
     }
 
     Connections {
         target: IdleService
         function onMonitorsOffChanged() {
-            if (IdleService.monitorsOff)
+            if (IdleService.monitorsOff) {
                 root._flushPendingUnloads();
+                return;
+            }
+            root._scheduleRewarm();
+        }
+    }
+
+    function _rewarmBlocked() {
+        return IdleService.isShellLocked || IdleService.monitorsOff;
+    }
+
+    function _scheduleRewarm() {
+        if (!_rewarmKeys.length || _rewarmBlocked())
+            return;
+        rewarmTimer.restart();
+    }
+
+    function _rewarmPopout(key, popoutName, loaderName) {
+        const loader = root[loaderName];
+        if (!loader)
+            return;
+        loader.active = true;
+        const popout = root[popoutName];
+        if (!popout)
+            return;
+        if (!popout.triggerScreen)
+            popout.triggerScreen = CompositorService.getFocusedScreen() ?? Quickshell.screens[0] ?? null;
+        popout.warmContent();
+        _scheduleUnload(key);
+    }
+
+    Timer {
+        id: rewarmTimer
+        interval: 1500
+        onTriggered: {
+            if (root._rewarmBlocked())
+                return;
+            const key = root._rewarmKeys[0];
+            root._rewarmKeys = root._rewarmKeys.slice(1);
+            root._rewarmers[key]();
+            if (root._rewarmKeys.length)
+                restart();
         }
     }
 
@@ -95,6 +141,8 @@ Singleton {
     function _flushPendingUnloads() {
         const keys = Object.keys(_pendingUnloads);
         _pendingUnloads = ({});
+        rewarmTimer.stop();
+        _rewarmKeys = _rewarmKeys.concat(keys.filter(key => _rewarmers[key] && !_rewarmKeys.includes(key)));
         for (let i = 0; i < keys.length; i++) {
             const unload = _deferredUnloaders[keys[i]];
             if (unload)
@@ -115,6 +163,12 @@ Singleton {
         root[popoutName] = null;
         loader.active = false;
     }
+
+    readonly property var _rewarmers: ({
+            "dankDash": () => _rewarmPopout("dankDash", "dankDashPopout", "dankDashPopoutLoader"),
+            "controlCenter": () => _rewarmPopout("controlCenter", "controlCenterPopout", "controlCenterLoader"),
+            "notificationCenter": () => _rewarmPopout("notificationCenter", "notificationCenterPopout", "notificationCenterLoader")
+        })
 
     readonly property var _deferredUnloaders: ({
             "dankDash": () => _unloadPopoutNow("dankDashPopout", "dankDashPopoutLoader"),
@@ -139,9 +193,9 @@ Singleton {
         }
     }
 
-    function _sharedTriggerIsland(screen) {
+    function _sharedTriggerIsland(screen, activity) {
         const target = screen ?? CompositorService.getFocusedScreen();
-        const config = target ? SettingsData.sharedTriggerIslandConfig(target) : null;
+        const config = target ? SettingsData.sharedTriggerIslandConfig(target, activity) : null;
         if (!config || dankIslandRouter?.hasHostForScreen?.(target, config.id) !== true)
             return null;
         return {
@@ -155,7 +209,7 @@ Singleton {
     function routeToIsland(activityId, screen, shouldToggle, section, barId) {
         if (barId && dankIslandRouter?.hasHostForScreen(screen, barId) !== true)
             return false;
-        const shared = barId ? null : _sharedTriggerIsland(screen);
+        const shared = barId ? null : _sharedTriggerIsland(screen, activityId);
         if (!barId && !shared)
             return false;
         const targetScreen = shared?.screen ?? screen ?? null;
@@ -179,8 +233,7 @@ Singleton {
     }
 
     function closeControlCenter() {
-        if (closeIslandActivity("controlcenter"))
-            return;
+        closeIslandActivity("controlcenter");
         controlCenterPopout?.close();
     }
 
@@ -207,8 +260,7 @@ Singleton {
     }
 
     function closeNotificationCenter() {
-        if (closeIslandActivity("notificationcenter"))
-            return;
+        closeIslandActivity("notificationcenter");
         notificationCenterPopout?.close();
     }
 
@@ -671,11 +723,24 @@ Singleton {
     }
 
     function openClipboardHistory() {
+        if (routeToIsland("clipboard", null, false))
+            return;
         clipboardHistoryModal?.show();
     }
 
     function closeClipboardHistory() {
+        closeIslandActivity("clipboard");
         clipboardHistoryModal?.hide();
+    }
+
+    function toggleClipboardHistory() {
+        if (clipboardHistoryModal?.shouldBeVisible) {
+            clipboardHistoryModal.hide();
+            return;
+        }
+        if (routeToIsland("clipboard", null, true))
+            return;
+        clipboardHistoryModal?.toggle();
     }
 
     function unloadClipboardHistoryPopout() {
@@ -710,9 +775,9 @@ Singleton {
 
     function _routeSharedLauncher(query, mode, toggle) {
         const screen = CompositorService.getFocusedScreen();
-        if (!SettingsData.sharedShortcutsOverridden(screen))
+        if (!SettingsData.sharedShortcutsOverridden(screen, "launcher"))
             return false;
-        const shared = _sharedTriggerIsland(screen);
+        const shared = _sharedTriggerIsland(screen, "launcher");
         if (!shared)
             return false;
         return toggle ? dankIslandRouter.toggleLauncher(query, mode, shared.screen, shared.barId) : dankIslandRouter.openLauncher(query, mode, shared.screen, shared.barId);
@@ -761,7 +826,7 @@ Singleton {
     }
 
     function closeDankLauncherV2() {
-        dankIslandRouter?.closeLauncher?.();
+        closeIslandActivity("launcher");
         dankLauncherV2Modal?.hide();
     }
 

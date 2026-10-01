@@ -2,7 +2,10 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Common
+import qs.Modals.Clipboard
+import qs.Modals.DankLauncherV2.Components
 import qs.Modules.ControlCenter
+import qs.Modules.DankBar
 import qs.Modules.DankDash
 
 QtObject {
@@ -26,6 +29,14 @@ QtObject {
         if (launcherInputFocused)
             hoverExpanded = false;
     }
+    property var transientSurfaces: null
+    readonly property bool transientSurfacesActive: transientSurfaces?.active ?? false
+    onTransientSurfacesActiveChanged: {
+        if (!transientSurfacesActive)
+            return;
+        hoverExpanded = false;
+        hoverCloseTimer.stop();
+    }
     property string launcherPendingQuery: ""
     property string launcherPendingMode: ""
     property string controlCenterPendingSection: ""
@@ -36,11 +47,14 @@ QtObject {
     property var barConfig: null
     property string edge: "top"
     readonly property bool isVertical: edge === "left" || edge === "right"
+    readonly property bool farEdge: edge === "bottom" || edge === "right"
     property real cornerRadius: 34
     property real pillRadius: cornerRadius
     readonly property real edgeCornerRadius: Math.round(cornerRadius * 0.75)
     property bool freeMode: false
     property bool dotMode: false
+    // Hosted in a bar: the sheet is flush with the band, so its near corners stay square.
+    property bool embedded: false
     property real dotSize: 48
     property real compactThickness: 38
     property string batteryStyle: "solid"
@@ -56,15 +70,18 @@ QtObject {
     property int mediaReturnDelay: 1800
     property real controlCenterMaxHeight: 640
     property string editingActivity: ""
+    property real editRoom: 0
+    // The bar host grants the room once its surface has presented a frame at the grown size.
+    property bool editRoomGranted: false
     readonly property real controlCenterSheetInset: 30
     readonly property int controlCenterColumnCap: CcMetrics.columnCapFor(dashboardAvailableWidth - controlCenterSheetInset - PopoutMetrics.editOverflow * 2)
     readonly property int controlCenterColumns: Math.min(CcMetrics.gridColumns, controlCenterColumnCap)
     readonly property real controlCenterSheetWidth: CcMetrics.sheetWidthFor(controlCenterColumns)
-    readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset + PopoutMetrics.editOverflow * 2
+    readonly property real controlCenterMaxWidth: CcMetrics.sheetWidthFor(editingActivity === "controlcenter" ? controlCenterColumnCap : controlCenterColumns) + controlCenterSheetInset
     readonly property real controlCenterHeight: Math.max(320, Math.min(controlCenterMaxHeight, destinationContentHeight("controlcenter")))
 
     readonly property bool compactDense: compactThickness < 40
-    readonly property real compactFaceThickness: compactThickness + (compactDense ? 2 : 4)
+    readonly property real compactFaceThickness: BarMetrics.compactFaceThickness(compactThickness)
     readonly property real compactIconSize: Math.max(14, Math.min(32, compactThickness - 8))
     property bool homeCompactTight: false
     readonly property real homeCompactFaceThickness: homeCompactTight ? Math.max(16, Math.min(32, compactThickness - 8)) : compactFaceThickness
@@ -78,10 +95,12 @@ QtObject {
     property real dashboardAvailableWidth: 1920
     property real dashboardAvailableHeight: 1080
     readonly property int dashboardColumnCap: DashMetrics.columnCapFor(dashboardAvailableWidth - PopoutMetrics.editOverflow * 2, SettingsData.showWeekNumber)
-    readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns) + PopoutMetrics.editOverflow * 2)
+    readonly property real dashboardMaxWidth: Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, editingActivity !== "" ? dashboardColumnCap : DashRegistry.widestPanelColumns))
     property var dashboardContentHeights: ({})
-    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + DashMetrics.islandChromeHeight, ...Object.values(dashboardContentHeights)))
-    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
+    readonly property real dashChromeHeight: DashMetrics.islandHandleChromeHeight
+    readonly property real editSurfaceHeight: editRoom > 0 ? dashboardHeightFor(editingActivity, true) : 0
+    readonly property real dashboardHeight: Math.min(dashboardAvailableHeight, Math.max(DashMetrics.tabDefaultHeight + root.dashChromeHeight, ...Object.values(dashboardContentHeights)))
+    readonly property int dashboardRowBudget: Math.max(DashMetrics.minimumTabRows, Math.floor((dashboardAvailableHeight - DashMetrics.islandEditChromeHeight + DashMetrics.gridGap) / (DashMetrics.gridRowUnit + DashMetrics.gridGap)))
     readonly property real mediaCompactMaxLength: 360
     property real notificationContentLength: 0
     readonly property real notificationCompactMinLength: isVertical ? compactFaceThickness : (compactDense ? 200 : 240)
@@ -126,10 +145,14 @@ QtObject {
         return Math.min(dashboardAvailableWidth, DashMetrics.widthFor(SettingsData.showWeekNumber, undefined, DashMetrics.panelColumnsFor(dashEntryIdFor(activityId))));
     }
 
-    function dashboardTargetFor(activityId) {
+    function dashboardHeightFor(activityId, withEditRoom) {
         const minimum = DashMetrics.panelHeightFor(dashEntryIdFor(activityId));
-        const height = Math.max(minimum + DashMetrics.islandChromeHeight, dashboardContentHeights[activityId] ?? 0);
-        return sheetTarget(dashboardWidthFor(activityId) + editGutterFor(activityId) * 2, Math.min(dashboardAvailableHeight, height));
+        const height = Math.max(minimum + root.dashChromeHeight, dashboardContentHeights[activityId] ?? 0);
+        return Math.min(dashboardAvailableHeight, height + (withEditRoom ? root.editRoom : 0));
+    }
+
+    function dashboardTargetFor(activityId) {
+        return sheetTarget(dashboardWidthFor(activityId), dashboardHeightFor(activityId, root.editRoomGranted && root.editingActivity === activityId));
     }
 
     function setMediaContentLength(length) {
@@ -139,8 +162,8 @@ QtObject {
         mediaContentLength = next;
     }
 
-    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter"]
-    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter"]
+    readonly property var destinations: ["launcher", "controlcenter", "wallpaper", "weather", "notificationcenter", "clipboard"]
+    readonly property var blankClickOwners: ["launcher", "controlcenter", "wallpaper", "notificationcenter", "clipboard"]
     readonly property var destinationDefaults: ({
             "launcher": {
                 "contentLength": 160,
@@ -161,6 +184,10 @@ QtObject {
             "notificationcenter": {
                 "contentLength": 170,
                 "contentHeight": 320
+            },
+            "clipboard": {
+                "contentLength": 150,
+                "contentHeight": 0
             }
         })
     property var destinationState: root.freshDestinationState()
@@ -217,19 +244,19 @@ QtObject {
         destinationRevision++;
     }
 
-    function setEditing(activityId, editing) {
+    function setEditing(activityId, editing, room = 0) {
         if (editing) {
+            editRoomGranted = false;
             editingActivity = activityId;
+            editRoom = room;
             // Option sheets open child popups; a hover peek would collapse under them
             hoverExpanded = false;
             hoverCloseTimer.stop();
         } else if (editingActivity === activityId) {
+            editRoomGranted = false;
+            editRoom = 0;
             editingActivity = "";
         }
-    }
-
-    function editGutterFor(activityId) {
-        return editingActivity === activityId ? PopoutMetrics.editOverflow : 0;
     }
 
     function setDestinationContentHeight(activityId, height) {
@@ -317,6 +344,7 @@ QtObject {
             controlCenterPendingSection = "";
             return;
         case "wallpaper":
+        case "clipboard":
             keyboardYielded = false;
             return;
         }
@@ -349,7 +377,7 @@ QtObject {
     function sheetRadii() {
         if (root.freeMode)
             return [root.cornerRadius, root.cornerRadius, root.cornerRadius, root.cornerRadius];
-        const near = root.edgeCornerRadius;
+        const near = root.embedded ? 0 : root.edgeCornerRadius;
         const far = root.cornerRadius;
         switch (root.edge) {
         case "bottom":
@@ -379,6 +407,7 @@ QtObject {
     function sheetTarget(width, height) {
         const radii = root.sheetRadii();
         return {
+            "sheet": true,
             "width": width,
             "height": height,
             "offsetAlong": root.alongOffset,
@@ -409,13 +438,14 @@ QtObject {
     readonly property var mediaCompactTarget: pillTarget(mediaCompactLength, compactFaceThickness)
     readonly property var homeExpandedTarget: dashboardTargetFor("home")
     readonly property var mediaExpandedTarget: dashboardTargetFor("media")
-    readonly property var launcherExpandedTarget: sheetTarget(680, 560)
-    readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset + editGutterFor("controlcenter") * 2, controlCenterHeight)
+    readonly property var launcherExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, LauncherMetrics.sizeWidth(SettingsData.dankLauncherV2Size)), Math.min(dashboardAvailableHeight, LauncherMetrics.sizeHeight(SettingsData.dankLauncherV2Size)))
+    readonly property var controlCenterExpandedTarget: sheetTarget(controlCenterSheetWidth + controlCenterSheetInset, controlCenterHeight)
     readonly property var systemCompactTarget: pillTarget(root.isVertical ? 240 : (SettingsData.osdAlwaysShowValue ? 330 : 282), compactFaceThickness)
     readonly property var systemExpandedTarget: sheetTarget(460, 176)
     readonly property var notificationCompactTarget: pillTarget(Math.ceil(Math.max(notificationCompactMinLength, Math.min(notificationCompactMaxLength, notificationContentLength))), compactFaceThickness)
     readonly property var notificationExpandedTarget: sheetTarget(520, 220)
     readonly property var notificationCenterExpandedTarget: dashboardTargetFor("notificationcenter")
+    readonly property var clipboardExpandedTarget: sheetTarget(Math.min(dashboardAvailableWidth, ClipboardConstants.sizeWidth(SettingsData.clipboardSize)), Math.min(dashboardAvailableHeight, ClipboardConstants.sizeHeight(SettingsData.clipboardSize)))
 
     readonly property bool systemActivityActive: activeActivity === "volume" || activeActivity === "brightness"
     readonly property bool notificationActive: activeActivity === "notification"
@@ -457,6 +487,8 @@ QtObject {
             return controlCenterExpandedTarget;
         case "notificationcenter":
             return notificationCenterExpandedTarget;
+        case "clipboard":
+            return clipboardExpandedTarget;
         case "media":
             return mediaExpandedTarget;
         }
@@ -683,6 +715,12 @@ QtObject {
             return requestCollapse();
         root.consumeTransientNotification();
         return requestActivity("notificationcenter", true, true);
+    }
+
+    function requestClipboard(shouldToggle) {
+        if (shouldToggle === true && activeActivity === "clipboard" && expanded)
+            return requestCollapse();
+        return requestActivity("clipboard", true, true);
     }
 
     function cycleActivity(direction, shouldExpand) {

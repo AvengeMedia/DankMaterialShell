@@ -192,11 +192,19 @@ func (s *Screenshoter) captureRegion() (*CaptureResult, error) {
 		}
 	}
 
-	if s.config.SelectorHook != nil {
-		s.config.SelectorHook(true)
-		defer s.config.SelectorHook(false)
+	if hook := s.config.SelectorHook; hook != nil {
+		started := make(chan struct{})
+		go func() {
+			hook(true)
+			close(started)
+		}()
+		defer func() {
+			<-started
+			hook(false)
+		}()
 	}
 
+	PrefetchOverlayStyle()
 	selector := NewRegionSelector(s)
 	result, cancelled, err := selector.Run()
 	if err != nil {

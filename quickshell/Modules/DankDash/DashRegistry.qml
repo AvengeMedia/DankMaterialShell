@@ -5,6 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Modules.DankDash.Overview
+import "utils/options.js" as Options
 
 Singleton {
     id: root
@@ -66,8 +67,14 @@ Singleton {
         };
     }
 
-    function toneOption() {
-        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), "", toneChoices);
+    function toneOption(def = "") {
+        return choice("tone", I18n.tr("Tone", "noun, dashboard widget color tone option label"), def, toneChoices);
+    }
+
+    function cardOnly(spec) {
+        return Object.assign(spec, {
+            "cardOnly": true
+        });
     }
 
     function panelOptions(tab) {
@@ -122,7 +129,7 @@ Singleton {
                         "value": "slanted",
                         "text": I18n.tr("Slanted", "Album artwork shape")
                     }
-                ]), choice("titleFont", I18n.tr("Title font"), MediaOptions.defaultTitleFont, Theme.fontChoices), toggle("deviceName", I18n.tr("Show device name", "Media player option that puts the audio output device name on its button"), MediaOptions.defaults.deviceName), toggle("seekbar", I18n.tr("Show seekbar"), MediaOptions.defaults.seekbar), toggle("waveProgress", I18n.tr("Wave progress bars"), MediaOptions.defaults.waveProgress), toggle("albumArtBackdrop", I18n.tr("Album art backdrop"), MediaOptions.defaults.albumArtBackdrop), toggle("albumArtAccent", I18n.tr("Use album art accent"), MediaOptions.defaults.albumArtAccent), toggle("animatedArt", I18n.tr("Apple Music animated covers"), MediaOptions.defaults.animatedArt, I18n.tr("Sends the playing artist and album name to Apple")), toggle("lyrics", I18n.tr("Lyrics", "Media player lyrics button"), MediaOptions.defaults.lyrics, I18n.tr("Sends the playing track, artist and album name to enabled lyrics providers"))]
+                ]), choice("titleFont", I18n.tr("Title font"), MediaOptions.defaultTitleFont, Theme.fontChoices), toggle("deviceName", I18n.tr("Show device name", "Media player option that puts the audio output device name on its button"), MediaOptions.defaults.deviceName), toggle("seekbar", I18n.tr("Show seekbar"), MediaOptions.defaults.seekbar), toggle("waveProgress", I18n.tr("Wave progress bars"), MediaOptions.defaults.waveProgress), toggle("albumArtBackdrop", I18n.tr("Album art backdrop"), MediaOptions.defaults.albumArtBackdrop), toggle("albumArtAccent", I18n.tr("Use album art accent"), MediaOptions.defaults.albumArtAccent), toggle("animatedArt", I18n.tr("Apple Music animated covers"), MediaOptions.defaults.animatedArt, I18n.tr("Sends the playing artist and album name to Apple")), toggle("lyrics", I18n.tr("Lyrics", "Media player lyrics button"), MediaOptions.defaults.lyrics, I18n.tr("Sends the playing track, artist and album name to enabled lyrics providers")), toggle("smoothLyrics", I18n.tr("Smooth lyrics highlight", "Media player option that fills each sung word gradually instead of highlighting it at once"), MediaOptions.defaults.smoothLyrics)]
         },
         {
             "id": "wallpaper",
@@ -163,16 +170,7 @@ Singleton {
                 "minW": 1,
                 "minH": 1
             },
-            "options": [choice("forecast", I18n.tr("Forecast", "weather widget option label for forecast display type"), "chart", [
-                    {
-                        "value": "chart",
-                        "text": I18n.tr("Chart", "noun, weather forecast display option")
-                    },
-                    {
-                        "value": "cards",
-                        "text": I18n.tr("Cards", "noun, weather forecast display option")
-                    }
-                ]), toggle("city", I18n.tr("Show city"), false), toggle("readings", I18n.tr("Show readings"), true)]
+            "options": [cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
         },
         {
             "id": "notifications",
@@ -437,6 +435,13 @@ Singleton {
     function pluginOption(pluginId, raw) {
         if (!raw || typeof raw.key !== "string" || raw.key === "" || raw.key === widgetsKey)
             return null;
+        const spec = pluginOptionSpec(pluginId, raw);
+        if (spec && raw.cardOnly === true)
+            return cardOnly(spec);
+        return spec;
+    }
+
+    function pluginOptionSpec(pluginId, raw) {
         const text = I18n.trFor(pluginId, raw.text ?? raw.key);
         switch (raw.type) {
         case "toggle":
@@ -467,12 +472,12 @@ Singleton {
         return entry(id)?.options ?? [];
     }
 
-    function sheetOptionSpecs(id) {
-        return optionSpecs(id).filter(spec => spec.settingsOnly !== true);
+    function sheetOptionSpecs(id, tabScope = false) {
+        return optionSpecs(id).filter(spec => spec.settingsOnly !== true && !(tabScope && spec.cardOnly === true));
     }
 
-    function hasOptions(id) {
-        return sheetOptionSpecs(id).length > 0;
+    function hasOptions(id, tabScope = false) {
+        return sheetOptionSpecs(id, tabScope).length > 0;
     }
 
     function storedOptions(id) {
@@ -488,26 +493,15 @@ Singleton {
         return optionSpecs(id).some(spec => spec.key in stored);
     }
 
-    function resolvedOptions(id) {
+    function resolvedOptions(id, stored = storedOptions(id)) {
         const out = {};
-        const stored = storedOptions(id);
         for (const spec of optionSpecs(id))
             out[spec.key] = optionValue(spec, stored[spec.key]);
         return out;
     }
 
     function optionValue(spec, value) {
-        switch (spec.type) {
-        case "toggle":
-            return typeof value === "boolean" ? value : spec.def;
-        case "choice":
-            return spec.choices.some(c => c.value === value) ? value : spec.def;
-        case "number":
-            if (!Number.isFinite(value))
-                return spec.def;
-            return Math.max(spec.min, Math.min(spec.max, value));
-        }
-        return spec.def;
+        return Options.value(spec, value);
     }
 
     function option(id, key) {

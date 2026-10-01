@@ -11,6 +11,7 @@ Column {
 
     property bool daily: false
     property bool chartMode: true
+    property var widgetOptions: ({})
     property bool live: false
     readonly property int visibleCount: Math.max(1, Math.min(daily ? DashMetrics.dailyVisibleCount : DashMetrics.chartHourlyCount, Math.floor(width / DashMetrics.gridRowUnit)))
     property int startIndex: daily ? 0 : (WeatherService.weather.currentHourIndex ?? new Date().getHours())
