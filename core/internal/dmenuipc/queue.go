@@ -22,7 +22,7 @@ func AcquireQueueSlot(onWait func()) (release func(), err error) {
 	}
 
 	release = func() {
-		syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
+		_ = syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
 		f.Close()
 	}
 

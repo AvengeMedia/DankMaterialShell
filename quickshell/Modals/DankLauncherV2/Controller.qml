@@ -741,7 +741,6 @@ Item {
     }
 
     function _startDmenuSession(socketPath) {
-        console.log("[dmenu-debug] _startDmenuSession", socketPath);
         _endDmenuSession();
         searchMode = "dmenu";
         searchQuery = "";
@@ -775,13 +774,11 @@ Item {
     }
 
     function _endDmenuSession() {
-        console.log("[dmenu-debug] _endDmenuSession", "loaderActive=", dmenuSocketLoader.active);
         dmenuSocketLoader.active = false;
         dmenuSocketPath = "";
     }
 
     function _onDmenuSocketLine(line) {
-        console.log("[dmenu-debug] _onDmenuSocketLine", line);
         if (!line)
             return;
         var msg;
@@ -829,7 +826,6 @@ Item {
             Qt.callLater(performSearch);
             break;
         case "end":
-            console.log("[dmenu-debug] end received, itemCount=", dmenuItems.length);
             performSearch();
             _applyDmenuSelect();
             break;
@@ -882,7 +878,6 @@ Item {
     }
 
     function _writeDmenuSelection(payload) {
-        console.log("[dmenu-debug] _writeDmenuSelection", JSON.stringify(payload), "stack:", Error().stack);
         var socket = dmenuSocketLoader.item;
         if (socket && socket.connected) {
             socket.write(JSON.stringify(Object.assign({

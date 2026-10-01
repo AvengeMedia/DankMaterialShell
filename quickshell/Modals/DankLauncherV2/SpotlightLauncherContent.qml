@@ -344,7 +344,6 @@ FocusScope {
             ignoreUpDownKeys: true
             ignoreTabKeys: true
             keyForwardTargets: [searchKeyHandler]
-            shortcutOverrideFilter: event => _isDmenu && root.controller.matchDmenuKeybind(event) > 0
 
             onTextChanged: {
                 if (root.suspendSearchUpdates)

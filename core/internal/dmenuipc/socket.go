@@ -39,9 +39,9 @@ type Header struct {
 	Active      []Range   `json:"active,omitempty"`
 	Urgent      []Range   `json:"urgent,omitempty"`
 	Keybinds    []Keybind `json:"keybinds,omitempty"`
-	View string `json:"view,omitempty"`
-	Size string `json:"size,omitempty"`
-	Icon string `json:"icon,omitempty"`
+	View        string    `json:"view,omitempty"`
+	Size        string    `json:"size,omitempty"`
+	Icon        string    `json:"icon,omitempty"`
 }
 
 type ItemMeta struct {
@@ -53,7 +53,7 @@ type ItemMeta struct {
 	Urgent        bool   `json:"urgent,omitempty"`
 	Active        bool   `json:"active,omitempty"`
 	Permanent     bool   `json:"permanent,omitempty"`
-	Header bool `json:"header,omitempty"`
+	Header        bool   `json:"header,omitempty"`
 }
 
 type SelectedRow struct {

@@ -420,7 +420,6 @@ FocusScope {
                 ignoreUpDownKeys: true
                 ignoreTabKeys: true
                 keyForwardTargets: [root]
-                shortcutOverrideFilter: event => _isDmenu && controller.matchDmenuKeybind(event) > 0
 
                 onTextChanged: {
                     controller.setSearchQuery(text);
