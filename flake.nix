@@ -264,6 +264,7 @@
                 go-tools
                 gnumake
                 nodejs
+                lua
                 (python3.withPackages (ps: [ ps.dbus-next ]))
                 matugen
 

@@ -222,6 +222,10 @@ Singleton {
                     return "APTX";
                 if (vendor === 0x0000012d && vendorCodec === 0x00aa)
                     return "LDAC";
+                if (vendor === 0x0000053a && vendorCodec === 0x4c35)
+                    return "LHDC_V5";
+                if (vendor === 0x0000053a && vendorCodec === 0x4c33)
+                    return "LHDC_V3";
             }
             return "VENDOR";
         }
@@ -264,6 +268,7 @@ Singleton {
                             codecs.push({
                                 "name": info.name,
                                 "profile": info.name,
+                                "codec": root.codecLiteralFor(name),
                                 "description": info.description,
                                 "qualityColor": info.qualityColor,
                                 "category": root.codecCategory(info.name, info.name)
@@ -280,6 +285,7 @@ Singleton {
                             codecs.push({
                                 "name": info.name,
                                 "profile": info.name,
+                                "codec": root.codecLiteralFor(name),
                                 "description": info.description,
                                 "qualityColor": info.qualityColor,
                                 "category": root.codecCategory(info.name, info.name)
@@ -458,106 +464,151 @@ Singleton {
         return icon === "headset" || icon === "speaker";
     }
 
+    function codecMap() {
+        return {
+            "LHDC_V5": { "name": "LHDC v5", "description": "Highest quality • Low latency", "qualityColor": "#4CAF50" },
+            "LHDC_V3": { "name": "LHDC v3", "description": "High quality • Low latency", "qualityColor": "#FF9800" },
+            "LDAC": { "name": "LDAC", "description": "Highest quality • Higher battery usage", "qualityColor": "#4CAF50" },
+            "APTX_HD": { "name": "aptX HD", "description": "High quality • Balanced battery", "qualityColor": "#FF9800" },
+            "APTX_LL": { "name": "aptX LL", "description": "Low latency • Gaming and video", "qualityColor": "#FF9800" },
+            "APTX_ADAPTIVE": { "name": "aptX Adaptive", "description": "Adaptive quality and latency", "qualityColor": "#FF9800" },
+            "APTX": { "name": "aptX", "description": "Good quality • Low latency", "qualityColor": "#FF9800" },
+            "AAC_ELD": { "name": "AAC-ELD", "description": "Low-delay AAC • Voice and video", "qualityColor": "#2196F3" },
+            "AAC": { "name": "AAC", "description": "Balanced quality and battery", "qualityColor": "#2196F3" },
+            "OPUS_05": { "name": "Opus", "description": "High quality • Modern Bluetooth LE audio", "qualityColor": "#4CAF50" },
+            "OPUS_G": { "name": "Opus", "description": "High quality • Modern Bluetooth LE audio", "qualityColor": "#4CAF50" },
+            "OPUS": { "name": "Opus", "description": "High quality • Efficient streaming", "qualityColor": "#4CAF50" },
+            "LC3": { "name": "LC3", "description": "LE Audio • Efficient high quality", "qualityColor": "#4CAF50" },
+            "LC3_SWB": { "name": "LC3-SWB", "description": "Wideband speech • Hands-free calls", "qualityColor": "#9E9E9E" },
+            "LC3_A127": { "name": "LC3", "description": "LE Audio speech • Hands-free calls", "qualityColor": "#9E9E9E" },
+            "LC3PLUS_HR": { "name": "LC3plus HR", "description": "High resolution LE Audio", "qualityColor": "#4CAF50" },
+            "SBC_XQ": { "name": "SBC-XQ", "description": "Enhanced SBC • Better compatibility", "qualityColor": "#2196F3" },
+            "SBC": { "name": "SBC", "description": "Basic quality • Universal compatibility", "qualityColor": "#9E9E9E" },
+            "MSBC": { "name": "mSBC", "description": "Modified SBC • Optimized for speech", "qualityColor": "#9E9E9E" },
+            "CVSD": { "name": "CVSD", "description": "Basic speech codec • Legacy compatibility", "qualityColor": "#9E9E9E" },
+            "G722": { "name": "G722", "description": "ASHA • Hearing aid audio", "qualityColor": "#9E9E9E" },
+            "FASTSTREAM": { "name": "FastStream", "description": "Low latency SBC variant", "qualityColor": "#2196F3" }
+        };
+    }
+
+    // Exact bluez5 media_codec descriptions, mapped to a display key. Longest
+    // literal wins and a match must sit on a word boundary, so "LC3plus HR" is
+    // not read as LC3 and "LC3-24kHz" is not LC3-SWB.
+    function codecAliases() {
+        return {
+            "LHDC v5": "LHDC_V5",
+            "LHDC v3": "LHDC_V3",
+            "LDAC": "LDAC",
+            "aptX HD": "APTX_HD",
+            "aptX-LL mSBC": "APTX_LL",
+            "aptX-LL": "APTX_LL",
+            "aptX Adaptive": "APTX_ADAPTIVE",
+            "aptX": "APTX",
+            "AAC-ELD": "AAC_ELD",
+            "AAC": "AAC",
+            "Opus 05 5.1 Surround": "OPUS_05",
+            "Opus 05 7.1 Surround": "OPUS_05",
+            "Opus 05 Duplex Bidi channel": "OPUS_05",
+            "Opus 05 Pro Audio": "OPUS_05",
+            "Opus 05 Duplex": "OPUS_05",
+            "Opus 05": "OPUS_05",
+            "Opus": "OPUS_G",
+            "LC3plus HR": "LC3PLUS_HR",
+            "LC3-24kHz": "LC3_A127",
+            "LC3-SWB": "LC3_SWB",
+            "LC3": "LC3",
+            "SBC-XQ": "SBC_XQ",
+            "SBC": "SBC",
+            "MSBC": "MSBC",
+            "CVSD": "CVSD",
+            "G722": "G722",
+            "FastStream duplex SBC": "FASTSTREAM",
+            "FastStream": "FASTSTREAM"
+        };
+    }
+
+    function codecInfoFromDescription(description) {
+        const text = String(description || "").toLowerCase();
+        if (!text)
+            return null;
+        const aliases = codecAliases();
+        let bestKey = "";
+        let bestLiteral = "";
+        let bestLength = 0;
+        for (const literal in aliases) {
+            if (literal.length <= bestLength)
+                continue;
+            const needle = literal.toLowerCase();
+            const at = text.indexOf(needle);
+            if (at === -1)
+                continue;
+            const before = at > 0 ? text[at - 1] : "";
+            const after = text[at + needle.length] || "";
+            if (/[a-z0-9]/.test(before) || /[a-z0-9]/.test(after))
+                continue;
+            bestKey = aliases[literal];
+            bestLiteral = literal;
+            bestLength = literal.length;
+        }
+        if (bestKey === "")
+            return null;
+        const info = Object.assign({}, getCodecInfo(bestKey));
+        info.codec = bestLiteral;
+        return info;
+    }
+
+    function codecLiteralFor(codecName) {
+        const key = String(codecName || "").replace(/[-\s]+/g, "_").toUpperCase();
+        const aliases = codecAliases();
+        let literal = "";
+        for (const alias in aliases) {
+            if (aliases[alias] === key && (literal === "" || alias.length < literal.length))
+                literal = alias;
+        }
+        return literal;
+    }
+
     function getCodecInfo(codecName) {
         const codec = codecName.replace(/[-\s]+/g, "_").toUpperCase();
-
-        const codecMap = {
-            "LDAC": {
-                "name": "LDAC",
-                "description": "Highest quality • Higher battery usage",
-                "qualityColor": "#4CAF50"
-            },
-            "APTX_HD": {
-                "name": "aptX HD",
-                "description": "High quality • Balanced battery",
-                "qualityColor": "#FF9800"
-            },
-            "APTX_LL": {
-                "name": "aptX LL",
-                "description": "Low latency • Gaming and video",
-                "qualityColor": "#FF9800"
-            },
-            "APTX_ADAPTIVE": {
-                "name": "aptX Adaptive",
-                "description": "Adaptive quality and latency",
-                "qualityColor": "#FF9800"
-            },
-            "APTX": {
-                "name": "aptX",
-                "description": "Good quality • Low latency",
-                "qualityColor": "#FF9800"
-            },
-            "AAC_ELD": {
-                "name": "AAC-ELD",
-                "description": "Low-delay AAC • Voice and video",
-                "qualityColor": "#2196F3"
-            },
-            "AAC": {
-                "name": "AAC",
-                "description": "Balanced quality and battery",
-                "qualityColor": "#2196F3"
-            },
-            "OPUS_05": {
-                "name": "Opus",
-                "description": "High quality • Modern Bluetooth LE audio",
-                "qualityColor": "#4CAF50"
-            },
-            "OPUS_G": {
-                "name": "Opus",
-                "description": "High quality • Modern Bluetooth LE audio",
-                "qualityColor": "#4CAF50"
-            },
-            "OPUS": {
-                "name": "Opus",
-                "description": "High quality • Efficient streaming",
-                "qualityColor": "#4CAF50"
-            },
-            "LC3": {
-                "name": "LC3",
-                "description": "LE Audio • Efficient high quality",
-                "qualityColor": "#4CAF50"
-            },
-            "LC3_SWB": {
-                "name": "LC3-SWB",
-                "description": "Wideband speech • Hands-free calls",
-                "qualityColor": "#9E9E9E"
-            },
-            "LC3_A127": {
-                "name": "LC3",
-                "description": "LE Audio speech • Hands-free calls",
-                "qualityColor": "#9E9E9E"
-            },
-            "SBC_XQ": {
-                "name": "SBC-XQ",
-                "description": "Enhanced SBC • Better compatibility",
-                "qualityColor": "#2196F3"
-            },
-            "SBC": {
-                "name": "SBC",
-                "description": "Basic quality • Universal compatibility",
-                "qualityColor": "#9E9E9E"
-            },
-            "MSBC": {
-                "name": "mSBC",
-                "description": "Modified SBC • Optimized for speech",
-                "qualityColor": "#9E9E9E"
-            },
-            "CVSD": {
-                "name": "CVSD",
-                "description": "Basic speech codec • Legacy compatibility",
-                "qualityColor": "#9E9E9E"
-            },
-            "FASTSTREAM": {
-                "name": "FastStream",
-                "description": "Low latency SBC variant",
-                "qualityColor": "#2196F3"
-            }
-        };
-
-        return codecMap[codec] || {
+        const map = codecMap();
+        return map[codec] || {
             "name": codecName,
             "description": "Unknown codec",
             "qualityColor": "#9E9E9E"
+        };
+    }
+
+    function codecLabelFromProfile(profileName) {
+        const name = String(profileName || "");
+        const suffix = name.match(/^(?:a2dp-sink|a2dp-source|headset-head-unit|headset-audio-gateway)-(.+)$/);
+        if (suffix)
+            return suffix[1].replace(/-/g, "_").toUpperCase();
+        if (/^(?:a2dp-sink|a2dp-source|headset-head-unit|headset-audio-gateway)$/.test(name))
+            return name;
+        return "";
+    }
+
+    function parseCodecLine(line) {
+        const text = String(line || "").trim();
+        if (!text.startsWith("CODEC\t"))
+            return null;
+        const parts = text.split("\t");
+        if (parts.length < 5)
+            return null;
+        const profile = parts[2];
+        const info = codecInfoFromDescription(parts[3]);
+        // A codec the vocabulary does not name stays selectable under its profile.
+        const label = info ? "" : codecLabelFromProfile(profile);
+        if (!info && label === "")
+            return null;
+        return {
+            "name": info ? info.name : label,
+            "profile": profile,
+            "index": Number(parts[1]),
+            "codec": info ? info.codec : "",
+            "description": info ? info.description : "Unknown codec",
+            "qualityColor": info ? info.qualityColor : "#9E9E9E",
+            "current": parts[4] === "1"
         };
     }
 
@@ -661,7 +712,7 @@ Singleton {
         });
     }
 
-    function switchCodec(device, profileName, callback, codecDisplayName) {
+    function switchCodec(device, profileName, callback, codecDisplayName, codecIndex, codecLiteral) {
         if (!device || !isAudioDevice(device)) {
             callback(false, "Invalid device");
             return;
@@ -674,16 +725,21 @@ Singleton {
             }
 
             const cardName = root.getCardName(device);
+            const payload = {
+                "mode": "set",
+                "device": cardName,
+                "target": profileName
+            };
+            if (codecIndex !== undefined && codecIndex !== null)
+                payload.index = codecIndex;
+            if (codecLiteral)
+                payload.codec = codecLiteral;
             codecSwitchProcess.cardName = cardName;
             codecSwitchProcess.profile = profileName;
             codecSwitchProcess.deviceAddress = device.address || "";
             codecSwitchProcess.expectedCodec = codecDisplayName || root.codecNameFromProfile(profileName);
             codecSwitchProcess.callback = callback;
-            codecSwitchProcess.command = ["wpexec", root.cardProfileScript, JSON.stringify({
-                    "mode": "set",
-                    "device": cardName,
-                    "target": profileName
-                })];
+            codecSwitchProcess.command = ["wpexec", root.cardProfileScript, JSON.stringify(payload)];
             codecSwitchProcess.running = true;
         });
     }
@@ -733,28 +789,21 @@ Singleton {
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: data => {
-                const line = data.trim();
-                if (!line.startsWith("CODEC\t"))
+                const entry = root.parseCodecLine(data);
+                if (!entry)
                     return;
-                const parts = line.split("\t");
-                if (parts.length < 5)
-                    return;
-                const codecName = parts[1];
-                const profile = parts[2];
-                const isCurrent = parts[4] === "1";
-                const codecInfo = root.getCodecInfo(codecName);
-                if (!codecInfo)
-                    return;
-                if (isCurrent)
-                    codecListProcess.detectedCodec = codecInfo.name;
-                if (!codecListProcess.availableCodecs.some(c => c.profile === profile)) {
+                if (entry.current)
+                    codecListProcess.detectedCodec = entry.name;
+                if (!codecListProcess.availableCodecs.some(c => c.index === entry.index)) {
                     const next = codecListProcess.availableCodecs.slice();
                     next.push({
-                        "name": codecInfo.name,
-                        "profile": profile,
-                        "description": codecInfo.description,
-                        "qualityColor": codecInfo.qualityColor,
-                        "category": root.codecCategory(codecInfo.name, profile)
+                        "name": entry.name,
+                        "profile": entry.profile,
+                        "index": entry.index,
+                        "codec": entry.codec,
+                        "description": entry.description,
+                        "qualityColor": entry.qualityColor,
+                        "category": root.codecCategory(entry.name, entry.profile)
                     });
                     codecListProcess.availableCodecs = next;
                 }

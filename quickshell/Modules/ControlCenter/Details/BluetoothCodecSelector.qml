@@ -70,18 +70,15 @@ CcSheetDialog {
         });
     }
 
-    function selectCodec(profileName) {
-        if (!deviceValid || isLoading)
+    function selectCodec(selectedCodec) {
+        if (!deviceValid || isLoading || !selectedCodec)
             return;
         const capturedDevice = device;
         const capturedAddress = device.address;
-        const selectedCodec = availableCodecs.find(c => c.profile === profileName);
-        if (!selectedCodec)
-            return;
         BluetoothService.updateDeviceCodec(capturedAddress, selectedCodec.name);
         codecSelected(capturedAddress, selectedCodec.name);
         isLoading = true;
-        BluetoothService.switchCodec(capturedDevice, profileName, (success, message) => {
+        BluetoothService.switchCodec(capturedDevice, selectedCodec.profile, (success, message) => {
             if (!root.device || root.device.address !== capturedAddress)
                 return;
             isLoading = false;
@@ -93,7 +90,7 @@ CcSheetDialog {
             codecSelected(capturedAddress, selectedCodec.name);
             ToastService.showToast(message, ToastService.levelInfo);
             root.dismiss();
-        }, selectedCodec.name);
+        }, selectedCodec.name, selectedCodec.index, selectedCodec.codec);
     }
 
     onDeviceValidChanged: {
@@ -111,7 +108,7 @@ CcSheetDialog {
         active: modelData.name === root.currentCodec
         enabled: !root.isLoading
         clickable: !active
-        onClicked: root.selectCodec(modelData.profile)
+        onClicked: root.selectCodec(modelData)
 
         leading: CcStatusDot {
             color: modelData.qualityColor
