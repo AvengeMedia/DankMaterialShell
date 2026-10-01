@@ -579,39 +579,36 @@ Item {
                 }
 
                 Rectangle {
-                    width: {
-                        if (root.options.indicatorStyle === "circle") {
+                    readonly property bool dotFocused: {
+                        if (!appData) return false;
+                        if (appData.type !== "grouped" || appData.windowCount === 1)
+                            return isWindowFocused;
+                        const groupToplevels = getGroupedToplevels();
+                        return index < groupToplevels.length && groupToplevels[index].activated;
+                    }
+                    readonly property real baseWidth: {
+                        if (root.options.indicatorStyle === "circle")
                             return Math.max(4, actualIconSize * 0.1);
-                        }
                         return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
+                    width: dotFocused ? baseWidth * 3 : baseWidth
                     height: {
                         if (root.options.indicatorStyle === "circle") {
                             return Math.max(4, actualIconSize * 0.1);
                         }
                         return Math.max(2, actualIconSize * 0.05);
                     }
-                    radius: root.options.indicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
-                    color: {
-                        if (!appData) {
-                            return "transparent";
-                        }
+                    radius: height / 2
+                    color: !appData ? "transparent" : (dotFocused ? Theme.primary : Theme.surfaceTextSecondary)
 
-                        if (appData.type !== "grouped" || appData.windowCount === 1) {
-                            if (isWindowFocused) {
-                                return Theme.primary;
-                            }
-                            return Theme.surfaceTextSecondary;
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Easing.OutCubic
                         }
-
-                        if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels();
-                            if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary;
-                            }
-                        }
-
-                        return Theme.surfaceTextSecondary;
+                    }
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.shortDuration }
                     }
                 }
             }
@@ -639,39 +636,36 @@ Item {
                 }
 
                 Rectangle {
+                    readonly property bool dotFocused: {
+                        if (!appData) return false;
+                        if (appData.type !== "grouped" || appData.windowCount === 1)
+                            return isWindowFocused;
+                        const groupToplevels = getGroupedToplevels();
+                        return index < groupToplevels.length && groupToplevels[index].activated;
+                    }
+                    readonly property real baseHeight: {
+                        if (root.options.indicatorStyle === "circle")
+                            return Math.max(4, actualIconSize * 0.1);
+                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
+                    }
                     width: {
                         if (root.options.indicatorStyle === "circle") {
                             return Math.max(4, actualIconSize * 0.1);
                         }
                         return Math.max(2, actualIconSize * 0.05);
                     }
-                    height: {
-                        if (root.options.indicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1);
+                    height: dotFocused ? baseHeight * 3 : baseHeight
+                    radius: width / 2
+                    color: !appData ? "transparent" : (dotFocused ? Theme.primary : Theme.surfaceTextSecondary)
+
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Easing.OutCubic
                         }
-                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
-                    radius: root.options.indicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
-                    color: {
-                        if (!appData) {
-                            return "transparent";
-                        }
-
-                        if (appData.type !== "grouped" || appData.windowCount === 1) {
-                            if (isWindowFocused) {
-                                return Theme.primary;
-                            }
-                            return Theme.surfaceTextSecondary;
-                        }
-
-                        if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels();
-                            if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary;
-                            }
-                        }
-
-                        return Theme.surfaceTextSecondary;
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.shortDuration }
                     }
                 }
             }
