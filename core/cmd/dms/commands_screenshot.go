@@ -381,6 +381,7 @@ func runScreenshot(config screenshot.Config) {
 	if result.CopyOnly {
 		config.SaveFile = false
 		config.Clipboard = true
+		config.Stdout = false
 	}
 
 	if config.Stdout {
@@ -417,7 +418,11 @@ func runScreenshot(config screenshot.Config) {
 			exitScreenshotError(" copying to clipboard", err)
 		}
 		if !ssJSON && !config.SaveFile {
-			fmt.Println("Copied to clipboard")
+			if ssStdout {
+				fmt.Fprintln(os.Stderr, "Copied to clipboard")
+			} else {
+				fmt.Println("Copied to clipboard")
+			}
 		}
 	}
 

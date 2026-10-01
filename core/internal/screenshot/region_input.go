@@ -811,7 +811,7 @@ func (r *RegionSelector) finishSelection() {
 		return
 	}
 
-	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll
+	scrollMode := r.screenshoter != nil && r.screenshoter.config.Mode == ModeScroll && !r.copyOnly
 	switch {
 	case scrollMode:
 		r.clampSelectionToSurface()
