@@ -378,6 +378,11 @@ func runScreenshot(config screenshot.Config) {
 		}
 	}
 
+	if result.CopyOnly {
+		config.SaveFile = false
+		config.Clipboard = true
+	}
+
 	if config.Stdout {
 		if err := writeImageToStdout(result.Buffer, config.Format, config.Quality, result.Format, result.CICP); err != nil {
 			exitScreenshotError(" writing to stdout", err)
@@ -417,18 +422,25 @@ func runScreenshot(config screenshot.Config) {
 	}
 
 	if ssJSON {
-		scale := result.Scale
-		if scale <= 0 {
-			scale = 1.0
+		if result.CopyOnly {
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "aborted",
+				Error:  "User copied to clipboard",
+			})
+		} else {
+			scale := result.Scale
+			if scale <= 0 {
+				scale = 1.0
+			}
+			writeScreenshotJSON(screenshotMetadata{
+				Status: "success",
+				Path:   filePath,
+				Width:  result.Buffer.Width,
+				Height: result.Buffer.Height,
+				Scale:  scale,
+				Mime:   formatMime(config.Format),
+			})
 		}
-		writeScreenshotJSON(screenshotMetadata{
-			Status: "success",
-			Path:   filePath,
-			Width:  result.Buffer.Width,
-			Height: result.Buffer.Height,
-			Scale:  scale,
-			Mime:   formatMime(config.Format),
-		})
 	}
 
 	if config.Notify {
