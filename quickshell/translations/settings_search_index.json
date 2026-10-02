@@ -4475,6 +4475,26 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "frameSurfaceColor",
+    "label": "Background",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "background",
+      "bar",
+      "color",
+      "frame",
+      "panel",
+      "statusbar",
+      "surface",
+      "taskbar",
+      "topbar"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "frameEnabled"
+  },
+  {
     "section": "islandSatelliteBackground",
     "label": "Background",
     "tabIndex": 6,
@@ -4548,18 +4568,25 @@
     "keywords": [
       "appearance",
       "bar",
+      "between",
+      "components",
       "corner",
       "edge",
       "end",
+      "ends",
       "frame",
       "inset",
+      "modules",
+      "outermost",
       "padding",
       "panel",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "widgets"
     ],
     "parentLabel": "Bar",
+    "description": "Gap between the bar ends and the outermost widgets",
     "conditionKey": "frameEnabled"
   },
   {
@@ -4904,18 +4931,25 @@
     "keywords": [
       "appearance",
       "bar",
+      "between",
       "border",
+      "components",
       "corner",
+      "ends",
       "frame",
+      "modules",
+      "outermost",
       "panel",
       "radius",
       "rounding",
       "statusbar",
       "taskbar",
-      "topbar"
+      "topbar",
+      "widgets"
     ],
     "parentLabel": "Bar",
     "icon": "border_outer",
+    "description": "Gap between the bar ends and the outermost widgets",
     "conditionKey": "frameEnabled"
   },
   {
@@ -5179,6 +5213,28 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "frameSurfaceOpacity",
+    "label": "Override",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "frame",
+      "interface",
+      "opacity",
+      "override",
+      "panel",
+      "statusbar",
+      "style",
+      "taskbar",
+      "topbar",
+      "transparency"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "frameEnabled"
+  },
+  {
     "section": "islandSatelliteTransparency",
     "label": "Override",
     "tabIndex": 6,
@@ -5440,6 +5496,27 @@
     "parentLabel": "Bar"
   },
   {
+    "section": "frameThickness",
+    "label": "Thickness",
+    "tabIndex": 6,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "bar",
+      "border",
+      "frame",
+      "panel",
+      "size",
+      "statusbar",
+      "taskbar",
+      "thickness",
+      "topbar",
+      "width"
+    ],
+    "parentLabel": "Bar",
+    "conditionKey": "frameEnabled"
+  },
+  {
     "section": "islandHomeVolumeDisplay",
     "label": "Volume style",
     "tabIndex": 6,
@@ -5560,27 +5637,6 @@
     ],
     "parentLabel": "Bar",
     "icon": "widgets"
-  },
-  {
-    "section": "frameThickness",
-    "label": "Width",
-    "tabIndex": 6,
-    "category": "Appearance",
-    "keywords": [
-      "appearance",
-      "bar",
-      "border",
-      "frame",
-      "panel",
-      "size",
-      "statusbar",
-      "taskbar",
-      "thickness",
-      "topbar",
-      "width"
-    ],
-    "parentLabel": "Bar",
-    "conditionKey": "frameEnabled"
   },
   {
     "section": "networkStatus",

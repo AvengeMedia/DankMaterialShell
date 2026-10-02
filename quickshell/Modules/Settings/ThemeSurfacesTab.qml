@@ -31,13 +31,15 @@ Column {
     readonly property var opacityTargets: {
         SettingsData.barConfigs;
         SettingsData.dockConfigs;
+        const frameBarId = SettingsData._frameBarConfig()?.id;
         const bars = SettingsData.barConfigs.filter(config => !SettingsData.isDotBarConfig(config)).map(config => ({
                     kind: "bar",
                     id: config.id,
                     name: config.name || config.id,
                     enabled: config.enabled !== false,
                     override: config.followInterfaceStyle === false,
-                    transparency: config.transparency ?? 1
+                    transparency: config.transparency ?? 1,
+                    frame: SettingsData.frameEnabled && config.id === frameBarId
                 }));
         const docks = SettingsData.dockConfigs.map(config => ({
                     kind: "dock",
@@ -45,7 +47,8 @@ Column {
                     name: config.name,
                     enabled: config.enabled !== false,
                     override: config.followInterfaceStyle === false,
-                    transparency: config.transparency ?? 1
+                    transparency: config.transparency ?? 1,
+                    overlay: config.useOverlayLayer ?? false
                 }));
         return bars.concat(docks);
     }
@@ -154,6 +157,14 @@ Column {
             onSliderValueChanged: newValue => SettingsData.set("blurBorderOpacity", newValue / 100)
         }
 
+        SettingsControlledBy {
+            visible: SettingsData.connectedFrameModeActive && root.borderEnabled
+            parentModal: root.parentModal
+            section: "frameBorder"
+            settingLabel: I18n.tr("Border")
+            reason: I18n.tr("Managed by Frame in Connected Mode")
+        }
+
         SettingsToggleRow {
             tab: "theme"
             tags: ["foreground", "layers", "contrast", "surface", "blur", "glass", "frosted"]
@@ -206,6 +217,14 @@ Column {
             }
         }
 
+        SettingsControlledBy {
+            visible: SettingsData.connectedFrameModeActive && BlurService.available && (SettingsData.blurEnabled ?? false)
+            parentModal: root.parentModal
+            section: "frameBlurEnabled"
+            settingLabel: I18n.tr("Background blur")
+            reason: I18n.tr("Managed by Frame in Connected Mode")
+        }
+
         SettingsNavRow {
             tab: "theme"
             tags: ["blur", "xray", "compositor", "layout"]
@@ -255,6 +274,14 @@ Column {
             maximum: 32
             unit: "px"
             onSliderValueChanged: newValue => SettingsData.set("fixedRadius", newValue)
+        }
+
+        SettingsControlledBy {
+            visible: SettingsData.connectedFrameModeActive
+            parentModal: root.parentModal
+            section: "frameRounding"
+            settingLabel: I18n.tr("Corner style")
+            reason: I18n.tr("Managed by Frame in Connected Mode")
         }
 
         SettingsToggleRow {
@@ -378,7 +405,7 @@ Column {
             tags: ["surface", "opacity", "transparency", "bar", "dock", "override"]
             settingKey: "surfaceOpacity_" + modelData.kind + "_" + modelData.id
             text: modelData.name
-            description: I18n.tr("Override")
+            description: modelData.frame ? I18n.tr("Frame") + " · " + I18n.tr("Override") : I18n.tr("Override")
             checked: modelData.override
             modified: modelData.override
             resetByKeys: false
@@ -437,6 +464,14 @@ Column {
             title: modelData.title
             settingKey: modelData.settingKey
             visible: targets.length > 0
+
+            SettingsControlledBy {
+                visible: targetCard.modelData.kind === "dock" && SettingsData.connectedFrameModeActive && targetCard.activeTargets.some(target => !target.overlay)
+                parentModal: root.parentModal
+                section: "frameSurfaceOpacity"
+                settingLabel: I18n.tr("Opacity")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
+            }
 
             Repeater {
                 model: targetCard.activeTargets

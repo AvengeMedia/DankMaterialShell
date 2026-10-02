@@ -174,6 +174,14 @@ Item {
             title: I18n.tr("Apply to")
             settingKey: "m3ElevationTargets"
 
+            SettingsControlledBy {
+                visible: SettingsData.connectedFrameModeActive
+                parentModal: root.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Apply to")
+                reason: I18n.tr("Managed by Frame in Connected Mode")
+            }
+
             SettingsToggleRow {
                 tab: "theme"
                 tags: ["elevation", "shadow", "modal", "dialog", "m3"]
@@ -222,7 +230,7 @@ Item {
             iconName: "toolbar"
             title: I18n.tr("Bar")
             settingKey: "barShadow"
-            visible: bars.length > 0
+            visible: bars.length > 0 && !SettingsData.connectedFrameModeActive
 
             readonly property var bars: SettingsData.barConfigs.filter(config => !SettingsData.isIslandBarConfig(config))
             readonly property bool shadowActive: (bar.selectedBarConfig?.shadowIntensity ?? 0) > 0
@@ -396,6 +404,14 @@ Item {
                         shadowCustomColor: selectedColor.toString()
                     })
             }
+        }
+
+        SettingsControlledBy {
+            visible: SettingsData.connectedFrameModeActive && shadowCard.bars.length > 0
+            parentModal: root.parentModal
+            section: "frameBorder"
+            settingLabel: I18n.tr("Bar")
+            reason: I18n.tr("Disabled by Frame Mode")
         }
     }
 }
