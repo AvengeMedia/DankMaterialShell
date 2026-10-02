@@ -1176,3 +1176,94 @@ func TestHandleCopyEntry_OversizedFileEntryRestoresExactPath(t *testing.T) {
 	require.NotNil(t, resp.Result)
 	assert.Equal(t, path, (*resp.Result)["filePath"])
 }
+
+// "Copy as text" on a file entry must serve the bare path as plain text:
+// the entry's own text/uri-list representation is classified as Files by
+// Blink inside a contenteditable, so text-only editors paste nothing from it.
+func TestTextOnlyClipboardPayload_FileEntryServesBarePath(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	path := filepath.Join(t.TempDir(), "吉祥物 男女(2).fbx")
+	require.NoError(t, os.WriteFile(path, []byte("fbx-bytes"), 0o644))
+
+	data, mime, err := m.textOnlyClipboardPayload(&Entry{
+		Data:     []byte(encodeFileURI(path) + "\r\n"),
+		MimeType: "text/uri-list",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "text/plain;charset=utf-8", mime)
+	assert.Equal(t, path, string(data))
+}
+
+func TestTextOnlyClipboardPayload_PrefersStoredAltText(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	data, mime, err := m.textOnlyClipboardPayload(&Entry{
+		Data:        []byte("file:///tmp/x\r\n"),
+		MimeType:    "text/uri-list",
+		AltData:     []byte("alternate prose"),
+		AltMimeType: "text/plain;charset=utf-8",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "text/plain;charset=utf-8", mime)
+	assert.Equal(t, "alternate prose", string(data))
+}
+
+// A file manager's percent-encoded URI must come back as the real path, not
+// as My%20File.
+func TestTextOnlyClipboardPayload_DecodesEncodedURI(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	data, mime, err := m.textOnlyClipboardPayload(&Entry{
+		Data:     []byte("file:///home/user/My%20File.txt\r\n"),
+		MimeType: "text/uri-list",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "text/plain;charset=utf-8", mime)
+	assert.Equal(t, "/home/user/My File.txt", string(data))
+}
+
+// Decode exactly once: a name whose literal %20 was stored encoded as %2520
+// must not be decoded twice into a different path.
+func TestTextOnlyClipboardPayload_DecodesExactlyOnce(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	path := "/home/user/report%20final.fbx"
+	data, _, err := m.textOnlyClipboardPayload(&Entry{
+		Data:     []byte(encodeFileURI(path) + "\r\n"),
+		MimeType: "text/uri-list",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, path, string(data))
+}
+
+func TestHandleCopyEntry_TextOnlyFileEntrySucceeds(t *testing.T) {
+	m := newTestManagerWithDB(t)
+
+	path := filepath.Join(t.TempDir(), "吉祥物 男女(2).fbx")
+	require.NoError(t, os.WriteFile(path, []byte("fbx-bytes"), 0o644))
+	require.NoError(t, m.storeEntry(Entry{
+		Data:      []byte(encodeFileURI(path) + "\r\n"),
+		MimeType:  "text/uri-list",
+		Preview:   "[[ file 吉祥物 男女(2).fbx ]]",
+		Size:      len(path) + 10,
+		Timestamp: time.Now().Truncate(time.Second),
+	}))
+
+	history := m.GetHistory()
+	require.Len(t, history, 1)
+
+	mc := newClipboardTestConn()
+	handleCopyEntry(ipc.NewConnWriter(mc), ipc.Request{
+		ID:     1,
+		Params: map[string]any{"id": float64(history[0].ID), "textOnly": true},
+	}, m)
+
+	var resp ipc.Response[models.SuccessResult]
+	require.NoError(t, json.NewDecoder(mc.writeBuf).Decode(&resp))
+	assert.Empty(t, resp.Error)
+}

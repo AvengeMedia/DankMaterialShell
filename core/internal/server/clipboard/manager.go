@@ -2263,6 +2263,23 @@ func (m *Manager) EntryToFile(entry *Entry) string {
 	return ""
 }
 
+// textOnlyClipboardPayload resolves what "copy as text" puts on the clipboard:
+// the stored alternate text when present, else the entry's own file path as
+// plain text. A file entry's representation is text/uri-list, which Blink
+// classifies as Files inside a contenteditable — text-only editors (chat
+// composers) paste nothing from it, so a text-only copy must not carry it.
+func (m *Manager) textOnlyClipboardPayload(entry *Entry) ([]byte, string, error) {
+	if entry.AltMimeType != "" {
+		return entry.AltData, entry.AltMimeType, nil
+	}
+
+	if path := m.EntryToFile(entry); path != "" {
+		return []byte(path), "text/plain;charset=utf-8", nil
+	}
+
+	return entry.Data, entry.MimeType, nil
+}
+
 func (m *Manager) dbusConnForFlatpak() (*dbus.Conn, error) {
 	m.dbusConnMutex.Lock()
 	defer m.dbusConnMutex.Unlock()
