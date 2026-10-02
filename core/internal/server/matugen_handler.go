@@ -28,6 +28,8 @@ func handleMatugenQueue(conn *ipc.ConnWriter, req ipc.Request) {
 		StockColors:         models.GetOr(req, "stockColors", ""),
 		SyncModeWithPortal:  models.GetOr(req, "syncModeWithPortal", false),
 		TerminalsAlwaysDark: models.GetOr(req, "terminalsAlwaysDark", false),
+		TerminalOpacity:     int(models.GetOr(req, "terminalOpacity", 0.0)),
+		TerminalPalette:     models.GetOr(req, "terminalPalette", ""),
 		SkipTemplates:       models.GetOr(req, "skipTemplates", ""),
 		Contrast:            models.GetOr(req, "contrast", 0.0),
 		SourceMode:          models.GetOr(req, "sourceMode", ""),
