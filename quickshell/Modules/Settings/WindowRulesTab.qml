@@ -199,7 +199,7 @@ Item {
                 const result = JSON.parse(output.trim());
                 const allRules = result.rules || [];
                 CompositorService.syncDmsWindowFloatingRule(allRules);
-                windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules"));
+                windowRules = allRules.filter(r => (r.source || "").includes("dms/windowrules") && r.id !== CompositorService.dmsOpaqueRuleId);
                 externalRules = allRules.filter(r => !(r.source || "").includes("dms/windowrules"));
                 windowRulesInclude.applyStatus(result.dmsStatus);
             } catch (e) {
@@ -220,8 +220,7 @@ Item {
 
         Proc.runCommand("remove-windowrule", [Proc.dmsBin, "config", "windowrules", "remove", compositor, ruleId], (output, exitCode) => {
             if (exitCode === 0) {
-                if (CompositorService.isMango)
-                    MangoService.reloadConfig();
+                CompositorService.reloadAfterWindowRuleWrite();
                 loadWindowRules();
                 rulesChanged();
             }
@@ -250,8 +249,7 @@ Item {
                 windowRules = previous;
                 return;
             }
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            CompositorService.reloadAfterWindowRuleWrite();
             loadWindowRules();
             rulesChanged();
         });
@@ -422,7 +420,6 @@ Item {
                     readonly property var liveRuleData: (root.windowRules || []).find(rule => rule.id === ruleIdRef) ?? modelData
 
                     title: liveRuleData.name || liveRuleData.matchCriteria?.appId || liveRuleData.matchCriteria?.title || I18n.tr("Unnamed rule")
-                    titleColor: liveRuleData.enabled !== false ? Theme.surfaceText : Theme.surfaceVariantText
                     subtitle: {
                         const criteria = liveRuleData.matchCriteria || {};
                         const parts = [];

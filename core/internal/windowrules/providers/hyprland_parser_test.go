@@ -570,3 +570,264 @@ func TestLuaRoundTripTableSyntaxExpressions(t *testing.T) {
 		t.Errorf("MoveY = %q, want %q", parsed.MoveY, original.MoveY)
 	}
 }
+
+func TestFormatLuaManagedHyprRuleHyprlandKeyNames(t *testing.T) {
+	rule := windowrules.WindowRule{
+		ID:      "keys",
+		Enabled: true,
+		MatchCriteria: windowrules.MatchCriteria{
+			AppID:       "^app$",
+			IsFloating:  new(true),
+			Pinned:      new(false),
+			Initialised: new(true),
+		},
+		Actions: windowrules.Actions{
+			NoBorder:     new(true),
+			NoRounding:   new(true),
+			CornerRadius: new(8),
+		},
+	}
+	joined := strings.Join(formatLuaManagedHyprRule(rule), "\n")
+
+	for _, want := range []string{"float = true", "pin = false", "border_size = 0"} {
+		if got := strings.Count(joined, want); got != 1 {
+			t.Errorf("%q appears %d times, want 1:\n%s", want, got, joined)
+		}
+	}
+	if got := strings.Count(joined, "rounding = "); got != 1 {
+		t.Errorf("rounding key appears %d times, want 1:\n%s", got, joined)
+	}
+	if !strings.Contains(joined, "rounding = 0") {
+		t.Errorf("missing rounding = 0:\n%s", joined)
+	}
+	for _, bad := range []string{"floating", "pinned", "noborder", "norounding", "rounding = 8", "initialised"} {
+		if strings.Contains(joined, bad) {
+			t.Errorf("unexpected %q:\n%s", bad, joined)
+		}
+	}
+}
+
+func TestFormatLuaManagedHyprRuleCornerRadiusWithoutNoRounding(t *testing.T) {
+	rule := windowrules.WindowRule{
+		ID:      "radius",
+		Enabled: true,
+		Actions: windowrules.Actions{CornerRadius: new(8)},
+	}
+	joined := strings.Join(formatLuaManagedHyprRule(rule), "\n")
+	if !strings.Contains(joined, "rounding = 8") {
+		t.Errorf("missing rounding = 8:\n%s", joined)
+	}
+}
+
+func TestParseMatchLuaSpellings(t *testing.T) {
+	tests := []struct {
+		name         string
+		in           string
+		wantFloating *bool
+		wantPinned   *bool
+	}{
+		{"floating", `{ floating = true }`, new(true), nil},
+		{"float", `{ float = true }`, new(true), nil},
+		{"float false", `{ float = false }`, new(false), nil},
+		{"pinned", `{ pinned = true }`, nil, new(true)},
+		{"pin", `{ pin = false }`, nil, new(false)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var m luaMatchFields
+			parseMatchLua(tt.in, &m)
+			if (m.floating == nil) != (tt.wantFloating == nil) || (m.floating != nil && *m.floating != *tt.wantFloating) {
+				t.Errorf("floating = %v, want %v", m.floating, tt.wantFloating)
+			}
+			if (m.pinned == nil) != (tt.wantPinned == nil) || (m.pinned != nil && *m.pinned != *tt.wantPinned) {
+				t.Errorf("pinned = %v, want %v", m.pinned, tt.wantPinned)
+			}
+		})
+	}
+}
+
+func TestParseMatchLuaStillReadsInitialised(t *testing.T) {
+	var m luaMatchFields
+	parseMatchLua(`{ initialised = true }`, &m)
+	if m.initialised == nil || !*m.initialised {
+		t.Fatalf("initialised not parsed: %v", m.initialised)
+	}
+}
+
+func TestApplyLuaActionKeyBorderAndRounding(t *testing.T) {
+	tests := []struct {
+		name         string
+		key, raw     string
+		wantHandled  bool
+		wantNoBorder bool
+		wantNoRound  bool
+		wantRadius   int
+	}{
+		{"noborder", "noborder", "true", true, true, false, 0},
+		{"border_size 0", "border_size", "0", true, true, false, 0},
+		{"border_size 2 unmanaged", "border_size", "2", false, false, false, 0},
+		{"norounding", "norounding", "true", true, false, true, 0},
+		{"rounding 0", "rounding", "0", true, false, true, 0},
+		{"rounding 6", "rounding", "6", true, false, false, 6},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var a windowrules.Actions
+			if got := applyLuaActionKey(&a, tt.key, tt.raw); got != tt.wantHandled {
+				t.Fatalf("handled = %v, want %v", got, tt.wantHandled)
+			}
+			if gotB := a.NoBorder != nil && *a.NoBorder; gotB != tt.wantNoBorder {
+				t.Errorf("NoBorder = %v, want %v", gotB, tt.wantNoBorder)
+			}
+			if gotR := a.NoRounding != nil && *a.NoRounding; gotR != tt.wantNoRound {
+				t.Errorf("NoRounding = %v, want %v", gotR, tt.wantNoRound)
+			}
+			if tt.wantRadius == 0 {
+				if a.CornerRadius != nil {
+					t.Errorf("CornerRadius = %d, want nil", *a.CornerRadius)
+				}
+			} else if a.CornerRadius == nil || *a.CornerRadius != tt.wantRadius {
+				t.Errorf("CornerRadius = %v, want %d", a.CornerRadius, tt.wantRadius)
+			}
+		})
+	}
+}
+
+func TestHyprlandLuaRoundTripMatchAndActions(t *testing.T) {
+	provider := NewHyprlandWritableProvider(t.TempDir())
+	rule := newTestWindowRule("rt", "Round Trip", "^throwaway$")
+	rule.MatchCriteria.IsFloating = new(true)
+	rule.MatchCriteria.Pinned = new(false)
+	rule.Actions.NoBorder = new(true)
+	rule.Actions.NoRounding = new(true)
+	rule.Actions.CornerRadius = new(8)
+
+	if err := provider.SetRule(rule); err != nil {
+		t.Fatalf("SetRule: %v", err)
+	}
+	rules, err := provider.LoadDMSRules()
+	if err != nil {
+		t.Fatalf("LoadDMSRules: %v", err)
+	}
+	if len(rules) != 1 {
+		t.Fatalf("expected 1 rule, got %d", len(rules))
+	}
+	got := rules[0]
+	if got.MatchCriteria.IsFloating == nil || !*got.MatchCriteria.IsFloating {
+		t.Errorf("IsFloating lost: %v", got.MatchCriteria.IsFloating)
+	}
+	if got.MatchCriteria.Pinned == nil || *got.MatchCriteria.Pinned {
+		t.Errorf("Pinned lost: %v", got.MatchCriteria.Pinned)
+	}
+	if got.Actions.NoBorder == nil || !*got.Actions.NoBorder {
+		t.Errorf("NoBorder lost")
+	}
+	if got.Actions.NoRounding == nil || !*got.Actions.NoRounding {
+		t.Errorf("NoRounding lost")
+	}
+	if got.Actions.CornerRadius != nil {
+		t.Errorf("CornerRadius = %d, want nil (suppressed by NoRounding)", *got.Actions.CornerRadius)
+	}
+}
+
+func ruleOrder(t *testing.T, content string, ids ...string) {
+	t.Helper()
+	last := -1
+	for _, id := range ids {
+		i := strings.Index(content, id)
+		if i < 0 || i < last {
+			t.Fatalf("rule %q missing or out of order (want %v) in:\n%s", id, ids, content)
+		}
+		last = i
+	}
+}
+
+func TestHyprlandEndToEndWriterOrderAndKeys(t *testing.T) {
+	provider := NewHyprlandWritableProvider(t.TempDir())
+
+	user1 := newTestWindowRule("user1", "User 1", "^throwaway$")
+	user1.MatchCriteria.IsFloating = new(true)
+	user1.Actions.NoBorder = new(true)
+	user1.Actions.NoRounding = new(true)
+	opaque := newTestWindowRule(windowrules.OpaqueRuleID, "Opaque", ".*")
+	opaque.Actions.Opaque = new(true)
+	user2 := newTestWindowRule("user2", "User 2", "^tiled$")
+	user2.Actions.Tile = new(true)
+
+	for _, r := range []windowrules.WindowRule{user1, opaque, user2} {
+		if err := provider.SetRule(r); err != nil {
+			t.Fatalf("SetRule %s: %v", r.ID, err)
+		}
+	}
+
+	read := func() string {
+		b, err := os.ReadFile(provider.GetOverridePath())
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(b)
+	}
+	content := read()
+	for _, want := range []string{"float = true", "border_size = 0", "rounding = 0"} {
+		if !strings.Contains(content, want) {
+			t.Errorf("missing %q in:\n%s", want, content)
+		}
+	}
+	for _, bad := range []string{"floating =", "noborder", "norounding"} {
+		if strings.Contains(content, bad) {
+			t.Errorf("unexpected %q in:\n%s", bad, content)
+		}
+	}
+	ruleOrder(t, content, "user1", "user2", windowrules.OpaqueRuleID)
+
+	if err := provider.ReorderRules([]string{"user2", "user1"}); err != nil {
+		t.Fatalf("ReorderRules: %v", err)
+	}
+	ruleOrder(t, read(), "user2", "user1", windowrules.OpaqueRuleID)
+
+	rules, err := provider.LoadDMSRules()
+	if err != nil {
+		t.Fatalf("LoadDMSRules: %v", err)
+	}
+	got := map[string]windowrules.WindowRule{}
+	for _, r := range rules {
+		got[r.ID] = r
+	}
+	if len(got) != 3 {
+		t.Fatalf("expected 3 rules, got %d", len(got))
+	}
+	if a := got[windowrules.OpaqueRuleID].Actions.Opaque; a == nil || !*a {
+		t.Error("opaque lost")
+	}
+	if a := got["user2"].Actions.Tile; a == nil || !*a {
+		t.Error("tile lost")
+	}
+	if a := got["user1"].Actions.NoBorder; a == nil || !*a {
+		t.Error("NoBorder lost")
+	}
+}
+
+func TestNiriEndToEndOpaqueLast(t *testing.T) {
+	provider := NewNiriWritableProvider(t.TempDir())
+	opaque := newTestWindowRule(windowrules.OpaqueRuleID, "Opaque", ".*")
+	opaque.Actions.Opacity = new(1.0)
+	user := newTestWindowRule("user1", "User 1", "^a$")
+	user.Actions.OpenFloating = new(true)
+
+	for _, r := range []windowrules.WindowRule{opaque, user} {
+		if err := provider.SetRule(r); err != nil {
+			t.Fatalf("SetRule %s: %v", r.ID, err)
+		}
+	}
+	b, err := os.ReadFile(provider.GetOverridePath())
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(b)
+	if !strings.Contains(content, "opacity 1.00") {
+		t.Errorf("missing opacity 1.00 in:\n%s", content)
+	}
+	if strings.Index(content, "^a$") > strings.Index(content, "opacity 1.00") {
+		t.Errorf("opaque rule not last in:\n%s", content)
+	}
+}

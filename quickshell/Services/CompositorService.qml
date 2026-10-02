@@ -135,6 +135,7 @@ Singleton {
     readonly property bool supportsWindowRules: isNiri || isHyprland || isMango
     readonly property string dmsFloatingRuleId: "dms-floating-windows"
     property bool dmsWindowFloatingActive: false
+    readonly property string dmsOpaqueRuleId: "dms-window-opaque"
     readonly property bool supportsLayoutConfig: isNiri || isHyprland || isMango
     readonly property bool supportsCursorConfig: isNiri || isHyprland || isMango
     readonly property bool supportsDisplayConfig: isNiri || isHyprland || isMango || isAqueous
@@ -1438,24 +1439,36 @@ Singleton {
         if (!supportsWindowRules)
             return;
         if (SettingsData.dmsWindowsFloatingSeeded.includes(compositor)) {
-            refreshDmsWindowFloatingRule();
+            refreshDmsWindowFloatingRule(true);
             return;
         }
         const seeded = compositor;
-        setDmsWindowFloatingRule(true, () => SettingsData.set("dmsWindowsFloatingSeeded", SettingsData.dmsWindowsFloatingSeeded.concat([seeded])));
+        setDmsWindowFloatingRule(true, () => {
+            SettingsData.set("dmsWindowsFloatingSeeded", SettingsData.dmsWindowsFloatingSeeded.concat([seeded]));
+            refreshDmsWindowFloatingRule(true);
+        });
     }
 
-    function refreshDmsWindowFloatingRule() {
+    function refreshDmsWindowFloatingRule(ensureOpaque) {
         if (!supportsWindowRules)
             return;
-        Proc.runCommand("dms-windowrule-float-list", [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
-            if (exitCode !== 0)
+        const procId = ensureOpaque ? "dms-windowrule-startup-list" : "dms-windowrule-float-list";
+        Proc.runCommand(procId, [Proc.dmsBin, "config", "windowrules", "list", compositor], (output, exitCode) => {
+            if (exitCode !== 0) {
+                if (ensureOpaque)
+                    log.warn("failed to list window rules:", exitCode, output);
                 return;
+            }
+            let rules;
             try {
-                syncDmsWindowFloatingRule(JSON.parse(output.trim()).rules || []);
+                rules = JSON.parse(output.trim()).rules || [];
             } catch (e) {
                 log.warn("failed to parse window rules", e);
+                return;
             }
+            syncDmsWindowFloatingRule(rules);
+            if (ensureOpaque)
+                ensureDmsOpaqueRule(rules);
         });
     }
 
@@ -1463,32 +1476,68 @@ Singleton {
         dmsWindowFloatingActive = rules.some(rule => rule.id === dmsFloatingRuleId && rule.enabled !== false && rule.actions?.openFloating === true);
     }
 
-    function setDmsWindowFloatingRule(enabled, onDone) {
+    function reloadAfterWindowRuleWrite() {
+        if (isNiri)
+            NiriService.validate();
+        else if (isMango)
+            MangoService.reloadConfig();
+        else if (isHyprland)
+            HyprlandService.reloadConfig();
+    }
+
+    function setDmsRule(id, rule, onDone) {
         if (!supportsWindowRules)
             return;
-        const ruleJson = JSON.stringify({
-            "id": dmsFloatingRuleId,
+        const args = rule ? ["add", compositor, JSON.stringify(Object.assign({
+                "id": id,
+                "enabled": true
+            }, rule))] : ["remove", compositor, id];
+        Proc.runCommand("dms-windowrule-" + id, [Proc.dmsBin, "config", "windowrules", ...args], (output, exitCode) => {
+            if (exitCode !== 0) {
+                log.warn("failed to update DMS window rule", id, exitCode, output);
+                return;
+            }
+            reloadAfterWindowRuleWrite();
+            onDone?.();
+        });
+    }
+
+    function setDmsWindowFloatingRule(enabled, onDone) {
+        setDmsRule(dmsFloatingRuleId, enabled ? {
             "name": "DMS Floating Windows",
-            "enabled": true,
             "matchCriteria": {
                 "appId": "^com.danklinux.dms$"
             },
             "actions": {
                 "openFloating": true
             }
-        });
-        const args = enabled ? ["add", compositor, ruleJson] : ["remove", compositor, dmsFloatingRuleId];
-        Proc.runCommand("dms-windowrule-float", [Proc.dmsBin, "config", "windowrules", ...args], (output, exitCode) => {
-            if (exitCode !== 0) {
-                log.warn("failed to update DMS floating window rule", exitCode, output);
-                return;
-            }
+        } : null, () => {
             dmsWindowFloatingActive = enabled;
-            if (isNiri)
-                NiriService.validate();
-            if (isMango)
-                MangoService.reloadConfig();
             onDone?.();
+        });
+    }
+
+    function ensureDmsOpaqueRule(rules) {
+        if (rules.some(rule => rule.id === dmsOpaqueRuleId))
+            return;
+        // DMS windows are translucent via client alpha; Hyprland's opaque keeps that alpha, force_rgbx would drop it.
+        let actions;
+        if (isHyprland)
+            actions = {
+                "opaque": true
+            };
+        else if (isNiri)
+            actions = {
+                "opacity": 1.0
+            };
+        else
+            return;
+        setDmsRule(dmsOpaqueRuleId, {
+            "name": "DMS Window Opaque",
+            "matchCriteria": {
+                "appId": "^com\\.danklinux\\.dms$"
+            },
+            "actions": actions
         });
     }
 

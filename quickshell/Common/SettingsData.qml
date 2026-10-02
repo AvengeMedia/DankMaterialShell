@@ -208,6 +208,7 @@ Singleton {
     property int hyprlandLayoutRadiusOverride: Spec.SPEC.hyprlandLayoutRadiusOverride.def
     property int hyprlandLayoutBorderSize: Spec.SPEC.hyprlandLayoutBorderSize.def
     property bool hyprlandResizeOnBorder: Spec.SPEC.hyprlandResizeOnBorder.def
+    property int hyprlandWindowOpacity: Spec.SPEC.hyprlandWindowOpacity.def
     property string hyprlandTilingLayout: Spec.SPEC.hyprlandTilingLayout.def
     property bool hyprlandDwindlePreserveSplit: Spec.SPEC.hyprlandDwindlePreserveSplit.def
     property bool hyprlandDwindleSmartSplit: Spec.SPEC.hyprlandDwindleSmartSplit.def
