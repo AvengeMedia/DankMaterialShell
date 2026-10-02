@@ -55,7 +55,7 @@ Examples:
   printf '%s\n' opt1 opt2 opt3 | dms dmenu -p "Pick one:"
   dms dmenu --prompt-only -p "Rename to:"
 
-Unlike dmenu, there is no -i flag; matching is always case-sensitive.
+Unlike dmenu, there is no -i flag; matching is always case-insensitive.
 
 Exit codes: 0 on accept, 1 if the user cancelled (or stdin was empty),
 2 if the shell was unreachable.`,
