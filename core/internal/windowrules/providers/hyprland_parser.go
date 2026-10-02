@@ -478,16 +478,13 @@ func luaAppendMatch(mc windowrules.MatchCriteria, dst *[]string) {
 		*dst = append(*dst, fmt.Sprintf(`xwayland = %s`, hyprLuaBoolStr(*mc.XWayland)))
 	}
 	if mc.IsFloating != nil {
-		*dst = append(*dst, fmt.Sprintf(`floating = %s`, hyprLuaBoolStr(*mc.IsFloating)))
+		*dst = append(*dst, fmt.Sprintf(`float = %s`, hyprLuaBoolStr(*mc.IsFloating)))
 	}
 	if mc.Fullscreen != nil {
 		*dst = append(*dst, fmt.Sprintf(`fullscreen = %s`, hyprLuaBoolStr(*mc.Fullscreen)))
 	}
 	if mc.Pinned != nil {
-		*dst = append(*dst, fmt.Sprintf(`pinned = %s`, hyprLuaBoolStr(*mc.Pinned)))
-	}
-	if mc.Initialised != nil {
-		*dst = append(*dst, fmt.Sprintf(`initialised = %s`, hyprLuaBoolStr(*mc.Initialised)))
+		*dst = append(*dst, fmt.Sprintf(`pin = %s`, hyprLuaBoolStr(*mc.Pinned)))
 	}
 }
 
@@ -508,7 +505,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, `no_focus = true`)
 	}
 	if a.NoBorder != nil && *a.NoBorder {
-		*dst = append(*dst, `noborder = true`)
+		*dst = append(*dst, `border_size = 0`)
 	}
 	if a.NoShadow != nil && *a.NoShadow {
 		*dst = append(*dst, `no_shadow = true`)
@@ -523,7 +520,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, `no_anim = true`)
 	}
 	if a.NoRounding != nil && *a.NoRounding {
-		*dst = append(*dst, `norounding = true`)
+		*dst = append(*dst, `rounding = 0`)
 	}
 	if a.Pin != nil && *a.Pin {
 		*dst = append(*dst, `pin = true`)
@@ -549,7 +546,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 	if a.Workspace != "" {
 		*dst = append(*dst, fmt.Sprintf(`workspace = %s`, strconv.Quote(a.Workspace)))
 	}
-	if a.CornerRadius != nil {
+	if a.CornerRadius != nil && (a.NoRounding == nil || !*a.NoRounding) {
 		*dst = append(*dst, fmt.Sprintf(`rounding = %d`, *a.CornerRadius))
 	}
 	if a.Idleinhibit != "" {
@@ -1123,7 +1120,7 @@ func parseMatchLua(val string, m *luaMatchFields) {
 			if b, okb := luaBoolLike(v); okb {
 				m.xwayland = new(b)
 			}
-		case "floating":
+		case "float", "floating":
 			if b, okb := luaBoolLike(v); okb {
 				m.floating = new(b)
 			}
@@ -1131,7 +1128,7 @@ func parseMatchLua(val string, m *luaMatchFields) {
 			if b, okb := luaBoolLike(v); okb {
 				m.fullscreen = new(b)
 			}
-		case "pinned":
+		case "pin", "pinned":
 			if b, okb := luaBoolLike(v); okb {
 				m.pinned = new(b)
 			}
@@ -1213,6 +1210,12 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 			a.NoRounding = &t
 			return true
 		}
+	case "border_size":
+		if n, err := strconv.Atoi(luaStringValue(raw)); err == nil && n == 0 {
+			t := true
+			a.NoBorder = &t
+			return true
+		}
 	case "pin":
 		if b, ok := luaBoolLike(raw); ok && b {
 			t := true
@@ -1239,6 +1242,11 @@ func applyLuaActionKey(a *windowrules.Actions, key, raw string) bool {
 	case "rounding":
 		if v := luaStringValue(raw); v != "" {
 			if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+				if n == 0 {
+					t := true
+					a.NoRounding = &t
+					return true
+				}
 				a.CornerRadius = &n
 				return true
 			}

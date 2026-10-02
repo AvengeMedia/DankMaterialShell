@@ -475,6 +475,17 @@ awk '$1 == "xray" { print FILENAME ":" FNR; exit }' $files 2>/dev/null`;
                 onToggled: checked => SettingsData.set("hyprlandResizeOnBorder", checked)
             }
 
+            SettingsSliderRow {
+                tags: ["hyprland", "opacity", "transparency", "window"]
+                settingKey: "hyprlandWindowOpacity"
+                text: I18n.tr("Window opacity", "Hyprland opacity applied to app windows")
+                value: SettingsData.hyprlandWindowOpacity
+                minimum: 10
+                maximum: 100
+                unit: "%"
+                onSliderValueChanged: newValue => SettingsData.set("hyprlandWindowOpacity", newValue)
+            }
+
             SettingsToggleRow {
                 visible: CompositorService.isHyprland
                 tags: ["hyprland", "xray", "blur", "background-effect", "performance"]
