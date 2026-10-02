@@ -698,7 +698,7 @@ Column {
                         color: Theme.surfaceTextSecondary
                         font.family: textArea.font.family
                         font.pixelSize: textArea.font.pixelSize
-                        visible: textArea.text.length === 0
+                        visible: textArea.text.length === 0 && !textArea.inputMethodComposing
                         anchors.left: textArea.left
                         anchors.top: textArea.top
                         anchors.leftMargin: textArea.leftPadding
