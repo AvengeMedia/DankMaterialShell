@@ -77,8 +77,15 @@ Scope {
     Component.onCompleted: {
         IdleService.lockComponent = this;
         IdleService.isSessionLockSecure = sessionLock.secure;
-        if (SettingsData.lockAtStartup && !freshGreeterLogin())
+        if (SettingsData.lockAtStartup && !freshGreeterLogin()) {
             lock();
+            return;
+        }
+        // A shell restarted into a locked session: after a logind Unlock
+        // ignored for a lock it started, only lockedHint still says locked,
+        // and the state can arrive before this module's Connections exist.
+        if (SessionService.locked || SessionService.lockedHint)
+            followLoginctlLock();
     }
 
     function notifyLockedHint(locked: bool) {
@@ -112,6 +119,21 @@ Scope {
         if (!customLockerSpawned)
             spawnCustomLocker();
         return true;
+    }
+
+    function followLoginctlLock() {
+        if (shouldLock || pendingLock)
+            return;
+        if (handleLoginctlCustomLock())
+            return;
+        if (!SessionService.active && SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration) {
+            pendingLock = true;
+            lockInitiatedLocally = false;
+            return;
+        }
+        lockInitiatedLocally = false;
+        lockPowerOffArmed = powerOffOnLock;
+        shouldLock = true;
     }
 
     function resetLockRetry() {
@@ -191,18 +213,7 @@ Scope {
         target: SessionService
 
         function onSessionLocked() {
-            if (shouldLock || pendingLock)
-                return;
-            if (handleLoginctlCustomLock())
-                return;
-            if (!SessionService.active && SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration) {
-                pendingLock = true;
-                lockInitiatedLocally = false;
-                return;
-            }
-            lockInitiatedLocally = false;
-            lockPowerOffArmed = powerOffOnLock;
-            shouldLock = true;
+            root.followLoginctlLock();
         }
 
         function onSessionUnlocked() {
