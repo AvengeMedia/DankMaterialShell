@@ -216,7 +216,6 @@ FocusScope {
     readonly property real adjacentLeftBarWidth: !isVertical && !autoHide ? ShellLayout.dockAdjacentThickness(screen, "left") : 0
 
     readonly property real dockMargin: dock.config.margin
-    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
     readonly property real effectiveDockMargin: dockGeometry.effectiveMargin
     readonly property real joinedEdgeMargin: dockGeometry.joinedEdgeMargin
     readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1

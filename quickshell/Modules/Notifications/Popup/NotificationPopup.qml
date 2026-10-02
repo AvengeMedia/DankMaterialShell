@@ -667,7 +667,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: content.cardInset
             radius: win.connectedFrameMode ? Theme.connectedSurfaceRadius : NotificationMetrics.popupRadius
-            color: Theme.notificationFloatingSurface
+            color: win.connectedFrameMode ? "transparent" : Theme.notificationFloatingSurface
 
             HoverHandler {
                 id: cardHoverHandler

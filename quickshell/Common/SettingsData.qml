@@ -362,7 +362,11 @@ Singleton {
     property real frameRounding: Spec.SPEC.frameRounding.def
     onFrameRoundingChanged: saveSettings()
     property var frameScreenPreferences: Spec.SPEC.frameScreenPreferences.def
-    onFrameScreenPreferencesChanged: saveSettings()
+    onFrameScreenPreferencesChanged: {
+        saveSettings();
+        if (!_loading)
+            Qt.callLater(_reconcileConnectedFrameBarStyles);
+    }
     property real frameBarSize: Spec.SPEC.frameBarSize.def
     onFrameBarSizeChanged: saveSettings()
     property bool frameShowOnOverview: Spec.SPEC.frameShowOnOverview.def
@@ -1100,6 +1104,10 @@ Singleton {
     property var updaterIgnoredPackages: Spec.SPEC.updaterIgnoredPackages.def
 
     property string displayNameMode: Spec.SPEC.displayNameMode.def
+    onDisplayNameModeChanged: {
+        if (!_loading)
+            _reconcileConnectedFrameBarStyles();
+    }
     property var screenPreferences: Spec.SPEC.screenPreferences.def
     property var showOnLastDisplay: Spec.SPEC.showOnLastDisplay.def
     property var displayProfiles: Spec.SPEC.displayProfiles.def
@@ -1372,6 +1380,14 @@ Singleton {
             root.setIconThemeUnmanaged();
             ToastService.showWarning(I18n.tr("Icon theme changed outside DMS; switched to System Default", "shown when an external tool overrides the icon theme DMS applied"));
         });
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!root._loading)
+                Qt.callLater(root._reconcileConnectedFrameBarStyles);
+        }
     }
 
     Connections {
@@ -1889,116 +1905,48 @@ Singleton {
         };
     }
 
-    function _hasConnectedFrameBarStyleBackups() {
-        return connectedFrameBarStyleBackups && Object.keys(connectedFrameBarStyleBackups).length > 0;
+    function barUsesConnectedFrameStyle(config) {
+        if (!config || !connectedFrameModeActive)
+            return false;
+        return Quickshell.screens.some(screen => barConfigCoversScreen(config, screen) && isScreenInPreferences(screen, frameScreenPreferences));
     }
 
-    function _captureConnectedFrameBarStyleBackups(configs, overwriteExisting) {
+    function _applyConnectedFrameBarStyles(configs) {
         if (!Array.isArray(configs))
-            return;
-
-        const nextBackups = JSON.parse(JSON.stringify(connectedFrameBarStyleBackups || {}));
-        const validIds = {};
-        let changed = false;
-
-        for (let i = 0; i < configs.length; i++) {
-            const config = configs[i];
-            if (!config?.id)
-                continue;
-            validIds[config.id] = true;
-
-            if (!overwriteExisting && nextBackups[config.id] !== undefined)
-                continue;
-
-            const snapshot = _connectedFrameBarStyleSnapshot(config);
-            if (JSON.stringify(nextBackups[config.id]) !== JSON.stringify(snapshot)) {
-                nextBackups[config.id] = snapshot;
-                changed = true;
-            }
-        }
-
-        if (overwriteExisting) {
-            for (const barId in nextBackups) {
-                if (validIds[barId])
-                    continue;
-                delete nextBackups[barId];
-                changed = true;
-            }
-        }
-
-        if (changed)
-            connectedFrameBarStyleBackups = nextBackups;
-    }
-
-    function _restoreConnectedFrameBarStyleBackups() {
-        if (!_hasConnectedFrameBarStyleBackups())
-            return;
-
-        const backups = connectedFrameBarStyleBackups || {};
-        const configs = JSON.parse(JSON.stringify(barConfigs));
-        let changed = false;
-
-        for (let i = 0; i < configs.length; i++) {
-            const backup = backups[configs[i].id];
-            if (!backup)
-                continue;
-            for (const key in backup) {
-                if (configs[i][key] === backup[key])
-                    continue;
-                configs[i][key] = backup[key];
-                changed = true;
-            }
-        }
-
-        if (changed)
-            barConfigs = configs;
-        connectedFrameBarStyleBackups = ({});
-        if (changed)
-            updateBarConfigs();
-    }
-
-    // Zeroes out connected-mode-hostile fields (shadow, square/goth corners, edge attach, border).
-    // Returns { configs, changed } — `configs` is the same ref when no change.
-    function _sanitizeBarConfigsForConnectedFrame(configs) {
-        if (!connectedFrameModeActive || !Array.isArray(configs))
             return {
                 "configs": configs,
-                "changed": false
+                "changed": false,
+                "backups": null
             };
 
+        const backups = connectedFrameBarStyleBackups || {};
+        const nextBackups = {};
+        let backupsChanged = false;
         let anyChanged = false;
+        const zeroed = _connectedFrameBarStyleSnapshot(null);
         const out = configs.map(cfg => {
-            if (!cfg)
+            if (!cfg?.id)
                 return cfg;
-            let dirty = false;
-            const s = Object.assign({}, cfg);
-            if ((s.shadowIntensity ?? 0) !== 0) {
-                s.shadowIntensity = 0;
-                dirty = true;
+            const covered = barUsesConnectedFrameStyle(cfg);
+            if (covered) {
+                nextBackups[cfg.id] = backups[cfg.id] ?? _connectedFrameBarStyleSnapshot(cfg);
+                backupsChanged = backupsChanged || backups[cfg.id] === undefined;
             }
-            if (s.squareCorners ?? false) {
-                s.squareCorners = false;
-                dirty = true;
-            }
-            if (s.attachToScreenEdge ?? false) {
-                s.attachToScreenEdge = false;
-                dirty = true;
-            }
-            if (s.gothCornersEnabled ?? false) {
-                s.gothCornersEnabled = false;
-                dirty = true;
-            }
-            if (s.borderEnabled ?? false) {
-                s.borderEnabled = false;
-                dirty = true;
-            }
-            if (dirty)
-                anyChanged = true;
-            return dirty ? s : cfg;
+            const target = covered ? zeroed : backups[cfg.id];
+            if (!target)
+                return cfg;
+            const current = _connectedFrameBarStyleSnapshot(cfg);
+            if (Object.keys(target).every(key => current[key] === target[key]))
+                return cfg;
+            anyChanged = true;
+            return Object.assign({}, cfg, target);
         });
+
+        const backupsDirty = backupsChanged || Object.keys(nextBackups).length !== Object.keys(backups).length;
         return {
             "configs": anyChanged ? out : configs,
-            "changed": anyChanged
+            "changed": anyChanged,
+            "backups": backupsDirty ? nextBackups : null
         };
     }
 
@@ -2011,20 +1959,14 @@ Singleton {
         return Object.assign({}, config, backup);
     }
 
-    // Single entry point for connected-mode settings state.
-    //   !active → restore backups
     function _reconcileConnectedFrameBarStyles() {
-        if (!connectedFrameModeActive) {
-            _restoreConnectedFrameBarStyleBackups();
-            return;
-        }
-        if (!_hasConnectedFrameBarStyleBackups())
-            _captureConnectedFrameBarStyleBackups(barConfigs, true);
-        const result = _sanitizeBarConfigsForConnectedFrame(barConfigs);
-        if (result.changed) {
+        const result = _applyConnectedFrameBarStyles(barConfigs);
+        if (result.changed)
             barConfigs = result.configs;
+        if (result.backups)
+            connectedFrameBarStyleBackups = result.backups;
+        if (result.changed)
             updateBarConfigs();
-        }
     }
 
     function detectAvailableIconThemes() {
@@ -2482,9 +2424,10 @@ Singleton {
     function addBarConfig(config) {
         const configs = JSON.parse(JSON.stringify(barConfigs));
         configs.push(config);
-        if (connectedFrameModeActive)
-            _captureConnectedFrameBarStyleBackups(configs, false);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        const result = _applyConnectedFrameBarStyles(configs);
+        barConfigs = result.configs;
+        if (result.backups)
+            connectedFrameBarStyleBackups = result.backups;
         updateBarConfigs();
     }
 
@@ -2674,7 +2617,10 @@ Singleton {
     function _commitBarConfigs(configs) {
         for (const cfg of configs)
             _restoreIslandWidget(cfg, configs);
-        barConfigs = _sanitizeBarConfigsForConnectedFrame(configs).configs;
+        const result = _applyConnectedFrameBarStyles(configs);
+        barConfigs = result.configs;
+        if (result.backups)
+            connectedFrameBarStyleBackups = result.backups;
         updateBarConfigs();
     }
 

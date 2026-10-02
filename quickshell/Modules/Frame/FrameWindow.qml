@@ -254,6 +254,23 @@ PanelWindow {
             connector: SurfaceGeometry.connectorRadii(descriptor, body, win._ccr, radius, win._dpr, true).near
         };
     }
+    readonly property var _slideoutDescriptor: {
+        win._surfaceRevision;
+        return ConnectedModeState.surfaceDescriptor(win._screenName, "slideout");
+    }
+    readonly property var _slideoutSurface: {
+        const descriptor = win._slideoutDescriptor;
+        if (!win._connectedActive || !descriptor.visible)
+            return null;
+        const body = win._clampNear(descriptor.barSide, SurfaceGeometry.animatedBodyRect(descriptor, win._dpr));
+        if (body.width < 1 || body.height < 1)
+            return null;
+        return {
+            descriptor: descriptor,
+            body: body,
+            radii: SurfaceGeometry.connectorRadii(descriptor, body, win._ccr, win._surfaceRadius, win._dpr, true)
+        };
+    }
     readonly property var _modalDescriptor: {
         win._surfaceRevision;
         return ConnectedModeState.surfaceDescriptor(win._screenName, "modal");
@@ -325,7 +342,7 @@ PanelWindow {
     readonly property real _surfaceRadius: Theme.connectedSurfaceRadius
     readonly property real _seamOverlap: Theme.hairline(win._dpr)
     readonly property bool _disableLayer: Quickshell.env("DMS_DISABLE_LAYER") === "true" || Quickshell.env("DMS_DISABLE_LAYER") === "1"
-    readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && !win._disableLayer
+    readonly property bool _elevationShadow: win._connectedActive && Theme.elevationEnabled && (SettingsData.barElevationEnabled ?? true) && !win._disableLayer
     function _clampNear(side, b) {
         const r = {
             "x": b.x,
@@ -388,7 +405,7 @@ PanelWindow {
             "param": Qt.vector4d(0, 0, 0, 0)
         })
 
-    // Slots 0-3 hold popout, modal, notification and docks; the island's spring steps every frame, so it owns slot 4 alone.
+    // Slots 0-3 hold popout, modal, notification and docks; the island and slideout spring every frame, so each owns a slot alone (4, 5).
     readonly property var _sdfSlots: {
         win._surfaceRevision;
         const src = win._unifiedSurfaces();
@@ -413,6 +430,24 @@ PanelWindow {
                 "farStartCr": 0,
                 "farEndCr": 0,
                 "surfaceRadius": island.radius
+            }
+        });
+    }
+
+    readonly property var _slideoutSdfSlot: {
+        const slideout = win._slideoutSurface;
+        if (!slideout)
+            return win._emptySdfSlot;
+        return win._sdfSlot({
+            "side": slideout.descriptor.barSide,
+            "body": slideout.body,
+            "radii": {
+                "farCr": slideout.radii.far,
+                "startCr": slideout.radii.start,
+                "endCr": slideout.radii.end,
+                "farStartCr": slideout.radii.farStart,
+                "farEndCr": slideout.radii.farEnd,
+                "surfaceRadius": win._surfaceRadius
             }
         });
     }
@@ -846,6 +881,71 @@ PanelWindow {
                 radius: win._effectiveNotifFarEndCcr
                 x: _active ? Math.round(win._connectorCutoutX(_notifFarEndConnectorBlurAnchor.x, _notifFarEndConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
                 y: _active ? Math.round(win._connectorCutoutY(_notifFarEndConnectorBlurAnchor.y, _notifFarEndConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
+            }
+        }
+
+        Region {
+            id: _slideoutBodyBlurAnchor
+
+            readonly property bool _active: win._blurSurfacesActive && win._slideoutSurface !== null
+
+            x: _active ? Math.round(win._slideoutSurface.body.x) : 0
+            y: _active ? Math.round(win._slideoutSurface.body.y) : 0
+            width: _active ? Math.round(win._slideoutSurface.body.width) : 0
+            height: _active ? Math.round(win._slideoutSurface.body.height) : 0
+        }
+        Region {
+            id: _slideoutFarStartConnectorBlurAnchor
+
+            readonly property real _radius: _slideoutBodyBlurAnchor._active ? Math.min(win._slideoutSurface.radii.farStart, win._slideoutSurface.body.width) : 0
+            readonly property bool _active: _radius > 0
+            readonly property var _rect: _active ? SurfaceGeometry.farConnectorRect(win._slideoutDescriptor.barSide, _slideoutBodyBlurAnchor, "left", _radius, win._dpr) : null
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
+            Region {
+                readonly property bool _active: _slideoutFarStartConnectorBlurAnchor.width > 0 && _slideoutFarStartConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._slideoutDescriptor.barSide, "left")
+                readonly property string _placement: win._farConnectorPlacement(win._slideoutDescriptor.barSide, "left")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: _slideoutFarStartConnectorBlurAnchor._radius
+
+                intersection: Intersection.Subtract
+                radius: _radius
+                x: _active ? Math.round(win._connectorCutoutX(_slideoutFarStartConnectorBlurAnchor.x, _slideoutFarStartConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_slideoutFarStartConnectorBlurAnchor.y, _slideoutFarStartConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
+                width: _active ? Math.round(_radius * 2) : 0
+                height: _active ? Math.round(_radius * 2) : 0
+            }
+        }
+        Region {
+            id: _slideoutFarEndConnectorBlurAnchor
+
+            readonly property real _radius: _slideoutBodyBlurAnchor._active ? Math.min(win._slideoutSurface.radii.farEnd, win._slideoutSurface.body.width) : 0
+            readonly property bool _active: _radius > 0
+            readonly property var _rect: _active ? SurfaceGeometry.farConnectorRect(win._slideoutDescriptor.barSide, _slideoutBodyBlurAnchor, "right", _radius, win._dpr) : null
+
+            x: _active ? Math.round(_rect.x) : 0
+            y: _active ? Math.round(_rect.y) : 0
+            width: _active ? Math.round(_rect.width) : 0
+            height: _active ? Math.round(_rect.height) : 0
+
+            Region {
+                readonly property bool _active: _slideoutFarEndConnectorBlurAnchor.width > 0 && _slideoutFarEndConnectorBlurAnchor.height > 0
+                readonly property string _barSide: win._farConnectorBarSide(win._slideoutDescriptor.barSide, "right")
+                readonly property string _placement: win._farConnectorPlacement(win._slideoutDescriptor.barSide, "right")
+                readonly property string _arcCorner: ConnectorGeometry.arcCorner(_barSide, _placement)
+                readonly property real _radius: _slideoutFarEndConnectorBlurAnchor._radius
+
+                intersection: Intersection.Subtract
+                radius: _radius
+                x: _active ? Math.round(win._connectorCutoutX(_slideoutFarEndConnectorBlurAnchor.x, _slideoutFarEndConnectorBlurAnchor.width, _arcCorner, _radius)) : 0
+                y: _active ? Math.round(win._connectorCutoutY(_slideoutFarEndConnectorBlurAnchor.y, _slideoutFarEndConnectorBlurAnchor.height, _arcCorner, _radius)) : 0
                 width: _active ? Math.round(_radius * 2) : 0
                 height: _active ? Math.round(_radius * 2) : 0
             }
@@ -1335,6 +1435,10 @@ PanelWindow {
         property vector4d chromeCorner4: win._islandSdfSlot.corner
         property vector4d chromeK4: win._islandSdfSlot.k
         property vector4d chromeParam4: win._islandSdfSlot.param
+        property vector4d chromeRect5: win._slideoutSdfSlot.rect
+        property vector4d chromeCorner5: win._slideoutSdfSlot.corner
+        property vector4d chromeK5: win._slideoutSdfSlot.k
+        property vector4d chromeParam5: win._slideoutSdfSlot.param
     }
 
     Loader {

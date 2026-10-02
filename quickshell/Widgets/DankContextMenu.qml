@@ -30,7 +30,7 @@ Item {
     property int selectedMenuIndex: -1
     property bool keyboardNavigation: false
     readonly property alias contextWindow: menuWindow
-    readonly property bool blurActive: renderActive && openState && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
+    readonly property bool blurActive: renderActive && openState && BlurService.enabled
 
     readonly property real maxMenuWidth: Math.max(0, (targetScreen?.width ?? Theme.launcherWidthMicro) - menuMargin * 2)
     readonly property real maxMenuHeight: Math.max(0, (targetScreen?.height ?? Theme.launcherHeightDefault) - menuMargin * 2)

@@ -53,7 +53,7 @@ Item {
         return root.selectedBarScreens.filter(screen => ShellLayout.forScreen(screen)?.frameConfigured).length;
     }
     readonly property bool selectedBarFrameStyled: SettingsData.frameEnabled && root.frameStyledScreenCount === root.selectedBarScreens.length
-    readonly property bool selectedBarFrameSanitized: SettingsData.connectedFrameModeActive || root.selectedBarFrameStyled
+    readonly property bool selectedBarFrameSanitized: SettingsData.barUsesConnectedFrameStyle(root.selectedBarConfig) || root.selectedBarFrameStyled
     readonly property var positionChoices: ShellLayout.positionChoices(selectedBarConfig)
 
     function positionLabel(pos) {
