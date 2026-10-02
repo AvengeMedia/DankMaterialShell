@@ -273,7 +273,8 @@ Scope {
             property bool isActiveScreen: {
                 if (Quickshell.screens.length <= 1)
                     return true;
-                return SettingsData.getFilteredScreens("lockScreen").includes(screen);
+                const screens = SettingsData.getFilteredScreens("lockScreen");
+                return screens.length === 0 || screens.includes(screen);
             }
 
             color: isActiveScreen ? "transparent" : SettingsData.lockScreenInactiveColor
