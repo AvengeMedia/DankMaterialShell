@@ -60,6 +60,7 @@ Item {
     property string dmenuView: ""
     property string dmenuSize: ""
     property string dmenuIcon: ""
+    property bool dmenuDisableHistory: false
     property bool _dmenuSelectApplied: false
 
     readonly property var _dmenuKeyNameMap: (function () {
@@ -177,6 +178,8 @@ Item {
 
         if (searchMode === "dmenu") {
             _endDmenuSession();
+            if (!dmenuDisableHistory)
+                SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
         } else {
             SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
         }
@@ -768,6 +771,7 @@ Item {
         dmenuView = "";
         dmenuSize = "";
         dmenuIcon = "";
+        dmenuDisableHistory = false;
         _dmenuSelectApplied = false;
         sections = [];
         flatModel = [];
@@ -816,6 +820,7 @@ Item {
             });
             dmenuSize = msg.size || "";
             dmenuIcon = msg.icon || "";
+            dmenuDisableHistory = !!msg.disableHistory;
             dmenuView = msg.view || "";
             if (dmenuView)
                 viewModeVersion++;
@@ -2646,7 +2651,7 @@ Item {
         if (!item)
             return;
 
-        if (searchMode !== "dmenu")
+        if (searchMode !== "dmenu" || !dmenuDisableHistory)
             SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
 
         if (item.type === "plugin_browse") {

@@ -323,3 +323,67 @@ func TestDmenuKeybindExitCode(t *testing.T) {
 		}
 	}
 }
+
+func TestNormalizeDmenuArgv(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		args []string
+		want []string
+	}{
+		{
+			"not the dmenu subcommand: untouched",
+			[]string{"dms", "ipc", "-password"},
+			[]string{"dms", "ipc", "-password"},
+		},
+		{
+			"rofi-style single-dash long flags get a second dash",
+			[]string{"dms", "dmenu", "-only-match", "-password", "-sep", ","},
+			[]string{"dms", "dmenu", "--only-match", "--password", "--sep", ","},
+		},
+		{
+			"= form is preserved",
+			[]string{"dms", "dmenu", "-format=i"},
+			[]string{"dms", "dmenu", "--format=i"},
+		},
+		{
+			"already-double-dash flags are untouched",
+			[]string{"dms", "dmenu", "--password", "-p", "hi"},
+			[]string{"dms", "dmenu", "--password", "-p", "hi"},
+		},
+		{
+			"single-char shorthands are untouched",
+			[]string{"dms", "dmenu", "-p", "hi", "-l", "5", "-i"},
+			[]string{"dms", "dmenu", "-p", "hi", "-l", "5", "-i"},
+		},
+		{
+			"negative --active/--urgent spec values are not mistaken for flag names",
+			[]string{"dms", "dmenu", "--active", "-3:"},
+			[]string{"dms", "dmenu", "--active", "-3:"},
+		},
+		{
+			"DMS-native long flags also get the single-dash alias",
+			[]string{"dms", "dmenu", "-icon", "star"},
+			[]string{"dms", "dmenu", "--icon", "star"},
+		},
+		{
+			"rofi's -a/-u abbreviations are real shorthands, untouched by the rewrite",
+			[]string{"dms", "dmenu", "-a", "1,3", "-u", "2"},
+			[]string{"dms", "dmenu", "-a", "1,3", "-u", "2"},
+		},
+		{
+			"-disable-history gets the standard single-dash alias too",
+			[]string{"dms", "dmenu", "-disable-history"},
+			[]string{"dms", "dmenu", "--disable-history"},
+		},
+		{
+			"stops rewriting after a bare --",
+			[]string{"dms", "dmenu", "--", "-password"},
+			[]string{"dms", "dmenu", "--", "-password"},
+		},
+	} {
+		got := normalizeDmenuArgv(tc.args)
+		if !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("%s: normalizeDmenuArgv(%v) = %v, want %v", tc.name, tc.args, got, tc.want)
+		}
+	}
+}

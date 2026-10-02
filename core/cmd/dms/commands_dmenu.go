@@ -14,6 +14,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/qsipc"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 const dmenuConnectTimeout = 5 * time.Second
@@ -43,6 +44,8 @@ var (
 	dmenuView         string
 	dmenuSize         string
 	dmenuIcon         string
+	dmenuCaseInsens   bool
+	dmenuDisableHist  bool
 )
 
 var dmenuCmd = &cobra.Command{
@@ -55,7 +58,12 @@ Examples:
   printf '%s\n' opt1 opt2 opt3 | dms dmenu -p "Pick one:"
   dms dmenu --prompt-only -p "Rename to:"
 
-Unlike dmenu, there is no -i flag; matching is always case-insensitive.
+Matching is always case-insensitive; -i/--case-insensitive is accepted for
+dmenu script compatibility but has no effect.
+
+Most, but not all, rofi flags are implemented.
+Long-form flags also accept rofi's single-dash form
+(e.g. -only-match as well as --only-match).
 
 Exit codes: 0 on accept, 1 if the user cancelled (or stdin was empty),
 2 if the shell was unreachable.`,
@@ -63,14 +71,15 @@ Exit codes: 0 on accept, 1 if the user cancelled (or stdin was empty),
 }
 
 func init() {
+	dmenuCmd.Flags().BoolVarP(&dmenuCaseInsens, "case-insensitive", "i", false, "No effect: matching is always case-insensitive. Accepted for dmenu/rofi script compatibility")
 	dmenuCmd.Flags().StringVarP(&dmenuPrompt, "prompt", "p", "dmenu", "Prompt label")
 	dmenuCmd.Flags().IntVarP(&dmenuLines, "lines", "l", 0, "Max visible result rows (0 = shell default)")
 	dmenuCmd.Flags().StringVar(&dmenuPlaceholder, "placeholder", "", "Input placeholder text")
 	dmenuCmd.Flags().BoolVar(&dmenuPromptOnly, "prompt-only", false, "No piped item list — pure free-text prompt")
 
 	dmenuCmd.Flags().StringVar(&dmenuSep, "sep", "\n", "Input item separator")
-	dmenuCmd.Flags().StringVar(&dmenuActiveSpec, "active", "", "Mark rows active by index (e.g. \"1,3,7:11,-3:\")")
-	dmenuCmd.Flags().StringVar(&dmenuUrgentSpec, "urgent", "", "Mark rows urgent by index (same spec syntax as --active)")
+	dmenuCmd.Flags().StringVarP(&dmenuActiveSpec, "active", "a", "", "Mark rows active by index (e.g. \"1,3,7:11,-3:\")")
+	dmenuCmd.Flags().StringVarP(&dmenuUrgentSpec, "urgent", "u", "", "Mark rows urgent by index (same spec syntax as --active)")
 	dmenuCmd.Flags().BoolVar(&dmenuOnlyMatch, "only-match", false, "Reject free text; only a listed item may be returned; also blocks Escape/click-outside cancel, forcing a real pick")
 	dmenuCmd.Flags().BoolVar(&dmenuNoCustom, "no-custom", false, "Reject free text; only a listed item may be returned (unlike --only-match, Escape/cancel still works normally)")
 	dmenuCmd.Flags().StringVar(&dmenuSelect, "select", "", "Pre-select the first row matching this string (or, with --dump, filter to matching rows)")
@@ -85,10 +94,47 @@ func init() {
 	dmenuCmd.Flags().BoolVar(&dmenuDump, "dump", false, "Apply --select against the item list and print the result immediately; no UI is ever shown")
 	dmenuCmd.Flags().StringArrayVar(&dmenuKeybindSpecs, "keybind", nil, "Bind a custom accept key (repeatable): N=keyspec, e.g. --keybind 1=ctrl+e (N is 1-19); exits 9+N (10-28) instead of 0 when accepted that way")
 	dmenuCmd.Flags().BoolVar(&dmenuPrintInfo, "print-info", false, "Also print an accepted row's info metadata (the per-row \\0info\\x1f... field, see the per-row metadata protocol) on a second line")
+	dmenuCmd.Flags().BoolVar(&dmenuDisableHist, "disable-history", false, "Don't add this session's search query to the launcher's persistent history (default: recorded, like other launcher modes)")
 
 	dmenuCmd.Flags().StringVar(&dmenuView, "view", "", "Override the result view mode for this invocation: list, grid, or tile (default: list)")
 	dmenuCmd.Flags().StringVar(&dmenuSize, "size", "", "Override the popup size preset for this invocation: 1-4, matching the Appearance settings size buttons (default: the shell's own launcher size setting)")
 	dmenuCmd.Flags().StringVar(&dmenuIcon, "icon", "", "Show a Material Symbols icon next to the prompt badge (default: no icon)")
+}
+
+var dmenuLongFlagToken = regexp.MustCompile(`^-([a-zA-Z][a-zA-Z0-9-]+)(=.*)?$`)
+
+func dmenuAliasableLongFlags() map[string]bool {
+	set := map[string]bool{}
+	dmenuCmd.Flags().VisitAll(func(f *pflag.Flag) {
+		if len(f.Name) > 1 {
+			set[f.Name] = true
+		}
+	})
+	return set
+}
+
+func normalizeDmenuArgv(args []string) []string {
+	if len(args) < 2 || args[1] != "dmenu" {
+		return args
+	}
+	aliasable := dmenuAliasableLongFlags()
+	out := make([]string, len(args))
+	copy(out, args)
+	for i := 2; i < len(out); i++ {
+		tok := out[i]
+		if tok == "--" {
+			break
+		}
+		m := dmenuLongFlagToken.FindStringSubmatch(tok)
+		if m == nil {
+			continue
+		}
+		name, valueSuffix := m[1], m[2]
+		if aliasable[name] {
+			out[i] = "--" + name + valueSuffix
+		}
+	}
+	return out
 }
 
 func dmenuSplitFunc(sep string) bufio.SplitFunc {
@@ -365,6 +411,9 @@ func runDmenuDump(rows []dmenuRow, format string) {
 }
 
 func runDmenu(cmd *cobra.Command, args []string) {
+	if cmd.Flags().Changed("case-insensitive") {
+		fmt.Fprintln(os.Stderr, "dms dmenu: warning: -i/--case-insensitive has no effect (matching is always case-insensitive)")
+	}
 	os.Exit(dmenuSession())
 }
 
@@ -482,23 +531,24 @@ func dmenuSession() int {
 	defer conn.Close()
 
 	header := dmenuipc.Header{
-		Prompt:      dmenuPrompt,
-		Placeholder: dmenuPlaceholder,
-		Lines:       dmenuLines,
-		PromptOnly:  dmenuPromptOnly,
-		Select:      dmenuSelect,
-		Mesg:        dmenuMesg,
-		Password:    dmenuPassword,
-		MarkupRows:  dmenuMarkupRows,
-		OnlyMatch:   dmenuOnlyMatch,
-		NoCustom:    dmenuNoCustom,
-		MultiSelect: dmenuMultiSelect,
-		Active:      activeRanges,
-		Urgent:      urgentRanges,
-		Keybinds:    keybinds,
-		View:        dmenuView,
-		Size:        dmenuSizePresetName,
-		Icon:        dmenuIcon,
+		Prompt:         dmenuPrompt,
+		Placeholder:    dmenuPlaceholder,
+		Lines:          dmenuLines,
+		PromptOnly:     dmenuPromptOnly,
+		Select:         dmenuSelect,
+		Mesg:           dmenuMesg,
+		Password:       dmenuPassword,
+		MarkupRows:     dmenuMarkupRows,
+		OnlyMatch:      dmenuOnlyMatch,
+		NoCustom:       dmenuNoCustom,
+		MultiSelect:    dmenuMultiSelect,
+		Active:         activeRanges,
+		Urgent:         urgentRanges,
+		Keybinds:       keybinds,
+		View:           dmenuView,
+		Size:           dmenuSizePresetName,
+		Icon:           dmenuIcon,
+		DisableHistory: dmenuDisableHist,
 	}
 	if err := conn.SendHeader(header); err != nil {
 		log.Debugf("dmenu: failed to send header: %v", err)

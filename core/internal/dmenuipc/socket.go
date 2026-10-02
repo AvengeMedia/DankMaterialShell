@@ -25,23 +25,24 @@ type Keybind struct {
 }
 
 type Header struct {
-	Prompt      string    `json:"prompt"`
-	Placeholder string    `json:"placeholder,omitempty"`
-	Lines       int       `json:"lines,omitempty"`
-	PromptOnly  bool      `json:"promptOnly,omitempty"`
-	Select      string    `json:"select,omitempty"`
-	Mesg        string    `json:"mesg,omitempty"`
-	Password    bool      `json:"password,omitempty"`
-	MarkupRows  bool      `json:"markupRows,omitempty"`
-	OnlyMatch   bool      `json:"onlyMatch,omitempty"`
-	NoCustom    bool      `json:"noCustom,omitempty"`
-	MultiSelect bool      `json:"multiSelect,omitempty"`
-	Active      []Range   `json:"active,omitempty"`
-	Urgent      []Range   `json:"urgent,omitempty"`
-	Keybinds    []Keybind `json:"keybinds,omitempty"`
-	View        string    `json:"view,omitempty"`
-	Size        string    `json:"size,omitempty"`
-	Icon        string    `json:"icon,omitempty"`
+	Prompt         string    `json:"prompt"`
+	Placeholder    string    `json:"placeholder,omitempty"`
+	Lines          int       `json:"lines,omitempty"`
+	PromptOnly     bool      `json:"promptOnly,omitempty"`
+	Select         string    `json:"select,omitempty"`
+	Mesg           string    `json:"mesg,omitempty"`
+	Password       bool      `json:"password,omitempty"`
+	MarkupRows     bool      `json:"markupRows,omitempty"`
+	OnlyMatch      bool      `json:"onlyMatch,omitempty"`
+	NoCustom       bool      `json:"noCustom,omitempty"`
+	MultiSelect    bool      `json:"multiSelect,omitempty"`
+	Active         []Range   `json:"active,omitempty"`
+	Urgent         []Range   `json:"urgent,omitempty"`
+	Keybinds       []Keybind `json:"keybinds,omitempty"`
+	View           string    `json:"view,omitempty"`
+	Size           string    `json:"size,omitempty"`
+	Icon           string    `json:"icon,omitempty"`
+	DisableHistory bool      `json:"disableHistory,omitempty"`
 }
 
 type ItemMeta struct {
@@ -63,32 +64,33 @@ type SelectedRow struct {
 }
 
 type envelope struct {
-	Type        string        `json:"type"`
-	Prompt      string        `json:"prompt,omitempty"`
-	Placeholder string        `json:"placeholder,omitempty"`
-	Lines       int           `json:"lines,omitempty"`
-	PromptOnly  bool          `json:"promptOnly,omitempty"`
-	Select      string        `json:"select,omitempty"`
-	Mesg        string        `json:"mesg,omitempty"`
-	Password    bool          `json:"password,omitempty"`
-	MarkupRows  bool          `json:"markupRows,omitempty"`
-	OnlyMatch   bool          `json:"onlyMatch,omitempty"`
-	NoCustom    bool          `json:"noCustom,omitempty"`
-	MultiSelect bool          `json:"multiSelect,omitempty"`
-	Active      []Range       `json:"active,omitempty"`
-	Urgent      []Range       `json:"urgent,omitempty"`
-	Keybinds    []Keybind     `json:"keybinds,omitempty"`
-	View        string        `json:"view,omitempty"`
-	Size        string        `json:"size,omitempty"`
-	Icon        string        `json:"icon,omitempty"`
-	Text        string        `json:"text,omitempty"`
-	Row         *ItemMeta     `json:"row,omitempty"`
-	Kind        string        `json:"kind,omitempty"`
-	Index       int           `json:"index"`
-	Info        string        `json:"info,omitempty"`
-	FilterText  string        `json:"filterText,omitempty"`
-	Items       []SelectedRow `json:"items,omitempty"`
-	KeybindN    int           `json:"keybindN,omitempty"`
+	Type           string        `json:"type"`
+	Prompt         string        `json:"prompt,omitempty"`
+	Placeholder    string        `json:"placeholder,omitempty"`
+	Lines          int           `json:"lines,omitempty"`
+	PromptOnly     bool          `json:"promptOnly,omitempty"`
+	Select         string        `json:"select,omitempty"`
+	Mesg           string        `json:"mesg,omitempty"`
+	Password       bool          `json:"password,omitempty"`
+	MarkupRows     bool          `json:"markupRows,omitempty"`
+	OnlyMatch      bool          `json:"onlyMatch,omitempty"`
+	NoCustom       bool          `json:"noCustom,omitempty"`
+	MultiSelect    bool          `json:"multiSelect,omitempty"`
+	Active         []Range       `json:"active,omitempty"`
+	Urgent         []Range       `json:"urgent,omitempty"`
+	Keybinds       []Keybind     `json:"keybinds,omitempty"`
+	View           string        `json:"view,omitempty"`
+	Size           string        `json:"size,omitempty"`
+	Icon           string        `json:"icon,omitempty"`
+	DisableHistory bool          `json:"disableHistory,omitempty"`
+	Text           string        `json:"text,omitempty"`
+	Row            *ItemMeta     `json:"row,omitempty"`
+	Kind           string        `json:"kind,omitempty"`
+	Index          int           `json:"index"`
+	Info           string        `json:"info,omitempty"`
+	FilterText     string        `json:"filterText,omitempty"`
+	Items          []SelectedRow `json:"items,omitempty"`
+	KeybindN       int           `json:"keybindN,omitempty"`
 }
 
 type Session struct {
@@ -156,24 +158,25 @@ func (c *Conn) Close() error { return c.conn.Close() }
 
 func (c *Conn) SendHeader(h Header) error {
 	return c.send(envelope{
-		Type:        "header",
-		Prompt:      h.Prompt,
-		Placeholder: h.Placeholder,
-		Lines:       h.Lines,
-		PromptOnly:  h.PromptOnly,
-		Select:      h.Select,
-		Mesg:        h.Mesg,
-		Password:    h.Password,
-		MarkupRows:  h.MarkupRows,
-		OnlyMatch:   h.OnlyMatch,
-		NoCustom:    h.NoCustom,
-		MultiSelect: h.MultiSelect,
-		Active:      h.Active,
-		Urgent:      h.Urgent,
-		Keybinds:    h.Keybinds,
-		View:        h.View,
-		Size:        h.Size,
-		Icon:        h.Icon,
+		Type:           "header",
+		Prompt:         h.Prompt,
+		Placeholder:    h.Placeholder,
+		Lines:          h.Lines,
+		PromptOnly:     h.PromptOnly,
+		Select:         h.Select,
+		Mesg:           h.Mesg,
+		Password:       h.Password,
+		MarkupRows:     h.MarkupRows,
+		OnlyMatch:      h.OnlyMatch,
+		NoCustom:       h.NoCustom,
+		MultiSelect:    h.MultiSelect,
+		Active:         h.Active,
+		Urgent:         h.Urgent,
+		Keybinds:       h.Keybinds,
+		View:           h.View,
+		Size:           h.Size,
+		Icon:           h.Icon,
+		DisableHistory: h.DisableHistory,
 	})
 }
 
