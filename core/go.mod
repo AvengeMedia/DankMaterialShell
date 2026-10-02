@@ -101,7 +101,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/afero v1.15.0
-	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/spf13/pflag v1.0.10
 	github.com/xo/terminfo v1.2.0 // indirect
 	golang.org/x/sys v0.48.0
 	golang.org/x/text v0.42.0
