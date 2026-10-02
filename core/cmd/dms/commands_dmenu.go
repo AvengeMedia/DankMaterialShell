@@ -365,6 +365,10 @@ func runDmenuDump(rows []dmenuRow, format string) {
 }
 
 func runDmenu(cmd *cobra.Command, args []string) {
+	os.Exit(dmenuSession())
+}
+
+func dmenuSession() int {
 	format := dmenuFormat
 	if format == "" {
 		format = "s"
@@ -379,7 +383,7 @@ func runDmenu(cmd *cobra.Command, args []string) {
 			defer input.Close()
 		}
 		runDmenuDump(dmenuReadAll(input), format)
-		return
+		return 0
 	}
 
 	activeRanges, err := parseIndexSpec(dmenuActiveSpec)
@@ -421,7 +425,8 @@ func runDmenu(cmd *cobra.Command, args []string) {
 			bufferedItems = append(bufferedItems, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-			log.Fatalf("Error reading items: %v", err)
+			log.Errorf("Error reading items: %v", err)
+			return 1
 		}
 	}
 
@@ -431,14 +436,15 @@ func runDmenu(cmd *cobra.Command, args []string) {
 		if streaming {
 			if !scanner.Scan() {
 				if err := scanner.Err(); err != nil {
-					log.Fatalf("Error reading items: %v", err)
+					log.Errorf("Error reading items: %v", err)
+					return 1
 				}
-				os.Exit(1)
+				return 1
 			}
 			pendingFirstItem = scanner.Text()
 			havePendingFirstItem = true
 		} else if len(bufferedItems) == 0 {
-			os.Exit(1)
+			return 1
 		}
 	}
 
@@ -458,18 +464,20 @@ func runDmenu(cmd *cobra.Command, args []string) {
 
 	pid, ok := shellApp.SessionPID()
 	if !ok {
-		log.Fatalf("DMS shell is not running")
+		log.Errorf("DMS shell is not running")
+		return 1
 	}
 
 	mode := "dmenu:" + sess.Path()
 	if _, _, err := qsipc.Call(qsipc.SocketPathForPID(pid), "launcher", "openWith", []string{mode}); err != nil {
-		log.Fatalf("Error opening launcher: %v", err)
+		log.Errorf("Error opening launcher: %v", err)
+		return 1
 	}
 
 	conn, err := sess.Accept(dmenuConnectTimeout)
 	if err != nil {
 		log.Debugf("dmenu: shell never connected: %v", err)
-		os.Exit(2)
+		return 2
 	}
 	defer conn.Close()
 
@@ -494,45 +502,52 @@ func runDmenu(cmd *cobra.Command, args []string) {
 	}
 	if err := conn.SendHeader(header); err != nil {
 		log.Debugf("dmenu: failed to send header: %v", err)
-		os.Exit(2)
+		return 2
 	}
 
+	var sendErr error
 	sendItem := func(line string) {
 		text, meta := parseDmenuRow(line)
 		if err := conn.SendItem(text, meta); err != nil {
 			log.Debugf("dmenu: failed to send item: %v", err)
-			os.Exit(2)
+			sendErr = err
 		}
 	}
 
 	if streaming {
-		if havePendingFirstItem {
+		if havePendingFirstItem && sendErr == nil {
 			sendItem(pendingFirstItem)
 		}
-		for scanner.Scan() {
+		for sendErr == nil && scanner.Scan() {
 			sendItem(scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
 			log.Debugf("dmenu: error reading items mid-stream: %v", err)
-			os.Exit(2)
+			return 2
 		}
 	} else {
 		for _, item := range bufferedItems {
+			if sendErr != nil {
+				break
+			}
 			sendItem(item)
 		}
 	}
+	if sendErr != nil {
+		return 2
+	}
 	if err := conn.SendEnd(); err != nil {
 		log.Debugf("dmenu: failed to send end marker: %v", err)
-		os.Exit(2)
+		return 2
 	}
 
 	sel, selected, err := conn.ReadSelection()
 	if err != nil {
 		log.Debugf("dmenu: failed to read result: %v", err)
-		os.Exit(2)
+		return 2
 	}
 	if !selected {
-		os.Exit(1)
+		return 1
 	}
 
 	switch sel.Kind {
@@ -540,7 +555,8 @@ func runDmenu(cmd *cobra.Command, args []string) {
 		for _, item := range sel.Items {
 			out, err := dmenuFormatOutput(format, item.Index, item.Text, sel.FilterText)
 			if err != nil {
-				log.Fatalf("Error formatting output: %v", err)
+				log.Errorf("Error formatting output: %v", err)
+				return 1
 			}
 			fmt.Println(out)
 			if dmenuPrintInfo && item.Info != "" {
@@ -550,13 +566,15 @@ func runDmenu(cmd *cobra.Command, args []string) {
 	case "freetext":
 		out, err := dmenuFormatOutput(format, -1, sel.Text, sel.FilterText)
 		if err != nil {
-			log.Fatalf("Error formatting output: %v", err)
+			log.Errorf("Error formatting output: %v", err)
+			return 1
 		}
 		fmt.Println(out)
 	default: // "row"
 		out, err := dmenuFormatOutput(format, sel.Index, sel.Text, sel.FilterText)
 		if err != nil {
-			log.Fatalf("Error formatting output: %v", err)
+			log.Errorf("Error formatting output: %v", err)
+			return 1
 		}
 		fmt.Println(out)
 		if dmenuPrintInfo && sel.Info != "" {
@@ -564,7 +582,7 @@ func runDmenu(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	os.Exit(dmenuKeybindExitCode(sel.KeybindN))
+	return dmenuKeybindExitCode(sel.KeybindN)
 }
 
 func dmenuKeybindExitCode(keybindN int) int {

@@ -175,9 +175,11 @@ Item {
         if (active)
             return;
 
-        if (searchMode === "dmenu")
+        if (searchMode === "dmenu") {
             _endDmenuSession();
-        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        } else {
+            SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        }
         sections = [];
         flatModel = [];
         selectedItem = null;
@@ -2644,7 +2646,8 @@ Item {
         if (!item)
             return;
 
-        SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
+        if (searchMode !== "dmenu")
+            SessionData.addLauncherHistory(searchQuery, explicitQuerySession);
 
         if (item.type === "plugin_browse") {
             var browsePluginId = item.data?.pluginId;
