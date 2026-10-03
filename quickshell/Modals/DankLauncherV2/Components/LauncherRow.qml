@@ -71,7 +71,7 @@ DankListItem {
         anchors.left: parent.left
         anchors.leftMargin: LauncherMetrics.rowPadding
         anchors.verticalCenter: parent.verticalCenter
-        visible: true
+        visible: SettingsData.dankLauncherV2ShowAppIcons
         iconValue: root.iconValue
         iconMargins: root.iconMargins
         fallbackLeftMargin: root.iconFallbackLeftMargin
@@ -89,7 +89,7 @@ DankListItem {
 
     Item {
         id: textColumn
-        anchors.left: iconRenderer.right
+        anchors.left: SettingsData.dankLauncherV2ShowAppIcons ? iconRenderer.right : parent.left
         anchors.leftMargin: LauncherMetrics.rowPadding
         anchors.right: rightContent.left
         anchors.rightMargin: rightContent.width > 0 ? Theme.spacingM : 0
