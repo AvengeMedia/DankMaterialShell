@@ -697,23 +697,7 @@ Singleton {
                 }
             }
 
-            // Honor the freedesktop "suppress-sound" hint: the sender
-            // plays its own audio for this notification and asks the
-            // server not to double up. "sound-name" is the opposite — an
-            // explicit request for audio — so it plays even when the
-            // global new-notification sound is off.
-            const soundHints = notif.hints || {};
-            const suppressSound = !!soundHints["suppress-sound"];
-            const requestsSound = !!soundHints["sound-name"];
             const dndBlocked = SessionData.doNotDisturb && !_allowedInDnd(policy.urgency, policy.bypassDnd);
-            if (!dndBlocked && SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
-                if (policy.urgency === NotificationUrgency.Critical) {
-                    AudioService.playCriticalNotificationSound();
-                } else {
-                    AudioService.playNormalNotificationSound();
-                }
-            }
-
             const shouldShowPopup = !root.popupsDisabled && !dndBlocked && !policy.disablePopup;
             const isTransient = notif.transient;
             const shouldKeepInCenter = !isTransient && !policy.hideFromCenter;
@@ -723,6 +707,22 @@ Singleton {
                     notif.dismiss();
                 } catch (e) {}
                 return;
+            }
+
+            // Honor the freedesktop "suppress-sound" hint: the sender
+            // plays its own audio for this notification and asks the
+            // server not to double up. "sound-name" is the opposite — an
+            // explicit request for audio — so it plays even when the
+            // global new-notification sound is off.
+            const soundHints = notif.hints || {};
+            const suppressSound = !!soundHints["suppress-sound"];
+            const requestsSound = !!soundHints["sound-name"];
+            if (!dndBlocked && !policy.disablePopup && SettingsData.soundsEnabled && (SettingsData.soundNewNotification || requestsSound) && !suppressSound) {
+                if (policy.urgency === NotificationUrgency.Critical) {
+                    AudioService.playCriticalNotificationSound();
+                } else {
+                    AudioService.playNormalNotificationSound();
+                }
             }
 
             const wrapper = notifComponent.createObject(root, {
