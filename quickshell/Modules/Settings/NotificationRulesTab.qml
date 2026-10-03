@@ -20,7 +20,9 @@ Item {
                 })).filter(entry => predicate(entry.rule));
     }
 
-    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute")
+    // Expired timed mutes drop out of the list the minute they lapse
+    // (notificationRuleNowMs ticks), without waiting for the sweep.
+    readonly property var mutedRules: indexedRules(rule => (rule.action || "").toString().toLowerCase() === "mute" && !SettingsData.isNotificationRuleExpired(rule, NotificationService.notificationRuleNowMs))
 
     readonly property var notificationRuleFieldOptions: [
         {
@@ -110,6 +112,14 @@ Item {
         return [getRuleOptionLabel(notificationRuleFieldOptions, rule.field, notificationRuleFieldOptions[0].label), getRuleOptionLabel(notificationRuleMatchTypeOptions, rule.matchType, notificationRuleMatchTypeOptions[0].label)].join(" · ");
     }
 
+    function remainingLabel(rule) {
+        const expiresAt = rule && rule.expiresAt ? rule.expiresAt : 0;
+        if (expiresAt <= NotificationService.notificationRuleNowMs)
+            return "";
+        const remaining = NotificationService.formatRuleRemaining(expiresAt);
+        return remaining ? I18n.tr("expires in %1", "timed notification rule, %1 = remaining time until it expires").arg(remaining) : "";
+    }
+
     function outcomeBadges(rule) {
         const badges = [];
         if ((rule.action || "default") !== "default")
@@ -118,6 +128,9 @@ Item {
             badges.push(getRuleOptionLabel(notificationRuleUrgencyOptions, rule.urgency, rule.urgency));
         if (rule.bypassDnd === true)
             badges.push(I18n.tr("Allow in Do Not Disturb"));
+        const remaining = remainingLabel(rule);
+        if (remaining !== "")
+            badges.push(remaining);
         return badges;
     }
 
@@ -262,6 +275,7 @@ Item {
                     required property var modelData
 
                     title: modelData.rule?.pattern || I18n.tr("Unknown")
+                    subtitle: root.remainingLabel(modelData.rule)
                     singleLineTitle: true
 
                     DankButton {
