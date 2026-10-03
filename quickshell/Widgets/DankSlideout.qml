@@ -27,7 +27,12 @@ PanelWindow {
     property real edgeGap: 0
     property string slideEdge: "right"
     readonly property bool slideFromLeft: slideEdge === "left"
-    readonly property real surfaceOriginX: slideFromLeft ? 0 : Math.max(0, (modelData?.width ?? width) - width)
+    readonly property bool frameOwnsConnectedChrome: CompositorService.canShareConnectedFrameChromeForScreen(modelData)
+    readonly property int frameInsetTop: _frameInset("top")
+    readonly property int frameInsetBottom: _frameInset("bottom")
+    readonly property int frameInsetEdge: _frameInset(slideEdge)
+    readonly property real surfaceOriginX: slideFromLeft ? frameInsetEdge : Math.max(0, (modelData?.width ?? width) - width - frameInsetEdge)
+    readonly property real surfaceOriginY: frameInsetTop
     property Component content: null
     property bool contentRequested: false
     property string title: ""
@@ -70,8 +75,68 @@ PanelWindow {
         const padding = 24;
         const topLeft = slideContainer.mapToItem(null, 0, 0);
         const globalX = surfaceOriginX + topLeft.x;
-        return gx >= globalX - padding && gx < globalX + slideContainer.width + padding && gy >= topLeft.y - padding && gy < topLeft.y + slideContainer.height + padding;
+        const globalY = surfaceOriginY + topLeft.y;
+        return gx >= globalX - padding && gx < globalX + slideContainer.width + padding && gy >= globalY - padding && gy < globalY + slideContainer.height + padding;
     }
+
+    function _frameInset(edge) {
+        SettingsData.barConfigs;
+        if (!frameOwnsConnectedChrome)
+            return 0;
+        return Math.max(0, Math.round(Theme.px(SettingsData.frameEdgeReservation(modelData, edge), dpr)));
+    }
+
+    readonly property string _frameSlot: ConnectedModeState.surfaceSlot("slideout")
+    readonly property bool _frameClaimActive: frameOwnsConnectedChrome && mappedVisible && _slideoutScreenName !== ""
+    readonly property real _frameSurfaceOpacity: Theme.connectedSurfaceColor.a
+    readonly property var _frameMotion: ({
+            "bodyX": surfaceOriginX + slideContainer.x,
+            "bodyY": surfaceOriginY + slideContainer.y,
+            "bodyW": slideContainer.width,
+            "bodyH": slideContainer.height,
+            "animX": slideoutSlideSnapX
+        })
+    property string _claimedScreen: ""
+    property string _claimedOwner: ""
+
+    function _releaseFrameClaim() {
+        if (!_claimedScreen)
+            return;
+        ConnectedModeState.releaseSurface(_claimedScreen, _frameSlot, _claimedOwner);
+        _claimedScreen = "";
+        _claimedOwner = "";
+    }
+
+    function _syncFrameClaim() {
+        const owner = layerNamespace + ":" + _slideoutScreenName;
+        if (!_frameClaimActive || _claimedScreen !== _slideoutScreenName || _claimedOwner !== owner)
+            _releaseFrameClaim();
+        if (!_frameClaimActive)
+            return;
+        if (ConnectedModeState.claimSurface(_slideoutScreenName, _frameSlot, Object.assign({
+            "kind": "slideout",
+            "visible": true,
+            "presented": true,
+            "phase": "open",
+            "barSide": slideEdge,
+            "omitStartConnector": true,
+            "omitEndConnector": true,
+            "opacity": _frameSurfaceOpacity
+        }, _frameMotion), owner)) {
+            _claimedScreen = _slideoutScreenName;
+            _claimedOwner = owner;
+        }
+    }
+
+    on_FrameClaimActiveChanged: _syncFrameClaim()
+    on_SlideoutScreenNameChanged: _syncFrameClaim()
+    onSlideEdgeChanged: _syncFrameClaim()
+    on_FrameSurfaceOpacityChanged: _syncFrameClaim()
+    on_FrameMotionChanged: {
+        if (_claimedScreen)
+            ConnectedModeState.setSurfaceMotion(_claimedScreen, _frameSlot, _claimedOwner, _frameMotion);
+    }
+    Component.onDestruction: _releaseFrameClaim()
 
     function toggle() {
         if (isVisible) {
@@ -102,22 +167,30 @@ PanelWindow {
             return !PopoutManager.cursorOverBar(PopoutManager.hoverCursorGlobalX, PopoutManager.hoverCursorGlobalY);
         }
         onDismissRequested: root.hideFromHoverDismiss()
-        onHoverMoved: (sceneX, sceneY) => PopoutManager.updateHoverCursor(root.surfaceOriginX + sceneX, sceneY)
+        onHoverMoved: (sceneX, sceneY) => PopoutManager.updateHoverCursor(root.surfaceOriginX + sceneX, root.surfaceOriginY + sceneY)
     }
 
-    readonly property bool slideoutBlurActive: root.visible && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
+    readonly property bool slideoutBlurActive: root.visible && !root.frameOwnsConnectedChrome && BlurService.enabled && Theme.connectedSurfaceBlurEnabled
 
     readonly property string _slideoutScreenName: modelData?.name ?? ""
 
     WlrLayershell.layer: (!suppressOverlayLayer && (triggerUsesOverlayLayer || CompositorService.framePeerSurfacesUseOverlayForScreen(modelData))) ? WlrLayershell.Overlay : WlrLayershell.Top
-    WlrLayershell.exclusiveZone: 0
+    // Frame-owned: sit exactly in the frame cutout so the claimed body matches the frame's own geometry.
+    WlrLayershell.exclusiveZone: frameOwnsConnectedChrome ? -1 : 0
+
+    margins {
+        top: root.frameInsetTop
+        bottom: root.frameInsetBottom
+        left: root.slideFromLeft ? root.frameInsetEdge : 0
+        right: root.slideFromLeft ? 0 : root.frameInsetEdge
+    }
     WlrLayershell.keyboardFocus: isVisible && !ModalManager.currentModalsByScreen[_slideoutScreenName] ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     readonly property real dpr: CompositorService.getScreenScale(root.screen)
     readonly property real alignedWidth: Theme.px(expandable && expandedWidth ? expandedWidthValue : slideoutWidth, dpr)
     onAlignedWidthChanged: widthSpring.retarget(alignedWidth)
     readonly property real alignedHeight: Theme.px(modelData ? modelData.height : 800, dpr)
-    readonly property real alignedEdgeGap: Theme.px(edgeGap, dpr)
+    readonly property real alignedEdgeGap: frameOwnsConnectedChrome ? 0 : Theme.px(edgeGap, dpr)
     readonly property real slideoutSlideSnapX: Theme.snap(slideContainer.slideOffset, dpr)
 
     onIsVisibleChanged: {
@@ -194,10 +267,10 @@ PanelWindow {
             clip: true
 
             readonly property color slideoutSurfaceColor: {
-                if (root.customTransparency >= 0)
-                    return Theme.withAlpha(Theme.hostSurface, root.customTransparency);
                 if (Theme.isConnectedEffect)
                     return Theme.connectedSurfaceColor;
+                if (root.customTransparency >= 0)
+                    return Theme.withAlpha(Theme.hostSurface, root.customTransparency);
                 return Theme.readableSurface;
             }
 
@@ -217,7 +290,7 @@ PanelWindow {
 
             Rectangle {
                 anchors.fill: parent
-                color: Theme.isConnectedEffect ? contentRect.slideoutSurfaceColor : "transparent"
+                color: Theme.isConnectedEffect && !root.frameOwnsConnectedChrome ? contentRect.slideoutSurfaceColor : "transparent"
                 radius: Theme.isConnectedEffect ? Theme.connectedSurfaceRadius : Theme.windowRadius
                 border.color: Theme.isConnectedEffect ? Theme.withAlpha(BlurService.borderColor, 0) : BlurService.borderColor
                 border.width: Theme.isConnectedEffect ? 0 : BlurService.borderWidth

@@ -619,7 +619,7 @@ Item {
                 text: I18n.tr("Auto popup gaps")
                 description: I18n.tr("Gap between the bar and its popouts follows edge spacing", "bar auto popup gaps toggle description")
                 tags: ["popup", "gaps", "auto"]
-                visible: !bar.selectedBarFrameStyled
+                visible: !SettingsData.connectedFrameModeActive
                 resetStore: bar
                 resetKeys: ["popupGapsAuto"]
                 checked: bar.selectedBarConfig?.popupGapsAuto ?? true
@@ -629,7 +629,7 @@ Item {
             }
 
             SettingsSliderRow {
-                visible: !bar.selectedBarFrameStyled && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
+                visible: !SettingsData.connectedFrameModeActive && !(bar.selectedBarConfig?.popupGapsAuto ?? true)
                 text: I18n.tr("Gap size")
                 tags: ["popup", "gaps", "size"]
                 resetStore: bar

@@ -24,6 +24,8 @@ StyledRect {
             return "layers";
         case "shadows":
             return "tonality";
+        case "bar":
+            return "toolbar";
         default:
             return "frame_source";
         }
@@ -34,6 +36,8 @@ StyledRect {
             return I18n.tr("Interface style");
         case "shadows":
             return I18n.tr("Shadows");
+        case "bar":
+            return I18n.tr("Bar");
         default:
             return I18n.tr("Open Frame", "settings: button that opens the Frame tab");
         }
@@ -44,6 +48,8 @@ StyledRect {
             return "theme_surfaces";
         case "shadows":
             return "surface_shadows";
+        case "bar":
+            return "dankbar";
         default:
             return section === "frameConnectedOptions" ? "dankbar_settings" : "dankbar_appearance";
         }

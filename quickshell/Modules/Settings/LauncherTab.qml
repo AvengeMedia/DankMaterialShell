@@ -72,22 +72,22 @@ Item {
             SettingsControlledBy {
                 visible: SettingsData.connectedFrameModeActive
                 parentModal: root.parentModal
-                section: "frameConnectedOptions"
+                target: "bar"
                 settingLabel: I18n.tr("Default action")
-                reason: I18n.tr("Connected Frame Mode uses the connected launcher for default launcher shortcuts.")
+                reason: I18n.tr("Only Full launcher is supported in Connected Frame Mode.")
             }
 
             SettingsButtonGroupRow {
                 readonly property bool islandOffered: SettingsData.dankIslandEnabled || SettingsData.launcherStyle === "island"
 
-                visible: !SettingsData.connectedFrameModeActive
                 settingKey: "launcherStyleSelector"
                 tags: ["launcher", "style", "default", "spotlight", "full", "minimal", "island", "dankisland"]
                 resetKeys: ["launcherStyle"]
                 text: I18n.tr("Opens", "verb, row label, which launcher style the shortcut opens")
                 model: [I18n.tr("Full", "adjective, full size launcher style option"), I18n.tr("Spotlight", "launcher style option, small centered search bar")].concat(islandOffered ? [I18n.tr("Island")] : [])
                 values: ["full", "spotlight"].concat(islandOffered ? ["island"] : [])
-                value: SettingsData.launcherStyle
+                enabled: !SettingsData.connectedFrameModeActive
+                value: SettingsData.connectedFrameModeActive ? "full" : SettingsData.launcherStyle
                 fallbackValue: "full"
                 onValueSelected: value => SettingsData.set("launcherStyle", value)
             }

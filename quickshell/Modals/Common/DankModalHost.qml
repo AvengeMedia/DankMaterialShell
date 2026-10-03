@@ -68,7 +68,6 @@ Item {
     readonly property color effectiveBorderColor: frameOwnsConnectedChrome ? Theme.withAlpha(borderColor, 0) : borderColor
     readonly property real effectiveBorderWidth: frameOwnsConnectedChrome ? 0 : borderWidth
     readonly property real effectiveCornerRadius: frameOwnsConnectedChrome ? Theme.connectedSurfaceRadius : cornerRadius
-    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
     property bool enableShadow: modalHandle.enableShadow
     property alias modalFocusScope: focusScope
     property bool shouldBeVisible: false
@@ -546,7 +545,7 @@ Item {
 
         WindowBlur {
             targetWindow: contentWindow
-            blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
+            blurEnabled: !root.frameOwnsConnectedChrome
             surfaceColor: root.effectiveBackgroundColor
             readonly property real s: Math.min(1, modalContainer.scaleValue)
             readonly property real op: Math.max(0, Math.min(1, (morph.value - 0.06) * 2))

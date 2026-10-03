@@ -206,7 +206,6 @@ Item {
     readonly property color effectiveBorderColor: connectedSurfaceOverride ? Theme.withAlpha(borderColor, 0) : borderColor
     readonly property int effectiveBorderWidth: connectedSurfaceOverride ? 0 : borderWidth
     readonly property int paintedBorderWidth: connected ? (frameOwnsConnectedChrome ? 0 : effectiveBorderWidth) : Math.max(borderWidth, BlurService.borderWidth)
-    readonly property bool effectiveBlurEnabled: Theme.connectedSurfaceBlurEnabled
 
     readonly property var shadowLevel: Theme.elevationLevel3
     readonly property real shadowFallbackOffset: Theme.spacingS
@@ -910,7 +909,7 @@ Item {
 
             WindowBlur {
                 targetWindow: contentWindow
-                blurEnabled: root.effectiveBlurEnabled && !root.frameOwnsConnectedChrome
+                blurEnabled: !root.frameOwnsConnectedChrome
                 surfaceColor: root.backgroundColor
                 readonly property real s: Math.min(1, contentContainer.scaleValue)
                 readonly property bool clipDriven: root._fluidMotionActive && !root.connectedFluidMotion
