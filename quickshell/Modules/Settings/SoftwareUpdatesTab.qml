@@ -759,7 +759,7 @@ Item {
                 const name = newIgnoredPackageField.value.trim();
                 if (name === "")
                     return;
-                errorIsInvalidName = !/^[A-Za-z0-9@._+:-]+$/.test(name);
+                errorIsInvalidName = !SystemUpdateService.isValidIgnoredName(name);
                 if (errorIsInvalidName) {
                     ignoredPackageError.visible = true;
                     return;
@@ -797,7 +797,7 @@ Item {
             SettingsRow {
                 id: ignoredPackageError
                 visible: false
-                title: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:- only.") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
+                title: ignoredPackagesCard.errorIsInvalidName ? I18n.tr("Invalid package name — letters, digits and @._+:/- only.") : I18n.tr("With Shelly, only Flatpak packages in the current update list can be ignored.")
                 titleColor: Theme.error
             }
 

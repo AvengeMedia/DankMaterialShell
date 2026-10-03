@@ -17,7 +17,14 @@ func init() {
 }
 
 // [ebuild     U  ] sys-apps/util-linux-2.40.4::gentoo [2.40.2::gentoo] USE="..."
-var portageUpdateLine = regexp.MustCompile(`^\s*\[(ebuild|binary)\b[^\]]*\]\s+([^\s/]+)/([^\s\[\]]+?)::([^\s\[\]]+)(?:\s+\[\s*([^\s\]]+?)(?:::[^\s\]]+)?\])?`)
+var (
+	portageUpdateLine = regexp.MustCompile(`^\s*\[(ebuild|binary)\b[^\]]*\]\s+([^\s/]+)/([^\s\[\]]+?)::([^\s\[\]]+)(?:\s+\[\s*([^\s\]]+?)(?:::[^\s\]]+)?\])?`)
+	ansiRegexp        = regexp.MustCompile(`\x1B\[[0-9;?]*[ -/]*[@-~]`)
+)
+
+func stripANSI(s string) string {
+	return ansiRegexp.ReplaceAllString(s, "")
+}
 
 type portageBackend struct{}
 
@@ -43,6 +50,7 @@ func (b portageBackend) Upgrade(ctx context.Context, opts UpgradeOptions, onLine
 	}
 	if err != nil && !opts.DryRun && ctx.Err() == nil {
 		notifyPortageFailure()
+
 	}
 	return err
 }
@@ -74,13 +82,65 @@ func (b portageBackend) upgrade(ctx context.Context, opts UpgradeOptions, onLine
 		return nil
 	}
 
-	if len(opts.Targets) > 0 && hasPortageTarget(opts.Targets) {
+	if len(opts.Targets) > 0 && hasPortageTarget(opts.Targets) && !portageIsExcluded(opts) {
 		if err := runPortageFirst(ctx, opts, onLine); err != nil {
 			return err
 		}
 	}
 
-	return Run(ctx, privilegedArgv(opts, []string{"emerge", "--update", "--newuse", "--deep", "--quiet", "@world"}...), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+	ansiWrap := func(s string) {
+		if onLine != nil {
+			onLine(stripANSI(s))
+		}
+	}
+	return Run(ctx, portageUpgradeArgv(opts), RunOptions{OnLine: ansiWrap, AttachStdio: opts.AttachStdio})
+}
+
+// emerge upgrades all of @world, so ignores are the only way to hold a package back
+func portageUpgradeArgv(opts UpgradeOptions) []string {
+	argv := []string{"emerge", "--update", "--newuse", "--deep", "--quiet"}
+	for _, atom := range shellSafeNames(opts.Ignored) {
+		argv = append(argv, "--exclude", atom)
+	}
+	argv = append(argv, "@world")
+	return privilegedArgv(opts, argv...)
+}
+
+// Portage can report names without slots, so a sloted ignore only matches slotless packages when it is slot 0.
+func PackageMatchesIgnore(pkgName, ignored string) bool {
+	pkgBase, pkgSlot, _ := strings.Cut(pkgName, ":")
+	ignBase, ignSlot, _ := strings.Cut(ignored, ":")
+	if pkgSlot != "" && ignSlot != "" {
+		return strings.EqualFold(pkgBase, ignBase) && pkgSlot == ignSlot
+	}
+	if ignSlot != "" && pkgSlot == "" {
+		return strings.EqualFold(pkgBase, ignBase) && ignSlot == "0"
+	}
+	return strings.EqualFold(pkgBase, ignBase)
+}
+
+// IsPackageIgnored reports whether any ignore entry holds pkgName back.
+func IsPackageIgnored(pkgName string, ignored []string) bool {
+	for _, ign := range ignored {
+		if PackageMatchesIgnore(pkgName, ign) {
+			return true
+		}
+	}
+	return false
+}
+
+// An ignored portage means the user holds it back, so the pre-update step must skip it too
+func portageIsExcluded(opts UpgradeOptions) bool {
+	for _, ign := range opts.Ignored {
+		if IsPackageIgnored("sys-apps/portage", []string{ign}) {
+			return true
+		}
+		base, _, _ := strings.Cut(ign, ":")
+		if isPortagePackage(base) {
+			return true
+		}
+	}
+	return false
 }
 
 func isPortagePackage(name string) bool {
@@ -103,6 +163,9 @@ func runPortageFirst(ctx context.Context, opts UpgradeOptions, onLine func(strin
 	return Run(ctx, privilegedArgv(opts, argv...), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
 }
 
+// Portage needs to sync the repos first before we can check for any available updates
+// This requires root, there is no good way around this
+// even if this causes the user to suddenly get pkexec prompts if they enable background updates
 func portageSync(ctx context.Context) (string, error) {
 	argv := privilegedArgv(UpgradeOptions{}, "emerge", "--sync")
 	var out strings.Builder
@@ -114,11 +177,16 @@ func portageSync(ctx context.Context) (string, error) {
 		return out.String(), errors.New("authentication request was dismissed or canceled")
 	}
 	if err != nil {
-		if detail := strings.TrimSpace(out.String()); detail != "" {
-			return out.String(), fmt.Errorf("%w: %s", err, detail)
-		}
+		return out.String(), portageRunError(err, out.String())
 	}
-	return out.String(), err
+	return out.String(), nil
+}
+
+func portageRunError(err error, output string) error {
+	if detail := strings.TrimSpace(output); detail != "" {
+		return fmt.Errorf("%w: %s", err, detail)
+	}
+	return err
 }
 
 func capturePortageUpdates(ctx context.Context) (string, error) {
@@ -128,17 +196,14 @@ func capturePortageUpdates(ctx context.Context) (string, error) {
 
 	cmd := exec.CommandContext(ctx, "emerge", "--pretend", "--verbose", "--update", "--newuse", "--deep", "--color=n", "@world")
 	cmd.Env = append(cmd.Environ(), "TERM=dumb", "LC_ALL=C")
-	out, err := cmd.Output()
-	if err != nil {
-		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
-			switch exitErr.ExitCode() {
-			case 1:
-				return string(out), nil
-			}
-		}
-		return "", err
+	var out, errOut strings.Builder
+	cmd.Stdout = &out
+	cmd.Stderr = &errOut
+	// Any non-zero exit means @world does not resolve, and a broken world prints no update list, so it must not read as up to date.
+	if err := cmd.Run(); err != nil {
+		return "", portageRunError(err, out.String()+errOut.String())
 	}
-	return string(out), nil
+	return out.String(), nil
 }
 
 func splitPkgVersion(pkgVer string) (pkg, ver string) {
@@ -168,6 +233,7 @@ func parsePortageUpdates(text, backendID string) []Package {
 		if line == "" {
 			continue
 		}
+		line = stripANSI(line)
 		m := portageUpdateLine.FindStringSubmatch(line)
 		if m == nil {
 			continue

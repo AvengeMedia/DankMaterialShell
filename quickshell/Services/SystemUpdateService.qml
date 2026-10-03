@@ -93,6 +93,10 @@ Singleton {
         return systemHoldsAllowed || pkg.repo !== "system";
     }
 
+    function isValidIgnoredName(name) {
+        return /^[A-Za-z0-9@._+:\/-]+$/.test(name);
+    }
+
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
@@ -228,14 +232,50 @@ Singleton {
             _maybeNotify();
     }
 
-    function _filterUpdates(pkgs) {
+    function _packageMatchesIgnore(pkgName, ignored) {
+        const split = (s) => {
+            if (!s)
+                return [s || "", ""];
+            const idx = s.indexOf(":");
+            if (idx === -1)
+                return [s, ""];
+            return [s.substring(0, idx), s.substring(idx + 1)];
+        };
+        const [pkgBase, pkgSlot] = split(pkgName);
+        const [ignBase, ignSlot] = split(ignored);
+        if (pkgSlot && ignSlot) {
+            if (pkgBase === ignBase && pkgSlot === ignSlot)
+                return true;
+            return false;
+        }
+        if (ignSlot && !pkgSlot) {
+            if (pkgBase === ignBase && ignSlot === "0")
+                return true;
+            return false;
+        }
+        if (pkgBase === ignBase)
+            return true;
+        return false;
+    }
+
+    function _isIgnored(pkg) {
+        if (!pkg || !pkg.name)
+            return false;
         const ignored = SettingsData.updaterIgnoredPackages || [];
+        for (let i = 0; i < ignored.length; i++) {
+            if (_packageMatchesIgnore(pkg.name, ignored[i]))
+                return true;
+        }
+        return false;
+    }
+
+    function _filterUpdates(pkgs) {
         return (pkgs || []).filter(p => {
             if (!SettingsData.updaterAllowAUR && p.repo === "aur")
                 return false;
             if (!canIgnorePackage(p))
                 return true;
-            return ignored.indexOf(p.name) === -1;
+            return !_isIgnored(p);
         });
     }
 
