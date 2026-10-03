@@ -39,7 +39,7 @@ Item {
                 resetKeys: ["showOnFullscreen"]
                 text: I18n.tr("Over fullscreen")
                 description: I18n.tr("Keeps the dock showing over fullscreen windows", "dock over fullscreen toggle description")
-                enabled: dock.config?.useOverlayLayer ?? false
+                enabled: (dock.config?.useOverlayLayer ?? false) || SettingsData.frameEnabled
                 checked: dock.config?.showOnFullscreen ?? false
                 onToggled: checked => dock.setOption("showOnFullscreen", checked)
             }

@@ -562,7 +562,7 @@ Item {
                 resetStore: bar
                 resetKeys: ["useOverlayLayer"]
                 tags: ["bar", "fullscreen", "overlay", "layer"]
-                visible: !bar.islandOwnsSelectedBarTop
+                visible: !bar.islandOwnsSelectedBarTop && !(bar.selectedBarFrameStyled && !SettingsData.connectedFrameModeActive)
                 text: I18n.tr("Use overlay layer")
                 checked: bar.selectedBarConfig?.useOverlayLayer ?? false
                 onToggled: toggled => {
@@ -576,7 +576,7 @@ Item {
             SettingsToggleRow {
                 settingKey: "islandUseOverlayLayer"
                 tags: ["island", "fullscreen", "overlay", "layer"]
-                visible: bar.selectedBarIsIsland
+                visible: bar.selectedBarIsIsland && !bar.selectedBarFrameStyled
                 resetStore: bar
                 resetKeys: ["islandUseOverlayLayer"]
                 text: I18n.tr("Use overlay layer")
@@ -584,18 +584,34 @@ Item {
                 onToggled: checked => bar.apply("islandUseOverlayLayer", checked)
             }
 
+            SettingsControlledBy {
+                visible: bar.selectedBarFrameStyled && (bar.selectedBarIsIsland || (!bar.islandOwnsSelectedBarTop && !SettingsData.connectedFrameModeActive))
+                parentModal: dankBarTab.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Use overlay layer")
+                reason: I18n.tr("Disabled by Frame Mode")
+            }
+
             SettingsToggleRow {
                 settingKey: "barMaximizeDetection"
                 resetStore: bar
                 resetKeys: ["maximizeDetection"]
                 tags: ["maximize", "gaps", "border", "fullscreen"]
-                visible: CompositorService.supportsBarAutoHideReveal
+                visible: CompositorService.supportsBarAutoHideReveal && !bar.selectedBarFrameStyled
                 text: I18n.tr("Maximize detection")
                 description: I18n.tr("Drops bar gaps and rounding while a window is maximized", "bar maximize detection toggle description")
                 checked: bar.selectedBarConfig?.maximizeDetection ?? true
                 onToggled: toggled => SettingsData.updateBarConfig(bar.selectedBarId, {
                         maximizeDetection: toggled
                     })
+            }
+
+            SettingsControlledBy {
+                visible: CompositorService.supportsBarAutoHideReveal && bar.selectedBarFrameStyled
+                parentModal: dankBarTab.parentModal
+                section: "frameBorder"
+                settingLabel: I18n.tr("Maximize detection")
+                reason: I18n.tr("Disabled by Frame Mode")
             }
 
             SettingsSliderRow {

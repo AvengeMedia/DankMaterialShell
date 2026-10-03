@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -8,6 +9,8 @@ Column {
     id: root
 
     property var parentModal: null
+
+    readonly property bool frameForcesOverlay: Quickshell.screens.length > 0 && Quickshell.screens.every(screen => CompositorService.frameWindowVisibleForScreen(screen))
 
     width: parent?.width ?? 0
     spacing: Theme.spacingL
@@ -161,7 +164,8 @@ Column {
             settingKey: "notificationOverlayEnabled"
             tags: ["notification", "overlay", "fullscreen", "priority"]
             text: I18n.tr("Over fullscreen")
-            checked: SettingsData.notificationOverlayEnabled
+            enabled: !root.frameForcesOverlay
+            checked: root.frameForcesOverlay || SettingsData.notificationOverlayEnabled
             onToggled: checked => SettingsData.set("notificationOverlayEnabled", checked)
         }
 

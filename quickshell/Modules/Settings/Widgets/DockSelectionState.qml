@@ -90,7 +90,7 @@ Item {
         return I18n.tr("Top", "screen edge position");
     }
 
-    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive
+    readonly property bool connectedFrameModeActive: SettingsData.connectedFrameModeActive && !(config?.useOverlayLayer ?? false)
     readonly property bool connectedPersistentDock: connectedFrameModeActive && (config?.enabled ?? false) && !(config?.autoHide ?? false) && !(config?.smartAutoHide ?? false)
     // An auto-hiding dock never reserves screen space, so its exclusive zone has nothing to offset.
     readonly property bool reservesSpace: !!config && !config.autoHide && !config.smartAutoHide && (!connectedFrameModeActive || connectedPersistentDock)
