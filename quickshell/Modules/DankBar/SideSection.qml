@@ -1,20 +1,27 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 
 BarSection {
     id: root
 
     property alias widgetLayoutLoader: layoutLoader
+    readonly property var layoutItem: layoutLoader.item
+    entryRepeater: layoutItem?.repeater ?? null
+    property real contentSize: 0
+    property real contentThickness: 0
+    onLayoutRequested: rolesTimer.restart()
 
     onXChanged: refreshBlur()
     onYChanged: refreshBlur()
 
-    implicitHeight: layoutLoader.item ? layoutLoader.item.implicitHeight : 0
-    implicitWidth: layoutLoader.item ? layoutLoader.item.implicitWidth : 0
+    implicitHeight: isVertical ? contentSize : contentThickness
+    implicitWidth: isVertical ? widgetThickness : contentSize
 
     onSegmentedChanged: rolesTimer.restart()
 
     function updateRoles() {
-        const repeater = layoutLoader.item?.repeater ?? null;
+        const repeater = entryRepeater;
         if (!repeater)
             return;
         const entries = [];
@@ -25,6 +32,20 @@ BarSection {
             participating.push(participation(wrapper, wrapper?.visible ?? false, wrapper?.widgetItem ?? null));
         }
         applyRoles(entries, participating);
+        const layout = inlineLayout();
+        contentSize = layout.totalSize;
+        let thickness = overflowCount > 0 ? barThickness : 0;
+        for (let index = 0; index < repeater.count; index++) {
+            const wrapper = repeater.itemAt(index);
+            if (!wrapper || layout.positions[index] === null)
+                continue;
+            thickness = Math.max(thickness, wrapper.itemHeight);
+            wrapper.x = isVertical ? 0 : layout.positions[index];
+            wrapper.y = isVertical ? layout.positions[index] : 0;
+        }
+        contentThickness = thickness;
+        overflowButtonPosition = layout.buttonPosition ?? 0;
+        refreshBlur();
     }
 
     Timer {
@@ -44,11 +65,9 @@ BarSection {
     Component {
         id: rowComponent
 
-        Row {
+        Item {
             readonly property int widgetCount: rowRepeater.count
             readonly property alias repeater: rowRepeater
-            spacing: root.widgetSpacing
-            anchors.right: root.section === "right" && parent ? parent.right : undefined
 
             Repeater {
                 id: rowRepeater
@@ -62,11 +81,10 @@ BarSection {
     Component {
         id: columnComponent
 
-        Column {
+        Item {
             readonly property int widgetCount: columnRepeater.count
             readonly property alias repeater: columnRepeater
             width: parent.width
-            spacing: root.widgetSpacing
 
             Repeater {
                 id: columnRepeater
@@ -80,16 +98,12 @@ BarSection {
     Component {
         id: widgetComponent
 
-        Item {
-            property var itemData: modelData
-            readonly property var widgetItem: widgetLoader.item
-            readonly property bool participates: visible && width > 0 && height > 0
-
-            readonly property bool itemShown: widgetLoader.item?.visible ?? false
-
-            visible: widgetLoader.active && widgetLoader.widgetEnabled
-            width: !itemShown ? 0 : root.isVertical ? root.width : widgetLoader.item.width
-            height: itemShown ? widgetLoader.item.height : 0
+        SectionEntry {
+            required property var modelData
+            required property int index
+            sectionContext: root
+            itemData: modelData
+            occurrenceOrder: index
             onXChanged: {
                 if (!root.isVertical)
                     root.refreshBlur();
@@ -100,18 +114,6 @@ BarSection {
             }
             onParticipatesChanged: rolesTimer.restart()
             onWidgetItemChanged: rolesTimer.restart()
-
-            SectionWidget {
-                id: widgetLoader
-
-                anchors.verticalCenter: !root.isVertical ? parent.verticalCenter : undefined
-                anchors.horizontalCenter: root.isVertical ? parent.horizontalCenter : undefined
-                occurrenceOrder: index
-                sectionContext: root
-                widgetData: itemData
-                isFirst: index === 0
-                isLast: index === (parent?.parent?.widgetCount ?? 0) - 1
-            }
         }
     }
 }

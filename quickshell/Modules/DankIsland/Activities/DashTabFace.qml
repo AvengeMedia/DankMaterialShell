@@ -22,10 +22,7 @@ FocusScope {
     readonly property real tabHeight: tab?.implicitHeight ?? 0
     readonly property real contentHeight: DashMetrics.panelHeightFor(entryId, tabHeight)
     readonly property bool handleHeader: !root.editMode
-    readonly property real editHeaderInset: PopoutMetrics.panelChromeInset + DashMetrics.contentPadding
-    readonly property real editBottomInset: PopoutMetrics.panelChromeInset + PopoutMetrics.editOverflow
-    // Card pills overhang their card by half their height and must stay inside the pages clip.
-    readonly property real pillOverhang: editMode ? PopoutMetrics.chromeButtonSize / 2 : 0
+    readonly property real pillOverhang: editMode ? DashMetrics.islandPillOverhang : 0
     readonly property int panelColumns: DashMetrics.panelColumnsFor(entryId)
     readonly property int contentRows: DashMetrics.rowsForHeight(tabHeight)
     readonly property int panelRows: Math.max(DashMetrics.panelFloorRowsFor(entryId), contentRows)
@@ -101,7 +98,7 @@ FocusScope {
         tabOptions.dismiss();
     }
     onEditModeChanged: {
-        root.controller.setEditing(root.activityId, editMode);
+        root.controller.setEditing(root.activityId, editMode, DashMetrics.islandEditRoom);
         if (!editMode) {
             panelResizer.cancel();
             return;
@@ -147,7 +144,7 @@ FocusScope {
             top: parent.top
             left: parent.left
             right: parent.right
-            topMargin: root.editMode ? root.editHeaderInset : 0
+            topMargin: root.editMode ? DashMetrics.islandEditHeaderInset : 0
             leftMargin: DashMetrics.contentPadding
             rightMargin: DashMetrics.contentPadding
         }
@@ -193,7 +190,7 @@ FocusScope {
             bottom: parent.bottom
             leftMargin: DashMetrics.contentPadding
             rightMargin: DashMetrics.contentPadding
-            bottomMargin: root.editMode ? root.editBottomInset : DashMetrics.contentPadding
+            bottomMargin: root.editMode ? DashMetrics.islandEditBottomInset : DashMetrics.contentPadding
         }
         contentHeight: tabLoader.y + tabLoader.height
         clip: contentHeight > height

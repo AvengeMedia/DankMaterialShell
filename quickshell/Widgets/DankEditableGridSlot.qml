@@ -22,6 +22,7 @@ Item {
     function moveDrag(scenePosition) {
         if (!dragOrigin || !dragging)
             return;
+        grid.dragScenePoint = scenePosition;
         const point = grid.mapFromItem(null, scenePosition.x, scenePosition.y);
         x = dragOrigin.x + point.x - dragOrigin.px;
         y = dragOrigin.y + point.y - dragOrigin.py;

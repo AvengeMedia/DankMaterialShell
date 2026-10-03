@@ -72,7 +72,8 @@ DankFloatingWindow {
 
                 Column {
                     anchors.fill: parent
-                    anchors.margins: Theme.spacingL
+                    anchors.margins: Theme.windowInset
+                    anchors.topMargin: 0
                     spacing: Theme.spacingM
 
                     DankSearchField {
@@ -180,8 +181,9 @@ DankFloatingWindow {
 
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
+                                    duration: Theme.expressiveDurations.expressiveFastEffects
+                                    easing.type: Easing.BezierSpline
+                                    easing.bezierCurve: Theme.expressiveCurves.expressiveEffects
                                 }
                             }
                         }

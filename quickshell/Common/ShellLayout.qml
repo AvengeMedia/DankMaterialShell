@@ -97,7 +97,10 @@ Singleton {
     }
 
     function frameReservation(screen, side) {
-        return edge(screen, side)?.frameReservation ?? 0;
+        const band = edge(screen, side);
+        if (SettingsData.frameShowOnOverview && CompositorService.overviewActiveOnScreen(screen))
+            return band?.overviewFrameReservation ?? 0;
+        return band?.frameReservation ?? 0;
     }
 
     function frameContentInset(screen, barId, side) {

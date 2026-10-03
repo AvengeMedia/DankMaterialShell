@@ -224,7 +224,9 @@ DankModal {
 
                 KeyboardNavigatedNotificationList {
                     id: notificationList
-                    width: parent.width
+                    x: -swipeBleed
+                    width: parent.width + swipeBleed * 2
+                    swipeBleed: Theme.spacingL
                     height: parent.height - y
                     visible: notificationHeader.currentTab === 0
                     keyboardController: modalKeyboardController
@@ -243,6 +245,7 @@ DankModal {
                     width: parent.width
                     height: parent.height - y
                     visible: notificationHeader.currentTab === 1
+                    swipeBleed: Theme.spacingL
                     Component.onCompleted: notificationModal.historyListRef = historyList
                 }
             }

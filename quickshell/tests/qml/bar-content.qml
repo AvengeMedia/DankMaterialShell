@@ -18,7 +18,7 @@ ShellRoot {
     function hosts(section) {
         const found = [];
         function visit(item) {
-            if (item.sectionContext !== undefined)
+            if (item.sectionContext !== undefined && item.widgetId !== undefined)
                 found.push(item);
             for (const child of item.children || [])
                 visit(child);
@@ -333,7 +333,7 @@ ShellRoot {
                     break;
                 case 8:
                     root.check(leftHosts[1].item.visible && first.widgetThickness === 36, "enabled and context updates remain bound");
-                    root.check(first.segmentRole === "first" && leftHosts[1].item.segmentRole === "middle" && last.segmentRole === "last" && centerHosts[1].item.segmentRole === "middle", "segment roles after enabling the middle occurrence");
+                    root.check(first.segmentRole === "first" && leftHosts[1].item.segmentRole === "middle" && last.segmentRole === "last" && centerHosts[1].item.segmentRole === "middle", "segment roles after enabling the middle occurrence: " + JSON.stringify([first.segmentRole, leftHosts[1].item.segmentRole, last.segmentRole, centerHosts[1].item.segmentRole, left.roles, center.roles]));
                     left.barConfig = {
                         id: "fixture",
                         widgetOutlineEnabled: true,

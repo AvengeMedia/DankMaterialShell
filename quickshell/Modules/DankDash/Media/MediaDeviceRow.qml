@@ -77,7 +77,6 @@ SettingsRow {
                 fillTextColor: Theme.selectedContainer
                 trackColor: Theme.onPrimary
                 trackTextColor: Theme.onSelectedContainer
-                thumbOutlineColor: Theme.selectedContainer
                 Accessible.name: I18n.tr("Volume") + ": " + root.title
                 onVolumeChangedByUser: volume => {
                     const audio = root.node?.audio;

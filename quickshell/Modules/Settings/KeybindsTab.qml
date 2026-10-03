@@ -587,6 +587,9 @@ Item {
 
     DankListView {
         id: flickable
+        keyNavigationEnabled: false
+        // ListView hands focus to every new current row; cleared, filtering can't steal it from the header search
+        currentIndex: -1
 
         readonly property real columnWidth: Math.min(SettingsMetrics.contentMaxWidth, width - Theme.spacingL * 2)
         property Item fabBar: null

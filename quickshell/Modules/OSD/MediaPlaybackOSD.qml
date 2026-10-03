@@ -262,7 +262,7 @@ DankOSD {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.fullRadius(width, height)
-                    color: Theme.surface
+                    color: Theme.hostSurface
                     opacity: 0.3
                 }
             }

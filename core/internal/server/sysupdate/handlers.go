@@ -49,6 +49,7 @@ func handleUpgrade(conn *ipc.ConnWriter, req ipc.Request, m *Manager) {
 		IncludeFlatpak: params.BoolOpt(req.Params, "includeFlatpak", true),
 		IncludeAUR:     params.BoolOpt(req.Params, "includeAUR", true),
 		DryRun:         params.BoolOpt(req.Params, "dry", false),
+		Interactive:    params.BoolOpt(req.Params, "interactive", false),
 		CustomCommand:  params.StringOpt(req.Params, "customCommand", ""),
 		Terminal:       params.StringOpt(req.Params, "terminal", ""),
 		TerminalArgs:   stringSliceOpt(req.Params, "terminalArgs"),

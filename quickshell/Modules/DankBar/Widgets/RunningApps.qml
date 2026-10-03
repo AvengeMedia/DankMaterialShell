@@ -365,7 +365,7 @@ BasePill {
                         anchors.centerIn: parent
                         text: windowCount > 9 ? "9+" : windowCount
                         font.pixelSize: 9
-                        color: Theme.surface
+                        color: Theme.onPrimary
                     }
                 }
 

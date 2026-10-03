@@ -38,7 +38,7 @@ jobs:
       - name: Install test dependencies
         run: |
           pacman-key --init
-          pacman -Syu --noconfirm --needed git make nodejs python quickshell qt6-declarative niri xorg-server-xvfb libxcursor ttf-dejavu dbus python-dbus-next
+          pacman -Syu --noconfirm --needed git make nodejs python lua quickshell qt6-declarative niri xorg-server-xvfb libxcursor ttf-dejavu dbus python-dbus-next
 
       - name: Record runtime versions
         run: |

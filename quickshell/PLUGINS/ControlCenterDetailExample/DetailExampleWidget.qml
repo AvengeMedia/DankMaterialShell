@@ -33,7 +33,7 @@ PluginComponent {
             id: detailRoot
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.cardSurface
             border.width: 0
             visible: true
 
@@ -66,7 +66,7 @@ PluginComponent {
                         width: parent.width
                         height: 40
                         radius: Theme.cornerRadius
-                        color: optionMouseArea.containsMouse ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0)
+                        color: optionMouseArea.containsMouse ? Theme.chipSurface : Theme.withAlpha(Theme.chipSurface, 0)
                         border.color: detailRoot.currentSelection === modelData ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                         border.width: detailRoot.currentSelection === modelData ? 2 : 0
 

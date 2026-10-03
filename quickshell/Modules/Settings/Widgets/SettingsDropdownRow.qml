@@ -41,6 +41,8 @@ SettingsRow {
 
     DankDropdown {
         id: dropdown
+        downKeyOpens: false
+        backgroundColor: SettingsMetrics.controlSurface
         enabled: root.enabled
         Accessible.name: root.text
         Accessible.description: root.description + (root.description ? " · " : "") + currentValue

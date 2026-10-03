@@ -6,6 +6,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
 import "../../Common/settings/DockConfig.js" as DockConfig
+import "../DankBar/OverflowLayout.js" as OverflowLayout
 
 Item {
     id: root
@@ -31,6 +32,7 @@ Item {
             }) : raw;
     }
     readonly property string widgetType: entry?.widgetId ?? entry?.id ?? ""
+    readonly property bool sectionAutoOverflow: SettingsData.getBarConfig(barId)?.[section + "OverflowMode"] !== "bar"
     readonly property var store: ({
             "get": key => root.value(key),
             "set": (key, value) => root.set(key, value),
@@ -78,12 +80,16 @@ Item {
         })
 
     function defaultOption(key) {
+        if (!dockHosted && key === "overflowMode")
+            return "section";
         if (dockHosted && widgetType === "appsDock" && key in _dockAppsDefaults)
             return _dockAppsDefaults[key];
         return SettingsData.widgetDefaults(widgetType)[key];
     }
 
     function value(key) {
+        if (!dockHosted && key === "overflowMode")
+            return entry?.overflowMode ?? "section";
         if (dockHosted && widgetType === "appsDock" && key in _dockAppsDefaults)
             return entry?.[key] ?? _dockAppsDefaults[key];
         return SettingsData.widgetOption(widgetType, entry, key);
@@ -132,7 +138,7 @@ Item {
             SettingsNavRow {
                 title: I18n.tr("Weather")
                 iconName: "partly_cloudy_day"
-                onClicked: root.parentModal?.navigateTo("weather")
+                onClicked: keyboard => root.parentModal?.navigateTo("weather", keyboard)
             }
         }
 
@@ -145,6 +151,20 @@ Item {
                 description: SettingsUiState.selectedWidgetDescription
                 checked: root.entry?.enabled !== false
                 onToggled: checked => root.set("enabled", checked)
+            }
+
+            SettingsDropdownRow {
+                readonly property var placementValues: ["section", "bar", "auto", "always"]
+                readonly property var placementLabels: [I18n.tr("Section default (%1)").arg(root.sectionAutoOverflow ? I18n.tr("Overflow when needed") : I18n.tr("Keep in Bar")), I18n.tr("Keep in Bar"), I18n.tr("Overflow when needed"), I18n.tr("Always in overflow")]
+
+                visible: !root.dockHosted && !OverflowLayout.pinned(root.widgetType)
+                resetStore: root.store
+                resetKeys: ["overflowMode"]
+                text: I18n.tr("Placement")
+                description: I18n.tr("Move this widget into overflow when the bar runs out of space")
+                options: placementLabels
+                currentValue: placementLabels[Math.max(0, placementValues.indexOf(root.value("overflowMode")))]
+                onValueChanged: value => root.set("overflowMode", placementValues[placementLabels.indexOf(value)])
             }
         }
 

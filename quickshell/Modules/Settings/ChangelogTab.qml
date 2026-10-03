@@ -36,7 +36,7 @@ Item {
                     iconName: "refresh"
                     busy: SystemUpdateService.isChecking
                     enabled: !SystemUpdateService.isChecking
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: SystemUpdateService.loadReleases(true)
                 }
@@ -45,7 +45,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: I18n.tr("View on GitHub")
                     iconName: "open_in_new"
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell/releases")
                 }

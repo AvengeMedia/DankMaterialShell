@@ -122,6 +122,9 @@ Item {
 
                     objectName: "notificationList"
                     anchors.fill: parent
+                    anchors.leftMargin: -PopoutMetrics.contentPadding
+                    anchors.rightMargin: -PopoutMetrics.contentPadding
+                    swipeBleed: PopoutMetrics.contentPadding
                     cardAnimateExpansion: root.host.animateCardExpansion ?? true
                     trackStableContentHeight: !root.hostOwnsHeight
                     trackSessionContentHeight: root.hostOwnsHeight
@@ -135,6 +138,7 @@ Item {
                 visible: notificationHeader.currentTab === 1
                 width: parent.width
                 height: parent.height - root.cachedHeaderHeight - contentColumnInner.spacing
+                swipeBleed: PopoutMetrics.contentPadding
             }
         }
     }

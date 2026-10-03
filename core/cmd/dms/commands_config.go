@@ -104,8 +104,6 @@ func checkHyprlandInclude(filename string) (IncludeResult, error) {
 		return result, err
 	}
 
-	targetRel := filepath.ToSlash(filepath.Join("dms", filename))
-
 	mainLua := filepath.Join(configDir, "hyprland.lua")
 	if _, err := os.Stat(mainLua); err == nil {
 		result.ConfigFormat = "lua"
@@ -124,7 +122,7 @@ func checkHyprlandInclude(filename string) (IncludeResult, error) {
 			result.ReadOnly = true
 		}
 		processed := make(map[string]bool)
-		if hyprlandFindIncludeHyprlang(mainConf, targetRel, processed) {
+		if hyprlandFindIncludeHyprlang(mainConf, targetAbs, processed) {
 			result.Included = true
 			return result, nil
 		}
@@ -167,22 +165,12 @@ func hyprlandFindIncludeHyprlang(filePath, target string, processed map[string]b
 			continue
 		}
 
-		sourcePath := strings.TrimSpace(parts[1])
-		if matchesTarget(sourcePath, target) {
-			return true
-		}
-
-		fullPath := sourcePath
-		if !filepath.IsAbs(sourcePath) {
-			fullPath = filepath.Join(baseDir, sourcePath)
-		}
-
-		expanded, err := utils.ExpandPath(fullPath)
+		fullPath, err := resolveSourcePath(baseDir, strings.TrimSpace(parts[1]))
 		if err != nil {
 			continue
 		}
 
-		if hyprlandFindIncludeHyprlang(expanded, target, processed) {
+		if fullPath == target || hyprlandFindIncludeHyprlang(fullPath, target, processed) {
 			return true
 		}
 	}
@@ -205,8 +193,13 @@ func checkNiriInclude(filename string) (IncludeResult, error) {
 		return result, nil
 	}
 
+	targetAbs, err := filepath.Abs(targetPath)
+	if err != nil {
+		return result, err
+	}
+
 	processed := make(map[string]bool)
-	result.Included = niriFindInclude(mainConfig, "dms/"+filename, processed)
+	result.Included = niriFindInclude(mainConfig, targetAbs, processed)
 	return result, nil
 }
 
@@ -248,17 +241,12 @@ func niriFindInclude(filePath, target string, processed map[string]bool) bool {
 			continue
 		}
 
-		includePath := trimmed[startQuote+1 : endQuote]
-		if matchesTarget(includePath, target) {
-			return true
+		fullPath, err := resolveSourcePath(baseDir, trimmed[startQuote+1:endQuote])
+		if err != nil {
+			continue
 		}
 
-		fullPath := includePath
-		if !filepath.IsAbs(includePath) {
-			fullPath = filepath.Join(baseDir, includePath)
-		}
-
-		if niriFindInclude(fullPath, target, processed) {
+		if fullPath == target || niriFindInclude(fullPath, target, processed) {
 			return true
 		}
 	}
@@ -284,8 +272,13 @@ func checkMangoWCInclude(filename string) (IncludeResult, error) {
 		return result, nil
 	}
 
+	targetAbs, err := filepath.Abs(targetPath)
+	if err != nil {
+		return result, err
+	}
+
 	processed := make(map[string]bool)
-	result.Included = mangowcFindInclude(mainConfig, "dms/"+filename, processed)
+	result.Included = mangowcFindInclude(mainConfig, targetAbs, processed)
 	return result, nil
 }
 
@@ -323,22 +316,12 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 			continue
 		}
 
-		sourcePath := strings.TrimSpace(parts[1])
-		if matchesTarget(sourcePath, target) {
-			return true
-		}
-
-		fullPath := sourcePath
-		if !filepath.IsAbs(sourcePath) {
-			fullPath = filepath.Join(baseDir, sourcePath)
-		}
-
-		expanded, err := utils.ExpandPath(fullPath)
+		fullPath, err := resolveSourcePath(baseDir, strings.TrimSpace(parts[1]))
 		if err != nil {
 			continue
 		}
 
-		if mangowcFindInclude(expanded, target, processed) {
+		if fullPath == target || mangowcFindInclude(fullPath, target, processed) {
 			return true
 		}
 	}
@@ -346,8 +329,13 @@ func mangowcFindInclude(filePath, target string, processed map[string]bool) bool
 	return false
 }
 
-func matchesTarget(path, target string) bool {
-	path = strings.TrimPrefix(path, "./")
-	target = strings.TrimPrefix(target, "./")
-	return path == target || strings.HasSuffix(path, "/"+target)
+func resolveSourcePath(baseDir, raw string) (string, error) {
+	expanded, err := utils.ExpandPath(raw)
+	if err != nil {
+		return "", err
+	}
+	if !filepath.IsAbs(expanded) {
+		expanded = filepath.Join(baseDir, expanded)
+	}
+	return filepath.Abs(expanded)
 }

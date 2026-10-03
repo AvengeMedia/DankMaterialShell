@@ -27,6 +27,7 @@ CcTile {
             return `${BatteryService.batteryLevel}% • ` + I18n.tr("Plugged in");
         return `${BatteryService.batteryLevel}%`;
     }
+    dockedText: available || profileMode ? subtitle : title
     active: available && (BatteryService.isCharging || BatteryService.isPluggedIn)
     opensPage: !profileMode
     showExpand: profileMode

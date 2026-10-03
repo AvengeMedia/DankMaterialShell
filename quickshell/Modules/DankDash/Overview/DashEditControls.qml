@@ -16,6 +16,7 @@ Item {
     property string pendingAction: ""
     readonly property var actionButtons: [addButton, optionsButton, customButton, resetButton, clearButton, finishButton]
     readonly property var focusTargets: actionButtons.filter(item => item.visible && item.enabled)
+    readonly property real focusPadding: Theme.focusRingOffset + Theme.focusRingWidth
 
     signal addRequested(var anchor)
     signal actionsRequested(var anchor)
@@ -37,10 +38,10 @@ Item {
             return;
         const point = target.mapToItem(viewport.contentItem, 0, 0);
         if (vertical) {
-            viewport.contentY = Math.max(0, Math.min(point.y, Math.max(viewport.contentY, point.y + target.height - viewport.height)));
+            viewport.contentY = Math.max(0, Math.min(point.y - focusPadding, Math.max(viewport.contentY, point.y + target.height + focusPadding - viewport.height)));
             return;
         }
-        viewport.contentX = Math.max(0, Math.min(point.x, Math.max(viewport.contentX, point.x + target.width - viewport.width)));
+        viewport.contentX = Math.max(0, Math.min(point.x - focusPadding, Math.max(viewport.contentX, point.x + target.width + focusPadding - viewport.width)));
     }
 
     function cancelConfirmation() {
@@ -101,9 +102,10 @@ Item {
     DankFlickable {
         id: viewport
         anchors.fill: parent
+        anchors.margins: -root.focusPadding
         showScrollBar: false
-        contentWidth: root.vertical ? width : Math.max(width, actions.implicitWidth)
-        contentHeight: root.vertical ? actions.implicitHeight : height
+        contentWidth: root.vertical ? width : Math.max(width, actions.implicitWidth + root.focusPadding * 2)
+        contentHeight: root.vertical ? actions.implicitHeight + root.focusPadding * 2 : height
         flickableDirection: root.vertical ? Flickable.VerticalFlick : Flickable.HorizontalFlick
         wheelEnabled: root.vertical
         clip: true
@@ -119,8 +121,8 @@ Item {
 
         Grid {
             id: actions
-            x: Math.max(0, (viewport.width - implicitWidth) / 2)
-            y: root.vertical ? 0 : Math.max(0, (viewport.height - implicitHeight) / 2)
+            x: Math.max(root.focusPadding, (viewport.width - implicitWidth) / 2)
+            y: root.vertical ? root.focusPadding : Math.max(root.focusPadding, (viewport.height - implicitHeight) / 2)
             columns: root.vertical ? 1 : root.actionButtons.length
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter

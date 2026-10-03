@@ -1,66 +1,114 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell
 import qs.Common
 
 Item {
     id: root
 
-    anchors.fill: parent
-
     property string screenName: ""
-    readonly property bool ready: logo.status !== Image.Loading
-    property bool isColorWallpaper: {
-        var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
-        return currentWallpaper && currentWallpaper.startsWith("#");
+    property real blur: 0
+    property int blurMax: Theme.wallpaperBlurMax
+    readonly property string source: SessionData.getMonitorWallpaper(screenName)
+    readonly property bool isColorWallpaper: source.startsWith("#")
+    readonly property var composition: SessionData.getMonitorMaterialWallpaper(screenName)
+    readonly property var palette: Theme.wallpaperPalette()
+    readonly property real pixelRatio: Window.window?.devicePixelRatio ?? Screen.devicePixelRatio
+    readonly property string renderKey: JSON.stringify([source, composition, palette, width, height, pixelRatio, blur, blurMax])
+    readonly property bool ready: isColorWallpaper || frozenValid
+    readonly property bool liveReady: liveActive && (wallpaper.item?.ready ?? false)
+    property bool liveActive: false
+    property bool frozenValid: false
+    property bool snapshotEnabled: true
+    property bool capturePending: false
+    property string capturedKey: ""
+
+    signal invalidated
+
+    anchors.fill: parent
+    onRenderKeyChanged: refresh()
+    onReadyChanged: invalidated()
+    onLiveReadyChanged: capture()
+
+    function capture() {
+        if (!liveReady || capturePending || !frozen.item)
+            return;
+        capturedKey = renderKey;
+        capturePending = true;
+        frozen.item.scheduleUpdate();
+        invalidated();
+    }
+
+    function refresh() {
+        frozenValid = false;
+        liveActive = !isColorWallpaper;
+        capture();
+        invalidated();
+    }
+
+    Connections {
+        target: root.QsWindow.window
+        function onResourcesLost() {
+            root.snapshotEnabled = false;
+            root.refresh();
+            root.snapshotEnabled = true;
+        }
     }
 
     Rectangle {
         anchors.fill: parent
-        color: isColorWallpaper ? SessionData.getMonitorWallpaper(screenName) : Theme.background
+        color: root.isColorWallpaper ? root.source : root.palette.surface
     }
 
-    Rectangle {
-        x: parent.width * 0.7
-        y: -parent.height * 0.3
-        width: parent.width * 0.8
-        height: parent.height * 1.5
-        color: Theme.primaryPressed
-        rotation: 35
-        visible: !isColorWallpaper
+    Loader {
+        id: frozen
+        anchors.fill: parent
+        active: !root.isColorWallpaper && root.snapshotEnabled
+        visible: root.liveActive || root.frozenValid
+        onLoaded: root.capture()
+        onActiveChanged: {
+            if (!active)
+                root.capturePending = false;
+        }
+        sourceComponent: ShaderEffectSource {
+            sourceItem: liveContainer
+            live: false
+            hideSource: true
+            smooth: true
+            onScheduledUpdateCompleted: {
+                root.capturePending = false;
+                if (root.capturedKey !== root.renderKey || !root.liveReady) {
+                    root.capture();
+                    return;
+                }
+                root.frozenValid = true;
+                root.liveActive = false;
+                root.invalidated();
+            }
+        }
     }
 
-    Rectangle {
-        x: parent.width * 0.85
-        y: -parent.height * 0.2
-        width: parent.width * 0.4
-        height: parent.height * 1.2
-        color: Theme.secondaryHover
-        rotation: 35
-        visible: !isColorWallpaper
-    }
-
-    Image {
-        id: logo
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: Theme.spacingXL * 2
-        anchors.bottomMargin: Theme.spacingXL * 2
-        width: 200
-        height: width * (569.94629 / 506.50931)
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        mipmap: true
-        asynchronous: true
-        source: "file://" + Theme.shellDir + "/assets/danklogonormal.svg"
-        opacity: 0.25
-        visible: !isColorWallpaper
-        layer.enabled: true
-        layer.smooth: true
-        layer.mipmap: true
+    Item {
+        id: liveContainer
+        anchors.fill: parent
+        visible: root.liveActive
+        layer.enabled: root.liveActive && root.blur > 0
         layer.effect: MultiEffect {
-            saturation: 0
-            colorization: 1
-            colorizationColor: Theme.primary
+            autoPaddingEnabled: false
+            blurEnabled: true
+            blur: root.blur
+            blurMax: root.blurMax
+        }
+
+        Loader {
+            id: wallpaper
+            anchors.fill: parent
+            active: root.liveActive
+            sourceComponent: MaterialWallpaper {
+                composition: root.composition
+                palette: root.palette
+                onInvalidated: root.invalidated()
+            }
         }
     }
 }

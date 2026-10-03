@@ -56,7 +56,7 @@ Item {
                             width: parent.width
                             height: paletteColumn.implicitHeight + Theme.spacingM * 2
                             radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
+                            color: SettingsMetrics.controlColor
 
                             Column {
                                 id: paletteColumn
@@ -84,41 +84,19 @@ Item {
 
                                     DankToggle {
                                         id: enableToggle
-                                        width: 40
-                                        height: 24
                                         hideText: true
                                         checked: paletteItem.modelData.enabled !== false
                                         onToggled: checked => PaletteInjectService.updatePalette(paletteItem.index, "enabled", checked)
                                     }
 
-                                    Item {
-                                        id: deleteBtn
-                                        Accessible.role: Accessible.Button
-                                        Accessible.name: I18n.tr("Remove")
-                                        width: 28
-                                        height: 28
+                                    DankActionButton {
+                                        buttonSize: Theme.buttonHeightXXS
+                                        iconName: "delete"
+                                        iconColor: Theme.surfaceVariantText
+                                        stateColor: Theme.error
+                                        tooltipText: I18n.tr("Remove")
                                         anchors.verticalCenter: parent.verticalCenter
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: Theme.cornerRadius
-                                            color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                        }
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: "delete"
-                                            size: 18
-                                            color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: deleteArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: PaletteInjectService.removePalette(paletteItem.index)
-                                        }
+                                        onClicked: PaletteInjectService.removePalette(paletteItem.index)
                                     }
                                 }
 

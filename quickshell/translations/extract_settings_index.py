@@ -5,6 +5,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from extract_translations import STR_DQ, STR_SQ, decode_string_literal
+
 ABBREVIATIONS = {
     "on-screen displays": ["osd"],
     "on-screen display": ["osd"],
@@ -99,6 +101,7 @@ TAB_INDEX_MAP = {
     "KeybindsTab.qml": 2,
     "DankBarTab.qml": 3,
     "DankDashTab.qml": 43,
+    "DigitalWellbeingTab.qml": 67,
     "CompositorLayoutTab.qml": 37,
     "WindowRulesTab.qml": 38,
     "DockGeneralTab.qml": 5,
@@ -252,7 +255,7 @@ def enrich_keywords(label, description, category, existing_tags, parent_label=No
     keywords = set(existing_tags)
 
     label_lower = label.lower()
-    label_words = re.split(r"[\s\-_&/]+", label_lower)
+    label_words = re.split(r"[\s\-_&/\"]+", label_lower)
     keywords.update(w for w in label_words if len(w) > 2)
     keywords.update(alias_keywords(label_lower))
 
@@ -275,12 +278,10 @@ def enrich_keywords(label, description, category, existing_tags, parent_label=No
 
 
 def extract_i18n_string(value):
-    match = re.search(r'I18n\.tr\(["\']([^"\']+)["\']', value)
-    if match:
-        return match.group(1)
-    match = re.search(r'^["\']([^"\']+)["\']$', value.strip())
-    if match:
-        return match.group(1)
+    for literal, quote in ((STR_DQ, '"'), (STR_SQ, "'")):
+        match = re.search(rf"I18n\.tr\(\s*{literal}", value) or re.fullmatch(literal, value.strip())
+        if match and match.group(1):
+            return decode_string_literal(match.group(1), quote)
     return None
 
 
@@ -589,9 +590,11 @@ def parse_structure_entry(block, parent=None):
         own = block[: children_match.start()] + block[end + 1 :]
 
     tab_index_match = re.search(r'"tabIndex"\s*:\s*(\d+)', own)
+    label = i18n_prop(own, "text")
     entry = {
         "id": string_prop(own, "id"),
-        "label": i18n_prop(own, "text"),
+        "label": label,
+        "runtimeLabel": label is None and re.search(r'"text"\s*:', own) is not None,
         "icon": string_prop(own, "icon"),
         "tabIndex": int(tab_index_match.group(1)) if tab_index_match else None,
         "hint": i18n_prop(own, "hint"),
@@ -679,8 +682,8 @@ def generate_tab_entries(leaves, settings_entries):
 
     entries = []
     for leaf in leaves:
-        base_label = leaf["label"]
-        if not base_label or leaf["children"]:
+        base_label = leaf["label"] or ""
+        if leaf["children"] or not (base_label or leaf["runtimeLabel"]):
             continue
         label = (
             f"{leaf['parentLabel']}: {base_label}"
@@ -705,6 +708,8 @@ def generate_tab_entries(leaves, settings_entries):
             entry["description"] = leaf["hint"]
         if leaf["conditionKey"]:
             entry["conditionKey"] = leaf["conditionKey"]
+        if leaf["runtimeLabel"]:
+            entry["runtimeType"] = "pageLabel"
         entries.append(entry)
 
     return entries

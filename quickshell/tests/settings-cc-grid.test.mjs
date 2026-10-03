@@ -28,12 +28,5 @@ test("sparse settings migrate without inventing grid keys", () => {
 
 test("header entries become a user row and lock, power and settings tiles", () => {
     const released = store.migrateToVersion({ configVersion: 18, controlCenterWidgets: [{ id: "wifi", width: 50 }] }, 35);
-    assert.deepEqual(JSON.parse(JSON.stringify(released.controlCenterWidgets.map(w => [w.id, w.w, w.h]))), [["user", 5, 1], ["settings", 1, 1], ["lock", 1, 1], ["power", 1, 1], ["wifi", 4, 1]]);
-});
-
-test("layouts saved before the running apps tile get one appended", () => {
-    const migrated = store.migrateToVersion({ configVersion: 35, controlCenterColumns: 6, controlCenterWidgets: [{ id: "wifi", w: 4, h: 1 }] }, 36);
-    assert.deepEqual(JSON.parse(JSON.stringify(migrated.controlCenterWidgets)), [{ id: "wifi", w: 4, h: 1 }, { id: "runningApps", enabled: true, w: 5, h: 1, small: true }]);
-    const kept = store.migrateToVersion({ configVersion: 35, controlCenterWidgets: [{ id: "runningApps", w: 2, h: 1, col: 0, row: 3 }] }, 36);
-    assert.deepEqual(JSON.parse(JSON.stringify(kept.controlCenterWidgets)), [{ id: "runningApps", w: 2, h: 1, col: 0, row: 3 }]);
+    assert.deepEqual(JSON.parse(JSON.stringify(released.controlCenterWidgets.map(w => [w.id, w.w, w.h, !!w.footer]))), [["user", 5, 1, false], ["settings", 1, 1, false], ["lock", 1, 1, false], ["power", 1, 1, false], ["wifi", 4, 1, false], ["runningApps", 4, 1, true]]);
 });

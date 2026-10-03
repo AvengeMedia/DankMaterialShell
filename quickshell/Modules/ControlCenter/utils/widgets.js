@@ -3,71 +3,19 @@
 .import qs.Modules.ControlCenter as ControlCenter
 .import "../../../Common/GridLayout.js" as GridLayout
 
-var OPTION_IDS = ["diskUsage", "brightnessSlider", "idleInhibitor", "user", "runningApps"];
+var OPTION_IDS = ["diskUsage", "brightnessSlider", "idleInhibitor", "user"];
 var ACTION_IDS = ["settings", "lock", "power"];
-var BUTTON_IDS = ACTION_IDS.concat(["edit"]);
-var SMALL_BY_DEFAULT = BUTTON_IDS.concat(["runningApps"]);
-var CARD_IDENTITY = "user";
+var FOOTER_CELLS = {
+    "runningApps": 4,
+    "user": 3,
+    "volumeSlider": 4,
+    "inputVolumeSlider": 4,
+    "brightnessSlider": 4
+};
 var USER_SHAPES = ["circle", "cookie4", "cookie7", "cookie12", "clover4", "clover8", "sunny", "pentagon", "arch", "slanted", "gem", "square"];
 
 function isSliderWidget(id) {
     return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
-}
-
-function isButton(id) {
-    return BUTTON_IDS.includes(id);
-}
-
-// A "user" entry marks where the identity sits among the card's buttons.
-function cardOrder(widget) {
-    const saved = Array.isArray(widget?.actions) ? widget.actions : [];
-    const order = saved.filter((id, i) => (id === CARD_IDENTITY || BUTTON_IDS.includes(id)) && saved.indexOf(id) === i);
-    return order.includes(CARD_IDENTITY) ? order : [CARD_IDENTITY].concat(order);
-}
-
-function cardActions(widget) {
-    return cardOrder(widget).filter(id => id !== CARD_IDENTITY);
-}
-
-function actionColumns(rows, count) {
-    return count > 0 ? Math.ceil(count / Math.max(1, Math.min(count, Math.floor(Number(rows) || 1)))) : 0;
-}
-
-function cardColumns(order, rows) {
-    const split = order.indexOf(CARD_IDENTITY);
-    return actionColumns(rows, split) + actionColumns(rows, order.length - split - 1);
-}
-
-function moveInOrder(order, id, targetId) {
-    const from = order.indexOf(id);
-    const to = order.indexOf(targetId);
-    if (from < 0 || to < 0 || from === to)
-        return order;
-    const moved = order.slice();
-    moved.splice(from, 1);
-    moved.splice(to, 0, id);
-    return moved;
-}
-
-function placedIds(widgets) {
-    return (widgets || []).reduce((ids, widget) => ids.concat([widget?.id], cardActions(widget)), []);
-}
-
-function triggerButton(host, id) {
-    switch (id) {
-    case "lock":
-        host?.lockRequested();
-        return;
-    case "power":
-        host?.powerRequested();
-        return;
-    case "settings":
-        host?.settingsRequested();
-        return;
-    case "edit":
-        host?.editRequested();
-        return;
-    }
 }
 
 function canShrink(id) {
@@ -76,6 +24,44 @@ function canShrink(id) {
 
 function isSmall(widget, rows) {
     return widget?.small === true && rows === 1 && canShrink(widget.id);
+}
+
+function inFooter(widget) {
+    return !!widget?.footer;
+}
+
+function footerMinCells(id) {
+    return isSliderWidget(id) ? 3 : 1;
+}
+
+// `footerW` outlives the footer flag, so an item dragged back in returns at the width it left with.
+function footerCells(widget) {
+    return Math.max(footerMinCells(widget?.id), Math.round(Number(widget?.footerW) || FOOTER_CELLS[widget?.id] || 1));
+}
+
+function footerFills(widget) {
+    return widget?.footerFill === true;
+}
+
+function footerEnds(widget) {
+    return widget?.footerEnd === true;
+}
+
+function fitFooterCells(sizes, mins, capacity) {
+    const fitted = sizes.slice();
+    let over = fitted.reduce((sum, cells) => sum + cells, 0) - capacity;
+    while (over > 0) {
+        const widest = fitted.reduce((best, cells, i) => cells > mins[i] && (best < 0 || cells > fitted[best]) ? i : best, -1);
+        if (widest < 0)
+            break;
+        fitted[widest]--;
+        over--;
+    }
+    for (let i = fitted.length - 1; over > 0 && i >= 0; i--) {
+        over -= fitted[i];
+        fitted[i] = 0;
+    }
+    return fitted;
 }
 
 function isShown(widget) {
@@ -127,13 +113,9 @@ function sizeSpec(widget, columns, rows = Infinity) {
         "maxH": rows,
         "step": ControlCenter.CcMetrics.gridStep
     };
-    if (widget?.id === "user") {
+    if (widget?.id === "user")
         spec.w = (Number.isFinite(columns) ? columns : ControlCenter.CcMetrics.defaultColumns) - ACTION_IDS.length;
-        spec.minW = Math.min(columns, 1 + cardColumns(cardOrder(widget), widget.h));
-    }
-    if (widget?.id === "runningApps")
-        spec.w = Number.isFinite(columns) ? columns : ControlCenter.CcMetrics.defaultColumns;
-    if (isButton(widget?.id))
+    if (ACTION_IDS.includes(widget?.id))
         spec.w = 1;
     return spec;
 }
@@ -160,7 +142,7 @@ function clampSize(widget, columns, rows = Infinity) {
 function addWidget(widgetId, columns) {
     const widgets = Common.SettingsData.controlCenterWidgets.slice();
     const widget = defaultWidget(widgetId, columns);
-    if (SMALL_BY_DEFAULT.includes(widgetId))
+    if (ACTION_IDS.includes(widgetId))
         widget.small = true;
 
     if (widgetId === "diskUsage") {
@@ -200,48 +182,67 @@ function setOption(index, key, value) {
     Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
-// A button lives in the card or the grid, never both; returns the card's index since tiles moving in or out shift it.
-function setCardAction(index, id, enabled, columns) {
+// Footer order is the saved order of footer entries, so the moved entry lands just before `beforeIndex`.
+function moveToFooter(index, beforeIndex, cells, end) {
     const widgets = Common.SettingsData.controlCenterWidgets.slice();
-    const card = widgets[index];
-    if (!card)
-        return index;
-    const before = cardOrder(card);
-    const order = before.filter(action => action !== id).concat(enabled ? [id] : []);
-    const width = clampSize(card, columns).w;
-    const w = Math.max(1, Math.min(columns, width + cardColumns(order, card.h) - cardColumns(before, card.h)));
-    const updated = Object.assign({}, card, {
-        "actions": order,
-        "w": w
+    const widget = widgets[index];
+    if (!widget)
+        return;
+    const before = beforeIndex === index ? null : widgets[beforeIndex] ?? null;
+    widgets.splice(index, 1);
+    const at = before ? widgets.indexOf(before) : widgets.length;
+    const moved = Object.assign({}, widget, {
+        "footer": true,
+        "footerW": cells
     });
-    widgets[index] = updated;
-    if (enabled)
-        return commitCard(widgets.filter(widget => widget?.id !== id), updated);
-    if (!before.includes(id) || placedIds(widgets).includes(id))
-        return commitCard(widgets, updated);
-
-    const tile = Object.assign(defaultWidget(id, columns), {
-        "small": true
-    });
-    const leading = before.indexOf(id) < before.indexOf(CARD_IDENTITY);
-    const freed = width - w;
-    if (isUnplaced(card)) {
-        widgets.splice(leading ? index : index + 1, 0, tile);
-    } else if (freed > 0) {
-        tile.col = leading ? card.col : card.col + w;
-        tile.row = card.row;
-        if (leading)
-            updated.col = card.col + freed;
-        widgets.splice(index + 1, 0, tile);
-    } else {
-        widgets.push(tile);
-    }
-    return commitCard(widgets, updated);
+    if (end)
+        moved.footerEnd = true;
+    else
+        delete moved.footerEnd;
+    widgets.splice(at, 0, moved);
+    Common.SettingsData.set("controlCenterWidgets", widgets);
 }
 
-function commitCard(widgets, card) {
+// Hands spare cells to fill items, the earlier ones taking the remainder.
+function spreadFooterFill(cells, fills, spare) {
+    const count = fills.filter(Boolean).length;
+    if (count === 0 || spare <= 0)
+        return cells;
+    let left = spare;
+    return cells.map((size, i) => {
+        if (!fills[i] || size === 0)
+            return size;
+        const share = Math.ceil(left / count);
+        left -= share;
+        return size + Math.max(0, share);
+    });
+}
+
+function setFooterSize(index, cells, fill) {
+    const widgets = Common.SettingsData.controlCenterWidgets.slice();
+    if (!widgets[index])
+        return;
+    const widget = Object.assign({}, widgets[index], {
+        "footerW": cells
+    });
+    if (fill)
+        widget.footerFill = true;
+    else
+        delete widget.footerFill;
+    widgets[index] = widget;
     Common.SettingsData.set("controlCenterWidgets", widgets);
-    return widgets.indexOf(card);
+}
+
+function placeFromFooter(widgets, index, col, row) {
+    const tile = Object.assign({}, widgets[index], {
+        "col": col,
+        "row": row
+    });
+    delete tile.footer;
+    delete tile.footerEnd;
+    const placed = widgets.slice();
+    placed[index] = tile;
+    return placed;
 }
 
 function setLayout(widgets) {
@@ -249,7 +250,7 @@ function setLayout(widgets) {
 }
 
 function resetToDefault() {
-    Common.SettingsData.resetToDefault(["controlCenterWidgets", "controlCenterColumns"]);
+    Common.SettingsData.resetToDefault(["controlCenterWidgets", "controlCenterColumns", "controlCenterFooterPosition"]);
 }
 
 function clearAll() {

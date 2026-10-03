@@ -72,7 +72,11 @@ Singleton {
     readonly property var notesRelease: {
         const list = releases?.releases ?? [];
         const mm = notesVersion.match(/^\d+\.\d+/)?.[0] ?? "";
-        return list.find(r => r.version === notesVersion) ?? list.find(r => mm !== "" && (r.version === mm || r.version.startsWith(mm + "."))) ?? null;
+        const match = list.find(r => r.version === notesVersion) ?? list.find(r => mm !== "" && (r.version === mm || r.version.startsWith(mm + "."))) ?? null;
+        if (match || shellChannel === "stable")
+            return match;
+        // Git builds may carry no semver (Fedora: 0.0.git.N.sha) or run past the newest tag
+        return list.find(r => !r.prerelease) ?? null;
     }
     readonly property bool shellManagedExternally: shellInstallMethod === "nix"
     readonly property bool helperAvailable: sysupdateAvailable && backends.length > 0
@@ -260,7 +264,6 @@ Singleton {
         DMSService.notifySend({
             "summary": count === 1 ? I18n.tr("%1 update", "singular, %1 is 1, available system update count").arg(count) : I18n.tr("%1 updates", "plural, %1 is a count of available system updates").arg(count),
             "body": I18n.tr("Software updates are ready to install."),
-            "icon": "system-software-update",
             "actionLabel": I18n.tr("Settings"),
             "actionArgs": ["ipc", "call", "settings", "openWith", "updater"]
         }, resp => {

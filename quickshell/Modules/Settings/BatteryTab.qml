@@ -132,12 +132,12 @@ done
 
                     Item {
                         width: parent.width
-                        height: 4
+                        height: Theme.spacingXS
 
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.fullRadius(width, height)
-                            color: Theme.withAlpha(Theme.primary, 0.16)
+                            color: Theme.withAlpha(root.batteryStatusColor, Theme.tonalTintAlpha)
                         }
 
                         Rectangle {
@@ -358,6 +358,14 @@ done
                 minimum: 1
                 maximum: 30
                 onSliderValueChanged: newValue => SettingsData.set("batteryCriticalThreshold", newValue)
+            }
+
+            SettingsToggleRow {
+                settingKey: "batteryCriticalAnimation"
+                tags: ["battery", "critical", "indicator", "animation", "pulse", "blink"]
+                text: I18n.tr("Pulse animation", "critical battery indicator animation toggle")
+                checked: SettingsData.batteryCriticalAnimation
+                onToggled: checked => SettingsData.set("batteryCriticalAnimation", checked)
             }
 
             SettingsToggleRow {

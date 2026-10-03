@@ -192,7 +192,7 @@ Item {
             DankFab {
                 text: I18n.tr("Add user")
                 iconName: "person_add"
-                onClicked: root.parentModal?.navigateTo("user_create")
+                onClicked: keyboard => root.parentModal?.navigateTo("user_create", keyboard)
             }
         }
     }

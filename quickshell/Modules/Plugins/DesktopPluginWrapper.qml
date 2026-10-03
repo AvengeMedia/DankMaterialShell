@@ -636,7 +636,7 @@ Item {
                 width: helperRow.implicitWidth + Theme.spacingM * 2
                 height: 32
                 radius: Theme.cornerRadius
-                color: Theme.surface
+                color: Theme.hostSurface
 
                 Row {
                     id: helperRow

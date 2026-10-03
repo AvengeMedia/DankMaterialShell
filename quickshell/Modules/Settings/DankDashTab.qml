@@ -27,7 +27,7 @@ FocusScope {
                 settingKey: "dashWeatherSettings"
                 title: I18n.tr("Weather")
                 iconName: "partly_cloudy_day"
-                onClicked: root.parentModal?.navigateTo("weather")
+                onClicked: keyboard => root.parentModal?.navigateTo("weather", keyboard)
             }
         }
 
@@ -40,7 +40,20 @@ FocusScope {
                 title: I18n.tr("Media player")
                 hint: I18n.tr("Lyrics providers", "Lyrics source priority settings")
                 iconName: "music_note"
-                onClicked: root.parentModal?.navigateTo("media_player")
+                onClicked: keyboard => root.parentModal?.navigateTo("media_player", keyboard)
+            }
+        }
+
+        SettingsCard {
+            title: I18n.tr("Digital wellbeing")
+
+            SettingsNavRow {
+                tab: "dank_dash"
+                settingKey: "dashWellbeingSettings"
+                title: I18n.tr("Digital wellbeing")
+                hint: I18n.tr("Screen time and app limits")
+                iconName: "digital_wellbeing"
+                onClicked: root.parentModal?.navigateTo("wellbeing")
             }
         }
 

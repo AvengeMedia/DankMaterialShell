@@ -270,59 +270,23 @@ Column {
         }
 
         SettingsRow {
-            body: Column {
-                width: parent.width
-                spacing: Theme.spacingS
+            subtitle: I18n.tr("Right-click a notification and choose \"Allow in Do Not Disturb\" to add an app")
+        }
 
-                StyledText {
-                    text: I18n.tr("Right-click a notification and choose \"Allow in Do Not Disturb\" to add an app")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    bottomPadding: Theme.spacingS
-                }
+        Repeater {
+            model: root.dndBypassRules
 
-                Repeater {
-                    model: root.dndBypassRules
+            delegate: SettingsRow {
+                required property var modelData
 
-                    delegate: Rectangle {
-                        width: parent.width
-                        height: dndBypassRow.implicitHeight + Theme.spacingS * 2
-                        radius: Theme.cornerRadius
-                        color: Theme.floatingWindowFieldColor
+                title: modelData.rule?.pattern || I18n.tr("Unknown")
+                singleLineTitle: true
 
-                        Row {
-                            id: dndBypassRow
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingS
-                            spacing: Theme.spacingM
-
-                            StyledText {
-                                id: dndBypassLabel
-                                text: modelData.rule.pattern || I18n.tr("Unknown")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item {
-                                width: Math.max(0, parent.width - parent.spacing * 2 - dndBypassLabel.width - dndBypassRemoveBtn.width)
-                                height: 1
-                            }
-
-                            DankActionButton {
-                                id: dndBypassRemoveBtn
-                                buttonSize: 28
-                                iconName: "delete"
-                                Accessible.name: I18n.tr("Remove")
-                                iconSize: 18
-                                iconColor: Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: SettingsData.removeNotificationRule(modelData.index)
-                            }
-                        }
-                    }
+                DankActionButton {
+                    iconName: "delete"
+                    iconColor: Theme.error
+                    tooltipText: I18n.tr("Remove")
+                    onClicked: SettingsData.removeNotificationRule(modelData.index)
                 }
             }
         }
@@ -335,7 +299,7 @@ Column {
             iconName: "rule_settings"
             title: I18n.tr("Rules")
             hint: SettingsTabs.page("notification_rules")?.hint ?? ""
-            onClicked: root.parentModal?.navigateTo("notification_rules")
+            onClicked: keyboard => root.parentModal?.navigateTo("notification_rules", keyboard)
         }
     }
 

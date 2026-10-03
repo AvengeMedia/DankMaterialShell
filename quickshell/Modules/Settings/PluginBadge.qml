@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Rectangle {
     id: root
@@ -8,12 +9,11 @@ Rectangle {
     property string label: ""
     property string iconName: ""
     property color tone: Theme.primary
-    property bool onImage: false
 
     height: Theme.iconSize
     width: content.implicitWidth + Theme.spacingS * 2
     radius: Theme.cornerRadiusS
-    color: Theme.chipSurface
+    color: SettingsMetrics.controlColor
     border.color: Theme.outlineVariant
     border.width: Theme.outlineWidth
 

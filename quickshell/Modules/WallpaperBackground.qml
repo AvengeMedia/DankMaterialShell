@@ -137,7 +137,7 @@ Variants {
             property string currentSource: ""
             property bool frozenValid: false
             property int _freezeWaitFrames: 0
-            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentSource !== ""
+            readonly property bool overviewBlurActive: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && (currentSource !== "" || showsBackdrop)
             readonly property var backingWindow: Window.window
             readonly property bool showsBackdrop: !source || isColorSource || currentWallpaper.status === Image.Error
             readonly property bool backdropBusy: showsBackdrop && !(backdropLoader.item?.ready ?? false)
@@ -605,6 +605,9 @@ Variants {
             }
 
             function setWallpaperImmediate(newSource) {
+                root.pendingWallpaper = "";
+                root._deferredSource = "";
+                root._freezeWaitFrames = 0;
                 transitionDelayTimer.stop();
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
@@ -655,6 +658,9 @@ Variants {
             }
 
             function changeWallpaper(newPath) {
+                const expectedSource = root.source.startsWith("file://") ? root.source : encodeFileUrl(root.source);
+                if (newPath !== expectedSource)
+                    return;
                 if (!newPath || newPath.startsWith("#")) {
                     root.changePending = false;
                     return;
@@ -721,6 +727,8 @@ Variants {
 
                 sourceComponent: DankBackdrop {
                     screenName: modelData.name
+                    blur: root.overviewBlurActive ? Theme.wallpaperBlur : 0
+                    onInvalidated: root.invalidate()
                 }
             }
 
@@ -1167,7 +1175,7 @@ Variants {
             Loader {
                 id: overviewBlurLoader
                 anchors.fill: parent
-                active: root.overviewBlurActive
+                active: root.overviewBlurActive && !root.showsBackdrop
 
                 sourceComponent: MultiEffect {
                     anchors.fill: parent

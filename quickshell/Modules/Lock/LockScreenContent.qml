@@ -190,6 +190,8 @@ Item {
 
         sourceComponent: DankBackdrop {
             screenName: root.screenName
+            blur: Theme.lockScreenBlur
+            blurMax: Theme.lockScreenBlurMax
         }
     }
 

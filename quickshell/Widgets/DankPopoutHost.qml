@@ -475,7 +475,8 @@ Item {
         }
     }
 
-    readonly property bool frameOwnsConnectedChrome: connected && effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
+    property bool _overStackedModal: false
+    readonly property bool frameOwnsConnectedChrome: connected && !_overStackedModal && effectivePopoutLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(root.screen)
     readonly property bool usesConnectedSurfaceChrome: connected && Theme.isConnectedEffect
     readonly property bool usesLocalConnectedSurfaceChrome: usesConnectedSurfaceChrome && !frameOwnsConnectedChrome
 
@@ -519,6 +520,8 @@ Item {
     function open() {
         if (!screen)
             return;
+        if (!contentWindow.visible || _openScreen !== screen)
+            _overStackedModal = ModalManager.hasStackedModal(screen.name);
         const preserveMotion = _canPreserveMotion();
         _resetPublishedBody();
         closeTimer.stop();

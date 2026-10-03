@@ -19,27 +19,43 @@ CcTile {
         }
         return ids;
     }
-    readonly property bool showCount: widgetData?.showCount !== false
     readonly property string countText: toplevels.length === 1 ? I18n.tr("%1 window", "singular, %1 is 1, open windows in the control center footer").arg(1) : I18n.tr("%1 windows", "plural, %1 is a count of open windows in the control center footer").arg(toplevels.length)
 
     opensPage: true
+    iconName: widgetDef?.icon ?? ""
     title: widgetDef?.text ?? ""
     subtitle: countText
     acceptsInput: interactive && toplevels.length > 0
+    iconContent: appIds.length > 0 ? leadingApp : null
+    bodyContent: docked ? chip : null
     onClicked: expandClicked()
 
-    bodyContent: Component {
+    Component {
+        id: leadingApp
+
+        CcAppIcon {
+            appId: root.appIds[0] ?? ""
+            iconSize: CcMetrics.runningAppsIconSize
+        }
+    }
+
+    Component {
+        id: chip
+
         Item {
             id: body
 
             readonly property real iconBox: Math.max(0, Math.min(CcMetrics.iconBoxSize, height - Theme.spacingS * 2))
-            readonly property int iconCount: Math.max(1, Math.min(root.appIds.length, CcMetrics.runningAppsMaxIcons, Math.floor((width - Theme.spacingS * 2 + Theme.spacingXS) / (iconBox + Theme.spacingXS))))
+            // Icons take whatever room the label leaves, falling back to the bare count and then to icons alone.
+            readonly property int iconCount: {
+                const fitting = textWidth => Math.floor((width - Theme.spacingS * 2 - textWidth + Theme.spacingXS) / (iconBox + Theme.spacingXS));
+                const room = [fullMetrics.advanceWidth + chevronRoom + Theme.spacingS + Theme.spacingM, shortMetrics.advanceWidth + Theme.spacingS + Theme.spacingM, 0].map(fitting).find(count => count >= 1) ?? 1;
+                return Math.max(1, Math.min(root.appIds.length, room));
+            }
             readonly property real chevronRoom: chevron.width + Theme.spacingXS
             readonly property real textRoom: width - Theme.spacingS * 2 - icons.width - Theme.spacingM
             // Drop the wording, then the chevron, then the count itself as the pill narrows.
             readonly property string label: {
-                if (!root.showCount || root.toplevels.length === 0)
-                    return "";
                 if (fullMetrics.advanceWidth + chevronRoom <= textRoom)
                     return root.countText;
                 return shortMetrics.advanceWidth <= textRoom ? String(root.toplevels.length) : "";
@@ -70,7 +86,7 @@ CcTile {
 
                 Repeater {
                     model: ScriptModel {
-                        values: root.appIds.length > 0 ? root.appIds.slice(0, body.iconCount) : [""]
+                        values: root.appIds.slice(0, body.iconCount)
                     }
 
                     Rectangle {

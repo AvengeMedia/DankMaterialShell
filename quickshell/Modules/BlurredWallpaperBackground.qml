@@ -282,6 +282,8 @@ Variants {
 
                 sourceComponent: DankBackdrop {
                     screenName: modelData.name
+                    blur: Theme.wallpaperBlur
+                    onInvalidated: root.invalidate()
                 }
             }
 

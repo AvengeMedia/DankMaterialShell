@@ -3,6 +3,7 @@ import qs.Common
 import qs.Modules.DankBar.Widgets
 import qs.Modules.SurfaceWidgets
 import qs.Services
+import "OverflowLayout.js" as OverflowLayout
 
 Item {
     id: topBarContent
@@ -31,6 +32,55 @@ Item {
     readonly property real fittedLeadingReach: leadingImplicitSize > 0 ? leadingImplicitSize + sectionGap : 0
     readonly property real fittedTrailingReach: trailingImplicitSize > 0 ? trailingImplicitSize + sectionGap : 0
     readonly property var fittedCenterSection: _barIsVertical ? vCenterSection : hCenterSection
+    property var overflowPlan: ({ hidden: { left: [], center: [], right: [] }, fits: true })
+    readonly property var overflowSections: _barIsVertical ? [vLeftSection, vCenterSection, vRightSection] : [hLeftSection, hCenterSection, hRightSection]
+    readonly property real overflowLength: fitToWidgets ? barWindow.fittedAvailableLength : (_barIsVertical ? height : width)
+    readonly property string overflowCenteringMode: SettingsData.centeringMode
+
+    onOverflowLengthChanged: requestOverflowLayout()
+    onOverflowSectionsChanged: requestOverflowLayout()
+    onOverflowCenteringModeChanged: requestOverflowLayout()
+    onLeadingSectionOffsetChanged: requestOverflowLayout()
+    onTrailingSectionOffsetChanged: requestOverflowLayout()
+    onFittedStartMarginChanged: requestOverflowLayout()
+    onFittedEndMarginChanged: requestOverflowLayout()
+
+    function requestOverflowLayout() {
+        overflowTimer.restart();
+    }
+
+    function updateOverflowLayout() {
+        if (overflowLength <= 0)
+            return;
+        const names = ["left", "center", "right"];
+        const sections = {};
+        const positions = {};
+        for (let index = 0; index < names.length; index++) {
+            sections[names[index]] = overflowSections[index].layoutEntries;
+            positions[names[index]] = overflowSections[index].overflowPosition;
+        }
+        const result = OverflowLayout.resolve(sections, {
+            length: overflowLength,
+            start: (fitToWidgets ? fittedStartMargin : 0) + leadingSectionOffset,
+            end: (fitToWidgets ? fittedEndMargin : 0) + trailingSectionOffset,
+            spacing: sectionGap,
+            triggerSize: overflowSections[0].overflowTriggerSize,
+            positions,
+            centeringMode: overflowCenteringMode,
+            confineCenter: fitToWidgets,
+            restoreMargin: Theme.spacingS
+        }, overflowPlan.hidden);
+        const next = { hidden: result.hidden, fits: result.fits };
+        if (JSON.stringify(next) !== JSON.stringify(overflowPlan))
+            overflowPlan = next;
+    }
+
+    Timer {
+        id: overflowTimer
+        interval: 0
+        repeat: false
+        onTriggered: topBarContent.updateOverflowLayout()
+    }
     readonly property real fittedCoreStart: {
         if (!fitToWidgets)
             return 0;

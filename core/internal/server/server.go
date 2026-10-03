@@ -31,6 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/trayrecovery"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wellbeing"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -38,7 +39,7 @@ import (
 	"github.com/AvengeMedia/dankgo/syncmap"
 )
 
-const APIVersion = 36
+const APIVersion = 37
 
 var CLIVersion = "dev"
 
@@ -77,6 +78,7 @@ var trayRecoveryManager *trayrecovery.Manager
 var locationManager *location.Manager
 var sysUpdateManager *sysupdate.Manager
 var notifyActionsManager *notifyactions.Manager
+var wellbeingManager *wellbeing.Manager
 var geoClientInstance geolocation.Client
 
 const dbusClientID = "dms-dbus-client"
@@ -349,6 +351,16 @@ func InitializeTrayRecoveryManager() error {
 	return nil
 }
 
+func InitializeWellbeingManager() error {
+	manager, err := wellbeing.NewManager()
+	if err != nil {
+		return err
+	}
+	wellbeingManager = manager
+	log.Info("Wellbeing manager initialized")
+	return nil
+}
+
 func InitializeLocationManager(geoClient geolocation.Client) error {
 	manager, err := location.NewManager(geoClient)
 	if err != nil {
@@ -470,6 +482,10 @@ func getCapabilities() Capabilities {
 
 	if locationManager != nil {
 		caps = append(caps, "location")
+	}
+
+	if wellbeingManager != nil {
+		caps = append(caps, "wellbeing")
 	}
 
 	if dbusManager != nil {
@@ -730,6 +746,15 @@ func handleSubscribe(ctx context.Context, conn *ipc.ConnWriter, req ipc.Request)
 		}, mgr.GetState)
 	}
 
+	if shouldSubscribe("wellbeing") && wellbeingManager != nil {
+		mgr := wellbeingManager
+		id := clientID + "-wellbeing"
+		source := mgr.Subscribe(id)
+		forwardSubscription(&wg, eventChan, stopChan, "wellbeing", source, func() {
+			mgr.Unsubscribe(id)
+		}, mgr.Snapshot)
+	}
+
 	if shouldSubscribe("sysupdate") && sysUpdateManager != nil {
 		mgr := sysUpdateManager
 		id := clientID + "-sysupdate"
@@ -872,6 +897,9 @@ func cleanupManagers() {
 	}
 	if sysUpdateManager != nil {
 		sysUpdateManager.Close()
+	}
+	if wellbeingManager != nil {
+		wellbeingManager.Close()
 	}
 	if geoClientInstance != nil {
 		geoClientInstance.Close()
@@ -1088,6 +1116,12 @@ func (s *Server) Serve(printDocs bool) error {
 		log.Info("Location:")
 		log.Info(" location.getState                      - Get current location state")
 		log.Info(" location.subscribe                     - Subscribe to location changes (streaming)")
+		log.Info("Wellbeing:")
+		log.Info(" wellbeing.getState                     - Today's screen time per app")
+		log.Info(" wellbeing.setState                     - Report the focused app and whether the session is active (params: appId?, active, seq?)")
+		log.Info(" wellbeing.setLimits                    - Set daily and per-app limits in seconds (params: daily?, apps?)")
+		log.Info(" wellbeing.summary                      - Per-day screen time ending today (params: days?)")
+		log.Info(" wellbeing.clear                        - Delete the screen time history")
 		log.Info("")
 	}
 	log.Info("Initializing managers...")
@@ -1188,6 +1222,10 @@ func (s *Server) Serve(printDocs bool) error {
 			}
 			themeModeManager.WatchLoginctl(loginctlManager)
 		}()
+	}
+
+	if err := InitializeWellbeingManager(); err != nil {
+		log.Warnf("Wellbeing manager unavailable: %v", err)
 	}
 
 	if err := InitializeWallpaperManager(); err != nil {

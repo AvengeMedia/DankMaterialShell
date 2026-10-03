@@ -15,8 +15,7 @@ DankEditableGridSlot {
     readonly property bool compact: cols <= 2 && rows === 1
     readonly property bool small: WidgetUtils.isSmall(grid.layoutItems[index] ?? widgetData, rows)
     readonly property var tileItem: tileLoader.item
-    // Small tiles resize from a virtual half cell so growing them passes through full size first.
-    property real biasW: 0
+    // Small tiles resize from a virtual half row so growing them passes through full size first.
     property real biasH: 0
     readonly property real smallSpanLimit: (1 + CcMetrics.smallRowFraction) / 2
 
@@ -25,11 +24,9 @@ DankEditableGridSlot {
     function reanchor(small) {
         const shift = ((small ? CcMetrics.smallRowFraction : 1) - smallSpanLimit) * grid.cellWidth;
         biasH += shift;
-        if (cols === 1)
-            biasW += shift;
     }
 
-    function spanOf(requested, bias) {
+    function spanOf(requested, bias = 0) {
         return (requested + bias + CcMetrics.gridGap) / grid.cellWidth;
     }
 
@@ -44,7 +41,7 @@ DankEditableGridSlot {
         const canShrink = WidgetUtils.canShrink(widgetData.id);
         if (canShrink && root.small !== (spanOf(requestedHeight, biasH) < smallSpanLimit))
             reanchor(!root.small);
-        const spanW = spanOf(requestedWidth, biasW);
+        const spanW = spanOf(requestedWidth);
         const spanH = spanOf(requestedHeight, biasH);
         let width = GridUtils.dimension(Math.round(spanW / step) * step, sizeSpec.minW, sizeSpec.maxW, sizeSpec.w, step);
         let height = GridUtils.dimension(Math.round(spanH / step) * step, sizeSpec.minH, sizeSpec.maxH, sizeSpec.h, step);
@@ -66,88 +63,16 @@ DankEditableGridSlot {
         grid.previewSize(index, changes);
     }
 
-    Loader {
+    CcTileLoader {
         id: tileLoader
         anchors.fill: parent
-        sourceComponent: root.grid.model ? root.grid.model.componentForWidget(root.widgetData) : null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "widgetData"
-        value: root.widgetData
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "widgetDef"
-        value: root.grid.model?.getWidgetForId(root.widgetData.id || "") ?? null
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "host"
-        value: root.grid
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "live"
-        value: root.grid.live
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "interactive"
-        value: !root.grid.editMode
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "columns"
-        value: root.cols
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "rows"
-        value: root.rows
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "compact"
-        value: root.compact
-        when: root.tileItem !== null
-    }
-
-    Binding {
-        target: root.tileItem
-        property: "small"
-        value: root.small
-        when: root.tileItem !== null && "small" in root.tileItem
-    }
-
-    Connections {
-        target: root.tileItem
-        ignoreUnknownSignals: true
-
-        function onExpandClicked() {
-            if (root.grid.editMode)
-                return;
-            root.grid.expandClicked(root.widgetData);
-        }
-
-        function onOptionChanged(key, value) {
-            root.grid.model?.setOption(root.grid.savedIndex(root.index), key, value);
-        }
+        grid: root.grid
+        widgetData: root.widgetData
+        savedIndex: root.grid.savedIndex(root.index)
+        columns: root.cols
+        rows: root.rows
+        compact: root.compact
+        small: root.small
     }
 
     CcEditChrome {
@@ -163,10 +88,9 @@ DankEditableGridSlot {
         dragging: root.dragging
         resizing: root.resizing
         cornerRadius: root.small ? Theme.fullRadius(root.width, root.height) : (root.tileItem?.bodyRadius ?? Theme.fullRadius(root.width, root.height))
-        sizeText: (root.small && root.cols === 1 ? CcMetrics.smallRowFraction : root.cols) + "×" + (root.small ? CcMetrics.smallRowFraction : root.rows)
+        sizeText: root.cols + "×" + root.rows
         onResizeStarted: (px, py) => {
             root.biasH = root.small ? (CcMetrics.smallRowFraction - 1) * root.grid.cellWidth : 0;
-            root.biasW = root.small && root.cols === 1 ? root.biasH : 0;
             root.beginResize(px, py);
         }
         onResizeMoved: (px, py) => root.resizeTo(px, py)

@@ -20,7 +20,7 @@ FocusScope {
 
     readonly property bool pageOpen: (host.expandedSection ?? "") !== ""
     readonly property real gridHeight: widgetGrid.gridHeight
-    readonly property real chromeHeight: footer.occupied ? Theme.spacingS + footer.height : 0
+    readonly property real chromeHeight: Theme.spacingS + footer.height
     readonly property bool widgetSheetOpen: widgetSheetLoader.item?.active ?? false
     readonly property real coveredAmount: Math.max(detailPage.opacity, widgetSheetLoader.item?.progress ?? 0)
     property bool widgetSheetRequested: false
@@ -31,8 +31,15 @@ FocusScope {
         const current = CompositorService.filterCurrentWorkspace(all, host.triggerScreen?.name) || [];
         return current.concat(all.filter(toplevel => !current.includes(toplevel)));
     }
-    readonly property string placedWidgetIds: WidgetUtils.placedIds(SettingsData.controlCenterWidgets).sort().join(",")
-    readonly property bool editPlaced: placedWidgetIds.split(",").includes("edit")
+    readonly property string placedWidgetIds: (SettingsData.controlCenterWidgets || []).map(w => w.id).sort().join(",")
+    readonly property var footerItems: (SettingsData.controlCenterWidgets || []).reduce((items, widget, index) => WidgetUtils.inFooter(widget) && WidgetUtils.isShown(widget) && widgetModel.componentForWidget(widget) ? items.concat([
+            {
+                "index": index,
+                "widget": widget
+            }
+        ]) : items, [])
+    readonly property bool footerOnTop: SettingsData.controlCenterFooterPosition === "top"
+    readonly property var gridDragWidget: widgetGrid.draggingSourceIndex >= 0 ? (widgetGrid.sourceItems[widgetGrid.draggingSourceIndex] ?? null) : null
     readonly property real targetImplicitHeight: {
         const total = CcMetrics.sheetPadding * 2 + gridHeight + chromeHeight;
         if (detailPage.shownSection === "")
@@ -47,8 +54,7 @@ FocusScope {
     readonly property vector4d surfaceCornerRadii: host.surfaceCornerRadii ?? Qt.vector4d(Theme.windowRadius, Theme.windowRadius, Theme.windowRadius, Theme.windowRadius)
     readonly property int gridColumnCap: host.gridColumnCap ?? CcMetrics.columnCapFor((host.triggerScreen?.width ?? CcMetrics.sheetWidthDefault + Theme.spacingL * 2) - Theme.spacingL * 2)
     readonly property int gridColumns: host.gridColumns ?? Math.min(CcMetrics.gridColumns, gridColumnCap)
-    // Always reserve the footer: the row cap stays the same in edit mode and cannot loop through the docked edit button.
-    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - Theme.spacingS - CcMetrics.footerHeight
+    readonly property real availableGridHeight: (host.availableHeight ?? (host.triggerScreen?.height ?? CcMetrics.fallbackScreenHeight) - CcMetrics.maxHeightInset) - CcMetrics.sheetPadding * 2 - chromeHeight
     readonly property vector4d chromeRoom: host.chromeRoom ?? Qt.vector4d(Infinity, Infinity, Infinity, Infinity)
     readonly property DankPanelResizer panelResizer: DankPanelResizer {
         popout: root.host
@@ -150,6 +156,87 @@ FocusScope {
             SettingsData.set("controlCenterWidgets", JSON.parse(snapshot.widgets));
         if (SettingsData.controlCenterColumns !== snapshot.columns)
             SettingsData.set("controlCenterColumns", snapshot.columns);
+        if (SettingsData.controlCenterFooterPosition !== snapshot.footerPosition)
+            SettingsData.set("controlCenterFooterPosition", snapshot.footerPosition);
+    }
+
+    // Goes by the dragged tile, not the pointer: the middle of its top row has to cross the grid's edge as it
+    // was at drag start, which the grid growing under the drag cannot move.
+    function footerTakesGridDrag(tile) {
+        if (gridDragWidget === null || footer.freeCells() < WidgetUtils.footerMinCells(gridDragWidget.id))
+            return false;
+        const anchor = tile.y + Math.min(tile.height, widgetGrid.slotLayout.rowUnit) / 2;
+        return footerOnTop ? anchor < -CcMetrics.gridGap / 2 : anchor > widgetGrid.pinnedHeight + CcMetrics.gridGap / 2;
+    }
+
+    // Drops commit a tick later: committing inside the release handler would destroy the dragged item mid-signal.
+    function dropFromGrid(index, scenePoint) {
+        if (!widgetGrid.heldOutside)
+            return false;
+        const savedIndex = widgetGrid.savedIndex(index);
+        if (footer.trashContains(scenePoint)) {
+            Qt.callLater(() => {
+                widgetModel.removeWidget(savedIndex);
+                widgetGrid.cancelInteraction();
+            });
+            return true;
+        }
+        const slot = footer.insertionAt(scenePoint);
+        const before = footer.savedIndexAt(slot);
+        const cells = Math.min(WidgetUtils.footerCells(gridDragWidget), footer.freeCells());
+        Qt.callLater(() => {
+            WidgetUtils.moveToFooter(savedIndex, before, cells, slot.end);
+            widgetGrid.cancelInteraction();
+        });
+        return true;
+    }
+
+    // Same rule as the other way round: the middle of the dragged item decides, against the grid's edge.
+    function gridTakesFooterDrag(visual) {
+        const middle = widgetGrid.mapFromItem(null, visual.x, visual.y + visual.height / 2).y - widgetGrid.contentPadding;
+        return footerOnTop ? middle > -CcMetrics.gridGap / 2 : middle < widgetGrid.gridHeight + CcMetrics.gridGap / 2;
+    }
+
+    function previewFooterDrag(index, visual, leaving) {
+        if (!leaving) {
+            widgetGrid.clearExternal();
+            return;
+        }
+        const widget = SettingsData.controlCenterWidgets[index];
+        const size = WidgetUtils.clampSize(widget, gridColumns, widgetGrid.maximumRows);
+        const point = widgetGrid.mapFromItem(null, visual.x, visual.y);
+        widgetGrid.previewExternal({
+            "id": widget.id,
+            "w": size.w,
+            "h": size.h
+        }, point.x, point.y);
+    }
+
+    function dropFromFooter(index, scenePoint) {
+        if (footer.trashContains(scenePoint)) {
+            Qt.callLater(() => widgetModel.removeWidget(index));
+            return true;
+        }
+        if (widgetGrid.externalItem) {
+            const placed = widgetGrid.committedItems();
+            const cell = placed.pop();
+            const widgets = WidgetUtils.placeFromFooter(widgetGrid.withHidden(placed), index, cell.col, cell.row);
+            Qt.callLater(() => {
+                WidgetUtils.setLayout(widgets);
+                widgetGrid.cancelInteraction();
+            });
+            return true;
+        }
+        const slot = footer.liftedSlot;
+        if (!slot)
+            return false;
+        const current = footer.slotOf(index);
+        if (slot.end === current.end && slot.at === current.at)
+            return false;
+        const before = footer.savedIndexAt(slot);
+        const cells = WidgetUtils.footerCells(SettingsData.controlCenterWidgets[index]);
+        Qt.callLater(() => WidgetUtils.moveToFooter(index, before, cells, slot.end));
+        return true;
     }
 
     function openWidgetSheet() {
@@ -168,11 +255,6 @@ FocusScope {
     }
 
     Keys.onEscapePressed: event => {
-        if (footer.pendingAction !== "") {
-            footer.cancelConfirmation();
-            event.accepted = true;
-            return;
-        }
         if (widgetSheetLoader.item?.opened) {
             closeWidgetSheet();
             event.accepted = true;
@@ -211,7 +293,8 @@ FocusScope {
             host.collapseAll();
             editSnapshot = {
                 "widgets": JSON.stringify(SettingsData.controlCenterWidgets),
-                "columns": SettingsData.controlCenterColumns
+                "columns": SettingsData.controlCenterColumns,
+                "footerPosition": SettingsData.controlCenterFooterPosition
             };
         } else {
             panelResizer.cancel();
@@ -288,9 +371,10 @@ FocusScope {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: footer.top
-        anchors.bottomMargin: footer.occupied ? Theme.spacingS : 0
+        anchors.top: root.footerOnTop ? footer.bottom : parent.top
+        anchors.topMargin: root.footerOnTop ? Theme.spacingS : 0
+        anchors.bottom: root.footerOnTop ? parent.bottom : footer.top
+        anchors.bottomMargin: root.footerOnTop ? 0 : Theme.spacingS
         clip: contentHeight > height
         contentWidth: width
         contentHeight: Math.max(height, mainColumn.implicitHeight + CcMetrics.sheetPadding)
@@ -301,7 +385,7 @@ FocusScope {
 
             width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
             x: CcMetrics.sheetPadding
-            y: CcMetrics.sheetPadding
+            y: root.footerOnTop ? 0 : CcMetrics.sheetPadding
             spacing: Theme.spacingS
 
             Item {
@@ -324,7 +408,8 @@ FocusScope {
                     screenName: root.host.triggerScreen?.name || ""
                     tapToClose: root.host.headerTogglesClose ?? false
                     runningToplevels: root.runningToplevels
-                    dockEdit: !root.editPlaced && !root.host.editMode
+                    dragsOutside: (index, scenePoint, tile) => footer.trashContains(scenePoint) || root.footerTakesGridDrag(tile)
+                    dropHandler: (index, scenePoint) => root.dropFromGrid(index, scenePoint)
                     onExpandClicked: widgetData => root.openWidgetPage(widgetData)
                     onRemoveWidget: index => widgetModel.removeWidget(index)
                     onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
@@ -332,7 +417,6 @@ FocusScope {
                     onCloseRequested: root.host.close()
                     onSettingsRequested: root.host.openSettings()
                     onAccountsRequested: root.host.openAccounts()
-                    onEditRequested: root.host.editMode = true
                     onLockRequested: {
                         root.host.close();
                         root.host.lockRequested();
@@ -356,15 +440,29 @@ FocusScope {
         id: footer
 
         x: CcMetrics.sheetPadding
+        y: root.footerOnTop ? CcMetrics.sheetPadding : root.height - CcMetrics.sheetPadding - height
         width: root.sheetContentWidth - CcMetrics.sheetPadding * 2
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: CcMetrics.sheetPadding
+        grid: widgetGrid
         editMode: root.host.editMode
-        showEdit: !root.editPlaced && widgetGrid.editDock === null
+        onTop: root.footerOnTop
+        transientSurfaceTracker: root.host.transientSurfaceTracker
+        items: root.footerItems
+        gridDragging: root.gridDragWidget !== null
+        gridDragPoint: widgetGrid.dragScenePoint
+        incoming: root.gridDragWidget !== null && widgetGrid.heldOutside && !footer.overTrash ? Object.assign({
+            "cells": Math.min(WidgetUtils.footerCells(root.gridDragWidget), footer.freeCells())
+        }, footer.gridSlot) : null
+        dropHandler: (index, cells, scenePoint) => root.dropFromFooter(index, scenePoint)
+        leavesRow: visual => root.gridTakesFooterDrag(visual)
         opacity: body.opacity
         onAddWidgetRequested: root.openWidgetSheet()
         onResetRequested: widgetModel.resetToDefault()
         onClearRequested: widgetModel.clearAll()
+        onMoveRequested: SettingsData.set("controlCenterFooterPosition", root.footerOnTop ? "bottom" : "top")
+        onRemoveRequested: index => widgetModel.removeWidget(index)
+        onConfigRequested: (index, widgetData, anchor) => root.openConfigOverlay(index, widgetData, anchor)
+        onItemMoved: (index, sceneRect, leaving) => root.previewFooterDrag(index, sceneRect, leaving)
+        onResized: (index, cells, fill) => WidgetUtils.setFooterSize(index, cells, fill)
         onEditToggled: root.host.editMode = !root.host.editMode
         onCancelRequested: root.cancelEdit()
     }
@@ -465,8 +563,6 @@ FocusScope {
 
         active: false
         sourceComponent: WidgetConfigOverlay {
-            model: widgetModel
-            columns: root.gridColumns
             transientSurfaceTracker: root.host.transientSurfaceTracker
             onVisibleChanged: {
                 if (visible)

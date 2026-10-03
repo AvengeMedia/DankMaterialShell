@@ -37,6 +37,7 @@ func TestRouteRequestUnavailableManagers(t *testing.T) {
 		{"dbus.subscribe", "dbus manager not initialized"},
 		{"clipboard.getState", "clipboard manager not initialized"},
 		{"location.getState", "location manager not initialized"},
+		{"wellbeing.getState", "wellbeing manager not initialized"},
 		{"notify.invoke", "notification action manager not initialized"},
 		{"sysupdate.getState", "sysupdate manager not initialized"},
 		{"files.list", "files service not initialized"},

@@ -139,34 +139,13 @@ CcListRow {
             Repeater {
                 model: root.configFields
 
-                Rectangle {
+                DankDetailChip {
                     required property var modelData
 
-                    width: fieldContent.width + Theme.spacingM * 2
-                    height: Theme.buttonHeightXS
-                    radius: Theme.cornerRadiusS
+                    label: modelData.label
+                    value: modelData.value
                     color: Theme.chipSurface
-
-                    Row {
-                        id: fieldContent
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: modelData.label + ":"
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: modelData.value
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Theme.fontWeightMedium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+                    border.width: 0
                 }
             }
         }

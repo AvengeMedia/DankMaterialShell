@@ -26,7 +26,6 @@ Item {
     property bool sliderEnabled: true
     property string sliderSize: "xs"
     property bool vertical: false
-    property color thumbOutlineColor: Theme.hostSurface
     property real horizontalPadding: -1
 
     readonly property bool containsMouse: levelSlider.containsMouse || icon.hovered || endIcon.hovered
@@ -95,7 +94,6 @@ Item {
             showValue: false
             unit: root.unit
             fillColor: root.fillColor
-            thumbOutlineColor: root.thumbOutlineColor
             valueOverride: root.value
             onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
 

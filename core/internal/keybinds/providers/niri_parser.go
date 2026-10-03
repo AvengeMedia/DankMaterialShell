@@ -414,21 +414,17 @@ func (p *NiriParser) handleInclude(node *document.Node, section *NiriSection, ba
 	}
 
 	includePath := strings.Trim(node.Arguments[0].String(), "\"")
-	isDMSInclude := includePath == "dms/binds.kdl" || strings.HasSuffix(includePath, "/dms/binds.kdl")
+	fullPath := filepath.Join(baseDir, includePath)
+	if filepath.IsAbs(includePath) {
+		fullPath = includePath
+	}
+	isDMSInclude := strings.HasSuffix(fullPath, "/dms/binds.kdl")
 
 	p.includeCount++
 	if isDMSInclude {
 		p.dmsBindsIncluded = true
 		p.dmsIncludePos = p.includeCount
 		p.bindsBeforeDMS = len(p.bindMap)
-	}
-
-	fullPath := filepath.Join(baseDir, includePath)
-	if filepath.IsAbs(includePath) {
-		fullPath = includePath
-	}
-
-	if isDMSInclude {
 		p.dmsProcessed = true
 	}
 

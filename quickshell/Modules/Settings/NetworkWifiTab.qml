@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Network
 import qs.Modules.Settings.Widgets
@@ -23,6 +22,48 @@ Item {
 
     Component.onDestruction: {
         NetworkService.removeRef();
+    }
+
+    function wifiDetailFields(net) {
+        const fields = [];
+        if (!net || net.outOfRange)
+            return fields;
+
+        fields.push({
+            label: I18n.tr("Signal"),
+            value: (net.signal || 0) + "%"
+        });
+        if (net.frequency)
+            fields.push({
+                label: I18n.tr("Frequency", "wifi network detail label, radio frequency in GHz"),
+                value: (net.frequency / 1000).toFixed(1) + " GHz"
+            });
+        if (net.channel)
+            fields.push({
+                label: I18n.tr("Channel", "wifi network detail label, radio channel number"),
+                value: String(net.channel)
+            });
+        if (net.rate)
+            fields.push({
+                label: I18n.tr("Rate", "noun, wifi network detail label, link speed in Mbps"),
+                value: net.rate + " Mbps"
+            });
+        if (net.mode)
+            fields.push({
+                label: I18n.tr("Mode"),
+                value: net.mode
+            });
+        if (net.bssid)
+            fields.push({
+                label: "BSSID",
+                value: net.bssid
+            });
+        fields.push({
+            label: I18n.tr("Security", "noun, settings page name and wifi security type label"),
+            value: net.secured ? (net.enterprise ? I18n.tr("Enterprise", "wifi security type value, 802.1x enterprise network") : "WPA/WPA2") : I18n.tr("Open", "network security type", true)
+        });
+
+        return fields;
     }
 
     SettingsPage {
@@ -278,31 +319,8 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingS
 
-                    DankIcon {
-                        id: scanningIcon
-                        name: "wifi_find"
-                        size: Theme.iconSizeLarge
-                        color: Theme.surfaceVariantText
+                    DankLoadingIndicator {
                         anchors.horizontalCenter: parent.horizontalCenter
-
-                        SequentialAnimation {
-                            running: networkWifiTab.visible && NetworkService.isScanning
-                            loops: Animation.Infinite
-                            OpacityAnimator {
-                                target: scanningIcon
-                                to: 0.3
-                                duration: 400
-                                easing.type: Easing.InOutQuad
-                            }
-                            OpacityAnimator {
-                                target: scanningIcon
-                                to: 1.0
-                                duration: 400
-                                easing.type: Easing.InOutQuad
-                            }
-                            onRunningChanged: if (!running)
-                                scanningIcon.opacity = 1.0
-                        }
                     }
 
                     StyledText {
@@ -380,7 +398,6 @@ Item {
                             iconName: wifiNetworkDelegate.isExpanded ? "expand_less" : "expand_more"
                             Accessible.name: wifiNetworkDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                             iconSize: Theme.iconSizeSmall
-                            buttonSize: 28
                             visible: wifiNetworkDelegate.isConnected || wifiNetworkDelegate.modelData.saved
                             onClicked: {
                                 if (wifiNetworkDelegate.isExpanded) {
@@ -395,7 +412,6 @@ Item {
                         DankActionButton {
                             iconName: "qr_code"
                             tooltipText: I18n.tr("Show QR Code")
-                            buttonSize: 28
                             visible: wifiNetworkDelegate.modelData.secured && wifiNetworkDelegate.modelData.saved && !(wifiNetworkDelegate.modelData.enterprise || false)
                             onClicked: {
                                 PopoutService.showWifiQRCodeModal(wifiNetworkDelegate.modelData.ssid);
@@ -405,7 +421,6 @@ Item {
                         DankActionButton {
                             iconName: "push_pin"
                             Accessible.name: wifiNetworkDelegate.isPinned ? I18n.tr("Unpin") : I18n.tr("Pin", "verb, keep an item pinned in place")
-                            buttonSize: 28
                             iconColor: wifiNetworkDelegate.isPinned ? Theme.primary : Theme.surfaceVariantText
                             onClicked: {
                                 root.toggleWifiPin(wifiNetworkDelegate.modelData.ssid);
@@ -414,8 +429,7 @@ Item {
 
                         DankActionButton {
                             iconName: "delete"
-                            tooltipText: I18n.tr("Forget")
-                            buttonSize: 28
+                            tooltipText: I18n.tr("Forget", "verb, remove a saved wifi network, button")
                             iconColor: Theme.error
                             visible: wifiNetworkDelegate.modelData.saved || wifiNetworkDelegate.isConnected
                             onClicked: {
@@ -447,80 +461,13 @@ Item {
                                 visible: !NetworkService.networkInfoLoading
 
                                 Repeater {
-                                    model: {
-                                        const fields = [];
-                                        const net = wifiNetworkDelegate.modelData;
-                                        if (!net)
-                                            return fields;
+                                    model: wifiNetworkDelegate.isExpanded ? networkWifiTab.wifiDetailFields(wifiNetworkDelegate.modelData) : []
 
-                                        fields.push({
-                                            label: I18n.tr("Signal"),
-                                            value: net.signal + "%"
-                                        });
-                                        if (net.frequency)
-                                            fields.push({
-                                                label: I18n.tr("Frequency", "wifi network detail label, radio frequency in GHz"),
-                                                value: (net.frequency / 1000).toFixed(1) + " GHz"
-                                            });
-                                        if (net.channel)
-                                            fields.push({
-                                                label: I18n.tr("Channel", "wifi network detail label, radio channel number"),
-                                                value: String(net.channel)
-                                            });
-                                        if (net.rate)
-                                            fields.push({
-                                                label: I18n.tr("Rate", "noun, wifi network detail label, link speed in Mbps"),
-                                                value: net.rate + " Mbps"
-                                            });
-                                        if (net.mode)
-                                            fields.push({
-                                                label: I18n.tr("Mode"),
-                                                value: net.mode
-                                            });
-                                        if (net.bssid)
-                                            fields.push({
-                                                label: "BSSID",
-                                                value: net.bssid
-                                            });
-                                        fields.push({
-                                            label: I18n.tr("Security", "noun, settings page name and wifi security type label"),
-                                            value: net.secured ? (net.enterprise ? I18n.tr("Enterprise", "wifi security type value, 802.1x enterprise network") : "WPA/WPA2") : I18n.tr("Open", "network security type", true)
-                                        });
-
-                                        return fields;
-                                    }
-
-                                    delegate: Rectangle {
+                                    delegate: DankDetailChip {
                                         required property var modelData
-                                        required property int index
 
-                                        width: wifiFieldContent.width + Theme.spacingM * 2
-                                        height: Theme.buttonHeightXS
-                                        radius: Theme.cornerRadiusS
-                                        color: Theme.floatingWindowFieldColor
-                                        border.width: Theme.outlineWidth
-                                        border.color: Theme.floatingWindowFieldBorderColor
-
-                                        Row {
-                                            id: wifiFieldContent
-                                            anchors.centerIn: parent
-                                            spacing: Theme.spacingXS
-
-                                            StyledText {
-                                                text: modelData.label + ":"
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.surfaceVariantText
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-
-                                            StyledText {
-                                                text: modelData.value
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.surfaceText
-                                                font.weight: Theme.fontWeightMedium
-                                                anchors.verticalCenter: parent.verticalCenter
-                                            }
-                                        }
+                                        label: modelData.label
+                                        value: modelData.value
                                     }
                                 }
                             }
@@ -574,7 +521,8 @@ Item {
                     readonly property bool isConnecting: NetworkService.isWifiConnecting && NetworkService.connectingSSID === modelData.ssid
                     readonly property bool isPinned: root.getPinnedWifiNetworks().includes(modelData.ssid)
                     readonly property bool isOutOfRange: modelData.outOfRange || false
-                    readonly property bool isExpanded: !isOutOfRange && root.expandedSavedWifiSsid === modelData.ssid
+                    readonly property bool isExpanded: root.expandedSavedWifiSsid === modelData.ssid
+                    readonly property var detailFields: networkWifiTab.wifiDetailFields(modelData)
 
                     width: parent?.width ?? 0
                     spacing: Theme.groupedListGap
@@ -595,13 +543,10 @@ Item {
                         subtitleColor: savedWifiDelegate.isConnecting ? Theme.warning : supportingContentColor
                         clickable: !savedWifiDelegate.isOutOfRange && (!NetworkService.isWifiConnecting || savedWifiDelegate.isConnected)
                         onClicked: {
-                            if (savedWifiDelegate.isOutOfRange)
-                                return;
-                            if (savedWifiDelegate.isExpanded) {
-                                root.expandedSavedWifiSsid = "";
-                            } else {
-                                root.expandedSavedWifiSsid = savedWifiDelegate.modelData.ssid;
-                            }
+                            WifiConnectionActions.connectToNetwork(savedWifiDelegate.modelData, {
+                                connected: savedWifiDelegate.isConnected,
+                                disconnectWhenConnected: true
+                            });
                         }
 
                         leading: [
@@ -635,8 +580,6 @@ Item {
                             iconName: savedWifiDelegate.isExpanded ? "expand_less" : "expand_more"
                             Accessible.name: savedWifiDelegate.isExpanded ? I18n.tr("Collapse") : I18n.tr("Expand")
                             iconSize: Theme.iconSizeSmall
-                            buttonSize: 28
-                            visible: !savedWifiDelegate.isOutOfRange
                             onClicked: {
                                 if (savedWifiDelegate.isExpanded) {
                                     root.expandedSavedWifiSsid = "";
@@ -649,7 +592,6 @@ Item {
                         DankActionButton {
                             iconName: "qr_code"
                             tooltipText: I18n.tr("Show QR Code")
-                            buttonSize: 28
                             visible: savedWifiDelegate.modelData.secured && !(savedWifiDelegate.modelData.enterprise || false)
                             onClicked: {
                                 PopoutService.showWifiQRCodeModal(savedWifiDelegate.modelData.ssid);
@@ -659,7 +601,6 @@ Item {
                         DankActionButton {
                             iconName: "push_pin"
                             Accessible.name: savedWifiDelegate.isPinned ? I18n.tr("Unpin") : I18n.tr("Pin", "verb, keep an item pinned in place")
-                            buttonSize: 28
                             iconColor: savedWifiDelegate.isPinned ? Theme.primary : Theme.surfaceVariantText
                             onClicked: {
                                 root.toggleWifiPin(savedWifiDelegate.modelData.ssid);
@@ -667,188 +608,37 @@ Item {
                         }
 
                         DankActionButton {
-                            id: savedWifiMoreButton
-                            iconName: "more_horiz"
-                            Accessible.name: I18n.tr("Options")
-                            buttonSize: 28
-                            onClicked: {
-                                if (savedWifiMenu.visible) {
-                                    savedWifiMenu.close();
-                                    return;
-                                }
-                                savedWifiMenu.popup(savedWifiMoreButton, -savedWifiMenu.width + savedWifiMoreButton.width, savedWifiMoreButton.height + Theme.spacingXS);
-                            }
+                            iconName: "delete"
+                            tooltipText: I18n.tr("Forget", "verb, remove a saved wifi network, button")
+                            iconColor: Theme.error
+                            onClicked: root.showForgetNetworkConfirm(savedWifiDelegate.modelData.ssid)
                         }
                     }
 
                     SettingsRow {
-                        visible: savedWifiDelegate.isExpanded
+                        visible: savedWifiDelegate.isExpanded && savedWifiDelegate.detailFields.length > 0
                         body: Flow {
                             width: parent.width
                             spacing: Theme.spacingXS
 
                             Repeater {
-                                model: {
-                                    const fields = [];
-                                    const net = savedWifiDelegate.modelData;
-                                    if (!net)
-                                        return fields;
+                                model: savedWifiDelegate.isExpanded ? savedWifiDelegate.detailFields : []
 
-                                    fields.push({
-                                        label: I18n.tr("Signal"),
-                                        value: (net.signal || 0) + "%"
-                                    });
-                                    if (net.frequency)
-                                        fields.push({
-                                            label: I18n.tr("Frequency"),
-                                            value: (net.frequency / 1000).toFixed(1) + " GHz"
-                                        });
-                                    if (net.channel)
-                                        fields.push({
-                                            label: I18n.tr("Channel"),
-                                            value: String(net.channel)
-                                        });
-                                    if (net.rate)
-                                        fields.push({
-                                            label: I18n.tr("Rate"),
-                                            value: net.rate + " Mbps"
-                                        });
-                                    if (net.mode)
-                                        fields.push({
-                                            label: I18n.tr("Mode"),
-                                            value: net.mode
-                                        });
-                                    if (net.bssid)
-                                        fields.push({
-                                            label: "BSSID",
-                                            value: net.bssid
-                                        });
-                                    fields.push({
-                                        label: I18n.tr("Security"),
-                                        value: net.secured ? (net.enterprise ? I18n.tr("Enterprise") : "WPA/WPA2") : I18n.tr("Open", "network security type", true)
-                                    });
-
-                                    return fields;
-                                }
-
-                                delegate: Rectangle {
+                                delegate: DankDetailChip {
                                     required property var modelData
-                                    required property int index
 
-                                    width: savedWifiFieldContent.width + Theme.spacingM * 2
-                                    height: Theme.buttonHeightXS
-                                    radius: Theme.cornerRadiusS
-                                    color: Theme.floatingWindowFieldColor
-                                    border.width: Theme.outlineWidth
-                                    border.color: Theme.floatingWindowFieldBorderColor
-
-                                    Row {
-                                        id: savedWifiFieldContent
-                                        anchors.centerIn: parent
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            text: modelData.label + ":"
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
-                                        StyledText {
-                                            text: modelData.value
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceText
-                                            font.weight: Theme.fontWeightMedium
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-                                    }
+                                    label: modelData.label
+                                    value: modelData.value
                                 }
                             }
                         }
                     }
 
-                    Menu {
-                        id: savedWifiMenu
-                        width: 170
-                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-                        background: Rectangle {
-                            color: Theme.floatingWindowSurface
-                            radius: Theme.windowRadius
-                            border.width: 0
-                        }
-
-                        MenuItem {
-                            text: isConnecting ? I18n.tr("Connecting...") : (isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect"))
-                            height: isOutOfRange ? 0 : 32
-                            visible: !isOutOfRange
-                            enabled: !isConnecting
-
-                            contentItem: StyledText {
-                                text: parent.text
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: parent.enabled ? Theme.surfaceText : Theme.surfaceVariantText
-                                leftPadding: Theme.spacingS
-                                verticalAlignment: Text.AlignVCenter
-                            }
-
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                                radius: Theme.cornerRadiusS
-                            }
-
-                            onTriggered: {
-                                WifiConnectionActions.connectToNetwork(modelData, {
-                                    connected: isConnected,
-                                    disconnectWhenConnected: true
-                                });
-                            }
-                        }
-
-                        MenuItem {
-                            text: modelData.autoconnect ? I18n.tr("Disable autoconnect") : I18n.tr("Enable autoconnect")
-                            height: DMSService.apiVersion > 13 ? 32 : 0
-                            visible: DMSService.apiVersion > 13
-
-                            contentItem: StyledText {
-                                text: parent.text
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                leftPadding: Theme.spacingS
-                                verticalAlignment: Text.AlignVCenter
-                            }
-
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.primaryHoverLight : Theme.withAlpha(Theme.primaryHoverLight, 0)
-                                radius: Theme.cornerRadiusS
-                            }
-
-                            onTriggered: {
-                                NetworkService.setWifiAutoconnect(modelData.ssid, !(modelData.autoconnect || false));
-                            }
-                        }
-
-                        MenuItem {
-                            text: I18n.tr("Forget network")
-                            height: Theme.buttonHeightXS
-
-                            contentItem: StyledText {
-                                text: parent.text
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.error
-                                leftPadding: Theme.spacingS
-                                verticalAlignment: Text.AlignVCenter
-                            }
-
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.errorHover : Theme.withAlpha(Theme.errorHover, 0)
-                                radius: Theme.cornerRadiusS
-                            }
-
-                            onTriggered: {
-                                root.showForgetNetworkConfirm(modelData.ssid);
-                            }
-                        }
+                    SettingsToggleRow {
+                        visible: savedWifiDelegate.isExpanded && DMSService.apiVersion > 13
+                        text: I18n.tr("Autoconnect", "toggle, connect to this wifi or vpn automatically")
+                        checked: savedWifiDelegate.modelData.autoconnect || false
+                        onToggled: checked => NetworkService.setWifiAutoconnect(savedWifiDelegate.modelData.ssid, checked)
                     }
                 }
             }
@@ -1130,7 +920,7 @@ Item {
                     visible: hotspotCard.editing
                     text: I18n.tr("Cancel", "cancel hotspot editing action")
                     buttonHeight: 36
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: hotspotCard.stopEditing()
                 }
@@ -1141,7 +931,7 @@ Item {
                     iconName: "edit"
                     buttonHeight: 36
                     enabled: !NetworkService.hotspotEnabled && !hotspotCard.starting
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: hotspotCard.beginEditing()
                 }
@@ -1152,7 +942,7 @@ Item {
                     iconName: "save"
                     buttonHeight: 36
                     enabled: hotspotCard.buildCanConfigure()
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     textColor: Theme.surfaceText
                     onClicked: hotspotCard.saveOnly()
                 }

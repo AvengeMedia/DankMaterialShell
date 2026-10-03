@@ -713,7 +713,8 @@ BasePill {
                     return colorFromMode(mode, unfocusedColor, effectiveCustomColor(root.opt("workspaceOccupiedCustomColor"), root.opt("workspaceUnfocusedMonitorOccupiedCustomColor")), Theme.secondary);
                 }
 
-                readonly property color urgentColor: colorFromMode(effectiveColorMode(root.opt("workspaceUrgentColorMode"), root.opt("workspaceUnfocusedMonitorUrgentColorMode")), Theme.error, effectiveCustomColor(root.opt("workspaceUrgentCustomColor"), root.opt("workspaceUnfocusedMonitorUrgentCustomColor")), Theme.error)
+                readonly property string urgentColorMode: effectiveColorMode(root.opt("workspaceUrgentColorMode"), root.opt("workspaceUnfocusedMonitorUrgentColorMode"))
+                readonly property color urgentColor: colorFromMode(urgentColorMode, Theme.error, effectiveCustomColor(root.opt("workspaceUrgentCustomColor"), root.opt("workspaceUnfocusedMonitorUrgentCustomColor")), Theme.error)
 
                 readonly property color focusedBorderColor: colorFromMode(effectiveColorMode(root.opt("workspaceFocusedBorderColor"), root.opt("workspaceUnfocusedMonitorBorderColor")), Theme.primary, effectiveCustomColor(root.opt("workspaceFocusedBorderCustomColor"), root.opt("workspaceUnfocusedMonitorBorderCustomColor")), Theme.primary)
 
@@ -726,6 +727,40 @@ BasePill {
 
                 readonly property color quickshellIconActiveColor: getContrastingIconColor(activeColor)
                 readonly property color quickshellIconInactiveColor: getContrastingIconColor(unfocusedColor)
+
+                function inkFromMode(mode, fill, fallbackInk) {
+                    switch (mode) {
+                    case "primary":
+                    case "pri":
+                        return Theme.onPrimary;
+                    case "primaryContainer":
+                        return Theme.onPrimaryContainer;
+                    case "secondaryContainer":
+                        return Theme.onSecondaryContainer;
+                    case "tertiaryContainer":
+                        return Theme.onTertiaryContainer;
+                    case "error":
+                    case "err":
+                        return Theme.onError;
+                    case "s":
+                    case "sc":
+                    case "sch":
+                    case "schh":
+                        return Theme.onSurface;
+                    case "secondary":
+                    case "sec":
+                    case "tertiary":
+                    case "ter":
+                    case "surfaceText":
+                    case "custom":
+                    case "none":
+                        return getContrastingIconColor(fill);
+                    default:
+                        return fallbackInk;
+                    }
+                }
+
+                readonly property color filledInk: isActive ? inkFromMode(activeColorMode, activeColor, Theme.onPrimary) : inkFromMode(urgentColorMode, urgentColor, Theme.onError)
 
                 readonly property color requestedColor: isActive ? activeColor : isUrgent ? urgentColor : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.withAlpha(unfocusedColor, root.hoverFadeAlpha) : isOccupied ? occupiedColor : unfocusedColor
 
@@ -1080,7 +1115,7 @@ BasePill {
                                         anchors.verticalCenter: parent.verticalCenter
                                         name: loadedIconData?.value ?? ""
                                         size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         weight: (isActive && !isPlaceholder) ? 500 : 400
                                     }
                                 }
@@ -1094,7 +1129,7 @@ BasePill {
                                         id: wsText
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: loadedIconData?.value ?? ""
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
@@ -1109,7 +1144,7 @@ BasePill {
                                         id: wsIndexText
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: loadedHasIcon ? (record?.name ?? "") : root.getWorkspaceIndex(record, index)
-                                        color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                         font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                     }
@@ -1251,7 +1286,7 @@ BasePill {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     name: loadedIconData?.value ?? ""
                                     size: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                     weight: (isActive && !isPlaceholder) ? 500 : 400
                                 }
 
@@ -1259,7 +1294,7 @@ BasePill {
                                     visible: loadedHasIcon && loadedIconData?.type === "text"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: loadedIconData?.value ?? ""
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                     font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                     font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                 }
@@ -1268,7 +1303,7 @@ BasePill {
                                     visible: (root.opt("showWorkspaceIndex") || root.opt("showWorkspaceName")) && !loadedHasIcon
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: root.getWorkspaceIndex(record, index)
-                                    color: (isActive || isUrgent) ? Theme.withAlpha(Theme.surfaceContainer, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                    color: (isActive || isUrgent) ? filledInk : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                     font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                                     font.weight: (isActive && !isPlaceholder) ? Theme.fontWeightMedium : Theme.fontWeight
                                 }

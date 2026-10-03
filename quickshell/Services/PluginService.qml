@@ -469,6 +469,15 @@ Singleton {
     }
 
     function updatePlugin(pluginId, callback) {
+        // Installed entries carry the registry's requires_dms, i.e. the version an update would fetch
+        const installed = (DMSService.installedPlugins || []).find(plugin => plugin.id === pluginId);
+        if (installed?.requires_dms && !checkPluginCompatibility(installed.requires_dms)) {
+            if (callback)
+                callback({
+                    error: I18n.tr("Requires DMS %1", "plugin incompatibility notice, %1 is the required DMS version").arg(installed.requires_dms)
+                });
+            return;
+        }
         DMSService.update(pluginId, response => {
             if (!response.error)
                 forceRescanPlugin(pluginId);

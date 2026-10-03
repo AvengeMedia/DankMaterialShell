@@ -57,7 +57,7 @@ Column {
             iconName: "music_note"
             title: I18n.tr("Media player")
             hint: I18n.tr("Visualizer, album art, excluded players")
-            onClicked: root.page.parentModal?.navigateTo("media_player")
+            onClicked: keyboard => root.page.parentModal?.navigateTo("media_player", keyboard)
         }
     }
 }

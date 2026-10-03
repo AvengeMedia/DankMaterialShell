@@ -276,4 +276,9 @@ Singleton {
     function hasOptions(id) {
         return optionFiles[id] !== undefined;
     }
+
+    // Every widget reaches the general options page (placement); spacers and separators configure inline on their row.
+    function configurable(item) {
+        return !!item?.pluginId || !["spacer", "separator"].includes(item?.id);
+    }
 }

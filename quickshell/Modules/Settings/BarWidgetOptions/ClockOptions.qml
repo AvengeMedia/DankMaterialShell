@@ -47,7 +47,7 @@ Column {
             iconName: "schedule"
             title: I18n.tr("Time & weather")
             hint: I18n.tr("Clock format, calendar, weather location")
-            onClicked: root.page.parentModal?.navigateTo("time_weather")
+            onClicked: keyboard => root.page.parentModal?.navigateTo("time_weather", keyboard)
         }
     }
 }

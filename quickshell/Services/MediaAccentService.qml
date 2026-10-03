@@ -27,7 +27,7 @@ Singleton {
 
     readonly property color accentContainer: _container(Theme.primaryContainer, Theme.isLightMode ? 0.3 : 0.55, Theme.isLightMode ? 0.9 : 0.42, 1.25)
     readonly property color accentSecondaryContainer: _container(Theme.secondaryContainer, Theme.isLightMode ? 0.12 : 0.22, Theme.isLightMode ? 0.94 : 0.3, 1.08)
-    readonly property color readableAccent: contrastTo(accent, Theme.onSurface, Theme.surfaceContainerHigh, 4.5)
+    readonly property color readableAccent: contrastTo(accent, Theme.onSurface, Theme.chipSurface, 4.5)
 
     property color onAccent
     property color onAccentContainer
@@ -123,7 +123,7 @@ Singleton {
         if (!MediaOptions.albumArtAccent || _accent === null)
             return fallback;
         const seed = Qt.hsva(Math.max(0, _accent.hsvHue), Math.min(_accent.hsvSaturation, saturationCap), value, 1);
-        return contrastTo(seed, Theme.onSurface, Theme.surfaceContainerHigh, cardContrast);
+        return contrastTo(seed, Theme.onSurface, Theme.chipSurface, cardContrast);
     }
 
     function _onContainer(fallback, saturationCap, container) {

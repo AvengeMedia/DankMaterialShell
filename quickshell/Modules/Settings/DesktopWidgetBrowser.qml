@@ -31,19 +31,17 @@ WidgetPickerWindow {
     Component {
         id: tileDelegate
 
-        Rectangle {
+        DankListItem {
             id: delegateRoot
 
             required property var modelData
             required property int index
 
             width: ListView.view.width
-            height: 72
-            radius: Theme.cornerRadius
-            property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-            color: isSelected ? Theme.selectedContainer : widgetArea.containsMouse ? Theme.primaryHover : Theme.floatingWindowNestedSurface
-            border.color: Theme.outlineMedium
-            border.width: Theme.layerOutlineWidth
+            implicitHeight: Theme.listItemTwoLineHeight
+            isSelected: root.keyboardNavigationActive && index === root.selectedIndex
+            Accessible.name: modelData.name || modelData.id
+            onClicked: root.addWidget(delegateRoot.modelData)
 
             Row {
                 anchors.fill: parent
@@ -51,10 +49,10 @@ WidgetPickerWindow {
                 spacing: Theme.spacingM
 
                 Rectangle {
-                    width: 44
-                    height: 44
+                    width: Theme.avatarSize
+                    height: Theme.avatarSize
                     radius: Theme.cornerRadius
-                    color: Theme.primarySelected
+                    color: Theme.withAlpha(Theme.primary, Theme.tonalTintAlpha)
                     anchors.verticalCenter: parent.verticalCenter
 
                     DankIcon {
@@ -68,7 +66,7 @@ WidgetPickerWindow {
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingXXS
-                    width: parent.width - 44 - Theme.iconSize - Theme.spacingM * 3
+                    width: parent.width - Theme.avatarSize - Theme.iconSizeMedium - Theme.spacingM * 3
 
                     Row {
                         spacing: Theme.spacingS
@@ -80,53 +78,19 @@ WidgetPickerWindow {
                             color: Theme.surfaceText
                         }
 
-                        Rectangle {
+                        PluginBadge {
                             visible: delegateRoot.modelData.featured || false
-                            width: featuredWidgetRow.implicitWidth + Theme.spacingXS * 2
-                            height: 18
-                            radius: Theme.fullRadius(width, height)
-                            color: Theme.withAlpha(Theme.secondary, 0.15)
-                            border.color: Theme.withAlpha(Theme.secondary, 0.4)
-                            border.width: Theme.outlineWidth
+                            iconName: "star"
+                            label: I18n.tr("featured")
+                            tone: Theme.secondary
                             anchors.verticalCenter: parent.verticalCenter
-
-                            Row {
-                                id: featuredWidgetRow
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXXS
-
-                                DankIcon {
-                                    name: "star"
-                                    size: 10
-                                    color: Theme.secondary
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                StyledText {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: I18n.tr("featured")
-                                    font.pixelSize: Theme.fontSizeSmall - 2
-                                    color: Theme.secondary
-                                    font.weight: Theme.fontWeightMedium
-                                }
-                            }
                         }
 
-                        Rectangle {
+                        PluginBadge {
                             visible: delegateRoot.modelData.type === "plugin"
-                            width: pluginLabel.implicitWidth + Theme.spacingXS * 2
-                            height: 18
-                            radius: Theme.fullRadius(width, height)
-                            color: Theme.withAlpha(Theme.secondary, 0.15)
+                            label: I18n.tr("Plugin")
+                            tone: Theme.secondary
                             anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                id: pluginLabel
-                                anchors.centerIn: parent
-                                text: I18n.tr("Plugin")
-                                font.pixelSize: Theme.fontSizeSmall - 2
-                                color: Theme.secondary
-                            }
                         }
                     }
 
@@ -147,22 +111,6 @@ WidgetPickerWindow {
                     size: Theme.iconSizeMedium
                     color: Theme.primary
                     anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            MouseArea {
-                id: widgetArea
-
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.addWidget(delegateRoot.modelData)
-            }
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.standardEasing
                 }
             }
         }

@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Common
-import qs.Modals.Settings
 import qs.Services
 import qs.Widgets
 import qs.Modules.Settings.Widgets
@@ -46,12 +45,62 @@ Item {
         searchField.forceActiveFocus();
     }
 
-    function focusAfterNavigation() {
-        if (parentModal?.isCompactMode && !parentModal.menuVisible) {
-            parentModal.focusCurrentPage();
+    function focusAfterNavigation(keyboard) {
+        if (keyboard || (parentModal?.isCompactMode && !parentModal.menuVisible)) {
+            parentModal?.focusCurrentPage(keyboard);
             return;
         }
-        focusSearch();
+        parentModal?.focusSidebar();
+    }
+
+    function focusNavigation() {
+        function findRow(item) {
+            if (item.modelData?.id === root.activeCategoryId && item.visible && item.enabled)
+                return item;
+            for (const child of item.children ?? []) {
+                const row = findRow(child);
+                if (row)
+                    return row;
+            }
+            return null;
+        }
+        const row = findRow(sidebarColumn);
+        if (row && !searchActive) {
+            row.forceActiveFocus(Qt.TabFocusReason);
+            ensureRowVisible(row);
+        } else {
+            focusSearch();
+        }
+    }
+
+    function moveRowFocus(forward) {
+        const start = Window.activeFocusItem;
+        if (start === root) {
+            parentModal?.focusSidebar();
+            return true;
+        }
+        let item = start;
+        do {
+            item = item?.nextItemInFocusChain(forward);
+            if (!item || item === start)
+                return false;
+            let ancestor = item;
+            while (ancestor && ancestor !== root)
+                ancestor = ancestor.parent;
+            if (!ancestor)
+                return false;
+        } while (!item.visible || !item.enabled)
+        keyboardHighlightId = "";
+        item.forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
+        ensureRowVisible(item);
+        return true;
+    }
+
+    Keys.onPressed: event => {
+        if ((event.modifiers & ~Qt.KeypadModifier) !== Qt.NoModifier)
+            return;
+        if (event.key === Qt.Key_Up || event.key === Qt.Key_Down)
+            event.accepted = moveRowFocus(event.key === Qt.Key_Down);
     }
 
     function navigableIds() {
@@ -79,7 +128,7 @@ Item {
             return;
         pageRequested(keyboardHighlightId);
         keyboardHighlightId = "";
-        Qt.callLater(root.focusAfterNavigation);
+        root.focusAfterNavigation(true);
     }
 
     function ensureRowVisible(item) {
@@ -120,13 +169,13 @@ Item {
             parentModal?.navigateTo("bar_widget");
     }
 
-    function selectSearchResult(result) {
+    function selectSearchResult(result, keyboard = true) {
         if (!result)
             return;
         if (result.runtimeType === "barWidget" || result.runtimeType === "barWidgetAdd") {
             openBarWidget(result.runtimeId, result.runtimeType === "barWidgetAdd");
             keyboardHighlightId = "";
-            Qt.callLater(root.focusAfterNavigation);
+            root.focusAfterNavigation(keyboard);
             return;
         }
         if (result.section)
@@ -135,7 +184,7 @@ Item {
         if (page)
             pageRequested(page);
         keyboardHighlightId = "";
-        Qt.callLater(root.focusAfterNavigation);
+        root.focusAfterNavigation(keyboard);
     }
 
     function navigateSearchResults(delta) {
@@ -169,26 +218,33 @@ Item {
 
     Component.onCompleted: GreeterService.refresh()
 
-    Rectangle {
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        width: Theme.dividerWidth
-        color: Theme.outlineVariant
-        visible: !(root.parentModal?.isCompactMode ?? false)
-    }
-
     DankSearchField {
         id: searchField
+
+        property real sideInset: root.searchActive ? Theme.spacingS : SettingsMetrics.paneMargin
+
+        Behavior on sideInset {
+            enabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+            NumberAnimation {
+                duration: Theme.expressiveDurations.expressiveFastSpatial
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Theme.expressiveCurves.expressiveFastSpatial
+            }
+        }
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL
-        anchors.topMargin: Theme.spacingM
-        height: Theme.iconButtonSize + Theme.spacingM
+        anchors.leftMargin: sideInset
+        anchors.rightMargin: sideInset
+        height: SettingsMetrics.searchBarHeight
         placeholderText: I18n.tr("Search settings", "settings search field placeholder")
-        onFocusStateChanged: hasFocus => root.searchFocused = hasFocus
+        rightAccessoryWidth: avatarButton.visible ? avatarButton.width + Theme.spacingXS : 0
+        onFocusStateChanged: hasFocus => {
+            root.searchFocused = hasFocus;
+            if (!hasFocus)
+                root.keyboardHighlightId = "";
+        }
         onTextChanged: {
             SettingsSearchService.search(text);
             root.searchSelectedIndex = 0;
@@ -218,6 +274,10 @@ Item {
                     root.selectSearchResult(SettingsSearchService.results[root.searchSelectedIndex]);
                     return;
                 }
+                if (!root.searchActive && root.keyboardHighlightId === "") {
+                    root.parentModal?.focusCurrentPage();
+                    return;
+                }
                 root.selectHighlighted();
             }
             Keys.onDownPressed: event => {
@@ -228,16 +288,19 @@ Item {
                 navPrev();
                 event.accepted = true;
             }
+            // Specific key handlers accept by default; with nothing to cycle, Tab must reach the focus chain
             Keys.onTabPressed: event => {
-                if (!root.searchActive && root.keyboardHighlightId === "")
-                    return;
-                navNext();
-                event.accepted = true;
+                event.accepted = !(event.modifiers & Qt.ControlModifier) && (root.searchActive || root.keyboardHighlightId !== "");
+                if (event.accepted)
+                    navNext();
             }
             Keys.onBacktabPressed: event => {
-                if (!root.searchActive && root.keyboardHighlightId === "")
-                    return;
-                navPrev();
+                event.accepted = !(event.modifiers & Qt.ControlModifier) && (root.searchActive || root.keyboardHighlightId !== "");
+                if (event.accepted)
+                    navPrev();
+            }
+            Keys.onEnterPressed: event => {
+                navSelect();
                 event.accepted = true;
             }
             Keys.onReturnPressed: event => {
@@ -254,6 +317,34 @@ Item {
                 event.accepted = true;
             }
         }
+
+        DankActionButton {
+            id: avatarButton
+
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacingXS
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !root.searchActive
+            buttonSize: SettingsMetrics.searchBarHeight - Theme.spacingXS * 2
+            radius: Theme.buttonRadius(width, height, buttonSize, false, circular)
+            focusPolicy: Qt.TabFocus
+            tooltipText: I18n.tr("Users & accounts", "settings sidebar category")
+            onClicked: {
+                root.pageRequested("user_accounts");
+                root.focusAfterNavigation(visualFocus);
+            }
+
+            // Below the state layer so hover, press and focus tint the avatar
+            DankCircularImage {
+                z: -1
+                anchors.fill: parent
+                ringWidth: Theme.avatarRingWidth
+                ringColor: Theme.avatarRingColor
+                imageSource: PortalService.profileImage
+                fallbackIcon: imageSource ? "material:person" : ""
+                fallbackText: (UserInfoService.fullName || I18n.tr("User")).charAt(0).toLocaleUpperCase()
+            }
+        }
     }
 
     DankFlickable {
@@ -262,26 +353,17 @@ Item {
         anchors.right: parent.right
         anchors.top: searchField.bottom
         anchors.bottom: parent.bottom
-        anchors.topMargin: SettingsMetrics.sidebarGroupGap
+        anchors.topMargin: SettingsMetrics.searchBarGap
         clip: true
         contentHeight: sidebarColumn.height
 
         Column {
             id: sidebarColumn
             width: parent.width
-            leftPadding: Theme.spacingL
-            rightPadding: Theme.spacingL
-            bottomPadding: Theme.spacingL
+            leftPadding: SettingsMetrics.paneMargin
+            rightPadding: SettingsMetrics.paneMargin
+            bottomPadding: SettingsMetrics.paneMargin
             spacing: SettingsMetrics.sidebarGroupGap
-
-            ProfileSection {
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                visible: !root.searchActive
-                onClicked: {
-                    root.pageRequested("user_accounts");
-                    Qt.callLater(root.focusAfterNavigation);
-                }
-            }
 
             Column {
                 id: searchResultsColumn
@@ -300,6 +382,10 @@ Item {
                         required property int index
                         required property var modelData
 
+                        onActiveFocusChanged: {
+                            if (activeFocus)
+                                root.ensureRowVisible(resultDelegate);
+                        }
                         isFirstInGroup: index === 0
                         isLastInGroup: index === SettingsSearchService.results.length - 1
                         iconName: modelData.icon || "settings"
@@ -307,7 +393,7 @@ Item {
                         hint: modelData.category
                         accent: SettingsTabs.accentFor(modelData.page || SettingsTabs.pageForTabIndex(modelData.tabIndex))
                         active: root.searchSelectedIndex === index
-                        onClicked: root.selectSearchResult(modelData)
+                        onClicked: keyboard => root.selectSearchResult(modelData, keyboard)
                     }
                 }
 
@@ -353,6 +439,10 @@ Item {
                                 id: categoryRow
                                 required property var modelData
 
+                                onActiveFocusChanged: {
+                                    if (activeFocus)
+                                        root.ensureRowVisible(categoryRow);
+                                }
                                 readonly property bool isHighlighted: root.keyboardHighlightId === modelData.id
                                 onIsHighlightedChanged: {
                                     if (isHighlighted)
@@ -369,10 +459,10 @@ Item {
                                 accent: SettingsTabs.accentFor(modelData.id)
                                 active: root.activeCategoryId === modelData.id && !SettingsTabs.isPluginPage(root.currentPage)
                                 highlighted: isHighlighted
-                                onClicked: {
+                                onClicked: keyboard => {
                                     root.keyboardHighlightId = "";
                                     root.pageRequested(modelData.id);
-                                    Qt.callLater(root.focusAfterNavigation);
+                                    root.focusAfterNavigation(keyboard);
                                 }
                             }
                         }

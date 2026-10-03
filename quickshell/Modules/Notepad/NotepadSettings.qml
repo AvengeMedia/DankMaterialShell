@@ -67,7 +67,7 @@ Item {
         anchors.fill: parent
         visible: root.isVisible
         z: 50
-        color: Theme.withAlpha(Theme.surface, 0.85)
+        color: Theme.withAlpha(Theme.hostSurface, 0.85)
 
         WheelHandler {
             // Hold scroll so the editor beneath doesn't move while settings are open.

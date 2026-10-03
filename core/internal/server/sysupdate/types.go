@@ -146,6 +146,7 @@ type UpgradeOptions struct {
 	DryRun         bool
 	UseSudo        bool
 	AttachStdio    bool
+	Interactive    bool
 	CustomCommand  string
 	Terminal       string
 	TerminalArgs   []string

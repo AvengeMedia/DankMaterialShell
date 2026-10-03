@@ -1323,6 +1323,37 @@
     "icon": "view_in_ar"
   },
   {
+    "section": "materialSeedHue",
+    "label": "Hue",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "around",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "cool",
+      "desktop",
+      "fine",
+      "hue",
+      "image",
+      "material",
+      "palette",
+      "picture",
+      "seed",
+      "tint",
+      "tune",
+      "wallpaper",
+      "warm",
+      "wheel"
+    ],
+    "page": "personalization",
+    "description": "Fine-tune the seed around the color wheel"
+  },
+  {
     "section": "controlCenterIconScale",
     "label": "Icon scale",
     "tabIndex": -1,
@@ -1550,6 +1581,36 @@
     "page": "theme_surfaces"
   },
   {
+    "section": "materialPresets",
+    "label": "Material",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "bloom",
+      "colors",
+      "colour",
+      "colours",
+      "dank",
+      "desktop",
+      "dune",
+      "garden",
+      "hue",
+      "image",
+      "material",
+      "orbit",
+      "palette",
+      "petal",
+      "picture",
+      "preset",
+      "shape",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization"
+  },
+  {
     "section": "matugenTargetMonitor",
     "label": "Matugen source display",
     "tabIndex": -1,
@@ -1585,7 +1646,7 @@
       "wallpaper colors"
     ],
     "page": "personalization",
-    "description": "Theme colors come from this display"
+    "description": "Theme colors come from this display's wallpaper"
   },
   {
     "section": "notificationHistoryMaxCount",
@@ -1786,6 +1847,33 @@
       "window"
     ],
     "page": "theme_surfaces"
+  },
+  {
+    "section": "paletteStyleNav",
+    "label": "Palette style",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "expressive",
+      "hue",
+      "image",
+      "matugen",
+      "neutral",
+      "palette",
+      "picture",
+      "scheme",
+      "style",
+      "tint",
+      "vibrant",
+      "wallpaper"
+    ],
+    "page": "personalization"
   },
   {
     "section": "pluginManagerUnavailable",
@@ -2018,6 +2106,31 @@
       "security"
     ],
     "icon": "lock"
+  },
+  {
+    "section": "materialSeedColor",
+    "label": "Seed color",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "hue",
+      "image",
+      "material",
+      "palette",
+      "picture",
+      "seed",
+      "tint",
+      "wallpaper"
+    ],
+    "page": "personalization",
+    "icon": "colorize"
   },
   {
     "section": "perModeWallpaper",
@@ -2309,6 +2422,42 @@
     "page": "personalization"
   },
   {
+    "section": "materialSeed",
+    "label": "Theme color",
+    "tabIndex": -1,
+    "category": "Wallpaper & colors",
+    "keywords": [
+      "appearance",
+      "around",
+      "background",
+      "bg",
+      "color",
+      "colors",
+      "colour",
+      "colours",
+      "desktop",
+      "dynamic",
+      "fine",
+      "hue",
+      "image",
+      "look",
+      "material",
+      "matugen",
+      "palette",
+      "picture",
+      "seed",
+      "style",
+      "theme",
+      "tint",
+      "tune",
+      "wallpaper",
+      "wheel"
+    ],
+    "page": "personalization",
+    "icon": "colorize",
+    "description": "Fine-tune the seed around the color wheel"
+  },
+  {
     "section": "focusRingWidth",
     "label": "Thickness",
     "tabIndex": -1,
@@ -2486,7 +2635,7 @@
     ],
     "page": "personalization",
     "icon": "lock",
-    "description": "Theme colors come from this display"
+    "description": "Theme colors come from this display's wallpaper"
   },
   {
     "section": "windowRadius",
@@ -7214,19 +7363,25 @@
     "category": "Lock screen",
     "keywords": [
       "factor",
+      "fingerprint",
+      "first",
       "key",
+      "lets",
       "lock",
       "lockscreen",
       "login",
       "mode",
       "password",
+      "requires",
       "screen",
       "second",
       "security",
       "u2f",
+      "unlock",
       "yubikey"
     ],
-    "parentLabel": "Security"
+    "parentLabel": "Security",
+    "description": "'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key."
   },
   {
     "section": "lockScreenSecurityKeyShortcutEnabled",
@@ -8879,6 +9034,29 @@
       "upgrade"
     ],
     "parentLabel": "System & integrations"
+  },
+  {
+    "section": "systemUpdaterUpgradeInWindow",
+    "label": "Show upgrade in a window",
+    "tabIndex": 20,
+    "category": "Software updates",
+    "keywords": [
+      "floating",
+      "integrations",
+      "live",
+      "log",
+      "opens",
+      "output",
+      "popout",
+      "show",
+      "software",
+      "system",
+      "updates",
+      "upgrade",
+      "window"
+    ],
+    "parentLabel": "System & integrations",
+    "description": "Opens a floating window with the live output"
   },
   {
     "section": "_tab_20",
@@ -11967,6 +12145,28 @@
     "icon": "handyman"
   },
   {
+    "section": "_tab_37",
+    "label": "",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "borders",
+      "corner",
+      "corners",
+      "gaps",
+      "integrations",
+      "radius",
+      "round",
+      "rounded",
+      "system",
+      "window"
+    ],
+    "icon": "layers",
+    "description": "Gaps, window borders, corner radius",
+    "conditionKey": "layoutCapable",
+    "runtimeType": "pageLabel"
+  },
+  {
     "section": "hyprlandLayoutBorderSize",
     "label": "Border size",
     "tabIndex": 37,
@@ -12611,13 +12811,15 @@
   },
   {
     "section": "showConfigReloadToast",
-    "label": "Show \\",
+    "label": "Show \"config reloaded\" toast",
     "tabIndex": 37,
     "category": "System & integrations",
     "keywords": [
       "compositor",
+      "config",
       "integrations",
       "reload",
+      "reloaded",
       "show",
       "system",
       "toast"
@@ -13364,6 +13566,34 @@
     "icon": "tune"
   },
   {
+    "section": "batteryCriticalAnimation",
+    "label": "Pulse animation",
+    "tabIndex": 42,
+    "category": "Battery",
+    "keywords": [
+      "animate",
+      "animation",
+      "animations",
+      "battery",
+      "blink",
+      "charge",
+      "charging",
+      "critical",
+      "hibernate",
+      "indicator",
+      "motion",
+      "power",
+      "pulse",
+      "reboot",
+      "restart",
+      "shutdown",
+      "sleep",
+      "suspend",
+      "transition"
+    ],
+    "parentLabel": "Power & battery"
+  },
+  {
     "section": "batteryStatusCard",
     "label": "Status",
     "tabIndex": 42,
@@ -13399,6 +13629,18 @@
     ],
     "icon": "space_dashboard",
     "description": "Tabs and weather"
+  },
+  {
+    "section": "dashWellbeingSettings",
+    "label": "Digital wellbeing",
+    "tabIndex": 43,
+    "category": "Dashboard",
+    "keywords": [
+      "dashboard",
+      "digital",
+      "wellbeing"
+    ],
+    "icon": "digital_wellbeing"
   },
   {
     "section": "dashTabsEvenlySpaced",
@@ -16104,6 +16346,7 @@
     "category": "Advanced",
     "keywords": [
       "advanced",
+      "display",
       "displays",
       "dock",
       "isolate",
@@ -16122,7 +16365,7 @@
     ],
     "parentLabel": "Dock",
     "icon": "monitor",
-    "description": "Shows only windows from the dock"
+    "description": "Shows only windows from the dock's own display"
   },
   {
     "section": "dockExclusiveZone",
@@ -16156,6 +16399,7 @@
     "category": "Advanced",
     "keywords": [
       "advanced",
+      "display",
       "displays",
       "dock",
       "isolate",
@@ -16173,7 +16417,7 @@
       "windows"
     ],
     "parentLabel": "Dock",
-    "description": "Shows only windows from the dock"
+    "description": "Shows only windows from the dock's own display"
   },
   {
     "section": "dockAdvanced",
@@ -17341,5 +17585,141 @@
     ],
     "parentLabel": "System & integrations",
     "icon": "cloud_off"
+  },
+  {
+    "section": "wellbeingAppLimits",
+    "label": "App limits",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "app",
+      "digital",
+      "limit",
+      "limits",
+      "screen time",
+      "wellbeing"
+    ],
+    "icon": "timer"
+  },
+  {
+    "section": "wellbeingDailyLimit",
+    "label": "Daily limit",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "daily",
+      "digital",
+      "limit",
+      "screen time",
+      "wellbeing"
+    ]
+  },
+  {
+    "section": "_tab_67",
+    "label": "Digital wellbeing",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "digital",
+      "limits",
+      "screen",
+      "time",
+      "wellbeing"
+    ],
+    "icon": "digital_wellbeing",
+    "description": "Screen time and app limits"
+  },
+  {
+    "section": "wellbeingHistory",
+    "label": "History",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "clear",
+      "digital",
+      "history",
+      "screen time",
+      "wellbeing"
+    ],
+    "icon": "history"
+  },
+  {
+    "section": "wellbeingApps",
+    "label": "Most used apps",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "apps",
+      "digital",
+      "most",
+      "screen time",
+      "usage",
+      "wellbeing"
+    ],
+    "icon": "apps"
+  },
+  {
+    "section": "wellbeing",
+    "label": "Screen time",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "active",
+      "counts",
+      "device",
+      "digital",
+      "focused",
+      "limit",
+      "screen",
+      "screen time",
+      "session",
+      "stays",
+      "time",
+      "usage",
+      "wellbeing",
+      "while"
+    ],
+    "icon": "digital_wellbeing",
+    "description": "Counts time in the focused app while the session is active. Stays on this device."
+  },
+  {
+    "section": "wellbeingEnabled",
+    "label": "Track screen time",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "active",
+      "counts",
+      "device",
+      "digital",
+      "focused",
+      "screen",
+      "screen time",
+      "session",
+      "stays",
+      "time",
+      "track",
+      "tracking",
+      "wellbeing",
+      "while"
+    ],
+    "description": "Counts time in the focused app while the session is active. Stays on this device."
+  },
+  {
+    "section": "wellbeingChart",
+    "label": "Weekly screen time",
+    "tabIndex": 67,
+    "category": "Digital wellbeing",
+    "keywords": [
+      "chart",
+      "digital",
+      "screen",
+      "screen time",
+      "time",
+      "week",
+      "weekly",
+      "wellbeing"
+    ],
+    "icon": "show_chart"
   }
 ]

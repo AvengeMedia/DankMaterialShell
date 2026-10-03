@@ -149,7 +149,7 @@ Item {
                     iconName: "skip_previous"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Previous")
                     anchors.verticalCenter: parent.verticalCenter
@@ -161,7 +161,7 @@ Item {
                     iconName: "skip_next"
                     iconSize: Theme.iconSizeMedium
                     iconColor: Theme.surfaceText
-                    backgroundColor: Theme.chipSurface
+                    backgroundColor: SettingsMetrics.controlSurface
                     enabled: root.canCycle
                     Accessible.name: I18n.tr("Next")
                     anchors.verticalCenter: parent.verticalCenter

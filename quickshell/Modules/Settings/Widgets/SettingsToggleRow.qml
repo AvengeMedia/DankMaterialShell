@@ -25,7 +25,7 @@ SettingsRow {
     Accessible.role: Accessible.CheckBox
     Accessible.checkable: true
     Accessible.checked: checked
-    Accessible.onToggleAction: root.clicked()
+    Accessible.onToggleAction: root.clicked(true)
     onClicked: {
         if (!enabled || toggling)
             return;

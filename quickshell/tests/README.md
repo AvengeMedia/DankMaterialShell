@@ -1,6 +1,6 @@
 # Shell tests
 
-`make test-qml` runs the shell JavaScript tests, Qt output-cycle tests and every QML fixture in `qml/`. It needs Python 3, Node.js, make, Qt 6 qmltestrunner, Quickshell, niri, Xvfb, dbus-daemon or dbus-broker, and the `dbus_next` Python module. The Nix development shell includes these dependencies on Linux.
+`make test-qml` runs the shell JavaScript tests, Qt output-cycle tests and every QML fixture in `qml/`. It needs Python 3, Node.js, make, Lua, Qt 6 qmltestrunner, Quickshell, niri, Xvfb, dbus-daemon or dbus-broker, and the `dbus_next` Python module. The Nix development shell includes these dependencies on Linux.
 
 The `qml-tests` pre-commit hook runs the same checks when shell code, tests or their configuration changes. CI runs that hook in the QML tests job. The other pre-commit job skips it to avoid running it twice.
 

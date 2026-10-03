@@ -173,6 +173,25 @@ Singleton {
             "options": [cardOnly(toggle("city", I18n.tr("Show city"), false)), cardOnly(toggle("readings", I18n.tr("Show readings"), true)), cardOnly(toneOption())]
         },
         {
+            "id": "wellbeing",
+            "text": I18n.tr("Digital wellbeing"),
+            "icon": "digital_wellbeing",
+            "description": SettingsData.wellbeingEnabled ? I18n.tr("Screen time and app limits") : I18n.tr("Hidden until screen time tracking is enabled"),
+            "available": SettingsData.wellbeingEnabled,
+            "tab": {
+                "component": wellbeingTab,
+                "async": true
+            },
+            "card": {
+                "component": wellbeingCard,
+                "w": 2,
+                "h": 1,
+                "minW": 1,
+                "minH": 1,
+                "maxH": 3
+            }
+        },
+        {
             "id": "notifications",
             "text": I18n.tr("Notifications"),
             "icon": "notifications",
@@ -332,6 +351,15 @@ Singleton {
                     {
                         "value": "ring",
                         "text": I18n.tr("Ring", "noun, battery widget ring gauge style option")
+                    }
+                ]), choice("color", I18n.tr("Color"), "level", [
+                    {
+                        "value": "level",
+                        "text": I18n.tr("Level", "battery settings: charge level indicator colors")
+                    },
+                    {
+                        "value": "theme",
+                        "text": I18n.tr("Theme", "battery settings: theme accent indicator colors")
                     }
                 ]), toggle("health", I18n.tr("Show health"), false), toneOption()]
         }
@@ -714,6 +742,16 @@ Singleton {
     Component {
         id: notificationsCard
         NotificationsOverviewCard {}
+    }
+
+    Component {
+        id: wellbeingTab
+        WellbeingTab {}
+    }
+
+    Component {
+        id: wellbeingCard
+        WellbeingOverviewCard {}
     }
 
     Component {

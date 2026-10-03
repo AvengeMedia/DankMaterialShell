@@ -419,7 +419,7 @@ func (r *RegionSelector) overlayFor(os *OutputSurface, buf *ShmBuffer) *overlay 
 		bottom:      bounds.bottom,
 		left:        bounds.left,
 		right:       bounds.right,
-		showHandles: (r.resizingHandle != handleNone || r.ctrlHeld) && r.selection.hasSelection && r.phase != phaseScroll,
+		showHandles: (r.resizingHandle != handleNone || (r.ctrlHeld && !r.selection.dragging)) && r.selection.hasSelection && r.phase != phaseScroll,
 		scaleX:      bounds.scaleX,
 	}
 }
@@ -759,6 +759,7 @@ func (r *RegionSelector) hudItems() []hudItem {
 
 	return []hudItem{
 		{captureKey, "capture"},
+		{"Ctrl+C", "copy"},
 		{"Ctrl", "resize/move"},
 		{"P", cursorLabel + " cursor"},
 		{"Esc", "cancel"},

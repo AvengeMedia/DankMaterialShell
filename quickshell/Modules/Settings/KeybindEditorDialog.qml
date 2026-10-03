@@ -901,6 +901,7 @@ DankDialog {
 
         SettingsRow {
             body: DankButtonGroup {
+                arrowKeysSelect: false
                 width: parent.width
                 fillWidth: true
                 maximumWidth: width

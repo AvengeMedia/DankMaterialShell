@@ -27,6 +27,7 @@ FocusScope {
             id: headerLoader
 
             width: parent.width
+            focus: status === Loader.Ready
             source: root.headerFile ? Qt.resolvedUrl(root.headerFile + ".qml") : ""
             onLoaded: item.parentModal = Qt.binding(() => root.parentModal)
         }
@@ -45,7 +46,7 @@ FocusScope {
                     title: modelData.text
                     hint: modelData.hint ?? ""
                     trailingBadge: modelData.kind === "plugin" && PluginService.loadedPlugins[modelData.pluginId] === undefined ? I18n.tr("Disabled") : ""
-                    onClicked: root.parentModal?.navigateTo(modelData.id)
+                    onClicked: keyboard => root.parentModal?.navigateTo(modelData.id, keyboard)
                 }
             }
         }
@@ -63,7 +64,7 @@ FocusScope {
                     iconName: modelData.icon
                     title: modelData.text
                     hint: modelData.hint ?? ""
-                    onClicked: root.parentModal?.navigateTo(modelData.id)
+                    onClicked: keyboard => root.parentModal?.navigateTo(modelData.id, keyboard)
                 }
             }
         }

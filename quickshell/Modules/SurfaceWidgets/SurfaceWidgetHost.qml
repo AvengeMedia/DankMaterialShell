@@ -7,6 +7,9 @@ Loader {
     id: root
 
     property var surfaceContext: null
+    property var overflowAnchor: null
+    property var overflowSurface: null
+    property bool live: true
     property string instanceId: widgetData?.id ?? widgetId
     readonly property string registrationId: (surfaceContext?.kind ?? "bar") + ":" + (surfaceContext?.configId ?? barConfig?.id ?? "") + ":" + section + ":" + instanceId
     property int occurrenceOrder: 0
@@ -67,7 +70,7 @@ Loader {
         target: root.item
         when: root.item && "surfaceLive" in root.item && !("effectiveVisible" in root.item)
         property: "surfaceLive"
-        value: root.surfaceContext?.live ?? true
+        value: root.live && (root.surfaceContext?.live ?? true)
         restoreMode: Binding.RestoreBindingOrValue
     }
 

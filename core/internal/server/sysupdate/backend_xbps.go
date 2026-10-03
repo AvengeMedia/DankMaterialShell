@@ -56,9 +56,9 @@ func xbpsUpgradeArgv(opts UpgradeOptions) []string {
 	ignored := shellSafeNames(opts.Ignored)
 	selfUpdate := xbpsSelfUpdatePending(opts.Targets)
 	if len(ignored) == 0 && !selfUpdate {
-		return privilegedArgv(opts, "xbps-install", "-Syu", "-y")
+		return privilegedArgv(opts, withAutoYes(opts, []string{"xbps-install", "-Syu"}, "-y")...)
 	}
-	return privilegedArgv(opts, "sh", "-c", xbpsUpgradeScript(ignored, selfUpdate))
+	return privilegedArgv(opts, "sh", "-c", xbpsUpgradeScript(ignored, selfUpdate, opts.Interactive))
 }
 
 func xbpsSelfUpdatePending(targets []Package) bool {
@@ -72,7 +72,11 @@ func xbpsSelfUpdatePending(targets []Package) bool {
 
 // One script = one auth prompt: xbps updates itself first (Void requires it); ignored packages are
 // held only for this run, pre-existing user holds stay.
-func xbpsUpgradeScript(ignored []string, selfUpdate bool) string {
+func xbpsUpgradeScript(ignored []string, selfUpdate, interactive bool) string {
+	yes := " -y"
+	if interactive {
+		yes = ""
+	}
 	var sb strings.Builder
 	if len(ignored) > 0 {
 		fmt.Fprintf(&sb,
@@ -81,9 +85,9 @@ func xbpsUpgradeScript(ignored []string, selfUpdate bool) string {
 			strings.Join(ignored, " "))
 	}
 	if selfUpdate {
-		sb.WriteString(`xbps-install -Syu -y xbps && xbps-install -u -y; rc=$?; `)
+		fmt.Fprintf(&sb, `xbps-install -Syu%s xbps && xbps-install -u%s; rc=$?; `, yes, yes)
 	} else {
-		sb.WriteString(`xbps-install -Syu -y; rc=$?; `)
+		fmt.Fprintf(&sb, `xbps-install -Syu%s; rc=$?; `, yes)
 	}
 	if len(ignored) > 0 {
 		sb.WriteString(`[ -n "$new" ] && xbps-pkgdb -m unhold $new; `)

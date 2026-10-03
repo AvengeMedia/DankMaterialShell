@@ -73,10 +73,7 @@ BasePill {
             return;
         popout.currentWindow = activeWindow;
         popout.processId = CompositorService.windowPid(activeWindow);
-        const globalPos = root.visualContent.mapToItem(null, 0, 0);
-        const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
-        const position = SettingsData.getPopupTriggerPosition(globalPos, root.parentScreen, root.barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
-        popout.setTriggerPosition(position.x, position.y, position.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+        root.positionPopout(popout);
     }
 
     onActiveWindowChanged: {
@@ -345,6 +342,14 @@ BasePill {
             if (tooltipLoader.item)
                 tooltipLoader.item.hide();
             tooltipLoader.active = false;
+
+            // No context menu from inside the overflow popup; behave like a task switcher.
+            const owner = BarWidgetService.registrationForItem(root)?.context?.owner;
+            if (owner?.overflowAnchor) {
+                CompositorService.activateToplevel(activeWindow);
+                owner.overflowSurface?.close();
+                return;
+            }
 
             focusedWindowPopoutLoader.active = true;
             if (!focusedWindowPopoutLoader.item)

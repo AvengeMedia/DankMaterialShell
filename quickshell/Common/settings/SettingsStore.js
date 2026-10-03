@@ -707,20 +707,6 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 35;
     }
 
-    if (currentVersion < 36 && targetVersion >= 36) {
-        // The footer's running-apps chip became a grid tile; layouts saved before then never mention it.
-        const widgets = settings.controlCenterWidgets;
-        if (Array.isArray(widgets) && !widgets.some(widget => widget?.id === "runningApps"))
-            settings.controlCenterWidgets = widgets.concat([{
-                        id: "runningApps",
-                        enabled: true,
-                        w: Math.max(1, (settings.controlCenterColumns ?? 8) - 1),
-                        h: 1,
-                        small: true
-                    }]);
-        settings.configVersion = 36;
-    }
-
     return settings;
 }
 
@@ -738,9 +724,18 @@ function migrateControlCenterHeader(widgets, fixedHeader, columns) {
                 h: 1,
                 small: true
             }));
+    const footer = rest.some(widget => widget?.id === "runningApps") ? [] : [
+        {
+            id: "runningApps",
+            enabled: true,
+            w: 4,
+            h: 1,
+            footer: true
+        }
+    ];
     const identity = header.length === 0 ? {} : header.find(widget => widget.id === "userCard" || (widget.id === "header" && widget.showUser !== false));
     if (!identity || rest.some(widget => widget?.id === "user"))
-        return tiles.concat(rest);
+        return tiles.concat(rest, footer);
     const user = {
         id: "user",
         enabled: true,
@@ -751,7 +746,7 @@ function migrateControlCenterHeader(widgets, fixedHeader, columns) {
         if (key in identity)
             user[key] = identity[key];
     }
-    return [user].concat(tiles, rest);
+    return [user].concat(tiles, rest, footer);
 }
 
 function migrateBarWidgetGlobals(settings) {

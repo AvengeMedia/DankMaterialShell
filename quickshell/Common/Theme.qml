@@ -50,58 +50,14 @@ Singleton {
     readonly property string homeDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.HomeLocation))
     readonly property string configDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation))
     readonly property string shellDir: Paths.strip(Qt.resolvedUrl(".").toString()).replace("/Common/", "")
-    readonly property string wallpaperPath: {
-        if (typeof SessionData === "undefined")
-            return "";
-
-        var monitors = SessionData.monitorWallpapers;
-        if (SessionData.perMonitorWallpaper) {
-            var screens = Quickshell.screens;
-            if (screens.length > 0) {
-                var s = screens[0];
-                return monitors[s.name] || (s.model ? monitors[s.model] : "") || SessionData.wallpaperPath;
-            }
-        }
-
-        return SessionData.wallpaperPath;
+    readonly property string wallpaperSourceScreen: {
+        const screens = Quickshell.screens;
+        const target = SettingsData.matugenTargetMonitor;
+        return screens.find(screen => screen.name === target)?.name ?? screens[0]?.name ?? "";
     }
-    readonly property string rawWallpaperPath: {
-        if (typeof SessionData === "undefined")
-            return "";
-
-        var monitors = SessionData.monitorWallpapers;
-        if (SessionData.perMonitorWallpaper) {
-            var screens = Quickshell.screens;
-            if (screens.length > 0) {
-                var targetMonitor = (typeof SettingsData !== "undefined" && SettingsData.matugenTargetMonitor && SettingsData.matugenTargetMonitor !== "") ? SettingsData.matugenTargetMonitor : screens[0].name;
-
-                var targetMonitorExists = false;
-                for (var i = 0; i < screens.length; i++) {
-                    if (screens[i].name === targetMonitor) {
-                        targetMonitorExists = true;
-                        break;
-                    }
-                }
-
-                if (!targetMonitorExists)
-                    targetMonitor = screens[0].name;
-
-                var s = null;
-                for (var j = 0; j < screens.length; j++) {
-                    if (screens[j].name === targetMonitor) {
-                        s = screens[j];
-                        break;
-                    }
-                }
-
-                if (s)
-                    return monitors[s.name] || (s.model ? monitors[s.model] : "") || SessionData.wallpaperPath;
-                return monitors[targetMonitor] || SessionData.wallpaperPath;
-            }
-        }
-
-        return SessionData.wallpaperPath;
-    }
+    readonly property string wallpaperPath: SessionData.getMonitorWallpaper(Quickshell.screens[0]?.name ?? "")
+    readonly property string rawWallpaperPath: SessionData.getMonitorWallpaper(wallpaperSourceScreen)
+    readonly property string materialWallpaperSeed: SessionData.getMonitorMaterialWallpaper(wallpaperSourceScreen).seed
 
     property bool matugenAvailable: false
     property var workerRunning: false
@@ -241,6 +197,7 @@ Singleton {
         return {
             "name": name,
             "primary": getMatugenColorForMode(colorMode, "primary", "#42a5f5"),
+            "inversePrimary": getMatugenColorForMode(colorMode, "inverse_primary", getMatugenColorForMode(colorMode === "light" ? "dark" : "light", "primary", "#6750a4")),
             "primaryText": getMatugenColorForMode(colorMode, "on_primary", "#ffffff"),
             "primaryContainer": getMatugenColorForMode(colorMode, "primary_container", "#1976d2"),
             "onPrimaryContainer": getMatugenColorForMode(colorMode, "on_primary_container"),
@@ -420,6 +377,7 @@ Singleton {
     readonly property color accentOnSelectedContainer: currentThemeData.accentOnSelectedContainer || (Contrast.ratio(primary, selectedContainer) >= 3 ? primary : onSelectedContainer)
     readonly property color accentOnPrimaryContainer: currentThemeData.accentOnPrimaryContainer || (Contrast.ratio(primary, primaryContainer) >= 3 ? primary : onPrimaryContainer)
     readonly property var accents: Accents.derive(primary, isLightMode, currentThemeData.accents ?? null)
+    property color inversePrimary: currentThemeData.inversePrimary || wallpaperThemeData(!isLightMode).primary
     property color inverseSurface: currentThemeData.inverseSurface || surfaceText
     property color inverseOnSurface: currentThemeData.inverseOnSurface || surface
 
@@ -565,6 +523,7 @@ Singleton {
     readonly property color notificationFloatingSurface: notificationForegroundLayers ? readableSurface : withAlpha(readableSurface, 0)
     readonly property color notificationFloatingSurfaceHigh: notificationForegroundLayers ? readableSurfaceHigh : withAlpha(readableSurfaceHigh, 0)
     readonly property color notificationNestedSurface: notificationFloatingSurfaceHigh
+    readonly property color notificationChipSurface: notificationForegroundLayers ? chipSurface : withAlpha(onSurface, stateLayerFocus)
     readonly property real blurLayerOutlineOpacity: Math.max(0, Math.min(1, typeof SettingsData === "undefined" ? 0 : (SettingsData.blurLayerOutlineOpacity ?? 0)))
     readonly property real layerOutlineOpacity: blurLayerOutlineOpacity
     readonly property int layerOutlineWidth: layerOutlineOpacity > 0 ? 1 : 0
@@ -592,6 +551,50 @@ Singleton {
 
     readonly property real avatarRingWidth: SettingsData.avatarRing === "none" ? 0 : outlineWidth
     readonly property color avatarRingColor: SettingsData.avatarRing === "outline" ? surfaceVariant : roleColor(SettingsData.avatarRing)
+
+    function wallpaperThemeData(light) {
+        switch (currentTheme) {
+        case "dynamic":
+            return buildExtractedDynamicMode(light ? "light" : "dark", "Dynamic");
+        case "custom":
+            return resolveCustomTheme(customThemeRawData, light ? "light" : "dark");
+        default:
+            return StockThemes.getThemeByName(currentTheme, light);
+        }
+    }
+
+    function wallpaperPalette(light = isLightMode) {
+        if (light === isLightMode)
+            return {
+                primary,
+                secondary,
+                tertiary,
+                primaryContainer,
+                secondaryContainer,
+                tertiaryContainer,
+                inversePrimary,
+                contrastDark,
+                surface
+            };
+        const data = wallpaperThemeData(light);
+        const container = Qt.color(data.surfaceContainer);
+        const high = Qt.color(data.surfaceContainerHigh);
+        const primaryColor = Qt.color(data.primary);
+        const secondaryColor = Qt.color(data.secondary);
+        const tertiaryColor = Qt.color(data.tertiary || data.secondary);
+        const tint = (data.containerTint ?? Tonal.defaultTint(container)) * containerSaturation;
+        return {
+            primary: primaryColor,
+            secondary: secondaryColor,
+            tertiary: tertiaryColor,
+            primaryContainer: data.softPrimaryContainer || Tonal.softContainer(primaryColor, container, tint),
+            secondaryContainer: data.secondaryContainer || blend(high, secondaryColor, 0.35),
+            tertiaryContainer: data.tertiaryContainer || blend(high, tertiaryColor, 0.35),
+            inversePrimary: data.inversePrimary || wallpaperThemeData(!light).primary,
+            contrastDark,
+            surface: data.surface
+        };
+    }
 
     function roleColor(mode) {
         switch (mode) {
@@ -1244,6 +1247,7 @@ Singleton {
     property real spacingM: 12
     property real spacingL: 16
     property real spacingXL: 24
+    readonly property real windowInset: spacingM
     property real fontSizeSmall: Math.round(fontScale * 12)
     property real fontSizeMedium: Math.round(fontScale * 14)
     property real fontSizeLarge: Math.round(fontScale * 16)
@@ -1371,6 +1375,8 @@ Singleton {
     readonly property int clockSwitchDelay: 100
     readonly property real chipIconSize: 18
     readonly property real buttonGroupExpandRatio: 0.15
+    readonly property real wallpaperBlur: 0.8
+    readonly property int wallpaperBlurMax: 75
     readonly property color contrastDark: "#000000"
     readonly property color contrastLight: "#ffffff"
 
@@ -1471,7 +1477,13 @@ Singleton {
 
     function loadCustomTheme(themeData) {
         customThemeRawData = themeData;
-        const colorMode = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "light" : "dark";
+        customThemeData = resolveCustomTheme(themeData, isLightMode ? "light" : "dark");
+        generateSystemThemesFromCurrentTheme();
+    }
+
+    function resolveCustomTheme(themeData, colorMode) {
+        if (!themeData)
+            return StockThemes.getThemeByName("purple", colorMode === "light");
 
         var baseColors = {};
         if (themeData.dark || themeData.light) {
@@ -1506,9 +1518,7 @@ Singleton {
                     const accentColors = accent[flavor.id] || {};
                     baseColors = mergeColors(baseColors, accentColors);
                 }
-                customThemeData = baseColors;
-                generateSystemThemesFromCurrentTheme();
-                return;
+                return baseColors;
             }
 
             if (themeData.variants.options && themeData.variants.options.length > 0) {
@@ -1516,15 +1526,12 @@ Singleton {
                 const variant = findVariant(themeData.variants.options, selectedVariantId);
                 if (variant) {
                     const variantColors = variant[colorMode] || variant.dark || variant.light || {};
-                    customThemeData = mergeColors(baseColors, variantColors);
-                    generateSystemThemesFromCurrentTheme();
-                    return;
+                    return mergeColors(baseColors, variantColors);
                 }
             }
         }
 
-        customThemeData = baseColors;
-        generateSystemThemesFromCurrentTheme();
+        return baseColors;
     }
 
     function findVariant(options, variantId) {
@@ -1767,7 +1774,7 @@ Singleton {
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
         };
 
-        const args = ["dms", "matugen", "queue", "--state-dir", stateDir, "--shell-dir", shellDir, "--config-dir", configDir, "--kind", desired.kind, "--value", desired.value, "--mode", desired.mode, "--icon-theme", desired.iconTheme, "--matugen-type", desired.matugenType,];
+        const args = [Proc.dmsBin, "matugen", "queue", "--state-dir", stateDir, "--shell-dir", shellDir, "--config-dir", configDir, "--kind", desired.kind, "--value", desired.value, "--mode", desired.mode, "--icon-theme", desired.iconTheme, "--matugen-type", desired.matugenType,];
 
         if (!desired.runUserTemplates) {
             args.push("--run-user-templates=false");
@@ -1895,13 +1902,10 @@ Singleton {
         const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
 
         if (currentTheme === dynamic) {
-            if (!rawWallpaperPath) {
-                log.warn("Auto theme has no wallpaper - skipping matugen");
-                return;
-            }
-            const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-            const kind = rawWallpaperPath.startsWith("#") ? "hex" : "image";
-            setDesiredTheme(kind, rawWallpaperPath, isLight, iconTheme, selectedMatugenType, null);
+            const selectedMatugenType = SettingsData.matugenScheme || "scheme-tonal-spot";
+            const source = rawWallpaperPath || SettingsData.matugenSeedColor || materialWallpaperSeed;
+            const kind = source.startsWith("#") ? "hex" : "image";
+            setDesiredTheme(kind, source, isLight, iconTheme, selectedMatugenType, null);
             return;
         }
 
@@ -2417,7 +2421,7 @@ Singleton {
 
             colorsFileLoadFailed = true;
             const stale = Date.now() - _lastGenerateMs > 5000;
-            if (matugenAvailable && rawWallpaperPath && stale) {
+            if (matugenAvailable && (rawWallpaperPath || materialWallpaperSeed) && stale) {
                 log.debug("Dynamic colors unrecoverable, regenerating");
                 generateSystemThemesFromCurrentTheme();
             }

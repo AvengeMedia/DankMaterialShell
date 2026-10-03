@@ -52,13 +52,25 @@ T.Control {
     readonly property bool hasBody: bodySlot.height > 0
     readonly property bool hasText: title !== "" || subtitle !== ""
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
+    property bool highlighted: isHighlighted
     readonly property bool isFirstInGroup: _edge(true)
     readonly property bool isLastInGroup: _edge(false)
     property real topRadius: isFirstInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
     property real bottomRadius: isLastInGroup ? Theme.groupedListOuterRadius : Theme.groupedListInnerRadius
     property real minHeight: subtitle !== "" ? Theme.listItemTwoLineHeight : Theme.listItemHeight
+    // Keyboard focus on the row or any control inside it tints the row, so navigation reads without a focus ring
+    readonly property Item activeItem: Window.activeFocusItem
+    readonly property bool focusWithin: (activeItem?.visualFocus ?? false) && _contains(activeItem)
 
-    signal clicked
+    function _contains(item) {
+        for (let p = item; p; p = p.parent) {
+            if (p === root)
+                return true;
+        }
+        return false;
+    }
+
+    signal clicked(bool keyboard)
     signal resetRequested
 
     onResetRequested: {
@@ -72,7 +84,7 @@ T.Control {
     Accessible.description: subtitle
     Accessible.onPressAction: {
         if (clickable && enabled)
-            clicked();
+            clicked(true);
     }
 
     Keys.onPressed: event => {
@@ -82,7 +94,7 @@ T.Control {
         case Qt.Key_Space:
         case Qt.Key_Return:
         case Qt.Key_Enter:
-            root.clicked();
+            root.clicked(true);
             event.accepted = true;
             break;
         }
@@ -126,7 +138,7 @@ T.Control {
     Rectangle {
         anchors.fill: parent
         visible: root.paintBackground
-        color: root.active ? Theme.selectedContainer : root.isHighlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
+        color: root.active ? Theme.selectedContainer : root.highlighted ? Theme.blend(root.rowColor, Theme.primary, SettingsMetrics.highlightBlend) : root.rowColor
         border.width: Theme.layerOutlineWidth
         border.color: Theme.outlineMedium
         topLeftRadius: root.topRadius
@@ -137,7 +149,7 @@ T.Control {
 
     Rectangle {
         anchors.fill: parent
-        visible: !root.paintBackground && (root.active || root.isHighlighted)
+        visible: !root.paintBackground && (root.active || root.highlighted)
         color: root.active ? Theme.selectedContainer : SettingsMetrics.rowHighlightColor
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
@@ -148,9 +160,9 @@ T.Control {
     Rectangle {
         id: stateLayer
         anchors.fill: parent
-        visible: root.clickable
+        visible: root.clickable || root.focusWithin
         color: root.contentColor
-        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : (clickControl.hovered ? Theme.stateLayerHover : 0))
+        opacity: !root.enabled ? 0 : (clickControl.down ? Theme.stateLayerPressed : root.focusWithin ? Theme.stateLayerFocus : (clickControl.hovered ? Theme.stateLayerHover : 0))
         topLeftRadius: root.topRadius
         topRightRadius: root.topRadius
         bottomLeftRadius: root.bottomRadius
@@ -194,14 +206,16 @@ T.Control {
         anchors.fill: parent
         enabled: root.clickable && root.enabled
         hoverEnabled: root.clickable
-        focusPolicy: Qt.ClickFocus
+        focusPolicy: Qt.NoFocus
         background: null
         Accessible.ignored: true
         onPressedChanged: {
-            if (pressed)
+            if (pressed) {
+                root.forceActiveFocus(Qt.MouseFocusReason);
                 ripple.trigger(pressX, pressY);
+            }
         }
-        onClicked: root.clicked()
+        onClicked: root.clicked(false)
 
         HoverHandler {
             cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor

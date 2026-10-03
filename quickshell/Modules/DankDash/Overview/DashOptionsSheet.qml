@@ -13,6 +13,11 @@ CcSheetDialog {
     property bool tabScope: false
 
     readonly property var entry: DashRegistry.entry(entryId)
+    readonly property var settingsPages: ({
+            "weather": "weather",
+            "media": "media_player",
+            "wellbeing": "wellbeing"
+        })
     readonly property var specs: DashRegistry.sheetOptionSpecs(entryId, tabScope)
 
     function presentFor(id) {
@@ -44,14 +49,14 @@ CcSheetDialog {
     }
 
     SettingsNavRow {
-        visible: root.entryId === "weather" || root.entryId === "media"
+        visible: root.entryId in root.settingsPages
         width: parent.width
-        title: root.entryId === "media" ? I18n.tr("Media player") : I18n.tr("Weather")
+        title: root.entryId === "media" ? I18n.tr("Media player") : root.entry?.text ?? ""
         iconName: "settings"
         onClicked: {
             root.dismiss();
             PopoutService.closeDankDash();
-            PopoutService.openSettingsWithTab(root.entryId === "media" ? "media_player" : "weather");
+            PopoutService.openSettingsWithTab(root.settingsPages[root.entryId]);
         }
     }
 

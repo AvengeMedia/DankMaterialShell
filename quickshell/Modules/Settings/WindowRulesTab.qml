@@ -67,6 +67,16 @@ Item {
         return [rule.matchCriteria || {}];
     }
 
+    function actionChips(actions) {
+        const a = actions || {};
+        return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
+            const label = root.actionLabels[k] || k;
+            if (typeof a[k] === "boolean")
+                return a[k] ? label : label + ": " + I18n.tr("Off");
+            return label + ": " + a[k];
+        });
+    }
+
     function formatCriteria(obj, labels) {
         let out = [];
         const keys = Object.keys(obj || {});
@@ -333,6 +343,8 @@ Item {
 
                 DankDropdown {
                     id: windowSelector
+                    downKeyOpens: false
+                    backgroundColor: SettingsMetrics.controlSurface
                     anchors.verticalCenter: parent.verticalCenter
                     dropdownWidth: Math.min(400, createRuleRow.width - SettingsMetrics.rowPaddingH * 2)
                     compactMode: true
@@ -373,10 +385,9 @@ Item {
 
                     DankIcon {
                         name: "select_window"
-                        size: 40
+                        size: Theme.iconSizeLarge
                         color: Theme.surfaceVariantText
                         anchors.horizontalCenter: parent.horizontalCenter
-                        opacity: 0.5
                     }
 
                     StyledText {
@@ -442,35 +453,15 @@ Item {
 
                         Repeater {
                             id: actionRepeater
-                            model: {
-                                const actions = ruleRow.liveRuleData.actions || {};
-                                const labels = root.actionLabels;
-                                return Object.keys(actions).filter(key => actions[key] !== undefined && actions[key] !== null && actions[key] !== "").map(key => {
-                                    const value = actions[key];
-                                    if (typeof value === "boolean")
-                                        return value ? (labels[key] || key) : (labels[key] || key) + ": " + I18n.tr("Off");
-                                    return (labels[key] || key) + ": " + value;
-                                });
-                            }
+                            model: root.actionChips(ruleRow.liveRuleData.actions)
 
-                            delegate: Rectangle {
+                            delegate: DankBadge {
                                 required property string modelData
-
-                                width: Math.min(parent?.width ?? 0, chipText.implicitWidth + Theme.spacingS * 2)
-                                height: chipText.height + Theme.spacingXS * 2
-                                radius: Theme.cornerRadiusS
+                                maximumWidth: parent?.width ?? 0
+                                text: modelData
                                 color: Theme.primaryContainer
-
-                                StyledText {
-                                    id: chipText
-                                    anchors.centerIn: parent
-                                    width: Math.min(implicitWidth, parent.width - Theme.spacingS * 2)
-                                    text: modelData
-                                    font.weight: Theme.fontWeightMedium
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.onPrimaryContainer
-                                    wrapMode: Text.Wrap
-                                }
+                                textColor: Theme.onPrimaryContainer
+                                tooltipText: truncated ? modelData : null
                             }
                         }
                     }
@@ -536,25 +527,21 @@ Item {
                         visible: externalCard.sourceFile.length > 0
                         anchors.verticalCenter: parent.verticalCenter
                         text: externalCard.sourceFile
-                        color: Theme.withAlpha(Theme.surfaceVariantText, 0.15)
+                        color: SettingsMetrics.controlColor
                         textColor: Theme.surfaceVariantText
                     }
 
                     DankIcon {
                         name: externalCard.expanded ? "expand_less" : "expand_more"
-                        size: 20
+                        size: Theme.iconSize
                         color: Theme.surfaceVariantText
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     DankActionButton {
-                        buttonSize: 28
                         iconName: "content_copy"
-                        iconSize: 16
-                        backgroundColor: "transparent"
                         iconColor: Theme.surfaceVariantText
                         enabled: !root.readOnly
-                        opacity: enabled ? 1 : 0.5
                         anchors.verticalCenter: parent.verticalCenter
                         tooltipText: I18n.tr("Convert to DMS")
                         tooltipSide: "left"
@@ -572,22 +559,15 @@ Item {
                             visible: externalCard.hasActions
 
                             Repeater {
-                                model: {
-                                    const a = externalCard.modelData.actions || {};
-                                    const labels = root.actionLabels;
-                                    return Object.keys(a).filter(k => a[k] !== undefined && a[k] !== null && a[k] !== "").map(k => {
-                                        const val = a[k];
-                                        if (typeof val === "boolean")
-                                            return val ? (labels[k] || k) : (labels[k] || k) + ": " + I18n.tr("Off");
-                                        return (labels[k] || k) + ": " + val;
-                                    });
-                                }
+                                model: root.actionChips(externalCard.modelData.actions)
 
                                 delegate: DankBadge {
                                     required property string modelData
+                                    maximumWidth: parent?.width ?? 0
                                     text: modelData
-                                    color: Theme.withAlpha(Theme.primary, 0.15)
-                                    textColor: Theme.primary
+                                    color: Theme.primaryContainer
+                                    textColor: Theme.onPrimaryContainer
+                                    tooltipText: truncated ? modelData : null
                                 }
                             }
                         }

@@ -542,7 +542,7 @@ BasePill {
 
                             DankBlink {
                                 target: vIconOnlyItem
-                                running: root.getIconBlinking(verticalGroupItem.modelData.id)
+                                running: root.surfaceLive && root.getIconBlinking(verticalGroupItem.modelData.id)
                             }
                         }
 
@@ -727,7 +727,7 @@ BasePill {
 
                             DankBlink {
                                 target: iconOnlyItem
-                                running: root.getIconBlinking(horizontalGroupItem.modelData.id)
+                                running: root.surfaceLive && root.getIconBlinking(horizontalGroupItem.modelData.id)
                             }
                         }
 

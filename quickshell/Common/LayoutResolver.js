@@ -93,16 +93,40 @@ function resolveScreen(inputs, screen, options) {
         // A free island keeps its satellites in a bar window on its configured edge; that band never reserves or shadows.
         const satellites = !dot && (input.islandSatellites ?? input.config.islandSatellitesEnabled ?? true);
         instances.push({
-            key: JSON.stringify([screen.name, input.config.id]), screenName: screen.name,
-            barId: input.config.id, configOrder: inputs.indexOf(input), edge: "", kind: "island", free: true, dot, hostsIsland: true,
+            key: JSON.stringify([screen.name, input.config.id]),
+            screenName: screen.name,
+            barId: input.config.id,
+            configOrder: inputs.indexOf(input),
+            edge: "",
+            kind: "island",
+            free: true,
+            dot,
+            hostsIsland: true,
             satelliteEdge: satellites ? edgeName(input.config.position ?? 0) || "top" : "",
-            row: 0, rowThickness: 0, rowOffset: 0, reservation: 0, exclusiveZone: -1, exclusionSize: 0,
-            paintedBounds: { x: 0, y: 0, width: 0, height: 0 }, margins: { top: 0, bottom: 0, left: 0, right: 0 }
+            row: 0,
+            rowThickness: 0,
+            rowOffset: 0,
+            reservation: 0,
+            exclusiveZone: -1,
+            exclusionSize: 0,
+            paintedBounds: {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+            margins: {
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0
+            }
         });
     }
     for (const edge of edges) {
         const selected = enabled.filter(input => !isFree(input) && (edgeName(input.config.position ?? 0) || "top") === edge);
         const active = selected.filter(input => !isIsland(input.config));
+        const shown = active.filter(input => input.config.visible !== false);
         const hosted = active.filter(input => !input.config.useOverlayLayer);
         let offset = 0;
         let reservation = 0;
@@ -148,8 +172,9 @@ function resolveScreen(inputs, screen, options) {
             hostedBars: hosted.map(input => input.config),
             occupancy: offset,
             reservation: Math.max(frameStyled ? options.frameThickness : 0, reservation),
-            frameReservation: active.length ? Math.max(options.frameThickness, offset) : options.frameThickness,
-            frameExclusionEnabled: frameStyled && (!active.length || (frameHosted && !active.some(input => input.config.useOverlayLayer)))
+            frameReservation: shown.length ? Math.max(options.frameThickness, offset) : options.frameThickness,
+            overviewFrameReservation: active.length ? Math.max(options.frameThickness, offset) : options.frameThickness,
+            frameExclusionEnabled: frameStyled && (!shown.length || (frameHosted && !shown.some(input => input.config.useOverlayLayer)))
         };
     }
     const manualPlacement = edges.some(edge => instances.filter(instance => instance.edge === edge).length > 1);

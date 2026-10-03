@@ -111,7 +111,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-Vlhtg829lRKpHLQXcdZMBN/jRwxmg54YFnnSuUdYc5E=";
+              vendorHash = "sha256-WFufeGR21sidUJVGQTygubcaBB/aOIkKcBKf5dtwwVk=";
 
               subPackages = [ "cmd/dms" ];
 
@@ -264,6 +264,7 @@
                 go-tools
                 gnumake
                 nodejs
+                lua
                 (python3.withPackages (ps: [ ps.dbus-next ]))
                 matugen
 

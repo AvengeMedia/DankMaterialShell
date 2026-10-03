@@ -6,7 +6,7 @@ import qs.Services
 import qs.Widgets
 import qs.Modules.DankDash
 
-Column {
+Rectangle {
     id: root
 
     property bool daily: false
@@ -19,7 +19,10 @@ Column {
     readonly property int maxStart: Math.max(0, forecasts.length - visibleCount)
     readonly property int start: Math.max(0, Math.min(maxStart, startIndex))
 
-    spacing: Theme.spacingS
+    radius: Theme.cornerRadiusXL
+    color: DashMetrics.cardColor
+    border.width: Theme.layerOutlineWidth
+    border.color: Theme.outlineMedium
 
     function step(delta) {
         const next = Math.max(0, Math.min(maxStart, start + delta));
@@ -30,24 +33,46 @@ Column {
     }
 
     Item {
-        width: parent.width
+        id: header
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Theme.spacingM
         height: Theme.buttonHeightS
 
-        StyledText {
+        Row {
+            id: title
+
             anchors.left: parent.left
             anchors.right: actions.left
             anchors.rightMargin: Theme.spacingS
             anchors.verticalCenter: parent.verticalCenter
-            text: root.daily ? I18n.tr("Daily") : I18n.tr("Hourly")
-            font.pixelSize: Theme.fontSizeLarge
-            font.weight: Theme.fontWeightMedium
-            color: Theme.onSurface
-            elide: Text.ElideRight
+            spacing: Theme.spacingS
+
+            DankIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: root.daily ? "calendar_month" : "schedule"
+                size: Theme.iconSize
+                color: Theme.onSurface
+            }
+
+            StyledText {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.max(0, title.width - Theme.iconSize - title.spacing)
+                text: root.daily ? I18n.tr("Daily") : I18n.tr("Hourly")
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Theme.fontWeightMedium
+                color: Theme.onSurface
+                elide: Text.ElideRight
+            }
         }
 
         Row {
             id: actions
+
             anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.spacingXS
 
             DankActionButton {
@@ -76,8 +101,10 @@ Column {
     }
 
     Loader {
-        width: parent.width
-        height: Math.max(0, root.height - y)
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
         active: root.live
         sourceComponent: root.chartMode ? chart : cards
     }
@@ -98,6 +125,10 @@ Column {
             Row {
                 id: cardRow
                 anchors.fill: parent
+                anchors.topMargin: Theme.spacingS
+                anchors.leftMargin: Theme.spacingM
+                anchors.rightMargin: Theme.spacingM
+                anchors.bottomMargin: Theme.spacingM
                 spacing: Theme.spacingS
                 Repeater {
                     model: root.forecasts.slice(root.start, root.start + root.visibleCount)

@@ -65,9 +65,9 @@ Item {
                             spacing: Theme.spacingS
 
                             Rectangle {
-                                width: 8
-                                height: 8
-                                radius: Theme.cornerRadiusXS
+                                width: Theme.spacingS
+                                height: Theme.spacingS
+                                radius: Theme.fullRadius(width, height)
                                 anchors.verticalCenter: parent.verticalCenter
                                 color: {
                                     switch (NetworkService.networkStatus) {
@@ -137,6 +137,7 @@ Item {
                         }
 
                         DankButtonGroup {
+                            arrowKeysSelect: false
                             id: preferenceButtons
 
                             readonly property var preferenceValues: {

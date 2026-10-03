@@ -131,7 +131,7 @@ Item {
         width: Math.min(root.width, SettingsMetrics.positionPickerMaxWidth)
         height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
         radius: Theme.cornerRadiusM
-        color: Theme.surfaceContainerHighest
+        color: SettingsMetrics.controlColor
         border.width: Theme.outlineWidth
         border.color: Theme.outlineVariant
 

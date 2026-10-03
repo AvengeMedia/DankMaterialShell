@@ -10,6 +10,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -825,6 +826,27 @@ func (m *Manager) imagePreview(data []byte, format string) string {
 	return fmt.Sprintf("[[ image %s %s %dx%d ]]", sizeStr(len(data)), imgFmt, config.Width, config.Height)
 }
 
+// URI convention: what we store and what we offer on the clipboard are always
+// percent-encoded file:// URIs; every read path decodes exactly once through
+// pathFromFileURI, so encode and decode stay a true round-trip.
+func encodeFileURI(path string) string {
+	return (&url.URL{Scheme: "file", Path: path}).String()
+}
+
+// pathFromFileURI strips the file:// prefix and decodes once. A raw "%" that
+// was never encoded (invalid escape) falls back to the raw remainder rather
+// than mangling a real path.
+func pathFromFileURI(uri string) string {
+	path, ok := strings.CutPrefix(uri, "file://")
+	if !ok {
+		return ""
+	}
+	if decoded, err := url.PathUnescape(path); err == nil {
+		return decoded
+	}
+	return path
+}
+
 func (m *Manager) uriListPreview(data []byte) (string, bool) {
 	text := strings.TrimSpace(string(data))
 	uris := strings.Split(text, "\r\n")
@@ -837,7 +859,7 @@ func (m *Manager) uriListPreview(data []byte) (string, bool) {
 	}
 
 	if len(uris) == 1 && strings.HasPrefix(uris[0], "file://") {
-		filePath := strings.TrimPrefix(uris[0], "file://")
+		filePath := pathFromFileURI(uris[0])
 		info, err := os.Stat(filePath)
 		if err != nil || info.IsDir() {
 			return m.textPreview(data), false
@@ -868,7 +890,7 @@ func (m *Manager) tryReadImageFromURI(data []byte) ([]byte, string, bool) {
 		return nil, "", false
 	}
 
-	filePath := strings.TrimPrefix(uris[0], "file://")
+	filePath := pathFromFileURI(uris[0])
 	info, err := os.Stat(filePath)
 	if err != nil || info.IsDir() {
 		return nil, "", false
@@ -2141,22 +2163,25 @@ func (m *Manager) CopyFile(filePath string) error {
 	}
 
 	cfg := m.getConfig()
-	if fileInfo.Size() > cfg.MaxEntrySize {
-		return fmt.Errorf("file too large: %d > %d", fileInfo.Size(), cfg.MaxEntrySize)
-	}
-
-	fileData, err := os.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("read file: %w", err)
+	// Files over MaxEntrySize are no longer read into memory (this used to
+	// fail the copy outright): the uri-list / plain path offers below let the
+	// paste target read the file itself, and the image probe size-guards
+	// internally.
+	var fileData []byte
+	if fileInfo.Size() <= cfg.MaxEntrySize {
+		fileData, err = os.ReadFile(filePath)
+		if err != nil {
+			return fmt.Errorf("read file: %w", err)
+		}
 	}
 
 	exportedPath, err := m.ExportFileForFlatpak(filePath)
 	if err != nil {
 		exportedPath = filePath
 	}
-	fileURI := "file://" + exportedPath
+	fileURI := encodeFileURI(exportedPath)
 
-	if imgData, imgMime, ok := m.tryReadImageFromURI([]byte("file://" + filePath)); ok {
+	if imgData, imgMime, ok := m.tryReadImageFromURI([]byte(encodeFileURI(filePath))); ok {
 		entry := Entry{
 			Data:      imgData,
 			MimeType:  imgMime,
@@ -2169,10 +2194,16 @@ func (m *Manager) CopyFile(filePath string) error {
 			log.Errorf("Failed to store file entry: %v", err)
 		}
 	} else {
+		entryData := fileData
+		if entryData == nil {
+			// Oversized: store the encoded URI instead of the body so the
+			// entry can be restored through EntryToFile later.
+			entryData = []byte(encodeFileURI(filePath) + "\r\n")
+		}
 		entry := Entry{
-			Data:      fileData,
+			Data:      entryData,
 			MimeType:  "text/uri-list",
-			Size:      len(fileData),
+			Size:      len(entryData),
 			Timestamp: time.Now(),
 			IsImage:   false,
 			Preview:   fmt.Sprintf("[[ file %s ]]", filepath.Base(filePath)),
@@ -2207,8 +2238,8 @@ func (m *Manager) EntryToFile(entry *Entry) string {
 			return ""
 		}
 		uri := strings.TrimSuffix(strings.TrimSpace(lines[0]), "\r")
-		if path, ok := strings.CutPrefix(uri, "file://"); ok {
-			return path
+		if strings.HasPrefix(uri, "file://") {
+			return pathFromFileURI(uri)
 		}
 	case entry.IsImage:
 		ext := ".png"

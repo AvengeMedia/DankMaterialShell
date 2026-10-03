@@ -68,7 +68,29 @@ Item {
     readonly property bool transientActive: controller.transientActive
     // Held from expand until the collapse spring settles, so compact-to-compact morphs never resize the bar window.
     property bool sheetOut: false
-    readonly property bool hostReady: !root.embedded || root.frameHosted || (root.isVertical ? root.windowWidth : root.windowHeight) >= root.hostThickness - 1
+    readonly property bool surfaceFits: (root.isVertical ? root.windowWidth : root.windowHeight) >= root.hostThickness - 1
+    readonly property bool hostReady: !root.embedded || root.frameHosted || root.surfaceFits
+    // Layer surfaces glitch when they resize under a moving sheet: edit room waits for a frame at the grown size, and the grown size outlives the shrink spring.
+    readonly property bool surfaceResizes: !root.freeMode && !root.frameHosted
+    readonly property int editSurfaceHeight: controller.editSurfaceHeight
+    property int heldEditSurfaceHeight: 0
+    readonly property bool editRoomWaiting: controller.editRoom > 0 && !controller.editRoomGranted
+    onEditSurfaceHeightChanged: {
+        if (root.editSurfaceHeight >= root.heldEditSurfaceHeight) {
+            root.heldEditSurfaceHeight = root.editSurfaceHeight;
+            return;
+        }
+        Qt.callLater(root.releaseEditSurface);
+    }
+    onEditRoomWaitingChanged: {
+        if (root.editRoomWaiting && !root.surfaceResizes)
+            controller.editRoomGranted = true;
+    }
+
+    function releaseEditSurface() {
+        if (!surface.motionRunning)
+            root.heldEditSurfaceHeight = root.editSurfaceHeight;
+    }
     readonly property real compactTargetSize: surface.descriptorAlong(controller.compactTarget)
     // Summed by hand so every ancestor offset is a binding dependency; mapToItem goes stale when a section re-centres.
     readonly property real slotCentre: {
@@ -147,7 +169,7 @@ Item {
     readonly property var springDampingRange: [10, 100]
     readonly property var springMassRange: [0.25, 3]
     readonly property int destinationMaxHeight: Math.max(destinationMinHeight, Math.min(destinationMaxHeightLimit, (root.screen?.height ?? referenceScreenHeight) - screenMargin))
-    readonly property int maxActivityHeight: Math.max(controller.dashboardHeight, controller.controlCenterHeight, controller.launcherExpandedTarget.height, controller.clipboardExpandedTarget.height, destinationMaxHeight)
+    readonly property int maxActivityHeight: Math.max(root.heldEditSurfaceHeight, controller.dashboardHeight, controller.controlCenterHeight, controller.launcherExpandedTarget.height, controller.clipboardExpandedTarget.height, destinationMaxHeight)
     readonly property int maxActivityWidth: Math.max(controller.dashboardMaxWidth, controller.controlCenterMaxWidth, controller.launcherExpandedTarget.width, controller.clipboardExpandedTarget.width, Math.min(activityMaxWidth, Math.max(activityMinWidth, (root.screen?.width ?? referenceScreenWidth) - screenMargin)))
     readonly property int hostThickness: outerGap + nearInset + (root.isVertical ? maxActivityWidth : maxActivityHeight) + Theme.spacingS
     readonly property real maximumAlongOffset: root.isVertical ? Math.max(0, (height - maxActivityHeight) / 2 - Theme.spacingS) : Math.max(0, (width - maxActivityWidth) / 2 - Theme.spacingS)
@@ -285,12 +307,23 @@ Item {
     }
 
     Connections {
+        target: root.Window.window
+        enabled: root.editRoomWaiting && root.surfaceResizes && root.surfaceFits
+
+        function onFrameSwapped() {
+            controller.editRoomGranted = true;
+        }
+    }
+
+    Connections {
         target: surface.surfaceMotion
 
         function onStepped() {
             // settle() emits after running drops, so the latch clears on the last step of the collapse spring.
             if (!controller.expanded && !surface.motionRunning)
                 root.sheetOut = false;
+            if (!surface.motionRunning)
+                root.releaseEditSurface();
             if (!root.connectedChrome)
                 return;
             const body = root.surfaceBodyRect();

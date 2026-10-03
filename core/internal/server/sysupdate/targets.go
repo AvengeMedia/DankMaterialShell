@@ -73,3 +73,10 @@ func privilegedArgv(opts UpgradeOptions, argv ...string) []string {
 	out = append(out, argv...)
 	return out
 }
+
+func withAutoYes(opts UpgradeOptions, argv []string, flag string) []string {
+	if opts.Interactive {
+		return argv
+	}
+	return append(argv, flag)
+}

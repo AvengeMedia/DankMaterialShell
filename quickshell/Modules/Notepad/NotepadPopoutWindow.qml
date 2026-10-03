@@ -59,10 +59,9 @@ DankFloatingWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.topMargin: Theme.spacingM
-            anchors.leftMargin: Theme.spacingM
-            anchors.rightMargin: Theme.spacingM
-            anchors.bottomMargin: Theme.spacingM
+            anchors.leftMargin: Theme.windowInset
+            anchors.rightMargin: Theme.windowInset
+            anchors.bottomMargin: Theme.windowInset
             inPopout: true
             surfaceVisible: win.visible
             onHideRequested: win.hide()

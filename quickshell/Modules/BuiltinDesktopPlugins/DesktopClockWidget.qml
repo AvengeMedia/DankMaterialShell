@@ -81,7 +81,7 @@ Item {
     readonly property color handColorDim: Theme.withAlpha(accentColor, 0.65)
     readonly property color textColor: Theme.onSurface
     readonly property color subtleTextColor: Theme.onSurfaceVariant
-    readonly property color backgroundColor: Theme.withAlpha(Theme.surface, root.transparency)
+    readonly property color backgroundColor: Theme.withAlpha(Theme.hostSurface, root.transparency)
 
     readonly property bool showAnalogSeconds: cfg.showAnalogSeconds ?? true
     readonly property bool showDigitalSeconds: cfg.showDigitalSeconds ?? false

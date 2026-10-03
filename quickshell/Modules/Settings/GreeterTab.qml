@@ -216,31 +216,13 @@ Item {
                 }
             }
 
-            SettingsRow {
+            SettingsNoteRow {
                 visible: root.greeterStatusOutput !== ""
-
-                body: Rectangle {
-                    width: parent.width
-                    height: statusTextArea.implicitHeight + Theme.spacingM * 2
-                    radius: Theme.cornerRadius
-                    color: Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: Theme.layerOutlineWidth
-
-                    StyledText {
-                        id: statusTextArea
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.margins: Theme.spacingM
-                        text: root.greeterStatusOutput
-                        font.pixelSize: Theme.fontSizeSmall
-                        isMonospace: true
-                        color: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText
-                        wrapMode: Text.Wrap
-                        horizontalAlignment: Text.AlignLeft
-                    }
-                }
+                noteIconName: ""
+                monospace: true
+                text: root.greeterStatusOutput
+                tint: root.greeterStatusRunning ? Theme.surfaceVariantText : Theme.surfaceText
+                tintBackground: SettingsMetrics.controlColor
             }
         }
 
@@ -250,7 +232,7 @@ Item {
                 tags: ["greeter", "login", "authentication", "pam", "fingerprint", "security", "key"]
                 title: I18n.tr("Authentication")
                 iconName: "fingerprint"
-                onClicked: root.parentModal?.navigateTo("greeter_auth")
+                onClicked: keyboard => root.parentModal?.navigateTo("greeter_auth", keyboard)
             }
         }
 
@@ -266,19 +248,19 @@ Item {
             SettingsNavRow {
                 title: I18n.tr("Wallpaper & colors")
                 iconName: "wallpaper"
-                onClicked: root.parentModal?.navigateTo("personalization")
+                onClicked: keyboard => root.parentModal?.navigateTo("personalization", keyboard)
             }
 
             SettingsNavRow {
                 title: I18n.tr("Fonts & motion")
                 iconName: "text_fields"
-                onClicked: root.parentModal?.navigateTo("typography")
+                onClicked: keyboard => root.parentModal?.navigateTo("typography", keyboard)
             }
 
             SettingsNavRow {
                 title: I18n.tr("Lock screen")
                 iconName: "lock"
-                onClicked: root.parentModal?.navigateTo("lock_screen")
+                onClicked: keyboard => root.parentModal?.navigateTo("lock_screen", keyboard)
             }
         }
 

@@ -8,6 +8,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import "settings/SessionSpec.js" as Spec
+import "../DankCommon/Common/MaterialWallpaper.js" as MaterialWallpaper
 import "settings/SessionStore.js" as Store
 import "../DankCommon/Common/settings/SpecUtil.js" as SpecUtil
 
@@ -15,7 +16,7 @@ Singleton {
     id: root
     readonly property var log: Log.scoped("SessionData")
 
-readonly property int sessionConfigVersion: 7
+    readonly property int sessionConfigVersion: 7
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -133,6 +134,40 @@ readonly property int sessionConfigVersion: 7
         function onNotificationDndWhileScreenSharingChanged() {
             root.syncScreenShareDnd();
         }
+    }
+
+    property var materialWallpapers: ({})
+    property int wallpaperRevision: 0
+    property int wallpaperScopeRevision: 0
+    property var monitorWallpaperRevisions: ({})
+    property var previousMonitorWallpapers: ({})
+    onWallpaperPathChanged: wallpaperRevision++
+    onPerMonitorWallpaperChanged: wallpaperScopeRevision++
+    onPerModeWallpaperChanged: wallpaperScopeRevision++
+    onMonitorWallpapersChanged: {
+        const revisions = Object.assign({}, monitorWallpaperRevisions);
+        for (const screen of Quickshell.screens) {
+            if (_findMonitorValue(previousMonitorWallpapers, screen.name) !== _findMonitorValue(monitorWallpapers, screen.name))
+                revisions[screen.name] = (revisions[screen.name] ?? 0) + 1;
+        }
+        previousMonitorWallpapers = monitorWallpapers;
+        monitorWallpaperRevisions = revisions;
+    }
+
+    function wallpaperRequestRevision(screenName) {
+        const inherited = !screenName || _findMonitorValue(monitorWallpapers, screenName) === undefined;
+        const mode = perModeWallpaper ? (isLightMode ? "light" : "dark") : "shared";
+        return mode + "/" + wallpaperScopeRevision + "/" + (inherited ? wallpaperRevision : 0) + "/" + (monitorWallpaperRevisions[screenName] ?? 0);
+    }
+
+    function invalidateWallpaperRequests(screenName) {
+        if (!screenName) {
+            wallpaperRevision++;
+            return;
+        }
+        const revisions = Object.assign({}, monitorWallpaperRevisions);
+        revisions[screenName] = (revisions[screenName] ?? 0) + 1;
+        monitorWallpaperRevisions = revisions;
     }
 
     property string wallpaperPath: ""
@@ -863,8 +898,115 @@ readonly property int sessionConfigVersion: 7
     }
 
     function clearWallpaper() {
-        wallpaperPath = "";
+        setWallpaper("");
+    }
+
+    function materialWallpaperTarget(screenName) {
+        const screen = perMonitorWallpaper ? _screenByName(screenName) : null;
+        return {
+            screen: perMonitorWallpaper ? screenName : "",
+            key: screen ? SettingsData.getScreenDisplayName(screen) : "",
+            separate: perModeWallpaper,
+            light: isLightMode,
+            perMonitor: perMonitorWallpaper
+        };
+    }
+
+    function materialWallpaperTargetAvailable(target) {
+        if (!target || target.separate !== perModeWallpaper || target.perMonitor !== perMonitorWallpaper)
+            return false;
+        if (!target.perMonitor)
+            return true;
+        const screen = _screenByName(target.screen);
+        return !!screen && SettingsData.getScreenDisplayName(screen) === target.key;
+    }
+
+    function materialWallpaperEntry(target) {
+        const slot = target.separate ? (target.light ? "light" : "dark") : "shared";
+        const inherits = !target.perMonitor || _findMonitorValue(monitorWallpapers, target.screen) === undefined;
+        const slots = inherits ? materialWallpapers[""] : _findMonitorValue(materialWallpapers, target.screen);
+        const key = inherits ? "" : target.key;
+        return MaterialWallpaper.entry({
+            "": materialWallpapers[""],
+            [key]: slots
+        }, key, slot);
+    }
+
+    function getMonitorMaterialWallpaper(screenName) {
+        return MaterialWallpaper.composition(materialWallpaperEntry(materialWallpaperTarget(screenName)));
+    }
+
+    function writeMonitorWallpaper(map, screenName, path, inherit = false) {
+        const screen = _screenByName(screenName);
+        if (!screen)
+            return map;
+        const identifier = SettingsData.getScreenDisplayName(screen);
+        const next = Object.assign({}, map);
+        delete next[screen.name];
+        if (screen.model)
+            delete next[screen.model];
+        delete next[identifier];
+        if (!inherit)
+            next[identifier] = path;
+        return next;
+    }
+
+    function setMaterialWallpaperPreset(target, preset) {
+        return setMaterialWallpaper(target, Object.assign({}, materialWallpaperEntry(target), {
+            preset
+        }));
+    }
+
+    function setMaterialWallpaperSeed(target, seed) {
+        if (!MaterialWallpaper.validSeed(seed))
+            return false;
+        return setMaterialWallpaper(target, Object.assign({}, materialWallpaperEntry(target), {
+            seed
+        }));
+    }
+
+    function setMaterialWallpaper(target, value) {
+        if (!materialWallpaperTargetAvailable(target))
+            return false;
+        const entry = MaterialWallpaper.normalizeEntry(value);
+        const slot = target.separate ? (target.light ? "light" : "dark") : "shared";
+        let store = Object.assign({}, materialWallpapers);
+        const existingSlots = target.perMonitor ? _findMonitorValue(store, target.screen) : store[""];
+        const slots = Object.assign({}, existingSlots ?? {});
+        slots[slot] = entry;
+        if (target.perMonitor)
+            store = writeMonitorWallpaper(store, target.screen, slots);
+        else
+            store[""] = slots;
+        materialWallpapers = store;
+        invalidateWallpaperRequests(target.screen);
+        if (target.perMonitor) {
+            setMonitorCyclingEnabled(target.screen, false);
+            setMonitorCyclingFolderPath(target.screen, "");
+            if (target.separate) {
+                if (target.light)
+                    monitorWallpapersLight = writeMonitorWallpaper(monitorWallpapersLight, target.screen, "");
+                else
+                    monitorWallpapersDark = writeMonitorWallpaper(monitorWallpapersDark, target.screen, "");
+            }
+            if (!target.separate || target.light === isLightMode)
+                monitorWallpapers = writeMonitorWallpaper(monitorWallpapers, target.screen, "");
+        } else {
+            wallpaperCyclingEnabled = false;
+            wallpaperCyclingFolderPath = "";
+            if (target.separate) {
+                if (target.light)
+                    wallpaperPathLight = "";
+                else
+                    wallpaperPathDark = "";
+            }
+            if (!target.separate || target.light === isLightMode)
+                wallpaperPath = "";
+        }
         saveSettings();
+        if ((!target.separate || target.light === isLightMode) && (!target.perMonitor || target.screen === Theme.wallpaperSourceScreen))
+            Theme.generateSystemThemesFromCurrentTheme();
+        return true;
     }
 
     function setPerMonitorWallpaper(enabled) {
@@ -880,6 +1022,21 @@ readonly property int sessionConfigVersion: 7
     }
 
     function setPerModeWallpaper(enabled) {
+        if (enabled === perModeWallpaper)
+            return;
+        const compositions = {};
+        const mode = isLightMode ? "light" : "dark";
+        for (const key of Object.keys(materialWallpapers)) {
+            const slots = materialWallpapers[key];
+            const entry = MaterialWallpaper.entry(materialWallpapers, key, perModeWallpaper ? mode : "shared");
+            compositions[key] = enabled ? Object.assign({}, slots, {
+                light: entry,
+                dark: entry
+            }) : Object.assign({}, slots, {
+                shared: entry
+            });
+        }
+        materialWallpapers = compositions;
         if (enabled && wallpaperCyclingEnabled) {
             setWallpaperCyclingEnabled(false);
         }
@@ -920,62 +1077,16 @@ readonly property int sessionConfigVersion: 7
     }
 
     function setMonitorWallpaper(screenName, path) {
-        var screen = null;
-        var screens = Quickshell.screens;
-        for (var i = 0; i < screens.length; i++) {
-            if (screens[i].name === screenName) {
-                screen = screens[i];
-                break;
-            }
-        }
-
-        if (!screen) {
+        if (!_screenByName(screenName)) {
             log.warn("Screen not found");
             return;
         }
-
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
-
-        var newMonitorWallpapers = {};
-        for (var key in monitorWallpapers) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
-            if (!isThisScreen) {
-                newMonitorWallpapers[key] = monitorWallpapers[key];
-            }
-        }
-
-        if (path && path !== "") {
-            newMonitorWallpapers[identifier] = path;
-        }
-
-        monitorWallpapers = newMonitorWallpapers;
-
+        monitorWallpapers = writeMonitorWallpaper(monitorWallpapers, screenName, path, !path);
         if (perModeWallpaper) {
-            if (isLightMode) {
-                var newLight = {};
-                for (var key in monitorWallpapersLight) {
-                    var isThisScreen = key === screen.name || (screen.model && key === screen.model);
-                    if (!isThisScreen) {
-                        newLight[key] = monitorWallpapersLight[key];
-                    }
-                }
-                if (path && path !== "") {
-                    newLight[identifier] = path;
-                }
-                monitorWallpapersLight = newLight;
-            } else {
-                var newDark = {};
-                for (var key in monitorWallpapersDark) {
-                    var isThisScreen = key === screen.name || (screen.model && key === screen.model);
-                    if (!isThisScreen) {
-                        newDark[key] = monitorWallpapersDark[key];
-                    }
-                }
-                if (path && path !== "") {
-                    newDark[identifier] = path;
-                }
-                monitorWallpapersDark = newDark;
-            }
+            if (isLightMode)
+                monitorWallpapersLight = writeMonitorWallpaper(monitorWallpapersLight, screenName, path, !path);
+            else
+                monitorWallpapersDark = writeMonitorWallpaper(monitorWallpapersDark, screenName, path, !path);
         }
 
         saveSettings();

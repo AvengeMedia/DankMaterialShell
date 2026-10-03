@@ -6,35 +6,37 @@ SettingsRow {
     id: root
 
     property bool checked: false
+    property bool navigable: true
 
-    signal navigated
+    signal navigated(bool keyboard)
     signal toggled(bool checked)
 
-    clickable: true
-    onClicked: navigated()
+    clickable: navigable
+    onClicked: keyboard => navigated(keyboard)
 
     DankIcon {
         name: "chevron_right"
         size: Theme.iconSize
         color: Theme.surfaceVariantText
         rotation: I18n.isRtl ? 180 : 0
+        visible: root.navigable
         anchors.verticalCenter: parent.verticalCenter
     }
 
-    Rectangle {
-        width: Theme.dividerWidth
-        height: SettingsMetrics.splitDividerHeight
-        color: Theme.outlineVariant
-        anchors.verticalCenter: parent.verticalCenter
+    SettingsDivider {
+        vertical: true
+        visible: root.navigable
     }
 
     Item {
         width: Theme.spacingS
         height: parent.height
+        visible: root.navigable
     }
 
     DankToggle {
         hideText: true
+        text: root.title
         checked: root.checked
         enabled: root.enabled
         onToggled: value => root.toggled(value)

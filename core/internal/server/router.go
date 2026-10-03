@@ -28,6 +28,7 @@ import (
 	serverThemes "github.com/AvengeMedia/DankMaterialShell/core/internal/server/themes"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wallpaper"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wellbeing"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 	"github.com/AvengeMedia/dankgo/ipc"
 )
@@ -211,6 +212,14 @@ func newRequestMux() *ipc.Mux {
 			return
 		}
 		location.HandleRequest(conn, req, locationManager)
+	}))
+
+	mux.HandlePrefix("wellbeing.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {
+		if wellbeingManager == nil {
+			models.RespondError(conn, req.ID, "wellbeing manager not initialized")
+			return
+		}
+		wellbeing.HandleRequest(conn, req, wellbeingManager)
 	}))
 
 	mux.HandlePrefix("notify.", requestHandler(func(conn *ipc.ConnWriter, req ipc.Request) {

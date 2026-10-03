@@ -223,7 +223,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
                             iconName: "menu_book"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally(Site.docs)
                         }
@@ -234,7 +234,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
                             iconName: "extension"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally(Site.plugins)
                         }
@@ -245,7 +245,7 @@ Item {
                             text: resourceButtonsRow.compactMode ? "" : "GitHub"
                             iconName: "code"
                             iconSize: 18
-                            backgroundColor: Theme.chipSurface
+                            backgroundColor: SettingsMetrics.controlSurface
                             textColor: Theme.surfaceText
                             onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell")
                         }

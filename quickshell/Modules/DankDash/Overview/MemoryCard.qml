@@ -16,8 +16,5 @@ MetricCard {
     badgeText: options.swap === true && DgopService.totalSwapKB > 0 ? Math.round(DgopService.usedSwapKB / DgopService.totalSwapKB * 100) + "%" : ""
     badgeIcon: "swap_horiz"
     showTrend: options.trend === true
-    trend: {
-        DgopService.memoryUsage;
-        return DgopService.memoryHistory.slice();
-    }
+    trend: DgopService.memoryHistory
 }

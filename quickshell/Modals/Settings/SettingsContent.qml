@@ -27,15 +27,156 @@ FocusScope {
     readonly property string pageTitle: (pageInfo?.titleFrom ? SettingsUiState[pageInfo.titleFrom] : "") || (pageInfo?.text ?? "")
     readonly property real pageContentMaxWidth: currentPageItem?.contentMaxWidth ?? SettingsMetrics.contentMaxWidth
     readonly property bool animationsEnabled: Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
+    // Mouse navigation lands parked; only keyboard navigation highlights a control on the page
+    property bool keyboardNavigation: true
 
     focus: true
 
+    function rememberFocus() {
+        const item = Window.activeFocusItem;
+        if (pageStack.currentItem && item !== currentPageItem && _contains(currentPageItem, item))
+            pageStack.currentItem.rememberedFocus = item;
+    }
+
+    function _validRemembered() {
+        const remembered = pageStack.currentItem?.rememberedFocus;
+        return remembered?.visible && remembered.enabled && _contains(currentPageItem, remembered) ? remembered : null;
+    }
+
     function _focusPage() {
+        const revision = parentModal?.modalFocusScope?.focusRevision;
         Qt.callLater(() => {
-            if (!sessionVisible || !currentPageItem || parentModal?.searchFocused)
+            if (revision !== parentModal?.modalFocusScope?.focusRevision)
                 return;
-            currentPageItem.forceActiveFocus();
+            if (parentModal?.modalFocusScope?.transientOwnsFocus())
+                return;
+            if (!sessionVisible || !currentPageItem || !pageStack.currentItem.presented)
+                return;
+            if (parentModal?.focusPane === "sidebar")
+                return;
+            if (!keyboardNavigation) {
+                if (!_contains(currentPageItem, Window.activeFocusItem))
+                    parkFocus();
+                return;
+            }
+            const remembered = _validRemembered();
+            if (remembered) {
+                remembered.forceActiveFocus(Qt.TabFocusReason);
+                _reveal(remembered);
+                return;
+            }
+            let item = currentPageItem;
+            do {
+                item = item.nextItemInFocusChain(true);
+                if (!item || item === currentPageItem || !_contains(currentPageItem, item)) {
+                    currentPageItem.forceActiveFocus(Qt.TabFocusReason);
+                    return;
+                }
+            } while (!item.visible || !item.enabled || !_inViewport(item))
+            item.forceActiveFocus(Qt.TabFocusReason);
         });
+    }
+
+    function goBack(keyboard) {
+        if (!showBack)
+            return false;
+        if (menuHidden && !(parentModal?.canGoBack ?? false)) {
+            parentModal.toggleMenu();
+            return true;
+        }
+        parentModal?.goBack(keyboard);
+        return true;
+    }
+
+    function _contains(ancestor, item) {
+        for (let p = item; p; p = p.parent) {
+            if (p === ancestor)
+                return true;
+        }
+        return false;
+    }
+
+    // Parked focus highlights nothing until a key resumes from rememberedFocus
+    function parkFocus() {
+        focusAnchor.forceActiveFocus(Qt.MouseFocusReason);
+    }
+
+    Item {
+        id: focusAnchor
+    }
+
+    function _moveFocus(forward) {
+        const page = currentPageItem;
+        let start = Window.activeFocusItem;
+        if (!page || (start !== focusAnchor && !_contains(page, start)))
+            return false;
+        if (start === focusAnchor) {
+            const remembered = _validRemembered();
+            if (remembered) {
+                remembered.forceActiveFocus(Qt.TabFocusReason);
+                _reveal(remembered);
+                return true;
+            }
+            start = page;
+        }
+        let item = start;
+        do {
+            item = item.nextItemInFocusChain(forward);
+            if (!item || item === start || !_contains(page, item))
+                return false;
+        } while (!item.visible || !item.enabled)
+        item.forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
+        _reveal(item);
+        return true;
+    }
+
+    function _inViewport(item) {
+        for (let f = item.parent; f; f = f.parent) {
+            if (typeof f.flick !== "function")
+                continue;
+            const y = item.mapToItem(f.contentItem, 0, 0).y;
+            const top = Math.max(f.originY, y - Theme.spacingL);
+            const bottom = Math.min(f.originY + f.contentHeight, y + item.height + Theme.spacingL);
+            if (top < f.contentY || bottom > f.contentY + f.height)
+                return false;
+        }
+        return true;
+    }
+
+    function _reveal(item) {
+        for (let f = item.parent; f; f = f.parent) {
+            if (typeof f.flick !== "function" || f.contentHeight <= f.height)
+                continue;
+            const top = item.mapToItem(f.contentItem, 0, 0).y - Theme.spacingL;
+            const bottom = top + item.height + Theme.spacingL * 2;
+            if (top < f.contentY)
+                f.contentY = Math.max(f.originY, top);
+            else if (bottom > f.contentY + f.height)
+                f.contentY = Math.min(f.originY + f.contentHeight - f.height, bottom - f.height);
+            return;
+        }
+    }
+
+    // Keys bubble up from the focused control, so a control that uses an arrow itself (text, lists, open menus) keeps it
+    Keys.onPressed: event => {
+        const mods = event.modifiers & ~Qt.KeypadModifier;
+        const backKey = I18n.isRtl ? Qt.Key_Right : Qt.Key_Left;
+        if ((event.key === Qt.Key_Up || event.key === Qt.Key_Down) && mods === Qt.NoModifier) {
+            event.accepted = _moveFocus(event.key === Qt.Key_Down);
+            return;
+        }
+        if ((event.key === backKey && mods === Qt.AltModifier) || (event.key === Qt.Key_Backspace && mods === Qt.NoModifier)) {
+            event.accepted = goBack(true);
+            return;
+        }
+        if (event.key !== Qt.Key_Escape || mods !== Qt.NoModifier)
+            return;
+        const focused = Window.activeFocusItem;
+        if (focused && focused !== currentPageItem && focused.cursorPosition !== undefined)
+            currentPageItem?.forceActiveFocus();
+        else if (!goBack(true))
+            parentModal?.focusSidebar();
+        event.accepted = true;
     }
 
     function _fileFor(page) {
@@ -114,6 +255,30 @@ FocusScope {
         }
     }
 
+    function _scrollerOf(item) {
+        if (typeof item.flick === "function")
+            return item;
+        for (const child of item.children) {
+            const found = _scrollerOf(child);
+            if (found)
+                return found;
+        }
+        return null;
+    }
+
+    // A page's Flickable accepts every press inside it before the pane handler sees it, so the scroller carries its own.
+    // Handlers die with their parent, so one per page.
+    Component {
+        id: scrollerTap
+
+        TapHandler {
+            onPressedChanged: {
+                if (pressed)
+                    root.parentModal?.modalFocusScope?.pointerFocus("content");
+            }
+        }
+    }
+
     Component {
         id: pageComponent
 
@@ -127,6 +292,7 @@ FocusScope {
             readonly property int status: loader.status
             readonly property bool settled: !pending && loader.status !== Loader.Loading && (presented || loader.status !== Loader.Ready)
 
+            property Item rememberedFocus: null
             property bool pending: true
             property bool presented: false
 
@@ -147,10 +313,16 @@ FocusScope {
 
                 anchors.fill: parent
                 opacity: host.presented ? 1 : 0
+                enabled: host.presented
 
                 onLoaded: {
                     if (item.pageActive !== undefined)
                         item.pageActive = Qt.binding(() => host.pageActive);
+                    const scroller = root._scrollerOf(item);
+                    if (scroller)
+                        scrollerTap.createObject(scroller, {
+                            "parent": scroller
+                        });
                     root._focusPage();
                 }
             }
@@ -178,6 +350,11 @@ FocusScope {
                         return;
                     host.presented = true;
                 }
+            }
+
+            onPresentedChanged: {
+                if (presented && pageActive)
+                    root._focusPage();
             }
 
             onPageActiveChanged: {
@@ -243,6 +420,7 @@ FocusScope {
             "autostart": "AutoStartTab.qml",
             "battery": "BatteryTab.qml",
             "dank_dash": "DankDashTab.qml",
+            "wellbeing": "DigitalWellbeingTab.qml",
             "mouse_touchpad": "MouseTouchpadTab.qml",
             "keyboard": "KeyboardTab.qml",
             "plugins_manage": "PluginsManageTab.qml"
@@ -252,13 +430,13 @@ FocusScope {
 
     Column {
         anchors.fill: parent
-        anchors.leftMargin: root.isCompactMode ? Theme.spacingS : SettingsMetrics.scrollGutter
-        anchors.rightMargin: root.isCompactMode ? Theme.spacingS : SettingsMetrics.scrollGutter
+        anchors.leftMargin: SettingsMetrics.panePadding
+        anchors.rightMargin: SettingsMetrics.panePadding
         spacing: 0
 
         Item {
             id: pageHeader
-            width: Math.min(root.pageContentMaxWidth, parent.width - Theme.spacingL * 2)
+            width: Math.min(root.pageContentMaxWidth, parent.width)
             anchors.horizontalCenter: parent.horizontalCenter
             height: Math.max(SettingsMetrics.pageHeaderHeight, pageHeading.implicitHeight + Theme.spacingM * 2)
 
@@ -280,13 +458,7 @@ FocusScope {
                     iconSize: Theme.iconSize
                     iconColor: Theme.surfaceText
                     visible: root.showBack
-                    onClicked: {
-                        if (root.menuHidden && !(root.parentModal?.canGoBack ?? false)) {
-                            root.parentModal.toggleMenu();
-                            return;
-                        }
-                        root.parentModal?.goBack();
-                    }
+                    onClicked: root.goBack()
                 }
             }
 

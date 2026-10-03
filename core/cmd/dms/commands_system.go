@@ -36,6 +36,7 @@ Examples:
   dms system update --check                  # list available updates
   dms system update                          # apply updates (interactive prompt)
   dms system update --noconfirm              # apply updates without prompting
+  dms system update --interactive            # let the package manager ask its own questions
   dms system update --dry                    # simulate without changing anything
   dms system update --no-flatpak --noconfirm # apply system updates only
   dms system update --interval 3600          # set the server poll interval to 1h`,
@@ -43,20 +44,22 @@ Examples:
 }
 
 var (
-	sysUpdateCheck      bool
-	sysUpdateNoConfirm  bool
-	sysUpdateDry        bool
-	sysUpdateJSON       bool
-	sysUpdateNoFlatpak  bool
-	sysUpdateNoAUR      bool
-	sysUpdateIgnore     []string
-	sysUpdateIntervalS  int
-	sysUpdateListPmTime = 5 * time.Minute
+	sysUpdateCheck       bool
+	sysUpdateNoConfirm   bool
+	sysUpdateInteractive bool
+	sysUpdateDry         bool
+	sysUpdateJSON        bool
+	sysUpdateNoFlatpak   bool
+	sysUpdateNoAUR       bool
+	sysUpdateIgnore      []string
+	sysUpdateIntervalS   int
+	sysUpdateListPmTime  = 5 * time.Minute
 )
 
 func init() {
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateCheck, "check", false, "List available updates without applying")
 	systemUpdateCmd.Flags().BoolVarP(&sysUpdateNoConfirm, "noconfirm", "y", false, "Apply updates without prompting")
+	systemUpdateCmd.Flags().BoolVar(&sysUpdateInteractive, "interactive", false, "Let the package manager ask its own questions instead of answering yes")
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateDry, "dry", false, "Simulate the upgrade without applying changes")
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateJSON, "json", false, "Output as JSON (with --check)")
 	systemUpdateCmd.Flags().BoolVar(&sysUpdateNoFlatpak, "no-flatpak", false, "Skip the Flatpak overlay")
@@ -187,7 +190,7 @@ func runSystemUpdateApply() {
 	}
 	fmt.Println()
 
-	if !sysUpdateNoConfirm && !sysUpdateDry {
+	if !sysUpdateNoConfirm && !sysUpdateInteractive && !sysUpdateDry {
 		if !promptYesNo("Proceed with upgrade? [Y/n]: ") {
 			fmt.Println("Aborted.")
 			return
@@ -206,6 +209,7 @@ func runSystemUpdateApply() {
 		UseSudo:        true,
 	}
 	opts.AttachStdio = sysupdate.UpgradeNeedsPrivilege(backends, pkgs, opts)
+	opts.Interactive = sysUpdateInteractive && opts.AttachStdio
 
 	onLine := func(line string) { fmt.Println(line) }
 	ran := false

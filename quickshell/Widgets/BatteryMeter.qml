@@ -18,6 +18,7 @@ Item {
     property bool levelColors: false
     property real maxDiameter: 0
     property bool hovered: false
+    property color colorOverride: "transparent"
 
     readonly property bool outlined: root.meterStyle === "outline"
     readonly property bool ring: root.meterStyle === "ring"
@@ -26,6 +27,8 @@ Item {
     readonly property bool charging: BatteryService.batteryAvailable && BatteryService.isCharging
     readonly property bool lowState: BatteryService.batteryAvailable && BatteryService.isLowBattery && !BatteryService.isCharging
     readonly property color fillColor: {
+        if (root.colorOverride.a > 0)
+            return root.colorOverride;
         if (!BatteryService.batteryAvailable)
             return Theme.surfaceVariant;
         if (root.levelColors)

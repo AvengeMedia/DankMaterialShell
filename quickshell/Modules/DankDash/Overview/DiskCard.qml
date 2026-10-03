@@ -26,12 +26,6 @@ MetricCard {
     badgeIcon: "swap_vert"
     trendMaximum: 0
     showTrend: options.trend === true
-    trend: {
-        DgopService.diskReadRate;
-        return DgopService.diskHistory.read.slice();
-    }
-    secondaryTrend: {
-        DgopService.diskWriteRate;
-        return DgopService.diskHistory.write.slice();
-    }
+    trend: DgopService.diskHistory.read
+    secondaryTrend: DgopService.diskHistory.write
 }

@@ -212,7 +212,7 @@ Column {
             settingKey: "blurXrayLink"
             visible: CompositorService.isNiri || CompositorService.isHyprland
             title: I18n.tr("Xray options are in Compositor → Layout")
-            onClicked: root.parentModal?.navigateTo("compositor_layout")
+            onClicked: keyboard => root.parentModal?.navigateTo("compositor_layout", keyboard)
         }
 
         SettingsButtonGroupRow {
@@ -291,7 +291,7 @@ Column {
             subtitle: SettingsTabs.page("surface_shadows")?.hint ?? ""
             resetKeys: ["m3ElevationEnabled"]
             checked: SettingsData.m3ElevationEnabled ?? true
-            onNavigated: root.parentModal?.navigateTo("surface_shadows")
+            onNavigated: keyboard => root.parentModal?.navigateTo("surface_shadows", keyboard)
             onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
         }
     }

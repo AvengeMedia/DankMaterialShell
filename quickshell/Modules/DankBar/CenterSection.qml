@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import qs.Common
 import "CenterLayout.js" as CenterLayout
@@ -11,16 +13,13 @@ BarSection {
     property real contentStart: 0
     property real contentSize: 0
     readonly property var bounds: barContent?.centerBounds ?? null
+    entryRepeater: centerRepeater
+    onLayoutRequested: layoutTimer.restart()
 
     onBoundsChanged: layoutTimer.restart()
 
     function requestLayout() {
-        if (root.visible && (isVertical ? height : width) > 0) {
-            layoutTimer.stop();
-            root.updateLayout();
-        } else {
-            layoutTimer.restart();
-        }
+        layoutTimer.restart();
     }
 
     function updateLayout() {
@@ -53,23 +52,26 @@ BarSection {
             return;
 
         const widgets = [];
-        const sizes = [];
         const entries = [];
         const participating = [];
         for (let index = 0; index < centerRepeater.count; index++) {
-            const wrapper = centerRepeater.itemAt(index);
-            const widget = wrapper?.active && wrapper.item?.visible ? wrapper.item : null;
+            const wrapper = centerRepeater.itemAt(index) as SectionEntry;
+            const widget = wrapper?.participates ? wrapper : null;
             widgets.push(widget);
-            sizes.push(widget ? (isVertical ? widget.height : widget.width) : null);
             entries.push(wrapper?.itemData ?? null);
-            participating.push(participation(wrapper, widget !== null, widget));
+            participating.push(participation(wrapper, widget !== null, wrapper?.item));
         }
         applyRoles(entries, participating);
 
-        const layout = CenterLayout.resolve(sizes, length, widgetSpacing, SettingsData.centeringMode, bounds);
-        for (let index = 0; index < widgets.length; index++) {
-            const widget = widgets[index];
-            if (!widget)
+        const inline = inlineLayout();
+        const layout = CenterLayout.resolve(inline.sizes, length, widgetSpacing, SettingsData.centeringMode, bounds, inline.anchor);
+        for (let index = 0; index < inline.indices.length; index++) {
+            if (inline.indices[index] === -1) {
+                overflowButtonPosition = layout.positions[index];
+                continue;
+            }
+            const widget = widgets[inline.indices[index]];
+            if (!widget || layout.positions[index] === null)
                 continue;
             if (isVertical) {
                 widget.anchors.verticalCenter = undefined;
@@ -80,6 +82,8 @@ BarSection {
             widget.x = layout.positions[index];
         }
         centerWidgets = widgets.filter(widget => widget !== null);
+        if (overflowButton)
+            centerWidgets.push(overflowButton);
         totalWidgets = centerWidgets.length;
         totalSize = layout.totalSize;
     }
@@ -123,37 +127,16 @@ BarSection {
 
         onCountChanged: layoutTimer.restart()
 
-        Item {
-            property var itemData: modelData
-
-            width: root.isVertical ? root.width : (widgetLoader.item ? widgetLoader.item.width : 0)
-            height: widgetLoader.item ? widgetLoader.item.height : 0
-
-            readonly property bool active: widgetLoader.active
-            readonly property var item: widgetLoader.item
-            readonly property bool itemVisible: widgetLoader.item?.visible ?? false
-            readonly property real itemWidth: widgetLoader.item?.width ?? 0
-            readonly property real itemHeight: widgetLoader.item?.height ?? 0
-
-            onItemVisibleChanged: root.requestLayout()
+        SectionEntry {
+            required property var modelData
+            required property int index
+            sectionContext: root
+            itemData: modelData
+            occurrenceOrder: index
+            onParticipatesChanged: root.requestLayout()
             onItemWidthChanged: root.requestLayout()
             onItemHeightChanged: root.requestLayout()
-
-            SectionWidget {
-                id: widgetLoader
-
-                anchors.verticalCenter: !root.isVertical ? parent.verticalCenter : undefined
-                anchors.horizontalCenter: root.isVertical ? parent.horizontalCenter : undefined
-
-                occurrenceOrder: index
-                sectionContext: root
-                widgetData: itemData
-                isFirst: index === 0
-                isLast: index === centerRepeater.count - 1
-                onContentItemReady: layoutTimer.restart()
-
-                onActiveChanged: layoutTimer.restart()
-            }
+            onActiveChanged: layoutTimer.restart()
         }
     }
 

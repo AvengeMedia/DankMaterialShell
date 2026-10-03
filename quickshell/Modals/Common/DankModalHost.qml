@@ -46,7 +46,8 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && effectiveModalLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
+    property bool _overStackedModal: false
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !allowStacking && !_overStackedModal && effectiveModalLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
 
     function _dockOccupiesSide(side) {
         return SettingsData.dockOccupiesSide(root.effectiveScreen, side);
@@ -264,10 +265,12 @@ Item {
     function _openConnected() {
         if (!_fluidMotionActive || !contentWindow.visible)
             animationsEnabled = false;
+        const focusedScreen = root.targetScreen ?? CompositorService.getFocusedScreen();
+        if (!contentWindow.visible)
+            _overStackedModal = ModalManager.hasStackedModal((focusedScreen ?? effectiveScreen)?.name ?? "");
         frozenMotionOffsetX = modalContainer.offsetX;
         frozenMotionOffsetY = modalContainer.offsetY;
 
-        const focusedScreen = root.targetScreen ?? CompositorService.getFocusedScreen();
         if (focusedScreen)
             contentWindow.screen = focusedScreen;
 

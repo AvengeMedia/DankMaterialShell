@@ -49,15 +49,13 @@ WidgetPickerWindow {
     Component {
         id: rowDelegate
 
-        Rectangle {
+        DankListItem {
             width: ListView.view.width
-            height: Math.max(60, textColumn.implicitHeight + 24)
-            radius: Theme.cornerRadius
-            property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex && !modelData.disabled
-            color: isSelected ? Theme.selectedContainer : widgetArea.containsMouse ? Theme.withAlpha(Theme.primary, root.blurActive ? 0.14 : 0.08) : Theme.floatingWindowNestedSurface
-            border.color: Theme.outlineMedium
-            border.width: Theme.layerOutlineWidth
-            antialiasing: true
+            implicitHeight: Math.max(Theme.listItemHeight, textColumn.implicitHeight + Theme.spacingM * 2)
+            isSelected: root.keyboardNavigationActive && index === root.selectedIndex && !modelData.disabled
+            enabled: !modelData.disabled
+            Accessible.name: modelData.text
+            onClicked: root.widgetChosen(modelData)
 
             Row {
                 anchors.fill: parent
@@ -102,23 +100,6 @@ WidgetPickerWindow {
                     size: Theme.iconSizeMedium
                     color: modelData.disabled ? Theme.onSurface_38 : Theme.primary
                     anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            MouseArea {
-                id: widgetArea
-
-                anchors.fill: parent
-                enabled: !modelData.disabled
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.widgetChosen(modelData)
-            }
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.standardEasing
                 }
             }
         }

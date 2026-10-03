@@ -32,7 +32,7 @@ test("low charge and charging transitions share an endpoint without inventing sa
     assert.deepEqual(plain(history.segments(rows, 20)), [
         { kind: "normal", samples: [[100, 30, 2], [120, 20, 2]] },
         { kind: "low", samples: [[120, 20, 2], [140, 15, 1]] },
-        { kind: "charging", samples: [[140, 15, 1], [160, 25, 1]] }
+        { kind: "plugged", samples: [[140, 15, 1], [160, 25, 1]] }
     ]);
 });
 

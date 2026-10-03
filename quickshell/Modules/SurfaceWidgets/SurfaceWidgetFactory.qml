@@ -102,7 +102,8 @@ Item {
             // A section the island sits in is not an anchor: the popout would open under the island.
             const centred = spec.useCenterSection && widgetSection === "center" && !(surfaceContext.host?.hostsIsland && SettingsData.islandWidgetSection(surfaceContext.config) === "center");
             const visual = centred ? surfaceContext.centerSection : spec.visualItem;
-            surfaceContext.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
+            const context = spec.registration?.context?.surface ?? surfaceContext;
+            context.positionPopout(popout, spec.widgetItem, widgetSection, visual, spec.triggerWidth, mode !== "hover");
         }
 
         if (typeof popout.prepareForTrigger === "function")

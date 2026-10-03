@@ -31,10 +31,7 @@ exec /bin/sh "$@"`)
 		notifyDirty: make(chan struct{}, 1),
 		stopChan:    make(chan struct{}),
 	}
-	m.runCustomUpgrade(t.Context(), UpgradeOptions{
-		Terminal:      "fake-terminal",
-		CustomCommand: "false",
-	})
+	m.runCustomUpgrade(t.Context(), "false", "test", UpgradeOptions{Terminal: "fake-terminal"})
 
 	state := m.GetState()
 	if state.Phase != PhaseError {

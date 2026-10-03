@@ -96,7 +96,7 @@ Item {
                                 width: parent.width
                                 height: 56
                                 radius: Theme.cornerRadius
-                                color: isConnected ? Theme.selectedContainer : modemMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                                color: isConnected ? Theme.selectedContainer : modemMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                                 border.width: Theme.layerOutlineWidth
                                 border.color: Theme.outlineMedium
 
@@ -152,36 +152,17 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingXS
 
-                                    Rectangle {
-                                        width: 28
-                                        height: 28
-                                        radius: Theme.cornerRadiusL
-                                        color: modemActionBtn.containsMouse ? (modemDelegate.isConnected ? Theme.errorHover : Theme.primaryHover) : "transparent"
-
-                                        DankIcon {
-                                            anchors.centerIn: parent
-                                            name: modemDelegate.isConnected ? "link_off" : "link"
-                                            size: 18
-                                            color: modemActionBtn.containsMouse ? (modemDelegate.isConnected ? Theme.error : Theme.primary) : Theme.surfaceVariantText
-                                        }
-
-                                        MouseArea {
-                                            id: modemActionBtn
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                if (modemDelegate.isConnected)
-                                                    NetworkService.disconnectCellularDevice(modelData.name);
-                                                else
-                                                    NetworkService.connectCellular();
-                                            }
-                                        }
-
-                                        DankTooltipHost {
-                                            text: modemDelegate.isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
-                                            target: parent
-                                            hoverArea: modemActionBtn
+                                    DankActionButton {
+                                        buttonSize: Theme.buttonHeightXXS
+                                        iconName: modemDelegate.isConnected ? "link_off" : "link"
+                                        iconColor: Theme.surfaceVariantText
+                                        stateColor: modemDelegate.isConnected ? Theme.error : Theme.primary
+                                        tooltipText: modemDelegate.isConnected ? I18n.tr("Disconnect") : I18n.tr("Connect")
+                                        onClicked: {
+                                            if (modemDelegate.isConnected)
+                                                NetworkService.disconnectCellularDevice(modelData.name);
+                                            else
+                                                NetworkService.connectCellular();
                                         }
                                     }
                                 }
@@ -231,7 +212,7 @@ Item {
                             width: parent.width
                             height: 56
                             radius: Theme.cornerRadius
-                            color: isActive ? Theme.selectedContainer : profileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.floatingWindowNestedSurface
+                            color: isActive ? Theme.selectedContainer : profileMouseArea.containsMouse ? Theme.primaryHoverLight : SettingsMetrics.controlColor
                             border.color: Theme.outlineMedium
                             border.width: Theme.layerOutlineWidth
 
@@ -282,8 +263,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 iconName: profileDelegate.isActive ? "link_off" : "link"
                                 tooltipText: profileDelegate.isActive ? I18n.tr("Disconnect") : I18n.tr("Connect")
-                                buttonSize: 28
-                                iconSize: 18
+                                iconSize: Theme.iconSizeSmall
                                 iconColor: profileDelegate.isActive ? Theme.error : Theme.primary
                                 onClicked: {
                                     if (profileDelegate.isActive)

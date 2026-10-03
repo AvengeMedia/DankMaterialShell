@@ -5,6 +5,7 @@ import Quickshell
 import qs.Common
 import qs.Modules.ControlCenter
 import qs.Widgets
+import "../../../Common/QmlUtils.js" as QmlUtils
 
 Item {
     id: root
@@ -19,14 +20,14 @@ Item {
 
     function openAt(anchor) {
         const window = root.QsWindow.window;
-        const screen = window?.screen;
-        if (!anchor || !screen)
+        const pos = QmlUtils.screenPointOf(window, anchor, 0, 0);
+        if (!pos)
             return;
 
         _anchor = anchor;
-        const pos = anchor.mapToGlobal(0, 0);
-        const x = pos.x - screen.x;
-        const y = pos.y - screen.y;
+        const screen = window.screen;
+        const x = pos.x;
+        const y = pos.y;
         const menuX = I18n.isRtl ? x : x + anchor.width - menu.effectiveMenuWidth;
         const below = y + anchor.height + Theme.spacingXS;
         const menuY = below + menu.effectiveMenuHeight > screen.height - Theme.spacingS

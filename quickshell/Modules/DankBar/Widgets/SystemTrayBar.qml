@@ -7,6 +7,7 @@ import qs.Modules.DankBar
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import "../OverflowLayout.js" as OverflowLayout
 
 BasePill {
     id: root
@@ -132,18 +133,8 @@ BasePill {
 
     function toggleIconName() {
         const edge = root.axis?.edge;
-        if (root.useOverflowPopup) {
-            switch (edge) {
-            case "left":
-                return root.menuOpen ? "keyboard_arrow_left" : "keyboard_arrow_right";
-            case "right":
-                return root.menuOpen ? "keyboard_arrow_right" : "keyboard_arrow_left";
-            case "bottom":
-                return root.menuOpen ? "keyboard_arrow_down" : "keyboard_arrow_up";
-            case "top":
-                return root.menuOpen ? "keyboard_arrow_up" : "keyboard_arrow_down";
-            }
-        }
+        if (root.useOverflowPopup)
+            return OverflowLayout.expanderIcon(edge, root.menuOpen);
 
         if (edge === "left" || edge === "right") {
             return root.menuOpen == (root.section !== "right") ? "keyboard_arrow_up" : "keyboard_arrow_down";
@@ -466,10 +457,8 @@ BasePill {
     function _openOverflowAt(triggerItem) {
         if (!triggerItem || !root.parentScreen)
             return;
-        const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
-        const triggerPos = triggerItem.mapToItem(null, 0, root.isVerticalOrientation ? (triggerItem.height / 2 + root.minTooltipY) : 0);
-        const pos = SettingsData.getPopupTriggerPosition(triggerPos, root.parentScreen, root.barThickness, triggerItem.width, root.barSpacing, barPosition, root.barConfig);
-        overflowPopout.setTriggerPosition(pos.x, pos.y, pos.width, root.section, root.parentScreen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+        if (!root.positionPopout(overflowPopout, triggerItem, root.isVerticalOrientation ? triggerItem.height : triggerItem.width))
+            return;
         root.menuOpen = true;
         PopoutManager.requestPopout(overflowPopout, undefined, "tray-overflow-" + root.section);
     }
@@ -1534,7 +1523,11 @@ BasePill {
         const tw = triggerWidth || root.width;
         const pos = SettingsData.getPopupTriggerPosition(localPos, screen, root.barThickness, tw, root.barSpacing, barPosition, root.barConfig);
 
-        trayMenuPopout.setTriggerPosition(pos.x, pos.y, pos.width, root.section, screen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
+        const registration = BarWidgetService.registrationForItem(root);
+        if (registration?.context?.owner?.overflowAnchor)
+            registration.context.surface.positionPopout(trayMenuPopout, root, root.section);
+        else
+            trayMenuPopout.setTriggerPosition(pos.x, pos.y, pos.width, root.section, screen, barPosition, root.barThickness, root.barSpacing, root.barConfig);
 
         trayMenuState.trayItem = item;
         trayMenuState.menuHandle = item?.menu ?? null;

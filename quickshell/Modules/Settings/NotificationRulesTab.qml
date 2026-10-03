@@ -252,86 +252,23 @@ Item {
             tags: ["notification", "mute", "unmute", "popup"]
 
             SettingsRow {
-                body: Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+                subtitle: root.mutedRules.length > 0 ? I18n.tr("Apps with notification popups muted. Unmute or delete to remove.") : I18n.tr("No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.")
+            }
 
-                    StyledText {
-                        text: mutedRules.length > 0 ? I18n.tr("Apps with notification popups muted. Unmute or delete to remove.") : I18n.tr("No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
-                        wrapMode: Text.WordWrap
-                        width: parent.width
-                        bottomPadding: Theme.spacingS
-                    }
+            Repeater {
+                model: root.mutedRules
 
-                    Repeater {
-                        model: mutedRules
+                delegate: SettingsRow {
+                    required property var modelData
 
-                        delegate: Rectangle {
-                            width: parent.width
-                            height: mutedRow.implicitHeight + Theme.spacingS * 2
-                            radius: Theme.cornerRadius
-                            color: Theme.floatingWindowFieldColor
+                    title: modelData.rule?.pattern || I18n.tr("Unknown")
+                    singleLineTitle: true
 
-                            Row {
-                                id: mutedRow
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingS
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    id: mutedAppLabel
-                                    text: (modelData.rule && modelData.rule.pattern) ? modelData.rule.pattern : I18n.tr("Unknown")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Item {
-                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - mutedDeleteBtn.width - Theme.spacingS * 5)
-                                    height: 1
-                                }
-
-                                DankButton {
-                                    id: unmuteBtn
-                                    text: I18n.tr("Unmute")
-                                    backgroundColor: Theme.chipSurface
-                                    textColor: Theme.primary
-                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
-                                }
-
-                                Item {
-                                    id: mutedDeleteBtn
-                                    Accessible.role: Accessible.Button
-                                    Accessible.name: I18n.tr("Remove")
-                                    width: 28
-                                    height: 28
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: Theme.cornerRadius
-                                        color: mutedDeleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : Theme.withAlpha(Theme.error, 0)
-                                    }
-
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "delete"
-                                        size: 18
-                                        color: mutedDeleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
-                                    }
-
-                                    MouseArea {
-                                        id: mutedDeleteArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: SettingsData.removeNotificationRule(modelData.index)
-                                    }
-                                }
-                            }
-                        }
+                    DankButton {
+                        text: I18n.tr("Unmute")
+                        backgroundColor: "transparent"
+                        textColor: Theme.primary
+                        onClicked: SettingsData.removeNotificationRule(modelData.index)
                     }
                 }
             }

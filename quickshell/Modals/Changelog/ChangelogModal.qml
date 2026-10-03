@@ -57,7 +57,6 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerRow.bottom
             anchors.bottom: footerRow.top
-            anchors.topMargin: Theme.spacingS
             clip: true
             contentHeight: mainColumn.height + Theme.spacingL * 2
             contentWidth: width

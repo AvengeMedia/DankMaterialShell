@@ -45,7 +45,6 @@ Item {
         unit: root.systemModel.unit
         displayText: root.systemModel.displayValue
         sliderEnabled: root.systemModel.available
-        thumbOutlineColor: Theme.hostSurface
         onIconClicked: root.systemModel.toggleMute()
         onSliderValueChanged: newValue => root.systemModel.setRatio(newValue / Math.max(1, root.maximum))
     }

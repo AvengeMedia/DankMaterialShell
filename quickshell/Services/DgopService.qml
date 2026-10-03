@@ -395,7 +395,7 @@ Singleton {
             cpuCores = cpu.count || 1;
             cpuModel = cpu.model || "";
             perCoreCpuUsage = cpu.coreUsage || [];
-            addToHistory(cpuHistory, cpuUsage);
+            cpuHistory = appendHistory(cpuHistory, cpuUsage);
 
             if (cpu.cursor) {
                 cpuCursor = cpu.cursor;
@@ -425,7 +425,7 @@ Singleton {
             totalSwapKB = mem.swaptotal || 0;
             usedSwapKB = (mem.swaptotal || 0) - (mem.swapfree || 0);
 
-            addToHistory(memoryHistory, memoryUsage);
+            memoryHistory = appendHistory(memoryHistory, memoryUsage);
         }
 
         if (hasModule("network") && data.network && Array.isArray(data.network)) {
@@ -444,8 +444,10 @@ Singleton {
                 const txDiff = totalTx - lastNetworkStats.tx;
                 networkRxRate = Math.max(0, rxDiff / timeDiff);
                 networkTxRate = Math.max(0, txDiff / timeDiff);
-                addToHistory(networkHistory.rx, networkRxRate / 1024);
-                addToHistory(networkHistory.tx, networkTxRate / 1024);
+                networkHistory = {
+                    rx: appendHistory(networkHistory.rx, networkRxRate / 1024),
+                    tx: appendHistory(networkHistory.tx, networkTxRate / 1024)
+                };
             }
             lastNetworkStats = {
                 "time": sampleTime,
@@ -470,8 +472,10 @@ Singleton {
                 const writeDiff = totalWrite - lastDiskStats.write;
                 diskReadRate = Math.max(0, readDiff / timeDiff);
                 diskWriteRate = Math.max(0, writeDiff / timeDiff);
-                addToHistory(diskHistory.read, diskReadRate / (1024 * 1024));
-                addToHistory(diskHistory.write, diskWriteRate / (1024 * 1024));
+                diskHistory = {
+                    read: appendHistory(diskHistory.read, diskReadRate / (1024 * 1024)),
+                    write: appendHistory(diskHistory.write, diskWriteRate / (1024 * 1024))
+                };
             }
             lastDiskStats = {
                 "time": sampleTime,
@@ -570,11 +574,9 @@ Singleton {
         statsUpdated();
     }
 
-    function addToHistory(array, value) {
-        array.push(value);
-        if (array.length > historySize) {
-            array.splice(0, array.length - historySize);
-        }
+    function appendHistory(history, value) {
+        const next = history.concat([value]);
+        return next.length > historySize ? next.slice(next.length - historySize) : next;
     }
 
     function formatSystemMemory(memoryKB) {

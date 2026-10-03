@@ -211,9 +211,8 @@ DankFloatingWindow {
             DankNavigationBar {
                 id: viewNavigation
                 Layout.fillWidth: true
-                Layout.topMargin: Theme.spacingS
-                Layout.leftMargin: Theme.spacingL
-                Layout.rightMargin: Theme.spacingL
+                Layout.leftMargin: Theme.windowInset
+                Layout.rightMargin: Theme.windowInset
                 nextFocusTarget: currentTab === 0 ? searchField : null
                 model: [
                     {
@@ -240,16 +239,16 @@ DankFloatingWindow {
             ProcessSummary {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                Layout.leftMargin: Theme.spacingL
-                Layout.rightMargin: Theme.spacingL
+                Layout.leftMargin: Theme.windowInset
+                Layout.rightMargin: Theme.windowInset
                 Layout.topMargin: Theme.spacingS
                 visible: currentTab === 0
             }
 
             RowLayout {
                 Layout.fillWidth: true
-                Layout.leftMargin: Theme.spacingL
-                Layout.rightMargin: Theme.spacingL
+                Layout.leftMargin: Theme.windowInset
+                Layout.rightMargin: Theme.windowInset
                 Layout.topMargin: Theme.spacingS
                 spacing: Theme.spacingM
                 visible: currentTab === 0
@@ -327,8 +326,8 @@ DankFloatingWindow {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Theme.buttonHeightXS
-                Layout.leftMargin: Theme.spacingL
-                Layout.rightMargin: Theme.spacingL
+                Layout.leftMargin: Theme.windowInset
+                Layout.rightMargin: Theme.windowInset
                 Layout.bottomMargin: Theme.spacingM
                 color: "transparent"
 

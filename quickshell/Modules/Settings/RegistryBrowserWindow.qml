@@ -185,10 +185,9 @@ DankFloatingWindow {
             anchors.right: parent.right
             anchors.top: headerArea.bottom
             anchors.bottom: parent.bottom
-            anchors.leftMargin: Theme.spacingL
-            anchors.rightMargin: Theme.spacingL
-            anchors.topMargin: Theme.spacingM
-            anchors.bottomMargin: Theme.spacingL
+            anchors.leftMargin: Theme.windowInset
+            anchors.rightMargin: Theme.windowInset
+            anchors.bottomMargin: Theme.windowInset
 
             Item {
                 id: browserBody

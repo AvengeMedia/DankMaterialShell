@@ -434,6 +434,9 @@ var LOCAL_SPEC = {
     controlCenterIconScale: {
         def: 1.0
     },
+    controlCenterFooterPosition: {
+        def: "bottom"
+    },
     controlCenterWidgets: {
         def: [
             {
@@ -538,9 +541,9 @@ var LOCAL_SPEC = {
             {
                 id: "runningApps",
                 enabled: true,
-                w: 7,
+                w: 4,
                 h: 1,
-                small: true
+                footer: true
             }
         ]
     },
@@ -733,6 +736,10 @@ var LOCAL_SPEC = {
                 enabled: true
             },
             {
+                id: "wellbeing",
+                enabled: true
+            },
+            {
                 id: "notifications",
                 enabled: false
             }
@@ -768,6 +775,15 @@ var LOCAL_SPEC = {
         ]
     },
     dashOptions: {
+        def: {}
+    },
+    wellbeingEnabled: {
+        def: true
+    },
+    wellbeingDailyLimit: {
+        def: 0
+    },
+    wellbeingAppLimits: {
         def: {}
     },
     networkPreference: {
@@ -927,6 +943,9 @@ var LOCAL_SPEC = {
     },
     batteryCriticalThreshold: {
         def: 10
+    },
+    batteryCriticalAnimation: {
+        def: true
     },
     batteryNotifyCritical: {
         def: true
@@ -1344,6 +1363,9 @@ var LOCAL_SPEC = {
     },
     updaterReopenAfterUpgrade: {
         def: true
+    },
+    updaterUpgradeInWindow: {
+        def: false
     },
     updaterIgnoredPackages: {
         def: []

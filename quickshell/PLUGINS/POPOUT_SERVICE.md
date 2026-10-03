@@ -71,7 +71,7 @@ Rectangle {
 
     width: 100
     height: 30
-    color: Theme.surfaceContainerHigh
+    color: Theme.chipSurface
     radius: Theme.cornerRadius
 
     MouseArea {

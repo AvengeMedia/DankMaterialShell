@@ -615,7 +615,7 @@ RegistryBrowserWindow {
             visible: root.operationMessage !== ""
             tone: "primary"
             pad: Theme.spacingM
-            color: root.operationFailed ? Theme.errorContainer : surfaceColor
+            color: root.operationFailed ? Theme.errorContainer : SettingsMetrics.rowColor
             Accessible.name: root.operationMessage
 
             RowLayout {
@@ -698,6 +698,7 @@ RegistryBrowserWindow {
                 DankDropdown {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Theme.buttonHeightS
+                    backgroundColor: SettingsMetrics.controlSurface
                     compactMode: true
                     dropdownWidth: Math.max(Theme.smallBreakpoint / 2, categoryFiltersRow.width - categoryFilterLabel.implicitWidth - Theme.spacingS * 3)
                     currentValue: root.categoryFilterLabelForKey(root.categoryFilter)
@@ -779,7 +780,7 @@ RegistryBrowserWindow {
                         horizontalPadding: 0
                         buttonHeight: Theme.buttonHeightXS
                         text: modelData
-                        backgroundColor: Theme.chipSurface
+                        backgroundColor: SettingsMetrics.controlSurface
                         textColor: Theme.onSurfaceVariant
                         onClicked: root.scrollToLetter(modelData)
                     }
@@ -839,7 +840,7 @@ RegistryBrowserWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: I18n.tr("Retry", "retry failed action button")
                 iconName: "refresh"
-                backgroundColor: Theme.chipSurface
+                backgroundColor: SettingsMetrics.controlSurface
                 textColor: Theme.surfaceText
                 onClicked: root.refreshPlugins()
             }
@@ -948,10 +949,10 @@ RegistryBrowserWindow {
                 spacing: Theme.spacingL
 
                 Rectangle {
-                    width: Math.min(SettingsMetrics.contentMaxWidth, parent.width)
+                    width: Math.min(SettingsMetrics.mediaMaxWidth, parent.width)
                     height: Math.round(width * SettingsMetrics.choiceCardPreviewRatio)
                     radius: Theme.cornerRadiusM
-                    color: Theme.floatingWindowNestedSurface
+                    color: SettingsMetrics.rowColor
                     border.color: Theme.outlineMedium
                     border.width: Theme.layerOutlineWidth
 

@@ -48,6 +48,8 @@ Singleton {
     property var durationPopoutLoader: null
     property var processListModal: null
     property var processListModalLoader: null
+    property var systemUpdateModal: null
+    property var systemUpdateModalLoader: null
     property var colorPickerModal: null
     property var notificationModal: null
     property var wifiPasswordModal: null
@@ -1075,6 +1077,22 @@ Singleton {
             processListModal = null;
             processListModalLoader.active = false;
         }
+    }
+
+    function showSystemUpdateModal() {
+        if (systemUpdateModal) {
+            systemUpdateModal.show();
+        } else if (systemUpdateModalLoader) {
+            systemUpdateModalLoader.active = true;
+            Qt.callLater(() => systemUpdateModal?.show());
+        }
+    }
+
+    function unloadSystemUpdateModal() {
+        if (!systemUpdateModalLoader)
+            return;
+        systemUpdateModal = null;
+        systemUpdateModalLoader.active = false;
     }
 
     function toggleProcessListModal() {

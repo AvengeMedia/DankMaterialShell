@@ -200,7 +200,7 @@ FocusScope {
                 iconName: "widgets"
                 title: I18n.tr("Desktop widgets")
                 hint: I18n.tr("Desktop widget plugins are configured per widget instance")
-                onClicked: root.parentModal?.navigateTo("desktop_widgets")
+                onClicked: keyboard => root.parentModal?.navigateTo("desktop_widgets", keyboard)
             }
         }
 

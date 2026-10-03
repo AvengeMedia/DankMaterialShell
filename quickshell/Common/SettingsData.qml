@@ -413,6 +413,7 @@ Singleton {
 
     property int controlCenterColumns: Spec.SPEC.controlCenterColumns.def
     property real controlCenterIconScale: Spec.SPEC.controlCenterIconScale.def
+    property string controlCenterFooterPosition: Spec.SPEC.controlCenterFooterPosition.def
     property var controlCenterWidgets: Spec.SPEC.controlCenterWidgets.def
 
     property var workspaceNameIcons: Spec.SPEC.workspaceNameIcons.def
@@ -487,6 +488,10 @@ Singleton {
             "enabled": true
         },
         {
+            "id": "wellbeing",
+            "enabled": true
+        },
+        {
             "id": "notifications",
             "enabled": false
         }
@@ -527,6 +532,9 @@ Singleton {
     onDashCardsChanged: saveSettings()
     property var dashOptions: Spec.SPEC.dashOptions.def
     onDashOptionsChanged: saveSettings()
+    property bool wellbeingEnabled: Spec.SPEC.wellbeingEnabled.def
+    property int wellbeingDailyLimit: Spec.SPEC.wellbeingDailyLimit.def
+    property var wellbeingAppLimits: Spec.SPEC.wellbeingAppLimits.def
 
     function getDashTabs() {
         const stored = Array.isArray(dashTabs) ? dashTabs : [];
@@ -698,6 +706,7 @@ Singleton {
     property int batteryChargeLimit: Spec.SPEC.batteryChargeLimit.def
     property bool batteryNotifyChargeLimit: Spec.SPEC.batteryNotifyChargeLimit.def
     property int batteryCriticalThreshold: Spec.SPEC.batteryCriticalThreshold.def
+    property bool batteryCriticalAnimation: Spec.SPEC.batteryCriticalAnimation.def
     property bool batteryNotifyCritical: Spec.SPEC.batteryNotifyCritical.def
     property int batteryLowThreshold: Spec.SPEC.batteryLowThreshold.def
     property bool batteryNotifyLow: Spec.SPEC.batteryNotifyLow.def
@@ -1088,6 +1097,7 @@ Singleton {
     property bool updaterIncludeFlatpak: Spec.SPEC.updaterIncludeFlatpak.def
     property bool updaterAllowAUR: Spec.SPEC.updaterAllowAUR.def
     property bool updaterReopenAfterUpgrade: Spec.SPEC.updaterReopenAfterUpgrade.def
+    property bool updaterUpgradeInWindow: Spec.SPEC.updaterUpgradeInWindow.def
     property var updaterIgnoredPackages: Spec.SPEC.updaterIgnoredPackages.def
 
     property string displayNameMode: Spec.SPEC.displayNameMode.def

@@ -864,3 +864,33 @@ func TestNiriParseActionWithProperties(t *testing.T) {
 		}
 	}
 }
+
+func TestNiriParseIncludeNestedDMSBinds(t *testing.T) {
+	tmpDir := t.TempDir()
+	subDir := filepath.Join(tmpDir, "dms")
+	if err := os.MkdirAll(subDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	files := map[string]string{
+		filepath.Join(tmpDir, "config.kdl"): "include \"dms/dms.kdl\"\n",
+		filepath.Join(subDir, "dms.kdl"):    "include \"binds.kdl\"\n",
+		filepath.Join(subDir, "binds.kdl"):  "binds {\n    Mod+T { spawn \"kitty\"; }\n}\n",
+	}
+	for path, content := range files {
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	result, err := ParseNiriKeys(tmpDir)
+	if err != nil {
+		t.Fatalf("ParseNiriKeys failed: %v", err)
+	}
+	if !result.DMSBindsIncluded {
+		t.Error("dms/binds.kdl included via dms/dms.kdl not detected")
+	}
+	if len(result.Section.Keybinds) != 1 {
+		t.Errorf("expected 1 keybind from the nested include, got %d", len(result.Section.Keybinds))
+	}
+}

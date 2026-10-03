@@ -237,6 +237,10 @@ Item {
     }
 
     function _findWidgetHostInWrapper(wrapper) {
+        if (wrapper.inOverflow)
+            return null;
+        if (wrapper.host)
+            return wrapper.host;
         if (wrapper.widgetId !== undefined)
             return wrapper;
         const children = wrapper.children || [];

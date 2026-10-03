@@ -110,7 +110,8 @@ Item {
 
     readonly property string resolvedConnectedBarSide: frameConnectedMode ? preferredConnectedBarSide : ""
 
-    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && effectiveLauncherLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
+    property bool _overStackedModal: false
+    readonly property bool frameOwnsConnectedChrome: frameConnectedMode && resolvedConnectedBarSide !== "" && !_overStackedModal && effectiveLauncherLayer === WlrLayer.Top && CompositorService.canShareConnectedFrameChromeForScreen(effectiveScreen)
     readonly property bool launcherArcExtenderActive: frameOwnsConnectedChrome && SettingsData.frameLauncherArcExtender && (resolvedConnectedBarSide === "top" || resolvedConnectedBarSide === "bottom")
 
     function _dockOccupiesSide(side) {
@@ -508,10 +509,13 @@ Item {
         if (!preserveFluid)
             animationsEnabled = false;
 
+        var focusedScreen = CompositorService.getFocusedScreen();
+        if (!contentWindow.visible)
+            _overStackedModal = ModalManager.hasStackedModal((focusedScreen ?? effectiveScreen)?.name ?? "");
+
         _frozenMotionX = contentContainer ? contentContainer.collapsedMotionX : 0;
         _frozenMotionY = contentContainer ? contentContainer.collapsedMotionY : (Theme.isDirectionalEffect ? Math.max(root.screenHeight - root._ccY + root.shadowPad, Theme.effectAnimOffset * 1.1) : -Theme.effectAnimOffset);
 
-        var focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
         }

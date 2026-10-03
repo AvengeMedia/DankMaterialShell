@@ -403,14 +403,20 @@ Item {
     }
 
     function setInitialSelection() {
-        enableAnimation = false;
         const currentWallpaper = getCurrentWallpaper();
         let index = -1;
         if (currentWallpaper && wallpaperCount > 0)
             index = filteredWallpaperPaths.indexOf(currentWallpaper);
-        currentPage = index >= 0 ? Math.floor(index / itemsPerPage) : currentPage;
-        gridIndex = index >= 0 ? index % itemsPerPage : 0;
+        const page = index >= 0 ? Math.floor(index / itemsPerPage) : currentPage;
+        const cell = index >= 0 ? index % itemsPerPage : 0;
         updateSelectedFileName();
+        if (page === currentPage && cell === gridIndex) {
+            enableAnimation = true;
+            return;
+        }
+        enableAnimation = false;
+        currentPage = page;
+        gridIndex = cell;
         Qt.callLater(() => {
             enableAnimation = true;
         });

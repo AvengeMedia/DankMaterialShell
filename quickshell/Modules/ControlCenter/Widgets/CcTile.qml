@@ -21,25 +21,30 @@ Item {
     property real rows: 1
     property bool compact: columns <= 2 && rows === 1
     property bool small: false
-    readonly property real bodyInset: small ? Math.max(0, (Math.min(width, height) - CcMetrics.iconBoxSize) / 2) : 0
-    readonly property real bodyWidth: width - bodyInset * 2
+    property bool docked: false
+    property string dockedText: title
+    readonly property real bodyInset: small ? Math.max(0, (height - CcMetrics.iconBoxSize) / 2) : 0
     readonly property real bodyHeight: height - bodyInset * 2
     property bool toggle: !opensPage
     property Component expandedContent: null
     // Replaces the icon and labels inside the body; the chrome, focus and activation stay.
     property Component bodyContent: null
+    property Component iconContent: null
     property real expandedMinimumHeight: Theme.listItemHeight
     readonly property Item expandedItem: expandedLoader.item
     readonly property bool expanded: expandedContent !== null && width >= CcMetrics.expandedTileMinWidth && height >= headerHeight + expandedMinimumHeight + tilePadding * 2 + Theme.spacingM
     readonly property real tilePadding: tall && !narrow ? Theme.spacingM : Theme.spacingS
-    readonly property real baseIconExtent: Math.min(Math.max(Theme.minimumTouchTargetSize, CcMetrics.iconBoxSize), bodyHeight - tilePadding * 2, bodyWidth - tilePadding * 2)
+    readonly property real baseIconExtent: Math.min(Math.max(Theme.minimumTouchTargetSize, CcMetrics.iconBoxSize), bodyHeight - tilePadding * 2, width - tilePadding * 2)
     readonly property real iconExtent: stacked ? Math.max(0, Math.min(baseIconExtent, height - tilePadding * 2 - Theme.spacingS - titleLabel.implicitHeight)) : baseIconExtent
     readonly property real headerHeight: Math.max(baseIconExtent, Theme.fontSizeLarge + Theme.fontSizeMedium + Theme.spacingS)
     readonly property bool stacked: tall && !expanded && width <= height
     readonly property bool narrow: width < CcMetrics.expandedTileMinWidth
     readonly property bool denseText: narrow || small
     readonly property real labelHeight: titleLabel.implicitHeight + (showSubtitle ? Theme.spacingXXS + subtitleLabel.implicitHeight : 0)
-    readonly property bool showSubtitle: subtitle !== "" && (!stacked || height - tilePadding * 2 >= iconExtent + Theme.spacingS + titleLabel.implicitHeight + Theme.spacingXXS + subtitleLabel.implicitHeight)
+    readonly property real chevronRoom: Theme.iconSizeSmall + Theme.spacingXS
+    readonly property bool showChevron: docked && !compact && (opensPage || showExpand) && titleLabel.implicitWidth + chevronRoom <= width - tilePadding * 2 - baseIconExtent - textGap
+    readonly property real textGap: docked ? Theme.spacingS : CcMetrics.tileTextGap
+    readonly property bool showSubtitle: subtitle !== "" && !docked && (!stacked || height - tilePadding * 2 >= iconExtent + Theme.spacingS + titleLabel.implicitHeight + Theme.spacingXXS + subtitleLabel.implicitHeight)
     property bool showExpand: false
     property bool opensPage: false
     property color restIconColor: CcMetrics.tileInactiveIcon
@@ -57,8 +62,8 @@ Item {
     readonly property bool showsActive: active && interactive
     readonly property real restRadius: {
         if (showsActive)
-            return Math.min(CcMetrics.tileActiveRadius, bodyWidth / 2, bodyHeight / 2);
-        return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(bodyWidth, bodyHeight);
+            return Math.min(CcMetrics.tileActiveRadius, width / 2, bodyHeight / 2);
+        return tall ? Math.min(CcMetrics.tallTileRadius, width / 2, height / 2) : Theme.fullRadius(width, bodyHeight);
     }
     property bool acceptsInput: interactive && enabled
     readonly property bool bodyActive: showsActive && !hasIconBox
@@ -90,7 +95,7 @@ Item {
         return showsActive ? CcMetrics.tileActiveColor : CcMetrics.iconBoxInactiveColor;
     }
 
-    property real bodyRadius: bodyLayer.pressed ? Math.min(Theme.cornerRadiusM, bodyWidth / 2, bodyHeight / 2) : restRadius
+    property real bodyRadius: bodyLayer.pressed ? Math.min(Theme.cornerRadiusM, width / 2, bodyHeight / 2) : restRadius
     property real iconBoxRadius: {
         if (boxLayer.pressed)
             return Math.min(Theme.cornerRadiusS, CcMetrics.iconBoxSize / 2);
@@ -158,7 +163,8 @@ Item {
         id: body
 
         anchors.fill: parent
-        anchors.margins: root.bodyInset
+        anchors.topMargin: root.bodyInset
+        anchors.bottomMargin: root.bodyInset
         radius: root.bodyRadius
         color: root.bodyColor
         border.width: Theme.layerOutlineWidth
@@ -181,7 +187,7 @@ Item {
             stateColor: root.contentColor
             cornerRadius: root.bodyRadius
             acceptedButtons: Qt.LeftButton | Qt.RightButton
-            tooltipText: root.compact ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
+            tooltipText: root.compact || root.docked ? [root.title, root.subtitle].filter(text => text !== "").join(" · ") : ""
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {
                     if (root.showExpand || root.opensPage)
@@ -209,7 +215,7 @@ Item {
             color: root.iconColor
             filled: root.showsActive
             rotation: root.iconRotation
-            visible: root.compact && root.bodyContent === null
+            visible: root.compact && root.bodyContent === null && root.iconContent === null
 
             DankBlink {
                 target: compactIcon
@@ -218,6 +224,13 @@ Item {
         }
 
         Loader {
+            anchors.centerIn: parent
+            active: root.compact && root.bodyContent === null && root.iconContent !== null
+            sourceComponent: root.iconContent
+        }
+
+        Loader {
+            id: bodyLoader
             anchors.fill: parent
             active: root.bodyContent !== null
             sourceComponent: root.bodyContent
@@ -277,11 +290,18 @@ Item {
                     color: root.iconColor
                     filled: root.showsActive
                     rotation: root.iconRotation
+                    visible: root.iconContent === null
 
                     DankBlink {
                         target: tileIcon
                         running: root.iconBlinking && !root.compact && root.visible && root.live
                     }
+                }
+
+                Loader {
+                    anchors.centerIn: parent
+                    active: root.iconContent !== null && !root.compact
+                    sourceComponent: root.iconContent
                 }
 
                 StateLayer {
@@ -303,7 +323,7 @@ Item {
             Loader {
                 id: meterLoader
                 anchors.left: iconBox.right
-                anchors.leftMargin: CcMetrics.tileTextGap
+                anchors.leftMargin: root.textGap
                 anchors.right: parent.right
                 y: iconBox.y
                 height: iconBox.height
@@ -314,8 +334,8 @@ Item {
             Item {
                 id: labels
                 objectName: "tileLabels"
-                x: root.stacked || root.LayoutMirroring.enabled ? 0 : root.baseIconExtent + CcMetrics.tileTextGap
-                width: root.stacked ? parent.width : Math.max(0, parent.width - root.baseIconExtent - CcMetrics.tileTextGap)
+                x: root.stacked || root.LayoutMirroring.enabled ? 0 : root.baseIconExtent + root.textGap
+                width: root.stacked ? parent.width : Math.max(0, parent.width - root.baseIconExtent - root.textGap - (root.showChevron ? root.chevronRoom : 0))
                 y: root.stacked ? iconBox.y + iconBox.height + Theme.spacingS : root.expanded ? (root.headerHeight - height) / 2 : (parent.height - height) / 2
                 height: root.labelHeight
 
@@ -323,7 +343,7 @@ Item {
                     id: titleLabel
                     objectName: "tileTitle"
                     width: parent.width
-                    text: root.title
+                    text: root.docked ? root.dockedText : root.title
                     color: root.contentColor
                     font.pixelSize: root.denseText ? Theme.fontSizeMedium : Theme.fontSizeLarge
                     font.weight: Theme.fontWeightMedium
@@ -348,6 +368,17 @@ Item {
                 }
             }
 
+            DankIcon {
+                id: chevron
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+                name: I18n.isRtl ? "chevron_left" : "chevron_right"
+                size: Theme.iconSizeSmall
+                color: root.subtitleColor
+                visible: root.showChevron
+            }
+
             Loader {
                 id: expandedLoader
                 objectName: "tileExpandedContent"
@@ -367,5 +398,12 @@ Item {
         property: "tile"
         value: root
         when: expandedLoader.item !== null && "tile" in expandedLoader.item
+    }
+
+    Binding {
+        target: bodyLoader.item
+        property: "tile"
+        value: root
+        when: bodyLoader.item !== null && "tile" in bodyLoader.item
     }
 }

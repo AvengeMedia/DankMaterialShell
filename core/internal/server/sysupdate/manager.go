@@ -430,7 +430,7 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 	}()
 
 	if opts.CustomCommand != "" {
-		m.runCustomUpgrade(ctx, opts)
+		m.runCustomUpgrade(ctx, opts.CustomCommand, "DMS — System Update (custom)", opts)
 		return
 	}
 
@@ -443,6 +443,16 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 		opts.Ignored = dropPacmanRepoIgnores(opts.Ignored, opts.Targets)
 	}
 	opts.Targets = dropIgnoredTargets(opts.Targets, opts.Ignored)
+
+	if opts.Interactive {
+		exe, err := os.Executable()
+		if err != nil {
+			m.setError(ErrCodeBackendFailed, err.Error())
+			return
+		}
+		m.runCustomUpgrade(ctx, interactiveUpgradeCommand(exe, opts), "DMS — System Update", opts)
+		return
+	}
 
 	backends := upgradeBackends(m.selection, opts)
 	if len(backends) == 0 {
@@ -486,7 +496,7 @@ func (m *Manager) runUpgrade(ctx context.Context, opts UpgradeOptions) {
 	m.finishSuccessfulUpgrade(true, opts.Targets)
 }
 
-func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
+func (m *Manager) runCustomUpgrade(ctx context.Context, command, title string, opts UpgradeOptions) {
 	term := findTerminal(opts.Terminal)
 	if term == "" {
 		m.setError(ErrCodeBackendFailed, "no terminal found (pick one in DMS settings, set $TERMINAL, or install kitty/ghostty/foot/alacritty)")
@@ -504,7 +514,7 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
 	m.markDirty()
 
 	onLine := func(line string) { m.appendLog(line) }
-	argv := wrapInTerminal(term, "DMS — System Update (custom)", opts.CustomCommand, opts.TerminalArgs)
+	argv := wrapInTerminal(term, title, command, opts.TerminalArgs)
 	if err := Run(ctx, argv, RunOptions{OnLine: onLine}); err != nil {
 		switch {
 		case errors.Is(ctx.Err(), context.DeadlineExceeded):
@@ -523,6 +533,20 @@ func (m *Manager) runCustomUpgrade(ctx context.Context, opts UpgradeOptions) {
 	m.mu.RUnlock()
 	m.finishSuccessfulUpgrade(false, installed)
 	m.runRefresh(context.Background(), false)
+}
+
+func interactiveUpgradeCommand(exe string, opts UpgradeOptions) string {
+	parts := []string{"'" + strings.ReplaceAll(exe, "'", `'\''`) + "'", "system", "update", "--interactive"}
+	if !opts.IncludeFlatpak {
+		parts = append(parts, "--no-flatpak")
+	}
+	if !opts.IncludeAUR {
+		parts = append(parts, "--no-aur")
+	}
+	if ignored := shellSafeNames(opts.Ignored); len(ignored) > 0 {
+		parts = append(parts, "--ignore", strings.Join(ignored, ","))
+	}
+	return strings.Join(parts, " ")
 }
 
 func (m *Manager) failCustomUpgrade(code ErrorCode, err error) {

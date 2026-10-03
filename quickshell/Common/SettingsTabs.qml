@@ -249,6 +249,14 @@ Singleton {
             "hint": I18n.tr("Volume, brightness, caps lock, position")
         },
         {
+            "id": "wellbeing",
+            "text": I18n.tr("Digital wellbeing"),
+            "icon": "digital_wellbeing",
+            "tabIndex": 67,
+            "aliases": ["screen_time"],
+            "hint": I18n.tr("Screen time and app limits")
+        },
+        {
             "id": "sound_media",
             "text": I18n.tr("Sound & media"),
             "icon": "volume_up",

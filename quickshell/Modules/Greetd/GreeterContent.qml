@@ -627,6 +627,8 @@ Item {
     DankBackdrop {
         anchors.fill: parent
         screenName: root.screenName
+        blur: Theme.lockScreenBlur
+        blurMax: Theme.lockScreenBlurMax
         visible: root.wallpaperSource === "" || wallpaperBackground.status === Image.Error
     }
 

@@ -355,7 +355,7 @@ Item {
                 title: I18n.tr("Weather")
                 checked: SettingsData.lockScreenShowWeather
                 onToggled: checked => SettingsData.set("lockScreenShowWeather", checked)
-                onNavigated: root.parentModal?.navigateTo("weather")
+                onNavigated: keyboard => root.parentModal?.navigateTo("weather", keyboard)
             }
 
             SettingsDropdownRow {
@@ -605,9 +605,8 @@ Item {
                         id: securityKeyCapture
                         width: 200
                         anchors.verticalCenter: parent.verticalCenter
-                        focus: capturing
                         text: capturing ? I18n.tr("Press key...", "lock screen security key shortcut key combination capture prompt") : SettingsData.lockScreenSecurityKeyShortcut
-                        backgroundColor: capturing ? Theme.selectedContainer : Theme.chipSurface
+                        backgroundColor: capturing ? Theme.selectedContainer : SettingsMetrics.controlColor
                         textColor: Theme.surfaceText
 
                         property bool capturing: false
@@ -631,8 +630,14 @@ Item {
                                 startCapture();
                         }
 
-                        Keys.onPressed: event => {
-                            if (!securityKeyCapture.capturing)
+                        Keys.onPressed: event => captureKey(event)
+                        // Specific Tab handlers stop Qt focus traversal while capturing.
+                        Keys.onTabPressed: event => captureKey(event)
+                        Keys.onBacktabPressed: event => captureKey(event)
+
+                        function captureKey(event) {
+                            event.accepted = capturing;
+                            if (!capturing)
                                 return;
 
                             if (KeyUtils.isModifierKey(event.key))
@@ -640,7 +645,6 @@ Item {
 
                             if (event.key === Qt.Key_Escape) {
                                 securityKeyCapture.stopCapture();
-                                event.accepted = true;
                                 return;
                             }
 
@@ -708,30 +712,23 @@ Item {
                     const prefs = SettingsData.screenPreferences?.lockScreen;
                     return Array.isArray(prefs) && !prefs.includes("all") && prefs.length > 0;
                 }
+                clickable: true
+                onClicked: {
+                    if (!PopoutService.colorPickerModal)
+                        return;
+                    PopoutService.colorPickerModal.selectedColor = SettingsData.lockScreenInactiveColor;
+                    PopoutService.colorPickerModal.pickerTitle = I18n.tr("Inactive display color");
+                    PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                        SettingsData.set("lockScreenInactiveColor", selectedColor);
+                    };
+                    PopoutService.colorPickerModal.show();
+                }
 
-                Rectangle {
-                    width: Theme.iconButtonSize
-                    height: Theme.iconButtonSize
-                    radius: Theme.cornerRadius
-                    color: SettingsData.lockScreenInactiveColor
-                    border.color: Theme.outline
-                    border.width: Theme.outlineWidth
+                DankColorSwatch {
+                    width: Theme.iconSizeMedium
+                    height: width
+                    swatchColor: SettingsData.lockScreenInactiveColor
                     anchors.verticalCenter: parent.verticalCenter
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (!PopoutService.colorPickerModal)
-                                return;
-                            PopoutService.colorPickerModal.selectedColor = SettingsData.lockScreenInactiveColor;
-                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Inactive display color");
-                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                                SettingsData.set("lockScreenInactiveColor", selectedColor);
-                            };
-                            PopoutService.colorPickerModal.show();
-                        }
-                    }
                 }
             }
         }
@@ -805,28 +802,14 @@ Item {
                 }
             }
 
-            SettingsRow {
+            SettingsNoteRow {
                 visible: root.authValidateMessage !== ""
-                body: Rectangle {
-                    width: parent.width
-                    height: Math.min(160, authStatusText.implicitHeight + Theme.spacingM * 2)
-                    radius: Theme.cornerRadius
-                    color: Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: Theme.layerOutlineWidth
-
-                    StyledText {
-                        id: authStatusText
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingM
-                        text: root.authValidateMessage
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
-                        color: !root.authValidateOk ? Theme.error : (root.authValidateWarn ? Theme.warning : Theme.surfaceVariantText)
-                        wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
+                noteIconName: ""
+                monospace: true
+                maxHeight: SettingsMetrics.noteMaxHeight
+                text: root.authValidateMessage
+                tint: !root.authValidateOk ? Theme.error : (root.authValidateWarn ? Theme.warning : Theme.surfaceVariantText)
+                tintBackground: SettingsMetrics.controlColor
             }
 
             SettingsDropdownRow {
@@ -873,28 +856,14 @@ Item {
                 }
             }
 
-            SettingsRow {
+            SettingsNoteRow {
                 visible: !root.lockU2fControlledByPrimary && root.u2fValidateMessage !== ""
-                body: Rectangle {
-                    width: parent.width
-                    height: Math.min(160, u2fStatusText.implicitHeight + Theme.spacingM * 2)
-                    radius: Theme.cornerRadius
-                    color: Theme.floatingWindowFieldColor
-                    border.color: Theme.outlineMedium
-                    border.width: Theme.layerOutlineWidth
-
-                    StyledText {
-                        id: u2fStatusText
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingM
-                        text: root.u2fValidateMessage
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.family: "monospace"
-                        color: !root.u2fValidateOk ? Theme.error : (root.u2fValidateWarn ? Theme.warning : Theme.surfaceVariantText)
-                        wrapMode: Text.Wrap
-                        verticalAlignment: Text.AlignTop
-                    }
-                }
+                noteIconName: ""
+                monospace: true
+                maxHeight: SettingsMetrics.noteMaxHeight
+                text: root.u2fValidateMessage
+                tint: !root.u2fValidateOk ? Theme.error : (root.u2fValidateWarn ? Theme.warning : Theme.surfaceVariantText)
+                tintBackground: SettingsMetrics.controlColor
             }
 
             SettingsRow {

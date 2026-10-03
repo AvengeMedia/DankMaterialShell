@@ -120,6 +120,16 @@ test("frame overlays reserve once and every row retains its position", () => {
     assert.equal(resolve(configs, { effectiveFrameEnabled: true, effectiveConnected: true, framePreferences: [] }).instances[0].kind, "bar");
 });
 
+test("a hidden bar collapses its frame band to a reserved gutter outside the overview", () => {
+    for (const effectiveConnected of [false, true]) {
+        const options = { effectiveFrameEnabled: true, effectiveConnected };
+        const shown = resolve([bar("main")], options).edges.top;
+        const hidden = resolve([bar("main", 0, { visible: false })], options).edges.top;
+        assert.deepEqual([shown.frameReservation, shown.overviewFrameReservation], [48, 48]);
+        assert.deepEqual([hidden.frameReservation, hidden.frameExclusionEnabled, hidden.overviewFrameReservation], [12, true, 48]);
+    }
+});
+
 test("popup triggers preserve each edge and connected gap policy", () => {
     const config = { bottomGap: 8, popupGapsAuto: false, popupGapsManual: 6 };
     const expected = [{ x: 20, y: 58, width: 24 }, { x: 20, y: 1022, width: 24 }, { x: 50, y: 30, width: 24 }, { x: 1870, y: 30, width: 24 }];

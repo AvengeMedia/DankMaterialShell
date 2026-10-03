@@ -54,6 +54,7 @@ SettingsRow {
     }
 
     DankButtonGroup {
+        arrowKeysSelect: false
         id: buttonGroup
         parent: root.compact ? bodyHost : trailingHost
         x: root.compact ? (parent.width - width) / 2 : 0

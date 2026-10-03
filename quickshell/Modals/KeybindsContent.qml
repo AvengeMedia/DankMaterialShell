@@ -481,7 +481,8 @@ FocusScope {
 
     Item {
         anchors.fill: parent
-        anchors.margins: Theme.spacingL
+        anchors.margins: Theme.windowInset
+        anchors.topMargin: 0
 
         // Sidebar
         Item {
@@ -590,15 +591,6 @@ FocusScope {
                         }
                     }
 
-                    // Divider between All and specific categories
-                    Rectangle {
-                        width: sidebarCol.width - Theme.spacingS * 2
-                        height: Theme.dividerWidth
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        color: Theme.outlineVariant
-                        opacity: 0.3
-                    }
-
                     // Category Tabs
                     Repeater {
                         model: content.dataModel.sortedKeys
@@ -656,23 +648,11 @@ FocusScope {
             }
         }
 
-        // Vertical Divider between Sidebar and Main Content
-        Rectangle {
-            id: vDivider
-            anchors.left: sidebar.right
-            anchors.leftMargin: Theme.spacingM
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            width: Theme.dividerWidth
-            color: Theme.outlineVariant
-            opacity: 0.4
-        }
-
         // Main Content Area
         Item {
             id: mainArea
-            anchors.left: vDivider.right
-            anchors.leftMargin: Theme.spacingM
+            anchors.left: sidebar.right
+            anchors.leftMargin: Theme.spacingL
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -717,13 +697,6 @@ FocusScope {
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: Theme.fontWeightMedium
                                     color: Theme.primary
-                                }
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    height: Theme.dividerWidth
-                                    color: Theme.outlineVariant
-                                    opacity: 0.3
                                 }
                             }
 

@@ -74,6 +74,7 @@ Singleton {
     signal locationStateUpdate(var data)
     signal sysupdateStateUpdate(var data)
     signal tailscaleStateUpdate(var data)
+    signal wellbeingStateUpdate(var data)
     signal filesEvent(var data)
 
     property bool capsLockState: false
@@ -351,6 +352,8 @@ Singleton {
             sysupdateStateUpdate(data);
         } else if (service === "tailscale") {
             tailscaleStateUpdate(data);
+        } else if (service === "wellbeing") {
+            wellbeingStateUpdate(data);
         } else if (service === "files") {
             filesEvent(data);
         }

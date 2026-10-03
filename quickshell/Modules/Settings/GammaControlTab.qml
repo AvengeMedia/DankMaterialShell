@@ -19,9 +19,9 @@ Item {
         width: (parent.width - Theme.spacingM) / 2
         height: tileColumn.implicitHeight + Theme.spacingM * 2
         radius: Theme.cornerRadius
-        color: Theme.floatingWindowNestedSurface
-        border.color: Theme.outlineMedium
-        border.width: Theme.layerOutlineWidth
+        color: SettingsMetrics.controlColor
+        border.color: Theme.floatingWindowFieldBorderColor
+        border.width: Theme.outlineWidth
 
         Column {
             id: tileColumn

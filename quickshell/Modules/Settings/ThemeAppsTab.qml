@@ -46,33 +46,10 @@ Item {
     SettingsPage {
         id: mainColumn
 
-        Rectangle {
-            width: parent.width
-            height: warningText.implicitHeight + Theme.spacingM * 2
-            radius: Theme.cornerRadius
-            color: Theme.warningHover
-
-            Row {
-                anchors.fill: parent
-                anchors.margins: Theme.spacingM
-                spacing: Theme.spacingM
-
-                DankIcon {
-                    name: "info"
-                    size: Theme.iconSizeSmall
-                    color: Theme.warning
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    id: warningText
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).")
-                    wrapMode: Text.WordWrap
-                    width: parent.width - Theme.iconSizeSmall - Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+        SettingsNoteRow {
+            paintBackground: false
+            noteIconName: "info"
+            text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf|qtengine/config.json and ~/.config/gtk-3.0|gtk-4.0).")
         }
 
         SettingsCard {
@@ -88,72 +65,22 @@ Item {
                     width: parent.width
                     spacing: Theme.spacingM
 
-                    Rectangle {
+                    DankButton {
                         width: (parent.width - Theme.spacingM) / 2
-                        height: 48
-                        radius: Theme.cornerRadius
-                        color: Theme.primaryHover
-
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "settings"
-                                size: 16
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Apply GTK colors")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.primary
-                                font.weight: Theme.fontWeightMedium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Theme.applyGtkColors()
-                        }
+                        iconName: "settings"
+                        text: I18n.tr("Apply GTK colors")
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        onClicked: Theme.applyGtkColors()
                     }
 
-                    Rectangle {
+                    DankButton {
                         width: (parent.width - Theme.spacingM) / 2
-                        height: 48
-                        radius: Theme.cornerRadius
-                        color: Theme.primaryHover
-
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingS
-
-                            DankIcon {
-                                name: "settings"
-                                size: 16
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Apply Qt colors")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.primary
-                                font.weight: Theme.fontWeightMedium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Theme.applyQtColors()
-                        }
+                        iconName: "settings"
+                        text: I18n.tr("Apply Qt colors")
+                        backgroundColor: Theme.secondaryContainer
+                        textColor: Theme.onSecondaryContainer
+                        onClicked: Theme.applyQtColors()
                     }
                 }
             }

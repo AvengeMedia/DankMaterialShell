@@ -174,6 +174,8 @@ func TestHUDGlyphsCoverage(t *testing.T) {
 		"Space/Enter",
 		"capture",
 		"Drag+Release",
+		"Ctrl+C",
+		"copy",
 		"Ctrl",
 		"resize/move",
 		"P",

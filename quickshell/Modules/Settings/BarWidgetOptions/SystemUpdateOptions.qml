@@ -25,7 +25,7 @@ Column {
             iconName: "system_update_alt"
             title: I18n.tr("Software updates")
             hint: I18n.tr("DMS and system updates")
-            onClicked: root.page.parentModal?.navigateTo("updater")
+            onClicked: keyboard => root.page.parentModal?.navigateTo("updater", keyboard)
         }
     }
 }

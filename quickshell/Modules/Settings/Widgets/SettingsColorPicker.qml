@@ -47,7 +47,7 @@ SettingsRow {
                 width: (parent.width - Theme.spacingS * 2) / 3
                 height: Theme.listItemHeight + Theme.spacingXS
                 radius: Theme.cornerRadius
-                color: root.colorMode === modelData.id ? Theme.primarySelected : Theme.chipSurface
+                color: root.colorMode === modelData.id ? Theme.primarySelected : SettingsMetrics.controlColor
                 border.color: root.colorMode === modelData.id ? Theme.primary : Theme.withAlpha(Theme.primary, 0)
                 border.width: Theme.outlineWidthFocused
 

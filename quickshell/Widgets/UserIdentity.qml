@@ -100,6 +100,7 @@ Item {
             color: root.contentColor
             horizontalAlignment: Text.AlignLeft
             elide: Text.ElideRight
+            maximumLineCount: 1
             Accessible.ignored: true
         }
 

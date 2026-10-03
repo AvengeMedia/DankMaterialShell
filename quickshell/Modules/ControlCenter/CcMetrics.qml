@@ -55,10 +55,9 @@ Singleton {
     readonly property real tallMeterThickness: 28
     readonly property real tileTextGap: Theme.spacingM
     readonly property real footerHeight: iconBoxSize
-    readonly property real footerGap: Theme.spacingM
+    readonly property real footerGap: Theme.spacingS
     readonly property real runningAppsIconSize: Theme.iconSize * iconScale
-    readonly property int runningAppsMaxIcons: 3
-    // Small tile body height as a fraction of a row; the resize corner snaps to the nearer of this and a full row.
+    // The resize corner counts a small tile as this many rows and snaps to the nearer of this and a full row.
     readonly property real smallRowFraction: 0.5
     readonly property real shapeButtonSize: Theme.iconSize
 
@@ -121,10 +120,6 @@ Singleton {
     readonly property color tileInactiveContent: Theme.surfaceText
     readonly property color tileInactiveSubtitle: Theme.surfaceVariantText
     readonly property color tileInactiveIcon: Theme.primary
-
-    function actionIconColor(id) {
-        return id === "power" ? Theme.error : tileInactiveIcon;
-    }
 
     readonly property bool animationsEnabled: !SettingsData.reduceMotion && Theme.currentAnimationSpeed !== SettingsData.AnimationSpeed.None
 

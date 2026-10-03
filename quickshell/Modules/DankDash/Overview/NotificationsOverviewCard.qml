@@ -24,6 +24,7 @@ Card {
         live: root.live
         interactive: root.interactive
         nested: true
+        swipeBleed: root.pad
         transientSurfaceTracker: root.transientSurfaceTracker
     }
 }
