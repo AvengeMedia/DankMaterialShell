@@ -31,6 +31,10 @@ Singleton {
     readonly property bool genericPowerBackend: compositorDetected && !isNiri && !isHyprland && !isMango && !isSway && !isScroll && !isMiracle && !isLabwc && !isUmbriel
     onGenericPowerBackendChanged: probeOutputPower()
 
+    readonly property bool inOverview: (isHyprland && HyprlandService.inOverview) ||
+                                       (isNiri && NiriService.inOverview) ||
+                                       (isMango && MangoService.inOverview)
+
     function probeOutputPower() {
         outputPowerAvailable = false;
         if (!genericPowerBackend)

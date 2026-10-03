@@ -1549,6 +1549,12 @@ var LOCAL_SPEC = {
     },
     frameBarInsetPadding: {
         def: -1
+    },
+    nightModeExcludeFullscreen: {
+        def: false
+    },
+    nightModeExcludedApps: {
+        def: []
     }
 };
 
