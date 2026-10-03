@@ -504,6 +504,7 @@ Singleton {
         };
 
         policy.bypassDnd = rules.some(rule => rule.bypassDnd === true && _matchesNotificationRule(rule, info));
+        policy.disablePopup = rules.some(rule => (rule.action || "default").toString().toLowerCase() === "mute" && _matchesNotificationRule(rule, info));
 
         for (const rule of rules) {
             if (!_matchesNotificationRule(rule, info))
@@ -513,9 +514,6 @@ Singleton {
             switch (action) {
             case "ignore":
                 policy.drop = true;
-                break;
-            case "mute":
-                policy.disablePopup = true;
                 break;
             case "popup_only":
                 policy.hideFromCenter = true;
