@@ -898,7 +898,7 @@ DankDialog {
             visible: root.cornerRadiusOn
             text: I18n.tr("Corner radius")
             value: root.cornerRadiusValue
-            maximum: 24
+            maximum: 20
             unit: "px"
             enabled: root.fieldsEnabled
             onSliderValueChanged: newValue => root.cornerRadiusValue = newValue
