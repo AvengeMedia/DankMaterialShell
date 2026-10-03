@@ -144,6 +144,10 @@ var LOCAL_SPEC = {
         def: false,
         onChange: "updateCompositorLayout"
     },
+    hyprlandWindowOpacity: {
+        def: 100,
+        onChange: "updateCompositorLayout"
+    },
     hyprlandTilingLayout: {
         def: "",
         onChange: "updateCompositorLayout"

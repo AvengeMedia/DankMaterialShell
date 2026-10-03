@@ -12889,6 +12889,21 @@
     "conditionKey": "layoutCapable"
   },
   {
+    "section": "hyprlandWindowOpacity",
+    "label": "Window opacity",
+    "tabIndex": 37,
+    "category": "System & integrations",
+    "keywords": [
+      "hyprland",
+      "integrations",
+      "opacity",
+      "system",
+      "transparency",
+      "window"
+    ],
+    "conditionKey": "layoutCapable"
+  },
+  {
     "section": "hyprlandLayoutXrayEnabled",
     "label": "Xray blur",
     "tabIndex": 37,

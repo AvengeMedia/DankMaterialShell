@@ -17,6 +17,7 @@ DankDialog {
     readonly property bool isHyprland: CompositorService.isHyprland
     readonly property bool isMango: CompositorService.isMango
     readonly property bool fieldsEnabled: !submitting
+    readonly property bool halfPair: isHyprland && (!!moveXInput.text.trim() !== !!moveYInput.text.trim() || !!sizeWInput.text.trim() !== !!sizeHInput.text.trim())
 
     property int floatingTri: 0
     property var openingFlags: []
@@ -160,7 +161,7 @@ DankDialog {
     surfaceColor: Theme.hostSurface
     title: isEditMode ? I18n.tr("Edit Window Rule") : I18n.tr("New Window Rule")
     closeEnabled: !submitting
-    acceptEnabled: !submitting
+    acceptEnabled: !submitting && !halfPair
     onAccepted: submit()
 
     ListModel {
@@ -401,9 +402,9 @@ DankDialog {
             actions.openFullscreen = true;
         if (has("focus") && isNiri)
             actions.openFocused = true;
-        if (outputInput.text.trim())
+        if (isNiri && outputInput.text.trim())
             actions.openOnOutput = outputInput.text.trim();
-        if (workspaceInput.text.trim())
+        if (isNiri && workspaceInput.text.trim())
             actions.openOnWorkspace = workspaceInput.text.trim();
         if (cornerRadiusOn)
             actions.cornerRadius = cornerRadiusValue;
@@ -412,14 +413,16 @@ DankDialog {
         const maxW = parseInt(maxWidthInput.text);
         const minH = parseInt(minHeightInput.text);
         const maxH = parseInt(maxHeightInput.text);
-        if (!isNaN(minW))
-            actions.minWidth = minW;
-        if (!isNaN(maxW))
-            actions.maxWidth = maxW;
-        if (!isNaN(minH))
-            actions.minHeight = minH;
-        if (!isNaN(maxH))
-            actions.maxHeight = maxH;
+        if (isNiri) {
+            if (!isNaN(minW))
+                actions.minWidth = minW;
+            if (!isNaN(maxW))
+                actions.maxWidth = maxW;
+            if (!isNaN(minH))
+                actions.minHeight = minH;
+            if (!isNaN(maxH))
+                actions.maxHeight = maxH;
+        }
 
         if (isNiri) {
             if (columnWidthInput.text.trim())
@@ -490,7 +493,7 @@ DankDialog {
     }
 
     function submit() {
-        if (submitting)
+        if (submitting || !acceptEnabled)
             return;
         const {
             matchCriteria,
@@ -516,10 +519,7 @@ DankDialog {
             root.submitting = false;
             if (exitCode !== 0)
                 return;
-            if (CompositorService.isNiri)
-                NiriService.validate();
-            if (CompositorService.isMango)
-                MangoService.reloadConfig();
+            CompositorService.reloadAfterWindowRuleWrite();
             root.ruleSubmitted();
         });
     }
@@ -606,7 +606,7 @@ DankDialog {
         onAccepted: root.submit()
     }
 
-    readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned, condInitialised]
+    readonly property var matchConditions: [condFloating, condActive, condFocused, condActiveInColumn, condCastTarget, condUrgent, condAtStartup, condXwayland, condFullscreen, condPinned]
 
     actions: [
         DankButton {
@@ -798,12 +798,6 @@ DankDialog {
                     label: I18n.tr("Pinned", "adjective, state of a pinned window, clipboard entry or item")
                     visible: root.isHyprland
                 }
-                MatchCond {
-                    id: condInitialised
-                    key: "initialised"
-                    label: I18n.tr("Initialised", "adjective, hyprland window rule match condition")
-                    visible: root.isHyprland
-                }
             }
         }
     }
@@ -836,7 +830,7 @@ DankDialog {
         }
 
         FieldRow {
-            visible: root.isNiri || root.isHyprland
+            visible: root.isNiri
 
             Field {
                 id: outputInput
@@ -904,7 +898,7 @@ DankDialog {
             visible: root.cornerRadiusOn
             text: I18n.tr("Corner radius")
             value: root.cornerRadiusValue
-            maximum: 24
+            maximum: 20
             unit: "px"
             enabled: root.fieldsEnabled
             onSliderValueChanged: newValue => root.cornerRadiusValue = newValue
@@ -1058,7 +1052,7 @@ DankDialog {
 
     SettingsCard {
         title: I18n.tr("Size Constraints")
-        visible: root.isNiri || root.isHyprland
+        visible: root.isNiri
 
         FieldRow {
             Field {
