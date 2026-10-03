@@ -931,7 +931,7 @@ DDialog {
             text: I18n.tr("Corner radius")
             checked: root.cornerRadiusOn
             value: root.cornerRadiusValue
-            maximum: 24
+            maximum: 20
             unit: "px"
             enabled: root.fieldsEnabled
             onToggled: checked => root.cornerRadiusOn = checked

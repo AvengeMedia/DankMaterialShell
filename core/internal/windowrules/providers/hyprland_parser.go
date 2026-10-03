@@ -547,7 +547,7 @@ func luaAppendActions(a windowrules.Actions, dst *[]string) {
 		*dst = append(*dst, fmt.Sprintf(`workspace = %s`, strconv.Quote(a.Workspace)))
 	}
 	if a.CornerRadius != nil && (a.NoRounding == nil || !*a.NoRounding) {
-		*dst = append(*dst, fmt.Sprintf(`rounding = %d`, *a.CornerRadius))
+		*dst = append(*dst, fmt.Sprintf(`rounding = %d`, min(*a.CornerRadius, 20)))
 	}
 	if a.Idleinhibit != "" {
 		*dst = append(*dst, fmt.Sprintf(`idle_inhibit = %s`, strconv.Quote(a.Idleinhibit)))

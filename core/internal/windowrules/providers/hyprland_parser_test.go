@@ -619,6 +619,18 @@ func TestFormatLuaManagedHyprRuleCornerRadiusWithoutNoRounding(t *testing.T) {
 	}
 }
 
+func TestFormatLuaManagedHyprRuleCornerRadiusCapped(t *testing.T) {
+	rule := windowrules.WindowRule{
+		ID:      "radius",
+		Enabled: true,
+		Actions: windowrules.Actions{CornerRadius: new(24)},
+	}
+	joined := strings.Join(formatLuaManagedHyprRule(rule), "\n")
+	if !strings.Contains(joined, "rounding = 20") {
+		t.Errorf("rounding not capped at 20:\n%s", joined)
+	}
+}
+
 func TestParseMatchLuaSpellings(t *testing.T) {
 	tests := []struct {
 		name         string
