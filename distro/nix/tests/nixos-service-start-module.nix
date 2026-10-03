@@ -6,7 +6,9 @@
 let
   fakeDms = pkgs.writeShellScriptBin "dms" ''
     printf '%s\n' "$@" > /tmp/dms-service-args
-    exec ${pkgs.coreutils}/bin/sleep 300
+    exec ${pkgs.dbus}/bin/dbus-test-tool echo \
+      --session \
+      --name=org.freedesktop.Notifications
   '';
 in
 pkgs.testers.runNixOSTest {
@@ -41,6 +43,8 @@ pkgs.testers.runNixOSTest {
 
     machine.succeed("systemctl --machine=danklinux@ --user start dms.service")
     machine.wait_until_succeeds("systemctl --machine=danklinux@ --user is-active dms.service")
+    machine.succeed("test $(systemctl --machine=danklinux@ --user show dms.service --property=Type --value) = dbus")
+    machine.succeed("test $(systemctl --machine=danklinux@ --user show dms.service --property=BusName --value) = org.freedesktop.Notifications")
     machine.wait_until_succeeds("test -f /tmp/dms-service-args")
     machine.succeed("grep -Fx run /tmp/dms-service-args")
     machine.succeed("grep -Fx -- --session /tmp/dms-service-args")
