@@ -74,13 +74,47 @@ func (b portageBackend) upgrade(ctx context.Context, opts UpgradeOptions, onLine
 		return nil
 	}
 
-	if len(opts.Targets) > 0 && hasPortageTarget(opts.Targets) {
+	if len(opts.Targets) > 0 && hasPortageTarget(opts.Targets) && !portageIsExcluded(opts) {
 		if err := runPortageFirst(ctx, opts, onLine); err != nil {
 			return err
 		}
 	}
 
-	return Run(ctx, privilegedArgv(opts, []string{"emerge", "--update", "--newuse", "--deep", "--quiet", "@world"}...), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+	return Run(ctx, portageUpgradeArgv(opts), RunOptions{OnLine: onLine, AttachStdio: opts.AttachStdio})
+}
+
+// emerge upgrades all of @world, so ignores are the only way to hold a package back
+func portageUpgradeArgv(opts UpgradeOptions) []string {
+	argv := []string{"emerge", "--update", "--newuse", "--deep", "--quiet"}
+	for _, atom := range portageExcludes(opts.Ignored) {
+		argv = append(argv, "--exclude", atom)
+	}
+	argv = append(argv, "@world")
+	return privilegedArgv(opts, argv...)
+}
+
+// Ignored names come from the parser as category/name, which shellSafeNames rejects for the '/'
+var portageAtom = regexp.MustCompile(`^[A-Za-z0-9+*][A-Za-z0-9+*_.-]*/[A-Za-z0-9+*][A-Za-z0-9+*_.-]*(?::[A-Za-z0-9+*_.-]+)?$`)
+
+func portageExcludes(names []string) []string {
+	out := make([]string, 0, len(names))
+	for _, n := range names {
+		if portageAtom.MatchString(n) {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
+// An ignored portage means the user holds it back, so the pre-update step must skip it too
+func portageIsExcluded(opts UpgradeOptions) bool {
+	for _, atom := range portageExcludes(opts.Ignored) {
+		pkg, _, _ := strings.Cut(atom, ":")
+		if isPortagePackage(pkg) {
+			return true
+		}
+	}
+	return false
 }
 
 func isPortagePackage(name string) bool {

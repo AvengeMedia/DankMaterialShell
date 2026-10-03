@@ -39,3 +39,23 @@ func TestPortageRepoLabelDefaultsToGentoo(t *testing.T) {
 		t.Errorf("portageRepoLabel(no repo) = %q, want %q", got, "gentoo (ebuild)")
 	}
 }
+
+func TestPortageIsExcluded(t *testing.T) {
+	tests := []struct {
+		name     string
+		ignored  []string
+		excluded bool
+	}{
+		{name: "no ignores", ignored: nil},
+		{name: "portage ignored", ignored: []string{"sys-apps/portage"}, excluded: true},
+		{name: "portage slot ignored", ignored: []string{"sys-apps/portage:0"}, excluded: true},
+		{name: "other package ignored", ignored: []string{"mail-client/thunderbird", "bad;name"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := portageIsExcluded(UpgradeOptions{Ignored: tt.ignored}); got != tt.excluded {
+				t.Fatalf("portageIsExcluded(%v) = %v, want %v", tt.ignored, got, tt.excluded)
+			}
+		})
+	}
+}

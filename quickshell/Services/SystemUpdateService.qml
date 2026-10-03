@@ -93,6 +93,10 @@ Singleton {
         return systemHoldsAllowed || pkg.repo !== "system";
     }
 
+    function isValidIgnoredName(name) {
+        return /^[A-Za-z0-9@._+:\/-]+$/.test(name);
+    }
+
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
