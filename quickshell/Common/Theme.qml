@@ -1788,6 +1788,12 @@ Singleton {
         if (typeof SettingsData !== "undefined" && SettingsData.terminalsAlwaysDark) {
             args.push("--terminals-always-dark");
         }
+        if (typeof SettingsData !== "undefined" && SettingsData.terminalOpacity < 100) {
+            args.push("--terminal-opacity", SettingsData.terminalOpacity.toString());
+        }
+        if (typeof SettingsData !== "undefined" && SettingsData.terminalPalette !== "default") {
+            args.push("--terminal-palette", SettingsData.terminalPalette);
+        }
         if (typeof SettingsData !== "undefined" && SettingsData.matugenContrast !== 0) {
             args.push("--contrast", SettingsData.matugenContrast.toString());
         }
