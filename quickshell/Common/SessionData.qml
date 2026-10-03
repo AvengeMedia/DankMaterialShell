@@ -849,7 +849,55 @@ Singleton {
         setDoNotDisturb(true, 0, "screenshare");
     }
 
-    function setWallpaper(imagePath) {
+    readonly property var liveWallpaperExtensions: [".mp4", ".webm", ".mkv", ".mov", ".m4v"]
+
+    // The video that is playing, if any: DMS remembers the still frame it takes
+    // the palette from, so it cannot tell on its own.
+    property string liveWallpaperPath: ""
+
+    readonly property string liveWallpaperFrame: Paths.strip(Paths.cache) + "/wallpapers/live-frame.jpg"
+
+    function isLiveWallpaper(path) {
+        const lower = String(path || "").toLowerCase();
+        return liveWallpaperExtensions.some(ext => lower.endsWith(ext));
+    }
+
+    // One frame is enough: matugen cannot read a video, and mpvpaper draws the
+    // moving picture on top anyway.
+    Process {
+        id: liveWallpaperFrameExtractor
+
+        property string videoPath: ""
+
+        command: ["ffmpeg", "-y", "-ss", "1", "-i", videoPath, "-frames:v", "1", SessionData.liveWallpaperFrame]
+        onExited: code => {
+            if (code === 0)
+                SessionData.applyWallpaperPath(SessionData.liveWallpaperFrame);
+        }
+    }
+
+    Process {
+        id: liveWallpaperPlayer
+
+        property string videoPath: ""
+
+        command: ["mpvpaper", "-o", "loop-file=inf no-audio hwdec=auto panscan=1.0", "*", videoPath]
+        onExited: liveWallpaperPath = ""
+    }
+
+    function setWallpaperLive(videoPath) {
+        liveWallpaperPath = videoPath;
+        liveWallpaperPlayer.videoPath = videoPath;
+        liveWallpaperPlayer.running = false;
+        liveWallpaperPlayer.running = true;
+        liveWallpaperFrameExtractor.videoPath = videoPath;
+        liveWallpaperFrameExtractor.running = false;
+        liveWallpaperFrameExtractor.running = true;
+    }
+
+    // Kept separate from setWallpaper so the frame extraction can record the
+    // still without re-entering the branch that stops the player.
+    function applyWallpaperPath(imagePath) {
         wallpaperPath = imagePath;
         if (perModeWallpaper) {
             if (isLightMode) {
@@ -863,6 +911,18 @@ Singleton {
         if (typeof Theme !== "undefined") {
             Theme.generateSystemThemesFromCurrentTheme();
         }
+    }
+
+    function setWallpaper(imagePath) {
+        if (isLiveWallpaper(imagePath)) {
+            setWallpaperLive(imagePath);
+            return;
+        }
+        if (liveWallpaperPath !== "") {
+            liveWallpaperPlayer.running = false;
+            liveWallpaperPath = "";
+        }
+        applyWallpaperPath(imagePath);
     }
 
     function setWallpaperColor(color) {
