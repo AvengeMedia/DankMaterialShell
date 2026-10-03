@@ -52,7 +52,8 @@ Item {
         PopoutService.closeNotificationCenter();
     }
 
-    function openContextMenu(item, x, y) {
+    function openContextMenu(item, notification) {
+        contextActions.notification = notification;
         notificationCardContextMenu.popupAnchorItem = item;
         notificationCardContextMenu.showDropdownMenu();
     }
@@ -109,7 +110,7 @@ Item {
             }
             root.invokeAction(contextActions.defaultAction(notificationData));
         }
-        onContextMenuRequested: (x, y) => root.openContextMenu(collapsedCard, x, y)
+        onContextMenuRequested: (x, y) => root.openContextMenu(collapsedCard, collapsedCard.notificationData)
     }
 
     Column {
@@ -210,7 +211,7 @@ Item {
                     onDismissRequested: NotificationService.dismissNotification(row.modelData)
                     onActionRequested: action => root.invokeAction(action)
                     onBodyClicked: root.invokeAction(contextActions.defaultAction(notificationData))
-                    onContextMenuRequested: (x, y) => root.openContextMenu(message, x, y)
+                    onContextMenuRequested: (x, y) => root.openContextMenu(message, row.modelData)
                 }
 
                 SequentialAnimation {

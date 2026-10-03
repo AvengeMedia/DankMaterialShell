@@ -3221,10 +3221,11 @@ Singleton {
         if (!app && !desktop)
             return -1;
         return rules.findIndex(rule => {
-            if (!predicate(rule))
+            if (!predicate(rule) || (rule.matchType || "contains").toString().toLowerCase() !== "exact")
                 return false;
             const pattern = (rule.pattern || "").toString().toLowerCase();
-            return pattern !== "" && (pattern === app || pattern === desktop);
+            const value = !rule.field || rule.field === "appName" ? app : rule.field === "desktopEntry" ? desktop : "";
+            return pattern !== "" && pattern === value;
         });
     }
 
@@ -3242,20 +3243,31 @@ Singleton {
         saveSettings();
     }
 
-    function _removeAppRule(appName, desktopEntry, predicate) {
+    function _hasNoAction(rule) {
+        return (rule.action || "default").toString().toLowerCase() === "default";
+    }
+
+    // Edits the first enabled matching rule and drops it once it no longer does anything.
+    function _updateAppRule(appName, desktopEntry, predicate, changes) {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
-        const index = _appRuleIndex(rules, appName, desktopEntry, predicate);
+        const index = _appRuleIndex(rules, appName, desktopEntry, rule => rule.enabled !== false && predicate(rule));
         if (index === -1)
-            return;
-        rules.splice(index, 1);
+            return false;
+        const rule = Object.assign(rules[index], changes);
+        if (_hasNoAction(rule) && (rule.urgency || "default").toString().toLowerCase() === "default" && !_isDndBypassRule(rule))
+            rules.splice(index, 1);
         notificationRules = rules;
         saveSettings();
+        return true;
     }
 
     function addMuteRuleForApp(appName, desktopEntry) {
-        _addAppRule(appName, desktopEntry, {
-            action: "mute"
-        });
+        if (!_updateAppRule(appName, desktopEntry, _hasNoAction, {
+                action: "mute"
+            }))
+            _addAppRule(appName, desktopEntry, {
+                action: "mute"
+            });
     }
 
     function isAppMuted(appName, desktopEntry) {
@@ -3263,7 +3275,9 @@ Singleton {
     }
 
     function removeMuteRuleForApp(appName, desktopEntry) {
-        _removeAppRule(appName, desktopEntry, _isMuteRule);
+        _updateAppRule(appName, desktopEntry, _isMuteRule, {
+            action: "default"
+        });
     }
 
     function isAppDndBypassed(appName, desktopEntry) {
@@ -3272,14 +3286,19 @@ Singleton {
 
     function setAppDndBypass(appName, desktopEntry, enabled) {
         if (!enabled) {
-            _removeAppRule(appName, desktopEntry, _isDndBypassRule);
+            _updateAppRule(appName, desktopEntry, _isDndBypassRule, {
+                bypassDnd: false
+            });
             return;
         }
         if (isAppDndBypassed(appName, desktopEntry))
             return;
-        _addAppRule(appName, desktopEntry, {
-            bypassDnd: true
-        });
+        if (!_updateAppRule(appName, desktopEntry, () => true, {
+                bypassDnd: true
+            }))
+            _addAppRule(appName, desktopEntry, {
+                bypassDnd: true
+            });
     }
 
     function updateNotificationRule(index, ruleData) {

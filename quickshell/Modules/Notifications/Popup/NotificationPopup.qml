@@ -996,6 +996,7 @@ PanelWindow {
             appName: notificationData?.appName ?? ""
             desktopEntry: notificationData?.desktopEntry ?? ""
             dismissText: notificationCard.dismissText
+            notification: notificationData
             onAppMuted: {
                 if (notificationData && !win.exiting)
                     NotificationService.dismissNotification(notificationData);

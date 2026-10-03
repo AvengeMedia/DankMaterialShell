@@ -1,12 +1,16 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
+import "../../Common/htmlElide.js" as HtmlElide
 
 QtObject {
     id: root
     property string appName: ""
     property string desktopEntry: ""
     property string dismissText: I18n.tr("Dismiss")
+    property var notification: null
+    readonly property string copyText: [notification?.summary, notification?.body].map(text => HtmlElide.stripHtmlTags((text || "").replace(/<br\s*\/?>/gi, "\n")).trim()).filter(text => text).join("\n")
     readonly property bool isMuted: SettingsData.isAppMuted(appName, desktopEntry)
     readonly property bool isDndBypassed: SettingsData.isAppDndBypassed(appName, desktopEntry)
     signal dismissRequested
@@ -28,6 +32,13 @@ QtObject {
             label: isDndBypassed ? I18n.tr("Block %1 in Do Not Disturb", "notification menu action, %1 is the app name").arg(appName || I18n.tr("this app")) : I18n.tr("Allow %1 in Do Not Disturb", "notification menu action, %1 is the app name").arg(appName || I18n.tr("this app")),
             action: "dnd"
         },
+        ...(root.copyText ? [
+                {
+                    icon: "content_copy",
+                    label: I18n.tr("Copy"),
+                    action: "copy"
+                }
+            ] : []),
         {
             icon: "close",
             label: root.dismissText,
@@ -56,6 +67,10 @@ QtObject {
             return;
         case "dnd":
             SettingsData.setAppDndBypass(appName, desktopEntry, !isDndBypassed);
+            return;
+        case "copy":
+            Quickshell.execDetached([Proc.dmsBin, "cl", "copy", copyText]);
+            ToastService.showInfo(I18n.tr("Copied to clipboard"));
             return;
         case "dismiss":
             dismissRequested();
