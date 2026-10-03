@@ -50,7 +50,9 @@ Item {
             var section = sections[s];
             var sectionId = section.id;
 
-            if (!root._bottomSectionHeaderActive || s > 0) {
+            var isDmenuSection = sectionId === "dmenu" || sectionId.indexOf("dmenu:") === 0;
+            var showsHeader = !isDmenuSection || (section.title && section.title.length > 0);
+            if (showsHeader && (!root._bottomSectionHeaderActive || s > 0)) {
                 if (rows.length > 0) {
                     cumHeights.push(cumY);
                     rows.push({
@@ -85,8 +87,13 @@ Item {
                     var flatIdx = flatStartIndex + i;
                     indexMap[flatIdx] = rows.length;
                     cumHeights.push(cumY);
+                    var rowId = items[i].id;
+                    if (items[i].type === "dmenu") {
+                        var d = items[i].data;
+                        rowId += ":" + (d.checked ? 1 : 0) + (d.active ? 1 : 0) + (d.urgent ? 1 : 0);
+                    }
                     rows.push({
-                        _rowId: items[i].id,
+                        _rowId: rowId,
                         type: "list_item",
                         item: items[i],
                         flatIndex: flatIdx,

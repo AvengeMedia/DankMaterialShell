@@ -2,6 +2,50 @@
 
     .import "ControllerUtils.js" as Utils
 
+function transformDmenuItem(text, index, opts) {
+    opts = opts || {};
+    var markup = !!opts.markup;
+    var row = opts.row || null;
+    var display = (row && row.display) || text;
+    var icon = (row && row.icon) || "";
+    var nonSelectable = !!(row && row.nonSelectable);
+    var isHeader = !!(row && row.header);
+    return {
+        id: "dmenu-" + index,
+        type: "dmenu",
+        name: display,
+        subtitle: "",
+        icon: icon || (nonSelectable || isHeader ? "" : "chevron_right"),
+        iconType: icon ? "image" : "material",
+        section: "dmenu",
+        data: {
+            text: text,
+            index: index,
+            info: (row && row.info) || "",
+            meta: (row && row.meta) || "",
+            rowActive: !!(row && row.active),
+            rowUrgent: !!(row && row.urgent),
+            nonSelectable: !!(row && row.nonSelectable),
+            permanent: !!(row && row.permanent),
+            header: isHeader,
+            active: false,
+            urgent: false,
+            checked: false
+        },
+        keywords: (row && row.meta) ? [row.meta] : [],
+        actions: [],
+        primaryAction: {
+            name: "Select",
+            icon: "check",
+            action: "select"
+        },
+        _hName: markup ? display : "",
+        _hSub: "",
+        _hRich: markup,
+        _preScored: undefined
+    };
+}
+
 function transformApp(app, override, defaultActions, primaryActionLabel) {
     var appId = app.id || app.execString || app.exec || "";
 

@@ -9,6 +9,7 @@ DankSearchField {
     property bool showModes: false
     property string pluginName: ""
     property string pluginIcon: ""
+    property bool pluginIconVisible: true
     property bool flat: false
     readonly property var modes: [
         {
@@ -66,7 +67,7 @@ DankSearchField {
         id: pluginBadge
 
         Rectangle {
-            implicitWidth: pluginLabel.implicitWidth + Theme.chipIconSize + Theme.spacingS + Theme.spacingM * 2
+            implicitWidth: pluginLabel.implicitWidth + (root.pluginIconVisible ? Theme.chipIconSize + Theme.spacingS : 0) + Theme.spacingM * 2
             width: Math.min(implicitWidth, Math.max(0, root.width - root.contentPadding - LauncherMetrics.minSearchWidth - root.accessorySize - Theme.spacingS * 3))
             height: Theme.buttonHeightXS
             radius: Theme.fullRadius(width, height)
@@ -75,6 +76,7 @@ DankSearchField {
 
             DankIcon {
                 id: pluginIconGlyph
+                visible: root.pluginIconVisible
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
@@ -85,8 +87,8 @@ DankSearchField {
 
             StyledText {
                 id: pluginLabel
-                anchors.left: pluginIconGlyph.right
-                anchors.leftMargin: Theme.spacingS
+                anchors.left: root.pluginIconVisible ? pluginIconGlyph.right : parent.left
+                anchors.leftMargin: root.pluginIconVisible ? Theme.spacingS : Theme.spacingM
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter

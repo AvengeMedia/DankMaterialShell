@@ -33,6 +33,7 @@ func main() {
 		log.Fatal("This program should not be run as root. Exiting.")
 	}
 
+	os.Args = normalizeDmenuArgv(os.Args)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
