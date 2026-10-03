@@ -2,9 +2,9 @@ package sysupdate
 
 import (
 	"context"
-	"regexp"
 	"errors"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
