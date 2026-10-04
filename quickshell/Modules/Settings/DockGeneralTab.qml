@@ -120,7 +120,25 @@ Item {
             iconName: "edit"
             title: I18n.tr("Edit mode")
             settingKey: "dockEditMode"
-            tags: ["dock", "edit", "widgets", "right-click"]
+            tags: ["dock", "edit", "widgets", "right-click", "arrange"]
+
+            SettingsRow {
+                title: I18n.tr("Arrange dock items")
+                subtitle: I18n.tr("Enter edit mode on the dock to rearrange or remove items")
+
+                DankButton {
+                    text: I18n.tr("Edit dock")
+                    iconName: "edit"
+                    buttonHeight: Theme.buttonHeightS
+                    onClicked: {
+                        BarWidgetService.dockEditRequested(dock.selectedDockId);
+                        if (root.parentModal?.hide)
+                            root.parentModal.hide();
+                        else if (root.parentModal?.close)
+                            root.parentModal.close();
+                    }
+                }
+            }
 
             SettingsToggleRow {
                 settingKey: "dockEditOnRightClick"

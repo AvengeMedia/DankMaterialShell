@@ -417,14 +417,5 @@ DockContextMenuBase {
             }
         }
     }
-    DockTrashMenuItem {
-        visible: root.dockApps?.surfaceContext?.kind === "dock"
-        width: parent.width
-        text: I18n.tr("Edit widgets")
-        iconName: "edit"
-        onTriggered: {
-            root.dockApps.surfaceContext.host.editMode = true;
-            root.close();
-        }
-    }
 }
+
