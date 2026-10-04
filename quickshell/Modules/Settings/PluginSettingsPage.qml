@@ -243,7 +243,7 @@ FocusScope {
             SettingsRow {
                 iconName: "code"
                 title: I18n.tr("Plugin Source Code", "plugin settings page, plugin details")
-                subtitle: I18n.tr("Open the source code on Github", "plugin settings page, plugin details")
+                subtitle: I18n.tr("Opens %1", "plugin settings page, plugin details, %1 is the link to the plugin source code").arg(root.pluginRepo)
                 clickable: true
                 visible: root.pluginRepo !== undefined
                 onClicked: Qt.openUrlExternally(root.pluginRepo)
