@@ -63,7 +63,7 @@ FocusScope {
         let offset = startOffset ?? alignOffset;
         for (const index of order) {
             const scale = scales?.[index] ?? 1.0;
-            const extra = (scale - 1.0) * allocatedSizes[index] * expansionRatio;
+            const extra = scales ? (scale - 1.0) * allocatedSizes[index] * expansionRatio : 0;
             result[index] = offset + extra / 2;
             if (participating[index])
                 offset += allocatedSizes[index] + extra + spacing;
