@@ -9,7 +9,7 @@ import qs.Modules.Settings.Widgets
 
 FocusScope {
     id: root
-
+        
     property string pluginId: ""
     property var parentModal: null
     property bool isReloading: false
@@ -22,6 +22,7 @@ FocusScope {
     readonly property bool hasSettings: !!pluginData?.settings && !isDesktopPlugin
     readonly property bool isSystemPlugin: pluginData?.source === "system"
     readonly property string pluginName: pluginData?.name || pluginId
+    readonly property string pluginRepo: DMSService.installedPlugins.find(entry => entry.id === pluginId)?.repo
     readonly property string requiresDms: pluginData?.requires_dms || ""
     readonly property bool meetsRequirements: requiresDms ? PluginService.checkPluginCompatibility(requiresDms) : true
     readonly property var permissions: Array.isArray(pluginData?.permissions) ? pluginData.permissions : []
@@ -237,6 +238,21 @@ FocusScope {
             SettingsRow {
                 subtitle: root.pluginData?.description || ""
                 visible: subtitle !== ""
+            }
+            SettingsRow {
+                iconName: "code"
+                title: I18n.tr("Plugin Source Code", "plugin settings page, plugin details")
+                subtitle: I18n.tr("Open the source code on Github", "plugin settings page, plugin details")
+                clickable: true
+                visible: root.pluginRepo !== undefined
+                onClicked: Qt.openUrlExternally(root.pluginRepo)
+
+                DankIcon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    name: "open_in_browser"
+                    size: Theme.iconSizeMedium
+                    color: Theme.primary
+                }
             }
 
             SettingsRow {
