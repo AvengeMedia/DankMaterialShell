@@ -132,6 +132,16 @@ Item {
                         dock.setOption("magnificationProfile", "parabolic");
                 }
             }
+
+            SettingsToggleRow {
+                settingKey: "dockMagnificationExpand"
+                tags: ["dock", "zoom", "magnification", "expand", "displace", "shift"]
+                resetStore: dock
+                resetKeys: ["magnificationExpand"]
+                text: I18n.tr("Push neighboring icons", "dock setting: shift adjacent icons and expand dock to avoid overlap")
+                checked: dock.config?.magnificationExpand ?? false
+                onToggled: checked => dock.setOption("magnificationExpand", checked)
+            }
         }
 
         SettingsControlledBy {

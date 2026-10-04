@@ -16335,6 +16335,28 @@
     "parentLabel": "Dock"
   },
   {
+    "section": "dockMagnificationExpand",
+    "label": "Push neighboring icons",
+    "tabIndex": 58,
+    "category": "Appearance",
+    "keywords": [
+      "appearance",
+      "displace",
+      "dock",
+      "expand",
+      "icons",
+      "launcher bar",
+      "magnification",
+      "neighboring",
+      "panel",
+      "push",
+      "shift",
+      "taskbar",
+      "zoom"
+    ],
+    "parentLabel": "Dock"
+  },
+  {
     "section": "dockMagnificationScale",
     "label": "Scale",
     "tabIndex": 58,

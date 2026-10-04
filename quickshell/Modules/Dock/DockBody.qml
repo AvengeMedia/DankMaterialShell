@@ -768,11 +768,12 @@ FocusScope {
                     x: !dock.isVertical ? Math.round((parent.width - width + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Right ? parent.width - width - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
                     y: dock.isVertical ? Math.round((parent.height - height + dock.primaryStartInset - dock.primaryEndInset) / 2) : (dock.config.position === SettingsData.Position.Bottom ? parent.height - height - dockGeometry.bodyEdgeMargin : dockGeometry.bodyEdgeMargin)
 
-                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.preferredLength + dock.config.spacing * 2, dock.availablePrimary)
+                    readonly property real targetPrimary: dock.config.mode === "taskbar" ? dock.availablePrimary : Math.min(widgetStrip.preferredLength - widgetStrip.totalMagnificationExpansion + dock.config.spacing * 2, dock.availablePrimary)
                     readonly property real targetWidth: dock.isVertical ? dock.effectiveBarThickness + dock.expansionExtent : targetPrimary
                     readonly property real targetHeight: dock.isVertical ? targetPrimary : dock.effectiveBarThickness + dock.expansionExtent
-                    implicitWidth: surfaceMotion.currentWidth
-                    implicitHeight: surfaceMotion.currentHeight
+                    // Magnification expansion bypasses the spring so icons and background stay in sync
+                    implicitWidth: surfaceMotion.currentWidth + (dock.isVertical ? 0 : widgetStrip.totalMagnificationExpansion)
+                    implicitHeight: surfaceMotion.currentHeight + (dock.isVertical ? widgetStrip.totalMagnificationExpansion : 0)
                     width: implicitWidth
                     height: implicitHeight
 

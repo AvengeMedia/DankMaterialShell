@@ -45,6 +45,7 @@ BasePill {
             magnification: dockHosted && (surfaceContext?.config?.magnification ?? false),
             magnificationScale: dockHosted ? (surfaceContext?.config?.magnificationScale ?? 130) : 130,
             magnificationProfile: dockHosted ? (surfaceContext?.config?.magnificationProfile ?? "parabolic") : "parabolic",
+            magnificationExpand: dockHosted && (surfaceContext?.config?.magnificationExpand ?? false),
             iconSizePercentage: appOption("appsDockIconSizePercentage", 100)
         });
     }
