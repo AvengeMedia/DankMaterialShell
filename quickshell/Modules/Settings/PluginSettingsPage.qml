@@ -9,7 +9,7 @@ import qs.Modules.Settings.Widgets
 
 FocusScope {
     id: root
-        
+
     property string pluginId: ""
     property var parentModal: null
     property bool isReloading: false
@@ -239,6 +239,7 @@ FocusScope {
                 subtitle: root.pluginData?.description || ""
                 visible: subtitle !== ""
             }
+
             SettingsRow {
                 iconName: "code"
                 title: I18n.tr("Plugin Source Code", "plugin settings page, plugin details")
